@@ -36,7 +36,7 @@
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(SampleAttributeType.all.map { |t| [t.title, t.id] },
+                   options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id] },
                                       attribute_type_id),
                    :class => 'form-control'%>
   </td>

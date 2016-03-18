@@ -28,6 +28,14 @@ class SampleAttributeType < ActiveRecord::Base
     BASE_TYPE_AND_CHECKER_MAP.keys
   end
 
+  def self.default
+    primitive_string_types.first
+  end
+
+  def default?
+    self == self.class.default
+  end
+
   def validate_value?(value)
     check_value_against_base_type(value) && check_value_against_regular_expression(value)
   end

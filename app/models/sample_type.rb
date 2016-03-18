@@ -96,7 +96,7 @@ class SampleType < ActiveRecord::Base
   end
 
   def default_attribute_type
-    SampleAttributeType.primitive_string_types.first
+    SampleAttributeType.default
   end
 
   def validate_one_title_attribute_present
