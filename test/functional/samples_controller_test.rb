@@ -9,6 +9,7 @@ class SamplesControllerTest < ActionController::TestCase
     Factory(:sample,:policy=>Factory(:public_policy))
     get :index
     assert_response :success
+    assert_select '#samples-table table', count: 0
   end
 
   test 'new' do
@@ -336,6 +337,46 @@ class SamplesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(data_file)
     assert_not_empty flash[:error]
   end
+
+  test "should get table view for data file" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do # public
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
+    end
+    2.times do # private
+      Factory(:sample, sample_type: sample_type, policy: Factory(:private_policy), originating_data_file: data_file)
+    end
+
+    login_as(data_file.contributor)
+
+    get :index, data_file_id: data_file.id
+
+    assert_response :success
+
+    assert_select '#samples-table tbody tr', count: 3
+  end
+
+  test "should get table view for sample type" do
+    person = Factory(:person)
+    sample_type = Factory(:simple_sample_type)
+    2.times do # public
+      Factory(:sample, sample_type: sample_type, contributor: person, policy: Factory(:private_policy))
+    end
+    3.times do # private
+      Factory(:sample, sample_type: sample_type, policy: Factory(:private_policy))
+    end
+
+    login_as(person.user)
+
+    get :index, sample_type_id: sample_type.id
+
+    assert_response :success
+
+    assert_select '#samples-table tbody tr', count: 2
+  end
+
 
   private
 

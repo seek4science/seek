@@ -29,6 +29,14 @@ module Seek
                          polymorphic_path([@resource, @snapshot])
         end
         return
+      elsif controller_name == 'samples'
+        if @data_file
+          add_index_breadcrumb "data_files"
+          add_show_breadcrumb @data_file
+        elsif @sample_type
+          add_index_breadcrumb "sample_types"
+          add_show_breadcrumb @sample_type
+        end
       end
 
       #Index

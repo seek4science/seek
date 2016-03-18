@@ -4,12 +4,14 @@ class SamplesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::IndexPager
 
-  before_filter :find_assets, :only => [ :index ]
+  before_filter :find_index_assets, :only => :index
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview]
 
   before_filter :auth_to_create, :only=>[:new,:create]
   before_filter :find_and_authorize_data_file, :only => :extract_from_data_file
   before_filter :get_sample_type, :only => :extract_from_data_file
+
+  include Seek::BreadCrumbs
 
   def extract_from_data_file
     @rejected_samples = []
@@ -138,6 +140,26 @@ class SamplesController < ApplicationController
       respond_to do |format|
         format.html { redirect_to @data_file }
       end
+    end
+  end
+
+  def find_index_assets
+    if params[:data_file_id]
+      @data_file = DataFile.find(params[:data_file_id])
+
+      unless @data_file.can_view?
+        flash[:error] = "You are not authorize to view samples from this data file"
+        respond_to do |format|
+          format.html { redirect_to data_file_path(@data_file)}
+        end
+      end
+
+      @samples = Sample.authorize_asset_collection(@data_file.extracted_samples.all, 'view')
+    elsif params[:sample_type_id]
+      @sample_type = SampleType.find(params[:sample_type_id])
+      @samples = Sample.authorize_asset_collection(@sample_type.samples.all, 'view')
+    else
+      find_assets
     end
   end
 

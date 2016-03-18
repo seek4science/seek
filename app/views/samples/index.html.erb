@@ -1,3 +1,18 @@
 <%= index_title -%>
 
-<%= render :partial => "general/index_facets_or_paged" %>
+<% if @data_file || @sample_type %>
+    <% if @samples.any? %>
+        <div id="samples-table">
+          <%= render partial: "samples/table_view", locals: { samples: @samples }%>
+        </div>
+        <script>
+          $j(document).ready(function () {
+            Samples.initTable($j('#samples-table'));
+          });
+        </script>
+    <% else %>
+        <span class="none_text">No samples were extracted</span>
+    <% end %>
+<% else %>
+    <%= render partial: "general/index_facets_or_paged" %>
+<% end %>
