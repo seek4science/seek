@@ -1,5 +1,6 @@
 <% sample_type = samples.first.sample_type %>
 <% shown_attributes = sample_type.sample_attributes.includes(:sample_attribute_type) %>
+<% link ||= false %>
 
 <div data-role="seek-association-candidate-list">
   <div class="table-responsive">
@@ -22,7 +23,18 @@
               <td><%= sample.title %></td>
               <% shown_attributes.each do |attribute| %>
                   <td>
-                    <%= text_or_not_specified(sample.send(attribute.accessor_name), auto_link: true) %>
+                    <% case attribute.sample_attribute_type.base_type %>
+                    <% when 'Date' %>
+                        <%= Date.parse(sample.send(attribute.accessor_name)).strftime("%e %B %Y") %>
+                    <% when 'DateTime' %>
+                        <%= DateTime.parse(sample.send(attribute.accessor_name)).strftime("%e %B %Y %H:%M:%S") %>
+                    <% else %>
+                        <% if link && attribute.is_title %>
+                            <%= link_to(sample.send(attribute.accessor_name), sample) %>
+                        <% else %>
+                            <%= text_or_not_specified(sample.send(attribute.accessor_name), auto_link: link) %>
+                        <% end %>
+                    <% end %>
                   </td>
               <% end %>
           <% end %>
