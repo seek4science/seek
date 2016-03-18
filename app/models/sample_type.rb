@@ -90,7 +90,7 @@ class SampleType < ActiveRecord::Base
     []
   end
 
-  def tech_type_titles
+  def technology_type_titles
     []
   end
 
