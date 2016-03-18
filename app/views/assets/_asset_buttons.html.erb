@@ -6,7 +6,7 @@
 
 <% if asset.is_a?(DataFile) %>
     <% if asset.extracted_samples.any? %>
-        <%= button_link_to("View samples", 'view_samples', samples_path(data_file_id: asset.id)) %>
+        <%= button_link_to("View samples", 'view_samples', data_file_samples_path(asset)) %>
     <% end %>
     <% if (asset.can_manage? && display_asset.version == asset.version && asset.sample_template? && asset.extracted_samples.empty?) %>
         <%= button_link_to("Extract samples", 'extract_samples',
