@@ -1,5 +1,5 @@
 <% sample_type = samples.first.sample_type %>
-<% shown_attributes = sample_type.sample_attributes %>
+<% shown_attributes = sample_type.sample_attributes.includes(:sample_attribute_type) %>
 
 <div data-role="seek-association-candidate-list">
   <div class="table-responsive">
@@ -10,7 +10,7 @@
                 <th>ID</th>
                 <th>Title</th>
                 <% shown_attributes.each do |attribute| %>
-                    <th><%= attribute.title %></th>
+                    <th data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
                 <% end %>
               </tr>
           <% end %>
@@ -21,7 +21,9 @@
               <td><%= sample.id %></td>
               <td><%= sample.title %></td>
               <% shown_attributes.each do |attribute| %>
-                  <td><%= sample.send(attribute.accessor_name.to_sym) %></td>
+                  <td>
+                    <%= text_or_not_specified(sample.send(attribute.accessor_name), auto_link: true) %>
+                  </td>
               <% end %>
           <% end %>
       <% end %>

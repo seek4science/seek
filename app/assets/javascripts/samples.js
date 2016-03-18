@@ -19,6 +19,20 @@ Samples.initTable = function (selector, enableRowSelection) {
         }]
     };
 
+    var dateColumns = [];
+    $j('table thead th', selector).each(function (index, column) {
+        if($j(column).data('columnType') == 'Date' ||
+           $j(column).data('columnType') == 'DateTime') {
+            dateColumns.push(index);
+        }
+    });
+
+    if(dateColumns.length > 0)
+        options["columnDefs"].push({
+            "targets": dateColumns,
+            "type": "date"
+        });
+
     if(enableRowSelection) {
         $j.extend(options, options, {
             dom: '<"row"<"col-sm-6"l><"col-sm-6 text-right"B>>rtip', // Needed to place the buttons
