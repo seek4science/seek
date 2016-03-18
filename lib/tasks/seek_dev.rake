@@ -201,7 +201,7 @@ namespace :seek_dev do
   task :generate_logins, [:pwd] => :environment do |t,args|
     password = args.pwd
     Person.not_registered.each do |person|
-      login = "#{person.first_name[0]}#{person.last_name}".downcase
+      login = "#{person.first_name[0]}#{person.last_name}".downcase.gsub(' ','')
       person.create_user login: login, password: password, password_confirmation: password
       person.user.activate
     end
