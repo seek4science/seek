@@ -425,3 +425,7 @@ a.selectable.selected:focus,
   color: $list-group-active-color;
   background-color: $list-group-active-bg;
 }
+
+.samples-table-container {
+  overflow: auto;
+}
