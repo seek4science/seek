@@ -138,4 +138,14 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     assert_equal %w(Date DateTime Float Integer String Text).sort, SampleAttributeType.allowed_base_types.sort
   end
 
+  test 'chebi atribute' do
+    type = SampleAttributeType.new title:"CHEBI ID",regexp:'CHEBI:[0-9]+', base_type:'String'
+    assert type.validate_value?("CHEBI:1111")
+    assert type.validate_value?("CHEBI:1121")
+    refute type.validate_value?('fish')
+    refute type.validate_value?('fish:22')
+    refute type.validate_value?("CHEBI:1121a")
+    refute type.validate_value?('chebi:222')
+  end
+
 end

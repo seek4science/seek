@@ -415,6 +415,8 @@ namespace :seek_dev do
     text_type.save!
     string_type = SampleAttributeType.new title:"String", base_type: 'String'
     string_type.save!
+    chebi = SampleAttributeType.new title:"CHEBI ID",regexp:'CHEBI:[0-9]+', base_type:'String'
+    chebi.save!
 
     SampleType.destroy_all
     #dummy type - just with some varied attributes
@@ -436,6 +438,11 @@ namespace :seek_dev do
     patient_type.sample_attributes << SampleAttribute.new(title:"Address",sample_attribute_type:text_type)
     patient_type.save!
 
+  end
+
+  task :create_chebi_id_attribute => :environment do
+    chebi = SampleAttributeType.new title:"CHEBI ID",regexp:'CHEBI:[0-9]+', base_type:'String'
+    chebi.save!
   end
 
 end
