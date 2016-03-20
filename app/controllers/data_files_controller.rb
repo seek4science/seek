@@ -291,7 +291,7 @@ class DataFilesController < ApplicationController
 
   def filter
     @data_files = DataFile.authorize_asset_collection(
-        DataFile.with_extracted_samples.where("title LIKE ?", "#{params[:filter]}%"), 'view'
+        DataFile.with_extracted_samples.where("data_files.title LIKE ?", "#{params[:filter]}%"), 'view'
     ).first(20)
 
     respond_to do |format|
