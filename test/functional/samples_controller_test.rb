@@ -377,6 +377,27 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select '#samples-table tbody tr', count: 2
   end
 
+  test 'filtering for association forms' do
+    person = Factory(:person)
+    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: "fish")
+    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: "frog")
+    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: "banana")
+    login_as(person.user)
+
+    get :filter, filter: ''
+    assert_select 'a', count: 3
+    assert_response :success
+
+    get :filter, filter: 'f'
+    assert_select 'a', count: 2
+    assert_select 'a', text: /fish/
+    assert_select 'a', text: /frog/
+
+    get :filter, filter: 'fi'
+    assert_select 'a', count: 1
+    assert_select 'a', text: /fish/
+  end
+
 
   private
 
