@@ -429,3 +429,12 @@ a.selectable.selected:focus,
 .samples-table-container {
   overflow: auto;
 }
+
+table > tbody > tr > td.sample-field-error {
+  background-color: $state-danger-bg;
+  padding: 0;
+
+  > div {
+    padding: 8px;
+  }
+}

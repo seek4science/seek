@@ -75,5 +75,11 @@ Samples.initTable = function (selector, enableRowSelection) {
         });
     });
 
+    $j('table tbody td.sample-field-error div', selector).popover({
+        html: true,
+        placement: 'top',
+        trigger: 'hover'
+    });
+
     return table;
 };
