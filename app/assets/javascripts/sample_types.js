@@ -53,8 +53,8 @@ var SampleTypes = {
                 SampleTypes.recalculatePositions();
             } else {
                 row.addClass('danger');
-                // This selects all the fields in the row, except the magic "_destroy" checkbox
-                $j(':input:not(.destroy-attribute)', row).prop('disabled', true);
+                // This selects all the fields in the row, except the magic "_destroy" checkbox and the hidden ID field
+                $j(':input:not(.destroy-attribute):not([type=hidden])', row).prop('disabled', true);
                 row.find('.sample-type-is-title').prop('checked',false);
             }
         }
