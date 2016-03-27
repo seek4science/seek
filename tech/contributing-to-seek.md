@@ -6,7 +6,8 @@ redirect_from: "/contributing-to-seek.html"
 
 # Contributing to SEEK
 
-We welcome all sorts of contributions to SEEK,  
+We welcome all sorts of contributions to SEEK,
+
 * **Non-developer contributions.** These are contributions that can be made by anyone
   using SEEK.
   * *Vote and comment other feature requests:* Contact us to get a user within the JIRA issue tracker. This enables you to upvote or downvote features. This helps us in the development process.
