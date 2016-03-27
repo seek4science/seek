@@ -36,6 +36,7 @@ We will work hard to ensure quick communication. For your orientation, please se
 ### A contribution timeline
 
 For issuing a **bug report**, **feature request** or a **contribution suggestion**, please give a 5-10 line document
+
 * A short description of the feature, bug
 * Which version of SEEK are you using? / URL of the SEEK
 * Do you want to contribute to the development? When/where?
