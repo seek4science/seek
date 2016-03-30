@@ -38,6 +38,24 @@ class Programme < ActiveRecord::Base
     projects.collect(&:institutions).flatten.uniq
   end
 
+  def investigations
+    projects.collect(&:investigations).flatten.uniq
+  end
+
+  def studies
+    investigations.collect(&:studies).flatten.uniq
+  end
+
+  def assays
+    studies.collect(&:assays).flatten.uniq
+  end
+
+  [:data_files, :models, :sops, :presentations, :events, :publications].each do |type|
+    define_method(type) do
+      projects.collect(&type).flatten.uniq
+    end
+  end
+
   def can_be_edited_by?(user)
     can_edit?(user)
   end
