@@ -38,7 +38,7 @@
                                      {:url=>{:action=>'test_email_configuration'},
                                       :method=>:post,
                                       :with=>"'address=' + $F('address') + '&port=' + $F('port') + '&domain=' + $F('domain') + '&authentication=' + $F('authentication')
-                             + '&enable_starttls_auto='+$F('enable_starttls_auto') + '&user_name=' + $F('user_name') + '&password=' + $F('password') + '&testing_email=' + $F('testing_email')",
+                             + '&enable_starttls_auto='+$F('enable_starttls_auto') + '&user_name=' + $F('smtp_user_name') + '&password=' + $F('smtp_password') + '&testing_email=' + $F('testing_email')",
                                       :before => "show_ajax_loader('ajax_loader_position');"},
                                      {:remote=>true, :class => 'btn btn-default'}-%>
           <div id='ajax_loader_position'></div>
