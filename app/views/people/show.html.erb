@@ -81,18 +81,3 @@
 
 <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
 <%= render :seek_partial=>"general/items_related_to", :object => @person %>
-<%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
-<%# this is because it's not needed then: admins can see everything anyway -%>
-<% if admin_logged_in? -%>
-    <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
-    <ul>
-
-      <%= content_tag(:li,"This person is a #{Seek::Config.dm_project_name} PAL for #{@person.projects_for_role(Seek::Roles::PAL).collect(&:title).join(', ')}") if @person.is_pal_of_any_project? %>
-
-      <%= content_tag(:li,"This person is a #{t('project_administrator')} for #{@person.projects_for_role(Seek::Roles::PROJECT_ADMINISTRATOR).collect(&:title).join(', ')}") if @person.is_project_administrator_of_any_project? %>
-
-      <%= content_tag(:li,"This person is an #{t('asset_housekeeper')} for #{@person.projects_for_role(Seek::Roles::ASSET_HOUSEKEEPER).collect(&:title).join(', ')}") if @person.is_asset_housekeeper_of_any_project? %>
-      <%= content_tag(:li,"This person is an #{t('asset_gatekeeper')} for #{@person.projects_for_role(Seek::Roles::ASSET_GATEKEEPER).collect(&:title).join(', ')}") if @person.is_asset_gatekeeper_of_any_project? %>
-
-    </ul>
-<% end -%>
