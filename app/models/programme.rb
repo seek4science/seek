@@ -1,5 +1,9 @@
 class Programme < ActiveRecord::Base
-  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details, :administrator_ids, :activation_rejection_reason
+
+  include Seek::Taggable
+
+  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details,
+                  :administrator_ids, :activation_rejection_reason, :funding_codes
 
   attr_accessor :administrator_ids
 
@@ -11,6 +15,7 @@ class Programme < ActiveRecord::Base
   end if Seek::Config.solr_enabled
   
   acts_as_yellow_pages
+  acts_as_annotatable :name_field => :title
 
   # associations
   has_many :projects, dependent: :nullify
@@ -103,6 +108,14 @@ class Programme < ActiveRecord::Base
 
   def total_asset_size
     projects.sum(&:total_asset_size)
+  end
+
+  def funding_codes= tags
+    tag_annotations(tags, 'funding_code')
+  end
+
+  def funding_codes
+    annotations_with_attribute('funding_code').collect(&:value_content)
   end
 
   private

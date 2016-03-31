@@ -760,4 +760,28 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test "admin can add and remove funding codes" do
+    login_as(Factory(:admin))
+    prog = Factory(:programme)
+
+    assert_difference('Annotation.count', 2) do
+      put :update, id: prog, programme: { funding_codes: '1234,abcd' }
+    end
+
+    assert_redirected_to prog
+
+    assert_equal 2, assigns(:programme).funding_codes.length
+    assert_includes assigns(:programme).funding_codes, '1234'
+    assert_includes assigns(:programme).funding_codes, 'abcd'
+
+    assert_difference('Annotation.count', -2) do
+      put :update, id: prog, programme: { funding_codes: '' }
+    end
+
+    assert_redirected_to prog
+
+    assert_equal 0, assigns(:programme).funding_codes.length
+  end
+
+
 end
