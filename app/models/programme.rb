@@ -40,24 +40,24 @@ class Programme < ActiveRecord::Base
   end
 
   def institutions
-    projects.collect(&:institutions).flatten.uniq
+    projects.includes(:institutions).collect(&:institutions).flatten.uniq
   end
 
-  def investigations
-    projects.collect(&:investigations).flatten.uniq
+  def investigations(include_clause = :investigations)
+    projects.includes(include_clause).collect(&:investigations).flatten.uniq
   end
 
-  def studies
-    investigations.collect(&:studies).flatten.uniq
+  def studies(include_clause = {:investigations => :studies})
+    investigations(include_clause).collect(&:studies).flatten.uniq
   end
 
-  def assays
-    studies.collect(&:assays).flatten.uniq
+  def assays(include_clause = {:investigations => {:studies => :assays}})
+    studies(include_clause).collect(&:assays).flatten.uniq
   end
 
   [:data_files, :models, :sops, :presentations, :events, :publications].each do |type|
     define_method(type) do
-      projects.collect(&type).flatten.uniq
+      projects.includes(type).collect(&type).flatten.uniq
     end
   end
 
