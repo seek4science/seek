@@ -1,7 +1,11 @@
 class RemoveAssayAndTechTypeIdFromAssay < ActiveRecord::Migration
   def up
-    remove_column :assays,:assay_type_id
-    remove_column :assays, :technology_type_id
+    if column_exists? :assays, :assay_type_id
+      remove_column :assays,:assay_type_id
+    end
+    if column_exists? :assays, :technology_type_id
+      remove_column :assays, :technology_type_id
+    end
   end
 
   def down
