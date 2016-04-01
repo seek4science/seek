@@ -57,6 +57,7 @@ task. Using seek:upgrade should still work, but could take a lot of
 unnecessary time. There is more details and an example towards the end of the
 this page.
 
+
 ## Steps to upgrade from 0.23.x to 1.0.x
 
 ### Dependencies
@@ -81,6 +82,11 @@ Although not critical, we recommend updating Ruby to 2.1.7. If you are using
 RVM, as recommended in the installation, you can do this with:
 
     rvm get stable
+    rvm upgrade 2.1.6 2.1.7
+
+The above upgrade command will copy across all previous gemsets (see:[https://rvm.io/rubies/upgrading](https://rvm.io/rubies/upgrading)).
+If you have gemsets for other applications and copying them all isn't desirable, then you may want to start afresh:
+
     rvm install ruby-2.1.7
 
 ### Make sure bundler is installed
@@ -99,10 +105,10 @@ files with:
 
 Starting with version 0.22, we've started making SEEK available as a download.
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.0.2.tar.gz> You can
+<https://bitbucket.org/seek4science/seek/downloads/seek-1.0.3.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.0.2.tar.gz
+    tar zxvf seek-1.0.3.tar.gz
 
 and then copy across your existing filestore and database configuration file
 from your previous installation and continue with the upgrade steps. The
@@ -126,6 +132,23 @@ content.
     bundle exec rake sunspot:solr:start
     touch tmp/restart.txt
     bundle exec rake tmp:clear
+
+## Extra steps for a production server
+
+If the upgrade has involved an upgrade of Ruby, and you are running a production service with Apache and Passenger Phusion, you will need
+ to update the Apache config. You will need to point to the correct ruby wrapper script according to your version. The full path may differ, but for example
+
+    PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.6/wrappers/ruby
+
+would need changing to
+
+    PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.7/wrappers/ruby
+
+after upgrading from ruby 2.1.6 to ruby 2.1.7
+
+If you have problems, you may need to upgrade and reinstall the Passenger Phusion modules (if unsure there no harm in doing so).
+
+Please read [Installing SEEK in a production environment](install-production.html) for more details about setting up Apache and installing the module.
 
 
 ## Earlier upgrade notes

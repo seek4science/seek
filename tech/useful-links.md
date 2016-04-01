@@ -17,9 +17,9 @@ Code quality metrics (Code Climate): [https://codeclimate.com/github/seek4scienc
 
 SEEK software website: [http://seek4science.org](http://seek4science.org)
 
-SEEK installation guide: [http://seek4science.org/installing](http://seek4science.org/installing)
+SEEK installation guide: [/tech/install.html](/tech/install.html)
 
-SEEK changelog: [http://seek4science.org/changes](http://seek4science.org/changes)
+SEEK changelog: [/tech/releases/](/tech/releases)
 
 JERM ontology: [https://github.com/SysMO-DB/JERMOntology](https://github.com/SysMO-DB/JERMOntology)
 

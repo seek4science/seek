@@ -7,9 +7,15 @@ layout: page
 
 Latest version - {{ site.current_seek_version }}
 
+## Version 1.0.3
+
+Release date: _April 1st 2016_
+
+Upgrade fix that avoids a possible error in some cases when upgrading from a fresh 0.23.0 version of SEEK.
+
 ## Version 1.0.2
 
-Release date: _February 9th 2015_
+Release date: _February 9th 2016_
 
 Patch release with some minor improvements and bug fixes, in particular
 

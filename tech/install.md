@@ -82,6 +82,8 @@ from GitHub. You can download SEEK from
 then unpack the file with:
 
     tar zxfv seek-{{ site.current_seek_version }}.tar.gz
+    mv seek-{{ site.current_seek_version }} seek
+    cd seek/
 
 Alternatively, if you wish to install directly from GitHub, the latest version of SEEK is
 tagged as *(v{{ site.current_seek_version }})*. To fetch this run:
