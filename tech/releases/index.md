@@ -11,7 +11,7 @@ Latest version - {{ site.current_seek_version }}
 
 Release date: _April 1st 2016_
 
-Upgrade fix that avoid a possible error in some cases when upgrading from a fresh 0.23.0 version of SEEK.
+Upgrade fix that avoids a possible error in some cases when upgrading from a fresh 0.23.0 version of SEEK.
 
 ## Version 1.0.2
 
