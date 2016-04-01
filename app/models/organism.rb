@@ -16,6 +16,14 @@ class Organism < ActiveRecord::Base
 
   validates_presence_of :title
 
+  validate do |organism|
+    unless organism.bioportal_concept.nil? || organism.bioportal_concept.valid?
+      organism.bioportal_concept.errors.each do |attr, msg|
+        errors.add(attr, msg)
+      end
+    end
+  end
+
   def can_delete? user=User.current_user
     !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
   end
