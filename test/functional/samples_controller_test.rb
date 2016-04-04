@@ -132,6 +132,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'contributor can edit' do
     person = Factory(:person)
     login_as(person)
+
     sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
     get :edit,:id=>sample.id
     assert_response :success

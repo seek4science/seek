@@ -1194,8 +1194,8 @@ end
 Factory.define(:sample) do |f|
   f.sequence(:title) {|n| "Sample #{n}"}
   f.association :sample_type,:factory=>:simple_sample_type
-  f.after_build do |type|
-    type.the_title=type.title if type.respond_to?(:the_title)
+  f.after_build do |s|
+    s.the_title = s.title if s.respond_to?(:the_title)
   end
 end
 

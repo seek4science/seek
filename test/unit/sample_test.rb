@@ -163,7 +163,7 @@ class SampleTest < ActiveSupport::TestCase
     sample.weight = 88.9
     sample.postcode = 'M13 9PL'
     sample.address = 'Somewhere on earth'
-    assert_nil sample.json_metadata
+    assert_equal %({"full_name":null,"age":null,"weight":null,"address":null,"postcode":null}), sample.json_metadata
     sample.save!
     refute_nil sample.json_metadata
     assert_equal %({"full_name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}), sample.json_metadata
@@ -179,9 +179,9 @@ class SampleTest < ActiveSupport::TestCase
 
     sample.title_ = "the title"
     sample.updated_at_ = "the updated at"
-    assert_nil sample.json_metadata
+    assert_equal %({"title_":null,"updated_at_":null}), sample.json_metadata
     sample.save!
-    assert_equal %({"title":"the title","updated_at":"the updated at"}), sample.json_metadata
+    assert_equal %({"title_":"the title","updated_at_":"the updated at"}), sample.json_metadata
 
     sample = Sample.find(sample.id)
     assert_equal "the title",sample.title

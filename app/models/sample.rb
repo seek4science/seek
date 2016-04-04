@@ -29,9 +29,9 @@ class Sample < ActiveRecord::Base
   before_validation :set_title_to_title_attribute_value
 
   def sample_type=(type)
-    remove_accessor_methods if sample_type
-    super(type)
-    setup_accessor_methods if type
+    super
+    self.json_metadata = nil
+    @metadata = nil
   end
 
   def is_in_isa_publishable?
@@ -51,8 +51,20 @@ class Sample < ActiveRecord::Base
     originating_data_file
   end
 
-  def json
-    @json ||= JSON.parse(json_metadata)
+  def metadata
+    if @metadata.blank?
+      if json_metadata.blank?
+        if sample_type.nil?
+          @metadata = {}
+        else
+          @metadata = JSON.parse(set_json_structure)
+        end
+      else
+        @metadata = JSON.parse(json_metadata)
+      end
+    else
+      @metadata
+    end
   end
 
   private
@@ -91,8 +103,12 @@ class Sample < ActiveRecord::Base
   end
 
   def set_json_metadata
+    self.json_metadata = @metadata.to_json
+  end
+
+  def set_json_structure
     hash = Hash[sample_type.sample_attributes.map do |attribute|
-      [attribute.parameterised_title, send(attribute.accessor_name)]
+      [attribute.accessor_name, nil]
     end]
     self.json_metadata = hash.to_json
   end
@@ -117,6 +133,14 @@ class Sample < ActiveRecord::Base
     self.send(title_attr.accessor_name)
   end
 
+  def respond_to_missing?(method_name, include_private = false)
+    if metadata.keys.include?(method_name.to_s) || metadata.keys.include?(method_name.to_s.chomp('='))
+      true
+    else
+      super
+    end
+  end
+
   def method_missing(method_name, *args)
     setter = method_name.to_s.end_with?('=')
     if setter
@@ -125,9 +149,9 @@ class Sample < ActiveRecord::Base
       attribute_name = method_name.to_s
     end
 
-    if json.keys.include?(attribute_name)
-      json[attribute_name] = args.first if setter
-      json.send(:[], attribute_name)
+    if metadata.keys.include?(attribute_name)
+      metadata[attribute_name] = args.first if setter
+      metadata[attribute_name]
     else
       super
     end
