@@ -40,6 +40,14 @@ class SamplesController < ApplicationController
     end
   end
 
+  def index
+    if @data_file || @sample_type
+      respond_with(@samples)
+    else
+      super
+    end
+  end
+
   def new
     @sample = Sample.new(sample_type_id: params[:sample_type_id])
     respond_with(@sample)
