@@ -23,7 +23,7 @@ class Sample < ActiveRecord::Base
   include ActiveModel::Validations
   validates_with SampleAttributeValidator
 
-  after_initialize :setup_accessor_methods, :read_json_metadata, unless: 'sample_type.nil?'
+  #after_initialize :setup_accessor_methods, :read_json_metadata, unless: 'sample_type.nil?'
 
   before_save :set_json_metadata
   before_validation :set_title_to_title_attribute_value
@@ -49,6 +49,10 @@ class Sample < ActiveRecord::Base
 
   def related_data_file
     originating_data_file
+  end
+
+  def json
+    @json ||= JSON.parse(json_metadata)
   end
 
   private
@@ -111,6 +115,22 @@ class Sample < ActiveRecord::Base
     return nil unless (sample_type && sample_type.sample_attributes.title_attributes.any?)
     title_attr=sample_type.sample_attributes.title_attributes.first
     self.send(title_attr.accessor_name)
+  end
+
+  def method_missing(method_name, *args)
+    setter = method_name.to_s.end_with?('=')
+    if setter
+      attribute_name = method_name.to_s.chomp('=')
+    else
+      attribute_name = method_name.to_s
+    end
+
+    if json.keys.include?(attribute_name)
+      json[attribute_name] = args.first if setter
+      json.send(:[], attribute_name)
+    else
+      super
+    end
   end
 
 end
