@@ -1461,4 +1461,23 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select "div.panel-body div", :text => other_creators
   end
 
+  test "programme assays through nested routing" do
+    assert_routing 'programmes/2/assays', { controller: 'assays' ,action: 'index', programme_id: '2'}
+    programme = Factory(:programme)
+    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy))
+    investigation2 = Factory(:investigation, policy: Factory(:public_policy))
+    study = Factory(:study, investigation: investigation, policy: Factory(:public_policy))
+    study2 = Factory(:study, investigation: investigation2, policy: Factory(:public_policy))
+    assay = Factory(:assay, study: study, policy: Factory(:public_policy))
+    assay2 = Factory(:assay, study: study2, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", assay_path(assay), text: assay.title
+      assert_select "a[href=?]", assay_path(assay2), text: assay2.title, count: 0
+    end
+  end
+
 end

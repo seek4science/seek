@@ -323,7 +323,19 @@ class PresentationsControllerTest < ActionController::TestCase
     assert_equal 'CC-BY-SA-4.0', assigns(:presentation).license
   end
 
+  test "programme presentations through nested routing" do
+    assert_routing 'programmes/2/presentations', { controller: 'presentations' ,action: 'index', programme_id: '2'}
+    programme = Factory(:programme)
+    presentation = Factory(:presentation, projects: programme.projects, policy: Factory(:public_policy))
+    presentation2 = Factory(:presentation, policy: Factory(:public_policy))
 
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", presentation_path(presentation), text: presentation.title
+      assert_select "a[href=?]", presentation_path(presentation2), text: presentation2.title, count: 0
+    end
+  end
 
 end
-

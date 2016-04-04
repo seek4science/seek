@@ -156,4 +156,20 @@ class EventsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
   end
+
+  test "programme events through nested routing" do
+    assert_routing 'programmes/2/events', { controller: 'events' ,action: 'index', programme_id: '2'}
+    programme = Factory(:programme)
+    event = Factory(:event, projects: programme.projects, policy: Factory(:public_policy))
+    event2 = Factory(:event, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", event_path(event), text: event.title
+      assert_select "a[href=?]", event_path(event2), text: event2.title, count: 0
+    end
+  end
+  
 end

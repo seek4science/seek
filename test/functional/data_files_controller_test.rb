@@ -2181,6 +2181,21 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution 4.0'
   end
 
+  test "programme data files through nested routing" do
+    assert_routing 'programmes/2/data_files', { controller: 'data_files' ,action: 'index', programme_id: '2'}
+    programme = Factory(:programme)
+    data_file = Factory(:data_file, projects: programme.projects, policy: Factory(:public_policy))
+    data_file2 = Factory(:data_file, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", data_file_path(data_file), text: data_file.title
+      assert_select "a[href=?]", data_file_path(data_file2), text: data_file2.title, count: 0
+    end
+  end
+
   private
 
   def mock_http
