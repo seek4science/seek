@@ -530,7 +530,8 @@ SEEK::Application.routes.draw do
       post :spawn_project
       get :storage_report
     end
-    resources :people,:projects, :institutions
+    resources :people,:projects, :institutions, :investigations, :studies, :assays,
+              :data_files, :models, :sops, :presentations, :events, :publications
   end
 
   resources :publications do

@@ -883,6 +883,21 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 'CC-BY-SA-4.0', assigns(:sop).license
   end
 
+  test "programme sops through nested routing" do
+    assert_routing 'programmes/2/sops', { controller: 'sops' ,action: 'index', programme_id: '2'}
+    programme = Factory(:programme)
+    sop = Factory(:sop, projects: programme.projects, policy: Factory(:public_policy))
+    sop2 = Factory(:sop, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", sop_path(sop), text: sop.title
+      assert_select "a[href=?]", sop_path(sop2), text: sop2.title, count: 0
+    end
+  end
+
   private
 
   def file_for_upload options={}

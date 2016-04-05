@@ -1124,6 +1124,21 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 'CC-BY-SA-4.0', assigns(:model).license
   end
 
+  test "programme models through nested routing" do
+    assert_routing 'programmes/2/models', { controller: 'models' ,action: 'index', programme_id: '2'}
+    programme = Factory(:programme)
+    model = Factory(:model, projects: programme.projects, policy: Factory(:public_policy))
+    model2 = Factory(:model, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", model_path(model), text: model.title
+      assert_select "a[href=?]", model_path(model2), text: model2.title, count: 0
+    end
+  end
+
   def valid_model
     { :title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
   end

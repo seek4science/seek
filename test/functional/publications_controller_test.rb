@@ -503,6 +503,20 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 10, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
   end
 
+  test "programme publications through nested routing" do
+    assert_routing 'programmes/2/publications', { controller: 'publications' ,action: 'index', programme_id: '2'}
+    programme = Factory(:programme)
+    publication = Factory(:publication, projects: programme.projects, policy: Factory(:public_policy))
+    publication2 = Factory(:publication, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", publication_path(publication), text: publication.title
+      assert_select "a[href=?]", publication_path(publication2), text: publication2.title, count: 0
+    end
+  end
 
   def mock_crossref options
     url= "http://www.crossref.org/openurl/"

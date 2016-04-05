@@ -536,4 +536,21 @@ class StudiesControllerTest < ActionController::TestCase
     assert_equal 1, study.creators.count
   end
 
+  test "programme studies through nested routing" do
+    assert_routing 'programmes/2/studies', { controller: 'studies' ,action: 'index', programme_id: '2'}
+    programme = Factory(:programme)
+    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy))
+    investigation2 = Factory(:investigation, policy: Factory(:public_policy))
+    study = Factory(:study, investigation: investigation, policy: Factory(:public_policy))
+    study2 = Factory(:study, investigation: investigation2, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", study_path(study), text: study.title
+      assert_select "a[href=?]", study_path(study2), text: study2.title, count: 0
+    end
+  end
+
 end

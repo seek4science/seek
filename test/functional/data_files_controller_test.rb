@@ -208,6 +208,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_includes new_assay.data_files,d
   end
 
+  test "associate sample" do
+     # associate to a new data file
+     data_file_with_samples,blob = valid_data_file
+     data_file_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
+     assert_difference("DataFile.count") do
+       post :create,:data_file => data_file_with_samples,:content_blobs=>[blob], :sharing => valid_sharing
+     end
+
+    df = assigns(:data_file)
+    assert_equal "newTestSample", df.samples.first.title
+
+    #edit associations of samples to an existing data file
+    put :update,:id=> df.id, :data_file => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
+    df = assigns(:data_file)
+    assert_equal "editTestSample", df.samples.first.title
+  end
+
+
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
@@ -1751,7 +1769,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "filter by people, including creators, using nested routes" do
-    assert_routing "people/7/data_files",{controller:"data_files",action:"index",person_id:"7"}
+    assert_routing "people/7/presentations",{controller:"presentations",action:"index",person_id:"7"}
 
     person1=Factory(:person)
     person2=Factory(:person)
@@ -2219,6 +2237,21 @@ class DataFilesControllerTest < ActionController::TestCase
     get :filter, filter: 'fi'
     assert_select 'a', count: 1
     assert_select 'a', text: /fish/
+  end
+
+  test "programme data files through nested routing" do
+    assert_routing 'programmes/2/data_files', { controller: 'data_files' ,action: 'index', programme_id: '2'}
+    programme = Factory(:programme)
+    data_file = Factory(:data_file, projects: programme.projects, policy: Factory(:public_policy))
+    data_file2 = Factory(:data_file, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", data_file_path(data_file), text: data_file.title
+      assert_select "a[href=?]", data_file_path(data_file2), text: data_file2.title, count: 0
+    end
   end
 
   private
