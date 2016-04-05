@@ -409,7 +409,7 @@ module ApplicationHelper
   end
 
   def toggle_appear_javascript block_id
-    "$j('##{block_id}').slideToggle()".html_safe
+    "this.checked ? $j('##{block_id}').slideDown() : $j('##{block_id}').slideUp();".html_safe
   end
 
   def set_parameters_for_sharing_form object=nil

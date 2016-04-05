@@ -88,7 +88,7 @@ class OrganismsController < ApplicationController
         format.html { redirect_to organism_path(@organism) }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => "new" }
         format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
       end
     end

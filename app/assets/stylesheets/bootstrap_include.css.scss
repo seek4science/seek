@@ -86,6 +86,24 @@ ul.nav-tabs {
   font-weight: normal;
 }
 
+#error_explanation, #errorExplanation {
+  @extend .alert;
+  @extend .alert-danger;
+  h2 {
+    margin-top: 0;
+  }
+  ul {
+    margin-top: 5px;
+  }
+}
+
+.field_with_errors, .fieldWithErrors {
+  @extend .has-error;
+  .form-control {
+    color: $state-danger-text;
+  }
+}
+
 .modal-xl {
   width: 90%;
   max-width: 1300px;

@@ -658,21 +658,6 @@ class PeopleControllerTest < ActionController::TestCase
 
   end
 
-  test 'should show that the person is asset housekeeper for admin' do
-    person = Factory(:asset_housekeeper)
-
-    get :show, id: person
-    assert_select 'li', text: /This person is an Asset housekeeper/, count: 1
-  end
-
-  test 'should not show that the person is asset housekeeper for non-admin' do
-    person = Factory(:asset_housekeeper)
-
-    login_as(:aaron)
-    get :show, id: person
-    assert_select 'li', text: /This person is an Asset housekeeper/, count: 0
-  end
-
   def test_project_administrator_can_administer_others_in_the_same_project
     pm = Factory(:project_administrator)
     other_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: pm.group_memberships.first.work_group)])
@@ -1174,21 +1159,6 @@ class PeopleControllerTest < ActionController::TestCase
     person = assigns(:person)
     assert_not_nil person
     assert person.is_asset_gatekeeper?(work_group.project)
-  end
-
-  test 'should show that the person is gatekeeper for admin' do
-    person = Factory(:asset_gatekeeper)
-
-    get :show, id: person
-    assert_select 'li', text: /This person is an Asset gatekeeper/, count: 1
-  end
-
-  test 'should not show that the person is gatekeeper for non-admin' do
-    person = Factory(:asset_gatekeeper)
-
-    login_as(:aaron)
-    get :show, id: person
-    assert_select 'li', text: /This person is an Asset gatekeeper/, count: 0
   end
 
   test 'should have gatekeeper icon on person show page' do

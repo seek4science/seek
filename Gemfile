@@ -68,7 +68,7 @@ gem 'piwik_analytics',:github=>"SysMO-DB/piwik-ruby-tracking"
 gem 'my_savage_beast', :github => "SysMO-DB/my_savage_beast"
 gem 'redbox', :github=>"SysMO-DB/redbox"
 gem "my_responds_to_parent", :github => "SysMO-DB/my_responds_to_parent"
-gem 'bioportal',">=2.2"
+gem 'bioportal',">=2.3",:github => "SysMO-DB/bioportal"
 gem 'acts_as_activity_logged', :github => "SysMO-DB/acts_as_activity_logged"
 gem 'acts_as_trashable',:github=> "SysMO-DB/acts_as_trashable"
 gem "app_version", :github => "SysMO-DB/app_version"
@@ -126,16 +126,19 @@ group :test do
   gem 'test_after_commit'
   gem "sqlite3"
   gem "ruby-prof"
-  gem "webmock"
   gem "minitest","~> 4.0"
   gem 'minitest-reporters'
   gem 'coveralls', require: false
   gem 'rspec-rails'
   gem 'sunspot_matchers'
   gem 'pg'
-  gem 'teaspoon'
-  gem "teaspoon-mocha"
   gem "magic_lamp"
   gem 'database_cleaner'
+end
+
+group :test, :development do
   gem 'selenium-webdriver'
+  gem "webmock"
+  gem 'teaspoon'
+  gem "teaspoon-mocha"
 end

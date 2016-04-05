@@ -19,6 +19,11 @@
     </div>
 
     <div class="form-group">
+      <%= f.label :funding_codes -%>
+      <%= tags_input('programme[funding_codes]', @programme.funding_codes, :typeahead => {:type => 'funding_code'}) %>
+    </div>
+
+    <div class="form-group">
       <%= f.label :funding_details -%>
       <%= f.text_area :funding_details, :rows => 5, :class=>"form-control" -%>
     </div>

@@ -30,19 +30,23 @@
   </div>
   <div class="col-sm-6">
     <p class="web_page">
-      <label><%= t('event') %> Website: </label><%= text_or_not_specified(@event.url, :external_link=>true) -%>
+      <label><%= t('event') %> Website:</label>
+      <%= text_or_not_specified(@event.url, :external_link=>true) -%>
     </p>
 
     <p class="address">
-      <label>Address: </label><%= text_or_not_specified @event.address, :address=>true %>
+      <label>Address:</label>
+      <%= text_or_not_specified @event.address, :address=>true %>
     </p>
 
     <p class="city">
-      <label>City: </label><%= text_or_not_specified @event.city %>
+      <label>City:</label>
+      <%= text_or_not_specified @event.city %>
     </p>
 
     <p class="country">
-      <label>Country: </label><%= text_or_not_specified @event.country, :link_as_country => true -%>
+      <label>Country:</label>
+      <%= text_or_not_specified @event.country, :link_as_country => true -%>
     </p>
   </div>
 </div>

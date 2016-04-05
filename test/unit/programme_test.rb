@@ -399,4 +399,35 @@ class ProgrammeTest < ActiveSupport::TestCase
 
   end
 
+  test 'related items' do
+    projects = FactoryGirl.create_list(:project, 3)
+    programme = Factory(:programme, projects: projects)
+
+    projects.each do |project|
+      i = Factory(:investigation, projects: [project])
+      s = Factory(:study, investigation: i)
+      a = Factory(:assay, study: s)
+      project.reload # Can't find investigations of second project if this isn't here!
+      assert_includes project.investigations, i
+      assert_includes project.studies, s
+      assert_includes project.assays, a
+      assert_includes programme.investigations, i
+      assert_includes programme.studies, s
+      assert_includes programme.assays, a
+      [:data_files, :models, :sops, :presentations, :events, :publications].each do |type|
+        item = Factory(type.to_s.singularize.to_sym, projects: [project])
+        assert_includes project.send(type), item, "Project related #{type} didn't include item"
+        assert_includes programme.send(type), item, "Programme related #{type} didn't include item"
+      end
+    end
+
+    assert_equal 3, programme.projects.count
+    assert_equal 3, programme.investigations.count
+    assert_equal 3, programme.studies.count
+    assert_equal 3, programme.assays.count
+    [:data_files, :models, :sops, :presentations, :events, :publications].each do |type|
+      assert_equal 3, programme.send(type).count
+    end
+  end
+
 end
