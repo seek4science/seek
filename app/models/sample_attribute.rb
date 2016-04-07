@@ -13,6 +13,8 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, where(is_title: true)
 
+  INVALID_NAMES = (Sample.instance_methods(true) + Sample.private_instance_methods(true)).map(&:to_s)
+
   def validate_value?(value)
     return false if required? && value.blank?
     (value.blank? && !required?) || sample_attribute_type.validate_value?(value)
@@ -21,9 +23,8 @@ class SampleAttribute < ActiveRecord::Base
   # the name for the sample accessor based on the attribute title, spaces are replaced with underscore, and all downcase
   # if there is a clash with a sample method then _ is prepended
   def accessor_name
-    invalid_names = Sample.new.methods.collect(&:to_s)
     name = parameterised_title
-    name += '_' if invalid_names.include?(name)
+    name += '_' while INVALID_NAMES.include?(name)
     name
   end
 

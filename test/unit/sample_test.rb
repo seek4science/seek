@@ -316,4 +316,21 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal "the updated_at",sample.updated_at_
   end
 
+  test 'sample with clashing attribute names with private methods' do
+    sample_type = SampleType.new :title=>"with awkward attributes"
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"format",is_title:true, :sample_type => sample_type)
+    assert sample_type.valid?
+    sample = Sample.new title: 'testing'
+    sample.sample_type=sample_type
+
+    sample.format_ = "the title"
+    refute sample.valid?
+    sample.save!
+    assert_equal "the title",sample.title
+
+    sample=Sample.find(sample.id)
+    assert_equal "the title",sample.title
+    assert_equal "the title",sample.format_
+  end
+
 end
