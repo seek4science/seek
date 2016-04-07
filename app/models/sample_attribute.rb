@@ -13,8 +13,6 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, where(is_title: true)
 
-  INVALID_NAMES = (Sample.attribute_names + Sample.instance_methods(true) + Sample.private_instance_methods(true)).map(&:to_s)
-
   def validate_value?(value)
     return false if required? && value.blank?
     (value.blank? && !required?) || sample_attribute_type.validate_value?(value)
@@ -24,7 +22,7 @@ class SampleAttribute < ActiveRecord::Base
   # if there is a clash with a sample method then _ is prepended
   def accessor_name
     name = parameterised_title
-    name += '_' while INVALID_NAMES.include?(name)
+    name += '_' while (Sample.attribute_method?(name) || Sample.private_method_defined?(name))
     name
   end
 
