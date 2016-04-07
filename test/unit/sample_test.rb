@@ -324,7 +324,7 @@ class SampleTest < ActiveSupport::TestCase
     sample.sample_type=sample_type
 
     sample.format_ = "the title"
-    refute sample.valid?
+    assert sample.valid?
     sample.save!
     assert_equal "the title",sample.title
 

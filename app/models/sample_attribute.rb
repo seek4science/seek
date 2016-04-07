@@ -13,7 +13,7 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, where(is_title: true)
 
-  INVALID_NAMES = (Sample.instance_methods(true) + Sample.private_instance_methods(true)).map(&:to_s)
+  INVALID_NAMES = (Sample.attribute_names + Sample.instance_methods(true) + Sample.private_instance_methods(true)).map(&:to_s)
 
   def validate_value?(value)
     return false if required? && value.blank?

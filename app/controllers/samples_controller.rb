@@ -165,7 +165,7 @@ class SamplesController < ApplicationController
 
       @samples = Sample.authorize_asset_collection(@data_file.extracted_samples.includes(:sample_type => :sample_attributes).all, 'view')
     elsif params[:sample_type_id]
-      @sample_type = SampleType.find(params[:sample_type_id]).includes(:sample_attributes)
+      @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       @samples = Sample.authorize_asset_collection(@sample_type.samples.all, 'view')
     else
       find_assets
