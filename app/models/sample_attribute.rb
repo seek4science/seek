@@ -14,6 +14,12 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, where(is_title: true)
 
+  def title= title
+    super
+    generate_accessor_name
+    self.title
+  end
+
   def validate_value?(value)
     return false if required? && value.blank?
     (value.blank? && !required?) || sample_attribute_type.validate_value?(value)
@@ -34,8 +40,6 @@ class SampleAttribute < ActiveRecord::Base
   def required?
     super || is_title?
   end
-
-
 
   private
 
