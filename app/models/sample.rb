@@ -149,7 +149,7 @@ class Sample < ActiveRecord::Base
       attribute_name = method_name.to_s
     end
 
-    if metadata.keys.include?(attribute_name)
+    if metadata.key?(attribute_name)
       metadata[attribute_name] = args.first if setter
       metadata[attribute_name]
     else
