@@ -9,6 +9,7 @@ class SampleAttribute < ActiveRecord::Base
   validates :title, :sample_attribute_type, presence: true
   validates :sample_type, presence: true
 
+  before_save :generate_accessor_name
   before_save :default_pos, :check_required_against_is_title
 
   scope :title_attributes, where(is_title: true)
@@ -20,10 +21,10 @@ class SampleAttribute < ActiveRecord::Base
 
   # the name for the sample accessor based on the attribute title, spaces are replaced with underscore, and all downcase
   # if there is a clash with a sample method then _ is prepended
-  def accessor_name
+  def generate_accessor_name
     name = parameterised_title
     name += '_' while (Sample.attribute_method?(name) || Sample.private_method_defined?(name))
-    name
+    self.accessor_name = name
   end
 
   def parameterised_title

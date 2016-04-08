@@ -14,7 +14,7 @@ class Sample < ActiveRecord::Base
 
   acts_as_asset
 
-  belongs_to :sample_type
+  belongs_to :sample_type, inverse_of: :samples
   belongs_to :originating_data_file, :class_name => 'DataFile'
 
   scope :default_order, order("title")
