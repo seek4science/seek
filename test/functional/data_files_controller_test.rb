@@ -2221,6 +2221,36 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a', text: /fish/
   end
 
+  test "should get table view for data file" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
+    end
+    login_as(data_file.contributor)
+
+    get :samples_table, format: :json, id: data_file.id
+
+    assert_response :success
+
+    json = JSON.parse(@response.body)
+    assert_equal 3, json['data'].length
+  end
+
+  test "should not get table view for private data file if unauthorized" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
+    end
+
+    get :samples_table, format: :json, id: data_file.id
+
+    assert_response :forbidden
+  end
+
   private
 
   def mock_http
