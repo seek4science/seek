@@ -156,7 +156,7 @@
       wizard.reset();
     });
 
-    $j('#samples-select-data-file .selectable[data-role="seek-association-candidate"]').click(function () {
+    $j('#samples-select-data-file').on('click', '.selectable[data-role="seek-association-candidate"]', function () {
       var candidate = $j(this);
       candidate.spinner('add');
       $j.ajax('/data_files/'+$j(this).data('associationId')+'/samples_table', {
