@@ -107,17 +107,17 @@
       samplesTable = Samples.initTable($j('#data-file-samples-table'), true);
       // When at least one sample is selected, unlock step 3
       var handleRowSelect = function ( e, dt, type, indexes ) {
-        var selectedRows = samplesTable.rows({ selected: true });
+        var selectedRowData = samplesTable.rows({ selected: true }).data();
 
         batchSamplesForm.selectedItems = [];
-        selectedRows.every(function () {
+        for(var i = 0; i < selectedRowData.length; i++) {
           batchSamplesForm.selectedItems.push({
-            id: this.data()[0],
-            title: this.data()[1]
+            id: selectedRowData[i].id,
+            title: selectedRowData[i].title
           });
-        });
+        }
 
-        if(selectedRows.count() > 0) {
+        if(selectedRowData.length > 0) {
           wizard.step(3).unlock();
         } else {
           wizard.step(3).lock();
