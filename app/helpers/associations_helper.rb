@@ -38,8 +38,8 @@ module AssociationsHelper
   def filterable_association_select(filter_url, options = {}, &_block)
     options.reverse_merge!(multiple: false)
     content_tag(:div, class: 'form-group') do
-      content_tag(:input, '', class: 'form-control', 'data-role' => 'seek-association-filter',
-                              type: 'text', placeholder: 'Type to filter...',
+      text_field_tag(nil, nil, class: 'form-control', 'data-role' => 'seek-association-filter',
+                              placeholder: 'Type to filter...',
                               autocomplete: 'off', 'data-filter-url' => filter_url) +
       content_tag(:div, class: 'list-group association-candidate-list',
                   data: { role: 'seek-association-candidate-list',
