@@ -55,7 +55,7 @@ layout: page
           - [Create Institutions](adding-admin-items.html#creating-institutions)
           - [Add and remove people from a project](admin-project-members.html#add-and-remove-people-from-a-project)
           - [Assign people to project roles](admin-project-members.html#assign-people-to-project-roles)
-          - [Flag when a person leaves a project](admin-project-members.html#flag-when-a-person-leaves-a-project)
+          - [Flag when a person becomes inactive in a project](administer-project-members.html#flag-when-a-person-becomes-inactive-in-a-project)
 - [Executing a model on JWS Online](http://jws-docs.readthedocs.org/)
 
 

@@ -37,7 +37,7 @@ A Programme administrator also has some of the abilities of a Project Administra
 * [Create Institutions](adding-admin-items.html#creating-institutions)
 
 ## Asset housekeeper
-The Asset Housekeeper has the special ability to manage assets belonging to other people in the project – but only people who have been flagged as having left the project. It is useful to prevent items being "stranded" when somebody leaves a project, but without handing over their assets from the project to be managed by other users.
+The Asset Housekeeper has the special ability to manage assets belonging to other people in the project – but only people who have been flagged as having become inactive in the project. It is useful to prevent items being "stranded" when somebody leaves a project, but without handing over their assets from the project to be managed by other users.
 
 To become an Asset housekeeper the user must also be a member of that Project.
 
@@ -54,7 +54,7 @@ The Project Administrator gets notified when someone new signs up to the project
 * [Create profiles](adding-admin-items.html#creating-profiles)
 * [Create Institutions](adding-admin-items.html#creating-institutions)
 * [Assign people to project roles](administer-project-members.html#assign-people-to-project-roles)
-* [Flag when a person leaves a project](administer-project-members.html#flag-when-a-person-leaves-a-project)
+* [Flag when a person becomes inactive a project](administer-project-members.html#flag-when-a-person-becomes-inactive-in-a-project)
 
 They can also edit the Project details, along with Institutions associated with the Project.
 
