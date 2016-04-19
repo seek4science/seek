@@ -4,14 +4,16 @@
   assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
 
   if params[:samples] && params[:samples].any?
+    collapse_panel = false
     associated_samples_json = associations_json_from_params(Sample, params[:samples])
   else
-    associated_samples_json = associations_json(assay_assets)
+    collapse_panel = assay_assets.empty?
+    associated_samples_json = associations_json_from_assay_assets(assay_assets)
   end
 
 -%>
 
-<%= folding_panel("Samples", assay_assets.blank? && params[:samples].blank?, :body_options => {:id => 'associate_sample_fold_content'},
+<%= folding_panel("Samples", collapse_panel, :body_options => {:id => 'associate_sample_fold_content'},
                   :help_text => "Here you associate Samples in SEEK to this #{resource_text}.") do %>
 
     <p>The following Samples are involved in this <%= resource_text -%>:</p>

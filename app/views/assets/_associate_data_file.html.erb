@@ -1,25 +1,27 @@
 <%
+  has_direction ||= false
+  has_relationships ||= false
   resource_text ||= text_for_resource(resource)
 
-  assay_assets = resource.assay_assets.where(asset_type: 'DataFile').includes(:asset, :relationship_type)
-
   if params[:data_files] && params[:data_files].any?
+    collapse_panel = false
     associated_data_files_json = associations_json_from_params(DataFile, params[:data_files])
+  elsif resource.respond_to?(:asset_assets)
+    assay_assets = resource.assay_assets.where(asset_type: 'DataFile').includes(:asset, :relationship_type)
+    collapse_panel = assay_assets.empty?
+    associated_data_files_json = associations_json_from_assay_assets(assay_assets)
   else
-    associated_data_files_json = associations_json(assay_assets)
+    collapse_panel = resource.data_files.empty?
+    associated_data_files_json = associations_json_from_relationship(resource.data_files)
   end
-
 -%>
 
-<%= folding_panel("Data Files", assay_assets.blank? && params[:data_files].blank?, :body_options => {:id => 'associate_data_file_fold_content'},
+<%= folding_panel("Data Files", collapse_panel, :body_options => {:id => 'associate_data_file_fold_content'},
                   :help_text => "Here you associate Data Files in SEEK to this #{resource_text}.") do %>
 
     <p>The following Data Files are involved in this <%= resource_text -%>:</p>
 
-    <% if show_relationships -%>
-        <%= associations_list('data_file_to_list', 'associations/data_file', associated_data_files_json,
-                              empty_text: 'No data files') %>
-    <% else %>
+    <% if has_direction -%>
         <%= associations_list_group('data_file_to_list', 'direction.value', associated_data_files_json) do %>
             <div class="row">
               <div class="col-md-4">
@@ -42,6 +44,9 @@
               </div>
             </div>
         <% end %>
+    <% else %>
+        <%= associations_list('data_file_to_list', 'associations/data_file', associated_data_files_json,
+                              empty_text: 'No data files') %>
     <% end %>
 
     <hr/>
@@ -55,13 +60,14 @@
         <% end %>
 
         <hr/>
-        <% if show_relationships -%>
+        <% if has_relationships -%>
             <div class="form-group">
               <%= label_tag "How was the data used in this #{resource_text}" %>
               <%= select_tag :relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),:class => 'form-control',
                              'data-role' => 'seek-association-common-field' %>
             </div>
-        <% else %>
+        <% end %>
+        <% if has_direction -%>
             <div class="form-group">
               <label>Select direction</label>
               <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>

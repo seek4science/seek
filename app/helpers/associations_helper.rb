@@ -55,7 +55,13 @@ module AssociationsHelper
     content_tag(:button, text, options)
   end
 
-  def associations_json(assay_assets)
+  def associations_json_from_relationship(related_items)
+    related_items.map do |item|
+      { title: item.title, id: item.id }
+    end.to_json
+  end
+
+  def associations_json_from_assay_assets(assay_assets)
     assay_assets.map do |aa|
       hash = { title: aa.asset.title, id: aa.asset_id,
                direction: { value: aa.direction, text: direction_name(aa.direction) }
