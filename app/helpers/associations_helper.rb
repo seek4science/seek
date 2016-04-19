@@ -54,4 +54,34 @@ module AssociationsHelper
                            'data-role' => 'seek-association-confirm-button')
     content_tag(:button, text, options)
   end
+
+  def associations_json(assay_assets)
+    assay_assets.map do |aa|
+      hash = { title: aa.asset.title, id: aa.asset_id,
+               direction: { value: aa.direction, text: direction_name(aa.direction) }
+      }
+      if aa.relationship_type
+        hash.merge!({ relationship_type: { value: aa.relationship_type.id,
+                                           text: aa.relationship_type.title } })
+      end
+
+      hash
+    end.to_json
+  end
+
+  def associations_json_from_params(model, association_params)
+    association_params.map do |association|
+      item = model.find(association[:id])
+      hash = { title: item.title, id: item.id,
+               direction: { value: association[:direction],
+                            text: direction_name(association[:direction]) }
+      }
+      unless association[:relationship_type].blank?
+        hash.merge!({ relationship_type: { value: association[:relationship_type],
+                                           text: RelationshipType.find_by_id(association[:relationship_type]).try(:title) } })
+      end
+
+      hash
+    end.to_json
+  end
 end

@@ -2,13 +2,16 @@
   resource_text ||= text_for_resource(resource)
 
   assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
-  associated_samples_json = assay_assets.map do |aa|
-    { title: aa.asset.title, id: aa.asset_id,
-      direction: { value: aa.direction, text: direction_name(aa.direction) } }
-  end.to_json
+
+  if params[:samples] && params[:samples].any?
+    associated_samples_json = associations_json_from_params(Sample, params[:samples])
+  else
+    associated_samples_json = associations_json(assay_assets)
+  end
+
 -%>
 
-<%= folding_panel("Samples", assay_assets.blank?, :body_options => {:id => 'associate_sample_fold_content'},
+<%= folding_panel("Samples", assay_assets.blank? && params[:samples].blank?, :body_options => {:id => 'associate_sample_fold_content'},
                   :help_text => "Here you associate Samples in SEEK to this #{resource_text}.") do %>
 
     <p>The following Samples are involved in this <%= resource_text -%>:</p>
@@ -61,7 +64,7 @@
             <div data-role="seek-wizard-nav"></div>
             <div data-role="seek-wizard-step" data-step-name="Select data file" id="samples-select-data-file">
               <label>Select data file</label>
-              <%= filterable_association_select(filter_data_files_path) do %>
+              <%= filterable_association_select(filter_data_files_path(with_samples: true)) do %>
                   <%= render :partial => 'data_files/association_preview',
                              :collection => DataFile.with_extracted_samples.all_authorized_for('view').select { |d| d.extracted_samples.any? }.first(20),
                              :locals => { :existing => resource.samples }

@@ -129,6 +129,16 @@ Associations.Form.prototype.submit = function () {
     this.reset();
 };
 
+Associations.filter = function (filterField) {
+    $j.ajax($j(filterField).data('filterUrl'), {
+            data: { filter: $j(filterField).val() },
+            success: function (data) {
+                $j(filterField).siblings('[data-role="seek-association-candidate-list"]').html(data);
+            }
+        }
+    );
+};
+
 
 $j(document).ready(function () {
     // Markup
@@ -200,15 +210,18 @@ $j(document).ready(function () {
 
     $j('[data-role="seek-association-filter"]').keypress(function (e) {
         // If more than two characters were entered, or the input was cleared, or the ENTER key was pressed..
-        var filter = this;
-        if($j(this).val().length == 0 || $j(this).val().length >= 2 || e.keyCode == 13) {
-            $j.ajax($j(this).data('filterUrl'), {
-                    data: { filter: $j(this).val() },
-                    success: function (data) { $j(filter).siblings('[data-role="seek-association-candidate-list"]').html(data); }
-                }
-            );
+        var filterField = this;
+        if($j(filterField).val().length == 0 || $j(filterField).val().length >= 2 || e.keyCode == 13) {
+            Associations.filter(filterField);
             if(e.keyCode == 13)
                 e.preventDefault();
         }
+    });
+
+    // If no initial association candidates provided, make a filter call to get some.
+    $j('[data-role="seek-association-filter"]').each(function () {
+        var list = $j(this).siblings('[data-role="seek-association-candidate-list"]');
+        if($j.trim(list.html()) == '')
+            Associations.filter(this);
     });
 });

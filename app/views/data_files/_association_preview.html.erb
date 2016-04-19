@@ -1,7 +1,10 @@
+<% hide_sample_count ||= false %>
 <%= link_to '#', :class => "list-group-item selectable",
             'data-role' => 'seek-association-candidate',
             'data-association-id' => association_preview.id,
             'data-association-title' => association_preview.title do %>
     <%= association_preview.title %>
-    <small>(<%= pluralize(association_preview.extracted_samples.count, 'sample') %>)</small>
+    <% unless hide_sample_count %>
+        <small>(<%= pluralize(association_preview.extracted_samples.count, 'sample') %>)</small>
+    <% end %>
 <% end %>
