@@ -20,6 +20,7 @@ require 'action_view/test_case'
 require 'tmpdir'
 require 'authenticated_test_helper'
 require 'mock_helper'
+require 'html_helper'
 
 
 module ActionView
