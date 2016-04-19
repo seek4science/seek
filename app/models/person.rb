@@ -6,6 +6,8 @@ class Person < ActiveRecord::Base
   include Seek::Taggable
   include Seek::Roles::AdminDefinedRoles
 
+  auto_strip_attributes :email, :first_name, :last_name, :url
+
   alias_attribute :title, :name
 
   acts_as_yellow_pages

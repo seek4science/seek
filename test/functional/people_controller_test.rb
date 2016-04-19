@@ -76,6 +76,15 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to registration_form_admin_path(during_setup: 'true')
   end
 
+  test 'trim the email to avoid validation error' do
+    login_as(Factory(:admin))
+    assert_difference('Person.count') do
+        post :create, person: { first_name: 'test', email: ' hghg@sdfsd.com ' }
+    end
+    assert person = assigns(:person)
+    assert_equal 'hghg@sdfsd.com',person.email
+  end
+
   def test_second_registered_person_is_not_admin
     Person.delete_all
     person = Person.new(first_name: 'fred', email: 'fred@dddd.com')

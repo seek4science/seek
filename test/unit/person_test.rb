@@ -1060,4 +1060,21 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes person.projects, project
   end
 
+  test 'trim spaces from email, first_name, last_name' do
+    person = Factory(:brand_new_person)
+    person.email = ' fish@email.com '
+    person.first_name = ' bob '
+    person.last_name = ' monkhouse '
+    person.url = ' http://fish.com '
+    assert person.valid?
+    disable_authorization_checks do
+      person.save!
+    end
+    person.reload
+    assert_equal 'fish@email.com',person.email
+    assert_equal 'bob',person.first_name
+    assert_equal 'monkhouse',person.last_name
+    assert_equal 'http://fish.com',person.url
+  end
+
 end

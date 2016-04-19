@@ -147,6 +147,7 @@ class PeopleController < ApplicationController
   # POST /people
   # POST /people.xml
   def create
+
     @person = Person.new(params[:person])
 
     redirect_action="new"
