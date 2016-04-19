@@ -21,6 +21,7 @@ GIT
   remote: https://github.com/SysMO-DB/bioportal.git
   revision: 27253aec409f64bc7a1cb812b20119a982026422
   specs:
+    bioportal (2.3)
 
 GIT
   remote: https://github.com/SysMO-DB/convert_office.git
@@ -190,7 +191,7 @@ GEM
       hashie (>= 1.0, < 3.0)
       httparty
     arel (3.0.3)
-    ast (2.2.0)
+    ast (2.1.0)
     astrolabe (1.3.1)
       parser (~> 2.2)
     auto_strip_attributes (2.0.6)
@@ -202,7 +203,6 @@ GEM
     bcp47 (0.3.3)
       i18n
     bio (1.4.3.0001)
-    bioportal (2.2)
     bives (1.0)
       open4 (~> 1.3.0)
     bootstrap-multiselect-rails (0.0.4)
@@ -218,11 +218,11 @@ GEM
     cancan (1.6.10)
     celluloid (0.16.0)
       timers (~> 4.0.0)
-    childprocess (0.5.9)
+    childprocess (0.5.6)
       ffi (~> 1.0, >= 1.0.11)
     climate_control (0.0.3)
       activesupport (>= 3.0)
-    cocaine (0.5.8)
+    cocaine (0.5.7)
       climate_control (>= 0.0.3, < 1.0)
     code_analyzer (0.4.5)
       sexp_processor
