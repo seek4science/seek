@@ -28,14 +28,14 @@
               <span class="flag_as_left_icon"></span>
             </dt>
             <dd>
-              Mark a user as left the project on a given date.
-              This will allow the user's contributions to the project to be managed by the project's asset manager.
+              Mark that a user has left, or became inactive in, the project on a given date.
+              This will allow the user's contributions to the project to be managed by the project's asset housekeeper. It won't remove them from the project.
             </dd>
             <dt>
               <span class="unflag_as_left_icon"></span>
             </dt>
             <dd>
-              Unmark a user as left the project.
+              Unmark that a user has left, or became inactive in, the project.
             </dd>
             <dt>
               <span class="remove_member_icon"></span>
@@ -59,11 +59,11 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Flag as left the project</h4>
+            <h4 class="modal-title">Flag as inactive in the project</h4>
           </div>
           <div class="modal-body">
             <div class="form-group date-select">
-              <label>Date left at</label>
+              <label>Date became inactive at</label>
               <%= calendar_date_select_tag :leaving_date, Date.today, :time => "mixed", :class => "form-control" -%>
               <input id="leaving-person-id" type="hidden" value=""/>
               <input id="leaving-person-name" type="hidden" value=""/>
