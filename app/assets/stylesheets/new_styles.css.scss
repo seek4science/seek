@@ -1,8 +1,17 @@
 @import 'variables';
 @import 'mixins';
 
+html {
+  height: 100%;
+  position: relative;
+}
+
 body {
   border: none;
+  min-height: 100%;
+  position: relative;
+  margin: 0;
+  padding-bottom: $seek-footer-height + 20px;
 }
 
 #header {
@@ -75,29 +84,31 @@ ul.feed .file-type-icon img {
   padding: 2px;
   margin: 2px auto;
   background-color: #fff;
-  border: 1px solid #ccc;
   width: 90px;
   display: block;
   border-radius: 4px;
 }
 
 #ft {
-  color: $text-color;
   background-color: $panel-default-heading-bg;
-  bottom: 0;
-  margin-top: 2em;
+  position: absolute;
   text-align: center;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin-top: 2em;
   padding: 1em 0.5em;
   font-size: small;
-  border-top: 1px solid $panel-default-border;
-  border-bottom: 1px solid $panel-default-border;
 }
 
-#ft .logo-section {
-  border: 1px solid #ccc;
-  background-color: #fff;
-  padding: 0.5em;
-  border-radius: 4px;
+#ft .ft-info {
+  padding: 10px;
+}
+
+#seek-credit {
+  text-align: center;
+  padding-left: 10px;
+  float: right;
 }
 
 #delete-favourite-zone {

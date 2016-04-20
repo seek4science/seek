@@ -29,7 +29,7 @@ function init() {
 	oDv.style.position="absolute";
 	oDv.style.visibility='hidden';
   oDv.style.zIndex='100000';
-	document.body.appendChild(oDv);	
+	document.getElementById('content').appendChild(oDv);
 }
 
 function defHdrStyle() {
@@ -306,11 +306,17 @@ function pauseBox(e) {
 }
 
 function showHideBox(e) {
-	oDv.style.visibility=(oDv.style.visibility!='visible')?'visible':'hidden';
+	if(oDv.style.visibility!='visible') {
+		oDv.style.visibility='visible';
+	} else {
+		hideBox();
+	}
+
 }
 
 function hideBox(e) {
 	oDv.style.visibility='hidden';
+	oDv.style.top = '0px';
 }
 
 var COL=0;
@@ -333,8 +339,7 @@ function fadeIn2(fs) {
 
 
 function fadeOut() {
-	oDv.style.visibility='hidden';
-	
+	hideBox();
 }
 
 function isChild(s,d) {
