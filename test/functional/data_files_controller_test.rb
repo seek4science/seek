@@ -2195,7 +2195,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'select[name=sample_type_id] option', count: 2
   end
 
-  test 'filtering for association forms' do
+  test 'filtering for sample association form' do
     person = Factory(:person)
     d1 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "fish")
     d2 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "frog")
@@ -2206,17 +2206,17 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     login_as(person.user)
 
-    get :filter, filter: ''
+    get :filter, filter: '', with_samples: true
     assert_select 'a', count: 3
     assert_select 'a', text: /no samples/, count: 0
     assert_response :success
 
-    get :filter, filter: 'f'
+    get :filter, filter: 'f', with_samples: true
     assert_select 'a', count: 2
     assert_select 'a', text: /fish/
     assert_select 'a', text: /frog/
 
-    get :filter, filter: 'fi'
+    get :filter, filter: 'fi', with_samples: true
     assert_select 'a', count: 1
     assert_select 'a', text: /fish/
   end
