@@ -40,6 +40,14 @@ class SamplesController < ApplicationController
     end
   end
 
+  def index
+    if @data_file || @sample_type
+      respond_with(@samples)
+    else
+      super
+    end
+  end
+
   def new
     @sample = Sample.new(sample_type_id: params[:sample_type_id])
     respond_with(@sample)
@@ -127,7 +135,7 @@ class SamplesController < ApplicationController
   def get_sample_type
     if params[:sample_type_id] || @data_file.possible_sample_types.count == 1
       if params[:sample_type_id]
-        @sample_type = SampleType.find(params[:sample_type_id])
+        @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       else
         @sample_type = @data_file.possible_sample_types.last
       end
@@ -155,9 +163,9 @@ class SamplesController < ApplicationController
         end
       end
 
-      @samples = Sample.authorize_asset_collection(@data_file.extracted_samples.all, 'view')
+      @samples = Sample.authorize_asset_collection(@data_file.extracted_samples.includes(:sample_type => :sample_attributes).all, 'view')
     elsif params[:sample_type_id]
-      @sample_type = SampleType.find(params[:sample_type_id])
+      @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       @samples = Sample.authorize_asset_collection(@sample_type.samples.all, 'view')
     else
       find_assets

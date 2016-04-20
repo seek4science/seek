@@ -290,18 +290,30 @@ class DataFilesController < ApplicationController
   end
 
   def filter
+    if params[:with_samples]
+      scope = DataFile.with_extracted_samples
+    else
+      scope = DataFile
+    end
+
     @data_files = DataFile.authorize_asset_collection(
-        DataFile.with_extracted_samples.where("data_files.title LIKE ?", "#{params[:filter]}%"), 'view'
+        scope.where("data_files.title LIKE ?", "#{params[:filter]}%"), 'view'
     ).first(20)
 
     respond_to do |format|
-      format.html { render :partial => 'data_files/association_preview', :collection => @data_files }
+      format.html { render :partial => 'data_files/association_preview', :collection => @data_files, :locals => { :hide_sample_count => !params[:with_samples] } }
     end
   end
 
   def samples_table
     respond_to do |format|
-      format.html { render :partial => 'samples/table_view', :locals => { :samples => @data_file.extracted_samples.includes(:sample_type) } }
+      format.html do
+        render(partial: 'samples/table_view', locals: {
+          samples: @data_file.extracted_samples.includes(:sample_type),
+          source_url: samples_table_data_file_path(@data_file)
+        })
+      end
+      format.json { @samples = @data_file.extracted_samples.select([:id, :title, :json_metadata]) }
     end
   end
 

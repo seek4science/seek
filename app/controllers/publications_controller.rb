@@ -106,7 +106,7 @@ class PublicationsController < ApplicationController
     investigation_ids = params[:investigation_ids] || []
     study_ids = params[:study_ids] || []
     assay_ids = params[:assay_ids] || []
-    data_file_ids = params[:data_file_ids] || []
+    data_files = params[:data_files] || []
     model_ids = params[:model_ids] || []
 
     respond_to do |format|
@@ -118,8 +118,8 @@ class PublicationsController < ApplicationController
         create_or_update_associations study_ids, "Study", "view"
         create_or_update_associations assay_ids, "Assay", "edit"
 
-        data_file_ids = data_file_ids.collect{|data_file_id| data_file_id.split(',').first}
-        create_or_update_associations data_file_ids, "DataFile", "view"
+        data_files = data_files.map { |df| df['id'] }
+        create_or_update_associations data_files, "DataFile", "view"
 
         create_or_update_associations model_ids, "Model", "view"
 

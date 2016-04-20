@@ -2195,7 +2195,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'select[name=sample_type_id] option', count: 2
   end
 
-  test 'filtering for association forms' do
+  test 'filtering for sample association form' do
     person = Factory(:person)
     d1 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "fish")
     d2 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "frog")
@@ -2206,17 +2206,17 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     login_as(person.user)
 
-    get :filter, filter: ''
+    get :filter, filter: '', with_samples: true
     assert_select 'a', count: 3
     assert_select 'a', text: /no samples/, count: 0
     assert_response :success
 
-    get :filter, filter: 'f'
+    get :filter, filter: 'f', with_samples: true
     assert_select 'a', count: 2
     assert_select 'a', text: /fish/
     assert_select 'a', text: /frog/
 
-    get :filter, filter: 'fi'
+    get :filter, filter: 'fi', with_samples: true
     assert_select 'a', count: 1
     assert_select 'a', text: /fish/
   end
@@ -2234,6 +2234,36 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a[href=?]", data_file_path(data_file), text: data_file.title
       assert_select "a[href=?]", data_file_path(data_file2), text: data_file2.title, count: 0
     end
+  end
+
+  test "should get table view for data file" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
+    end
+    login_as(data_file.contributor)
+
+    get :samples_table, format: :json, id: data_file.id
+
+    assert_response :success
+
+    json = JSON.parse(@response.body)
+    assert_equal 3, json['data'].length
+  end
+
+  test "should not get table view for private data file if unauthorized" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
+    end
+
+    get :samples_table, format: :json, id: data_file.id
+
+    assert_response :forbidden
   end
 
   private

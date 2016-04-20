@@ -164,7 +164,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     #add association
-    put :update, :id => p,:author=>{},:data_file_ids=>["#{df.id.to_s},None"]
+    put :update, :id => p,:author=>{},:data_files=>[{ id: df.id.to_s }]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -306,7 +306,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should keep model and data associations after update" do
     p = publications(:pubmed_2)
     put :update, :id => p,:author=>{},:assay_ids=>[],
-        :data_file_ids => p.data_files.collect{|df| "#{df.id},None"},
+        :data_files => p.data_files.map { |df| { id: df.id } },
         :model_ids => p.models.collect{|m| m.id.to_s}
 
     assert_redirected_to publication_path(p)
@@ -499,8 +499,8 @@ class PublicationsControllerTest < ActionController::TestCase
 
     # 3 for events 'fancy_multiselect'
     assert_equal 3, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
-    # 10 = 2 each for investigations, studies, assays, datafiles, models (using bespoke association forms)
-    assert_equal 10, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
+    # 8 = 2 each for investigations, studies, assays, models (using bespoke association forms) - datafiles loaded asynchronously
+    assert_equal 8, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
   end
 
   test "programme publications through nested routing" do

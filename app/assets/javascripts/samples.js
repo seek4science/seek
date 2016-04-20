@@ -1,15 +1,16 @@
 var Samples = {};
 
-Samples.initTable = function (selector, enableRowSelection) {
+Samples.initTable = function (selector, enableRowSelection, opts) {
     var table;
     enableRowSelection = enableRowSelection || false;
+    opts = opts || {};
 
     $j('table tfoot th', selector).each( function () {
         var title = $j(this).text();
         $j(this).html('<input type="text" class="form-control" placeholder="Search '+title+'" />');
     });
 
-    var options = {
+    var options = $j.extend({}, opts, {
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
         dom: 'lr<"samples-table-container"t>ip', // Needed to place the buttons
         "columnDefs": [{
@@ -17,7 +18,26 @@ Samples.initTable = function (selector, enableRowSelection) {
             "visible": false,
             "searchable": false
         }]
-    };
+        //"initComplete": function () {  // THIS IS TOO SLOW - CRASHES BROWSER
+        //    console.log("Hiding empty columns");
+        //    table.columns().flatten().each(function (columnIndex) {
+        //        console.log("Col " + columnIndex);
+        //        if(table.columns(columnIndex).data()[0].every(function(v) { return v === null; }))
+        //            table.column(columnIndex).visible(false);
+        //    });
+        //}
+    });
+
+    if($j('table', selector).data('sourceUrl'))
+        options.ajax = $j('table', selector).data('sourceUrl');
+
+    if(options.ajax) {
+        options.columns = [{ data: 'id'},{ data: 'title'}];
+        $j('table thead th', selector).each(function (index, column) {
+            if($j(column).data('accessorName'))
+                options.columns.push({ data: 'data.' + $j(column).data('accessorName') });
+        });
+    }
 
     var dateColumns = [];
     $j('table thead th', selector).each(function (index, column) {
@@ -80,6 +100,5 @@ Samples.initTable = function (selector, enableRowSelection) {
         placement: 'top',
         trigger: 'hover'
     });
-
     return table;
 };

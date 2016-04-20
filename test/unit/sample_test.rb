@@ -163,7 +163,7 @@ class SampleTest < ActiveSupport::TestCase
     sample.weight = 88.9
     sample.postcode = 'M13 9PL'
     sample.address = 'Somewhere on earth'
-    assert_nil sample.json_metadata
+    assert_equal %({"full_name":null,"age":null,"weight":null,"address":null,"postcode":null}), sample.json_metadata
     sample.save!
     refute_nil sample.json_metadata
     assert_equal %({"full_name":"Jimi Hendrix","age":27,"weight":88.9,"address":"Somewhere on earth","postcode":"M13 9PL"}), sample.json_metadata
@@ -179,9 +179,9 @@ class SampleTest < ActiveSupport::TestCase
 
     sample.title_ = "the title"
     sample.updated_at_ = "the updated at"
-    assert_nil sample.json_metadata
+    assert_equal %({"title_":null,"updated_at_":null}), sample.json_metadata
     sample.save!
-    assert_equal %({"title":"the title","updated_at":"the updated at"}), sample.json_metadata
+    assert_equal %({"title_":"the title","updated_at_":"the updated at"}), sample.json_metadata
 
     sample = Sample.find(sample.id)
     assert_equal "the title",sample.title
@@ -314,6 +314,40 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal "the title",sample.title
     assert_equal "the title",sample.freeze_
     assert_equal "the updated_at",sample.updated_at_
+  end
+
+  test 'sample with clashing attribute names with private methods' do
+    sample_type = SampleType.new :title=>"with awkward attributes"
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"format",is_title:true, :sample_type => sample_type)
+    assert sample_type.valid?
+    sample = Sample.new title: 'testing'
+    sample.sample_type=sample_type
+
+    sample.format_ = "the title"
+    assert sample.valid?
+    sample.save!
+    assert_equal "the title",sample.title
+
+    sample=Sample.find(sample.id)
+    assert_equal "the title",sample.title
+    assert_equal "the title",sample.format_
+  end
+
+  test 'sample with clashing attribute names with dynamic rails methods' do
+    sample_type = SampleType.new :title=>"with awkward attributes"
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"title_was",is_title:true, :sample_type => sample_type)
+    assert sample_type.valid?
+    sample = Sample.new title: 'testing'
+    sample.sample_type=sample_type
+
+    sample.title_was_ = "the title"
+    assert sample.valid?
+    sample.save!
+    assert_equal "the title",sample.title
+
+    sample=Sample.find(sample.id)
+    assert_equal "the title",sample.title
+    assert_equal "the title",sample.title_was_
   end
 
 end

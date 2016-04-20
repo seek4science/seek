@@ -1,56 +1,59 @@
 <% sample_type = samples.first.sample_type %>
 <% shown_attributes = sample_type.sample_attributes.includes(:sample_attribute_type) %>
 <% link ||= false %>
+<% source_url ||= false %>
 
 <div data-role="seek-association-candidate-list">
   <div class="table-responsive">
-    <table class="table table-bordered samples-table" style="width: 100%">
+    <table class="table table-bordered samples-table" style="width: 100%" <%= "data-source-url=\"#{source_url}\"".html_safe if source_url %>>
       <% [:thead, :tfoot].each do |section| %>
           <%= content_tag(section) do %>
               <tr>
                 <th>ID</th>
                 <th>Title</th>
                 <% shown_attributes.each do |attribute| %>
-                    <th data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
+                    <th data-accessor-name="<%= attribute.accessor_name-%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
                 <% end %>
               </tr>
           <% end %>
       <% end %>
-      <tbody>
-      <% samples.each do |sample| %>
-          <%= content_tag(:tr) do %>
-              <td><%= sample.id %></td>
-              <td><%= sample.title %></td>
-              <% shown_attributes.each do |attribute| %>
-                  <% if (errors = sample.errors[attribute.accessor_name]).any? %>
-                      <td class="sample-field-error">
-                        <%# Wrapping <div> needed for popover to display properly %>
-                        <%= content_tag(:div, data: {
-                              toggle: 'popover',
-                              content: errors.map { |e| "#{attribute.title} #{e}<br/>" }.join.html_safe }) do %>
-                            <%= text_or_not_specified(sample.send(attribute.accessor_name), auto_link: link) %>
-                        <% end %>
-                      </td>
-                  <% else %>
-                      <td>
-                        <% case attribute.sample_attribute_type.base_type %>
-                        <% when 'Date' %>
-                            <%= Date.parse(sample.send(attribute.accessor_name)).strftime("%e %B %Y") %>
-                        <% when 'DateTime' %>
-                            <%= DateTime.parse(sample.send(attribute.accessor_name)).strftime("%e %B %Y %H:%M:%S") %>
-                        <% else %>
-                            <% if link && attribute.is_title %>
-                                <%= link_to(sample.send(attribute.accessor_name), sample) %>
-                            <% else %>
+      <% unless source_url %>
+          <tbody>
+          <% samples.each do |sample| %>
+              <%= content_tag(:tr) do %>
+                  <td><%= sample.id %></td>
+                  <td><%= sample.title %></td>
+                  <% shown_attributes.each do |attribute| %>
+                      <% if (errors = sample.errors[attribute.accessor_name]).any? %>
+                          <td class="sample-field-error">
+                            <%# Wrapping <div> needed for popover to display properly %>
+                            <%= content_tag(:div, data: {
+                                toggle: 'popover',
+                                content: errors.map { |e| "#{attribute.title} #{e}<br/>" }.join.html_safe }) do %>
                                 <%= text_or_not_specified(sample.send(attribute.accessor_name), auto_link: link) %>
                             <% end %>
-                        <% end %>
-                      </td>
+                          </td>
+                      <% else %>
+                          <td>
+                            <% case attribute.sample_attribute_type.base_type %>
+                            <% when 'Date' %>
+                                <%= Date.parse(sample.send(attribute.accessor_name)).strftime("%e %B %Y") %>
+                            <% when 'DateTime' %>
+                                <%= DateTime.parse(sample.send(attribute.accessor_name)).strftime("%e %B %Y %H:%M:%S") %>
+                            <% else %>
+                                <% if link && attribute.is_title %>
+                                    <%= link_to(sample.send(attribute.accessor_name), sample) %>
+                                <% else %>
+                                    <%= text_or_not_specified(sample.send(attribute.accessor_name), auto_link: link) %>
+                                <% end %>
+                            <% end %>
+                          </td>
+                      <% end %>
                   <% end %>
               <% end %>
           <% end %>
+          </tbody>
       <% end %>
-      </tbody>
     </table>
   </div>
   <% if samples.map { |s| s.errors.any? }.all? %>

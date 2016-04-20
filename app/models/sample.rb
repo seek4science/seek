@@ -14,7 +14,7 @@ class Sample < ActiveRecord::Base
 
   acts_as_asset
 
-  belongs_to :sample_type
+  belongs_to :sample_type, inverse_of: :samples
   belongs_to :originating_data_file, :class_name => 'DataFile'
 
   scope :default_order, order("title")
@@ -23,15 +23,15 @@ class Sample < ActiveRecord::Base
   include ActiveModel::Validations
   validates_with SampleAttributeValidator
 
-  after_initialize :setup_accessor_methods, :read_json_metadata, unless: 'sample_type.nil?'
+  #after_initialize :setup_accessor_methods, :read_json_metadata, unless: 'sample_type.nil?'
 
   before_save :set_json_metadata
   before_validation :set_title_to_title_attribute_value
 
   def sample_type=(type)
-    remove_accessor_methods if sample_type
-    super(type)
-    setup_accessor_methods if type
+    super
+    self.json_metadata = nil
+    @metadata = nil
   end
 
   def is_in_isa_publishable?
@@ -49,6 +49,22 @@ class Sample < ActiveRecord::Base
 
   def related_data_file
     originating_data_file
+  end
+
+  def metadata
+    if @metadata.blank?
+      if json_metadata.blank?
+        if sample_type.nil?
+          @metadata = {}
+        else
+          @metadata = JSON.parse(set_json_structure)
+        end
+      else
+        @metadata = JSON.parse(json_metadata)
+      end
+    else
+      @metadata
+    end
   end
 
   private
@@ -87,8 +103,12 @@ class Sample < ActiveRecord::Base
   end
 
   def set_json_metadata
+    self.json_metadata = @metadata.to_json
+  end
+
+  def set_json_structure
     hash = Hash[sample_type.sample_attributes.map do |attribute|
-      [attribute.parameterised_title, send(attribute.accessor_name)]
+      [attribute.accessor_name, nil]
     end]
     self.json_metadata = hash.to_json
   end
@@ -111,6 +131,30 @@ class Sample < ActiveRecord::Base
     return nil unless (sample_type && sample_type.sample_attributes.title_attributes.any?)
     title_attr=sample_type.sample_attributes.title_attributes.first
     self.send(title_attr.accessor_name)
+  end
+
+  def respond_to_missing?(method_name, include_private = false)
+    if metadata.keys.include?(method_name.to_s) || metadata.keys.include?(method_name.to_s.chomp('='))
+      true
+    else
+      super
+    end
+  end
+
+  def method_missing(method_name, *args)
+    setter = method_name.to_s.end_with?('=')
+    if setter
+      attribute_name = method_name.to_s.chomp('=')
+    else
+      attribute_name = method_name.to_s
+    end
+
+    if metadata.key?(attribute_name)
+      metadata[attribute_name] = args.first if setter
+      metadata[attribute_name]
+    else
+      super
+    end
   end
 
 end

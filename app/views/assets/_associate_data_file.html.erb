@@ -1,105 +1,77 @@
-<% resource_text ||= text_for_resource(resource)
-   associated_data_files = resource.data_files
-   all_data_files=authorised_data_files
-   project_data_files=authorised_data_files(current_user.person.projects)
-   select_truncate_length=120
-%>
-<%= folding_panel(t('data_file').pluralize, associated_data_files.blank?, :body_options => {:id => 'associate_data_fold_content'},
-                  :help_text => "Here you associate #{t('data_file')} in SEEK to this #{resource_text}.") do %>
-    <div class="row">
-      <div class="col-md-8">
-        <p style="color: #666666;">
-          The following <%= t('data_file').pluralize %> are involved in this <%= resource_text -%>:
-        </p>
-        <div id="data_file_to_list" class="box_editing_inner" style="line-height: 1.5">
-          <span class="none_text" id="data_files">Loading ...</span>
-        </div>
-        <div class="association_step">
-          <p style="color: #666666;">
-            You may select an existing <%= t('data_file') %> or <%= link_to "upload a new #{t('data_file')} here", new_data_file_path(:parent_name=>controller_name.underscore.singularize), :onclick => "window.open(this.href);return false;" %>  for the <%= resource_text -%>.
-          </p>
+<%
+  has_direction ||= false
+  has_relationships ||= false
+  resource_text ||= text_for_resource(resource)
 
-          <% if show_relationships -%>
-              <div class="form-group">
-                <%= label_tag "How was the data used in this #{resource_text}" %>
-                <%= select_tag :data_file_relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),:class => 'form-control' %>
+  if params[:data_files] && params[:data_files].any?
+    collapse_panel = false
+    associated_data_files_json = associations_json_from_params(DataFile, params[:data_files])
+  elsif resource.respond_to?(:asset_assets)
+    assay_assets = resource.assay_assets.where(asset_type: 'DataFile').includes(:asset, :relationship_type)
+    collapse_panel = assay_assets.empty?
+    associated_data_files_json = associations_json_from_assay_assets(assay_assets)
+  else
+    collapse_panel = resource.data_files.empty?
+    associated_data_files_json = associations_json_from_relationship(resource.data_files)
+  end
+-%>
+
+<%= folding_panel("Data Files", collapse_panel, :body_options => {:id => 'associate_data_file_fold_content'},
+                  :help_text => "Here you associate Data Files in SEEK to this #{resource_text}.") do %>
+
+    <p>The following Data Files are involved in this <%= resource_text -%>:</p>
+
+    <% if has_direction -%>
+        <%= associations_list_group('data_file_to_list', 'direction.value', associated_data_files_json) do %>
+            <div class="row">
+              <div class="col-md-4">
+                <h3>Incoming</h3>
+                <%= associations_list('incoming-data-file-list', 'associations/data_file', '',
+                                      empty_text: 'No incoming data',
+                                      'data-multilist-group-value' => AssayAsset::Direction::INCOMING) %>
               </div>
-          <% end -%>
-          <div class="form-group">
-            <%= select_tag :possible_data_files,
-                           '<option>Loading...</option>',
-                           {:class => 'form-control',:onchange=>"addSelectedDataFile();"+remote_function(
-                                   :method=>:get,
-                                   :url=>preview_data_files_path(:element=>"data_file_preview"),
-                                   :with=>"'id='+this.value",
-                                   :before=>"show_ajax_loader('data_file_preview')"
-                           )+";return(false)"
-                           } -%>
-          </div>
+              <div class="col-md-4">
+                <h3>Outgoing</h3>
+                <%= associations_list('outgoing-data-file-list', 'associations/data_file', '',
+                                      empty_text: 'No outgoing data',
+                                      'data-multilist-group-value' => AssayAsset::Direction::OUTGOING) %>
+              </div>
+              <div class="col-md-4">
+                <h3>No direction</h3>
+                <%= associations_list('other-data-file-list', 'associations/data_file', '',
+                                      empty_text: 'No other data',
+                                      'data-multilist-group-value' => AssayAsset::Direction::NODIRECTION) %>
+              </div>
+            </div>
+        <% end %>
+    <% else %>
+        <%= associations_list('data_file_to_list', 'associations/data_file', associated_data_files_json,
+                              empty_text: 'No data files') %>
+    <% end %>
 
-          <%= select_tag :data_file_ids,'',{:multiple=>true,:style=>"display:none;"} -%>
-          <%= check_box_tag :include_other_project_data_files, nil, false, {:onchange=>"toggle_data_file_list();",:style=>"margin-top:0.5em;"} -%> Associate Data files from other projects?
-        </div>
-      </div>
-      <div class="col-md-4">
-        <%= render :partial => 'assets/preview_box', :locals => {:preview_name => 'data_file'} %>
-      </div>
-    </div>
+    <hr/>
+
+    <%= association_selector('data_file_to_list', 'Associate data', 'Associate data', size: 'md') do %>
+        <label>Select data file</label>
+        <%= filterable_association_select(filter_data_files_path(:assay_id => resource.id)) do %>
+            <%= render :partial => 'data_files/association_preview', :collection => DataFile.limit(0),
+                       :locals => { :existing => resource.data_files }
+            %>
+        <% end %>
+
+        <hr/>
+        <% if has_relationships -%>
+            <div class="form-group">
+              <%= label_tag "How was the data used in this #{resource_text}" %>
+              <%= select_tag :relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),:class => 'form-control',
+                             'data-role' => 'seek-association-common-field' %>
+            </div>
+        <% end %>
+        <% if has_direction -%>
+            <div class="form-group">
+              <label>Select direction</label>
+              <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
+            </div>
+        <% end %>
+    <% end %>
 <% end %>
-
-<script type="text/javascript">
-    var datafileOptions = {
-        project: <%= ([["Select #{t('data_file')} ...",0]]|project_data_files.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
-        all: <%= ([["Select #{t('data_file')} ...",0]]|all_data_files.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>
-    };
-
-    function toggle_data_file_list() {
-        if ($('include_other_project_data_files').checked)
-            $j('#possible_data_files').html(optionsFromArray(datafileOptions.all));
-        else
-            $j('#possible_data_files').html(optionsFromArray(datafileOptions.project));
-    }
-
-
-    function check_show_add_data_file() {
-        i=$('possible_data_files').selectedIndex;
-        selected_id=$('possible_data_files').options[i].value;
-        if (selected_id=='0') {
-            $('add_data_file_link').hide();
-        }
-        else {
-            $('add_data_file_link').show();
-        }
-    }
-
-
-    <% resource.data_files.each do |data_file| -%>
-    <% if data_file.can_view? -%>
-    data_file_id = '<%= data_file.id -%>';
-    data_title = '<%= escape_javascript(data_file.title) -%>';
-    <% if resource.instance_of? Assay %>
-    relationship_type = '<%= escape_javascript(data_file.relationship_type(resource).try(:title) || "None") -%>';
-    <%  else %>
-    relationship_type = "None";
-    <%  end %>
-    addDataFile(data_title,data_file_id,relationship_type);
-    <% end -%>
-    <% end -%>
-
-    <% if params[:data_file_ids] %>
-    <% params[:data_file_ids].each do |id_and_rel_id| -%>
-    <% a_id, r_type = id_and_rel_id.split(",") %>
-    <% data_file = DataFile.find(a_id) %>
-    <% if data_file.can_view? -%>
-    data_file_id = '<%= data_file.id -%>';
-    data_title = '<%= escape_javascript(data_file.title) -%>';
-    relationship_type = '<%= r_type -%>';
-    addDataFile(data_title, data_file_id, relationship_type);
-    <% end -%>
-    <% end -%>
-    <% end -%>
-
-
-    updateDataFiles();
-    toggle_data_file_list();
-</script>

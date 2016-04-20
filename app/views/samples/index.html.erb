@@ -3,7 +3,11 @@
 <% if @data_file || @sample_type %>
     <% if @samples.any? %>
         <div id="samples-table">
-          <%= render partial: "samples/table_view", locals: { samples: @samples, link: true }%>
+          <% if @data_file %>
+              <%= render partial: "samples/table_view", locals: { samples: @samples, link: true, source_url: samples_table_data_file_path(@data_file) }%>
+          <% else %>
+              <%= render partial: "samples/table_view", locals: { samples: @samples, link: true }%>
+          <% end %>
         </div>
         <script>
           $j(document).ready(function () {

@@ -179,14 +179,16 @@ class AssaysController < ApplicationController
 
   def update_assets_linked_to_assay assay,params
     sop_ids               = params[:assay_sop_ids] || []
-    data_file_ids         = params[:data_file_ids] || []
+    data_files            = params[:data_files] || []
     model_ids             = params[:model_ids] || []
     samples               = params[:samples] || []
+
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
-    Array(data_file_ids).each do |text|
-      id, r_type = text.split(",")
-      d = DataFile.find(id)
-      assay_assets_to_keep << assay.associate(d, relationship: RelationshipType.find_by_title(r_type)) if d.can_view?
+    data_files.each do |data_file|
+      d = DataFile.find(data_file[:id])
+      assay_assets_to_keep << assay.associate(d, direction: data_file[:direction],
+                                              relationship: RelationshipType.find_by_id(data_file[:relationship_type])
+      ) if d.can_view?
     end
     Array(model_ids).each do |id|
       m = Model.find(id)

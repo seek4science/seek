@@ -38,8 +38,8 @@ module AssociationsHelper
   def filterable_association_select(filter_url, options = {}, &_block)
     options.reverse_merge!(multiple: false)
     content_tag(:div, class: 'form-group') do
-      content_tag(:input, '', class: 'form-control', 'data-role' => 'seek-association-filter',
-                              type: 'text', placeholder: 'Type to filter...',
+      text_field_tag(nil, nil, class: 'form-control', 'data-role' => 'seek-association-filter',
+                              placeholder: 'Type to filter...',
                               autocomplete: 'off', 'data-filter-url' => filter_url) +
       content_tag(:div, class: 'list-group association-candidate-list',
                   data: { role: 'seek-association-candidate-list',
@@ -53,5 +53,41 @@ module AssociationsHelper
     options.reverse_merge!(class: 'btn btn-primary',
                            'data-role' => 'seek-association-confirm-button')
     content_tag(:button, text, options)
+  end
+
+  def associations_json_from_relationship(related_items)
+    related_items.map do |item|
+      { title: item.title, id: item.id }
+    end.to_json
+  end
+
+  def associations_json_from_assay_assets(assay_assets)
+    assay_assets.map do |aa|
+      hash = { title: aa.asset.title, id: aa.asset_id,
+               direction: { value: aa.direction, text: direction_name(aa.direction) }
+      }
+      if aa.relationship_type
+        hash.merge!({ relationship_type: { value: aa.relationship_type.id,
+                                           text: aa.relationship_type.title } })
+      end
+
+      hash
+    end.to_json
+  end
+
+  def associations_json_from_params(model, association_params)
+    association_params.map do |association|
+      item = model.find(association[:id])
+      hash = { title: item.title, id: item.id,
+               direction: { value: association[:direction],
+                            text: direction_name(association[:direction]) }
+      }
+      unless association[:relationship_type].blank?
+        hash.merge!({ relationship_type: { value: association[:relationship_type],
+                                           text: RelationshipType.find_by_id(association[:relationship_type]).try(:title) } })
+      end
+
+      hash
+    end.to_json
   end
 end

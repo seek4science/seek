@@ -55,7 +55,7 @@
 
       <%=  f.fancy_multiselect :publications,:with_new_link=>true,:other_projects_checkbox=>true -%>
 
-      <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event, :show_relationships=>false} -%>
+      <%= render :partial => "assets/associate_data_file", :locals=>{:f=>f, :resource => @event } -%>
 
       <%= f.fancy_multiselect :presentations,:with_new_link=>true,:other_projects_checkbox=>true %>
 

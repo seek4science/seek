@@ -2,13 +2,18 @@
   resource_text ||= text_for_resource(resource)
 
   assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
-  associated_samples_json = assay_assets.map do |aa|
-    { title: aa.asset.title, id: aa.asset_id,
-      direction: { value: aa.direction, text: direction_name(aa.direction) } }
-  end.to_json
+
+  if params[:samples] && params[:samples].any?
+    collapse_panel = false
+    associated_samples_json = associations_json_from_params(Sample, params[:samples])
+  else
+    collapse_panel = assay_assets.empty?
+    associated_samples_json = associations_json_from_assay_assets(assay_assets)
+  end
+
 -%>
 
-<%= folding_panel("Samples", assay_assets.blank?, :body_options => {:id => 'associate_sample_fold_content'},
+<%= folding_panel("Samples", collapse_panel, :body_options => {:id => 'associate_sample_fold_content'},
                   :help_text => "Here you associate Samples in SEEK to this #{resource_text}.") do %>
 
     <p>The following Samples are involved in this <%= resource_text -%>:</p>
@@ -61,7 +66,7 @@
             <div data-role="seek-wizard-nav"></div>
             <div data-role="seek-wizard-step" data-step-name="Select data file" id="samples-select-data-file">
               <label>Select data file</label>
-              <%= filterable_association_select(filter_data_files_path) do %>
+              <%= filterable_association_select(filter_data_files_path(with_samples: true)) do %>
                   <%= render :partial => 'data_files/association_preview',
                              :collection => DataFile.with_extracted_samples.all_authorized_for('view').select { |d| d.extracted_samples.any? }.first(20),
                              :locals => { :existing => resource.samples }
@@ -107,17 +112,17 @@
       samplesTable = Samples.initTable($j('#data-file-samples-table'), true);
       // When at least one sample is selected, unlock step 3
       var handleRowSelect = function ( e, dt, type, indexes ) {
-        var selectedRows = samplesTable.rows({ selected: true });
+        var selectedRowData = samplesTable.rows({ selected: true }).data();
 
         batchSamplesForm.selectedItems = [];
-        selectedRows.every(function () {
+        for(var i = 0; i < selectedRowData.length; i++) {
           batchSamplesForm.selectedItems.push({
-            id: this.data()[0],
-            title: this.data()[1]
+            id: selectedRowData[i].id,
+            title: selectedRowData[i].title
           });
-        });
+        }
 
-        if(selectedRows.count() > 0) {
+        if(selectedRowData.length > 0) {
           wizard.step(3).unlock();
         } else {
           wizard.step(3).lock();
@@ -156,7 +161,7 @@
       wizard.reset();
     });
 
-    $j('#samples-select-data-file .selectable[data-role="seek-association-candidate"]').click(function () {
+    $j('#samples-select-data-file').on('click', '.selectable[data-role="seek-association-candidate"]', function () {
       var candidate = $j(this);
       candidate.spinner('add');
       $j.ajax('/data_files/'+$j(this).data('associationId')+'/samples_table', {

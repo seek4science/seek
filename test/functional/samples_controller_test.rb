@@ -132,6 +132,7 @@ class SamplesControllerTest < ActionController::TestCase
   test 'contributor can edit' do
     person = Factory(:person)
     login_as(person)
+
     sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
     get :edit,:id=>sample.id
     assert_response :success
@@ -345,17 +346,15 @@ class SamplesControllerTest < ActionController::TestCase
       Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
               originating_data_file: data_file)
     end
-    2.times do # private
-      Factory(:sample, sample_type: sample_type, policy: Factory(:private_policy), originating_data_file: data_file)
-    end
 
     login_as(data_file.contributor)
 
     get :index, data_file_id: data_file.id
 
     assert_response :success
-
-    assert_select '#samples-table tbody tr', count: 3
+    # Empty table - content is loaded asynchronously (see data_files_controller_test.rb)
+    assert_select '#samples-table tbody tr', count: 0
+    assert_select '#samples-table thead th', count: 3
   end
 
   test "should get table view for sample type" do

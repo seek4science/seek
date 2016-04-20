@@ -141,7 +141,7 @@ module AssaysHelper
         'Incoming'
       when AssayAsset::Direction::OUTGOING
         'Outgoing'
-      when AssayAsset::Direction::NODIRECTION
+      else
         'No direction'
     end
   end
