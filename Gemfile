@@ -59,7 +59,6 @@ gem 'bives'
 gem 'paperclip', '~>4.2.0'
 
 # Linked to SysMO Git repositories
-gem 'gibberish', git: 'https://github.com/SysMO-DB/gibberish.git'
 gem 'white_list', git: 'https://github.com/SysMO-DB/white_list.git'
 gem 'white_list_formatted_content', git: 'https://github.com/SysMO-DB/white_list_formatted_content.git'
 gem 'my_rails_settings', git: 'https://github.com/SysMO-DB/my_rails_settings.git', require: 'settings'
