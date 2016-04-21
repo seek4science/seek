@@ -120,18 +120,18 @@ module ISAHelper
       if item.can_view?
         description = item.description
         no_description_text = item.kind_of?(Publication) ? 'No abstract' : 'No description'
-        tooltip = description.blank? ? no_description_text : truncate(h(description), :length => 500)
+        tt = description.blank? ? no_description_text : truncate(h(description), :length => 500)
         #distinquish two assay classes
         if item.kind_of?(Assay)
           assay_class_title = item.assay_class.title
           assay_class_key = item.assay_class.key
           name = truncate("#{assay_class_title}: ".html_safe + h(item.title), :length => 110)
-          item_info = link_to("<b>#{assay_class_title}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
+          item_info = link_to("<b>#{assay_class_title}: </b>".html_safe +  h(item.title), polymorphic_path(item), 'data-tooltip' => tooltip(tt))
           fave_color = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
         else
           name = truncate("#{item_type.humanize}: ".html_safe + h(item.title), :length => 110)
-          item_info = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
+          item_info = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), 'data-tooltip' => tooltip(tt))
           fave_color = FILL_COLOURS[item_type] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
         end

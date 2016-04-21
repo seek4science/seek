@@ -7,7 +7,8 @@ logged_in_class = logged_in_and_registered? ? "class=logged_in" : ""
 
     <ul id="header">
       <li id="seek_logo">
-        <%= link_to image_tag(Seek::Config.header_home_logo_image, :alt => Seek::Config.application_name, :title => tooltip_title_attrib(Seek::Config.application_name)),
+        <%= link_to image_tag(Seek::Config.header_home_logo_image, :alt => Seek::Config.application_name,
+                              'data-tooltip' => tooltip(Seek::Config.application_name)),
                     root_path %>
       </li>
 

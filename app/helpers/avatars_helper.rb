@@ -28,7 +28,7 @@ module AvatarsHelper
       img
     else
       url ||= eval("#{object.class.name.downcase}_url(#{object.id})")
-      link_to(img, url, title: tooltip_title_attrib(tooltip_text))
+      link_to(img, url, 'data-tooltip' => tooltip(tooltip_text))
     end
   end
 

@@ -23,7 +23,7 @@
 
   <div>
     <% if item.is_published? %>
-        <span class="label label-default" title="<%= tooltip_title_attrib('This item has already been published.') %>">
+        <span class="label label-default" data-tooltip="<%= tooltip('This item has already been published.') %>">
           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
           Published
         </span>
@@ -39,7 +39,7 @@
           </div>
         </div>
     <% else %>
-        <span class="label label-warning" title="<%= tooltip_title_attrib('You do not have permission to pubish this item.') %>">
+        <span class="label label-warning" data-tooltip="<%= tooltip('You do not have permission to pubish this item.') %>">
           <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
           Can't publish
         </span>

@@ -18,7 +18,7 @@ module BiosamplesHelper
       return link_to image("edit"), edit_strain_path(strain) + "?from_biosamples=true", {:title => "Edit this strain", :target => '_blank'}
     else
       explanation = "You are not authorized to edit this Strain"
-      return image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
+      return image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",'data-tooltip' => tooltip(explanation)})
     end
   end
 
@@ -34,7 +34,7 @@ module BiosamplesHelper
                              :confirm => "Are you sure you want to delete this strain?", :method => :delete, :remote => true
       else
         explanation=unable_to_delete_text strain
-        image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
+        image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",'data-tooltip' => tooltip(explanation)})
       end ),
      edit_strain_link(strain)]
   end
@@ -79,7 +79,7 @@ module BiosamplesHelper
     creators << specimen.other_creators unless specimen.other_creators.blank?
 
     explanation = unable_to_delete_text specimen
-    disabled_delete_icon = image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
+    disabled_delete_icon = image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",'data-tooltip' => tooltip(explanation)})
 
     delete_icon = specimen.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this #{I18n.t 'biosamples.sample_parent_term'}"),
                          {:action => "destroy", :controller => 'biosamples', :id => specimen.id, :class => 'specimen', :id_column_position => id_column},
@@ -91,7 +91,7 @@ module BiosamplesHelper
       update_icon = link_to image("edit"), edit_specimen_path(specimen) + "?from_biosamples=true", {:title => "Edit this #{I18n.t 'biosamples.sample_parent_term'}", :target => '_blank'}
     else
       explanation = "You are not authorized to edit this #{I18n.t 'biosamples.sample_parent_term'}."
-      update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
+      update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",'data-tooltip' => tooltip(explanation)})
     end
     strain = specimen.strain
     strain_info = 'Strain' + ": "+ strain.info + "(Seek ID=#{strain.id})"
@@ -126,7 +126,7 @@ module BiosamplesHelper
 
   def sample_row_data sample
     explanation = unable_to_delete_text sample
-    disabled_delete_icon =  image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
+    disabled_delete_icon =  image('destroy', {:alt=>"Delete",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",'data-tooltip' => tooltip(explanation)})
 
     delete_icon = sample.can_delete? ? (link_to image("destroy", :alt => "Delete", :title => "Delete this sample"),
                              {:action => "destroy", :controller => 'biosamples', :id => sample.id, :class => 'sample', :id_column_position => 6},
@@ -138,7 +138,7 @@ module BiosamplesHelper
       update_icon = link_to image("edit"), edit_sample_path(sample) + "?from_biosamples=true", {:title => "Edit this sample", :target => '_blank'}
     else
       explanation = "You are not authorized to edit this Sample"
-      update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",:title=>"#{tooltip_title_attrib(explanation)}"})
+      update_icon = image('edit', {:alt=>"Edit",:class=>"disabled",:onclick=>"javascript:alert(\"#{explanation}\")",'data-tooltip' => tooltip(explanation)})
     end
 
     [sample.specimen_info,

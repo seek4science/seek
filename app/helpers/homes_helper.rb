@@ -60,9 +60,9 @@ module HomesHelper
   def display_single_entry(entry)
     return '' if entry.nil? || entry.url.blank?
 
-    entry_date, entry_title, feed_title, tooltip = feed_item_content_for_html(entry)
+    entry_date, entry_title, feed_title, tt = feed_item_content_for_html(entry)
     html = '<li>'
-    html << link_to(entry_title.html_safe, entry.url, title: tooltip, target: '_blank')
+    html << link_to(entry_title.html_safe, entry.url, 'data-tooltip' => tt, target: '_blank')
     html << "<br/><span class='subtle'>"
     html << feed_title
     html << " - #{time_ago_in_words(entry_date)} ago" unless entry_date.nil?
@@ -84,8 +84,8 @@ module HomesHelper
     feed_title = entry.feed_title || 'Unknown publisher'
     entry_date = determine_entry_date(entry)
     entry_summary = truncate(strip_tags(entry.summary || entry.content), length: 500)
-    tooltip = tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
-    [entry_date, entry_title, feed_title, tooltip]
+    tt = tooltip("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
+    [entry_date, entry_title, feed_title, tt]
   end
 
   def recently_downloaded_item_logs_hash(time = 1.month.ago, number_of_item = 10)
@@ -142,10 +142,10 @@ module HomesHelper
   end
 
   def construct_html_for_log_item(item, action)
-    icon, tooltip = log_item_content_for_html(item)
+    icon, tt = log_item_content_for_html(item)
     html = '<li>'
     html << "#{icon} "
-    html << link_to(item[:title], item[:url], title: tooltip)
+    html << link_to(item[:title], item[:url], 'data-tooltip' => tt)
     html << "<br/><span class='subtle'>#{item[:type]} - #{action} #{time_ago_in_words(item[:created_at])} ago</span>"
     html << '</li>'
     html
@@ -153,10 +153,10 @@ module HomesHelper
 
   def log_item_content_for_html(item)
     image = item[:avatar_image]
-    icon = link_to(image, item[:url], class: 'file-type-icon', title: tooltip_title_attrib(item[:type]))
+    icon = link_to(image, item[:url], class: 'file-type-icon', 'data-tooltip' => tooltip(item[:type]))
     description = item[:description] || item[:abstract]
-    tooltip = tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{item[:created_at]}</p>")
-    [icon, tooltip]
+    tt = tooltip("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{item[:created_at]}</p>")
+    [icon, tt]
   end
 
   def guest_login_link(text)

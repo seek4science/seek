@@ -8,7 +8,7 @@
             <%= text_field_tag :q, @search_query, :class=>"form-control", :placeholder=>"Search here..." %>
             <div class="input-group-btn">
               <%= submit_tag "Search", :name => nil, :class => 'btn btn-default' -%>
-              <button id="adv-search-btn" title="<%= tooltip_title_attrib('Click for more search options') -%>" type="button" class="btn btn-default" data-toggle="button" aria-pressed="false">
+              <button id="adv-search-btn" data-tooltip="<%= tooltip('Click for more search options') -%>" type="button" class="btn btn-default" data-toggle="button" aria-pressed="false">
                 &nbsp;<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;
               </button>
             </div>
@@ -29,7 +29,7 @@
             <% end %>
             <% if Seek::Config.external_search_enabled %>
                 <div class="checkbox">
-                  <label title="<%= tooltip_title_attrib(external_search_tooltip_text) -%>">
+                  <label data-tooltip="<%= tooltip(external_search_tooltip_text) -%>">
                     <%= check_box_tag :include_external_search, 1, @include_external_search, :class => "checkbox" -%> External
                   </label>
                 </div>

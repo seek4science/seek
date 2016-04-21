@@ -41,9 +41,9 @@
             <% explanation = "This content is stored externally and cannot be previewed." %>
         <% end %>
         <% if icon_view %>
-            <%= image('show', :onclick => "javascript:alert('#{explanation}')", :title => tooltip_title_attrib(explanation)) %>
+            <%= image('show', :onclick => "javascript:alert('#{explanation}')", 'data-tooltip' => tooltip(explanation)) %>
         <% else %>
-            <span class='disabled_icon disabled-button btn btn-default' onclick='javascript:alert("<%=explanation%>")' title='<%= tooltip_title_attrib(explanation) %>'>
+            <span class='disabled_icon disabled-button btn btn-default' onclick='javascript:alert("<%=explanation%>")' data-tooltip='<%= tooltip(explanation) %>'>
               <%= image('show', {:alt=>"View Content",:class=>"disabled"}) %> View Content
             </span>
         <% end %>

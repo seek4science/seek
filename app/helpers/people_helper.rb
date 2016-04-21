@@ -26,7 +26,7 @@ module PeopleHelper
     icons = ''
     person.roles.each do |role|
       icons << image("#{role}", :size => "#{size}x#{size}", :alt=>"#{role}",
-                     :title=>tooltip_title_attrib(role.humanize), :style=>"vertical-align: middle")
+                     'data-tooltip' => tooltip(role.humanize), :style=>"vertical-align: middle")
     end
     icons.html_safe
   end

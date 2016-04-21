@@ -1,5 +1,5 @@
 module FoldersHelper
-  def folder_asset_item_tooltip asset, delay=2000
+  def folder_asset_item_tooltip asset
     text="<h3>#{h(asset.title)}</h3>"
     text << "<p><b>Description: </b><em>#{text_or_not_specified(asset.description)}</em></p>" if asset.respond_to?("description")
     text << "<p><em>#{text_or_not_specified(asset.abstract)}</em></p>" if asset.respond_to?("abstract")
@@ -9,7 +9,7 @@ module FoldersHelper
     end
     text << "<p><b>Filename: </b>#{asset.original_filename}" if asset.respond_to?("original_filename")
 
-    tooltip_title_attrib(text, delay)
+    tooltip(text)
   end
 
   def folder_node_creation_javascript root_folders, root="root",map_var="elementFolderIds"
