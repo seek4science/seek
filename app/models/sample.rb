@@ -10,7 +10,7 @@ class Sample < ActiveRecord::Base
     text :sample_type do
       sample_type.title
     end
-  end
+  end if Seek::Config.solr_enabled
 
   acts_as_asset
 
