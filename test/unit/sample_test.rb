@@ -155,6 +155,85 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal 'M13 9PL', sample.postcode
   end
 
+  test 'handling booleans' do
+    sample = Sample.new title: 'testing'
+    sample_type = Factory(:simple_sample_type)
+    sample_type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false,:is_title=>false, :sample_type => sample_type)
+    sample.sample_type=sample_type
+
+    #the simple cases
+    sample.update_attributes({the_title:'fish',bool:true})
+    assert sample.valid?
+    sample.save!
+    assert sample.bool
+
+    sample.update_attributes({the_title:'fish',bool:false})
+    assert sample.valid?
+    sample.save!
+    refute sample.bool
+
+    #from a form
+    sample.update_attributes({the_title:'fish',bool:'1'})
+    assert sample.valid?
+    sample.save!
+    assert sample.bool
+
+    sample.update_attributes({the_title:'fish',bool:'0'})
+    assert sample.valid?
+    sample.save!
+    refute sample.bool
+
+    #as text
+    sample.update_attributes({the_title:'fish',bool:'true'})
+    assert sample.valid?
+    sample.save!
+    assert sample.bool
+
+    sample.update_attributes({the_title:'fish',bool:'false'})
+    assert sample.valid?
+    sample.save!
+    refute sample.bool
+
+    #as text2
+    sample.update_attributes({the_title:'fish',bool:'TRUE'})
+    assert sample.valid?
+    sample.save!
+    assert sample.bool
+
+    sample.update_attributes({the_title:'fish',bool:'FALSE'})
+    assert sample.valid?
+    sample.save!
+    refute sample.bool
+
+    #via accessors
+    sample.bool=true
+    assert sample.valid?
+    sample.save!
+    assert sample.bool
+    sample.bool=false
+    assert sample.valid?
+    sample.save!
+    refute sample.bool
+
+    sample.bool='1'
+    assert sample.valid?
+    sample.save!
+    assert sample.bool
+    sample.bool='0'
+    assert sample.valid?
+    sample.save!
+    refute sample.bool
+
+    sample.bool='true'
+    assert sample.valid?
+    sample.save!
+    assert sample.bool
+    sample.bool='false'
+    assert sample.valid?
+    sample.save!
+    refute sample.bool
+  end
+
   test 'json_metadata' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)

@@ -15,7 +15,8 @@ class SampleAttributeType < ActiveRecord::Base
     'String' => :is_string?,
     'DateTime' => :is_datetime?,
     'Date' => :is_date?,
-    'Text' => :is_string?
+    'Text' => :is_string?,
+    'Boolean' => :is_boolean?
   }
 
   def validate_allowed_type
@@ -94,5 +95,9 @@ class SampleAttributeType < ActiveRecord::Base
 
   def is_date?(value)
     fail 'Not a date time' unless Date.parse(value.to_s)
+  end
+
+  def is_boolean?(value)
+    fail 'Not a boolean' unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
   end
 end

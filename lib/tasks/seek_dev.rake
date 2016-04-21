@@ -417,6 +417,8 @@ namespace :seek_dev do
     string_type.save!
     chebi = SampleAttributeType.new title:"CHEBI ID",regexp:'CHEBI:[0-9]+', base_type:'String'
     chebi.save!
+    boolean = SampleAttributeType.new title:"Boolean",base_type:'Boolean'
+    boolean.save!
 
     SampleType.destroy_all
     #dummy type - just with some varied attributes
