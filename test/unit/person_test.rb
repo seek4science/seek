@@ -1065,7 +1065,7 @@ class PersonTest < ActiveSupport::TestCase
     person.email = ' fish@email.com '
     person.first_name = ' bob '
     person.last_name = ' monkhouse '
-    person.url = ' http://fish.com '
+    person.web_page = ' http://fish.com '
     assert person.valid?
     disable_authorization_checks do
       person.save!
@@ -1074,7 +1074,7 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 'fish@email.com',person.email
     assert_equal 'bob',person.first_name
     assert_equal 'monkhouse',person.last_name
-    assert_equal 'http://fish.com',person.url
+    assert_equal 'http://fish.com',person.web_page
   end
 
 end
