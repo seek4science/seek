@@ -47,4 +47,14 @@ namespace :seek do
         Seek::Config.project_news_number_of_entries
   end
 
+  task(:delete_orphaned_strains=>:environment) do
+    puts "Checking for orphaned Strains..."
+    disable_authorization_checks do
+      Strain.where("organism_id is NOT NULL").select { |s| s.organism.nil? }.each do |strain|
+        puts "Deleting #{strain.title}"
+      end
+    end
+    puts "Done"
+  end
+
 end
