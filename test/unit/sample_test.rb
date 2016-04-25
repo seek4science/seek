@@ -390,6 +390,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"freeze",is_title:true, :sample_type => sample_type)
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"updated_at",is_title:false, :sample_type => sample_type)
     assert sample_type.valid?
+    sample_type.save!
     sample = Sample.new title: 'testing'
     sample.sample_type=sample_type
 
@@ -407,8 +408,9 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'sample with clashing attribute names with private methods' do
     sample_type = SampleType.new :title=>"with awkward attributes"
-    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"format",is_title:true, :sample_type => sample_type)
+    sample_type.sample_attributes << Factory.build(:any_string_sample_attribute, :title=>"format",is_title:true, :sample_type => sample_type)
     assert sample_type.valid?
+    sample_type.save!
     sample = Sample.new title: 'testing'
     sample.sample_type=sample_type
 
@@ -426,6 +428,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type = SampleType.new :title=>"with awkward attributes"
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"title_was",is_title:true, :sample_type => sample_type)
     assert sample_type.valid?
+    sample_type.save!
     sample = Sample.new title: 'testing'
     sample.sample_type=sample_type
 
