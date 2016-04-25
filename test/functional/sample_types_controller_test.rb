@@ -48,9 +48,16 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "should get edit" do
+  test "should get edit if no samples" do
     get :edit, id: @sample_type
     assert_response :success
+  end
+
+  test "should not get edit if has existing samples" do
+    FactoryGirl.create_list(:sample, 3, sample_type: @sample_type)
+    get :edit, id: @sample_type
+    assert_response :redirect
+    assert_equal "Cannot edit this sample type - There are 3 samples using it.", flash[:error]
   end
 
   test "should update sample_type" do
@@ -84,12 +91,36 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert assigns(:sample_type).sample_attributes[1].is_title?
   end
 
+  test "should not update sample_type if has existing samples" do
+    FactoryGirl.create_list(:sample, 3, sample_type: @sample_type)
+    get :update, id: @sample_type, sample_attributes_attributes: {
+        pos: 1,
+        title: 'fish',
+        required: '1',
+        _destroy: '0',
+        id: @sample_type.sample_attributes.first.id
+    }
+    assert_response :redirect
+    assert_equal "Cannot update this sample type - There are 3 samples using it.", flash[:error]
+  end
+
   test "should destroy sample_type" do
     assert_difference('SampleType.count', -1) do
       delete :destroy, id: @sample_type
     end
 
     assert_redirected_to sample_types_path
+  end
+
+  test "should not destroy sample_type if has existing samples" do
+    FactoryGirl.create_list(:sample, 3, sample_type: @sample_type)
+
+    assert_no_difference('SampleType.count') do
+      delete :destroy, id: @sample_type
+    end
+
+    assert_response :redirect
+    assert_equal "Cannot destroy this sample type - There are 3 samples using it.", flash[:error]
   end
 
   test "create from template" do

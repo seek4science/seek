@@ -5,6 +5,9 @@ class SampleTypesController < ApplicationController
   include Seek::UploadHandling::DataUpload
   include Seek::IndexPager
 
+  before_filter :get_sample_type, :only => [:show, :edit, :update, :destroy]
+  before_filter :check_no_created_samples, :only => [:edit, :update, :destroy]
+
   def index
     @sample_types = SampleType.all
 
@@ -17,8 +20,6 @@ class SampleTypesController < ApplicationController
   # GET /sample_types/1
   # GET /sample_types/1.json
   def show
-    @sample_type = SampleType.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @sample_type }
@@ -61,7 +62,6 @@ class SampleTypesController < ApplicationController
 
   # GET /sample_types/1/edit
   def edit
-    @sample_type = SampleType.find(params[:id])
   end
 
   # POST /sample_types
@@ -84,8 +84,6 @@ class SampleTypesController < ApplicationController
   # PUT /sample_types/1
   # PUT /sample_types/1.json
   def update
-    @sample_type = SampleType.find(params[:id])
-
     respond_to do |format|
       if @sample_type.update_attributes(params[:sample_type])
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully updated.' }
@@ -100,7 +98,6 @@ class SampleTypesController < ApplicationController
   # DELETE /sample_types/1
   # DELETE /sample_types/1.json
   def destroy
-    @sample_type = SampleType.find(params[:id])
     @sample_type.destroy
 
     respond_to do |format|
@@ -108,4 +105,18 @@ class SampleTypesController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  private
+
+  def get_sample_type
+    @sample_type = SampleType.find(params[:id])
+  end
+
+  def check_no_created_samples
+    if (count = @sample_type.samples.count) > 0
+      flash[:error] = "Cannot #{action_name} this sample type - There are #{count} samples using it."
+      redirect_to @sample_type
+    end
+  end
+
 end
