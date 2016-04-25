@@ -150,11 +150,21 @@ class Sample < ActiveRecord::Base
     end
 
     if metadata.key?(attribute_name)
-      metadata[attribute_name] = args.first if setter
+      metadata[attribute_name] = pre_process_value(attribute_name,args.first) if setter
       metadata[attribute_name]
     else
       super
     end
+  end
+
+  def pre_process_value(accessor_name, value)
+    attribute=sample_type.sample_attributes.where(accessor_name:accessor_name).first
+    if attribute
+      attribute.pre_process_value(value)
+    else
+      value
+    end
+
   end
 
 end

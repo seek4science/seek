@@ -41,6 +41,10 @@ class SampleAttribute < ActiveRecord::Base
     super || is_title?
   end
 
+  def pre_process_value(value)
+    sample_attribute_type.pre_process_value(value)
+  end
+
   private
 
   # if not set, takes the next value for that sample type

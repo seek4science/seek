@@ -74,6 +74,18 @@ class SampleAttributeType < ActiveRecord::Base
     true
   end
 
+  def pre_process_value(value)
+    if base_type=='Boolean'
+      unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+        map = {'1'=>true,'0'=>false,'true'=>true,'false'=>false}
+        if map.keys.include?(value.downcase)
+          value = map[value.downcase]
+        end
+      end
+    end
+    value
+  end
+
   # CHECKERS for types, these should raise an exception if the type doesn't match
 
   # value can be Integer or String

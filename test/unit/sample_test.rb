@@ -159,7 +159,9 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.new title: 'testing'
     sample_type = Factory(:simple_sample_type)
     sample_type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false,:is_title=>false, :sample_type => sample_type)
+    sample_type.save!
     sample.sample_type=sample_type
+
 
     #the simple cases
     sample.update_attributes({the_title:'fish',bool:true})
@@ -232,6 +234,14 @@ class SampleTest < ActiveSupport::TestCase
     assert sample.valid?
     sample.save!
     refute sample.bool
+
+    #not valid
+    sample.update_attributes({the_title:'fish',bool:'fish'})
+    refute sample.valid?
+    sample.bool='true'
+    assert sample.valid?
+    sample.bool='fish'
+    refute sample.valid?
   end
 
   test 'json_metadata' do
