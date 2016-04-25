@@ -11,8 +11,6 @@ class SampleAttributeType < ActiveRecord::Base
 
   BASE_TYPES = %w(Integer Float String DateTime Date Text Boolean)
 
-  @@handlers = {}
-
   def validate_allowed_type
     unless SampleAttributeType.allowed_base_types.include?(base_type)
       errors.add(:base_type, 'Not a valid base type')
@@ -67,6 +65,6 @@ class SampleAttributeType < ActiveRecord::Base
   end
 
   def base_type_handler
-    "Seek::Samples::AttributeTypeHandlers::#{base_type}AttributeTypeHandler".constantize.new
+    Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type)
   end
 end

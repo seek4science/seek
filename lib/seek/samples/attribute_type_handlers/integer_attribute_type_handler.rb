@@ -1,7 +1,7 @@
 module Seek
   module Samples
     module AttributeTypeHandlers
-      class IntegerAttributeTypeHandler < SampleAttributeHandler
+      class IntegerAttributeTypeHandler < BaseAttributeHandler
         def test_value(value)
           fail 'Not an integer' unless (Integer(value).to_s == value.to_s)
         end

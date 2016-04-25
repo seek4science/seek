@@ -1,7 +1,7 @@
 module Seek
   module Samples
     module AttributeTypeHandlers
-      class SampleAttributeHandler
+      class BaseAttributeHandler
         def convert(value)
           value
         end
