@@ -394,29 +394,17 @@ namespace :seek_dev do
       Sample.destroy_all
     }
 
-    SampleAttributeType.destroy_all
-
     #basic attribute types
-    two_words_type = SampleAttributeType.new title:"Two capitalized words",regexp:'[A-Z][a-z]+[ ][A-Z][a-z]+', base_type:'String'
-    two_words_type.save!
-    date_time_type = SampleAttributeType.new title:'Date time',base_type:'DateTime'
-    date_time_type.save!
-    date_time = SampleAttributeType.new title:'Date',base_type:'Date'
-    date_time.save!
-    integer_type = SampleAttributeType.new title:"Integer", base_type:'Integer'
-    integer_type.save!
-    float_type = SampleAttributeType.new title:"Float", base_type:'Float'
-    float_type.save!
-    web_link_type = SampleAttributeType.new title:"Web link",base_type:'String',regexp:URI.regexp(%w(http https)).to_s
-    web_link_type.save!
-    email_type = SampleAttributeType.new title:"Email address",base_type:'String',regexp:RFC822::EMAIL.to_s
-    email_type.save!
-    text_type = SampleAttributeType.new title:"Text",base_type:'Text'
-    text_type.save!
-    string_type = SampleAttributeType.new title:"String", base_type: 'String'
-    string_type.save!
-    chebi = SampleAttributeType.new title:"CHEBI ID",regexp:'CHEBI:[0-9]+', base_type:'String'
-    chebi.save!
+    two_words_type = SampleAttributeType.find_by_title('Two capitalized words')
+    date_time_type = SampleAttributeType.find_by_title('Date time')
+    date_time = SampleAttributeType.find_by_title('Date')
+    integer_type = SampleAttributeType.find_by_title('Integer')
+    float_type = SampleAttributeType.find_by_title('Float')
+    web_link_type = SampleAttributeType.find_by_title('Web link')
+    email_type = SampleAttributeType.find_by_title('Email address')
+    text_type = SampleAttributeType.find_by_title('Text')
+    string_type = SampleAttributeType.find_by_title('String')
+    chebi = SampleAttributeType.find_by_title('CHEBI ID')
 
     SampleType.destroy_all
     #dummy type - just with some varied attributes
