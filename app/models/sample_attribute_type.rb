@@ -9,15 +9,9 @@ class SampleAttributeType < ActiveRecord::Base
 
   scope :primitive_string_types, where(base_type: 'String', regexp: '.*')
 
-  BASE_TYPE_AND_CHECKER_MAP = {
-    'Integer' => :is_integer?,
-    'Float' => :is_float?,
-    'String' => :is_string?,
-    'DateTime' => :is_datetime?,
-    'Date' => :is_date?,
-    'Text' => :is_string?,
-    'Boolean' => :is_boolean?
-  }
+  BASE_TYPES = %w(Integer Float String DateTime Date Text Boolean)
+
+  @@handlers = {}
 
   def validate_allowed_type
     unless SampleAttributeType.allowed_base_types.include?(base_type)
@@ -26,7 +20,7 @@ class SampleAttributeType < ActiveRecord::Base
   end
 
   def self.allowed_base_types
-    BASE_TYPE_AND_CHECKER_MAP.keys
+    BASE_TYPES
   end
 
   def self.default
@@ -65,51 +59,14 @@ class SampleAttributeType < ActiveRecord::Base
   end
 
   def check_value_against_base_type(value)
-    checker = BASE_TYPE_AND_CHECKER_MAP[base_type]
-    begin
-      send(checker, value)
-    rescue
-      return false
-    end
-    true
+    base_type_handler.validate_value(value)
   end
 
   def pre_process_value(value)
-    if base_type=='Boolean'
-      unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
-        map = {'1'=>true,'0'=>false,'true'=>true,'false'=>false}
-        if map.keys.include?(value.downcase)
-          value = map[value.downcase]
-        end
-      end
-    end
-    value
+    base_type_handler.convert(value)
   end
 
-  # CHECKERS for types, these should raise an exception if the type doesn't match
-
-  # value can be Integer or String
-  def is_integer?(value)
-    fail 'Not an integer' unless (Integer(value).to_s == value.to_s)
-  end
-
-  def is_string?(value)
-    fail 'Not a string' unless value.is_a?(String)
-  end
-
-  def is_float?(value)
-    fail 'Not a float' unless (Float(value).to_s == value.to_s || Integer(value).to_s == value.to_s )
-  end
-
-  def is_datetime?(value)
-    fail 'Not a date time' unless DateTime.parse(value.to_s)
-  end
-
-  def is_date?(value)
-    fail 'Not a date time' unless Date.parse(value.to_s)
-  end
-
-  def is_boolean?(value)
-    fail 'Not a boolean' unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+  def base_type_handler
+    "Seek::Samples::AttributeTypeHandlers::#{base_type}AttributeTypeHandler".constantize.new
   end
 end

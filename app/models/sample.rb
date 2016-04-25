@@ -134,7 +134,7 @@ class Sample < ActiveRecord::Base
   end
 
   def respond_to_missing?(method_name, include_private = false)
-    if metadata.keys.include?(method_name.to_s) || metadata.keys.include?(method_name.to_s.chomp('='))
+    if metadata.keys.include?(method_name.to_s.chomp('='))
       true
     else
       super
@@ -143,28 +143,18 @@ class Sample < ActiveRecord::Base
 
   def method_missing(method_name, *args)
     setter = method_name.to_s.end_with?('=')
-    if setter
-      attribute_name = method_name.to_s.chomp('=')
-    else
-      attribute_name = method_name.to_s
-    end
+    attribute_name = method_name.to_s.chomp('=')
 
     if metadata.key?(attribute_name)
-      metadata[attribute_name] = pre_process_value(attribute_name,args.first) if setter
+      metadata[attribute_name] = attribute_for_attribute_name(attribute_name).pre_process_value(args.first) if setter
       metadata[attribute_name]
     else
       super
     end
   end
 
-  def pre_process_value(accessor_name, value)
-    attribute=sample_type.sample_attributes.where(accessor_name:accessor_name).first
-    if attribute
-      attribute.pre_process_value(value)
-    else
-      value
-    end
-
+  def attribute_for_attribute_name(attribute_name)
+    sample_type.sample_attributes.where(accessor_name:attribute_name).first
   end
 
 end
