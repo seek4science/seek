@@ -32,8 +32,6 @@ project.save!
 puts "Created default project."
 
 # Sample attribute types
-two_words_type = SampleAttributeType.new title:"Two capitalized words",regexp:'[A-Z][a-z]+[ ][A-Z][a-z]+', base_type:'String'
-two_words_type.save!
 date_time_type = SampleAttributeType.new title:'Date time',base_type:'DateTime'
 date_time_type.save!
 date_time = SampleAttributeType.new title:'Date',base_type:'Date'
