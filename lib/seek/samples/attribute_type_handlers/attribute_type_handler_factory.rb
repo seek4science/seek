@@ -3,8 +3,11 @@ module Seek
     module AttributeTypeHandlers
       class AttributeTypeHandlerFactory
         include Singleton
-        cattr_accessor :handlers do
-          {}
+
+        attr_accessor :handlers
+
+        def initialize
+          @handlers = {}
         end
 
         def for_base_type(base_type)
