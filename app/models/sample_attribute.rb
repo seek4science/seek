@@ -14,7 +14,7 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, where(is_title: true)
 
-  def title= title
+  def title=(title)
     super
     generate_accessor_name
     self.title
@@ -29,7 +29,7 @@ class SampleAttribute < ActiveRecord::Base
   # if there is a clash with a sample method then _ is prepended
   def generate_accessor_name
     name = parameterised_title
-    name += '_' while (Sample.attribute_method?(name) || Sample.private_method_defined?(name))
+    name += '_' while Sample.attribute_method?(name) || Sample.private_method_defined?(name)
     self.accessor_name = name
   end
 
@@ -39,6 +39,10 @@ class SampleAttribute < ActiveRecord::Base
 
   def required?
     super || is_title?
+  end
+
+  def pre_process_value(value)
+    sample_attribute_type.pre_process_value(value)
   end
 
   private

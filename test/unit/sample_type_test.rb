@@ -138,7 +138,8 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'build from template' do
-    string_type = Factory(:string_sample_attribute_type, title:'String')
+    default_type = SampleAttributeType.default
+    default_type ||= Factory(:string_sample_attribute_type, title:'String')
 
     sample_type = SampleType.new title:'from template'
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
@@ -152,7 +153,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     assert sample_type.sample_attributes.first.is_title?
     sample_type.sample_attributes.each do |attr|
-      assert_equal string_type,attr.sample_attribute_type
+      assert_equal default_type,attr.sample_attribute_type
     end
 
     assert sample_type.valid?
@@ -167,7 +168,8 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   #a less clean template, to check it takes the last sample sheet, and handles irregular columns
   test 'build from template2' do
-    string_type = Factory(:string_sample_attribute_type, title:'String')
+    default_type = SampleAttributeType.default
+    default_type ||= Factory(:string_sample_attribute_type, title:'String')
 
     sample_type = SampleType.new title:'from template'
     sample_type.content_blob = Factory(:sample_type_template_content_blob2)
@@ -181,7 +183,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     assert sample_type.sample_attributes.first.is_title?
     sample_type.sample_attributes.each do |attr|
-      assert_equal string_type,attr.sample_attribute_type
+      assert_equal default_type,attr.sample_attribute_type
     end
 
     assert sample_type.valid?

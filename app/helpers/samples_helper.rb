@@ -9,6 +9,8 @@ module SamplesHelper
         calendar_date_select :sample, attribute.accessor_name, :time=>:mixed, :class=>"form-control  #{clz}"
       when 'Date'
         calendar_date_select :sample, attribute.accessor_name, :time=>false, :class=>"form-control  #{clz}"
+      when 'Boolean'
+        check_box :sample, attribute.accessor_name,:class=>"#{clz}"
       else
         text_field :sample, attribute.accessor_name, :class=>"form-control #{clz}"
     end

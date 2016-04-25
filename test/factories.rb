@@ -1127,6 +1127,11 @@ end
     f.base_type 'Text'
   end
 
+  Factory.define(:boolean_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "Boolean attribute type #{n}"}
+    f.base_type 'Boolean'
+  end
+
   Factory.define(:sample_attribute) do |f|
     f.sequence(:title) {|n| "Sample attribute #{n}"}
     f.association :sample_type, :factory => :sample_type
@@ -1134,12 +1139,12 @@ end
 
   #a string that must contain 'xxx'
   Factory.define(:simple_string_sample_attribute, :parent=>:sample_attribute) do |f|
-    f.sample_attribute_type Factory.build(:string_sample_attribute_type,regexp:".*xxx.*")
+    f.sample_attribute_type Factory(:string_sample_attribute_type,regexp:".*xxx.*")
     f.required true
   end
 
   Factory.define(:any_string_sample_attribute, :parent=>:sample_attribute) do |f|
-    f.sample_attribute_type Factory.build(:string_sample_attribute_type)
+    f.sample_attribute_type Factory(:string_sample_attribute_type)
     f.required true
   end
 

@@ -394,18 +394,6 @@ namespace :seek_dev do
       Sample.destroy_all
     }
 
-    #basic attribute types
-    two_words_type = SampleAttributeType.find_by_title('Two capitalized words')
-    date_time_type = SampleAttributeType.find_by_title('Date time')
-    date_time = SampleAttributeType.find_by_title('Date')
-    integer_type = SampleAttributeType.find_by_title('Integer')
-    float_type = SampleAttributeType.find_by_title('Float')
-    web_link_type = SampleAttributeType.find_by_title('Web link')
-    email_type = SampleAttributeType.find_by_title('Email address')
-    text_type = SampleAttributeType.find_by_title('Text')
-    string_type = SampleAttributeType.find_by_title('String')
-    chebi = SampleAttributeType.find_by_title('CHEBI ID')
-
     SampleType.destroy_all
     #dummy type - just with some varied attributes
     dummy_type = SampleType.new title:"Dummy sample type"

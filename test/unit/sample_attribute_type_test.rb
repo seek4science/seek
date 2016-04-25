@@ -129,13 +129,21 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute web_type.validate_value?('moonbeam')
   end
 
+  test 'boolean' do
+    bool_type = SampleAttributeType.new title:"bool",base_type:'Boolean'
+    assert bool_type.valid?
+    assert bool_type.validate_value?(true)
+    assert bool_type.validate_value?(false)
+    refute bool_type.validate_value?('fish')
+  end
+
   test 'to json' do
     type = SampleAttributeType.new(title: 'x-type', base_type: 'String', regexp: 'xxx')
     assert_equal %({"title":"x-type","base_type":"String","regexp":"xxx"}), type.to_json
   end
 
   test 'allowed types' do
-    assert_equal %w(Date DateTime Float Integer String Text).sort, SampleAttributeType.allowed_base_types.sort
+    assert_equal %w(Boolean Date DateTime Float Integer String Text).sort, SampleAttributeType.allowed_base_types.sort
   end
 
   test 'chebi atribute' do
