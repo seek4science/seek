@@ -12,7 +12,8 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
            :environment,
-           :consolidate_news_feeds
+           :consolidate_news_feeds,
+           :delete_orphaned_strains
        ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -52,6 +53,7 @@ namespace :seek do
     disable_authorization_checks do
       Strain.where("organism_id is NOT NULL").select { |s| s.organism.nil? }.each do |strain|
         puts "Deleting #{strain.title}"
+        strain.destroy
       end
     end
     puts "Done"
