@@ -77,7 +77,11 @@ class Strain < ActiveRecord::Base
   end
 
   def can_delete? user=User.current_user
-    contributor.nil? && organism && organism.can_delete?(user)
+    if contributor.nil?
+      organism && organism.can_delete?(user)
+    else
+      super
+    end
   end
 
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
