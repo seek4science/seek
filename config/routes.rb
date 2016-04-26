@@ -367,6 +367,8 @@ SEEK::Application.routes.draw do
     resources :content_blobs do
       member do
         get :view_pdf_content
+        get :view_text_content
+        get :view_content
         get :get_pdf
         get :download
       end
@@ -397,6 +399,8 @@ SEEK::Application.routes.draw do
     resources :content_blobs do
       member do
         get :view_pdf_content
+        get :view_text_content
+        get :view_content
         get :get_pdf
         get :download
       end
@@ -442,10 +446,12 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
-    resources :content_blobs do
 
+    resources :content_blobs do
       member do
         get :view_pdf_content
+        get :view_text_content
+        get :view_content
         get :get_pdf
         get :download
       end
@@ -483,6 +489,8 @@ SEEK::Application.routes.draw do
     resources :content_blobs do
       member do
         get :view_pdf_content
+        get :view_text_content
+        get :view_content
         get :get_pdf
         get :download
       end

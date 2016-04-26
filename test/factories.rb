@@ -820,6 +820,24 @@ end
     f.original_filename 'txt_test.txt'
   end
 
+  Factory.define(:csv_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/csv_test.csv", "rb").read
+    f.content_type "text/x-comma-separated-values"
+    f.original_filename 'csv_test.csv'
+  end
+
+  Factory.define(:tsv_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/tsv_test.tsv", "rb").read
+    f.content_type "text/tab-separated-values"
+    f.original_filename 'tsv_test.tsv'
+  end
+
+  Factory.define(:json_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/slideshare.json", "rb").read
+    f.content_type "application/json"
+    f.original_filename 'slideshare.json'
+  end
+
   Factory.define(:typeless_content_blob, :parent=>:content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/file_with_no_extension", "rb").read
     f.content_type nil
