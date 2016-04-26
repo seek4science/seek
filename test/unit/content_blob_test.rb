@@ -710,4 +710,15 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal 5000, blob.file_size
   end
 
+  test 'is_text?' do
+    assert Factory(:txt_content_blob).is_text?
+    assert Factory(:csv_content_blob).is_text?
+    assert Factory(:tsv_content_blob).is_text?
+    assert Factory(:teusink_model_content_blob).is_text?
+    assert Factory(:json_content_blob).is_text?
+
+    refute Factory(:ppt_content_blob).is_text?
+    refute Factory(:binary_content_blob).is_text?
+  end
+
 end

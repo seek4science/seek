@@ -1,11 +1,24 @@
 class ContentBlobsController < ApplicationController
 
-  before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_pdf_content, :download]
-  before_filter :find_and_authorize_content_blob, :only=>[:get_pdf, :view_pdf_content, :download]
+  before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_text_content,:view_content,:view_pdf_content, :download]
+  before_filter :find_and_authorize_content_blob, :only=>[:get_pdf, :view_text_content,:view_content,:view_pdf_content, :download]
   before_filter :set_asset_version, :only=>[:get_pdf, :download]
 
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
+
+  def view_content
+    @content_url=polymorphic_path([@asset,@content_blob], :action => 'view_text_content',:intent=>:inline_view, :code => params[:code])
+    respond_to do |format|
+      format.html
+    end
+    #view_text_content
+  end
+
+  def view_text_content
+    @text_url = polymorphic_path([@asset,@content_blob], :action => 'download',:intent=>:inline_view, :code => params[:code])
+    render file: @content_blob.filepath, layout: false, content_type: 'text/plain'
+  end
 
   def view_pdf_content
     #param code is used for temporary link

@@ -16,10 +16,7 @@ module Seek
         def self.is_taggable?
           false #defaults to false, unless it includes Taggable which will override this and check the configuration
         end
-
       end
-
-
     end
 
     #takes and ignores arguments for use in :after_add => :update_timestamp, etc.
