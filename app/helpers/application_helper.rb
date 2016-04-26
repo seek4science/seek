@@ -206,7 +206,7 @@ module ApplicationHelper
   end
   
   def text_or_not_specified text, options = {}
-    text=text.to_s if text.kind_of?(Numeric)
+    text=text.to_s
     if text.nil? or text.chomp.empty?
       not_specified_text||=options[:none_text]
       not_specified_text||="No description specified" if options[:description]==true
