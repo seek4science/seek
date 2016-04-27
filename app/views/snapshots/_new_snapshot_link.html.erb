@@ -3,7 +3,7 @@
 <% else %>
     <% explanation = "You may only create snapshots of publicly accessible #{item.class.name.pluralize.downcase}." %>
     <li>
-      <span class='disabled_icon disabled' onclick='javascript:alert("<%= explanation-%>")' title='<%= tooltip_title_attrib(explanation) -%>'>
+      <span class='disabled_icon disabled' onclick='javascript:alert("<%= explanation-%>")' data-tooltip='<%= tooltip(explanation) -%>'>
           <%= image('snapshot', {:alt=>"Snapshot", :class=>"disabled"}) %> Make Snapshot
       </span>
     </li>

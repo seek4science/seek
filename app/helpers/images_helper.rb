@@ -5,9 +5,9 @@ module ImagesHelper
 
   include Seek::MimeTypes
   
-  def info_icon_with_tooltip(info_text, delay=200)
+  def info_icon_with_tooltip(info_text)
     return image("info",
-      :title => tooltip_title_attrib(info_text, delay),
+      'data-tooltip' => tooltip(info_text),
       :style => "vertical-align:middle;")
   end
 
@@ -61,7 +61,7 @@ module ImagesHelper
   end
   
   def help_icon(text, delay=200, extra_style="")
-    image("info", :alt=>"help", :title=>tooltip_title_attrib(text,delay), :style => "vertical-align: middle;#{extra_style}")
+    image("info", :alt=>"help", 'data-tooltip' => tooltip(text), :style => "vertical-align: middle;#{extra_style}")
   end
   
   def flag_icon(country, text=country, margin_right='0.3em')
@@ -71,7 +71,7 @@ module ImagesHelper
     
     if code && !code.empty?
       image_tag("famfamfam_flags/#{code.downcase}.png",
-        :title => "header=[] body=[<b>Location: </b>#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[200]",
+        'data-tooltip' => tooltip(text),
         :style => "vertical-align:middle; margin-right: #{margin_right};")
     else
       ''
@@ -101,7 +101,7 @@ module ImagesHelper
       return html.html_safe
     elsif model_item.can_manage?(user)
       explanation=unable_to_delete_text model_item
-      html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span></li>"
+      html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' data-tooltip='#{tooltip(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete #{item_name} </span></li>"
       return html.html_safe
     end
   end
@@ -137,15 +137,15 @@ module ImagesHelper
   end
 
   def toggle_image(margin_left,key)
-    image_tag icon_filename_for_key(key), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => key, :title=>tooltip_title_attrib("#{key.capitalize} for more details")
+    image_tag icon_filename_for_key(key), :style => "margin-left: #{margin_left}; vertical-align: middle;", :alt => key, 'data-tooltip' => tooltip("#{key.capitalize} for more details")
   end
 
   def expand_plus_image(size="18x18")
-    image_tag icon_filename_for_key("expand_plus"),:size=>size,:alt => 'Expand', :title=>tooltip_title_attrib("Expand for more details")
+    image_tag icon_filename_for_key("expand_plus"),:size=>size,:alt => 'Expand', 'data-tooltip' => tooltip("Expand for more details")
   end
 
   def collapse_minus_image(size="18x18")
-    image_tag icon_filename_for_key("collapse_minus"),:size=>size,:alt => 'Collapse', :title=>tooltip_title_attrib("Collapse the details")
+    image_tag icon_filename_for_key("collapse_minus"),:size=>size,:alt => 'Collapse', 'data-tooltip' => tooltip("Collapse the details")
   end
 
   def header_logo_image

@@ -1,19 +1,26 @@
 <div class="row seek-homepage-button-container">
   <div class="col-sm-4">
     <%= frontpage_button(help_link(:get_started,url_only:true),
-                         '/assets/button_placeholder.png') do %>
+                         '/assets/front_page/home-get-started-3.svg') do %>
         Get started
     <% end %>
   </div>
   <div class="col-sm-4">
-    <%= frontpage_button(programmes_path,
-                         '/assets/button_placeholder.png') do %>
-        Who is using it?
-    <% end %>
+    <% if Seek::Config.programmes_enabled %>
+      <%= frontpage_button(programmes_path,
+                           '/assets/front_page/home-who-2.svg') do %>
+          Who is using it?
+      <% end %>
+    <% else %>
+      <%= frontpage_button(projects_path,
+                           '/assets/front_page/home-who-2.svg') do %>
+          Who is using it?
+      <% end %>
+   <% end %>
   </div>
   <div class="col-sm-4">
     <%= frontpage_button(help_link(:get_involved,url_only:true),
-                         '/assets/button_placeholder.png') do %>
+                         '/assets/front_page/home-participate-3.svg') do %>
         Get involved
     <% end %>
   </div>

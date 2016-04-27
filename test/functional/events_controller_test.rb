@@ -158,7 +158,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   test "programme events through nested routing" do
-    assert_routing 'programmes/2/events', { controller: 'events' ,action: 'index', programme_id: '2'}
+    assert_routing 'programmes/2/events', { controller: 'events', action: 'index', programme_id: '2' }
     programme = Factory(:programme)
     event = Factory(:event, projects: programme.projects, policy: Factory(:public_policy))
     event2 = Factory(:event, policy: Factory(:public_policy))

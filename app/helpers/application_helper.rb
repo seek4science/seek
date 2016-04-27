@@ -228,8 +228,8 @@ module ApplicationHelper
     res.html_safe
   end
 
-  def tooltip_title_attrib(text, delay=200)
-    return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]"
+  def tooltip(text)
+    h(text)
   end
       
   # text in "caption" will be used to display the item next to the image_tag_for_key;
@@ -244,7 +244,7 @@ module ApplicationHelper
       list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
     end
     item_caption = " " + (caption.blank? ? item.title : caption)
-    list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
+    list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), 'data-tooltip' => tooltip(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += "</li>"
     
     return list_item.html_safe

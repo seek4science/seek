@@ -1125,7 +1125,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "programme models through nested routing" do
-    assert_routing 'programmes/2/models', { controller: 'models' ,action: 'index', programme_id: '2'}
+    assert_routing 'programmes/2/models', { controller: 'models', action: 'index', programme_id: '2' }
     programme = Factory(:programme)
     model = Factory(:model, projects: programme.projects, policy: Factory(:public_policy))
     model2 = Factory(:model, policy: Factory(:public_policy))

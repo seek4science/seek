@@ -3,7 +3,7 @@
 <% end -%>
 <% if item.try(:has_member?,current_user) || admin_logged_in? -%>
     <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
-    <%= button_link_to("Asset report", 'report', asset_report_project_path(item), :title=>tooltip_title_attrib(tooltip_text)) -%>
+    <%= button_link_to("Asset report", 'report', asset_report_project_path(item), 'data-tooltip' => tooltip(tooltip_text)) -%>
 <% end -%>
 
 <%= admin_dropdown do %>

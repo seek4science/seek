@@ -30,7 +30,7 @@ module OrganismsHelper
       image_tag_for_key('destroy', organism_path(organism), "Delete Organism", { :confirm => 'Are you sure?', :method => :delete }, "Delete Organism")
     else
       explanation="Unable to delete an Organism that is associated with other items."
-      html = "<span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' title='#{tooltip_title_attrib(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete Organism</span>"
+      html = "<span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' data-tooltip='#{tooltip(explanation)}' >"+image('destroy', {:alt=>"Delete",:class=>"disabled"}) + " Delete Organism</span>"
       html.html_safe
     end    
   end

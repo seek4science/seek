@@ -1,13 +1,13 @@
 <% if mine?(@person) && !current_user.guest? -%>
     <% tooltip_text = "Publish your owned assets in one click. A preview will be given before publishing" %>
-    <%= button_link_to "Publish your assets", "publish", batch_publishing_preview_person_path(@person), :title => tooltip_title_attrib(tooltip_text) -%>
+    <%= button_link_to "Publish your assets", "publish", batch_publishing_preview_person_path(@person), 'data-tooltip' => tooltip(tooltip_text) -%>
   <% if @person.is_in_any_gatekept_projects? %>
     <%= button_link_to "Assets awaiting approval", "waiting", waiting_approval_assets_person_path(@person),
-                       :title => tooltip_title_attrib("The assets you have requested to publish, but are awaiting Gatekeeper approval") -%>
+                       'data-tooltip' => tooltip("The assets you have requested to publish, but are awaiting Gatekeeper approval") -%>
   <% end %>
   <% if @person.is_asset_gatekeeper_of_any_project? %>
     <%= button_link_to "Assets you are Gatekeeping", "waiting", requested_approval_assets_person_path(@person),
-                       :title => tooltip_title_attrib("The assets people have requested to publish, but are still awaiting your approval") -%>
+                       'data-tooltip' => tooltip("The assets people have requested to publish, but are still awaiting your approval") -%>
   <% end %>
 <% end %>
 

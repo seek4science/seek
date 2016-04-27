@@ -7,7 +7,6 @@
 //= require prototype_ujs
 //= require prototype_patch
 //= require effects
-//= require boxover
 //= require scriptaculous
 //= require controls
 //= require bootstrap
@@ -52,6 +51,7 @@
 //= require associations
 //= require people
 //= require search
+//= require tooltips
 //= require sample_types
 //= require wizard_step
 //= require DataTables-1.10.11/jquery.dataTables

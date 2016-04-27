@@ -884,7 +884,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "programme sops through nested routing" do
-    assert_routing 'programmes/2/sops', { controller: 'sops' ,action: 'index', programme_id: '2'}
+    assert_routing 'programmes/2/sops', { controller: 'sops', action: 'index', programme_id: '2' }
     programme = Factory(:programme)
     sop = Factory(:sop, projects: programme.projects, policy: Factory(:public_policy))
     sop2 = Factory(:sop, policy: Factory(:public_policy))

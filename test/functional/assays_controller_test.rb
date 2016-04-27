@@ -1332,7 +1332,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test "programme assays through nested routing" do
-    assert_routing 'programmes/2/assays', { controller: 'assays' ,action: 'index', programme_id: '2'}
+    assert_routing 'programmes/2/assays', { controller: 'assays', action: 'index', programme_id: '2' }
     programme = Factory(:programme)
     investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy))
     investigation2 = Factory(:investigation, policy: Factory(:public_policy))

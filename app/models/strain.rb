@@ -89,7 +89,13 @@ class Strain < ActiveRecord::Base
     (deprecated_specimens.empty? || ((deprecated_specimens.count == 1) && deprecated_specimens.first.is_dummy? && deprecated_specimens.first.samples.empty?)) && super
   end
 
-
+  def can_delete? user=User.current_user
+    if contributor.nil?
+      organism && organism.can_delete?(user)
+    else
+      super
+    end
+  end
 
   #defines that this is a user_creatable object, and appears in the "New Object" gadget
   def self.user_creatable?

@@ -85,6 +85,7 @@ gem 'recaptcha'
 gem 'metainspector'
 gem 'mechanize'
 gem 'mimemagic'
+gem 'auto_strip_attributes'
 
 gem 'datacite_doi_ify', '~>1.1.0'
 

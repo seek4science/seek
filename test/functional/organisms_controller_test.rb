@@ -269,7 +269,18 @@ class OrganismsControllerTest < ActionController::TestCase
         assert_select "td > a[href=?]",strain_path(parent_strain),:text=>parent_strain.title
       end
     end
+  end
 
+  test "strains cleaned up when organism deleted" do
+    login_as(:quentin)
+    organism = Factory(:organism)
+    strains = FactoryGirl.create_list(:strain, 3, organism: organism, contributor: nil)
+
+    assert_difference('Organism.count', -1) do
+      assert_difference('Strain.count', -3) do
+        delete :destroy, :id => organism
+      end
+    end
   end
   
 end
