@@ -412,7 +412,7 @@ class ApplicationController < ActionController::Base
                                :data => {:search_query => object, :result_count => @results.count})
           end
         when "content_blobs"
-          action = "inline_view" if action=="view_pdf_content"
+          action = "inline_view" if action=="view_content"
           if action=="inline_view" || (action=="download" && params['intent'].to_s != 'inline_view')
             activity_loggable = object.asset
             ActivityLog.create(:action => action,
