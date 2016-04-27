@@ -7,6 +7,5 @@ publisher: FAIRDOM
 categories: jekyll update
 ---
 Issues with the DB have been solved. MDS is back to normal.
-
 You can now generate a DOI for your asset within FAIRDOMHub.
 
