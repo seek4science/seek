@@ -7,7 +7,6 @@ layout: page
 
 ## Content
 
-- [Contributing to these SEEK Documents](/contributing.html)
 - [Registering in SEEK](registering.html)
 - [Logging into SEEK](login.html)
 - [Editing your profile](editing-profile.html)
@@ -58,14 +57,7 @@ layout: page
           - [Assign people to project roles](admin-project-members.html#assign-people-to-project-roles)
           - [Flag when a person leaves a project](admin-project-members.html#flag-when-a-person-leaves-a-project)
 - [Executing a model on JWS Online](http://jws-docs.readthedocs.org/)
-
-
-
-
-
-
-
-
+- [Contributing to these SEEK Documents](/contributing.html)
 
 
 
