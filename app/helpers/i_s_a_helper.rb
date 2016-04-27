@@ -41,6 +41,7 @@ module ISAHelper
       cytoscape_elements = cytoscape_node_elements(nodes) + cytoscape_edge_elements(edges)
       cytoscape_elements
     rescue Exception=>e
+      raise e if Rails.env.development?
       Rails.logger.error("Error generating nodes and edges for the graph - #{e.message}")
       {:error => 'error'}
     end
@@ -114,7 +115,7 @@ module ISAHelper
       item_type, item_id = node.split('_')
       item = item_type.constantize.find_by_id(item_id)
       if item.can_view?
-        description = item.description
+        description = item.respond_to?(:description) ? item.description : ''
         no_description_text = item.kind_of?(Publication) ? 'No abstract' : 'No description'
         tooltip = description.blank? ? no_description_text : truncate(h(description), :length => 500)
         #distinquish two assay classes
@@ -190,12 +191,15 @@ module ISAHelper
     source_type,source_id = source.split('_')
     target_type,target_id = target.split('_')
 
-    label = ''
-    if source_type == 'Assay' && target_type == 'DataFile'
+    label_data = []
+    if source_type == 'Assay' && (target_type == 'DataFile' || target_type == 'Sample')
       assay_asset = AssayAsset.where(["assay_id=? AND asset_id=?",
                         source_id, target_id]).first
-      label << assay_asset.try(:relationship_type).try(:title).to_s
+      if assay_asset
+        label_data << assay_asset.relationship_type.title if assay_asset.relationship_type
+        label_data << direction_name(assay_asset.direction) if (assay_asset.direction && assay_asset.direction != 0)
+      end
     end
-    label
+    label_data.join(', ')
   end
 end
