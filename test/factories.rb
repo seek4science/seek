@@ -1132,6 +1132,11 @@ end
     f.base_type 'Boolean'
   end
 
+  Factory.define(:strain_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "Strain attribute type #{n}"}
+    f.base_type 'SeekStrain'
+  end
+
   Factory.define(:sample_attribute) do |f|
     f.sequence(:title) {|n| "Sample attribute #{n}"}
     f.association :sample_type, :factory => :sample_type
@@ -1210,5 +1215,13 @@ Factory.define(:patient_sample, :parent=>:sample) do |f|
     type.full_name="Fred Bloggs"
     type.age=44
     type.weight=88.7
+  end
+end
+
+Factory.define(:strain_sample_type, :parent=>:sample_type) do |f|
+  f.title "Strain type"
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:sample_attribute,:title=>"name",:sample_attribute_type=>Factory(:string_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
+    type.sample_attributes << Factory.build(:sample_attribute,:title=>"seekstrain",:sample_attribute_type=>Factory(:strain_sample_attribute_type),:required=>true, :sample_type => type)
   end
 end

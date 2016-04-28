@@ -34,20 +34,7 @@
                             <% end %>
                           </td>
                       <% else %>
-                          <td>
-                            <% case attribute.sample_attribute_type.base_type %>
-                            <% when 'Date' %>
-                                <%= Date.parse(sample.send(attribute.accessor_name)).strftime("%e %B %Y") %>
-                            <% when 'DateTime' %>
-                                <%= DateTime.parse(sample.send(attribute.accessor_name)).strftime("%e %B %Y %H:%M:%S") %>
-                            <% else %>
-                                <% if link && attribute.is_title %>
-                                    <%= link_to(sample.send(attribute.accessor_name), sample) %>
-                                <% else %>
-                                    <%= text_or_not_specified(sample.send(attribute.accessor_name), auto_link: link) %>
-                                <% end %>
-                            <% end %>
-                          </td>
+                          <td><%= display_attribute(sample, attribute, link: link) %></td>
                       <% end %>
                   <% end %>
               <% end %>

@@ -52,4 +52,6 @@ chebi = SampleAttributeType.new title:"CHEBI ID",regexp:'CHEBI:[0-9]+', base_typ
 chebi.save!
 boolean = SampleAttributeType.new title:"Boolean",base_type:'Boolean'
 boolean.save!
+seek_strain = SampleAttributeType.new title:"SEEK Strain",base_type:'SeekStrain'
+seek_strain.save!
 puts "Seeded sample attribute types."

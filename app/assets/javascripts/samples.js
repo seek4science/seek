@@ -46,12 +46,30 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             dateColumns.push(index);
         }
     });
-
-    if(dateColumns.length > 0)
+    if(dateColumns.length > 0) {
         options["columnDefs"].push({
             "targets": dateColumns,
             "type": "date"
         });
+    }
+    // Parse Strain data into a link
+    // Only needed if we're loading the data from ajax
+    if($j('table', selector).data('sourceUrl')) {
+        var strainColumns = [];
+        $j('table thead th', selector).each(function (index, column) {
+            if($j(column).data('columnType') == 'SeekStrain') {
+                strainColumns.push(index);
+            }
+        });
+        if(strainColumns.length > 0) {
+            options["columnDefs"].push({
+                "targets": strainColumns,
+                "render": function (data, type, row) {
+                    return '<a href="/strains/'+data.id+'">'+data.title+'</a>';
+                }
+            });
+        }
+    }
 
     if(enableRowSelection) {
         $j.extend(options, options, {

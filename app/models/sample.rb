@@ -67,6 +67,12 @@ class Sample < ActiveRecord::Base
     end
   end
 
+  def strains
+    self.sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == 'SeekStrain' }.map do |sa|
+      Strain.find_by_id(send(sa.accessor_name)['id'])
+    end.compact
+  end
+
   private
 
   def attribute_values_for_search

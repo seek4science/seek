@@ -442,4 +442,59 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal "the title",sample.title_was_
   end
 
+  test 'strain type stores valid strain info' do
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+
+    sample = Sample.new(sample_type: sample_type)
+    sample.name = 'Strain sample'
+    sample.seekstrain = strain.id
+    assert sample.valid?
+    sample.save!
+    sample = Sample.find(sample.id)
+
+    assert_equal strain.id, sample.seekstrain['id']
+    assert_equal strain.title, sample.seekstrain['title']
+  end
+
+  test 'strain type still stores missing strain info' do
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+    invalid_strain_id = Strain.last.id + 1 # non-existant strain ID
+
+    sample = Sample.new(sample_type: sample_type)
+    sample.name = 'Strain sample'
+    sample.seekstrain = invalid_strain_id
+    assert sample.valid?
+    sample.save!
+    sample = Sample.find(sample.id)
+
+    assert_equal invalid_strain_id, sample.seekstrain['id']
+    assert_nil sample.seekstrain['title'] # can't look up the title because that strain doesn't exist!
+  end
+
+  test 'strain attributes can appear as related items' do
+    sample_type = Factory(:strain_sample_type)
+    sample_type.sample_attributes << Factory.build(:sample_attribute, title: "seekstrain2",
+                                                   sample_attribute_type: Factory(:strain_sample_attribute_type),
+                                                   required: true, sample_type: sample_type)
+    sample_type.sample_attributes << Factory.build(:sample_attribute, title: "seekstrain3",
+                                                   sample_attribute_type: Factory(:strain_sample_attribute_type),
+                                                   required: true, sample_type: sample_type)
+    strain = Factory(:strain)
+    strain2 = Factory(:strain)
+
+    sample = Sample.new(sample_type: sample_type)
+    sample.name = 'Strain sample'
+    sample.seekstrain = strain.id
+    sample.seekstrain2 = strain2.id
+    sample.seekstrain3 = Strain.last.id + 1000 # Non-existant strain id
+    assert sample.valid?
+    sample.save!
+    sample = Sample.find(sample.id)
+
+    assert_equal 2, sample.strains.size
+    assert_equal [strain.title, strain2.title].sort, [sample.seekstrain['title'],sample.seekstrain2['title']].sort
+  end
+
 end

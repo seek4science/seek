@@ -397,6 +397,39 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select 'a', text: /fish/
   end
 
+  test 'turns strain attributes into links' do
+    person = Factory(:person)
+    login_as(person.user)
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+
+    sample = Sample.new(sample_type: sample_type, contributor: person)
+    sample.name = 'Strain sample'
+    sample.seekstrain = strain.id
+    sample.save!
+
+    get :show, id: sample
+
+    assert_response :success
+    assert_select "p a[href=?]", strain_path(strain), text: /#{strain.title}/
+  end
+
+  test 'strains show up in related items' do
+    person = Factory(:person)
+    login_as(person.user)
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+
+    sample = Sample.new(sample_type: sample_type, contributor: person)
+    sample.name = 'Strain sample'
+    sample.seekstrain = strain.id
+    sample.save!
+
+    get :show, id: sample
+
+    assert_response :success
+    assert_select "div.related-items a[href=?]", strain_path(strain), text: /#{strain.title}/
+  end
 
   private
 

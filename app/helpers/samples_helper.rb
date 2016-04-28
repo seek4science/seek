@@ -11,6 +11,8 @@ module SamplesHelper
         calendar_date_select :sample, attribute.accessor_name, :time=>false, :class=>"form-control  #{clz}"
       when 'Boolean'
         check_box :sample, attribute.accessor_name,:class=>"#{clz}"
+      when 'SeekStrain'
+        grouped_collection_select :sample, attribute.accessor_name, Organism.all, :strains, :title, :id, :title, :class=>"#{clz}"
       else
         text_field :sample, attribute.accessor_name, :class=>"form-control #{clz}"
     end
@@ -26,6 +28,28 @@ module SamplesHelper
       title = title + " ( #{unit.to_s} )"
     end
     title
+  end
+
+  def display_attribute(sample, attribute, options = {})
+    value = sample.send(attribute.accessor_name)
+    case attribute.sample_attribute_type.base_type
+      when 'Date'
+        Date.parse(value).strftime("%e %B %Y")
+      when 'DateTime'
+        DateTime.parse(value).strftime("%e %B %Y %H:%M:%S")
+      when 'SeekStrain'
+        if value['title']
+          link_to(value['title'], strain_path(value['id']))
+        else
+          content_tag(:span, value, class: 'none_text')
+        end
+      else
+        if options[:link] && attribute.is_title
+          link_to(value, sample)
+        else
+          text_or_not_specified(value, auto_link: options[:link])
+        end
+    end
   end
 
 end
