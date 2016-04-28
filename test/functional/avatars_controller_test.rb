@@ -70,7 +70,7 @@ class AvatarsControllerTest < ActionController::TestCase
     end
   end
 
-  test "index for programmes" do
+  test "index for programmes for admin" do
     programme = Factory(:programme,:avatar=>Factory(:avatar))
     Factory(:avatar,:owner=>programme)
     login_as(@admin)
@@ -78,11 +78,40 @@ class AvatarsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test "index for projects" do
+  test "index for programmes for programme admin" do
+    programme_admin = Factory(:programme_administrator)
+    programme = programme_admin.programmes.first
+    Factory(:avatar,:owner=>programme)
+    login_as(programme_admin)
+    get :index, :programme_id=>programme.id
+    assert_response :success
+  end
+
+  test "index for projects for admin" do
     p = Factory(:project,:avatar=>Factory(:avatar))
     Factory(:avatar,:owner=>p)
     login_as(@admin)
     get :index, :project_id=>p.id
+    assert_response :success
+  end
+
+  test "index for projects for programme admin" do
+    programme_admin = Factory(:programme_administrator)
+    refute_empty(programme_admin.programmes.first.projects)
+    project = programme_admin.programmes.first.projects.first
+    Factory(:avatar,:owner=>project)
+    login_as(programme_admin)
+    get :index, :project_id=>project.id
+    assert_response :success
+  end
+
+  test "index for projects for project admin" do
+    project_admin = Factory(:project_administrator)
+    refute_empty(project_admin.projects)
+    project = project_admin.projects.first
+    Factory(:avatar,:owner=>project)
+    login_as(project_admin)
+    get :index, :project_id=>project.id
     assert_response :success
   end
 
@@ -101,5 +130,6 @@ class AvatarsControllerTest < ActionController::TestCase
     get :new, :programme_id=>programme
     assert_response :success
   end
+
   
 end
