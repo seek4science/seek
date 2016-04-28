@@ -27,6 +27,6 @@ As a [Project Administrator](roles.html#project-administrator) (or SEEK system a
 The people must be first have been [added to the project](#add-and-remove-people-from-a-project) before they can be assigned to a role.
 
 
-## Flag when a person leaves a project
+## Flag when a person becomes inactive in a project
 
 *Coming soon*

@@ -5,3 +5,8 @@ current_seek_version: 1.0.3
 gems:
   - jekyll-sitemap
   - jekyll-redirect-from
+  - jekyll-feed
+
+name: FAIRDOM
+url: http://docs.seek4science.org
+author: FAIRDOM
