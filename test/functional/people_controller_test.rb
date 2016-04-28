@@ -76,6 +76,15 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to registration_form_admin_path(during_setup: 'true')
   end
 
+  test 'trim the email to avoid validation error' do
+    login_as(Factory(:admin))
+    assert_difference('Person.count') do
+        post :create, person: { first_name: 'test', email: ' hghg@sdfsd.com ' }
+    end
+    assert person = assigns(:person)
+    assert_equal 'hghg@sdfsd.com',person.email
+  end
+
   def test_second_registered_person_is_not_admin
     Person.delete_all
     person = Person.new(first_name: 'fred', email: 'fred@dddd.com')
@@ -698,7 +707,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have asset housekeeper icon on person show page' do
     asset_housekeeper = Factory(:asset_housekeeper)
     get :show, id: asset_housekeeper
-    assert_select 'img[src*=?]', /medal_bronze_3.png/, count: 1
+    assert_select 'img[src*=?]', /#{role_image(:asset_housekeeper)}/, count: 1
   end
 
   test 'should have asset housekeeper icon on people index page' do
@@ -707,13 +716,13 @@ class PeopleControllerTest < ActionController::TestCase
     end
     get :index
     asset_housekeeper_number = assigns(:people).select(&:is_asset_housekeeper_of_any_project?).count
-    assert_select 'img[src*=?]', /medal_bronze_3/, count: asset_housekeeper_number
+    assert_select 'img[src*=?]', /#{role_image(:asset_housekeeper)}/, count: asset_housekeeper_number
   end
 
   test 'should have project administrator icon on person show page' do
     project_administrator = Factory(:project_administrator)
     get :show, id: project_administrator
-    assert_select 'img[src*=?]', /medal_gold_1.png/, count: 1
+    assert_select 'img[src*=?]', /#{role_image(:project_administrator)}/, count: 1
   end
 
   test 'should have project administrator icon on people index page' do
@@ -724,7 +733,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :index
 
     project_administrator_count = assigns(:people).select(&:is_project_administrator_of_any_project?).count
-    assert_select 'img[src*=?]', /medal_gold_1.png/, count: project_administrator_count
+    assert_select 'img[src*=?]', /#{role_image(:project_administrator)}/, count: project_administrator_count
   end
 
   test 'project administrator can only see projects he can manage to assign to person' do
@@ -1164,7 +1173,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have gatekeeper icon on person show page' do
     gatekeeper = Factory(:asset_gatekeeper)
     get :show, id: gatekeeper
-    assert_select 'img[src*=?]', /medal_silver_2.png/, count: 1
+    assert_select 'img[src*=?]', /#{role_image(:asset_gatekeeper)}/, count: 1
   end
 
   test 'should have gatekeeper icon on people index page' do
@@ -1173,7 +1182,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
     get :index
     gatekeeper_number = assigns(:people).select(&:is_asset_gatekeeper_of_any_project?).count
-    assert_select 'img[src*=?]', /medal_silver_2/, count: gatekeeper_number
+    assert_select 'img[src*=?]', /#{role_image(:asset_gatekeeper)}/, count: gatekeeper_number
   end
 
   test 'unsubscribe to a project should unsubscribe all the items of that project' do
@@ -1581,5 +1590,9 @@ class PeopleControllerTest < ActionController::TestCase
 
   def mask_for_pal
     Seek::Roles::Roles.instance.mask_for_role("pal")
+  end
+
+  def role_image(role)
+    Seek::ImageFileDictionary.instance.image_filename_for_key(role)
   end
 end

@@ -16,9 +16,11 @@
     <%= admin_textarea_setting(:home_description, Seek::Config.home_description,
                                "Home page description", "Sets the description text on the front page") %>
 
+<!--
     <%= admin_checkbox_setting(:front_page_buttons_enabled, 1, Seek::Config.front_page_buttons_enabled,
                                "Home page buttons enabled", "Display the three large buttons on the home page.") %>
 
+-->
     <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path -%>
 <% end %>

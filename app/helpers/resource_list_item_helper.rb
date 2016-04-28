@@ -56,7 +56,7 @@ module ResourceListItemHelper
   end
 
   def list_item_title_for_person(html, person, title, url)
-    icons = seek_role_icons(person)
+    icons = seek_role_icons(person, 16)
     html << "#{link_to title, (url.nil? ? show_resource_path(person) : url)} #{icons}"
     html
   end

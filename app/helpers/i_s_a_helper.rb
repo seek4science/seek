@@ -41,6 +41,7 @@ module ISAHelper
       cytoscape_elements = cytoscape_node_elements(nodes) + cytoscape_edge_elements(edges)
       cytoscape_elements
     rescue Exception=>e
+      raise e if Rails.env.development?
       Rails.logger.error("Error generating nodes and edges for the graph - #{e.message}")
       {:error => 'error'}
     end
@@ -114,20 +115,20 @@ module ISAHelper
       item_type, item_id = node.split('_')
       item = item_type.constantize.find_by_id(item_id)
       if item.can_view?
-        description = item.description
+        description = item.respond_to?(:description) ? item.description : ''
         no_description_text = item.kind_of?(Publication) ? 'No abstract' : 'No description'
-        tooltip = description.blank? ? no_description_text : truncate(h(description), :length => 500)
+        tt = description.blank? ? no_description_text : truncate(h(description), :length => 500)
         #distinquish two assay classes
         if item.kind_of?(Assay)
           assay_class_title = item.assay_class.title
           assay_class_key = item.assay_class.key
           name = truncate("#{assay_class_title}: ".html_safe + h(item.title), :length => 110)
-          item_info = link_to("<b>#{assay_class_title}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
+          item_info = link_to("<b>#{assay_class_title}: </b>".html_safe +  h(item.title), polymorphic_path(item), 'data-tooltip' => tooltip(tt))
           fave_color = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
         else
           name = truncate("#{item_type.humanize}: ".html_safe + h(item.title), :length => 110)
-          item_info = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), :title => tooltip_title_attrib(tooltip))
+          item_info = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), 'data-tooltip' => tooltip(tt))
           fave_color = FILL_COLOURS[item_type] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
         end
@@ -190,12 +191,15 @@ module ISAHelper
     source_type,source_id = source.split('_')
     target_type,target_id = target.split('_')
 
-    label = ''
-    if source_type == 'Assay' && target_type == 'DataFile'
+    label_data = []
+    if source_type == 'Assay' && (target_type == 'DataFile' || target_type == 'Sample')
       assay_asset = AssayAsset.where(["assay_id=? AND asset_id=?",
                         source_id, target_id]).first
-      label << assay_asset.try(:relationship_type).try(:title).to_s
+      if assay_asset
+        label_data << assay_asset.relationship_type.title if assay_asset.relationship_type
+        label_data << direction_name(assay_asset.direction) if (assay_asset.direction && assay_asset.direction != 0)
+      end
     end
-    label
+    label_data.join(', ')
   end
 end

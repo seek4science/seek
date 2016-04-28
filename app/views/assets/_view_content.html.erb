@@ -10,6 +10,7 @@
     <% is_inline_viewable = content_blob.is_content_viewable? %>
 
     <% if is_inline_viewable %>
+        <%#FIXME: this decision of whether to display image can be made in view_content controller method, as it does between text and pdf %>
         <% if content_blob.is_image? %>
             <%
                image_width = content_blob.width.to_i
@@ -23,8 +24,8 @@
             <% options = {:rel => "lightbox", :title => 'Preview'} %>
         <% else %>
             <%#param code is used for temporary link %>
-            <% url = polymorphic_path([asset, content_blob], :action => 'view_pdf_content', :code => params[:code]) %>
-            <% options = {:onclick => "checkSupportedBrowser();", :title => 'View inline content this file'} %>
+            <% url = polymorphic_path([asset, content_blob], :action => 'view_content', :code => params[:code]) %>
+            <% options = {:onclick => "checkSupportedBrowser();", :title => 'View contents of this file'} %>
         <% end %>
 
         <% if icon_view %>
@@ -41,9 +42,9 @@
             <% explanation = "This content is stored externally and cannot be previewed." %>
         <% end %>
         <% if icon_view %>
-            <%= image('show', :onclick => "javascript:alert('#{explanation}')", :title => tooltip_title_attrib(explanation)) %>
+            <%= image('show', :onclick => "javascript:alert('#{explanation}')", 'data-tooltip' => tooltip(explanation)) %>
         <% else %>
-            <span class='disabled_icon disabled-button btn btn-default' onclick='javascript:alert("<%=explanation%>")' title='<%= tooltip_title_attrib(explanation) %>'>
+            <span class='disabled_icon disabled-button btn btn-default' onclick='javascript:alert("<%=explanation%>")' data-tooltip='<%= tooltip(explanation) %>'>
               <%= image('show', {:alt=>"View Content",:class=>"disabled"}) %> View Content
             </span>
         <% end %>

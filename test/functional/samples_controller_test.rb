@@ -50,6 +50,41 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal person.user,sample.contributor
   end
 
+  test 'create and update with boolean' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:simple_sample_type)
+    type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false, :sample_type => type)
+    type.save!
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, the_title: 'ttt', bool:'1' }
+    end
+    assert_not_nil sample=assigns(:sample)
+    assert_equal 'ttt',sample.the_title
+    assert_equal true,sample.bool
+    assert_no_difference('Sample.count') do
+      put :update, id:sample.id,sample: {  the_title: 'ttt', bool:'0' }
+    end
+    assert_not_nil sample=assigns(:sample)
+    assert_equal 'ttt',sample.the_title
+    assert_equal false,sample.bool
+  end
+
+  test 'show sample with boolean' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:simple_sample_type)
+    type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false, :sample_type => type)
+    type.save!
+    sample=Factory(:sample,:sample_type=>type)
+    sample.the_title='ttt'
+    sample.bool=true
+    sample.save!
+    get :show,id:sample.id
+    assert_response :success
+
+  end
+
   test 'edit' do
     login_as(Factory(:person))
     get :edit, id: populated_patient_sample.id
@@ -374,6 +409,20 @@ class SamplesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select '#samples-table tbody tr', count: 2
+  end
+
+  test "show table with a boolean sample" do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:simple_sample_type)
+    type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false, :sample_type => type)
+    type.save!
+    sample=Factory(:sample,:sample_type=>type)
+    sample.the_title='ttt'
+    sample.bool=true
+    sample.save!
+    get :index,sample_type_id:type.id
+    assert_response :success
   end
 
   test 'filtering for association forms' do

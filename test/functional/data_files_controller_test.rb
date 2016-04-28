@@ -2222,7 +2222,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "programme data files through nested routing" do
-    assert_routing 'programmes/2/data_files', { controller: 'data_files' ,action: 'index', programme_id: '2'}
+    assert_routing 'programmes/2/data_files', { controller: 'data_files', action: 'index', programme_id: '2' }
     programme = Factory(:programme)
     data_file = Factory(:data_file, projects: programme.projects, policy: Factory(:public_policy))
     data_file2 = Factory(:data_file, policy: Factory(:public_policy))

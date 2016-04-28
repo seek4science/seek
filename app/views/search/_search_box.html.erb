@@ -13,7 +13,7 @@
         <%= select_tag :scale, (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) + options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])) %>
       <% end %>
       <% if Seek::Config.external_search_enabled %>
-        <span title='<%= tooltip_title_attrib(external_search_tooltip_text) -%>' >
+        <span data-tooltip='<%= tooltip(external_search_tooltip_text) -%>' >
           <%= check_box_tag :include_external_search, 1, @include_external_search -%>External
         </span>
       <% end %>

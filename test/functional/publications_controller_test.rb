@@ -504,7 +504,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "programme publications through nested routing" do
-    assert_routing 'programmes/2/publications', { controller: 'publications' ,action: 'index', programme_id: '2'}
+    assert_routing 'programmes/2/publications', { controller: 'publications', action: 'index', programme_id: '2' }
     programme = Factory(:programme)
     publication = Factory(:publication, projects: programme.projects, policy: Factory(:public_policy))
     publication2 = Factory(:publication, policy: Factory(:public_policy))

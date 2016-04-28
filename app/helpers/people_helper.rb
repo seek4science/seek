@@ -22,10 +22,11 @@ module PeopleHelper
     end
   end
 
-  def seek_role_icons person
+  def seek_role_icons person, size = 32
     icons = ''
     person.roles.each do |role|
-      icons << image("#{role}",:alt=>"#{role}",:title=>tooltip_title_attrib(role.humanize), :style=>"vertical-align: middle")
+      icons << image("#{role}", :size => "#{size}x#{size}", :alt=>"#{role}",
+                     'data-tooltip' => tooltip(role.humanize), :style=>"vertical-align: middle")
     end
     icons.html_safe
   end

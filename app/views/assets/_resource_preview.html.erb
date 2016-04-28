@@ -1,6 +1,6 @@
 <% unless resource.nil? -%>
     
-  <div title='<%= tooltip_title_attrib(h(resource.description), 1000) %>'>
+  <div data-tooltip='<%= tooltip(h(resource.description)) %>'>
     <p class="title">
       <%= list_item_title resource -%>
     </p>

@@ -2,55 +2,31 @@
 
 <% cache cache_name do -%>
     <div id="ft">
-      <div class="container-fluid">
-        <div class="row">
-          <div class="col-md-2">
-            <%= link_to "Front Page", "/" %><br/>
-
-            <% if Seek::Config.dm_project_link != Seek::Config.project_link %>
-                <%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' %><br/>
-            <% end %>
-
-            <%= link_to Seek::Config.project_name, Seek::Config.project_link %><br/>
-
-            <% if logged_in_and_registered? %>
-              <%= link_to 'Provide feedback', feedback_home_path -%><br/>
-            <% end %>
-            <%= link_to 'Funding and Programmes',funding_home_path -%><br/>
-
-            <span class="subtle"><%= version_text -%></span>
-            <br/>
-            <%= link_to("Imprint", imprint_home_path) if Seek::Config.imprint_enabled %>
-          </div>
-          <div class="col-md-8">
-            <div class="row logo-section">
-              <%= link_to image_tag("logos/taverna_logo_footer.png",:title=>"Taverna workflow workbench",:alt=>"Taverna workflow workbench"), "http://www.mygrid.org.uk/tools/taverna/", :target => '_blank' %>
-              <%= link_to image_tag("logos/myexperiment_logo_footer.png",:title=>"myExperiment",:alt=>"myExperiment"), "http://www.myExperiment.org", :target => '_blank' %>
-              <%= link_to image_tag("logos/jwsonline_webpic_footer.jpg",:title=>"JWS Online",:alt=>"JWS Online"), "http://jjj.biochem.sun.ac.za/", :target => '_blank' %>
-              <%= link_to image_tag("logos/isatab_logo_footer.png",:title=>"ISATAB",:alt=>"ISATAB"),"http://isatab.sourceforge.net",:target=>'_blank' %>
-              <%= link_to image_tag("logos/mygrid_logo_footer.png",:title=>"myGrid",:alt=>"myGrid",:style=>"background-color:#AAA;"), "http://www.mygrid.org.uk", :target => '_blank' %>
-              <%= link_to image_tag("logos/sabiork_logo_footer.jpg",:title=>"Sabio-RK",:alt=>"Sabio-RK"),"http://sabio.h-its.org",:target=>'_blank' %>
-              <%= link_to image_tag("logos/bioportal_logo_footer.png",:title=>"BioPortal",:alt=>"BioPortal"), "http://bioportal.bioontology.org/", :target => '_blank' %>
-              <%= link_to image_tag("logos/semanticSBML-logo_footer.png",:title=>"Semantic SBML",:alt=>"Semantic SBML"), "http://www.semanticsbml.org/", :target => '_blank' %>
-              <% unless Seek::Config.is_virtualliver -%>
-                  <%= link_to image_tag("logos/vln-logo_footer.png",:title=>"Virtual Liver Network",:alt=>"Virtual Liver Network"), "http://www.virtual-liver.de/", :target => '_blank' %>
-              <% end -%>
-            </div>
-          </div>
-          <div class="col-md-2">
-            <a href="http://www.seek4science.org" target="_blank" class="powered-by">
-              Powered by<br/>
-              <%= image_tag('seek-logo-smaller.png') %>
-            </a>
-            Icons:
-            <%= link_to "Silk icons 1.3", "http://www.famfamfam.com/lab/icons/silk/", :target => '_blank' %>,
-            <%= link_to "Crystal Clear icons", "http://www.iconarchive.com/show/crystal-clear-icons-by-everaldo.html", :target => '_blank' %>
-          </div>
+      <div class="container">
+        <div id="seek-credit">
+          <a href="http://www.seek4science.org" target="_blank" class="powered-by">
+            Powered by<br/>
+            <%= image_tag('seek-new-full.png') %>
+          </a>
+          <span class="subtle"><%= version_text -%></span>
         </div>
-        <div class="row">
-          Copyright (c) 2008 - Present
-          <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %>
-          and
+        <div class="ft-info">
+          <% if Seek::Config.dm_project_link != Seek::Config.project_link %>
+              <%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' %> |
+          <% end %>
+          <%= link_to Seek::Config.project_name, Seek::Config.project_link, :target => '_blank' %> |
+          <% if logged_in_and_registered? %>
+              <%= link_to 'Provide feedback', feedback_home_path -%> |
+          <% end %>
+          <%= link_to 'Funding and Programmes', funding_home_path, :target => '_blank' -%> |
+          <%= link_to 'Credits', 'http://docs.seek4science.org/credits', :target => '_blank' -%>
+          <% if Seek::Config.imprint_enabled %>
+              | <%= link_to("Imprint", imprint_home_path) %>
+          <% end %>
+        </div>
+        <div class="ft-info">
+          Copyright &copy; 2008 - 2016
+          <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %> and
           <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
           <% if Seek::Config.copyright_addendum_enabled  %>
               <%= Seek::Config.copyright_addendum_content.html_safe%>

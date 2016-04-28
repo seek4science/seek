@@ -1,6 +1,6 @@
 <%
     default_folder = initial_folder(@project)
-    help_icon = image_tag(icon_filename_for_key("help"), :alt=>"help", :title=>tooltip_title_attrib("Click to toggle information on how to use the #{t('project')} asset browser",1))
+    help_icon = image_tag(icon_filename_for_key("help"), :alt=>"help", 'data-tooltip' => tooltip("Click to toggle information on how to use the #{t('project')} asset browser"))
     help_button = link_to_function help_icon, visual_effect(:toggle_blind, "folders_help", :duration => 0.3)
 %>
 <%= render :partial=>"yui_css_and_js" -%>
