@@ -108,7 +108,7 @@ class SampleTest < ActiveSupport::TestCase
     sample.set_attribute(:postcode, 'fish')
     refute sample.valid?
     assert_equal 1, sample.errors.count
-    assert_equal 'Postcode is not a valid Post Code', sample.errors.full_messages.first
+    assert_equal 'is not a valid Post Code', sample.errors[(SampleAttribute::METHOD_PREFIX + 'postcode').to_sym].first
     sample.set_attribute(:postcode, 'M13 9PL')
     assert sample.valid?
   end
