@@ -1,7 +1,7 @@
 class Sample < ActiveRecord::Base
   attr_accessible :contributor_id, :contributor_type, :json_metadata,
                   :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
-                  :other_creators
+                  :other_creators, :data
 
   searchable(:auto_index=>false) do
     text :attribute_values do
@@ -23,15 +23,13 @@ class Sample < ActiveRecord::Base
   include ActiveModel::Validations
   validates_with SampleAttributeValidator
 
-  #after_initialize :setup_accessor_methods, :read_json_metadata, unless: 'sample_type.nil?'
-
   before_save :set_json_metadata
   before_validation :set_title_to_title_attribute_value
 
   def sample_type=(type)
     super
     self.json_metadata = nil
-    @metadata = nil
+    @data = nil
   end
 
   def is_in_isa_publishable?
@@ -51,26 +49,41 @@ class Sample < ActiveRecord::Base
     originating_data_file
   end
 
-  def metadata
-    if @metadata.blank?
+  # Mass assignment of attributes
+  def data= hash
+    hash.each do |key, value|
+      set_attribute(key, value)
+    end
+  end
+
+  def data
+    if @data.blank?
       if json_metadata.blank?
         if sample_type.nil?
-          @metadata = {}
+          @data = HashWithIndifferentAccess.new
         else
-          @metadata = JSON.parse(set_json_structure)
+          @data = JSON.parse(set_json_structure).with_indifferent_access
         end
       else
-        @metadata = JSON.parse(json_metadata)
+        @data = JSON.parse(json_metadata).with_indifferent_access
       end
     else
-      @metadata
+      @data
     end
   end
 
   def strains
     self.sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == 'SeekStrain' }.map do |sa|
-      Strain.find_by_id(send(sa.accessor_name)['id'])
+      Strain.find_by_id(get_attribute(sa.hash_key)['id'])
     end.compact
+  end
+
+  def get_attribute(attr)
+    data[attr]
+  end
+
+  def set_attribute(attr, value)
+    data[attr] = attribute_for_attribute_name(attr).pre_process_value(value)
   end
 
   private
@@ -78,54 +91,29 @@ class Sample < ActiveRecord::Base
   def attribute_values_for_search
     return [] unless self.sample_type
     self.sample_type.sample_attributes.collect do |attr|
-      self.send(attr.accessor_name).to_s
+      self.data[attr.hash_key].to_s
     end.reject{|val| val.blank?}.uniq
   end
 
-  def setup_accessor_methods
-    sample_type.sample_attributes.collect(&:accessor_name).each do |name|
-      class_eval <<-END_EVAL
-          attr_accessor '#{name}'
-        END_EVAL
-    end
-  end
-
-  # overrdie to insert the extra accessors for mass assignment
+  # override to insert the extra accessors for mass assignment
   def mass_assignment_authorizer(role)
     extra = []
     if sample_type
-      extra = sample_type.sample_attributes.collect(&:accessor_name)
+      extra = sample_type.sample_attributes.collect(&:method_name)
     end
     super(role) + extra
   end
 
-  def remove_accessor_methods
-    sample_type.sample_attributes.collect(&:accessor_name).each do |name|
-      class_eval <<-END_EVAL
-          undef_method '#{name}'
-          undef_method '#{name}='
-      END_EVAL
-    end
-  end
-
   def set_json_metadata
-    self.json_metadata = @metadata.to_json
+    self.json_metadata = @data.to_json
   end
 
+  # Creates a JSON skeleton with null values in the json_metadata field
   def set_json_structure
     hash = Hash[sample_type.sample_attributes.map do |attribute|
-      [attribute.accessor_name, nil]
+      [attribute.hash_key, nil]
     end]
     self.json_metadata = hash.to_json
-  end
-
-  def read_json_metadata
-    if sample_type && json_metadata
-      json = JSON.parse(json_metadata)
-      sample_type.sample_attributes.each do |attribute|
-        send("#{attribute.accessor_name}=", json[attribute.parameterised_title])
-      end
-    end
   end
 
   def set_title_to_title_attribute_value
@@ -136,11 +124,11 @@ class Sample < ActiveRecord::Base
   def title_attribute_value
     return nil unless (sample_type && sample_type.sample_attributes.title_attributes.any?)
     title_attr=sample_type.sample_attributes.title_attributes.first
-    self.send(title_attr.accessor_name)
+    get_attribute(title_attr.hash_key)
   end
 
   def respond_to_missing?(method_name, include_private = false)
-    if metadata.keys.include?(method_name.to_s.chomp('='))
+    if data.key?(method_name.to_s.sub(SampleAttribute::METHOD_PREFIX,'').chomp('='))
       true
     else
       super
@@ -148,12 +136,16 @@ class Sample < ActiveRecord::Base
   end
 
   def method_missing(method_name, *args)
-    setter = method_name.to_s.end_with?('=')
-    attribute_name = method_name.to_s.chomp('=')
-
-    if metadata.key?(attribute_name)
-      metadata[attribute_name] = attribute_for_attribute_name(attribute_name).pre_process_value(args.first) if setter
-      metadata[attribute_name]
+    name = method_name.to_s
+    if name.start_with?(SampleAttribute::METHOD_PREFIX)
+      setter = name.end_with?('=')
+      attribute_name = name.sub(SampleAttribute::METHOD_PREFIX, '').chomp('=')
+      if data.key?(attribute_name)
+        set_attribute(attribute_name, args.first) if setter
+        get_attribute(attribute_name)
+      else
+        super
+      end
     else
       super
     end

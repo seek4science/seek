@@ -1,4 +1,7 @@
 class SampleAttribute < ActiveRecord::Base
+
+  METHOD_PREFIX = '__sample_data_'
+
   attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
                   :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index
 
@@ -16,7 +19,6 @@ class SampleAttribute < ActiveRecord::Base
 
   def title=(title)
     super
-    generate_accessor_name
     self.title
   end
 
@@ -25,15 +27,13 @@ class SampleAttribute < ActiveRecord::Base
     (value.blank? && !required?) || sample_attribute_type.validate_value?(value)
   end
 
-  # the name for the sample accessor based on the attribute title, spaces are replaced with underscore, and all downcase
-  # if there is a clash with a sample method then _ is prepended
-  def generate_accessor_name
-    name = parameterised_title
-    name += '_' while Sample.attribute_method?(name) || Sample.private_method_defined?(name)
-    self.accessor_name = name
+  # The method name used to get this attribute via a method call
+  def method_name
+    METHOD_PREFIX + hash_key
   end
 
-  def parameterised_title
+  # The key used to address this attribute in the sample's JSON blob
+  def hash_key
     title.parameterize.underscore
   end
 
@@ -46,6 +46,10 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   private
+
+  def generate_accessor_name
+    self.accessor_name = self.hash_key
+  end
 
   # if not set, takes the next value for that sample type
   def default_pos
