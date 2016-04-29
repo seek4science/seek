@@ -113,7 +113,7 @@ class SampleType < ActiveRecord::Base
     sample = Sample.new(sample_type: self)
     data.each do |entry|
       if attribute = attribute_for_column(entry.column)
-        sample.send("#{attribute.accessor_name}=", entry.value)
+        sample.set_attribute(attribute.hash_key, entry.value)
       end
     end
     sample
