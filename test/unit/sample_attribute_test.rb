@@ -148,33 +148,33 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('')
   end
 
-  test 'parameterised_title' do
+  test 'hash_key' do
     attribute = SampleAttribute.new title: 'fish pie'
-    assert_equal 'fish_pie',attribute.parameterised_title
+    assert_equal 'fish_pie',attribute.hash_key
 
     attribute.title = "provider's cell culture identifier"
-    assert_equal 'provider_s_cell_culture_identifier',attribute.parameterised_title
+    assert_equal 'provider_s_cell_culture_identifier',attribute.hash_key
 
     attribute = SampleAttribute.new title: %!fish "' &-[]}^-pie!
-    assert_equal 'fish_pie',attribute.parameterised_title
+    assert_equal 'fish_pie',attribute.hash_key
 
     attribute = SampleAttribute.new title: 'Fish Pie'
-    assert_equal 'fish_pie',attribute.parameterised_title
+    assert_equal 'fish_pie',attribute.hash_key
 
     attribute = SampleAttribute.new title: 'title'
-    assert_equal 'title',attribute.parameterised_title
+    assert_equal 'title',attribute.hash_key
 
   end
 
   test 'accessor name' do
     attribute = SampleAttribute.new title: 'fish pie'
-    assert_equal 'fish_pie',attribute.accessor_name
+    assert_equal SampleAttribute::METHOD_PREFIX + 'fish_pie', attribute.method_name
 
     attribute.title = "title"
-    assert_equal 'title_',attribute.accessor_name
+    assert_equal SampleAttribute::METHOD_PREFIX + 'title',attribute.method_name
 
     attribute.title = "updated_at"
-    assert_equal 'updated_at_',attribute.accessor_name
+    assert_equal SampleAttribute::METHOD_PREFIX + 'updated_at',attribute.method_name
 
   end
 
