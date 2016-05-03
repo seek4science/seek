@@ -4,6 +4,7 @@ class SamplesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
+  include HtmlHelper
 
   test 'index' do
     Factory(:sample,:policy=>Factory(:public_policy))
@@ -478,6 +479,43 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select "div.related-items a[href=?]", strain_path(strain), text: /#{strain.title}/
+  end
+
+  test 'strain samples successfully extracted from spreadsheet' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:strain_sample_data_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:strain_sample_data_content_blob)
+    sample_type.build_attributes_from_template
+    attribute_type = sample_type.sample_attributes.last
+    attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
+    attribute_type.required = true
+    sample_type.save!
+
+    assert_difference("Sample.count", 3) do
+      post :extract_from_data_file, :data_file_id=>data_file.id, :confirm=>'true'
+    end
+
+    assert (samples = assigns(:samples))
+    assert assigns(:rejected_samples)
+    assert_equal 3, samples.count
+    assert_equal 1, assigns(:rejected_samples).count
+
+    strain = Strain.find_by_title('default')
+    assert_select '#accepted table tbody tr:nth-child(1) td:last-child a[href=?]', strain_path(strain), text: 'default'
+    assert_select '#accepted table tbody tr:nth-child(2) td:last-child a[href=?]', strain_path(strain), text: 'default'
+    assert_select '#accepted table tbody tr:nth-child(3) td:last-child span.none_text', text: '1234'
+    assert_select '#rejected table tbody tr:nth-child(1) td:last-child span.none_text', text: 'Not specified'
+
+    assert_equal samples.sort, data_file.extracted_samples.sort
   end
 
   private

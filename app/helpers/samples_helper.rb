@@ -32,23 +32,27 @@ module SamplesHelper
 
   def display_attribute(sample, attribute, options = {})
     value = sample.get_attribute(attribute.hash_key)
-    case attribute.sample_attribute_type.base_type
-      when 'Date'
-        Date.parse(value).strftime("%e %B %Y")
-      when 'DateTime'
-        DateTime.parse(value).strftime("%e %B %Y %H:%M:%S")
-      when 'SeekStrain'
-        if value['title']
-          link_to(value['title'], strain_path(value['id']))
+    if value.nil?
+      content_tag(:span, 'Not specified', class: 'none_text')
+    else
+      case attribute.sample_attribute_type.base_type
+        when 'Date'
+          Date.parse(value).strftime("%e %B %Y")
+        when 'DateTime'
+          DateTime.parse(value).strftime("%e %B %Y %H:%M:%S")
+        when 'SeekStrain'
+          if value['title']
+            link_to(value['title'], strain_path(value['id']))
+          else
+            content_tag(:span, value['id'], class: 'none_text')
+          end
         else
-          content_tag(:span, value, class: 'none_text')
-        end
-      else
-        if options[:link] && attribute.is_title
-          link_to(value, sample)
-        else
-          text_or_not_specified(value, auto_link: options[:link])
-        end
+          if options[:link] && attribute.is_title
+            link_to(value, sample)
+          else
+            text_or_not_specified(value, auto_link: options[:link])
+          end
+      end
     end
   end
 
