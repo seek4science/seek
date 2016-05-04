@@ -3,7 +3,7 @@ class SampleControlledVocab < ActiveRecord::Base
 
   has_many :sample_controlled_vocab_terms, inverse_of: :sample_controlled_vocab
 
-  validates :title,presence:true
+  validates :title,presence:true,uniqueness: true
 
   def labels
     sample_controlled_vocab_terms.collect(&:label)

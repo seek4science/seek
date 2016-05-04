@@ -25,6 +25,9 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     assert vocab.valid?
     vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label:'fish')
     assert vocab.valid?
+    vocab.save!
+    vocab2=SampleControlledVocab.new(title:'test')
+    refute vocab2.valid?
   end
 
   test 'apples factory' do
