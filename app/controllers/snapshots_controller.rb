@@ -3,9 +3,9 @@ require 'zenodo-client'
 
 class SnapshotsController < ApplicationController
   before_filter :find_resource
-  before_filter :auth_resource, only: [:mint_doi, :new, :create, :export_preview, :export_submit]
+  before_filter :auth_resource, only: [:mint_doi, :new, :create, :export_preview, :export_submit, :destroy]
   before_filter :check_resource_permitted_for_ro, only: [:new, :create]
-  before_filter :find_snapshot, only: [:show, :mint_doi, :download, :export_preview, :export_submit]
+  before_filter :find_snapshot, only: [:show, :mint_doi, :download, :export_preview, :export_submit, :destroy]
   before_filter :doi_minting_enabled?, only: [:mint_doi]
   before_filter :zenodo_oauth_client
   before_filter :zenodo_oauth_session, only: [:export_submit]
@@ -61,6 +61,17 @@ class SnapshotsController < ApplicationController
         flash[:error] = @snapshot.errors.full_messages
         redirect_to polymorphic_path([@resource, @snapshot])
       end
+    end
+  end
+
+  def destroy
+    if @snapshot.has_doi?
+      flash[:error] = "You cannot delete a snapshot that has a DOI."
+      redirect_to polymorphic_path([@resource, @snapshot])
+    else
+      @snapshot.destroy
+      flash[:notice] = "Snapshot successfully deleted"
+      redirect_to polymorphic_path(@resource)
     end
   end
 

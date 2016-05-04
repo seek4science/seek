@@ -5,6 +5,9 @@
         <% end %>
     <% elsif @snapshot.can_mint_doi? %>
         <%= button_link_to("Generate a DOI", 'doi',  polymorphic_path([@resource, @snapshot], :action => 'mint_doi'), :method => :post) %>
+    <% else %>
+        <%= button_link_to("Delete", 'destroy',  polymorphic_path([@resource, @snapshot]),
+                           { confirm: "Are you sure you wish to delete this snapshot?", method: :delete }) %>
     <% end %>
 <% end %>
 <% if @resource.can_view? %>

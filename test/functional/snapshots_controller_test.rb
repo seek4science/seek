@@ -357,6 +357,43 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert @snapshot.zenodo_deposition_id.nil?
   end
 
+  test "can delete snapshot without doi" do
+    create_investigation_snapshot
+    login_as(@user)
+
+    assert_difference('Snapshot.count', -1) do
+      delete :destroy, investigation_id: @investigation, id: @snapshot
+    end
+
+    assert_redirected_to investigation_path(@investigation)
+    assert flash[:notice].include?('deleted')
+  end
+
+  test "can't delete snapshot with doi" do
+    create_investigation_snapshot
+    login_as(@user)
+    @snapshot.doi = '10.5072/123'
+    @snapshot.save
+
+    assert_no_difference('Snapshot.count') do
+      delete :destroy, investigation_id: @investigation, id: @snapshot
+    end
+
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot)
+    assert flash[:error].include?('DOI')
+  end
+
+  test "can't delete snapshot without permission" do
+    create_investigation_snapshot
+
+    assert_no_difference('Snapshot.count') do
+      delete :destroy, investigation_id: @investigation, id: @snapshot
+    end
+
+    assert_redirected_to investigation_path(@investigation)
+    assert flash[:error].include?('authorized')
+  end
+
   private
 
   def create_investigation_snapshot
