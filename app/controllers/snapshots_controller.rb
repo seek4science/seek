@@ -3,10 +3,10 @@ require 'zenodo-client'
 
 class SnapshotsController < ApplicationController
   before_filter :find_resource
-  before_filter :auth_resource, only: [:mint_doi, :new, :create, :export_preview, :export_submit, :destroy]
+  before_filter :auth_resource, only: [:mint_doi_confirm, :mint_doi, :new, :create, :export_preview, :export_submit, :destroy]
   before_filter :check_resource_permitted_for_ro, only: [:new, :create]
-  before_filter :find_snapshot, only: [:show, :mint_doi, :download, :export_preview, :export_submit, :destroy]
-  before_filter :doi_minting_enabled?, only: [:mint_doi]
+  before_filter :find_snapshot, only: [:show, :mint_doi_confirm, :mint_doi, :download, :export_preview, :export_submit, :destroy]
+  before_filter :doi_minting_enabled?, only: [:mint_doi_confirm, :mint_doi]
   before_filter :zenodo_oauth_client
   before_filter :zenodo_oauth_session, only: [:export_submit]
 
@@ -31,6 +31,9 @@ class SnapshotsController < ApplicationController
     send_file @content_blob.filepath,
               :filename => @content_blob.original_filename,
               :type => @content_blob.content_type || "application/octet-stream"
+  end
+
+  def mint_doi_confirm
   end
 
   def mint_doi

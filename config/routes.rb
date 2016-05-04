@@ -235,6 +235,7 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
+        get :mint_doi_confirm
         post :mint_doi
         get :download
         get :export, to: :export_preview
@@ -260,6 +261,7 @@ SEEK::Application.routes.draw do
     end
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
+        get :mint_doi_confirm
         post :mint_doi
         get :download
         get :export, to: :export_preview
@@ -287,6 +289,7 @@ SEEK::Application.routes.draw do
     end
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
+        get :mint_doi_confirm
         post :mint_doi
         get :download
         get :export, to: :export_preview

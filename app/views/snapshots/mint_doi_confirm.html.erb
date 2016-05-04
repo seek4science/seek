@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="col-md-8 col-md-push-2">
+    <%= panel("Confirmation") do %>
+        <%= form_tag(polymorphic_path([@resource, @snapshot], action: 'mint_doi'), method: :post) do %>
+            <%= image_tag('logos/doi_logo.svg', class: 'mint-doi') %>
+
+            <p>
+              You are about to mint a DOI for the following <%= text_for_resource @resource %> snapshot.
+              Please review the contents of the snapshot below and then click the "Mint DOI" button to continue,
+              or "Cancel" to go back.
+            </p>
+
+            <div class="alert alert-warning">
+              <strong>Please note:</strong><br/>
+              Once a snapshot has been given a DOI, it can no longer be deleted.
+            </div>
+
+            <h3>Contents</h3>
+            <%= render partial: 'tree', locals: { resource: @snapshot.metadata, top: true } %>
+
+            <hr/>
+
+            <p class="text-center">
+              <%= submit_tag 'Mint DOI', class: 'btn btn-primary' %>
+              <%= cancel_button(polymorphic_path(@resource)) %>
+            </p>
+        <% end %>
+    <% end %>
+  </div>
+</div>

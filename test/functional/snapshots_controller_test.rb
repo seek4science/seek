@@ -126,6 +126,17 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert flash[:error].include?('exist')
   end
 
+  test "can get confirmation when minting DOI for snapshot" do
+    datacite_mock
+    create_investigation_snapshot
+    login_as(@user)
+
+    get :mint_doi_confirm, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+
+    assert_response :success
+    assert_nil assigns(:snapshot).doi
+  end
+
   test "can mint DOI for snapshot" do
     datacite_mock
     create_investigation_snapshot
@@ -181,6 +192,18 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert !@investigation.can_manage?(other_user)
     assert_redirected_to investigation_path(@investigation)
     assert @snapshot.doi.nil?
+  end
+
+  test "can't get DOI confirmation page when no manage permissions" do
+    datacite_mock
+    create_investigation_snapshot
+    other_user = Factory(:user)
+    login_as(other_user)
+
+    get :mint_doi_confirm, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+
+    assert !@investigation.can_manage?(other_user)
+    assert_redirected_to investigation_path(@investigation)
   end
 
   test "error message mentions DataCite when DataCite broken" do
