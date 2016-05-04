@@ -3,20 +3,20 @@ require 'test_helper'
 class SampleTest < ActiveSupport::TestCase
 
   test 'validation' do
-    sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type),the_title:'fish'
+    sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
-    sample.the_title = nil
+    sample.set_attribute(:the_title, nil)
     refute sample.valid?
     sample.title = ''
     refute sample.valid?
 
-    sample.the_title = 'fish'
+    sample.set_attribute(:the_title, 'fish')
     sample.sample_type = nil
     refute sample.valid?
   end
 
   test 'test uuid generated' do
-    sample = Factory.build(:sample,the_title:'fish')
+    sample = Factory.build(:sample, data: { the_title: 'fish' })
     assert_nil sample.attributes['uuid']
     sample.save
     assert_not_nil sample.attributes['uuid']
@@ -82,34 +82,34 @@ class SampleTest < ActiveSupport::TestCase
     refute_respond_to sample, :weight=
   end
 
-  test 'mass assigment' do
+  test 'mass assignment' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
-    sample.update_attributes(full_name: 'Fred Bloggs', age: 25, postcode: 'M12 9QL', weight: 0.22, address: 'somewhere')
-    assert_equal 'Fred Bloggs', sample.full_name
-    assert_equal 25, sample.age
-    assert_equal 0.22, sample.weight
-    assert_equal 'M12 9QL', sample.postcode
-    assert_equal 'somewhere', sample.address
+    sample.update_attributes(data: { full_name: 'Fred Bloggs', age: 25, postcode: 'M12 9QL', weight: 0.22, address: 'somewhere' })
+    assert_equal 'Fred Bloggs', sample.get_attribute(:full_name)
+    assert_equal 25, sample.get_attribute(:age)
+    assert_equal 0.22, sample.get_attribute(:weight)
+    assert_equal 'M12 9QL', sample.get_attribute(:postcode)
+    assert_equal 'somewhere', sample.get_attribute(:address)
   end
 
   test 'adds validations' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
     refute sample.valid?
-    sample.full_name = 'Bob Monkhouse'
-    sample.age = 22
+    sample.set_attribute(:full_name, 'Bob Monkhouse')
+    sample.set_attribute(:age, 22)
     assert sample.valid?
 
-    sample.full_name = 'FRED'
+    sample.set_attribute(:full_name, 'FRED')
     refute sample.valid?
 
-    sample.full_name = 'Bob Monkhouse'
-    sample.postcode = 'fish'
+    sample.set_attribute(:full_name, 'Bob Monkhouse')
+    sample.set_attribute(:postcode, 'fish')
     refute sample.valid?
     assert_equal 1, sample.errors.count
-    assert_equal 'Postcode is not a valid Post Code', sample.errors.full_messages.first
-    sample.postcode = 'M13 9PL'
+    assert_equal 'is not a valid Post Code', sample.errors[(SampleAttribute::METHOD_PREFIX + 'postcode').to_sym].first
+    sample.set_attribute(:postcode, 'M13 9PL')
     assert sample.valid?
   end
 
@@ -119,40 +119,89 @@ class SampleTest < ActiveSupport::TestCase
     refute sample.valid?
 
     sample.sample_type = Factory(:simple_sample_type)
-    sample.the_title='bob'
+    sample.set_attribute(:the_title, 'bob')
     assert sample.valid?
   end
 
   test 'store and retrieve' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
-    sample.full_name = 'Jimi Hendrix'
-    sample.age = 27
-    sample.weight = 88.9
-    sample.postcode = 'M13 9PL'
+    sample.set_attribute(:full_name, 'Jimi Hendrix')
+    sample.set_attribute(:age, 27)
+    sample.set_attribute(:weight, 88.9)
+    sample.set_attribute(:postcode, 'M13 9PL')
     sample.save!
 
-    assert_equal 'Jimi Hendrix', sample.full_name
-    assert_equal 27, sample.age
-    assert_equal 88.9, sample.weight
-    assert_equal 'M13 9PL', sample.postcode
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 27, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
 
     sample = Sample.find(sample.id)
 
-    assert_equal 'Jimi Hendrix', sample.full_name
-    assert_equal 27, sample.age
-    assert_equal 88.9, sample.weight
-    assert_equal 'M13 9PL', sample.postcode
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 27, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
 
-    sample.age = 28
+    sample.set_attribute(:age, 28)
     sample.save!
 
     sample = Sample.find(sample.id)
 
-    assert_equal 'Jimi Hendrix', sample.full_name
-    assert_equal 28, sample.age
-    assert_equal 88.9, sample.weight
-    assert_equal 'M13 9PL', sample.postcode
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 28, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+  end
+
+  test 'various methods of sample data assignment' do
+    sample = Sample.new title: 'testing'
+    sample.sample_type = Factory(:patient_sample_type)
+    # Mass assignment
+    sample.data = { full_name: 'Jimi Hendrix', age: 27, weight: 88.9, postcode: 'M13 9PL' }
+    sample.save!
+
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 27, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+
+    sample = Sample.find(sample.id)
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 27, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+
+    # Setter
+    sample.set_attribute(:age, 28)
+    sample.save!
+
+    sample = Sample.find(sample.id)
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 28, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+
+    # Method name
+    sample.send((SampleAttribute::METHOD_PREFIX + 'postcode=').to_sym, 'M14 8PL')
+    sample.save!
+
+    sample = Sample.find(sample.id)
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 28, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M14 8PL', sample.get_attribute(:postcode)
+
+    # Hash
+    sample.data[:weight] = 90.1
+    sample.save!
+
+    sample = Sample.find(sample.id)
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 28, sample.get_attribute(:age)
+    assert_equal 90.1, sample.get_attribute(:weight)
+    assert_equal 'M14 8PL', sample.get_attribute(:postcode)
   end
 
   test 'handling booleans' do
@@ -160,98 +209,98 @@ class SampleTest < ActiveSupport::TestCase
     sample_type = Factory(:simple_sample_type)
     sample_type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false,:is_title=>false, :sample_type => sample_type)
     sample_type.save!
-    sample.sample_type=sample_type
+    sample.sample_type = sample_type
 
 
     #the simple cases
-    sample.update_attributes({the_title:'fish',bool:true})
+    sample.update_attributes(data: { the_title:'fish', bool:true })
     assert sample.valid?
     sample.save!
-    assert sample.bool
+    assert sample.get_attribute(:bool)
 
-    sample.update_attributes({the_title:'fish',bool:false})
+    sample.update_attributes(data: { the_title:'fish',bool:false })
     assert sample.valid?
     sample.save!
-    refute sample.bool
+    refute sample.get_attribute(:bool)
 
     #from a form
-    sample.update_attributes({the_title:'fish',bool:'1'})
+    sample.update_attributes(data: { the_title:'fish',bool:'1' })
     assert sample.valid?
     sample.save!
-    assert sample.bool
+    assert sample.get_attribute(:bool)
 
-    sample.update_attributes({the_title:'fish',bool:'0'})
+    sample.update_attributes(data: { the_title:'fish',bool:'0' })
     assert sample.valid?
     sample.save!
-    refute sample.bool
+    refute sample.get_attribute(:bool)
 
     #as text
-    sample.update_attributes({the_title:'fish',bool:'true'})
+    sample.update_attributes(data: { the_title:'fish',bool:'true' })
     assert sample.valid?
     sample.save!
-    assert sample.bool
+    assert sample.get_attribute(:bool)
 
-    sample.update_attributes({the_title:'fish',bool:'false'})
+    sample.update_attributes(data: { the_title:'fish',bool:'false' })
     assert sample.valid?
     sample.save!
-    refute sample.bool
+    refute sample.get_attribute(:bool)
 
     #as text2
-    sample.update_attributes({the_title:'fish',bool:'TRUE'})
+    sample.update_attributes(data: { the_title:'fish',bool:'TRUE' })
     assert sample.valid?
     sample.save!
-    assert sample.bool
+    assert sample.get_attribute(:bool)
 
-    sample.update_attributes({the_title:'fish',bool:'FALSE'})
+    sample.update_attributes(data: { the_title:'fish',bool:'FALSE' })
     assert sample.valid?
     sample.save!
-    refute sample.bool
+    refute sample.get_attribute(:bool)
 
     #via accessors
-    sample.bool=true
+    sample.set_attribute(:bool, true)
     assert sample.valid?
     sample.save!
-    assert sample.bool
-    sample.bool=false
+    assert sample.get_attribute(:bool)
+    sample.set_attribute(:bool, false)
     assert sample.valid?
     sample.save!
-    refute sample.bool
+    refute sample.get_attribute(:bool)
 
-    sample.bool='1'
+    sample.set_attribute(:bool, '1')
     assert sample.valid?
     sample.save!
-    assert sample.bool
-    sample.bool='0'
+    assert sample.get_attribute(:bool)
+    sample.set_attribute(:bool, '0')
     assert sample.valid?
     sample.save!
-    refute sample.bool
+    refute sample.get_attribute(:bool)
 
-    sample.bool='true'
+    sample.set_attribute(:bool, 'true')
     assert sample.valid?
     sample.save!
-    assert sample.bool
-    sample.bool='false'
+    assert sample.get_attribute(:bool)
+    sample.set_attribute(:bool, 'false')
     assert sample.valid?
     sample.save!
-    refute sample.bool
+    refute sample.get_attribute(:bool)
 
     #not valid
-    sample.update_attributes({the_title:'fish',bool:'fish'})
+    sample.update_attributes(data: { the_title:'fish',bool:'fish' })
     refute sample.valid?
-    sample.bool='true'
+    sample.set_attribute(:bool, 'true')
     assert sample.valid?
-    sample.bool='fish'
+    sample.set_attribute(:bool, 'fish')
     refute sample.valid?
   end
 
   test 'json_metadata' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
-    sample.full_name = 'Jimi Hendrix'
-    sample.age = 27
-    sample.weight = 88.9
-    sample.postcode = 'M13 9PL'
-    sample.address = 'Somewhere on earth'
+    sample.set_attribute(:full_name, 'Jimi Hendrix')
+    sample.set_attribute(:age, 27)
+    sample.set_attribute(:weight, 88.9)
+    sample.set_attribute(:postcode, 'M13 9PL')
+    sample.set_attribute(:address, 'Somewhere on earth')
     assert_equal %({"full_name":null,"age":null,"weight":null,"address":null,"postcode":null}), sample.json_metadata
     sample.save!
     refute_nil sample.json_metadata
@@ -264,36 +313,36 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"updated_at",is_title:false, :sample_type => sample_type)
     assert sample_type.valid?
     sample = Sample.new title: 'testing'
-    sample.sample_type=sample_type
+    sample.sample_type = sample_type
 
-    sample.title_ = "the title"
-    sample.updated_at_ = "the updated at"
-    assert_equal %({"title_":null,"updated_at_":null}), sample.json_metadata
+    sample.set_attribute(:title, "the title")
+    sample.set_attribute(:updated_at, "the updated at")
+    assert_equal %({"title":null,"updated_at":null}), sample.json_metadata
     sample.save!
-    assert_equal %({"title_":"the title","updated_at_":"the updated at"}), sample.json_metadata
+    assert_equal %({"title":"the title","updated_at":"the updated at"}), sample.json_metadata
 
     sample = Sample.find(sample.id)
     assert_equal "the title",sample.title
-    assert_equal "the title",sample.title_
-    assert_equal "the updated at",sample.updated_at_
+    assert_equal "the title",sample.title
+    assert_equal "the updated at",sample.get_attribute(:updated_at)
   end
 
   #trying to track down an sqlite3 specific problem
   test 'sqlite3 setting of accessor problem' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
-    sample.full_name = 'Jimi Hendrix'
-    sample.age = 22
+    sample.set_attribute(:full_name, 'Jimi Hendrix')
+    sample.set_attribute(:age, 22)
     sample.save!
     id = sample.id
     assert_equal 5,sample.sample_type.sample_attributes.count
-    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample.sample_type.sample_attributes.collect(&:accessor_name)
+    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample.sample_type.sample_attributes.collect(&:hash_key)
     assert_respond_to sample,:full_name
 
     sample2 = Sample.find(id)
     assert_equal id,sample2.id
     assert_equal 5,sample2.sample_type.sample_attributes.count
-    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample2.sample_type.sample_attributes.collect(&:accessor_name)
+    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample2.sample_type.sample_attributes.collect(&:hash_key)
     assert_respond_to sample2,:full_name
   end
 
@@ -379,7 +428,7 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'title delegated to title attribute on save' do
     sample = Factory.build(:sample,:title=>'frog',:policy=>Factory(:public_policy))
-    sample.the_title='this should be the title'
+    sample.set_attribute(:the_title, 'this should be the title')
     sample.save!
     sample.reload
     assert_equal 'this should be the title',sample.title
@@ -392,18 +441,18 @@ class SampleTest < ActiveSupport::TestCase
     assert sample_type.valid?
     sample_type.save!
     sample = Sample.new title: 'testing'
-    sample.sample_type=sample_type
+    sample.sample_type = sample_type
 
-    sample.freeze_ = "the title"
+    sample.set_attribute(:freeze, "the title")
     refute sample.valid?
-    sample.updated_at_ = "the updated_at"
+    sample.set_attribute(:updated_at, "the updated_at")
     sample.save!
     assert_equal "the title",sample.title
 
     sample=Sample.find(sample.id)
     assert_equal "the title",sample.title
-    assert_equal "the title",sample.freeze_
-    assert_equal "the updated_at",sample.updated_at_
+    assert_equal "the title",sample.get_attribute(:freeze)
+    assert_equal "the updated_at",sample.get_attribute(:updated_at)
   end
 
   test 'sample with clashing attribute names with private methods' do
@@ -412,16 +461,16 @@ class SampleTest < ActiveSupport::TestCase
     assert sample_type.valid?
     sample_type.save!
     sample = Sample.new title: 'testing'
-    sample.sample_type=sample_type
+    sample.sample_type = sample_type
 
-    sample.format_ = "the title"
+    sample.set_attribute(:format, "the title")
     assert sample.valid?
     sample.save!
     assert_equal "the title",sample.title
 
     sample=Sample.find(sample.id)
     assert_equal "the title",sample.title
-    assert_equal "the title",sample.format_
+    assert_equal "the title",sample.get_attribute(:format)
   end
 
   test 'sample with clashing attribute names with dynamic rails methods' do
@@ -430,16 +479,16 @@ class SampleTest < ActiveSupport::TestCase
     assert sample_type.valid?
     sample_type.save!
     sample = Sample.new title: 'testing'
-    sample.sample_type=sample_type
+    sample.sample_type = sample_type
 
-    sample.title_was_ = "the title"
+    sample.set_attribute(:title_was, "the title")
     assert sample.valid?
     sample.save!
     assert_equal "the title",sample.title
 
     sample=Sample.find(sample.id)
     assert_equal "the title",sample.title
-    assert_equal "the title",sample.title_was_
+    assert_equal "the title",sample.get_attribute(:title_was)
   end
 
   test 'strain type stores valid strain info' do
@@ -447,14 +496,14 @@ class SampleTest < ActiveSupport::TestCase
     strain = Factory(:strain)
 
     sample = Sample.new(sample_type: sample_type)
-    sample.name = 'Strain sample'
-    sample.seekstrain = strain.id
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
     assert sample.valid?
     sample.save!
     sample = Sample.find(sample.id)
 
-    assert_equal strain.id, sample.seekstrain['id']
-    assert_equal strain.title, sample.seekstrain['title']
+    assert_equal strain.id, sample.get_attribute(:seekstrain)['id']
+    assert_equal strain.title, sample.get_attribute(:seekstrain)['title']
   end
 
   test 'strain type still stores missing strain info' do
@@ -463,14 +512,14 @@ class SampleTest < ActiveSupport::TestCase
     invalid_strain_id = Strain.last.id + 1 # non-existant strain ID
 
     sample = Sample.new(sample_type: sample_type)
-    sample.name = 'Strain sample'
-    sample.seekstrain = invalid_strain_id
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, invalid_strain_id)
     assert sample.valid?
     sample.save!
     sample = Sample.find(sample.id)
 
-    assert_equal invalid_strain_id, sample.seekstrain['id']
-    assert_nil sample.seekstrain['title'] # can't look up the title because that strain doesn't exist!
+    assert_equal invalid_strain_id, sample.get_attribute(:seekstrain)['id']
+    assert_nil sample.get_attribute(:seekstrain)['title'] # can't look up the title because that strain doesn't exist!
   end
 
   test 'strain attributes can appear as related items' do
@@ -485,16 +534,16 @@ class SampleTest < ActiveSupport::TestCase
     strain2 = Factory(:strain)
 
     sample = Sample.new(sample_type: sample_type)
-    sample.name = 'Strain sample'
-    sample.seekstrain = strain.id
-    sample.seekstrain2 = strain2.id
-    sample.seekstrain3 = Strain.last.id + 1000 # Non-existant strain id
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+    sample.set_attribute(:seekstrain2, strain2.id)
+    sample.set_attribute(:seekstrain3, Strain.last.id + 1000) # Non-existant strain id
     assert sample.valid?
     sample.save!
     sample = Sample.find(sample.id)
 
     assert_equal 2, sample.strains.size
-    assert_equal [strain.title, strain2.title].sort, [sample.seekstrain['title'],sample.seekstrain2['title']].sort
+    assert_equal [strain.title, strain2.title].sort, [sample.get_attribute(:seekstrain)['title'],sample.get_attribute(:seekstrain2)['title']].sort
   end
 
 end

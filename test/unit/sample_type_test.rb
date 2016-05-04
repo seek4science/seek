@@ -269,10 +269,10 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     sample = samples.first
     assert sample.valid?
-    assert_equal "Bob Monkhouse",sample.full_name
-    assert_equal "Blue", sample.hair_colour
-    assert_equal "Yellow", sample.eye_colour
-    assert_equal Date.parse("12 March 1970"), Date.parse(sample.date_of_birth)
+    assert_equal "Bob Monkhouse",sample.get_attribute(:full_name)
+    assert_equal "Blue", sample.get_attribute(:hair_colour)
+    assert_equal "Yellow", sample.get_attribute(:eye_colour)
+    assert_equal Date.parse("12 March 1970"), Date.parse(sample.get_attribute(:date_of_birth))
   end
 
   test 'dependant destroy content blob' do

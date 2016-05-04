@@ -1,9 +1,7 @@
 <% current_user_authorized_to_manage = @sample.new_record?|| @sample.can_manage? -%>
 
 <div class="asset_form">
-
-
-  <%= f.error_messages %>
+  <%= render partial: 'sample_error_messages', locals: { object: @sample } %>
 
   <% if @sample.new_record? %>
       <div class="form-group">

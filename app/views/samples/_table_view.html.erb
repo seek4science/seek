@@ -12,7 +12,7 @@
                 <th>ID</th>
                 <th>Title</th>
                 <% shown_attributes.each do |attribute| %>
-                    <th data-accessor-name="<%= attribute.accessor_name-%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
+                    <th data-hash-key="<%= attribute.hash_key -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
                 <% end %>
               </tr>
           <% end %>
@@ -24,13 +24,13 @@
                   <td><%= sample.id %></td>
                   <td><%= sample.title %></td>
                   <% shown_attributes.each do |attribute| %>
-                      <% if (errors = sample.errors[attribute.accessor_name]).any? %>
+                      <% if (errors = sample.errors[attribute.method_name]).any? %>
                           <td class="sample-field-error">
                             <%# Wrapping <div> needed for popover to display properly %>
                             <%= content_tag(:div, data: {
                                 toggle: 'popover',
                                 content: errors.map { |e| "#{attribute.title} #{e}<br/>" }.join.html_safe }) do %>
-                                <%= text_or_not_specified(sample.send(attribute.accessor_name), auto_link: link) %>
+                                <%= text_or_not_specified(sample.get_attribute(attribute.hash_key), auto_link: link) %>
                             <% end %>
                           </td>
                       <% else %>

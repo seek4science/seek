@@ -34,8 +34,8 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     if(options.ajax) {
         options.columns = [{ data: 'id'},{ data: 'title'}];
         $j('table thead th', selector).each(function (index, column) {
-            if($j(column).data('accessorName'))
-                options.columns.push({ data: 'data.' + $j(column).data('accessorName') });
+            if($j(column).data('hashKey'))
+                options.columns.push({ data: 'data.' + $j(column).data('hashKey') });
         });
     }
 
@@ -65,7 +65,14 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             options["columnDefs"].push({
                 "targets": strainColumns,
                 "render": function (data, type, row) {
-                    return '<a href="/strains/'+data.id+'">'+data.title+'</a>';
+                    if(data.id) {
+                        if (data.title)
+                            return '<a href="/strains/' + data.id + '">' + data.title + '</a>';
+                        else
+                            return '<span class="none_text">' + data.id + '</span>';
+                    } else {
+                        return '<span class="none_text">Not specified</span>';
+                    }
                 }
             });
         }
