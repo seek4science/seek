@@ -1249,3 +1249,17 @@ Factory.define(:strain_sample_type, :parent=>:sample_type) do |f|
     type.sample_attributes << Factory.build(:sample_attribute,:title=>"seekstrain",:sample_attribute_type=>Factory(:strain_sample_attribute_type),:required=>true, :sample_type => type)
   end
 end
+
+Factory.define(:sample_controlled_vocab_term) do |f|
+
+end
+
+Factory.define(:apples_sample_controlled_vocab,class:SampleControlledVocab) do |f|
+  f.title 'apples'
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term,label:'Granny Smith')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term,label:'Golden Delicious')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term,label:'Bramley')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term,label:"Cox's Orange Pippin")
+  end
+end

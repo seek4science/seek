@@ -21,6 +21,9 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     type = SampleAttributeType.new(title: 'x-type', base_type: 'String', regexp: 'xxx')
     assert type.valid?
 
+    type = SampleAttributeType.new(title: 'x-type', base_type: 'CV')
+    assert type.valid?
+
   end
 
   test 'default regexp' do

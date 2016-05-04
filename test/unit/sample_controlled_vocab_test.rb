@@ -1,0 +1,35 @@
+require 'test_helper'
+
+class SampleControlledVocabTest < ActiveSupport::TestCase
+
+  test 'association with terms' do
+    vocab=SampleControlledVocab.new(title: 'test')
+    vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label:'fish')
+    vocab.save!
+    vocab = SampleControlledVocab.find(vocab.id)
+    assert_equal ['fish'],vocab.sample_controlled_vocab_terms.collect(&:label)
+  end
+
+  test 'labels' do
+    vocab=SampleControlledVocab.new(title: 'test')
+    vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label:'fish')
+    vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label:'sprout')
+    vocab.save!
+    assert_equal %w(fish sprout),vocab.labels.sort
+  end
+
+  test 'validation' do
+    vocab=SampleControlledVocab.new
+    refute vocab.valid?
+    vocab.title='test'
+    assert vocab.valid?
+    vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label:'fish')
+    assert vocab.valid?
+  end
+
+  test 'apples factory' do
+    apples = Factory(:apples_sample_controlled_vocab)
+    assert_equal 'apples',apples.title
+    assert_equal ['Golden Delicious','Granny Smith','Bramley',"Cox's Orange Pippin"].sort,apples.labels.sort
+  end
+end

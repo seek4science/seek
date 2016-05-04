@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160408082534) do
+ActiveRecord::Schema.define(:version => 20160504151626) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1329,6 +1329,20 @@ ActiveRecord::Schema.define(:version => 20160408082534) do
 
   add_index "sample_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_sample_user_id_asset_id_can_view"
   add_index "sample_auth_lookup", ["user_id", "can_view"], :name => "index_sample_auth_lookup_on_user_id_and_can_view"
+
+  create_table "sample_controlled_vocab_terms", :force => true do |t|
+    t.string   "label"
+    t.integer  "sample_controlled_vocab_id"
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
+  end
+
+  create_table "sample_controlled_vocabs", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "sample_types", :force => true do |t|
     t.string   "title"
