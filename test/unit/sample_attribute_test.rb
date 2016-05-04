@@ -148,7 +148,7 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('')
   end
 
-  test 'hash_key' do
+  test 'hash key' do
     attribute = SampleAttribute.new title: 'fish pie'
     assert_equal 'fish_pie',attribute.hash_key
 
@@ -163,10 +163,9 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
     attribute = SampleAttribute.new title: 'title'
     assert_equal 'title',attribute.hash_key
-
   end
 
-  test 'accessor name' do
+  test 'method name' do
     attribute = SampleAttribute.new title: 'fish pie'
     assert_equal SampleAttribute::METHOD_PREFIX + 'fish_pie', attribute.method_name
 
@@ -175,7 +174,24 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
     attribute.title = "updated_at"
     assert_equal SampleAttribute::METHOD_PREFIX + 'updated_at',attribute.method_name
+  end
 
+  test 'accessor name matches hash key and is updated when title changes' do
+    attribute = SampleAttribute.new title: 'fish pie'
+    assert_equal 'fish_pie', attribute.accessor_name
+    assert_equal attribute.hash_key, attribute.accessor_name
+
+    attribute.title = "title"
+    assert_equal 'title', attribute.accessor_name
+    assert_equal attribute.hash_key, attribute.accessor_name
+
+    attribute.title = "updated_at"
+    assert_equal 'updated_at', attribute.accessor_name
+    assert_equal attribute.hash_key, attribute.accessor_name
+
+    attribute.title = "HeLlo World!"
+    assert_equal 'hello_world', attribute.accessor_name
+    assert_equal attribute.hash_key, attribute.accessor_name
   end
 
   test 'title_attributes scope' do

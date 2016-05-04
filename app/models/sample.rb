@@ -152,7 +152,7 @@ class Sample < ActiveRecord::Base
   end
 
   def attribute_for_attribute_name(attribute_name)
-    sample_type.sample_attributes.where(accessor_name:attribute_name).first
+    sample_type.sample_attributes.where(accessor_name: attribute_name).first
   end
 
 end

@@ -155,6 +155,55 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal 'M13 9PL', sample.get_attribute(:postcode)
   end
 
+  test 'various methods of sample data assignment' do
+    sample = Sample.new title: 'testing'
+    sample.sample_type = Factory(:patient_sample_type)
+    # Mass assignment
+    sample.data = { full_name: 'Jimi Hendrix', age: 27, weight: 88.9, postcode: 'M13 9PL' }
+    sample.save!
+
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 27, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+
+    sample = Sample.find(sample.id)
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 27, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+
+    # Setter
+    sample.set_attribute(:age, 28)
+    sample.save!
+
+    sample = Sample.find(sample.id)
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 28, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+
+    # Method name
+    sample.send((SampleAttribute::METHOD_PREFIX + 'postcode=').to_sym, 'M14 8PL')
+    sample.save!
+
+    sample = Sample.find(sample.id)
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 28, sample.get_attribute(:age)
+    assert_equal 88.9, sample.get_attribute(:weight)
+    assert_equal 'M14 8PL', sample.get_attribute(:postcode)
+
+    # Hash
+    sample.data[:weight] = 90.1
+    sample.save!
+
+    sample = Sample.find(sample.id)
+    assert_equal 'Jimi Hendrix', sample.get_attribute(:full_name)
+    assert_equal 28, sample.get_attribute(:age)
+    assert_equal 90.1, sample.get_attribute(:weight)
+    assert_equal 'M14 8PL', sample.get_attribute(:postcode)
+  end
+
   test 'handling booleans' do
     sample = Sample.new title: 'testing'
     sample_type = Factory(:simple_sample_type)
@@ -287,13 +336,13 @@ class SampleTest < ActiveSupport::TestCase
     sample.save!
     id = sample.id
     assert_equal 5,sample.sample_type.sample_attributes.count
-    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample.sample_type.sample_attributes.collect(&:accessor_name)
+    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample.sample_type.sample_attributes.collect(&:hash_key)
     assert_respond_to sample,:full_name
 
     sample2 = Sample.find(id)
     assert_equal id,sample2.id
     assert_equal 5,sample2.sample_type.sample_attributes.count
-    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample2.sample_type.sample_attributes.collect(&:accessor_name)
+    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample2.sample_type.sample_attributes.collect(&:hash_key)
     assert_respond_to sample2,:full_name
   end
 
