@@ -128,7 +128,8 @@ class Sample < ActiveRecord::Base
   end
 
   def respond_to_missing?(method_name, include_private = false)
-    if data.key?(method_name.to_s.sub(SampleAttribute::METHOD_PREFIX,'').chomp('='))
+    if method_name.to_s.start_with?(SampleAttribute::METHOD_PREFIX) &&
+        data.key?(method_name.to_s.sub(SampleAttribute::METHOD_PREFIX,'').chomp('='))
       true
     else
       super

@@ -546,4 +546,39 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal [strain.title, strain2.title].sort, [sample.get_attribute(:seekstrain)['title'],sample.get_attribute(:seekstrain2)['title']].sort
   end
 
+  test 'sample responds to correct methods' do
+    sample_type = SampleType.new(title: 'Custom')
+    attribute1 = Factory(:any_string_sample_attribute, title: 'banana_type',
+                                             is_title:true, sample_type: sample_type)
+    attribute2 = Factory(:any_string_sample_attribute, title: 'license',
+                         sample_type: sample_type)
+    sample_type.sample_attributes << attribute1
+    sample_type.sample_attributes << attribute2
+    assert sample_type.valid?
+    sample_type.save!
+    sample = Sample.new(title: 'testing')
+    sample.sample_type = sample_type
+    sample.set_attribute(:banana_type, 'yellow')
+    sample.set_attribute(:license, 'GPL')
+    assert sample.valid?
+    sample.save!
+
+    assert sample.respond_to?(attribute1.method_name.to_sym)
+    assert sample.respond_to?(attribute2.method_name.to_sym)
+    refute sample.respond_to?(:banana_type)
+    refute sample.respond_to?(:license)
+
+    assert_raises(NoMethodError) do
+      sample.license
+    end
+
+    assert_raises(NoMethodError) do
+      sample.banana_type
+    end
+
+    assert_nothing_raised do
+      sample.send(attribute1.method_name.to_sym)
+    end
+  end
+
 end
