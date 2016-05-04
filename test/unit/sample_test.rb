@@ -22,64 +22,50 @@ class SampleTest < ActiveSupport::TestCase
     assert_not_nil sample.attributes['uuid']
   end
 
-  test 'sets up accessor methods' do
+  test 'responds to correct methods when sample type assigned' do
     sample = Factory.build(:sample, sample_type: Factory(:patient_sample_type))
     sample.save(validate: false)
     sample = Sample.find(sample.id)
     refute_nil sample.sample_type
 
-    assert_respond_to sample, :full_name
-    assert_respond_to sample, :full_name=
-    assert_respond_to sample, :age
-    assert_respond_to sample, :age=
-    assert_respond_to sample, :postcode
-    assert_respond_to sample, :postcode=
-    assert_respond_to sample, :weight
-    assert_respond_to sample, :weight=
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name='
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age'
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age='
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode'
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode='
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight'
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight='
 
     # doesn't affect all sample classes
     sample = Factory(:sample, sample_type: Factory(:simple_sample_type))
-    refute_respond_to sample, :full_name
-    refute_respond_to sample, :full_name=
-    refute_respond_to sample, :age
-    refute_respond_to sample, :age=
-    refute_respond_to sample, :postcode
-    refute_respond_to sample, :postcode=
-    refute_respond_to sample, :weight
-    refute_respond_to sample, :weight=
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name='
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age'
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age='
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode'
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode='
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight'
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight='
   end
 
-  test 'sets up accessor methods when assigned' do
+  test 'removes methods with new assigned type' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
 
-    assert_respond_to sample, :full_name
-    assert_respond_to sample, :full_name=
-    assert_respond_to sample, :age
-    assert_respond_to sample, :age=
-    assert_respond_to sample, :postcode
-    assert_respond_to sample, :postcode=
-    assert_respond_to sample, :weight
-    assert_respond_to sample, :weight=
-  end
-
-  test 'removes accessor methods with new assigned type' do
-    sample = Sample.new title: 'testing'
-    sample.sample_type = Factory(:patient_sample_type)
-
-    assert_respond_to sample, :full_name
-    assert_respond_to sample, :full_name=
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name='
 
     sample.sample_type = Factory(:simple_sample_type)
 
-    refute_respond_to sample, :full_name
-    refute_respond_to sample, :full_name=
-    refute_respond_to sample, :age
-    refute_respond_to sample, :age=
-    refute_respond_to sample, :postcode
-    refute_respond_to sample, :postcode=
-    refute_respond_to sample, :weight
-    refute_respond_to sample, :weight=
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name='
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age'
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'age='
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode'
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'postcode='
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight'
+    refute_respond_to sample, SampleAttribute::METHOD_PREFIX + 'weight='
   end
 
   test 'mass assignment' do
@@ -337,13 +323,13 @@ class SampleTest < ActiveSupport::TestCase
     id = sample.id
     assert_equal 5,sample.sample_type.sample_attributes.count
     assert_equal ["full_name", "age", "weight", "address", "postcode"],sample.sample_type.sample_attributes.collect(&:hash_key)
-    assert_respond_to sample,:full_name
+    assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
 
     sample2 = Sample.find(id)
     assert_equal id,sample2.id
     assert_equal 5,sample2.sample_type.sample_attributes.count
     assert_equal ["full_name", "age", "weight", "address", "postcode"],sample2.sample_type.sample_attributes.collect(&:hash_key)
-    assert_respond_to sample2,:full_name
+    assert_respond_to sample2, SampleAttribute::METHOD_PREFIX + 'full_name'
   end
 
   test 'projects' do
