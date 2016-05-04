@@ -19,6 +19,7 @@ class SampleAttribute < ActiveRecord::Base
 
   def title=(title)
     super
+    generate_accessor_name
     self.title
   end
 
