@@ -29,7 +29,7 @@ class SampleAttribute < ActiveRecord::Base
 
   def validate_value?(value)
     return false if required? && value.blank?
-    (value.blank? && !required?) || sample_attribute_type.validate_value?(value)
+    (value.blank? && !required?) || sample_attribute_type.validate_value?(value,controlled_vocab:sample_controlled_vocab)
   end
 
   # The method name used to get this attribute via a method call
@@ -68,10 +68,10 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   def sample_controlled_vocab_and_attribute_type_consistency
-    if sample_controlled_vocab && sample_attribute_type.base_type!='CV'
+    if sample_attribute_type && sample_controlled_vocab && sample_attribute_type.base_type!='CV'
       errors.add(:sample_attribute_type, "Attribute type must be CV if controlled vocabulary set")
     end
-    if sample_attribute_type.base_type=='CV' && sample_controlled_vocab.nil?
+    if sample_attribute_type && sample_attribute_type.base_type=='CV' && sample_controlled_vocab.nil?
       errors.add(:sample_controlled_vocab, "Controlled vocabulary must be set if attribute type is CV")
     end
   end

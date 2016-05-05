@@ -6,9 +6,9 @@ module Seek
           value
         end
 
-        def validate_value(value)
+        def validate_value(value,*args)
           begin
-            test_value(value)
+            test_value(value,*args)
           rescue
             return false
           end
