@@ -223,7 +223,7 @@ class SampleAttributeTest < ActiveSupport::TestCase
   test 'controlled vocab must exist for CV type' do
     attribute=Factory(:apples_controlled_vocab_attribute,is_title:true,sample_type: Factory(:simple_sample_type))
     assert attribute.valid?
-    attribute.sample_controlled_vocab=Factory(:apples_sample_controlled_vocab)
+    attribute.sample_controlled_vocab=nil
     refute attribute.valid?
     attribute.sample_controlled_vocab=Factory(:apples_sample_controlled_vocab)
     assert attribute.valid?

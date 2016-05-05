@@ -13,6 +13,9 @@ class SampleAttribute < ActiveRecord::Base
   validates :title, :sample_attribute_type, presence: true
   validates :sample_type, presence: true
 
+  #validates that the attribute type is CV if vocab is set, and vice-versa
+  validate :sample_controlled_vocab_and_attribute_type_consistency
+
   before_save :generate_accessor_name
   before_save :default_pos, :force_required_when_is_title
 
@@ -62,5 +65,14 @@ class SampleAttribute < ActiveRecord::Base
     #forces required to be true if it is a title
     self.required = required? || is_title?
     true
+  end
+
+  def sample_controlled_vocab_and_attribute_type_consistency
+    if sample_controlled_vocab && sample_attribute_type.base_type!='CV'
+      errors.add(:sample_attribute_type, "Attribute type must be CV if controlled vocabulary set")
+    end
+    if sample_attribute_type.base_type=='CV' && sample_controlled_vocab.nil?
+      errors.add(:sample_controlled_vocab, "Controlled vocabulary must be set if attribute type is CV")
+    end
   end
 end
