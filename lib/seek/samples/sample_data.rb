@@ -13,10 +13,12 @@ module Seek
         end
       end
 
+      # Pre-processes the value before setting
       def []=(key, value)
         super(key, pre_process_value(key, value))
       end
 
+      # Mass pre-processes values provided as a hash
       def mass_assign(hash)
         hash.each do |key, value|
           self[key] = value

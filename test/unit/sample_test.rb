@@ -190,6 +190,44 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal 'M14 8PL', sample.get_attribute(:postcode)
   end
 
+  test 'various methods of sample data assignment perform conversions' do
+    sample_type = Factory(:simple_sample_type)
+    sample_type.sample_attributes << Factory(:sample_attribute, title: "bool",
+                                             sample_attribute_type: Factory(:boolean_sample_attribute_type),
+                                             required: false, is_title: false, sample_type: sample_type)
+    sample = Sample.new(title: 'testing', sample_type: sample_type)
+
+    # Update attributes
+    sample.update_attributes(data: { the_title:'fish', bool: '0' })
+    assert sample.valid?
+    sample.save!
+    assert_equal false, sample.data[:bool]
+
+    # Mass assignment
+    sample.data = { the_title:'fish', bool: '1' }
+    assert sample.valid?
+    sample.save!
+    assert_equal true, sample.data[:bool]
+
+    # Setter
+    sample.set_attribute(:bool, '0')
+    assert sample.valid?
+    sample.save!
+    assert_equal false, sample.data[:bool]
+
+    # Method name
+    sample.send((SampleAttribute::METHOD_PREFIX + 'bool=').to_sym, '1')
+    assert sample.valid?
+    sample.save!
+    assert_equal true, sample.data[:bool]
+
+    # Hash
+    sample.data[:bool] = '0'
+    assert sample.valid?
+    sample.save!
+    assert_equal false, sample.data[:bool]
+  end
+
   test 'handling booleans' do
     sample = Sample.new title: 'testing'
     sample_type = Factory(:simple_sample_type)
