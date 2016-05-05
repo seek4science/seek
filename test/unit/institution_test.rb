@@ -6,8 +6,8 @@ class InstitutionTest < ActiveSupport::TestCase
   # Replace this with your real tests.
 
   def test_delete_inst_deletes_workgroup
-    n_wg = WorkGroup.find(:all).size
-    n_inst = Institution.find(:all).size
+    n_wg = WorkGroup.count
+    n_inst = Institution.count
     
     i=Institution.find(1)
     

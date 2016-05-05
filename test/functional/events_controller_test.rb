@@ -54,7 +54,7 @@ class EventsControllerTest < ActionController::TestCase
     get :index, :page => "all"
     assert_response :success
     assert_equal assigns(:events).sort_by(&:id), Event.authorize_asset_collection(assigns(:events), "view",  users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
-    assert assigns(:events).count < Event.find(:all).count #fails if all events are assigned to @events
+    assert assigns(:events).count < Event.count #fails if all events are assigned to @events
   end
 
   test "xml for projectless event" do

@@ -116,17 +116,17 @@ namespace :seek_dev do
 
   desc 'removes any data this is not authorized to viewed by the first User'
   task(:remove_private_data=>:environment) do
-    sops        =Sop.find(:all)
+    sops        =Sop.all
     private_sops=sops.select { |s| !s.can_view? User.first }
     puts "#{private_sops.size} private Sops being removed"
     private_sops.each { |s| s.destroy }
 
-    models        =Model.find(:all)
+    models        =Model.all
     private_models=models.select { |m| ! m.can_view? User.first }
     puts "#{private_models.size} private Models being removed"
     private_models.each { |m| m.destroy }
 
-    data        =DataFile.find(:all)
+    data        =DataFile.all
     private_data=data.select { |d| !d.can_view? User.first }
     puts "#{private_data.size} private Data files being removed"
     private_data.each { |d| d.destroy }

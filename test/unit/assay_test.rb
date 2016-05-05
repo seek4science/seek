@@ -48,7 +48,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "sort by updated_at" do
-    assert_equal Assay.find(:all).sort_by { |a| a.updated_at.to_i * -1 }, Assay.find(:all)
+    assert_equal Assay.all.sort_by { |a| a.updated_at.to_i * -1 }, Assay.all
   end
 
   test "authorization supported?" do

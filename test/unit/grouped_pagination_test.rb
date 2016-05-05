@@ -105,7 +105,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     Factory :person, :last_name=>"Bobbins",:first_name=>"Fred"
     Factory :person, :last_name=>"Davis",:first_name=>"Fred"
     #delete those with A
-    Person.find(:all,:conditions=>["first_letter = ?","A"]).each {|p| p.delete }
+    Person.where(["first_letter = ?","A"]).each {|p| p.delete }
     @people=Person.paginate :default_page=>"first"
     assert @people.size>0
     assert_equal "B",@people.page
@@ -115,7 +115,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal "A",@people.page
 
     #delete every person, and check it still returns the first page with empty content
-    Person.find(:all).each{|x| x.delete}
+    Person.all.each{|x| x.delete}
     @people=Person.paginate :default_page=>"first"
     assert_equal 0,@people.size
     assert_equal "A",@people.page

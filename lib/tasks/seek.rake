@@ -24,9 +24,9 @@ namespace :seek do
 
   desc 'updates the md5sum, and makes a local cache, for existing remote assets'
   task(:cache_remote_content_blobs=>:environment) do
-    resources = Sop.find(:all)
-    resources |= Model.find(:all)
-    resources |= DataFile.find(:all)
+    resources = Sop.all
+    resources |= Model.all
+    resources |= DataFile.all
     resources = resources.select { |r| r.content_blob && r.content_blob.data.nil? && r.content_blob.url && !r.projects.empty? }
 
     resources.each do |res|
