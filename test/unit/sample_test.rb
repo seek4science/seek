@@ -211,6 +211,7 @@ class SampleTest < ActiveSupport::TestCase
 
     #from a form
     sample.update_attributes(data: { the_title:'fish',bool:'1' })
+    puts sample.errors.full_messages
     assert sample.valid?
     sample.save!
     assert sample.get_attribute(:bool)
@@ -551,6 +552,7 @@ class SampleTest < ActiveSupport::TestCase
 
     assert sample.respond_to?(attribute1.method_name.to_sym)
     assert sample.respond_to?(attribute2.method_name.to_sym)
+    refute sample.respond_to?(SampleAttribute::METHOD_PREFIX + 'hello_kitty')
     refute sample.respond_to?(:banana_type)
     refute sample.respond_to?(:license)
 
