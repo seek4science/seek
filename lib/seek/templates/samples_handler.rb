@@ -15,7 +15,7 @@ module Seek
           unless (heading = cell.content).blank?
             ColumnDetails.new(heading, cell.attributes['column'].to_i)
           end
-        end
+        end.compact
       end
 
       def each_record(columns = nil)

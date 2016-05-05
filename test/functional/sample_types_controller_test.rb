@@ -136,6 +136,19 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_empty assigns(:sample_type).errors
   end
 
+  test "create from template with some blank columns" do
+    blob = { data: missing_columns_template_for_upload }
+
+    assert_difference('SampleType.count', 1) do
+      assert_difference('ContentBlob.count', 1) do
+        post :create_from_template, sample_type: { title: "Hello!" }, :content_blobs => [blob]
+      end
+    end
+
+    assert_redirected_to edit_sample_type_path(assigns(:sample_type))
+    assert_empty assigns(:sample_type).errors
+  end
+
   test "don't create from bad template" do
     blob = { data: bad_template_for_upload }
 
@@ -167,6 +180,12 @@ class SampleTypesControllerTest < ActionController::TestCase
                                            })
   end
 
-
+  def missing_columns_template_for_upload
+    ActionDispatch::Http::UploadedFile.new({
+                                               :filename => 'samples-data-missing-columns.xls',
+                                               :content_type => 'application/excel',
+                                               :tempfile => fixture_file_upload('files/samples-data-missing-columns.xls')
+                                           })
+  end
 
 end
