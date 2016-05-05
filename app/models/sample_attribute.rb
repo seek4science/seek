@@ -14,7 +14,7 @@ class SampleAttribute < ActiveRecord::Base
   validates :sample_type, presence: true
 
   before_save :generate_accessor_name
-  before_save :default_pos, :check_required_against_is_title
+  before_save :default_pos, :force_required_when_is_title
 
   scope :title_attributes, where(is_title: true)
 
@@ -58,8 +58,8 @@ class SampleAttribute < ActiveRecord::Base
     self.pos ||= (self.class.where(sample_type_id: sample_type_id).maximum(:pos) || 0) + 1
   end
 
-  def check_required_against_is_title
-    #FIXME: this look wrong, always returns true
+  def force_required_when_is_title
+    #forces required to be true if it is a title
     self.required = required? || is_title?
     true
   end
