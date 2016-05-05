@@ -205,4 +205,35 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute_includes not_title.sample_type.sample_attributes.title_attributes,not_title
   end
 
+  test 'controlled vocab attribute factory' do
+    #its a fairly complex factory so added test whilst creating it
+    attribute=Factory(:apples_controlled_vocab_attribute,is_title:true,sample_type: Factory(:simple_sample_type))
+    assert attribute.valid?
+    refute_nil attribute.sample_controlled_vocab
+    assert_equal 'CV',attribute.sample_attribute_type.base_type
+  end
+
+  test 'controlled vocab validate value' do
+    attribute=Factory(:apples_controlled_vocab_attribute,is_title:true,sample_type: Factory(:simple_sample_type))
+    assert attribute.validate_value?('Granny Smith')
+    refute attribute.validate_value?('Orange')
+    refute attribute.validate_value?(1)
+  end
+
+  test 'controlled vocab must exist for CV type' do
+    attribute=Factory(:apples_controlled_vocab_attribute,is_title:true,sample_type: Factory(:simple_sample_type))
+    assert attribute.valid?
+    attribute.sample_controlled_vocab=Factory(:apples_sample_controlled_vocab)
+    refute attribute.valid?
+    attribute.sample_controlled_vocab=Factory(:apples_sample_controlled_vocab)
+    assert attribute.valid?
+  end
+
+  test 'controlled vocab must not exist if not CV type' do
+    attribute = Factory(:simple_string_sample_attribute,is_title:true,sample_type: Factory(:simple_sample_type))
+    assert attribute.valid?
+    attribute.sample_controlled_vocab=Factory(:apples_sample_controlled_vocab)
+    refute attribute.valid?
+  end
+
 end

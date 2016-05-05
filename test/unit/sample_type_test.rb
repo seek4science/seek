@@ -123,6 +123,14 @@ class SampleTypeTest < ActiveSupport::TestCase
     end
   end
 
+  test 'controlled vocab sample type validate_value' do
+    type = Factory(:apples_controlled_vocab_sample_type)
+    assert type.validate_value?('apples','Granny Smith')
+    refute type.validate_value?('apples','Orange')
+    refute type.validate_value?('apples',1)
+    refute type.validate_value?('apples',nil)
+  end
+
   test "must have one title attribute" do
     type = SampleType.new title:"No title"
     type.sample_attributes << Factory(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true,:is_title=>false, :sample_type => type)
@@ -255,6 +263,8 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_empty SampleType.sample_types_matching_content_blob(non_template1)
     assert_equal [sample_type],SampleType.sample_types_matching_content_blob(template_blob)
   end
+
+
 
   test 'build samples from template' do
     Factory(:string_sample_attribute_type, title:'String')

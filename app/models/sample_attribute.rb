@@ -8,6 +8,7 @@ class SampleAttribute < ActiveRecord::Base
   belongs_to :sample_attribute_type
   belongs_to :sample_type, inverse_of: :sample_attributes
   belongs_to :unit
+  belongs_to :sample_controlled_vocab
 
   validates :title, :sample_attribute_type, presence: true
   validates :sample_type, presence: true
@@ -58,6 +59,7 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   def check_required_against_is_title
+    #FIXME: this look wrong, always returns true
     self.required = required? || is_title?
     true
   end
