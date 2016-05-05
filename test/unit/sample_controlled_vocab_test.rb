@@ -36,4 +36,10 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     assert_equal ['Golden Delicious','Granny Smith','Bramley',"Cox's Orange Pippin"].sort,apples.labels.sort
   end
 
+  test 'includes term?' do
+    apples = Factory(:apples_sample_controlled_vocab)
+    assert apples.includes_term?('Bramley')
+    refute apples.includes_term?('Fish')
+  end
+
 end

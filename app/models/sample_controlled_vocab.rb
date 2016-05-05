@@ -8,4 +8,8 @@ class SampleControlledVocab < ActiveRecord::Base
   def labels
     sample_controlled_vocab_terms.collect(&:label)
   end
+
+  def includes_term?(value)
+    labels.include?(value)
+  end
 end
