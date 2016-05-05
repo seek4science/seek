@@ -35,4 +35,5 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     assert apples.title.start_with?('apples controlled vocab')
     assert_equal ['Golden Delicious','Granny Smith','Bramley',"Cox's Orange Pippin"].sort,apples.labels.sort
   end
+
 end

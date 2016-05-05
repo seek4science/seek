@@ -2,7 +2,7 @@ module Seek
   module Samples
     module AttributeTypeHandlers
       class SeekStrainAttributeTypeHandler < BaseAttributeHandler
-        def test_value(value,*args)
+        def test_value(value)
           fail 'Not a valid SEEK database ID' unless value[:id].to_i > 0
         end
 

@@ -29,8 +29,8 @@ class SampleAttributeType < ActiveRecord::Base
     self == self.class.default
   end
 
-  def validate_value?(value,*args)
-    check_value_against_base_type(value,*args) && check_value_against_regular_expression(value)
+  def validate_value?(value,additional_options={})
+    check_value_against_base_type(value,additional_options) && check_value_against_regular_expression(value)
   end
 
   def as_json(_options = nil)
@@ -56,8 +56,8 @@ class SampleAttributeType < ActiveRecord::Base
     match && match.to_s == value.to_s
   end
 
-  def check_value_against_base_type(value,*args)
-    base_type_handler.validate_value?(value,*args)
+  def check_value_against_base_type(value,additional_options)
+    base_type_handler.validate_value?(value,additional_options)
   end
 
   def pre_process_value(value)

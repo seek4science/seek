@@ -2,10 +2,18 @@ module Seek
   module Samples
     module AttributeTypeHandlers
       class CVAttributeTypeHandler < BaseAttributeHandler
-        def test_value(value,*args)
-          options = args.extract_options!
-          vocab = options[:controlled_vocab]
-          fail "'#{value}' is not included in the controlled vocabulary" unless vocab.labels.include?(value)
+        class MissingControlledVocabularyException < AttributeHandlerException; end
+
+        def test_value(value)
+          fail "'#{value}' is not included in the controlled vocabulary" unless controlled_vocab.labels.include?(value)
+        end
+
+        private
+
+        def controlled_vocab
+          vocab = additional_options[:controlled_vocab]
+          fail MissingControlledVocabularyException.new unless vocab
+          vocab
         end
       end
     end
