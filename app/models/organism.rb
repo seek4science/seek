@@ -10,7 +10,7 @@ class Organism < ActiveRecord::Base
   has_many :models
   has_many :assays,:through=>:assay_organisms  
   has_many :strains, :dependent=>:destroy
-  has_many :specimens, :through=>:strains
+  has_many :deprecated_specimens, :through=>:strains
 
   has_and_belongs_to_many :projects
 

@@ -21,7 +21,7 @@
 
   <div class="col-sm-6 hidden-xs">
     <% if Seek::Config.organisms_enabled %>
-        <%= list_samples_and_assay_organisms("Organisms", resource.samples, resource.assay_organisms,{:class=>"list_item_attribute"}) %>
+        <%= list_assay_organisms("Organisms", resource.assay_organisms,{:class=>"list_item_attribute"}) %>
     <% end %>
 
     <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>

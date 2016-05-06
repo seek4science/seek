@@ -408,3 +408,52 @@ div.isa_graph {
   border-radius: 5px;
   display: inline-block;
 }
+.sample-attribute .attribute-handle {
+}
+
+.sample-attribute .attribute-position .glyphicon {
+  color: #fff;
+}
+
+a.remove-association {
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 21px;
+  color: $brand-danger;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.association-candidate-list {
+  border: 1px solid $list-group-border;
+  max-height: 200px;
+  overflow-y: scroll;
+
+  .list-group-item {
+    border-radius: 0;
+  }
+}
+
+a.selectable.selected,
+a.selectable.selected:hover,
+a.selectable.selected:focus,
+.selectable.selected,
+.selectable.selected:hover,
+.selectable.selected:focus {
+  color: $list-group-active-color;
+  background-color: $list-group-active-bg;
+}
+
+.samples-table-container {
+  overflow: auto;
+}
+
+table > tbody > tr > td.sample-field-error {
+  background-color: $state-danger-bg;
+  padding: 0;
+
+  > div {
+    padding: 8px;
+  }
+}

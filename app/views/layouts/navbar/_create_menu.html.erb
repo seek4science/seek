@@ -37,27 +37,33 @@
         <% end %>
         <li><%= link_to t("sop"), new_sop_path %></li>
         <li><%= link_to "Publication", new_publication_path %></li>
-
-        <% if Seek::Config.biosamples_enabled %>
-            <li role="presentation" class="dropdown-header">Biosamples</li>
-            <li><%= link_to "Strain", new_strain_path %></li>
-            <li><%= link_to t("biosamples.sample_parent_term"), new_specimen_path %></li>
-            <li><%= link_to "Sample", new_sample_path %></li>
-        <% end %>
+        
 
         <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
         <li><%= link_to t("presentation"), new_presentation_path %></li>
         <% if Seek::Config.events_enabled %>
             <li><%= link_to t("event"), new_event_path %></li>
         <% end %>
+
+        <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
+        <% if Sample.can_create? %>
+            <li><%= link_to("Sample", new_sample_path) %></li>
+        <% end %>
+        <% if SampleType.can_create? %>
+            <li><%= link_to("Sample Type", new_sample_type_path) %></li>
+        <% end %>
+        <li><%= link_to("Strain", new_strain_path) %></li>
+        <% if can_create_organisms? %>
+            <li><%= link_to "Organism", new_organism_path %></li>
+        <% end %>
+
     <% else %>
         <li role="presentation" class="dropdown-header"><span style="color:red">You cannot add assets or other items until you are a member of a <%= t('project') %>.</span></li>
     <% end %>
 
-    <% if can_create_organisms? %>
-        <li role="presentation" class="dropdown-header">Other</li>
-        <li><%= link_to "Organism", new_organism_path %></li>
-    <% end %>
+
+
+
   </ul>
 
 </li>

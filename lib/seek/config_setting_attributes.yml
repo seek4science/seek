@@ -54,7 +54,6 @@ is_virtualliver:
 sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
-biosamples_enabled:
 events_enabled:
 modelling_analysis_enabled:
 organisms_enabled:

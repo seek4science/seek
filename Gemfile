@@ -119,6 +119,7 @@ group :development do
   gem 'rubycritic', require: false
   gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
+  gem 'quiet_assets'
 end
 
 group :test do

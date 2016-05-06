@@ -53,10 +53,7 @@ class SopsController < ApplicationController
 
     @sop.attributes = sop_params
 
-    if params[:sharing]
-      @sop.policy_or_default
-      @sop.policy.set_attributes_with_sharing params[:sharing], @sop.projects
-    end
+    update_sharing_policies @sop, params
 
     respond_to do |format|
       if @sop.save

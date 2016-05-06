@@ -1,206 +1,174 @@
 class SamplesController < ApplicationController
-
-  include Seek::IndexPager
+  respond_to :html
   include Seek::PreviewHandling
-  include Seek::DestroyHandling
+  include Seek::AssetsCommon
+  include Seek::IndexPager
 
-  before_filter :biosamples_enabled?
-  before_filter :find_assets, :only => [:index]
-  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy,:preview,:new_object_based_on_existing_one]
+  before_filter :find_index_assets, :only => :index
+  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview]
 
-  #project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
-  #defined in the application controller
-  before_filter :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
-
-  before_filter :virtualliver_only, :only => [:new_object_based_on_existing_one]
-
-  include Seek::Publishing::PublishingCommon
+  before_filter :auth_to_create, :only=>[:new,:create]
+  before_filter :find_and_authorize_data_file, :only => :extract_from_data_file
+  before_filter :get_sample_type, :only => :extract_from_data_file
 
   include Seek::BreadCrumbs
 
-  def new_object_based_on_existing_one
-    @existing_sample = Sample.find(params[:id])
-    @sample = @existing_sample.clone_with_associations
+  def extract_from_data_file
+    @rejected_samples = []
+    @samples = []
 
-    notice_message = ''
-    unless @sample.specimen.can_view?
-      @sample.specimen = nil
-      notice_message << "The #{t('biosamples.sample_parent_term')} of the existing Sample cannot be viewed, please specify your own #{t('biosamples.sample_parent_term')}! <br/> "
-    end
-
-    @existing_sample.data_files.each do |df|
-      if !df.can_view?
-        notice_message << "Some or all #{t('data_file').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
-        break
+    samples = @sample_type.build_samples_from_template(@data_file.content_blob)
+    samples.each do |sample|
+      sample.contributor=User.current_user
+      sample.originating_data_file = @data_file
+      sample.policy=Policy.public_policy
+      if sample.valid?
+        sample.save if params[:confirm]
+        @samples << sample
+      else
+        @rejected_samples << sample
       end
     end
-    @existing_sample.models.each do |m|
-      if !m.can_view?
-        notice_message << "Some or all #{t('model').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
-        break
-      end
+    if params[:confirm]
+      @show_confirmation = false
+      flash[:notice]="#{@samples.count} samples created, #{@rejected_samples.count} rejected"
+    else
+      @show_confirmation = true
     end
-    @existing_sample.sops.each do |s|
-      if !s.can_view?
-        notice_message << "Some or all #{t('sop').pluralize} of the existing Sample cannot be viewed, you may specify your own! <br/>"
-        break
-      end
-    end
-
-    unless notice_message.blank?
-      flash.now[:notice] = notice_message.html_safe
-    end
-
-    render :action => "new"
-
-  end
-
-  def show
     respond_to do |format|
       format.html
-      format.xml
-      format.rdf { render :template=>'rdf/show'}
+    end
+  end
+
+  def index
+    if @data_file || @sample_type
+      respond_with(@samples)
+    else
+      super
     end
   end
 
   def new
-    @sample = Sample.new
-    @sample.parent_name = params[:parent_name]
-    @sample.from_biosamples = params[:from_biosamples]
-    @sample.specimen = Specimen.find_by_id(params[:specimen_id]) || Specimen.new(:creators=>[current_person])
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml
-    end
-  end
-
-  def edit
-    @sample.from_biosamples = params[:from_biosamples]
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml
-    end
+    @sample = Sample.new(sample_type_id: params[:sample_type_id])
+    respond_with(@sample)
   end
 
   def create
-    @sample = Sample.new(params[:sample])
-    # create new specimen only for combined form
-    is_new_spec = params[:sample][:specimen_id].nil? ? true : false
-
-    if is_new_spec
-      @sample.specimen.contributor = @sample.contributor if @sample.specimen.contributor.nil?
-      @sample.specimen.projects = @sample.projects if @sample.specimen.projects.blank?
-      if @sample.specimen.strain.nil? && !params[:organism].blank? && Seek::Config.is_virtualliver
-        @sample.specimen.strain = Strain.default_strain_for_organism(params[:organism])
-      end
-      #add policy to specimen
-      @sample.specimen.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-      #get specimen SOPs
-      specimen_sop_ids = (params[:specimen_sop_ids].nil?? [] : params[:specimen_sop_ids].reject(&:blank?)) || []
-      #add creators
-      AssetsCreator.add_or_update_creator_list(@sample.specimen, params[:creators])
-      @sample.specimen.other_creators=params[:specimen][:other_creators] if params[:specimen]
-    end
-
-    tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
-
-    @sample.policy.set_attributes_with_sharing params[:sharing], @sample.projects
-
-    data_file_ids = (params[:sample_data_file_ids].nil?? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
-    model_ids = (params[:sample_model_ids].nil?? [] : params[:sample_model_ids].reject(&:blank?)) || []
-    sop_ids = (params[:sample_sop_ids].nil?? [] : params[:sample_sop_ids].reject(&:blank?)) || []
-
-    if @sample.save
-      #send publishing request for specimen
-      if !@sample.specimen.can_publish? && params[:sharing] && (params[:sharing][:sharing_scope].to_i == Policy::EVERYONE)
-        notify_gatekeepers_of_approval_request [@sample.specimen]
-      end
-
-        tissue_and_cell_types.each do |t|
-          t_id, t_title = t.split(",")
-          @sample.associate_tissue_and_cell_type(t_id, t_title)
-        end if @sample.respond_to?(:tissue_and_cell_types)
-      @sample.create_or_update_assets data_file_ids, "DataFile"
-      @sample.create_or_update_assets model_ids, "Model"
-      @sample.create_or_update_assets sop_ids, "Sop"
-      
-      align_sops(@sample.specimen, specimen_sop_ids) if is_new_spec
-
-
-      if @sample.parent_name=="assay"
-        render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@sample, :parent_name=>"assay"}
-        elsif @sample.from_biosamples=="true"
-          render :partial=>"biosamples/back_to_biosamples",:locals=>{:action => 'create', :object=>@sample, :new_specimen => is_new_spec}
-      else
-        respond_to do |format|
-          flash[:notice] = 'Sample was successfully created.'
-          format.html { redirect_to(@sample) }
-          format.xml { head :ok }
-        end
-      end
-    else
-        respond_to do |format|
-          format.html { render :action => "new" }
-        end
-    end
-
+    @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
+    update_sample_with_params
+    flash[:notice] = 'The sample was successfully created.' if @sample.save
+    respond_with(@sample)
   end
 
+  def show
+    @sample = Sample.find(params[:id])
+    respond_with(@sample)
+  end
+
+  def edit
+    @sample = Sample.find(params[:id])
+    respond_with(@sample)
+  end
 
   def update
-    data_file_ids = (params[:sample_data_file_ids].nil? ? [] : params[:sample_data_file_ids].reject(&:blank?)) || []
-    model_ids = (params[:sample_model_ids].nil? ? [] : params[:sample_model_ids].reject(&:blank?)) || []
-    sop_ids = (params[:sample_sop_ids].nil? ? [] : params[:sample_sop_ids].reject(&:blank?)) || []
-    @sample.attributes = params[:sample]
-      tissue_and_cell_types = params[:tissue_and_cell_type_ids]||[]
-
-    #update policy to sample
-    @sample.policy.set_attributes_with_sharing params[:sharing],@sample.projects
-
-      if @sample.save
-        #TODO CONFIG improve configurability. Configuration currently is deduced from other parameters
-        if tissue_and_cell_types.blank?
-          @sample.tissue_and_cell_types= tissue_and_cell_types
-          @sample.save
-        else
-          tissue_and_cell_types.each do |t|
-          t_id, t_title = t.split(",")
-          @sample.associate_tissue_and_cell_type(t_id, t_title)
-          end
-        end
-          @sample.create_or_update_assets data_file_ids,"DataFile"
-          @sample.create_or_update_assets model_ids,"Model"
-          @sample.create_or_update_assets sop_ids,"Sop"
-
-        if @sample.from_biosamples=="true"
-          render :partial => "biosamples/back_to_biosamples", :locals => {:action => 'update', :object => @sample}
-        else
-          respond_to do |format|
-            flash[:notice] = 'Sample was successfully updated.'
-            format.html { redirect_to(@sample) }
-            format.xml { head :ok }
-          end
-        end
-      else
-        respond_to do |format|
-          format.html { render :action => "edit" }
-        end
-      end
+    @sample = Sample.find(params[:id])
+    update_sample_with_params
+    flash[:notice] = 'The sample was successfully updated.' if @sample.save
+    respond_with(@sample)
   end
 
-  def align_sops resource,new_sop_ids
-    existing_ids = resource.sops.collect{|sm| sm.sop.id}
-    to_remove = existing_ids - new_sop_ids
-    join_class_string = ['Sop', resource.class.name].sort.join
-    join_class = join_class_string.constantize
-    to_remove.each do |id|
-      joins = join_class.where({"#{resource.class.name.downcase}_id".to_sym=>resource.id,:sop_id=>id})
-      joins.each{|j| j.destroy}
+  def destroy
+    @sample = Sample.find(params[:id])
+    if @sample.can_delete? && @sample.destroy
+      flash[:notice] = 'The sample was successfully deleted.'
+    else
+      flash[:notice] = 'It was not possible to delete the sample.'
     end
-    (new_sop_ids - existing_ids).each do |id|
-      sop=Sop.find(id)
-      join_class.create!(:sop_id=>sop.id,:sop_version=>sop.version,"#{resource.class.name.downcase}_id".to_sym=>resource.id)
+    respond_with(@sample,location:root_path)
+  end
+
+  #called from AJAX, returns the form containing the attributes for the sample_type_id
+  def attribute_form
+    sample_type_id = params[:sample_type_id]
+
+    sample=Sample.new(sample_type_id:sample_type_id)
+
+
+    respond_with do |format|
+      format.js {
+        render json: {
+                form: (render_to_string(partial:"samples/sample_attributes_form",locals:{sample:sample}))
+               }
+      }
+    end
+  end
+
+  def filter
+    @associated_samples = params[:assay_id].blank? ? [] : Assay.find(params[:assay_id]).samples
+    @samples = Sample.where("title LIKE ?", "%#{params[:filter]}%").limit(20)
+
+    respond_with do |format|
+      format.html { render :partial => 'samples/association_preview', :collection => @samples,
+                           :locals => { :existing => @associated_samples } }
+    end
+  end
+
+  private
+
+  def update_sample_with_params
+    @sample.update_attributes(params[:sample])
+    update_sharing_policies @sample, params
+    update_annotations(params[:tag_list], @sample)
+  end
+
+  def find_and_authorize_data_file
+    @data_file = DataFile.find(params[:data_file_id])
+
+    unless @data_file.can_manage?
+      flash[:error] = "You are not authorize to extract samples from this data file"
+      respond_to do |format|
+        format.html { redirect_to data_file_path(@data_file)}
+      end
+    end
+  end
+
+  def get_sample_type
+    if params[:sample_type_id] || @data_file.possible_sample_types.count == 1
+      if params[:sample_type_id]
+        @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
+      else
+        @sample_type = @data_file.possible_sample_types.last
+      end
+    elsif @data_file.possible_sample_types.count > 1
+      # Redirect to sample type selector
+      respond_to do |format|
+        format.html { redirect_to select_sample_type_data_file_path(@data_file) }
+      end
+    else
+      flash[:error] = "Couldn't determine the sample type of this data"
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
+    end
+  end
+
+  def find_index_assets
+    if params[:data_file_id]
+      @data_file = DataFile.find(params[:data_file_id])
+
+      unless @data_file.can_view?
+        flash[:error] = "You are not authorize to view samples from this data file"
+        respond_to do |format|
+          format.html { redirect_to data_file_path(@data_file)}
+        end
+      end
+
+      @samples = Sample.authorize_asset_collection(@data_file.extracted_samples.includes(:sample_type => :sample_attributes).all, 'view')
+    elsif params[:sample_type_id]
+      @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
+      @samples = Sample.authorize_asset_collection(@sample_type.samples.all, 'view')
+    else
+      find_assets
     end
   end
 

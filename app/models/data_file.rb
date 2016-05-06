@@ -23,14 +23,15 @@ class DataFile < ActiveRecord::Base
 
   scope :default_order, order('title')
 
-  validates_presence_of :title
-
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
+  has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 
   has_many :studied_factors, :conditions => Proc.new{["studied_factors.data_file_version =?", version]}
+  has_many :extracted_samples, :class_name => 'Sample', :foreign_key => :originating_data_file_id
+
+  scope :with_extracted_samples, -> { joins(:extracted_samples).uniq }
 
   explicit_versioning(:version_column => "version") do
     include Seek::Data::DataFileExtraction
@@ -88,10 +89,11 @@ class DataFile < ActiveRecord::Base
        else
          return true
      end
-   end
+  end
 
-  has_many :sample_assets,:dependent=>:destroy,:as => :asset
-  has_many :samples, :through => :sample_assets
+  #DEPRECATED
+  has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :deprecated_samples, :through => :sample_assets
 
 
   def relationship_type(assay)
@@ -166,6 +168,15 @@ class DataFile < ActiveRecord::Base
     end
   end
 
+  #FIXME: bad name, its not whether it IS a template, but whether it originates from a template
+  def sample_template?
+    possible_sample_types.any?
+  end
+
+  def possible_sample_types
+    SampleType.sample_types_matching_content_blob(content_blob)
+  end
+
   #a simple container for handling the matching results returned from #matching_data_files
   class ModelMatchResult < Struct.new(:search_terms,:score,:primary_key); end
 
@@ -202,6 +213,10 @@ class DataFile < ActiveRecord::Base
     end
 
     results.values.sort_by{|a| -a.score}
+  end
+
+  def related_samples
+    extracted_samples
   end
 
 end

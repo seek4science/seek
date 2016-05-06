@@ -22,8 +22,7 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :presentations
   has_and_belongs_to_many :taverna_player_runs, class_name: 'TavernaPlayer::Run',
                                                 join_table: 'projects_taverna_player_runs', association_foreign_key: 'run_id'
-  has_and_belongs_to_many :specimens
-  has_and_belongs_to_many :samples
+
   has_and_belongs_to_many :strains
   has_and_belongs_to_many :organisms
 
@@ -43,6 +42,10 @@ class Project < ActiveRecord::Base
   after_save :handle_asset_gatekeeper_ids, if: '@asset_gatekeeper_ids'
   after_save :handle_pal_ids, if: '@pal_ids'
   after_save :handle_asset_housekeeper_ids, if: '@asset_housekeeper_ids'
+
+  #DEPRECATED
+  has_and_belongs_to_many :deprecated_specimens
+  has_and_belongs_to_many :deprecated_samples
 
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes

@@ -26,9 +26,6 @@
     <% end %>
     <li><%= link_to t("sop").pluralize, sops_path %></li>
     <li><%= link_to "Publications", publications_path %></li>
-    <% if Seek::Config.biosamples_enabled %>
-        <li><%= link_to "Biosamples", biosamples_path %></li>
-    <% end %>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
     <li><%= link_to t("presentation").pluralize, presentations_path %></li>
@@ -38,8 +35,10 @@
     <% if Seek::Config.forum_enabled %>
         <li><%= link_to "Forums", forums_path %></li>
     <% end %>
+    <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
+    <li><%= link_to("Samples", samples_path) %></li>
+    <li><%= link_to("Sample types", sample_types_path) %></li>
     <% if Seek::Config.organisms_enabled %>
-        <li role="presentation" class="dropdown-header">Other</li>
         <li><%= link_to "Organisms", organisms_path %></li>
     <% end %>
   </ul>

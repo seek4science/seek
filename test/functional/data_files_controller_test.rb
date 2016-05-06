@@ -208,24 +208,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_includes new_assay.data_files,d
   end
 
-  test "associate sample" do
-     # associate to a new data file
-     data_file_with_samples,blob = valid_data_file
-     data_file_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
-     assert_difference("DataFile.count") do
-       post :create,:data_file => data_file_with_samples,:content_blobs=>[blob], :sharing => valid_sharing
-     end
-
-    df = assigns(:data_file)
-    assert_equal "newTestSample", df.samples.first.title
-
-    #edit associations of samples to an existing data file
-    put :update,:id=> df.id, :data_file => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
-    df = assigns(:data_file)
-    assert_equal "editTestSample", df.samples.first.title
-  end
-
-
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
@@ -2181,6 +2163,64 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution 4.0'
   end
 
+  test 'can disambiguate sample type' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    get :select_sample_type, :id => data_file
+
+    assert_select 'select[name=sample_type_id] option', count: 2
+  end
+
+  test 'filtering for sample association form' do
+    person = Factory(:person)
+    d1 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "fish")
+    d2 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "frog")
+    d3 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "banana")
+    d4 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "no samples")
+    [d1, d2, d3].each do |data_file|
+      Factory(:sample, originating_data_file_id: data_file.id)
+    end
+    login_as(person.user)
+
+    get :filter, filter: '', with_samples: true
+    assert_select 'a', count: 3
+    assert_select 'a', text: /no samples/, count: 0
+    assert_response :success
+
+    get :filter, filter: 'f', with_samples: true
+    assert_select 'a', count: 2
+    assert_select 'a', text: /fish/
+    assert_select 'a', text: /frog/
+
+    get :filter, filter: 'fi', with_samples: true
+    assert_select 'a', count: 1
+    assert_select 'a', text: /fish/
+  end
+
   test "programme data files through nested routing" do
     assert_routing 'programmes/2/data_files', { controller: 'data_files', action: 'index', programme_id: '2' }
     programme = Factory(:programme)
@@ -2194,6 +2234,36 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "a[href=?]", data_file_path(data_file), text: data_file.title
       assert_select "a[href=?]", data_file_path(data_file2), text: data_file2.title, count: 0
     end
+  end
+
+  test "should get table view for data file" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
+    end
+    login_as(data_file.contributor)
+
+    get :samples_table, format: :json, id: data_file.id
+
+    assert_response :success
+
+    json = JSON.parse(@response.body)
+    assert_equal 3, json['data'].length
+  end
+
+  test "should not get table view for private data file if unauthorized" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
+    end
+
+    get :samples_table, format: :json, id: data_file.id
+
+    assert_response :forbidden
   end
 
   private

@@ -12,8 +12,8 @@ module Seek
                 Investigation=>"Investigation",
                 Publication=>"Publication",
                 Strain=>"strain",
-                Sample=>"Sample",
-                Specimen=>"specimen",
+                DeprecatedSample=>"Sample",
+                DeprecatedSpecimen=>"specimen",
                 Compound=>"compound"}
 
       property :Data

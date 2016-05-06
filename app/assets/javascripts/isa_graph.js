@@ -46,7 +46,14 @@ function drawGraph(elements, current_element_id){
                 'source-arrow-color': 'data(faveColor)',
                 'target-arrow-color': 'data(faveColor)',
                 'content': 'data(name)',
-                'color': '#323232',
+                'color': '#222222',
+                'text-background-color': '#eeeeff',
+                'text-background-shape': 'roundrectangle',
+                'text-background-opacity': 0.7,
+                'text-border-width': 1,
+                'text-border-style': 'solid',
+                'text-border-color': '#ccccdd',
+                'text-border-opacity': 0.7,
                 'font-size': (default_font_size)
             }),
 

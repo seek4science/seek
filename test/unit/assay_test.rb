@@ -2,6 +2,7 @@ require 'test_helper'
 require 'tmpdir'
 
 class AssayTest < ActiveSupport::TestCase
+
   fixtures :all
 
   test "shouldnt edit the assay" do
@@ -47,7 +48,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test "sort by updated_at" do
-    assert_equal Assay.find(:all).sort_by { |a| a.updated_at.to_i * -1 }, Assay.find(:all)
+    assert_equal Assay.all.sort_by { |a| a.updated_at.to_i * -1 }, Assay.all
   end
 
   test "authorization supported?" do
@@ -65,7 +66,6 @@ class AssayTest < ActiveSupport::TestCase
     User.current_user = assay.contributor.user
     assert !assay.is_modelling?
     assay.assay_class=assay_classes(:modelling_assay_class)
-    assay.samples = []
     assay.save!
     assert assay.is_modelling?
   end
@@ -85,7 +85,6 @@ class AssayTest < ActiveSupport::TestCase
     User.current_user = assay.contributor.user
     assert assay.is_experimental?
     assay.assay_class=assay_classes(:modelling_assay_class)
-    assay.samples = []
     assay.save!
     assert !assay.is_experimental?
   end
@@ -141,16 +140,16 @@ class AssayTest < ActiveSupport::TestCase
 
       assay.owner=people(:person_for_model_owner)
 
-      #an modelling assay can be valid without a technology type, sample or organism
+      #an modelling assay can be valid without a technology type, or organism
       assay.assay_class=assay_classes(:modelling_assay_class)
       assay.technology_type_uri=nil
-      assay.samples = []
+
       assert assay.valid?
     #an experimental assay can be invalid without a sample nor a organism
     assay.assay_class=assay_classes(:experimental_assay_class)
     assay.technology_type_uri=nil
     assay.organisms = []
-    assay.samples = []
+
 
 
     as_not_virtualliver do
@@ -159,13 +158,6 @@ class AssayTest < ActiveSupport::TestCase
 
     assay.assay_organisms = [Factory(:assay_organism)]
     assert assay.valid?
-    assay.assay_organisms = []
-    assay.samples = [Factory(:sample)]
-    assert assay.valid?
-
-     assay.assay_organisms = [Factory(:assay_organism)]
-     assay.samples = [Factory(:sample)]
-     assert assay.valid?
 
     end
   end
@@ -206,12 +198,6 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal 3,assay.assets.size,"should be 2 sops and 1 data file"
   end
 
-  test "sop versions" do
-    assay=assays(:metabolomics_assay)
-    assert_equal 2,assay.sops.size
-    assert assay.sop_versions.include?(sops(:my_first_sop).find_version(1))
-    assert assay.sop_versions.include?(sops(:sop_with_fully_public_policy).find_version(1))
-  end
 
   test "sops" do
     assay=assays(:metabolomics_assay)
@@ -220,11 +206,6 @@ class AssayTest < ActiveSupport::TestCase
     assert assay.sops.include?(sops(:sop_with_fully_public_policy))
   end
 
-  test "data_file versions" do
-    assay=assays(:metabolomics_assay)
-    assert_equal 1,assay.data_files.size
-    assert assay.data_file_versions.include?(data_files(:picture).find_version(1))
-  end
 
   test "data files" do
     assay=assays(:metabolomics_assay)
@@ -236,7 +217,7 @@ class AssayTest < ActiveSupport::TestCase
     assay = assays(:metabolomics_assay)
     User.with_current_user assay.contributor.user do
       assert_difference("Assay.find_by_id(assay.id).data_files.count") do
-        assay.associate(data_files(:viewable_data_file), relationship_types(:test_data))
+        assay.associate(data_files(:viewable_data_file), relationship: relationship_types(:test_data))
       end
     end
   end
@@ -253,7 +234,7 @@ class AssayTest < ActiveSupport::TestCase
       end
       assay.reload
       assert_equal 1, assay.assay_assets.size
-      assert_equal sop.version, assay.assay_assets.first.versioned_asset.version
+      assert_equal sop.version, assay.assay_assets.first.version
 
       User.current_user = sop.contributor
       sop.save_as_new_version
@@ -266,7 +247,7 @@ class AssayTest < ActiveSupport::TestCase
 
       assay.reload
       assert_equal 1, assay.assay_assets.size
-      assert_equal sop.version, assay.assay_assets.first.versioned_asset.version
+      assert_equal sop.version, assay.assay_assets.first.version
     end
   end
 
@@ -403,7 +384,6 @@ class AssayTest < ActiveSupport::TestCase
       :study => studies(:metabolomics_study),
       :owner => people(:person_for_model_owner),
       :assay_class => assay_classes(:experimental_assay_class),
-      :samples => [Factory(:sample)],
       :policy => Factory(:private_policy)
     )
   end
@@ -516,6 +496,32 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal tech_type, assay.suggested_technology_type
     assert_equal "carroty", assay.technology_type_label
     assert_equal "carrot:3",assay.technology_type_uri
+  end
+
+  test 'associated samples' do
+    assay = Factory(:assay)
+    sample1 = Factory(:sample)
+    sample2 = Factory(:sample)
+    sample3 = Factory(:sample)
+    df = Factory(:data_file)
+    aa1 = AssayAsset.new assay:assay,asset:sample1,direction:AssayAsset::Direction::INCOMING
+    aa1.save!
+    aa2 = AssayAsset.new assay:assay,asset:sample2,direction:AssayAsset::Direction::INCOMING
+    aa2.save!
+    aa3 = AssayAsset.new assay:assay,asset:df,direction:AssayAsset::Direction::NODIRECTION
+    aa3.save!
+
+    assay = assay.reload
+    assert_includes assay.samples,sample1
+    assert_includes assay.samples,sample2
+    refute_includes assay.samples, df
+
+    assert_includes assay.assets,sample1
+    assert_includes assay.assets,sample2
+    assert_includes assay.assets,df
+
+    refute_includes assay.samples,sample3
+    refute_includes assay.assets,sample3
   end
 
 end

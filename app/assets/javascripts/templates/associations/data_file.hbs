@@ -1,0 +1,12 @@
+<li class="association-list-item">
+    <input type="hidden" name="data_files[][id]" value="{{id}}"/>
+    {{title}}
+    {{#if direction}}
+        <input type="hidden" name="data_files[][direction]" value="{{direction.value}}"/>
+    {{/if}}
+    {{#if relationship_type}}
+        <input type="hidden" name="data_files[][relationship_type]" value="{{relationship_type.value}}"/>
+        <small>({{relationship_type.text}})</small>
+    {{/if}}
+    <a class="remove-association clickable" title="Remove sample">&times;</a>
+</li>

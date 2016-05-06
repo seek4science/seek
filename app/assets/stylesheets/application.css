@@ -15,14 +15,12 @@
 *= require dynamic_menu
 *= require easytabs
 *= require taverna_player/application
-*= require data_tables
 *= require projects
 *= require jquery.bxslider
 *= require jws
 *= require images
 *= require landing_page
 *= require asset_report
-*= require biosamples
 *= require bives
 *= require full_scroll_table
 *= require match_making
@@ -38,4 +36,8 @@
 *= require calendar_date_select/default
 *= require organisms
 *= require tweaks
+*= require samples
+*= require DataTables-1.10.11/dataTables.bootstrap
+*= require DataTables-1.10.11/select.bootstrap
+*= require DataTables-1.10.11/buttons.bootstrap
 */

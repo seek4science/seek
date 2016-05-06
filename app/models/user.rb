@@ -18,13 +18,15 @@ class User < ActiveRecord::Base
 
   has_many :investigations,:as=>:contributor
   has_many :studies,:as=>:contributor
-  has_many :samples,:as=>:contributor
 
   has_many :workflows, :as => :contributor
   has_many :taverna_player_runs, :class_name => 'TavernaPlayer::Run', :as => :contributor
   has_many :sweeps, :as => :contributor
 
   has_many :oauth_sessions, :dependent => :destroy
+
+  #DEPRECATED
+  has_many :deprecated_samples,:as=>:contributor
 
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password

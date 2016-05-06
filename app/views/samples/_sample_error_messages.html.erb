@@ -1,0 +1,11 @@
+<% if object.errors.any? %>
+    <div id="errorExplanation" class="errorExplanation">
+      <h2><%= pluralize(object.errors.count, 'error') %> prohibited this sample from being saved</h2>
+      <p>There were problems with the following fields:</p>
+      <ul>
+        <% object.errors.each do |attr, msg| %>
+            <li><%= attr.to_s.sub(SampleAttribute::METHOD_PREFIX, '').humanize %><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+<% end %>

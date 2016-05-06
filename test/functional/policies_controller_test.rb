@@ -94,7 +94,7 @@ class PoliciesControllerTest < ActionController::TestCase
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
     gatekeeper = Factory(:asset_gatekeeper)
     a_person = Factory(:person)
-    sample = Sample.new
+    sample = DeprecatedSample.new
 
     login_as(a_person.user)
     assert sample.can_manage?
@@ -105,7 +105,7 @@ class PoliciesControllerTest < ActionController::TestCase
 
   test 'when creating an item, can publish the item if associate to it the project which has no gatekeeper' do
     a_person = Factory(:person)
-    sample = Sample.new
+    sample = DeprecatedSample.new
 
     login_as(a_person.user)
     assert sample.can_manage?
@@ -118,14 +118,14 @@ class PoliciesControllerTest < ActionController::TestCase
     as_not_virtualliver do
       gatekeeper = Factory(:asset_gatekeeper)
       a_person = Factory(:person)
-      sample = Factory(:sample, policy: Factory(:policy))
-      Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: sample.policy)
-      sample.reload
+      item = Factory(:sop, policy: Factory(:policy))
+      Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+      item.reload
 
       login_as(a_person.user)
-      assert sample.can_manage?
+      assert item.can_manage?
 
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sample, gatekeeper.projects.first.id.to_s)
+      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first.id.to_s)
       assert !updated_can_publish_immediately
     end
   end
@@ -134,14 +134,14 @@ class PoliciesControllerTest < ActionController::TestCase
     as_not_virtualliver do
       gatekeeper = Factory(:asset_gatekeeper)
       a_person = Factory(:person)
-      sample = Factory(:sample, policy: Factory(:policy), project_ids: gatekeeper.projects.collect(&:id))
-      Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: sample.policy)
-      sample.reload
+      item = Factory(:sop, policy: Factory(:policy), project_ids: gatekeeper.projects.collect(&:id))
+      Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+      item.reload
 
       login_as(a_person.user)
-      assert sample.can_manage?
+      assert item.can_manage?
 
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sample, Factory(:project).id.to_s)
+      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, Factory(:project).id.to_s)
       assert updated_can_publish_immediately
     end
   end
@@ -177,14 +177,14 @@ class PoliciesControllerTest < ActionController::TestCase
     gatekeeper = Factory(:asset_gatekeeper)
     a_person = Factory(:person)
     login_as(gatekeeper.user)
-    sample = Factory(:sample, contributor: gatekeeper.user, policy: Factory(:public_policy), project_ids: gatekeeper.projects.collect(&:id))
-    Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: sample.policy)
-    sample.reload
+    item = Factory(:sop, contributor: gatekeeper.user, policy: Factory(:public_policy), project_ids: gatekeeper.projects.collect(&:id))
+    Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+    item.reload
 
     login_as(a_person.user)
-    assert sample.can_manage?
+    assert item.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sample, gatekeeper.projects.first.id.to_s)
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first.id.to_s)
     assert updated_can_publish_immediately
   end
 

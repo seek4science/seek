@@ -7,7 +7,7 @@ class Assay < ActiveRecord::Base
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  #needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in
+  #needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   def projects
     study.try(:projects) || []
   end
@@ -27,7 +27,7 @@ class Assay < ActiveRecord::Base
   acts_as_annotatable :name_field=>:title
 
   belongs_to :institution
-  has_and_belongs_to_many :samples
+
   belongs_to :study
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
@@ -38,15 +38,10 @@ class Assay < ActiveRecord::Base
 
   has_many :assay_assets, :dependent => :destroy
 
-  #FIXME: These should be reversed, with the concrete version becoming the primary case, and versioned assets becoming secondary
-  # i.e. - so data_files returnes [DataFile], and data_file_masters is replaced with versioned_data_files, returning [DataFile::Version]
-  has_many :data_file_versions, :class_name => "DataFile::Version", :finder_sql => Proc.new{self.asset_sql("DataFile")}
-  has_many :sop_versions, :class_name => "Sop::Version", :finder_sql => Proc.new{self.asset_sql("Sop")}
-  has_many :model_versions, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
-
   has_many :data_files, :through => :assay_assets, :source => :asset, :source_type => "DataFile"
   has_many :sops, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :models, :through => :assay_assets, :source => :asset, :source_type => "Model"
+  has_many :samples, :through => :assay_assets, :source => :asset, :source_type => "Sample"
 
   has_one :investigation,:through=>:study
 
@@ -56,7 +51,6 @@ class Assay < ActiveRecord::Base
   validates_presence_of :owner
   validates_presence_of :assay_class
 
-  validate :no_sample_for_modelling_assay
 
   before_validation :default_assay_and_technology_type
 
@@ -65,22 +59,15 @@ class Assay < ActiveRecord::Base
 
   alias_attribute :contributor, :owner
 
+  #DEPRECATED
+  has_and_belongs_to_many :deprecated_samples
+
   def project_ids
     projects.map(&:id)
   end
 
   def default_contributor
     User.current_user.try :person
-  end
-
-  def asset_sql(asset_class)
-    asset_class_underscored = asset_class.underscore
-    'SELECT '+ asset_class_underscored +'_versions.* FROM ' + asset_class_underscored + '_versions ' +
-    'INNER JOIN assay_assets ' + 
-    'ON assay_assets.asset_id = ' + asset_class_underscored + '_id ' + 
-    'AND assay_assets.asset_type = \'' + asset_class + '\' ' + 
-    'WHERE (assay_assets.version = ' + asset_class_underscored + '_versions.version ' +
-    "AND assay_assets.assay_id = #{self.id})"
   end
 
   def short_description
@@ -105,7 +92,7 @@ class Assay < ActiveRecord::Base
 
   
   #Create or update relationship of this assay to another, with a specific relationship type and version
-  def associate(asset, r_type=nil)
+  def associate(asset, options = {})
     if asset.is_a?(Organism)
       associate_organism(asset)
     else
@@ -117,8 +104,12 @@ class Assay < ActiveRecord::Base
       end
 
       assay_asset.asset = asset
-      assay_asset.version = asset.version
+      assay_asset.version = asset.version if asset && asset.respond_to?(:version)
+      r_type = options.delete(:relationship)
       assay_asset.relationship_type = r_type unless r_type.nil?
+
+      direction = options.delete(:direction)
+      assay_asset.direction = direction unless direction.nil?
       assay_asset.save if assay_asset.changed?
 
       @pending_related_assets ||= []
@@ -128,12 +119,8 @@ class Assay < ActiveRecord::Base
     end
   end
 
-  def asset_versions
-    data_file_versions + model_versions + sop_versions
-  end
-
   def assets
-    data_files + models + sops + publications
+    data_files + models + sops + publications + samples
   end
 
   def avatar_key
@@ -147,18 +134,8 @@ class Assay < ActiveRecord::Base
     new_object.sops = self.try(:sops)
 
     new_object.models = self.try(:models)
-    new_object.sample_ids = self.try(:sample_ids)
     new_object.assay_organisms = self.try(:assay_organisms)
     return new_object
-  end
-
-  def either_samples_or_organisms_for_experimental_assay
-     errors[:base] << "You should associate a #{I18n.t('assays.experimental_assay')} with either samples or organisms or both" if !is_modelling? && samples.empty? && assay_organisms.empty?
-  end
-
-  def no_sample_for_modelling_assay
-    #FIXME: allows at the moment until fixtures and factories are updated: JIRA: SYSMO-734
-    errors[:base] << "You cannot associate a #{I18n.t('assays.modelling_analysis')} with a sample" if is_modelling? && !samples.empty? && !Seek::Config.is_virtualliver
   end
 
   def organism_terms

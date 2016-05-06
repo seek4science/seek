@@ -1,0 +1,12 @@
+input.sample_attribute_integer, input.sample_attribute_float {
+    width: 10em;
+}
+
+input.sample_attribute_datetime,
+input.sample_attribute_date {
+    width: 25em;
+}
+
+textarea.sample_attribute_text {
+    height: 7em;
+}

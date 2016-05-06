@@ -47,9 +47,9 @@ class EventsController < ApplicationController
 
   def handle_update_or_create(is_new)
     @new = is_new
-    data_file_ids = params.delete(:data_file_ids) || []
-    data_file_ids.map! { |text| id, rel = text.split(','); id }
-    @event.data_files = DataFile.find(data_file_ids)
+    data_files = params.delete(:data_files) || []
+    data_files.map! { |d| d['id'] }
+    @event.data_files = DataFile.find(data_files)
 
     publication_ids = params.delete(:related_publication_ids) || []
     @event.publications = Publication.find(publication_ids)

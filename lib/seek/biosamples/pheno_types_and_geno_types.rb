@@ -32,7 +32,7 @@ module Seek
         genotypes = self.genotypes
         phenotypes = self.phenotypes
         (genotypes | phenotypes).each do |type|
-          if (type.strain == self || type.strain.nil?) && (type.specimen==self || type.specimen.nil?)
+          if (type.strain == self || type.strain.nil?) && (type.deprecated_specimen==self || type.deprecated_specimen.nil?)
             type.destroy
           end
         end

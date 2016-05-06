@@ -4,7 +4,7 @@ module TavernaPlayer
     # This line has to go at the top to make sure the projects HABTM relationship is defined before the callbacks
     #  provided by TavernaPlayer (specifically after_create :enqueue). If not, associations to Projects aren't
     #  automatically created after the Run is saved.
-    include ProjectCompat
+    include Seek::ProjectAssociation
 
     # Do not remove the next line.
     include TavernaPlayer::Concerns::Models::Run

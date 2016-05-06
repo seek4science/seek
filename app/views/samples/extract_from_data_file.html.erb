@@ -1,0 +1,63 @@
+<% total = @samples.count + @rejected_samples.count %>
+
+<% if total > 0 %>
+    <% if @show_confirmation %>
+      <div class="alert alert-info">
+        The following samples were detected in the data file.
+        Please review them, then click "Confirm" below to complete the process, or "Cancel" to go back.
+      </div>
+    <% end %>
+    <div>
+      <ul class="nav nav-tabs" role="tablist">
+        <% if @samples.any? %>
+            <li role="presentation" class="active">
+              <a href="#accepted" aria-controls="home" role="tab" data-toggle="tab">
+                Accepted (<%= @samples.count -%>/<%= total %>)
+              </a>
+            </li>
+        <% end %>
+        <% if @rejected_samples.any? %>
+            <li role="presentation" class="<%= 'active' if @samples.none? -%>">
+              <a href="#rejected" aria-controls="profile" role="tab" data-toggle="tab">
+                Rejected (<%= @rejected_samples.count -%>/<%= total %>)
+              </a>
+            </li>
+        <% end %>
+      </ul>
+
+      <div class="tab-content">
+        <% if @samples.any? %>
+            <div role="tabpanel" class="tab-pane active" id="accepted">
+              <%= render partial: 'samples/table_view', locals: { samples: @samples } %>
+              <script>
+                $j(document).ready(function () {
+                  Samples.initTable($j('#accepted'));
+                });
+              </script>
+            </div>
+        <% end %>
+        <% if @rejected_samples.any? %>
+            <div role="tabpanel" class="tab-pane <%= 'active' if @samples.none? -%>" id="rejected">
+              <%= render partial: 'samples/table_view', locals: { samples: @rejected_samples } %>
+              <script>
+                $j(document).ready(function () {
+                  Samples.initTable($j('#rejected'));
+                });
+              </script>
+            </div>
+        <% end %>
+      </div>
+    </div>
+<% else %>
+    <span class="none_text">No samples were extracted</span>
+<% end %>
+
+<% if @show_confirmation %>
+    <hr/>
+    <%= form_tag(extract_from_data_file_samples_path(:data_file_id => @data_file.id)) do %>
+        <%= hidden_field_tag(:sample_type_id, @samples.first.sample_type_id) %>
+        <%= hidden_field_tag(:confirm, 'true') %>
+        <%= submit_tag "Confirm", :class => 'btn btn-primary'-%>
+        or <%= cancel_button(data_files_path) -%>
+    <% end %>
+<% end %>

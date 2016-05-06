@@ -261,7 +261,7 @@ class Person < ActiveRecord::Base
   end
 
   def member?
-    !projects.empty?
+    projects.any?
   end
 
   def member_of?(item_or_array)

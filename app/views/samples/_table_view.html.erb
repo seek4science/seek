@@ -1,0 +1,52 @@
+<% sample_type = samples.first.sample_type %>
+<% shown_attributes = sample_type.sample_attributes.includes(:sample_attribute_type) %>
+<% link ||= false %>
+<% source_url ||= false %>
+
+<div data-role="seek-association-candidate-list">
+  <div class="table-responsive">
+    <table class="table table-bordered samples-table" style="width: 100%" <%= "data-source-url=\"#{source_url}\"".html_safe if source_url %>>
+      <% [:thead, :tfoot].each do |section| %>
+          <%= content_tag(section) do %>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <% shown_attributes.each do |attribute| %>
+                    <th data-hash-key="<%= attribute.hash_key -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
+                <% end %>
+              </tr>
+          <% end %>
+      <% end %>
+      <% unless source_url %>
+          <tbody>
+          <% samples.each do |sample| %>
+              <%= content_tag(:tr) do %>
+                  <td><%= sample.id %></td>
+                  <td><%= sample.title %></td>
+                  <% shown_attributes.each do |attribute| %>
+                      <% if (errors = sample.errors[attribute.method_name]).any? %>
+                          <td class="sample-field-error">
+                            <%# Wrapping <div> needed for popover to display properly %>
+                            <%= content_tag(:div, data: {
+                                toggle: 'popover',
+                                content: errors.map { |e| "#{attribute.title} #{e}<br/>" }.join.html_safe }) do %>
+                                <%= text_or_not_specified(sample.get_attribute(attribute.hash_key), auto_link: link) %>
+                            <% end %>
+                          </td>
+                      <% else %>
+                          <td><%= display_attribute(sample, attribute, link: link) %></td>
+                      <% end %>
+                  <% end %>
+              <% end %>
+          <% end %>
+          </tbody>
+      <% end %>
+    </table>
+  </div>
+  <% if samples.map { |s| s.errors.any? }.all? %>
+      <%= modal(id: 'sample-error-modal') do %>
+          <%= modal_header 'Errors' %>
+          <%= modal_body {} %>
+      <% end %>
+  <% end %>
+</div>

@@ -32,8 +32,6 @@
           <%= render :partial => "assets/associate_event", :locals=>{:resource => @data_file, :show_relationships=>false} -%>
       <% end -%>
 
-      <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@data_file} %>
-
       <div>
         <%= preview_permission_popup_link(@data_file)-%>
         <%= f.submit "Update", :id => "data_file_submit_btn",

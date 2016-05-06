@@ -100,8 +100,7 @@ module Seek
                    :data_file_masters, :sop_masters, :model_masters,
                    :assets,
                    :assays, :studies, :investigations,
-                   :institutions, :creators, :owners, :owner, :contributors, :contributor, :projects, :events, :presentations,
-                   :samples, :specimens, :compounds, :organisms, :strains
+                   :institutions, :creators, :owners, :owner, :contributors, :contributor, :projects, :events, :presentations, :compounds, :organisms, :strains
                   ]
         methods.each do |method|
           if self.respond_to?(method)

@@ -1,122 +1,71 @@
-<%= javascript_include_tag "biosample"%>
+<% current_user_authorized_to_manage = @sample.new_record?|| @sample.can_manage? -%>
 
-<%= f.error_messages %>
+<div class="asset_form">
+  <%= render partial: 'sample_error_messages', locals: { object: @sample } %>
 
-<% if @sample.new_record? && @sample.specimen.try(:new_record?)%>
-    <%= f.fields_for :specimen do |specimen_f| %>
-        <%= render :partial => "specimens/form", :locals => {:f => specimen_f, :specimen => @sample.specimen, :action => action}%>
-    <% end %>
-<% else %>
-    <div class="form-group">
-      <%= f.label "Choose a #{I18n.t 'biosamples.sample_parent_term'}" %> <span class="required">*</span>
-      <%= f.collection_select(:specimen_id, Specimen.all_authorized_for('view'), :id, :title, {:include_blank =>"Please Select..."},
-                              {:class => 'form-control'}) %>
-    </div>
-<% end %>
-
-<%= folding_panel('Sample Details') do %>
-    <div class="form-group">
-      <%= f.label "Sample name" -%><span class="required">*</span><br/>
-      <%= f.text_field :title, :class=>"form-control" -%>
-    </div>
-
-    <% if Seek::Config.is_virtualliver %>
-        <div class="form-group">
-          <%= f.label :description -%><br/>
-          <%= f.text_area :comments, :rows => 5, :class=>"form-control" -%>
-        </div>
-
-        <div class="form-group">
-          <%= f.label "Explantation time" -%><br/>
-          <%= f.text_field :explantation, :class=>"form-control" -%>
-        </div>
-
-        <div class="form-group date-select">
-          <%= f.label :donation_date -%><span class="required">*</span>
-          <%= f.calendar_date_select :donation_date, :time => "mixed", :class=>"form-control" -%>
-        </div>
-    <% end %>
-
-    <div class="form-group">
-      <%= f.label :lab_internal_identifier -%><span class="required">*</span>
-      <%= f.text_field :lab_internal_number, :class=>"form-control"-%>
-    </div>
-
-    <div class="form-group date-select">
-      <%= f.label :sampling_date -%>
-      <%= f.calendar_date_select :sampling_date, :time => "mixed", :class=>"form-control" -%>
-    </div>
-
-    <div class="form-group">
-      <%= f.label :age_at_sampling -%>
-      <div class="row">
-        <div class="col-sm-10 col-xs-7">
-          <%= f.text_field :age_at_sampling, :class=>"form-control",
-                           :onkeypress => "javascript: return onlyFloatNumbers(event);" -%>
-        </div>
-        <div class="col-sm-2 col-xs-5">
-          <%= f.select :age_at_sampling_unit_id, options_for_select(Unit.time_units.sort_by(&:order).collect{|u| [u.title.pluralize, u.id]}, @sample.age_at_sampling_unit_id), {},
-                       :class=>"form-control"-%>
-        </div>
+  <% if @sample.new_record? %>
+      <div class="form-group">
+      <%= f.select :sample_type_id,
+                   options_for_select(SampleType.all.collect { |st| [st.title, st.id] }, @sample.sample_type_id),
+                   {:include_blank => 'Please select the appropriate Sample type' },:class => 'form-control' %>
+        <span id="new_sample_type_link">or <%= link_to 'Define new sample type',new_sample_type_path %></span>
       </div>
-    </div>
+  <% end %>
 
-    <div class="form-group">
-      <%= f.label :provider_name -%>
-      <%= f.text_field :provider_name, :class=>"form-control" -%>
-    </div>
+  <div id="sample_attributes">
+    <%= render :partial=>"sample_attributes_form",:locals=>{sample:@sample} %>
+  </div>
 
-    <div class="form-group">
-      <%= f.label "Provider's sample identifier" -%>
-      <%= f.text_field :provider_id, :class=>"form-control" -%>
-    </div>
+  <div id="sample_extra_details" style="display:none">
+    <%= render :partial => "projects/project_selector", :locals => { :resource => @sample,:allow_nil=> false} -%>
+    <% if current_user_authorized_to_manage -%>
+        <%= render :partial => "assets/asset_form_bottom", :locals=>{:f=>f,attribution_enable:false,show_publications:false,sharing_link:false} %>
+    <% end %>
+  </div>
+  <%= preview_permission_popup_link(@sample)-%>
 
-    <div class="form-group">
-      <%= f.label "Comment" -%>
-      <%= f.text_field :comments, :class=>"form-control" -%>
-    </div>
+  <%= f.submit (@sample.new_record? ? "Create" : "Update"), :class => 'btn btn-primary',:id=>'sample_submit_btn',disabled:@sample.sample_type.nil? %>
+    or
+  <%= cancel_button(@sample.new_record? ? samples_path : sample_path(@sample)) %>
+</div>
 
-    <div class="form-group">
-      <%= f.label "Organism part" -%>
-      <% organism_part_options = Seek::Config.is_virtualliver ? ['whole organism','organ','tissue','intercellular','cell','subcellular','blood','serum']:['whole cell', 'membrane fraction'] %>
-      <%= f.select :organism_part, options_for_select(organism_part_options.insert(0,'Not specified'), @sample.organism_part), {}, :class=>"form-control" %>
-    </div>
-<% end %>
+<script>
+    <% unless @sample.sample_type.nil? %>
+        $j('#sample_extra_details').show();
+    <% end %>
 
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @sample,:allow_nil=>Seek::Config.is_virtualliver ? true : false}%>
+    $j('#sample_sample_type_id').on('change', function () {
+        if (this.value) {
+            $j.ajax({
+                url:"<%= attribute_form_samples_path %>",
+                type: "get",
+                data: {sample_type_id: this.value},
+                dataType: "json",
+                success: function(data) {
+                    var replacement = "<div id='sample_attributes'>"+data["form"]+"</div>"
+                    $j('#sample_attributes').replaceWith(replacement);
+                    $j('#sample_submit_btn').prop('disabled',false);
+                    $j('#sample_extra_details').show();
+                    $j('#new_sample_type_link').hide();
+                },
+                error: function(data) {
+                    $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
+                    $j('#sample_submit_btn').prop('disabled',true);
+                }
+            });
+        }
+        else {
+            $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
+            $j('#sample_submit_btn').prop('disabled',true);
+            $j('#sample_extra_details').hide();
+            $j('#new_sample_type_link').show();
+        }
+    });
 
-<% if Seek::Config.is_virtualliver %>
-    <%= render :partial => "samples/select_tissue_and_cell_types", :locals=>{:resource => @sample} if @sample.respond_to?(:tissue_and_cell_types) -%>
-<% end %>
+    $j('#sample_submit_btn').on('click', function() {
+        previewPermissions();
+        return(false);
+    });
 
-<%= render :partial => "scales/scales_selector",:locals=>{:object=>@sample} if @sample.respond_to?(:scales) && show_scales? %>
 
-<% if @sample.can_manage?%>
-    <%= render :seek_partial => "assets/sharing_form" -%>
-
-    <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} if !@sample.try(:new_record?)%>
-<% end %>
-
-<%= fancy_multiselect @sample, :data_files,  {:name => 'sample_data_file_ids', :association_class => DataFile,:selected => (params[:sample_data_file_ids] || []).map(&:to_i) | @sample.data_files.map(&:id), :hidden=> @sample.data_files.blank? ? true : false, :other_projects_checkbox => true} %>
-
-<%= fancy_multiselect @sample, :models, :name => 'sample_model_ids', :association_class => Model,:selected => (params[:sample_model_ids] || []).map(&:to_i) | @sample.models.map(&:id) %>
-
-<%= fancy_multiselect @sample, :sops,  {:name => 'sample_sop_ids', :association_class => Sop,:selected => (params[:sample_sop_ids] || []).map(&:to_i) | @sample.sops.map(&:id), :hidden=> @sample.sops.blank?  ? true : false, :other_projects_checkbox => true} %>
-
-<%= f.hidden_field :parent_name %>
-<%= f.hidden_field :from_biosamples %>
-
-<%
-   button_text=action==:edit ? "Update" : "Create"
-   disabled_text=action==:edit ? "Updating..." : "Creating..."
-%>
-<% if @sample.can_manage? %>
-    <%= preview_permission_popup_link(@sample)-%>
-    <%= f.submit button_text, :id => "sample_submit_btn",
-                 :onclick => "javascript: if(($('organism')!=null && ($F('organism')=='' || $F('organism')=='0'))){alert('Please select organism');return false;};previewPermissions();return(false);",
-                 :class => 'btn btn-primary' -%>
-<% else %>
-    <%= f.submit button_text, :id => "sample_submit_btn", :disable_with => disabled_text,
-                 :class => 'btn btn-primary' -%>
-<% end %>
- or <%= cancel_button(@sample.id ? sample_path(@sample.id) : samples_path) -%>
+</script>

@@ -1,194 +1,134 @@
-require 'grouped_pagination'
-
+require 'seek/samples/sample_data'
 
 class Sample < ActiveRecord::Base
-  include Seek::Subscribable
+  attr_accessible :contributor_id, :contributor_type, :json_metadata,
+                  :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
+                  :other_creators, :data
 
-  acts_as_scalable if Seek::Config.is_virtualliver
-  include Seek::Rdf::RdfGeneration
-  include Seek::Search::BackgroundReindexing
-  include Seek::Stats::ActivityCounts
-
-  acts_as_authorized
-  acts_as_favouritable
-  acts_as_uniquely_identifiable
-
-  grouped_pagination
-
-  attr_accessor :parent_name
-  attr_accessor :from_biosamples
-
-  belongs_to :specimen
-  belongs_to :age_at_sampling_unit, :class_name => 'Unit', :foreign_key => "age_at_sampling_unit_id"
-  belongs_to :institution
-
-  has_and_belongs_to_many :assays
-  has_and_belongs_to_many :tissue_and_cell_types
-  has_many :sample_assets, :dependent => :destroy
-  has_many :treatments, :dependent=>:destroy
-
-  has_many :data_file_versions, :class_name => "DataFile::Version", :finder_sql => Proc.new { self.asset_sql("DataFile") }
-  has_many :model_versions, :class_name => "Model::Version", :finder_sql => Proc.new{self.asset_sql("Model")}
-  has_many :sop_versions, :class_name => "Sop::Version", :finder_sql => Proc.new { self.asset_sql("Sop") }
-
-  has_many :data_files, :through => :sample_assets, :source => :asset, :source_type => 'DataFile'
-  has_many :models, :through => :sample_assets, :source => :asset, :source_type => 'Model'
-  has_many :sops, :through => :sample_assets, :source => :asset, :source_type => 'Sop'
-
-  accepts_nested_attributes_for :specimen
-  alias_attribute :description, :comments
-
-  validates_uniqueness_of :title
-
-  validates_presence_of :title
-  validates_presence_of :specimen, :lab_internal_number
-  validates_presence_of :donation_date, :if => "Seek::Config.is_virtualliver"
-  validates_presence_of :projects, :unless => "Seek::Config.is_virtualliver"
-
-  scope :default_order, order("title")
-
-  include Seek::Search::BiosampleFields
-
-  searchable(auto_index: false) do
-    text :specimen do
-      if specimen
-        text=[]
-        text << specimen.lab_internal_number
-        text << specimen.provider_name
-        text << specimen.title
-        text << specimen.provider_id
-        text
-      end
+  searchable(:auto_index=>false) do
+    text :attribute_values do
+      attribute_values_for_search
     end
-
-    text :strain do
-      if (specimen.strain)
-        text = []
-        text << specimen.strain.info
-        text << specimen.strain.try(:organism).try(:title).to_s
-        text
-      end
+    text :sample_type do
+      sample_type.title
     end
   end if Seek::Config.solr_enabled
 
-  HUMANIZED_COLUMNS = {:title => "Sample name", :lab_internal_number=> "Sample lab internal identifier", :provider_id => "Provider's sample identifier"}
+  acts_as_asset
 
-  def asset_sql(asset_class)
-    asset_class_underscored = asset_class.underscore
-    'SELECT ' + asset_class_underscored + '_versions.* FROM ' + asset_class_underscored + '_versions ' +
-        'INNER JOIN sample_assets ' +
-        'ON sample_assets.asset_id= '+ asset_class_underscored + '_id ' +
-        'AND sample_assets.asset_type=\'' + asset_class + '\' ' +
-        'WHERE (sample_assets.version= ' + asset_class_underscored + '_versions.version ' +
-        "AND sample_assets.sample_id= #{self.id})"
+  belongs_to :sample_type, inverse_of: :samples
+  belongs_to :originating_data_file, :class_name => 'DataFile'
+
+  scope :default_order, order("title")
+
+  validates :title, :sample_type, presence: true
+  include ActiveModel::Validations
+  validates_with SampleAttributeValidator
+
+  before_save :update_json_metadata
+  before_validation :set_title_to_title_attribute_value
+
+  def sample_type=(type)
+    super
+    @data = Seek::Samples::SampleData.new(type)
+    update_json_metadata
+    type
   end
 
-  def state_allows_delete? *args
-    assays.empty? && super
+  def is_in_isa_publishable?
+    false
   end
+
+  def self.can_create?
+    User.logged_in_and_member?
+  end
+
 
   def self.user_creatable?
-    Seek::Config.biosamples_enabled
+    true
   end
 
-  def associate_tissue_and_cell_type tissue_and_cell_type_id,tissue_and_cell_type_title
-       tissue_and_cell_type=nil
-    if !tissue_and_cell_type_title.blank?
-      if ( tissue_and_cell_type_id =="0" )
-          found = TissueAndCellType.where(:title => tissue_and_cell_type_title).first
-          unless found
-          tissue_and_cell_type = TissueAndCellType.create!(:title=> tissue_and_cell_type_title)
-          end
-      else
-          tissue_and_cell_type = TissueAndCellType.find_by_id(tissue_and_cell_type_id)
-      end
+  def related_data_file
+    originating_data_file
+  end
 
-      if tissue_and_cell_type
-       existing = false
-       self.tissue_and_cell_types.each do |t|
-         if t == tissue_and_cell_type
-           existing = true
-           break
-         end
-       end
-       unless existing
-         self.tissue_and_cell_types << tissue_and_cell_type
-       end
-      end
+  # Mass assignment of attributes
+  def data= hash
+    data.mass_assign(hash)
+  end
+
+  def data
+    @data ||= Seek::Samples::SampleData.new(sample_type, json_metadata)
+  end
+
+  def strains
+    self.sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == 'SeekStrain' }.map do |sa|
+      Strain.find_by_id(get_attribute(sa.hash_key)['id'])
+    end.compact
+  end
+
+  def get_attribute(attr)
+    data[attr]
+  end
+
+  def set_attribute(attr, value)
+    data[attr] = value
+  end
+
+  private
+
+  def attribute_values_for_search
+    self.sample_type ? self.data.values.select { |v| !v.blank? }.uniq : []
+  end
+
+  # override to insert the extra accessors for mass assignment
+  def mass_assignment_authorizer(role)
+    extra = []
+    if sample_type
+      extra = sample_type.sample_attributes.collect(&:method_name)
     end
+    super(role) + extra
   end
 
-  def associate_asset asset
-    sample_asset = sample_assets.detect { |sa| sa.asset == asset }
-
-    unless sample_asset
-      sample_asset = SampleAsset.new
-      sample_asset.sample = self
-      sample_asset.asset = asset
-    end
-
-    sample_asset.version = asset.version
-    sample_asset.save if sample_asset.changed?
-
-    return sample_asset
+  def update_json_metadata
+    self.json_metadata = @data.to_json
   end
 
-  def create_or_update_assets asset_ids, asset_class_name
-    asset_class = eval asset_class_name
-    existing_sample_assets = sample_assets.select { |sa| sa.asset_type == asset_class_name }
-    asset_ids_to_destroy = existing_sample_assets.map(&:asset_id) - asset_ids.map(&:to_i)
-
-    #destroy old,redundant sample_assets
-    existing_sample_assets.select { |sa| asset_ids_to_destroy.include? sa.asset_id }.each &:destroy
-
-    #update/create new sample assets
-    asset_ids.each do |id|
-      asset = asset_class.find id
-      associate_asset asset if asset.can_view?
-    end
+  def set_title_to_title_attribute_value
+    self.title = title_attribute_value
   end
 
-  def clone_with_associations
-    new_object= self.dup
-    new_object.policy = self.policy.deep_copy
-    new_object.data_files = self.data_files.select(&:can_view?)
-   new_object.models = self.models.select(&:can_view?)
-    new_object.sops = self.sops.select(&:can_view?)
-   new_object.tissue_and_cell_types = self.try(:tissue_and_cell_types)
-    new_object.project_ids = self.project_ids
-    return new_object
+  #the value of the designated title attribute
+  def title_attribute_value
+    return nil unless (sample_type && sample_type.sample_attributes.title_attributes.any?)
+    title_attr=sample_type.sample_attributes.title_attributes.first
+    get_attribute(title_attr.hash_key)
   end
 
-  def self.human_attribute_name(attribute, options = {})
-    HUMANIZED_COLUMNS[attribute.to_sym] || super
-  end
-
-  def sampling_date_info
-    if sampling_date.nil?
-      ''
+  def respond_to_missing?(method_name, include_private = false)
+    name = method_name.to_s
+    if name.start_with?(SampleAttribute::METHOD_PREFIX) &&
+        data.key?(name.sub(SampleAttribute::METHOD_PREFIX,'').chomp('='))
+      true
     else
-      if try(:sampling_date).hour == 0 and try(:sampling_date).min == 0 and try(:sampling_date).sec == 0 then
-        try(:sampling_date).strftime('%d/%m/%Y')
+      super
+    end
+  end
+
+  def method_missing(method_name, *args)
+    name = method_name.to_s
+    if name.start_with?(SampleAttribute::METHOD_PREFIX)
+      setter = name.end_with?('=')
+      attribute_name = name.sub(SampleAttribute::METHOD_PREFIX, '').chomp('=')
+      if data.key?(attribute_name)
+        set_attribute(attribute_name, args.first) if setter
+        get_attribute(attribute_name)
       else
-        try(:sampling_date).strftime('%d/%m/%Y @ %H:%M:%S')
+        super
       end
-
-    end
-  end
-
-  def provider_name_info
-    provider_name.blank? ? contributor.try(:person).try(:name) : provider_name
-  end
-
-  def specimen_info
-    specimen.nil? ? '' : (I18n.t 'biosamples.sample_parent_term').capitalize + ': ' + specimen.title
-  end
-
-  def age_at_sampling_info
-    unless age_at_sampling.blank? || age_at_sampling_unit.blank?
-      "#{age_at_sampling} (#{age_at_sampling_unit.title || age_at_sampling_unit.symbol}s)"
     else
-      ''
+      super
     end
   end
+
 end

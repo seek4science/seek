@@ -73,11 +73,7 @@ class StudiesController < ApplicationController
 
     @study.attributes = params[:study]
 
-    if params[:sharing]
-      @study.policy_or_default
-      @study.policy.set_attributes_with_sharing params[:sharing], @study.projects
-
-    end
+    update_sharing_policies @study,params
 
     respond_to do |format|
       if @study.save
@@ -108,7 +104,7 @@ class StudiesController < ApplicationController
   def create
     @study = Study.new(params[:study])
 
-    @study.policy.set_attributes_with_sharing params[:sharing], @study.projects
+    update_sharing_policies @study,params
 
 
   if @study.save

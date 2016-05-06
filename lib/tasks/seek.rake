@@ -14,7 +14,7 @@ namespace :seek do
 
   desc 'set age_unit to be week for Virtual Liver old specimens which use week as age unit'
   task(:update_age_unit => :environment) do
-    Specimen.all.each do |sp|
+    DeprecatedSpecimen.all.each do |sp|
       sp.age_unit = "week" unless sp.age_unit
       disable_authorization_checks do
         sp.save!
@@ -24,9 +24,9 @@ namespace :seek do
 
   desc 'updates the md5sum, and makes a local cache, for existing remote assets'
   task(:cache_remote_content_blobs=>:environment) do
-    resources = Sop.find(:all)
-    resources |= Model.find(:all)
-    resources |= DataFile.find(:all)
+    resources = Sop.all
+    resources |= Model.all
+    resources |= DataFile.all
     resources = resources.select { |r| r.content_blob && r.content_blob.data.nil? && r.content_blob.url && !r.projects.empty? }
 
     resources.each do |res|

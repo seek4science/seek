@@ -119,17 +119,6 @@ class StrainsControllerTest < ActionController::TestCase
     assert_redirected_to s
   end
 
-  test "should not destroy strain related to an existing specimen" do
-    strain = Factory :strain
-    specimen = Factory :specimen, :strain => strain
-    assert !strain.specimens.empty?
-    assert_no_difference("Strain.count") do
-      delete :destroy, :id => strain.id
-    end
-    assert flash[:error]
-    assert_redirected_to strain
-  end
-
   test "should update genotypes and phenotypes" do
     strain = Factory(:strain)
     genotype1 = Factory(:genotype, :strain => strain)

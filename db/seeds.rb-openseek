@@ -29,3 +29,29 @@ project = Project.create(:title=>"Default Project")
 institution = Institution.create(:title=>"Default Institution",:country=>"United Kingdom")
 project.institutions=[institution]
 project.save!
+puts "Created default project."
+
+# Sample attribute types
+date_time_type = SampleAttributeType.new title:'Date time',base_type:'DateTime'
+date_time_type.save!
+date_time = SampleAttributeType.new title:'Date',base_type:'Date'
+date_time.save!
+integer_type = SampleAttributeType.new title:"Integer", base_type:'Integer'
+integer_type.save!
+float_type = SampleAttributeType.new title:"Float", base_type:'Float'
+float_type.save!
+web_link_type = SampleAttributeType.new title:"Web link",base_type:'String',regexp:URI.regexp(%w(http https)).to_s
+web_link_type.save!
+email_type = SampleAttributeType.new title:"Email address",base_type:'String',regexp:RFC822::EMAIL.to_s
+email_type.save!
+text_type = SampleAttributeType.new title:"Text",base_type:'Text'
+text_type.save!
+string_type = SampleAttributeType.new title:"String", base_type: 'String'
+string_type.save!
+chebi = SampleAttributeType.new title:"CHEBI ID",regexp:'CHEBI:[0-9]+', base_type:'String'
+chebi.save!
+boolean = SampleAttributeType.new title:"Boolean",base_type:'Boolean'
+boolean.save!
+seek_strain = SampleAttributeType.new title:"SEEK Strain",base_type:'SeekStrain'
+seek_strain.save!
+puts "Seeded sample attribute types."

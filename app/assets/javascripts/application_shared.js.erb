@@ -222,3 +222,39 @@ function show_ajax_loader(element) {
 function show_large_ajax_loader(element) {
   $(element).innerHTML = '<%= image_tag("ajax-loader-large.gif").html_safe %>';
 }
+
+
+// Takes an object of arbitrary depth, and a period separated "path" and returns the value.
+// e.g. digValue({a: {b: {c: 1}}}, 'a.b.c') => 1
+
+function digValue(object, path) {
+  keys = path.split('.');
+
+  var value = object[keys.shift()];
+  keys.forEach(function (key) {
+    value = value[key];
+  });
+
+  return value;
+}
+
+(function ($) {
+  $.fn.spinner = function (action) {
+    if(action === 'add') {
+      return this.each(function () {
+        if(!$(this).data('spinnerElement')) {
+          var spinner = $('<%= image_tag("ajax-loader.gif").html_safe %>');
+          $(this).append(spinner);
+          $(this).data('spinnerElement', spinner);
+        }
+      });
+    } else if(action === 'remove') {
+      return this.each(function () {
+        if($(this).data('spinnerElement')) {
+          $(this).data('spinnerElement').remove();
+          $(this).data('spinnerElement', null);
+        }
+      });
+    }
+  };
+}( jQuery ));

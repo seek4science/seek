@@ -62,8 +62,6 @@
           <%= render :partial => "assets/associate_event", :locals => {:resource => @data_file} -%>
       <% end -%>
 
-      <%= render :partial=>"samples/associate_sample", :locals=>{:resource=>@data_file} %>
-
       <div>
         <%= preview_permission_popup_link(@data_file)-%>
         <%= submit_tag "Upload and Save",

@@ -1,3 +1,182 @@
-<% if Seek::Config.biosamples_enabled %>
-    <%= fields_for(resource) {|f| f.fancy_multiselect :samples, {:hidden=> resource.samples.blank?  ? true : false, :other_projects_checkbox => true}}  -%>
+<%
+  resource_text ||= text_for_resource(resource)
+
+  assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
+
+  if params[:samples] && params[:samples].any?
+    collapse_panel = false
+    associated_samples_json = associations_json_from_params(Sample, params[:samples])
+  else
+    collapse_panel = assay_assets.empty?
+    associated_samples_json = associations_json_from_assay_assets(assay_assets)
+  end
+
+-%>
+
+<%= folding_panel("Samples", collapse_panel, :body_options => {:id => 'associate_sample_fold_content'},
+                  :help_text => "Here you associate Samples in SEEK to this #{resource_text}.") do %>
+
+    <p>The following Samples are involved in this <%= resource_text -%>:</p>
+
+    <%= associations_list_group('sample_to_list', 'direction.value', associated_samples_json) do %>
+        <div class="row">
+          <div class="col-md-4">
+            <h3>Incoming</h3>
+            <%= associations_list('incoming-sample-list', 'associations/sample', '',
+                                  empty_text: 'No incoming samples',
+                                  'data-multilist-group-value' => AssayAsset::Direction::INCOMING) %>
+          </div>
+          <div class="col-md-4">
+            <h3>Outgoing</h3>
+            <%= associations_list('outgoing-sample-list', 'associations/sample', '',
+                                  empty_text: 'No outgoing samples',
+                                  'data-multilist-group-value' => AssayAsset::Direction::OUTGOING) %>
+          </div>
+          <div class="col-md-4">
+            <h3>No direction</h3>
+            <%= associations_list('other-sample-list', 'associations/sample', '',
+                                  empty_text: 'No other samples',
+                                  'data-multilist-group-value' => AssayAsset::Direction::NODIRECTION) %>
+          </div>
+        </div>
+    <% end %>
+
+    <hr/>
+
+    <%= association_selector('sample_to_list', 'Add individual samples', 'Select samples') do %>
+        <label>Select samples</label>
+        <%= filterable_association_select(filter_samples_path(:assay_id => resource.id), :multiple => true) do %>
+            <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20),
+                       :locals => { :existing => resource.samples }
+            %>
+        <% end %>
+
+        <hr/>
+
+        <div class="form-group">
+          <label>Select sample direction</label>
+          <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
+        </div>
+    <% end %>
+
+    <%= button_link_to('Add samples from data file', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "#AddSamplesFromDataFileModal") %>
+    <%= modal(id: 'AddSamplesFromDataFileModal', size: 'xl', 'data-role' => 'seek-wizard') do %>
+        <%= modal_header('Add samples from data file') %>
+        <%= modal_body do %>
+            <div data-role="seek-wizard-nav"></div>
+            <div data-role="seek-wizard-step" data-step-name="Select data file" id="samples-select-data-file">
+              <label>Select data file</label>
+              <%= filterable_association_select(filter_data_files_path(with_samples: true)) do %>
+                  <%= render :partial => 'data_files/association_preview',
+                             :collection => DataFile.with_extracted_samples.all_authorized_for('view').select { |d| d.extracted_samples.any? }.first(20),
+                             :locals => { :existing => resource.samples }
+                  %>
+              <% end %>
+            </div>
+            <div data-role="seek-wizard-step" data-step-name="Select samples">
+              <label>Select samples</label>
+              <div id="data-file-samples-table">
+                <%= image('spinner') %>
+              </div>
+            </div>
+            <div data-role="seek-wizard-step" data-step-name="Select sample direction">
+              <div class="form-group">
+                <label>Select sample direction</label>
+                <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
+              </div>
+            </div>
+        <% end %>
+        <%= modal_footer do %>
+            <a data-role="seek-wizard-next-btn" href="#" class="pull-right btn btn-default">Next</a>
+            <a data-role="seek-wizard-prev-btn" href="#" class="pull-left btn btn-default">Previous</a>
+            <%= confirm_association_button('Add samples', id: 'add-batch-sample-btn', style: 'display: none',
+                                           class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
+        <% end %>
+    <% end %>
+    <%= button_link_to('Clear all samples', 'destroy', '#', id: 'clear-all-samples-btn') %>
 <% end %>
+
+<script>
+  $j(document).ready(function () {
+    var samplesList = $j('#sample_to_list').data('associationList');
+    var batchSamplesForm = new Associations.Form(samplesList, $j('#AddSamplesFromDataFileModal'));
+    $j('#AddSamplesFromDataFileModal :input[data-role="seek-association-common-field"]').each(function () {
+      $j(this).data('attributeName', this.name);
+      this.name = '';
+      batchSamplesForm.commonFieldElements.push($j(this));
+    });
+
+    var samplesTable;
+
+    function initSamplesTable() {
+      samplesTable = Samples.initTable($j('#data-file-samples-table'), true);
+      // When at least one sample is selected, unlock step 3
+      var handleRowSelect = function ( e, dt, type, indexes ) {
+        var selectedRowData = samplesTable.rows({ selected: true }).data();
+
+        batchSamplesForm.selectedItems = [];
+        for(var i = 0; i < selectedRowData.length; i++) {
+          batchSamplesForm.selectedItems.push({
+            id: selectedRowData[i].id,
+            title: selectedRowData[i].title
+          });
+        }
+
+        if(selectedRowData.length > 0) {
+          wizard.step(3).unlock();
+        } else {
+          wizard.step(3).lock();
+        }
+      };
+      samplesTable.on('select', handleRowSelect);
+      samplesTable.on('deselect', handleRowSelect);
+    }
+
+    initSamplesTable();
+
+    $j('#add-batch-sample-btn').click(function () {
+      batchSamplesForm.submit();
+    });
+    $j('#clear-all-samples-btn').click(function () {
+      if(confirm("Are you sure you wish to remove all samples from this assay?")) {
+        samplesList.removeAll();
+      }
+      return false;
+    });
+
+    // Wizard steps
+    var wizard = new Wizards.Wizard($j('#AddSamplesFromDataFileModal'));
+
+    // On final step, show the confirm button
+    wizard.step(3).onShow = function () {
+      $j('#add-batch-sample-btn').show();
+    };
+    wizard.step(3).onHide = function () {
+      $j('#add-batch-sample-btn').hide();
+    };
+
+    // Reset the wizard when the modal is closed
+    $j('#AddSamplesFromDataFileModal').on('hide.bs.modal', function () {
+      samplesTable.rows().deselect();
+      wizard.reset();
+    });
+
+    $j('#samples-select-data-file').on('click', '.selectable[data-role="seek-association-candidate"]', function () {
+      var candidate = $j(this);
+      candidate.spinner('add');
+      $j.ajax('/data_files/'+$j(this).data('associationId')+'/samples_table', {
+            success: function (data) {
+              $j('#data-file-samples-table').html(data);
+              initSamplesTable();
+              wizard.step(2).unlock();
+              wizard.gotoStep(2);
+              candidate.spinner('remove');
+            }
+          }
+      );
+
+      return false;
+    })
+  });
+
+</script>

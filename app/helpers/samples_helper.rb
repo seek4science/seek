@@ -1,53 +1,61 @@
 module SamplesHelper
-
-
-  def sample_tissue_and_cell_type_list_item sample_tissue_and_cell_type
-    result = link_to h(sample_tissue_and_cell_type.title),sample_tissue_and_cell_type
-
-    return result.html_safe
-  end
-  def sample_tissue_and_cell_types_list sample_tissue_and_cell_types,none_text="Not specified"
-    result=""
-    result="<span class='none_text'>#{none_text}</span>" if sample_tissue_and_cell_types.empty?
-    sample_tissue_and_cell_types.each do |ao|
-      result += sample_tissue_and_cell_type_list_item ao
-      result += ", " unless ao==sample_tissue_and_cell_types.last
+  def sample_form_field_for_attribute(attribute)
+    base_type = attribute.sample_attribute_type.base_type
+    clz="sample_attribute_#{base_type.downcase}"
+    case base_type
+      when 'Text'
+        text_area :sample, attribute.method_name, :class=>"form-control #{clz}"
+      when 'DateTime'
+        calendar_date_select :sample, attribute.method_name, :time=>:mixed, :class=>"form-control  #{clz}"
+      when 'Date'
+        calendar_date_select :sample, attribute.method_name, :time=>false, :class=>"form-control  #{clz}"
+      when 'Boolean'
+        check_box :sample, attribute.method_name,:class=>"#{clz}"
+      when 'SeekStrain'
+        grouped_collection_select :sample, attribute.method_name, Organism.all, :strains, :title, :id, :title, :class=>"#{clz}"
+      else
+        text_field :sample, attribute.method_name, :class=>"form-control #{clz}"
     end
-    result.html_safe
   end
 
+  def authorised_samples(projects = nil)
+    authorised_assets(Sample, projects)
+  end
 
-  def samples_link_list samples
-    #FIXME: make more generic and share with other model link list helper methods
-    samples=samples.select{|s| !s.nil?} #remove nil items
-    return "<span class='none_text'>Not Specified</span>".html_safe if samples.empty?
+  def sample_attribute_title_and_unit(attribute)
+    title = attribute.title
+    if (unit = attribute.unit) && !unit.dimensionless?
+      title = title + " ( #{unit.to_s} )"
+    end
+    title
+  end
 
-    result=""
-    result += "<table cellpadding='10'>"
-     samples.each do |sample|
-
-       result += "<tr><td style='text-align:left;'>"
-      result += link_to sample.title.capitalize,sample
-
-
-      if sample
-        result += describe_sample_tissue_and_cell_types(sample)
+  def display_attribute(sample, attribute, options = {})
+    value = sample.get_attribute(attribute.hash_key)
+    if value.nil?
+      content_tag(:span, 'Not specified', class: 'none_text')
+    else
+      case attribute.sample_attribute_type.base_type
+        when 'Date'
+          Date.parse(value).strftime("%e %B %Y")
+        when 'DateTime'
+          DateTime.parse(value).strftime("%e %B %Y %H:%M:%S")
+        when 'SeekStrain'
+          if value['title']
+            link_to(value['title'], strain_path(value['id']))
+          else
+            content_tag(:span, value['id'], class: 'none_text')
+          end
+        else
+          if options[:link] && attribute.is_title
+            link_to(value, sample)
+          else
+            text_or_not_specified(value, auto_link: options[:link])
+          end
       end
-      result += "</td></tr>"
-     end
-     result += "</table>"
-    return result.html_safe
-   end
-
-  def describe_sample_tissue_and_cell_types(sample)
-    result = ""
-    sample.tissue_and_cell_types.each do |tt|
-      result += " [" if tt== sample.tissue_and_cell_types.first
-      result += link_to h(tt.title), tt
-      result += " | " unless tt == sample.tissue_and_cell_types.last
-      result += "]" if tt == sample.tissue_and_cell_types.last
     end
-    result
   end
 
 end
+
+

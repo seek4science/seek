@@ -32,13 +32,13 @@ class SpreadsheetTest < ActiveSupport::TestCase
   test "spreadsheet xml is cached" do
     datafile = Factory :small_test_spreadsheet_datafile
     Rails.cache.clear
-    assert_nil Rails.cache.fetch("#{datafile.content_blob.cache_key}-ss-xml")
+    assert_nil Rails.cache.fetch("blob_ss_xml-#{datafile.content_blob.cache_key}")
 
 
     #Creates spreadsheet
     assert !datafile.spreadsheet.nil?
 
-    assert_not_nil Rails.cache.fetch("#{datafile.content_blob.cache_key}-ss-xml")
+    assert_not_nil Rails.cache.fetch("blob_ss_xml-#{datafile.content_blob.cache_key}")
   end
 
   test "alphabetical and numeric column conversion" do

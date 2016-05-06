@@ -101,8 +101,8 @@ module RelatedItemsHelper
 
   def relatable_types
     { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
-      'Study' => {}, 'Assay' => {}, 'Specimen' => {}, 'Sample' => {}, 'DataFile' => {}, 'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
-      'Workflow' => {}, 'TavernaPlayer::Run' => {}, 'Sweep' => {}, 'Strain' => {}
+      'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
+      'Workflow' => {}, 'TavernaPlayer::Run' => {}, 'Sweep' => {}, 'Strain' => {}, 'Sample' => {}
     }
   end
 

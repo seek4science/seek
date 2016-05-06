@@ -238,12 +238,12 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_ordered_by_last_name
-    sorted = Person.find(:all).sort_by do |p|
+    sorted = Person.all.sort_by do |p|
       lname = "" || p.last_name.try(:downcase)
       fname = "" || p.first_name.try(:downcase)
       lname+fname
     end
-    assert_equal sorted, Person.find(:all)
+    assert_equal sorted, Person.all
   end
 
   def test_is_asset

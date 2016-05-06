@@ -118,7 +118,7 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test "sort by updated_at" do
-    assert_equal Model.find(:all).sort_by { |m| m.updated_at.to_i * -1 }, Model.find(:all)
+    assert_equal Model.all.sort_by { |m| m.updated_at.to_i * -1 }, Model.all
   end
 
   test "validation" do

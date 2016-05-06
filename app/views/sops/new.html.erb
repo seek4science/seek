@@ -28,8 +28,6 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
 
-      <%= fields_for(@sop) { |f|  f.fancy_multiselect :samples, {:hidden=> @sop.samples.blank?  ? true : false, :other_projects_checkbox => true}} -%>
-
       <div>
         <%= preview_permission_popup_link(@sop)-%>
         <%= submit_tag "Upload and Save", :id => "sop_submit_btn",

@@ -15,16 +15,16 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="navbar-inner">
       <ul class="nav navbar-nav">
-        <%= navigation_link 'Home', main_app.root_path, nil, controller_name == 'homes' -%>
-        <%= navigation_link t('data_file').pluralize, main_app.data_files_path, nil, controller_name == 'data_files' -%>
-        <%= navigation_link 'Workflows', main_app.workflows_path, nil, controller_name == 'workflows' -%>
-        <%= navigation_link 'Runs', taverna_player.runs_path, nil, controller_name == 'runs' -%>
+        <%= navigation_link 'Home', main_app.root_path, controller_name == 'homes' -%>
+        <%= navigation_link t('data_file').pluralize, main_app.data_files_path, controller_name == 'data_files' -%>
+        <%= navigation_link 'Workflows', main_app.workflows_path, controller_name == 'workflows' -%>
+        <%= navigation_link 'Runs', taverna_player.runs_path, controller_name == 'runs' -%>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <% if logged_in? && current_user.person && !current_user.person.new_record? %>
-            <%= navigation_link current_user.person.name, main_app.person_path(current_user.person), nil, false -%>
-            <%= navigation_link('Admin', main_app.admin_path, nil, false) if admin_logged_in? -%>
-            <%= navigation_link 'Log out', main_app.logout_path, nil, false -%>
+            <%= navigation_link current_user.person.name, main_app.person_path(current_user.person), false -%>
+            <%= navigation_link('Admin', main_app.admin_path, false) if admin_logged_in? -%>
+            <%= navigation_link 'Log out', main_app.logout_path, false -%>
         <% else %>
             <li><%= link_to 'Register', main_app.signup_path %></li>
             <li><%= link_to 'Log in', main_app.new_session_path(:return_to => request.original_url) %></li>

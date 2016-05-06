@@ -37,7 +37,7 @@ module ProjectHierarchyTestHelper
       force_reload_model klass.name
     end
 
-    force_reload_model ProjectCompat.name, "#{Rails.root}/lib/project_compat.rb"
+    force_reload_model Seek::ProjectAssociation.name, "#{Rails.root}/lib/project_association.rb"
 
     Seek.send(:remove_const, "AdminDefinedRoles")
     load "#{Rails.root}/lib/seek/admin_defined_roles.rb"

@@ -5,4 +5,12 @@ class Unit < ActiveRecord::Base
   scope :factors_studied_units,where(:factors_studied=>true)
   scope :time_units, where(:comment => 'time')
 
+  def dimensionless?
+    symbol=="dimensionless"
+  end
+
+  def to_s
+    title ? title : symbol
+  end
+
 end

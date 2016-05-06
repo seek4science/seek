@@ -18,7 +18,7 @@ class Strain < ActiveRecord::Base
   grouped_pagination
 
   belongs_to :organism
-  has_many :specimens
+
   has_many :assay_organisms
   has_many :assays,:through=>:assay_organisms
 
@@ -36,12 +36,25 @@ class Strain < ActiveRecord::Base
 
   alias_attribute :description, :comment
 
-  include Seek::Search::BiosampleFields
+  #DEPRECATED
+  has_many :deprecated_specimens
 
-  attr_accessor :from_biosamples
+  include Seek::Search::CommonFields
 
   searchable(:auto_index=>false) do
       text :synonym
+      text :genotype_info do
+        genotype_info
+      end
+      text :phenotype_info do
+        phenotype_info
+      end
+      text :provider_name do
+        provider_name
+      end
+      text :provider_id do
+        provider_id
+      end
   end if Seek::Config.solr_enabled
 
   def is_default?
@@ -73,7 +86,7 @@ class Strain < ActiveRecord::Base
   end
 
   def state_allows_delete? *args
-    (specimens.empty? || ((specimens.count == 1) && specimens.first.is_dummy? && specimens.first.samples.empty?)) && super
+    (deprecated_specimens.empty? || ((deprecated_specimens.count == 1) && deprecated_specimens.first.is_dummy? && deprecated_specimens.first.samples.empty?)) && super
   end
 
   def can_delete? user=User.current_user
@@ -102,4 +115,5 @@ class Strain < ActiveRecord::Base
 
     return new_object
   end
+
 end

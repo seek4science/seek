@@ -1,78 +1,31 @@
-<%= render :partial => "general/item_title", :locals => {:item=>@sample, :buttons_partial => 'samples/buttons'} %>
+<%= render :partial => "general/item_title", :locals => {:item => @sample, :buttons_partial => 'assets/asset_buttons'} %>
+
+
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
+
     <div class="row">
       <div class="col-md-6">
         <p>
-          <label>Sample name:</label>
-          <%= text_or_not_specified(@sample.title) -%>
+          <label>Sample type:</label>
+          <%= link_to @sample.sample_type.title,@sample.sample_type %>
         </p>
-        <p>
-          <label>Seek ID:</label>
-          <%= text_or_not_specified(@sample.id) %>
-        </p>
-
-        <% if Seek::Config.is_virtualliver %>
+        <% if @sample.originating_data_file %>
             <p>
-              <label>Tissue and cell types:</label>
-              <%= sample_tissue_and_cell_types_list @sample.tissue_and_cell_types -%>
+              <label>Source data:</label>
+              <%= link_to @sample.originating_data_file.title, @sample.originating_data_file %>
             </p>
         <% end %>
-        <p>
-          <label>Lab internal identifier:</label>
-          <%= text_or_not_specified(@sample.lab_internal_number) %>
-        </p>
-        <p>
-          <label>Date at sampling:</label>
-          <%= text_or_not_specified @sample.sampling_date.nil? ? nil : date_as_string(@sample.sampling_date) -%>
-        </p>
-        <% if Seek::Config.is_virtualliver %>
-            <p>
-              <label>Donation date:</label>
-              <%= text_or_not_specified @sample.donation_date.nil? ? nil : date_as_string(@sample.donation_date.utc) -%>
-            </p>
-        <% end %>
-        <p>
-          <label>Age at sampling:</label>
-          <%= text_or_not_specified @sample.age_at_sampling_info -%>
-        </p>
-        <p>
-          <label>Provider name:</label>
-          <%= text_or_not_specified @sample.provider_name -%>
-        </p>
-        <p>
-          <label>Provider's sample identifier:</label>
-          <%= text_or_not_specified @sample.provider_id -%>
-        </p>
-        <p>
-          <label>Organism part:</label>
-          <%= text_or_not_specified @sample.organism_part -%>
-        </p>
-        <p>
-          <label>Comment:</label>
-          <%= text_or_not_specified @sample.comments -%>
-        </p>
-        <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sample} %>
+        <%= render :partial => "attribute_values", :locals => {:sample => @sample} %>
       </div>
     </div>
   </div>
+
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample, :title => 'Contributor'} %>
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sample } %>
   </div>
 </div>
-<div class="row">
-  <h2><%= (I18n.t 'biosamples.sample_parent_term').capitalize -%> details</h2>
-  <% if @sample.specimen.can_view? %>
-      <div class="col-md-9 col-sm-8">
-        <%= render :partial => "sample_specimen_details", :object => @sample.specimen %>
-      </div>
-      <div class="col-md-3 col-sm-4">
-        <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @sample.specimen } %>
-      </div>
-  <% else %>
-      <%= hidden_items_html([@sample.specimen], "This item is hidden")  %>
-  <% end %>
-</div>
 
-<%= render :partial => "general/items_related_to", :object => @sample %>
+
+<%= render :partial=>"general/items_related_to",:object => @sample %>

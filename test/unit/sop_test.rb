@@ -161,6 +161,16 @@ class SopTest < ActiveSupport::TestCase
     assert_equal project,sop.latest_version.projects.first
   end
 
+  test 'assign projects' do
+    sop = Factory(:sop, projects:[])
+    assert_empty sop.projects
+    project = Factory(:project)
+    sop.update_attributes(project_ids:[project.id])
+    sop.save!
+    sop.reload
+    assert_equal [project],sop.projects
+  end
+
   test "sop with no contributor" do
     sop=sops(:sop_with_no_contributor)
     assert_nil sop.contributor

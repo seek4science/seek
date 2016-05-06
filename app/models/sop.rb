@@ -18,21 +18,16 @@ class Sop < ActiveRecord::Base
 
   scope :default_order, order("title")
 
-  validates_presence_of :title
-
-  # allow same titles, but only if these belong to different users
-  # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a SOP with such title."
-
-  has_many :sample_assets,:dependent=>:destroy,:as => :asset
-  has_many :samples, :through => :sample_assets
-
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 
   has_many :experimental_conditions, :conditions =>  Proc.new{["experimental_conditions.sop_version =?", version]}
 
-  has_many :sop_specimens, :dependent => :destroy
-  has_many :specimens,:through=>:sop_specimens
+  #DEPRECATED
+  has_many :sop_deprecated_specimens, :dependent => :destroy
+  has_many :deprecated_specimens,:through=>:sop_deprecated_specimens
+  has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :deprecated_samples, :through => :sample_assets
 
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource

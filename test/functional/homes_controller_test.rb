@@ -124,7 +124,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'root should route to sign_up when no user, otherwise to home' do
-    User.find(:all).each do |u|
+    User.all.each do |u|
       u.delete
     end
     get :index

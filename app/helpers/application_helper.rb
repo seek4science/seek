@@ -16,6 +16,12 @@ module ApplicationHelper
     end
   end
 
+  def required_span
+    content_tag :span,class:'required' do
+      "*"
+    end
+  end
+
   #e.g. SOP for sops_controller, taken from the locale based on the controller name
   def resource_text_from_controller
     internationalized_resource_name(controller_name.singularize.camelize, false)
@@ -200,7 +206,7 @@ module ApplicationHelper
   end
   
   def text_or_not_specified text, options = {}
-    text=text.to_s if text.kind_of?(Numeric)
+    text=text.to_s
     if text.nil? or text.chomp.empty?
       not_specified_text||=options[:none_text]
       not_specified_text||="No description specified" if options[:description]==true
@@ -525,8 +531,8 @@ module ApplicationHelper
      Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
      Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
      Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
-     Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
-     Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
+     DeprecatedSpecimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
+     DeprecatedSample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
      Project=>"You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
      Institution=>"You cannot delete this Institution. It may have people associated with it."
     }

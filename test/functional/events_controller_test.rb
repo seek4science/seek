@@ -54,7 +54,7 @@ class EventsControllerTest < ActionController::TestCase
     get :index, :page => "all"
     assert_response :success
     assert_equal assigns(:events).sort_by(&:id), Event.authorize_asset_collection(assigns(:events), "view",  users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
-    assert assigns(:events).count < Event.find(:all).count #fails if all events are assigned to @events
+    assert assigns(:events).count < Event.count #fails if all events are assigned to @events
   end
 
   test "xml for projectless event" do
@@ -172,4 +172,12 @@ class EventsControllerTest < ActionController::TestCase
     end
   end
   
+  test "should create event with associated data file" do
+    data_file = Factory(:data_file)
+    assert_difference('Event.count', 1) do
+      post :create, :event => valid_event, :sharing => valid_sharing, :data_files => [{id: data_file.id}]
+    end
+
+    assert_includes assigns(:event).data_files, data_file
+  end
 end

@@ -1,4 +1,17 @@
 SEEK::Application.routes.draw do
+
+  resources :sample_types do
+    collection do
+      post :create_from_template
+    end
+    resources :samples
+    resources :content_blobs do
+      member do
+        get :download
+      end
+    end
+  end
+
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
@@ -305,7 +318,7 @@ SEEK::Application.routes.draw do
       get :published
       get :new_object_based_on_existing_one
     end
-    resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
 
 
@@ -335,6 +348,7 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :preview
+      get :filter
       post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
@@ -361,6 +375,8 @@ SEEK::Application.routes.draw do
       get :mint_doi_confirm
       get :minted_doi
       post :mint_doi
+      get :samples_table
+      get :select_sample_type
     end
     resources :studied_factors do
       collection do
@@ -375,7 +391,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
-    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays, :samples, :studies,:publications,:events,:only=>[:index]
   end
 
   resources :presentations do
@@ -558,34 +574,11 @@ SEEK::Application.routes.draw do
 
   resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
 
-  ### BIOSAMPLES AND ORGANISMS ###
-
-  resources :specimens do
-    collection do
-      post :items_for_result
-    end
-    resources :projects,:people,:samples,:strains,:institutions,:sops,:only=>[:index]
-    member do
-      get :new_object_based_on_existing_one
-    end
-  end
-
-  resources :samples do
-    collection do
-      get :typeahead
-      get :preview
-      post :items_for_result
-      post :resource_in_tab
-    end
-    member do
-      get :new_object_based_on_existing_one
-    end
-    resources :projects,:people,:specimens,:sops,:data_files,:only=>[:index]
-  end
 
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
+      get :strains_of_selected_organism
       post :items_for_result
       post :resource_in_tab
     end
@@ -593,15 +586,6 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
     end
     resources :specimens,:assays,:people,:projects,:only=>[:index]
-  end
-
-  resources :biosamples do
-    collection do
-      get :existing_strains
-      get :existing_specimens
-      get :strains_of_selected_organism
-      get :existing_samples
-    end
   end
 
   resources :organisms do
@@ -626,11 +610,9 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       post :test_asset_url
-#      get :preview
     end
 
     member do
-#      get :check_related_items
       get :download
       get :describe_ports
       post :temp_link
@@ -639,7 +621,6 @@ SEEK::Application.routes.draw do
       post :check_related_items
       post :publish
       get :published
-#      get :view_items_in_tab
       post :favourite
       delete :favourite_delete
       post :mint_doi
@@ -671,6 +652,20 @@ SEEK::Application.routes.draw do
       get :feed
       get :notification_settings
       post :update_notification_settings
+    end
+  end
+
+  ### SAMPLES ###
+
+  resources :samples do
+    collection do
+      get :attribute_form
+      get :preview
+      get :filter
+      post :extract_from_data_file
+    end
+    member do
+      post :update_annotations_ajax
     end
   end
 

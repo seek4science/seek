@@ -1,529 +1,532 @@
-require "test_helper"
+require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
-  fixtures :policies
+
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
-  include RdfTestCases
-  include FunctionalAuthorizationTests
-  # Called before every test method runs. Can be used
-  # to set up fixture information.
+  include HtmlHelper
 
-  def setup
-    login_as Factory(:user,:person => Factory(:person,:roles_mask=> 0))
-  end
-
-  def rest_api_test_object
-    @object = Factory(:sample,:contributor => User.current_user,
-                      :title=> "test1",
-                      :policy => policies(:policy_for_viewable_data_file))
-  end
-
-  test "index xml validates with schema" do
-    Factory(:sample,
-            :title=> "test2",
-            :policy => policies(:policy_for_viewable_data_file))
-    Factory :sample, :policy => policies(:editing_for_all_sysmo_users_policy)
-    get :index, :format =>"xml"
-    assert_response :success
-    assert_not_nil assigns(:samples)
-    validate_xml_against_schema(@response.body)
-  end
-
-  test "show xml validates with schema" do
-    s = Factory(:sample,:contributor => Factory(:user,:person => Factory(:admin)),
-                :title => "test sample",
-                :policy => policies(:policy_for_viewable_data_file))
-    get :show, :id => s, :format =>"xml"
-    assert_response :success
-    assert_not_nil assigns(:sample)
-    validate_xml_against_schema(@response.body)
-  end
-
-  test "should get index" do
+  test 'index' do
+    Factory(:sample,:policy=>Factory(:public_policy))
     get :index
     assert_response :success
-    assert_not_nil assigns(:samples)
+    assert_select '#samples-table table', count: 0
   end
 
-  test "logged out user can't see new" do
-    logout
-    get :new
-    assert_redirected_to samples_path
-  end
-
-  test "related specimen tab title" do
-    s = Factory :sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy))
-    assert !s.specimen.nil?
-    assert s.specimen.can_view?
-
-    get :show, :id=>s
-    assert_response :success
-    assert_select "ul.nav-pills" do
-      assert_select "a", :text=>/#{I18n.t('biosamples.sample_parent_term')}s/ ,:count => 1
-    end
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, {:resource_ids => [s.specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-    end
-
-    assert_select "div.list_item" do
-      assert_select "div.list_item_title a[href=?]", specimen_path(s.specimen), :text=>s.specimen.title,:count => 1
-    end
-  end
-
-  test "should get new" do
+  test 'new' do
+    login_as(Factory(:person))
     get :new
     assert_response :success
-    assert_not_nil assigns(:sample)
+    assert assigns(:sample)
   end
 
-  test "should create" do
-    specimen = Factory(:specimen, :contributor => User.current_user)
-    assert_difference("Sample.count") do
-      post :create, :sample => {:title => "test",
-                                :project_ids=>[Factory(:project).id],
-                                :lab_internal_number =>"Do232",
-                                :donation_date => Date.today,
-                                :specimen_id => specimen.id }, :sharing => valid_sharing
-    end
-    s = assigns(:sample)
-    assert_redirected_to sample_path(s)
-    assert_equal "test", s.title
-    assert_equal specimen,s.specimen
-  end
-
-  test "should create sample and specimen" do
-    creator=Factory :person
-    proj1=Factory(:project)
-    proj2=Factory(:project)
-    sop = Factory :sop,:contributor=>User.current_user
-    assert_difference("Sample.count") do
-      assert_difference("Specimen.count") do
-        post :create,
-            :sharing => valid_sharing,
-            :specimen_sop_ids=>[sop.id],
-            :organism_id=>Factory(:organism).id,
-            :creators=>[[creator.name,creator.id]].to_json,
-            :specimen=>{:other_creators=>"jesus jones"},
-            :sample => {
-            :title => "test",
-            :project_ids=>[proj1.id,proj2.id],
-            :lab_internal_number =>"Do232",
-            :donation_date => Date.today,
-            :specimen_attributes => {:strain_id => Factory(:strain).id,
-                          :institution_id => Factory(:institution).id,
-                          :lab_internal_number=>"Lab number",
-                          :title=>"Donor number",
-                          :institution_id =>Factory(:institution).id
-            }
-        }
-      end
-    end
-    s = assigns(:sample)
-    s.reload
-    assert_redirected_to sample_path(s)
-    assert_equal "test",s.title
-    assert_not_nil s.specimen
-    assert_equal "Donor number",s.specimen.title
-    assert_equal [sop],s.specimen.sops
-    assert s.specimen.creators.include?(creator)
-    assert_equal 1,s.specimen.creators.count
-    assert_equal "jesus jones",s.specimen.other_creators
-    assert_equal 2,s.projects.count
-    assert s.projects.include?(proj1)
-    assert s.projects.include?(proj2)
-    assert_equal s.projects.sort_by(&:id),s.specimen.projects.sort_by(&:id)
-  end
-
-  test "should create sample and specimen with default strain if missing" do
-    with_config_value :is_virtualliver,true do
-      assert_difference("Sample.count") do
-        assert_difference("Specimen.count") do
-          assert_difference("Strain.count") do
-            post :create,
-                 :organism=>Factory(:organism),
-               :sharing => valid_sharing,
-                 :sample => {
-                     :title => "test",
-                     :project_ids=>[Factory(:project).id],
-                     :lab_internal_number =>"Do232",
-                     :donation_date => Date.today,
-                     :specimen_attributes => {
-                         :lab_internal_number=>"Lab number",
-                       :institution_id =>Factory(:institution).id,
-                         :title=>"Donor number"
-                     }
-                 }
-          end
-        end
-      end
-      s = assigns(:sample)
-      assert_redirected_to sample_path(s)
-      assert s.specimen.strain.is_dummy?
-      assert_equal "test",s.title
-      assert_not_nil s.specimen
-      assert_equal "Donor number",s.specimen.title
-    end
-  end
-
-  test "should create sample specimen with genotypes and phenotypes" do
-    new_gene_title = 'new gene'
-    new_modification_title = 'new modification'
-    new_phenotype_description = "new phenotype"
-    assert_difference(["Sample.count","Specimen.count"]) do
-          post :create,
-               :organism_id => Factory(:organism).id,
-               :sample => {
-                   :title => "test",
-                   :project_ids => [Factory(:project).id],
-                   :lab_internal_number => "Do232",
-                   :donation_date => Date.today,
-                   :specimen_attributes => {
-                       :strain_id => Factory(:strain).id,
-                       :lab_internal_number => "Lab number",
-                       :institution_id =>Factory(:institution).id,
-                       :title => "Donor number",
-                       :genotypes_attributes => {"1234432"=>{:gene_attributes => {:title => new_gene_title},
-                                                               :modification_attributes => {:title => new_modification_title}}},
-                        :phenotypes_attributes => {"213213"=>{:description => new_phenotype_description}}
-                       }
-
-                   },
-               :sharing => valid_sharing
-
-    end
-    s = assigns(:sample)
-
-    assert_redirected_to sample_path(s)
-    assert_equal "test", s.title
-    assert_not_nil s.specimen
-    assert_equal "Donor number", s.specimen.title
-    assert_equal "new modification new gene", s.specimen.genotype_info
-    assert_equal "new phenotype", s.specimen.phenotype_info
-
-  end
-
-  test "should create sample specimen with tissue and cell types" do
-     existing_tissue_and_cell_type = Factory(:tissue_and_cell_type, :title=> "test tissue")
-     new_tissue_and_cell_types = ["0,new_tissue", "0,new_cell_type"]
-     assert_difference(["Sample.count","Specimen.count"]) do
-           post :create,
-                :organism_id => Factory(:organism).id,
-                :tissue_and_cell_type_ids => ["#{existing_tissue_and_cell_type.id},#{existing_tissue_and_cell_type.title}"] + new_tissue_and_cell_types,
-                :sample => {
-                    :title => "test",
-                    :project_ids => [Factory(:project).id],
-                    :lab_internal_number => "Do232",
-                    :donation_date => Date.today,
-                    :specimen_attributes => {
-                        :strain_id => Factory(:strain).id,
-                        :lab_internal_number => "Lab number",
-                        :institution_id =>Factory(:institution).id,
-                        :title => "Donor number"
-                        }
-                    },
-                :sharing => valid_sharing
-     end
-     s = assigns(:sample)
-     assert_redirected_to sample_path(s)
-     assert_equal "test", s.title
-     assert_not_nil s.specimen
-     assert_equal "Donor number", s.specimen.title
-     assert_equal ["test tissue", "new_tissue", "new_cell_type"], s.tissue_and_cell_types.map(&:title)
-   end
-
-  test "should get show" do
-    get :show, :id => Factory(:sample, :title=>"test", :policy =>policies(:editing_for_all_sysmo_users_policy))
+  test 'show' do
+    get :show, id: populated_patient_sample.id
     assert_response :success
-    assert_not_nil assigns(:sample)
   end
 
-  test "should get edit" do
-    get :edit, :id=> Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
+  test 'new with sample type id' do
+    login_as(Factory(:person))
+    type = Factory(:patient_sample_type)
+    get :new, sample_type_id: type.id
     assert_response :success
-    assert_not_nil assigns(:sample)
+    assert assigns(:sample)
+    assert_equal type, assigns(:sample).sample_type
   end
 
-  test "should update" do
-    s = Factory(:sample, :title=>"oneSample", :policy =>policies(:editing_for_all_sysmo_users_policy))
-    new_specimen = Factory(:specimen, :policy => Factory(:public_policy))
-    assert_not_equal "test", s.title
-    put :update, :id=>s, :sample =>{:title =>"test", :specimen_id => new_specimen.id}
-    s = assigns(:sample)
-    assert_redirected_to sample_path(s)
-    assert_equal "test", s.title
-    assert_equal new_specimen, s.specimen
-  end
-
-  test "should destroy" do
-    s = Factory :sample, :contributor => User.current_user
-    assert_difference("Sample.count", -1, "A sample should be deleted") do
-      delete :destroy, :id => s.id
+  test 'create' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' } }
     end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'George Osborne', sample.title
+    assert_equal 'George Osborne', sample.get_attribute(:full_name)
+    assert_equal '22', sample.get_attribute(:age)
+    assert_equal '22.1', sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+    assert_equal person.user,sample.contributor
   end
 
-  test "unauthorized users cannot add new samples" do
-    login_as Factory(:user,:person => Factory(:brand_new_person))
-    get :new
-    assert_response :redirect
+  test 'create and update with boolean' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:simple_sample_type)
+    type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false, :sample_type => type)
+    type.save!
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, data: { the_title: 'ttt', bool:'1' } }
+    end
+    assert_not_nil sample=assigns(:sample)
+    assert_equal 'ttt',sample.get_attribute(:the_title)
+    assert_equal true,sample.get_attribute(:bool)
+    assert_no_difference('Sample.count') do
+      put :update, id:sample.id,sample: { data: { the_title: 'ttt', bool:'0' } }
+    end
+    assert_not_nil sample=assigns(:sample)
+    assert_equal 'ttt',sample.get_attribute(:the_title)
+    assert_equal false,sample.get_attribute(:bool)
   end
 
-  test "unauthorized user cannot edit sample" do
-    s = Factory :sample, :policy => Factory(:private_policy), :contributor => Factory(:user)
-    get :edit, :id =>s.id
-    assert_redirected_to sample_path(s)
-    assert flash[:error]
+  test 'show sample with boolean' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:simple_sample_type)
+    type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false, :sample_type => type)
+    type.save!
+    sample=Factory(:sample,:sample_type=>type)
+    sample.set_attribute(:the_title, 'ttt')
+    sample.set_attribute(:bool, true)
+    sample.save!
+    get :show,id:sample.id
+    assert_response :success
+
   end
 
-  test "unauthorized user cannot update sample" do
-    s = Factory :sample, :policy => Factory(:private_policy), :contributor => Factory(:user)
-
-    put :update, :id=> s.id, :sample =>{:title =>"test"}
-    assert_redirected_to sample_path(s)
-    assert flash[:error]
+  test 'edit' do
+    login_as(Factory(:person))
+    get :edit, id: populated_patient_sample.id
+    assert_response :success
   end
 
-  test "unauthorized user cannot delete sample" do
-    s = Factory :sample, :policy => Factory(:private_policy), :contributor => Factory(:user)
+  test 'update' do
+    login_as(Factory(:person))
+    sample = populated_patient_sample
+    type_id = sample.sample_type.id
+
+    assert_no_difference('Sample.count') do
+      put :update, id: sample.id, sample: { data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' } }
+    end
+
+    assert assigns(:sample)
+    assert_redirected_to assigns(:sample)
+    updated_sample = assigns(:sample)
+    updated_sample = Sample.find(updated_sample.id)
+    assert_equal type_id, updated_sample.sample_type.id
+    assert_equal 'Jesus Jones', updated_sample.title
+    assert_equal 'Jesus Jones', updated_sample.get_attribute(:full_name)
+    assert_equal '47', updated_sample.get_attribute(:age)
+    assert_nil updated_sample.get_attribute(:weight)
+    assert_equal 'M13 9QL', updated_sample.get_attribute(:postcode)
+  end
+
+  test 'associate with project on create' do
+    person = Factory(:person_in_multiple_projects)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert person.projects.count >= 3 #incase the factory changes
+    project_ids = person.projects[0..1].collect(&:id)
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample', data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }, project_ids:project_ids }
+    end
+    assert sample=assigns(:sample)
+    assert_equal person.projects[0..1].sort,sample.projects.sort
+  end
+
+  test 'associate with project on update' do
+    person = Factory(:person_in_multiple_projects)
+    login_as(person)
+    sample = populated_patient_sample
+    assert_empty sample.projects
+    assert person.projects.count >= 3 #incase the factory changes
+    project_ids = person.projects[0..1].collect(&:id)
+
+    put :update, id: sample.id, sample: { title: 'Updated Sample',  data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }, project_ids:project_ids }
+
+    assert sample=assigns(:sample)
+    assert_equal person.projects[0..1].sort,sample.projects.sort
+
+  end
+
+  test 'contributor can view' do
+    person = Factory(:person)
+    login_as(person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :show,:id=>sample.id
+    assert_response :success
+  end
+
+  test 'non contributor cannot view' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(other_person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :show,:id=>sample.id
+    assert_response :forbidden
+  end
+
+  test 'anonymous cannot view' do
+    person = Factory(:person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :show,:id=>sample.id
+    assert_response :forbidden
+  end
+
+  test 'contributor can edit' do
+    person = Factory(:person)
+    login_as(person)
+
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :edit,:id=>sample.id
+    assert_response :success
+  end
+
+  test 'non contributor cannot edit' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(other_person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :edit,:id=>sample.id
+    assert_redirected_to sample
+    refute_nil flash[:error]
+  end
+
+  test 'anonymous cannot edit' do
+    person = Factory(:person)
+    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
+    get :edit,:id=>sample.id
+    assert_redirected_to sample
+    refute_nil flash[:error]
+  end
+
+  test 'create with sharing' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+
+
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample',  data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }, project_ids:[] },:sharing=>valid_sharing
+    end
+    assert sample=assigns(:sample)
+    assert_equal person.user,sample.contributor
+    assert_equal Policy::ALL_USERS,sample.policy.sharing_scope
+    assert sample.can_view?(Factory(:person).user)
+  end
+
+  test 'update with sharing' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(person)
+    sample = populated_patient_sample
+    sample.contributor = person
+    sample.policy = Factory(:private_policy)
+    sample.save!
+    sample.reload
+    refute sample.can_view?(other_person.user)
+
+    put :update, id: sample.id, sample: { title: 'Updated Sample',  data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' },project_ids:[] },:sharing=>valid_sharing
+
+    assert sample=assigns(:sample)
+    assert_equal Policy::ALL_USERS,sample.policy.sharing_scope
+    assert sample.can_view?(other_person.user)
+  end
+
+  test 'filter by sample_type route' do
+    assert_routing "sample_types/7/samples",{controller:"samples",action:"index",sample_type_id:"7"}
+  end
+
+  test 'filter by sample type' do
+    sample_type1=Factory(:simple_sample_type)
+    sample_type2=Factory(:simple_sample_type)
+    sample1=Factory(:sample,:sample_type=>sample_type1,:policy=>Factory(:public_policy),:title=>"SAMPLE 1")
+    sample2=Factory(:sample,:sample_type=>sample_type2,:policy=>Factory(:public_policy),:title=>"SAMPLE 2")
+
+    get :index,:sample_type_id=>sample_type1.id
+    assert_response :success
+    assert samples = assigns(:samples)
+    assert_includes samples, sample1
+    refute_includes samples, sample2
+  end
+
+  test 'extract from data file with multiple matching sample types' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_difference("Sample.count",0) do
+      post :extract_from_data_file, :data_file_id=>data_file.id
+    end
+
+    assert_redirected_to select_sample_type_data_file_path(data_file) # Test for this is in data_files_controller_test
+  end
+
+  test 'extract from data file prompts confirmation' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_difference("Sample.count",0) do
+      post :extract_from_data_file, :data_file_id=>data_file.id
+    end
+
+    assert_select '#accepted table tbody tr', count: 3
+    assert_select '#rejected table tbody tr', count: 1
+    assert_select 'form input[name=confirm]', count: 1
+  end
+
+  test 'extract from data file' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_difference("Sample.count",3) do
+      post :extract_from_data_file, :data_file_id=>data_file.id, :confirm=>'true'
+    end
+
+    assert (samples = assigns(:samples))
+    assert assigns(:rejected_samples)
+    assert_equal 3, samples.count
+    assert_equal 1, assigns(:rejected_samples).count
+    assert_equal "Bob", assigns(:rejected_samples).first.get_attribute(:full_name)
+
+    assert_select '#accepted table tbody tr', count: 3
+    assert_select '#rejected table tbody tr', count: 1
+    assert_select 'form input[name=confirm]', count: 0
+
+    samples.each do |sample|
+      assert_equal data_file, sample.originating_data_file
+    end
+
+    data_file.reload
+
+    assert_equal samples.sort, data_file.extracted_samples.sort
+  end
+
+  test "can't extract from data file if no permissions" do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    login_as(another_person)
+
     assert_no_difference("Sample.count") do
-      delete :destroy, :id => s.id
-    end
-    assert flash[:error]
-    assert_redirected_to s
-  end
-
-  test "only current user can delete sample" do
-    s = Factory :sample, :contributor => User.current_user
-    assert_difference("Sample.count", -1, "A sample should be deleted") do
-      delete :destroy, :id => s.id
-    end
-    s = Factory :sample, :contributor => Factory(:user)
-    assert_no_difference("Sample.count") do
-      delete :destroy, :id => s.id
-    end
-    assert flash[:error]
-    assert_redirected_to s
-  end
-
-  test "should not destroy sample related to an existing assay" do
-    s = Factory :sample, :assays => [Factory(:experimental_assay)], :contributor => Factory(:user)
-    assert_no_difference("Sample.count") do
-      delete :destroy, :id => s.id
-    end
-    assert flash[:error]
-    assert_redirected_to s
-  end
-
-  test "should not show organism and strain information of a sample if there is no organism" do
-    s = Factory :sample, :contributor => User.current_user
-    s.specimen.strain.organism = nil
-    s.save
-    s.reload
-    get :show, :id => s.id
-    assert_response :success
-    assert_not_nil assigns(:sample)
-    assert_select 'p', :text => s.specimen.strain.info, :count => 0
-  end
-  
-  test "associate data files,models,sops" do
-      assert_difference("Sample.count") do
-      post :create, :sample => {:title=>"test",
-                                :lab_internal_number =>"Do232",
-                                :donation_date => Date.today,
-                                 :project_ids =>[Factory(:project).id],
-                                :specimen_id => Factory(:specimen, :contributor => User.current_user).id},
-             :sharing => valid_sharing,
-             :sample_data_file_ids => [Factory(:data_file,:title=>"testDF",:contributor=>User.current_user).id],
-             :sample_model_ids => [Factory(:model,:title=>"testModel",:contributor=>User.current_user).id],
-             :sample_sop_ids => [Factory(:sop,:title=>"testSop",:contributor=>User.current_user).id]
-
-    end
-    s = assigns(:sample)
-    assert_equal "testDF", s.data_files.first.title
-    assert_equal "testModel", s.models.first.title
-    assert_equal "testSop", s.sops.first.title
-  end
-
-
-test "should show organism and strain information of a sample if there is organism" do
-    specimen = Factory(:specimen, :contributor => User.current_user)
-    sample = Factory :sample, :specimen_id => specimen.id, :contributor => User.current_user
-    assert_equal true, sample.specimen.can_view?
-
-    get :show, :id => sample.id
-    assert_response :success
-    assert_not_nil assigns(:sample)
-
-    #lazy load related cell cultures /speicmens
-    with_config_value :tabs_lazy_load_enabled, true do
-      get :resource_in_tab, {:resource_ids => [specimen.id].join(","), :resource_type => "Specimen", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
+      post :extract_from_data_file, :data_file_id=>data_file.id
     end
 
-
-    assert_select 'p a[href=?]', organism_path(sample.specimen.strain.organism), :count => 1 # one in the show page of sample
-    assert_select 'p a[href=?]', h(organism_path(sample.specimen.strain.organism)), :count => 1 # one in the related cell cuture/specimen tab, but need to escape ""
+    assert_redirected_to data_file_path(data_file)
+    assert_not_empty flash[:error]
   end
 
-  test 'should have specimen comment and gender fields in the specimen/sample show page' do
-    as_not_virtualliver do
-      s = Factory :sample, :contributor => User.current_user
-      get :show, :id => s.id
-      assert_response :success
-
-      assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
-    assert_select "label", :text => /Gender/, :count => 1
+  test "should get table view for data file" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do # public
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
     end
-  end
 
-  test 'should have sample organism_part in the specimen/sample show page' do
-    s = Factory :sample, :contributor => User.current_user
-    get :show, :id => s.id
+    login_as(data_file.contributor)
+
+    get :index, data_file_id: data_file.id
+
     assert_response :success
-    assert_select "label", :text => /Organism part/, :count => 1
+    # Empty table - content is loaded asynchronously (see data_files_controller_test.rb)
+    assert_select '#samples-table tbody tr', count: 0
+    assert_select '#samples-table thead th', count: 3
   end
 
-  test 'should have sample organism_part in the sample edit page' do
-    s = Factory :sample, :contributor => User.current_user
-    get :edit, :id => s.id
-    assert_response :success
-    assert_select "select#sample_organism_part", :count => 1
-  end
-
-  test 'should have sample Comment in the specimen/sample show page' do
-      specimen = Factory(:specimen, :contributor => User.current_user)
-      sample = Factory :sample, :specimen_id => specimen.id, :contributor => User.current_user
-      assert_equal true, sample.specimen.can_view?
-
-      get :show, :id => sample.id
-      assert_response :success
-      assert_select "label", :text => /Comment/, :count => 2 #one for specimen, one for sample
-  end
-
-  test 'should have sample comment in the sample edit page' do
-    s = Factory :sample, :contributor => User.current_user
-    get :edit, :id => s.id
-    assert_response :success
-    assert_select "input#sample_comments", :count => 1
-  end
-
-  test "should not have 'New sample based on this one' for sysmo" do
-    as_not_virtualliver do
-      s = Factory :sample, :contributor => User.current_user
-      get :show, :id => s.id
-      assert_response :success
-      assert_select "a", :text => /New sample based on this one/, :count => 0
-
-      post :new_object_based_on_existing_one, :id => s.id
-      assert_redirected_to :root
-      assert_not_nil flash[:error]
+  test "should get table view for sample type" do
+    person = Factory(:person)
+    sample_type = Factory(:simple_sample_type)
+    2.times do # public
+      Factory(:sample, sample_type: sample_type, contributor: person, policy: Factory(:private_policy))
     end
-  end
-
-  test 'combined sample_specimen form when creating new sample' do
-    get :new
-    assert_response :success
-    assert_select 'input#sample_specimen_attributes_title', :count => 1
-  end
-
-  test 'only sample form when updating sample' do
-    get :edit, :id => Factory(:sample, :policy => policies(:editing_for_all_sysmo_users_policy))
-    assert_response :success
-    assert_select 'input#sample_specimen_attributes_title', :count => 0
-  end
-
-  test 'should have age at sampling' do
-    get :new
-    assert_response :success
-    assert_select 'input#sample_age_at_sampling', :count => 1
-
-    sample = Factory(:sample, :policy => Factory(:public_policy),
-                     :age_at_sampling => 4, :age_at_sampling_unit => Factory(:unit, :symbol => 's'))
-    get :show, :id => sample.id
-    assert_response :success
-    assert_select "label", :text => /Age at sampling/
-
-    get :edit, :id => sample.id
-    assert_response :success
-    assert_select "input#sample_age_at_sampling"
-  end
-  
-  test "sample-sop association when sop has multiple versions" do
-    sop = Factory :sop, :contributor => User.current_user
-    sop_version_2 = Factory(:sop_version, :sop => sop)
-    assert_equal 2, sop.versions.count
-    assert_equal sop.latest_version, sop_version_2
-
-    assert_difference("Sample.count") do
-      post :create, :sample => {:title => "test",
-                                :lab_internal_number => "Do232",
-                                :donation_date => Date.today,
-                                :project_ids => [Factory(:project).id],
-                                :specimen_id => Factory(:specimen, :contributor => User.current_user).id},
-           :sample_sop_ids => [sop.id],
-           :sharing => valid_sharing
-
-
+    3.times do # private
+      Factory(:sample, sample_type: sample_type, policy: Factory(:private_policy))
     end
-    s = assigns(:sample)
-    assert_redirected_to sample_path(s)
-    assert_nil flash[:error]
-    assert_equal "test", s.title
-    assert_equal 1, s.sops.length
-    assert_equal sop, s.sops.first
-    assert_equal 1, s.sop_versions.length
-    assert_equal sop_version_2, s.sop_versions.first
+
+    login_as(person.user)
+
+    get :index, sample_type_id: sample_type.id
+
+    assert_response :success
+
+    assert_select '#samples-table tbody tr', count: 2
   end
 
-  test "filter by specimen using nested routes" do
-    assert_routing "specimens/4/samples",{controller:"samples",action:"index",specimen_id:"4"}
-    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
-    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
-
-    refute_nil sample1.specimen
-    refute_equal sample1.specimen,sample2.specimen
-
-    get :index,specimen_id:sample1.specimen.id
+  test "show table with a boolean sample" do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:simple_sample_type)
+    type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false, :sample_type => type)
+    type.save!
+    sample=Factory(:sample,:sample_type=>type)
+    sample.set_attribute(:the_title, 'ttt')
+    sample.set_attribute(:bool, true)
+    sample.save!
+    get :index,sample_type_id:type.id
     assert_response :success
-    assert_select "div.list_item_title" do
-      assert_select "a[href=?]",sample_path(sample1),:text=>sample1.title
-      assert_select "a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
-    end
   end
 
-  test "filter by project using nested routes" do
-    assert_routing "projects/4/samples",{controller:"samples",action:"index",project_id:"4"}
-    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
-    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:specimen=>Factory(:specimen,:policy=>Factory(:public_policy)))
+  test 'filtering for association forms' do
+    person = Factory(:person)
+    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: "fish")
+    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: "frog")
+    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: "banana")
+    login_as(person.user)
 
-    refute_empty sample1.projects
-    refute_empty sample2.projects
-    assert_equal sample1.projects.count,sample2.projects.count
-    refute_equal sample1.projects,sample2.projects
-
-    get :index,project_id:sample1.projects.first.id
+    get :filter, filter: ''
+    assert_select 'a', count: 3
     assert_response :success
-    assert_select "div.list_item_title" do
-      assert_select "a[href=?]",sample_path(sample1),:text=>sample1.title
-      assert_select "a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
-    end
+
+    get :filter, filter: 'f'
+    assert_select 'a', count: 2
+    assert_select 'a', text: /fish/
+    assert_select 'a', text: /frog/
+
+    get :filter, filter: 'fi'
+    assert_select 'a', count: 1
+    assert_select 'a', text: /fish/
   end
 
-  test "filter by sop using nested routes" do
-    assert_routing "sops/4/samples",{controller:"samples",action:"index",sop_id:"4"}
-    sample1 = Factory(:sample,:policy=>Factory(:public_policy),:sops=>[Factory(:sop,:policy=>Factory(:public_policy))])
-    sample2 = Factory(:sample,:policy=>Factory(:public_policy),:sops=>[Factory(:sop,:policy=>Factory(:public_policy))])
+  test 'turns strain attributes into links' do
+    person = Factory(:person)
+    login_as(person.user)
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
 
-    refute_empty sample1.sops
-    refute_empty sample2.sops
-    assert_equal sample1.sops.count,sample2.sops.count
-    refute_equal sample1.sops,sample2.sops
+    sample = Sample.new(sample_type: sample_type, contributor: person)
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+    sample.save!
 
-    get :index,sop_id:sample1.sops.first.id
+    get :show, id: sample
+
     assert_response :success
-    assert_select "div.list_item_title" do
-      assert_select "a[href=?]",sample_path(sample1),:text=>sample1.title
-      assert_select "a[href=?]",sample_path(sample2),:text=>sample2.title,:count=>0
+    assert_select "p a[href=?]", strain_path(strain), text: /#{strain.title}/
+  end
+
+  test 'strains show up in related items' do
+    person = Factory(:person)
+    login_as(person.user)
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+
+    sample = Sample.new(sample_type: sample_type, contributor: person)
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+    sample.save!
+
+    get :show, id: sample
+
+    assert_response :success
+    assert_select "div.related-items a[href=?]", strain_path(strain), text: /#{strain.title}/
+  end
+
+  test 'strain samples successfully extracted from spreadsheet' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:strain_sample_data_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:strain_sample_data_content_blob)
+    sample_type.build_attributes_from_template
+    attribute_type = sample_type.sample_attributes.last
+    attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
+    attribute_type.required = true
+    sample_type.save!
+
+    assert_difference("Sample.count", 3) do
+      post :extract_from_data_file, :data_file_id=>data_file.id, :confirm=>'true'
     end
+
+    assert (samples = assigns(:samples))
+    assert assigns(:rejected_samples)
+    assert_equal 3, samples.count
+    assert_equal 1, assigns(:rejected_samples).count
+
+    strain = Strain.find_by_title('default')
+    assert_select '#accepted table tbody tr:nth-child(1) td:last-child a[href=?]', strain_path(strain), text: 'default'
+    assert_select '#accepted table tbody tr:nth-child(2) td:last-child a[href=?]', strain_path(strain), text: 'default'
+    assert_select '#accepted table tbody tr:nth-child(3) td:last-child span.none_text', text: '1234'
+    assert_select '#rejected table tbody tr:nth-child(1) td:last-child span.none_text', text: 'Not specified'
+
+    assert_equal samples.sort, data_file.extracted_samples.sort
+  end
+
+  private
+
+  def populated_patient_sample
+    sample = Sample.new title: 'My Sample', policy:Factory(:public_policy), contributor:Factory(:person)
+    sample.sample_type = Factory(:patient_sample_type)
+    sample.title = 'My sample'
+    sample.set_attribute(:full_name, 'Fred Bloggs')
+    sample.set_attribute(:age, 22)
+    sample.save!
+    sample
   end
 end

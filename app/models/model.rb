@@ -29,14 +29,9 @@ class Model < ActiveRecord::Base
 
   include Seek::Models::ModelExtraction
 
-  validates_presence_of :title
-
   before_save :check_for_sbml_format
-  
-  # allow same titles, but only if these belong to different users
-  # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Model with such title."
-  has_many :sample_assets,:dependent=>:destroy,:as => :asset
-  has_many :samples, :through => :sample_assets
+
+
 
   #FIXME: model_images seems to be to keep persistence of old images, wheras model_image is just the current_image
   has_many :model_images
@@ -48,6 +43,10 @@ class Model < ActiveRecord::Base
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
   belongs_to :model_type
   belongs_to :model_format
+
+  #DEPRECATED
+  has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
+  has_many :deprecated_samples, :through => :sample_assets
 
 
   explicit_versioning(:version_column => "version") do

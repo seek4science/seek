@@ -10,6 +10,7 @@ class AssaysControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include FunctionalAuthorizationTests
+  include HtmlHelper
 
   def setup
     login_as(:quentin)
@@ -85,32 +86,31 @@ class AssaysControllerTest < ActionController::TestCase
   test "should update assay with new version of same sop" do
     login_as(:model_owner)
     assay=assays(:metabolomics_assay)
-    timestamp=assay.updated_at
 
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert !assay.sops.include?(sop.latest_version)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}
     end
 
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
 
     assay.reload
-    stored_sop = assay.assay_assets.detect { |aa| aa.asset_id=sop.id }.versioned_asset
-    assert_equal sop.version, stored_sop.version
+    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset_id=sop.id }
+    assert_equal sop.version, stored_sop_assay_asset.version
 
     login_as sop.contributor
     sop.save_as_new_version
     login_as(:model_owner)
 
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}
     end
 
     assay.reload
-    stored_sop = assay.assay_assets.detect { |aa| aa.asset_id=sop.id }.versioned_asset
-    assert_equal sop.version, stored_sop.version
+    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset_id=sop.id }
+    assert_equal sop.version, stored_sop_assay_asset.version
 
 
   end
@@ -124,13 +124,13 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.sops.include?(sop.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :assay_sop_ids=>[sop.id], :assay=>{}
     end
 
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.sop_versions.include?(sop.latest_version)
+
     assert_not_equal timestamp, updated_assay.updated_at
 
   end
@@ -145,13 +145,15 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.data_files.include?(df.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :data_file_ids=>["#{df.id},Test data"], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay,
+          :data_files=>[{id: df.id, relationship_type: RelationshipType.find_by_title('Test data').id}],
+          :assay=>{}
     end
 
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.data_file_versions.include?(df.latest_version)
+
     assert_not_equal timestamp, updated_assay.updated_at
   end
 
@@ -164,13 +166,13 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>assay, :model_ids=>[model.id], :assay=>{}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>assay, :model_ids=>[model.id], :assay=>{}
     end
 
     assert_redirected_to assay_path(assay)
     assert assigns(:assay)
     updated_assay=Assay.find(assay.id)
-    assert updated_assay.model_versions.include?(model.latest_version)
+
     assert_not_equal timestamp, updated_assay.updated_at
   end
 
@@ -239,7 +241,7 @@ class AssaysControllerTest < ActionController::TestCase
     a=assays(:assay_with_no_study_or_files)
     s=studies(:metabolomics_study)
     assert_difference('ActivityLog.count') do
-      put :update, :id=>a, :assay=>{:study_id=>s}, :assay_sample_ids=>[Factory(:sample).id]
+      put :update, :id=>a, :assay=>{:study_id=>s}
     end
 
     assert_redirected_to assay_path(a)
@@ -247,64 +249,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_nil assigns(:assay).study
     assert_equal s, assigns(:assay).study
   end
-
-
-  test "should create experimental assay with or without sample" do
-    organism = Factory(:organism,:title=>"Frog")
-    strain = Factory(:strain, :title=>"UUU", :organism=>organism)
-    assert_difference('ActivityLog.count') do
-      assert_difference("Assay.count") do
-        post :create, :assay => {:title => "test",
-                                 :study_id => studies(:metabolomics_study).id,
-                                 :assay_class_id => assay_classes(:experimental_assay_class).id
-        }, :assay_organism_ids => [organism.id, strain.title, strain.id, ""].join(","), :sharing => valid_sharing
-      end
-    end
-    a=assigns(:assay)
-    assert a.samples.empty?
-
-
-    sample = Factory(:sample)
-    assert_difference('ActivityLog.count') do
-      assert_difference("Assay.count") do
-        post :create, :assay => {:title => "test",
-                                 :study_id => studies(:metabolomics_study).id,
-                                 :assay_class_id => assay_classes(:experimental_assay_class).id,
-                                 :sample_ids => [sample.id]
-        }, :sharing => valid_sharing
-
-      end
-    end
-    a=assigns(:assay)
-    assert_equal User.current_user.person, a.owner
-    assert_redirected_to assay_path(a)
-    assert_equal [sample], a.samples
-  end
-
-  test "should update assay with strains and organisms and sample" do
-    assay = Factory(:assay,:contributor=>User.current_user.person)
-    assert_empty assay.organisms
-    assert_empty assay.strains
-    assert_empty assay.samples
-
-
-    organism = Factory(:organism,:title=>"Frog")
-    strain = Factory(:strain, :title=>"UUU", :organism=>organism)
-    sample = Factory(:sample)
-
-    assert_difference("AssayOrganism.count") do
-      put :update, :id=>assay.id,:assay => {:title => "test"},
-                        :assay_organism_ids => [organism.id,strain.title, strain.id, ""].join(",")#,
-                        # :sharing => valid_sharing
-
-    end
-    assay = assigns(:assay)
-    assert_redirected_to assay_path(assay)
-    assert_include assay.organisms,organism
-    assert_include assay.strains,strain
-  end
-
-
 
   test "should create modelling assay with/without organisms" do
 
@@ -334,40 +278,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_include a.strains,strain
     assert_redirected_to assay_path(a)
 
-
-  end
-
-  test "should not create modelling assay with sample" do
-    person = Factory(:person)
-    assert_no_difference("Assay.count") do
-      post :create, :assay => {:title => "test",
-                               :study_id => studies(:metabolomics_study).id,
-                           :assay_class_id=>assay_classes(:modelling_assay_class).id,
-                           :sample_ids=>[Factory(:sample).id, Factory(:sample).id].join(",")
-                               },
-                               :sharing => valid_sharing
-    end
-    assert_response :success
-    assert assigns(:assay)
-    assay = assigns(:assay)
-    assert_equal 0, assay.samples.count
-  end
-
-  test "should create modelling assay with sample for virtual liver" do
-    as_virtualliver do
-      assert_difference("Assay.count") do
-        post :create, :assay => {:title => "test",
-                                 :study_id => studies(:metabolomics_study).id,
-                                 :assay_class_id => assay_classes(:modelling_assay_class).id,
-                                 :sample_ids => [Factory(:sample, :policy=>Factory(:public_policy)).id, Factory(:sample,:policy=>Factory(:public_policy)).id]},
-                                 :sharing => valid_sharing
-      end
-      assert assigns(:assay)
-      assay = assigns(:assay)
-      assert_redirected_to assay_path(assay)
-      assert_equal 2, assay.samples.count
-
-    end
 
   end
 
@@ -789,48 +699,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   end
 
-  def test_authorization_of_sops_and_datafiles_links_with_lazy_load
-    #sanity check the fixtures are correct
-    check_fixtures_for_authorization_of_sops_and_datafiles_links
-    login_as(:model_owner)
-    assay=assays(:assay_with_public_and_private_sops_and_datafiles)
 
-    with_config_value :tabs_lazy_load_enabled, true do
-
-      assert_difference('ActivityLog.count') do
-        get :show, :id => assay.id
-      end
-
-      assert_response :success
-
-      # tabs lazy loading: only first tab with items, and other tabs only item types and counts are shown.
-      assert_select "div.tabbertab" do
-        assert_select "h3", :text => "#{I18n.t('sop').pluralize} (2)", :count => 1
-        assert_select "h3", :text => "#{I18n.t('data_file').pluralize} (2)", :count => 1
-      end
-
-
-      data_file_ids = assay.data_file_versions.map &:data_file_id
-      get :resource_in_tab, {:resource_ids => data_file_ids.join(","), :resource_type => "DataFile", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-      assert_response :success
-      assert_select "div.list_item" do
-        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:downloadable_data_file)), :text => "Download Only", :count => 1
-        assert_select "div.list_item_actions a[href=?]", download_data_file_path(data_files(:downloadable_data_file)), :count => 1
-        assert_select "div.list_item_title a[href=?]", data_file_path(data_files(:private_data_file)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", download_data_file_path(data_files(:private_data_file)), :count => 0
-      end
-
-      sop_ids = assay.sop_versions.map &:sop_id
-      get :resource_in_tab, {:resource_ids => sop_ids.join(","), :resource_type => "Sop", :view_type => "view_some", :scale_title => "all", :actions_partial_disable => 'false'}
-      assert_response :success
-      assert_select "div.list_item" do
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_fully_public_policy)), :text => "SOP with fully public policy", :count => 1
-        assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_fully_public_policy)), :count => 1
-        assert_select "div.list_item_title a[href=?]", sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-        assert_select "div.list_item_actions a[href=?]", download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), :count => 0
-      end
-    end
-  end
   test "associated assets aren't lost on failed validation in create" do
     sop=sops(:sop_with_all_sysmo_users_policy)
     model=models(:model_with_links_in_description)
@@ -850,7 +719,7 @@ class AssaysControllerTest < ActionController::TestCase
           }, :sharing => valid_sharing ,
                :assay_sop_ids=>["#{sop.id}"],
                :model_ids=>["#{model.id}"],
-               :data_file_ids=>["#{datafile.id},#{rel.title}"]
+               :data_files=>[{id: datafile.id, relationship_type: rel.id}]
         end
       end
     end
@@ -862,10 +731,11 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select "script", :text=>/sop_id = '#{sop.id}'/, :count=>1
     assert_select "script", :text=>/model_title = '#{model.title}'/, :count=>1
     assert_select "script", :text=>/model_id = '#{model.id}'/, :count=>1
-    assert_select "script", :text=>/data_title = '#{datafile.title}'/, :count=>1
-    assert_select "script", :text=>/data_file_id = '#{datafile.id}'/, :count=>1
-    assert_select "script", :text=>/relationship_type = '#{rel.title}'/, :count=>1
-    assert_select "script", :text=>/addDataFile/, :count=>1
+    df_json = JSON.parse(select_node_contents('#data_file_to_list script'))
+    assert_equal 1, df_json.length
+    assert_equal datafile.title, df_json[0]['title']
+    assert_equal datafile.id, df_json[0]['id']
+    assert_equal rel.id.to_s, df_json[0]['relationship_type']['value']
     assert_select "script", :text=>/addSop/, :count=>1
     assert_select "script", :text=>/addModel/, :count=>1
   end
@@ -892,7 +762,7 @@ class AssaysControllerTest < ActionController::TestCase
           },
                :assay_sop_ids=>["#{sop.id}"],
                :model_ids=>["#{model.id}"],
-               :data_file_ids=>["#{df.id},#{rel.title}"],
+               :data_files=>[{id: df.id, relationship_type: rel.id}],
                :related_publication_ids=>["#{pub.id}"],
                :sharing => valid_sharing # default policy is nil in VLN
           end
@@ -934,7 +804,7 @@ class AssaysControllerTest < ActionController::TestCase
           put :update, :id=>assay, :assay=>{:title=>"", :assay_class_id=>assay_classes(:modelling_assay_class).id},
               :assay_sop_ids=>["#{sop.id}"],
               :model_ids=>["#{model.id}"],
-              :data_file_ids=>["#{datafile.id},#{rel.title}"]
+              :data_files=>[{id: datafile.id, relationship_type: rel.id}]
         end
       end
     end
@@ -946,10 +816,11 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select "script", :text=>/sop_id = '#{sop.id}'/, :count=>1
     assert_select "script", :text=>/model_title = '#{model.title}'/, :count=>1
     assert_select "script", :text=>/model_id = '#{model.id}'/, :count=>1
-    assert_select "script", :text=>/data_title = '#{datafile.title}'/, :count=>1
-    assert_select "script", :text=>/data_file_id = '#{datafile.id}'/, :count=>1
-    assert_select "script", :text=>/relationship_type = '#{rel.title}'/, :count=>1
-    assert_select "script", :text=>/addDataFile/, :count=>1
+    df_json = JSON.parse(select_node_contents('#data_file_to_list script'))
+    assert_equal 1, df_json.length
+    assert_equal datafile.title, df_json[0]['title']
+    assert_equal datafile.id, df_json[0]['id']
+    assert_equal rel.id.to_s, df_json[0]['relationship_type']['value']
     assert_select "script", :text=>/addSop/, :count=>1
     assert_select "script", :text=>/addModel/, :count=>1
   end
@@ -1016,8 +887,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:quentin)
     a = {:title=>"test",
          :study_id=>studies(:metabolomics_study).id,
-         :assay_class_id=>assay_classes(:experimental_assay_class).id,
-         :sample_ids=>[Factory(:sample).id]}
+         :assay_class_id=>assay_classes(:experimental_assay_class).id}
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
         post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}

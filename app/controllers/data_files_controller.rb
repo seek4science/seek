@@ -143,7 +143,7 @@ class DataFilesController < ApplicationController
 
       @data_file = DataFile.new params[:data_file]
 
-      @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
+      update_sharing_policies @data_file,params
 
       if @data_file.save
         update_annotations(params[:tag_list], @data_file)
@@ -209,10 +209,7 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       @data_file.attributes = data_file_params
 
-      if params[:sharing]
-        @data_file.policy_or_default
-        @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
-      end
+      update_sharing_policies @data_file,params
 
       if @data_file.save
 
@@ -238,10 +235,10 @@ class DataFilesController < ApplicationController
     sheet = params[:sheet] || 1
     trim = params[:trim] || false
     content_blob = @data_file.content_blob
+    file = open(content_blob.filepath)
     mime_extensions = mime_extensions(content_blob.content_type)
     if !(["xls","xlsx"] & mime_extensions).empty?
       respond_to do |format|
-        file = open(content_blob.filepath)
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
         format.xml {render :xml=>spreadsheet_to_xml(file) }
         format.csv {render :text=>spreadsheet_to_csv(file,sheet,trim) }
@@ -268,8 +265,8 @@ class DataFilesController < ApplicationController
   end
 
   def clear_population bio_samples
-      specimens = Specimen.find_all_by_title bio_samples.instance_values["specimen_names"].values
-      samples = Sample.find_all_by_title bio_samples.instance_values["sample_names"].values
+      specimens = DeprecatedSpecimen.find_all_by_title bio_samples.instance_values["specimen_names"].values
+      samples = DeprecatedSample.find_all_by_title bio_samples.instance_values["sample_names"].values
       samples.each do |s|
         s.assays.clear
         s.destroy
@@ -287,6 +284,42 @@ class DataFilesController < ApplicationController
     @matching_model_items = @matching_model_items.select{|mdf| authorised_ids.include?(mdf.primary_key.to_i)}
 
     flash.now[:notice]="#{@matching_model_items.count} #{t('model').pluralize}  were found that may be relevant to this #{t('data_file')} "
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def filter
+    if params[:with_samples]
+      scope = DataFile.with_extracted_samples
+    else
+      scope = DataFile
+    end
+
+    @data_files = DataFile.authorize_asset_collection(
+        scope.where("data_files.title LIKE ?", "#{params[:filter]}%"), 'view'
+    ).first(20)
+
+    respond_to do |format|
+      format.html { render :partial => 'data_files/association_preview', :collection => @data_files, :locals => { :hide_sample_count => !params[:with_samples] } }
+    end
+  end
+
+  def samples_table
+    respond_to do |format|
+      format.html do
+        render(partial: 'samples/table_view', locals: {
+          samples: @data_file.extracted_samples.includes(:sample_type),
+          source_url: samples_table_data_file_path(@data_file)
+        })
+      end
+      format.json { @samples = @data_file.extracted_samples.select([:id, :title, :json_metadata]) }
+    end
+  end
+
+  def select_sample_type
+    @possible_sample_types = @data_file.possible_sample_types
+
     respond_to do |format|
       format.html
     end
