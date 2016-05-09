@@ -54,4 +54,6 @@ boolean = SampleAttributeType.new title:"Boolean",base_type:'Boolean'
 boolean.save!
 seek_strain = SampleAttributeType.new title:"SEEK Strain",base_type:'SeekStrain'
 seek_strain.save!
+cv = SampleAttributeType.new title:"Controlled Vocabulary",base_type:'CV'
+cv.save!
 puts "Seeded sample attribute types."
