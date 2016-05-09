@@ -39,6 +39,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
         });
     }
 
+    // Date Columns
     var dateColumns = [];
     $j('table thead th', selector).each(function (index, column) {
         if($j(column).data('columnType') == 'Date' ||
@@ -52,7 +53,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             "type": "date"
         });
     }
-    // Parse Strain data into a link
+    // Strain columns
     // Only needed if we're loading the data from ajax
     if($j('table', selector).data('sourceUrl')) {
         var strainColumns = [];
@@ -77,6 +78,17 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             });
         }
     }
+    // Title column
+    $j('table thead th', selector).each(function (index, column) {
+        if($j(column).data('titleColumn')) {
+            options["columnDefs"].push({
+                "targets": [index],
+                "render": function (data, type, row) {
+                    return '<a href="/samples/' + row.id + '">' + row.title + '</a>';
+                }
+            });
+        }
+    });
 
     if(enableRowSelection) {
         $j.extend(options, options, {

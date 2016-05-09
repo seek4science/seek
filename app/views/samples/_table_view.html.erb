@@ -12,7 +12,7 @@
                 <th>ID</th>
                 <th>Title</th>
                 <% shown_attributes.each do |attribute| %>
-                    <th data-hash-key="<%= attribute.hash_key -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
+                    <th <%= 'data-title-column="true" ' if (attribute.is_title && link) -%>data-hash-key="<%= attribute.hash_key -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
                 <% end %>
               </tr>
           <% end %>
