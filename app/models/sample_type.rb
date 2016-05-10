@@ -51,6 +51,17 @@ class SampleType < ActiveRecord::Base
     end
   end
 
+  #fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
+  # this is to help when a controlled vocab has been selected in the form, but then the type has been changed
+  # rather than clearing the selected vocab each time
+  def fix_up_controlled_vocabs
+    sample_attributes.each do |attribute|
+      unless attribute.sample_attribute_type.is_controlled_vocab?
+        attribute.sample_controlled_vocab=nil
+      end
+    end
+  end
+
   def compatible_template_file?
     template_handler.compatible?
   end

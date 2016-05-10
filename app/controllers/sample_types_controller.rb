@@ -68,6 +68,9 @@ class SampleTypesController < ApplicationController
   # POST /sample_types.json
   def create
     @sample_type = SampleType.new(params[:sample_type])
+
+    #removes controlled vocabularies set on attributes where the type is not CV
+    @sample_type.fix_up_controlled_vocabs
     @tab = 'manual'
 
     respond_to do |format|

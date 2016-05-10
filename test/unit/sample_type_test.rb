@@ -303,6 +303,23 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert blob.destroyed?
   end
 
+  test 'fix up controlled vocabs' do
+    type = Factory(:simple_sample_type)
+    string_attribute=Factory(:simple_string_sample_attribute,:sample_type=>type,:title=>'string type')
+    string_attribute.sample_controlled_vocab=Factory(:apples_sample_controlled_vocab)
+    type.sample_attributes << string_attribute
+    type.sample_attributes << Factory(:apples_controlled_vocab_attribute,:sample_type=>type,:title=>'cv type')
+
+    refute type.valid?
+    type.fix_up_controlled_vocabs
+    assert_nil type.sample_attributes[0].sample_controlled_vocab
+    refute type.sample_attributes[0].sample_attribute_type.is_controlled_vocab?
+    assert_nil type.sample_attributes[1].sample_controlled_vocab
+    refute type.sample_attributes[1].sample_attribute_type.is_controlled_vocab?
+    refute_nil type.sample_attributes[2].sample_controlled_vocab
+    assert type.sample_attributes[2].sample_attribute_type.is_controlled_vocab?
+  end
+
   test 'dependant attributes destroyed' do
     type = Factory(:patient_sample_type)
     attribute_count = type.sample_attributes.count

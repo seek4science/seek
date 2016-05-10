@@ -63,7 +63,18 @@ var SampleTypes = {
             $j(':input:not(.destroy-attribute)', row).prop('disabled', false);
         }
         SampleTypes.checkForIsTitle();
-    }
+    },
 
+    attributeTypeChanged: function () {
+        //check if it is a controlled vocab, and change the state of the controlled vocab selector if need be
+        var is_cv = $j(this).find(':selected').data('is-cv');
+        var cv_element = $j(this).siblings('.controlled-vocab-block');
+        if (is_cv) {
+            cv_element.show();
+        }
+        else {
+            cv_element.hide();
+        }
+    }
 
 };
