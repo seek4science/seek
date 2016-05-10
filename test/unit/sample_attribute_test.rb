@@ -211,6 +211,7 @@ class SampleAttributeTest < ActiveSupport::TestCase
     assert attribute.valid?
     refute_nil attribute.sample_controlled_vocab
     assert_equal 'CV',attribute.sample_attribute_type.base_type
+    assert attribute.sample_attribute_type.is_controlled_vocab?
   end
 
   test 'controlled vocab validate value' do
