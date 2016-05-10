@@ -45,7 +45,7 @@ class Ability
     can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
       user = item.contributor
       asset_housekeeper.is_asset_housekeeper_of?(item) &&
-          (user.nil? || (item.projects - user.person.former_projects).none?)
+          (item.managers.empty? || (item.projects - user.person.former_projects).none?)
     end
   end
 
