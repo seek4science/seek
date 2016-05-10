@@ -219,4 +219,20 @@ class DataFile < ActiveRecord::Base
     extracted_samples
   end
 
+  # Extracts samples using the given sample_type
+  # Returns a list of extracted samples, including
+  def extract_samples(sample_type, confirm = false)
+    samples = sample_type.build_samples_from_template(self.content_blob)
+    extracted = []
+    samples.each do |sample|
+      sample.contributor = self.contributor
+      sample.originating_data_file = self
+      sample.policy = self.policy.deep_copy
+      sample.save if sample.valid? && confirm
+
+      extracted << sample
+    end
+    extracted
+  end
+
 end
