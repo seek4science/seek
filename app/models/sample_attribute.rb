@@ -68,10 +68,10 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   def sample_controlled_vocab_and_attribute_type_consistency
-    if sample_attribute_type && sample_controlled_vocab && sample_attribute_type.base_type!='CV'
+    if sample_attribute_type && sample_controlled_vocab && !sample_attribute_type.is_controlled_vocab?
       errors.add(:sample_attribute_type, "Attribute type must be CV if controlled vocabulary set")
     end
-    if sample_attribute_type && sample_attribute_type.base_type=='CV' && sample_controlled_vocab.nil?
+    if sample_attribute_type && sample_attribute_type.is_controlled_vocab? && sample_controlled_vocab.nil?
       errors.add(:sample_controlled_vocab, "Controlled vocabulary must be set if attribute type is CV")
     end
   end
