@@ -16,6 +16,7 @@ module Seek
       if Seek::Config.cache_remote_files
         commands << "--queue=#{RemoteContentFetchingJob.queue_name} -i #{number + 2} #{action}"
       end
+      commands << "--queue=#{SampleDataExtractionJob.queue_name} -i #{number + 3} #{action}"
       if number > 0
         commands << "--queue=#{TavernaPlayer.job_queue_name} -n #{number} #{action}"
       end
