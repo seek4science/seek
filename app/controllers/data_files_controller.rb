@@ -327,15 +327,10 @@ class DataFilesController < ApplicationController
   end
 
   def extract_samples
-    @poll = true
     if params[:confirm]
       extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
-      if extractor.fetch.nil?
-        SampleDataExtractionJob.new(@data_file, @sample_type, true).queue_job
-      else
-        @samples = extractor.persist
-        @poll = false
-      end
+      @samples = extractor.persist.select(&:persisted?)
+      flash[:notice] = "#{@samples.count} samples extracted successfully"
     else
       SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
     end

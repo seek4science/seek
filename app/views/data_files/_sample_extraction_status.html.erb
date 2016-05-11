@@ -1,28 +1,30 @@
 <div id="sample-extraction-status">
-  <%= rand %>
   <% @job_status ||= SampleDataExtractionJob.get_status(data_file) %>
   <% if data_file.can_manage? && (@job_status || @previous_status) %>
       <div class="alert alert-info" role="alert">
-        <strong>Extracting samples</strong>
-        <span id="sample-extraction-status"><%= @previous_status %> -> <%= @job_status %></span>
-        <% if @job_status.nil? && @previous_status && data_file.extracted_samples.none? %>
-          Extraction complete, please review the extracted samples:
-          <%= link_to('Review Extracted Samples', confirm_extraction_data_file_path(data_file), class: 'btn btn-primary') %>
+        <strong>Sample extraction:</strong>
+        <% if @job_status.nil? && @previous_status %>
+            Waiting for confirmation
+            <p>
+              Please review the extracted samples by clicking the button below.
+            </p>
+            <%= link_to('Review Extracted Samples', confirm_extraction_data_file_path(data_file),
+                        class: 'btn btn-primary') %>
+        <% else %>
+            <%= @job_status.to_s.humanize %>
         <% end %>
         <% if [:running, :pending].include?(@job_status) %>
             <%= image 'spinner' %>
             <script>
-                setTimeout(function () {
-                  console.log('hey');
-                  $j.ajax('<%= extraction_status_data_file_path(data_file) %>', {
-                        data: { 'previous_status': '<%= @job_status -%>' },
-                        success: function (html) {
-                          console.log('success');
-                          $j('#sample-extraction-status').replaceWith(html);
-                        }
+              setTimeout(function () {
+                $j.ajax('<%= extraction_status_data_file_path(data_file) %>', {
+                      data: { 'previous_status': '<%= @job_status -%>' },
+                      success: function (html) {
+                        $j('#sample-extraction-status').replaceWith(html);
                       }
-                  );
-                }, 5000);
+                    }
+                );
+              }, 5000);
             </script>
         <% end %>
       </div>
