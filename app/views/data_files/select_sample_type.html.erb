@@ -2,12 +2,13 @@
 
 This data file matches multiple sample types. Please choose the correct sample type below and click "Continue".
 
-<%= form_tag(extract_from_data_file_samples_path(:data_file_id => @data_file.id)) do %>
+<%= form_tag(extract_samples_data_file_path(@data_file)) do %>
     <div class="form-group">
       <label>Sample Type</label>
-      <%= select_tag(:sample_type_id, options_from_collection_for_select(@possible_sample_types, :id, :title), class: 'form-control') %>
+      <%= select_tag(:sample_type_id, options_from_collection_for_select(@possible_sample_types, :id, :title),
+                     class: 'form-control') %>
     </div>
 
-    <%= submit_tag "Continue", :class => 'btn btn-primary'-%>
-    or <%= cancel_button(data_files_path) -%>
+    <%= submit_tag "Continue", class: 'btn btn-primary'-%>
+    or <%= cancel_button(data_file_path(@data_file)) -%>
 <% end %>
