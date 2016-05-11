@@ -14,27 +14,15 @@ class SamplesController < ApplicationController
   include Seek::BreadCrumbs
 
   def extract_from_data_file
-    @rejected_samples = []
-    @samples = []
-
-    samples = @sample_type.build_samples_from_template(@data_file.content_blob)
-    samples.each do |sample|
-      sample.contributor=User.current_user
-      sample.originating_data_file = @data_file
-      sample.policy=Policy.public_policy
-      if sample.valid?
-        sample.save if params[:confirm]
-        @samples << sample
-      else
-        @rejected_samples << sample
-      end
-    end
     if params[:confirm]
-      @show_confirmation = false
-      flash[:notice]="#{@samples.count} samples created, #{@rejected_samples.count} rejected"
+      if @samples = Seek::Samples::Extractor.new(@data_file, @sample_type).fetch
+      else
+        SampleDataExtractionJob.new(@data_file, @sample_type, true).queue_job
+      end
     else
-      @show_confirmation = true
+      SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
     end
+
     respond_to do |format|
       format.html
     end
@@ -128,26 +116,6 @@ class SamplesController < ApplicationController
       flash[:error] = "You are not authorize to extract samples from this data file"
       respond_to do |format|
         format.html { redirect_to data_file_path(@data_file)}
-      end
-    end
-  end
-
-  def get_sample_type
-    if params[:sample_type_id] || @data_file.possible_sample_types.count == 1
-      if params[:sample_type_id]
-        @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
-      else
-        @sample_type = @data_file.possible_sample_types.last
-      end
-    elsif @data_file.possible_sample_types.count > 1
-      # Redirect to sample type selector
-      respond_to do |format|
-        format.html { redirect_to select_sample_type_data_file_path(@data_file) }
-      end
-    else
-      flash[:error] = "Couldn't determine the sample type of this data"
-      respond_to do |format|
-        format.html { redirect_to @data_file }
       end
     end
   end

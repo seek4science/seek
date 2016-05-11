@@ -377,6 +377,9 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :samples_table
       get :select_sample_type
+      get :confirm_extraction
+      get :extraction_status
+      post :extract_samples
     end
     resources :studied_factors do
       collection do
@@ -662,7 +665,6 @@ SEEK::Application.routes.draw do
       get :attribute_form
       get :preview
       get :filter
-      post :extract_from_data_file
     end
     member do
       post :update_annotations_ajax

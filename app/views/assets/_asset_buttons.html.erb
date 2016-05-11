@@ -10,7 +10,7 @@
     <% end %>
     <% if (asset.can_manage? && display_asset.version == asset.version && asset.sample_template? && asset.extracted_samples.empty?) %>
         <%= button_link_to("Extract samples", 'extract_samples',
-                           extract_from_data_file_samples_path(:data_file_id=>@data_file.id), method: :post) %>
+                           extract_samples_data_file_path(@data_file), method: :post) %>
     <% end %>
 <% end %>
 
