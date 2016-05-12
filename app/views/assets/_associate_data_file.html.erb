@@ -6,7 +6,7 @@
   if params[:data_files] && params[:data_files].any?
     collapse_panel = false
     associated_data_files_json = associations_json_from_params(DataFile, params[:data_files])
-  elsif resource.respond_to?(:asset_assets)
+  elsif resource.respond_to?(:assay_assets)
     assay_assets = resource.assay_assets.where(asset_type: 'DataFile').includes(:asset, :relationship_type)
     collapse_panel = assay_assets.empty?
     associated_data_files_json = associations_json_from_assay_assets(assay_assets)
