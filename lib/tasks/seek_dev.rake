@@ -389,4 +389,25 @@ namespace :seek_dev do
     end
   end
 
+  desc('Forces the making public of all DataFiles, Models and SOPs in a project, logging it as published by the person id provided. This was a requirement of SysMO and is really specific to those projects')
+  task :publish_project_items,[:project_id,:person_id] => :environment do |t, args|
+    project_id = args.project_id
+    person_id = args.person_id
+    project = Project.find(project_id)
+    assets = project.assets | project.investigations | project.studies | project.assays
+    assets = assets.select{|asset| !asset.is_published?}
+
+    user = Person.find(person_id).user
+
+    User.with_current_user(user) do
+      disable_authorization_checks do
+        assets.each do |asset|
+          result = asset.publish!("published from rake task script :publish_project_items",true)
+          puts "#{asset.class.name} - #{asset.id} - #{result}"
+        end
+      end
+    end
+
+  end
+
 end
