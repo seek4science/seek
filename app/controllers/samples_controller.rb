@@ -8,25 +8,6 @@ class SamplesController < ApplicationController
   before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview]
 
   before_filter :auth_to_create, :only=>[:new,:create]
-  before_filter :find_and_authorize_data_file, :only => :extract_from_data_file
-  before_filter :get_sample_type, :only => :extract_from_data_file
-
-  include Seek::BreadCrumbs
-
-  def extract_from_data_file
-    if params[:confirm]
-      if @samples = Seek::Samples::Extractor.new(@data_file, @sample_type).fetch
-      else
-        SampleDataExtractionJob.new(@data_file, @sample_type, true).queue_job
-      end
-    else
-      SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
-    end
-
-    respond_to do |format|
-      format.html
-    end
-  end
 
   def index
     if @data_file || @sample_type
