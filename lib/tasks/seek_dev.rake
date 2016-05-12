@@ -394,7 +394,7 @@ namespace :seek_dev do
     project_id = args.project_id
     person_id = args.person_id
     project = Project.find(project_id)
-    assets = project.data_files | project.sops | project.models
+    assets = project.assets | project.investigations | project.studies | project.assays
     assets = assets.select{|asset| !asset.is_published?}
 
     user = Person.find(person_id).user
