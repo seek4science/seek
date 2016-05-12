@@ -42,15 +42,15 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     attribute = SampleAttributeType.new(title: 'fish', base_type: 'Integer')
     assert attribute.validate_value?(1)
     assert attribute.validate_value?('1')
+    assert attribute.validate_value?('01')
     refute attribute.validate_value?('frog')
     refute attribute.validate_value?('1.1')
     refute attribute.validate_value?(1.1)
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
-
-    refute attribute.validate_value?(1.0)
-    refute attribute.validate_value?('1.0')
+    # refute attribute.validate_value?(1.0)
+  #  refute attribute.validate_value?('1.0')
 
     attribute = SampleAttributeType.new(title: 'fish', base_type: 'String', regexp: '.*yyy')
     assert attribute.validate_value?('yyy')
@@ -80,6 +80,9 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     assert attribute.validate_value?(1.0)
     assert attribute.validate_value?(1)
     assert attribute.validate_value?('1.0')
+    assert attribute.validate_value?('012')
+    assert attribute.validate_value?('012.3')
+    assert attribute.validate_value?('12.30')
     assert attribute.validate_value?('1')
 
     attribute = SampleAttributeType.new(title: 'fish', base_type: 'DateTime')
