@@ -43,9 +43,7 @@ class Ability
   #asset housekeeper can manage the assets belonging to their project
   def asset_housekeeper asset_housekeeper
     can [:manage_asset, :delete, :edit, :download, :view], :all do |item|
-      user = item.contributor
-      asset_housekeeper.is_asset_housekeeper_of?(item) &&
-          (item.managers.empty? || (item.projects - user.person.former_projects).none?)
+      item.managers.map { |manager| (item.projects - manager.person.former_projects).none? }.all?
     end
   end
 
