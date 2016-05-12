@@ -3,7 +3,8 @@
 <% if total > 0 %>
     <div class="alert alert-info">
       The following samples were detected in the data file.
-      Please review them, then click "Confirm" below to complete the process, or "Cancel" to go back.
+      Please review them, then click "Confirm" below to complete the process, or "Cancel Extraction" to cancel
+      the extraction process.
     </div>
     <div>
       <ul class="nav nav-tabs" role="tablist">
@@ -55,6 +56,6 @@
     <%= hidden_field_tag(:sample_type_id, @samples.first.sample_type_id) %>
     <%= hidden_field_tag(:confirm, 'true') %>
     <%= submit_tag "Confirm", :class => 'btn btn-primary'-%>
+    or <%= cancel_button(cancel_extraction_data_file_path(@data_file), button_text: 'Cancel Extraction', method: :delete) -%>
 <% end %>
-or <%= cancel_button(cancel_extraction_data_file, method: :delete) -%>
 

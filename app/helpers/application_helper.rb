@@ -584,7 +584,8 @@ module ApplicationHelper
   def cancel_button path,html_options={}
     html_options[:class]||=''
     html_options[:class] << ' btn btn-default'
-    link_to 'Cancel',path,html_options
+    text = html_options.delete(:button_text) || 'Cancel'
+    link_to text, path, html_options
   end
 
   private  

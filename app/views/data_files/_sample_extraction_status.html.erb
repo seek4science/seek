@@ -1,19 +1,20 @@
+<% @job_status ||= SampleDataExtractionJob.get_status(data_file) %>
+<% waiting_for_confirmation = !Seek::Samples::Extractor.new(data_file).fetch.nil? %>
+
 <div id="sample-extraction-status">
-  <% @job_status ||= SampleDataExtractionJob.get_status(data_file) %>
-  <% if data_file.can_manage? && (@job_status || @previous_status) %>
+  <% if data_file.can_manage? && (waiting_for_confirmation || [:running, :pending].include?(@job_status)) %>
       <div class="alert alert-info" role="alert">
         <strong>Sample extraction:</strong>
-        <% if @job_status.nil? && @previous_status %>
+        <% if waiting_for_confirmation %>
             Waiting for confirmation
             <p>
-              Please review the extracted samples by clicking the button below.
+              Please review the extracted samples by clicking the button below, and decide whether to continue or cancel
+              the extraction process.
             </p>
             <%= link_to('Review Extracted Samples', confirm_extraction_data_file_path(data_file),
                         class: 'btn btn-primary') %>
         <% else %>
             <%= @job_status.to_s.humanize %>
-        <% end %>
-        <% if [:running, :pending].include?(@job_status) %>
             <%= image 'spinner' %>
             <script>
               setTimeout(function () {

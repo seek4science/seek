@@ -30,10 +30,13 @@ class SampleDataExtractionJob
   end
 
   def perform
+    extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
+
     if @persist
-      Seek::Samples::Extractor.new(@data_file, @sample_type).persist
+      extractor.persist
     else
-      Seek::Samples::Extractor.new(@data_file, @sample_type).extract
+      extractor.clear
+      extractor.extract
     end
   end
 
