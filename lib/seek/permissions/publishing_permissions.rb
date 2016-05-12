@@ -30,8 +30,8 @@ module Seek
         end
       end
 
-      def publish!(comment = nil)
-        if can_publish?
+      def publish!(comment = nil, force=false)
+        if (force || can_publish?)
           if gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
             false
           else
