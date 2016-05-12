@@ -10,25 +10,33 @@ module Seek
         @sample_type = sample_type
       end
 
+      # Extract samples and store in the filesystem temporarily
       def extract
         # Marshalling doesn't seem to work on AR objects, so we just extract the attributes into a hash and then
         # rebuild them on load
         self.class.decode(cache { self.class.encode(@data_file.extract_samples(@sample_type)) })
       end
 
+      # Persist the extracted samples to the database
       def persist
         samples = extract # Re-extracts samples if cache expired, otherwise returns the cached samples
 
         samples.each(&:save)
       end
 
+      # Clear the temporarily-stored samples
+      def clear
+        File.delete(cache_path) if File.exist?(cache_path)
+      end
+
+      # Return the temporarily-stored samples if they exist (nil if not)
       def fetch
         self.class.decode(cache)
       end
 
       private
 
-      def development_cache_path
+      def cache_path
         "#{Seek::Config.temporary_filestore_path}/#{cache_key}"
       end
 
@@ -37,20 +45,16 @@ module Seek
       end
 
       def cache(&block)
-        if Rails.env.development?
-          if File.exist?(development_cache_path)
-            Marshal.load(File.binread(development_cache_path))
-          elsif block_given?
-            File.open(development_cache_path, 'wb') do |f|
-              v = block.call
-              f.write(Marshal.dump(v))
-              v
-            end
-          else
-            nil
+        if File.exist?(cache_path)
+          Marshal.load(File.binread(cache_path))
+        elsif block_given?
+          File.open(cache_path, 'wb') do |f|
+            v = block.call
+            f.write(Marshal.dump(v))
+            v
           end
         else
-          Rails.cache.fetch(cache_key, &block)
+          nil
         end
       end
 
