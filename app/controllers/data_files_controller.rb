@@ -16,6 +16,7 @@ class DataFilesController < ApplicationController
   skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, :only => [:upload_for_tool,:upload_from_email]
   before_filter :get_sample_type, :only => :extract_samples
+  before_filter :check_already_extracted, :only => :extract_samples
 
   #has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -396,6 +397,15 @@ class DataFilesController < ApplicationController
       end
     else
       flash[:error] = "Couldn't determine the sample type of this data"
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
+    end
+  end
+
+  def check_already_extracted
+    if @data_file.extracted_samples.any?
+      flash[:error] = "Already extracted samples from this data file"
       respond_to do |format|
         format.html { redirect_to @data_file }
       end
