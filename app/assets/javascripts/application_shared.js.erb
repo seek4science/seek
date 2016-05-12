@@ -231,7 +231,11 @@ function digValue(object, path) {
   keys = path.split('.');
 
   var value = object[keys.shift()];
+
   keys.forEach(function (key) {
+    if (typeof value === 'undefined') {
+      return value;
+    }
     value = value[key];
   });
 
