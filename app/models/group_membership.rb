@@ -6,7 +6,7 @@ class GroupMembership < ActiveRecord::Base
   has_many :group_memberships_project_positions, :dependent => :destroy
   has_many :project_positions, :through => :group_memberships_project_positions
 
-  after_save :remember_previous_person
+  after_save :remember_previous_person,:remember_time_left_at_changed
   after_update { remove_admin_defined_role_projects if has_left }
   after_commit :queue_update_auth_table
 
@@ -29,11 +29,19 @@ class GroupMembership < ActiveRecord::Base
     @previous_person_id = person_id_was
   end
 
+  def remember_time_left_at_changed
+    @was_time_left_at_changed=self.time_left_at_changed?
+  end
+
   def queue_update_auth_table
     people = [Person.find_by_id(person_id)]
     people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
+    if @was_time_left_at_changed && project
+      people = people | project.asset_housekeepers
+    end
 
-    AuthLookupUpdateJob.new.add_items_to_queue people.compact
+    AuthLookupUpdateJob.new.add_items_to_queue people.compact.uniq
+
   end
 
   #whether the person can remove this person from the project. If they are an administrator and related programme administrator they can, but otherwise they cannot remove themself.
