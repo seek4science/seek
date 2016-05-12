@@ -59,8 +59,10 @@ module Seek
       end
 
       def self.decode(values)
-        values.map do |value|
-          Sample.new.tap { |s| s.assign_attributes(value, without_protection: true) }
+        if values
+          values.map do |value|
+            Sample.new.tap { |s| s.assign_attributes(value, without_protection: true) }
+          end
         end
       end
     end
