@@ -380,6 +380,7 @@ SEEK::Application.routes.draw do
       get :confirm_extraction
       get :extraction_status
       post :extract_samples
+      delete :cancel_extraction
     end
     resources :studied_factors do
       collection do

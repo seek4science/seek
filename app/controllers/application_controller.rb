@@ -251,8 +251,8 @@ class ApplicationController < ActionController::Base
         'delete'
 
       when 'manage', 'notification', 'read_interaction', 'write_interaction', 'report_problem', 'storage_report',
-          'select_sample_type', 'extraction_status', 'extract_samples', 'confirm_extraction'
-          'manage'
+          'select_sample_type', 'extraction_status', 'extract_samples', 'confirm_extraction', 'cancel_extraction'
+        'manage'
       else
         nil
     end

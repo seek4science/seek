@@ -55,5 +55,6 @@
     <%= hidden_field_tag(:sample_type_id, @samples.first.sample_type_id) %>
     <%= hidden_field_tag(:confirm, 'true') %>
     <%= submit_tag "Confirm", :class => 'btn btn-primary'-%>
-    or <%= cancel_button(data_files_path) -%>
 <% end %>
+or <%= cancel_button(cancel_extraction_data_file, method: :delete) -%>
+

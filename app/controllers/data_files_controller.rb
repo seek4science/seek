@@ -330,6 +330,7 @@ class DataFilesController < ApplicationController
     if params[:confirm]
       extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
       @samples = extractor.persist.select(&:persisted?)
+      extractor.clear
       flash[:notice] = "#{@samples.count} samples extracted successfully"
     else
       SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
@@ -345,6 +346,15 @@ class DataFilesController < ApplicationController
 
     respond_to do |format|
       format.html
+    end
+  end
+
+  def cancel_extraction
+    Seek::Samples::Extractor.new(@data_file).clear
+
+    respond_to do |format|
+      flash[:notice] = "Sample extraction cancelled"
+      format.html { redirect_to @data_file }
     end
   end
 
