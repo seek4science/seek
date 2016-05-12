@@ -228,7 +228,7 @@ function show_large_ajax_loader(element) {
 // e.g. digValue({a: {b: {c: 1}}}, 'a.b.c') => 1
 
 function digValue(object, path) {
-  keys = path.split('.');
+  var keys = path.split('.');
 
   var value = object[keys.shift()];
 
