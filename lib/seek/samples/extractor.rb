@@ -3,8 +3,6 @@ module Seek
     # Class to handle the extraction and temporary storage of samples from a data file
     class Extractor
 
-      TTL = 1.week # Time to store the cache of extracted samples
-
       def initialize(data_file, sample_type = nil)
         @data_file = data_file
         @sample_type = sample_type
