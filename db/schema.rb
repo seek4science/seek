@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160505094646) do
+ActiveRecord::Schema.define(:version => 20160513124317) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -423,9 +423,9 @@ ActiveRecord::Schema.define(:version => 20160505094646) do
     t.string   "provider_name"
     t.string   "age_at_sampling"
     t.string   "uuid"
-    t.integer  "age_at_sampling_unit_id"
     t.string   "sample_type"
     t.string   "treatment"
+    t.integer  "age_at_sampling_unit_id"
   end
 
   create_table "deprecated_samples_projects", :id => false, :force => true do |t|
@@ -828,9 +828,9 @@ ActiveRecord::Schema.define(:version => 20160505094646) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
-    t.integer  "model_image_id"
     t.string   "doi"
     t.string   "license"
   end
@@ -860,9 +860,9 @@ ActiveRecord::Schema.define(:version => 20160505094646) do
     t.text     "other_creators"
     t.string   "uuid"
     t.integer  "policy_id"
+    t.integer  "model_image_id"
     t.string   "imported_source"
     t.string   "imported_url"
-    t.integer  "model_image_id"
     t.string   "doi"
     t.string   "license"
   end
@@ -1796,10 +1796,10 @@ ActiveRecord::Schema.define(:version => 20160505094646) do
   end
 
   create_table "text_value_versions", :force => true do |t|
-    t.integer  "text_value_id",                          :null => false
-    t.integer  "version",                                :null => false
+    t.integer  "text_value_id",                            :null => false
+    t.integer  "version",                                  :null => false
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1809,7 +1809,7 @@ ActiveRecord::Schema.define(:version => 20160505094646) do
   create_table "text_values", :force => true do |t|
     t.integer  "version"
     t.integer  "version_creator_id"
-    t.text     "text",               :limit => 16777215, :null => false
+    t.text     "text",               :limit => 2147483647, :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
