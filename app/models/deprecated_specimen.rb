@@ -44,8 +44,8 @@ class DeprecatedSpecimen < ActiveRecord::Base
   # DEPRECATED
   has_many :deprecated_samples
   has_many :deprecated_treatments, dependent: :destroy
-  has_many :sop_specimens, dependent: :destroy
-  has_many :sops, through: :sop_specimens
+  has_many :sop_deprecated_specimens, dependent: :destroy
+  has_many :sops, through: :sop_deprecated_specimens
 
   HUMANIZED_COLUMNS = Seek::Config.is_virtualliver ? {} : { born: 'culture starting date', culture_growth_type: 'culture type' }
   HUMANIZED_COLUMNS[:title] = "#{(I18n.t 'biosamples.sample_parent_term').capitalize} title"
