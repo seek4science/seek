@@ -1,0 +1,45 @@
+<%= form_for(@sample_controlled_vocab) do |f| %>
+
+<%= f.error_messages %>
+
+<div class="form-group">
+  <label>Title</label><%= required_span %>
+  <%= f.text_field :title, :class => 'form-control', :placeholder => 'Controlled vocabulary name' %>
+</div>
+
+
+<h2>Terms</h2>
+<ul id="new-terms">
+<%= f.fields_for :sample_controlled_vocab_terms do |terms_f| %>
+    <li><%= terms_f.text_field :label, :class => 'form-control'  %></li>
+<% end %>
+  <%= button_link_to('Add new term', 'add', '#', :id => 'add-term') %>
+</ul>
+
+
+
+
+
+<p class="actions">
+  <%= f.submit (@sample_controlled_vocab.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
+  or
+  <%= cancel_button(@sample_controlled_vocab.new_record? ? sample_controlled_vocabs_path : sample_controlled_vocab_path(@sample_controlled_vocab)) %>
+</p>
+
+<% end %>
+
+<div id="new-term-list-item" style="display: none">
+  <li>
+    <input class="form-control" id="sample_controlled_vocab_sample_controlled_vocab_terms_attributes_--index--_label" name="sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][label]" type="text">
+  </li>
+</div>
+
+<script>
+    $j('#add-term').click(function () {
+        var newTerm = $j('#new-term-list-item').clone().html();
+        var index = $j('#new-terms li').length;
+        newTerm = newTerm.replace(/--index--/g, index);
+        $j('#add-term').before($j(newTerm));
+        return false;
+    });
+</script>
