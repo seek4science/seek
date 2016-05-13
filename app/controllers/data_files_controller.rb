@@ -15,6 +15,8 @@ class DataFilesController < ApplicationController
   before_filter :find_display_asset, :only=>[:show,:explore,:download,:matching_models]
   skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, :only => [:upload_for_tool,:upload_from_email]
+  before_filter :get_sample_type, :only => :extract_samples
+  before_filter :check_already_extracted, :only => :extract_samples
 
   #has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -325,6 +327,47 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def extract_samples
+    if params[:confirm]
+      extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
+      @samples = extractor.persist.select(&:persisted?)
+      extractor.clear
+      flash[:notice] = "#{@samples.count} samples extracted successfully"
+    else
+      SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
+    end
+
+    respond_to do |format|
+      format.html { redirect_to @data_file }
+    end
+  end
+
+  def confirm_extraction
+    @samples, @rejected_samples = Seek::Samples::Extractor.new(@data_file).fetch.partition(&:valid?)
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def cancel_extraction
+    Seek::Samples::Extractor.new(@data_file).clear
+
+    respond_to do |format|
+      flash[:notice] = "Sample extraction cancelled"
+      format.html { redirect_to @data_file }
+    end
+  end
+
+  def extraction_status
+    @previous_status = params[:previous_status]
+    @job_status = SampleDataExtractionJob.get_status(@data_file)
+
+    respond_to do |format|
+      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
+    end
+  end
+
   protected
 
   def translate_action action
@@ -337,6 +380,35 @@ class DataFilesController < ApplicationController
     unless session[:xml_login]
       flash[:error] = "Only available when logged in via xml"
       redirect_to root_url
+    end
+  end
+
+  def get_sample_type
+    if params[:sample_type_id] || @data_file.possible_sample_types.count == 1
+      if params[:sample_type_id]
+        @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
+      else
+        @sample_type = @data_file.possible_sample_types.last
+      end
+    elsif @data_file.possible_sample_types.count > 1
+      # Redirect to sample type selector
+      respond_to do |format|
+        format.html { redirect_to select_sample_type_data_file_path(@data_file) }
+      end
+    else
+      flash[:error] = "Couldn't determine the sample type of this data"
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
+    end
+  end
+
+  def check_already_extracted
+    if @data_file.extracted_samples.any?
+      flash[:error] = "Already extracted samples from this data file"
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
     end
   end
 

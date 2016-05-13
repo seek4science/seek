@@ -2266,6 +2266,165 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :forbidden
   end
 
+  test "can't extract from data file if no permissions" do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    login_as(another_person)
+
+    assert_no_difference("Sample.count") do
+      post :extract_samples, id: data_file, confirm: 'true'
+    end
+
+    assert_redirected_to data_file_path(data_file)
+    assert_not_empty flash[:error]
+  end
+
+
+  test 'strain samples successfully extracted from spreadsheet' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:strain_sample_data_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:strain_sample_data_content_blob)
+    sample_type.build_attributes_from_template
+    attribute_type = sample_type.sample_attributes.last
+    attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
+    attribute_type.required = true
+    sample_type.save!
+
+    assert_difference("Sample.count", 3) do
+      post :extract_samples, id: data_file.id, confirm: 'true'
+    end
+
+    assert (samples = assigns(:samples))
+    assert_equal 3, samples.count
+    assert_equal samples.sort, data_file.extracted_samples.sort
+  end
+
+  test 'extract from data file' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_difference("Sample.count",3) do
+      post :extract_samples, id: data_file.id, confirm: 'true'
+    end
+
+    assert_redirected_to data_file_path(data_file)
+
+    assert (samples = assigns(:samples))
+    assert_equal 3, samples.count
+    assert_not_includes samples.map {|s| s.get_attribute(:full_name) }, "Bob"
+
+    samples.each do |sample|
+      assert_equal data_file, sample.originating_data_file
+    end
+
+    data_file.reload
+
+    assert_equal samples.sort, data_file.extracted_samples.sort
+  end
+
+  test 'extract from data file with multiple matching sample types redirects to selection page' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_difference("Sample.count",0) do
+      post :extract_samples, id: data_file.id
+    end
+
+    assert_redirected_to select_sample_type_data_file_path(data_file) # Test for this is in data_files_controller_test
+  end
+
+  test 'extract from data file queues job' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_no_difference("Sample.count") do
+      assert_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count", 1) do
+        post :extract_samples, id: data_file.id
+      end
+    end
+
+
+    assert_redirected_to data_file_path(data_file)
+  end
+
   private
 
   def mock_http

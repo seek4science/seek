@@ -1,12 +1,11 @@
 <% total = @samples.count + @rejected_samples.count %>
 
 <% if total > 0 %>
-    <% if @show_confirmation %>
-      <div class="alert alert-info">
-        The following samples were detected in the data file.
-        Please review them, then click "Confirm" below to complete the process, or "Cancel" to go back.
-      </div>
-    <% end %>
+    <div class="alert alert-info">
+      The following samples were detected in the data file.
+      Please review them, then click "Confirm" below to complete the process, or "Cancel Extraction" to cancel
+      the extraction process.
+    </div>
     <div>
       <ul class="nav nav-tabs" role="tablist">
         <% if @samples.any? %>
@@ -52,12 +51,11 @@
     <span class="none_text">No samples were extracted</span>
 <% end %>
 
-<% if @show_confirmation %>
-    <hr/>
-    <%= form_tag(extract_from_data_file_samples_path(:data_file_id => @data_file.id)) do %>
-        <%= hidden_field_tag(:sample_type_id, @samples.first.sample_type_id) %>
-        <%= hidden_field_tag(:confirm, 'true') %>
-        <%= submit_tag "Confirm", :class => 'btn btn-primary'-%>
-        or <%= cancel_button(data_files_path) -%>
-    <% end %>
+<hr/>
+<%= form_tag(extract_samples_data_file_path(@data_file)) do %>
+    <%= hidden_field_tag(:sample_type_id, @samples.first.sample_type_id) %>
+    <%= hidden_field_tag(:confirm, 'true') %>
+    <%= submit_tag "Confirm", :class => 'btn btn-primary'-%>
+    or <%= cancel_button(cancel_extraction_data_file_path(@data_file), button_text: 'Cancel Extraction', method: :delete) -%>
 <% end %>
+

@@ -25,7 +25,7 @@ class Sample < ActiveRecord::Base
   include ActiveModel::Validations
   validates_with SampleAttributeValidator
 
-  before_save :update_json_metadata
+  before_validation :update_json_metadata
   before_validation :set_title_to_title_attribute_value
 
   def sample_type=(type)
@@ -91,7 +91,7 @@ class Sample < ActiveRecord::Base
   end
 
   def update_json_metadata
-    self.json_metadata = @data.to_json
+    self.json_metadata = data.to_json
   end
 
   def set_title_to_title_attribute_value
