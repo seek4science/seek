@@ -13,6 +13,9 @@ module SamplesHelper
         check_box :sample, attribute.method_name,:class=>"#{clz}"
       when 'SeekStrain'
         grouped_collection_select :sample, attribute.method_name, Organism.all, :strains, :title, :id, :title, :class=>"#{clz}"
+      when 'CV'
+        terms = attribute.sample_controlled_vocab.sample_controlled_vocab_terms
+        collection_select :sample, attribute.method_name,terms,:label,:label,:include_blank=>!attribute.required?,  :class=>"form-control #{clz}"
       else
         text_field :sample, attribute.method_name, :class=>"form-control #{clz}"
     end
