@@ -90,17 +90,6 @@ class SamplesController < ApplicationController
     update_annotations(params[:tag_list], @sample)
   end
 
-  def find_and_authorize_data_file
-    @data_file = DataFile.find(params[:data_file_id])
-
-    unless @data_file.can_manage?
-      flash[:error] = "You are not authorize to extract samples from this data file"
-      respond_to do |format|
-        format.html { redirect_to data_file_path(@data_file)}
-      end
-    end
-  end
-
   def find_index_assets
     if params[:data_file_id]
       @data_file = DataFile.find(params[:data_file_id])
