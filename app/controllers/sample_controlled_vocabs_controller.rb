@@ -1,10 +1,10 @@
 class SampleControlledVocabsController < ApplicationController
   respond_to :html
 
-  before_filter :login_required, :except => [ :show ]
+  before_filter :login_required, except: [:show]
+  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create]
 
   def show
-    @sample_controlled_vocab = SampleControlledVocab.find(params[:id])
     respond_with(@sample_controlled_vocab)
   end
 
@@ -15,7 +15,6 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def edit
-    @sample_controlled_vocab = SampleControlledVocab.find(params[:id])
     respond_with(@sample_controlled_vocab)
   end
 
@@ -27,9 +26,9 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def update
-    @sample_controlled_vocab = SampleControlledVocab.find(params[:id])
     @sample_controlled_vocab.update_attributes(params[:sample_controlled_vocab])
     respond_with(@sample_controlled_vocab)
   end
+
 
 end

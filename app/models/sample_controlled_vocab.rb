@@ -5,7 +5,7 @@ class SampleControlledVocab < ActiveRecord::Base
 
   validates :title, presence: true, uniqueness: true
 
-  accepts_nested_attributes_for :sample_controlled_vocab_terms, :allow_destroy => true
+  accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
 
   def labels
     sample_controlled_vocab_terms.collect(&:label)
