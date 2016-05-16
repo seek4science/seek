@@ -7,6 +7,11 @@
       <%= f.text_field :title, :class => 'form-control', :placeholder => 'Controlled vocabulary name' %>
     </div>
 
+    <div class="form-group">
+      <label>Description</label>
+      <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
+    </div>
+
 
     <h3>Terms</h3>
     <table id="new-terms" class="table">
@@ -106,7 +111,7 @@
                 }
             }
         }
-        
+
         $j('#new-terms').on('change', '.destroy-attribute', CVTerms.removeTerm);
     });
 
