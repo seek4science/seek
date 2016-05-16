@@ -25,4 +25,10 @@ class SampleControlledVocabsController < ApplicationController
     respond_with(@sample_controlled_vocab)
   end
 
+  def update
+    @sample_controlled_vocab = SampleControlledVocab.find(params[:id])
+    @sample_controlled_vocab.update_attributes(params[:sample_controlled_vocab])
+    respond_with(@sample_controlled_vocab)
+  end
+
 end
