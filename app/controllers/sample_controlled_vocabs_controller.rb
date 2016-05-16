@@ -1,7 +1,7 @@
 class SampleControlledVocabsController < ApplicationController
   respond_to :html
 
-  include Seek::IndexPager
+  before_filter :login_required, :except => [ :show ]
 
   def show
     @sample_controlled_vocab = SampleControlledVocab.find(params[:id])
