@@ -121,6 +121,14 @@ class AdminsControllerTest < ActionController::TestCase
     assert_equal 2, Seek::Config.default_all_visitors_access_type
   end
 
+  test 'update permissions popup' do
+    login_as(:quentin)
+    Seek::Config.permissions_popup = Seek::Config::PERMISSION_POPUP_ALWAYS
+    assert_equal Seek::Config::PERMISSION_POPUP_ALWAYS, Seek::Config.permissions_popup
+    post :update_others, :permissions_popup => "#{Seek::Config::PERMISSION_POPUP_NEVER}"
+    assert_equal Seek::Config::PERMISSION_POPUP_NEVER, Seek::Config.permissions_popup
+  end
+
   test 'invalid email address' do
     login_as(:quentin)
     post :update_others, :pubmed_api_email => 'quentin', :crossref_api_email => 'quentin@example.com', :tag_threshold => '1', :max_visible_tags => '20'

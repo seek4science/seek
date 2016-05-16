@@ -28,19 +28,27 @@
         # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
         option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_associated_projects_access_type)
         admin_dropdown_setting(:default_associated_projects_access_type, option_tags, 'Settings For Default Permissions',
-                               description = 'Default permissions option for members of associated projects', options = {}) %>
+                               'Default permissions option for members of associated projects') %>
 
     <%= access_type_options = [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING]
         # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
         option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_consortium_access_type)
         admin_dropdown_setting(:default_consortium_access_type, option_tags, nil,
-                               description = 'Default permissions option for all registered users', options = {}) %>
+                               'Default permissions option for all registered users') %>
 
     <%= access_type_options = [Policy::VISIBLE, Policy::ACCESSIBLE]
         # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
         option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_all_visitors_access_type)
         admin_dropdown_setting(:default_all_visitors_access_type, option_tags, nil,
-                               description = 'Default permissions option for all visitors', options = {}) %>
+                               'Default permissions option for all visitors') %>
+
+    <%= admin_dropdown_setting(:permissions_popup,
+           options_for_select([['Always show', Seek::Config::PERMISSION_POPUP_ALWAYS],
+                               ['Show when permissions changed', Seek::Config::PERMISSION_POPUP_ON_CHANGE],
+                               ['Never show',Seek::Config::PERMISSION_POPUP_NEVER]], Seek::Config.permissions_popup),
+           'Permissions Summary Settings',
+           'Choose when/if to display the "Preview of your sharing settings" pop-up when creating or updating a resource') %>
+
 
     <%= admin_checkbox_setting(:recaptcha_enabled, 1, Seek::Config.recaptcha_enabled,
                                'Captcha enabled', 'Enable to show a captcha on forms susceptible to spam',

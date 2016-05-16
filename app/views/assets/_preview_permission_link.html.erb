@@ -1,5 +1,16 @@
-<script type="text/javascript">
+<script type="text/javascript" id="preview-permission-link-script">
+    var permissionPopupSetting = "<%= case Seek::Config.permissions_popup
+      when Seek::Config::PERMISSION_POPUP_NEVER
+        'never'
+      when Seek::Config::PERMISSION_POPUP_ON_CHANGE
+        'on_change'
+      else
+        'always'
+        end -%>";
+
     function previewPermissions() {
+      if(permissionPopupSetting === 'always' ||
+         permissionPopupSetting === 'on_change' && permissionsChanged) {
         $j('#permissions_spinner').show();
         $j.ajax({
             type: "POST",
@@ -30,6 +41,10 @@
             }
         });
         return false;
+      } else {
+        createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')
+        return false;
+      }
     }
 </script>
 

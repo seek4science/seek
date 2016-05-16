@@ -145,6 +145,8 @@ SEEK::Application.configure do
   Seek::Config.default :default_consortium_access_type, Policy::VISIBLE
   Seek::Config.default :default_all_visitors_access_type, Policy::ACCESSIBLE
 
+  Seek::Config.default :permissions_popup, Seek::Config::PERMISSION_POPUP_ALWAYS
+
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,''
   Seek::Config.fixed :main_layout,'application'
