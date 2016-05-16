@@ -10,7 +10,7 @@
 <% template_column_index = sample_attribute ? sample_attribute.template_column_index : nil %>
 <% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
 
-<tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>">
+<tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
     <div class="btn btn-info attribute-handle">
       <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>

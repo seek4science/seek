@@ -58,8 +58,15 @@
 
     $j('#add-attribute').click(function () {
       var newRow = $j('#new-attribute-row tbody').clone().html();
-      var id = $j('#attribute-table tr.sample-attribute').length;
-      newRow = newRow.replace(/replace-me/g, id);
+      var index = 0;
+      $j('#attribute-table tr.sample-attribute').each(function () {
+        var newIndex = parseInt($j(this).data('index'));
+        if(newIndex > index) {
+          index = newIndex;
+        }
+      });
+      index++;
+      newRow = newRow.replace(/replace-me/g, index);
       SampleTypes.unbindSortable();
       $j('#attribute-table #add-attribute-row').before($j(newRow));
       SampleTypes.recalculatePositions();
