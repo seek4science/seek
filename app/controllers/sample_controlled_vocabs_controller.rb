@@ -4,7 +4,8 @@ class SampleControlledVocabsController < ApplicationController
   include Seek::IndexPager
 
   def show
-    render :text=>'done'
+    @sample_controlled_vocab = SampleControlledVocab.find(params[:id])
+    respond_with(@sample_controlled_vocab)
   end
 
   def new
