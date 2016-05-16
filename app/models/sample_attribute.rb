@@ -3,7 +3,8 @@ class SampleAttribute < ActiveRecord::Base
   METHOD_PREFIX = '__sample_data_'
 
   attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
-                  :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index
+                  :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index,:sample_controlled_vocab,
+                  :sample_controlled_vocab_id
 
   belongs_to :sample_attribute_type
   belongs_to :sample_type, inverse_of: :sample_attributes
@@ -68,10 +69,10 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   def sample_controlled_vocab_and_attribute_type_consistency
-    if sample_attribute_type && sample_controlled_vocab && sample_attribute_type.base_type!='CV'
+    if sample_attribute_type && sample_controlled_vocab && !sample_attribute_type.is_controlled_vocab?
       errors.add(:sample_attribute_type, "Attribute type must be CV if controlled vocabulary set")
     end
-    if sample_attribute_type && sample_attribute_type.base_type=='CV' && sample_controlled_vocab.nil?
+    if sample_attribute_type && sample_attribute_type.is_controlled_vocab? && sample_controlled_vocab.nil?
       errors.add(:sample_controlled_vocab, "Controlled vocabulary must be set if attribute type is CV")
     end
   end

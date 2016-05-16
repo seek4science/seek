@@ -1,0 +1,146 @@
+require 'test_helper'
+
+class SampleControlledVocabsControllerTest < ActionController::TestCase
+
+  include AuthenticatedTestHelper
+
+  def setup
+    #create a dummy user, to prevent the first becoming an admin
+    person = Factory(:person)
+  end
+
+  test 'show' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    get :show,:id=>cv
+    assert_response :success
+    assert_select "ul>li",:text=>"Bramley",:count=>1
+    assert_select "ul>li",:text=>"Orange",:count=>0
+  end
+
+  test 'login required for new' do
+    get :new
+    assert_response :redirect
+    assert flash[:error]
+  end
+
+  test 'project required for new' do
+    login_as(Factory(:person_not_in_project))
+    get :new
+    assert_response :redirect
+    assert flash[:error]
+  end
+
+  test 'new' do
+    login_as(Factory(:person))
+    assert_response :success
+  end
+
+  test 'create' do
+    login_as(Factory(:person))
+    assert_difference("SampleControlledVocab.count") do
+      assert_difference("SampleControlledVocabTerm.count",2) do
+        post :create,sample_controlled_vocab:{title:'fish',description:'About fish',
+                    sample_controlled_vocab_terms_attributes:{
+            "0"=>{label:'goldfish',_destroy:'0'},
+            "1"=>{label:'guppy',_destroy:'0'}
+        }
+                    }
+      end
+    end
+    assert cv=assigns(:sample_controlled_vocab)
+    assert_redirected_to sample_controlled_vocab_path(cv)
+    assert_equal 'fish',cv.title
+    assert_equal 'About fish',cv.description
+    assert_equal 2,cv.sample_controlled_vocab_terms.count
+    assert_equal ['goldfish','guppy'],cv.labels
+  end
+
+  test 'login required for create' do
+    assert_no_difference("SampleControlledVocab.count") do
+      assert_no_difference("SampleControlledVocabTerm.count") do
+        post :create,sample_controlled_vocab:{title:'fish',description:'About fish',
+                                              sample_controlled_vocab_terms_attributes:{
+                                                  "0"=>{label:'goldfish',_destroy:'0'},
+                                                  "1"=>{label:'guppy',_destroy:'0'}
+                                              }
+                    }
+      end
+    end
+    assert_response :redirect
+    assert flash[:error]
+  end
+
+  test 'project required for create' do
+    login_as(Factory(:person_not_in_project))
+    assert_no_difference("SampleControlledVocab.count") do
+      assert_no_difference("SampleControlledVocabTerm.count",2) do
+        post :create,sample_controlled_vocab:{title:'fish',description:'About fish',
+                                              sample_controlled_vocab_terms_attributes:{
+                                                  "0"=>{label:'goldfish',_destroy:'0'},
+                                                  "1"=>{label:'guppy',_destroy:'0'}
+                                              }
+                    }
+      end
+    end
+    assert_response :redirect
+    assert flash[:error]
+  end
+
+  test 'update' do
+    login_as(Factory(:person))
+    cv = Factory(:apples_sample_controlled_vocab)
+    term_ids = cv.sample_controlled_vocab_terms.collect(&:id)
+    assert_no_difference("SampleControlledVocab.count") do
+      assert_no_difference("SampleControlledVocabTerm.count") do
+        put :update,:id=>cv,sample_controlled_vocab:{title:'the apples',description:'About apples',
+                                              sample_controlled_vocab_terms_attributes:{
+                                                  "0"=>{label:'Granny Smith',_destroy:'0',id:term_ids[0]},
+                                                  "1"=>{_destroy:'1',id:term_ids[1]},
+                                                  "2"=>{label:'Bramley',_destroy:'0',id:term_ids[2]},
+                                                  "3"=>{label:"Cox",_destroy:'0',id:term_ids[3]},
+                                                  "4"=>{label:'Jazz',_destroy:'0'}
+                                              }
+                    }
+      end
+    end
+    assert cv=assigns(:sample_controlled_vocab)
+    assert_redirected_to sample_controlled_vocab_path(cv)
+    assert_equal 'the apples',cv.title
+    assert_equal 'About apples',cv.description
+    assert_equal 4,cv.sample_controlled_vocab_terms.count
+    assert_equal ['Granny Smith','Bramley','Cox','Jazz'],cv.labels
+  end
+
+  test 'login required for update' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    term_ids = cv.sample_controlled_vocab_terms.collect(&:id)
+    assert_no_difference("SampleControlledVocab.count") do
+      assert_no_difference("SampleControlledVocabTerm.count") do
+        put :update,:id=>cv,sample_controlled_vocab:{title:'the apples',description:'About apples',
+                                                     sample_controlled_vocab_terms_attributes:{
+                                                         "0"=>{label:'Granny Smith',_destroy:'0',id:term_ids[0]},
+                                                         "1"=>{_destroy:'1',id:term_ids[1]},
+                                                         "2"=>{label:'Bramley',_destroy:'0',id:term_ids[2]},
+                                                         "3"=>{label:"Cox",_destroy:'0',id:term_ids[3]},
+                                                         "4"=>{label:'Jazz',_destroy:'0'}
+                                                     }
+                   }
+      end
+    end
+    assert_response :redirect
+  end
+
+  test 'edit' do
+    login_as(Factory(:person))
+    cv = Factory(:apples_sample_controlled_vocab)
+    get :edit,:id=>cv.id
+    assert_response :success
+  end
+
+  test 'login required for edit' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    get :edit,:id=>cv.id
+    assert_response :redirect
+  end
+
+end

@@ -1,0 +1,12 @@
+
+
+<%= render :partial => "general/item_title", :locals => {:item => @sample_controlled_vocab} %>
+
+<%= item_description @sample_controlled_vocab.description -%>
+
+<h3>Terms</h3>
+<ul>
+<% @sample_controlled_vocab.sample_controlled_vocab_terms.each do |term| %>
+  <li><%= term.label %></li>
+<% end %>
+</ul>

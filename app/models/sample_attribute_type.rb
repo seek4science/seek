@@ -64,6 +64,10 @@ class SampleAttributeType < ActiveRecord::Base
     base_type_handler.convert(value)
   end
 
+  def is_controlled_vocab?
+    base_type=="CV"
+  end
+
   def base_type_handler
     Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type)
   end

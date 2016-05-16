@@ -1219,7 +1219,7 @@ end
   end
 
   Factory.define(:simple_sample_type,:parent=>:sample_type) do |f|
-    f.title "Simple type"
+    f.sequence(:title) {|n| "Simple Sample Type #{n}"}
     f.after_build do |type|
       type.sample_attributes << Factory.build(:sample_attribute,:title=>"the title",:sample_attribute_type=>Factory(:string_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
     end
@@ -1271,7 +1271,7 @@ end
 
 Factory.define(:apples_controlled_vocab_attribute,parent: :sample_attribute) do |f|
   f.sequence(:title) {|n| "apples controlled vocab attribute #{n}"}
-  f.association :sample_controlled_vocab,:factory=>:apples_sample_controlled_vocab
+  f.sample_controlled_vocab Factory.build(:apples_sample_controlled_vocab)
   f.sample_attribute_type Factory(:controlled_vocab_attribute_type)
 end
 

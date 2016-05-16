@@ -162,4 +162,13 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute type.validate_value?('chebi:222')
   end
 
+  test 'is_controlled_vocab?' do
+    type = Factory(:controlled_vocab_attribute_type)
+    assert type.is_controlled_vocab?
+    type = Factory(:text_sample_attribute_type)
+    refute type.is_controlled_vocab?
+    type = Factory(:boolean_sample_attribute_type)
+    refute type.is_controlled_vocab?
+  end
+
 end

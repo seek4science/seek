@@ -1,0 +1,34 @@
+class SampleControlledVocabsController < ApplicationController
+  respond_to :html
+
+  before_filter :login_required, except: [:show]
+  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create]
+
+  def show
+    respond_with(@sample_controlled_vocab)
+  end
+
+  def new
+    @sample_controlled_vocab = SampleControlledVocab.new
+    @sample_controlled_vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new
+    respond_with(@sample_controlled_vocab)
+  end
+
+  def edit
+    respond_with(@sample_controlled_vocab)
+  end
+
+  def create
+    @sample_controlled_vocab = SampleControlledVocab.new(params[:sample_controlled_vocab])
+
+    flash[:notice] = 'The sample controlled vocabulary was successfully created.' if @sample_controlled_vocab.save
+    respond_with(@sample_controlled_vocab)
+  end
+
+  def update
+    @sample_controlled_vocab.update_attributes(params[:sample_controlled_vocab])
+    respond_with(@sample_controlled_vocab)
+  end
+
+
+end
