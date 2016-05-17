@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
-
   test 'validation' do
     sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
@@ -192,19 +191,19 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'various methods of sample data assignment perform conversions' do
     sample_type = Factory(:simple_sample_type)
-    sample_type.sample_attributes << Factory(:sample_attribute, title: "bool",
-                                             sample_attribute_type: Factory(:boolean_sample_attribute_type),
-                                             required: false, is_title: false, sample_type: sample_type)
+    sample_type.sample_attributes << Factory(:sample_attribute, title: 'bool',
+                                                                sample_attribute_type: Factory(:boolean_sample_attribute_type),
+                                                                required: false, is_title: false, sample_type: sample_type)
     sample = Sample.new(title: 'testing', sample_type: sample_type)
 
     # Update attributes
-    sample.update_attributes(data: { the_title:'fish', bool: '0' })
+    sample.update_attributes(data: { the_title: 'fish', bool: '0' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert_equal false, sample.data[:bool]
 
     # Mass assignment
-    sample.data = { the_title:'fish', bool: '1' }
+    sample.data = { the_title: 'fish', bool: '1' }
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert_equal true, sample.data[:bool]
@@ -231,57 +230,56 @@ class SampleTest < ActiveSupport::TestCase
   test 'handling booleans' do
     sample = Sample.new title: 'testing'
     sample_type = Factory(:simple_sample_type)
-    sample_type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false,:is_title=>false, :sample_type => sample_type)
+    sample_type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, is_title: false, sample_type: sample_type)
     sample_type.save!
     sample.sample_type = sample_type
 
-
-    #the simple cases
-    sample.update_attributes(data: { the_title:'fish', bool:true })
+    # the simple cases
+    sample.update_attributes(data: { the_title: 'fish', bool: true })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert sample.get_attribute(:bool)
 
-    sample.update_attributes(data: { the_title:'fish',bool:false })
+    sample.update_attributes(data: { the_title: 'fish', bool: false })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute(:bool)
 
-    #from a form
-    sample.update_attributes(data: { the_title:'fish',bool:'1' })
+    # from a form
+    sample.update_attributes(data: { the_title: 'fish', bool: '1' })
     puts sample.errors.full_messages
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert sample.get_attribute(:bool)
 
-    sample.update_attributes(data: { the_title:'fish',bool:'0' })
+    sample.update_attributes(data: { the_title: 'fish', bool: '0' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute(:bool)
 
-    #as text
-    sample.update_attributes(data: { the_title:'fish',bool:'true' })
+    # as text
+    sample.update_attributes(data: { the_title: 'fish', bool: 'true' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert sample.get_attribute(:bool)
 
-    sample.update_attributes(data: { the_title:'fish',bool:'false' })
+    sample.update_attributes(data: { the_title: 'fish', bool: 'false' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute(:bool)
 
-    #as text2
-    sample.update_attributes(data: { the_title:'fish',bool:'TRUE' })
+    # as text2
+    sample.update_attributes(data: { the_title: 'fish', bool: 'TRUE' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert sample.get_attribute(:bool)
 
-    sample.update_attributes(data: { the_title:'fish',bool:'FALSE' })
+    sample.update_attributes(data: { the_title: 'fish', bool: 'FALSE' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute(:bool)
 
-    #via accessors
+    # via accessors
     sample.set_attribute(:bool, true)
     assert sample.valid?
     disable_authorization_checks { sample.save! }
@@ -309,8 +307,8 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute(:bool)
 
-    #not valid
-    sample.update_attributes(data: { the_title:'fish',bool:'fish' })
+    # not valid
+    sample.update_attributes(data: { the_title: 'fish', bool: 'fish' })
     refute sample.valid?
     sample.set_attribute(:bool, 'true')
     assert sample.valid?
@@ -333,26 +331,26 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'json metadata with awkward attributes' do
-    sample_type = SampleType.new :title=>"with awkward attributes"
-    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"title",is_title:true, :sample_type => sample_type)
-    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"updated_at",is_title:false, :sample_type => sample_type)
+    sample_type = SampleType.new title: 'with awkward attributes'
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title', is_title: true, sample_type: sample_type)
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
     sample = Sample.new title: 'testing'
     sample.sample_type = sample_type
 
-    sample.set_attribute(:title, "the title")
-    sample.set_attribute(:updated_at, "the updated at")
+    sample.set_attribute(:title, 'the title')
+    sample.set_attribute(:updated_at, 'the updated at')
     assert_equal %({"title":null,"updated_at":null}), sample.json_metadata
     disable_authorization_checks { sample.save! }
     assert_equal %({"title":"the title","updated_at":"the updated at"}), sample.json_metadata
 
     sample = Sample.find(sample.id)
-    assert_equal "the title",sample.title
-    assert_equal "the title",sample.title
-    assert_equal "the updated at",sample.get_attribute(:updated_at)
+    assert_equal 'the title', sample.title
+    assert_equal 'the title', sample.title
+    assert_equal 'the updated at', sample.get_attribute(:updated_at)
   end
 
-  #trying to track down an sqlite3 specific problem
+  # trying to track down an sqlite3 specific problem
   test 'sqlite3 setting of accessor problem' do
     sample = Sample.new title: 'testing'
     sample.sample_type = Factory(:patient_sample_type)
@@ -360,14 +358,14 @@ class SampleTest < ActiveSupport::TestCase
     sample.set_attribute(:age, 22)
     disable_authorization_checks { sample.save! }
     id = sample.id
-    assert_equal 5,sample.sample_type.sample_attributes.count
-    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample.sample_type.sample_attributes.collect(&:hash_key)
+    assert_equal 5, sample.sample_type.sample_attributes.count
+    assert_equal %w(full_name age weight address postcode), sample.sample_type.sample_attributes.collect(&:hash_key)
     assert_respond_to sample, SampleAttribute::METHOD_PREFIX + 'full_name'
 
     sample2 = Sample.find(id)
-    assert_equal id,sample2.id
-    assert_equal 5,sample2.sample_type.sample_attributes.count
-    assert_equal ["full_name", "age", "weight", "address", "postcode"],sample2.sample_type.sample_attributes.collect(&:hash_key)
+    assert_equal id, sample2.id
+    assert_equal 5, sample2.sample_type.sample_attributes.count
+    assert_equal %w(full_name age weight address postcode), sample2.sample_type.sample_attributes.collect(&:hash_key)
     assert_respond_to sample2, SampleAttribute::METHOD_PREFIX + 'full_name'
   end
 
@@ -375,18 +373,17 @@ class SampleTest < ActiveSupport::TestCase
     sample = Factory(:sample)
     assert_empty sample.projects
     project = Factory(:project)
-    sample.update_attributes(project_ids:[project.id])
+    sample.update_attributes(project_ids: [project.id])
     disable_authorization_checks { sample.save! }
     sample.reload
-    assert_equal [project],sample.projects
+    assert_equal [project], sample.projects
   end
 
   test 'authorization' do
-
     person = Factory(:person)
     other_person = Factory(:person)
-    public_sample = Factory(:sample,:policy=>Factory(:public_policy),:contributor=>person)
-    private_sample = Factory(:sample,:policy=>Factory(:private_policy),:contributor=>person)
+    public_sample = Factory(:sample, policy: Factory(:public_policy), contributor: person)
+    private_sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
 
     assert public_sample.can_view?(person.user)
     assert public_sample.can_view?(nil)
@@ -402,13 +399,12 @@ class SampleTest < ActiveSupport::TestCase
     refute private_sample.can_download?(nil)
     refute private_sample.can_download?(other_person.user)
 
-    assert_equal [public_sample,private_sample].sort,Sample.all_authorized_for(:view,person.user).sort
-    assert_equal [public_sample],Sample.all_authorized_for(:view,other_person.user)
-    assert_equal [public_sample],Sample.all_authorized_for(:view,nil)
-    assert_equal [public_sample,private_sample].sort,Sample.all_authorized_for(:download,person.user).sort
-    assert_equal [public_sample],Sample.all_authorized_for(:download,other_person.user)
-    assert_equal [public_sample],Sample.all_authorized_for(:download,nil)
-
+    assert_equal [public_sample, private_sample].sort, Sample.all_authorized_for(:view, person.user).sort
+    assert_equal [public_sample], Sample.all_authorized_for(:view, other_person.user)
+    assert_equal [public_sample], Sample.all_authorized_for(:view, nil)
+    assert_equal [public_sample, private_sample].sort, Sample.all_authorized_for(:download, person.user).sort
+    assert_equal [public_sample], Sample.all_authorized_for(:download, other_person.user)
+    assert_equal [public_sample], Sample.all_authorized_for(:download, nil)
   end
 
   test 'assays studies and investigation' do
@@ -425,95 +421,92 @@ class SampleTest < ActiveSupport::TestCase
     assay.save!
     sample.reload
 
-    assert_equal [assay],sample.assays
-    assert_equal [study],sample.studies
-    assert_equal [investigation],sample.investigations
-
+    assert_equal [assay], sample.assays
+    assert_equal [study], sample.studies
+    assert_equal [investigation], sample.investigations
   end
 
   test 'cleans up assay asset on destroy' do
     assay = Factory(:assay)
-    sample = Factory(:sample,:policy=>Factory(:public_policy))
-    assert_difference('AssayAsset.count',1) do
+    sample = Factory(:sample, policy: Factory(:public_policy))
+    assert_difference('AssayAsset.count', 1) do
       assay.associate(sample)
     end
     assay.save!
     sample.reload
     id = sample.id
 
-    refute_empty AssayAsset.where(asset_type:'Sample',asset_id:id)
+    refute_empty AssayAsset.where(asset_type: 'Sample', asset_id: id)
 
-    assert_difference('AssayAsset.count',-1) do
+    assert_difference('AssayAsset.count', -1) do
       assert sample.destroy
     end
-    assert_empty AssayAsset.where(asset_type:'Sample',asset_id:id)
-
-
+    assert_empty AssayAsset.where(asset_type: 'Sample', asset_id: id)
   end
 
   test 'title delegated to title attribute on save' do
-    sample = Factory.build(:sample,:title=>'frog',:policy=>Factory(:public_policy))
+    sample = Factory.build(:sample, title: 'frog', policy: Factory(:public_policy))
     sample.set_attribute(:the_title, 'this should be the title')
     disable_authorization_checks { sample.save! }
     sample.reload
-    assert_equal 'this should be the title',sample.title
+    assert_equal 'this should be the title', sample.title
   end
 
   test 'sample with clashing attribute names' do
-    sample_type = SampleType.new :title=>"with awkward attributes"
-    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"freeze",is_title:true, :sample_type => sample_type)
-    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"updated_at",is_title:false, :sample_type => sample_type)
+    sample_type = SampleType.new title: 'with awkward attributes'
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'freeze', is_title: true, sample_type: sample_type)
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.save!
     sample = Sample.new title: 'testing'
     sample.sample_type = sample_type
 
-    sample.set_attribute(:freeze, "the title")
+    sample.set_attribute(:freeze, 'the title')
     refute sample.valid?
-    sample.set_attribute(:updated_at, "the updated_at")
+    sample.set_attribute(:updated_at, 'the updated_at')
     disable_authorization_checks { sample.save! }
-    assert_equal "the title",sample.title
+    assert_equal 'the title', sample.title
 
-    sample=Sample.find(sample.id)
-    assert_equal "the title",sample.title
-    assert_equal "the title",sample.get_attribute(:freeze)
-    assert_equal "the updated_at",sample.get_attribute(:updated_at)
+    sample = Sample.find(sample.id)
+    assert_equal 'the title', sample.title
+    assert_equal 'the title', sample.get_attribute(:freeze)
+    assert_equal 'the updated_at', sample.get_attribute(:updated_at)
   end
 
   test 'sample with clashing attribute names with private methods' do
-    sample_type = SampleType.new :title=>"with awkward attributes"
-    sample_type.sample_attributes << Factory.build(:any_string_sample_attribute, :title=>"format",is_title:true, :sample_type => sample_type)
+    sample_type = SampleType.new title: 'with awkward attributes'
+    sample_type.sample_attributes << Factory.build(:any_string_sample_attribute, title: 'format', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.save!
     sample = Sample.new title: 'testing'
     sample.sample_type = sample_type
 
-    sample.set_attribute(:format, "the title")
+    sample.set_attribute(:format, 'the title')
     assert sample.valid?
     disable_authorization_checks { sample.save! }
-    assert_equal "the title",sample.title
+    assert_equal 'the title', sample.title
 
-    sample=Sample.find(sample.id)
-    assert_equal "the title",sample.title
-    assert_equal "the title",sample.get_attribute(:format)
+    sample = Sample.find(sample.id)
+    assert_equal 'the title', sample.title
+    assert_equal 'the title', sample.get_attribute(:format)
   end
 
   test 'sample with clashing attribute names with dynamic rails methods' do
-    sample_type = SampleType.new :title=>"with awkward attributes"
-    sample_type.sample_attributes << Factory(:any_string_sample_attribute, :title=>"title_was",is_title:true, :sample_type => sample_type)
+    sample_type = SampleType.new title: 'with awkward attributes'
+    sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_was', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.save!
     sample = Sample.new title: 'testing'
     sample.sample_type = sample_type
 
-    sample.set_attribute(:title_was, "the title")
+    sample.set_attribute(:title_was, 'the title')
     assert sample.valid?
     disable_authorization_checks { sample.save! }
-    assert_equal "the title",sample.title
+    assert_equal 'the title', sample.title
 
-    sample=Sample.find(sample.id)
-    assert_equal "the title",sample.title
-    assert_equal "the title",sample.get_attribute(:title_was)
+    sample = Sample.find(sample.id)
+    assert_equal 'the title', sample.title
+    assert_equal 'the title', sample.get_attribute(:title_was)
   end
 
   test 'strain type stores valid strain info' do
@@ -549,12 +542,12 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'strain attributes can appear as related items' do
     sample_type = Factory(:strain_sample_type)
-    sample_type.sample_attributes << Factory.build(:sample_attribute, title: "seekstrain2",
-                                                   sample_attribute_type: Factory(:strain_sample_attribute_type),
-                                                   required: true, sample_type: sample_type)
-    sample_type.sample_attributes << Factory.build(:sample_attribute, title: "seekstrain3",
-                                                   sample_attribute_type: Factory(:strain_sample_attribute_type),
-                                                   required: true, sample_type: sample_type)
+    sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'seekstrain2',
+                                                                      sample_attribute_type: Factory(:strain_sample_attribute_type),
+                                                                      required: true, sample_type: sample_type)
+    sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'seekstrain3',
+                                                                      sample_attribute_type: Factory(:strain_sample_attribute_type),
+                                                                      required: true, sample_type: sample_type)
     strain = Factory(:strain)
     strain2 = Factory(:strain)
 
@@ -568,15 +561,15 @@ class SampleTest < ActiveSupport::TestCase
     sample = Sample.find(sample.id)
 
     assert_equal 2, sample.strains.size
-    assert_equal [strain.title, strain2.title].sort, [sample.get_attribute(:seekstrain)['title'],sample.get_attribute(:seekstrain2)['title']].sort
+    assert_equal [strain.title, strain2.title].sort, [sample.get_attribute(:seekstrain)['title'], sample.get_attribute(:seekstrain2)['title']].sort
   end
 
   test 'sample responds to correct methods' do
     sample_type = SampleType.new(title: 'Custom')
     attribute1 = Factory(:any_string_sample_attribute, title: 'banana_type',
-                                             is_title:true, sample_type: sample_type)
+                                                       is_title: true, sample_type: sample_type)
     attribute2 = Factory(:any_string_sample_attribute, title: 'license',
-                         sample_type: sample_type)
+                                                       sample_type: sample_type)
     sample_type.sample_attributes << attribute1
     sample_type.sample_attributes << attribute2
     assert sample_type.valid?
@@ -606,5 +599,4 @@ class SampleTest < ActiveSupport::TestCase
       sample.send(attribute1.method_name.to_sym)
     end
   end
-
 end

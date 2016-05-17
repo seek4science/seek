@@ -59,12 +59,12 @@ class SamplesHandlerTest < ActiveSupport::TestCase
     assert_equal 4, data.count
     assert_equal [1, 2, 3, 4], data.first.collect(&:column)
     values = data.first.collect(&:value)
-    values[1]= Date.parse(values[1])
+    values[1] = Date.parse(values[1])
     assert_equal ['Bob Monkhouse', Date.parse('12 March 1970'), 'Blue', 'Yellow'], values
 
     assert_equal [1, 2, 3, 4], data.last.collect(&:column)
     values = data.last.collect(&:value)
-    values[1]= Date.parse(values[1])
+    values[1] = Date.parse(values[1])
     assert_equal ['Bob', Date.parse('2 January 1900'), 'Pink', 'Green'], values
   end
 

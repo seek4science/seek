@@ -23,14 +23,13 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
 
     type = SampleAttributeType.new(title: 'x-type', base_type: 'CV')
     assert type.valid?
-
   end
 
   test 'default regexp' do
     type = SampleAttributeType.new(title: 'x-type', base_type: 'Integer')
     type.save!
     type = SampleAttributeType.find(type.id)
-    assert_equal '.*',type[:regexp]
+    assert_equal '.*', type[:regexp]
   end
 
   test 'validate_value' do
@@ -50,7 +49,7 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('')
 
     # refute attribute.validate_value?(1.0)
-  #  refute attribute.validate_value?('1.0')
+    #  refute attribute.validate_value?('1.0')
 
     attribute = SampleAttributeType.new(title: 'fish', base_type: 'String', regexp: '.*yyy')
     assert attribute.validate_value?('yyy')
@@ -109,25 +108,25 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   end
 
   test 'regular expression match' do
-    #whole string must match
+    # whole string must match
     attribute = SampleAttributeType.new(title: 'first name', base_type: 'String', regexp: '[A-Z][a-z]+')
-    assert attribute.validate_value?("Fred")
-    refute attribute.validate_value?(" Fred")
-    refute attribute.validate_value?("FRed")
-    refute attribute.validate_value?("Fred2")
-    refute attribute.validate_value?("Fred ")
+    assert attribute.validate_value?('Fred')
+    refute attribute.validate_value?(' Fred')
+    refute attribute.validate_value?('FRed')
+    refute attribute.validate_value?('Fred2')
+    refute attribute.validate_value?('Fred ')
   end
 
   test 'web and email regexp' do
-    email_type = SampleAttributeType.new title:"Email address",base_type:'String',regexp:RFC822::EMAIL.to_s
+    email_type = SampleAttributeType.new title: 'Email address', base_type: 'String', regexp: RFC822::EMAIL.to_s
     email_type.save!
     email_type.reload
-    assert_equal RFC822::EMAIL.to_s,email_type.regexp
+    assert_equal RFC822::EMAIL.to_s, email_type.regexp
 
     assert email_type.validate_value?('fred@email.com')
     refute email_type.validate_value?('moonbeam')
 
-    web_type = SampleAttributeType.new title:"Web link",base_type:'String',regexp:URI.regexp(%w(http https)).to_s
+    web_type = SampleAttributeType.new title: 'Web link', base_type: 'String', regexp: URI.regexp(%w(http https)).to_s
     web_type.save!
     web_type.reload
     assert web_type.validate_value?('http://google.com')
@@ -136,7 +135,7 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   end
 
   test 'boolean' do
-    bool_type = SampleAttributeType.new title:"bool",base_type:'Boolean'
+    bool_type = SampleAttributeType.new title: 'bool', base_type: 'Boolean'
     assert bool_type.valid?
     assert bool_type.validate_value?(true)
     assert bool_type.validate_value?(false)
@@ -153,12 +152,12 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   end
 
   test 'chebi atribute' do
-    type = SampleAttributeType.new title:"CHEBI ID",regexp:'CHEBI:[0-9]+', base_type:'String'
-    assert type.validate_value?("CHEBI:1111")
-    assert type.validate_value?("CHEBI:1121")
+    type = SampleAttributeType.new title: 'CHEBI ID', regexp: 'CHEBI:[0-9]+', base_type: 'String'
+    assert type.validate_value?('CHEBI:1111')
+    assert type.validate_value?('CHEBI:1121')
     refute type.validate_value?('fish')
     refute type.validate_value?('fish:22')
-    refute type.validate_value?("CHEBI:1121a")
+    refute type.validate_value?('CHEBI:1121a')
     refute type.validate_value?('chebi:222')
   end
 
@@ -170,5 +169,4 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     type = Factory(:boolean_sample_attribute_type)
     refute type.is_controlled_vocab?
   end
-
 end
