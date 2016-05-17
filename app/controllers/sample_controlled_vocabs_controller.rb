@@ -5,8 +5,8 @@ class SampleControlledVocabsController < ApplicationController
   include Seek::AssetsCommon
 
   before_filter :login_required, except: [:show, :index]
-  before_filter :find_and_authorize_requested_item, :except => [:index, :new, :create]
-  before_filter :find_assets, :only => :index
+  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create]
+  before_filter :find_assets, only: :index
 
   def show
     respond_with(@sample_controlled_vocab)
@@ -35,6 +35,4 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   private
-
-
 end

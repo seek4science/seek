@@ -27,5 +27,4 @@ class SampleControlledVocab < ActiveRecord::Base
   def can_edit?
     samples.empty?
   end
-
 end
