@@ -2,6 +2,8 @@ class SampleControlledVocab < ActiveRecord::Base
   attr_accessible :title, :description, :sample_controlled_vocab_terms_attributes
 
   has_many :sample_controlled_vocab_terms, inverse_of: :sample_controlled_vocab, dependent: :destroy
+  has_many :sample_attributes, inverse_of: :sample_controlled_vocab
+  has_many :sample_types, through: :sample_attributes
 
   validates :title, presence: true, uniqueness: true
 
@@ -16,4 +18,9 @@ class SampleControlledVocab < ActiveRecord::Base
   def includes_term?(value)
     labels.include?(value)
   end
+
+  def can_delete?
+    sample_types.empty?
+  end
+  
 end

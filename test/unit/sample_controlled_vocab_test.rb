@@ -51,4 +51,15 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     end
   end
 
+  test 'cannot destroy if linked to sample type' do
+    type = Factory(:apples_controlled_vocab_sample_type)
+    cv = type.sample_attributes.first.sample_controlled_vocab
+    refute cv.can_delete?
+    assert_no_difference("SampleControlledVocab.count") do
+      assert_no_difference("SampleControlledVocabTerm.count") do
+        refute cv.destroy
+      end
+    end
+  end
+
 end
