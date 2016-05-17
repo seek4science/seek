@@ -143,4 +143,10 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
+  test 'index' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    get :index
+    assert_response :success
+  end
+
 end

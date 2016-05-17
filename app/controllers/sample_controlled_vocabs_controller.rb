@@ -1,8 +1,11 @@
 class SampleControlledVocabsController < ApplicationController
   respond_to :html
 
-  before_filter :login_required, except: [:show]
-  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create]
+  include Seek::IndexPager
+
+  before_filter :login_required, except: [:show, :index]
+  before_filter :find_and_authorize_requested_item, :except => [:index, :new, :create]
+  before_filter :find_assets, :only => :index
 
   def show
     respond_with(@sample_controlled_vocab)
@@ -29,6 +32,8 @@ class SampleControlledVocabsController < ApplicationController
     @sample_controlled_vocab.update_attributes(params[:sample_controlled_vocab])
     respond_with(@sample_controlled_vocab)
   end
+
+  private
 
 
 end

@@ -7,6 +7,8 @@ class SampleControlledVocab < ActiveRecord::Base
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
 
+  grouped_pagination
+
   def labels
     sample_controlled_vocab_terms.collect(&:label)
   end
