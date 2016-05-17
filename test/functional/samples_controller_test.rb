@@ -1,13 +1,12 @@
 require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include HtmlHelper
 
   test 'index' do
-    Factory(:sample,:policy=>Factory(:public_policy))
+    Factory(:sample, policy: Factory(:public_policy))
     get :index
     assert_response :success
     assert_select '#samples-table table', count: 0
@@ -48,42 +47,41 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '22', sample.get_attribute(:age)
     assert_equal '22.1', sample.get_attribute(:weight)
     assert_equal 'M13 9PL', sample.get_attribute(:postcode)
-    assert_equal person.user,sample.contributor
+    assert_equal person.user, sample.contributor
   end
 
   test 'create and update with boolean' do
     person = Factory(:person)
     login_as(person)
     type = Factory(:simple_sample_type)
-    type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false, :sample_type => type)
+    type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     assert_difference('Sample.count') do
-      post :create, sample: { sample_type_id: type.id, data: { the_title: 'ttt', bool:'1' } }
+      post :create, sample: { sample_type_id: type.id, data: { the_title: 'ttt', bool: '1' } }
     end
-    assert_not_nil sample=assigns(:sample)
-    assert_equal 'ttt',sample.get_attribute(:the_title)
-    assert_equal true,sample.get_attribute(:bool)
+    assert_not_nil sample = assigns(:sample)
+    assert_equal 'ttt', sample.get_attribute(:the_title)
+    assert_equal true, sample.get_attribute(:bool)
     assert_no_difference('Sample.count') do
-      put :update, id:sample.id,sample: { data: { the_title: 'ttt', bool:'0' } }
+      put :update, id: sample.id, sample: { data: { the_title: 'ttt', bool: '0' } }
     end
-    assert_not_nil sample=assigns(:sample)
-    assert_equal 'ttt',sample.get_attribute(:the_title)
-    assert_equal false,sample.get_attribute(:bool)
+    assert_not_nil sample = assigns(:sample)
+    assert_equal 'ttt', sample.get_attribute(:the_title)
+    assert_equal false, sample.get_attribute(:bool)
   end
 
   test 'show sample with boolean' do
     person = Factory(:person)
     login_as(person)
     type = Factory(:simple_sample_type)
-    type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false, :sample_type => type)
+    type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
-    sample=Factory(:sample,:sample_type=>type)
+    sample = Factory(:sample, sample_type: type)
     sample.set_attribute(:the_title, 'ttt')
     sample.set_attribute(:bool, true)
     sample.save!
-    get :show,id:sample.id
+    get :show, id: sample.id
     assert_response :success
-
   end
 
   test 'edit' do
@@ -117,13 +115,13 @@ class SamplesControllerTest < ActionController::TestCase
     person = Factory(:person_in_multiple_projects)
     login_as(person)
     type = Factory(:patient_sample_type)
-    assert person.projects.count >= 3 #incase the factory changes
+    assert person.projects.count >= 3 # incase the factory changes
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
-      post :create, sample: { sample_type_id: type.id, title: 'My Sample', data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }, project_ids:project_ids }
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample', data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }, project_ids: project_ids }
     end
-    assert sample=assigns(:sample)
-    assert_equal person.projects[0..1].sort,sample.projects.sort
+    assert sample = assigns(:sample)
+    assert_equal person.projects[0..1].sort, sample.projects.sort
   end
 
   test 'associate with project on update' do
@@ -131,21 +129,20 @@ class SamplesControllerTest < ActionController::TestCase
     login_as(person)
     sample = populated_patient_sample
     assert_empty sample.projects
-    assert person.projects.count >= 3 #incase the factory changes
+    assert person.projects.count >= 3 # incase the factory changes
     project_ids = person.projects[0..1].collect(&:id)
 
-    put :update, id: sample.id, sample: { title: 'Updated Sample',  data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }, project_ids:project_ids }
+    put :update, id: sample.id, sample: { title: 'Updated Sample',  data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }, project_ids: project_ids }
 
-    assert sample=assigns(:sample)
-    assert_equal person.projects[0..1].sort,sample.projects.sort
-
+    assert sample = assigns(:sample)
+    assert_equal person.projects[0..1].sort, sample.projects.sort
   end
 
   test 'contributor can view' do
     person = Factory(:person)
     login_as(person)
-    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
-    get :show,:id=>sample.id
+    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    get :show, id: sample.id
     assert_response :success
   end
 
@@ -153,15 +150,15 @@ class SamplesControllerTest < ActionController::TestCase
     person = Factory(:person)
     other_person = Factory(:person)
     login_as(other_person)
-    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
-    get :show,:id=>sample.id
+    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    get :show, id: sample.id
     assert_response :forbidden
   end
 
   test 'anonymous cannot view' do
     person = Factory(:person)
-    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
-    get :show,:id=>sample.id
+    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    get :show, id: sample.id
     assert_response :forbidden
   end
 
@@ -169,8 +166,8 @@ class SamplesControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
 
-    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
-    get :edit,:id=>sample.id
+    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    get :edit, id: sample.id
     assert_response :success
   end
 
@@ -178,16 +175,16 @@ class SamplesControllerTest < ActionController::TestCase
     person = Factory(:person)
     other_person = Factory(:person)
     login_as(other_person)
-    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
-    get :edit,:id=>sample.id
+    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    get :edit, id: sample.id
     assert_redirected_to sample
     refute_nil flash[:error]
   end
 
   test 'anonymous cannot edit' do
     person = Factory(:person)
-    sample = Factory(:sample, :policy=>Factory(:private_policy), :contributor=>person)
-    get :edit,:id=>sample.id
+    sample = Factory(:sample, policy: Factory(:private_policy), contributor: person)
+    get :edit, id: sample.id
     assert_redirected_to sample
     refute_nil flash[:error]
   end
@@ -197,13 +194,12 @@ class SamplesControllerTest < ActionController::TestCase
     login_as(person)
     type = Factory(:patient_sample_type)
 
-
     assert_difference('Sample.count') do
-      post :create, sample: { sample_type_id: type.id, title: 'My Sample',  data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }, project_ids:[] },:sharing=>valid_sharing
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample',  data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }, project_ids: [] }, sharing: valid_sharing
     end
-    assert sample=assigns(:sample)
-    assert_equal person.user,sample.contributor
-    assert_equal Policy::ALL_USERS,sample.policy.sharing_scope
+    assert sample = assigns(:sample)
+    assert_equal person.user, sample.contributor
+    assert_equal Policy::ALL_USERS, sample.policy.sharing_scope
     assert sample.can_view?(Factory(:person).user)
   end
 
@@ -218,36 +214,36 @@ class SamplesControllerTest < ActionController::TestCase
     sample.reload
     refute sample.can_view?(other_person.user)
 
-    put :update, id: sample.id, sample: { title: 'Updated Sample',  data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' },project_ids:[] },:sharing=>valid_sharing
+    put :update, id: sample.id, sample: { title: 'Updated Sample',  data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }, project_ids: [] }, sharing: valid_sharing
 
-    assert sample=assigns(:sample)
-    assert_equal Policy::ALL_USERS,sample.policy.sharing_scope
+    assert sample = assigns(:sample)
+    assert_equal Policy::ALL_USERS, sample.policy.sharing_scope
     assert sample.can_view?(other_person.user)
   end
 
   test 'filter by sample_type route' do
-    assert_routing "sample_types/7/samples",{controller:"samples",action:"index",sample_type_id:"7"}
+    assert_routing 'sample_types/7/samples', controller: 'samples', action: 'index', sample_type_id: '7'
   end
 
   test 'filter by sample type' do
-    sample_type1=Factory(:simple_sample_type)
-    sample_type2=Factory(:simple_sample_type)
-    sample1=Factory(:sample,:sample_type=>sample_type1,:policy=>Factory(:public_policy),:title=>"SAMPLE 1")
-    sample2=Factory(:sample,:sample_type=>sample_type2,:policy=>Factory(:public_policy),:title=>"SAMPLE 2")
+    sample_type1 = Factory(:simple_sample_type)
+    sample_type2 = Factory(:simple_sample_type)
+    sample1 = Factory(:sample, sample_type: sample_type1, policy: Factory(:public_policy), title: 'SAMPLE 1')
+    sample2 = Factory(:sample, sample_type: sample_type2, policy: Factory(:public_policy), title: 'SAMPLE 2')
 
-    get :index,:sample_type_id=>sample_type1.id
+    get :index, sample_type_id: sample_type1.id
     assert_response :success
     assert samples = assigns(:samples)
     assert_includes samples, sample1
     refute_includes samples, sample2
   end
 
-  test "should get table view for data file" do
+  test 'should get table view for data file' do
     data_file = Factory(:data_file, policy: Factory(:private_policy))
     sample_type = Factory(:simple_sample_type)
     3.times do # public
       Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
-              originating_data_file: data_file)
+                       originating_data_file: data_file)
     end
 
     login_as(data_file.contributor)
@@ -260,7 +256,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select '#samples-table thead th', count: 3
   end
 
-  test "should get table view for sample type" do
+  test 'should get table view for sample type' do
     person = Factory(:person)
     sample_type = Factory(:simple_sample_type)
     2.times do # public
@@ -279,25 +275,25 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select '#samples-table tbody tr', count: 2
   end
 
-  test "show table with a boolean sample" do
+  test 'show table with a boolean sample' do
     person = Factory(:person)
     login_as(person)
     type = Factory(:simple_sample_type)
-    type.sample_attributes << Factory(:sample_attribute,:title=>"bool",:sample_attribute_type=>Factory(:boolean_sample_attribute_type),:required=>false, :sample_type => type)
+    type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
-    sample=Factory(:sample,:sample_type=>type)
+    sample = Factory(:sample, sample_type: type)
     sample.set_attribute(:the_title, 'ttt')
     sample.set_attribute(:bool, true)
     sample.save!
-    get :index,sample_type_id:type.id
+    get :index, sample_type_id: type.id
     assert_response :success
   end
 
   test 'filtering for association forms' do
     person = Factory(:person)
-    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: "fish")
-    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: "frog")
-    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: "banana")
+    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: 'fish')
+    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: 'frog')
+    Factory(:sample, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
     login_as(person.user)
 
     get :filter, filter: ''
@@ -328,7 +324,7 @@ class SamplesControllerTest < ActionController::TestCase
     get :show, id: sample
 
     assert_response :success
-    assert_select "p a[href=?]", strain_path(strain), text: /#{strain.title}/
+    assert_select 'p a[href=?]', strain_path(strain), text: /#{strain.title}/
   end
 
   test 'strains show up in related items' do
@@ -345,13 +341,13 @@ class SamplesControllerTest < ActionController::TestCase
     get :show, id: sample
 
     assert_response :success
-    assert_select "div.related-items a[href=?]", strain_path(strain), text: /#{strain.title}/
+    assert_select 'div.related-items a[href=?]', strain_path(strain), text: /#{strain.title}/
   end
 
   private
 
   def populated_patient_sample
-    sample = Sample.new title: 'My Sample', policy:Factory(:public_policy), contributor:Factory(:person)
+    sample = Sample.new title: 'My Sample', policy: Factory(:public_policy), contributor: Factory(:person)
     sample.sample_type = Factory(:patient_sample_type)
     sample.title = 'My sample'
     sample.set_attribute(:full_name, 'Fred Bloggs')
