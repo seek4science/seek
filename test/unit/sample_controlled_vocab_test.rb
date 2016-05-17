@@ -42,4 +42,13 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     refute apples.includes_term?('Fish')
   end
 
+  test 'destroy' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    assert_difference("SampleControlledVocab.count",-1) do
+      assert_difference("SampleControlledVocabTerm.count",-4) do
+        assert cv.destroy
+      end
+    end
+  end
+
 end

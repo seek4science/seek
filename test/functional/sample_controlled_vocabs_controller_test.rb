@@ -149,4 +149,24 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'destroy' do
+    login_as(Factory(:person))
+    cv = Factory(:apples_sample_controlled_vocab)
+    assert_difference("SampleControlledVocab.count",-1) do
+      assert_difference("SampleControlledVocabTerm.count",-4) do
+        delete :destroy, id: cv
+      end
+    end
+  end
+
+  test 'need login to destroy' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    assert_no_difference("SampleControlledVocab.count") do
+      assert_no_difference("SampleControlledVocabTerm.count") do
+        delete :destroy, id: cv
+      end
+    end
+    assert_response :redirect
+  end
+
 end
