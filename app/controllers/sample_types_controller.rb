@@ -7,15 +7,8 @@ class SampleTypesController < ApplicationController
 
   before_filter :get_sample_type, :only => [:show, :edit, :update, :destroy]
   before_filter :check_no_created_samples, :only => [:edit, :update, :destroy]
+  before_filter :find_assets, :only=>[:index]
 
-  def index
-    @sample_types = SampleType.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @sample_types }
-    end
-  end
 
   # GET /sample_types/1
   # GET /sample_types/1.json

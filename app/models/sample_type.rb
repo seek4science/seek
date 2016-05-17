@@ -25,6 +25,8 @@ class SampleType < ActiveRecord::Base
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
 
+  grouped_pagination
+
   def self.can_create?
     User.logged_in_and_member?
   end

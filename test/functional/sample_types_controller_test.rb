@@ -14,7 +14,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'should get index' do
     get :index
     assert_response :success
-    assert_not_nil assigns(:sample_types)
+    refute_nil assigns(:sample_types)
   end
 
   test 'should get new' do
