@@ -30,7 +30,7 @@ settings, just before the Directory definition.
 
 You can find out more about this configuration at
 
-[https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html#deploying_rack_to_sub_uri](https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html#deploying_rack_to_sub_uri)
+[https://www.phusionpassenger.com/library/deploy/apache/deploy/ruby/#deploying-an-app-to-a-sub-uri-or-subdirectory](https://www.phusionpassenger.com/library/deploy/apache/deploy/ruby/#deploying-an-app-to-a-sub-uri-or-subdirectory)
 
 ## Setting the relative_url_root
 
