@@ -29,8 +29,8 @@ settings, just before the Directory definition.
     </Location>
 
 You can find out more about this configuration at
-https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html#dep
-loying_rails_to_sub_uri
+
+[https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html#deploying_rack_to_sub_uri](https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html#deploying_rack_to_sub_uri)
 
 ## Setting the relative_url_root
 
@@ -53,4 +53,4 @@ Now restart Apache, and if you have already ran seek clear the cache with:
 
     bundle exec rake tmp:clear
 
-You should now be able to visit and use seek at http://localhost/seek
+You should now be able to visit and use seek at [http://localhost/seek](http://localhost/seek)
