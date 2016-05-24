@@ -9,7 +9,7 @@
       For example,  if you measure the concentration of compounds at pH 5, 6 & 7, the factor studied is the pH (i.e. it is about the treatment you apply rather than the measurements you make).
     </p>
 
-    <center>
+    <div class="center-block">
       <div id="add_condition_or_factor" style="display:block;">
         <%= render :partial=>"add_condition_or_factor", :locals => {:asset => 'data_file'} %>
       </div>
@@ -21,6 +21,6 @@
           <%= render :partial=>"condition_or_factor_row",:collection=>@display_data_file.studied_factors, :locals=>{:asset => 'data_file', :show_delete=>true} %>
         </div>
       </ul>
-    </center>
+    </div>
 </div>
 

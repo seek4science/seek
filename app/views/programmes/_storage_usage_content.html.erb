@@ -1,0 +1,20 @@
+
+<p>
+  Total: <strong><%= number_to_human_size programme.total_asset_size %></strong>
+</p>
+
+<% if programme.projects.any? %>
+
+    The breakdown for each project is as follows:
+    <ul>
+      <% programme.projects.each do |project| %>
+          <li>
+            <%= link_to project.title, project %> -
+            <%= render partial: 'projects/storage_usage_content', locals: { project: project, standalone: false } %>
+          </li>
+      <% end %>
+    </ul>
+
+<% end %>
+
+

@@ -12,6 +12,26 @@
       <strong>Web page:</strong>
       <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>
     </p>
+
+    <% if logged_in_and_registered? %>
+
+        <p class="programme_administrators">
+          <strong><%= t('programme') %> Administrators:</strong>
+          <%= programme_administrator_link_list @programme -%>
+        </p>
+
+    <% end %>
+
+    <% if @programme.funding_codes.any? %>
+        <strong>Funding codes:</strong>
+        <ul>
+          <% @programme.funding_codes.each do |code| %>
+              <li><%= code %></li>
+          <% end %>
+        </ul>
+    <% end %>
+
+
     <strong>Funding details:</strong>
     <div class="well well-sm">
       <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>
@@ -20,6 +40,10 @@
 
   <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @programme } -%>
+    <% if @programme.can_manage? -%>
+        <%= render :partial => 'general/storage_usage_box', locals: { programme: @programme,
+                                                                      url: storage_report_programme_path(@programme)} %>
+    <% end %>
   </div>
 </div>
 

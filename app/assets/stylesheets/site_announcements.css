@@ -1,7 +1,7 @@
 div#notification_setttings p {
 	font-size: larger;
 	padding-left: 2em;
-	padding-top: 1em;	
+	padding-top: 1em;
 }
 
 .headline_announcement {
@@ -12,10 +12,10 @@ div#notification_setttings p {
 
 .headline_announcement_title {
     font-weight: bolder;
-    font-size: larger;    
+    font-size: larger;
 }
 
-.headline_announcement_date {    
+.headline_announcement_date {
     font-size: smaller;
     color: #666666;
 }
@@ -26,103 +26,7 @@ div#notification_setttings p {
     display: inline-block;
 }
 
-ul.announcement_list {    
-    padding: 0em 1em 1em 0em;
-}
-ul.announcement {
-    font-size: large;
-}
-li.announcement {    
-    list-style: none;
-}
-
-li.announcement .announcement_title {
-    font-weight: bold;
-    font-size: larger;
-}
-
-li.announcement .announcement_date {    
-    color: #666;
-    font-size:smaller;
-}
-
-li.announcement .announcement_announcer {
-    font-size: smaller;
-    color: #666;
-}
-
-li.announcement .announcement_body {
-    padding: 1em 1em 0.5em 1em;
-}
-
-li.announcement span.announcement_edit {
-    float: right;
-}
-
-li.announcement .announcement_seperator {
-    border-top: #aaa solid 1px;
-    margin-top: 1em;
-    padding-bottom: 1em;
-    width: 100%;
-}
-
-li.announcement .announcement_attributes {
-    font-size: x-small;
-    color: #777;
-}
-
 ul.feed_announcement_list {
-    padding: 0em;
-    font-size: smaller;
-    margin: 0 0 0 0;
-    padding: 0 0 0 0;
-}
-
-li.feed_announcement {
+    padding-left: 0;
     list-style: none;
-    margin: 0 0 0 0;
-    padding: 0.2em 0 0.2em 0;
-    text-align: left;
-}
-
-li.feed_announcement .announcement_title {
-
-}
-
-li.feed_announcement .announcement_date {
-    margin: 0 0 0 0;
-    padding: 0 0 0 0;
-    color: #666;
-}
-
-li.feed_announcement .announcement_announcer {
-    margin: 0 0 0 0;
-    padding: 0 0 0 0;
-    color: #666;
-}
-
-li.feed_announcement .announcement_seperator {
-    border-top: #ccc solid 1px;
-    width: 100%;
-}
-
-li.feed_announcement .announcement_attributes {
-    font-size: x-small;
-    color: #777;
-}
-
-div#announcement_form {
-	padding-left: 2em;	
-}
-
-div#announcement_form .comment {
-	color: #666;
-}
-
-div#announcement_form p {
-	padding-top: 0.5em;
-}
-
-div#announcement_form label {
-	font-weight: bold;
 }

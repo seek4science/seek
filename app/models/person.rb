@@ -6,6 +6,8 @@ class Person < ActiveRecord::Base
   include Seek::Taggable
   include Seek::Roles::AdminDefinedRoles
 
+  auto_strip_attributes :email, :first_name, :last_name, :web_page
+
   alias_attribute :title, :name
 
   acts_as_yellow_pages
@@ -18,10 +20,9 @@ class Person < ActiveRecord::Base
   acts_as_annotatable :name_field=>:name
 
   validates_presence_of :email
-
-  #FIXME: consolidate these regular expressions into 1 holding class
-  validates_format_of :email,:with => RFC822::EMAIL
-  validates_format_of :web_page, :with=>/(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix,:allow_nil=>true,:allow_blank=>true
+  
+  validates :email,format: {:with => RFC822::EMAIL}
+  validates :web_page, url: {allow_nil: true, allow_blank: true}
 
   validates_uniqueness_of :email,:case_sensitive => false
 
@@ -61,7 +62,7 @@ class Person < ActiveRecord::Base
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
 
   searchable(:auto_index => false) do
-    text :project_roles
+    text :project_positions
     text :disciplines do
       disciplines.map{|d| d.title}
     end
@@ -260,7 +261,7 @@ class Person < ActiveRecord::Base
   end
 
   def member?
-    !projects.empty?
+    projects.any?
   end
 
   def member_of?(item_or_array)
@@ -290,12 +291,12 @@ class Person < ActiveRecord::Base
   end
 
   #the roles defined within the project
-  def project_roles
-    project_roles = []
+  def project_positions
+    project_positions = []
     group_memberships.each do |gm|
-      project_roles = project_roles | gm.project_roles
+      project_positions = project_positions | gm.project_positions
     end
-    project_roles
+    project_positions
   end
 
   def update_first_letter
@@ -306,11 +307,11 @@ class Person < ActiveRecord::Base
     self.first_letter=first_letter
   end
 
-  def project_roles_of_project(projects_or_project)
+  def project_positions_of_project(projects_or_project)
     #Get intersection of all project memberships + person's memberships to find project membership
 	  projects_or_project = Array(projects_or_project)
     memberships = group_memberships.select{|g| projects_or_project.include? g.work_group.project}
-    return memberships.collect{|m| m.project_roles}.flatten
+    return memberships.collect{|m| m.project_positions}.flatten
   end
 
   def assets
@@ -394,6 +395,29 @@ class Person < ActiveRecord::Base
        related_items |= user.studies
      end
      related_items
+  end
+
+  def recent_activity(limit = 10)
+    # TODO: Need to find a better way of doing this
+    results = ActivityLog.group(:id, :activity_loggable_type, :activity_loggable_id).
+        where(culprit_type: 'User', culprit_id: user, action: 'update').
+        where('controller_name != \'sessions\'').
+        where('controller_name != \'people\'').
+        order('created_at DESC').
+        limit(limit).
+        uniq +
+    ActivityLog.group(:id, :activity_loggable_type, :activity_loggable_id).
+        where(culprit_type: 'User', culprit_id: user, action: 'create').
+        where('controller_name != \'sessions\'').
+        where('controller_name != \'people\'').
+        order('created_at DESC').
+        limit(limit).
+        uniq
+    results.sort_by { |r| r.created_at }.reverse.uniq { |r| "#{r.activity_loggable_type}#{r.activity_loggable_id}" }[0...limit]
+  end
+
+  def recent_items(limit = 10)
+    recent_activity(limit).map { |a| a.activity_loggable }
   end
 
   #remove the permissions which are set on this person

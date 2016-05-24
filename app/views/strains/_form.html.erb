@@ -1,4 +1,4 @@
-<%= javascript_include_tag 'strain', 'biosample' -%>
+<%= javascript_include_tag 'strain' -%>
 <script type="text/javascript">
     updateFancyMultiselect('strain_project_ids');
 </script>
@@ -69,7 +69,6 @@
   <% end %>
 
   <%= f.hidden_field :id %>
-  <%= f.hidden_field :from_biosamples %>
 
   <%
      button_text=action=="edit" ? "Update" : "Create"

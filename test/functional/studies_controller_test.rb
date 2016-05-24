@@ -44,8 +44,8 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study.id
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"Publications (3)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"Publications (3)",:count=>1
     end
   end
 
@@ -278,10 +278,10 @@ class StudiesControllerTest < ActionController::TestCase
     get :show,:id=>study
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
-      assert_select "h3",:text=>"#{I18n.t('sop').pluralize} (1+1)",:count=>1
-      assert_select "h3",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"#{I18n.t('assays.assay').pluralize} (1)",:count=>1
+      assert_select "a",:text=>"#{I18n.t('sop').pluralize} (1+1)",:count=>1
+      assert_select "a",:text=>"#{I18n.t('data_file').pluralize} (1+1)",:count=>1
     end
 
     assert_select "div.list_item" do
@@ -358,8 +358,8 @@ class StudiesControllerTest < ActionController::TestCase
     s=studies(:metabolomics_study)
     get :show,:id=>s
     assert_response :success
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"#{I18n.t('investigation').pluralize} (1)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"#{I18n.t('investigation').pluralize} (1)",:count=>1
     end
   end
   
@@ -534,6 +534,23 @@ class StudiesControllerTest < ActionController::TestCase
 
     study.reload
     assert_equal 1, study.creators.count
+  end
+
+  test "programme studies through nested routing" do
+    assert_routing 'programmes/2/studies', { controller: 'studies', action: 'index', programme_id: '2' }
+    programme = Factory(:programme)
+    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy))
+    investigation2 = Factory(:investigation, policy: Factory(:public_policy))
+    study = Factory(:study, investigation: investigation, policy: Factory(:public_policy))
+    study2 = Factory(:study, investigation: investigation2, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", study_path(study), text: study.title
+      assert_select "a[href=?]", study_path(study2), text: study2.title, count: 0
+    end
   end
 
 end

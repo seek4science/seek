@@ -6,6 +6,21 @@ module AssetsHelper
     controller_name.downcase.singularize.underscore
   end
 
+  #will render a view of the asset, if available. For example, a slideshare based asset could give a embedded slideshare view
+  def rendered_asset_view(asset)
+    return '' unless asset.can_download?
+    content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}") do
+      Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob).render
+    end
+    unless content.blank?
+      content_tag(:div,class:'renderer') do
+        content.html_safe
+      end
+    else
+      ''
+    end
+  end
+
   def can_create_new_items?
     #the state of being able to create assets is the same for all assets
     DataFile.can_create?
@@ -49,7 +64,7 @@ module AssetsHelper
       resource_type = resource_or_text.class.name
       if resource_or_text.is_a?(Assay)
         text = resource_or_text.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
-      elsif resource_or_text.is_a?(Specimen)
+      elsif resource_or_text.is_a?(DeprecatedSpecimen)
         text = t('biosamples.sample_parent_term')
       elsif !(translated = translate_resource_type(resource_type)).include?('translation missing')
         text = translated

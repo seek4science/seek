@@ -14,7 +14,7 @@ class SinglePublishingTest < ActionController::TestCase
 
   test "should be able to do publish when publishable" do
     df=data_with_isa
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     df.projects << gatekeeper.projects.first
     assert df.can_publish?,"The data file must be manageable for this test to succeed"
 
@@ -86,7 +86,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     notifying_df=assay.data_files.reject{|d|d==df}.first
     request_publishing_df = Factory(:data_file,
-                                    :project_ids => Factory(:gatekeeper).projects.collect(&:id),
+                                    :project_ids => Factory(:asset_gatekeeper).projects.collect(&:id),
                                     :contributor => users(:datafile_owner),
                                     :assays => [assay])
     publishing_df = Factory(:data_file,
@@ -101,42 +101,42 @@ class SinglePublishingTest < ActionController::TestCase
     get :publish_related_items, :id=>df.id
     assert_response :success
 
-    assert_select "li.type_and_title",:text=>/Investigation/,:count=>1 do
+    assert_select ".type_and_title",:text=>/Investigation/,:count=>1 do
       assert_select "a[href=?]",investigation_path(investigation),:text=>/#{investigation.title}/
     end
-    assert_select "li.secondary",:text=>/Publish/ do
+    assert_select ".checkbox",:text=>/Publish/ do
       assert_select "input[type='checkbox'][id=?]","publish_Investigation_#{investigation.id}"
     end
 
-    assert_select "li.type_and_title",:text=>/Study/,:count=>1 do
+    assert_select ".type_and_title",:text=>/Study/,:count=>1 do
       assert_select "a[href=?]",study_path(study),:text=>/#{study.title}/
     end
-    assert_select "li.secondary",:text=>/Publish/ do
+    assert_select ".checkbox",:text=>/Publish/ do
       assert_select "input[type='checkbox'][id=?]","publish_Study_#{study.id}"
     end
 
-    assert_select "li.type_and_title",:text=>/Assay/,:count=>1 do
+    assert_select ".type_and_title",:text=>/Assay/,:count=>1 do
       assert_select "a[href=?]",assay_path(assay),:text=>/#{assay.title}/
     end
-    assert_select "li.secondary",:text=>/Publish/ do
+    assert_select ".checkbox",:text=>/Publish/ do
       assert_select "input[type='checkbox'][id=?]","publish_Assay_#{assay.id}"
     end
 
-    assert_select "li.type_and_title",:text=>/#{I18n.t('data_file')}/,:count=>4 do
+    assert_select ".type_and_title",:text=>/#{I18n.t('data_file')}/,:count=>4 do
       assert_select "a[href=?]",data_file_path(df),:text=>/#{df.title}/
       assert_select "a[href=?]",data_file_path(publishing_df),:text=>/#{publishing_df.title}/
       assert_select "a[href=?]",data_file_path(request_publishing_df),:text=>/#{request_publishing_df.title}/
       assert_select "a[href=?]",data_file_path(notifying_df),:text=>/#{notifying_df.title}/
     end
-    assert_select "li.secondary",:text=>/Publish/ do
+    assert_select ".checkbox",:text=>/Publish/ do
       assert_select "input[type='checkbox'][id=?]","publish_DataFile_#{publishing_df.id}"
       assert_select "input[type='checkbox'][id=?]","publish_DataFile_#{request_publishing_df.id}"
-      assert_select "input[disabled='disabled'][type='checkbox'][id=?]","publish_DataFile_#{notifying_df.id}"
     end
+    assert_select "span.label-warning", :text => "Can't publish", :count => 1
   end
 
   test "get check_gatekeeper_required" do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     df = Factory(:data_file,:project_ids=>gatekeeper.projects.collect(&:id),:contributor=>User.current_user)
     model = Factory(:model,:project_ids=>gatekeeper.projects.collect(&:id),:contributor=>User.current_user)
     sop = Factory(:sop,:contributor=>User.current_user)
@@ -169,7 +169,7 @@ class SinglePublishingTest < ActionController::TestCase
 
   test "if the asset has no related items, proceed directly to check_gatekeeper_required" do
     df=data_file_for_publishing
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     df.projects << gatekeeper.projects.first
     assert df.can_publish?,"The data file must be manageable for this test to succeed"
 
@@ -217,7 +217,7 @@ class SinglePublishingTest < ActionController::TestCase
   end
 
   test "sending publishing request when doing publish for asset that need gatekeeper's approval" do
-    df=Factory(:data_file, :contributor => User.current_user, :project_ids => Factory(:gatekeeper).projects.collect(&:id))
+    df=Factory(:data_file, :contributor => User.current_user, :project_ids => Factory(:asset_gatekeeper).projects.collect(&:id))
     assert df.can_publish?,"The data file must be publishable for this test to succeed"
     assert df.gatekeeper_required?,"This datafile must need gatekeeper's approval for the test to succeed'"
     assert  !df.is_waiting_approval?(User.current_user),"The publishing request for this data file must not be sent for this test to succeed"

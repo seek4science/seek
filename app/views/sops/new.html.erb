@@ -7,7 +7,7 @@
       <%= render :partial=>"assets/upload_box" -%>
 
       <div class="form-group">
-        <label>Title</label>
+        <label>Title <span class="required">*</span></label>
         <% sop_title_value = (params[:sop].blank? || params[:sop][:title].blank?) ? nil : params[:sop][:title] -%>
         <%= text_field_tag 'sop[title]', sop_title_value, :class=>"form-control" -%>
       </div>
@@ -22,11 +22,11 @@
 
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} if show_scales?%>
 
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
+
       <%= fields_for(@sop) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
-
-      <%= fields_for(@sop) { |f|  f.fancy_multiselect :samples, {:hidden=> @sop.samples.blank?  ? true : false, :other_projects_checkbox => true}} -%>
 
       <div>
         <%= preview_permission_popup_link(@sop)-%>

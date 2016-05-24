@@ -2,23 +2,29 @@
 <div class="show_basic">
   <%= show_title "Review and select associated items" %>
 
+  <p>
+    Listed below are the additional items you associated with item you wish to publish.
+  </p>
 
-    <p>
-      Listed below are the additional items you associated with item you wish to publish.
-    </p>
-    <p>
-      If you have the required access rights, you can choose to publish it by <b>checking</b> the
-      <span class="published"><b>Publish</b></span> checkbox beside the item.
-      If you do not have the required access rights to publish, the checkbox is
-      <span style="color:gray;font-weight:bolder">disabled</span>. Somebody that can publish that item is listed next to it and you should contact them and ask them to publish it for you.
-    </p>
-
+  <p>
+    If you have the required access rights, you can choose to publish it by <b>checking</b> the
+    <span class="publish-colour"><b>Publish</b></span> checkbox beside the item.
+    If you do not have the required access rights to publish, the checkbox is
+    <span style="color:gray;font-weight:bolder">disabled</span>. Somebody that can publish that item is listed next to it and you should contact them and ask them to publish it for you.
+  </p>
 
   <br/>
   <%= form_tag({:action => :check_gatekeeper_required},:method=>:post) do %>
       <% @items_for_publishing.each do |item| %>
           <% if item.contains_publishable_items? %>
-              <%= render :partial => "assets/publishing/isa_publishing_preview", :object => item %>
+              <% if item.is_asset? %>
+                <%= render :partial => "assets/publishing/isa_publishing_preview",
+                           :collection => item.assays.map(&:study).map(&:investigation).flatten.uniq,
+                           :locals => { :preselected => item } %>
+              <% else %>
+                <%= render :partial => "assets/publishing/isa_publishing_preview", :object => item,
+                           :locals => { :preselected => item } %>
+              <% end %>
           <% else %>
               <%= check_box_tag publishing_item_param(item), 1, true, {:style => 'display:none;'} %>
           <% end %>
@@ -27,7 +33,7 @@
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
       <%= submit_tag "Next",:disable_with=>"Next", :class => 'btn btn-primary' -%>
-      Or
+      or
       <%= cancel_button(resource) %>
   <% end %>
 </div>

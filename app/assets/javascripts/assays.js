@@ -1,6 +1,7 @@
 var sops_assets=new Array();
 var models_assets=new Array();
 var data_files_assets=new Array();
+var samples_assets=new Array();
 var organisms = new Array();
 var assays_array = new Array();
 var id_rel_array = new Array();
@@ -53,7 +54,7 @@ function addSop(title,id) {
 function addSelectedSop() {
     selected_option_index=$("possible_sops").selectedIndex;
     selected_option=$("possible_sops").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
 
     i = $('possible_sops').selectedIndex;
@@ -132,7 +133,7 @@ function addDataFile(title,id,relationshipType) {
 function addSelectedDataFile() {
     selected_option_index=$("possible_data_files").selectedIndex;
     selected_option=$("possible_data_files").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
     if ($("data_file_relationship_type")) {
         relationshipType = $("data_file_relationship_type").options[$("data_file_relationship_type").selectedIndex].text;
@@ -216,7 +217,7 @@ function addModel(title,id) {
 function addSelectedModel() {
     selected_option_index=$("possible_models").selectedIndex;
     selected_option=$("possible_models").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
 
     i = $('possible_models').selectedIndex;
@@ -286,6 +287,88 @@ function updateModels() {
 
 }
 
+// Samples
+
+//Models
+function addSample(title,id) {
+    if(checkNotInList(id,samples_assets)) {
+        samples_assets.push([title,id]);
+    }
+}
+
+function addSelectedSample() {
+    selected_option_index=$("possible_samples").selectedIndex;
+    selected_option=$("possible_samples").options[selected_option_index];
+    title=selected_option.innerHTML;
+    id=selected_option.value;
+
+    i = $('possible_samples').selectedIndex;
+    selected_id = $('possible_samples').options[i].value;
+    if(selected_id != '0') {
+        if(checkNotInList(id,samples_assets)) {
+            addSample(title,id);
+            updateSamples();
+        }
+        else {
+            alert('The following item had already been added:\n\n' +
+            title);
+        }
+    }
+}
+
+function removeSample(index) {
+    samples_assets.splice(index, 1);
+
+    // update the page
+    updateSamples();
+}
+
+function updateSamples() {
+    sample_text='<ul class="related_asset_list">';
+    type="Sample";
+    sample_ids=new Array();
+
+    for (var i=0;i<samples_assets.length;i++) {
+        sample=samples_assets[i];
+        title=sample[0];
+        id=sample[1];
+        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
+        sample_text += '<li>' + titleText
+            //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
+        + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
+        + '[<a href="" onclick="javascript:removeSample('+i+'); return(false);">remove</a>]</small></li>';
+        sample_ids.push(id);
+    }
+
+    sample_text += '</ul>';
+
+    // update the page
+    if(samples_assets.length == 0) {
+        $('sample_to_list').innerHTML = '<span class="none_text">None</span>';
+    }
+    else {
+        $('sample_to_list').innerHTML = sample_text;
+    }
+
+    clearList('sample_ids');
+
+    select=$('sample_ids');
+    for (i=0;i<sample_ids.length;i++) {
+        id=sample_ids[i];
+        o=document.createElement('option');
+        o.value=id;
+        o.text=id;
+        o.selected=true;
+        try {
+            select.add(o); //for older IE version
+        }
+        catch (ex) {
+            select.add(o,null);
+        }
+    }
+
+}
+
 function check_show_add_assay() {
     i = $('possible_assays').selectedIndex;
     selected_id = $('possible_assays').options[i].value;
@@ -305,7 +388,7 @@ function addAssay(title,id,relationshipType) {
 function addSelectedAssay() {
     selected_option_index=$("possible_assays").selectedIndex;
     selected_option=$("possible_assays").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
     if ($("assay_relationship_type")) {
         relationshipType = $("assay_relationship_type").options[$("assay_relationship_type").selectedIndex].text;
@@ -412,7 +495,7 @@ function addOrganism(title,id,strain_info,strain_id,culture_growth,t_id,t_title)
 function addSelectedOrganism() {
     selected_option_index=$("possible_organisms").selectedIndex;
     selected_option=$("possible_organisms").options[selected_option_index];
-    title=selected_option.text;
+    title=selected_option.innerHTML;
     id=selected_option.value;
     //strains selection list can be null when no strains is defined to an organism
     if($('strains')){

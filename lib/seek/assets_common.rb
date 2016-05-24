@@ -57,7 +57,7 @@ module Seek
       assay_ids.each.with_index do |assay_id, index|
         if (assay = Assay.find(assay_id)).can_edit?
           relationship = RelationshipType.find_by_title(relationship_type_titles[index])
-          assay.associate(asset, relationship)
+          assay.associate(asset, relationship: relationship)
         end
       end
     end

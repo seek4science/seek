@@ -34,7 +34,7 @@ module ScalesHelper
     length=options[:truncate_length]
     length||=150
     link = scale_path(scale)
-    link_to h(truncate(scale.name, :length=>length)), link, :class=>options[:class], :id=>options[:id], :style=>options[:style], :title=>tooltip_title_attrib(scale.name)
+    link_to h(truncate(scale.name, :length=>length)), link, :class=>options[:class], :id=>options[:id], :style=>options[:style], 'data-tooltip' => tooltip(scale.name)
   end
 
   def sort_scales scales

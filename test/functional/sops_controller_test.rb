@@ -192,24 +192,6 @@ class SopsControllerTest < ActionController::TestCase
     assert_includes new_assay.sops, s
   end
 
-  test "associate sample" do
-     # assign to a new sop
-     sop_with_samples,blob = valid_sop
-     sop_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
-
-     assert_difference("Sop.count") do
-       post :create,:sop => sop_with_samples,:content_blobs => [blob], :sharing => valid_sharing
-     end
-
-    s = assigns(:sop)
-    assert_equal "newTestSample",s.samples.first.title
-
-    #edit associations of samples to an existing sop
-    put :update,:id=> s.id, :sop => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
-    s = assigns(:sop)
-    assert_equal "editTestSample", s.samples.first.title
-  end
-
   test "should create sop" do
     login_as(:owner_of_my_first_sop) #can edit assay_can_edit_by_my_first_sop_owner
     sop,blob = valid_sop
@@ -350,21 +332,6 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, :id=>s
     assert_select "a", :text=>/Edit experimental conditions/, :count=>0
-  end
-
-  def test_should_be_able_to_edit_exp_conditions_for_owners_downloadable_only_sop
-    login_as(:owner_of_my_first_sop)
-    s=sops(:downloadable_sop)
-
-    get :show, :id=>s
-    assert_select "a", :text=>/Edit experimental conditions/, :count=>1
-  end
-
-  def test_should_be_able_to_edit_exp_conditions_for_editable_sop
-    s=sops(:editable_sop)
-
-    get :show, :id=>sops(:editable_sop)
-    assert_select "a", :text=>/Edit experimental conditions/, :count=>1
   end
 
   def test_should_show_version
@@ -656,7 +623,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
     as_not_virtualliver do
-      gatekeeper = Factory(:gatekeeper)
+      gatekeeper = Factory(:asset_gatekeeper)
     post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id)},:content_blobs => [{:data => file_for_upload}],
          :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
       sop = assigns(:sop)
@@ -671,7 +638,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should not change the policy if the item is requested to be published, when managing sop" do
-      gatekeeper = Factory(:gatekeeper)
+      gatekeeper = Factory(:asset_gatekeeper)
       policy = Factory(:policy, :sharing_scope => Policy::PRIVATE, :permissions => [Factory(:permission)])
       sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id), :policy => policy)
       login_as(sop.contributor)
@@ -780,7 +747,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'send publish approval request' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id))
 
     #request publish
@@ -792,7 +759,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'dont send publish approval request if can_publish' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, :contributor => gatekeeper.user, :project_ids => gatekeeper.projects.collect(&:id))
 
     #request publish
@@ -805,7 +772,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'dont send publish approval request again if it was already sent by this person' do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id))
 
     #request publish
@@ -867,6 +834,68 @@ class SopsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select "h1",:text=>"SOPs"
+  end
+
+  test "should display null license text" do
+    sop = Factory :sop, :policy => Factory(:public_policy)
+
+    get :show, :id => sop
+
+    assert_select '.panel .panel-body span.none_text', :text => 'No license specified'
+  end
+
+  test "should display license" do
+    sop = Factory :sop, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
+
+    get :show, :id => sop
+
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
+  end
+
+  test "should display license for current version" do
+    sop = Factory :sop, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
+    sopv = Factory :sop_version_with_blob, :sop => sop
+
+    sop.update_attributes :license => 'CC0-1.0'
+
+    get :show, :id => sop, :version => 1
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
+
+    get :show, :id => sop, :version => sopv.version
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'CC0 1.0'
+  end
+
+  test "should update license" do
+    user = users(:owner_of_my_first_sop)
+    login_as(user)
+    sop = sops(:editable_sop)
+
+    assert_nil sop.license
+
+    put :update, :id => sop, :sop => { :license => 'CC-BY-SA-4.0' }
+
+    assert_response :redirect
+
+    get :show, :id => sop
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike 4.0'
+    assert_equal 'CC-BY-SA-4.0', assigns(:sop).license
+  end
+
+  test "programme sops through nested routing" do
+    assert_routing 'programmes/2/sops', { controller: 'sops', action: 'index', programme_id: '2' }
+    programme = Factory(:programme)
+    sop = Factory(:sop, projects: programme.projects, policy: Factory(:public_policy))
+    sop2 = Factory(:sop, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", sop_path(sop), text: sop.title
+      assert_select "a[href=?]", sop_path(sop2), text: sop2.title, count: 0
+    end
   end
 
   private

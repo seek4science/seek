@@ -52,7 +52,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     assert assets.empty?
 
     #create items for project
-    ps.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study'}.each do |type|
+    ps.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study' || t=='DeprecatedSample' || t=='DeprecatedSpecimen'}.each do |type|
       Factory("#{type.underscore.gsub('/','_')}", :projects => [project])
     end
     project.reload
@@ -62,7 +62,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     Factory(:assay, :study => study)
 
     assets = ProjectSubscriptionJob.new(1).all_in_project project
-    assert_equal ps.subscribable_types.count, assets.count
+    assert_equal ps.subscribable_types.count-2, assets.count # -2 to account for the Sample and Specimen, which will be removed in future refactoring
   end
 
   test "perform" do

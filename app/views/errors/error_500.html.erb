@@ -1,6 +1,7 @@
-
 <div class="dialog">
   <h2 class="error">We're sorry, but something went wrong with your request.</h2>
   <p>We've been notified about this issue and will be taking a look at it with some urgency.</p>
+  <% if logged_in_and_registered? %>
+    <%= link_to 'Provide feedback', feedback_home_path -%>
+  <% end %>
 </div>
-

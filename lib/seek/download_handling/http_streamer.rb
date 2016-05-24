@@ -8,8 +8,9 @@ module Seek
 
       REDIRECT_LIMIT = 10
 
-      def initialize(url)
+      def initialize(url, options = {})
         @url = url
+        @size_limit = options[:size_limit]
       end
 
       # yields a chunk of data to the given block
@@ -25,7 +26,7 @@ module Seek
             if response.code == '200'
               begin_stream(response, block)
             elsif response.code == '301' || response.code == '302'
-              follow_redirect(response, redirect_count, block)
+              follow_redirect(uri, response, redirect_count, block)
             else
               raise BadResponseCodeException.new(response)
             end
@@ -34,23 +35,25 @@ module Seek
       end
 
       def begin_stream(response, block)
-        max_size = Seek::Config.hard_max_cachable_size
         total_size = 0
 
         response.read_body do |chunk|
           total_size += chunk.size
-          raise SizeLimitExceededException.new(total_size) if total_size > max_size
+          raise SizeLimitExceededException.new(total_size) if @size_limit && (total_size > @size_limit)
           block.call(chunk)
         end
 
         total_size
       end
 
-      def follow_redirect(response, redirect_count, block)
+      def follow_redirect(uri, response, redirect_count, block)
         if redirect_count >= REDIRECT_LIMIT
           raise RedirectLimitExceededException.new(redirect_count)
         else
-          get_uri(URI(response.header['location']), redirect_count + 1, block)
+          new_uri = URI(response.header['location'])
+          new_uri = URI(uri) + new_uri if new_uri.relative?
+
+          get_uri(new_uri, redirect_count + 1, block)
         end
       end
 

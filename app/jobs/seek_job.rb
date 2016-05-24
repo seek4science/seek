@@ -12,8 +12,10 @@ class SeekJob
           perform_job(item)
         end
       rescue Exception => exception
-        report_exception(exception,item)
-        retry_item(item)
+        unless item.destroyed?
+          report_exception(exception,item)
+          retry_item(item)
+        end
       end
     end
     if follow_on_job?

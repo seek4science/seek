@@ -1,0 +1,29 @@
+<% content_for :buttons do %>
+    <% if @sample_type.samples.any? %>
+        <%= button_link_to("View samples", 'view_samples', sample_type_samples_path(@sample_type)) %>
+    <% end %>
+<% end %>
+
+<%= render :partial => "general/item_title", :locals => {:item => @sample_type} %>
+
+<% if @sample_type.template %>
+
+    <h2>Template</h2>
+
+    <%= @sample_type.template.original_filename %> -    <%= link_to 'Download',download_sample_type_content_blob_path(@sample_type,@sample_type.template)  %>
+
+<% end %>
+
+<h2>Attributes</h2>
+
+<ul>
+<% @sample_type.sample_attributes.each do |attribute| %>
+<li>
+  <%= sample_attribute_details(attribute) %>
+</li>
+
+
+<% end %>
+</ul>
+
+<%= render :partial=>"general/items_related_to",:object => @sample_type %>

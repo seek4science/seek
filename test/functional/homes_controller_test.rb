@@ -1,10 +1,18 @@
 require 'test_helper'
 
 class HomesControllerTest < ActionController::TestCase
+
   fixtures :all
 
   include AuthenticatedTestHelper
   include HomesHelper
+
+  test 'funding page' do
+    #check accessible outside
+    get :funding
+    assert_response :success
+    assert_select 'h1',/seek funding/i
+  end
 
   test "test should be accessible to seek even if not logged in" do
     get :index
@@ -116,7 +124,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'root should route to sign_up when no user, otherwise to home' do
-    User.find(:all).each do |u|
+    User.all.each do |u|
       u.delete
     end
     get :index
@@ -156,38 +164,33 @@ class HomesControllerTest < ActionController::TestCase
 
   test "should turn on/off project news and community news" do
     #turn on
-    Seek::Config.project_news_enabled=true
-    Seek::Config.community_news_enabled=true
+    Seek::Config.news_enabled=true
 
     get :index
     assert_response :success
 
-    assert_select "div.panel-heading", :text=>/Community News/, :count=>1
-    assert_select "div.panel-heading", :text=>"#{Seek::Config.application_name} News", :count=>1
+    assert_select "div.panel-heading", :text=>/News/, :count=>1
 
     #turn off
-    Seek::Config.project_news_enabled=false
-    Seek::Config.community_news_enabled=false
-
+    Seek::Config.news_enabled=false
 
     get :index
     assert_response :success
 
-    assert_select "div#project_news", :count => 0
-    assert_select "div#community_news", :count => 0
+    assert_select "div#news-feed", :count => 0
   end
 
   test "feed reader should handle missing feed title" do
 
-    Seek::Config.project_news_enabled=true
-    Seek::Config.project_news_feed_urls = uri_to_feed("simple_feed_with_subtitle.xml")
-    Seek::Config.project_news_number_of_entries = "5"
+    Seek::Config.news_enabled=true
+    Seek::Config.news_feed_urls = uri_to_feed("simple_feed_with_subtitle.xml")
+    Seek::Config.news_number_of_entries = "5"
 
     get :index
 
     assert_response :success
 
-    assert_select "#project_news ul.feed li" do
+    assert_select "#news-feed ul.feed li" do
       assert_select "span.subtle",:text=>/Unknown publisher/,:count=>4
     end
   end
@@ -246,40 +249,31 @@ class HomesControllerTest < ActionController::TestCase
   test "should show the content of project news and community news with the configurable number of entries" do
     sbml = uri_to_sbml_feed
     bbc = uri_to_bbc_feed
-    guardian = uri_to_guardian_feed
-    #project news
-    Seek::Config.project_news_enabled=true
-    Seek::Config.project_news_feed_urls = "#{bbc}, #{sbml}"
-    Seek::Config.project_news_number_of_entries = "5"
 
-    #community news
-    Seek::Config.community_news_enabled=true
-    Seek::Config.community_news_feed_urls = "#{guardian}"
-    Seek::Config.community_news_number_of_entries = "7"
+    Seek::Config.news_enabled=true
+    Seek::Config.news_feed_urls = "#{bbc}, #{sbml}"
+    Seek::Config.news_number_of_entries = "5"
 
     login_as(:aaron)
     get :index
     assert_response :success
 
-    assert_select 'div#project_news ul>li', 5
-    assert_select 'div#community_news ul>li', 7
+    assert_select 'div#news-feed ul>li', 5
 
     logout
     get :index
     assert_response :success
 
-    assert_select 'div#project_news ul>li', 5
-    assert_select 'div#community_news ul>li', 7
+    assert_select 'div#news-feed ul>li', 5
   end
 
   test "recently added should include data_file" do
-    login_as(:aaron)
+    person = Factory(:person_in_project)
 
-    df = Factory :data_file, :title=>"A new data file", :contributor=>User.current_user.person
+    df = Factory :data_file, :title=>"A new data file", :contributor=>person, :policy=>Factory(:public_policy)
     assert_difference "ActivityLog.count" do
-      log = Factory :activity_log, :activity_loggable=>df, :controller_name=>"data_files", :culprit=>User.current_user
+      log = Factory :activity_log, :activity_loggable=>df, :controller_name=>"data_files", :culprit=>person.user
     end
-
 
     get :index
     assert_response :success
@@ -287,10 +281,10 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test "recently added should include presentations" do
-    login_as(:aaron)
+    person = Factory(:person_in_project)
 
-    presentation = Factory :presentation, :title=>"A new presentation", :contributor=>User.current_user.person
-    log = Factory :activity_log, :activity_loggable=>presentation, :controller_name=>"presentations", :culprit=>User.current_user
+    presentation = Factory :presentation, :title=>"A new presentation", :contributor=>person, :policy=>Factory(:public_policy)
+    log = Factory :activity_log, :activity_loggable=>presentation, :controller_name=>"presentations", :culprit=>person.user
 
     get :index
     assert_response :success
@@ -298,6 +292,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test "should show headline announcement" do
+    SiteAnnouncement.destroy_all
     login_as :aaron
     ann=Factory :headline_announcement
 
@@ -384,12 +379,58 @@ class HomesControllerTest < ActionController::TestCase
   test "documentation only shown when enabled" do
     with_config_value :documentation_enabled,true do
       get :index
-      assert_select "li.dropdown span",:text=>"Documentation",:count=>1
+      assert_select "li.dropdown span",:text=>"Help",:count=>1
     end
 
     with_config_value :documentation_enabled,false do
       get :index
-      assert_select "li.dropdown span",:text=>"Documentation",:count=>0
+      assert_select "li.dropdown span",:text=>"Help",:count=>0
+    end
+  end
+
+  test "my recent contributions section works correctly" do
+    person = Factory(:person)
+    login_as(person)
+
+    df = Factory :data_file, :title=>"A new data file", :contributor=>person, :policy=>Factory(:public_policy)
+    sop = Factory :sop, :title=>"A new sop", :contributor=>person, :policy=>Factory(:public_policy)
+    assay= Factory :assay, :title=>"A new assay", :contributor=>person, :policy=>Factory(:public_policy)
+
+    Factory :activity_log, :activity_loggable => df, :controller_name=>"data_files", :culprit=>person.user
+    Factory :activity_log, :activity_loggable => sop, :controller_name=>"sops", :culprit=>person.user
+    Factory :activity_log, :activity_loggable => assay, :controller_name=>"assays", :culprit=>person.user
+
+    get :index
+    assert_response :success
+
+    assert_select "div#my-recent-contributions .panel-body ul li", 3
+    assert_select "div#my-recent-contributions .panel-body ul>li a[href=?]",data_file_path(df),:text=>/A new data file/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",sop_path(sop),:text=>/A new sop/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",assay_path(assay),:text=>/A new assay/
+
+    sop.update_attributes(:title => 'An old sop')
+    Factory :activity_log, :activity_loggable => sop, :controller_name=>"assays", :culprit=>person.user, :action => 'update'
+
+    get :index
+    assert_response :success
+    assert_select "div#my-recent-contributions .panel-body ul li", 3
+    assert_select "div#my-recent-contributions .panel-body ul>li a[href=?]",sop_path(sop),:text=>/An old sop/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",data_file_path(df),:text=>/A new data file/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",assay_path(assay),:text=>/A new assay/
+    assert_select "div#my-recent-contributions .panel-body ul li a[href=?]",sop_path(sop),:text=>/A new sop/, :count => 0
+  end
+
+  test "can enabled/disable front page buttons" do
+    login_as Factory(:user)
+    with_config_value :front_page_buttons_enabled, true do
+        get :index
+        assert_response :success
+        assert_select "a.seek-homepage-button",:count => 3
+    end
+    with_config_value :front_page_buttons_enabled, false do
+      get :index
+      assert_response :success
+      assert_select "a.seek-homepage-button",:count => 0
     end
   end
 

@@ -32,7 +32,7 @@ module Seek #:nodoc:
       module InstanceMethods
 
         def create_snapshot
-          ro_file = Seek::ResearchObjects::Generator.instance.generate(self) # This only works for investigations
+          ro_file = Seek::ResearchObjects::Generator.new(self).generate
           snapshot = snapshots.create
           blob = ContentBlob.new({
                                      tmp_io_object: ro_file,

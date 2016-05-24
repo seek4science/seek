@@ -163,7 +163,6 @@ class PersonTest < ActiveSupport::TestCase
       assert p.valid?
       p.save!
       p.reload
-      pp p.orcid
       assert_equal "http://orcid.org/0000-0003-2130-0865",p.orcid_uri
 
       p.orcid = "0000-0002-1694-233X"
@@ -239,12 +238,12 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_ordered_by_last_name
-    sorted = Person.find(:all).sort_by do |p|
+    sorted = Person.all.sort_by do |p|
       lname = "" || p.last_name.try(:downcase)
       fname = "" || p.first_name.try(:downcase)
       lname+fname
     end
-    assert_equal sorted, Person.find(:all)
+    assert_equal sorted, Person.all
   end
 
   def test_is_asset
@@ -616,12 +615,12 @@ class PersonTest < ActiveSupport::TestCase
 
   end
   
-  def test_roles_association
-    role = Factory(:project_role)
+  def test_positions_association
+    position = Factory(:project_position)
     p=Factory :person
-    p.group_memberships.first.project_roles << role
-    assert_equal 1, p.project_roles.size
-    assert p.project_roles.include?(role)
+    p.group_memberships.first.project_positions << position
+    assert_equal 1, p.project_positions.size
+    assert p.project_positions.include?(position)
   end
   
   def test_update_first_letter
@@ -922,10 +921,10 @@ class PersonTest < ActiveSupport::TestCase
     User.current_user=Factory(:pal).user
     refute Person.can_create?
 
-    User.current_user=Factory(:gatekeeper).user
+    User.current_user=Factory(:asset_gatekeeper).user
     refute Person.can_create?
 
-    User.current_user=Factory(:asset_manager).user
+    User.current_user=Factory(:asset_housekeeper).user
     refute Person.can_create?
 
     User.current_user=Factory(:programme_administrator).user
@@ -1059,6 +1058,23 @@ class PersonTest < ActiveSupport::TestCase
     assert_not_includes person.former_projects, project
     assert_includes person.current_projects, project
     assert_includes person.projects, project
+  end
+
+  test 'trim spaces from email, first_name, last_name' do
+    person = Factory(:brand_new_person)
+    person.email = ' fish@email.com '
+    person.first_name = ' bob '
+    person.last_name = ' monkhouse '
+    person.web_page = ' http://fish.com '
+    assert person.valid?
+    disable_authorization_checks do
+      person.save!
+    end
+    person.reload
+    assert_equal 'fish@email.com',person.email
+    assert_equal 'bob',person.first_name
+    assert_equal 'monkhouse',person.last_name
+    assert_equal 'http://fish.com',person.web_page
   end
 
 end

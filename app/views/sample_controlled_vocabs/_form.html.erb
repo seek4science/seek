@@ -1,0 +1,118 @@
+<%= form_for(@sample_controlled_vocab) do |f| %>
+
+    <%= f.error_messages %>
+
+    <div class="form-group">
+      <label>Title</label><%= required_span %>
+      <%= f.text_field :title, :class => 'form-control', :placeholder => 'Controlled vocabulary name' %>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
+    </div>
+
+
+    <h3>Terms</h3>
+    <table id="new-terms" class="table">
+      <tbody>
+      <% @sample_controlled_vocab.sample_controlled_vocab_terms.each_with_index do |term, index| %>
+          <%= f.fields_for :sample_controlled_vocab_terms, term do |terms_f| %>
+              <tr class="sample-cv-term" data-index="<%= index %>">
+                <td><%= terms_f.text_field :label, :class => 'form-control' %></td>
+                <td>
+                  <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-danger">
+                      Remove
+                      <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '0', :autocomplete => 'off' %>
+                      <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '1', false,
+                                        :class => 'destroy-attribute', :autocomplete => 'off' %>
+                    </label>
+                  </div>
+
+                </td>
+              </tr>
+          <% end %>
+      <% end %>
+      <tr id='add-term-button-row'>
+        <td>
+          <%= button_link_to('Add new term', 'add', '#', :id => 'add-term') %>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+
+    <p class="actions">
+      <%= f.submit (@sample_controlled_vocab.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
+      or
+      <%= cancel_button(@sample_controlled_vocab.new_record? ? sample_controlled_vocabs_path : sample_controlled_vocab_path(@sample_controlled_vocab)) %>
+    </p>
+
+
+<% end %>
+
+<table id="new-term-row" style="display: none">
+  <tbody>
+  <tr class="sample-cv-term success" data-index="--index--">
+    <td>
+      <input class="form-control" id="sample_controlled_vocab_sample_controlled_vocab_terms_attributes_--index--_label" name="sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][label]" type="text">
+    </td>
+    <td>
+      <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-danger">
+          Remove
+          <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][_destroy]", '0', :autocomplete => 'off' %>
+          <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][_destroy]", '1', false,
+                            :class => 'destroy-attribute', :autocomplete => 'off' %>
+        </label>
+      </div>
+
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<script>
+    $j(document).ready(function () {
+        $j('#add-term').click(function () {
+            var newTerm = $j('#new-term-row tbody').clone().html();
+
+            var index = 0;
+            $j('#new-terms tr.sample-cv-term').each(function () {
+                var newIndex = parseInt($j(this).data('index'));
+                if (newIndex > index) {
+                    index = newIndex;
+                }
+            });
+            index++;
+
+            newTerm = newTerm.replace(/--index--/g, index);
+            $j('#add-term-button-row').before($j(newTerm));
+            return false;
+        });
+
+        CVTerms = {
+            removeTerm: function () {
+                var row = $j(this).parents('.sample-cv-term');
+                if ($j(this).is(':checked')) {
+                    if (row.hasClass('success')) { // If it is a new attribute, just delete from the form - doesn't exist yet.
+                        row.remove();
+                        //SampleTypes.recalculatePositions();
+                    } else {
+                        row.addClass('danger');
+                        // This selects all the fields in the row, except the magic "_destroy" checkbox and the hidden ID field
+                        $j(':input:not(.destroy-attribute):not([type=hidden])', row).prop('disabled', true);
+                    }
+                }
+                else {
+                    row.removeClass('danger');
+                    $j(':input:not(.destroy-attribute)', row).prop('disabled', false);
+                }
+            }
+        }
+
+        $j('#new-terms').on('change', '.destroy-attribute', CVTerms.removeTerm);
+    });
+
+</script>

@@ -1,10 +1,11 @@
+require 'seek/research_objects/acts_as_snapshottable'
 
 class Study < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  #FIXME: needs to be declared before acts_as_isa, else ProjectCompat module gets pulled in
+  #FIXME: needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   def projects
     investigation.try(:projects) || []
   end
@@ -15,7 +16,9 @@ class Study < ActiveRecord::Base
       person_responsible.try(:name)
     end
   end if Seek::Config.solr_enabled
+
   acts_as_isa
+  acts_as_snapshottable
 
   attr_accessor :new_link_from_assay
 

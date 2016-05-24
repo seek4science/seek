@@ -1,15 +1,27 @@
 class ContentBlobsController < ApplicationController
 
-  before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_pdf_content, :download]
-  before_filter :find_and_authorize_content_blob, :only=>[:get_pdf, :view_pdf_content, :download]
+  before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_content,:view_pdf_content, :download]
+  before_filter :find_and_authorize_content_blob, :only=>[:get_pdf, :view_content,:view_pdf_content, :download]
   before_filter :set_asset_version, :only=>[:get_pdf, :download]
 
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
 
+  def view_content
+    if @content_blob.is_text?
+      view_text_content
+    else
+      @pdf_url=pdf_url
+      render action: :view_pdf_content,:layout=>false
+    end
+  end
+
+  def view_text_content
+    render file: @content_blob.filepath, layout: false, content_type: 'text/plain'
+  end
+
   def view_pdf_content
-    #param code is used for temporary link
-    @pdf_url = polymorphic_path([@asset,@content_blob], :action => 'download',:intent=>:inline_view, :format => 'pdf', :code => params[:code])
+    @pdf_url=pdf_url
     respond_to do |format|
       format.html { render :layout=>false }
     end
@@ -20,7 +32,11 @@ class ContentBlobsController < ApplicationController
     url = params[:data_url]
     begin
       case URI(url).scheme
-        when 'http', 'https'
+        when 'ftp'
+          handler = Seek::DownloadHandling::FTPHandler.new(url)
+          info = handler.info
+          handle_good_ftp_response(url, info)
+        else
           handler = Seek::DownloadHandling::HTTPHandler.new(url)
           info = handler.info
           if info[:code] == 200
@@ -28,10 +44,6 @@ class ContentBlobsController < ApplicationController
           else
             handle_bad_http_response(info[:code])
           end
-        when 'ftp'
-          handler = Seek::DownloadHandling::FTPHandler.new(url)
-          info = handler.info
-          handle_good_ftp_response(url, info)
       end
     rescue Exception => e
       handle_exception_response(e)
@@ -61,7 +73,7 @@ class ContentBlobsController < ApplicationController
   end
 
   def download
-    @asset.just_used
+    @asset.just_used if @asset.respond_to?(:just_used)
 
     disposition = params[:disposition] || 'attachment'
     image_size = params[:image_size]
@@ -73,6 +85,10 @@ class ContentBlobsController < ApplicationController
   end
 
   private
+
+  def pdf_url
+    polymorphic_path([@asset, @content_blob], :action => 'download', :intent => :inline_view, :format => 'pdf', :code => params[:code])
+  end
 
   #check whether the file is pdf, otherwise convert to pdf
   #then return the pdf file
@@ -138,6 +154,8 @@ class ContentBlobsController < ApplicationController
           Sop.find(params[:sop_id])
         when params[:presentation_id] then
           Presentation.find(params[:presentation_id])
+        when params[:sample_type_id] then
+          SampleType.find(params[:sample_type_id])
       end
     rescue ActiveRecord::RecordNotFound
       error("Unable to find the asset", "is invalid")
@@ -166,11 +184,13 @@ class ContentBlobsController < ApplicationController
   end
 
   def set_asset_version
-    begin
-      @asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
-    rescue Exception=>e
-      error("Unable to find asset version", "is invalid")
-      return false
+    if @content_blob.asset_version
+      begin
+        @asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
+      rescue Exception=>e
+        error("Unable to find asset version", "is invalid")
+        return false
+      end
     end
   end
 end

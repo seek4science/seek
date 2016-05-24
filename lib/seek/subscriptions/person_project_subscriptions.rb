@@ -32,9 +32,17 @@ module Seek
         if work_groups.empty?
           project_subscriptions.delete_all
           subscriptions.delete_all
-        elsif ps = project_subscriptions.find { |ps| ps.project_id == workgroup_or_membership.project.id }
-          # unsunscribe direct project subscriptions
-          project_subscriptions.delete ps
+        else
+          if workgroup_or_membership.is_a?(WorkGroup)
+            pid =workgroup_or_membership.project_id_was
+          else
+            pid = workgroup_or_membership.work_group.project_id_was
+          end
+
+          if (ps = project_subscriptions.find { |ps| ps.project_id == pid })
+            # unsunscribe direct project subscriptions
+            project_subscriptions.delete ps
+          end
         end
       end
 

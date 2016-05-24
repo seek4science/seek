@@ -1,3 +1,22 @@
-<%= render :partial=> "general/index",:locals=>{:new_item_label=>"New Sample"} %>
+<%= index_title -%>
 
-
+<% if @data_file || @sample_type %>
+    <% if @samples.any? %>
+        <div id="samples-table">
+          <% if @data_file %>
+              <%= render partial: "samples/table_view", locals: { samples: @samples, link: true, source_url: samples_table_data_file_path(@data_file) }%>
+          <% else %>
+              <%= render partial: "samples/table_view", locals: { samples: @samples, link: true }%>
+          <% end %>
+        </div>
+        <script>
+          $j(document).ready(function () {
+            Samples.initTable($j('#samples-table'));
+          });
+        </script>
+    <% else %>
+        <span class="none_text">No samples visible.</span>
+    <% end %>
+<% else %>
+    <%= render partial: "general/index_facets_or_paged" %>
+<% end %>

@@ -75,18 +75,12 @@ class PoliciesController < ApplicationController
       cloned_resource.creators = creators if cloned_resource.respond_to?(:creators)
       cloned_resource.contributor = contributor_person
 
-      asset_managers = get_asset_managers cloned_resource
-
       privileged_people = {}
       #exclude the current_person from the privileged people
       contributor_person = nil if contributor_person == current_person
-      asset_managers.delete(current_person)
-      asset_managers.delete(contributor_person)
       creators.delete(current_person)
       creators.delete(contributor_person)
-      asset_managers.each{|am| creators.delete(am)}
       privileged_people['contributor'] = [contributor_person] if contributor_person
-      privileged_people['asset_managers'] = asset_managers unless asset_managers.empty?
       privileged_people['creators'] = creators unless creators.empty?
 
       respond_to do |format|
@@ -105,7 +99,7 @@ class PoliciesController < ApplicationController
     if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
       updated_can_publish_immediately = true
       #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
-    elsif cloned_resource.gatekeeper_required? && !User.current_user.person.is_gatekeeper_of?(cloned_resource)
+    elsif cloned_resource.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(cloned_resource)
       updated_can_publish_immediately = false
     else
       updated_can_publish_immediately = true
@@ -114,14 +108,6 @@ class PoliciesController < ApplicationController
   end
 
   protected
-  def get_asset_managers resource
-    asset_managers = []
-    resource.projects.each do |project|
-      asset_managers |= project.asset_managers
-    end
-    asset_managers.reject!{|am| !resource.can_manage?(am.user) }
-    asset_managers
-  end
 
   def resource_with_assigned_projects resource, project_ids
      if resource.kind_of?Assay

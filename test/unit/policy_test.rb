@@ -146,17 +146,17 @@ class PolicyTest < ActiveSupport::TestCase
     assert_equal (people_with_access_type.count + whitelist_added.count), filtered_people.count
   end
 
-  test 'should have asset managers in the summarize_permissions if the asset is entirely private' do
-    asset_manager = Factory(:asset_manager)
+  test 'should have asset housekeepers in the summarize_permissions if the asset is entirely private' do
+    asset_housekeeper = Factory(:asset_housekeeper)
     policy = Factory(:private_policy)
     User.with_current_user Factory(:user) do
-      people_in_group = policy.summarize_permissions [], [asset_manager]
-      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+' (asset manager)',Policy::MANAGING])
+      people_in_group = policy.summarize_permissions [], [asset_housekeeper]
+      assert people_in_group[Policy::MANAGING].include?([asset_housekeeper.id, asset_housekeeper.name+' (asset housekeeper)',Policy::MANAGING])
     end
   end
 
-  test 'should have asset managers in the summarize_permissions if the asset is not entirely private' do
-    asset_manager = Factory(:asset_manager)
+  test 'should have asset housekeepers in the summarize_permissions if the asset is not entirely private' do
+    asset_housekeeper = Factory(:asset_housekeeper)
 
     #private policy but with permissions
     policy1 = Factory(:private_policy)
@@ -167,16 +167,16 @@ class PolicyTest < ActiveSupport::TestCase
     policy2 = Factory(:all_sysmo_viewable_policy)
 
     User.with_current_user Factory(:user) do
-      people_in_group = policy1.summarize_permissions [], [asset_manager]
-      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+' (asset manager)',Policy::MANAGING])
+      people_in_group = policy1.summarize_permissions [], [asset_housekeeper]
+      assert people_in_group[Policy::MANAGING].include?([asset_housekeeper.id, asset_housekeeper.name+' (asset housekeeper)',Policy::MANAGING])
 
-      people_in_group = policy2.summarize_permissions [], [asset_manager]
-      assert people_in_group[Policy::MANAGING].include?([asset_manager.id, asset_manager.name+' (asset manager)',Policy::MANAGING])
+      people_in_group = policy2.summarize_permissions [], [asset_housekeeper]
+      assert people_in_group[Policy::MANAGING].include?([asset_housekeeper.id, asset_housekeeper.name+' (asset housekeeper)',Policy::MANAGING])
     end
   end
 
   test 'should concat the roles of a person after name' do
-    asset_manager = Factory(:asset_manager)
+    asset_manager = Factory(:asset_housekeeper)
     creator = Factory(:person)
     policy = Factory(:public_policy)
     User.with_current_user Factory(:user) do
@@ -191,9 +191,9 @@ class PolicyTest < ActiveSupport::TestCase
       end
       people_in_group[Policy::MANAGING].each do |person|
         if person[0] == asset_manager.id
-          assert person[1].include?('(asset manager)')
+          assert person[1].include?('(asset housekeeper)')
         else
-          assert !person[1].include?('(asset manager)')
+          assert !person[1].include?('(asset housekeeper)')
         end
       end
     end

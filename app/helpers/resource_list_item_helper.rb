@@ -7,6 +7,8 @@ module ResourceListItemHelper
   def get_list_item_actions_partial resource
     if resource.authorization_supported? && resource.is_downloadable_asset?
       actions_partial = "assets/resource_actions_td"
+    elsif resource.is_a?(Organism)
+      actions_partial = "organisms/resource_actions_td"
     else
       actions_partial = nil
     end
@@ -54,7 +56,7 @@ module ResourceListItemHelper
   end
 
   def list_item_title_for_person(html, person, title, url)
-    icons = seek_role_icons(person)
+    icons = seek_role_icons(person, 16)
     html << "#{link_to title, (url.nil? ? show_resource_path(person) : url)} #{icons}"
     html
   end

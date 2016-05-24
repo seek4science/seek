@@ -5,9 +5,24 @@ class SnapshotTest < ActiveSupport::TestCase
   include MockHelper
 
   fixtures :investigations
-  
+
   setup do
-    @investigation = Factory(:investigation, :description => 'not blank', :policy => Factory(:publicly_viewable_policy))
+    @investigation = Factory(:investigation, :title => 'i1', :description => 'not blank',
+                             :policy => Factory(:downloadable_public_policy))
+    @study = Factory(:study, :title => 's1', :investigation => @investigation, :contributor => @investigation.contributor,
+                     :policy => Factory(:downloadable_public_policy))
+    @assay = Factory(:assay, :title => 'a1', :study => @study, :contributor => @investigation.contributor,
+                     :policy => Factory(:downloadable_public_policy))
+    @assay2 = Factory(:assay, :title => 'a2', :study => @study, :contributor => @investigation.contributor,
+                      :policy => Factory(:downloadable_public_policy))
+    @data_file = Factory(:data_file, :title => 'df1', :contributor => @investigation.contributor,
+                         :content_blob => Factory(:doc_content_blob, :original_filename=>"word.doc"),
+                         :policy => Factory(:downloadable_public_policy))
+    @publication = Factory(:publication, :title => 'p1', :contributor => @investigation.contributor,
+                           :policy => Factory(:downloadable_public_policy))
+    @assay.associate(@data_file)
+    @assay2.associate(@data_file)
+    Factory(:relationship, :subject => @assay, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object => @publication)
   end
 
   test 'snapshot number correctly set' do
@@ -169,4 +184,51 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_not_empty snapshot.errors
   end
 
+  test 'study snapshot' do
+    snapshot = @study.create_snapshot
+
+    assert_equal 's1', snapshot.title
+    assert_equal 2, snapshot.metadata['assays'].count
+    assert_equal 2, snapshot.metadata['assays'].find { |a| a['title'] == 'a1' }['assets'].count
+    assert_equal 1, snapshot.metadata['assays'].find { |a| a['title'] == 'a2' }['assets'].count
+
+    titles = extract_keys(snapshot.metadata, 'title')
+    assert_not_includes titles, 'i1'
+    assert_includes titles, 's1'
+    assert_includes titles, 'a1'
+    assert_includes titles, 'a2'
+    assert_includes titles, 'df1'
+    assert_includes titles, 'p1'
+  end
+
+  test 'assay snapshot' do
+    snapshot = @assay.create_snapshot
+
+    assert_equal 'a1', snapshot.title
+    assert_equal 2, snapshot.metadata['assets'].count
+
+    titles = extract_keys(snapshot.metadata, 'title')
+    assert_not_includes titles, 'i1'
+    assert_not_includes titles, 's1'
+    assert_not_includes titles, 'a2'
+    assert_includes titles, 'a1'
+    assert_includes titles, 'df1'
+    assert_includes titles, 'p1'
+  end
+
+  private
+
+  def extract_keys(o, key)
+    results = []
+    if o.is_a?(Hash)
+      if o[key]
+        results << o[key]
+      end
+      results += o.map { |k,v| extract_keys(v, key) }
+    elsif o.is_a?(Array)
+      results += o.map { |v| extract_keys(v, key) }
+    end
+
+    results.flatten
+  end
 end

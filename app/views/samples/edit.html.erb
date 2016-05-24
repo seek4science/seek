@@ -1,5 +1,5 @@
-<h1>Edit Sample: <%= link_to @sample.title, sample_path(@sample) -%></h1>
+<h1>Edit Sample</h1>
 
 <%= form_for(@sample) do |f| %>
-    <%= render :partial => "form", :locals => { :f => f, :action => :edit } -%>
+    <%= render :partial => "form", :locals => { :f => f } -%>
 <% end %>

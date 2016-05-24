@@ -1,4 +1,4 @@
-require 'project_compat'
+
 module Seek
   module Permissions
     module PolicyBasedAuthorization
@@ -17,7 +17,7 @@ module Seek
           #checks a policy exists, and if missing resorts to using a private policy
           after_initialize :policy_or_default_if_new
 
-          include ProjectCompat unless method_defined? :projects
+          include Seek::ProjectAssociation unless method_defined? :projects
 
           belongs_to :policy, :autosave => true #, :required_access_to_owner => :manage
           enforce_required_access_for_owner :policy,:manage
@@ -314,7 +314,7 @@ module Seek
         contributor = self.contributor.kind_of?(Person) ? self.contributor : self.contributor.try(:person)
         return [[contributor.id, "#{contributor.first_name} #{contributor.last_name}", Policy::MANAGING]] if policy.blank?
         creators = is_downloadable? ? self.creators : []
-        asset_managers = (projects & contributor.former_projects).collect(&:asset_managers).flatten
+        asset_managers = (projects & contributor.former_projects).collect(&:asset_housekeepers).flatten
         grouped_people_by_access_type = policy.summarize_permissions creators,asset_managers, contributor
         grouped_people_by_access_type[Policy::MANAGING]
       end

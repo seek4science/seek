@@ -6,6 +6,21 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   fixtures :content_blobs
 
+  test 'search terms' do
+    blob = ContentBlob.new
+    blob.url = "http://fish.com"
+    assert_includes blob.search_terms, 'fish'
+    assert_includes blob.search_terms, 'http://fish.com'
+    refute_includes blob.search_terms, 'http'
+    refute_includes blob.search_terms, 'com'
+
+    blob = Factory(:rightfield_content_blob)
+    assert_includes blob.search_terms, 'rightfield.xls'
+    assert_includes blob.search_terms, 'xls'
+
+  end
+
+
   test 'md5sum_on_demand' do
     blob=Factory :rightfield_content_blob
     assert_not_nil blob.md5sum
@@ -640,6 +655,70 @@ class ContentBlobTest < ActiveSupport::TestCase
       blob.retrieve
     end
     assert !blob.file_exists?
+  end
+
+  test "handles relative redirects when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(:headers => {:location => '/xyz'}, :status => 302)
+    stub_request(:get, 'http://www.abc.com').to_return(:headers => {:location => '/xyz'}, :status => 302)
+    stub_request(:head, "http://www.abc.com/xyz").to_return(
+        :headers => {:content_length => nil, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, "http://www.abc.com/xyz").to_return(:body => 'abcdefghij'*500,
+                                                       :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal nil, blob.file_size
+
+    blob.retrieve
+    assert blob.file_exists?
+    assert_equal 5000, blob.file_size
+  end
+
+  test "handles absolute redirects when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.abc.com/xyz'}, :status => 302)
+    stub_request(:get, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.abc.com/xyz'}, :status => 302)
+    stub_request(:head, "http://www.abc.com/xyz").to_return(
+        :headers => {:content_length => nil, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, "http://www.abc.com/xyz").to_return(:body => 'abcdefghij'*500,
+                                                           :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal nil, blob.file_size
+
+    blob.retrieve
+    assert blob.file_exists?
+    assert_equal 5000, blob.file_size
+  end
+
+  test "handles mixed redirects when downloading remote content" do
+    stub_request(:head, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.xyz.com'}, :status => 302)
+    stub_request(:get, 'http://www.abc.com').to_return(:headers => {:location => 'http://www.xyz.com'}, :status => 302)
+    stub_request(:head, 'http://www.xyz.com').to_return(:headers => {:location => '/xyz'}, :status => 302)
+    stub_request(:get, 'http://www.xyz.com').to_return(:headers => {:location => '/xyz'}, :status => 302)
+    stub_request(:head, "http://www.xyz.com/xyz").to_return(
+        :headers => {:content_length => nil, :content_type => 'text/plain'}, :status => 200)
+    stub_request(:get, "http://www.xyz.com/xyz").to_return(:body => 'abcdefghij'*500,
+                                                           :headers => {:content_type => 'text/plain'}, :status => 200)
+
+    blob = Factory(:url_content_blob)
+    assert !blob.file_exists?
+    assert_equal nil, blob.file_size
+
+    blob.retrieve
+    assert blob.file_exists?
+    assert_equal 5000, blob.file_size
+  end
+
+  test 'is_text?' do
+    assert Factory(:txt_content_blob).is_text?
+    assert Factory(:csv_content_blob).is_text?
+    assert Factory(:tsv_content_blob).is_text?
+    assert Factory(:teusink_model_content_blob).is_text?
+    assert Factory(:json_content_blob).is_text?
+
+    refute Factory(:ppt_content_blob).is_text?
+    refute Factory(:binary_content_blob).is_text?
   end
 
 end

@@ -71,7 +71,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def check_version
-    self.asset_version = asset.version if asset_version.nil? && !asset.nil?
+    self.asset_version = asset.version if asset_version.nil? && !asset.nil? && asset.respond_to?(:version)
   end
 
   def show_as_external_link?
@@ -159,7 +159,12 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def retrieve
-    handler = Seek::DownloadHandling::HTTPHandler.new(self.url)
+    case URI(self.url).scheme
+    when 'ftp'
+      handler = Seek::DownloadHandling::FTPHandler.new(self.url)
+    else
+        handler = Seek::DownloadHandling::HTTPHandler.new(self.url)
+    end
 
     self.tmp_io_object = handler.fetch
 
@@ -168,6 +173,7 @@ class ContentBlob < ActiveRecord::Base
 
   def cachable?
     Seek::Config.cache_remote_files &&
+        !is_webpage? &&
         file_size &&
         file_size < Seek::Config.max_cachable_size
   end
@@ -180,6 +186,16 @@ class ContentBlob < ActiveRecord::Base
     else
       Delayed::Job.where(['handler = ? AND failed_at IS NULL', job_yaml])
     end
+  end
+
+  def search_terms
+    if url
+      url_ignore_terms = ['http','https','www','com','co','org','uk','de']
+      url_search_terms = [url,url.split(/\W+/)].flatten - url_ignore_terms
+    else
+      url_search_terms = []
+    end
+    [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
   end
 
   private

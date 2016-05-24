@@ -85,9 +85,13 @@ class Mailer < ActionMailer::Base
   end
 
   def contact_admin_new_user(params, user)
-    @details = Seek::Mail::NewMemberAffiliationDetails.new(params).message
+    new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
+    @details = new_member_details.message
     @person = user.person
     @user = user
+    @projects = new_member_details.projects
+    @projects_with_admins = @projects.select{|p| p.project_administrators.any?}
+
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
          reply_to: user.person.email_with_name,
@@ -106,8 +110,10 @@ class Mailer < ActionMailer::Base
   end
 
   def contact_project_administrator_new_user(project_administrator, params, user)
-    @details = Seek::Mail::NewMemberAffiliationDetails.new(params).message
+    new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
+    @details = new_member_details.message
     @person = user.person
+    @projects = new_member_details.projects.select{|project| project_administrator.is_project_administrator?(project)}
     @user = user
     mail(from: Seek::Config.noreply_sender,
          to: project_administrator_email(project_administrator),
@@ -164,7 +170,7 @@ class Mailer < ActionMailer::Base
     @programme = programme
 
     mail(from: Seek::Config.noreply_sender,
-         to: programme.administrators.map(&:email_with_name),
+         to: programme.programme_administrators.map(&:email_with_name),
          subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} has been activated"
     )
   end
@@ -173,7 +179,7 @@ class Mailer < ActionMailer::Base
     @programme = programme
     @reason = reason
     mail(from: Seek::Config.noreply_sender,
-         to: programme.administrators.map(&:email_with_name),
+         to: programme.programme_administrators.map(&:email_with_name),
          subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} has been rejected"
     )
   end

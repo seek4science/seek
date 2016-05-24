@@ -164,7 +164,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     #add association
-    put :update, :id => p,:author=>{},:data_file_ids=>["#{df.id.to_s},None"]
+    put :update, :id => p,:author=>{},:data_files=>[{ id: df.id.to_s }]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -306,7 +306,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "should keep model and data associations after update" do
     p = publications(:pubmed_2)
     put :update, :id => p,:author=>{},:assay_ids=>[],
-        :data_file_ids => p.data_files.collect{|df| "#{df.id},None"},
+        :data_files => p.data_files.map { |df| { id: df.id } },
         :model_ids => p.models.collect{|m| m.id.to_s}
 
     assert_redirected_to publication_path(p)
@@ -464,7 +464,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 'latest', Seek::Config.default_pages[:publications]
     get :index
     assert_response :success
-    assert_select "li.current_page" do
+    assert_select ".pagination li.active" do
       assert_select "a[href=?]", publications_path(:page => 'latest')
     end
 
@@ -473,8 +473,48 @@ class PublicationsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select "li.current_page" do
+    assert_select ".pagination li.active" do
       assert_select "a[href=?]", publications_path(:page => 'all')
+    end
+  end
+
+  test "should avoid XSS in association forms" do
+    project = Factory(:project)
+    c = Factory(:person, group_memberships: [Factory(:group_membership, work_group: Factory(:work_group, project: project))])
+    Factory(:event, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
+    Factory(:data_file, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
+    Factory(:model, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
+    i = Factory(:investigation, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
+    s = Factory(:study, title: '<script>alert("xss")</script> &', investigation: i, contributor: c)
+    a = Factory(:assay, title: '<script>alert("xss")</script> &', study: s, contributor: c)
+    p = Factory(:publication, projects: [project], contributor: c)
+
+    login_as(p.contributor)
+
+    get :edit, :id => p.id
+
+    assert_response :success
+    assert_not_include response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
+    # This will be slow!
+
+    # 3 for events 'fancy_multiselect'
+    assert_equal 3, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
+    # 8 = 2 each for investigations, studies, assays, models (using bespoke association forms) - datafiles loaded asynchronously
+    assert_equal 8, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
+  end
+
+  test "programme publications through nested routing" do
+    assert_routing 'programmes/2/publications', { controller: 'publications', action: 'index', programme_id: '2' }
+    programme = Factory(:programme)
+    publication = Factory(:publication, projects: programme.projects, policy: Factory(:public_policy))
+    publication2 = Factory(:publication, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", publication_path(publication), text: publication.title
+      assert_select "a[href=?]", publication_path(publication2), text: publication2.title, count: 0
     end
   end
 

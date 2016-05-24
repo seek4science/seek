@@ -1,6 +1,6 @@
 div.isa_graph {
-    background-color: white;
-    border: 1px solid lightgray;
+    border-width: 1px;
+    border-style: solid;
     margin: 1em 0em 1em 0.75em;
 
     width: 98%;

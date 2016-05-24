@@ -3,14 +3,17 @@ require 'rubygems'
 require 'rake'
 require 'active_record/fixtures'
 require 'colorize'
+require 'seek/mime_types'
+
+include Seek::MimeTypes
 
 namespace :seek do
 
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
            :environment,
-           :convert_image_to_png,
-           :clear_delayed_jobs
+           :consolidate_news_feeds,
+           :delete_orphaned_strains
        ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -22,7 +25,7 @@ namespace :seek do
        ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
-  task(:upgrade => [:environment, "db:migrate", "db:sessions:clear", "tmp:clear"]) do
+  task(:upgrade => [:environment, "db:migrate", "tmp:clear"]) do
 
     solr=Seek::Config.solr_enabled
     Seek::Config.solr_enabled=false
@@ -38,89 +41,22 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
-  task(:clear_delayed_jobs=>:environment) do
-    Delayed::Job.destroy_all
-    #need to add a new authlookup job as these were added before being cleared as part of the standard_upgrade_tasks
-    AuthLookupUpdateJob.new.queue_job(0,Time.now)
+  task(:consolidate_news_feeds=>:environment) do
+    Seek::Config.news_enabled = Seek::Config.community_news_enabled || Seek::Config.project_news_enabled
+    Seek::Config.news_feed_urls = [Seek::Config.community_news_feed_urls, Seek::Config.project_news_feed_urls].join(',')
+    Seek::Config.news_number_of_entries = Seek::Config.community_news_number_of_entries +
+        Seek::Config.project_news_number_of_entries
   end
 
-  desc "convert the avatar and model image from jpg to png"
-  task(:convert_image_to_png => :environment) do
-    avatar_filestore_path = Seek::Config.avatar_filestore_path
-    Avatar.all.each do |avatar|
-      filepath = avatar_filestore_path + "/#{avatar.id}.jpg"
-      convert_path = avatar_filestore_path + "/#{avatar.id}.png"
-      if File.exist?(filepath)
-        puts "converting avatar #{avatar.id}"
-        command = "convert #{filepath} #{convert_path}"
-        begin
-          cl = Cocaine::CommandLine.new(command)
-          cl.run
-          FileUtils.remove_file(filepath)
-        rescue Cocaine::CommandNotFoundError => e
-          puts 'convert command not found!'
-        rescue => e
-          error = e.message
-          puts "Problem with converting avatar #{avatar.id}: " + error
-        end
-      else
-        if File.exist?(convert_path)
-          puts "avatar #{avatar.id} was already converted"
-        else
-          puts "no file exist at #{filepath}"
-        end
+  task(:delete_orphaned_strains=>:environment) do
+    puts "Checking for orphaned Strains..."
+    disable_authorization_checks do
+      Strain.where("organism_id is NOT NULL").select { |s| s.organism.nil? }.each do |strain|
+        puts "Deleting #{strain.title}"
+        strain.destroy
       end
     end
-
-    model_image_filestore_path = Seek::Config.model_image_filestore_path
-    ModelImage.all.each do |model_image|
-      filepath = model_image_filestore_path + "/#{model_image.id}.jpg"
-      convert_path = model_image_filestore_path + "/#{model_image.id}.png"
-      if File.exist?(filepath)
-        puts "converting model image #{model_image.id}"
-        convert_path = model_image_filestore_path + "/#{model_image.id}.png"
-        command = "convert #{filepath} #{convert_path}"
-        begin
-          cl = Cocaine::CommandLine.new(command)
-          cl.run
-          FileUtils.remove_file(filepath)
-        rescue Cocaine::CommandNotFoundError => e
-          puts 'convert command not found!'
-        rescue => e
-          error = e.message
-          puts "Problem with converting model image #{model_image.id}: " + error
-        end
-      else
-        if File.exist?(convert_path)
-          puts "model image  #{model_image.id} was already converted"
-        else
-          puts "no file exist at #{filepath}"
-        end
-      end
-    end
+    puts "Done"
   end
 
-  private
-
-  def read_label_map type
-    file = "#{type.to_s}_label_mappings.yml"
-    file = File.join(Rails.root, "config", "default_data", file)
-    YAML::load_file(file)
-  end
-
-  def normalize_name(name, remove_special_character=true, replace_umlaut=false)
-    #handle the characters that can't be handled through normalization
-    %w[ØO].each do |s|
-      name.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
-    end
-
-    codepoints = name.mb_chars.normalize(:d).split(//u)
-    if remove_special_character
-      ascii=codepoints.map(&:to_s).reject { |e| e.bytesize > 1 }.join
-    end
-    if replace_umlaut
-      ascii=codepoints.map(&:to_s).collect { |e| e == '̈' ? 'e' : e }.join
-    end
-    ascii
-  end
 end

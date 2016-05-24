@@ -10,7 +10,7 @@ class LogPublishingTest < ActionController::TestCase
 
   def setup
     login_as(:datafile_owner)
-    @gatekeeper=Factory(:gatekeeper)
+    @gatekeeper=Factory(:asset_gatekeeper)
   end
 
   test 'log when creating the public item' do
@@ -149,7 +149,7 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test "gatekeeper cannot approve an item from another project" do
-    gatekeeper2 = Factory(:gatekeeper)
+    gatekeeper2 = Factory(:asset_gatekeeper)
     df = Factory(:data_file, :project_ids => gatekeeper2.projects.collect(&:id))
 
     login_as(df.contributor)
@@ -183,7 +183,7 @@ class LogPublishingTest < ActionController::TestCase
     assay=df.assays.first
 
     request_publishing_df = Factory(:data_file,
-                                    :project_ids => Factory(:gatekeeper).projects.collect(&:id),
+                                    :project_ids => Factory(:asset_gatekeeper).projects.collect(&:id),
                                     :contributor => users(:datafile_owner),
                                     :assays => [assay])
 

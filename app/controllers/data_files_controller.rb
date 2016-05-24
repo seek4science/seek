@@ -15,6 +15,8 @@ class DataFilesController < ApplicationController
   before_filter :find_display_asset, :only=>[:show,:explore,:download,:matching_models]
   skip_before_filter :verify_authenticity_token, :only => [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, :only => [:upload_for_tool,:upload_from_email]
+  before_filter :get_sample_type, :only => :extract_samples
+  before_filter :check_already_extracted, :only => :extract_samples
 
   #has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -143,9 +145,7 @@ class DataFilesController < ApplicationController
 
       @data_file = DataFile.new params[:data_file]
 
-      @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
-
-      assay_ids = params[:assay_ids] || []
+      update_sharing_policies @data_file,params
 
       if @data_file.save
         update_annotations(params[:tag_list], @data_file)
@@ -163,16 +163,10 @@ class DataFilesController < ApplicationController
             #parse the data file if it is with sample data
             if @data_file.is_with_sample
               bio_samples = @data_file.bio_samples_population params[:institution_id]
-              #@bio_samples = bio_samples
-              #Rails.logger.warn "BIO SAMPLES ::: " + @bio_samples.treatments_text
+
               unless  bio_samples.errors.blank?
                 flash[:notice] << "<br/> However, Sample database population failed."
                 flash[:error] = bio_samples.errors.html_safe
-                #respond_to do |format|
-                #  format.html{
-                #    render :action => "new"
-                #  }
-                # end
               end
             end
             #the assay_id param can also contain the relationship type
@@ -217,10 +211,7 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       @data_file.attributes = data_file_params
 
-      if params[:sharing]
-        @data_file.policy_or_default
-        @data_file.policy.set_attributes_with_sharing params[:sharing], @data_file.projects
-      end
+      update_sharing_policies @data_file,params
 
       if @data_file.save
 
@@ -246,10 +237,10 @@ class DataFilesController < ApplicationController
     sheet = params[:sheet] || 1
     trim = params[:trim] || false
     content_blob = @data_file.content_blob
+    file = open(content_blob.filepath)
     mime_extensions = mime_extensions(content_blob.content_type)
     if !(["xls","xlsx"] & mime_extensions).empty?
       respond_to do |format|
-        file = open(content_blob.filepath)
         format.html #currently complains about a missing template, but we don't want people using this for now - its purely XML
         format.xml {render :xml=>spreadsheet_to_xml(file) }
         format.csv {render :text=>spreadsheet_to_csv(file,sheet,trim) }
@@ -276,8 +267,8 @@ class DataFilesController < ApplicationController
   end
 
   def clear_population bio_samples
-      specimens = Specimen.find_all_by_title bio_samples.instance_values["specimen_names"].values
-      samples = Sample.find_all_by_title bio_samples.instance_values["sample_names"].values
+      specimens = DeprecatedSpecimen.find_all_by_title bio_samples.instance_values["specimen_names"].values
+      samples = DeprecatedSample.find_all_by_title bio_samples.instance_values["sample_names"].values
       samples.each do |s|
         s.assays.clear
         s.destroy
@@ -300,6 +291,83 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def filter
+    if params[:with_samples]
+      scope = DataFile.with_extracted_samples
+    else
+      scope = DataFile
+    end
+
+    @data_files = DataFile.authorize_asset_collection(
+        scope.where("data_files.title LIKE ?", "#{params[:filter]}%"), 'view'
+    ).first(20)
+
+    respond_to do |format|
+      format.html { render :partial => 'data_files/association_preview', :collection => @data_files, :locals => { :hide_sample_count => !params[:with_samples] } }
+    end
+  end
+
+  def samples_table
+    respond_to do |format|
+      format.html do
+        render(partial: 'samples/table_view', locals: {
+          samples: @data_file.extracted_samples.includes(:sample_type),
+          source_url: samples_table_data_file_path(@data_file)
+        })
+      end
+      format.json { @samples = @data_file.extracted_samples.select([:id, :title, :json_metadata]) }
+    end
+  end
+
+  def select_sample_type
+    @possible_sample_types = @data_file.possible_sample_types
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def extract_samples
+    if params[:confirm]
+      extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
+      @samples = extractor.persist.select(&:persisted?)
+      extractor.clear
+      flash[:notice] = "#{@samples.count} samples extracted successfully"
+    else
+      SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
+    end
+
+    respond_to do |format|
+      format.html { redirect_to @data_file }
+    end
+  end
+
+  def confirm_extraction
+    @samples, @rejected_samples = Seek::Samples::Extractor.new(@data_file).fetch.partition(&:valid?)
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def cancel_extraction
+    Seek::Samples::Extractor.new(@data_file).clear
+
+    respond_to do |format|
+      flash[:notice] = "Sample extraction cancelled"
+      format.html { redirect_to @data_file }
+    end
+  end
+
+  def extraction_status
+    @previous_status = params[:previous_status]
+    @job_status = SampleDataExtractionJob.get_status(@data_file)
+
+    respond_to do |format|
+      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
+    end
+  end
+
   protected
 
   def translate_action action
@@ -312,6 +380,35 @@ class DataFilesController < ApplicationController
     unless session[:xml_login]
       flash[:error] = "Only available when logged in via xml"
       redirect_to root_url
+    end
+  end
+
+  def get_sample_type
+    if params[:sample_type_id] || @data_file.possible_sample_types.count == 1
+      if params[:sample_type_id]
+        @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
+      else
+        @sample_type = @data_file.possible_sample_types.last
+      end
+    elsif @data_file.possible_sample_types.count > 1
+      # Redirect to sample type selector
+      respond_to do |format|
+        format.html { redirect_to select_sample_type_data_file_path(@data_file) }
+      end
+    else
+      flash[:error] = "Couldn't determine the sample type of this data"
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
+    end
+  end
+
+  def check_already_extracted
+    if @data_file.extracted_samples.any?
+      flash[:error] = "Already extracted samples from this data file"
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
     end
   end
 

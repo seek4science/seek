@@ -77,9 +77,9 @@ module Seek
 
           #project role, in project and its descendants
           def pis
-            pi_role = ProjectRole.find_by_name('PI')
+            pi_role = ProjectPosition.find_by_name('PI')
             projects = [self] + descendants
-            people.select { |p| p.project_roles_of_project(projects).include?(pi_role) }
+            people.select { |p| p.project_positions_of_project(projects).include?(pi_role) }
           end
 
           #admin defined project roles, in the project and its ancestors
@@ -92,9 +92,9 @@ module Seek
 
           #project role, in the project and its descendants
           def project_coordinators
-            coordinator_role = ProjectRole.project_coordinator_role
+            coordinator_role = ProjectPosition.project_coordinator_position
             projects = [self] + descendants
-            people.select { |p| p.project_roles_of_project(projects).include?(coordinator_role) }
+            people.select { |p| p.project_positions_of_project(projects).include?(coordinator_role) }
 
           end
 

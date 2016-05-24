@@ -1,4 +1,19 @@
 SEEK::Application.routes.draw do
+
+  resources :sample_types do
+    collection do
+      post :create_from_template
+    end
+    resources :samples
+    resources :content_blobs do
+      member do
+        get :download
+      end
+    end
+  end
+
+  resources :sample_controlled_vocabs
+
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
@@ -50,11 +65,13 @@ SEEK::Application.routes.draw do
     member do
       get :index
       get :feedback
+      get :funding
       post :send_feedback
       get :imprint
     end
   end
 
+  match 'funding' => 'homes#funding', :as => :match
   match 'index.html' => 'homes#index', :as => :match
   match 'index' => 'homes#index', :as => :match
   match 'my_biovel' => 'homes#my_biovel', :as => :my_biovel
@@ -182,6 +199,7 @@ SEEK::Application.routes.draw do
       get :admin
       get :admin_members
       get :admin_member_roles
+      get :storage_report
       post :update_members
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
@@ -230,8 +248,9 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     resources :people,:projects,:assays,:studies,:models,:sops,:data_files,:publications,:only=>[:index]
-    resources :snapshots, :only => [:show, :new, :create] do
+    resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
+        get :mint_doi_confirm
         post :mint_doi
         get :download
         get :export, to: :export_preview
@@ -255,8 +274,22 @@ SEEK::Application.routes.draw do
       post :items_for_result
       post :resource_in_tab
     end
+    resources :snapshots, :only => [:show, :new, :create, :destroy] do
+      member do
+        get :mint_doi_confirm
+        post :mint_doi
+        get :download
+        get :export, to: :export_preview
+        post :export, to: :export_submit
+      end
+    end
     member do
       get :new_object_based_on_existing_one
+      post :check_related_items
+      post :check_gatekeeper_required
+      post :publish_related_items
+      post :publish
+      get :published
     end
     resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
   end
@@ -269,11 +302,25 @@ SEEK::Application.routes.draw do
       #MERGENOTE - these should be gets and are tested as gets, using post to fix later
       post :resource_in_tab
     end
+    resources :snapshots, :only => [:show, :new, :create, :destroy] do
+      member do
+        get :mint_doi_confirm
+        post :mint_doi
+        get :download
+        get :export, to: :export_preview
+        post :export, to: :export_submit
+      end
+    end
     member do
       post :update_annotations_ajax
+      post :check_related_items
+      post :check_gatekeeper_required
+      post :publish_related_items
+      post :publish
+      get :published
       get :new_object_based_on_existing_one
     end
-    resources :people,:projects,:investigations,:studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
+    resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
 
 
@@ -303,6 +350,7 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :preview
+      get :filter
       post :test_asset_url
       post :upload_for_tool
       post :upload_from_email
@@ -324,11 +372,17 @@ SEEK::Application.routes.draw do
       post :convert_to_presentation
       post :update_annotations_ajax
       post :new_version
-      #MERGENOTE - this is a destroy, and should be the destory method, not post since we are not updating or creating something.
+      #MERGENOTE - this is a destroy, and should be the destroy method, not post since we are not updating or creating something.
       post :destroy_version
       get :mint_doi_confirm
       get :minted_doi
       post :mint_doi
+      get :samples_table
+      get :select_sample_type
+      get :confirm_extraction
+      get :extraction_status
+      post :extract_samples
+      delete :cancel_extraction
     end
     resources :studied_factors do
       collection do
@@ -338,11 +392,12 @@ SEEK::Application.routes.draw do
     resources :content_blobs do
       member do
         get :view_pdf_content
+        get :view_content
         get :get_pdf
         get :download
       end
     end
-    resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
+    resources :people,:projects,:investigations,:assays, :samples, :studies,:publications,:events,:only=>[:index]
   end
 
   resources :presentations do
@@ -368,6 +423,7 @@ SEEK::Application.routes.draw do
     resources :content_blobs do
       member do
         get :view_pdf_content
+        get :view_content
         get :get_pdf
         get :download
       end
@@ -413,10 +469,11 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
-    resources :content_blobs do
 
+    resources :content_blobs do
       member do
         get :view_pdf_content
+        get :view_content
         get :get_pdf
         get :download
       end
@@ -454,6 +511,7 @@ SEEK::Application.routes.draw do
     resources :content_blobs do
       member do
         get :view_pdf_content
+        get :view_content
         get :get_pdf
         get :download
       end
@@ -483,8 +541,10 @@ SEEK::Application.routes.draw do
       put :reject_activation
       get :reject_activation_confirmation
       post :spawn_project
+      get :storage_report
     end
-    resources :people,:projects, :institutions
+    resources :people,:projects, :institutions, :investigations, :studies, :assays,
+              :data_files, :models, :sops, :presentations, :events, :publications
   end
 
   resources :publications do
@@ -520,34 +580,11 @@ SEEK::Application.routes.draw do
 
   resources :spreadsheet_annotations, :only => [:create, :destroy, :update]
 
-  ### BIOSAMPLES AND ORGANISMS ###
-
-  resources :specimens do
-    collection do
-      post :items_for_result
-    end
-    resources :projects,:people,:samples,:strains,:institutions,:sops,:only=>[:index]
-    member do
-      get :new_object_based_on_existing_one
-    end
-  end
-
-  resources :samples do
-    collection do
-      get :typeahead
-      get :preview
-      post :items_for_result
-      post :resource_in_tab
-    end
-    member do
-      get :new_object_based_on_existing_one
-    end
-    resources :projects,:people,:specimens,:sops,:data_files,:only=>[:index]
-  end
 
   resources :strains do
     collection do
       get :existing_strains_for_assay_organism
+      get :strains_of_selected_organism
       post :items_for_result
       post :resource_in_tab
     end
@@ -555,15 +592,6 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
     end
     resources :specimens,:assays,:people,:projects,:only=>[:index]
-  end
-
-  resources :biosamples do
-    collection do
-      get :existing_strains
-      get :existing_specimens
-      get :strains_of_selected_organism
-      get :existing_samples
-    end
   end
 
   resources :organisms do
@@ -575,7 +603,6 @@ SEEK::Application.routes.draw do
     member do
       get :visualise
     end
-
   end
 
   resources :tissue_and_cell_types
@@ -589,11 +616,9 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       post :test_asset_url
-#      get :preview
     end
 
     member do
-#      get :check_related_items
       get :download
       get :describe_ports
       post :temp_link
@@ -602,7 +627,6 @@ SEEK::Application.routes.draw do
       post :check_related_items
       post :publish
       get :published
-#      get :view_items_in_tab
       post :favourite
       delete :favourite_delete
       post :mint_doi
@@ -626,6 +650,27 @@ SEEK::Application.routes.draw do
       get :runs
       post :download_results
       get :view_result
+    end
+  end
+
+  resources :site_announcements do
+    collection do
+      get :feed
+      get :notification_settings
+      post :update_notification_settings
+    end
+  end
+
+  ### SAMPLES ###
+
+  resources :samples do
+    collection do
+      get :attribute_form
+      get :preview
+      get :filter
+    end
+    member do
+      post :update_annotations_ajax
     end
   end
 
@@ -672,8 +717,6 @@ SEEK::Application.routes.draw do
   match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
   match '/fail'=>'fail#index',:as=>:fail,:via=>:get
-
-  match '/contact' => 'contact#index', :as => :contact, :via => :get
 
   #feedback
   match '/home/feedback' => 'homes#feedback', :as=> :feedback, :via=>:get

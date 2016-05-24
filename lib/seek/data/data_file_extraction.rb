@@ -4,12 +4,12 @@ module Seek
 
     module DataFileExtraction
       include Seek::Data::TreatmentExtraction
-      include Seek::Data::BioSamplesExtraction
       # include Seek::Data::SearchExtraction
 
       def contains_extractable_spreadsheet?
         content_blob.is_extractable_spreadsheet?
       end
+
     end
   end
 end

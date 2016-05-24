@@ -96,6 +96,15 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_equal zip_file_size1, zip_file_size2
   end
 
+  test "should not download zip with only remote files" do
+    model = Factory :model_2_remote_files, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
+    assert_difference("ActivityLog.count") do
+      get :download, :id => model.id
+    end
+    assert_response :redirect
+    assert flash[:error].include?('remote')
+  end
+
   test "should not create model with file url" do
     file_path=File.expand_path(__FILE__) #use the current file
     file_url="file://"+file_path
@@ -146,30 +155,6 @@ class ModelsControllerTest < ActionController::TestCase
     assay = assays(:modelling_assay_with_data_and_relationship)
     assert_equal true, assay.is_modelling?
 
-  end
-
-  test "should show only modelling assays in associate modelling analysis form" do
-    login_as(:model_owner)
-    as_not_virtualliver do
-      get :new
-      assert_response :success
-      assert_select 'select#possible_assays' do
-        assert_select "option", :text=>/Select #{I18n.t('assays.assay')} .../,:count=>1
-        assert_select "option", :text=>/Modelling Assay/,:count=>1
-        assert_select "option", :text=>/Metabolomics Assay/,:count=>0
-      end
-    end
-
-    as_virtualliver do
-    #show all can_view assays in the list
-      get :new
-      assert_response :success
-      assert_select 'select#possible_assays' do
-        assert_select "option", :text=>/Select #{I18n.t('assays.assay')} .../,:count=>1
-        assert_select "option", :text=>/Modelling Assay/,:count=>5
-        assert_select "option", :text=>/Metabolomics Assay/,:count=>0
-      end
-    end
   end
 
   test "correct title and text for associating a modelling analysis for new" do
@@ -258,7 +243,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.models, m
 
-    put :update, :id => m, :model =>{}, :assay_ids=>[new_assay.id.to_s]
+    put :update, :id => m, :model => {}, :assay_ids => [new_assay.id.to_s]
 
     assert_redirected_to model_path(m)
     m.reload
@@ -266,24 +251,8 @@ class ModelsControllerTest < ActionController::TestCase
     new_assay.reload
     refute_includes original_assay.models, m
     assert_includes new_assay.models, m
-    end
-
-  test "associate sample" do
-     # assign to a new model
-     model_with_samples = valid_model
-     model_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
-     assert_difference("Model.count") do
-       post :create,:model => model_with_samples,:content_blobs => [{:data=>file_for_upload}], :sharing => valid_sharing
-     end
-
-    m = assigns(:model)
-    assert_equal "newTestSample", m.samples.first.title
-
-    #edit associations of samples to an existing model
-    put :update,:id=> m.id, :model => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
-    m = assigns(:model)
-    assert_equal "editTestSample", m.samples.first.title
   end
+
 
   test "association of scales" do
     scale1=Factory :scale, :pos=>1
@@ -1008,57 +977,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert content_blobs.collect(&:original_filename).include?(retained_content_blob.original_filename)
   end
 
-  test "should display find matching data button for sbml model" do
-    with_config_value :solr_enabled,true do
-      m = Factory(:teusink_model)
-      login_as(m.contributor.user)
-      get :show,:id=>m
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
-    end
-  end
-
-  test "should display find matching data button for jws dat model" do
-    with_config_value :solr_enabled,true do
-      m = Factory(:teusink_jws_model)
-      login_as(m.contributor.user)
-      get :show,:id=>m
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
-    end
-  end
-
-  test "should not display find matching data button for non smbml or dat model" do
-    with_config_value :solr_enabled,true do
-      m = Factory(:non_sbml_xml_model)
-      login_as(m.contributor.user)
-      get :show,:id=>m
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
-    end
-  end
-
-  test "only show the matching data button for the latest version" do
-    m = Factory(:teusink_jws_model, :policy => Factory(:public_policy))
-
-    m.save_as_new_version
-    Factory(:teusink_jws_model_content_blob, :asset => m, :asset_version => m.version)
-    m.reload
-    login_as(m.contributor.user)
-    assert_equal 2,m.version
-    with_config_value :solr_enabled,true do
-      get :show,:id=>m,:version=>2
-      assert_response :success
-      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:text=>/Find related #{I18n.t('data_file').pluralize}/
-
-      get :show,:id=>m,:version=>1
-      assert_response :success
-      assert_select "#buttons a[href=?]",matching_data_model_path(m),:count=>0
-      assert_select "#buttons a",:text=>/Find related #{I18n.t('data_file').pluralize}/,:count=>0
-    end
-  end
 
   test "should have -View content- button on the model containing one inline viewable file" do
     one_file_model = Factory(:doc_model, :policy => Factory(:all_sysmo_downloadable_policy))
@@ -1156,6 +1074,68 @@ class ModelsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select "#format_info" do
       assert_select "#model_format",:text=>/SBML/i
+    end
+  end
+
+  test "should display null license text" do
+    model = Factory :model, :policy => Factory(:public_policy)
+
+    get :show, :id => model
+
+    assert_select '.panel .panel-body span.none_text', :text => 'No license specified'
+  end
+
+  test "should display license" do
+    model = Factory :model, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
+
+    get :show, :id => model
+
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
+  end
+
+  test "should display license for current version" do
+    model = Factory :model, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
+    modelv = Factory :model_version_with_blob, :model => model
+
+    model.update_attributes :license => 'CC0-1.0'
+
+    get :show, :id => model, :version => 1
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
+
+    get :show, :id => model, :version => modelv.version
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'CC0 1.0'
+  end
+
+  test "should update license" do
+    user = users(:model_owner)
+    login_as(user)
+    model = models(:teusink_with_space)
+
+    assert_nil model.license
+
+    put :update, :id => model, :model => { :license => 'CC-BY-SA-4.0' }
+
+    assert_response :redirect
+
+    get :show, :id => model
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike 4.0'
+    assert_equal 'CC-BY-SA-4.0', assigns(:model).license
+  end
+
+  test "programme models through nested routing" do
+    assert_routing 'programmes/2/models', { controller: 'models', action: 'index', programme_id: '2' }
+    programme = Factory(:programme)
+    model = Factory(:model, projects: programme.projects, policy: Factory(:public_policy))
+    model2 = Factory(:model, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", model_path(model), text: model.title
+      assert_select "a[href=?]", model_path(model2), text: model2.title, count: 0
     end
   end
 

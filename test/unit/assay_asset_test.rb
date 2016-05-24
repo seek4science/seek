@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class AssayAssetTest < ActiveSupport::TestCase
-  #fixtures :all
+
 
   def setup
     User.current_user = Factory :user
@@ -32,29 +32,46 @@ class AssayAssetTest < ActiveSupport::TestCase
     assert_equal(sop.find_version(version_number), a.asset)
     
     assert_equal(assay, a.assay)
-  end   
-  
-  test "versioned asset" do
-    sop = Factory :sop, :contributor => User.current_user
-    sop.save_as_new_version
-    assay = Factory :assay, :contributor => User.current_user.person
-    
+  end
+
+  test 'direction' do
+    assert_equal 1,AssayAsset::Direction::INCOMING
+    assert_equal 2,AssayAsset::Direction::OUTGOING
+    assert_equal 0,AssayAsset::Direction::NODIRECTION
+
     a = AssayAsset.new
-    a.asset = sop.latest_version
-    a.assay = assay
-    a.version=1
+    a.assay = Factory(:assay)
+    a.asset = Factory(:sop).latest_version
     a.save!
-        
-    assert_equal 1,a.versioned_asset.version
-    assert_equal sop.find_version(1),a.versioned_asset
-    
-    a = AssayAsset.new
-    a.asset = sop.latest_version
-    a.assay = assay    
+    a.reload
+    assert_equal 0,a.direction
+    refute a.incoming_direction?
+    refute a.outgoing_direction?
+
+    a.direction = AssayAsset::Direction::INCOMING
     a.save!
-    
-    assert_equal sop.version,a.versioned_asset.version
-    assert_equal sop.latest_version,a.versioned_asset    
+    a.reload
+    assert a.incoming_direction?
+    refute a.outgoing_direction?
+
+    a.direction = AssayAsset::Direction::OUTGOING
+    a.save!
+    a.reload
+    refute a.incoming_direction?
+    assert a.outgoing_direction?
+  end
+
+  test 'sample as asset' do
+    sample = Factory(:sample)
+    assay = Factory(:assay)
+    a = AssayAsset.new asset:sample,assay:assay,direction:AssayAsset::Direction::OUTGOING
+    assert a.valid?
+    a.save!
+    a.reload
+    assert_equal sample,a.asset
+    assert_equal assay,a.assay
+
+
   end
 
   

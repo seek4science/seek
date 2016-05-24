@@ -60,12 +60,10 @@ class TagsController < ApplicationController
 
   def get_tags
     attribute = AnnotationAttribute.where(:name => params[:type] || 'tag').first
-    if attribute
-      TextValue.select(:text).
-          joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" +
-                    "LEFT OUTER JOIN annotation_value_seeds ON annotation_value_seeds.value_id = text_values.id").
-          where("annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id", :attribute_id => attribute.id).uniq
-    end
+    TextValue.select(:text).
+        joins("LEFT OUTER JOIN annotations ON annotations.value_id = text_values.id AND annotations.value_type = 'TextValue'" +
+                  "LEFT OUTER JOIN annotation_value_seeds ON annotation_value_seeds.value_id = text_values.id").
+        where("annotations.attribute_id = :attribute_id OR annotation_value_seeds.attribute_id = :attribute_id", :attribute_id => attribute.try(:id)).uniq
   end
 
 end

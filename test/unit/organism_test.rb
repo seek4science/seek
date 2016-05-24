@@ -48,6 +48,17 @@ class OrganismTest < ActiveSupport::TestCase
 
     User.current_user = Factory(:project_administrator).user
     assert Organism.can_create?
+
+    User.current_user = Factory(:programme_administrator).user
+    assert Organism.can_create?
+
+    #only if the programme is activated
+    person = Factory(:programme_administrator)
+    programme = person.administered_programmes.first
+    programme.is_activated=false
+    disable_authorization_checks{programme.save!}
+    User.current_user = person.user
+    refute Organism.can_create?
   end
 
   test "can_view" do
@@ -110,6 +121,19 @@ class OrganismTest < ActiveSupport::TestCase
     refute o.can_delete?(non_admin)
   end
 
+  test "can't create organism with duplicate concept uri" do
+    org = Factory(:organism, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/562')
+    assert_equal "http://purl.bioontology.org/ontology/NCBITAXON/562", org.concept_uri
+    assert org.valid?
+    assert org.errors.none?
 
+    org2 = FactoryGirl.build(:organism, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/562')
+
+    refute org2.valid?
+    refute org2.save
+    assert_equal "http://purl.bioontology.org/ontology/NCBITAXON/562", org2.concept_uri
+    refute org2.errors.none?
+    assert org2.errors[:concept_uri].any?
+  end
 
 end

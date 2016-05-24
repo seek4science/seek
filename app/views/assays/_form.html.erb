@@ -9,7 +9,7 @@
 <%= f.hidden_field :create_from_asset %>
 
 <div class="form-group">
-  <%= f.label :title-%><span class="required">*</span>
+  <label>Title <span class="required">*</span></label>
   <%= f.text_field :title, :class=>"form-control" -%>
 </div>
 
@@ -101,13 +101,18 @@
                                                              :existing_creators => existing_creators,
                                                              :other_creators => @assay.other_creators} -%>
 
-    <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} -%>
+    <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>
+
+
+    <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} %>
 
     <%  if @assay.is_modelling? -%>
-        <%= render :partial=>"assets/associate_model",:locals=>{:f=>f, :resource => @assay} -%>
+        <%= render :partial=>"assets/associate_model",:locals=>{:f=>f, :resource => @assay} %>
     <% end -%>
 
-    <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,:show_relationships=>@assay.is_modelling?} -%>
+    <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,
+                                                                  :has_relationships => @assay.is_modelling?,
+                                                                  :has_direction => !@assay.is_modelling?} -%>
 
     <%= render :partial => "assets/associate_publication", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
                                                                             :related_publications => @assay.publications} -%>

@@ -49,17 +49,17 @@ class BatchPublishingTest < ActionController::TestCase
     get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
 
-    assert_select "li.type_and_title", :count=>total_asset_count do
+    assert_select ".type_and_title", :count=>total_asset_count do
       publish_immediately_assets.each do |a|
         assert_select "a[href=?]",eval("#{a.class.name.underscore}_path(#{a.id})"),:text=>/#{a.title}/
       end
       gatekeeper_required_assets.each do |a|
         assert_select "a[href=?]",eval("#{a.class.name.underscore}_path(#{a.id})"),:text=>/#{a.title}/
       end
-      assert_select "li.type_and_title img[src*=?][title=?]",/lock.png/, /Private/, :count => total_asset_count
+      assert_select ".type_and_title img[src*=?][title=?]",/lock.png/, /Private/, :count => total_asset_count
     end
 
-    assert_select "li.secondary", :text => /Publish/, :count => total_asset_count do
+    assert_select ".checkbox", :text => /Publish/, :count => total_asset_count do
       publish_immediately_assets.each do |a|
         assert_select "input[type='checkbox'][id=?]", "publish_#{a.class.name}_#{a.id}"
       end
@@ -83,8 +83,8 @@ class BatchPublishingTest < ActionController::TestCase
   end
 
   test "do not have not_publishable_type item in batch_publishing_preview" do
-    item = Factory(:sample, :contributor => User.current_user)
-    assert item.can_publish?, "This data file must be publishable for the test to be meaningful"
+    item = Factory(:publication, :contributor => User.current_user)
+    refute item.can_publish?, "This item must not be publishable for the test to be meaningful"
 
     get :batch_publishing_preview, :id => User.current_user.person.id
     assert_response :success
@@ -144,7 +144,7 @@ class BatchPublishingTest < ActionController::TestCase
   #The following tests are for generating your asset list that you requested to make published are still waiting for approval
   test "should have the -Your assets waiting for approval- button only on your profile" do
     #not yourself
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     me = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>gatekeeper.group_memberships.first.work_group)])
     another_person = Factory(:person,:group_memberships=>[Factory(:group_membership,:work_group=>gatekeeper.group_memberships.first.work_group)])
 
@@ -177,14 +177,14 @@ class BatchPublishingTest < ActionController::TestCase
 
     get :waiting_approval_assets, :id => User.current_user.person
 
-    assert_select "li.type_and_title", :count => 3 do
+    assert_select ".type_and_title", :count => 3 do
       assert_select "a[href=?]", data_file_path(df)
       assert_select "a[href=?]", model_path(model)
       assert_select "a[href=?]", sop_path(sop)
     end
 
-    assert_select "li.request_info", :count => 3 do
-      assert_select "a[href=?]", person_path(df.gatekeepers.first), :count => 3
+    assert_select ".request_info", :count => 3 do
+      assert_select "a[href=?]", person_path(df.asset_gatekeepers.first), :count => 3
     end
 
     assert_select "a[href=?]", data_file_path(not_requested_df), :count => 0
@@ -202,12 +202,12 @@ class BatchPublishingTest < ActionController::TestCase
   def create_gatekeeper_required_assets
     publishable_types = Seek::Util.authorized_types.select {|c| c.first.try(:is_in_isa_publishable?)}
     publishable_types.collect do |klass|
-      Factory(klass.name.underscore.to_sym, :contributor => User.current_user, :project_ids => Factory(:gatekeeper).projects.collect(&:id))
+      Factory(klass.name.underscore.to_sym, :contributor => User.current_user, :project_ids => Factory(:asset_gatekeeper).projects.collect(&:id))
     end
   end
 
   def waiting_approval_assets_for user
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
     df = Factory(:data_file, :contributor => user, :project_ids => gatekeeper.projects.collect(&:id))
     df.resource_publish_logs.create(:publish_state=>ResourcePublishLog::WAITING_FOR_APPROVAL,:user=>df.contributor)
     model = Factory(:model, :contributor => user, :project_ids => gatekeeper.projects.collect(&:id))

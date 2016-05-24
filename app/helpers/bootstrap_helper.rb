@@ -59,11 +59,11 @@ module BootstrapHelper
       else
         ''.html_safe
       end +
-      if options.delete(:collapsible)
-        content_tag(:div, body, options.delete(:collapse_options)) # The "collapse" wrapper around the body
-      else
-        body
-      end
+          if options.delete(:collapsible)
+            content_tag(:div, body, options.delete(:collapse_options)) # The "collapse" wrapper around the body
+          else
+            body
+          end
     end
   end
 
@@ -85,11 +85,11 @@ module BootstrapHelper
       content_tag(:div, :type => 'button', :class => "btn dropdown-toggle #{options[:type] || 'btn-default'}".strip,
                   'data-toggle' => 'dropdown', 'aria-expanded' => 'false') do
         ((icon_key ? icon_tag(icon_key, options.delete(:icon_options) || {}) : '') +
-        text + ' <span class="caret"></span>'.html_safe)
+            text + ' <span class="caret"></span>'.html_safe)
       end +
-      content_tag(:ul, merge_options({:class => 'dropdown-menu text-left', :role => 'menu'}, options.delete(:menu_options))) do
-        yield
-      end
+          content_tag(:ul, merge_options({:class => 'dropdown-menu text-left', :role => 'menu'}, options.delete(:menu_options))) do
+            yield
+          end
     end
   end
 
@@ -129,6 +129,46 @@ module BootstrapHelper
     end
 
     text_field_tag(name, nil, options)
+  end
+
+  def modal(options = {})
+    opts = merge_options({:class => 'modal', :role => 'dialog', :tabindex => -1}, options)
+
+    dialog_class = 'modal-dialog'
+    if (size = options.delete(:size))
+      dialog_class += " modal-#{size}"
+    end
+
+    content_tag(:div, opts) do
+    content_tag(:div, :class => dialog_class) do
+    content_tag(:div, :class => 'modal-content') do
+      yield
+    end
+    end
+    end
+  end
+
+  def modal_header(title, options = {})
+    content_tag(:div, :class => 'modal-header') do
+      content_tag(:button, :class => 'close', 'data-dismiss' => 'modal', 'aria-label' => 'Close') do
+        content_tag(:span, '&times;'.html_safe, 'aria-hidden' => 'true')
+      end +
+      content_tag(:h4, title, :class => 'modal-title')
+    end
+  end
+
+  def modal_body(options = {})
+    opts = merge_options({:class => 'modal-body'}, options)
+    content_tag(:div, opts) do
+      yield
+    end
+  end
+
+  def modal_footer(options = {})
+    opts = merge_options({:class => 'modal-footer'}, options)
+    content_tag(:div, opts) do
+      yield
+    end
   end
 
   private

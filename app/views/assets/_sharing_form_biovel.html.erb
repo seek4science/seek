@@ -18,7 +18,7 @@
 <%="<div class='fieldWithErrors'>" if !@resource.errors.empty? and !@policy.valid? %>
 <%= folding_panel('Sharing', false, :id => 'sharing_form', :body_options => {:id => 'creator_fold_content'},
                   :help_text => "Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") do %>
-    <div class="box_infotext">
+    <div class="alert alert-info">
       <p>
         Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type.downcase -%>.
         <%= link_to_function(("More info " + expand_image).html_safe, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3)) -%>
@@ -184,7 +184,7 @@
                   <span class="note_text_disabled" id="proj_select_step_3">Step 3</span>
                 </p>
 
-                <center>
+                <div class="center-block">
                   <div style="width: 95%; text-align: left; margin-top: 2em;">
                     <input type="hidden" id="proj_select_step_index" value="1">
 
@@ -235,7 +235,7 @@
                     </p>
                     <div class="clearer"></div>
                   </div>
-                </center>
+                </div>
             <% end %>
 
             <!-- individual people -->

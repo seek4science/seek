@@ -11,8 +11,8 @@
   <h2><%= "People with the discipline '#{h(@discipline.title)}'" %></h2>
 <%  end -%>
 
-<% if @project_role -%>
-  <h2><%= "People with the role '#{h(@project_role.name)}'" %></h2>
+<% if @project_position -%>
+  <h2><%= "People with the role '#{h(@project_position.name)}'" %></h2>
 <% end -%>
 
 <%= render :partial => "general/index_facets_or_paged" %>

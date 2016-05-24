@@ -74,26 +74,10 @@
       </div>
   <% end %>
   <div class="col-md-6">
-    <%= render :partial=>"people/project_roles", :locals=>{:editable=>false} %>
+    <%= render :partial=>"people/project_positions", :locals=>{:editable=>false} %>
   </div>
 </div>
 <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>
 
 <%# get, classify and authorize all assets for this person's user (assets belong to users, not people!) -%>
 <%= render :seek_partial=>"general/items_related_to", :object => @person %>
-<%# show the following section only to admins and only if the @person has an associated "user", which is not an admin itself - -%>
-<%# this is because it's not needed then: admins can see everything anyway -%>
-<% if admin_logged_in? -%>
-    <h3 class="admin_warning" style="margin-top: 2.5em;">Access Rights Information - Only Visible to Admins</h3>
-    <ul>
-
-      <%= content_tag(:li,"This person is a #{Seek::Config.dm_project_name} PAL for #{@person.projects_for_role('pal').collect(&:title).join(', ')}") if @person.is_pal_of_any_project? %>
-
-
-      <%= content_tag(:li,"This person is a #{t('project')} Administrator for #{@person.projects_for_role('project_administrator').collect(&:title).join(', ')}") if @person.is_project_administrator_of_any_project? %>
-
-      <%= content_tag(:li,"This person is an Asset Manager for #{@person.projects_for_role('asset_manager').collect(&:title).join(', ')}") if @person.is_asset_manager_of_any_project? %>
-      <%= content_tag(:li,"This person is a Gatekeeper for #{@person.projects_for_role('gatekeeper').collect(&:title).join(', ')}") if @person.is_gatekeeper_of_any_project? %>
-
-    </ul>
-<% end -%>

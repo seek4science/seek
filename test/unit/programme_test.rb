@@ -7,6 +7,20 @@ class ProgrammeTest < ActiveSupport::TestCase
     Factory(:admin)
   end
 
+  test 'has_member?' do
+    programme_administrator = Factory(:programme_administrator)
+    programme1 = programme_administrator.programmes.first
+    programme2 = Factory(:programme)
+
+    assert programme1.has_member?(programme_administrator)
+    assert programme1.has_member?(programme_administrator.user)
+
+    refute programme2.has_member?(programme_administrator)
+    refute programme2.has_member?(programme_administrator.user)
+
+    refute programme2.has_member?(nil)
+  end
+
   test 'uuid' do
     p = Programme.new title: 'fish'
     assert_nil p.attributes['uuid']
@@ -31,6 +45,20 @@ class ProgrammeTest < ActiveSupport::TestCase
     p2.title = 'sdfsdfsdf'
     assert p2.valid?
     assert p2.valid?
+
+    #web_page url must be a valid web url if present
+    p.web_page = nil
+    assert p.valid?
+    p.web_page = ''
+    assert p.valid?
+    p.web_page = 'not a url'
+    refute p.valid?
+    p.web_page = 'ftp://google.com'
+    refute p.valid?
+    p.web_page = 'http://google.com'
+    assert p.valid?
+    p.web_page = 'https://google.com'
+    assert p.valid?
   end
 
   test 'factory' do
@@ -107,17 +135,17 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert_nil project.programme_id
   end
 
-  test 'administrators' do
+  test 'programme_administrators' do
     person = Factory(:person)
     programme = Factory(:programme)
     refute person.is_programme_administrator?(programme)
-    assert_empty programme.administrators
+    assert_empty programme.programme_administrators
     person.is_programme_administrator = true, programme
     disable_authorization_checks { person.save! }
 
     assert person.is_programme_administrator?(programme)
-    refute_empty programme.administrators
-    assert_equal [person], programme.administrators
+    refute_empty programme.programme_administrators
+    assert_equal [person], programme.programme_administrators
   end
 
   test 'assign adminstrator ids' do
@@ -132,7 +160,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     assert person.is_programme_administrator?(programme)
     refute person2.is_programme_administrator?(programme)
-    assert_equal [person], programme.administrators
+    assert_equal [person], programme.programme_administrators
 
     programme.update_attributes(administrator_ids: [person2.id])
     person.reload
@@ -141,7 +169,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     refute person.is_programme_administrator?(programme)
     assert person2.is_programme_administrator?(programme)
-    assert_equal [person2], programme.administrators
+    assert_equal [person2], programme.programme_administrators
 
     programme.update_attributes(administrator_ids: [person2.id, person.id])
     person.reload
@@ -150,11 +178,11 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     assert person.is_programme_administrator?(programme)
     assert person2.is_programme_administrator?(programme)
-    assert_equal [person2, person].sort, programme.administrators.sort
+    assert_equal [person2, person].sort, programme.programme_administrators.sort
   end
 
   test 'can create' do
-    with_config_value :allow_user_programme_creation,true do
+    with_config_value :programme_user_creation_enabled,true do
       User.current_user = nil
       refute Programme.can_create?
 
@@ -168,7 +196,7 @@ class ProgrammeTest < ActiveSupport::TestCase
       assert Programme.can_create?
     end
 
-    with_config_value :allow_user_programme_creation,false do
+    with_config_value :programme_user_creation_enabled,false do
       User.current_user = nil
       refute Programme.can_create?
 
@@ -220,6 +248,52 @@ class ProgrammeTest < ActiveSupport::TestCase
       prog.save!
       refute prog.is_activated?
     end
+  end
+
+  test 'update programme administrators after destroy' do
+    User.current_user=Factory(:admin)
+    pa = Factory(:programme_administrator)
+    prog = pa.programmes.first
+
+    assert pa.is_programme_administrator?(prog)
+    assert pa.is_programme_administrator_of_any_programme?
+    assert pa.has_role?('programme_administrator')
+
+    assert_difference('Programme.count', -1) do
+      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+        prog.destroy
+      end
+    end
+    pa.reload
+    refute pa.is_programme_administrator?(prog)
+    refute pa.is_programme_administrator_of_any_programme?
+    refute pa.has_role?('programme_administrator')
+
+    #administrator of multiple programmes
+    pa = Factory(:programme_administrator)
+    prog = pa.programmes.first
+    prog2 = Factory(:programme)
+    disable_authorization_checks do
+      pa.is_programme_administrator=true, prog2
+      pa.save!
+    end
+    pa.reload
+
+    assert pa.is_programme_administrator?(prog)
+    assert pa.is_programme_administrator_of_any_programme?
+    assert pa.has_role?('programme_administrator')
+
+    assert_difference('Programme.count', -1) do
+      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+        prog.destroy
+      end
+    end
+    pa.reload
+    refute pa.is_programme_administrator?(prog)
+    assert pa.is_programme_administrator?(prog2)
+    assert pa.is_programme_administrator_of_any_programme?
+    assert pa.has_role?('programme_administrator')
+
   end
 
   test "doesn't change activation flag on later save" do
@@ -323,6 +397,37 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert_instance_of ActiveRecord::Relation, result
     assert_equal [prog_yes_1,prog_yes_2].sort,result.sort
 
+  end
+
+  test 'related items' do
+    projects = FactoryGirl.create_list(:project, 3)
+    programme = Factory(:programme, projects: projects)
+
+    projects.each do |project|
+      i = Factory(:investigation, projects: [project])
+      s = Factory(:study, investigation: i)
+      a = Factory(:assay, study: s)
+      project.reload # Can't find investigations of second project if this isn't here!
+      assert_includes project.investigations, i
+      assert_includes project.studies, s
+      assert_includes project.assays, a
+      assert_includes programme.investigations, i
+      assert_includes programme.studies, s
+      assert_includes programme.assays, a
+      [:data_files, :models, :sops, :presentations, :events, :publications].each do |type|
+        item = Factory(type.to_s.singularize.to_sym, projects: [project])
+        assert_includes project.send(type), item, "Project related #{type} didn't include item"
+        assert_includes programme.send(type), item, "Programme related #{type} didn't include item"
+      end
+    end
+
+    assert_equal 3, programme.projects.count
+    assert_equal 3, programme.investigations.count
+    assert_equal 3, programme.studies.count
+    assert_equal 3, programme.assays.count
+    [:data_files, :models, :sops, :presentations, :events, :publications].each do |type|
+      assert_equal 3, programme.send(type).count
+    end
   end
 
 end

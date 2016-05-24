@@ -14,10 +14,6 @@ module HomesHelper
     simple_format(auto_link(Seek::Config.imprint_description.html_safe, sanitize: false), {}, sanitize: false)
   end
 
-  def show_guide_box?
-    Seek::Config.guide_box_enabled && ((!logged_in? && cookies[:hide_guide_box].nil?) || (logged_in? && current_user.try(:show_guide_box?)))
-  end
-
   def show_announcements?
     logged_in_and_registered? && Seek::Config.show_announcements
   end
@@ -64,9 +60,9 @@ module HomesHelper
   def display_single_entry(entry)
     return '' if entry.nil? || entry.url.blank?
 
-    entry_date, entry_title, feed_title, tooltip = feed_item_content_for_html(entry)
+    entry_date, entry_title, feed_title, tt = feed_item_content_for_html(entry)
     html = '<li>'
-    html << link_to(entry_title.html_safe, entry.url, title: tooltip, target: '_blank')
+    html << link_to(entry_title.html_safe, entry.url, 'data-tooltip' => tt, target: '_blank')
     html << "<br/><span class='subtle'>"
     html << feed_title
     html << " - #{time_ago_in_words(entry_date)} ago" unless entry_date.nil?
@@ -77,8 +73,8 @@ module HomesHelper
   end
 
   def determine_entry_date(entry)
-    entry_date = entry.try(:updated) if entry.respond_to?(:updated)
-    entry_date ||= entry.try(:published) if entry.respond_to?(:published)
+    entry_date = entry.try(:published) if entry.respond_to?(:published)
+    entry_date ||= entry.try(:updated) if entry.respond_to?(:updated)
     entry_date ||= entry.try(:last_modified) if entry.respond_to?(:last_modified)
     entry_date
   end
@@ -88,8 +84,8 @@ module HomesHelper
     feed_title = entry.feed_title || 'Unknown publisher'
     entry_date = determine_entry_date(entry)
     entry_summary = truncate(strip_tags(entry.summary || entry.content), length: 500)
-    tooltip = tooltip_title_attrib("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
-    [entry_date, entry_title, feed_title, tooltip]
+    tt = tooltip("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
+    [entry_date, entry_title, feed_title, tt]
   end
 
   def recently_downloaded_item_logs_hash(time = 1.month.ago, number_of_item = 10)
@@ -146,10 +142,10 @@ module HomesHelper
   end
 
   def construct_html_for_log_item(item, action)
-    icon, tooltip = log_item_content_for_html(item)
+    icon, tt = log_item_content_for_html(item)
     html = '<li>'
     html << "#{icon} "
-    html << link_to(item[:title], item[:url], title: tooltip)
+    html << link_to(item[:title], item[:url], 'data-tooltip' => tt)
     html << "<br/><span class='subtle'>#{item[:type]} - #{action} #{time_ago_in_words(item[:created_at])} ago</span>"
     html << '</li>'
     html
@@ -157,13 +153,22 @@ module HomesHelper
 
   def log_item_content_for_html(item)
     image = item[:avatar_image]
-    icon = link_to(image, item[:url], class: 'file-type-icon', title: tooltip_title_attrib(item[:type]))
+    icon = link_to(image, item[:url], class: 'file-type-icon', 'data-tooltip' => tooltip(item[:type]))
     description = item[:description] || item[:abstract]
-    tooltip = tooltip_title_attrib("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{item[:created_at]}</p>")
-    [icon, tooltip]
+    tt = tooltip("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{item[:created_at]}</p>")
+    [icon, tt]
   end
 
   def guest_login_link(text)
     link_to(text, session_path(login: 'guest', password: 'guest'), method: :post)
+  end
+
+  def frontpage_button(link, image_path, &block)
+    link_to link, class: 'seek-homepage-button', target: :_blank do
+      image_tag(image_path) +
+          content_tag(:span) do
+            block.call
+          end
+    end
   end
 end

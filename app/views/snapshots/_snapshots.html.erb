@@ -5,7 +5,7 @@
           <% if snapshot == selected %>
               <%= content_tag :strong, "Snapshot #{snapshot.snapshot_number}" %>
           <% else %>
-              <%= link_to "Snapshot #{snapshot.snapshot_number}", investigation_snapshot_path(@investigation.id, snapshot.snapshot_number) %>
+              <%= link_to "Snapshot #{snapshot.snapshot_number}", polymorphic_path([resource, snapshot]) %>
           <% end %>
           <span class="subtle">(<%= date_as_string(snapshot.created_at) %>)</span>
           <% if snapshot.has_doi? %>

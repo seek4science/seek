@@ -34,7 +34,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   def test_should_create_institution
     assert_difference('Institution.count') do
-      post :create, :institution => {:title=>"test" }
+      post :create, :institution => { :title => "test", :country => 'Finland' }
     end
 
     assert_redirected_to institution_path(assigns(:institution))
@@ -141,7 +141,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_difference("Institution.count") do
-      post :create, :institution => {:title=>"a test institution"}
+      post :create, :institution => { :title => "a test institution", :country => 'Thailand' }
     end
   end
 
@@ -190,6 +190,31 @@ class InstitutionsControllerTest < ActionController::TestCase
   test "non-project administrator  doesnt has a 'New Institution' link in the institution index" do
     get :index
     assert_select "#content a[href=?]", new_institution_path(), :count => 0
+  end
+
+  test 'activity logging' do
+    person = Factory(:project_administrator)
+    institution = person.institutions.first
+    login_as(person)
+
+    assert_difference('ActivityLog.count') do
+      get :show,id:institution.id
+    end
+
+    log = ActivityLog.last
+    assert_equal institution,log.activity_loggable
+    assert_equal 'show', log.action
+    assert_equal person.user, log.culprit
+
+    assert_difference('ActivityLog.count') do
+      put :update,id:institution.id,institution:{title:'fishy project'}
+    end
+
+    log = ActivityLog.last
+    assert_equal institution,log.activity_loggable
+    assert_equal 'update', log.action
+    assert_equal person.user, log.culprit
+
   end
 
 end

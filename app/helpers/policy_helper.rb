@@ -128,7 +128,7 @@ module PolicyHelper
 
   def process_privileged_people privileged_people, resource_name
     html = ''
-    if !privileged_people.blank?
+    unless privileged_people.blank?
       html << "<h3> Privileged people:</h3>"
       privileged_people.each do |key, value|
         value.each do |v|
@@ -137,8 +137,6 @@ module PolicyHelper
             html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::MANAGING, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase} as an uploader"
           elsif key == 'creators'
             html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::EDITING, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase} as a creator"
-          elsif key == 'asset_managers'
-            html << "#{h(v.name)} can #{Policy.get_access_type_wording(Policy::MANAGING, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase} as an asset manager"
           end
           html << "</p>"
         end

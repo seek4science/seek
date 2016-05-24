@@ -6,7 +6,7 @@
 <p>
   The administrators of the <%= t('programme') %> are:
   <ul>
-    <% @programme.administrators.each do |admin| %>
+    <% @programme.programme_administrators.each do |admin| %>
     <li>
       <%= link_to admin.name, admin %>
     </li>

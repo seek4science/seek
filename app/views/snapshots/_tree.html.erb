@@ -1,10 +1,12 @@
+<% unless top %>
 <h4><%= link_to resource['title'], resource['uri'] %></h4>
 <p><%= text_or_not_specified resource['description'], description: true, auto_link: true, length: 500 %></p>
+<% end %>
 
 <% children = resource['studies'] || resource['assays'] || resource['assets'] || [] %>
 <% children.each do |child| %>
     <div class="isa-tree">
-      <%= render :partial => 'tree', locals: { resource: child } %>
+      <%= render :partial => 'tree', locals: { resource: child, top: false } %>
     </div>
 <% end %>
 <% if resource['contains'] %>

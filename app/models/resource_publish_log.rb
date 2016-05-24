@@ -24,7 +24,7 @@ class ResourcePublishLog < ActiveRecord::Base
                                                                               WAITING_FOR_APPROVAL, publishable_resource_names])
     requested_approval_assets = requested_approval_logs.collect(&:resource).compact
     requested_approval_assets.select!{|asset| !asset.is_published?}
-    requested_approval_assets.select!{|asset| gatekeeper.is_gatekeeper_of? asset}
+    requested_approval_assets.select!{|asset| gatekeeper.is_asset_gatekeeper_of? asset}
     requested_approval_assets.uniq
   end
 

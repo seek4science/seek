@@ -249,7 +249,7 @@ class AssayNode < SeekNode
   end
 
   def children
-    deep ? item.assets + item.publications : []
+    deep ? item.assets : []
   end
 end
 

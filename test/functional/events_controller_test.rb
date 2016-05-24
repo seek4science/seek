@@ -54,7 +54,7 @@ class EventsControllerTest < ActionController::TestCase
     get :index, :page => "all"
     assert_response :success
     assert_equal assigns(:events).sort_by(&:id), Event.authorize_asset_collection(assigns(:events), "view",  users(:aaron)).sort_by(&:id), "events haven't been authorized properly"
-    assert assigns(:events).count < Event.find(:all).count #fails if all events are assigned to @events
+    assert assigns(:events).count < Event.count #fails if all events are assigned to @events
   end
 
   test "xml for projectless event" do
@@ -155,5 +155,29 @@ class EventsControllerTest < ActionController::TestCase
 
     get :index
     assert_response :success
+  end
+
+  test "programme events through nested routing" do
+    assert_routing 'programmes/2/events', { controller: 'events', action: 'index', programme_id: '2' }
+    programme = Factory(:programme)
+    event = Factory(:event, projects: programme.projects, policy: Factory(:public_policy))
+    event2 = Factory(:event, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", event_path(event), text: event.title
+      assert_select "a[href=?]", event_path(event2), text: event2.title, count: 0
+    end
+  end
+  
+  test "should create event with associated data file" do
+    data_file = Factory(:data_file)
+    assert_difference('Event.count', 1) do
+      post :create, :event => valid_event, :sharing => valid_sharing, :data_files => [{id: data_file.id}]
+    end
+
+    assert_includes assigns(:event).data_files, data_file
   end
 end

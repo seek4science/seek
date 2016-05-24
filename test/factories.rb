@@ -47,14 +47,14 @@ include ActionDispatch::TestProcess
   Factory.define(:pal, :parent => :person) do |f|
     f.roles_mask 2
     f.after_build do |pal|
-      Factory(:pal_role) if ProjectRole.pal_role.nil?
-      pal.group_memberships.first.project_roles << ProjectRole.pal_role
+      Factory(:pal_position) if ProjectPosition.pal_position.nil?
+      pal.group_memberships.first.project_positions << ProjectPosition.pal_position
       Factory(:admin_defined_role_project,:project=>pal.projects.first,:person=>pal,:role_mask=>2)
       pal.roles_mask = 2
     end
   end
 
-  Factory.define(:asset_manager,:parent=>:person) do |f|
+  Factory.define(:asset_housekeeper,:parent=>:person) do |f|
     f.after_build do |am|
       Factory(:admin_defined_role_project,:project=>am.projects.first,:person=>am,:role_mask=>8)
       am.roles_mask = 8
@@ -68,6 +68,14 @@ include ActionDispatch::TestProcess
     end
   end
 
+  Factory.define(:programme_administrator_not_in_project, :parent=>:person_not_in_project) do |f|
+    f.after_build do |pm|
+      programme=Factory(:programme)
+      Factory(:admin_defined_role_programme,:programme=>programme,:person=>pm,:role_mask=>32)
+      pm.roles_mask = 32
+    end
+  end
+
   Factory.define(:programme_administrator,:parent=>:project_administrator) do |f|
     f.after_build do |pm|
       programme=Factory(:programme,:projects=>[pm.projects.first])
@@ -77,7 +85,7 @@ include ActionDispatch::TestProcess
   end
 
 
-  Factory.define(:gatekeeper,:parent=>:person) do |f|
+  Factory.define(:asset_gatekeeper,:parent=>:person) do |f|
     f.after_build do |gk|
       Factory(:admin_defined_role_project,:project=>gk.projects.first,:person=>gk,:role_mask=>16)
       gk.roles_mask = 16
@@ -129,6 +137,7 @@ include ActionDispatch::TestProcess
 #Institution
   Factory.define(:institution) do |f|
     f.sequence(:title) { |n| "An Institution: #{n}" }
+    f.country { ActionView::Helpers::FormOptionsHelper::COUNTRIES.sample }
   end
 
 #Sop
@@ -192,7 +201,7 @@ end
     f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::ACCESSIBLE
   end
-    
+
   Factory.define(:publicly_viewable_policy, :parent=>:policy) do |f|
     f.sharing_scope Policy::EVERYONE
     f.access_type Policy::VISIBLE
@@ -202,7 +211,7 @@ end
     f.sharing_scope Policy::ALL_USERS
     f.access_type Policy::ACCESSIBLE
   end
-  
+
   Factory.define(:editing_public_policy,:parent=>:policy) do |f|
     f.sharing_scope Policy::EVERYONE
     f.access_type Policy::EDITING
@@ -259,7 +268,7 @@ end
   end
 
   Factory.define(:modelling_assay, :parent => :assay_base) do |f|
-    f.association :assay_class, :factory => :modelling_assay_class    
+    f.association :assay_class, :factory => :modelling_assay_class
   end
 
   Factory.define(:modelling_assay_with_organism, :parent => :modelling_assay) do |f|
@@ -270,7 +279,6 @@ end
     f.association :assay_class, :factory => :experimental_assay_class
     f.assay_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
     f.technology_type_uri "http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
-    f.samples {[Factory.build(:sample, :policy => Factory(:public_policy))]}
   end
 
   Factory.define(:assay, :parent => :modelling_assay) {}
@@ -307,11 +315,10 @@ end
     f.title "a culture_growth_type"
   end
 
-#Tissue and cell type
-Factory.define(:tissue_and_cell_type) do |f|
-  f.sequence(:title){|n| "Tisse and cell type #{n}"}
-end
-
+  #Tissue and cell type
+  Factory.define(:tissue_and_cell_type) do |f|
+    f.sequence(:title){|n| "Tisse and cell type #{n}"}
+  end
 
   #Assay organism
   Factory.define(:assay_organism) do |f|
@@ -319,27 +326,6 @@ end
     f.association :strain
     f.association :organism
   end
-
-  #Specimen
-  Factory.define(:specimen) do |f|
-    f.sequence(:title) { |n| "Specimen#{n}" }
-    f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
-    f.association :contributor, :factory => :person
-    f.projects {[Factory.build(:project)]}
-    f.association :institution
-    f.association :strain
-  end
-
-  #Sample
-  Factory.define(:sample) do |f|
-    f.sequence(:title) { |n| "Sample#{n}" }
-    f.sequence(:lab_internal_number) { |n| "Lab#{n}" }
-    f.association :contributor, :factory => :person
-    f.projects {[Factory.build(:project)]}
-    f.donation_date Date.today
-    f.specimen { Factory(:specimen, :policy => Factory(:public_policy))}
-  end
-
 
   #Data File
   Factory.define(:data_file) do |f|
@@ -355,12 +341,6 @@ end
         data_file.content_blob.save
       end
     end
-  end
-
-  #Treatment
-  Factory.define(:treatment) do |f|
-    f.association :sample, :factory=>:sample
-    f.association :specimen, :factory=>:specimen
   end
 
   Factory.define(:rightfield_datafile,:parent=>:data_file) do |f|
@@ -399,6 +379,20 @@ end
     f.association :contributor, :factory => :person
     f.after_create do |model|
       model.content_blobs = [Factory.create(:cronwright_model_content_blob, :asset => model,:asset_version=>model.version),Factory.create(:rightfield_content_blob, :asset => model,:asset_version=>model.version)] if model.content_blobs.blank?
+    end
+  end
+
+  Factory.define(:model_2_remote_files,:class=>Model) do |f|
+    f.sequence(:title) {|n| "A Model #{n}"}
+    f.projects {[Factory.build(:project)]}
+    f.association :contributor, :factory => :person
+    f.after_create do |model|
+      model.content_blobs = [Factory.create(:url_content_blob,
+                                            :asset => model,
+                                            :asset_version => model.version),
+                             Factory.create(:url_content_blob,
+                                            :asset => model,
+                                            :asset_version => model.version)] if model.content_blobs.blank?
     end
   end
 
@@ -478,7 +472,7 @@ end
   #Presentation
   Factory.define(:presentation) do |f|
     f.sequence(:title) { |n| "A Presentation #{n}" }
-    f.projects { [Factory.build(:project)] }    
+    f.projects { [Factory.build(:project)] }
     f.association :contributor, :factory => :person
     f.after_create do |presentation|
       if presentation.content_blob.blank?
@@ -511,6 +505,22 @@ end
     end
   end
 
+  Factory.define(:model_version_with_blob, :parent => :model_version) do |f|
+    f.after_create do |model_version|
+      if model_version.content_blobs.empty?
+        Factory.create(:teusink_model_content_blob,
+                       :asset => model_version.model,
+                       :asset_version => model_version.model.version)
+      else
+        model_version.content_blobs.each do |cb|
+          cb.asset = model_version.model
+          cb.asset_version = model_version.version
+          cb.save
+        end
+      end
+    end
+  end
+
   #SOP Version
   Factory.define(:sop_version,:class=>Sop::Version) do |f|
     f.association :sop
@@ -520,6 +530,20 @@ end
       sop_version.version = sop_version.sop.version
       sop_version.title = sop_version.sop.title
       sop_version.save
+    end
+  end
+
+  Factory.define(:sop_version_with_blob, :parent => :sop_version) do |f|
+    f.after_create do |sop_version|
+      if sop_version.content_blob.blank?
+        sop_version.content_blob = Factory.create(:pdf_content_blob,
+                                                  :asset => sop_version.sop,
+                                                  :asset_version => sop_version.version)
+      else
+        sop_version.content_blob.asset = sop_version.sop
+        sop_version.content_blob.asset_version = sop_version.version
+        sop_version.content_blob.save
+      end
     end
   end
 
@@ -535,6 +559,20 @@ end
     end
   end
 
+  Factory.define(:data_file_version_with_blob, :parent => :data_file_version) do |f|
+    f.after_create do |data_file_version|
+      if data_file_version.content_blob.blank?
+        data_file_version.content_blob = Factory.create(:pdf_content_blob,
+                                                        :asset => data_file_version.data_file,
+                                                        :asset_version => data_file_version.version)
+      else
+        data_file_version.content_blob.asset = data_file_version.data_file
+        data_file_version.content_blob.asset_version = data_file_version.version
+        data_file_version.content_blob.save
+      end
+    end
+  end
+
   #Presentation Version
   Factory.define(:presentation_version,:class=>Presentation::Version) do |f|
     f.association :presentation
@@ -547,16 +585,31 @@ end
     end
   end
 
+  Factory.define(:presentation_version_with_blob, :parent => :presentation_version) do |f|
+    f.after_create do |presentation_version|
+      if presentation_version.content_blob.blank?
+        presentation_version.content_blob = Factory.create(:content_blob, :original_filename => "test.pdf",
+                                                           :content_type => "application/pdf",
+                                                           :asset => presentation_version.presentation,
+                                                           :asset_version => presentation_version)
+      else
+        presentation_version.content_blob.asset = presentation_version.presentation
+        presentation_version.content_blob.asset_version = presentation_version.version
+        presentation_version.content_blob.save
+      end
+    end
+  end
+
   #Misc
   Factory.define(:group_membership) do |f|
     f.association :work_group
   end
 
-  Factory.define(:project_role) do |f|
+  Factory.define(:project_position) do |f|
     f.name "A Role"
   end
 
-  Factory.define(:pal_role,:parent=>:project_role) do |f|
+  Factory.define(:pal_position,:parent=>:project_position) do |f|
     f.name "A Pal"
   end
 
@@ -622,7 +675,7 @@ end
     f.content_type "application/pdf"
     f.data  File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read
   end
-  
+
   Factory.define(:rightfield_content_blob,:parent=>:content_blob) do |f|
     f.content_type "application/excel"
     f.original_filename "rightfield.xls"
@@ -738,6 +791,24 @@ end
     f.original_filename 'txt_test.txt'
   end
 
+  Factory.define(:csv_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/csv_test.csv", "rb").read
+    f.content_type "text/x-comma-separated-values"
+    f.original_filename 'csv_test.csv'
+  end
+
+  Factory.define(:tsv_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/tsv_test.tsv", "rb").read
+    f.content_type "text/tab-separated-values"
+    f.original_filename 'tsv_test.tsv'
+  end
+
+  Factory.define(:json_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/slideshare.json", "rb").read
+    f.content_type "application/json"
+    f.original_filename 'slideshare.json'
+  end
+
   Factory.define(:typeless_content_blob, :parent=>:content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/file_with_no_extension", "rb").read
     f.content_type nil
@@ -748,6 +819,31 @@ end
     f.data File.new("#{Rails.root}/test/fixtures/files/little_file.txt", "rb").read
     f.content_type 'application/octet-stream'
     f.original_filename "binary.bin"
+  end
+
+  Factory.define(:sample_type_template_content_blob, :parent => :content_blob) do |f|
+    f.original_filename "sample-type-example.xlsx"
+    f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/sample-type-example.xlsx","rb").read
+  end
+
+  #has more than one sample sheet, and the columns are irregular with leading empty columns and gaps
+  Factory.define(:sample_type_template_content_blob2, :parent => :content_blob) do |f|
+    f.original_filename "sample-type-example.xlsx"
+    f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/sample-type-example2.xls","rb").read
+  end
+
+  Factory.define(:sample_type_populated_template_content_blob, :parent => :content_blob) do |f|
+    f.original_filename "sample-type-populated.xlsx"
+    f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/sample-type-populated.xlsx","rb").read
+  end
+
+  Factory.define(:strain_sample_data_content_blob, :parent => :content_blob) do |f|
+    f.original_filename "strain-sample-data.xlsx"
+    f.content_type "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    f.data  File.new("#{Rails.root}/test/fixtures/files/strain-sample-data.xlsx","rb").read
   end
 
   Factory.define(:activity_log) do |f|
@@ -784,7 +880,7 @@ end
   Factory.define(:notifiee_info) do |f|
     f.association :notifiee, :factory => :person
   end
-    
+
   Factory.define(:measured_item) do |f|
     f.title 'concentration'
   end
@@ -824,7 +920,7 @@ end
   Factory.define(:special_auth_code) do |f|
     f.association :asset, :factory => :data_file
   end
-  
+
   Factory.define(:experimental_condition_link) do |f|
     f.association :substance, :factory => :compound
     f.association :experimental_condition
@@ -918,7 +1014,6 @@ end
     f.association :gene, :factory => :gene
     f.association :modification, :factory => :modification
     f.association :strain, :factory => :strain
-    f.association :specimen,:factory => :specimen
   end
 
   Factory.define :gene do |f|
@@ -932,7 +1027,6 @@ end
   Factory.define :phenotype do |f|
     f.sequence(:description) {|n| "phenotype #{n}"}
     f.association :strain, :factory => :strain
-    f.specimen { Factory(:specimen, :policy => Factory(:public_policy))}
   end
 
   Factory.define :publication_author do |f|
@@ -1027,3 +1121,163 @@ end
     f.refresh_token 'ref'
     f.expires_at (Time.now + 1.hour)
   end
+
+  Factory.define(:sample_type) do |f|
+    f.sequence(:title) {|n| "SampleType #{n}"}
+  end
+
+  Factory.define(:integer_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "Integer attribute type #{n}"}
+    f.base_type 'Integer'
+  end
+
+  Factory.define(:string_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "String attribute type #{n}"}
+    f.base_type 'String'
+  end
+
+  Factory.define(:float_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "Float attribute type #{n}"}
+    f.base_type 'Float'
+  end
+
+  Factory.define(:datetime_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "DateTime attribute type #{n}"}
+    f.base_type 'DateTime'
+  end
+
+  Factory.define(:text_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "Text attribute type #{n}"}
+    f.base_type 'Text'
+  end
+
+  Factory.define(:boolean_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "Boolean attribute type #{n}"}
+    f.base_type 'Boolean'
+  end
+
+  Factory.define(:strain_sample_attribute_type,:class=>SampleAttributeType) do |f|
+    f.sequence(:title) {|n| "Strain attribute type #{n}"}
+    f.base_type 'SeekStrain'
+  end
+
+  Factory.define(:sample_attribute) do |f|
+    f.sequence(:title) {|n| "Sample attribute #{n}"}
+    f.association :sample_type, :factory => :sample_type
+  end
+
+  #a string that must contain 'xxx'
+  Factory.define(:simple_string_sample_attribute, :parent=>:sample_attribute) do |f|
+    f.sample_attribute_type Factory(:string_sample_attribute_type,regexp:".*xxx.*")
+    f.required true
+  end
+
+  Factory.define(:any_string_sample_attribute, :parent=>:sample_attribute) do |f|
+    f.sample_attribute_type Factory(:string_sample_attribute_type)
+    f.required true
+  end
+
+
+  #very simple persons name, must be 2 words, first and second word starting with capital with all letters
+  Factory.define(:full_name_sample_attribute_type,:parent=>:string_sample_attribute_type) do |f|
+    f.regexp  '[A-Z][a-z]+[ ][A-Z][a-z]+'
+    f.title 'Full name'
+  end
+
+  #positive integer
+  Factory.define(:age_sample_attribute_type,:parent=>:integer_sample_attribute_type) do |f|
+    f.regexp '^[1-9]\d*$'
+    f.title 'Age'
+  end
+
+  #positive float
+  Factory.define(:weight_sample_attribute_type,:parent=>:float_sample_attribute_type) do |f|
+    f.regexp '^[1-9]\d*[.][1-9]\d*$'
+    f.title 'Weight'
+  end
+
+  #uk postcode - taken from http://regexlib.com/REDetails.aspx?regexp_id=260
+  Factory.define(:postcode_sample_attribute_type,:parent=>:string_sample_attribute_type) do |f|
+    f.regexp '^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$'
+    f.title 'Post Code'
+  end
+
+  Factory.define(:address_sample_attribute_type,:parent=>:text_sample_attribute_type) do |f|
+    f.title 'Address'
+  end
+
+  Factory.define(:patient_sample_type,:parent=>:sample_type) do |f|
+    f.title "Patient data"
+    f.after_build do |type|
+      # Not sure why i have to explicitly add the sample_type association
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"full name",:sample_attribute_type=>Factory(:full_name_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"age",:sample_attribute_type=>Factory(:age_sample_attribute_type),:required=>true, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"weight",:sample_attribute_type=>Factory(:weight_sample_attribute_type),:required=>false, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"address",:sample_attribute_type=>Factory(:address_sample_attribute_type),:required=>false, :sample_type => type)
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"postcode",:sample_attribute_type=>Factory(:postcode_sample_attribute_type),:required=>false, :sample_type => type)
+    end
+  end
+
+  Factory.define(:simple_sample_type,:parent=>:sample_type) do |f|
+    f.sequence(:title) {|n| "Simple Sample Type #{n}"}
+    f.after_build do |type|
+      type.sample_attributes << Factory.build(:sample_attribute,:title=>"the title",:sample_attribute_type=>Factory(:string_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
+    end
+  end
+
+Factory.define(:sample) do |f|
+  f.sequence(:title) {|n| "Sample #{n}"}
+  f.association :sample_type,:factory=>:simple_sample_type
+  f.after_build do |sample|
+    sample.set_attribute(:the_title, sample.title) if sample.data.key?(:the_title)
+  end
+end
+
+Factory.define(:patient_sample, :parent=>:sample) do |f|
+  f.association :sample_type, :factory => :patient_sample_type
+  f.after_build do |sample|
+    sample.set_attribute(:full_name, "Fred Bloggs")
+    sample.set_attribute(:age, 44)
+    sample.set_attribute(:weight, 88.7)
+  end
+end
+
+Factory.define(:strain_sample_type, :parent=>:sample_type) do |f|
+  f.title "Strain type"
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:sample_attribute,:title=>"name",:sample_attribute_type=>Factory(:string_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
+    type.sample_attributes << Factory.build(:sample_attribute,:title=>"seekstrain",:sample_attribute_type=>Factory(:strain_sample_attribute_type),:required=>true, :sample_type => type)
+  end
+end
+
+Factory.define(:sample_controlled_vocab_term) do |f|
+
+end
+
+Factory.define(:apples_sample_controlled_vocab,class:SampleControlledVocab) do |f|
+  f.sequence(:title) {|n| "apples controlled vocab #{n}"}
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term,label:'Granny Smith')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term,label:'Golden Delicious')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term,label:'Bramley')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term,label:"Cox's Orange Pippin")
+  end
+end
+
+Factory.define(:controlled_vocab_attribute_type,:class=>SampleAttributeType) do |f|
+  f.sequence(:title) {|n| "CV attribute type #{n}"}
+  f.base_type 'CV'
+end
+
+Factory.define(:apples_controlled_vocab_attribute,parent: :sample_attribute) do |f|
+  f.sequence(:title) {|n| "apples controlled vocab attribute #{n}"}
+  f.sample_controlled_vocab Factory.build(:apples_sample_controlled_vocab)
+  f.sample_attribute_type Factory(:controlled_vocab_attribute_type)
+end
+
+Factory.define(:apples_controlled_vocab_sample_type, :parent=>:sample_type) do |f|
+  f.sequence(:title) {|n| "apples controlled vocab sample type #{n}"}
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:apples_controlled_vocab_attribute,title:'apples',is_title:true,required:true,sample_type:type)
+  end
+end

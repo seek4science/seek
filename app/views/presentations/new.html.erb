@@ -7,7 +7,7 @@
       <%= render :partial=>"assets/upload_box" -%>
 
       <div class="form-group">
-        <label>Title</label>
+        <label>Title <span class="required">*</span></label>
         <% presentation_title_value = (params[:presentation].blank? || params[:presentation][:title].blank?) ? nil : params[:presentation][:title] -%>
         <%= text_area_tag "presentation[title]", presentation_title_value, :class=>"form-control" -%>
       </div>
@@ -21,6 +21,8 @@
       <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => true} -%>
 
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} if show_scales?%>
+
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @presentation } %>
 
       <%= fields_for(@presentation) {|f|  f.hidden_field :parent_name } -%>
 

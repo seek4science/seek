@@ -27,7 +27,7 @@ class EventTest < ActiveSupport::TestCase
   end
 
   test "sort by created_at" do
-    assert_equal Event.find(:all).sort_by { |e| e.start_date.to_i * -1 }, Event.find(:all)
+    assert_equal Event.all.sort_by { |e| e.start_date.to_i * -1 }, Event.all
   end
 
   test "datafiles are unique" do

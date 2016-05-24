@@ -9,47 +9,6 @@ min-width:
     600px; /* optional but recommended */
 }
 
-#errorExplanation {
-    width: 95%;
-    border: 2px solid #c00;
-    padding: 0.5em;
-    margin: 1em;
-    background-color: #F5F5F5;
-    text-align: left;
-}
-
-#errorExplanation h2 {
-    text-align: left;
-    font-weight: bold;
-    padding: 5px 5px 5px 15px;
-    font-size: 93%;
-    margin: 0;
-    background-image: none;
-    background-color: #c00;
-    border: none;
-    color: #fff;
-}
-
-#errorExplanation p {
-    color: #333;
-    margin-bottom: 0;
-    margin-top: 0.5em;
-    padding: 5px;
-}
-
-#errorExplanation ul {
-    font-size: 14px;
-    list-style:none;
-}
-
-#errorExplanation ul li {
-    list-style: none;
-}
-
-.fieldWithErrors {
-    border: solid 2px red;
-}
-
 #main_pane {
     padding-right: 1em;
     padding-left: 0.5em;
@@ -213,7 +172,8 @@ table.list_item .tags {
     margin-top: 0.7em;
 }
 
-.disabled, .disabled-button {
+span.disabled, span.disabled-button,
+a.disabled, a.disabled-button{
     filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
     opacity: 0.50;
 }
@@ -375,42 +335,6 @@ table.list_item .tags {
 
 .contribution_section_box ul.list li * {
     vertical-align: middle;
-}
-
-
-.boxoverTooltipHeader {
-    display: none;
-    border: 0;
-    height: 0;
-}
-
-.boxoverTooltipBody {
-    border: solid 1px Gray;
-    color: #000000;
-    background-color: #fffeda;
-    font-size: 93%;
-    font-weight: normal;
-    padding: 0.2em 0.6em;
-    max-width: 500px;
-    text-align: left;
-    line-height: 1.4em;
-}
-
-.boxoverInfoHeader {
-    display: none;
-    border: 0;
-    height: 0;
-}
-
-.boxoverInfoBody {
-    border: solid 1px Gray;
-    color: #333333;
-    padding: 0.4em;
-    background-color: #ebf3ff;
-    font-size: 93%;
-    text-align: left;
-    max-width: 400px;
-    line-height: 1.4em;
 }
 
 /* text style classes */
@@ -778,25 +702,10 @@ ul.horiz_list_items li {
     display: inline;
 }
 
-div.error_div {
-    background-color:#F5F5F5;
-    border:2px solid #CC0000;
-    margin:0.5em 0;
-    padding:0.5em;
-    text-align:left;
-    width:95%;
-}
-
 div.error_div h2 {
-    text-align: left;
+    font-size: inherit;
     font-weight: bold;
-    padding: 5px 5px 5px 15px;
-    font-size: 93%;
     margin: 0;
-    background-image: none;
-    background-color: #c00;
-    border: none;
-    color: #fff;
 }
 
 .assay_item_sup_info {
@@ -1334,10 +1243,6 @@ li.fileinfo_container div.fileinfo {
 }
 
 
-div#guide_box {
-    min-height: 4em;
-}
-
 #usage_timestamps {
     color: #555;
     font-size: smaller;
@@ -1361,17 +1266,6 @@ div#guide_box {
     text-align: center;
 }
 
-.box_infotext {
-    margin: 0;
-    padding: 0.5em 0.8em;
-    line-height: 1.4;
-    border: 1px solid #bbb;
-    background-color: #fffeda;
-    border-radius: 4px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-}
-
 .box_normal {
     margin: 0;
     padding: 0.5em 0.8em;
@@ -1384,7 +1278,6 @@ div#guide_box {
 
 .none_text {
     font-style: italic;
-    color: #666666;
 }
 
 ul.model_scales_list {
@@ -1624,10 +1517,6 @@ div#version_box .compare {
     padding-left: 0.25em;
 }
 
-.field_with_errors > input {
-    border: 2px solid red;
-}
-
 .large_text_entry {
     width: 99%;
     height: 10em;
@@ -1689,9 +1578,11 @@ div#version_box .compare {
 }
 
 .isa-tree {
-    margin-bottom: 0.5em;
+    margin-bottom: 0;
     margin-left: 1em;
     padding-left: 1em;
+    padding-top: 0.25em;
+    padding-bottom: 0.25em;
     border-left: 4px solid #eee;
 }
 
@@ -1700,6 +1591,11 @@ img.zenodo-publish {
     border-radius: 5px;
     box-shadow: 1px 1px 4px 0 #ccc;
     margin: 0 auto 6px;
+}
+
+img.mint-doi {
+  display: block;
+  margin: 0 auto 6px;
 }
 
 .creator-checkbox {
@@ -1713,7 +1609,7 @@ img.zenodo-publish {
 }
 
 #login-panel, #forgot-password-panel {
-    width: 45em;
+    max-width: 45em;
     margin: auto;
 }
 
@@ -1727,4 +1623,30 @@ dl.icon-key > dt {
 
 dl.icon-key > dd {
     margin-left: 60px;
+}
+
+.avatar-gallery {
+    overflow: auto;
+}
+
+.avatar-gallery div.avatar {
+    float: left;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 2px #999;
+    margin: 10px;
+    width: 200px;
+    text-align: center;
+}
+
+select.project-positions-adder {
+    width: auto;
+}
+
+.related-items .nav {
+    margin-bottom: 0.5em;
+}
+
+div.renderer {
+    text-align:center;
 }

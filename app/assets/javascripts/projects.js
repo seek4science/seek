@@ -102,11 +102,13 @@ var Projects = {
     actions: {
         add: function () {
             var people = $j('#people_ids').tagsinput('items');
+            var institution_id = $j("#institution_ids").val();
+            var institution_title = $j("#institution_ids option:selected").text();
+            var errors = [];
+            var toRemove = [];
 
             $j.each(people, function (index, value) {
-                if(Projects.getPersonIndex(Projects.memberships, value.id) == -1) {
-                    var institution_id = $j("#institution_ids").val();
-                    var institution_title = $j("#institution_ids option:selected").text();
+                if(Projects.getPersonIndex(Projects.memberships, value.id, institution_id) == -1) {
                     var change = {
                         person: { id: value.id, name: value.name },
                         institution: { id: institution_id, title: institution_title },
@@ -117,23 +119,30 @@ var Projects = {
                             institution_title: institution_title })
                     };
                     Projects.addChange(change);
+                    toRemove.push({ id: value.id });
                 } else {
-                    alert(value.name + ' is already a member of the project.')
+                    errors.push(value.name + ' is already a member of the project through that institution.');
                 }
             });
 
-            $j('#people_ids').tagsinput('removeAll');
+            for(var i = 0; i < toRemove.length; i++)
+                $j('#people_ids').tagsinput('remove', toRemove[i]);
+
+            if(errors.length > 0)
+                alert(errors.join("\n"));
         },
         undo: function () {
             var item = $j(this).parent('.institution_member');
-            var id = item.data('personId');
-            Projects.removeChange(id);
+            var personId = item.data('personId');
+            var institutionId = item.data('institutionId');
+            Projects.removeChange(personId, institutionId);
         },
         remove: function () {
             var item = $j(this).parent('.institution_member');
             var change = {
                 id: item.data('membershipId'),
                 person: { id: item.data('personId'), name: item.data('personName') },
+                institution: { id: item.data('institutionId'), title: item.data('institutionTitle') },
                 action: 'removed'
             };
             Projects.addChange(change);
@@ -142,6 +151,8 @@ var Projects = {
             var item = $j(this).parent('.institution_member');
             $j('#leaving-person-id').val(item.data('personId'));
             $j('#leaving-person-name').val(item.data('personName'));
+            $j('#leaving-person-institution-id').val(item.data('institutionId'));
+            $j('#leaving-person-institution-title').val(item.data('institutionTitle'));
             $j('#leaving-membership-id').val(item.data('membershipId'));
             $j('#leaving-date-form').modal('show');
         },
@@ -149,6 +160,7 @@ var Projects = {
             var change = {
                 id: $j('#leaving-membership-id').val(),
                 person: { id: $j('#leaving-person-id').val(), name: $j('#leaving-person-name').val() },
+                institution: { id: $j('#leaving-person-institution-id').val(), title: $j('#leaving-person-institution-title').val() },
                 date: $j('#leaving_date').val(),
                 action: 'flagged'
             };
@@ -160,6 +172,7 @@ var Projects = {
             var change = {
                 id: item.data('membershipId'),
                 person: { id: item.data('personId'), name: item.data('personName') },
+                institution: { id: item.data('institutionId'), title: item.data('institutionTitle') },
                 action: 'unflagged'
             };
             Projects.addChange(change);
@@ -167,17 +180,18 @@ var Projects = {
     }
 };
 
-Projects.getPersonIndex = function (set, personId) {
+Projects.getPersonIndex = function (set, personId, institutionId) {
     for(var i = 0; i < set.length; i++) {
         if(set[i].person.id == personId)
-            return i;
+            if(set[i].institution.id == institutionId)
+                return i;
     }
 
     return -1;
 };
 
-Projects.removeChange = function (id) {
-    var index = Projects.getPersonIndex(Projects.membershipChanges, id);
+Projects.removeChange = function (personId, institutionId) {
+    var index = Projects.getPersonIndex(Projects.membershipChanges, personId, institutionId);
     if(index > -1)
         Projects.membershipChanges.splice(index, 1);
 
@@ -185,7 +199,7 @@ Projects.removeChange = function (id) {
 };
 
 Projects.addChange = function (change) {
-    var index = Projects.getPersonIndex(Projects.membershipChanges, change.person.id);
+    var index = Projects.getPersonIndex(Projects.membershipChanges, change.person.id, change.institution.id);
     if(index > -1)
         Projects.membershipChanges[index] = change;
     else {
@@ -199,11 +213,12 @@ Projects.renderMemberships = function () {
     var changeListElement = $j('#change-list');
 
     var addToList = function (membership) {
-        var institutionElement = membershipListElement.find('[data-institution-id="' + membership.institution.id + '"]');
+        var selector = '.institution_members[data-institution-id="' + membership.institution.id + '"]';
+        var institutionElement = membershipListElement.find(selector);
         if(institutionElement.length === 0) {
             // Create institution if not already there
             membershipListElement.append(HandlebarsTemplates['projects/institution'](membership.institution));
-            institutionElement = membershipListElement.find('[data-institution-id="' + membership.institution.id + '"]');
+            institutionElement = membershipListElement.find(selector);
         }
         var templateName = membership.action === 'added' ? 'projects/new_member' : 'projects/member';
         institutionElement.append(HandlebarsTemplates[templateName](membership));
@@ -243,5 +258,6 @@ $j(document).ready(function () {
     $j('#undo-all').click(function () {
         Projects.membershipChanges = [];
         Projects.renderMemberships();
+        return false;
     });
 });

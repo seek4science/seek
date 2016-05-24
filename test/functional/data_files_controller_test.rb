@@ -208,24 +208,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_includes new_assay.data_files,d
   end
 
-  test "associate sample" do
-     # associate to a new data file
-     data_file_with_samples,blob = valid_data_file
-     data_file_with_samples[:sample_ids] = [Factory(:sample,:title=>"newTestSample",:contributor=> User.current_user).id]
-     assert_difference("DataFile.count") do
-       post :create,:data_file => data_file_with_samples,:content_blobs=>[blob], :sharing => valid_sharing
-     end
-
-    df = assigns(:data_file)
-    assert_equal "newTestSample", df.samples.first.title
-
-    #edit associations of samples to an existing data file
-    put :update,:id=> df.id, :data_file => {:sample_ids=> [Factory(:sample,:title=>"editTestSample",:contributor=> User.current_user).id]}
-    df = assigns(:data_file)
-    assert_equal "editTestSample", df.samples.first.title
-  end
-
-
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
@@ -956,28 +938,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "a",:text=>/Edit factors studied/,:count=>0
   end
   
-  def test_should_allow_factors_studies_edited_for_editable_file
-    login_as(:aaron)
-    d=data_files(:editable_data_file)
-    d.save
-    assert_difference('ActivityLog.count') do
-      get :show, :id=>d
-    end
-
-    assert_select "a",:text=>/Edit factors studied/,:count=>1
-  end
-  
-  test "show should allow factors studied edited owner of downloadable file" do
-    login_as(:datafile_owner)
-    d=data_files(:downloadable_data_file)
-    d.save
-    assert_difference('ActivityLog.count') do
-      get :show, :id=>d
-    end
-
-    assert_select "a",:text=>/Edit factors studied/,:count=>1
-  end
-  
   test "should update data file" do
     assert_difference('ActivityLog.count') do
       put :update, :id => data_files(:picture).id, :data_file => { }
@@ -1489,7 +1449,7 @@ class DataFilesControllerTest < ActionController::TestCase
     policy = Factory(:policy)
     Factory(:permission, :policy => policy, :contributor => person, :access_type => Policy::MANAGING)
     data_file = Factory(:data_file, :policy => policy)
-    assert data_file.gatekeepers.empty?
+    assert data_file.asset_gatekeepers.empty?
     assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
     login_as(person.user)
     assert data_file.can_manage?
@@ -1528,7 +1488,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     project = Factory(:project)
     work_group = Factory(:work_group, :project => project)
-    gatekeeper = Factory(:gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
+    gatekeeper = Factory(:asset_gatekeeper, :group_memberships => [Factory(:group_membership, :work_group => work_group)])
 
     data_file = Factory(:data_file, :policy => policy, :project_ids => [project.id])
     assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
@@ -1772,8 +1732,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "description formatting" do
     desc = "This is <b>Bold</b> - this is <em>emphasised</em> - this is super<sup>script</sup> - "
-    desc << "This is <u>underlined</u> - "
-    desc << "this is link to goole: http://google.com - "
+    desc << "this is link to google: http://google.com - "
     desc << "this is some nasty javascript <script>alert('fred');</script>"
 
     df = Factory(:data_file,:description=>desc,:policy=>Factory(:public_policy))
@@ -1784,7 +1743,6 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "p"
       assert_select "b", :text=>"Bold"
       assert_select "em", :text=>"emphasised"
-      assert_select "u", :text=>"underlined"
       assert_select "sup", :text=>"script"
       assert_select "script",:count=>0
       assert_select "a[href=?]","http://google.com",:text=>"http://google.com"
@@ -2078,6 +2036,36 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !blob.caching_job.exists?
   end
 
+  test "should not automatically create cache job for webpage links" do
+    mock_http
+    params = { data_file: {
+        title: "My Fav Website",
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: "http://mockedlocation.com"
+                               }],
+               sharing: valid_sharing
+    }
+
+
+    assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    blob = assigns(:data_file).content_blob
+    assert !blob.cachable?
+    assert !blob.url.blank?
+    assert_blank blob.original_filename
+    assert_equal "text/html", blob.content_type
+    assert !blob.caching_job.exists?
+  end
+
   test "should create cache job for large file if user requests 'make_local_copy'" do
     mock_http
     params = { data_file: {
@@ -2110,6 +2098,359 @@ class DataFilesControllerTest < ActionController::TestCase
     assert blob.caching_job.exists?
   end
 
+  test "should display null license text" do
+    df = Factory :data_file, :policy => Factory(:public_policy)
+
+    get :show, :id => df
+
+    assert_select '.panel .panel-body span.none_text', :text => 'No license specified'
+  end
+
+  test "should display license" do
+    df = Factory :data_file, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
+
+    get :show, :id => df
+
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
+  end
+
+  test "should display license for current version" do
+    df = Factory :data_file, :license => 'CC-BY-4.0', :policy => Factory(:public_policy)
+    dfv = Factory :data_file_version_with_blob, :data_file => df
+
+    df.update_attributes :license => 'CC0-1.0'
+
+    get :show, :id => df, :version => 1
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution 4.0'
+
+    get :show, :id => df, :version => dfv.version
+    assert_response :success
+    assert_select '.panel .panel-body a', :text => 'CC0 1.0'
+  end
+
+  test "should update license" do
+    user = users(:datafile_owner)
+    login_as(user)
+    df = data_files(:editable_data_file)
+
+    assert_nil df.license
+
+    put :update, :id => df, :data_file => { :license => 'CC-BY-SA-4.0' }
+
+    assert_response :redirect
+
+    get :show, :id => df
+    assert_select '.panel .panel-body a', :text => 'Creative Commons Attribution Share-Alike 4.0'
+    assert_equal 'CC-BY-SA-4.0', assigns(:data_file).license
+  end
+
+  test "check correct license pre-selected" do
+    df = Factory :data_file, :license => 'CC-BY-SA-4.0', :policy => Factory(:public_policy)
+
+    get :edit, :id => df
+    assert_response :success
+    assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution Share-Alike 4.0'
+
+    df2 = Factory :data_file, :license => nil, :policy => Factory(:public_policy)
+
+    get :edit, :id => df2
+    assert_response :success
+    assert_select '#license-select option[selected=?]', 'selected', :text => 'License Not Specified'
+
+    get :new
+    assert_response :success
+    assert_select '#license-select option[selected=?]', 'selected', :text => 'Creative Commons Attribution 4.0'
+  end
+
+  test 'can disambiguate sample type' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    get :select_sample_type, :id => data_file
+
+    assert_select 'select[name=sample_type_id] option', count: 2
+  end
+
+  test 'filtering for sample association form' do
+    person = Factory(:person)
+    d1 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "fish")
+    d2 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "frog")
+    d3 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "banana")
+    d4 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: "no samples")
+    [d1, d2, d3].each do |data_file|
+      Factory(:sample, originating_data_file_id: data_file.id)
+    end
+    login_as(person.user)
+
+    get :filter, filter: '', with_samples: true
+    assert_select 'a', count: 3
+    assert_select 'a', text: /no samples/, count: 0
+    assert_response :success
+
+    get :filter, filter: 'f', with_samples: true
+    assert_select 'a', count: 2
+    assert_select 'a', text: /fish/
+    assert_select 'a', text: /frog/
+
+    get :filter, filter: 'fi', with_samples: true
+    assert_select 'a', count: 1
+    assert_select 'a', text: /fish/
+  end
+
+  test "programme data files through nested routing" do
+    assert_routing 'programmes/2/data_files', { controller: 'data_files', action: 'index', programme_id: '2' }
+    programme = Factory(:programme)
+    data_file = Factory(:data_file, projects: programme.projects, policy: Factory(:public_policy))
+    data_file2 = Factory(:data_file, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", data_file_path(data_file), text: data_file.title
+      assert_select "a[href=?]", data_file_path(data_file2), text: data_file2.title, count: 0
+    end
+  end
+
+  test "should get table view for data file" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
+    end
+    login_as(data_file.contributor)
+
+    get :samples_table, format: :json, id: data_file.id
+
+    assert_response :success
+
+    json = JSON.parse(@response.body)
+    assert_equal 3, json['data'].length
+  end
+
+  test "should not get table view for private data file if unauthorized" do
+    data_file = Factory(:data_file, policy: Factory(:private_policy))
+    sample_type = Factory(:simple_sample_type)
+    3.times do
+      Factory(:sample, sample_type: sample_type, contributor: data_file.contributor, policy: Factory(:private_policy),
+              originating_data_file: data_file)
+    end
+
+    get :samples_table, format: :json, id: data_file.id
+
+    assert_response :forbidden
+  end
+
+  test "can't extract from data file if no permissions" do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    login_as(another_person)
+
+    assert_no_difference("Sample.count") do
+      post :extract_samples, id: data_file, confirm: 'true'
+    end
+
+    assert_redirected_to data_file_path(data_file)
+    assert_not_empty flash[:error]
+  end
+
+
+  test 'strain samples successfully extracted from spreadsheet' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:strain_sample_data_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:strain_sample_data_content_blob)
+    sample_type.build_attributes_from_template
+    attribute_type = sample_type.sample_attributes.last
+    attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
+    attribute_type.required = true
+    sample_type.save!
+
+    assert_difference("Sample.count", 3) do
+      post :extract_samples, id: data_file.id, confirm: 'true'
+    end
+
+    assert (samples = assigns(:samples))
+    assert_equal 3, samples.count
+    assert_equal samples.sort, data_file.extracted_samples.sort
+  end
+
+  test 'extract from data file' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_difference("Sample.count",3) do
+      post :extract_samples, id: data_file.id, confirm: 'true'
+    end
+
+    assert_redirected_to data_file_path(data_file)
+
+    assert (samples = assigns(:samples))
+    assert_equal 3, samples.count
+    assert_not_includes samples.map {|s| s.get_attribute(:full_name) }, "Bob"
+
+    samples.each do |sample|
+      assert_equal data_file, sample.originating_data_file
+    end
+
+    data_file.reload
+
+    assert_equal samples.sort, data_file.extracted_samples.sort
+  end
+
+  test 'extract from data file with multiple matching sample types redirects to selection page' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_difference("Sample.count",0) do
+      post :extract_samples, id: data_file.id
+    end
+
+    assert_redirected_to select_sample_type_data_file_path(data_file) # Test for this is in data_files_controller_test
+  end
+
+  test 'extract from data file queues job' do
+    person = Factory(:person)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title:'String')
+
+    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+                        :policy=>Factory(:private_policy), :contributor=>person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    #this is to force the full name to be 2 words, so that one row fails
+    sample_type.sample_attributes.first.sample_attribute_type = Factory(:full_name_sample_attribute_type)
+    sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
+    sample_type.save!
+
+    assert_no_difference("Sample.count") do
+      assert_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count", 1) do
+        post :extract_samples, id: data_file.id
+      end
+    end
+
+    assert_redirected_to data_file_path(data_file)
+  end
+
+  test "can't extract from data file if samples already extracted" do
+    person = Factory(:person)
+    login_as(person)
+
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy),
+                        contributor: person.user
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title:'from template'
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+    extracted_sample = Factory(:sample, data: { full_name: 'John Wayne' },
+                               sample_type: sample_type,
+                               originating_data_file: data_file)
+
+    assert_no_difference("Sample.count") do
+      post :extract_samples, id: data_file, confirm: 'true'
+    end
+
+    assert_redirected_to data_file_path(data_file)
+    assert_not_empty flash[:error]
+    assert flash[:error].include?('Already extracted')
+  end
+
   private
 
   def mock_http
@@ -2134,6 +2475,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     stub_request(:get, "http://mockedlocation.com/big.txt").to_return(body: 'bananafish'*500, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
     stub_request(:head, "http://mockedlocation.com/big.txt").to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
+
+    stub_request(:get, "http://mockedlocation.com").to_return(body: '<!doctype html><html><head></head><body>internet.</body></html>', status: 200,
+                                                              headers: { content_type: 'text/html; charset=UTF-8', content_length: 63 })
+    stub_request(:head, "http://mockedlocation.com").to_return(status: 200, headers: { content_type: 'text/html; charset=UTF-8', content_length: 63 })
+
   end
 
   def mock_https

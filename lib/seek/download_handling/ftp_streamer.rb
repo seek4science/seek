@@ -1,17 +1,19 @@
+require 'net/ftp'
+
 module Seek
   module DownloadHandling
     ##
     # A class to handle streaming remote content over FTP.
     class FTPStreamer
 
-      def initialize(url)
+      def initialize(url, options = {})
         @url = url
+        @size_limit = options[:size_limit]
       end
 
       # yields a chunk of data to the given block
       def stream(&block)
         total_size = 0
-        max_size = Seek::Config.hard_max_cachable_size
 
         uri = URI(@url)
         unless uri.userinfo.nil?
@@ -25,7 +27,7 @@ module Seek
           ftp.passive = true
           ftp.getbinaryfile(uri.path) do |chunk|
             total_size += chunk.size
-            raise SizeLimitExceededException.new(total_size) if total_size > max_size
+            raise SizeLimitExceededException.new(total_size) if @size_limit && (total_size > @size_limit)
             block.call(chunk)
           end
         end

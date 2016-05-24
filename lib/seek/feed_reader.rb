@@ -6,10 +6,7 @@ module Seek
     BLACKLIST_TIME=1.day
 
     #Fetches the feed entries - aggregated and ordered, for a particular category
-    #the category may be either :project_news or :community_news
     def self.fetch_entries_for category
-      raise ArgumentError.new("Invalid category - should be either :project_news or :community_news") unless [:project_news,:community_news].include? category
-
       feeds = fetch_feeds_for_category(category)
 
       filter_feeds_entries_with_chronological_order(feeds, Seek::Config.send("#{category.to_s}_number_of_entries"))
@@ -116,8 +113,8 @@ module Seek
 
     def self.resolve_feed_date(entry)
       date = nil
-      date = entry.try(:updated) if entry.respond_to?(:updated)
-      date ||= entry.try(:published) if entry.respond_to?(:published)
+      date = entry.try(:published) if entry.respond_to?(:published)
+      date ||= entry.try(:updated) if entry.respond_to?(:updated)
       date ||= entry.try(:last_modified) if entry.respond_to?(:last_modified)
       date ||= 10.year.ago
       date

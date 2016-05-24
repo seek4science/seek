@@ -1,0 +1,12 @@
+<%
+   user_id = current_user_id
+-%>
+<% cache "rli_actions_#{resource.cache_key}_#{user_id}" do -%>
+    <% if resource.can_manage? -%>
+      <%= button_link_to 'Manage', 'manage', edit_organism_path(resource), :class => 'btn-xs' -%>
+    <% end -%>
+    <% if resource.can_delete? -%>
+        <%= button_link_to 'Delete', 'destroy', organism_path(resource), :confirm => 'Are you sure?',
+                           :method => :delete, :class => 'btn-xs' -%>
+    <% end -%>
+<% end -%>

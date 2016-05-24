@@ -7,7 +7,6 @@
 //= require prototype_ujs
 //= require prototype_patch
 //= require effects
-//= require boxover
 //= require scriptaculous
 //= require controls
 //= require bootstrap
@@ -37,7 +36,7 @@
 //= require detect_browser
 //= require easytabs
 //= require favourites
-//= require jquery-ui-drag-drop
+//= require jquery-ui
 //= require bootstrap-tagsinput-fixed
 //= require bootstrap-typeahead-rails
 //= require bootstrap-multiselect
@@ -49,4 +48,16 @@
 //= require zenodo_form
 //= require batch_upload
 //= require bootstrap_tab_memory
+//= require associations
+//= require people
+//= require search
+//= require tooltips
+//= require sample_types
+//= require wizard_step
+//= require DataTables-1.10.11/jquery.dataTables
+//= require DataTables-1.10.11/dataTables.bootstrap
+//= require DataTables-1.10.11/dataTables.select
+//= require DataTables-1.10.11/dataTables.buttons
+//= require DataTables-1.10.11/buttons.bootstrap
+//= require samples
 //= require_tree ./templates

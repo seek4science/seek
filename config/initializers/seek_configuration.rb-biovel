@@ -14,7 +14,9 @@ SEEK::Application.configure do
   Seek::Config.default :support_email_address, 'support@biovel.eu'
   Seek::Config.default :solr_enabled,false
   Seek::Config.default :jws_enabled, true
-  Seek::Config.default :jws_online_root,"https://jws.sysmo-db.org/"
+  Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
+  Seek::Config.default :internal_help_enabled, false
+  Seek::Config.default :external_help_url,"http://seek4science.github.io/seek/help"
   Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
@@ -90,14 +92,14 @@ SEEK::Application.configure do
   Seek::Config.default :is_virtualliver, false
 
 # Pagination
-  Seek::Config.default :default_pages,{:specimens => 'latest',:samples => 'latest', :people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
+  Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
   Seek::Config.default :limit_latest,7
 
   Seek::Config.default :related_items_limit,5
 
 # Faceted Browsing
   Seek::Config.default :faceted_browsing_enabled, false
-  Seek::Config.default :facet_enable_for_pages, {:specimens => false,:samples => false, :people => true, :projects => false, :institutions => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
+  Seek::Config.default :facet_enable_for_pages, {:people => true, :projects => false, :institutions => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
 
 # Others
   Seek::Config.default :type_managers_enabled,true
@@ -149,5 +151,11 @@ SEEK::Application.configure do
   Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
 
   Seek::Config.default :orcid_required, false
+
+  Seek::Config.default :news_enabled,false
+  Seek::Config.default :news_feed_urls,''
+  Seek::Config.default :news_number_of_entries,10
+
+  Seek::Config.default :front_page_buttons_enabled, false
 end
 

@@ -334,15 +334,6 @@ class UserTest < ActiveSupport::TestCase
     assert_equal x.uuid, uuid
   end
 
-  test 'test show_guide_box' do
-    x = users(:aaron)
-    assert x.show_guide_box?
-    x.show_guide_box = false
-    x.save
-    x.reload
-    assert !x.show_guide_box?
-  end
-
   test "reset password" do
     user = Factory(:user)
     assert_nil user.reset_password_code

@@ -24,14 +24,6 @@
   </div>
 </div>
 
-
-
-
-<% if Seek::Config.experimental_conditions_enabled %>
-    <h2>Experimental Conditions</h2>
-    <%= render :partial=>"sops/simple_experimental_conditions_list" %>
-<% end %>
-
 <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} -%>
 
 <%# get, classify and authorize all assets for this project -%>

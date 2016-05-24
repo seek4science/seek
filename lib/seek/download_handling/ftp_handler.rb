@@ -1,3 +1,5 @@
+require 'net/ftp'
+
 module Seek
   module DownloadHandling
     class FTPHandler
@@ -33,7 +35,7 @@ module Seek
         file = Tempfile.new('remote-content')
         file.binmode # Strange encoding issues occur if this is not set
 
-        Seek::DownloadHandling::FTPStreamer.new(@url).stream do |chunk|
+        Seek::DownloadHandling::FTPStreamer.new(@url, size_limit: Seek::Config.hard_max_cachable_size).stream do |chunk|
           file << chunk
         end
 

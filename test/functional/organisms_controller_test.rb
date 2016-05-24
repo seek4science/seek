@@ -15,6 +15,11 @@ class OrganismsControllerTest < ActionController::TestCase
   def rest_api_test_object
     @object=Factory(:organism,:bioportal_concept=>Factory(:bioportal_concept))
   end
+
+  test "new organism route" do
+    assert_routing '/organisms/new', { controller: "organisms", action: "new" }
+    assert_equal '/organisms/new', new_organism_path.to_s
+  end
   
   test "admin can get edit" do
     login_as(:quentin)
@@ -55,6 +60,7 @@ class OrganismsControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_nil flash[:error]
+    assert_select 'h1',/add a new organism/i
   end
 
   test "project administrator can get new" do
@@ -62,6 +68,19 @@ class OrganismsControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_nil flash[:error]
+    assert_select 'h1',/add a new organism/i
+  end
+
+  test "programme administrator can get new" do
+    pa = Factory(:programme_administrator_not_in_project)
+    login_as(pa)
+
+    #check not already in a project
+    assert_empty pa.projects
+    get :new
+    assert_response :success
+    assert_nil flash[:error]
+    assert_select 'h1',/add a new organism/i
   end
   
   test "non admin cannot get new" do
@@ -121,6 +140,17 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_not_nil assigns(:organism)
     assert_redirected_to organism_path(assigns(:organism))
   end
+
+  test "programme administrator can create new organism" do
+    login_as(Factory(:programme_administrator_not_in_project))
+    assert_difference("Organism.count") do
+      post :create, :organism=>{:title=>"An organism"}
+    end
+    assert_not_nil assigns(:organism)
+    assert_redirected_to organism_path(assigns(:organism))
+  end
+
+
   
   test "non admin cannot create new organism" do
     login_as(:aaron)
@@ -239,7 +269,18 @@ class OrganismsControllerTest < ActionController::TestCase
         assert_select "td > a[href=?]",strain_path(parent_strain),:text=>parent_strain.title
       end
     end
+  end
 
+  test "strains cleaned up when organism deleted" do
+    login_as(:quentin)
+    organism = Factory(:organism)
+    strains = FactoryGirl.create_list(:strain, 3, organism: organism, contributor: nil)
+
+    assert_difference('Organism.count', -1) do
+      assert_difference('Strain.count', -3) do
+        delete :destroy, :id => organism
+      end
+    end
   end
   
 end

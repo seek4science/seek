@@ -1,0 +1,18 @@
+<% text=@info.receive_notifications? ? " are currently receiving " : " are currently <b>not</b> receiving " -%>
+<div id="notification_setttings">
+    <p>
+        You have been identified as <b><%= h(@info.notifiee.name) -%></b>, and you <%= text -%>announcements through email. 
+    </p>
+    <p>
+        Please change the setting below to your preferred setting:
+    </p>
+    <%= form_tag update_notification_settings_site_announcements_path  do -%>
+    <%= hidden_field_tag :key, @info.unique_key -%>
+    <p>
+        Receive site annoucement emails: <%= check_box_tag(:receive_notifications, value="true", checked=@info.receive_notifications?, options = {}) -%>
+    </p>
+    <p>
+        <%= submit_tag "Update" %>
+    </p>
+    <% end -%>
+</div>

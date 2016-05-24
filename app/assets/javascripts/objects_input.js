@@ -1,4 +1,4 @@
-$j(document).ready(function () {
+function loadObjectInputs() {
     $j('[data-role="seek-objectsinput"]').each(function () {
         var options = { tagClass: 'label label-default',
             itemValue: 'id',
@@ -42,4 +42,6 @@ $j(document).ready(function () {
             for(var i = 0; i < objects.length; i++)
                 $j(this).tagsinput('add', objects[i]);
     });
-});
+}
+
+$j(document).ready(loadObjectInputs);

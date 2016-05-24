@@ -16,7 +16,7 @@ class AdminsController < ApplicationController
   end
 
   def update_admins
-    admin_ids = params[:admins] || []
+    admin_ids = params[:admins].split(',') || []
     current_admins = Person.admins
     admins = admin_ids.map { |id| Person.find(id) }
     current_admins.each { |ca| ca.is_admin = false }
@@ -39,19 +39,18 @@ class AdminsController < ApplicationController
 
   def update_features_enabled
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
-    Seek::Config.jerm_enabled = string_to_boolean params[:jerm_enabled]
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
-    Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
-    Seek::Config.forum_enabled = string_to_boolean params[:forum_enabled]
+    #Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
+    Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
     Seek::Config.set_smtp_settings 'domain', params[:domain]
     Seek::Config.set_smtp_settings 'authentication', params[:authentication]
-    Seek::Config.set_smtp_settings 'user_name', params[:user_name]
-    Seek::Config.set_smtp_settings 'password', params[:password]
+    Seek::Config.set_smtp_settings 'user_name', params[:smtp_user_name]
+    Seek::Config.set_smtp_settings 'password', params[:smtp_password]
     Seek::Config.set_smtp_settings 'enable_starttls_auto', params[:enable_starttls_auto] == '1'
 
     Seek::Config.support_email_address= params[:support_email_address]
@@ -59,6 +58,9 @@ class AdminsController < ApplicationController
     Seek::Config.solr_enabled= string_to_boolean params[:solr_enabled]
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root= params[:jws_online_root]
+
+    Seek::Config.internal_help_enabled= string_to_boolean params[:internal_help_enabled]
+    Seek::Config.external_help_url= params[:external_help_url]
 
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
@@ -86,12 +88,6 @@ class AdminsController < ApplicationController
     Seek::Config.zenodo_client_id = params[:zenodo_client_id].try(:strip)
     Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].try(:strip)
 
-    Seek::Config.cache_remote_files = params[:cache_remote_files]
-    Seek::Config.max_cachable_size = params[:max_cachable_size]
-    Seek::Config.max_cachable_size = params[:hard_max_cachable_size]
-
-    Seek::Config.orcid_required = params[:orcid_required]
-
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
     Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
@@ -107,29 +103,23 @@ class AdminsController < ApplicationController
   end
 
   def update_home_settings
-    Seek::Config.project_news_enabled = string_to_boolean params[:project_news_enabled]
-    Seek::Config.project_news_feed_urls = params[:project_news_feed_urls]
+    Seek::Config.news_enabled = string_to_boolean params[:news_enabled]
+    Seek::Config.news_feed_urls = params[:news_feed_urls]
 
-    project_entries = params[:project_news_number_of_entries]
-    is_project_entries_integer = only_integer project_entries, "#{t('project')} news items"
-    Seek::Config.project_news_number_of_entries = project_entries if is_project_entries_integer
-
-    Seek::Config.community_news_enabled = string_to_boolean params[:community_news_enabled]
-    Seek::Config.community_news_feed_urls = params[:community_news_feed_urls]
-
-    community_entries = params[:community_news_number_of_entries]
-    is_community_entries_integer = only_integer community_entries, 'community news items'
-    Seek::Config.community_news_number_of_entries = community_entries if is_community_entries_integer
+    entries = params[:news_number_of_entries]
+    is_entries_integer = only_integer entries, "news items"
+    Seek::Config.news_number_of_entries = entries if is_entries_integer
 
     Seek::Config.home_description = params[:home_description]
+
+#    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
     begin
       Seek::FeedReader.clear_cache
     rescue => e
       logger.error "Error whilst attempting to clear feed cache #{e.message}"
     end
 
-    validation_flag = is_project_entries_integer && is_community_entries_integer
-    update_redirect_to validation_flag, 'home_settings'
+    update_redirect_to is_entries_integer, 'home_settings'
   end
 
   def update_imprint_setting
@@ -213,6 +203,12 @@ class AdminsController < ApplicationController
     Seek::Config.default_associated_projects_access_type = params[:default_associated_projects_access_type]
     Seek::Config.default_consortium_access_type = params[:default_consortium_access_type]
     Seek::Config.default_all_visitors_access_type = params[:default_all_visitors_access_type]
+
+    Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
+    Seek::Config.max_cachable_size = params[:max_cachable_size]
+    Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
+
+    Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || (crossref_email_valid)) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
     update_redirect_to update_flag, 'others'
   end
@@ -368,8 +364,8 @@ class AdminsController < ApplicationController
       when 'invalid_users_profiles'
         partial = 'invalid_user_stats_list'
         invalid_users = {}
-        pal_role = ProjectRole.pal_role
-        invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal_of_any_project? != p.project_roles.include?(pal_role) }
+        pal_position = ProjectPosition.pal_position
+        invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal_of_any_project? != p.project_positions.include?(pal_position) }
         invalid_users[:duplicates] = Person.duplicates
         invalid_users[:no_person] = User.without_profile
         collection = invalid_users
@@ -425,7 +421,12 @@ class AdminsController < ApplicationController
 
   def test_email_configuration
     smtp_hash_old = ActionMailer::Base.smtp_settings
-    smtp_hash_new = { address: params[:address], enable_starttls_auto: params[:enable_starttls_auto] == '1', domain: params[:domain], authentication: params[:authentication], user_name: (params[:user_name].blank? ? nil : params[:user_name]), password: (params[:password].blank? ? nil : params[:password]) }
+    smtp_hash_new = { address: params[:address],
+                      enable_starttls_auto: params[:enable_starttls_auto] == '1',
+                      domain: params[:domain],
+                      authentication: params[:authentication],
+                      user_name: (params[:smtp_user_name].blank? ? nil : params[:smtp_user_name]),
+                      password: (params[:smtp_password].blank? ? nil : params[:smtp_password]) }
     smtp_hash_new[:port] = params[:port] if only_integer params[:port], 'port'
     ActionMailer::Base.smtp_settings = smtp_hash_new
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors

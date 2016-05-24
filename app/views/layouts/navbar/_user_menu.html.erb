@@ -7,7 +7,7 @@
         <% else %>
             <%= image_tag avatar_url(current_person, current_person.avatar_id, 18) %>
         <% end %>
-        <span class="truncated-name" style="max-width: 15em"><%= current_person.name %></span>
+        <span class="truncated-name" style="max-width: 12em"><%= current_person.name %></span>
         <span class="caret"></span>
       </a>
       <ul class="dropdown-menu" role="menu">
@@ -30,7 +30,7 @@
         </li>
         <div id="add-favourites-zone-text" style="display: none">
           <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
-          Drop here to save
+          Drop below to save
         </div>
         <% cache "favourites/user/#{current_user.id}" do -%>
             <div id="add-favourites-zone">

@@ -782,8 +782,8 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !item.can_manage?
   end
 
-  test "asset manager can't manage the items inside their projects of members who have not left" do
-    asset_manager = Factory(:asset_manager)
+  test "asset housekeeper can't manage the items inside their projects of members who have not left" do
+    asset_manager = Factory(:asset_housekeeper)
     work_group = asset_manager.work_groups.first
     project_member = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
     leaving_project_member = Factory(:person, group_memberships: [Factory(:group_membership,
@@ -811,8 +811,8 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
-  test "asset manager can manage the items inside their projects, even the entirely private items of former members" do
-    asset_manager = Factory(:asset_manager)
+  test "asset housekeeper can manage the items inside their projects, even the entirely private items of former members" do
+    asset_manager = Factory(:asset_housekeeper)
     work_group = asset_manager.work_groups.first
     former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
     datafile1 = Factory(:data_file, contributor: former_project_member.user,
@@ -832,8 +832,8 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
-  test "asset manager can not manage the items outside their projects" do
-    asset_manager = Factory(:asset_manager)
+  test "asset housekeeper can not manage the items outside their projects" do
+    asset_manager = Factory(:asset_housekeeper)
     datafile = Factory(:data_file)
     assert (asset_manager.projects & datafile.projects).empty?
 
@@ -847,11 +847,11 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
-  test "asset manager can not manage items for projects he is a member of but not manager of" do
+  test "asset housekeeper can not manage items for projects he is a member of but not manager of" do
     asset_manager = Factory(:person_in_multiple_projects)
     project = asset_manager.projects.first
     other_project = asset_manager.projects.last
-    asset_manager.is_asset_manager=true,project
+    asset_manager.is_asset_housekeeper=true,project
     datafile = Factory(:data_file, :projects=>[other_project])
     assert !(asset_manager.projects & datafile.projects).empty?
 
@@ -865,15 +865,29 @@ class AuthorizationTest < ActiveSupport::TestCase
     end
   end
 
+  test "asset housekeeper can manage jerm harvested items" do
+    asset_manager = Factory(:asset_housekeeper)
+    datafile1 = Factory(:data_file, contributor: nil,
+                        projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
+
+    ability = Ability.new(asset_manager.user)
+
+    assert ability.can? :manage_asset, datafile1
+
+    User.with_current_user asset_manager.user do
+      assert datafile1.can_manage?
+    end
+  end
+
   test "gatekeeper should not be able to manage the item" do
-    gatekeeper = Factory(:gatekeeper)
+    gatekeeper = Factory(:asset_gatekeeper)
      datafile = Factory(:data_file, :projects => gatekeeper.projects, :policy => Factory(:all_sysmo_viewable_policy))
 
      User.with_current_user gatekeeper.user do
        assert !datafile.can_manage?
 
        ability = Ability.new(gatekeeper.user)
-       assert gatekeeper.is_gatekeeper?(gatekeeper.projects.first)
+       assert gatekeeper.is_asset_gatekeeper?(gatekeeper.projects.first)
        assert ability.cannot? :publish, datafile
        assert ability.cannot? :manage_asset, datafile
        assert ability.cannot? :manage, datafile
@@ -881,7 +895,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   end
 
   test "should handle different types of contributor of resource (Person, User)" do
-    asset_manager = Factory(:asset_manager)
+    asset_manager = Factory(:asset_housekeeper)
     work_group = asset_manager.work_groups.first
     former_project_member = Factory(:person, group_memberships: [Factory(:group_membership, has_left: true, work_group: work_group)])
 

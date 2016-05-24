@@ -16,6 +16,12 @@ module ApplicationHelper
     end
   end
 
+  def required_span
+    content_tag :span,class:'required' do
+      "*"
+    end
+  end
+
   #e.g. SOP for sops_controller, taken from the locale based on the controller name
   def resource_text_from_controller
     internationalized_resource_name(controller_name.singularize.camelize, false)
@@ -200,7 +206,7 @@ module ApplicationHelper
   end
   
   def text_or_not_specified text, options = {}
-    text=text.to_s if text.kind_of?(Numeric)
+    text=text.to_s
     if text.nil? or text.chomp.empty?
       not_specified_text||=options[:none_text]
       not_specified_text||="No description specified" if options[:description]==true
@@ -222,8 +228,8 @@ module ApplicationHelper
     res.html_safe
   end
 
-  def tooltip_title_attrib(text, delay=200)
-    return "header=[] body=[#{text}] cssheader=[boxoverTooltipHeader] cssbody=[boxoverTooltipBody] delay=[#{delay}]"
+  def tooltip(text)
+    h(text)
   end
       
   # text in "caption" will be used to display the item next to the image_tag_for_key;
@@ -238,7 +244,7 @@ module ApplicationHelper
       list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
     end
     item_caption = " " + (caption.blank? ? item.title : caption)
-    list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), :title => tooltip_title_attrib(custom_tooltip.blank? ? item_caption : custom_tooltip)
+    list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), 'data-tooltip' => tooltip(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += "</li>"
     
     return list_item.html_safe
@@ -403,7 +409,7 @@ module ApplicationHelper
   end
 
   def toggle_appear_javascript block_id
-    "$j('##{block_id}').slideToggle()".html_safe
+    "this.checked ? $j('##{block_id}').slideDown() : $j('##{block_id}').slideUp();".html_safe
   end
 
   def set_parameters_for_sharing_form object=nil
@@ -525,8 +531,8 @@ module ApplicationHelper
      Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
      Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
      Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
-     Specimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
-     Sample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
+     DeprecatedSpecimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
+     DeprecatedSample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
      Project=>"You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
      Institution=>"You cannot delete this Institution. It may have people associated with it."
     }
@@ -578,7 +584,8 @@ module ApplicationHelper
   def cancel_button path,html_options={}
     html_options[:class]||=''
     html_options[:class] << ' btn btn-default'
-    link_to 'Cancel',path,html_options
+    text = html_options.delete(:button_text) || 'Cancel'
+    link_to text, path, html_options
   end
 
   private  

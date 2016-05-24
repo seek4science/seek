@@ -12,7 +12,7 @@ module FavouritesHelper
     html = block_given? ? capture(&block) : image("saved_search_avatar", {:class => "avatar curved with_smaller_shadow search_fav_avatar", :size => size})
     search_options[:resource_type] ||= 'SavedSearch'
     options['data-favourite-url'] ||= add_favourites_url(search_options)
-    options[:title] ||= tooltip_title_attrib("Drag to Favourites to save this search")
+    options['data-tooltip'] ||= tooltip("Drag to Favourites to save this search")
     html = link_to_draggable(html, path, options)
     html.html_safe
   end
@@ -27,7 +27,7 @@ module FavouritesHelper
   
   def draggable_icon(item, size = 100, options = {}, &block)
     html = block_given? ? capture(&block) : avatar(item, size, true, nil, nil, true, options[:avatar_class])
-    options[:title] ||= tooltip_title_attrib(get_object_title(item))
+    options['data-tooltip'] ||= tooltip(get_object_title(item))
     html = link_to_draggable(html, show_resource_path(item), options)
     html.html_safe
   end

@@ -99,6 +99,34 @@ function addPhenotypeRow(tableID,parent_name,action) {
     }
 }
 
+function strains_of_selected_organism(organism_id, strain_selection_box_id, strain_selection_box_name) {
+    var updated_selection_box = '<select class="form-control" id=\'' + strain_selection_box_id + '\' name=\'' + strain_selection_box_name + '\'>';
+    updated_selection_box += "<option value='0'>Select Strain ...</option>";
+    url = "/strains/strains_of_selected_organism"
+    request = new Ajax.Request(url, {
+        method: 'get',
+        parameters: {
+            organism_id: organism_id
+        },
+        onSuccess: function (transport) {
+            // "true" parameter to evalJSON() activates sanitization of input
+            var data = transport.responseText.evalJSON(true);
+            if (data.status == 200) {
+                var strains = data.strains
+                for (var i = 0; i < strains.length; i++) {
+                    updated_selection_box += '<option value=\'' + strains[i][0] + '\'>' + strains[i][1] + '</option>';
+
+                }
+            }
+            $('strains_of_selected_organism').innerHTML = updated_selection_box;
+        },
+        onFailure: function (transport) {
+            alert('Something went wrong, please try again...');
+        }
+    });
+
+}
+
 function fadeCreateStrain() {
     Effect.Fade('strain_form', { duration: 0.25 });
     Effect.Fade('existing_strains', { duration: 0.25 });

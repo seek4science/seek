@@ -147,7 +147,7 @@ class AdminsControllerTest < ActionController::TestCase
     assert quentin.is_admin?
     assert !aaron.is_admin?
 
-    post :update_admins,:admins=>[aaron.id]
+    post :update_admins,:admins => "#{aaron.id}"
 
     quentin.reload
     aaron.reload
@@ -219,20 +219,14 @@ class AdminsControllerTest < ActionController::TestCase
     assert_not_equal "This is the home description",Seek::Config.home_description
     post :update_home_settings,
          :home_description=>"This is the home description",
-         :project_news_number_of_entries=>"3",
-         :community_news_number_of_entries=>"7",
-         :community_news_enabled=>"1",
-         :project_news_enabled=>"1",
-         :community_news_feed_urls=>"http://fish.com, http://goats.com",
-         :project_news_feed_urls=>"http://carrot.com, http://soup.com"
+         :news_number_of_entries=>"3",
+         :news_enabled=>"1",
+         :news_feed_urls=>"http://fish.com, http://goats.com"
 
     assert_equal "This is the home description",Seek::Config.home_description
-    assert_equal "http://fish.com, http://goats.com",Seek::Config.community_news_feed_urls
-    assert_equal "http://carrot.com, http://soup.com",Seek::Config.project_news_feed_urls
-    assert_equal 7,Seek::Config.community_news_number_of_entries
-    assert_equal 3,Seek::Config.project_news_number_of_entries
-    assert Seek::Config.community_news_enabled
-    assert Seek::Config.project_news_enabled
+    assert_equal "http://fish.com, http://goats.com",Seek::Config.news_feed_urls
+    assert_equal 3,Seek::Config.news_number_of_entries
+    assert Seek::Config.news_enabled
   end
 
   test "update doi locked, should be stored as int" do
@@ -254,11 +248,11 @@ class AdminsControllerTest < ActionController::TestCase
 
   test "update_redirect_to for update_home_setting" do
     login_as(:quentin)
-    post :update_home_settings, :project_news_number_of_entries => '10', :community_news_number_of_entries => '10'
+    post :update_home_settings, :news_number_of_entries => '10'
     assert_redirected_to admin_path
     assert_nil flash[:error]
 
-    post :update_home_settings, :project_news_number_of_entries => '10', :community_news_number_of_entries => ''
+    post :update_home_settings, :news_number_of_entries => ''
     assert_redirected_to home_settings_admin_path
     assert_not_nil flash[:error]
   end

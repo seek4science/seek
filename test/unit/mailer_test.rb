@@ -91,7 +91,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "request publish approval" do
-    gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
+    gatekeeper = Factory(:asset_gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
     resources = [Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture"),Factory(:teusink_model,:projects=>gatekeeper.projects,:title=>"Teusink")]
     requester=Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle")
 
@@ -134,7 +134,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "gatekeeper approval feedback" do
-    gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
+    gatekeeper = Factory(:asset_gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
     item = Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture")
     items_and_comments = [{:item => item, :comment => nil}]
     requester = Factory(:person,:first_name=>"Aaron",:last_name=>"Spiggle")
@@ -154,7 +154,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test "gatekeeper reject feedback" do
-    gatekeeper = Factory(:gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
+    gatekeeper = Factory(:asset_gatekeeper,:first_name=>"Gatekeeper",:last_name=>"Last")
     item = Factory(:data_file,:projects=>gatekeeper.projects,:title=>"Picture")
     items_and_comments = [{:item => item, :comment => 'not ready'}]
 
@@ -193,13 +193,13 @@ class MailerTest < ActionMailer::TestCase
 
   end
 
-  test "contact_admin_new_user" do
+  test "contact_admin_new_user - project has no administrator" do
     @expected.subject = 'Sysmo SEEK member signed up'
     @expected.to =  "Quentin Jones <quentin@email.com>"
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 
-    @expected.body = read_fixture('contact_admin_new_user')
+    @expected.body = read_fixture('contact_admin_new_user_no_project_admin')
 
     params={}
     params[:projects]=[Factory(:project,:title=>"Project X").id.to_s,Factory(:project,:title=>"Project Y").id.to_s]
@@ -211,24 +211,58 @@ class MailerTest < ActionMailer::TestCase
                  encode_mail(Mailer.contact_admin_new_user(params, users(:aaron)))
   end
 
+  test "contact_admin_new_user - project has administrator" do
+    @expected.subject = 'Sysmo SEEK member signed up'
+    @expected.to =  "Quentin Jones <quentin@email.com>"
+    @expected.from = "no-reply@sysmo-db.org"
+    @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
+
+    @expected.body = read_fixture('contact_admin_new_user_has_project_admin')
+
+    params={}
+
+    project_admin = Factory(:project_administrator)
+    project = project_admin.projects.first
+    project.title="Project X"
+    disable_authorization_checks {project.save!}
+
+    params[:projects]=[project.id.to_s, Factory(:project,:title=>"Project Y").id.to_s]
+    params[:institutions]=[Factory(:institution,:title=>"The Institute").id.to_s]
+    params[:other_projects]="Another Project"
+    params[:other_institutions]="Another Institute"
+
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-project_path-","http://localhost:3000/projects/#{project.id}")
+
+    assert_equal expected_text,
+                 encode_mail(Mailer.contact_admin_new_user(params, users(:aaron)))
+  end
+
   test "contact_project_administrator_new_user" do
     project_administrator = Factory(:project_administrator)
+    admin_project = project_administrator.projects.first
+
+    assert project_administrator.is_project_administrator?(admin_project)
     @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are Project Administrator'
     @expected.to = project_administrator.email_with_name
     @expected.from = "no-reply@sysmo-db.org"
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 
     params={}
-    params[:projects]=[Factory(:project,:title=>"Project X").id.to_s,Factory(:project,:title=>"Project Y").id.to_s]
+    params[:projects]=[Factory(:project,:title=>"Project X").id.to_s,admin_project.id.to_s]
     params[:institutions]=[Factory(:institution,:title=>"The Institute").id.to_s]
     params[:other_projects]="Another Project"
     params[:other_institutions]="Another Institute"
 
     @expected.body = read_fixture('contact_project_administrator_new_user')
 
-    assert_equal encode_mail(@expected),
-                 encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron)))
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-pr_name-",admin_project.title)
+    expected_text.gsub!("-pr_id-",admin_project.id.to_s)
 
+    actual_text = encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron)))
+
+    assert_equal expected_text,actual_text
 
   end
 

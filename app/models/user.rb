@@ -18,13 +18,15 @@ class User < ActiveRecord::Base
 
   has_many :investigations,:as=>:contributor
   has_many :studies,:as=>:contributor
-  has_many :samples,:as=>:contributor
 
   has_many :workflows, :as => :contributor
   has_many :taverna_player_runs, :class_name => 'TavernaPlayer::Run', :as => :contributor
   has_many :sweeps, :as => :contributor
 
   has_many :oauth_sessions, :dependent => :destroy
+
+  #DEPRECATED
+  has_many :deprecated_samples,:as=>:contributor
 
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
@@ -104,8 +106,8 @@ class User < ActiveRecord::Base
     project_administrator_logged_in? || admin_logged_in?
   end
 
-  def self.asset_manager_logged_in?
-     self.logged_in_and_registered? && self.current_user.person.is_asset_manager?
+  def self.asset_housekeeper_logged_in?
+     self.logged_in_and_registered? && self.current_user.person.is_asset_housekeeper?
   end
   #a person can be logged in but not fully registered during
   #the registration process whilst selecting or creating a profile

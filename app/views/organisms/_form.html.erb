@@ -1,5 +1,5 @@
 <%
-   details_active = (params[:action] == "edit")
+   details_active = (params[:action] == "edit") || @organism.errors.any?
    details_active = details_active || !bioportal_search_enabled?
 
    if details_active

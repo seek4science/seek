@@ -113,59 +113,6 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     end
   end
 
-  test "updates to queue for sample" do
-    user = Factory :user
-    #otherwise a specimen and strain are also created and triggers inserts to queue
-    sample = Factory :sample, :contributor=>user.person, :policy=>Factory(:private_policy)
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      sample = Factory :sample, :contributor=>user.person, :policy=>Factory(:private_policy), :specimen=>sample.specimen
-    end
-    assert_equal sample, AuthLookupUpdateQueue.last(:order=>:id).item
-
-    AuthLookupUpdateQueue.destroy_all
-    sample.policy.access_type = Policy::VISIBLE
-
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      sample.policy.save
-    end
-    assert_equal sample, AuthLookupUpdateQueue.last(:order=>:id).item
-
-    AuthLookupUpdateQueue.destroy_all
-    sample.title = Time.now.to_s
-
-    assert_no_difference("AuthLookupUpdateQueue.count") do
-      disable_authorization_checks do
-        sample.save!
-      end
-    end
-  end
-
-  test "updates to queue for specimen" do
-    user = Factory :user
-    #otherwise a strain is also created and triggers inserts to queue
-    specimen = Factory :specimen, :contributor=>user.person, :policy=>Factory(:private_policy)
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      specimen = Factory :specimen, :contributor=>user.person, :policy=>Factory(:private_policy), :strain=>specimen.strain
-    end
-    assert_equal specimen, AuthLookupUpdateQueue.last(:order=>:id).item
-
-    AuthLookupUpdateQueue.destroy_all
-    specimen.policy.access_type = Policy::VISIBLE
-
-    assert_difference("AuthLookupUpdateQueue.count", 1) do
-      specimen.policy.save
-    end
-    assert_equal specimen, AuthLookupUpdateQueue.last(:order=>:id).item
-
-    AuthLookupUpdateQueue.destroy_all
-    specimen.title = Time.now.to_s
-    assert_no_difference("AuthLookupUpdateQueue.count") do
-      disable_authorization_checks do
-        specimen.save!
-      end
-    end
-  end
-
   test "updates to queue for sweep" do
     user = Factory :user
     #otherwise a workflow is also created and triggers inserts to queue
@@ -194,7 +141,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
   test "updates for remaining authorized assets" do
     user = Factory :user
-    types = Seek::Util.authorized_types - [Sop, Assay, Sample, Specimen, Study,Sweep,TavernaPlayer::Run]
+    types = Seek::Util.authorized_types - [Sop, Assay, DeprecatedSample, DeprecatedSpecimen, Study,Sweep,TavernaPlayer::Run]
     types.each do |type|
       entity=nil
       assert_difference("AuthLookupUpdateQueue.count", 1, "unexpected count for created type #{type.name}") do

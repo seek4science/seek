@@ -84,7 +84,7 @@ Person:
       value_from: tools:text
   role:
       label: Role
-      value_from: project_roles:title
+      value_from: project_positions:title
   institution:
       label: Institution
       value_from: institutions:title
@@ -130,34 +130,6 @@ Strain:
   gene:
       label: Modified Gene
       value_from: genotypes:gene:title
-
-Specimen:
-  organism:
-      label: Organism
-      value_from: strain:organism:title
-  strain:
-      label: Strain
-      value_from: strain:info
-  culture_growth_type:
-      label: Culture growth type
-      value_from: culture_growth_type:title
-  institution:
-      label: Institution
-      value_from: institution:title
-
-Sample:
-  organism:
-      label: Organism
-      value_from: specimen:strain:organism:title
-  strain:
-      label: Strain
-      value_from: specimen:strain:info
-  specimen:
-      label: Specimen
-      value_from: specimen:title
-  organism_part:
-      label: Organism part
-      value_from: organism_part
 
 Event:
   start_date:

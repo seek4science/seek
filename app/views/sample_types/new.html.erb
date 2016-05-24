@@ -1,0 +1,28 @@
+<% tab = @tab || 'manual' %>
+
+<h1>New Sample Type</h1>
+
+<p>
+  Sample Types can be defined manually through the form below,
+  or semi-automatically by uploading a spreadsheet to be used as a template.
+</p>
+
+<div>
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" <%= 'class="active"'.html_safe if tab == 'manual' -%>>
+      <a href="#manual" aria-controls="home" role="tab" data-toggle="tab">Form</a>
+    </li>
+    <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-template' -%>>
+      <a href="#from-template" aria-controls="profile" role="tab" data-toggle="tab">Use spreadsheet template</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
+      <%= render 'form' %>
+    </div>
+    <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-template' -%>" id="from-template">
+      <%= render 'from_template'%>
+    </div>
+  </div>
+</div>

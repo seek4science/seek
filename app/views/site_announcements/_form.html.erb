@@ -1,0 +1,52 @@
+<%= f.error_messages -%>
+
+<div class="form-group">
+  <%= f.label :title -%>
+  <%= f.text_field :title, :class=>"form-control" -%>
+</div>
+
+<div class="form-group">
+  <%= f.label :body -%>
+  <%= f.text_area :body, :rows => 5, :class=>"form-control" -%>
+</div>
+
+<div class="checkbox">
+  <label>
+      <%= f.check_box :show_in_feed -%> Show in feed
+  </label>
+</div>
+
+<div class="form-group">
+  <div class="checkbox">
+    <label>
+      <%= f.check_box :is_headline, {:onchange=>"toggle_expires_at();"}-%> Headline announcement
+    </label>
+  </div>
+  <div id="announcement_expires" style="display: none;">
+    <%= f.label :expires,"Expires at" -%>
+    <br/>
+    <%= datetime_select "site_announcement","expires_at" -%>
+    <br/>
+    <span class="headline_announcement_date">( Current server time is <%= Time.now.utc -%> )</span>
+  </div>
+  <p class="help-block">Headline announcements are shown at the top of the front page until after a specified date.</p>
+</div>
+
+<div class="checkbox">
+  <label>
+      <%= f.check_box :email_notification, :disabled=>edit -%> Send email notification
+  </label>
+</div>
+
+<script type="text/javascript">
+    function toggle_expires_at(){
+        if ($("site_announcement_is_headline").checked) {
+            Effect.Appear("announcement_expires");
+        }
+        else {
+            Effect.Fade("announcement_expires")
+        }
+    }
+
+    toggle_expires_at();
+</script>

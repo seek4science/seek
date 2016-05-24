@@ -9,7 +9,7 @@
       <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@model} -%>
 
       <div class="form-group">
-        <label>Title</label>
+        <label>Title <span class="required">*</span></label>
         <% model_title_value = (params[:model].blank? || params[:model][:title].blank?) ? nil : params[:model][:title] -%>
         <%= text_field_tag 'model[title]', model_title_value, :class=>"form-control" -%>
       </div>
@@ -22,6 +22,8 @@
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => true } -%>
 
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @model } %>
+
       <%= render :partial => "model_metadata" -%>
 
       <%= render :partial => "organisms/select_organism",:locals=>{:model_class=>Model} -%>
@@ -31,9 +33,6 @@
       <%= fields_for(@model) {|f| render :partial=>"assets/asset_form_bottom", :locals=> {:f => f}} -%>
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model, :show_relationships => false} -%>
-      <%= fields_for(@model) do |f|
-        f.fancy_multiselect(:samples, {:hidden => @model.samples.blank? ? true : false, :other_projects_checkbox => true})
-      end -%>
 
       <div>
         <%= preview_permission_popup_link(@model)-%>

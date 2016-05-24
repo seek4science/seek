@@ -10,7 +10,7 @@ class GeneratorTest < ActiveSupport::TestCase
       filename = File.join(dir,filename)
       open(filename,"w+") do |f|
         inv = investigation
-        f2 = Seek::ResearchObjects::Generator.instance.generate(inv,f)
+        f2 = Seek::ResearchObjects::Generator.new(inv).generate(f)
         assert_equal f,f2
         check_contents(f2,inv)
       end
@@ -19,7 +19,7 @@ class GeneratorTest < ActiveSupport::TestCase
 
   test "generate for investigation no file" do
     inv = investigation
-    file = Seek::ResearchObjects::Generator.instance.generate(inv)
+    file = Seek::ResearchObjects::Generator.new(inv).generate
     refute_nil file
     check_contents(file,inv)
     assert_equal Seek::ResearchObjects::Generator::DEFAULT_FILENAME,File.basename(file.path)
@@ -36,7 +36,7 @@ class GeneratorTest < ActiveSupport::TestCase
       inv.assays.last.associate(model)
     end
     inv.reload
-    file = Seek::ResearchObjects::Generator.instance.generate(inv)
+    file = Seek::ResearchObjects::Generator.new(inv).generate
     paths = Zip::File.open(file) do |zip_file|
       zip_file.collect do |entry|
         entry.name

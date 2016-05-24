@@ -22,8 +22,7 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :presentations
   has_and_belongs_to_many :taverna_player_runs, class_name: 'TavernaPlayer::Run',
                                                 join_table: 'projects_taverna_player_runs', association_foreign_key: 'run_id'
-  has_and_belongs_to_many :specimens
-  has_and_belongs_to_many :samples
+
   has_and_belongs_to_many :strains
   has_and_belongs_to_many :organisms
 
@@ -34,15 +33,19 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
-  attr_accessible :project_administrator_ids, :gatekeeper_ids, :pal_ids, :asset_manager_ids, :title, :programme_id, :description,
+  attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,
                   :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids
 
   # for handling the assignment for roles
-  attr_accessor :project_administrator_ids, :gatekeeper_ids, :pal_ids, :asset_manager_ids
+  attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids
   after_save :handle_project_administrator_ids, if: '@project_administrator_ids'
-  after_save :handle_gatekeeper_ids, if: '@gatekeeper_ids'
+  after_save :handle_asset_gatekeeper_ids, if: '@asset_gatekeeper_ids'
   after_save :handle_pal_ids, if: '@pal_ids'
-  after_save :handle_asset_manager_ids, if: '@asset_manager_ids'
+  after_save :handle_asset_housekeeper_ids, if: '@asset_housekeeper_ids'
+
+  #DEPRECATED
+  has_and_belongs_to_many :deprecated_specimens
+  has_and_belongs_to_many :deprecated_samples
 
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
@@ -59,8 +62,8 @@ class Project < ActiveRecord::Base
   scope :default_order, order('title')
   scope :without_programme, conditions: 'programme_id IS NULL'
 
-  validates_format_of :web_page, with: /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix, allow_nil: true, allow_blank: true
-  validates_format_of :wiki_page, with: /(^$)|(^(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?\/.*)?$)/ix, allow_nil: true, allow_blank: true
+  validates :web_page, url: {allow_nil: true, allow_blank: true}
+  validates :wiki_page, url: {allow_nil: true, allow_blank: true}
 
   validate :lineage_ancestor_cannot_be_self
 
@@ -121,27 +124,27 @@ class Project < ActiveRecord::Base
 
   # this is project role
   def pis
-    pi_role = ProjectRole.find_by_name('PI')
-    people.select { |p| p.project_roles_of_project(self).include?(pi_role) }
+    pi_role = ProjectPosition.find_by_name('PI')
+    people.select { |p| p.project_positions_of_project(self).include?(pi_role) }
   end
 
   # this is seek role
-  def asset_managers
-    people_with_the_role('asset_manager')
+  def asset_housekeepers
+    people_with_the_role(Seek::Roles::ASSET_HOUSEKEEPER)
   end
 
   # this is seek role
   def project_administrators
-    people_with_the_role('project_administrator')
+    people_with_the_role(Seek::Roles::PROJECT_ADMINISTRATOR)
   end
 
   # this is seek role
-  def gatekeepers
-    people_with_the_role('gatekeeper')
+  def asset_gatekeepers
+    people_with_the_role(Seek::Roles::ASSET_GATEKEEPER)
   end
 
   def pals
-    people_with_the_role('pal')
+    people_with_the_role(Seek::Roles::PAL)
   end
 
   # returns people belong to the admin defined seek 'role' for this project
@@ -189,7 +192,7 @@ class Project < ActiveRecord::Base
 
   # indicates whether this project has a person, or associated user, as a member
   def has_member?(user_or_person)
-    user_or_person = user_or_person.try(:person) if user_or_person.is_a?(User)
+    user_or_person = user_or_person.try(:person)
     people.include? user_or_person
   end
 
@@ -197,7 +200,7 @@ class Project < ActiveRecord::Base
     # Get intersection of all project memberships + person's memberships to find project membership
     project_memberships = work_groups.collect(&:group_memberships).flatten
     person_project_membership = person.group_memberships & project_memberships
-    person_project_membership.project_roles
+    person_project_membership.project_positions
   end
 
   def can_be_edited_by?(user)
@@ -256,22 +259,22 @@ class Project < ActiveRecord::Base
 
   # set the administrators, assigned from the params to :project_administrator_ids
   def handle_project_administrator_ids
-    handle_admin_role_ids :project_administrator
+    handle_admin_role_ids Seek::Roles::PROJECT_ADMINISTRATOR
   end
 
-  # set the gatekeepers, assigned from the params to :gatekeeper_ids
-  def handle_gatekeeper_ids
-    handle_admin_role_ids :gatekeeper
+  # set the gatekeepers, assigned from the params to :asset_gatekeeper_ids
+  def handle_asset_gatekeeper_ids
+    handle_admin_role_ids Seek::Roles::ASSET_GATEKEEPER
   end
 
   # set the pals, assigned from the params to :pal_ids
   def handle_pal_ids
-    handle_admin_role_ids :pal
+    handle_admin_role_ids Seek::Roles::PAL
   end
 
-  # set the asset managers, assigned from the params to :asset_manager_ids
-  def handle_asset_manager_ids
-    handle_admin_role_ids :asset_manager
+  # set the asset housekeepers, assigned from the params to :asset_housekeeper_ids
+  def handle_asset_housekeeper_ids
+    handle_admin_role_ids Seek::Roles::ASSET_HOUSEKEEPER
   end
 
   # general method for assigning the people with roles, according to the role passed in.
@@ -289,6 +292,20 @@ class Project < ActiveRecord::Base
     to_remove.each do |person|
       person.send("is_#{role}=", [false, self])
       disable_authorization_checks { person.save! }
+    end
+  end
+
+  def total_asset_size
+    assets.sum do |asset|
+      if asset.respond_to?(:content_blob)
+        asset.content_blob.file_size || 0
+      elsif asset.respond_to?(:content_blobs)
+        asset.content_blobs.sum do |blob|
+          blob.file_size || 0
+        end
+      else
+        0
+      end
     end
   end
 

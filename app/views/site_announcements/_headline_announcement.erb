@@ -1,0 +1,6 @@
+<% if can_manage_announcements? -%>
+  <span class="headline_announcement_edit"><%= link_to "Edit",edit_site_announcement_path(headline_announcement) -%></span>
+<% end -%>
+<span class="headline_announcement_title"><%= h(headline_announcement.title) -%></span><br/>
+<span class="headline_announcement_date"><%= time_ago_in_words(headline_announcement.created_at)+" ago" -%></span><br/>
+<span class="headline_announcement_body"><%= headline_announcement.body_html.html_safe -%></span>

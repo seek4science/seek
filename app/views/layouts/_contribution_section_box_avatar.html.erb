@@ -10,13 +10,10 @@
       <div style="padding-top: 0.5em">
         <%= seek_role_icons(@person) -%>
       </div>
-  <% end -%>
-  <% if object && (
-          User.admin_logged_in? ||
-          mine?(object) ||
-          ([Project, Institution].include?(object.class) && object.can_be_edited_by?(current_user))) -%>
-      <span style="font-size:smaller">
+    <% end -%>
+    <% if object && object.respond_to?(:can_be_edited_by?) && object.can_be_edited_by?(current_user) -%>
+        <span style="font-size:smaller">
       <%= image_tag_for_key("avatars", all_avatars_link(object), nil, nil, "Change picture") %>
       </span>
-  <% end %>
+    <% end %>
 <% end %>

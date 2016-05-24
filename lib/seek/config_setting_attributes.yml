@@ -12,6 +12,8 @@ email_enabled:
 no_reply:
 jws_enabled:
 jws_online_root:
+internal_help_enabled:
+external_help_url:
 hide_details_enabled:
 activation_required_enabled:
 project_name:
@@ -52,7 +54,6 @@ is_virtualliver:
 sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
-biosamples_enabled:
 events_enabled:
 modelling_analysis_enabled:
 organisms_enabled:
@@ -132,8 +133,39 @@ zenodo_api_url:
 zenodo_oauth_url:
 zenodo_client_id:
 zenodo_client_secret:
-allow_user_programme_creation:
+programme_user_creation_enabled:
 cache_remote_files:
-max_cachable_size:
-hard_max_cachable_size:
 orcid_required:
+max_cachable_size:
+  convert: :to_i
+hard_max_cachable_size:
+  convert: :to_i
+tag_threshold:
+  convert: :to_i
+limit_latest:
+  convert: :to_i
+max_visible_tags:
+  convert: :to_i
+piwik_analytics_id_site:
+  convert: :to_i
+project_news_number_of_entries:
+  convert: :to_i
+community_news_number_of_entries:
+  convert: :to_i
+home_feeds_cache_timeout:
+  convert: :to_i
+time_lock_doi_for:
+  convert: :to_i
+default_associated_projects_access_type:
+  convert: :to_i
+default_consortium_access_type:
+  convert: :to_i
+default_all_visitors_access_type:
+  convert: :to_i
+default_project_members_access_type:
+  convert: :to_i
+news_enabled:
+news_feed_urls:
+news_number_of_entries:
+  convert: :to_i
+front_page_buttons_enabled:

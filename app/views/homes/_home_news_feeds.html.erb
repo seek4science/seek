@@ -1,41 +1,15 @@
-<div class="row">
-  <% if Seek::Config.project_news_enabled %>
-      <div class="col-md-6">
-        <div class="panel panel-default">
-          <div class="panel-heading"><%= Seek::Config.application_name%> News</div>
-          <div id="project_news" class="panel-body front-page-panel">
-            <ul class="feed">
-              <%
-                 entries = Seek::FeedReader.fetch_entries_for :project_news
-              %>
-              <% unless entries.blank? %>
-                  <% entries.each do |entry|   %>
-                      <%= display_single_entry(entry) -%>
-                  <% end %>
+<% if Seek::Config.news_enabled %>
+    <div class="panel panel-default">
+      <div class="panel-heading">News</div>
+      <div id="news-feed" class="panel-body front-page-panel">
+        <ul class="feed">
+          <% entries = Seek::FeedReader.fetch_entries_for(:news) %>
+          <% unless entries.blank? %>
+              <% entries.each do |entry| %>
+                  <%= display_single_entry(entry) -%>
               <% end %>
-            </ul>
-          </div>
-        </div>
+          <% end %>
+        </ul>
       </div>
-  <% end %>
-
-  <% if Seek::Config.community_news_enabled %>
-      <div class="col-md-6">
-        <div class="panel panel-default">
-          <div class="panel-heading">Community News</div>
-          <div id="community_news" class="panel-body front-page-panel">
-            <ul class="feed">
-              <%
-                 entries = Seek::FeedReader.fetch_entries_for :community_news
-              %>
-              <% unless entries.blank? %>
-                  <% entries.each do |entry|   %>
-                      <%= display_single_entry(entry) -%>
-                  <% end %>
-              <% end %>
-            </ul>
-          </div>
-        </div>
-      </div>
-  <% end %>
-</div>
+    </div>
+<% end %>

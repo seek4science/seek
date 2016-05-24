@@ -14,7 +14,7 @@ Report displayed: <%= select_tag "displayed_publication_report",options_for_sele
 <div id="publications_with_public" class="asset_report_container curved">
   <h1>Publications associated with publicly available items</h1>
 
-  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+  <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the publications, with associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %> that
     are available to download by any visitor to the <%= Seek::Config.application_name %> site.
   </p>
@@ -25,7 +25,7 @@ Report displayed: <%= select_tag "displayed_publication_report",options_for_sele
 
   <h1>Publications associated with items, where some are not available publicly</h1>
 
-  <p class='box_infotext' style="width:98%;text-align:center;margin-bottom:1em;">
+  <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the publications that have associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %>,
     however not all the associated assets are available to download by everybody visiting
     the <%= Seek::Config.application_name %> site. <br/>

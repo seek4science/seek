@@ -1,3 +1,5 @@
+@import "bootstrap/mixins";
+
 @mixin box($background-colour) {
   background-color: $background-colour;
   border: 1px solid desaturate(darken($background-colour, 15%), 50%);
@@ -11,4 +13,9 @@
 @mixin rounded-box-shadow($background-colour) {
   @include rounded-box($background-colour);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+@mixin rounded-box-inset-shadow($background-colour) {
+  @include rounded-box($background-colour);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.05) inset;
 }

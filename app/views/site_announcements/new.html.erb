@@ -1,0 +1,9 @@
+<div id="announcement_form">
+  <h1>New announcement</h1>
+  <%= form_for @site_announcement do |f| -%>
+      <%= render :partial=>"form",:locals=>{:f=>f, :edit=>false} %>
+
+      <%= f.submit "Create", :class => 'btn btn-primary' -%>
+      or <%= cancel_button(site_announcements_path) -%>
+  <% end -%>
+</div>

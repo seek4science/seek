@@ -116,17 +116,17 @@ namespace :seek_dev do
 
   desc 'removes any data this is not authorized to viewed by the first User'
   task(:remove_private_data=>:environment) do
-    sops        =Sop.find(:all)
+    sops        =Sop.all
     private_sops=sops.select { |s| !s.can_view? User.first }
     puts "#{private_sops.size} private Sops being removed"
     private_sops.each { |s| s.destroy }
 
-    models        =Model.find(:all)
+    models        =Model.all
     private_models=models.select { |m| ! m.can_view? User.first }
     puts "#{private_models.size} private Models being removed"
     private_models.each { |m| m.destroy }
 
-    data        =DataFile.find(:all)
+    data        =DataFile.all
     private_data=data.select { |d| !d.can_view? User.first }
     puts "#{private_data.size} private Data files being removed"
     private_data.each { |d| d.destroy }
@@ -201,7 +201,7 @@ namespace :seek_dev do
   task :generate_logins, [:pwd] => :environment do |t,args|
     password = args.pwd
     Person.not_registered.each do |person|
-      login = "#{person.first_name[0]}#{person.last_name}".downcase
+      login = "#{person.first_name[0]}#{person.last_name}".downcase.gsub(' ','')
       person.create_user login: login, password: password, password_confirmation: password
       person.user.activate
     end
@@ -387,6 +387,27 @@ namespace :seek_dev do
       end
       user_count += user_step
     end
+  end
+
+  desc('Forces the making public of all DataFiles, Models and SOPs in a project, logging it as published by the person id provided. This was a requirement of SysMO and is really specific to those projects')
+  task :publish_project_items,[:project_id,:person_id] => :environment do |t, args|
+    project_id = args.project_id
+    person_id = args.person_id
+    project = Project.find(project_id)
+    assets = project.assets | project.investigations | project.studies | project.assays
+    assets = assets.select{|asset| !asset.is_published?}
+
+    user = Person.find(person_id).user
+
+    User.with_current_user(user) do
+      disable_authorization_checks do
+        assets.each do |asset|
+          result = asset.publish!("published from rake task script :publish_project_items",true)
+          puts "#{asset.class.name} - #{asset.id} - #{result}"
+        end
+      end
+    end
+
   end
 
 end

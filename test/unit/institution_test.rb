@@ -6,8 +6,8 @@ class InstitutionTest < ActiveSupport::TestCase
   # Replace this with your real tests.
 
   def test_delete_inst_deletes_workgroup
-    n_wg = WorkGroup.find(:all).size
-    n_inst = Institution.find(:all).size
+    n_wg = WorkGroup.count
+    n_inst = Institution.count
     
     i=Institution.find(1)
     
@@ -57,13 +57,13 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_title_trimmed
-    i=Institution.new(:title=>" an institution")
+    i=Institution.new(:title=>" an institution", :country => 'Ghana')
     i.save!
     assert_equal("an institution",i.title) 
   end
   
   def test_update_first_letter
-    i=Institution.new(:title=>"an institution")
+    i=Institution.new(:title=>"an institution", :country => 'Serbia')
     i.save
     assert_equal "A",i.first_letter
   end

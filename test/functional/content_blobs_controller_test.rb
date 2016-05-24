@@ -249,11 +249,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert flash[:error].match(/Unable to find a copy of the file for download/)
   end
 
-  test 'get view pdf content' do
+  test 'get view content' do
     sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
 
     assert_difference('ActivityLog.count') do
-      get :view_pdf_content, sop_id: sop.id, id: sop.content_blob.id
+      get :view_content, sop_id: sop.id, id: sop.content_blob.id
     end
 
     assert_response :success
@@ -267,6 +267,19 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal sop, al.activity_loggable
     assert_equal User.current_user, al.culprit
     assert_equal 'content_blobs', al.controller_name
+  end
+
+  test 'should view content as correct format for type' do
+    df = Factory(:data_file,content_blob:Factory(:csv_content_blob),policy: Factory(:all_sysmo_downloadable_policy))
+    get :view_content,data_file_id:df.id, id:df.content_blob.id
+    assert_response :success
+    assert @response.body.include?('1,2,3,4,5')
+    assert_equal 'text/plain',@response.content_type
+
+    df = Factory(:data_file,content_blob:Factory(:doc_content_blob),policy: Factory(:all_sysmo_downloadable_policy))
+    get :view_content,data_file_id:df.id, id:df.content_blob.id
+    assert_response :success
+    assert_equal 'text/html',@response.content_type
   end
 
   test 'should transparently redirect on download for 302 url' do

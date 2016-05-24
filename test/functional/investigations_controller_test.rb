@@ -59,8 +59,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     get :show,:id=>study.investigation.id
     assert_response :success
 
-    assert_select "div.tab-pane" do
-      assert_select "h3",:text=>"Publications (3)",:count=>1
+    assert_select "ul.nav-pills" do
+      assert_select "a",:text=>"Publications (3)",:count=>1
     end
   end
 
@@ -332,5 +332,20 @@ class InvestigationsControllerTest < ActionController::TestCase
     get :show, :id=> investigation.id
     assert_response :success
     assert_select "div.panel-body div", :text => other_creators
+  end
+
+  test "programme investigations through nested routing" do
+    assert_routing 'programmes/2/investigations', { controller: 'investigations', action: 'index', programme_id: '2' }
+    programme = Factory(:programme)
+    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy))
+    investigation2 = Factory(:investigation, policy: Factory(:public_policy))
+
+    get :index, programme_id: programme.id
+
+    assert_response :success
+    assert_select "div.list_item_title" do
+      assert_select "a[href=?]", investigation_path(investigation), text: investigation.title
+      assert_select "a[href=?]", investigation_path(investigation2), text: investigation2.title, count: 0
+    end
   end
 end

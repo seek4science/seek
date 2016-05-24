@@ -7,12 +7,13 @@ class ProjectsController < ApplicationController
   include CommonSweepers
   include Seek::DestroyHandling
 
-  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,:admin_member_roles,:update_members]
+  before_filter :find_requested_item, :only=>[:show,:admin, :edit,:update, :destroy,:asset_report,:admin_members,
+                                              :admin_member_roles,:update_members,:storage_report]
   before_filter :find_assets, :only=>[:index]
   before_filter :auth_to_create, :only=>[:new,:create]
   before_filter :is_user_admin_auth, :only => [:manage, :destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
-  before_filter :administerable_by_user, :only =>[:admin,:admin_members,:admin_member_roles,:update_members]
+  before_filter :administerable_by_user, :only =>[:admin,:admin_members,:admin_member_roles,:update_members,:storage_report]
   before_filter :auth_params,:only=>[:update]
   before_filter :member_of_this_project, :only=>[:asset_report],:unless=>:admin?
 
@@ -172,8 +173,17 @@ class ProjectsController < ApplicationController
 
     @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]
 
+
+
     respond_to do |format|
       if @project.save
+        if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project]=='1'
+          institution = Institution.find(params[:default_member][:institution_id])
+          person = current_person
+          person.add_to_project_and_institution(@project,institution)
+          person.is_project_administrator=true,@project
+          disable_authorization_checks{person.save}
+        end
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         format.xml  { render :xml => @project, :status => :created, :location => @project }
@@ -280,6 +290,13 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def storage_report
+    respond_with do |format|
+      format.html { render partial: 'projects/storage_usage_content',
+                           locals: { project: @project, standalone: true } }
+    end
+  end
+
   private
 
   def add_and_remove_members_and_institutions
@@ -287,10 +304,12 @@ class ProjectsController < ApplicationController
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
     groups_to_remove.each do |group|
       group_membership = GroupMembership.find(group)
-      if group_membership && !group_membership.person.me?
+      if group_membership && group_membership.person_can_be_removed?
         #this slightly strange bit of code is required to trigger and after_remove callback, which should be revisted
-        group_membership.person.group_memberships.delete(group_membership)
-        group_membership.destroy
+        #
+        # Finn: http://guides.rubyonrails.org/association_basics.html#the-has-many-through-association
+        #       "Automatic deletion of join models is direct, no destroy callbacks are triggered."
+        group_membership.person.group_memberships.destroy(group_membership)
       end
     end
 

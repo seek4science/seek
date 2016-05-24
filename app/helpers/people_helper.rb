@@ -22,10 +22,11 @@ module PeopleHelper
     end
   end
 
-  def seek_role_icons person
+  def seek_role_icons person, size = 32
     icons = ''
     person.roles.each do |role|
-      icons << image("#{role}",:alt=>"#{role}",:title=>tooltip_title_attrib(role.humanize), :style=>"vertical-align: middle")
+      icons << image("#{role}", :size => "#{size}x#{size}", :alt=>"#{role}",
+                     'data-tooltip' => tooltip(role.humanize), :style=>"vertical-align: middle")
     end
     icons.html_safe
   end
@@ -51,12 +52,12 @@ module PeopleHelper
     return text.html_safe
   end
 
-  def project_role_list person
-    unless person.project_roles.empty?
+  def project_position_list person
+    unless person.project_positions.empty?
       text=""
-      person.project_roles.each do |r|
-        text += link_to(h(r.title),people_path(:project_role_id=>r.id))
-        text += ", " unless person.project_roles.last==r
+      person.project_positions.each do |r|
+        text += link_to(h(r.title),people_path(:project_position_id=>r.id))
+        text += ", " unless person.project_positions.last==r
       end
     else
       text="<span class='none_text'>None specified</span>"
@@ -65,7 +66,11 @@ module PeopleHelper
   end
 
   def admin_defined_project_roles_hash
-    roles = {"pal"=>"a PAL","project_administrator"=>"a Project Administrator", "asset_manager"=>"an Asset Manager","gatekeeper"=>"a Gatekeeper"}
+    roles = Seek::Roles::ProjectRelatedRoles.role_names.map do |role|
+      [role,t(role)]
+    end
+    roles = Hash[roles]
+
     roles.delete("pal") unless admin_logged_in?
     roles
   end

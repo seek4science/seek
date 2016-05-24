@@ -105,7 +105,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     Factory :person, :last_name=>"Bobbins",:first_name=>"Fred"
     Factory :person, :last_name=>"Davis",:first_name=>"Fred"
     #delete those with A
-    Person.find(:all,:conditions=>["first_letter = ?","A"]).each {|p| p.delete }
+    Person.where(["first_letter = ?","A"]).each {|p| p.delete }
     @people=Person.paginate :default_page=>"first"
     assert @people.size>0
     assert_equal "B",@people.page
@@ -115,7 +115,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal "A",@people.page
 
     #delete every person, and check it still returns the first page with empty content
-    Person.find(:all).each{|x| x.delete}
+    Person.all.each{|x| x.delete}
     @people=Person.paginate :default_page=>"first"
     assert_equal 0,@people.size
     assert_equal "A",@people.page
@@ -222,14 +222,10 @@ class GroupedPaginationTest < ActiveSupport::TestCase
     assert_equal @publications.page, Seek::Config.default_pages[:publications]
     @events=Event.paginate
     assert_equal @events.page, Seek::Config.default_pages[:events]
-
-    @specimens=Specimen.paginate
-    assert_equal @specimens.page, Seek::Config.default_pages[:specimens]
-
   end
 
   test 'order by updated_at for -latest- pagination for all item types' do
-    item_types = [:person, :project, :institution, :investigation, :study, :assay, :data_file, :model, :sop, :presentation, :publication,:event, :strain, :specimen, :sample ]
+    item_types = [:person, :project, :institution, :investigation, :study, :assay, :data_file, :model, :sop, :presentation, :publication,:event, :strain ]
     item_types.each do |type|
       item1 = Factory(type, :updated_at => 2.second.ago)
       item2 = Factory(type, :updated_at => 1.second.ago)
@@ -278,7 +274,7 @@ class GroupedPaginationTest < ActiveSupport::TestCase
   end
 
   test 'order by title for the rest of item types,  for -all- and -alphabet- pagnation' do
-    item_types = [:investigation, :study, :assay, :data_file, :model, :sop, :presentation, :strain, :specimen, :sample]
+    item_types = [:investigation, :study, :assay, :data_file, :model, :sop, :presentation, :strain]
     item_types.each do |type|
       item1 = Factory(type, :title => 'AB', :updated_at => 2.days.ago)
       item2 = Factory(type, :title => 'AC', :updated_at => 1.days.ago)

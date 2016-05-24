@@ -3,7 +3,7 @@ require 'test_helper'
 
 class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
 
-  ASSETS_WITH_AUTH_CODES = %w[data_files events models sops samples specimens presentations]
+  ASSETS_WITH_AUTH_CODES = %w[data_files events models sops presentations]
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "form allows creating temporary access links for #{type_name}" do

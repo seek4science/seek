@@ -106,28 +106,6 @@ class StrainTest < ActiveSupport::TestCase
     end
   end
 
-  test 'should only allow to delete strain which has no specimen' do
-    strain = Factory(:strain,:policy=>Factory(:public_policy))
-    assert strain.specimens.empty?
-    assert strain.can_delete?
-
-    Factory :specimen, :strain_id => strain.id, :policy=>Factory(:public_policy)
-
-    strain.reload
-    assert !strain.specimens.empty?
-    assert !strain.can_delete?
-  end
-
-  test 'should allow to delete strain which has dummy specimen and no sample attach to this specimen' do
-    strain = Factory(:strain,:policy=>Factory(:public_policy))
-    Factory :specimen, :strain_id => strain.id, :is_dummy => true,:policy=>Factory(:public_policy)
-    strain.reload
-
-    assert !strain.specimens.empty?
-    assert strain.specimens.first.samples.empty?
-    assert strain.can_delete?
-  end
-
   test "validation" do
     strain=Strain.new :title => "strain", :projects => [projects(:sysmo_project)], :organism => organisms(:yeast)
     assert strain.valid?
@@ -151,8 +129,8 @@ class StrainTest < ActiveSupport::TestCase
   end
 
   test 'destroy strain' do
-    genotype = Factory(:genotype, :specimen => nil, :strain => nil)
-    phenotype = Factory(:phenotype, :specimen => nil, :strain => nil)
+    genotype = Factory(:genotype, :strain => nil)
+    phenotype = Factory(:phenotype, :strain => nil)
     strain = Factory(:strain, :genotypes => [genotype], :phenotypes => [phenotype])
     disable_authorization_checks{strain.destroy}
     assert_equal nil, Strain.find_by_id(strain.id)
@@ -160,18 +138,4 @@ class StrainTest < ActiveSupport::TestCase
     assert_equal nil, Phenotype.find_by_id(phenotype.id)
   end
 
-  test 'when destroying strain, should not destroy genotypes/phenotypes that are linked to specimen' do
-      genotype1 = Factory(:genotype, :specimen => nil, :strain => nil)
-      genotype2 = Factory(:genotype, :specimen => nil, :strain => nil)
-      phenotype1 = Factory(:phenotype, :specimen => nil, :strain => nil)
-      phenotype2 = Factory(:phenotype, :specimen => nil, :strain => nil)
-      strain = Factory(:strain, :genotypes => [genotype1,genotype2], :phenotypes => [phenotype1,phenotype2])
-      specimen = Factory(:specimen,:genotypes => [genotype1], :phenotypes => [phenotype1])
-      disable_authorization_checks{strain.destroy}
-      assert_equal nil, Strain.find_by_id(strain.id)
-      assert_equal nil, Genotype.find_by_id(genotype2.id)
-      assert_equal nil, Phenotype.find_by_id(phenotype2.id)
-      assert_not_nil Genotype.find_by_id(genotype1.id)
-      assert_not_nil Phenotype.find_by_id(phenotype1.id)
-  end
 end
