@@ -136,13 +136,13 @@ class Policy < ActiveRecord::Base
           contributor_types << "Project" if !contributor_types.include? "Project"
           #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
           new_permission_data["Project"] = {} unless new_permission_data["Project"]
-          projects.each {|project| new_permission_data["Project"][project.id] = {"access_type" => sharing[:your_proj_access_type].to_i}}
+          projects.each {|project| new_permission_data["Project"][project.id.to_s] = {"access_type" => sharing[:your_proj_access_type].to_i}}
         end
 
         # --- Synchronise All Permissions for the Policy ---
         # first delete or update any old memberships
         policy.permissions.each do |p|
-          if permission_access = (new_permission_data[p.contributor_type.to_s].try :delete, p.contributor_id)
+          if permission_access = (new_permission_data[p.contributor_type.to_s].try :delete, p.contributor_id.to_s)
             p.access_type = permission_access["access_type"]
           else
             p.mark_for_destruction
