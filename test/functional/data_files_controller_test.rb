@@ -1328,7 +1328,22 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal update_permission.access_type, Policy::EDITING
   end
 
+  test "do not remove permissions when updating permission" do
+    df = Factory :data_file, :policy => Factory(:private_policy)
+    Factory :permission, :policy => df.policy
 
+    login_as(df.contributor)
+
+    put :update, :id =>df, :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::NO_ACCESS,:sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+
+    df.reload
+    permissions = df.policy.permissions
+    assert_equal 1, permissions.size
+    permission = permissions.first
+    assert_equal "Project", permission.contributor_type
+    assert_equal df.projects.first.id, permission.contributor_id
+    assert_equal Policy::ACCESSIBLE, permission.access_type
+  end
 
 
   test "explore logged as inline view" do
