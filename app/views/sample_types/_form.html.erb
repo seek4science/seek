@@ -7,6 +7,11 @@
       <%= f.text_field :title, :class => 'form-control', :placeholder => 'Sample type name' %>
     </div>
 
+    <div class="form-group">
+      <label>Description</label>
+      <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
+    </div>
+
     <h3>Attributes</h3>
     <p class="help-block">Re-arrange attributes by clicking and dragging the button on the left-hand side of each row.</p>
     <table class="table" id="attribute-table">
