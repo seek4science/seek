@@ -67,8 +67,8 @@ admin_user.person ||= Person.create(first_name: 'Admin', last_name: 'User', emai
 admin_user.save
 admin_user.person.work_groups << admin_workgroup
 admin_person = admin_user.person
-admin_person.add_roles([['gatekeeper', biovel],
-                        ['project_manager', biovel]])
+admin_person.add_roles([Seek::Roles::RoleInfo.new(role_name:'asset_gatekeeper', items: biovel),
+                        Seek::Roles::RoleInfo.new(role_name:'project_administrator', items: biovel)])
 admin_person.save
 
 puts 'Seeded the Admin user.'

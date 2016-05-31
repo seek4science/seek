@@ -1,4 +1,3 @@
-puts 'seed organisms and strains for Virtual Liver Network project'
 # seed organisms and strains data
 organisms = ['Mus musculus', 'Rattus norvegicus', 'Homo sapiens']
 strains = [{ title: 'C57BL/6N', organism_title: 'Mus musculus' },
@@ -12,9 +11,11 @@ strains = [{ title: 'C57BL/6N', organism_title: 'Mus musculus' },
            { title: 'C57BL/6J', organism_title: 'Mus musculus' }]
 
 organisms.each do |o_title|
-  Organism.where(title: o_title).first_or_create!
+  Organism.find_or_create_by_title(o_title)
 end
 
 strains.each do |s|
-  Strain.where(title: s[:title], organism_id: Organism.find_by_title(s[:organism_title]).id).first_or_create!
+  Strain.find_or_create_by_title(s[:title], organism_id: Organism.find_by_title(s[:organism_title]).id, projects: [Project.first])
 end
+
+puts 'Seeded organisms and strains for Virtual Liver Network project.'
