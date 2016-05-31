@@ -107,26 +107,31 @@ var Projects = {
             var errors = [];
             var toRemove = [];
 
-            $j.each(people, function (index, value) {
-                if(Projects.getPersonIndex(Projects.memberships, value.id, institution_id) == -1) {
-                    var change = {
-                        person: { id: value.id, name: value.name },
-                        institution: { id: institution_id, title: institution_title },
-                        action: 'added',
-                        membershipData: JSON.stringify({
-                            person_id: value.id,
-                            institution_id: institution_id,
-                            institution_title: institution_title })
-                    };
-                    Projects.addChange(change);
-                    toRemove.push({ id: value.id });
-                } else {
-                    errors.push(value.name + ' is already a member of the project through that institution.');
-                }
-            });
+            if(institution_id == '') {
+                errors.push('Please select an institution!');
+                $j("#institution_ids").parent('.form-group').addClass('has-error');
+            } else {
+                $j.each(people, function (index, value) {
+                    if(Projects.getPersonIndex(Projects.memberships, value.id, institution_id) == -1) {
+                        var change = {
+                            person: { id: value.id, name: value.name },
+                            institution: { id: institution_id, title: institution_title },
+                            action: 'added',
+                            membershipData: JSON.stringify({
+                                person_id: value.id,
+                                institution_id: institution_id,
+                                institution_title: institution_title })
+                        };
+                        Projects.addChange(change);
+                        toRemove.push({ id: value.id });
+                    } else {
+                        errors.push(value.name + ' is already a member of the project through that institution.');
+                    }
+                });
 
-            for(var i = 0; i < toRemove.length; i++)
-                $j('#people_ids').tagsinput('remove', toRemove[i]);
+                for(var i = 0; i < toRemove.length; i++)
+                    $j('#people_ids').tagsinput('remove', toRemove[i]);
+            }
 
             if(errors.length > 0)
                 alert(errors.join("\n"));
@@ -260,4 +265,6 @@ $j(document).ready(function () {
         Projects.renderMemberships();
         return false;
     });
+
+    $j("#institution_ids").change(function () { $j(this).parent('.form-group').removeClass('has-error'); });
 });

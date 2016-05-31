@@ -84,7 +84,7 @@ module HomesHelper
     feed_title = entry.feed_title || 'Unknown publisher'
     entry_date = determine_entry_date(entry)
     entry_summary = truncate(strip_tags(entry.summary || entry.content), length: 500)
-    tt = tooltip("<p>#{entry_summary}</p><p class='feedinfo none_text'>#{entry_date.strftime('%c') unless entry_date.nil?}</p>")
+    tt = tooltip("#{entry_summary} (#{entry_date.strftime('%c') unless entry_date.nil?})")
     [entry_date, entry_title, feed_title, tt]
   end
 
@@ -155,7 +155,7 @@ module HomesHelper
     image = item[:avatar_image]
     icon = link_to(image, item[:url], class: 'file-type-icon', 'data-tooltip' => tooltip(item[:type]))
     description = item[:description] || item[:abstract]
-    tt = tooltip("<p>#{description.blank? ? 'No description' : description}</p><p class='feedinfo none_text'>#{item[:created_at]}</p>")
+    tt = tooltip("#{description.blank? ? 'No description' : description} (#{item[:created_at]})")
     [icon, tt]
   end
 
