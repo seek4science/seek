@@ -1,0 +1,14 @@
+<% asset = item %>
+
+<% if asset.samples.any? %>
+    <%= button_link_to("View samples", 'view_samples', sample_type_samples_path(asset)) %>
+<% end %>
+
+<%= admin_dropdown do %>
+
+    <% if asset.can_edit? -%>
+        <li><%= image_tag_for_key('edit', edit_sample_type_path(asset), nil, nil, "Edit Sample Type") -%></li>
+    <% end -%>
+<%= delete_icon(asset, current_user) %>
+
+<% end %>
