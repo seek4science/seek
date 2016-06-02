@@ -316,6 +316,21 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert type.sample_attributes[2].sample_attribute_type.is_controlled_vocab?
   end
 
+  test 'can edit' do
+    type = Factory(:simple_sample_type)
+    assert type.can_edit?
+    type = Factory(:patient_sample).sample_type
+    refute type.can_edit?
+  end
+
+  test 'can delete' do
+    type = Factory(:simple_sample_type)
+    assert type.can_delete?
+    type = Factory(:patient_sample).sample_type
+    refute type.can_delete?
+  end
+
+
   test 'dependant attributes destroyed' do
     type = Factory(:patient_sample_type)
     attribute_count = type.sample_attributes.count

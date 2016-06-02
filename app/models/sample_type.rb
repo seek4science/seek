@@ -110,6 +110,14 @@ class SampleType < ActiveRecord::Base
     []
   end
 
+  def can_edit?
+    samples.empty?
+  end
+
+  def can_delete?
+    samples.empty?
+  end
+
   private
 
   #required by Seek::ActsAsAsset::Searching - don't really need to full search terms, including content provided by Seek::ActsAsAsset::ContentBlobs
@@ -170,6 +178,8 @@ class SampleType < ActiveRecord::Base
   def attribute_search_terms
     sample_attributes.collect(&:title)
   end
+
+
 
   class UnknownAttributeException < Exception; end
 end
