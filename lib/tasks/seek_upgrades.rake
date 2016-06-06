@@ -12,8 +12,7 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
            :environment,
-           :consolidate_news_feeds,
-           :delete_orphaned_strains
+           :seed_sample_attribute_types
        ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -56,6 +55,11 @@ namespace :seek do
         strain.destroy
       end
     end
+    puts "Done"
+  end
+
+  task(:seed_sample_attribute_types => :environment) do
+    Rake::Task["db:seed:sample_attribute_types"].invoke
     puts "Done"
   end
 
