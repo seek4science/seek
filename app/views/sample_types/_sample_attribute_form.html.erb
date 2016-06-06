@@ -10,6 +10,7 @@
 <% unit_id = sample_attribute ? sample_attribute.unit_id : nil %>
 <% template_column_index = sample_attribute ? sample_attribute.template_column_index : nil %>
 <% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
+<% is_controlled_vocab = sample_attribute && sample_attribute.sample_attribute_type.try(:is_controlled_vocab?) %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -40,7 +41,7 @@
                    options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.is_controlled_vocab? }] },
                                       attribute_type_id),
                    :class => 'form-control sample-type-attribute-type'%>
-    <div class='controlled-vocab-block' style="<%= 'display:none;' if sample_controlled_vocab_id.nil? %>">
+    <div class='controlled-vocab-block' style="<%= 'display:none;' unless is_controlled_vocab %>">
     <br/>
     <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
                    options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id] },

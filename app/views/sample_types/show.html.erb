@@ -6,6 +6,8 @@
 
 <%= render :partial => "general/item_title", :locals => {:item => @sample_type} %>
 
+<%= item_description @sample_type.description -%>
+
 <% if @sample_type.template %>
 
     <h2>Template</h2>

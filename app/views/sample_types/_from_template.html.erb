@@ -8,6 +8,11 @@
     </div>
 
     <div class="form-group">
+      <label>Description</label>
+      <%= text_area_tag 'sample_type[description]',@sample_type.description, :class=>"form-control", :rows => 5 -%>
+    </div>
+
+    <div class="form-group">
       <label>File to upload<span class="required">*</span></label>
       <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => false } -%>
     </div>

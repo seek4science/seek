@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160517150444) do
+ActiveRecord::Schema.define(:version => 20160531141452) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1353,6 +1353,7 @@ ActiveRecord::Schema.define(:version => 20160517150444) do
     t.datetime "updated_at",                   :null => false
     t.integer  "content_blob_id"
     t.string   "first_letter",    :limit => 1
+    t.text     "description"
   end
 
   create_table "samples", :force => true do |t|

@@ -1,5 +1,5 @@
 class SampleType < ActiveRecord::Base
-  attr_accessible :title, :uuid, :sample_attributes_attributes
+  attr_accessible :title, :uuid, :sample_attributes_attributes, :description
 
 
   searchable(:auto_index=>false) do
