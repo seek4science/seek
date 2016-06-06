@@ -2,7 +2,13 @@ class << self
   def create_person(name, email_suffix, workgroup)
     first_name, last_name = name.split(' ')
     email = "#{first_name[0]}#{last_name[0]}#{email_suffix}@example.com".downcase
-    p = Person.where(first_name: first_name, last_name: last_name, email: email).first_or_create!
+    p = Person.where(first_name: first_name, last_name: last_name, email: email).first
+    if p.nil?
+      p = Person.create(first_name: first_name, last_name: last_name, email: email)
+      p.is_admin = false
+      p.save
+    end
+
     p.work_groups << workgroup unless p.work_groups.include?(workgroup)
     p
   end
