@@ -21,4 +21,8 @@ $j('#controlled-vocab-errors .errorExplanation').remove();
     var selectTag = $j('#'+cvSelectionTagId);
     selectTag.val('<%= @sample_controlled_vocab.id %>');
 
+    $j('#cv-modal').remove();
+    $j('#modal-dialogues').append(blankCvForm.clone());
+    initialiseCVForm();
+
 <% end %>

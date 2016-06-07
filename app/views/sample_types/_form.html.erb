@@ -63,7 +63,10 @@
     //used to hold the element Id that needs updating after creating a new CV
     var cvSelectionTagId;
 
+    var blankCvForm;
+
     $j(document).ready(function () {
+        blankCvForm=$j('#cv-modal').clone();
         // Make rows sortable
         SampleTypes.bindSortable();
         SampleTypes.recalculatePositions();

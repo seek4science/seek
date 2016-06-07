@@ -80,6 +80,9 @@
 
 <script>
     $j(document).ready(function () {
+        initialiseCVForm();
+    });
+    function initialiseCVForm() {
         $j('#add-term').click(function () {
             var newTerm = $j('#new-term-row tbody').clone().html();
 
@@ -118,6 +121,6 @@
         }
 
         $j('#new-terms').on('change', '.destroy-attribute', CVTerms.removeTerm);
-    });
+    }
 
 </script>
