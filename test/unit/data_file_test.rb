@@ -70,12 +70,13 @@ class DataFileTest < ActiveSupport::TestCase
     assert !asset.valid?
 
     #VL only:allow no projects
-    asset=DataFile.new :title=>"fred", :policy => Factory(:private_policy)
-    assert asset.valid?
+    as_virtualliver do
+      asset=DataFile.new :title=>"fred", :policy => Factory(:private_policy)
+      assert asset.valid?
 
-
-    asset = DataFile.new :title => "fred", :projects => [], :policy => Factory(:private_policy)
-    assert asset.valid?
+      asset = DataFile.new :title => "fred", :projects => [], :policy => Factory(:private_policy)
+      assert asset.valid?
+    end
   end
 
   test "version created on save" do

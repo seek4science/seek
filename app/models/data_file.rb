@@ -225,6 +225,7 @@ class DataFile < ActiveRecord::Base
     samples = sample_type.build_samples_from_template(self.content_blob)
     extracted = []
     samples.each do |sample|
+      sample.project_ids = self.project_ids
       sample.contributor = self.contributor
       sample.originating_data_file = self
       sample.policy = self.policy.deep_copy

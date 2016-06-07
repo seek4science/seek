@@ -272,6 +272,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     template_blob = Factory(:sample_type_populated_template_content_blob)
     samples = sample_type.build_samples_from_template(template_blob)
     assert_equal 4, samples.count
+    samples.each { |sample| sample.projects = [Factory(:project)] }
 
     sample = samples.first
     assert sample.valid?

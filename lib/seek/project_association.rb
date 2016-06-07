@@ -10,6 +10,9 @@ module Seek
                                            before_add: :react_to_project_addition,
                                            before_remove: :react_to_project_removal
 
+        validates :projects, presence: true, unless: Proc.new { |object| Seek::Config.is_virtualliver ||
+            object.is_a?(Strain) }
+
         def react_to_project_addition(project)
           SetSubscriptionsForItemJob.new(self, [project]).queue_job if !self.new_record? && self.subscribable?
           update_rdf_on_associated_change(project) if self.respond_to?(:update_rdf_on_associated_change)

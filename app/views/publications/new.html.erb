@@ -32,7 +32,7 @@
     </p>
 
     <%= fields_for(@publication) {|f|  f.hidden_field :parent_name } -%>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => true} -%>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver } -%>
 
     <%= submit_tag 'Fetch',:id=>"fetch_button", :class => 'btn btn-default' %>
     <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>
