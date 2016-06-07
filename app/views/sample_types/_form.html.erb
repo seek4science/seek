@@ -67,6 +67,7 @@
 
     $j(document).ready(function () {
         blankCvForm=$j('#cv-modal').clone();
+        resetCvForm();
         // Make rows sortable
         SampleTypes.bindSortable();
         SampleTypes.recalculatePositions();
@@ -98,11 +99,21 @@
 
     });
 
-    $j('#cv-modal').on('show.bs.modal', function (event) {
-        var button = $j(event.relatedTarget) // Button that triggered the modal
-        var dropdown = button.siblings('select');
-        cvSelectionTagId=(dropdown.prop('id'));
-    });
+    function bindCvButtonToEvent() {
+        $j('#cv-modal').on('show.bs.modal', function (event) {
+            var button = $j(event.relatedTarget) // Button that triggered the modal
+            var dropdown = button.siblings('select');
+            cvSelectionTagId=(dropdown.prop('id'));
+        });
+    }
+
+    function resetCvForm() {
+        $j('#cv-modal').remove();
+        $j('#modal-dialogues').append(blankCvForm.clone());
+        initialiseCVForm();
+        bindCvButtonToEvent();
+    }
+
 
 
 </script>

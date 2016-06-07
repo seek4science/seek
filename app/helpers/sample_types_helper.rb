@@ -8,7 +8,7 @@ module SampleTypesHelper
 
   def create_sample_controlled_vocab_model_button
     modal_id="cv-modal"
-    button_link_to('New', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}", 'id'=>'fish')
+    button_link_to('New', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}")
   end
 
   def sample_controlled_vocab_model_dialog(modal_id)
