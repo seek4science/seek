@@ -11,8 +11,7 @@ module SampleTypesHelper
     button_link_to('New', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}", 'id'=>'fish')
   end
 
-  def sample_controlled_vocab_model_dialog
-    modal_id="cv-modal"
+  def sample_controlled_vocab_model_dialog(modal_id)
     modal_options = {id: modal_id, size: 'xl', 'data-role' => 'create-sample-controlled-vocab-form'}
 
     modal_title='Create Sample Controlled Vocab'
