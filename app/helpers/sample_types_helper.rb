@@ -6,8 +6,8 @@ module SampleTypesHelper
        "#{sample_type_attribute.title} (#{type}) #{unit} #{req}".html_safe
   end
 
-  def create_sample_controlled_vocab_model_button index
-    modal_id="cv-model-#{index}"
+  def create_sample_controlled_vocab_model_button
+    modal_id="cv-modal"
     modal_options = {id: modal_id, size: 'xl', 'data-role' => 'create-sample-controlled-vocab-form'}
 
     modal_title='Create Sample Controlled Vocab'
