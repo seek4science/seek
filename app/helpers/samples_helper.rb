@@ -1,23 +1,23 @@
 module SamplesHelper
   def sample_form_field_for_attribute(attribute)
     base_type = attribute.sample_attribute_type.base_type
-    clz="sample_attribute_#{base_type.downcase}"
+    clz = "sample_attribute_#{base_type.downcase}"
     case base_type
       when 'Text'
-        text_area :sample, attribute.method_name, :class=>"form-control #{clz}"
+        text_area :sample, attribute.method_name, class: "form-control #{clz}"
       when 'DateTime'
-        calendar_date_select :sample, attribute.method_name, :time=>:mixed, :class=>"form-control  #{clz}"
+        calendar_date_select :sample, attribute.method_name, time: :mixed, class: "form-control  #{clz}"
       when 'Date'
-        calendar_date_select :sample, attribute.method_name, :time=>false, :class=>"form-control  #{clz}"
+        calendar_date_select :sample, attribute.method_name, time: false, class: "form-control  #{clz}"
       when 'Boolean'
-        check_box :sample, attribute.method_name,:class=>"#{clz}"
+        check_box :sample, attribute.method_name, class: "#{clz}"
       when 'SeekStrain'
-        grouped_collection_select :sample, attribute.method_name, Organism.all, :strains, :title, :id, :title, :class=>"#{clz}"
+        grouped_collection_select :sample, attribute.method_name, Organism.all, :strains, :title, :id, :title, class: "#{clz}"
       when 'CV'
         terms = attribute.sample_controlled_vocab.sample_controlled_vocab_terms
-        collection_select :sample, attribute.method_name,terms,:label,:label,:include_blank=>!attribute.required?,  :class=>"form-control #{clz}"
+        collection_select :sample, attribute.method_name, terms, :label, :label, include_blank: !attribute.required?,  class: "form-control #{clz}"
       else
-        text_field :sample, attribute.method_name, :class=>"form-control #{clz}"
+        text_field :sample, attribute.method_name, class: "form-control #{clz}"
     end
   end
 
@@ -28,7 +28,7 @@ module SamplesHelper
   def sample_attribute_title_and_unit(attribute)
     title = attribute.title
     if (unit = attribute.unit) && !unit.dimensionless?
-      title = title + " ( #{unit.to_s} )"
+      title += " ( #{unit} )"
     end
     title
   end
@@ -40,9 +40,9 @@ module SamplesHelper
     else
       case attribute.sample_attribute_type.base_type
         when 'Date'
-          Date.parse(value).strftime("%e %B %Y")
+          Date.parse(value).strftime('%e %B %Y')
         when 'DateTime'
-          DateTime.parse(value).strftime("%e %B %Y %H:%M:%S")
+          DateTime.parse(value).strftime('%e %B %Y %H:%M:%S')
         when 'SeekStrain'
           if value['title']
             link_to(value['title'], strain_path(value['id']))
@@ -58,7 +58,4 @@ module SamplesHelper
       end
     end
   end
-
 end
-
-
