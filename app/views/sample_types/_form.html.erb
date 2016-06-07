@@ -1,3 +1,5 @@
+<%= sample_controlled_vocab_model_dialog %>
+
 <%= form_for(@sample_type) do |f| %>
 
     <%= f.error_messages %>
@@ -56,6 +58,9 @@
 </table>
 
 <script>
+    //used to hold the element Id that needs updating after creating a new CV
+    var cvSelectionTagId;
+
     $j(document).ready(function () {
         // Make rows sortable
         SampleTypes.bindSortable();
@@ -86,6 +91,12 @@
         $j('#attribute-table').on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
 
 
+    });
+
+    $j('#cv-modal').on('show.bs.modal', function (event) {
+        var button = $j(event.relatedTarget) // Button that triggered the modal
+        var dropdown = button.siblings('select');
+        cvSelectionTagId=(dropdown.prop('id'));
     });
 
 
