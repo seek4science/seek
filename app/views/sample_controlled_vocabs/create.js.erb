@@ -1,0 +1,26 @@
+$j('#controlled-vocab-errors .errorExplanation').remove();
+
+<% if @sample_controlled_vocab.errors.any? %>
+
+    $j('#controlled-vocab-errors').append('<div class="errorExplanation" id="errorExplanation"></div>');
+    <% msg = "#{pluralize(@sample_controlled_vocab.errors.count, 'error')} prohibited this sample controlled vocab from being saved" %>
+    $j('#controlled-vocab-errors .errorExplanation').append('<h2><%= msg %></h2>');
+    $j('#controlled-vocab-errors .errorExplanation').append('<ul class="error-messages"></ul>');
+    <% @sample_controlled_vocab.errors.full_messages.each do |msg| %>
+        $j('#controlled-vocab-errors .error-messages').append('<li><%= escape_javascript msg %></li>');
+    <% end %>
+
+<% else %>
+
+    $j('#cv-modal').modal('hide');
+
+    //add the option to available dropdowns
+    var newOption = '<option value="<%= @sample_controlled_vocab.id %>"><%= @sample_controlled_vocab.title %></option>';
+    $j('.controlled-vocab-selection').append(newOption);
+    //select the new CV in the current dropdown
+    var selectTag = SampleTypeControlledVocab.controlledVocabSelectionElement();
+    selectTag.val('<%= @sample_controlled_vocab.id %>');
+
+    SampleTypeControlledVocab.resetModalControlledVocabForm();
+
+<% end %>
