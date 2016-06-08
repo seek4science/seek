@@ -61,13 +61,11 @@
 
 <script>
     //used to hold the element Id that needs updating after creating a new CV
-    var cvSelectionTagId;
 
-    var blankCvForm;
 
     $j(document).ready(function () {
-        blankCvForm=$j('#cv-modal').clone();
-        resetCvForm();
+        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
+        SampleTypeControlledVocab.resetModalControlledVocabForm();
         // Make rows sortable
         SampleTypes.bindSortable();
         SampleTypes.recalculatePositions();
@@ -99,20 +97,7 @@
 
     });
 
-    function bindCvButtonToEvent() {
-        $j('#cv-modal').on('show.bs.modal', function (event) {
-            var button = $j(event.relatedTarget) // Button that triggered the modal
-            var dropdown = button.siblings('select');
-            cvSelectionTagId=(dropdown.prop('id'));
-        });
-    }
 
-    function resetCvForm() {
-        $j('#cv-modal').remove();
-        $j('#modal-dialogues').append(blankCvForm.clone());
-        initialiseCVForm();
-        bindCvButtonToEvent();
-    }
 
 
 

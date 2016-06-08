@@ -78,3 +78,31 @@ var SampleTypes = {
     }
 
 };
+
+var SampleTypeControlledVocab = {
+    controlledVocabSelectionTagId: "",
+    blankControlledVocabModelForm: null,
+
+    //binds the show event to the modal dialogue, for determining with button, and therefore dropdown selection, is linked
+    //to the form
+    bindNewControlledVocabShowEvent: function () {
+        $j('#cv-modal').on('show.bs.modal', function (event) {
+            var button = $j(event.relatedTarget) // Button that triggered the modal
+            var dropdown = button.siblings('select');
+            SampleTypeControlledVocab.controlledVocabSelectionTagId = (dropdown.prop('id'));
+        });
+    },
+
+    //the select element associated with the last New button pressed
+    controlledVocabSelectionElement: function() {
+        return $j('#'+SampleTypeControlledVocab.controlledVocabSelectionTagId);
+    },
+
+    //resets the modal
+    resetModalControlledVocabForm: function () {
+        $j('#cv-modal').remove();
+        $j('#modal-dialogues').append(SampleTypeControlledVocab.blankControlledVocabModelForm.clone());
+        initialiseCVForm();
+        SampleTypeControlledVocab.bindNewControlledVocabShowEvent();
+    }
+};
