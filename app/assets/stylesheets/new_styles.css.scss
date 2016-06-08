@@ -457,3 +457,14 @@ table > tbody > tr > td.sample-field-error {
     padding: 8px;
   }
 }
+
+img.avatar-corner-icon {
+  display: block;
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+}
+
+.favouritable {
+  display: inline-block;
+}

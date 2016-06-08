@@ -1,6 +1,6 @@
 <div class="row">
   <div class="col-sm-6">
-    <%= list_item_authorized_attribute "Contributor", resource.contributor.try(:person) %>
+    <%= list_item_authorized_attribute t('contributor').capitalize, resource.contributor.try(:person) %>
     <%= list_item_attribute "Provider Name", text_or_not_specified(resource.provider_name) -%>
     <%= list_item_attribute "Provider's strain ID", text_or_not_specified(resource.provider_id) %>
     <%= list_item_attribute "Organism", organisms_link_list([resource.organism]) -%>

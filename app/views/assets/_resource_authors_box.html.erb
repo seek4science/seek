@@ -5,20 +5,24 @@
 <%# - title - the title of the box (defaults to Creators if missing) -%>
 <%
 creators ||= nil
-if resource.respond_to?(:contributor) and resource.contributor_credited? and !creators
-    creators = (resource.try(:creators) || []) | [resource.contributor.nil? ? nil : resource.contributor.person]
-    title ||= "Uploader and contributors"
-else
-    creators ||= resource.creators.dup
-    title ||= "Contributors"
-end
+title ||= "#{t('contributor').capitalize} and #{t('creator').capitalize.pluralize}"
+creators ||= resource.creators
+contributor = resource.contributor.try(:person)
+creators.reject! { |c| c == contributor }
 %>
 
 <%= panel(title, :help_text => "These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its contributors.") do %>
   <div class="author_list text-center">
-    <% creators.shift(5).each do |creator| %>
+    <span class="author_avatar author_avatar-contributor">
+      <% if contributor %>
+        <%= favouritable_icon(contributor, 50, tooltip_suffix: " (#{t('contributor').capitalize})", corner_icon: 'new') -%>
+      <% else %>
+        <%= the_jerm -%>
+      <% end %>
+    </span>
+    <% creators.shift(4).each do |creator| %>
         <% if creator.nil? || creator.can_view? %>
-            <span class="author_avatar"><%= creator.nil? ? the_jerm : favouritable_icon(creator,50) -%></span>
+            <span class="author_avatar"><%= favouritable_icon(creator,50) -%></span>
         <% elsif creator.title_is_public? %>
             [<%= h(creator.name) %>]
         <% end %>
@@ -40,7 +44,7 @@ end
     <% if resource.respond_to?(:other_creators) && !resource.other_creators.blank? -%>
         <p class="heading">
           <%= help_icon("Non-SEEK registered members who helped with the creation of this file.") -%>
-          Other Contributors
+          Other <%= t('creator').pluralize -%>
         </p>
         <div style="border: 1px dashed #BBB; margin: 0.5em;padding: 3px;text-align:left">
           <%= h(resource.other_creators) %>

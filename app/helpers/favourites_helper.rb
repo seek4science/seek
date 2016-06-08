@@ -27,8 +27,15 @@ module FavouritesHelper
   
   def draggable_icon(item, size = 100, options = {}, &block)
     html = block_given? ? capture(&block) : avatar(item, size, true, nil, nil, true, options[:avatar_class])
+    html += corner_icon(options[:corner_icon]) if options[:corner_icon]
+
     options['data-tooltip'] ||= tooltip(get_object_title(item))
+    options['data-tooltip'] += " #{options[:tooltip_suffix]}" if options[:tooltip_suffix]
     html = link_to_draggable(html, show_resource_path(item), options)
     html.html_safe
+  end
+
+  def corner_icon(icon)
+    image(icon, class: "avatar-corner-icon")
   end
 end

@@ -82,3 +82,7 @@ en:
     editing: "View and edit summary"
     editing_downloadable: "Edit"
     managing: "Manage"
+
+  contributor: 'contributor' # A person who submitted the resource to SEEK
+  creator: 'creator' # A person who was involved with the creation of the resource
+  person_responsible: 'contributor'
