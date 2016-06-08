@@ -1,5 +1,5 @@
 class SampleControlledVocabsController < ApplicationController
-  respond_to :html
+  respond_to :html, :json, :js
 
   include Seek::IndexPager
   include Seek::AssetsCommon
@@ -26,7 +26,9 @@ class SampleControlledVocabsController < ApplicationController
     @sample_controlled_vocab = SampleControlledVocab.new(params[:sample_controlled_vocab])
 
     flash[:notice] = 'The sample controlled vocabulary was successfully created.' if @sample_controlled_vocab.save
-    respond_with(@sample_controlled_vocab)
+    respond_with(@sample_controlled_vocab) do |format|
+      format.js {render layout: false, content_type: 'text/javascript'}
+    end
   end
 
   def update

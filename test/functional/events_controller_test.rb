@@ -8,6 +8,7 @@ class EventsControllerTest < ActionController::TestCase
 
   def setup
     login_as(:datafile_owner)
+    @project = users(:datafile_owner).person.projects.first
   end
 
   def rest_api_test_object
@@ -109,7 +110,7 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   def valid_event
-    {:title => "Barn Raising", :start_date => DateTime.now, :end_date => DateTime.now}
+    {:title => "Barn Raising", :start_date => DateTime.now, :end_date => DateTime.now, :project_ids => [@project.id]}
   end
 
   test "should get edit" do
@@ -146,7 +147,8 @@ class EventsControllerTest < ActionController::TestCase
 
   test "should create and show event without end_date" do
     assert_difference('Event.count', 1) do
-      post :create, :event => {:title => "Barn Raising", :start_date => DateTime.now},:sharing => valid_sharing
+      post :create, :event => {:title => "Barn Raising", :start_date => DateTime.now, :project_ids => [@project.id]},
+           :sharing => valid_sharing
     end
     assert_redirected_to assigns(:event)
 

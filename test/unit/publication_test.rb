@@ -199,8 +199,10 @@ class PublicationTest < ActiveSupport::TestCase
     asset=Publication.new :projects=>[project],:doi=>"111"
     assert !asset.valid?
 
-    asset=Publication.new :title=>"fred",:doi=>"111"
-    assert asset.valid?
+    as_virtualliver do
+      asset=Publication.new :title=>"fred",:doi=>"111"
+      assert asset.valid?
+    end
 
     #cant have both a pubmed and doi
     asset = Publication.new :title=>"bob",:doi=>"777",:projects=>[project]
@@ -237,10 +239,12 @@ class PublicationTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
-  
-  def test_project_not_required
-    p=Publication.new(:title=>"blah blah blah",:pubmed_id=>"123")
-    assert p.valid?
+
+  test "project_not_required" do
+    as_virtualliver do
+      p=Publication.new(:title=>"blah blah blah",:pubmed_id=>"123")
+      assert p.valid?
+    end
   end
 
   test 'validate uniqueness of pubmed_id and doi' do

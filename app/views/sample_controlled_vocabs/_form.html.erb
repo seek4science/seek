@@ -1,6 +1,10 @@
-<%= form_for(@sample_controlled_vocab) do |f| %>
+<% remote ||= false %>
 
-    <%= f.error_messages %>
+<%= form_for(@sample_controlled_vocab, remote:remote) do |f| %>
+
+    <span id="controlled-vocab-errors">
+        <%= f.error_messages %>
+    </span>
 
     <div class="form-group">
       <label>Title</label><%= required_span %>
@@ -11,7 +15,6 @@
       <label>Description</label>
       <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
     </div>
-
 
     <h3>Terms</h3>
     <table id="new-terms" class="table">
@@ -45,8 +48,10 @@
 
     <p class="actions">
       <%= f.submit (@sample_controlled_vocab.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
+      <% unless remote %>
       or
       <%= cancel_button(@sample_controlled_vocab.new_record? ? sample_controlled_vocabs_path : sample_controlled_vocab_path(@sample_controlled_vocab)) %>
+      <% end %>
     </p>
 
 
@@ -75,6 +80,9 @@
 
 <script>
     $j(document).ready(function () {
+        initialiseCVForm();
+    });
+    function initialiseCVForm() {
         $j('#add-term').click(function () {
             var newTerm = $j('#new-term-row tbody').clone().html();
 
@@ -113,6 +121,6 @@
         }
 
         $j('#new-terms').on('change', '.destroy-attribute', CVTerms.removeTerm);
-    });
+    }
 
 </script>

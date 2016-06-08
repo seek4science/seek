@@ -22,6 +22,7 @@ class SampleExtractorTest < ActiveSupport::TestCase
   test 'extracted samples are not re-extracted when persisted' do
     @extractor.extract
 
+    # Delete data file so re-extracting would raise an error
     disable_authorization_checks { @data_file.content_blob.destroy }
     @data_file.reload
     assert_nil @data_file.content_blob

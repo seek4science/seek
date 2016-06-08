@@ -129,8 +129,10 @@ class ModelTest < ActiveSupport::TestCase
     assert !asset.valid?
 
     #VL only: allow no projects
-    asset=Model.new :title=>"fred", :policy => Factory(:private_policy)
-    assert asset.valid?
+    as_virtualliver do
+      asset=Model.new :title=>"fred", :policy => Factory(:private_policy)
+      assert asset.valid?
+    end
   end
 
   test "is asset?" do

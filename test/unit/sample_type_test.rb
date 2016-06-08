@@ -272,6 +272,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     template_blob = Factory(:sample_type_populated_template_content_blob)
     samples = sample_type.build_samples_from_template(template_blob)
     assert_equal 4, samples.count
+    samples.each { |sample| sample.projects = [Factory(:project)] }
 
     sample = samples.first
     assert sample.valid?
@@ -315,6 +316,21 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute_nil type.sample_attributes[2].sample_controlled_vocab
     assert type.sample_attributes[2].sample_attribute_type.is_controlled_vocab?
   end
+
+  test 'can edit' do
+    type = Factory(:simple_sample_type)
+    assert type.can_edit?
+    type = Factory(:patient_sample).sample_type
+    refute type.can_edit?
+  end
+
+  test 'can delete' do
+    type = Factory(:simple_sample_type)
+    assert type.can_delete?
+    type = Factory(:patient_sample).sample_type
+    refute type.can_delete?
+  end
+
 
   test 'dependant attributes destroyed' do
     type = Factory(:patient_sample_type)

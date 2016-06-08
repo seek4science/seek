@@ -34,12 +34,12 @@ module Seek
           subscriptions.delete_all
         else
           if workgroup_or_membership.is_a?(WorkGroup)
-            pid =workgroup_or_membership.project_id_was
+            pid = workgroup_or_membership.project_id_was
           else
-            pid = workgroup_or_membership.work_group.project_id_was
+            pid = workgroup_or_membership.work_group.try(:project_id_was)
           end
 
-          if (ps = project_subscriptions.find { |ps| ps.project_id == pid })
+          if pid && (ps = project_subscriptions.find { |ps| ps.project_id == pid })
             # unsunscribe direct project subscriptions
             project_subscriptions.delete ps
           end
