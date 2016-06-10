@@ -8,16 +8,12 @@ class UploadHandingTest < ActiveSupport::TestCase
   include Seek::UploadHandling::ExamineUrl
 
   test 'valid scheme?' do
-    assert_equal %w(http https ftp).sort, Seek::UploadHandling::ContentInspection::VALID_SCHEMES.sort
+    assert_equal %w(file).sort, Seek::UploadHandling::ContentInspection::INVALID_SCHEMES.sort
     assert valid_scheme?('http://bbc.co.uk')
     assert valid_scheme?('https://bbc.co.uk')
     assert valid_scheme?('ftp://bbc.co.uk')
-    refute valid_scheme?('ssh://bbc.co.uk')
-
-    # also without a normal url
-    refute valid_scheme?('bob')
-    refute valid_scheme?('')
-    refute valid_scheme?(nil)
+    assert valid_scheme?('ssh://bbc.co.uk')
+    refute valid_scheme?('file:///secret/documents.txt')
   end
 
   test 'content_blob_params' do
