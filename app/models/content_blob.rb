@@ -191,7 +191,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def is_downloadable?
-    !is_webpage? && !unhandled_url_scheme?
+    !show_as_external_link?
   end
 
   def unhandled_url_scheme?
