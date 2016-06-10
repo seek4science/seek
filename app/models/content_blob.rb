@@ -78,7 +78,7 @@ class ContentBlob < ActiveRecord::Base
     no_local_copy =  !file_exists?
     html_content =  is_webpage? || content_type == 'text/html'
     show_as_link = Seek::Config.show_as_external_link_enabled ? no_local_copy : html_content
-    !url.blank? && show_as_link
+    !url.blank? && (show_as_link || unhandled_url_scheme?)
   end
   # include all image types
 
@@ -159,15 +159,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def retrieve
-    case URI(self.url).scheme
-    when 'ftp'
-      handler = Seek::DownloadHandling::FTPHandler.new(self.url)
-    else
-        handler = Seek::DownloadHandling::HTTPHandler.new(self.url)
-    end
-
-    self.tmp_io_object = handler.fetch
-
+    self.tmp_io_object = remote_content_handler.fetch
     self.save
   end
 
@@ -196,6 +188,14 @@ class ContentBlob < ActiveRecord::Base
       url_search_terms = []
     end
     [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
+  end
+
+  def is_downloadable?
+    !show_as_external_link?
+  end
+
+  def unhandled_url_scheme?
+    !remote_content_handler
   end
 
   private
@@ -256,8 +256,19 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def create_retrieval_job
-    if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?)
+    if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
       RemoteContentFetchingJob.new(self).queue_job
+    end
+  end
+
+  def remote_content_handler
+    case URI(self.url).scheme
+      when 'ftp'
+        Seek::DownloadHandling::FTPHandler.new(self.url)
+      when 'http', 'https'
+        Seek::DownloadHandling::HTTPHandler.new(self.url)
+      else
+        nil
     end
   end
 end

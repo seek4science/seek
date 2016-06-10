@@ -6,7 +6,7 @@
        permissions = resource.authorization_permissions
     -%>
 
-    <% if resource.contains_downloadable_items? && can_download_asset?(resource, params[:code],permissions.can_download)-%>
+    <% if can_download_asset?(resource, params[:code],permissions.can_download)-%>
       <%= download_or_link_button resource, download_resource_path(resource, params[:code]), resource.single_content_blob.try(:url), nil, :class => 'btn btn-default btn-xs' %>
     <% end -%>
     <% if permissions.can_manage -%>

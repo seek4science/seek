@@ -28,6 +28,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     xml_http_request :get, :examine_url, :data_url=>"http://mockedlocation.com/a-piccy.png"
     assert_response :success
     assert !@response.body.include?("This is a webpage")
+    refute @response.body.include?('disallow_copy_option();')
     refute assigns(:error)
     refute assigns(:error_msg)
     refute assigns(:unauthorized)
@@ -40,6 +41,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     xml_http_request :get, :examine_url, :data_url=>"http://somewhere.com"
     assert_response :success
     assert @response.body.include?("This is a webpage")
+    assert @response.body.include?('disallow_copy_option();')
     refute assigns(:error)
     refute assigns(:error_msg)
     refute assigns(:unauthorized)
@@ -52,6 +54,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     xml_http_request :get, :examine_url, :data_url=>"http://unauth.com/file.pdf"
     assert_response :success
     assert @response.body.include?("Access to this link is unauthorized")
+    assert @response.body.include?('disallow_copy_option();')
     refute assigns(:error)
     refute assigns(:error_msg)
     assert assigns(:unauthorized)
@@ -63,6 +66,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     xml_http_request :get, :examine_url, :data_url=>"http://unauth.com/file.pdf"
     assert_response :success
     assert @response.body.include?("Access to this link is unauthorized")
+    assert @response.body.include?('disallow_copy_option();')
     refute assigns(:error)
     refute assigns(:error_msg)
     assert assigns(:unauthorized)
@@ -74,6 +78,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     xml_http_request :get, :examine_url, :data_url=>"http://missing.com"
     assert_response :success
     assert @response.body.include?("Nothing can be found at that URL")
+    assert @response.body.include?('disallow_copy_option();')
     assert assigns(:error)
     assert assigns(:error_msg)
     refute assigns(:unauthorized)
@@ -85,6 +90,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     xml_http_request :get, :examine_url, :data_url=>"http://nohost.com"
     assert_response :success
     assert @response.body.include?("Nothing can be found at that URL")
+    assert @response.body.include?('disallow_copy_option();')
     assert assigns(:error)
     assert assigns(:error_msg)
     refute assigns(:unauthorized)
@@ -95,9 +101,21 @@ class ContentBlobsControllerTest < ActionController::TestCase
     xml_http_request :get, :examine_url, :data_url=>"this is not a uri"
     assert_response :success
     assert @response.body.include?("The URL appears to be invalid")
+    assert @response.body.include?('disallow_copy_option();')
     assert assigns(:error)
     assert assigns(:error_msg)
     refute assigns(:unauthorized)
+  end
+
+  test "examine url unrecognized scheme" do
+    xml_http_request :get, :examine_url, :data_url=>"fish://tuna:1525125151"
+    assert_response :success
+    assert @response.body.include?("Unhandled URL scheme")
+    assert @response.body.include?('disallow_copy_option();')
+    assert assigns(:warning)
+    assert assigns(:warning_msg)
+    refute assigns(:error)
+    refute assigns(:error_msg)
   end
 
   test 'should find_and_auth_asset for download' do

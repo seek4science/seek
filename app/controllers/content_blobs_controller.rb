@@ -31,12 +31,12 @@ class ContentBlobsController < ApplicationController
     #check content type and size
     url = params[:data_url]
     begin
-      case URI(url).scheme
+      case scheme = URI(url).scheme
         when 'ftp'
           handler = Seek::DownloadHandling::FTPHandler.new(url)
           info = handler.info
           handle_good_ftp_response(url, info)
-        else
+        when 'http', 'https', nil
           handler = Seek::DownloadHandling::HTTPHandler.new(url)
           info = handler.info
           if info[:code] == 200
@@ -44,6 +44,9 @@ class ContentBlobsController < ApplicationController
           else
             handle_bad_http_response(info[:code])
           end
+        else
+          @warning = true
+          @warning_msg = "Unhandled URL scheme: #{scheme}. The given URL will be presented as a clickable link."
       end
     rescue Exception => e
       handle_exception_response(e)
