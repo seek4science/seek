@@ -7,6 +7,23 @@ layout: page
 
 Latest version - {{ site.current_seek_version }}
 
+## Version 1.1.0
+
+Release date: _June xxx 2016_
+
+  * New icons and front page changes - in particular
+      * New and improved SEEK logo - [http://goo.gl/NeALVA](http://goo.gl/NeALVA)
+      * New default avatars for Project and Institution
+      * New logos for Investigation, Study and Assays
+      * New logos badges for the different roles
+  * Support for Programmes to define funding codes
+  * Licensing of assets. Existing assets will default to 'No License'. For more information please visit [Licenses](/help/user-guide/licenses.html)
+  * Ability to publish and create Research Object snapshots for Studies and Assays, along with assigning a DOI. Previously only the larger Investigation package was supported
+  * Display storage usage information for Programmes and Projects, visible to administrators.
+
+A full list of changes included in this release can be found in the [SEEK v1.1.0 release notes](release-notes-1.1.0.html).
+
+
 ## Version 1.0.3
 
 Release date: _April 1st 2016_
