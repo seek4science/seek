@@ -3,12 +3,12 @@ module Seek
     module ContentInspection
       include Seek::MimeTypes
 
-      VALID_SCHEMES = %w(http https ftp)
+      INVALID_SCHEMES = %w(file)
 
       def valid_scheme?(url)
         uri = URI.encode((url || '').strip)
         scheme = URI.parse(uri).scheme
-        VALID_SCHEMES.include?(scheme)
+        !INVALID_SCHEMES.include?(scheme)
       end
 
       def check_url_response_code(url)

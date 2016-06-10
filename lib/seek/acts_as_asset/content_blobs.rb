@@ -4,7 +4,7 @@ module Seek
     module ContentBlobs
       module InstanceMethods
         def contains_downloadable_items?
-          !all_content_blobs.compact.select { |blob| !blob.is_webpage? }.empty?
+          all_content_blobs.compact.any? { |blob| blob.is_downloadable? }
         end
 
         def all_content_blobs
