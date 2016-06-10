@@ -57,6 +57,94 @@ task. Using seek:upgrade should still work, but could take a lot of
 unnecessary time. There is more details and an example towards the end of the
 this page.
 
+## Steps to upgrade from 1.0.x to 1.1.x
+
+
+### Set RAILS_ENV
+
+**If upgrading a production instance of SEEK, remember to set the RAILS_ENV first**
+
+    export RAILS_ENV=production
+
+### Stopping services before upgrading
+
+    bundle exec rake seek:workers:stop
+    bundle exec rake sunspot:solr:stop
+
+### Update Ruby with RVM
+
+Although not critical, we recommend updating Ruby to 2.1.8. If you are using
+RVM, as recommended in the installation, you can do this with:
+
+    rvm get stable
+    rvm upgrade 2.1.7 2.1.8
+
+The above upgrade command will copy across all previous gemsets (see:[https://rvm.io/rubies/upgrading](https://rvm.io/rubies/upgrading)).
+If you have gemsets for other applications and copying them all isn't desirable, then you may want to start afresh:
+
+    rvm install ruby-2.1.8
+
+### Make sure bundler is installed
+
+    gem install bundler
+
+### Updating from GitHub
+
+If you have an existing installation linked to our GitHub, you can fetch the
+files with:
+
+    git pull https://github.com/seek4science/seek.git
+    git checkout v1.1.0
+
+### Updating using the tarball
+
+Starting with version 0.22, we've started making SEEK available as a download.
+You can download the file from
+<https://bitbucket.org/seek4science/seek/downloads/seek-1.1.0.tar.gz> You can
+unpack this file using:
+
+    tar zxvf seek-1.1.0.tar.gz
+
+and then copy across your existing filestore and database configuration file
+from your previous installation and continue with the upgrade steps. The
+database configuration file you would need to copy is *config/database.yml*,
+and the filestore is simply *filestore/*
+
+### Doing the upgrade
+
+After updating the files, the following steps will update the database, gems,
+and other necessary changes. Note that seek:upgrade may take longer than usual if you have data stored that points to remote
+content.
+
+    cd .. && cd seek #this is to allow RVM to pick up the ruby and gemset changes
+    bundle install --deployment
+    bundle exec rake seek:upgrade
+    bundle exec rake assets:precompile # this task will take a while
+
+### Restarting services
+
+    bundle exec rake seek:workers:start
+    bundle exec rake sunspot:solr:start
+    touch tmp/restart.txt
+    bundle exec rake tmp:clear
+
+## Extra steps for a production server
+
+If the upgrade has involved an upgrade of Ruby, and you are running a production service with Apache and Passenger Phusion, you will need
+ to update the Apache config. You will need to point to the correct ruby wrapper script according to your version. The full path may differ, but for example
+
+    PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.7/wrappers/ruby
+
+would need changing to
+
+    PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.8/wrappers/ruby
+
+after upgrading from ruby 2.1.7 to ruby 2.1.8
+
+If you have problems, you may need to upgrade and reinstall the Passenger Phusion modules (if unsure there no harm in doing so).
+
+Please read [Installing SEEK in a production environment](install-production.html) for more details about setting up Apache and installing the module.
+
 
 ## Steps to upgrade from 0.23.x to 1.0.x
 

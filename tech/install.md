@@ -125,11 +125,6 @@ First install bundler, which is used to manage gem versions
 
     gem install bundler
 
-Before installing the gems the following is needed, otherwise an error may
-occur whilst trying to install this gem:
-
-    bundle config build.nokogiri --use-system-libraries
-
 Next install the ruby gems SEEK needs:
 
     bundle install
