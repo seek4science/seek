@@ -14,6 +14,16 @@ For some other common distributions, we describe here the required
 distribution packages, and any other differences we are aware of from our
 general install guide.
 
+## Ubuntu 16.04
+
+SEEK has had some short testing and fixes for running on the latest LTS release of Ubuntu - 16.04. We are not yet using
+this version on any of our servers, but we don't anticipate any problems.
+
+One change you may need from the current installation guide, is that the package openjdk-7-jdk is unavailable. You can simply
+replace this with openjdk-8-jdk:
+
+    sudo apt-get install openjdk-8-jdk
+
 ## Linux Mint 16
 
 There shoudn't be any problems once SEEK is installed and

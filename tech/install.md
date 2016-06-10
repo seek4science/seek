@@ -25,7 +25,7 @@ describing Ruby on Rails can be found at http://rubyonrails.org/documentation
 SEEK is based on the 3.2 version of Rails, and requires Ruby 2.1.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
-Ubuntu (14.04 LTS) system. However, running on other Linux distributions the
+[Ubuntu (14.04 LTS)](http://releases.ubuntu.com/14.04/) system. However, running on other Linux distributions the
 main difference is the name of the required packages that have to be installed
 for that distribution, other than that the steps will be the same. If you want
 to install on different distribution or version please visit [Other
