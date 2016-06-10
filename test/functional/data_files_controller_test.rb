@@ -587,7 +587,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal "text/html", assigns(:data_file).content_blob.content_type
   end
 
-  test "should show wepage as a link" do
+  test "should show webpage as a link" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
 
     df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
@@ -597,6 +597,8 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show,:id=>df
     assert_response :success
 
+    assert_select "#buttons a.btn[href=?]","http://webpage.com",:text=>'External Link'
+
     assert_select "div.box_about_actor" do
       assert_select "p > b",:text=>/Link:/
       assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com"
@@ -604,6 +606,25 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select "p > b",:text=>/Size:/,:count=>0
     end
   end
+
+  test "should show URL with unrecognized scheme as a link" do
+    df = Factory :data_file,:content_blob=>Factory(:content_blob, :url=>"spotify:track:3vX71b5ey9twzyCqJwBEvY")
+
+    assert df.content_blob.show_as_external_link?
+    login_as(df.contributor.user)
+    get :show,:id=>df
+    assert_response :success
+
+    assert_select "#buttons a.btn[href=?]","spotify:track:3vX71b5ey9twzyCqJwBEvY",:text=>'External Link'
+
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Link:/
+      assert_select "a[href=?][target=_blank]","spotify:track:3vX71b5ey9twzyCqJwBEvY",:text=>"spotify:track:3vX71b5ey9twzyCqJwBEvY"
+      assert_select "p > b",:text=>/Format:/,:count=>0
+      assert_select "p > b",:text=>/Size:/,:count=>0
+    end
+  end
+
 
   test "should not show website link for viewable but inaccessible data but should show request button" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
