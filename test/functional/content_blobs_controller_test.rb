@@ -41,7 +41,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     xml_http_request :get, :examine_url, :data_url=>"http://somewhere.com"
     assert_response :success
     assert @response.body.include?("This is a webpage")
-    refute @response.body.include?('disallow_copy_option();')
+    assert @response.body.include?('disallow_copy_option();')
     refute assigns(:error)
     refute assigns(:error_msg)
     refute assigns(:unauthorized)
@@ -110,7 +110,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test "examine url unrecognized scheme" do
     xml_http_request :get, :examine_url, :data_url=>"fish://tuna:1525125151"
     assert_response :success
-    puts @response.body
     assert @response.body.include?("Unhandled URL scheme")
     assert @response.body.include?('disallow_copy_option();')
     assert assigns(:warning)
