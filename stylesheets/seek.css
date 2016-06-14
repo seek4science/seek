@@ -84,3 +84,12 @@ input.gsc-input,
 .gsc-option-menu-item:hover {
     background-color: #d4e8ff;
 }
+
+img.screenshot {
+    border: 1px solid #bbb;
+    padding: 1em;
+    max-width: 40em;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
