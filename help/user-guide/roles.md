@@ -18,7 +18,8 @@ Project specific roles:
 * [Project administrator](#project-administrator)
 
 Here is a summary of the capabilities of each role.
-![Roles 1](/images/user-guide/roles_1.png)
+
+![Roles 1](/images/user-guide/roles_1.png){:.screenshot}
 
 ## Programme administrator
 

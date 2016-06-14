@@ -37,11 +37,11 @@ Intracellular metabolomics of s. solfataricus at 70 and 80c (Metabolomics)
 
 In SEEK, the ISA structure is displayed graphically, so you can see at a glance what items are associated with one another
 
-![](/images/ISAUpperLevel.png)
+![](/images/ISAUpperLevel.png){:.screenshot}
 
 The figure above shows the Investigation &quot;Central Carbon Metabolism of Sulfolobus solfataricus&quot;  has one study, which in turn contains two different assays. If we zoom in on one particular assay, the &quot;Model Validation Gluconeogenesis in S. solfataricus&quot;, we can see the SEEK downloadable assets it is associated with.
 
-![](/images/ISADataModel.png)
+![](/images/ISADataModel.png){:.screenshot}
 
 In this case, the Assay is not a laboratory experiment, but a modelling task. This is key point to note when using ISA, the assays refer, in essence, to experiments, which means they can be laboratory analysis, modelling analysis, data analysis and more. In this example the assay has data files, a model, and a publication associated with it.
 It is possible to associate data files, models, and other SEEK assets with more than one assay if necessary.

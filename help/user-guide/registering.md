@@ -6,7 +6,7 @@ layout: page
 # Registering in SEEK
 In order to register yourself in SEEK, you need to click Register button in the top right hand corner of SEEK.
 
-![Registration 1](/images/user-guide/register_1.png)
+![Registration 1](/images/user-guide/register_1.png){:.screenshot}
 
 It will take you to a screen where you need provide
 
@@ -15,7 +15,7 @@ It will take you to a screen where you need provide
 * A password for your account
 When complete click the Register button in the bottom left hand corner.
 
-![Registration 2](/images/user-guide/register_2.png)
+![Registration 2](/images/user-guide/register_2.png){:.screenshot}
 
 You will then be taken to a screen where you will enter further information. We require the following information:
 
@@ -27,8 +27,8 @@ You will then be taken to a screen where you will enter further information. We 
 If your project is already in SEEK please select it from the dropdown menu.
 If your institute is already in SEEK please select it from the dropdown menu.
 
-![Registration 3](/images/user-guide/register_3.png)
+![Registration 3](/images/user-guide/register_3.png){:.screenshot}
 
 After you have registered the rest of your information you will need to activate your account. You will receive an email in the email account you have provided.
 
-![Registration 4](/images/user-guide/register_4.png)
+![Registration 4](/images/user-guide/register_4.png){:.screenshot}
