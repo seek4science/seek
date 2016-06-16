@@ -5,10 +5,17 @@ layout: page
 
 # Licenses
 
+
 We recommended giving a license to public resources in SEEK to clarify under what terms they may be used.
 
 The following licenses, provided by the [Open Definition Licenses Service](http://licenses.opendefinition.org/),
 are currently supported.
+
+This short video gives a good introduction of the benefits of licensing your data:
+
+<center>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Tvwp5LK_Wko" frameborder="0" allowfullscreen></iframe>
+</center>
 
 ## Recommended
 
