@@ -9,20 +9,38 @@ module Seek
         Programme => [Project]
     }
 
-    def initialize(object)
+    def initialize(object, deep = false)
       @object = object
+      @deep = deep
     end
 
     def generate
-      gather(@object)
+      hash = gather_children(@object)
+      parent_hash = immediate_parents(@object)
+
+      hash[:nodes] += parent_hash[:nodes]
+      hash[:edges] += parent_hash[:edges]
+
+      hash
     end
 
-    def gather(object, parent = nil)
+    def immediate_parents(object)
+      hash = { nodes: [], edges: [] }
+
+      parents(object).each do |parent|
+        hash[:nodes] << parent
+        hash[:edges] << [parent, object]
+      end
+
+      hash
+    end
+
+    def gather_children(object, parent = nil)
       nodes = [object]
       edges = parent ? [[parent, object]] : []
 
       children(object).each do |child|
-        hash = gather(child, object)
+        hash = gather_children(child, object)
         nodes += hash[:nodes]
         edges += hash[:edges]
       end
@@ -39,15 +57,14 @@ module Seek
     end
 
     def parents(object)
-      result = HIERARCHY.find {|k, v| v.include?(object) }
+      result = HIERARCHY.find {|k, v| v.include?(object.class) }
       if result
-        result[0].map do |c|
-          if object.respond_to?(c.name.snakecase.pluralize.to_sym)
-            object.send(c.name.snakecase.pluralize.to_sym)
-          else
-            [object.send(c.name.snakecase.to_sym)]
-          end
-        end.flatten
+        parent_class = result[0]
+        if object.respond_to?(parent_class.name.snakecase.pluralize.to_sym)
+          object.send(parent_class.name.snakecase.pluralize.to_sym)
+        else
+          [object.send(parent_class.name.snakecase.to_sym)]
+        end
       else
         []
       end
