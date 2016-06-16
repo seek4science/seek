@@ -19,6 +19,7 @@ config/sunspot.yml
 log/*.log*
 
 filestore*/
+filestore
 
 debug.log
 .project
