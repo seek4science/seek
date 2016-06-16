@@ -46,7 +46,7 @@ module ISAHelper
     nodes = elements.select{|e| e[:group] == 'nodes'}
     edges = elements.select{|e| e[:group] == 'edges'}
     if nodes.size > max_node_number
-      current_element_id = current_element.class.name + '_' + current_element.id.to_s
+      current_element_id = node_id(current_element)
       current_node = elements.select{|e| e[:group] == 'nodes' && e[:data][:id] == current_element_id }.first
 
       connected_edges = edges.select{|e| e[:data][:source] == current_element_id || e[:data][:target] == current_element_id}
@@ -108,7 +108,7 @@ module ISAHelper
     nodes.each do |node|
       item = node
       item_type = node.class.name
-      node_id = "#{node.class.name}-#{node.id}"
+      n_id = node_id(node)
 
       if item.can_view?
         description = item.respond_to?(:description) ? item.description : ''
@@ -134,7 +134,7 @@ module ISAHelper
         fave_color = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
         border_color = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
-      cytoscape_node_elements << node_element(node_id, name, item_info, fave_color, border_color)
+      cytoscape_node_elements << node_element(n_id, name, item_info, fave_color, border_color)
     end
     cytoscape_node_elements
   end
@@ -143,12 +143,12 @@ module ISAHelper
     cytoscape_edge_elements = []
     edges.each do |edge|
       source_item, target_item = edge
-      source = "#{source_item.class.name}-#{source_item.id}"
-      target = "#{target_item.class.name}-#{target_item.id}"
+      source = node_id(source_item)
+      target = node_id(target_item)
       target_type = target_item.class.name
-      edge_id = "#{source}-#{target}"
-
+      e_id = edge_id(source_item, target_item)
       name = edge_label(source_item, target_item)
+
       if target_item.can_view?
         if target_item.kind_of?(Assay)
           fave_color = BORDER_COLOURS[target_type][target_item.assay_class.key] || BORDER_COLOURS.default
@@ -158,7 +158,7 @@ module ISAHelper
       else
         fave_color = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
-      cytoscape_edge_elements << edge_element(edge_id, name, source, target, fave_color)
+      cytoscape_edge_elements << edge_element(e_id, name, source, target, fave_color)
     end
     cytoscape_edge_elements
   end
@@ -198,4 +198,15 @@ module ISAHelper
     end
     label_data.join(', ')
   end
+
+  private
+
+  def node_id(object)
+    "#{object.class.name}-#{object.id}"
+  end
+
+  def edge_id(source, target)
+    "#{node_id(source)}-#{node_id(target)}"
+  end
+
 end
