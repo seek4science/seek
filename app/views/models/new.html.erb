@@ -46,3 +46,13 @@
       </div>
     </div>
 <% end -%>
+
+<%# handle the data_url being passed from another form, such as importing a biomodels result %>
+<% if params['model'] && !params['model']['data_url'].blank? %>
+<script>
+  $j('#data_url_field').val('<%= params['model']['data_url'] %>');
+  submit_url_for_examination();
+  $j('#make_local_copy').prop('checked',true);
+  addRemoteFile();
+</script>
+<% end %>
