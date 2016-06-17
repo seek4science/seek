@@ -5,10 +5,10 @@
                            'Pubmed API email', 'When adding a publication from PubMed, an email address is required to use the API. No registration is required.') %>
 
     <%= admin_text_setting(:crossref_api_email, Seek::Config.crossref_api_email,
-                           'CrossRef API email', "When adding a publication from a DOI, an email address is required to use the API. The email address needs registering at #{link_to 'http://www.crossref.org/', 'http://www.crossref.org/'}") %>
+                           'CrossRef API email', "When adding a publication from a DOI, an email address is required to use the API. The email address needs registering at #{link_to 'http://www.crossref.org/', 'http://www.crossref.org/',:target=>:_blank}") %>
 
     <%= admin_text_setting(:bioportal_api_key, Seek::Config.bioportal_api_key,
-                           'BioPortal API key', 'Required to interact with BioPortal - for example when creating new Organisms through the NCBI Taxonomy. Please register with http://bioportal.bioontology.org to get an API key.') %>
+                           'BioPortal API key', "Required to interact with BioPortal - for example when creating new Organisms through the NCBI Taxonomy. Please register with #{link_to 'http://bioportal.bioontology.org','http://bioportal.bioontology.org',:target=>:_blank} to get an API key.") %>
 
     <%= admin_text_setting(:site_base_host, Seek::Config.site_base_host,
                            'Site base URL', 'This base URL for this SEEK installation. This is required cases where the host cannot be determined from the request - particularly within the REST API and Subscription email notifications.') %>
@@ -49,7 +49,7 @@
     <div id="captcha_key_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.recaptcha_enabled) %>">
       <p>
         You can request a private and public key for Recaptcha by visiting
-        <%= link_to("https://www.google.com/recaptcha/admin","https://www.google.com/recaptcha/admin",:target=>"_blank")%> (a Google account is required).
+        <%= link_to("https://www.google.com/recaptcha/admin","https://www.google.com/recaptcha/admin",:target=>:_blank)%> (a Google account is required).
       </p>
 
       <%= admin_text_setting(:recaptcha_public_key, Seek::Config.recaptcha_public_key,
