@@ -41,9 +41,9 @@ module SearchHelper
     [internal_resource_hash, external_resource_hash]
   end
 
-  #can only be supported if turned on and pubmed api email is configured
+  #can only be supported if turned on and crossref api email is configured
   def external_search_supported?
-    Seek::Config.external_search_enabled && !Seek::Config.pubmed_api_email.blank?
+    Seek::Config.external_search_enabled && !Seek::Config.crossref_api_email.blank?
   end
 
 end
