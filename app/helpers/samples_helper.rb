@@ -2,22 +2,23 @@ module SamplesHelper
   def sample_form_field_for_attribute(attribute)
     base_type = attribute.sample_attribute_type.base_type
     clz = "sample_attribute_#{base_type.downcase}"
+    attribute_method_name = attribute.method_name
     case base_type
       when 'Text'
-        text_area :sample, attribute.method_name, class: "form-control #{clz}"
+        text_area :sample, attribute_method_name, class: "form-control #{clz}"
       when 'DateTime'
-        calendar_date_select :sample, attribute.method_name, time: :mixed, class: "form-control  #{clz}"
+        calendar_date_select :sample, attribute_method_name, time: :mixed, class: "form-control  #{clz}"
       when 'Date'
-        calendar_date_select :sample, attribute.method_name, time: false, class: "form-control  #{clz}"
+        calendar_date_select :sample, attribute_method_name, time: false, class: "form-control  #{clz}"
       when 'Boolean'
-        check_box :sample, attribute.method_name, class: "#{clz}"
+        check_box :sample, attribute_method_name, class: "#{clz}"
       when 'SeekStrain'
-        grouped_collection_select :sample, attribute.method_name, Organism.all, :strains, :title, :id, :title, class: "#{clz}"
+        grouped_collection_select :sample, attribute_method_name, Organism.all, :strains, :title, :id, :title, class: "#{clz}"
       when 'CV'
         terms = attribute.sample_controlled_vocab.sample_controlled_vocab_terms
-        collection_select :sample, attribute.method_name, terms, :label, :label, include_blank: !attribute.required?,  class: "form-control #{clz}"
+        collection_select :sample, attribute_method_name, terms, :label, :label, include_blank: !attribute.required?,  class: "form-control #{clz}"
       else
-        text_field :sample, attribute.method_name, class: "form-control #{clz}"
+        text_field :sample, attribute_method_name, class: "form-control #{clz}"
     end
   end
 
@@ -35,8 +36,8 @@ module SamplesHelper
 
   def display_attribute(sample, attribute, options = {})
     value = sample.get_attribute(attribute.hash_key)
-    if value.nil?
-      content_tag(:span, 'Not specified', class: 'none_text')
+    unless value
+      text_or_not_specified(value)
     else
       case attribute.sample_attribute_type.base_type
         when 'Date'
@@ -44,18 +45,26 @@ module SamplesHelper
         when 'DateTime'
           DateTime.parse(value).strftime('%e %B %Y %H:%M:%S')
         when 'SeekStrain'
-          if value['title']
-            link_to(value['title'], strain_path(value['id']))
-          else
-            content_tag(:span, value['id'], class: 'none_text')
-          end
+          seek_strain_attribute_display(value)
         else
-          if options[:link] && attribute.is_title
-            link_to(value, sample)
-          else
-            text_or_not_specified(value, auto_link: options[:link])
-          end
+          default_attribute_display(attribute, options, sample, value)
       end
+    end
+  end
+
+  def default_attribute_display(attribute, options, sample, value)
+    if options[:link] && attribute.is_title
+      link_to(value, sample)
+    else
+      text_or_not_specified(value, auto_link: options[:link])
+    end
+  end
+
+  def seek_strain_attribute_display(value)
+    if value['title']
+      link_to(value['title'], strain_path(value['id']))
+    else
+      content_tag(:span, value['id'], class: 'none_text')
     end
   end
 end
