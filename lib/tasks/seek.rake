@@ -259,8 +259,14 @@ namespace :seek do
     puts "New unit is added"
   end
 
+  desc('clears temporary files from filestore/tmp')
   task(:clear_filestore_tmp => :environment) do
     FileUtils.rm_r(Dir["#{Seek::Config.temporary_filestore_path}/*"])
+  end
+
+  desc('clears converted formats for assets, such as pdf and text for browser viewing and search indexing respectively. If cleared these will be regenerated when needed')
+  task(:clear_converted_assets => :environment) do
+    FileUtils.rm_r(Dir["#{Seek::Config.converted_filestore_path}/*"])
   end
 
   

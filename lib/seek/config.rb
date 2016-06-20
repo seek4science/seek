@@ -170,7 +170,7 @@ module Seek
     end
 
     def converted_filestore_path
-      File.join(temporary_filestore_path, 'converted')
+      append_filestore_path 'converted-assets'
     end
 
     def asset_filestore_path
