@@ -294,7 +294,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     storage_directory = content_blob.data_storage_directory
     converted_storage_directory = content_blob.converted_storage_directory
     assert_equal  "#{Rails.root}/tmp/testing-filestore/assets", storage_directory
-    assert_equal  "#{Rails.root}/tmp/testing-filestore/tmp/converted", converted_storage_directory
+    assert_equal  "#{Rails.root}/tmp/testing-filestore/converted-assets", converted_storage_directory
     assert_equal (storage_directory + '/' + content_blob.uuid + '.dat'), content_blob.filepath
     assert_equal (converted_storage_directory + '/' + content_blob.uuid + '.pdf'), content_blob.filepath('pdf')
     assert_equal (converted_storage_directory + '/' + content_blob.uuid + '.txt'), content_blob.filepath('txt')
@@ -480,7 +480,8 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert File.exists? content_blob.filepath('txt')
 
     content = File.open(content_blob.filepath('txt'), 'rb').read
-    assert content.include?('This is a rtf format')
+
+    assert content.mb_chars.normalize.include?('This is a rtf format')
   end
 
   test 'convert_office should convert txt to pdf' do
