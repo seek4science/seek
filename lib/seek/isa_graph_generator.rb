@@ -1,27 +1,32 @@
 module Seek
   class IsaGraphGenerator
 
-    HIERARCHY = {
-        Assay => [DataFile, Model, Sop, Publication, Sample],
-        Study => [Assay],
-        Investigation => [Study],
-        Project => [Investigation],
-        Programme => [Project]
-    }
-
     def initialize(object, deep = false)
       @object = object
       @deep = deep
     end
 
     def generate
-      hash = gather_children(@object)
-      parent_hash = immediate_parents(@object)
+      hash = { nodes: [], edges: [] }
 
-      hash[:nodes] += parent_hash[:nodes]
-      hash[:edges] += parent_hash[:edges]
+      # Parents and siblings...
+      parents(@object).each do |parent|
+        sibling_hash = @deep ? all_descendants(parent) : immediate_descendants(parent)
+        merge_hashes(hash, sibling_hash)
+      end
+
+      # Self and descendants...
+      descendant_hash = @deep ? all_descendants(@object) : immediate_descendants(@object)
+      merge_hashes(hash, descendant_hash)
 
       hash
+    end
+
+    private
+
+    def merge_hashes(hash1, hash2)
+      hash1[:nodes] = (hash1[:nodes] + hash2[:nodes]).uniq
+      hash1[:edges] = (hash1[:edges] + hash2[:edges]).uniq
     end
 
     def immediate_parents(object)
@@ -35,12 +40,23 @@ module Seek
       hash
     end
 
-    def gather_children(object, parent = nil)
+    def immediate_descendants(object)
+      hash = { nodes: [object], edges: [] }
+
+      children(object).each do |child|
+        hash[:nodes] << child
+        hash[:edges] << [object, child]
+      end
+
+      hash
+    end
+
+    def all_descendants(object, parent = nil)
       nodes = [object]
       edges = parent ? [[parent, object]] : []
 
       children(object).each do |child|
-        hash = gather_children(child, object)
+        hash = all_descendants(child, object)
         nodes += hash[:nodes]
         edges += hash[:edges]
       end
@@ -48,26 +64,50 @@ module Seek
       { nodes: nodes, edges: edges }
     end
 
-    private
-
     def children(object)
-      (HIERARCHY[object.class] || []).map do |c|
-        object.send(c.name.snakecase.pluralize.to_sym)
-      end.flatten
+      associations = associations(object)
+      associations[:children] + associations[:related]
     end
 
     def parents(object)
-      result = HIERARCHY.find {|k, v| v.include?(object.class) }
-      if result
-        parent_class = result[0]
-        if object.respond_to?(parent_class.name.snakecase.pluralize.to_sym)
-          object.send(parent_class.name.snakecase.pluralize.to_sym)
-        else
-          [object.send(parent_class.name.snakecase.to_sym)]
-        end
-      else
-        []
-      end
+      associations(object)[:parents]
+    end
+
+    def associations(object)
+      case object
+        when Project
+          {
+              children: object.investigations,
+              parents: [object.programme]
+          }
+        when Investigation
+          {
+              children: object.studies,
+              parents: object.projects,
+              related: object.publications
+          }
+        when Study
+          {
+              children: object.assays,
+              parents: [object.investigation],
+              related: object.publications
+          }
+        when Assay
+          {
+              children: object.assets,
+              parents: [object.study],
+              related: object.publications
+          }
+        when Publication
+          {
+              parents: object.assays | object.studies | object.investigations | object.data_files | object.models
+          }
+        when DataFile, Model, Sop, Sample, Presentation
+          {
+              parents: object.assays,
+              related: object.publications
+          }
+      end.reverse_merge!(parents: [], children: [], related: [])
     end
 
   end
