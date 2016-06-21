@@ -18,5 +18,5 @@ a.graph_toggle {
 }
 
 #cy {
-    height: 600px !important;
+    max-height: 600px !important;
 }
