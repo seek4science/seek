@@ -1,23 +1,24 @@
 module Seek
   class IsaGraphGenerator
 
-    def initialize(object, deep = false)
+    def initialize(object)
       @object = object
-      @deep = deep
     end
 
-    def generate
+    def generate(depth: 1, deep: false, include_parents: false)
       hash = { nodes: [], edges: [] }
 
+      depth = deep ? nil : depth
+
       # Parents and siblings...
-      parents(@object).each do |parent|
-        sibling_hash = @deep ? all_descendants(parent) : immediate_descendants(parent)
-        merge_hashes(hash, sibling_hash)
+      if include_parents
+        parents(@object).each do |parent|
+          merge_hashes(hash, descendants(parent, depth))
+        end
       end
 
       # Self and descendants...
-      descendant_hash = @deep ? all_descendants(@object) : immediate_descendants(@object)
-      merge_hashes(hash, descendant_hash)
+      merge_hashes(hash, descendants(@object, depth))
 
       hash
     end
@@ -29,36 +30,25 @@ module Seek
       hash1[:edges] = (hash1[:edges] + hash2[:edges]).uniq
     end
 
-    def immediate_parents(object)
-      hash = { nodes: [], edges: [] }
-
-      parents(object).each do |parent|
-        hash[:nodes] << parent
-        hash[:edges] << [parent, object]
-      end
-
-      hash
+    def descendants(object, max_depth = nil, depth = 0)
+      traverse(:children, object, max_depth, depth)
     end
 
-    def immediate_descendants(object)
-      hash = { nodes: [object], edges: [] }
-
-      children(object).each do |child|
-        hash[:nodes] << child
-        hash[:edges] << [object, child]
-      end
-
-      hash
+    def ancestors(object, max_depth = nil, depth = 0)
+      traverse(:parents, object, max_depth, depth)
     end
 
-    def all_descendants(object, parent = nil)
+    def traverse(method, object, max_depth = nil, depth = 0)
       nodes = [object]
-      edges = parent ? [[parent, object]] : []
+      edges = []
 
-      children(object).each do |child|
-        hash = all_descendants(child, object)
-        nodes += hash[:nodes]
-        edges += hash[:edges]
+      if max_depth.nil? || (depth < max_depth)
+        send(method, object).each do |child|
+          hash = traverse(method, child, max_depth, depth + 1)
+          nodes += hash[:nodes]
+          edges += hash[:edges]
+          edges << [object, child]
+        end
       end
 
       { nodes: nodes, edges: edges }
