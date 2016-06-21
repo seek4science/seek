@@ -29,9 +29,8 @@ module TagsHelper
     link = show_ann_path(tag)
 
     text = tag.text
-
-    link_to truncate(text,:length=>length), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],
-            'data-tooltip' => tooltip(text)
+    tooltip = text.length>length ? text : nil
+    link_to truncate(text,:length=>length), link, :class=>options[:class],:id=>options[:id],:style=>options[:style],'data-tooltip' => tooltip
   end
 
   def list_item_tags_list tags,options={}
