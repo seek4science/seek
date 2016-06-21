@@ -40,7 +40,7 @@ div#remove_from_assay_drop_area p {
     font-weight: bolder;
 }
 
-.ygtvcontent.ygtvfocus < a {
+.ygtvcontent.ygtvfocus > a {
     background-color: green;
 }
 
