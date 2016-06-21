@@ -1,9 +1,7 @@
 <%= stylesheet_link_tag 'cytoscape_isa_graph' %>
 <%= javascript_include_tag 'cytoscape_isa_graph' %>
 
-
 <%
-   current_item ||= nil
    max_node_number ||= 10
    force_max_node ||= true
    cytoscape_elements = cytoscape_elements(root_item, deep)
@@ -33,11 +31,8 @@
       <% end %>
 
       <div class="row">
-        <div class="alert alert-info" role="alert" id="node_info">
-
-          </div>
-
-      <div id="cy"></div>
+        <div class="alert alert-info" role="alert" id="node_info"></div>
+        <div id="cy"></div>
       </div>
     </div>
 
@@ -49,7 +44,7 @@
     var isa_graph = $j('.isa_graph')[0];
     var elements = <%= cytoscape_elements.to_json.html_safe %>;
     var reduced_elements = <%= reduced_elements.to_json.html_safe %>;
-    var current_element_id = '<%= controller_name.singularize.camelize %>' + '_' + '<%= params[:id] %>';
+    var current_element_id = '<%= node_id(root_item) -%>';
 
     if (elements.error === 'error') {
         isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
@@ -66,13 +61,6 @@
 
         //this is to overcome a z-index problem that prevents the bootstrap menu working ontop of the isa-graph.
         //it forces a generated div, which is created with z-index:1000, to have a lower z-index.
-        $j('div#cy > div').css('z-index','0');
 
     }
 </script>
-
-<style>
-  div#cy div {
-      z-index:0;
-  }
-</style>

@@ -11,11 +11,15 @@ var $j = jQuery;
 function drawGraph(elements, current_element_id){
     cy=cytoscape({
         container: document.getElementById('cy'),
-        showOverlay: false,
+
+        userZoomingEnabled: false,
+        panningEnabled: true,
+        userPanningEnabled: true,
 
         layout: {
             name: 'breadthfirst',
-            directed: true
+            directed: true,
+            spacingFactor: 1.5
         },
 
         style: cytoscape.stylesheet()
@@ -84,12 +88,16 @@ function drawGraph(elements, current_element_id){
 
                 //disableMouseWheel();
                 resizeGraph();
-                //need put zoom after resizeGraph, otherwise fit() does not work
-                cy.zoomingEnabled(false);
             }else{
                 $j('.isa_graph')[0].hide();
             }
         }
+    });
+    cy.panzoom({
+        panSpeed: 1,
+        zoomInIcon: 'glyphicon glyphicon-plus',
+        zoomOutIcon: 'glyphicon glyphicon-minus',
+        resetIcon: 'glyphicon glyphicon-resize-full'
     });
 }
 
@@ -178,30 +186,6 @@ function connectedNodes(node){
         }
     });
     return connected_nodes;
-}
-
-function processPanzoom() {
-    //display panzoom
-    $j('#cy').cytoscapePanzoom({
-        panSpeed: 1
-    });
-
-    //set again the graph height if panzoom height is bigger
-    var panzoom_height = 220;
-    var graph_height = cy.container().style.height.split('px')[0];
-    cy.container().style.height = Math.max(graph_height, panzoom_height) +'px';
-
-    alignCenterVertical($j('.ui-cytoscape-panzoom')[0], panzoom_height);
-
-
-    //reset on panzoom also reset all nodes and edges css
-    $j('.ui-cytoscape-panzoom-reset').click(function () {
-        var nodes = cy.$('node');
-        normalizingNodes(nodes);
-        appearingNodes(nodes);
-        appearingEdges(cy.$('edge'));
-        Effect.Fade('node_info', { duration: 0.25 });
-    });
 }
 
 function alignCenterVertical(element, element_height){
@@ -333,18 +317,6 @@ function clickLabelLink(node, mouse_event){
             var link = document.createElement('a');
             link.href = node.data().item_info.split('"')[1];
             clickLink(link);
-        }
-    }
-}
-
-function disableMouseWheel(){
-    var canvas_render = cy.renderer();
-    var bindings = canvas_render.bindings;
-    for( var i=0; i<bindings.length; i++){
-        binding = bindings[i];
-        var event = binding.event;
-        if (event.match(/wheel/i) !== null || event.match(/scroll/i) !==null){
-            binding.target.removeEventListener(event, binding.handler, binding.useCapture);
         }
     }
 }

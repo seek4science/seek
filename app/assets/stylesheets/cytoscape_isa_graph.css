@@ -1,6 +1,4 @@
 /* ...
-*= require cytoscape.js-2.0.3/jquery.cytoscape-panzoom
-*= require font_awesome/css/font-awesome
-*= require font_awesome/css/font-awesome-ie7
+*= require cytoscape.js-panzoom-2.4.0/cytoscape.js-panzoom
 *= require isa_graph
 */
