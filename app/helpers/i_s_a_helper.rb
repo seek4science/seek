@@ -2,8 +2,6 @@ require 'tempfile'
 
 module ISAHelper
 
-  include Seek::DotGenerator
-
   FILL_COLOURS = {'Sop'=>"#7ac5cd", #cadetblue3
                   'Model'=>"#cdcd00", #yellow3
                   'DataFile'=>"#eec591", #burlywood2
