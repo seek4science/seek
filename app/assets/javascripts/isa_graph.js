@@ -19,7 +19,8 @@ function drawGraph(elements, current_element_id){
         layout: {
             name: 'breadthfirst',
             directed: true,
-            spacingFactor: 1.5
+            spacingFactor: 1.25,
+            padding: 50
         },
 
         style: cytoscape.stylesheet()
@@ -69,8 +70,6 @@ function drawGraph(elements, current_element_id){
 
             //process only when having nodes
             if (nodes.length > 0){
-                //processPanzoom();
-
                 nodes.on('click', function(e){
                     var node = e.cyTarget;
                     if(node.selected() === true){
@@ -85,9 +84,6 @@ function drawGraph(elements, current_element_id){
                 var current_node = cy.nodes('[id=\''+ current_element_id +'\']')[0];
                 animateNode(current_node);
                 displayNodeInfo(current_node);
-
-                //disableMouseWheel();
-                resizeGraph();
             }else{
                 $j('.isa_graph')[0].hide();
             }
@@ -227,14 +223,6 @@ function normalizingNodes(nodes){
         });
         node.unselect();
 
-    }
-}
-
-function resizeGraph(){
-    cy.fit(50);
-    if (cy.zoom() > 1){
-        cy.reset();
-        cy.center();
     }
 }
 
