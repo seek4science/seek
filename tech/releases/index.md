@@ -7,9 +7,15 @@ layout: page
 
 Latest version - {{ site.current_seek_version }}
 
+## Version 1.1.1
+
+Release date: _June 21st 2016_
+
+Small fixes and minor improvements - for full details see [SEEK v1.1.1 release notes](release-notes-1.1.1.html)
+
 ## Version 1.1.0
 
-Release date: _June xxx 2016_
+Release date: _June 15th 2016_
 
   * New icons and front page changes - in particular
       * New and improved SEEK logo - [http://goo.gl/NeALVA](http://goo.gl/NeALVA)
