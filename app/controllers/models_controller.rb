@@ -5,7 +5,6 @@ class ModelsController < ApplicationController
 
   include WhiteListHelper
   include Seek::IndexPager
-  include Seek::DotGenerator
   include Seek::AssetsCommon
 
   before_filter :models_enabled?

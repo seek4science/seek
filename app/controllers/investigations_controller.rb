@@ -1,6 +1,5 @@
 class InvestigationsController < ApplicationController
 
-  include Seek::DotGenerator
   include Seek::IndexPager
   include Seek::DestroyHandling
   include Seek::AssetsCommon

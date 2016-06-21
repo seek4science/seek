@@ -2,7 +2,6 @@
 class PublicationsController < ApplicationController
   
   include Seek::IndexPager
-  include Seek::DotGenerator
   include Seek::AssetsCommon
   include Seek::BioExtension
   include Seek::PreviewHandling

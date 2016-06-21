@@ -1,7 +1,6 @@
 class SopsController < ApplicationController
   
   include Seek::IndexPager
-  include Seek::DotGenerator
 
   include Seek::AssetsCommon
 

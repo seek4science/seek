@@ -1,6 +1,5 @@
 class AssaysController < ApplicationController
 
-  include Seek::DotGenerator
   include Seek::IndexPager
   include Seek::AssetsCommon
 

@@ -1,9 +1,7 @@
 #require "flash_tool"
 class PresentationsController < ApplicationController
 
-
   include Seek::IndexPager
-  include Seek::DotGenerator
 
   include Seek::AssetsCommon
 
