@@ -16,12 +16,9 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Licensing of Assets | March 2016 |
-| Research Object Snapshots of Assays and Studies | March 2016 |
-| Improved Samples/Treatments/SOP handling | Spring 2016  |
-| Full integration with openBIS | Summer 2016  |
-| Upgrade to Rails 4 | Summer 2016 |
-| Developer support - Plugins and extensions | Summer 2016 |
+| Improved Samples/Treatments/SOP handling | Summer 2016  |
+| Full integration with openBIS | Autumn 2016  |
+
 
 
 ## Completed
@@ -32,6 +29,8 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 | Feature | Milestone date | SEEK version |
 | --- | --- | --- |
+| Licensing of Assets | June 2016 | 1.1 |
+| Research Object Snapshots of Assays and Studies | June 2016 | 1.1 |
 | Self management of projects and programmes | December 2015  | 1.0 |
 | Self management of organisms | December 2015  | 1.0 |
 | Improved registration workflow | December 2015  | 1.0 |
