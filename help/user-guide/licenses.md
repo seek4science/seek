@@ -51,6 +51,8 @@ for more information.
 
 ## Other
 
+These additional licenses are also available to be used in SEEK.
+
 <table>
 <thead>
         <tr>
