@@ -151,7 +151,7 @@ module Seek
 
       def check_for_valid_scheme(blob_params)
         if !blob_params[:data_url].blank? && !valid_scheme?(blob_params[:data_url])
-          flash.now[:error] = "The URL type is invalid, only URLs of type #{VALID_SCHEMES.map { |s| "#{s}" }.join ', '} are valid"
+          flash.now[:error] = "The URL type is invalid, URLs with the scheme: #{INVALID_SCHEMES.map { |s| "#{s}" }.join ', '} are not permitted."
           false
         else
           true

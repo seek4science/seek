@@ -496,6 +496,7 @@ end
   #Model Version
   Factory.define(:model_version,:class=>Model::Version) do |f|
     f.association :model
+    f.projects { model.projects }
     f.after_create do |model_version|
       model_version.model.version +=1
       model_version.model.save
@@ -524,6 +525,7 @@ end
   #SOP Version
   Factory.define(:sop_version,:class=>Sop::Version) do |f|
     f.association :sop
+    f.projects { sop.projects }
     f.after_create do |sop_version|
       sop_version.sop.version +=1
       sop_version.sop.save
@@ -550,6 +552,7 @@ end
   #DataFile Version
   Factory.define(:data_file_version,:class=>DataFile::Version) do |f|
     f.association :data_file
+    f.projects { data_file.projects }
     f.after_create do |data_file_version|
       data_file_version.data_file.version +=1
       data_file_version.data_file.save
@@ -576,6 +579,7 @@ end
   #Presentation Version
   Factory.define(:presentation_version,:class=>Presentation::Version) do |f|
     f.association :presentation
+    f.projects { presentation.projects }
     f.after_create do |presentation_version|
       presentation_version.presentation.version +=1
       presentation_version.presentation.save
@@ -1228,6 +1232,7 @@ end
 Factory.define(:sample) do |f|
   f.sequence(:title) {|n| "Sample #{n}"}
   f.association :sample_type,:factory=>:simple_sample_type
+  f.projects { [Factory.build(:project)] }
   f.after_build do |sample|
     sample.set_attribute(:the_title, sample.title) if sample.data.key?(:the_title)
   end

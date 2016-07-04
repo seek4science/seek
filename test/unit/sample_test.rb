@@ -79,7 +79,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'adds validations' do
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     refute sample.valid?
     sample.set_attribute(:full_name, 'Bob Monkhouse')
@@ -99,7 +99,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'removes validations with new assigned type' do
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     refute sample.valid?
 
@@ -109,7 +109,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'store and retrieve' do
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     sample.set_attribute(:full_name, 'Jimi Hendrix')
     sample.set_attribute(:age, 27)
@@ -141,7 +141,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'various methods of sample data assignment' do
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     # Mass assignment
     sample.data = { full_name: 'Jimi Hendrix', age: 27, weight: 88.9, postcode: 'M13 9PL' }
@@ -194,7 +194,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << Factory(:sample_attribute, title: 'bool',
                                                                 sample_attribute_type: Factory(:boolean_sample_attribute_type),
                                                                 required: false, is_title: false, sample_type: sample_type)
-    sample = Sample.new(title: 'testing', sample_type: sample_type)
+    sample = Sample.new(title: 'testing', sample_type: sample_type, project_ids: [Factory(:project).id])
 
     # Update attributes
     sample.update_attributes(data: { the_title: 'fish', bool: '0' })
@@ -228,7 +228,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'handling booleans' do
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample_type = Factory(:simple_sample_type)
     sample_type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, is_title: false, sample_type: sample_type)
     sample_type.save!
@@ -317,7 +317,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'json_metadata' do
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     sample.set_attribute(:full_name, 'Jimi Hendrix')
     sample.set_attribute(:age, 27)
@@ -335,7 +335,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title', is_title: true, sample_type: sample_type)
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
     sample.set_attribute(:title, 'the title')
@@ -352,7 +352,7 @@ class SampleTest < ActiveSupport::TestCase
 
   # trying to track down an sqlite3 specific problem
   test 'sqlite3 setting of accessor problem' do
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     sample.set_attribute(:full_name, 'Jimi Hendrix')
     sample.set_attribute(:age, 22)
@@ -371,7 +371,6 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'projects' do
     sample = Factory(:sample)
-    assert_empty sample.projects
     project = Factory(:project)
     sample.update_attributes(project_ids: [project.id])
     disable_authorization_checks { sample.save! }
@@ -458,7 +457,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.save!
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
     sample.set_attribute(:freeze, 'the title')
@@ -478,7 +477,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << Factory.build(:any_string_sample_attribute, title: 'format', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.save!
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
     sample.set_attribute(:format, 'the title')
@@ -496,7 +495,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_was', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.save!
-    sample = Sample.new title: 'testing'
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
     sample.set_attribute(:title_was, 'the title')
@@ -513,7 +512,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type = Factory(:strain_sample_type)
     strain = Factory(:strain)
 
-    sample = Sample.new(sample_type: sample_type)
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
     sample.set_attribute(:name, 'Strain sample')
     sample.set_attribute(:seekstrain, strain.id)
     assert sample.valid?
@@ -529,7 +528,7 @@ class SampleTest < ActiveSupport::TestCase
     strain = Factory(:strain)
     invalid_strain_id = Strain.last.id + 1 # non-existant strain ID
 
-    sample = Sample.new(sample_type: sample_type)
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
     sample.set_attribute(:name, 'Strain sample')
     sample.set_attribute(:seekstrain, invalid_strain_id)
     assert sample.valid?
@@ -551,7 +550,7 @@ class SampleTest < ActiveSupport::TestCase
     strain = Factory(:strain)
     strain2 = Factory(:strain)
 
-    sample = Sample.new(sample_type: sample_type)
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
     sample.set_attribute(:name, 'Strain sample')
     sample.set_attribute(:seekstrain, strain.id)
     sample.set_attribute(:seekstrain2, strain2.id)
@@ -574,7 +573,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << attribute2
     assert sample_type.valid?
     sample_type.save!
-    sample = Sample.new(title: 'testing')
+    sample = Sample.new(title: 'testing', project_ids: [Factory(:project).id])
     sample.sample_type = sample_type
     sample.set_attribute(:banana_type, 'yellow')
     sample.set_attribute(:license, 'GPL')

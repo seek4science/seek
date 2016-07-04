@@ -1,4 +1,4 @@
-<% unless @error %>
+<% unless @error || @warning %>
     <p id="url_info">
     <ul>
       <li>
@@ -28,6 +28,11 @@
       <div class="alert alert-danger" role="alert">
         <span class="error_icon"></span>
         <%= @error_msg %>
+      </div>
+  <% elsif @warning %>
+      <div class="alert alert-warning" role="alert">
+        <span class="warning_icon"></span>
+        <%= @warning_msg %>
       </div>
   <% elsif @size && @size > Seek::Config.hard_max_cachable_size %>
       <div class="alert alert-info" role="alert">

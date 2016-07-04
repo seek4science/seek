@@ -89,3 +89,7 @@ en:
   project_administrator: 'Project administrator'
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
+
+  contributor: 'contributor' # A person who submitted the resource to SEEK
+  creator: 'creator' # A person who was involved with the creation of the resource
+  person_responsible: 'person responsible'

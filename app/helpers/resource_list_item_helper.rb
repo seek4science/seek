@@ -157,9 +157,9 @@ module ResourceListItemHelper
     list_item_description text,auto_link,length
   end
 
-  def list_item_contributor resource
-    return "<p class=\"list_item_attribute\"><b>Uploader</b>: #{jerm_harvester_name}</p>".html_safe if resource.contributor.nil?
-    list_item_authorized_attribute 'Uploader', resource.contributor.person
+  def list_item_contributor resource, key = t('contributor').capitalize
+    return "<p class=\"list_item_attribute\"><b>#{key}</b>: #{jerm_harvester_name}</p>".html_safe if resource.contributor.nil?
+    list_item_authorized_attribute key, resource.contributor.person
   end
 
   def list_item_expandable_text attribute, text, length=200
@@ -222,7 +222,7 @@ module ResourceListItemHelper
     html.html_safe
   end
 
-  def list_item_contributor_list(contributors, other_contributors = nil, key = 'Contributor')
+  def list_item_person_list(contributors, other_contributors = nil, key = t('creator').capitalize)
     contributor_count = contributors.count
     contributor_count += 1 unless other_contributors.blank?
     html = ''
@@ -242,7 +242,7 @@ module ResourceListItemHelper
   def list_item_author_list(all_authors)
     authors = all_authors.select {|a| a.person && a.person.can_view? }
     other_authors = all_authors.select {|a| a.person.nil? }.map {|a| a.last_name + ' ' + a.first_name}.join(',')
-    list_item_contributor_list(authors.map {|a| a.person}, other_authors, 'Author')
+    list_item_person_list(authors.map {|a| a.person}, other_authors, 'Author')
   end
 
 end

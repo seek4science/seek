@@ -128,6 +128,7 @@ project_membership_delete: 'famfamfam_silk/user_delete.png'
 project_membership_unflag: 'famfamfam_silk/user_add.png'
 extract_samples: 'famfamfam_silk/table_go.png'
 view_samples: 'famfamfam_silk/table.png'
+external_link: 'famfamfam_silk/arrow_right.png'
 
 # avatars
 specimen_avatar: 'misc_icons/green_virus-64x64.png'

@@ -5,10 +5,12 @@ class SampleTypesController < ApplicationController
   include Seek::UploadHandling::DataUpload
   include Seek::IndexPager
 
-  before_filter :get_sample_type, :only => [:show, :edit, :update, :destroy]
-  before_filter :check_no_created_samples, :only => [:edit, :update, :destroy]
-  before_filter :find_assets, :only=>[:index]
+  before_filter :get_sample_type, only: [:show, :edit, :update, :destroy]
+  before_filter :check_no_created_samples, only: [:edit, :update, :destroy]
+  before_filter :find_assets, only: [:index]
 
+  # these checks are mostly coverered by the #check_no_created_samples filter, but will give an additional check based on can_xxx? methods
+  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create]
 
   # GET /sample_types/1
   # GET /sample_types/1.json
@@ -25,7 +27,7 @@ class SampleTypesController < ApplicationController
     @tab = 'manual'
 
     @sample_type = SampleType.new
-    @sample_type.sample_attributes.build(is_title:true,required:true) # Initial attribute
+    @sample_type.sample_attributes.build(is_title: true, required: true) # Initial attribute
 
     respond_to do |format|
       format.html # new.html.erb
@@ -62,7 +64,7 @@ class SampleTypesController < ApplicationController
   def create
     @sample_type = SampleType.new(params[:sample_type])
 
-    #removes controlled vocabularies set on attributes where the type is not CV
+    # removes controlled vocabularies set on attributes where the type is not CV
     @sample_type.fix_up_controlled_vocabs
     @tab = 'manual'
 
@@ -71,7 +73,7 @@ class SampleTypesController < ApplicationController
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
         format.json { render json: @sample_type, status: :created, location: @sample_type }
       else
-        format.html { render action: "new" }
+        format.html { render action: 'new' }
         format.json { render json: @sample_type.errors, status: :unprocessable_entity }
       end
     end
@@ -85,7 +87,7 @@ class SampleTypesController < ApplicationController
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully updated.' }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
         format.json { render json: @sample_type.errors, status: :unprocessable_entity }
       end
     end
@@ -114,5 +116,4 @@ class SampleTypesController < ApplicationController
       redirect_to @sample_type
     end
   end
-
 end

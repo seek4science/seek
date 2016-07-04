@@ -1,0 +1,12 @@
+<% controlled_vocab = item %>
+
+
+
+<%= admin_dropdown do %>
+
+    <% if controlled_vocab.can_edit? -%>
+        <li><%= image_tag_for_key('edit', edit_sample_controlled_vocab_path(controlled_vocab), nil, nil, "Edit Sample Controlled Vocabulary") -%></li>
+    <% end -%>
+    <%= delete_icon(controlled_vocab, current_user) %>
+
+<% end %>

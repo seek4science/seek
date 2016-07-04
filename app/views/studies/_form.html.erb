@@ -25,7 +25,7 @@
       <%= render :partial=>"studies/investigation_list",:locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
     </div>
 
-    <%= f.label "Person responsible" %>
+    <%= f.label t('person_responsible').capitalize %>
     <div id="person_responsible_collection">
       <% people = @study.investigation ? @study.investigation.projects.collect(&:people).flatten : [] -%>
       <%= render :partial=>"studies/person_responsible_list",:locals=>{:people=>people} -%>

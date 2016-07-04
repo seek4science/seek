@@ -579,7 +579,7 @@ class SopsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     no_other_creator_sops = assigns(:sops).select { |s| s.creators.empty? && s.other_creators.blank? }
-    assert_select 'p.list_item_attribute', :text => /Contributors: None/, :count => no_other_creator_sops.count
+    assert_select 'p.list_item_attribute', :text => /#{I18n.t('creator').pluralize.capitalize}: None/, :count => no_other_creator_sops.count
   end
 
   test 'breadcrumb for sop index' do

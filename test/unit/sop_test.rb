@@ -35,8 +35,10 @@ class SopTest < ActiveSupport::TestCase
     assert !asset.valid?
 
     #VL only:allow no projects
-    asset=Sop.new :title=>"fred", :policy => Factory(:private_policy)
-    assert asset.valid?
+    as_virtualliver do
+      asset=Sop.new :title=>"fred", :policy => Factory(:private_policy)
+      assert asset.valid?
+    end
   end
 
   test "assay association" do
@@ -162,13 +164,13 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'assign projects' do
-    sop = Factory(:sop, projects:[])
-    assert_empty sop.projects
     project = Factory(:project)
-    sop.update_attributes(project_ids:[project.id])
+    sop = Factory(:sop, projects:[project])
+    projects = [project, Factory(:project)]
+    sop.update_attributes(project_ids: projects.map(&:id))
     sop.save!
     sop.reload
-    assert_equal [project],sop.projects
+    assert_equal projects.sort, sop.projects.sort
   end
 
   test "sop with no contributor" do

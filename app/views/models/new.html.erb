@@ -20,7 +20,7 @@
         <%= text_area_tag 'model[description]', model_description_value, :class=>"form-control" -%>
       </div>
 
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => true } -%>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => Seek::Config.is_virtualliver } -%>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @model } %>
 
@@ -43,3 +43,13 @@
       </div>
     </div>
 <% end -%>
+
+<%# handle the data_url being passed from another form, such as importing a biomodels result %>
+<% if params['model'] && !params['model']['data_url'].blank? %>
+<script>
+  $j('#data_url_field').val('<%= params['model']['data_url'] %>');
+  submit_url_for_examination();
+  $j('#make_local_copy').prop('checked',true);
+  addRemoteFile();
+</script>
+<% end %>

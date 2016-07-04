@@ -30,7 +30,7 @@ class Strain < ActiveRecord::Base
   delegate :ncbi_uri, :to=>:organism
 
   validates_presence_of :title, :organism
-  validates_presence_of :projects, :unless => Proc.new{|s| s.is_dummy? || Seek::Config.is_virtualliver}
+  validates_presence_of :projects, :unless => Proc.new{|strain| strain.is_dummy? || Seek::Config.is_virtualliver}
 
   scope :default_order, order("title")
 
@@ -64,7 +64,7 @@ class Strain < ActiveRecord::Base
   def self.default_strain_for_organism organism
     organism = Organism.find(organism) unless organism.is_a?(Organism)
     strain = Strain.where(:organism_id=>organism.id,:is_dummy=>true).first
-    if strain.nil?
+    unless strain
       gene = Gene.find_by_title('wild-type') || Gene.create(:title => 'wild-type')
       genotype = Genotype.new(:gene => gene)
       phenotype = Phenotype.new(:description => 'wild-type')
@@ -78,22 +78,15 @@ class Strain < ActiveRecord::Base
     title + " (" + genotype_info + ' / ' + phenotype_info + ')'
   end
 
-
-
-  def parent_strain
-    parent_strain = Strain.find_by_id(parent_id)
-    parent_strain.nil? ? '' : (parent_strain.title + "(Seek ID=#{parent_strain.id})")
-  end
-
   def state_allows_delete? *args
     (deprecated_specimens.empty? || ((deprecated_specimens.count == 1) && deprecated_specimens.first.is_dummy? && deprecated_specimens.first.samples.empty?)) && super
   end
 
   def can_delete? user=User.current_user
-    if contributor.nil?
-      organism && organism.can_delete?(user)
-    else
+    if contributor
       super
+    else
+      organism && organism.can_delete?(user)
     end
   end
 

@@ -100,6 +100,7 @@ gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 
 gem 'unicorn-rails'
+gem 'seedbank'
 
 group :assets do
   gem 'turbo-sprockets-rails3'

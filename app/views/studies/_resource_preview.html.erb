@@ -6,6 +6,6 @@
 
 <%= list_item_authorized_list(resource.assays, t('assay').pluralize, true, 50, true)%>
 
-<%= list_item_attribute "Contributor", resource.contributor.try(:person).try(:name), resource.contributor %>
+<%= list_item_attribute t('contributor').capitalize, resource.contributor.try(:person).try(:name), resource.contributor %>
 
 <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true} %>

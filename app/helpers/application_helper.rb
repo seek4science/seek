@@ -211,7 +211,7 @@ module ApplicationHelper
       not_specified_text||=options[:none_text]
       not_specified_text||="No description specified" if options[:description]==true
       not_specified_text||="Not specified"
-      res = "<span class='none_text'>#{not_specified_text}</span>"
+      res = content_tag(:span, not_specified_text, class: 'none_text')
     else      
       text.capitalize! if options[:capitalize]            
       res = text.html_safe
@@ -534,7 +534,9 @@ module ApplicationHelper
      DeprecatedSpecimen=>"You cannot delete this #{I18n.t 'biosamples.sample_parent_term'}. It might be published or it has Samples associated with it or you are not authorized.",
      DeprecatedSample=>"You cannot delete this Sample. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it or you are not authorized.",
      Project=>"You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
-     Institution=>"You cannot delete this Institution. It may have people associated with it."
+     Institution=>"You cannot delete this Institution. It may have people associated with it.",
+     SampleType=>"You cannot delete this Sample Type, is may have Samples associated with it",
+     SampleControlledVocab=>"You can delete this Controlled Vocabulary, it may be associated with a Sample Type"
     }
   end
 

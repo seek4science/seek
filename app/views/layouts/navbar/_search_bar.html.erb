@@ -27,7 +27,7 @@
                                  :class => 'form-control' %>
                 </div>
             <% end %>
-            <% if Seek::Config.external_search_enabled %>
+            <% if external_search_supported? %>
                 <div class="checkbox">
                   <label data-tooltip="<%= tooltip(external_search_tooltip_text) -%>">
                     <%= check_box_tag :include_external_search, 1, @include_external_search, :class => "checkbox" -%> External

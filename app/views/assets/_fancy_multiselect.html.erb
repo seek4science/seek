@@ -6,7 +6,7 @@
    possibilities_options ||= {}
    possibilities_options.merge!(:class => 'form-control')
    title ||= association.to_s.singularize.humanize.pluralize
-   title += ' <span class="required">*</span>'.html_safe if required
+   title += '<span class="required">*</span>'.html_safe if required
 
    if with_new_link
      new_association_path = eval "new_#{association.to_s.singularize}_path(:parent_name=>'#{controller_name.underscore.singularize}')"

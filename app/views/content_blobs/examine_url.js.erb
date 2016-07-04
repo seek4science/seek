@@ -7,6 +7,7 @@ el.show();
     !@is_webpage &&
     !@unauthorized &&
     !@error &&
+    !@warning &&
     !(@size && (@size > Seek::Config.hard_max_cachable_size)) %>
 
 <% if copy_allowed %>

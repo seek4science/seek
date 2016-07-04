@@ -1,7 +1,7 @@
 language: ruby
 
 rvm:
-  - 2.1.8
+  - 2.1.9
 
 sudo: false
 
@@ -11,6 +11,8 @@ env:
   - SUITE="rake test:units" DB_TYPE=mysql
   - SUITE="rake test:functionals" DB_TYPE=mysql
   - SUITE="rake test:integration" DB_TYPE=mysql
+  - SUITE="rake test:integration" DB_TYPE=sqlite3
+  - SUITE="rake test:integration" DB_TYPE=postgres
   - SUITE="rspec spec" DB_TYPE=mysql
   - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
   - SUITE="rake teaspoon" DB_TYPE=mysql DISPLAY=":99.0"

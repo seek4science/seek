@@ -2,5 +2,5 @@
     resource = resource_list_item_contributor_and_creators
  -%>
 
-<%= list_item_contributor_list resource.creators, resource.other_creators if resource.respond_to? 'other_creators' %>
-<%= list_item_contributor resource unless resource.creators.include?(resource.contributor.try(:person)) -%>
+<%= list_item_person_list resource.creators, (resource.other_creators if resource.respond_to? 'other_creators') %>
+<%= list_item_contributor resource -%>

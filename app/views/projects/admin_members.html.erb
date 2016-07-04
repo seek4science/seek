@@ -6,13 +6,15 @@
   <div class="col-md-5 col-md-push-7">
     <%= panel('Add members', :id => "add_member") do %>
         <div class="form-group">
-          <label>1. Type the names of the people you wish to add to the <%= t('project').downcase %></label>
+          <label class="control-label">1. Type the names of the people you wish to add to the <%= t('project').downcase %></label>
           <%= objects_input('people_ids', [], :typeahead => {:values => Person.all.map {|p| {:id => p.id, :name => p.name, :hint => p.email}}}) -%>
         </div>
 
         <div class="form-group">
-          <label>2. Select the institution through which these people are involved with the <%= t('project').downcase %></label>
-          <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title"), :class => 'form-control' %>
+          <label class="control-label">2. Select the institution through which these people are involved with the <%= t('project').downcase %></label>
+          <%= select_tag :institution_ids, options_from_collection_for_select(Institution.order(:title), "id", "title"),
+                         :include_blank => true,
+                         :class => 'form-control' %>
         </div>
 
         <%= button_link_to('Add', 'new', 'javascript:Projects.actions.add();') -%>

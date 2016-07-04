@@ -1,3 +1,7 @@
+<span id='modal-dialogues'>
+    <%= sample_controlled_vocab_model_dialog('cv-modal') %>
+</span>
+
 <%= form_for(@sample_type) do |f| %>
 
     <%= f.error_messages %>
@@ -5,6 +9,11 @@
     <div class="form-group">
       <label>Title</label><%= required_span %>
       <%= f.text_field :title, :class => 'form-control', :placeholder => 'Sample type name' %>
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
     </div>
 
     <h3>Attributes</h3>
@@ -51,7 +60,12 @@
 </table>
 
 <script>
+    //used to hold the element Id that needs updating after creating a new CV
+
+
     $j(document).ready(function () {
+        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
+        SampleTypeControlledVocab.resetModalControlledVocabForm();
         // Make rows sortable
         SampleTypes.bindSortable();
         SampleTypes.recalculatePositions();
@@ -82,6 +96,9 @@
 
 
     });
+
+
+
 
 
 </script>

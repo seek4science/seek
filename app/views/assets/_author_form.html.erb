@@ -6,29 +6,29 @@
 <% original_resource_type = resource_type -%>
 <% resource_type = text_for_resource(resource_type) -%>
 
-<%= folding_panel('Contributors', existing_creators.blank?, :body_options => {:id => 'creator_fold_content'},
+<%= folding_panel(t('creator').capitalize.pluralize, existing_creators.blank?, :body_options => {:id => 'creator_fold_content'},
                   :help_text => "Here you attribute this #{resource_type} to other people.") do %>
     <p>
       If this <%= resource_type %> was contributed by, or together with, other <%= Seek::Config.project_name %> members, please list their names below. <br/>
-      The contributors you specify will have the right to 'view and edit summary and contents' of this <%= resource_type %>.
+      The <%= t('creator').pluralize -%> you specify will have the right to 'view and edit summary and contents' of this <%= resource_type %>.
     </p>
 
     <p style="color: #666666;">
-      So far you have specified the following contributors:
+      So far you have specified the following <%= t('creator').pluralize -%>:
     </p>
     <p id="creators_list" class="box_editing_inner">
       <span class="none_text" id="creators_text">Loading...</span>
     </p>
     <p>
-      Please type contributors into the box below - suggestions will be displayed as you type.
-      Select contributors that you want to include and click "Add" to add them to the list.
+      Please type <%= t('creator').pluralize -%> into the box below - suggestions will be displayed as you type.
+      Select <%= t('creator').pluralize -%> that you want to include and click "Add" to add them to the list.
     </p>
     <%= objects_input('creator-typeahead', [], :typeahead => {:query_url => typeahead_people_path + '?query=%QUERY'}) -%>
     <%# this hidden input will submit all permission data with the form -%>
     <%= hidden_field_tag "creators", "" -%>
 
     <%= render :partial => 'assets/advanced_creator_select' %>
-    <%= folding_panel('Add non-SEEK creators') do %>
+    <%= folding_panel("Add other #{t('creator').pluralize}") do %>
         <p>
           If anyone not registered with SEEK assisted with the contribution of this <%= resource_type %>, you can specify them below.
         </p>

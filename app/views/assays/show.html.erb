@@ -35,7 +35,7 @@
         <% if @assay.owner.can_view? %>
             <p class="id">
               <label>
-                Contributor:
+                <%= t('contributor').capitalize -%>:
               </label>
               <%= link_to @assay.owner.name,@assay.owner -%>
             </p>

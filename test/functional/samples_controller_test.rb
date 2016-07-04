@@ -38,7 +38,9 @@ class SamplesControllerTest < ActionController::TestCase
     login_as(person)
     type = Factory(:patient_sample_type)
     assert_difference('Sample.count') do
-      post :create, sample: { sample_type_id: type.id, data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' } }
+      post :create, sample: { sample_type_id: type.id,
+                              data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                              project_ids: [person.projects.first.id] }
     end
     assert assigns(:sample)
     sample = assigns(:sample)
@@ -57,7 +59,8 @@ class SamplesControllerTest < ActionController::TestCase
     type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     assert_difference('Sample.count') do
-      post :create, sample: { sample_type_id: type.id, data: { the_title: 'ttt', bool: '1' } }
+      post :create, sample: { sample_type_id: type.id, data: { the_title: 'ttt', bool: '1' },
+                              project_ids: [person.projects.first.id] }
     end
     assert_not_nil sample = assigns(:sample)
     assert_equal 'ttt', sample.get_attribute(:the_title)
@@ -118,7 +121,9 @@ class SamplesControllerTest < ActionController::TestCase
     assert person.projects.count >= 3 # incase the factory changes
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
-      post :create, sample: { sample_type_id: type.id, title: 'My Sample', data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }, project_ids: project_ids }
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample',
+                              data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                              project_ids: project_ids }
     end
     assert sample = assigns(:sample)
     assert_equal person.projects[0..1].sort, sample.projects.sort
@@ -128,11 +133,12 @@ class SamplesControllerTest < ActionController::TestCase
     person = Factory(:person_in_multiple_projects)
     login_as(person)
     sample = populated_patient_sample
-    assert_empty sample.projects
     assert person.projects.count >= 3 # incase the factory changes
     project_ids = person.projects[0..1].collect(&:id)
 
-    put :update, id: sample.id, sample: { title: 'Updated Sample',  data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }, project_ids: project_ids }
+    put :update, id: sample.id, sample: { title: 'Updated Sample',
+                                          data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' },
+                                          project_ids: project_ids }
 
     assert sample = assigns(:sample)
     assert_equal person.projects[0..1].sort, sample.projects.sort
@@ -195,7 +201,9 @@ class SamplesControllerTest < ActionController::TestCase
     type = Factory(:patient_sample_type)
 
     assert_difference('Sample.count') do
-      post :create, sample: { sample_type_id: type.id, title: 'My Sample',  data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' }, project_ids: [] }, sharing: valid_sharing
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample',
+                              data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                              project_ids: [person.projects.first.id] }, sharing: valid_sharing
     end
     assert sample = assigns(:sample)
     assert_equal person.user, sample.contributor
@@ -316,7 +324,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample_type = Factory(:strain_sample_type)
     strain = Factory(:strain)
 
-    sample = Sample.new(sample_type: sample_type, contributor: person)
+    sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
     sample.set_attribute(:name, 'Strain sample')
     sample.set_attribute(:seekstrain, strain.id)
     sample.save!
@@ -333,7 +341,7 @@ class SamplesControllerTest < ActionController::TestCase
     sample_type = Factory(:strain_sample_type)
     strain = Factory(:strain)
 
-    sample = Sample.new(sample_type: sample_type, contributor: person)
+    sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
     sample.set_attribute(:name, 'Strain sample')
     sample.set_attribute(:seekstrain, strain.id)
     sample.save!
@@ -347,7 +355,8 @@ class SamplesControllerTest < ActionController::TestCase
   private
 
   def populated_patient_sample
-    sample = Sample.new title: 'My Sample', policy: Factory(:public_policy), contributor: Factory(:person)
+    sample = Sample.new title: 'My Sample', policy: Factory(:public_policy), contributor: Factory(:person),
+                        project_ids: [Factory(:project).id]
     sample.sample_type = Factory(:patient_sample_type)
     sample.title = 'My sample'
     sample.set_attribute(:full_name, 'Fred Bloggs')

@@ -57,7 +57,9 @@ module Seek
       end
 
       def self.encode(values)
-        values.map(&:attributes)
+        values.map do |value|
+          value.attributes.merge(project_ids: value.project_ids) # Associations aren't included in `attributes`
+        end
       end
 
       def self.decode(values)

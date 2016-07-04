@@ -2,18 +2,20 @@ require "test_helper"
 
 class PresentationTest < ActiveSupport::TestCase
 
- test "validations" do
-   presentation = Factory :presentation
-   presentation.title=""
+  test "validations" do
+    presentation = Factory :presentation
+    presentation.title=""
 
-   assert !presentation.valid?
+    assert !presentation.valid?
 
-   presentation.reload
+    presentation.reload
 
-   # VL only:allow no projects
-   presentation.projects.clear
-   assert presentation.valid?
- end
+    # VL only:allow no projects
+    as_virtualliver do
+      presentation.projects.clear
+      assert presentation.valid?
+    end
+  end
 
   test "new presentation's version is 1" do
     presentation = Factory :presentation

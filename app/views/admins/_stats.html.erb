@@ -1,14 +1,17 @@
 <div class="form-group form-inline">
+  <%
+     options = [["Select query ...","none"],
+                ["Content Statistics","contents"],
+                ["Activity Statistics","activity"],
+                ["Search Statistics","search"],
+                ["Job queue","job_queue"],
+                ["Auth table consistency","auth_consistency"]
+     ]
+     options = options | [["Workflow Statistics", "workflow_stats"]] if Seek::Config.workflows_enabled
+  %>
+
   <%= select_tag :stats_query,
-                 options_for_select([["Select query ...","none"],
-                                     ["Content Statistics","contents"],
-                                     ["Activity Statistics","activity"],
-                                     ["Search Statistics","search"],
-                                     ["Job queue","job_queue"],
-                                     ["Auth table consistency","auth_consistency"],
-                                     ["Monthly User Statistics", "monthly_stats"],
-                                     ["Workflow Statistics", "workflow_stats"]
-                                    ],:length=>10),
+                 options_for_select(options,:length=>10),
                  {:class => 'form-control',
                   :onchange=>remote_function(:url=>get_stats_admin_path(:element=>"stats_list"),
                                              :with=>"'id='+this.value",

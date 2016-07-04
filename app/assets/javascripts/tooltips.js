@@ -1,6 +1,6 @@
 $j(document).ready(function () {
     $j('[data-tooltip]').popover({
-        html: true,
+        html: false,
         animation: false,
         trigger: 'hover',
         placement: 'auto right',

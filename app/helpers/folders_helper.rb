@@ -5,7 +5,7 @@ module FoldersHelper
     text << "<p><em>#{text_or_not_specified(asset.abstract)}</em></p>" if asset.respond_to?("abstract")
 
     if asset.respond_to?("creators")
-      text << "<p><b>Contributors: </b>"+text_or_not_specified(join_with_and(asset.creators.collect{|c| c.name}))+"</p>"
+      text << "<p><b>#{t('contributor').capitalize.pluralize}: </b>"+text_or_not_specified(join_with_and(asset.creators.collect{|c| c.name}))+"</p>"
     end
     text << "<p><b>Filename: </b>#{asset.original_filename}" if asset.respond_to?("original_filename")
 
