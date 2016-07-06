@@ -45,7 +45,8 @@ function drawGraph(elements, current_element_id){
                     'height': default_node_height,
                     'font-size': default_font_size,
                     'text-wrap': 'wrap',
-                    'text-max-width': default_text_max_width
+                    'text-max-width': default_text_max_width,
+                    'opacity': 0.6
                 }
             },
             {
@@ -76,15 +77,27 @@ function drawGraph(elements, current_element_id){
                     'text-border-style': 'solid',
                     'text-border-color': '#ccccdd',
                     'text-border-opacity': 0.7,
-                    'font-size': (default_font_size)
+                    'font-size': (default_font_size),
+                    'opacity': 0.5
                 }
             },
             {
-                selector: ':selected',
+                selector: '.connected',
+                css: {
+                    'opacity': 1
+                }
+            },
+            {
+                selector: '.selected', // Note this is not the same as cytoscape's ':selected'
                 css: {
                     'font-weight': 'bold',
                     'font-size': default_font_size,
-                    'text-max-width': default_text_max_width + 15
+                    'text-max-width': default_text_max_width + 15,
+                    'width': default_node_width + 35,
+                    'height': default_node_height + 15,
+                    'transition-property': 'width, height',
+                    'transition-duration': 300,
+                    'opacity': 1
                 }
             }
         ],
@@ -123,43 +136,20 @@ function drawGraph(elements, current_element_id){
 }
 
 function animateNode(node){
-    var nodes = cy.$('node');
-    var edges = cy.$('edge');
-
-    var excluded_selected_nodes = [];
-    for (var i=0; i<nodes.length; i++){
-        var node_tmp = nodes[i];
-        if (node_tmp.data().id !== node.data().id)
-            excluded_selected_nodes.push(node_tmp);
-    }
-
     //first normalizing all nodes and fading all nodes and edges
-    normalizingNodes(excluded_selected_nodes);
-
-    fadingNodes(nodes);
-    fadingEdges(edges);
+    cy.$('node.connected').removeClass('connected');
+    cy.$('edge.connected').removeClass('connected');
 
     //then appearing the chosen node and the connected nodes and edges
-    appearingNodes(node);
-    edges.each(function(i, edge){
-        var source = edge.source();
-        var target =edge.target();
-        if (source.id() === node.id()){
-            appearingEdges(edge);
-            appearingNodes(target);
-        }
-        if (target.id() === node.id()){
-            appearingEdges(edge);
-            appearingNodes(source);
-        }
-    });
+    node.addClass('connected');
+    node.connectedEdges().addClass('connected');
+    node.connectedEdges().connectedNodes().addClass('connected');
 
-    node.animate({
-        css: { 'width':default_node_width+35, 'height':default_node_height+15 }
-    }, {
-        duration: 300
-    });
+    // Animate the selected node
+    cy.$('node.selected').removeClass('selected');
+    node.addClass('selected');
 
+    // Center the view on the node
     cy.animate({ center: { eles: cy.$(':selected') } });
 }
 
@@ -178,121 +168,6 @@ function itemInfo(item_data){
     html += item_data.item_info;
     html += '</span>';
     return html;
-}
-
-function connectedNodes(node){
-    var edges = cy.$('edge');
-    var connected_nodes = [];
-    edges.each(function(i, edge){
-        var source = edge.source();
-        var target =edge.target();
-        if (source.id() === node.id()){
-            connected_nodes.push(target);
-        }
-        if (target.id() === node.id()){
-            connected_nodes.push(source);
-        }
-    });
-    return connected_nodes;
-}
-
-function alignCenterVertical(element, element_height){
-    var graph_height = cy.container().style.height.split('px')[0];
-    var distance_from_top = (graph_height - element_height)/2;
-    if (distance_from_top > 0){
-        element.style.top=distance_from_top+'px';
-    }else{
-        element.style.top='0px';
-    }
-}
-
-function appearingNodes(nodes){
-    nodes.css({'opacity': 1});
-}
-
-function appearingEdges(edges){
-    edges.css({'opacity': 1});
-}
-
-function fadingNodes(nodes){
-    nodes.css({'opacity': 0.6});
-}
-
-function fadingEdges(edges){
-    edges.css({'opacity': 0.5});
-}
-
-function normalizingNodes(nodes){
-    for (var i=0; i<nodes.length; i++){
-        var node = nodes[i];
-        node.css({
-            'width': default_node_width,
-            'height': default_node_height,
-            'font-size': default_font_size,
-            'font-weight': 'normal',
-            'color': default_color,
-            'text-max-width': default_text_max_width
-        });
-        node.unselect();
-
-    }
-}
-
-function labelPosition(node, label_part, line_index, total_line){
-    var label_pos = {};
-    var graph_pos = $j('#cy')[0].getBoundingClientRect();
-    var node_posX = node.renderedPosition().x + graph_pos.left;
-    var node_posY = node.renderedPosition().y + graph_pos.top;
-    var font_size = node.renderedCss()['font-size'];
-    var ruler = $j('#ruler')[0];
-    ruler.style.fontSize = font_size;
-    ruler.style.fontWeight = 'bolder';
-    ruler.innerHTML = label_part;    
-    var label_width = ruler.offsetWidth;
-    var label_height = ruler.offsetHeight;
-    label_pos.minX = node_posX - label_width/2;
-    label_pos.maxX = node_posX + label_width/2;
-    label_pos.maxY = node_posY + (line_index - total_line/2)*label_height;
-    label_pos.minY = label_pos.maxY - label_height;
-    
-    return label_pos;
-}
-
-function labelLines(node){
-    var label = node.data().name;
-    var font_size = node.renderedCss()['font-size'];
-    var ruler = $j('#ruler')[0];
-    ruler.style.fontSize = font_size;
-    //ruler.style.fontWeight = 'bolder';
-    ruler.innerHTML = label;    
-    var label_width = ruler.offsetWidth;
-    var text_max_width = node.renderedCss()['text-max-width'];
-    var max_width = text_max_width.split('px')[0];
-    var max_width_integer = parseInt(max_width);
-    var lines = [];
-    if (label_width > max_width_integer){
-        var words = label.split(' ');
-        var line = '';
-        for( var i=0; i<words.length; i++){
-            var testLine = line + words[i] + ' ';
-            ruler.innerHTML = testLine;
-            var testWidth = ruler.offsetWidth;
-            if (testWidth > max_width_integer && i > 0) {
-                lines.push(line.trim());
-                line = words[i] + ' ';
-            }
-            else {
-                line = testLine;
-            }
-            //when last word, push line to lines
-            if (i === words.length-1){
-                lines.push(line.trim());
-            }
-        }
-    }else{
-        lines.push(label);
-    }
-    return lines;
 }
 
 function decodeHTMLForElements(elements){
