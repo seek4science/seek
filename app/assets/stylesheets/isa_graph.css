@@ -2,7 +2,6 @@ div.isa_graph {
     border-width: 1px;
     border-style: solid;
     margin: 1em 0 1em 0.75em;
-    min-height: 300px;
     width: 98%;
 }
 
@@ -19,4 +18,5 @@ a.graph_toggle {
 
 #cy {
     max-height: 600px !important;
+    min-height: 400px;
 }
