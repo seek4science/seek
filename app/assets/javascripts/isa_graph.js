@@ -1,9 +1,10 @@
 var cy;
-var default_node_width = 250;
+var default_node_width = 200;
 var default_node_height = 65;
 var default_font_size = 16;
 var default_color = '#323232';
-var default_text_max_width = 245;
+var default_text_max_width = 195;
+var background_image_size = default_node_height - 10;
 
 jQuery.noConflict();
 var $j = jQuery;
@@ -35,6 +36,14 @@ function drawGraph(elements, current_element_id){
                 'text-outline-width': 1,
                 'text-outline-color': 'data(faveColor)',
                 'background-color': 'data(faveColor)',
+                'background-image': 'data(imageUrl)',
+                'background-width': background_image_size,
+                'background-height': background_image_size,
+                // The following is a hacky way of making sure the image doesn't overlap the text
+                'background-position-x': -background_image_size,
+                'background-position-y': '50%',
+                'padding-left': background_image_size + 10,
+                'padding-right': background_image_size + 10,
                 'color':default_color,
                 'width':default_node_width,
                 'height':default_node_height,

@@ -103,11 +103,13 @@ module ISAHelper
       item = node
       item_type = node.class.name
       n_id = node_id(node)
+      image_url = nil
 
       if item.can_view?
         description = item.respond_to?(:description) ? item.description : ''
         no_description_text = item.kind_of?(Publication) ? 'No abstract' : 'No description'
         tt = description.blank? ? no_description_text : truncate(h(description), :length => 500)
+        image_url = resource_avatar_path(item)
         #distinquish two assay classes
         if item.kind_of?(Assay)
           assay_class_title = item.assay_class.title
@@ -128,7 +130,7 @@ module ISAHelper
         fave_color = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
         border_color = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
-      cytoscape_node_elements << node_element(n_id, name, item_info, fave_color, border_color)
+      cytoscape_node_elements << node_element(n_id, name, item_info, fave_color, border_color, image_url)
     end
     cytoscape_node_elements
   end
@@ -157,14 +159,19 @@ module ISAHelper
     cytoscape_edge_elements
   end
 
-  def node_element id, name, item_info, fave_color, border_color
-    {:group => 'nodes',
+  def node_element id, name, item_info, fave_color, border_color, image_url = true
+    hash = {:group => 'nodes',
      :data => {:id => id,
                :name => name,
                :item_info => item_info,
                :faveColor => fave_color,
                :borderColor => border_color}
     }
+    if image_url
+      hash[:data][:imageUrl] = asset_path(image_url)
+    end
+
+    hash
   end
 
   def edge_element id, name, source, target, fave_color

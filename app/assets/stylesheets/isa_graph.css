@@ -1,8 +1,8 @@
 div.isa_graph {
     border-width: 1px;
     border-style: solid;
-    margin: 1em 0em 1em 0.75em;
-
+    margin: 1em 0 1em 0.75em;
+    min-height: 300px;
     width: 98%;
 }
 
