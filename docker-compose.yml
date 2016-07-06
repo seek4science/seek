@@ -15,7 +15,7 @@ seekdata: # Data container for SEEK filestore
 
 seek: # The SEEK application, passenger, solr and delayed_job worker
   build: .
-  command: docker/entrypoint.sh
+  command: /entrypoint.sh
   environment:
       RAILS_ENV: production
   ports:
