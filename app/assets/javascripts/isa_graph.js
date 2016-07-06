@@ -38,6 +38,7 @@ function drawGraph(elements, current_element_id){
                     'text-outline-width': 1,
                     'text-outline-color': 'data(faveColor)',
                     'background-color': 'data(faveColor)',
+                    // The following is a hacky way of making sure the image doesn't overlap the text
                     'padding-left': background_image_size + 10,
                     'padding-right': background_image_size + 10,
                     'color': default_color,
