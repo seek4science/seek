@@ -110,16 +110,17 @@ module ISAHelper
         no_description_text = item.kind_of?(Publication) ? 'No abstract' : 'No description'
         tt = description.blank? ? no_description_text : truncate(h(description), :length => 500)
         image_url = resource_avatar_path(item)
+        url = polymorphic_path(item)
         #distinquish two assay classes
         if item.kind_of?(Assay)
           assay_class_title = item.assay_class.title
           assay_class_key = item.assay_class.key
-          name = truncate("#{assay_class_title}: ".html_safe + h(item.title), :length => 110)
+          name = truncate(h(item.title), :length => 110)
           item_info = link_to("<b>#{assay_class_title}: </b>".html_safe +  h(item.title), polymorphic_path(item), 'data-tooltip' => tooltip(tt))
           fave_color = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
         else
-          name = truncate("#{item_type.humanize}: ".html_safe + h(item.title), :length => 110)
+          name = truncate(h(item.title), :length => 110)
           item_info = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), 'data-tooltip' => tooltip(tt))
           fave_color = FILL_COLOURS[item_type] || FILL_COLOURS.default
           border_color = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
@@ -130,7 +131,7 @@ module ISAHelper
         fave_color = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
         border_color = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
-      cytoscape_node_elements << node_element(n_id, name, item_info, fave_color, border_color, image_url)
+      cytoscape_node_elements << node_element(n_id, name, item_info, fave_color, border_color, url, image_url)
     end
     cytoscape_node_elements
   end
@@ -159,13 +160,14 @@ module ISAHelper
     cytoscape_edge_elements
   end
 
-  def node_element id, name, item_info, fave_color, border_color, image_url = true
+  def node_element id, name, item_info, fave_color, border_color, url, image_url = nil
     hash = {:group => 'nodes',
      :data => {:id => id,
                :name => name,
                :item_info => item_info,
                :faveColor => fave_color,
-               :borderColor => border_color}
+               :borderColor => border_color,
+               :url => url}
     }
     if image_url
       hash[:data][:imageUrl] = asset_path(image_url)

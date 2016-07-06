@@ -5,6 +5,7 @@ var default_font_size = 16;
 var default_color = '#323232';
 var default_text_max_width = 195;
 var background_image_size = default_node_height - 10;
+var originNode;
 
 jQuery.noConflict();
 var $j = jQuery;
@@ -24,75 +25,80 @@ function drawGraph(elements, current_element_id){
             padding: 50
         },
 
-        style: cytoscape.stylesheet()
-            .selector('node')
-            .css({
-                'shape': 'roundrectangle',
-                'border-color': 'data(borderColor)',
-                'border-width': 2,
-                'das': 'mapData(weight, 40, 80, 20, 60)',
-                'content': 'data(name)',
-                'text-valign': 'center',
-                'text-outline-width': 1,
-                'text-outline-color': 'data(faveColor)',
-                'background-color': 'data(faveColor)',
-                'background-image': 'data(imageUrl)',
-                'background-width': background_image_size,
-                'background-height': background_image_size,
-                // The following is a hacky way of making sure the image doesn't overlap the text
-                'background-position-x': -background_image_size,
-                'background-position-y': '50%',
-                'padding-left': background_image_size + 10,
-                'padding-right': background_image_size + 10,
-                'color':default_color,
-                'width':default_node_width,
-                'height':default_node_height,
-                'font-size':default_font_size,
-                'text-wrap': 'wrap',
-                'text-max-width': default_text_max_width
-            })
-
-            .selector('edge')
-            .css({
-                'width': 1.5,
-                'target-arrow-shape': 'none',
-                'line-color': '#191975',
-                'source-arrow-color': 'data(faveColor)',
-                'target-arrow-color': 'data(faveColor)',
-                'content': 'data(name)',
-                'color': '#222222',
-                'text-background-color': '#eeeeff',
-                'text-background-shape': 'roundrectangle',
-                'text-background-opacity': 0.7,
-                'text-border-width': 1,
-                'text-border-style': 'solid',
-                'text-border-color': '#ccccdd',
-                'text-border-opacity': 0.7,
-                'font-size': (default_font_size)
-            }),
-
+        style: [
+            {
+                selector: 'node',
+                css: {
+                    'shape': 'roundrectangle',
+                    'border-color': 'data(borderColor)',
+                    'border-width': 2,
+                    'das': 'mapData(weight, 40, 80, 20, 60)',
+                    'content': 'data(name)',
+                    'text-valign': 'center',
+                    'text-outline-width': 1,
+                    'text-outline-color': 'data(faveColor)',
+                    'background-color': 'data(faveColor)',
+                    'padding-left': background_image_size + 10,
+                    'padding-right': background_image_size + 10,
+                    'color': default_color,
+                    'width': default_node_width,
+                    'height': default_node_height,
+                    'font-size': default_font_size,
+                    'text-wrap': 'wrap',
+                    'text-max-width': default_text_max_width
+                }
+            },
+            {
+                selector: 'node[imageUrl]',
+                css: {
+                    'background-image': 'data(imageUrl)',
+                    'background-width': background_image_size,
+                    'background-height': background_image_size,
+                    // The following is a hacky way of making sure the image doesn't overlap the text
+                    'background-position-x': -background_image_size,
+                    'background-position-y': '50%'
+                }
+            },
+            {
+                selector: 'edge',
+                css: {
+                    'width': 1.5,
+                    'target-arrow-shape': 'none',
+                    'line-color': '#191975',
+                    'source-arrow-color': 'data(faveColor)',
+                    'target-arrow-color': 'data(faveColor)',
+                    'content': 'data(name)',
+                    'color': '#222222',
+                    'text-background-color': '#eeeeff',
+                    'text-background-shape': 'roundrectangle',
+                    'text-background-opacity': 0.7,
+                    'text-border-width': 1,
+                    'text-border-style': 'solid',
+                    'text-border-color': '#ccccdd',
+                    'text-border-opacity': 0.7,
+                    'font-size': (default_font_size)
+                }
+            },
+            {
+                selector: ':selected',
+                css: {
+                    'font-weight': 'bold',
+                    'font-size': default_font_size,
+                    'text-max-width': default_text_max_width + 15
+                }
+            }
+        ],
         elements: elements,
 
         ready: function(){
-            cy = this;
             var nodes = cy.$('node');
 
             //process only when having nodes
             if (nodes.length > 0){
-                nodes.on('click', function(e){
-                    var node = e.cyTarget;
-                    if(node.selected() === true){
-                        clickLabelLink(node, e.originalEvent);
-                    }else{
-                        animateNode(node);
-                        displayNodeInfo(node);
-                    }
-                });
-
                 //animate the current node
-                var current_node = cy.nodes('[id=\''+ current_element_id +'\']')[0];
-                animateNode(current_node);
-                displayNodeInfo(current_node);
+                originNode = cy.nodes('[id=\''+ current_element_id +'\']')[0];
+                originNode.select();
+                cy.animate({ zoom: 0.75, center: { eles: originNode } });
             }else{
                 $j('.isa_graph')[0].hide();
             }
@@ -104,8 +110,17 @@ function drawGraph(elements, current_element_id){
         zoomOutIcon: 'glyphicon glyphicon-minus',
         resetIcon: 'glyphicon glyphicon-resize-full'
     });
-}
 
+    cy.on('tap', 'node:selected', function (event) {
+        if(event.cyTarget != originNode && event.cyTarget.data('url'))
+            window.location = event.cyTarget.data('url');
+    });
+
+    cy.on('select', 'node', function (event) {
+        animateNode(event.cyTarget);
+        displayNodeInfo(event.cyTarget);
+    });
+}
 
 function animateNode(node){
     var nodes = cy.$('node');
@@ -144,20 +159,11 @@ function animateNode(node){
     }, {
         duration: 300
     });
-    
-    node.css({
-        'font-size': default_font_size,
-        'text-max-width': default_text_max_width+15
-    });
 
-    if (node.data().name !== 'Hidden item'){
-        node.css({'color': '#0000e5'});
-    }
-    node.select();
+    cy.animate({ center: { eles: cy.$(':selected') } });
 }
 
-function displayNodeInfo(node){
-
+function displayNodeInfo(node) {
     html = "<div class='isa-selected-item'><strong>Selected item: </strong>";
     var item_data = node.data();
     html += itemInfo(item_data);
@@ -165,10 +171,7 @@ function displayNodeInfo(node){
 
     var node_info = $('node_info');
     $('node_info').innerHTML = html;
-
-
 }
-
 
 function itemInfo(item_data){
     var html = '<span>';
@@ -290,32 +293,6 @@ function labelLines(node){
         lines.push(label);
     }
     return lines;
-}
-
-function mouseOnLabel(node, mouse_event){
-    var lines = labelLines(node);
-    var mouse_on_label = false;
-    for (var i=0; i<lines.length; i++){
-    	var label_pos = labelPosition(node, lines[i], i+1, lines.length);
-    	var mouse_posX = mouse_event.clientX;
-    	var mouse_posY = mouse_event.clientY;
-	    mouse_on_label = mouse_posX > label_pos.minX && mouse_posX < label_pos.maxX && mouse_posY > label_pos.minY && mouse_posY < label_pos.maxY;
-        if (mouse_on_label === true){
-	        return mouse_on_label;
-	    }
-    }
-
-    return mouse_on_label;
-}
-
-function clickLabelLink(node, mouse_event){
-    if (node.data().name !== "Hidden item"){
-        if (mouseOnLabel(node, mouse_event)){
-            var link = document.createElement('a');
-            link.href = node.data().item_info.split('"')[1];
-            clickLink(link);
-        }
-    }
 }
 
 function decodeHTMLForElements(elements){
