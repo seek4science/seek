@@ -4,7 +4,7 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends libssl-dev build-essential git libreadline-dev \
             libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3 libcurl4-gnutls-dev \
             poppler-utils libreoffice libmagick++-dev libxslt1-dev libpq-dev ruby2.1 ruby2.1-dev \
-            nodejs build-essential mysql-client postgresql-client && \
+            nodejs build-essential mysql-client postgresql-client nginx && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -46,13 +46,13 @@ COPY config/sunspot.default.yml config/sunspot.yml
 
 COPY docker docker
 
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx.conf /etc/nginx/sites-available/default
 
 # Cleanup
 RUN rm -rf /tmp/* /var/tmp/* # db/*.sqlite3
 
 # Network
-EXPOSE 3000
+EXPOSE 80
 
 # Shared
 VOLUME ["/home/app/seek/filestore", "/home/app/seek/config", "/home/app/seek/log"]

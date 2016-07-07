@@ -19,4 +19,6 @@ bundle exec rake seek:workers:start
 # Search
 bundle exec rake sunspot:solr:start
 
-bundle exec rails server -b 0.0.0.0
+bundle exec rails server -b 0.0.0.0 &
+
+nginx -g 'daemon off;'
