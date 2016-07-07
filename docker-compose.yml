@@ -32,7 +32,6 @@ services:
     image: solr
     restart: always
 
-
 volumes:
   seek-filestore:
     external: true
