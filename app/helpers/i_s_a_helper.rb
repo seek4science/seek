@@ -97,42 +97,51 @@ module ISAHelper
     possible_edges
   end
 
-  def cytoscape_node_elements nodes
+  def cytoscape_node_elements items
     cytoscape_node_elements = []
-    nodes.each do |node|
-      item = node
-      item_type = node.class.name
-      n_id = node_id(node)
-      image_url = nil
+    items.each do |item|
+      item_type = item.class.name
+      data = { id: node_id(item) }
 
       if item.can_view?
-        description = item.respond_to?(:description) ? item.description : ''
-        no_description_text = item.kind_of?(Publication) ? 'No abstract' : 'No description'
-        tt = description.blank? ? no_description_text : truncate(h(description), :length => 500)
-        image_url = resource_avatar_path(item)
-        url = polymorphic_path(item)
-        #distinquish two assay classes
-        if item.kind_of?(Assay)
+        if item.respond_to?(:description)
+          data['description'] = truncate(h(item.description), length: 500)
+        else
+          data['description'] = ''
+        end
+        
+        if data['description'].blank?
+          data['description'] = item.kind_of?(Publication) ? 'No abstract' : 'No description'
+        end
+
+        data['name'] = truncate(h(item.title), :length => 110)
+        data['fullName'] = h(item.title)
+        data['imageUrl'] = asset_path(resource_avatar_path(item))
+        data['url'] = polymorphic_path(item)
+        
+        if item.kind_of?(Assay) #distinquish two assay classes
           assay_class_title = item.assay_class.title
           assay_class_key = item.assay_class.key
-          name = truncate(h(item.title), :length => 110)
-          item_info = link_to("<b>#{assay_class_title}: </b>".html_safe +  h(item.title), polymorphic_path(item), 'data-tooltip' => tooltip(tt))
-          fave_color = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
-          border_color = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
+          data['type'] = assay_class_title
+          data['faveColor'] = FILL_COLOURS[item_type][assay_class_key] || FILL_COLOURS.default
+          data['borderColor'] = BORDER_COLOURS[item_type][assay_class_key] || BORDER_COLOURS.default
         else
-          name = truncate(h(item.title), :length => 110)
-          item_info = link_to("<b>#{item_type.humanize}: </b>".html_safe +  h(item.title), polymorphic_path(item), 'data-tooltip' => tooltip(tt))
-          fave_color = FILL_COLOURS[item_type] || FILL_COLOURS.default
-          border_color = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
+          data['type'] = item_type.humanize
+          data['faveColor'] = FILL_COLOURS[item_type] || FILL_COLOURS.default
+          data['borderColor'] = BORDER_COLOURS[item_type] || BORDER_COLOURS.default
         end
       else
-        name = 'Hidden item'
-        item_info = hidden_items_html([item], 'Hidden item')
-        fave_color = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
-        border_color = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
+        data['name'] = 'Hidden item'
+        data['fullName'] = data['name']
+        data['type'] = 'Hidden'
+        data['description'] = 'Hidden item'
+        data['faveColor'] = FILL_COLOURS['HiddenItem'] || FILL_COLOURS.default
+        data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
-      cytoscape_node_elements << node_element(n_id, name, item_info, fave_color, border_color, url, image_url)
+
+      cytoscape_node_elements << { group: 'nodes', data: data }
     end
+
     cytoscape_node_elements
   end
 
@@ -158,22 +167,6 @@ module ISAHelper
       cytoscape_edge_elements << edge_element(e_id, name, source, target, fave_color)
     end
     cytoscape_edge_elements
-  end
-
-  def node_element id, name, item_info, fave_color, border_color, url, image_url = nil
-    hash = {:group => 'nodes',
-     :data => {:id => id,
-               :name => name,
-               :item_info => item_info,
-               :faveColor => fave_color,
-               :borderColor => border_color,
-               :url => url}
-    }
-    if image_url
-      hash[:data][:imageUrl] = asset_path(image_url)
-    end
-
-    hash
   end
 
   def edge_element id, name, source, target, fave_color

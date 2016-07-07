@@ -7,12 +7,12 @@
 
       <% if elements.size > reduced_elements.size %>
           <%= link_to_function ("Full graph "+image("expand")).html_safe,
-                               "drawGraph(elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                               "ISA.drawGraph(elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
                                :id => 'full_graph_expand_image',
                                :class => 'graph_toggle'
           -%>
           <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
-                               "drawGraph(reduced_elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
+                               "ISA.drawGraph(reduced_elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
                                :id => 'reduced_graph_collapse_image',
                                :style => "display:none",
                                :class => 'graph_toggle'
@@ -43,9 +43,9 @@
     isa_graph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
     isa_graph.style['text-align'] = 'center';
   } else {
-    decodeHTMLForElements(elements);
-    decodeHTMLForElements(reduced_elements);
+    ISA.decodeHTMLForElements(elements);
+    ISA.decodeHTMLForElements(reduced_elements);
 
-    drawGraph(reduced_elements, current_element_id);
+    ISA.drawGraph(reduced_elements, current_element_id);
   }
 </script>
