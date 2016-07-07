@@ -23,7 +23,7 @@ RUN chown -R app:app /home/app
 # Gems
 COPY Gemfile Gemfile
 COPY Gemfile.lock Gemfile.lock
-RUN bundle install --without development
+RUN bundle install
 
 # App code (picky about what gets copied to make caching of the assets:precompile more likely)
 COPY Rakefile Rakefile
