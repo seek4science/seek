@@ -5,14 +5,14 @@ FROM phusion/passenger-ruby21
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends libssl-dev build-essential git libreadline-dev \
             libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3 libcurl4-gnutls-dev \
-            poppler-utils libreoffice libmagick++-dev libxslt1-dev libpq-dev ruby2.1 ruby2.1-dev \
+            poppler-utils libreoffice libmagick++-dev libxslt1-dev libpq-dev \
             nodejs build-essential && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 
 # Update Ruby and Bundler
-RUN gem update bundler
+# RUN gem update bundler
 
 # Environment
 WORKDIR /home/app/seek
@@ -27,6 +27,7 @@ RUN bundle install --without development
 
 # App code (picky about what gets copied to make caching of the assets:precompile more likely)
 COPY Rakefile Rakefile
+COPY config.ru config.ru
 COPY app app
 COPY config config
 COPY db db
@@ -57,7 +58,7 @@ COPY docker/nginx.conf /etc/nginx/sites-enabled/seek.conf
 COPY docker/entrypoint.sh /entrypoint.sh
 
 # Cleanup
-# RUN /tmp/* /var/tmp/* db/*.sqlite3
+RUN rm -rf /tmp/* /var/tmp/* # db/*.sqlite3
 
 RUN chown -R app:app /home/app
 

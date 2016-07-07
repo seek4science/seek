@@ -12,6 +12,6 @@ bundle exec rake seek:workers:start
 # Search
 bundle exec rake sunspot:solr:start
 
-# chown -R app:app /home/app/seek
+chown -R app:app /home/app/seek
 
 /sbin/my_init
