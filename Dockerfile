@@ -9,39 +9,34 @@ RUN apt-get update -qq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# throw errors if Gemfile has been modified since Gemfile.lock
-RUN bundle config --global frozen 1
-
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 ENV RAILS_ENV=production
 
-COPY Gemfile /usr/src/app/
-COPY Gemfile.lock /usr/src/app/
-RUN bundle install
+# Bundle install throw errors if Gemfile has been modified since Gemfile.lock
+COPY Gemfile* .
+RUN bundle config --global frozen 1 && \
+    bundle install
 
 # App code (picky about what gets copied to make caching of the assets:precompile more likely)
-COPY Rakefile Rakefile
-COPY config.ru config.ru
-COPY app app
-COPY config config
-COPY db db
-COPY lib lib
-COPY public public
-COPY spec spec
-COPY script script
-COPY solr solr
-COPY vendor vendor
+COPY Rakefile .
+COPY config.ru .
+COPY app .
+COPY config .
+COPY db .
+COPY lib .
+COPY public .
+COPY spec .
+COPY script .
+COPY solr .
+COPY vendor .
 
-# Temp Database (for asset compilation)
-RUN cp config/database.sqlite.yml config/database.yml
-RUN bundle exec rake db:setup
-
-# Compile assets
-RUN bundle exec rake assets:precompile
+# SQLite Database (for asset compilation)
+RUN cp config/database.sqlite.yml config/database.yml && \
+    bundle exec rake db:setup && \
+    bundle exec rake assets:precompile
 
 # Config
-# RUN cp docker/database.docker.yml config/database.yml
 COPY docker/seek_local.rb config/initializers/seek_local.rb
 COPY config/sunspot.default.yml config/sunspot.yml
 
@@ -50,7 +45,7 @@ COPY docker docker
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 
 # Cleanup
-RUN rm -rf /tmp/* /var/tmp/* # db/*.sqlite3
+RUN rm -rf /tmp/* /var/tmp/*
 
 # Network
 EXPOSE 80
