@@ -22,12 +22,13 @@ fi
 # Soffice service
 soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1 &
 
+# Start Rails
+bundle exec rails server -d -b 0.0.0.0
+
 # Workers
 bundle exec rake seek:workers:start
 
 # Search
 bundle exec rake sunspot:solr:start
-
-bundle exec rails server -b 0.0.0.0 &
 
 nginx -g 'daemon off;'
