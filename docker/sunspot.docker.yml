@@ -1,0 +1,5 @@
+production:
+  solr:
+    hostname: solr
+    port: <%= ENV["SOLR_PORT"] %>
+    log_level: WARNING

@@ -14,6 +14,7 @@ services:
     restart: always
     environment:
       RAILS_ENV: production
+      #SOLR_PORT: 8983
     env_file:
       - docker/db.env
     volumes:
@@ -22,8 +23,15 @@ services:
       - "80:80"
     depends_on:
       - db
+      - solr
     links:
       - db
+      - solr
+
+  solr:
+    image: solr
+    restart: always
+
 
 volumes:
   seek-filestore:
