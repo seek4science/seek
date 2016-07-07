@@ -32,8 +32,8 @@ COPY vendor vendor
 
 # SQLite Database (for asset compilation)
 RUN cp config/database.sqlite.yml config/database.yml && \
-    bundle exec rake db:setup && \
-    bundle exec rake assets:precompile
+    bundle exec rake db:setup
+RUN bundle exec rake assets:precompile
 
 # Config
 COPY docker/seek_local.rb config/initializers/seek_local.rb
