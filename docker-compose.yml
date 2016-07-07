@@ -1,26 +1,32 @@
-dbdata: # Data container for DB
-  image: postgres
-  command: /bin/echo Postgres data container
+version: '2'
+services:
+  db: # Database implementation, in this case MySQL
+    image: mysql:5.7
+    restart: always
+    env_file:
+      - docker/db.env
+    volumes:
+      - mysql-db:/var/lib/mysql
 
-db: # Database implementation
-  image: postgres
-  volumes_from:
-    - dbdata
-
-seekdata: # Data container for SEEK filestore
-  image: busybox
-  command: mkdir /home/app/seek/filestore && echo SEEK data container
-  volumes:
-    - /home/app/seek/filestore
-
-seek: # The SEEK application, passenger, solr and delayed_job worker
-  build: .
-  command: /entrypoint.sh
-  environment:
+  seek: # The SEEK application, passenger, solr and delayed_job worker
+    build: .
+    command: docker/entrypoint.sh
+    restart: always
+    environment:
       RAILS_ENV: production
-  ports:
-    - "80:80"
-  links:
-    - db
-  volumes_from:
-    - seekdata
+    env_file:
+      - docker/db.env
+    volumes:
+      - seek-filestore:/home/app/seek/filestore
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    links:
+      - db
+
+volumes:
+  seek-filestore:
+    external: true
+  mysql-db:
+    external: true
