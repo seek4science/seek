@@ -55,7 +55,7 @@ RUN rm -f /etc/service/nginx/down
 RUN rm /etc/nginx/sites-enabled/default
 COPY docker/nginx.conf /etc/nginx/sites-enabled/seek.conf
 
-COPY docker/entrypoint.sh /entrypoint.sh
+COPY docker docker
 
 # Cleanup
 RUN rm -rf /tmp/* /var/tmp/* # db/*.sqlite3
@@ -68,4 +68,4 @@ EXPOSE 80
 # Shared
 VOLUME ["/home/app/seek/filestore", "/home/app/seek/config", "/home/app/seek/log"]
 
-CMD ["/entrypoint.sh"]
+CMD ["docker/entrypoint.sh"]
