@@ -5,9 +5,18 @@ sed -i "s/secret_token = '.*'/key = '"`bundle exec rake secret`"'/" config/initi
 
 # DB config
 
-# cp docker/database.docker.mysql.yml config/database.yml
+if [ ! -z $MYSQL_DATABASE ]
+then
+    echo "USING MYSQL"
 
-# bundle exec rake db:setup
+    cp docker/database.docker.mysql.yml config/database.yml
+
+    if ! mysql -uroot -p$MYSQL_ROOT_PASSWORD -h db -e "use $MYSQL_DATABASE"
+    then
+        echo "SETTING UP MYSQL DB"
+        bundle exec rake db:setup
+    fi
+fi
 
 
 # Soffice service
