@@ -73,16 +73,16 @@ this page.
 
 ### Update Ruby with RVM
 
-Although not critical, we recommend updating Ruby to 2.1.8. If you are using
+Although not critical, we recommend updating Ruby to 2.1.9. If you are using
 RVM, as recommended in the installation, you can do this with:
 
     rvm get stable
-    rvm upgrade 2.1.7 2.1.8
+    rvm upgrade 2.1.7 2.1.9
 
 The above upgrade command will copy across all previous gemsets (see:[https://rvm.io/rubies/upgrading](https://rvm.io/rubies/upgrading)).
 If you have gemsets for other applications and copying them all isn't desirable, then you may want to start afresh:
 
-    rvm install ruby-2.1.8
+    rvm install ruby-2.1.9
 
 ### Make sure bundler is installed
 
@@ -137,9 +137,9 @@ If the upgrade has involved an upgrade of Ruby, and you are running a production
 
 would need changing to
 
-    PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.8/wrappers/ruby
+    PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.9/wrappers/ruby
 
-after upgrading from ruby 2.1.7 to ruby 2.1.8
+after upgrading from ruby 2.1.7 to ruby 2.1.9
 
 If you have problems, you may need to upgrade and reinstall the Passenger Phusion modules (if unsure there no harm in doing so).
 
