@@ -103,3 +103,8 @@ ul.nav-tabs {
     color: $state-danger-text;
   }
 }
+
+textarea.form-control {
+  height: 7em;
+  line-height: 1.3;
+}
