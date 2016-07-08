@@ -113,6 +113,7 @@ end
 
 group :production do
   gem 'passenger'
+  gem 'puma'
 end
 
 group :development do
