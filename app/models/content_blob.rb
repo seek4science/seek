@@ -7,7 +7,7 @@ require 'rest-client'
 
 class ContentBlob < ActiveRecord::Base
   include Seek::ContentTypeDetection
-  include Seek::PdfExtraction
+  include Seek::ContentExtraction
   include Seek::Data::Checksums
 
   belongs_to :asset, polymorphic: true
@@ -187,7 +187,12 @@ class ContentBlob < ActiveRecord::Base
     else
       url_search_terms = []
     end
-    [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
+    if is_text?
+      [original_filename, url, file_extension, text_contents_for_search] | url_search_terms
+    else
+      [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
+    end
+
   end
 
   def is_downloadable?
