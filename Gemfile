@@ -3,6 +3,11 @@ source 'https://rubygems.org'
 gem 'rails', '3.2.22'
 gem 'rdoc'
 
+#database adaptors
+gem 'mysql2'
+gem 'pg'
+gem 'sqlite3'
+
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
@@ -11,7 +16,6 @@ gem 'uuid', '~>2.3'
 gem 'RedCloth', '4.2.9'
 gem 'simple-spreadsheet-extractor', '~>0.15.0'
 gem 'rmagick', '2.15.2'
-gem 'mysql2'
 gem 'rest-client'
 gem 'factory_girl', '2.6.4'
 gem 'rubyzip', '~> 1.1.4'
@@ -125,14 +129,12 @@ end
 
 group :test do
   gem 'test_after_commit'
-  gem 'sqlite3'
   gem 'ruby-prof'
   gem 'minitest', '~> 4.0'
   gem 'minitest-reporters'
   gem 'coveralls', require: false
   gem 'rspec-rails'
   gem 'sunspot_matchers'
-  gem 'pg'
   gem 'magic_lamp'
   gem 'database_cleaner'
 end

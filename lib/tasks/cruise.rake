@@ -2,9 +2,7 @@ require 'rubygems'
 require 'rake'
 require 'fileutils'
 require 'bundler'
-require 'rspec/core/rake_task'
-
-
+#require 'rspec/core/rake_task'
 
 "Cruise task for running with .rvm via ./script/build-cruise.sh"
 task :cruise do |t,args|
