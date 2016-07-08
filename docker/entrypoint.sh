@@ -35,7 +35,7 @@ fi
 
 # Start Rails
 echo "STARTING SEEK"
-bundle exec puma -C config/puma.rb
+bundle exec puma -C config/puma.rb -d
 
 # Workers
 echo "STARTING WORKERS"
