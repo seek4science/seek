@@ -505,10 +505,6 @@ class ContentBlobTest < ActiveSupport::TestCase
     viewable_formats << "application/vnd.oasis.opendocument.text"
     viewable_formats << "application/vnd.oasis.opendocument.presentation"
     viewable_formats << "application/rtf"
-    viewable_formats << "text/csv"
-    viewable_formats << "text/x-comma-separated-values"
-    viewable_formats << "text/tab-separated-values"
-    viewable_formats << "text/plain"
 
     viewable_formats.each do |viewable_format|
       cb_with_content_viewable_format = Factory(:content_blob, :content_type=>viewable_format, :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
