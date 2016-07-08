@@ -15,6 +15,9 @@ module Seek
         parents(@object).each do |parent|
           merge_hashes(hash, descendants(parent, depth))
         end
+
+        # All ancestors...
+        merge_hashes(hash, ancestors(@object, depth))
       end
 
       # Self and descendants...
@@ -47,7 +50,7 @@ module Seek
           hash = traverse(method, child, max_depth, depth + 1)
           nodes += hash[:nodes]
           edges += hash[:edges]
-          edges << [object, child]
+          edges << (method == :parents ? [child, object] : [object, child])
         end
       end
 
@@ -68,7 +71,7 @@ module Seek
         when Project
           {
               children: object.investigations,
-              parents: [object.programme]
+              parents: [object.programme].compact
           }
         when Investigation
           {
