@@ -1,6 +1,6 @@
 module Seek
   module ContentExtraction
-    MAXIMUM_PDF_CONVERT_TIME = 30.seconds
+    MAXIMUM_PDF_CONVERT_TIME = 3.minutes
 
     def pdf_contents_for_search
       content = []
