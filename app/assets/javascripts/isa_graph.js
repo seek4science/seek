@@ -2,9 +2,9 @@ var cy;
 
 var ISA = {
     originNode: null,
-    
+
     defaults: {
-      nodeWidth: 200,
+        nodeWidth: 200,
         nodeHeight: 65,
         fontSize: 16,
         color: '#323232',
