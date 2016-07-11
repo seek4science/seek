@@ -2,3 +2,4 @@
 Dockerfile
 filestore*
 coverage/
+docker/solr/
