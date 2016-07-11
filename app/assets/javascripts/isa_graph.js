@@ -157,11 +157,7 @@ var ISA = {
     },
 
     displayNodeInfo: function (node) {
-        html = "<div class='isa-selected-item'><strong>Selected item: </strong>";
-        html += HandlebarsTemplates['isa/item_info'](node.data());
-        html += '</div>';
-
-        $j('#node_info').html(html);
+        $j('#node_info').html(HandlebarsTemplates['isa/item_info'](node.data()));
     },
 
     decodeHTMLForElements: function (elements) {
