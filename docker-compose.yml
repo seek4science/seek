@@ -14,7 +14,7 @@ services:
     restart: always
     environment:
       RAILS_ENV: production
-      #SOLR_PORT: 8983
+      SOLR_PORT: 8983
     env_file:
       - docker/db.env
     volumes:
@@ -29,7 +29,7 @@ services:
       - solr
 
   solr:
-    image: solr
+    build: ./docker/solr/
     restart: always
 
 volumes:
