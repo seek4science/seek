@@ -1,5 +1,7 @@
 FROM ruby:2.1
 
+MAINTAINER Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall
+
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends libssl-dev build-essential git libreadline-dev \
             libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3 libcurl4-gnutls-dev \
