@@ -31,10 +31,14 @@ services:
   solr:
     #build: ./docker/solr/
     image: fairdom/seek-solr
+    volumes:
+      - seek-solr-data:/opt/solr/server/solr/seek/data
     restart: always
 
 volumes:
   seek-filestore:
     external: true
   seek-mysql-db:
+    external: true
+  seek-solr-data:
     external: true
