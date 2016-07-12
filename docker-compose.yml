@@ -6,7 +6,7 @@ services:
     env_file:
       - docker/db.env
     volumes:
-      - mysql-db:/var/lib/mysql
+      - seek-mysql-db:/var/lib/mysql
 
   seek: # The SEEK application, passenger, solr and delayed_job worker
     build: .
@@ -36,5 +36,5 @@ services:
 volumes:
   seek-filestore:
     external: true
-  mysql-db:
+  seek-mysql-db:
     external: true
