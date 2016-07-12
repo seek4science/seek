@@ -39,10 +39,7 @@ RUN bundle exec rake assets:precompile
 
 # Docker specific configs
 COPY docker docker
-COPY docker/seek_local.rb config/initializers/seek_local.rb
 COPY docker/nginx.conf /etc/nginx/sites-available/default
-
-
 
 # Cleanup
 RUN rm -rf /tmp/* /var/tmp/*
