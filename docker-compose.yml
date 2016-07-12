@@ -29,7 +29,8 @@ services:
       - solr
 
   solr:
-    build: ./docker/solr/
+    #build: ./docker/solr/
+    image: fairdom/seek-solr
     restart: always
 
 volumes:
