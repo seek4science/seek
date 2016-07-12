@@ -116,6 +116,7 @@ end
 group :production do
   gem 'passenger'
   gem 'puma'
+  gem 'system'
 end
 
 group :development do

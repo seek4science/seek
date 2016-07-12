@@ -1,5 +1,6 @@
+require 'system'
 # Change to match your CPU core count
-workers 2
+workers System::CPU.count
 
 # Min and Max threads per worker
 threads 1, 6
