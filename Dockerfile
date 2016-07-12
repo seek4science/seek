@@ -37,13 +37,12 @@ RUN cp config/database.sqlite.yml config/database.yml && \
     bundle exec rake db:setup
 RUN bundle exec rake assets:precompile
 
-# Config
-COPY docker/seek_local.rb config/initializers/seek_local.rb
-COPY config/sunspot.default.yml config/sunspot.yml
-
+# Docker specific configs
 COPY docker docker
-
+COPY docker/seek_local.rb config/initializers/seek_local.rb
 COPY docker/nginx.conf /etc/nginx/sites-available/default
+
+
 
 # Cleanup
 RUN rm -rf /tmp/* /var/tmp/*
