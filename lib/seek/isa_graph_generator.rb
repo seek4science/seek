@@ -17,7 +17,7 @@ module Seek
         end
 
         # All ancestors...
-        merge_hashes(hash, ancestors(@object, depth))
+        merge_hashes(hash, ancestors(@object, nil))
       end
 
       # Self and descendants...
