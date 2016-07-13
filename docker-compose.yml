@@ -18,7 +18,7 @@ services:
     env_file:
       - docker/db.env
     volumes:
-      - seek-filestore:/home/app/seek/filestore
+      - seek-filestore:/usr/src/app/filestore
     ports:
       - "80:80"
     depends_on:
