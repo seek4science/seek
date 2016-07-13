@@ -68,10 +68,14 @@ module Seek
 
     def associations(object)
       case object
+        when Programme
+          {
+              children: object.projects,
+          }
         when Project
           {
               children: object.investigations,
-              parents: [object.programme].compact
+              parents: object.programme ? [object.programme] : []
           }
         when Investigation
           {
