@@ -60,7 +60,12 @@ class ModelTest < ActiveSupport::TestCase
     m.content_blobs << Factory.create(:doc_content_blob,:original_filename=>"word.doc",:asset=>m,:asset_version=>m.version)
     m.reload
 
-    assert_equal ["This is a ms word doc format", "doc","teusink.xml", "word.doc","xml"],m.content_blob_search_terms.sort
+    terms = m.content_blob_search_terms
+    assert_includes terms,"This is a ms word doc format"
+    assert_includes terms,"doc"
+    assert_includes terms,"teusink.xml"
+    assert_includes terms,"word.doc"
+    assert_includes terms,"xml"
   end
 
   test "type detection" do
