@@ -17,7 +17,6 @@ task :cruise do |t,args|
   Rake::Task["db:create:all"].invoke
   Rake::Task["db:setup"].invoke
   Rake::Task["db:test:prepare"].invoke
-  Rake::Task["seek:seed_testing"].invoke
   Rake::Task["test"].invoke
 
   RSpec::Core::RakeTask.new(:spec)
