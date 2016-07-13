@@ -1,0 +1,22 @@
+# Postgres running on a host: "db"
+
+development:
+  adapter: postgresql
+  database: seek_development
+  username: postgres
+  password:
+  host: db
+
+test:
+  adapter: postgresql
+  database: seek_test
+  username: postgres
+  password:
+  host: db
+
+production:
+  adapter: postgresql
+  database: seek_production
+  username: postgres
+  password:
+  host: db

@@ -123,12 +123,12 @@ class HomesControllerTest < ActionController::TestCase
     assert !@response.body.include?(model.title)
   end
 
-  test 'root should route to sign_up when no user, otherwise to home' do
+  test 'root should route to sign_up when no user otherwise to home' do
     User.all.each do |u|
       u.delete
     end
     get :index
-    assert_redirected_to :controller => 'users', :action => 'new'
+    assert_redirected_to signup_path
 
     Factory(:user)
     get :index
@@ -306,6 +306,18 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select "span.headline_announcement_title",:count=>0
+  end
+
+  test 'should not show external search without crossref' do
+    with_config_value :solr_enabled,true do
+      with_config_value :external_search_enabled, true do
+        with_config_value :crossref_api_email, "" do
+          get :index
+          assert_response :success
+          assert_select "div#search_box input#include_external_search",:count=>0
+        end
+      end
+    end
   end
 
   test "should show external search when not logged in" do

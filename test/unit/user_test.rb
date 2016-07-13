@@ -292,10 +292,10 @@ class UserTest < ActiveSupport::TestCase
     assert_equal users(:quentin).remember_token_expires_at, time
   end
 
-  def test_should_remember_me_default_two_weeks
-    before = 2.weeks.from_now.utc
+  def test_should_remember_me_default_six_months
+    before = 6.months.from_now.utc
     users(:quentin).remember_me
-    after = 2.weeks.from_now.utc
+    after = 6.months.from_now.utc
     assert_not_nil users(:quentin).remember_token
     assert_not_nil users(:quentin).remember_token_expires_at
     assert users(:quentin).remember_token_expires_at.between?(before, after)

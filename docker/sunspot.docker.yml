@@ -1,0 +1,6 @@
+production:
+  solr:
+    hostname: solr
+    path: /solr/seek
+    port: <%= ENV["SOLR_PORT"] %>
+    log_level: WARNING

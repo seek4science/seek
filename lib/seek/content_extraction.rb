@@ -1,6 +1,6 @@
 module Seek
-  module PdfExtraction
-    MAXIMUM_PDF_CONVERT_TIME = 30.seconds
+  module ContentExtraction
+    MAXIMUM_PDF_CONVERT_TIME = 3.minutes
 
     def pdf_contents_for_search
       content = []
@@ -14,6 +14,18 @@ module Seek
         content = extract_text_from_pdf
       else
         Rails.logger.error("Unable to find file contents for content blob #{id}")
+      end
+      content
+    end
+
+    def text_contents_for_search
+      content = []
+      if file_exists?
+        text=File.open(filepath).read
+        unless text.blank?
+          content = filter_text_content text
+          content = split_content(content)
+        end
       end
       content
     end

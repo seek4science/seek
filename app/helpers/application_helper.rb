@@ -211,7 +211,7 @@ module ApplicationHelper
       not_specified_text||=options[:none_text]
       not_specified_text||="No description specified" if options[:description]==true
       not_specified_text||="Not specified"
-      res = "<span class='none_text'>#{not_specified_text}</span>"
+      res = content_tag(:span, not_specified_text, class: 'none_text')
     else      
       text.capitalize! if options[:capitalize]            
       res = text.html_safe

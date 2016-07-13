@@ -1,7 +1,7 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
 
-  before_filter :signup_admin_if_not_users,:only=>:new
+  before_filter :redirect_to_sign_up_when_no_user,:only=>:new
   skip_before_filter :restrict_guest_user
   skip_before_filter :project_membership_required
   skip_before_filter :profile_for_login_required,:only=>[:new,:destroy]
@@ -108,8 +108,5 @@ class SessionsController < ApplicationController
     end
   end
 
-  #will initiate creating an initial admin user if no users are present
-  def signup_admin_if_not_users    
-    redirect_to :signup if User.count==0
-  end  
+
 end

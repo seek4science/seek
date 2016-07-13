@@ -1,9 +1,8 @@
 module BootstrapHelper
-
   # A link with an icon next to it
   def icon_link_to(text, icon_key, url, options = {})
     icon = icon_tag(icon_key, options.delete(:icon_options) || {})
-    if url.nil?
+    unless url
       content_tag(:a, (icon + text).html_safe, options)
     else
       link_to((icon + text).html_safe, url, options)
@@ -21,8 +20,8 @@ module BootstrapHelper
     title += ' <span class="caret"></span>'.html_safe
 
     options[:collapsible] = true
-    options[:heading_options] = merge_options({:class => 'clickable collapsible', 'data-toggle' => 'collapse-next'}, options[:heading_options])
-    options[:collapse_options] = {:class => 'panel-collapse collapse', 'aria-expanded' => true}
+    options[:heading_options] = merge_options({ :class => 'clickable collapsible', 'data-toggle' => 'collapse-next' }, options[:heading_options])
+    options[:collapse_options] = { :class => 'panel-collapse collapse', 'aria-expanded' => true }
     if collapsed
       options[:heading_options][:class] += ' collapsed'
       options[:collapse_options]['aria-expanded'] = false
@@ -37,9 +36,9 @@ module BootstrapHelper
 
   # A panel with a heading section and body
   def panel(title = nil, options = {})
-    heading_options = merge_options({:class => 'panel-heading'}, options.delete(:heading_options))
-    body_options = merge_options({:class => 'panel-body'}, options.delete(:body_options))
-    options = merge_options({:class => "panel #{options[:type] || 'panel-default'}"}, options)
+    heading_options = merge_options({ class: 'panel-heading' }, options.delete(:heading_options))
+    body_options = merge_options({ class: 'panel-body' }, options.delete(:body_options))
+    options = merge_options({ class: "panel #{options[:type] || 'panel-default'}" }, options)
 
     # The body of the panel
     body = content_tag(:div, body_options) do
@@ -48,29 +47,33 @@ module BootstrapHelper
 
     content_tag(:div, options) do # The panel wrapper
       if title
-        content_tag(:div, heading_options) do # The panel title
-          title_html = ""
-          unless (help_text = options.delete(:help_text)).nil?
-            title_html << help_icon(help_text) + " "
-          end
-          title_html << title
-          title_html.html_safe
-        end
+        panel_title(title, options, heading_options)
       else
         ''.html_safe
       end +
-          if options.delete(:collapsible)
-            content_tag(:div, body, options.delete(:collapse_options)) # The "collapse" wrapper around the body
-          else
-            body
-          end
+        if options.delete(:collapsible)
+          content_tag(:div, body, options.delete(:collapse_options)) # The "collapse" wrapper around the body
+        else
+          body
+        end
+    end
+  end
+
+  def panel_title(title, options, heading_options )
+    content_tag(:div, heading_options) do # The panel title
+      title_html = ''
+      if (help_text = options.delete(:help_text))
+        title_html << help_icon(help_text) + ' '
+      end
+      title_html << title
+      title_html.html_safe
     end
   end
 
   # A coloured information box with an X button to close it
   def alert_box(style = 'info', options = {}, &block)
     hide_button = options.delete(:hide_button)
-    content_tag(:div, merge_options(options, {:class => "alert alert-#{style} alert-dismissable", :role => 'alert'})) do
+    content_tag(:div, merge_options(options, class: "alert alert-#{style} alert-dismissable", role: 'alert')) do
       if hide_button
         capture(&block)
       else
@@ -81,15 +84,15 @@ module BootstrapHelper
 
   # A button that displays a dropdown menu when clicked
   def dropdown_button(text, icon_key = nil, options = {})
-    content_tag(:div, :class => "btn-group") do
+    content_tag(:div, class: 'btn-group') do
       content_tag(:div, :type => 'button', :class => "btn dropdown-toggle #{options[:type] || 'btn-default'}".strip,
-                  'data-toggle' => 'dropdown', 'aria-expanded' => 'false') do
+                        'data-toggle' => 'dropdown', 'aria-expanded' => 'false') do
         ((icon_key ? icon_tag(icon_key, options.delete(:icon_options) || {}) : '') +
             text + ' <span class="caret"></span>'.html_safe)
       end +
-          content_tag(:ul, merge_options({:class => 'dropdown-menu text-left', :role => 'menu'}, options.delete(:menu_options))) do
-            yield
-          end
+        content_tag(:ul, merge_options({ class: 'dropdown-menu text-left', role: 'menu' }, options.delete(:menu_options))) do
+          yield
+        end
     end
   end
 
@@ -101,7 +104,7 @@ module BootstrapHelper
     end
 
     unless opts.blank?
-      dropdown_button(text, icon, {:menu_options => {:class => 'pull-right'}}) do
+      dropdown_button(text, icon, menu_options: { class: 'pull-right' }) do
         opts
       end
     end
@@ -124,7 +127,7 @@ module BootstrapHelper
       if existing_objects.is_a?(String)
         options['data-existing-objects'] = existing_objects
       else
-        options['data-existing-objects'] = existing_objects.map {|o| {id: o.id, name: o.try(:name) || o.try(:title)}}.to_json
+        options['data-existing-objects'] = existing_objects.map { |object| { id: object.id, name: object.try(:name) || object.try(:title) } }.to_json
       end
     end
 
@@ -132,7 +135,7 @@ module BootstrapHelper
   end
 
   def modal(options = {})
-    opts = merge_options({:class => 'modal', :role => 'dialog', :tabindex => -1}, options)
+    opts = merge_options({ class: 'modal', role: 'dialog', tabindex: -1 }, options)
 
     dialog_class = 'modal-dialog'
     if (size = options.delete(:size))
@@ -140,32 +143,32 @@ module BootstrapHelper
     end
 
     content_tag(:div, opts) do
-    content_tag(:div, :class => dialog_class) do
-    content_tag(:div, :class => 'modal-content') do
-      yield
-    end
-    end
+      content_tag(:div, class: dialog_class) do
+        content_tag(:div, class: 'modal-content') do
+          yield
+        end
+      end
     end
   end
 
-  def modal_header(title, options = {})
-    content_tag(:div, :class => 'modal-header') do
+  def modal_header(title, _options = {})
+    content_tag(:div, class: 'modal-header') do
       content_tag(:button, :class => 'close', 'data-dismiss' => 'modal', 'aria-label' => 'Close') do
         content_tag(:span, '&times;'.html_safe, 'aria-hidden' => 'true')
       end +
-      content_tag(:h4, title, :class => 'modal-title')
+        content_tag(:h4, title, class: 'modal-title')
     end
   end
 
   def modal_body(options = {})
-    opts = merge_options({:class => 'modal-body'}, options)
+    opts = merge_options({ class: 'modal-body' }, options)
     content_tag(:div, opts) do
       yield
     end
   end
 
   def modal_footer(options = {})
-    opts = merge_options({:class => 'modal-footer'}, options)
+    opts = merge_options({ class: 'modal-footer' }, options)
     content_tag(:div, opts) do
       yield
     end
@@ -177,7 +180,7 @@ module BootstrapHelper
     typeahead_opts = {} if typeahead_opts.is_a?(TrueClass)
     options = {}
     options['data-typeahead'] = true
-    options[:placeholder] ||= ' '*20
+    options[:placeholder] ||= ' ' * 20
     if typeahead_opts[:values]
       options['data-typeahead-local-values'] = typeahead_opts[:values].to_json
     else
@@ -185,7 +188,7 @@ module BootstrapHelper
           if typeahead_opts[:prefetch_url]
             typeahead_opts[:prefetch_url]
           elsif typeahead_opts[:type]
-            latest_tags_path(:type => typeahead_opts[:type])
+            latest_tags_path(type: typeahead_opts[:type])
           else
             latest_tags_path
           end
@@ -193,7 +196,7 @@ module BootstrapHelper
           if typeahead_opts[:query_url]
             typeahead_opts[:query_url]
           elsif typeahead_opts[:type]
-            (query_tags_path(:type => typeahead_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
+            (query_tags_path(type: typeahead_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
           else
             (query_tags_path + '?query=%QUERY').html_safe
           end
@@ -231,5 +234,4 @@ module BootstrapHelper
 
     defaults.merge(options)
   end
-
 end
