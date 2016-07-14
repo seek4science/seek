@@ -18,7 +18,7 @@ ENV RAILS_ENV=production
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
 COPY Gemfile* ./
 RUN bundle config --global frozen 1 && \
-    bundle install --without development test
+    bundle install 
 
 # App code (picky about what gets copied to make caching of the assets:precompile more likely)
 COPY Rakefile config.ru ./
