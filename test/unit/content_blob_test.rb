@@ -520,32 +520,45 @@ class ContentBlobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'content should not be viewable when pdf_conversion is disabled' do
-    tmp = Seek::Config.pdf_conversion_enabled
-    Seek::Config.pdf_conversion_enabled = false
+  test 'content needing conversion should not be viewable when pdf_conversion is disabled' do
+    with_config_value :pdf_conversion_enabled, false do
+      viewable_formats= %w[application/msword]
+      viewable_formats << "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      viewable_formats << "application/vnd.ms-powerpoint"
+      viewable_formats << "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      viewable_formats << "application/vnd.oasis.opendocument.text"
+      viewable_formats << "application/vnd.oasis.opendocument.presentation"
 
-    viewable_formats= %w[application/msword]
-    viewable_formats << "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    viewable_formats << "application/vnd.ms-powerpoint"
-    viewable_formats << "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-    viewable_formats << "application/vnd.oasis.opendocument.text"
-    viewable_formats << "application/vnd.oasis.opendocument.presentation"
-    viewable_formats << "application/rtf"
-    viewable_formats << "text/plain"
+      viewable_formats.each do |viewable_format|
+        cb_with_content_viewable_format = Factory(:content_blob, :content_type=>viewable_format, :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
+        User.with_current_user cb_with_content_viewable_format.asset.contributor do
+          assert !cb_with_content_viewable_format.is_content_viewable?
+        end
+      end
 
-    viewable_formats.each do |viewable_format|
-      cb_with_content_viewable_format = Factory(:content_blob, :content_type=>viewable_format, :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
-      User.with_current_user cb_with_content_viewable_format.asset.contributor do
-        assert !cb_with_content_viewable_format.is_content_viewable?
+
+    end
+  end
+
+  test 'content not needing conversion should be viewable when pdf_conversion is disabled' do
+    pdf_content_blob = Factory(:content_blob, :content_type=>'application/pdf', :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
+
+    with_config_value :pdf_conversion_enabled, false do
+
+      viewable_formats= %w[text/plain text/csv text/tsv]
+
+      viewable_formats.each do |viewable_format|
+        cb_with_content_viewable_format = Factory(:content_blob, :content_type=>viewable_format, :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
+        User.with_current_user cb_with_content_viewable_format.asset.contributor do
+          assert cb_with_content_viewable_format.is_content_viewable?
+        end
+      end
+
+      User.with_current_user pdf_content_blob.asset.contributor do
+        assert pdf_content_blob.is_content_viewable?
       end
     end
 
-    pdf_content_blob = Factory(:content_blob, :content_type=>'application/pdf', :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
-    User.with_current_user pdf_content_blob.asset.contributor do
-      assert pdf_content_blob.is_content_viewable?
-    end
-
-    Seek::Config.pdf_conversion_enabled = tmp
   end
 
   test 'filter_text_content' do
