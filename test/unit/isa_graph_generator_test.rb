@@ -47,13 +47,16 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
 
     result = Seek::IsaGraphGenerator.new(data_file).generate(include_parents: true)
 
-    assert_equal 4, result[:nodes].length
-    assert_equal 3, result[:edges].length
+    assert_equal 7, result[:nodes].length
+    assert_equal 6, result[:edges].length
 
     assert_includes result[:nodes], assay
     assert_includes result[:nodes], data_file
     assert_includes result[:nodes], model
     assert_includes result[:nodes], sop
+    assert_includes result[:nodes], assay.study
+    assert_includes result[:nodes], assay.study.investigation
+    assert_includes result[:nodes], assay.study.investigation.projects.first
 
     assert_includes result[:edges], [assay, data_file]
     assert_includes result[:edges], [assay, model]
