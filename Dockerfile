@@ -48,6 +48,6 @@ RUN rm -rf /tmp/* /var/tmp/*
 EXPOSE 80
 
 # Shared
-VOLUME ["/home/app/seek/filestore", "/home/app/seek/config", "/home/app/seek/log"]
+VOLUME ["/usr/src/app/filestore"]
 
 CMD ["docker/entrypoint.sh"]

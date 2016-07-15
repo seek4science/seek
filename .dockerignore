@@ -3,3 +3,5 @@ Dockerfile
 filestore*
 coverage/
 docker/solr/
+db/*.sqlite3
+vendor/bundle/

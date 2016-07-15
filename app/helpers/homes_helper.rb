@@ -128,7 +128,7 @@ module HomesHelper
         description: item.respond_to?(:description) ? item.description : nil,
         abstract: item.respond_to?(:abstract) ? item.abstract : nil,
         created_at: log.created_at,
-        avatar_image: resource_avatar(item, class: 'home_asset_icon'),
+        avatar_image: resource_avatar(item, class: 'home_asset_icon') || avatar(item, nil, true, nil, nil, true, 'home_asset_icon'),
         url: show_resource_path(item),
         log_id: log.id
       }
