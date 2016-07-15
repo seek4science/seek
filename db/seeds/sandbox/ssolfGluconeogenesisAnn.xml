@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created by JWS2SBML on 2013/02/06 11:09:52-->
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" version="4">
+<model name="ssolfGluconeogenesis20132219145263107420132695058784885">
+  <listOfCompartments>
+    <compartment id="compartment" name="compartment" size="1"/>
+  </listOfCompartments>
+  <listOfSpecies>
+    <species metaid="metaid_1" id="P3G" name="3-phospho-D-glycericacid" compartment="compartment" initialConcentration="5">
+      <annotation>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
+          <rdf:Description rdf:about="#metaid_1">
+            <bqbiol:is>
+              <rdf:Bag>
+                <rdf:li rdf:resource="urn:miriam:kegg.compound:C00197"/>
+              </rdf:Bag>
+            </bqbiol:is>
+          </rdf:Description>
+        </rdf:RDF>
+      </annotation>
+    </species>
+    <species id="ATP" name="ATP" compartment="compartment" initialConcentration="9.981" boundaryCondition="true" constant="true"/>
+    <species id="bisP" name="bisP" compartment="compartment" initialConcentration="0"/>
+    <species id="ADP" name="ADP" compartment="compartment" initialConcentration="0.019" boundaryCondition="true" constant="true"/>
+    <species id="nadph" name="nadph" compartment="compartment" initialConcentration="0.2" boundaryCondition="true" constant="true"/>
+    <species id="gap" name="gap" compartment="compartment" initialConcentration="0"/>
+    <species id="nadp" name="nadp" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+    <species id="pi" name="pi" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+    <species id="dhap" name="dhap" compartment="compartment" initialConcentration="0"/>
+    <species id="f6p" name="f6p" compartment="compartment" initialConcentration="0"/>
+    <species id="sink" name="sink" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+    <species id="sink2" name="sink2" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+    <species id="sink3" name="sink3" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+  </listOfSpecies>
+  <listOfParameters>
+    <parameter id="KaldDHAP" name="KaldDHAP" value="0.0356266975140382"/>
+    <parameter id="KaldF6P" name="KaldF6P" value="1"/>
+    <parameter id="KaldGAP" name="KaldGAP" value="0.0208229924875437"/>
+    <parameter id="KbisP" name="KbisP" value="0.000361391122939812"/>
+    <parameter id="kdbpg" name="kdbpg" value="1.05824"/>
+    <parameter id="kddhap" name="kddhap" value="0.0225"/>
+    <parameter id="kdgap" name="kdgap" value="0.0559"/>
+    <parameter id="Kgap" name="Kgap" value="1.63541516706497"/>
+    <parameter id="KiADP" name="KiADP" value="3.9345680269997"/>
+    <parameter id="Knadp" name="Knadp" value="0.292865795009516"/>
+    <parameter id="Knadph" name="Knadph" value="0.0558556960649001"/>
+    <parameter id="KpgkADP" name="KpgkADP" value="0.0321191670871277"/>
+    <parameter id="KpgkATP" name="KpgkATP" value="13.3576782604586"/>
+    <parameter id="KpgkbisP" name="KpgkbisP" value="5.58999999854782"/>
+    <parameter id="KpgkP3G" name="KpgkP3G" value="0.703672550780103"/>
+    <parameter id="Kpi" name="Kpi" value="323.993799522825"/>
+    <parameter id="KtimDHAP" name="KtimDHAP" value="0.518888549904879"/>
+    <parameter id="KtimGAP" name="KtimGAP" value="0.498415077220458"/>
+    <parameter id="KtimPEP" name="KtimPEP" value="0.848685943377774"/>
+    <parameter id="n" name="n" value="1.64682193303383"/>
+    <parameter id="pep" name="pep" value="2"/>
+    <parameter id="protALDPase" name="protALDPase" value="0.0034"/>
+    <parameter id="protGAPdh" name="protGAPdh" value="0.0394"/>
+    <parameter id="protPGK" name="protPGK" value="0.0068"/>
+    <parameter id="protTIM" name="protTIM" value="0.0008"/>
+    <parameter id="Vmarev" name="Vmarev" value="19.5958267894745"/>
+    <parameter id="VmfALD" name="VmfALD" value="2.4400286348037"/>
+    <parameter id="Vmfor" name="Vmfor" value="17.7049189682351"/>
+    <parameter id="VmfPGK" name="VmfPGK" value="13.5268050830795"/>
+    <parameter id="VmfTIM" name="VmfTIM" value="250.307172194359"/>
+    <parameter id="VmrPGK" name="VmrPGK" value="17.510831090958"/>
+    <parameter id="VmrTIM" name="VmrTIM" value="227.335101788348"/>
+    <parameter id="EXTERNAL" name="EXTERNAL" value="0"/>
+  </listOfParameters>
+  <listOfReactions>
+    <reaction metaid="metaid_v0" id="v1" name="ATP:3-phospho-D-glycerate1-phosphotransferase">
+      <annotation>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
+          <rdf:Description rdf:about="#metaid_v0">
+            <bqbiol:is>
+              <rdf:Bag>
+                <rdf:li rdf:resource="urn:miriam:kegg.reaction:R01512"/>
+              </rdf:Bag>
+            </bqbiol:is>
+          </rdf:Description>
+        </rdf:RDF>
+      </annotation>
+      <listOfReactants>
+        <speciesReference species="P3G"/>
+        <speciesReference species="ATP"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="bisP"/>
+        <speciesReference species="ADP"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <apply>
+              <times/>
+              <ci> protPGK </ci>
+              <apply>
+                <plus/>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> ADP </ci>
+                      <ci> VmrPGK </ci>
+                      <ci> bisP </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> KpgkADP </ci>
+                      <ci> KpgkbisP </ci>
+                    </apply>
+                  </apply>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> ATP </ci>
+                    <ci> VmfPGK </ci>
+                    <ci> P3G </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KpgkATP </ci>
+                    <ci> KpgkP3G </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <plus/>
+              <cn type="integer"> 1 </cn>
+              <apply>
+                <divide/>
+                <apply>
+                  <times/>
+                  <apply>
+                    <plus/>
+                    <cn type="integer"> 1 </cn>
+                    <apply>
+                      <divide/>
+                      <ci> ADP </ci>
+                      <ci> KiADP </ci>
+                    </apply>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <times/>
+                        <ci> ADP </ci>
+                        <apply>
+                          <plus/>
+                          <cn type="integer"> 1 </cn>
+                          <apply>
+                            <divide/>
+                            <ci> ADP </ci>
+                            <ci> KiADP </ci>
+                          </apply>
+                        </apply>
+                      </apply>
+                      <ci> KpgkADP </ci>
+                    </apply>
+                    <apply>
+                      <divide/>
+                      <ci> ATP </ci>
+                      <ci> KpgkATP </ci>
+                    </apply>
+                  </apply>
+                  <ci> bisP </ci>
+                </apply>
+                <ci> KpgkbisP </ci>
+              </apply>
+              <apply>
+                <divide/>
+                <apply>
+                  <times/>
+                  <apply>
+                    <plus/>
+                    <cn type="integer"> 1 </cn>
+                    <apply>
+                      <divide/>
+                      <ci> ADP </ci>
+                      <ci> KiADP </ci>
+                    </apply>
+                    <apply>
+                      <divide/>
+                      <ci> ATP </ci>
+                      <ci> KpgkATP </ci>
+                    </apply>
+                  </apply>
+                  <ci> P3G </ci>
+                </apply>
+                <ci> KpgkP3G </ci>
+              </apply>
+            </apply>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction metaid="metaid_v1" id="v2" name="D-glyceraldehyde-3-phosphate:NADP+oxidoreductase(phosphorylating)">
+      <annotation>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
+          <rdf:Description rdf:about="#metaid_v1">
+            <bqbiol:is>
+              <rdf:Bag>
+                <rdf:li rdf:resource="urn:miriam:kegg.reaction:R01063"/>
+              </rdf:Bag>
+            </bqbiol:is>
+          </rdf:Description>
+        </rdf:RDF>
+      </annotation>
+      <listOfReactants>
+        <speciesReference species="bisP"/>
+        <speciesReference species="nadph"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="gap"/>
+        <speciesReference species="nadp"/>
+        <speciesReference species="pi"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <apply>
+              <times/>
+              <ci> protGAPdh </ci>
+              <apply>
+                <power/>
+                <apply>
+                  <plus/>
+                  <apply>
+                    <divide/>
+                    <ci> bisP </ci>
+                    <ci> KbisP </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <pi/>
+                      <ci> gap </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> Kgap </ci>
+                      <ci> Kpi </ci>
+                    </apply>
+                  </apply>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> -1 </cn>
+                  <ci> n </ci>
+                </apply>
+              </apply>
+              <apply>
+                <minus/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> nadph </ci>
+                    <ci> Vmfor </ci>
+                    <ci> bisP </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KbisP </ci>
+                    <ci> Knadph </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> nadp </ci>
+                    <pi/>
+                    <ci> Vmarev </ci>
+                    <ci> gap </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> Kgap </ci>
+                    <ci> Knadp </ci>
+                    <ci> Kpi </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <times/>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <divide/>
+                  <ci> nadp </ci>
+                  <ci> Knadp </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <ci> nadph </ci>
+                  <ci> Knadph </ci>
+                </apply>
+              </apply>
+              <apply>
+                <plus/>
+                <apply>
+                  <minus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <times/>
+                    <cn type="integer"> 2 </cn>
+                    <apply>
+                      <power/>
+                      <apply>
+                        <divide/>
+                        <ci> bisP </ci>
+                        <ci> KbisP </ci>
+                      </apply>
+                      <ci> n </ci>
+                    </apply>
+                  </apply>
+                </apply>
+                <apply>
+                  <power/>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <divide/>
+                      <pi/>
+                      <ci> Kpi </ci>
+                    </apply>
+                    <apply>
+                      <divide/>
+                      <ci> bisP </ci>
+                      <ci> KbisP </ci>
+                    </apply>
+                  </apply>
+                  <ci> n </ci>
+                </apply>
+                <apply>
+                  <power/>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <divide/>
+                      <ci> bisP </ci>
+                      <ci> KbisP </ci>
+                    </apply>
+                    <apply>
+                      <divide/>
+                      <ci> gap </ci>
+                      <ci> Kgap </ci>
+                    </apply>
+                  </apply>
+                  <ci> n </ci>
+                </apply>
+                <apply>
+                  <power/>
+                  <apply>
+                    <plus/>
+                    <apply>
+                      <divide/>
+                      <ci> bisP </ci>
+                      <ci> KbisP </ci>
+                    </apply>
+                    <apply>
+                      <divide/>
+                      <apply>
+                        <times/>
+                        <pi/>
+                        <ci> gap </ci>
+                      </apply>
+                      <apply>
+                        <times/>
+                        <ci> Kgap </ci>
+                        <ci> Kpi </ci>
+                      </apply>
+                    </apply>
+                  </apply>
+                  <ci> n </ci>
+                </apply>
+              </apply>
+            </apply>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction metaid="metaid_v2" id="v3" name="D-glyceraldehyde-3-phosphatealdose-ketose-isomerase">
+      <annotation>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:vCard="http://www.w3.org/2001/vcard-rdf/3.0#" xmlns:bqbiol="http://biomodels.net/biology-qualifiers/" xmlns:bqmodel="http://biomodels.net/model-qualifiers/">
+          <rdf:Description rdf:about="#metaid_v2">
+            <bqbiol:is>
+              <rdf:Bag>
+                <rdf:li rdf:resource="urn:miriam:kegg.reaction:R01015"/>
+              </rdf:Bag>
+            </bqbiol:is>
+          </rdf:Description>
+        </rdf:RDF>
+      </annotation>
+      <listOfReactants>
+        <speciesReference species="gap"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="dhap"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <apply>
+              <times/>
+              <ci> protTIM </ci>
+              <apply>
+                <plus/>
+                <apply>
+                  <minus/>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> VmrTIM </ci>
+                      <ci> dhap </ci>
+                    </apply>
+                    <ci> KtimDHAP </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> VmfTIM </ci>
+                    <ci> gap </ci>
+                  </apply>
+                  <ci> KtimGAP </ci>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <plus/>
+              <cn type="integer"> 1 </cn>
+              <apply>
+                <divide/>
+                <ci> pep </ci>
+                <ci> KtimPEP </ci>
+              </apply>
+              <apply>
+                <divide/>
+                <ci> dhap </ci>
+                <ci> KtimDHAP </ci>
+              </apply>
+              <apply>
+                <divide/>
+                <ci> gap </ci>
+                <ci> KtimGAP </ci>
+              </apply>
+            </apply>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v4" name="v4">
+      <listOfReactants>
+        <speciesReference species="dhap"/>
+        <speciesReference species="gap"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="f6p"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <apply>
+              <times/>
+              <ci> protALDPase </ci>
+              <ci> VmfALD </ci>
+              <ci> dhap </ci>
+              <ci> gap </ci>
+            </apply>
+            <apply>
+              <times/>
+              <ci> KaldDHAP </ci>
+              <ci> KaldGAP </ci>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <divide/>
+                  <ci> dhap </ci>
+                  <ci> KaldDHAP </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <ci> f6p </ci>
+                  <ci> KaldF6P </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <ci> gap </ci>
+                  <ci> KaldGAP </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> dhap </ci>
+                    <ci> gap </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KaldDHAP </ci>
+                    <ci> KaldGAP </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v5" name="v5">
+      <listOfReactants>
+        <speciesReference species="gap"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="sink"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <times/>
+            <ci> kdgap </ci>
+            <ci> gap </ci>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v6" name="v6">
+      <listOfReactants>
+        <speciesReference species="dhap"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="sink2"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <times/>
+            <ci> kddhap </ci>
+            <ci> dhap </ci>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v7" name="v7">
+      <listOfReactants>
+        <speciesReference species="bisP"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="sink3"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <times/>
+            <ci> kdbpg </ci>
+            <ci> bisP </ci>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+  </listOfReactions>
+</model></sbml>
