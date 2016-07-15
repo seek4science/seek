@@ -227,3 +227,19 @@ end
 AssetsCreator.create(asset_id: publication.id, creator_id: guest_user.id, asset_type: publication.class.name)
 puts "Seeded 1 publication."
 
+[project,investigation,study,exp_assay,model_assay,data_file1,data_file2,model,publication].each do |item|
+  ActivityLog.create(:action => 'create',
+                     :culprit => guest_user,
+                     :controller_name => item.class.name.underscore.pluralize,
+                     :activity_loggable => item,
+                     :data => item.title
+                    )
+end
+
+Seek::Config.home_description = '<p style="text-align:center;font-size:larger;font-weight:bolder">Welcome to the SEEK Sandbox</p>
+<p style="text-align:center;font-size:larger;font-weight:bolder">You can log in with the username: <em>guest</em> and password: <em>guest</em></p>
+<p style="text-align:center">For more information about SEEK and to see a video, please visit our <a href="http://www.seek4science.org">Website</a>.</p>'
+
+Seek::Config.solr_enabled = true
+Seek::Config.programmes_enabled = true
+Seek::Config.front_page_buttons_enabled = true
