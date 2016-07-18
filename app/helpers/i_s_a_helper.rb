@@ -116,7 +116,8 @@ module ISAHelper
 
         data['name'] = truncate(h(item.title), :length => 110)
         data['fullName'] = h(item.title)
-        data['imageUrl'] = asset_path(resource_avatar_path(item))
+        avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
+        data['imageUrl'] = asset_path(avatar)
         data['url'] = polymorphic_path(item)
         
         if item.kind_of?(Assay) #distinquish two assay classes
