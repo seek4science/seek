@@ -200,6 +200,31 @@ module ISAHelper
     label_data.join(', ')
   end
 
+  def tree_json(hash)
+    roots = hash[:nodes].select do |obj|
+      hash[:edges].none? { |parent, child| child == obj }
+    end
+
+    roots.map do |root|
+      tree_node(hash, root)
+    end.to_json
+  end
+
+  def tree_node(hash, object)
+    child_edges = hash[:edges].select do |parent, child|
+      parent == object
+    end
+    hash[:edges] = hash[:edges] - child_edges
+
+    {
+      id: node_id(object),
+      text: object.title,
+      children: child_edges.map { |child_edge| tree_node(hash, child_edge[1]) },
+      state: { opened: child_edges.any? },
+      icon: asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
+    }
+  end
+
   private
 
   def node_id(object)

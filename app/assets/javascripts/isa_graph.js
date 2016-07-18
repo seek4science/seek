@@ -133,12 +133,19 @@ var ISA = {
         });
 
         cy.on('select', 'node', function (event) {
-            ISA.animateNode(event.cyTarget);
-            ISA.displayNodeInfo(event.cyTarget);
+            ISA.selectNode(event.cyTarget);
         });
     },
 
-    animateNode: function (node) {
+    selectNode: function (node) {
+        var jsTree = $j('#jstree').jstree(true);
+        jsTree.deselect_all();
+        jsTree.select_node(node.data('id'));
+        ISA.animateNode(node, 0.8);
+        ISA.displayNodeInfo(node);
+    },
+
+    animateNode: function (node, zoom) {
         //first normalizing all nodes and fading all nodes and edges
         cy.$('node.connected').removeClass('connected');
         cy.$('edge.connected').removeClass('connected');
@@ -153,7 +160,10 @@ var ISA = {
         node.addClass('selected');
 
         // Center the view on the node
-        cy.animate({center: {eles: cy.$(':selected')}});
+        opts = { center: { eles: node } };
+        if (zoom)
+            opts.zoom = zoom;
+        cy.animate(opts);
     },
 
     displayNodeInfo: function (node) {

@@ -1,0 +1,12 @@
+<div id="jstree"></div>
+
+<script type="text/javascript">
+  $j(document).ready(function () {
+    $j('#jstree').jstree({ 'core' : {
+      'data' : <%= tree_json(hash).html_safe -%>
+    } }).on('activate_node.jstree', function (e, data) {
+      var cyNode = cy.$('#' + data.node.id);
+      ISA.selectNode(cyNode);
+    });
+  });
+</script>

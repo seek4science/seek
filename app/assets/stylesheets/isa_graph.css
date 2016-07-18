@@ -20,3 +20,7 @@ a.graph_toggle {
     max-height: 600px !important;
     min-height: 400px;
 }
+
+#jstree .jstree-themeicon {
+    background-size: 24px !important;
+}
