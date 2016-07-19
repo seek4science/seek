@@ -110,7 +110,7 @@ gem 'rspec-rails'
 
 group :assets do
   gem 'turbo-sprockets-rails3'
-  gem 'yui-compressor'
+  gem 'uglifier'
 end
 
 group :production do
