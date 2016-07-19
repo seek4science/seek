@@ -3,15 +3,11 @@
 
 <div class="row">
   <div class="hidden-xs">
-    <div class="col-md-12 col-sm-12 isa_graph box_about_actor curved with_smaller_shadow">
-      <div class="row">
-        <div class="alert alert-info" role="alert" id="node_info"></div>
-        <div class="col-sm-8">
-          <div id="cy"></div>
-        </div>
-        <div class="col-sm-4">
-          <%= render partial: 'general/jstree', locals: { hash: hash } %>
-        </div>
+    <div class="isa_graph box_about_actor curved with_smaller_shadow">
+      <div id="node_info"></div>
+      <div class="isa-wrapper">
+        <div id="cy"></div>
+        <%= render partial: 'general/jstree', locals: { hash: hash } %>
       </div>
     </div>
 

@@ -216,13 +216,26 @@ module ISAHelper
     end
     hash[:edges] = hash[:edges] - child_edges
 
-    {
-      id: node_id(object),
-      text: object.title,
-      children: child_edges.map { |child_edge| tree_node(hash, child_edge[1]) },
-      state: { opened: child_edges.any? },
-      icon: asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
-    }
+    if object.can_view?
+      {
+        id: node_id(object),
+        text: object.title,
+        children: child_edges.map { |child_edge| tree_node(hash, child_edge[1]) },
+        state: { opened: child_edges.any? },
+        icon: asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
+      }
+    else
+      {
+          id: node_id(object),
+          text: 'Hidden item',
+          children: child_edges.map { |child_edge| tree_node(hash, child_edge[1]) },
+          state: {
+              opened: child_edges.any?,
+              disable: true
+          },
+          a_attr: { class: 'hidden-leaf none_text' }
+      }
+    end
   end
 
   private

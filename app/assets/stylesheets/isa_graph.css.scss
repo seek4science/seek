@@ -1,0 +1,49 @@
+@import 'variables';
+@import 'mixins';
+
+div.isa_graph {
+  overflow: hidden;
+}
+
+div#node_info {
+  border-bottom: 1px solid $panel-default-border;
+  padding: 10px;
+  background-color: $panel-default-heading-bg;
+}
+
+a.graph_toggle {
+  float: right;
+  margin-right:1em;
+  margin-top:1em;
+  font-weight: bold;
+}
+
+.isa-wrapper {
+  display: flex;
+}
+
+#cy {
+  flex-grow: 1;
+  max-height: 600px !important;
+  min-height: 400px;
+}
+
+#jstree {
+  background-color: #fff;
+  width: 300px;
+  flex-shrink: 0;
+  border-left: 1px solid $panel-default-border;
+  padding-left: 5px;
+  max-height: 600px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  .jstree-themeicon {
+    background-size: 24px !important;
+  }
+  .hidden-leaf {
+    color: gray;
+    > i {
+      display: none;
+    }
+  }
+}
