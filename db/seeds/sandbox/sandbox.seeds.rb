@@ -52,7 +52,7 @@ puts "Seeded 1 study."
 exp_assay = Assay.new(title: "Reconstituted system reference state",
                   description: "The four purified enzymes were incubated in assay buffer and consumption of 3PG and production of F6P were measured in time, together with GAP and DHAP concentrations."
 )
-exp_assay.owner = admin_person
+exp_assay.owner = guest_person
 exp_assay.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
 exp_assay.study = study
 exp_assay.assay_class = AssayClass.first
@@ -67,9 +67,6 @@ model_assay.policy = Policy.create(name: 'default policy', sharing_scope: 4, acc
 model_assay.study = study
 model_assay.assay_class = AssayClass.last
 model_assay.save
-RelationshipType.create(title: "Construction data", description: "Data used for model testing")
-                 #<RelationshipType id: 2, title: "Validation data", description: "Data used for validating a model", created_at: "2010-04-28 16:17:25", updated_at: "2010-04-28 16:17:25">,
-                 # #<RelationshipType id: 3, title: "Simulation results", description: "Data resulting from running a model simulation", created_at: "2010-04-28 16:17:25", updated_at: "2010-04-28 16:17:25"
 puts "Seeded 1 modelling analysis."
 
 #Assets
@@ -242,4 +239,17 @@ Seek::Config.home_description = '<p style="text-align:center;font-size:larger;fo
 
 Seek::Config.solr_enabled = true
 Seek::Config.programmes_enabled = true
+Seek::Config.programme_user_creation_enabled = true
 Seek::Config.front_page_buttons_enabled = true
+Seek::Config.site_base_host = 'https://sandbox.fairdomhub.org'
+Seek::Config.noreply_sender = 'no-reply@fair-dom.org'
+Seek::Config.project_name = 'SEEK SANDBOX'
+Seek::Config.application_name = 'SEEK SANDBOX'
+Seek::Config.exception_notification_enabled = true
+Seek::Config.exception_notification_recipients = ["errors@fair-dom.org"]
+Seek::Config.datacite_url = "https://mds.test.datacite.org/"
+Seek::Config.doi_prefix = "10.5072"
+Seek::Config.doi_suffix = "seek.5"
+puts "Finish configuration"
+puts "Now config manually: pubmed_api_email, crossref_api_email, bioportal_api_key, email, doi, admin email"
+puts "Then make sure solr, workers are running"
