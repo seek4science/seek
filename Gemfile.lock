@@ -717,6 +717,8 @@ GEM
     tzinfo (0.3.44)
     ucf (2.0.0)
       zip-container (~> 3.0.1)
+    uglifier (3.0.0)
+      execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.1)
@@ -759,7 +761,6 @@ GEM
       rails (>= 3.0, < 4.3)
       rake (>= 0.8.7)
     yard (0.8.7.6)
-    yui-compressor (0.12.0)
     zip-container (3.0.1)
       rubyzip (~> 1.1.6)
 
@@ -874,6 +875,7 @@ DEPENDENCIES
   test_after_commit
   transaction_isolation
   turbo-sprockets-rails3
+  uglifier
   unicorn-rails
   uuid (~> 2.3)
   validate_url
@@ -882,7 +884,6 @@ DEPENDENCIES
   white_list_formatted_content!
   will_paginate (~> 3.0.4)
   yaml_db
-  yui-compressor
   zenodo-client!
 
 BUNDLED WITH

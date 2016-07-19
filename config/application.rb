@@ -23,8 +23,8 @@ module SEEK
     #config.assets.version = '1.0'
     # Change the path that assets are served from
     # config.assets.prefix = "/assets"
-    config.assets.js_compressor = :yui
-    config.assets.css_compressor = :yui
+    config.assets.js_compressor = :uglifier
+    # config.assets.css_compressor = :yui
 
     config.assets.precompile += ['*.js',
                                  "prepended/*.css",
