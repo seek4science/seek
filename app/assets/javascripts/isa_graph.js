@@ -115,7 +115,7 @@ var ISA = {
                     ISA.originNode.select();
                     cy.animate({zoom: 0.75, center: {eles: ISA.originNode}});
                 } else {
-                    $j('.isa_graph')[0].hide();
+                    $j('#isa-graph').hide();
                 }
             }
         });
@@ -174,5 +174,10 @@ var ISA = {
         for (var i = 0; i < elements.length; i++) {
             elements[i].data.name = decodeHTML(elements[i].data.name);
         }
+    },
+    
+    fullscreen: function (state) {
+        $j('#isa-graph').toggleClass('fullscreen', state);
+        cy.resize();
     }
 };

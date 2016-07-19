@@ -1,8 +1,42 @@
 @import 'variables';
 @import 'mixins';
 
-div.isa_graph {
+#isa-graph {
   overflow: hidden;
+
+  &.fullscreen{
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    background-color: #fff;
+    padding-bottom: 70px;
+    height: 100%;
+
+    .isa-wrapper {
+      position: relative;
+      height: 100%;
+    }
+
+    .isa-footer {
+      position: absolute;
+      width: 100%;
+      bottom: 0px;
+      margin-top: 10px;
+      height: 60px;
+    }
+
+    #cy {
+      height: 100% !important;
+      max-height: none !important;
+      margin-bottom: 70px;
+    }
+
+    #exit-fullscreen-btn {
+      display: inline;
+    }
+  }
 }
 
 div#node_info {
@@ -34,7 +68,7 @@ a.graph_toggle {
   flex-shrink: 0;
   border-left: 1px solid $panel-default-border;
   padding-left: 5px;
-  max-height: 600px;
+  padding-bottom: 60px;
   overflow-y: scroll;
   overflow-x: hidden;
   .jstree-themeicon {
@@ -45,5 +79,25 @@ a.graph_toggle {
     > i {
       display: none;
     }
+  }
+}
+
+.isa-footer {
+  text-align: right;
+  border-top: 1px solid $panel-default-border;
+  padding: 10px;
+  background-color: $panel-footer-bg;
+}
+
+#exit-fullscreen-btn {
+  font-size: 40px;
+  color: inherit;
+  position: absolute;
+  right: 10px;
+  top: 0;
+  display: none;
+
+  &:hover {
+    text-decoration: none;
   }
 }
