@@ -9,7 +9,6 @@ events_enabled:
 bioportal_api_key:
 jerm_enabled:
 email_enabled:
-no_reply:
 jws_enabled:
 jws_online_root:
 internal_help_enabled:
