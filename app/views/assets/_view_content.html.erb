@@ -13,12 +13,16 @@
         <%#FIXME: this decision of whether to display image can be made in view_content controller method, as it does between text and pdf %>
         <% if content_blob.is_image? %>
             <%
-               image_width = content_blob.width.to_i
-               #zoom to larger image
-               zoom_width=image_width < Seek::ActsAsFleximageExtension::STANDARD_SIZE ? Seek::ActsAsFleximageExtension::STANDARD_SIZE : image_width
-               zoom_width=zoom_width > Seek::ActsAsFleximageExtension::MAX_SIZE ? Seek::ActsAsFleximageExtension::MAX_SIZE : zoom_width
-               zoom_width = (zoom_width == image_width) ? nil : zoom_width
-            %>
+                 class << content_blob
+                   acts_as_fleximage_extension
+                 end
+
+                 image_width = content_blob.width.to_i
+                 #zoom to larger image
+                 zoom_width=image_width < Seek::ActsAsFleximageExtension::STANDARD_SIZE ? Seek::ActsAsFleximageExtension::STANDARD_SIZE : image_width
+                 zoom_width=zoom_width > Seek::ActsAsFleximageExtension::MAX_SIZE ? Seek::ActsAsFleximageExtension::MAX_SIZE : zoom_width
+                 zoom_width = (zoom_width == image_width) ? nil : zoom_width
+              %>
             <%#param code is used for temporary link %>
             <% url = polymorphic_path([asset, content_blob], :action => 'download', :disposition => 'inline', :code => params[:code], :image_size => zoom_width) %>
             <% options = {:rel => "lightbox", :title => 'Preview'} %>

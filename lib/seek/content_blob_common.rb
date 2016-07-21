@@ -105,6 +105,24 @@ module Seek
       if @content_blob.url.blank?
         if @content_blob.file_exists?
           if image_size && @content_blob.is_image?
+            class << @content_blob
+              def image_assets_storage_directory
+                path = Seek::Config.temporary_filestore_path + '/image_assets'
+                FileUtils.mkdir_p path unless File.exist?(path)
+                path
+              end
+
+              acts_as_fleximage_extension
+
+              def copy_image
+                copy_to_path = image_assets_storage_directory
+                copy_to_path << "/#{id}.png"
+                if file_exists? && !File.exist?(copy_to_path)
+                  FileUtils.cp filepath, copy_to_path
+                end
+              end
+            end
+
             @content_blob.copy_image
             @content_blob.resize_image(image_size)
             filepath = @content_blob.full_cache_path(image_size)
