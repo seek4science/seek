@@ -384,8 +384,8 @@ class ApplicationController < ActionController::Base
         when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
           action = "create" if action == "upload_for_tool"
           action = "update" if action == "new_version"
-          action = "inline_view" if action == "explore"
-          if ["show", "create", "update", "destroy", "download", "inline_view"].include?(action)
+          action = "download" if action == "explore"
+          if ["show", "create", "update", "destroy", "download"].include?(action)
             check_log_exists(action, controller_name, object)
             ActivityLog.create(:action => action,
                                :culprit => current_user,
@@ -413,17 +413,15 @@ class ApplicationController < ActionController::Base
                                :data => {:search_query => object, :result_count => @results.count})
           end
         when "content_blobs"
-          action = "inline_view" if action=="view_content"
-          if action=="inline_view" || (action=="download" && params['intent'].to_s != 'inline_view')
-            activity_loggable = object.asset
-            ActivityLog.create(:action => action,
-                               :culprit => current_user,
-                               :referenced => object,
-                               :controller_name => controller_name,
-                               :activity_loggable => activity_loggable,
-                               :user_agent => request.env["HTTP_USER_AGENT"],
-                               :data => activity_loggable.title)
-          end
+          action = "download" if action=="view_content"
+          activity_loggable = object.asset
+          ActivityLog.create(:action => action,
+                             :culprit => current_user,
+                             :referenced => object,
+                             :controller_name => controller_name,
+                             :activity_loggable => activity_loggable,
+                             :user_agent => request.env["HTTP_USER_AGENT"],
+                             :data => activity_loggable.title)
       end
 
       expire_activity_fragment_cache(controller_name, action)
