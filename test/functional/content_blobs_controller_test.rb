@@ -280,7 +280,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
 
     al = ActivityLog.last
-    assert_equal 'inline_view', al.action
+    assert_equal 'download', al.action
     assert_equal sop.content_blob, al.referenced
     assert_equal sop, al.activity_loggable
     assert_equal User.current_user, al.culprit
@@ -338,9 +338,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal '7168', @response.header['Content-Length']
   end
 
-  test 'should not log download for inline view intent' do
+  test 'should log download for inline view intent' do
     df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user
-    assert_no_difference('ActivityLog.count') do
+    assert_difference('ActivityLog.count') do
       get :download, data_file_id: df, id: df.content_blob, intent: :inline_view
     end
     assert_response :success
