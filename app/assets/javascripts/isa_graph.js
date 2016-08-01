@@ -128,12 +128,20 @@ var ISA = {
         });
 
         cy.on('tap', 'node:selected', function (event) {
-            if (event.cyTarget != ISA.originNode && event.cyTarget.data('url'))
-                window.location = event.cyTarget.data('url');
+            if (ISA.recentlyClickedNode) {
+                if (event.cyTarget != ISA.originNode && event.cyTarget.data('url')) {
+                    window.location = event.cyTarget.data('url');
+                }
+                ISA.recentlyClickedNode = null;
+            } else {
+                // Remember the click for half a second, so we can treat a follow-up click as a double click
+                ISA.rememberFirstClick(event.cyTarget);
+            }
         });
 
         cy.on('select', 'node', function (event) {
             ISA.selectNode(event.cyTarget);
+            ISA.rememberFirstClick(event.cyTarget);
         });
     },
 
@@ -179,5 +187,13 @@ var ISA = {
     fullscreen: function (state) {
         $j('#isa-graph').toggleClass('fullscreen', state);
         cy.resize();
+    },
+
+    recentlyClickedNode: null,
+    rememberFirstClick: function (target) {
+        ISA.recentlyClickedNode = target;
+        setTimeout(function () {
+            ISA.recentlyClickedNode = null;
+        }, 500);
     }
 };
