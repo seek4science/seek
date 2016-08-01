@@ -113,7 +113,7 @@ var ISA = {
                     //animate the current node
                     ISA.originNode = cy.nodes('[id=\'' + current_element_id + '\']')[0];
                     ISA.originNode.select();
-                    cy.animate({zoom: 0.75, center: {eles: ISA.originNode}});
+                    cy.animate({zoom: 0.8, center: {eles: ISA.originNode}});
                 } else {
                     $j('#isa-graph').hide();
                 }
@@ -195,5 +195,8 @@ var ISA = {
         setTimeout(function () {
             ISA.recentlyClickedNode = null;
         }, 500);
-    }
+    },
+
+
+
 };
