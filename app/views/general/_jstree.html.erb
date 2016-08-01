@@ -7,8 +7,7 @@
     }).jstree({ 'core' : {
       'data' : <%= tree_json(hash).html_safe -%>
     } }).on('activate_node.jstree', function (e, data) {
-      var cyNode = cy.$('#' + data.node.id);
-      ISA.selectNode(cyNode);
+      ISA.selectNode(ISA.getNode(data.node.id));
     });
   });
 </script>

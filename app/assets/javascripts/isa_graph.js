@@ -129,9 +129,7 @@ var ISA = {
 
         cy.on('tap', 'node:selected', function (event) {
             if (ISA.recentlyClickedNode) {
-                if (event.cyTarget != ISA.originNode && event.cyTarget.data('url')) {
-                    window.location = event.cyTarget.data('url');
-                }
+                ISA.visitNode(event.cyTarget);
                 ISA.recentlyClickedNode = null;
             } else {
                 // Remember the click for half a second, so we can treat a follow-up click as a double click
@@ -197,6 +195,13 @@ var ISA = {
         }, 500);
     },
 
+    getNode: function (id) {
+        return cy.$('#' + id);
+    },
 
-
+    visitNode: function (node) {
+        if (node != ISA.originNode && node.data('url')) {
+            window.location = node.data('url');
+        }
+    }
 };
