@@ -84,7 +84,7 @@ module HomesHelper
     feed_title = entry.feed_title || 'Unknown publisher'
     entry_date = determine_entry_date(entry)
     entry_summary = truncate(strip_tags(entry.summary || entry.content), length: 500)
-    tt = tooltip("#{entry_summary} (#{entry_date.strftime('%c') unless entry_date.nil?})")
+    tt = tooltip("#{CGI::unescapeHTML(entry_summary)} (#{entry_date.strftime('%c') unless entry_date.nil?})")
     [entry_date, entry_title, feed_title, tt]
   end
 
