@@ -10,13 +10,12 @@ module Seek
     MAX_EXTRACTABLE_SPREADSHEET_SIZE = (Seek::Config.max_extractable_spreadsheet_size || 10).to_i * 1024 * 1024
     MAX_SIMULATABLE_SIZE = 5 * 1024 * 1024
     PDF_CONVERTABLE_FORMAT = %w(doc docx ppt pptx odt odp rtf xls xlsx)
-    PDF_VIEWABLE_FORMAT = PDF_CONVERTABLE_FORMAT - %w(xls xlsx)
+    PDF_VIEWABLE_FORMAT = PDF_CONVERTABLE_FORMAT - %w(xls xlsx) + %w(pdf)
     IMAGE_VIEWABLE_FORMAT = %w(gif jpeg png jpg bmp svg)
     TEXT_MIME_TYPES = %w(text/plain text/csv text/x-comma-separated-values text/tab-separated-values application/sbml+xml application/xml text/xml application/json)
 
     def is_text?(blob = self)
-      type = blob.content_type
-      TEXT_MIME_TYPES.include?(type)
+      TEXT_MIME_TYPES.include?(blob.content_type)
     end
 
     def is_excel?(blob = self)
@@ -71,15 +70,27 @@ module Seek
       !(PDF_CONVERTABLE_FORMAT & mime_extensions(blob.content_type)).empty? && Seek::Config.pdf_conversion_enabled
     end
 
+    def is_image_viewable?(blob = self)
+      !( IMAGE_VIEWABLE_FORMAT & mime_extensions(blob.content_type) ).empty?
+    end
+
+    def is_pdf_viewable?(blob = self)
+      !( PDF_VIEWABLE_FORMAT & mime_extensions(blob.content_type) ).empty?
+    end
+
+    def is_pdf?(blob = self)
+      mime_extensions(blob.content_type).include?("pdf")
+    end
+
     def unknown_file_type?(blob = self)
       blob.human_content_type == 'Unknown file type'
     end
 
     def is_viewable_format?(blob = self)
       if Seek::Config.pdf_conversion_enabled
-        !(((PDF_VIEWABLE_FORMAT + IMAGE_VIEWABLE_FORMAT) << 'pdf') & mime_extensions(blob.content_type)).empty?
+        is_text?(blob) || is_image_viewable?(blob) || is_pdf_viewable?(blob)
       else
-        !((IMAGE_VIEWABLE_FORMAT << 'pdf') & (mime_extensions(blob.content_type))).empty?
+        is_text?(blob) || is_image_viewable?(blob) || is_pdf?(blob)
       end
     end
 

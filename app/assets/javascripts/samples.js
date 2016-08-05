@@ -53,9 +53,10 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             "type": "date"
         });
     }
-    // Strain columns
-    // Only needed if we're loading the data from ajax
+    // The following only needed if we're loading the data from ajax
+
     if($j('table', selector).data('sourceUrl')) {
+        // Strain columns
         var strainColumns = [];
         $j('table thead th', selector).each(function (index, column) {
             if($j(column).data('columnType') == 'SeekStrain') {
@@ -77,18 +78,19 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
                 }
             });
         }
+
+        // Title column
+        $j('table thead th', selector).each(function (index, column) {
+            if($j(column).data('titleColumn')) {
+                options["columnDefs"].push({
+                    "targets": [index],
+                    "render": function (data, type, row) {
+                        return '<a href="/samples/' + row.id + '">' + row.title + '</a>';
+                    }
+                });
+            }
+        });
     }
-    // Title column
-    $j('table thead th', selector).each(function (index, column) {
-        if($j(column).data('titleColumn')) {
-            options["columnDefs"].push({
-                "targets": [index],
-                "render": function (data, type, row) {
-                    return '<a href="/samples/' + row.id + '">' + row.title + '</a>';
-                }
-            });
-        }
-    });
 
     if(enableRowSelection) {
         $j.extend(options, options, {
