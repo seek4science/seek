@@ -104,8 +104,8 @@
 
 <script type="text/javascript">
     var assayOptions = {
-        project: <%= ([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
-        all: <%= ([["Select #{single_assay_class_text} ...",0]]|all_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>
+        project: <%= ([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|assay| [assay_selection_dropdown_text(assay),assay.id]}).to_json.html_safe %>,
+        all: <%= ([["Select #{single_assay_class_text} ...",0]]|all_assays.collect{|assay| [assay_selection_dropdown_text(assay),assay.id]}).to_json.html_safe %>
     };
 
     function toggle_assay_list() {
@@ -134,7 +134,7 @@
     <% assay = Assay.find(associated_assay_id) %>
     <% if assay.try :can_view? -%>
     assay_id = '<%= assay.id -%>';
-    assay_title = '<%= assay.title -%>';
+    assay_title = '<%= "#{assay.title} (#{assay.study.title})" %>';
     relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None'-%>';
     addAssay(assay_title,assay_id,relationship_type);
     <% end %>
@@ -153,7 +153,7 @@
     assay_id = '<%= assay.id -%>';
     assay_title = '<%= escape_javascript(assay.title) -%>';
     relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None' -%>';
-    addAssay(assay_title,assay_id,relationship_type);
+    addAssay(assay_title, assay_id, relationship_type);
     <% end -%>
     <% end -%>
     <% end -%>
