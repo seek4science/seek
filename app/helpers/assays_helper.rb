@@ -7,8 +7,7 @@ module AssaysHelper
 
   #the text shown in the association dropdown box. Includes the study to avoid ambiguity between similar named assays
   def assay_selection_dropdown_text(assay,select_truncate_length=120)
-    puts assay.title
-    truncate("#{assay.title} (#{assay.study.title})",:length=>select_truncate_length)
+    truncate("#{assay.title}",:length=>select_truncate_length)
   end
 
   #only data files authorised for show, and belonging to projects matching current_user
