@@ -104,15 +104,15 @@
 
 <script type="text/javascript">
     var assayOptions = {
-        project: <%= ([["Select #{single_assay_class_text} ...",0]]|project_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
-        all: <%= ([["Select #{single_assay_class_text} ...",0]]|all_assays.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>
+        project: <%= (project_assays.collect{|assay| {title:assay_selection_dropdown_text(assay),id:assay.id,parent_id:assay.study.id,parent_title:assay.study.title}}).to_json.html_safe %>,
+        all: <%= (all_assays.collect{|assay| {title:assay_selection_dropdown_text(assay),id:assay.id,parent_id:assay.study.id,parent_title:assay.study.title}}).to_json.html_safe %>
     };
 
     function toggle_assay_list() {
       if ($('include_other_project_assays').checked)
-        $j('#possible_assays').html(optionsFromArray(assayOptions.all));
+        $j('#possible_assays').html(nestedOptionsFromJSONArray(assayOptions.all,'<%= "Select #{single_assay_class_text} ..." %>'));
       else
-        $j('#possible_assays').html(optionsFromArray(assayOptions.project));
+        $j('#possible_assays').html(nestedOptionsFromJSONArray(assayOptions.project,'<%= "Select #{single_assay_class_text} ..." %>'));
     }
 
     function selected_assay(){
@@ -134,7 +134,7 @@
     <% assay = Assay.find(associated_assay_id) %>
     <% if assay.try :can_view? -%>
     assay_id = '<%= assay.id -%>';
-    assay_title = '<%= assay.title -%>';
+    assay_title = '<%= assay.title %>';
     relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None'-%>';
     addAssay(assay_title,assay_id,relationship_type);
     <% end %>
@@ -153,7 +153,7 @@
     assay_id = '<%= assay.id -%>';
     assay_title = '<%= escape_javascript(assay.title) -%>';
     relationship_type = '<%= resource.is_a?(DataFile) ? escape_javascript(resource.relationship_type(assay).try(:title) || "None") : 'None' -%>';
-    addAssay(assay_title,assay_id,relationship_type);
+    addAssay(assay_title, assay_id, relationship_type);
     <% end -%>
     <% end -%>
     <% end -%>

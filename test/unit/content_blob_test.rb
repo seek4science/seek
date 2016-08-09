@@ -14,12 +14,33 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute_includes blob.search_terms, 'http'
     refute_includes blob.search_terms, 'com'
 
-    blob = Factory(:rightfield_content_blob)
-    assert_includes blob.search_terms, 'rightfield.xls'
-    assert_includes blob.search_terms, 'xls'
+    blob = Factory(:txt_content_blob)
+    assert_includes blob.search_terms, 'txt_test.txt'
+    assert_includes blob.search_terms, 'txt'
 
   end
 
+  test 'max indexable text size' do
+    blob = Factory :large_txt_content_blob
+    size = blob.file_size
+    assert size > 1.megabyte
+    assert size < 2.megabyte
+
+    assert blob.is_text?
+
+    with_config_value :max_indexable_text_size,1 do
+      refute blob.is_indexable_text?
+    end
+
+    with_config_value :max_indexable_text_size,2 do
+      assert blob.is_indexable_text?
+    end
+
+    with_config_value :max_indexable_text_size,'2' do
+      assert blob.is_indexable_text?
+    end
+
+  end
 
   test 'md5sum_on_demand' do
     blob=Factory :rightfield_content_blob
