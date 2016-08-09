@@ -820,6 +820,12 @@ end
     f.original_filename 'txt_test.txt'
   end
 
+  Factory.define(:large_txt_content_blob, :parent => :content_blob) do |f|
+    f.data File.new("#{Rails.root}/test/fixtures/files/large_text_file.txt", "rb").read
+    f.content_type "text/plain"
+    f.original_filename 'large_text_file.txt'
+  end
+
   Factory.define(:csv_content_blob, :parent => :content_blob) do |f|
     f.data File.new("#{Rails.root}/test/fixtures/files/csv_test.csv", "rb").read
     f.content_type "text/x-comma-separated-values"

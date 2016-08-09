@@ -7,7 +7,6 @@ module Seek
       before_create :update_content_mime_type if self.respond_to?(:before_create)
     end
 
-    MAX_EXTRACTABLE_SPREADSHEET_SIZE = (Seek::Config.max_extractable_spreadsheet_size || 10).to_i * 1024 * 1024
     MAX_SIMULATABLE_SIZE = 5 * 1024 * 1024
     PDF_CONVERTABLE_FORMAT = %w(doc docx ppt pptx odt odp rtf xls xlsx)
     PDF_VIEWABLE_FORMAT = PDF_CONVERTABLE_FORMAT - %w(xls xlsx) + %w(pdf)
@@ -18,12 +17,16 @@ module Seek
       TEXT_MIME_TYPES.include?(blob.content_type)
     end
 
+    def is_indexable_text?(blob = self)
+      within_text_size_limit(blob) && is_text?(blob) && blob.file_exists?
+    end
+
     def is_excel?(blob = self)
       is_xls?(blob) || is_xlsx?(blob)
     end
 
     def is_extractable_spreadsheet?(blob = self)
-      within_size_limit(blob) && is_excel?(blob) && blob.file_exists?
+      within_spreadsheet_size_limit(blob) && is_excel?(blob) && blob.file_exists?
     end
 
     def is_in_simulatable_size_limit?(blob = self)
@@ -108,8 +111,22 @@ module Seek
 
     private
 
-    def within_size_limit(blob)
-      !blob.file_size.nil? && blob.file_size < MAX_EXTRACTABLE_SPREADSHEET_SIZE
+    def within_text_size_limit(blob)
+      !blob.file_size.nil? && blob.file_size < max_indexible_text_size
+    end
+
+    def within_spreadsheet_size_limit(blob)
+      !blob.file_size.nil? && blob.file_size < max_extractable_spreadsheet_size
+    end
+
+    #the max_indexable_text_size in bytes, defaulting to 10Mb
+    def max_indexible_text_size
+      (Seek::Config.max_indexable_text_size || 10).to_i * 1024 * 1024
+    end
+
+    #the max_extractable_spreadsheet_size in bytes, defaulting to 10Mb
+    def max_extractable_spreadsheet_size
+      (Seek::Config.max_extractable_spreadsheet_size || 10).to_i * 1024 * 1024
     end
 
     def check_content(blob, str, max_length = 1500)

@@ -126,6 +126,7 @@ doi_prefix:
 doi_suffix:
 time_lock_doi_for:
 max_extractable_spreadsheet_size:
+max_indexable_text_size:
 show_announcements:
 imprint_enabled:
 imprint_description:

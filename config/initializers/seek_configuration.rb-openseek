@@ -113,6 +113,9 @@ SEEK::Application.configure do
   #the maximum size, in Mb, for a spreadsheet file that can be extracted and explored
   Seek::Config.default :max_extractable_spreadsheet_size,10
 
+  #the maximum size, in Mb, for a text file that can be indexed for search (too high and the indexing will timeout)
+  Seek::Config.default :max_indexable_text_size,100
+
   Seek::Config.default :is_virtualliver, false
 
 # Pagination

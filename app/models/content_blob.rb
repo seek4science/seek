@@ -196,7 +196,11 @@ class ContentBlob < ActiveRecord::Base
       url_search_terms = []
     end
     if is_text?
-      [original_filename, url, file_extension, text_contents_for_search] | url_search_terms
+      if is_indexable_text?
+        [original_filename, url, file_extension, text_contents_for_search] | url_search_terms
+      else
+        [original_filename, url, file_extension] | url_search_terms
+      end
     else
       [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
     end
