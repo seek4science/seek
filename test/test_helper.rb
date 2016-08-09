@@ -7,7 +7,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'rails/test_help'
 
 require "minitest/reporters"
-MiniTest::Reporters.use! MiniTest::Reporters::DefaultReporter.new
+Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new()]
 
 require 'rest_test_cases'
 require 'rdf_test_cases'
