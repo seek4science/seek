@@ -14,9 +14,9 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute_includes blob.search_terms, 'http'
     refute_includes blob.search_terms, 'com'
 
-    blob = Factory(:rightfield_content_blob)
-    assert_includes blob.search_terms, 'rightfield.xls'
-    assert_includes blob.search_terms, 'xls'
+    blob = Factory(:txt_content_blob)
+    assert_includes blob.search_terms, 'txt_test.txt'
+    assert_includes blob.search_terms, 'txt'
 
   end
 
