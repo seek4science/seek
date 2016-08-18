@@ -112,4 +112,13 @@ ul#folder_details li.actions {
 
 }
 
+.asset_card_item + .tooltip > .tooltip-inner {
+    background-color: white;
+    color: #111;
+    border: 1px #999 solid;
+}
+
+.asset_card_item + .tooltip.top > .tooltip-arrow {
+    display: none;
+}
 

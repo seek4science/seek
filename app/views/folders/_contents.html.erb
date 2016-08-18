@@ -11,3 +11,7 @@
 
     <%= render :partial=>"asset",:collection=>folder.authorized_assets,:locals=>{:folder=>folder} -%>
 </ul>
+
+<script>
+  $j('.asset_card_item').tooltip();
+</script>
