@@ -153,6 +153,8 @@ project_news_number_of_entries:
   convert: :to_i
 community_news_number_of_entries:
   convert: :to_i
+recent_contributions_number_of_entries:
+  convert: :to_i
 home_feeds_cache_timeout:
   convert: :to_i
 time_lock_doi_for:
