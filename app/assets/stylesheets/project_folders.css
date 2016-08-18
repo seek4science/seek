@@ -33,19 +33,22 @@ div#remove_from_assay_drop_area p {
     vertical-align: middle;
 }
 
-
 .folder_hover {
     background: black;
     color: black;
     font-weight: bolder;
 }
 
-.ygtvcontent.ygtvfocus < a {
+.ygtvcontent.ygtvfocus
+
+<
+a {
     background-color: green;
 }
 
 ul.asset_cards {
-    font-size:smaller;
+    font-size: smaller;
+    list-style-type: none;
 }
 
 ul.asset_cards li.asset_card_item {
@@ -92,8 +95,13 @@ li.asset_card_item {
     background-color: red;
 }
 
+ul#folder_details {
+    list-style-type: none;
+}
+
 ul#folder_details li {
     float: left;
+
 }
 
 ul#folder_details li.title_and_description {
