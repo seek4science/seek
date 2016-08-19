@@ -500,7 +500,8 @@ class PublicationsControllerTest < ActionController::TestCase
     # 3 for events 'fancy_multiselect'
     assert_equal 3, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
     # 8 = 2 each for investigations, studies, assays, models (using bespoke association forms) - datafiles loaded asynchronously
-    assert_equal 8, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
+    # plus an extra 2 for the study optgroups in the assay association
+    assert_equal 10, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
   end
 
   test "programme publications through nested routing" do

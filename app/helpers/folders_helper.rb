@@ -1,6 +1,6 @@
 module FoldersHelper
   def folder_asset_item_tooltip asset
-    text="<h3>#{h(asset.title)}</h3>"
+    text="<h4>#{h(asset.title)}</h4>"
     text << "<p><b>Description: </b><em>#{text_or_not_specified(asset.description)}</em></p>" if asset.respond_to?("description")
     text << "<p><em>#{text_or_not_specified(asset.abstract)}</em></p>" if asset.respond_to?("abstract")
 

@@ -8,7 +8,7 @@
     drag_classes << " exp_assay_accepted_item" if ([DataFile,Publication,Sop].include?(asset.class))
 %>
 
-<li class="asset_card_item <%= drag_classes -%> <%= li_class -%>" data-tooltip="<%= folder_asset_item_tooltip asset -%>" id="<%= drag_id -%>">
+<li class="asset_card_item <%= drag_classes -%> <%= li_class -%>" data-toggle="tooltip" title="<%= folder_asset_item_tooltip(asset) %>" data-html="true" id="<%= drag_id -%>">
 
   <p class="asset_card_title" >
     <%= image -%>
@@ -17,3 +17,4 @@
 </li>
 
 <%= draggable_element drag_id,:revert=>true, :ghosting=>false -%>
+

@@ -5,6 +5,11 @@ module AssaysHelper
     Assay.where(['study_id IS NULL'])
   end
 
+  #the text shown in the association dropdown box. Includes the study to avoid ambiguity between similar named assays
+  def assay_selection_dropdown_text(assay,select_truncate_length=120)
+    truncate("#{assay.title}",:length=>select_truncate_length)
+  end
+
   #only data files authorised for show, and belonging to projects matching current_user
   def data_files_for_assay_association
     data_files=DataFile.find(:all, :include => :asset)

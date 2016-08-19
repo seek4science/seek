@@ -170,6 +170,16 @@ module ISAHelper
     cytoscape_edge_elements
   end
 
+  def node_element id, name, item_info, fave_color, border_color
+    {:group => 'nodes',
+     :data => {:id => id,
+               :name => name,
+               :item_info => item_info,
+               :faveColor => fave_color,
+               :borderColor => border_color}
+    }
+  end
+
   def edge_element id, name, source, target, fave_color
     {:group => 'edges',
      :data => {:id => id,
