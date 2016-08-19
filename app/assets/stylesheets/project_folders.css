@@ -34,15 +34,11 @@ div#remove_from_assay_drop_area p {
 }
 
 .folder_hover {
-    background: black;
-    color: black;
+    background: #2f628f;
     font-weight: bolder;
 }
 
-.ygtvcontent.ygtvfocus
-
-<
-a {
+.ygtvcontent.ygtvfocus > a {
     background-color: green;
 }
 

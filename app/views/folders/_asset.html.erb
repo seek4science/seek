@@ -8,13 +8,17 @@
     drag_classes << " exp_assay_accepted_item" if ([DataFile,Publication,Sop].include?(asset.class))
 %>
 
-<li class="asset_card_item <%= drag_classes -%> <%= li_class -%>" data-toggle="tooltip" title="<%= folder_asset_item_tooltip(asset) %>" data-html="true" id="<%= drag_id -%>">
+<li class="asset_card_item <%= drag_classes -%> <%= li_class -%>"
+    id="<%= drag_id -%>"
+    data-asset-id='<%= asset.id %>'
+    data-origin-folder-id='<%= folder.id %>'
+    data-asset-class='<%= asset.class.name %>'
+    data-toggle="tooltip" title="<%= folder_asset_item_tooltip(asset) %>"
+    data-html="true" >
 
   <p class="asset_card_title" >
     <%= image -%>
     <%= link_to truncate(asset.title,:length=>max_title_length),asset -%><br/>
   </p>
 </li>
-
-<%= draggable_element drag_id,:revert=>true, :ghosting=>false -%>
 

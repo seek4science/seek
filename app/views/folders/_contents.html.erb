@@ -14,4 +14,10 @@
 
 <script>
   $j('.asset_card_item').tooltip();
+  $j('.asset_card_item').draggable(
+      {
+        revert: 'invalid',
+        opacity: 0.3
+      }
+  );
 </script>

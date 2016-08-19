@@ -2,15 +2,34 @@
 
 <script type="text/javascript">
   $j(document).ready(function () {
-    $j('#project_folders').bind('loaded.jstree', function() {
-      //$j(this).jstree(true).select_node(ISA.originNode.data('id'));
-    }).jstree({ 'core' : {
-      'data' : <%= folder_tree_json(@folders).html_safe -%>
-    } }).on('activate_node.jstree', function (e, data) {
-      //ISA.selectNode(ISA.getNode(data.node.id));
+
+    $j('#project_folders').bind('loaded.jstree', function () {
+      $j('#project_folders .jstree-anchor').droppable({
+        accept: '.draggable_folder_item',
+        hoverClass: 'folder_hover',
+        drop: function(event,ui) {
+          var asset_element_id=ui.draggable.attr('id');
+          var asset_id=ui.draggable.data('asset-id');
+          var asset_class=ui.draggable.data('asset-class');
+          var origin_folder_id=ui.draggable.data('origin-folder-id');
+          var folder_element_id=$j(this).attr('id');
+          var folder_id=$j('#project_folders').jstree(true).get_node(folder_element_id).data.folder_id;
+          var project_id=$j('#project_folders').jstree(true).get_node(folder_element_id).data.project_id;
+          item_dropped_to_folder(folder_id,origin_folder_id,asset_id,asset_class,asset_element_id,project_id);
+        }
+      });
+    }).jstree({
+      'core': {
+        'data': <%= folder_tree_json(@folders).html_safe -%>
+      }
+    }).on('activate_node.jstree', function (e, data) {
       var folder_id = $j(this).jstree(true).get_node(data.node.id).data.folder_id;
       var project_id = $j(this).jstree(true).get_node(data.node.id).data.project_id;
-      folder_clicked(folder_id,project_id);
+      folder_clicked(folder_id, project_id);
     });
+
+
   });
+
+
 </script>
