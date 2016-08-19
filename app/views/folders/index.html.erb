@@ -1,3 +1,5 @@
+<%= javascript_include_tag "project_folders" %>
+
 <%
     default_folder = initial_folder(@project)
     help_icon = image_tag(icon_filename_for_key("help"), :alt=>"help", 'data-tooltip' => tooltip("Click to toggle information on how to use the #{t('project')} asset browser"))
@@ -16,7 +18,7 @@
     <div class="yui-gf">
         <div id="folder_column" class="yui-u first yui-skin-sam">
           <div id="folders">
-            <%= render :partial=>"folders" -%>
+            <%= render :partial=>"folder_tree" -%>
           </div>
         </div>
         <div class="yui-u">

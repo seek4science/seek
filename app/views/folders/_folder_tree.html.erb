@@ -1,0 +1,16 @@
+<div id="project_folders"></div>
+
+<script type="text/javascript">
+  $j(document).ready(function () {
+    $j('#project_folders').bind('loaded.jstree', function() {
+      //$j(this).jstree(true).select_node(ISA.originNode.data('id'));
+    }).jstree({ 'core' : {
+      'data' : <%= folder_tree_json(@folders).html_safe -%>
+    } }).on('activate_node.jstree', function (e, data) {
+      //ISA.selectNode(ISA.getNode(data.node.id));
+      var folder_id = $j(this).jstree(true).get_node(data.node.id).data.folder_id;
+      var project_id = $j(this).jstree(true).get_node(data.node.id).data.project_id;
+      folder_clicked(folder_id,project_id);
+    });
+  });
+</script>
