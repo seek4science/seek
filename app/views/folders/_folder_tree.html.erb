@@ -1,33 +1,10 @@
 <div id="project_folders"></div>
 
+<div id="assay_tree"></div>
+
 <script type="text/javascript">
   $j(document).ready(function () {
-
-    $j('#project_folders').bind('loaded.jstree', function () {
-      $j('#project_folders .jstree-anchor').droppable({
-        accept: '.draggable_folder_item',
-        hoverClass: 'folder_hover',
-        tolerance: 'pointer',
-        drop: function(event,ui) {
-
-          var folder_element_id=$j(this).attr('id');
-          var folder_id=$j('#project_folders').jstree(true).get_node(folder_element_id).data.folder_id;
-          var project_id=$j('#project_folders').jstree(true).get_node(folder_element_id).data.project_id;
-          item_dropped_to_folder(ui.draggable,folder_id,project_id);
-        }
-      });
-    }).jstree({
-      'core': {
-        'data': <%= folder_tree_json(@folders).html_safe -%>
-      }
-    }).on('activate_node.jstree', function (e, data) {
-      var folder_id = $j(this).jstree(true).get_node(data.node.id).data.folder_id;
-      var project_id = $j(this).jstree(true).get_node(data.node.id).data.project_id;
-      folder_clicked(folder_id, project_id);
-    });
-
-
+    setupProjectFolders(<%= folder_tree_json(@folders).html_safe -%>);
   });
-
 
 </script>
