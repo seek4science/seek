@@ -2,12 +2,19 @@ var tree;
 var elementFolderIds = new Array();
 var displayed_folder_id = 0;
 
-function item_dropped_to_folder(folder_id,origin_folder_id,asset_id,asset_class,asset_element_id,project_id) {
-    if (folder_id != displayed_folder_id) {
-        var folder_element_id='folder_'+folder_id;
+function item_dropped_to_folder(item_element,dest_folder_id,project_id) {
+    if (dest_folder_id != displayed_folder_id) {
+
+        var folder_element_id='folder_'+dest_folder_id;
         var origin_folder_element_id='folder_'+origin_folder_id;
+
+        var asset_element_id=item_element.attr('id');
+        var asset_id=item_element.data('asset-id');
+        var asset_class=item_element.data('asset-class');
+        var origin_folder_id=item_element.data('origin-folder-id');
+
         var path = "/projects/" + project_id + "/folders/" + origin_folder_id + "/move_asset_to";
-        path += "?asset_id=" + asset_id + "&asset_type=" + asset_class + "&dest_folder_id=" + folder_id;
+        path += "?asset_id=" + asset_id + "&asset_type=" + asset_class + "&dest_folder_id=" + dest_folder_id;
         path += "&dest_folder_element_id=" + folder_element_id + "&origin_folder_element_id=" + origin_folder_element_id;
         path += "&asset_element_id="+asset_element_id;
 
