@@ -36,6 +36,10 @@
     #exit-fullscreen-btn {
       display: inline;
     }
+
+    #jstree {
+      max-height: none !important;
+    }
   }
 }
 
@@ -64,6 +68,7 @@ a.graph_toggle {
 
 #jstree {
   background-color: #fff;
+  max-height: 600px !important;
   width: 300px;
   flex-shrink: 0;
   border-left: 1px solid $panel-default-border;
