@@ -1,7 +1,8 @@
 <% item = items_related_to %>
 <% resource_hash = get_related_resources(item) %>
 <% limit ||= Seek::Config.related_items_limit %>
-<h2>Related Items</h2>
+<% title ||= 'Related items' %>
+<h2><%= title %></h2>
 <% if Seek::Config.tabs_lazy_load_enabled %>
     <div id="all_results">
       <%= render :partial => "assets/resource_tabbed_lazy_loading",

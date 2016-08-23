@@ -12,6 +12,7 @@
       </a>
       <ul class="dropdown-menu" role="menu">
         <li role="presentation" class="dropdown-header"> My details</li>
+        <li><%= link_to 'My items', items_person_path(current_person) -%></li>
         <li><%= link_to 'My profile', person_path(current_person) -%></li>
         <li><%= link_to 'Edit profile', edit_person_path(current_person) -%></li>
         <li><%= link_to 'Change password', edit_user_path(current_user) -%></li>
