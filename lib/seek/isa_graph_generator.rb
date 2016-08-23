@@ -5,7 +5,7 @@ module Seek
       @object = object
     end
 
-    def generate(depth: 1, deep: false, include_parents: false)
+    def generate(depth: 1, deep: false, include_parents: false, include_self: true)
       hash = { nodes: [], edges: [] }
 
       depth = deep ? nil : depth
@@ -22,6 +22,8 @@ module Seek
 
       # Self and descendants...
       merge_hashes(hash, descendants(@object, depth))
+
+      hash[:nodes].delete(@object) unless include_self
 
       hash
     end

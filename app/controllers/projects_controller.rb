@@ -22,6 +22,8 @@ class ProjectsController < ApplicationController
   cache_sweeper :projects_sweeper,:only=>[:update,:create,:destroy]
   include Seek::BreadCrumbs
 
+  include Seek::IsaGraphExtensions
+
   respond_to :html
 
   def asset_report

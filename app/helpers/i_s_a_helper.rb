@@ -35,67 +35,7 @@ module ISAHelper
     end
   end
 
-  def reduced_elements elements, max_node_number, force_max_node, root_element, current_element=nil
-    current_element||=root_element
-    nodes = elements.select{|e| e[:group] == 'nodes'}
-    edges = elements.select{|e| e[:group] == 'edges'}
-    if nodes.size > max_node_number
-      current_element_id = node_id(current_element)
-      current_node = elements.select{|e| e[:group] == 'nodes' && e[:data][:id] == current_element_id }.first
-
-      connected_edges = edges.select{|e| e[:data][:source] == current_element_id || e[:data][:target] == current_element_id}
-      connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}
-      connected_edge_targets = connected_edges.collect{|e| e[:data][:target]}
-      connected_edge_ids = (connected_edge_sources + connected_edge_targets).uniq
-
-      connected_nodes = nodes.select{|e| connected_edge_ids.include?(e[:data][:id]) && e[:data][:id] != current_element_id}
-      reduced_nodes = connected_nodes + [current_node]
-
-      reduced_edges = possible_edges_for reduced_nodes, edges
-
-      reduced_elements = reduced_nodes + reduced_edges
-
-      if force_max_node && reduced_nodes.size > max_node_number
-        max_elements_from(reduced_elements, max_node_number, current_node)
-      else
-        reduced_elements
-      end
-    else
-      elements
-    end
-  end
-
   private
-
-  #getting the nodes equal to the max_node_number, with the priority for the parent nodes
-  def max_elements_from(reduced_elements, max_node_number, current_node)
-    max_nodes = [current_node]
-    connected_nodes = reduced_elements.select{|e| e[:group] == 'nodes'}.reject {|element| element[:data][:id] == current_node[:data][:id] }
-    connected_edges = reduced_elements.select{|e| e[:group] == 'edges'}
-    connected_edge_sources = connected_edges.collect{|e| e[:data][:source]}.uniq
-    #put the parent nodes in front
-    connected_nodes.sort!{|a,b| connected_edge_sources.find_index(b[:data][:id]).to_i <=> connected_edge_sources.find_index(a[:data][:id]).to_i}
-    max_nodes |= connected_nodes.take(max_node_number-1)
-
-    max_edges = possible_edges_for max_nodes, connected_edges
-    max_elements = max_nodes + max_edges
-    max_elements
-  end
-
-  #get all the edges for nodes from the edge collection.
-  #not only the edges that connect current node to other node
-  def possible_edges_for nodes, edge_collection
-    possible_edges = []
-    node_ids = nodes.collect{|node| node[:data][:id]}
-    edge_collection.each do |edge|
-      source = edge[:data][:source]
-      target = edge[:data][:target]
-      if node_ids.include?(source) && node_ids.include?(target)
-        possible_edges << edge
-      end
-    end
-    possible_edges
-  end
 
   def cytoscape_node_elements items
     cytoscape_node_elements = []
@@ -215,22 +155,25 @@ module ISAHelper
       hash[:edges].none? { |parent, child| child == obj }
     end
 
-    roots.map do |root|
-      tree_node(hash, root)
-    end.to_json
+    nodes = roots.map { |root| tree_node(hash, root) }
+
+    nodes = nodes + hash[:edges].map do |edge|
+      tree_node(hash, edge[1], node_id(edge[0]))
+    end
+
+    nodes.to_json
   end
 
-  def tree_node(hash, object)
+  def tree_node(hash, object, parent_id = '#')
     child_edges = hash[:edges].select do |parent, child|
       parent == object
     end
-    hash[:edges] = hash[:edges] - child_edges
 
     if object.can_view?
       {
         id: node_id(object),
         text: object.title,
-        children: child_edges.map { |child_edge| tree_node(hash, child_edge[1]) },
+        parent: parent_id,
         state: { opened: child_edges.any? },
         icon: asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
       }
@@ -238,7 +181,7 @@ module ISAHelper
       {
           id: node_id(object),
           text: 'Hidden item',
-          children: child_edges.map { |child_edge| tree_node(hash, child_edge[1]) },
+          parent: parent_id,
           state: {
               opened: child_edges.any?,
               disable: true

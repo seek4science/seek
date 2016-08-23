@@ -15,6 +15,8 @@ class ProgrammesController < ApplicationController
 
   include Seek::BreadCrumbs
 
+  include Seek::IsaGraphExtensions
+
   respond_to :html
 
   def create

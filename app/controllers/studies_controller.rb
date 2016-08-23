@@ -18,6 +18,8 @@ class StudiesController < ApplicationController
 
   include Seek::BreadCrumbs
 
+  include Seek::IsaGraphExtensions
+
   def new_object_based_on_existing_one
     @existing_study =  Study.find(params[:id])
 

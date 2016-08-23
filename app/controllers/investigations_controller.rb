@@ -18,6 +18,8 @@ class InvestigationsController < ApplicationController
 
   include Seek::BreadCrumbs
 
+  include Seek::IsaGraphExtensions
+
   def new_object_based_on_existing_one
     @existing_investigation =  Investigation.find(params[:id])
     if @existing_investigation.can_view?

@@ -201,6 +201,7 @@ SEEK::Application.routes.draw do
       get :admin_member_roles
       get :storage_report
       post :update_members
+      get :isa_children
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:only=>[:index]
@@ -264,6 +265,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       get :published
+      get :isa_children
     end
   end
 
@@ -290,6 +292,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       get :published
+      get :isa_children
     end
     resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
   end
@@ -319,6 +322,7 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :new_object_based_on_existing_one
+      get :isa_children
     end
     resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
@@ -542,6 +546,7 @@ SEEK::Application.routes.draw do
       get :reject_activation_confirmation
       post :spawn_project
       get :storage_report
+      get :isa_children
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
               :data_files, :models, :sops, :presentations, :events, :publications

@@ -16,6 +16,8 @@ class AssaysController < ApplicationController
 
   include Seek::BreadCrumbs
 
+  include Seek::IsaGraphExtensions
+
   def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
     @assay = @existing_assay.clone_with_associations
