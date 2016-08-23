@@ -66,11 +66,8 @@ class FoldersController < ApplicationController
 
   def remove_asset
     @folder.remove_assets @asset
-    render :update do |page|
-       if (params[:origin_folder_element_id])
-        page[params[:origin_folder_element_id]].update(@folder.label)
-       end
-      page << "Effect.Fade(#{@asset.class.name}_#{@asset.id}_#{@folder.id});"
+    respond_to do |format|
+      format.js
     end
   end
 

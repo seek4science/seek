@@ -1,6 +1,3 @@
-var dest_node=$j('#project_folders').jstree(true).get_node('folder_<%=@dest_folder.id %>');
-var origin_node=$j('#project_folders').jstree(true).get_node('folder_<%=@origin_folder.id %>');
-
 Effect.Fade('<%= params[:asset_element_id] %>');
 
 //FIXME: the rename_node doesn't seem to work, but all the docs and googling suggests it should
