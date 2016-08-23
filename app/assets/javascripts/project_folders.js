@@ -2,23 +2,23 @@ var tree;
 var elementFolderIds = new Array();
 var displayed_folder_id = 0;
 
-function setupProjectFolders(dataJson) {
-    $j('#project_folders').bind('loaded.jstree', function () {
-        $j('#project_folders .jstree-anchor').droppable({
-            accept: '.draggable_folder_item',
+function setupFoldersTree(dataJson, container_id,drop_accept_class) {
+    $j('#'+container_id).bind('loaded.jstree', function () {
+        $j('#'+container_id+' .jstree-anchor').droppable({
+            accept: '.'+drop_accept_class,
             hoverClass: 'folder_hover',
             tolerance: 'pointer',
             drop: function(event,ui) {
 
                 var folder_element_id=$j(this).attr('id');
-                var folder_id=$j('#project_folders').jstree(true).get_node(folder_element_id).data.folder_id;
-                var project_id=$j('#project_folders').jstree(true).get_node(folder_element_id).data.project_id;
+                var folder_id=$j('#'+container_id).jstree(true).get_node(folder_element_id).data.folder_id;
+                var project_id=$j('#'+container_id).jstree(true).get_node(folder_element_id).data.project_id;
                 item_dropped_to_folder(ui.draggable,folder_id,project_id);
             }
         });
     }).jstree({
         'core': {
-            'data': dataJson
+            'data': dataJson,
         }
     }).on('activate_node.jstree', function (e, data) {
         var folder_id = $j(this).jstree(true).get_node(data.node.id).data.folder_id;
@@ -26,6 +26,8 @@ function setupProjectFolders(dataJson) {
         folder_clicked(folder_id, project_id);
     });
 }
+
+
 
 function item_dropped_to_folder(item_element,dest_folder_id,project_id) {
     if (dest_folder_id != displayed_folder_id) {
