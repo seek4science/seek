@@ -57,6 +57,25 @@ function setupAssayRemoveDropTarget(target_id) {
 
 }
 
+function setupAssetCardDraggable(card_class) {
+    $j('.'+card_class).draggable(
+        {
+            revert: 'invalid',
+            opacity: 0.3,
+            start: function(event,ui) {
+                if ($j("remove_from_assay_drop_area")) {
+                    $j("#remove_from_assay_drop_area").fadeIn(200);
+                }
+            },
+            stop: function(event,ui) {
+                if ($j("remove_from_assay_drop_area")) {
+                    $j("#remove_from_assay_drop_area").fadeOut(200);
+                }
+            }
+        }
+    );
+}
+
 
 
 
