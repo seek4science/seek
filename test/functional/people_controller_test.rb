@@ -1638,6 +1638,28 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'my items longer list' do
+    #the myitems shows a longer list of 50, rather than the related_items_limit configuration
+    person = Factory(:person)
+    login_as(person)
+    data_files = []
+    50.times do
+      data_files << Factory(:data_file,contributor: person, creators:[person])
+    end
+
+    assert_equal 50,data_files.length
+
+    with_config_value :related_items_limit,1 do
+      get :items,id:person.id
+      assert_response :success
+    end
+
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item_title  a[href=?]', data_file_path(data_files.first), text: /#{data_files.first.title}/, count: 1
+      assert_select 'div.list_item_title  a[href=?]', data_file_path(data_files.last), text: /#{data_files.last.title}/, count: 1
+    end
+  end
+
   def mask_for_admin
     Seek::Roles::Roles.instance.mask_for_role("admin")
   end

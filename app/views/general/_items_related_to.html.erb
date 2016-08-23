@@ -1,5 +1,6 @@
 <% item = items_related_to %>
 <% resource_hash = get_related_resources(item) %>
+<% limit ||= Seek::Config.related_items_limit %>
 <h2>Related Items</h2>
 <% if Seek::Config.tabs_lazy_load_enabled %>
     <div id="all_results">
@@ -14,6 +15,6 @@
                                                                                   :authorization_already_done => true,
                                                                                   :item => item,
                                                                                   :actions_partial_disable => false,
-                                                                                  :limit => Seek::Config.related_items_limit} -%>
+                                                                                  :limit => limit} -%>
 
 <% end %>
