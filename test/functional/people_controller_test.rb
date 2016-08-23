@@ -1584,6 +1584,60 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'my items' do
+    me = Factory(:person)
+
+    login_as(me)
+
+    someone_else = Factory(:person)
+    data_file=Factory(:data_file,contributor: me, creators:[me])
+    model=Factory(:model,contributor: me, creators:[me])
+    other_data_file=Factory(:data_file,contributor: someone_else, creators:[someone_else])
+
+    assert_includes me.assets,data_file
+    assert_includes me.assets,model
+    refute_includes me.assets,other_data_file
+
+    get :items,id:me.id
+    assert_response :success
+
+    project = me.projects.first
+    other_project = someone_else.projects.first
+
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item_title  a[href=?]', project_path(project), text: /#{project.title}/, count: 1
+      assert_select 'div.list_item_title  a[href=?]', data_file_path(data_file), text: /#{data_file.title}/, count: 1
+      assert_select 'div.list_item_title  a[href=?]', model_path(model), text: /#{model.title}/, count: 1
+
+      assert_select 'div.list_item_title  a[href=?]', data_file_path(other_data_file), text: /#{other_data_file.title}/, count: 0
+      assert_select 'div.list_item_title  a[href=?]', project_path(other_project), text: /#{other_project.title}/, count: 0
+    end
+  end
+
+  test 'my items permissions' do
+    person = Factory(:person)
+    login_as(person)
+
+    other_person = Factory(:person)
+    data_file=Factory(:data_file,contributor: other_person, creators:[other_person],policy: Factory(:public_policy))
+    data_file2=Factory(:data_file,contributor: other_person, creators:[other_person],policy: Factory(:private_policy))
+
+    assert data_file.can_view?(person.user)
+    refute data_file2.can_view?(person.user)
+
+    get :items,id:other_person.id
+    assert_response :success
+
+    project = other_person.projects.first
+
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item_title  a[href=?]', project_path(project), text: /#{project.title}/, count: 1
+
+      assert_select 'div.list_item_title  a[href=?]', data_file_path(data_file), text: /#{data_file.title}/, count: 1
+      assert_select 'div.list_item_title  a[href=?]', data_file_path(data_file2), text: /#{data_file2.title}/, count: 0
+    end
+  end
+
   def mask_for_admin
     Seek::Roles::Roles.instance.mask_for_role("admin")
   end
