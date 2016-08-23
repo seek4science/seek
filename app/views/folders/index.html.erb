@@ -5,7 +5,6 @@
     help_icon = image_tag(icon_filename_for_key("help"), :alt=>"help", 'data-tooltip' => tooltip("Click to toggle information on how to use the #{t('project')} asset browser"))
     help_button = link_to_function help_icon, visual_effect(:toggle_blind, "folders_help", :duration => 0.3)
 %>
-<%= render :partial=>"yui_css_and_js" -%>
 
 <%= render :partial => "general/page_title",:locals=>{:title=>"#{t('project')} item browser for the #{t('project')} '#{link_to @project.title,@project}'&nbsp;#{help_button}".html_safe} -%>
 <%=  -%>
