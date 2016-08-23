@@ -19,6 +19,7 @@ function setupFoldersTree(dataJson, container_id,drop_accept_class) {
     }).jstree({
         'core': {
             'data': dataJson,
+            'check_callback': true
         }
     }).on('activate_node.jstree', function (e, data) {
         var folder_id = $j(this).jstree(true).get_node(data.node.id).data.folder_id;
