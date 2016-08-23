@@ -9,7 +9,13 @@ var ISA = {
         fontSize: 16,
         color: '#323232',
         textMaxWidth: 195,
-        backgroundImageSize: 50
+        backgroundImageSize: 50,
+        layout: {
+            name: 'breadthfirst',
+            directed: true,
+            spacingFactor: 1.25,
+            padding: 50
+        }
     },
 
     drawGraph: function (elements, current_element_id) {
@@ -20,12 +26,7 @@ var ISA = {
             panningEnabled: true,
             userPanningEnabled: true,
 
-            layout: {
-                name: 'breadthfirst',
-                directed: true,
-                spacingFactor: 1.25,
-                padding: 50
-            },
+            layout: ISA.defaults.layout,
 
             style: [
                 {
@@ -149,6 +150,7 @@ var ISA = {
         jsTree.select_node(node.data('id'));
         ISA.animateNode(node, 0.8);
         ISA.displayNodeInfo(node);
+        ISA.loadChildren(node);
     },
 
     animateNode: function (node, zoom) {
@@ -181,7 +183,7 @@ var ISA = {
             elements[i].data.name = decodeHTML(elements[i].data.name);
         }
     },
-    
+
     fullscreen: function (state) {
         $j('#isa-graph').toggleClass('fullscreen', state);
         cy.resize();
@@ -203,5 +205,25 @@ var ISA = {
         if (node != ISA.originNode && node.data('url')) {
             window.location = node.data('url');
         }
+    },
+
+    loadChildren: function (node) {
+        $j.ajax({
+            url: node.data('url') + '/isa_children',
+            success: function (data) {
+                // Set the child node positions to be on top of the node
+                data.cytoscape.forEach(function (childNode) {
+                    childNode.renderedPosition = node.renderedPosition();
+                });
+                cy.add(data.cytoscape);
+                cy.layout($j.extend({ fit: false, animate: true, animationDuration: 500 }, ISA.defaults.layout));
+
+                // Add the nodes to the JStree
+                data.jstree.forEach(function (childNode) {
+                    $j('#jstree').jstree('create_node', childNode.parent, childNode, 'last')
+                });
+                $j('#jstree').jstree('open_node', node.id());
+            }
+        });
     }
 };
