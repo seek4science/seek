@@ -7,7 +7,7 @@ class PeopleController < ApplicationController
   include Seek::DestroyHandling
   include Seek::AdminBulkAction
 
-  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy]
+  before_filter :find_and_authorize_requested_item, :only => [:show, :edit, :update, :destroy, :items]
   before_filter :current_user_exists,:only=>[:register,:create,:new]
   before_filter :is_during_registration,:only=>[:register]
   before_filter :is_user_admin_auth,:only=>[:destroy]
@@ -84,6 +84,12 @@ class PeopleController < ApplicationController
       format.html # show.html.erb
       format.rdf { render :template=>'rdf/show'}
       format.xml
+    end
+  end
+
+  def items
+    respond_to do |format|
+      format.html
     end
   end
 
