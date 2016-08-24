@@ -20,17 +20,8 @@ COPY Gemfile* ./
 RUN bundle config --global frozen 1 && \
     bundle install --without development test
 
-# App code (picky about what gets copied to make caching of the assets:precompile more likely)
-COPY Rakefile config.ru ./
-COPY app app
-COPY config config
-COPY db db
-COPY lib lib
-COPY public public
-COPY spec spec
-COPY script script
-COPY solr solr
-COPY vendor vendor
+# App code
+COPY . .
 
 # SQLite Database (for asset compilation)
 RUN cp config/database.sqlite.yml config/database.yml && \
