@@ -280,11 +280,30 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
 
     al = ActivityLog.last
-    assert_equal 'download', al.action
+    assert_equal 'inline_view', al.action
     assert_equal sop.content_blob, al.referenced
     assert_equal sop, al.activity_loggable
     assert_equal User.current_user, al.culprit
     assert_equal 'content_blobs', al.controller_name
+  end
+
+  test 'log inline_view for viewing pdf and image' do
+    sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    assert_difference('ActivityLog.count') do
+      get :view_content, sop_id: sop.id, id: sop.content_blob.id
+    end
+    assert_response :success
+    al = ActivityLog.last
+    assert_equal 'inline_view', al.action
+
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy))
+    image_content_blob = Factory(:content_blob, :original_filename => 'test.png', :content_type => 'image/png', :asset => df)
+    assert_difference('ActivityLog.count') do
+      get :download, data_file_id: df.id, id: df.content_blob.id, disposition: 'inline'
+    end
+    assert_response :success
+    al = ActivityLog.last
+    assert_equal 'inline_view', al.action
   end
 
   test 'should view content as correct format for type' do
@@ -338,9 +357,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal '7168', @response.header['Content-Length']
   end
 
-  test 'should log download for inline view intent' do
+  test 'should not log download for inline view intent' do
     df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user
-    assert_difference('ActivityLog.count') do
+    assert_no_difference('ActivityLog.count') do
       get :download, data_file_id: df, id: df.content_blob, intent: :inline_view
     end
     assert_response :success

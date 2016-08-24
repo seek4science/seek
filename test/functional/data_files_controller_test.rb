@@ -1349,7 +1349,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
 
-  test "explore logged as download" do
+  test "explore logged as inline_view" do
     data = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy)
     assert_difference("ActivityLog.count") do
       get :explore,:id=>data
@@ -1358,7 +1358,7 @@ class DataFilesControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal data,al.activity_loggable
     assert_equal User.current_user,al.culprit
-    assert_equal "download",al.action
+    assert_equal "inline_view",al.action
     assert_equal "data_files",al.controller_name
   end
 
