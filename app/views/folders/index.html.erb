@@ -12,20 +12,21 @@
 
 
 <div class="show_basic">
-    <%= render :partial=>"folders_help" -%>
+  <%= render :partial => "folders_help" -%>
+  <div class="row">
 
-    <div class="yui-gf">
-        <div id="folder_column" class="yui-u first yui-skin-sam">
-          <div id="folders">
-            <%= render :partial=>"folder_tree" -%>
-          </div>
-        </div>
-        <div class="yui-u">
-            <div id="folder_contents">
-                <%= render :partial=>"contents",:locals=>{:folder=>default_folder} if default_folder -%>
-            </div>
-        </div>
+    <div id="folder_column" class="col-md-4">
+      <div id="folders">
+        <%= render :partial => "folder_tree" -%>
+      </div>
     </div>
+    <div class="col-md-8">
+      <div id="folder_contents">
+        <%= render :partial => "contents", :locals => {:folder => default_folder} if default_folder -%>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div>
