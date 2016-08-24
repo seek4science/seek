@@ -51,4 +51,22 @@ module FoldersHelper
     folder = ProjectFolder.find_by_id(last_id)
   end
 
+  def folder_tree_json folders
+    json = folders.map do |folder|
+      folder_node(folder)
+    end
+
+    json.to_json
+  end
+
+  def folder_node folder
+    {
+        id: "folder_#{folder.id}",
+        text: h(folder.label),
+        data: {folder_id: folder.id, project_id:folder.project.id},
+        state: {opened:folder.children.any?},
+        children: folder.children.map{|child| folder_node(child) }
+    }
+  end
+
 end

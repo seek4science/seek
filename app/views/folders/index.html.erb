@@ -1,9 +1,10 @@
+<%= javascript_include_tag "project_folders" %>
+
 <%
     default_folder = initial_folder(@project)
     help_icon = image_tag(icon_filename_for_key("help"), :alt=>"help", 'data-tooltip' => tooltip("Click to toggle information on how to use the #{t('project')} asset browser"))
     help_button = link_to_function help_icon, visual_effect(:toggle_blind, "folders_help", :duration => 0.3)
 %>
-<%= render :partial=>"yui_css_and_js" -%>
 
 <%= render :partial => "general/page_title",:locals=>{:title=>"#{t('project')} item browser for the #{t('project')} '#{link_to @project.title,@project}'&nbsp;#{help_button}".html_safe} -%>
 <%=  -%>
@@ -11,20 +12,21 @@
 
 
 <div class="show_basic">
-    <%= render :partial=>"folders_help" -%>
+  <%= render :partial => "folders_help" -%>
+  <div class="row">
 
-    <div class="yui-gf">
-        <div id="folder_column" class="yui-u first yui-skin-sam">
-          <div id="folders">
-            <%= render :partial=>"folders" -%>
-          </div>
-        </div>
-        <div class="yui-u">
-            <div id="folder_contents">
-                <%= render :partial=>"contents",:locals=>{:folder=>default_folder} if default_folder -%>
-            </div>
-        </div>
+    <div id="folder_column" class="col-md-4">
+      <div id="folders">
+        <%= render :partial => "folder_tree" -%>
+      </div>
     </div>
+    <div class="col-md-8">
+      <div id="folder_contents">
+        <%= render :partial => "contents", :locals => {:folder => default_folder} if default_folder -%>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div>
