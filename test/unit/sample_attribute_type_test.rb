@@ -148,7 +148,7 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   end
 
   test 'allowed types' do
-    assert_equal %w(Boolean CV Date DateTime Float Integer SeekStrain String Text).sort, SampleAttributeType.allowed_base_types.sort
+    assert_equal %w(Boolean CV Date DateTime Float Integer SeekSample SeekStrain String Text).sort, SampleAttributeType.allowed_base_types.sort
   end
 
   test 'chebi atribute' do

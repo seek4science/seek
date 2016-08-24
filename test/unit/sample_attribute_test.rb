@@ -234,4 +234,25 @@ class SampleAttributeTest < ActiveSupport::TestCase
     attribute.sample_controlled_vocab = Factory(:apples_sample_controlled_vocab)
     refute attribute.valid?
   end
+
+  test 'sample attribute factory' do
+    attribute = Factory(:sample_sample_attribute, is_title: true, sample_type: Factory(:simple_sample_type))
+    assert attribute.valid?
+    refute_nil attribute.linked_sample_type
+    assert attribute.linked_sample_type.is_a?(SampleType)
+  end
+
+  test 'linked sample type must exist for SeekSample type' do
+    attribute = Factory(:sample_sample_attribute, is_title: true, sample_type: Factory(:simple_sample_type))
+    assert attribute.valid?
+    attribute.linked_sample_type=nil
+    refute attribute.valid?
+  end
+
+  test 'linked sample type must not exist if not SeekSample type' do
+    attribute = Factory(:simple_string_sample_attribute, is_title: true, sample_type: Factory(:simple_sample_type))
+    assert attribute.valid?
+    attribute.linked_sample_type=Factory(:simple_sample_type)
+    refute attribute.valid?
+  end
 end

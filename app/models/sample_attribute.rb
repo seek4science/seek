@@ -10,12 +10,16 @@ class SampleAttribute < ActiveRecord::Base
   belongs_to :sample_type, inverse_of: :sample_attributes
   belongs_to :unit
   belongs_to :sample_controlled_vocab
+  belongs_to :linked_sample_type, class_name: 'SampleType'
 
   validates :title, :sample_attribute_type, presence: true
   validates :sample_type, presence: true
 
   #validates that the attribute type is CV if vocab is set, and vice-versa
   validate :sample_controlled_vocab_and_attribute_type_consistency
+
+  #validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
+  validate :linked_sample_type_and_attribute_type_consistency
 
   before_save :generate_accessor_name
   before_save :default_pos, :force_required_when_is_title
@@ -74,6 +78,15 @@ class SampleAttribute < ActiveRecord::Base
     end
     if sample_attribute_type && sample_attribute_type.is_controlled_vocab? && sample_controlled_vocab.nil?
       errors.add(:sample_controlled_vocab, "Controlled vocabulary must be set if attribute type is CV")
+    end
+  end
+
+  def linked_sample_type_and_attribute_type_consistency
+    if sample_attribute_type && linked_sample_type && !sample_attribute_type.is_seek_sample?
+      errors.add(:sample_attribute_type, "Attribute type must be SeekSample if linked sample type set")
+    end
+    if sample_attribute_type && sample_attribute_type.is_seek_sample? && linked_sample_type.nil?
+      errors.add(:sample_controlled_vocab, "Linked Sample Type must be set if attribute type is SeekSample")
     end
   end
 end
