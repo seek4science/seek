@@ -1,4 +1,4 @@
 $j('#<%= params[:asset_element_id] %>').fadeOut();
 
-//FIXME: the rename_node doesn't seem to work, but all the docs and googling suggests it should
-$j('#assay_folders').jstree('rename_node', 'folder_<%=@folder.id %>', '<%= @folder.label %>');
+
+updateFolderLabel('<%=@folder.id %>','<%= @folder.label %>');

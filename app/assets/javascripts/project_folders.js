@@ -17,8 +17,7 @@ function setupFoldersTree(dataJson, container_id,drop_accept_class) {
         });
     }).jstree({
         'core': {
-            'data': dataJson,
-            'check_callback': true
+            'data': dataJson
         }
     }).on('activate_node.jstree', function (e, data) {
         var folder_id = $j(this).jstree(true).get_node(data.node.id).data.folder_id;
@@ -55,6 +54,14 @@ function setupAssayRemoveDropTarget(target_id) {
         }
     });
 
+}
+
+function updateFolderLabel(folder_id,new_label) {
+    //this is a workaround to using rename_node, which loses the droppable.
+    var tree_id=$j('li#folder_'+folder_id).parents('.jstree').attr('id');
+    var selector='#'+tree_id+' li#folder_'+folder_id+' a';
+    var contents = $j(selector).contents();
+    contents[contents.length - 1].nodeValue = new_label;
 }
 
 function setupAssetCardDraggable(card_class) {
