@@ -25,6 +25,7 @@ class Project < ActiveRecord::Base
 
   has_and_belongs_to_many :strains
   has_and_belongs_to_many :organisms
+  has_and_belongs_to_many :samples
 
   has_many :work_groups, dependent: :destroy
   has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?
