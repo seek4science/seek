@@ -7,8 +7,15 @@
     }).jstree({ 'core' : {
       'check_callback': true,
       'data' : <%= tree_json(hash).html_safe -%>
-    } }).on('activate_node.jstree', function (e, data) {
+    }}).on('activate_node.jstree', function (e, data) {
       ISA.selectNode(ISA.getNode(data.node.id));
-    });
+    }).on('load_node.jstree', function (e, data) {
+      if (data.node.data && data.node.data.loadable) {
+        var childCountNode = ISA.getNode(data.node.id).outgoers().targets('.child-count');
+        if (childCountNode.length) {
+          ISA.loadChildren(childCountNode);
+        }
+      }
+    })
   });
 </script>

@@ -30,7 +30,7 @@ var ISA = {
 
             style: [
                 {
-                    selector: 'node',
+                    selector: 'node.resource',
                     css: {
                         'shape': 'roundrectangle',
                         'border-color': 'data(borderColor)',
@@ -54,6 +54,18 @@ var ISA = {
                     }
                 },
                 {
+                    selector: 'node.child-count',
+                    css: {
+                        'shape': 'roundrectangle',
+                        'content': 'data(name)',
+                        'text-valign': 'center',
+                        'background-color': '#eeeeee',
+                        'width': ISA.defaults.nodeWidth,
+                        'font-size': ISA.defaults.fontSize,
+                        'opacity': 0.6
+                    }
+                },
+                {
                     selector: 'node[imageUrl]',
                     css: {
                         'background-image': 'data(imageUrl)',
@@ -69,9 +81,18 @@ var ISA = {
                     css: {
                         'width': 1.5,
                         'target-arrow-shape': 'none',
+                        'line-color': '#bbb',
+                        'opacity': 0.5
+                    }
+                },
+                {
+                    selector: 'edge.resource-edge',
+                    css: {
+                        'width': 1.5,
+                        'target-arrow-shape': 'none',
                         'line-color': '#191975',
-                        'source-arrow-color': 'data(faveColor)',
-                        'target-arrow-color': 'data(faveColor)',
+                        'source-arrow-color': '#71b7be',
+                        'target-arrow-color': '#71b7be',
                         'content': 'data(name)',
                         'color': '#222222',
                         'text-background-color': '#eeeeff',
@@ -128,7 +149,7 @@ var ISA = {
             resetIcon: 'glyphicon glyphicon-resize-full'
         });
 
-        cy.on('tap', 'node:selected', function (event) {
+        cy.on('tap', 'node.resource:selected', function (event) {
             if (ISA.recentlyClickedNode) {
                 ISA.visitNode(event.cyTarget);
                 ISA.recentlyClickedNode = null;
@@ -138,9 +159,13 @@ var ISA = {
             }
         });
 
-        cy.on('select', 'node', function (event) {
+        cy.on('select', 'node.resource', function (event) {
             ISA.selectNode(event.cyTarget);
             ISA.rememberFirstClick(event.cyTarget);
+        });
+
+        cy.on('select', 'node.child-count', function (event) {
+           ISA.loadChildren(event.cyTarget);
         });
     },
 
@@ -150,7 +175,6 @@ var ISA = {
         jsTree.select_node(node.data('id'));
         ISA.animateNode(node, 0.8);
         ISA.displayNodeInfo(node);
-        ISA.loadChildren(node);
     },
 
     animateNode: function (node, zoom) {
@@ -207,15 +231,18 @@ var ISA = {
         }
     },
 
-    loadChildren: function (node) {
+    loadChildren: function (childCountNode) {
         $j.ajax({
-            url: node.data('url') + '/isa_children',
+            url: childCountNode.data('url'),
             success: function (data) {
+                var node = childCountNode.incomers().sources();
+
                 // Set the child node positions to be on top of the node
                 data.cytoscape.forEach(function (childNode) {
                     childNode.renderedPosition = node.renderedPosition();
                 });
                 cy.add(data.cytoscape);
+                cy.remove(childCountNode);
                 cy.layout($j.extend({ fit: false, animate: true, animationDuration: 500 }, ISA.defaults.layout));
 
                 // Add the nodes to the JStree
@@ -227,7 +254,11 @@ var ISA = {
                         tree.create_node(childNode.parent, childNode, 'last');
                     }
                 });
-                tree.open_node(node.id());
+                // Need to do this due to a little hack we used when drawing the tree
+                //  (to show a node as "openable" despite having no children)
+                tree.get_node(node.id()).state.loaded = true;
+                tree.get_node(node.id()).state.opened = true;
+                tree.redraw_node(node.id());
             }
         });
     }

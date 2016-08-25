@@ -1,4 +1,16 @@
 module Seek
+
+  class IsaGraphNode
+
+    attr_accessor :object, :child_count
+
+    def initialize(object)
+      @object = object
+      @child_count = 0
+    end
+
+  end
+
   class IsaGraphGenerator
 
     def initialize(object)
@@ -23,7 +35,7 @@ module Seek
       # Self and descendants...
       merge_hashes(hash, descendants(@object, depth))
 
-      hash[:nodes].delete(@object) unless include_self
+      hash[:nodes].delete_if { |n| n.object == @object } unless include_self
 
       hash
     end
@@ -31,7 +43,7 @@ module Seek
     private
 
     def merge_hashes(hash1, hash2)
-      hash1[:nodes] = (hash1[:nodes] + hash2[:nodes]).uniq
+      hash1[:nodes] = (hash1[:nodes] + hash2[:nodes]).uniq(&:object)
       hash1[:edges] = (hash1[:edges] + hash2[:edges]).uniq
     end
 
@@ -44,11 +56,16 @@ module Seek
     end
 
     def traverse(method, object, max_depth = nil, depth = 0)
-      nodes = [object]
+      node = Seek::IsaGraphNode.new(object)
+
+      children = send(method, object)
+      node.child_count = children.count
+
+      nodes = [node]
       edges = []
 
-      if max_depth.nil? || (depth < max_depth)
-        send(method, object).each do |child|
+      if max_depth.nil? || (depth < max_depth) || children.count == 1
+        children.each do |child|
           hash = traverse(method, child, max_depth, depth + 1)
           nodes += hash[:nodes]
           edges += hash[:edges]
@@ -61,11 +78,11 @@ module Seek
 
     def children(object)
       associations = associations(object)
-      associations[:children] + associations[:related]
+      (associations[:children] + associations[:related]).uniq
     end
 
     def parents(object)
-      associations(object)[:parents]
+      associations(object)[:parents].uniq
     end
 
     def associations(object)

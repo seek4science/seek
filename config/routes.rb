@@ -387,6 +387,7 @@ SEEK::Application.routes.draw do
       get :extraction_status
       post :extract_samples
       delete :cancel_extraction
+      get :isa_children
     end
     resources :studied_factors do
       collection do
@@ -423,6 +424,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :new_version
       delete :destroy_version
+      get :isa_children
     end
     resources :content_blobs do
       member do
@@ -464,6 +466,7 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
+      get :isa_children
     end
     resources :model_images do
       collection do
@@ -506,6 +509,7 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
+      get :isa_children
     end
     resources :experimental_conditions do
       collection do
@@ -676,6 +680,7 @@ SEEK::Application.routes.draw do
     end
     member do
       post :update_annotations_ajax
+      get :isa_children
     end
   end
 

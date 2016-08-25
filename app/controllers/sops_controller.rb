@@ -13,6 +13,8 @@ class SopsController < ApplicationController
   include Seek::BreadCrumbs
   include Seek::DataciteDoi
 
+  include Seek::IsaGraphExtensions
+
   def new_version
     if handle_upload_data
       comments=params[:revision_comment]

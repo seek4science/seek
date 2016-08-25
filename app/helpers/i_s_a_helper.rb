@@ -27,7 +27,7 @@ module ISAHelper
 
   def cytoscape_elements elements_hash
     begin
-      cytoscape_node_elements(elements_hash[:nodes]) + cytoscape_edge_elements(elements_hash[:edges])
+      cytoscape_node_elements(elements_hash) + cytoscape_edge_elements(elements_hash)
     rescue Exception=>e
       raise e if Rails.env.development?
       Rails.logger.error("Error generating nodes and edges for the graph - #{e.message}")
@@ -37,9 +37,10 @@ module ISAHelper
 
   private
 
-  def cytoscape_node_elements items
-    cytoscape_node_elements = []
-    items.each do |item|
+  def cytoscape_node_elements hash
+    elements = []
+    hash[:nodes].each do |node|
+      item = node.object
       item_type = item.class.name
       data = { id: node_id(item) }
 
@@ -80,15 +81,29 @@ module ISAHelper
         data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
 
-      cytoscape_node_elements << { group: 'nodes', data: data }
+      # If this node has children, but they aren't included in the set of nodes, create an info node that will load the children
+      #  when clicked
+      actual_child_count = hash[:edges].select { |source, _| source == item }.count
+      if node.child_count > actual_child_count
+        cc_id = "#{data[:id]}-child-count"
+        elements << { group: 'nodes', data: { id: cc_id,
+                                              name: "Show #{node.child_count - actual_child_count} more",
+                                              url: polymorphic_path(item, action: :isa_children) },
+                      classes: 'child-count'}
+        elements << { group: 'edges', data: { id: "#{cc_id}-edge",
+                                              source: data[:id],
+                                              target: cc_id } }
+      end
+
+      elements << { group: 'nodes', data: data, classes: 'resource' }
     end
 
-    cytoscape_node_elements
+    elements
   end
 
-  def cytoscape_edge_elements edges
-    cytoscape_edge_elements = []
-    edges.each do |edge|
+  def cytoscape_edge_elements hash
+    elements = []
+    hash[:edges].each do |edge|
       source_item, target_item = edge
       source = node_id(source_item)
       target = node_id(target_item)
@@ -105,19 +120,17 @@ module ISAHelper
       else
         fave_color = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
-      cytoscape_edge_elements << edge_element(e_id, name, source, target, fave_color)
-    end
-    cytoscape_edge_elements
-  end
 
-  def node_element id, name, item_info, fave_color, border_color
-    {:group => 'nodes',
-     :data => {:id => id,
-               :name => name,
-               :item_info => item_info,
-               :faveColor => fave_color,
-               :borderColor => border_color}
-    }
+      elements << { group: 'edges',
+                    data: { id: e_id,
+                            name: name,
+                            source: source,
+                            target: target,
+                            faveColor: fave_color },
+                    classes: 'resource-edge'
+      }
+    end
+    elements
   end
 
   def edge_element id, name, source, target, fave_color
@@ -151,11 +164,11 @@ module ISAHelper
   end
 
   def tree_json(hash)
-    roots = hash[:nodes].select do |obj|
-      hash[:edges].none? { |parent, child| child == obj }
+    roots = hash[:nodes].select do |n|
+      hash[:edges].none? { |parent, child| child == n.object }
     end
 
-    nodes = roots.map { |root| tree_node(hash, root) }
+    nodes = roots.map { |root| tree_node(hash, root.object) }
 
     nodes = nodes + hash[:edges].map do |edge|
       tree_node(hash, edge[1], node_id(edge[0]))
@@ -169,26 +182,38 @@ module ISAHelper
       parent == object
     end
 
+    node = hash[:nodes].detect { |n| n.object == object }
+
     if object.can_view?
-      {
+      entry = {
         id: node_id(object),
         text: object.title,
         parent: parent_id,
-        state: { opened: child_edges.any? },
         icon: asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
       }
     else
-      {
+      entry = {
           id: node_id(object),
           text: 'Hidden item',
           parent: parent_id,
-          state: {
-              opened: child_edges.any?,
-              disable: true
-          },
           a_attr: { class: 'hidden-leaf none_text' }
       }
     end
+
+    if node.child_count > 0
+      if node.child_count > child_edges.count
+        # This is a little hack to show a node as "openable" despite having no children
+        entry[:children] = true
+        entry[:state] = { opened: false }
+        entry[:data] = { loadable: true }
+      else
+        entry[:state] = { opened: true }
+      end
+    else
+      entry[:state] = { opened: false }
+    end
+
+    entry
   end
 
   private

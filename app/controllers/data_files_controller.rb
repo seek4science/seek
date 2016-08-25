@@ -24,6 +24,7 @@ class DataFilesController < ApplicationController
 
   include Seek::DataciteDoi
 
+  include Seek::IsaGraphExtensions
 
   def convert_to_presentation
     @data_file = DataFile.find params[:id]

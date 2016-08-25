@@ -19,6 +19,8 @@ class ModelsController < ApplicationController
   include Bives
   include Seek::DataciteDoi
 
+  include Seek::IsaGraphExtensions
+
   def find_other_version
     version = params[:other_version]
     @other_version = @model.find_version(version)
