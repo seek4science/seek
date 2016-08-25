@@ -1,7 +1,6 @@
 module Seek
   module Samples
     class SampleData < HashWithIndifferentAccess
-
       def initialize(sample_type = nil, json = nil)
         if sample_type
           @sample_type = sample_type
@@ -42,7 +41,6 @@ module Seek
       def attribute_for_attribute_name(attribute_name)
         @sample_type.sample_attributes.where(accessor_name: attribute_name).first
       end
-
     end
   end
 end

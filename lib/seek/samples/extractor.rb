@@ -2,7 +2,6 @@ module Seek
   module Samples
     # Class to handle the extraction and temporary storage of samples from a data file
     class Extractor
-
       def initialize(data_file, sample_type = nil)
         @data_file = data_file
         @sample_type = sample_type

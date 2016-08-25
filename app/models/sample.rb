@@ -5,7 +5,7 @@ class Sample < ActiveRecord::Base
                   :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
                   :other_creators, :data
 
-  searchable(:auto_index=>false) do
+  searchable(auto_index: false) do
     text :attribute_values do
       attribute_values_for_search
     end
@@ -17,9 +17,9 @@ class Sample < ActiveRecord::Base
   acts_as_asset
 
   belongs_to :sample_type, inverse_of: :samples
-  belongs_to :originating_data_file, :class_name => 'DataFile'
+  belongs_to :originating_data_file, class_name: 'DataFile'
 
-  scope :default_order, order("title")
+  scope :default_order, order('title')
 
   validates :title, :sample_type, presence: true
   include ActiveModel::Validations
@@ -43,7 +43,6 @@ class Sample < ActiveRecord::Base
     User.logged_in_and_member?
   end
 
-
   def self.user_creatable?
     true
   end
@@ -53,7 +52,7 @@ class Sample < ActiveRecord::Base
   end
 
   # Mass assignment of attributes
-  def data= hash
+  def data=(hash)
     data.mass_assign(hash)
   end
 
@@ -62,7 +61,7 @@ class Sample < ActiveRecord::Base
   end
 
   def strains
-    self.sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == 'SeekStrain' }.map do |sa|
+    sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == 'SeekStrain' }.map do |sa|
       Strain.find_by_id(get_attribute(sa.hash_key)['id'])
     end.compact
   end
@@ -78,15 +77,13 @@ class Sample < ActiveRecord::Base
   private
 
   def attribute_values_for_search
-    self.sample_type ? self.data.values.select { |v| !v.blank? }.uniq : []
+    sample_type ? data.values.select { |v| !v.blank? }.uniq : []
   end
 
   # override to insert the extra accessors for mass assignment
   def mass_assignment_authorizer(role)
     extra = []
-    if sample_type
-      extra = sample_type.sample_attributes.collect(&:method_name)
-    end
+    extra = sample_type.sample_attributes.collect(&:method_name) if sample_type
     super(role) + extra
   end
 
@@ -98,17 +95,17 @@ class Sample < ActiveRecord::Base
     self.title = title_attribute_value
   end
 
-  #the value of the designated title attribute
+  # the value of the designated title attribute
   def title_attribute_value
-    return nil unless (sample_type && sample_type.sample_attributes.title_attributes.any?)
-    title_attr=sample_type.sample_attributes.title_attributes.first
+    return nil unless sample_type && sample_type.sample_attributes.title_attributes.any?
+    title_attr = sample_type.sample_attributes.title_attributes.first
     get_attribute(title_attr.hash_key)
   end
 
   def respond_to_missing?(method_name, include_private = false)
     name = method_name.to_s
     if name.start_with?(SampleAttribute::METHOD_PREFIX) &&
-        data.key?(name.sub(SampleAttribute::METHOD_PREFIX,'').chomp('='))
+       data.key?(name.sub(SampleAttribute::METHOD_PREFIX, '').chomp('='))
       true
     else
       super
@@ -130,5 +127,4 @@ class Sample < ActiveRecord::Base
       super
     end
   end
-
 end

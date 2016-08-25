@@ -4,10 +4,10 @@ class SamplesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::IndexPager
 
-  before_filter :find_index_assets, :only => :index
-  before_filter :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview]
+  before_filter :find_index_assets, only: :index
+  before_filter :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
 
-  before_filter :auth_to_create, :only=>[:new,:create]
+  before_filter :auth_to_create, only: [:new, :create]
 
   def index
     if @data_file || @sample_type
@@ -53,32 +53,33 @@ class SamplesController < ApplicationController
     else
       flash[:notice] = 'It was not possible to delete the sample.'
     end
-    respond_with(@sample,location:root_path)
+    respond_with(@sample, location: root_path)
   end
 
-  #called from AJAX, returns the form containing the attributes for the sample_type_id
+  # called from AJAX, returns the form containing the attributes for the sample_type_id
   def attribute_form
     sample_type_id = params[:sample_type_id]
 
-    sample=Sample.new(sample_type_id:sample_type_id)
-
+    sample = Sample.new(sample_type_id: sample_type_id)
 
     respond_with do |format|
-      format.js {
+      format.js do
         render json: {
-                form: (render_to_string(partial:"samples/sample_attributes_form",locals:{sample:sample}))
-               }
-      }
+          form: (render_to_string(partial: 'samples/sample_attributes_form', locals: { sample: sample }))
+        }
+      end
     end
   end
 
   def filter
     @associated_samples = params[:assay_id].blank? ? [] : Assay.find(params[:assay_id]).samples
-    @samples = Sample.where("title LIKE ?", "%#{params[:filter]}%").limit(20)
+    @samples = Sample.where('title LIKE ?', "%#{params[:filter]}%").limit(20)
 
     respond_with do |format|
-      format.html { render :partial => 'samples/association_preview', :collection => @samples,
-                           :locals => { :existing => @associated_samples } }
+      format.html do
+        render partial: 'samples/association_preview', collection: @samples,
+               locals: { existing: @associated_samples }
+      end
     end
   end
 
@@ -95,13 +96,13 @@ class SamplesController < ApplicationController
       @data_file = DataFile.find(params[:data_file_id])
 
       unless @data_file.can_view?
-        flash[:error] = "You are not authorize to view samples from this data file"
+        flash[:error] = 'You are not authorize to view samples from this data file'
         respond_to do |format|
-          format.html { redirect_to data_file_path(@data_file)}
+          format.html { redirect_to data_file_path(@data_file) }
         end
       end
 
-      @samples = Sample.authorize_asset_collection(@data_file.extracted_samples.includes(:sample_type => :sample_attributes).all, 'view')
+      @samples = Sample.authorize_asset_collection(@data_file.extracted_samples.includes(sample_type: :sample_attributes).all, 'view')
     elsif params[:sample_type_id]
       @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       @samples = Sample.authorize_asset_collection(@sample_type.samples.all, 'view')
@@ -109,5 +110,4 @@ class SamplesController < ApplicationController
       find_assets
     end
   end
-
 end

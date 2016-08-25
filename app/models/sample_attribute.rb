@@ -1,9 +1,8 @@
 class SampleAttribute < ActiveRecord::Base
-
   METHOD_PREFIX = '__sample_data_'
 
   attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
-                  :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index,:sample_controlled_vocab,
+                  :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index, :sample_controlled_vocab,
                   :sample_controlled_vocab_id, :linked_sample_type_id
 
   belongs_to :sample_attribute_type
@@ -15,10 +14,10 @@ class SampleAttribute < ActiveRecord::Base
   validates :title, :sample_attribute_type, presence: true
   validates :sample_type, presence: true
 
-  #validates that the attribute type is CV if vocab is set, and vice-versa
+  # validates that the attribute type is CV if vocab is set, and vice-versa
   validate :sample_controlled_vocab_and_attribute_type_consistency
 
-  #validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
+  # validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
   validate :linked_sample_type_and_attribute_type_consistency
 
   before_save :generate_accessor_name
@@ -34,7 +33,7 @@ class SampleAttribute < ActiveRecord::Base
 
   def validate_value?(value)
     return false if required? && value.blank?
-    (value.blank? && !required?) || sample_attribute_type.validate_value?(value,controlled_vocab:sample_controlled_vocab,linked_sample_type:linked_sample_type)
+    (value.blank? && !required?) || sample_attribute_type.validate_value?(value, controlled_vocab: sample_controlled_vocab, linked_sample_type: linked_sample_type)
   end
 
   # The method name used to get this attribute via a method call
@@ -58,7 +57,7 @@ class SampleAttribute < ActiveRecord::Base
   private
 
   def generate_accessor_name
-    self.accessor_name = self.hash_key
+    self.accessor_name = hash_key
   end
 
   # if not set, takes the next value for that sample type
@@ -67,26 +66,26 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   def force_required_when_is_title
-    #forces required to be true if it is a title
+    # forces required to be true if it is a title
     self.required = required? || is_title?
     true
   end
 
   def sample_controlled_vocab_and_attribute_type_consistency
     if sample_attribute_type && sample_controlled_vocab && !sample_attribute_type.is_controlled_vocab?
-      errors.add(:sample_attribute_type, "Attribute type must be CV if controlled vocabulary set")
+      errors.add(:sample_attribute_type, 'Attribute type must be CV if controlled vocabulary set')
     end
     if sample_attribute_type && sample_attribute_type.is_controlled_vocab? && sample_controlled_vocab.nil?
-      errors.add(:sample_controlled_vocab, "Controlled vocabulary must be set if attribute type is CV")
+      errors.add(:sample_controlled_vocab, 'Controlled vocabulary must be set if attribute type is CV')
     end
   end
 
   def linked_sample_type_and_attribute_type_consistency
     if sample_attribute_type && linked_sample_type && !sample_attribute_type.is_seek_sample?
-      errors.add(:sample_attribute_type, "Attribute type must be SeekSample if linked sample type set")
+      errors.add(:sample_attribute_type, 'Attribute type must be SeekSample if linked sample type set')
     end
     if sample_attribute_type && sample_attribute_type.is_seek_sample? && linked_sample_type.nil?
-      errors.add(:sample_controlled_vocab, "Linked Sample Type must be set if attribute type is SeekSample")
+      errors.add(:sample_controlled_vocab, 'Linked Sample Type must be set if attribute type is SeekSample')
     end
   end
 end

@@ -27,7 +27,7 @@ class SampleControlledVocabsController < ApplicationController
 
     flash[:notice] = 'The sample controlled vocabulary was successfully created.' if @sample_controlled_vocab.save
     respond_with(@sample_controlled_vocab) do |format|
-      format.js {render layout: false, content_type: 'text/javascript'}
+      format.js { render layout: false, content_type: 'text/javascript' }
     end
   end
 

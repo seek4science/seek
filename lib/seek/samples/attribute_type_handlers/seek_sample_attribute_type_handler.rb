@@ -7,7 +7,7 @@ module Seek
         def test_value(value)
           sample = Sample.find_by_id(value)
           fail 'Unable to find Sample in database' unless sample
-          fail 'Sample type does not match' unless sample.sample_type==linked_sample_type
+          fail 'Sample type does not match' unless sample.sample_type == linked_sample_type
         end
 
         private
