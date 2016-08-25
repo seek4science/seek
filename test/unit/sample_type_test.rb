@@ -329,7 +329,24 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert type.can_delete?
     type = Factory(:patient_sample).sample_type
     refute type.can_delete?
+
+    #double check the type has been saved (due to an issue when running all tests together)
+    refute type.new_record?
+
+    #cannot delete if linked from another sample type
+    linked_attribute = Factory(:sample_sample_attribute, sample_type:Factory(:patient_sample_type))
+    type = linked_attribute.linked_sample_type
+    refute type.can_delete?
+    assert_no_difference('SampleType.count') do
+      assert_difference('SampleAttribute.count',-1) do
+        linked_attribute.destroy
+      end
+    end
+
+    assert type.can_delete?
   end
+
+
 
 
   test 'dependant attributes destroyed' do

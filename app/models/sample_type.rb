@@ -15,6 +15,8 @@ class SampleType < ActiveRecord::Base
 
   has_many :sample_attributes, order: :pos, inverse_of: :sample_type, dependent: :destroy
 
+  has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
+
   has_one :content_blob, :as => :asset, dependent: :destroy
 
   alias_method :template, :content_blob
@@ -115,7 +117,7 @@ class SampleType < ActiveRecord::Base
   end
 
   def can_delete?(user = User.current_user)
-    samples.empty?
+    samples.empty? && linked_sample_attributes.empty?
   end
 
   private
