@@ -68,5 +68,67 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     assert_includes result[:edges], [assay, sop]
   end
 
+  test "does not show sibling's children" do
+    investigation = Factory(:investigation)
+    study = Factory(:study, investigation: investigation)
+    assay = Factory(:assay, study: study)
+    sibling_assay = Factory(:assay, study: study)
+    data_file = Factory(:data_file)
+    nephew_model = Factory(:model)
+    niece_sop = Factory(:sop)
+
+    AssayAsset.create(assay: assay, asset: data_file)
+    AssayAsset.create(assay: sibling_assay, asset: nephew_model)
+    AssayAsset.create(assay: sibling_assay, asset: niece_sop)
+
+    result = Seek::IsaGraphGenerator.new(assay).generate(include_parents: true)
+
+    assert_equal 6, result[:nodes].length
+    assert_equal 5, result[:edges].length
+
+    assert_includes result[:nodes].map(&:object), assay
+    assert_includes result[:nodes].map(&:object), data_file
+    assert_includes result[:nodes].map(&:object), sibling_assay
+    assert_not_includes result[:nodes].map(&:object), nephew_model
+  end
+
+  test "show's sibling's child if only one" do
+    investigation = Factory(:investigation)
+    study = Factory(:study, investigation: investigation)
+    assay = Factory(:assay, study: study)
+    sibling_assay = Factory(:assay, study: study)
+    data_file = Factory(:data_file)
+    nephew_model = Factory(:model)
+
+    AssayAsset.create(assay: assay, asset: data_file)
+    AssayAsset.create(assay: sibling_assay, asset: nephew_model)
+
+    result = Seek::IsaGraphGenerator.new(assay).generate(include_parents: true)
+
+    assert_equal 7, result[:nodes].length
+    assert_equal 6, result[:edges].length
+
+    assert_includes result[:nodes].map(&:object), assay
+    assert_includes result[:nodes].map(&:object), data_file
+    assert_includes result[:nodes].map(&:object), sibling_assay
+    assert_includes result[:nodes].map(&:object), nephew_model
+  end
+
+  test 'maintains child asset count even if the are not included in graph' do
+    investigation = Factory(:investigation)
+    study = Factory(:study, investigation: investigation)
+    assay = Factory(:assay, study: study)
+    assay2 = Factory(:assay, study: study)
+    generator = Seek::IsaGraphGenerator.new(investigation)
+    result = generator.generate
+
+    study_node = result[:nodes].detect { |n| n.object == study }
+
+    assert_equal 2, study_node.child_count
+    assert_not_includes result[:nodes].map(&:object), assay
+    assert_not_includes result[:nodes].map(&:object), assay2
+  end
+
+
 
 end
