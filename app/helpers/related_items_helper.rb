@@ -79,7 +79,6 @@ module RelatedItemsHelper
   # Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
   def get_related_resources(resource, limit = nil)
     return resource_hash_lazy_load(resource) if Seek::Config.tabs_lazy_load_enabled
-    name = resource.class.name.split('::')[0]
 
     related = collect_related_items(resource)
 
@@ -158,7 +157,7 @@ module RelatedItemsHelper
   end
 
   def collect_related_items(resource)
-    related = relatable_types.delete_if { |k, _v| k == resource.class.name }
+    related = relatable_types
 
     related.each_key do |type|
       related[type][:items] = related_items_method(resource, type)

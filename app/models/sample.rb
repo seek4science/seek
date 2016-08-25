@@ -51,6 +51,10 @@ class Sample < ActiveRecord::Base
     originating_data_file
   end
 
+  def related_samples
+    samples_this_links_to
+  end
+
   # Mass assignment of attributes
   def data=(hash)
     data.mass_assign(hash)
@@ -75,6 +79,13 @@ class Sample < ActiveRecord::Base
   end
 
   private
+
+  def samples_this_links_to
+    return [] unless sample_type
+    seek_sample_attributes = sample_type.sample_attributes.select{|attr| attr.sample_attribute_type.is_seek_sample?}
+    seek_sample_attributes.map{|attr| Sample.find_by_id(get_attribute(attr.hash_key))}.compact
+
+  end
 
   def attribute_values_for_search
     sample_type ? data.values.select { |v| !v.blank? }.uniq : []
