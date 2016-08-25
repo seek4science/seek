@@ -219,10 +219,15 @@ var ISA = {
                 cy.layout($j.extend({ fit: false, animate: true, animationDuration: 500 }, ISA.defaults.layout));
 
                 // Add the nodes to the JStree
+                var tree = $j('#jstree').jstree(true);
                 data.jstree.forEach(function (childNode) {
-                    $j('#jstree').jstree('create_node', childNode.parent, childNode, 'last')
+                    // Only add the node to the tree if its not already there
+                    var node = tree.get_node(childNode.id);
+                    if (!node || node.parent !== childNode.parent) {
+                        tree.create_node(childNode.parent, childNode, 'last');
+                    }
                 });
-                $j('#jstree').jstree('open_node', node.id());
+                tree.open_node(node.id());
             }
         });
     }
