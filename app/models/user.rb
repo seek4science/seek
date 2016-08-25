@@ -15,6 +15,7 @@ class User < ActiveRecord::Base
   has_many :presentations,:as=>:contributor
   has_many :events, :as => :contributor
   has_many :publications, :as => :contributor
+  has_many :samples, :as => :contributor
 
   has_many :investigations,:as=>:contributor
   has_many :studies,:as=>:contributor

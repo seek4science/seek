@@ -51,6 +51,7 @@ class Person < ActiveRecord::Base
   has_many :assays,:foreign_key => :owner_id
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
   has_many :presentations_for_person,:as=>:contributor, :class_name=>"Presentation"
+  has_many :samples_for_person,:as=>:contributor, :class_name=>"Sample"
 
   has_one :user, :dependent=>:destroy
 
@@ -60,6 +61,7 @@ class Person < ActiveRecord::Base
   has_many :created_sops, :through => :assets_creators, :source => :asset, :source_type => "Sop"
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
+  has_many :created_samples,:through => :assets_creators,:source=>:asset,:source_type => "Sample"
 
   searchable(:auto_index => false) do
     text :project_positions
@@ -144,9 +146,11 @@ class Person < ActiveRecord::Base
   end
 
   def related_samples
-    user_items = []
-    user_items =  user.try(:send,:samples) if user.respond_to?(:samples)
-    user_items
+    result = samples_for_person | created_samples
+    if user
+      result = (result | user.samples).compact
+    end
+    result
   end
 
   def programmes
