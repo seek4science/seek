@@ -7,6 +7,7 @@
 <% is_title = sample_attribute ? sample_attribute.is_title : false %>
 <% attribute_type_id = sample_attribute ? sample_attribute.sample_attribute_type_id : nil %>
 <% sample_controlled_vocab_id = sample_attribute ? sample_attribute.sample_controlled_vocab_id : nil %>
+<% linked_sample_type_id = sample_attribute ? sample_attribute.linked_sample_type_id : nil %>
 <% unit_id = sample_attribute ? sample_attribute.unit_id : nil %>
 <% template_column_index = sample_attribute ? sample_attribute.template_column_index : nil %>
 <% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
@@ -38,18 +39,25 @@
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.is_controlled_vocab? }] },
+                   options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.is_controlled_vocab?, 'data-is-seek-sample'=>t.is_seek_sample? }] },
                                       attribute_type_id),
                    :class => 'form-control sample-type-attribute-type'%>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless is_controlled_vocab %>">
-    <br/>
-    <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                   options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id] },
-                                      sample_controlled_vocab_id),
-                   :include_blank => true,
-                   :class => 'form-control controlled-vocab-selection' %>
-      <%= create_sample_controlled_vocab_model_button %>
-
+      <br/>
+      <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
+                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id] },
+                                        sample_controlled_vocab_id),
+                     :include_blank => true,
+                     :class => 'form-control controlled-vocab-selection' %>
+        <%= create_sample_controlled_vocab_model_button %>
+    </div>
+    <div class='sample-type-block' style="<%= 'display:none;' unless is_controlled_vocab %>">
+      <br/>
+      <%= select_tag "#{field_name_prefix}[linked_sample_type_id]",
+                     options_for_select(SampleType.all.map { |t| [t.title, t.id] },
+                                        linked_sample_type_id),
+                     :include_blank => true,
+                     :class => 'form-control linked-sample-type-selection' %>
     </div>
   </td>
   <td>

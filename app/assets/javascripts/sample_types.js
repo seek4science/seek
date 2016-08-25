@@ -75,6 +75,15 @@ var SampleTypes = {
         else {
             cv_element.hide();
         }
+
+        var is_seek_sample = $j(this).find(':selected').data('is-seek-sample');
+        var seek_sample_element = $j(this).siblings('.sample-type-block');
+        if (is_seek_sample) {
+            seek_sample_element.show();
+        }
+        else {
+            seek_sample_element.hide();
+        }
     }
 
 };
