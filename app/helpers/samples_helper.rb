@@ -17,6 +17,9 @@ module SamplesHelper
       when 'CV'
         terms = attribute.sample_controlled_vocab.sample_controlled_vocab_terms
         collection_select :sample, attribute_method_name, terms, :label, :label, include_blank: !attribute.required?,  class: "form-control #{clz}"
+      when 'SeekSample'
+        terms = Sample.authorize_asset_collection(attribute.linked_sample_type.samples,:view)
+        collection_select :sample, attribute_method_name, terms, :id, :title, include_blank: !attribute.required?,  class: "form-control #{clz}"
       else
         text_field :sample, attribute_method_name, class: "form-control #{clz}"
     end
