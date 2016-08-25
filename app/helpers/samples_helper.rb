@@ -18,7 +18,7 @@ module SamplesHelper
         terms = attribute.sample_controlled_vocab.sample_controlled_vocab_terms
         collection_select :sample, attribute_method_name, terms, :label, :label, include_blank: !attribute.required?,  class: "form-control #{clz}"
       when 'SeekSample'
-        terms = Sample.authorize_asset_collection(attribute.linked_sample_type.samples,:view)
+        terms = Sample.authorize_asset_collection(attribute.linked_sample_type.samples, :view)
         collection_select :sample, attribute_method_name, terms, :id, :title, include_blank: !attribute.required?,  class: "form-control #{clz}"
       else
         text_field :sample, attribute_method_name, class: "form-control #{clz}"
@@ -49,9 +49,24 @@ module SamplesHelper
           DateTime.parse(value).strftime('%e %B %Y %H:%M:%S')
         when 'SeekStrain'
           seek_strain_attribute_display(value)
+        when 'SeekSample'
+          seek_sample_attribute_display(value)
         else
           default_attribute_display(attribute, options, sample, value)
       end
+    end
+  end
+
+  def seek_sample_attribute_display(value)
+    sample = Sample.find_by_id(value)
+    if sample
+      if sample.can_view?
+        link_to sample.title, sample
+      else
+        content_tag :span, 'Hidden', class: 'none_text'
+      end
+    else
+      content_tag :span, 'Not found', class: 'none_text'
     end
   end
 
