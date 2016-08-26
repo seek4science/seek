@@ -13,10 +13,10 @@ class CVAttributeTypeHandlerTest  < ActiveSupport::TestCase
   end
 
   test 'validate value' do
-    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new
     vocab = Factory(:apples_sample_controlled_vocab)
-    assert handler.validate_value?('Granny Smith',:controlled_vocab=>vocab)
-    refute handler.validate_value?('Pear',:controlled_vocab=>vocab)
+    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new({:controlled_vocab=>vocab})
+    assert handler.validate_value?('Granny Smith')
+    refute handler.validate_value?('Pear')
   end
 
   test 'exception thrown for missing controlled vocab' do
