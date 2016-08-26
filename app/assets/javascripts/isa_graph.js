@@ -26,6 +26,7 @@ var ISA = {
             userZoomingEnabled: false,
             panningEnabled: true,
             userPanningEnabled: true,
+            maxZoom: 2,
 
             layout: ISA.defaults.layout,
 
@@ -147,7 +148,8 @@ var ISA = {
             panSpeed: 1,
             zoomInIcon: 'glyphicon glyphicon-plus',
             zoomOutIcon: 'glyphicon glyphicon-minus',
-            resetIcon: 'glyphicon glyphicon-resize-full'
+            resetIcon: 'glyphicon glyphicon-resize-full',
+            maxZoom: 2
         });
 
         cy.on('tap', 'node.resource:selected', function (event) {
@@ -255,7 +257,7 @@ var ISA = {
                         animationDuration: ISA.defaults.animationDuration,
                         stop: function () {
                             ISA.highlightNode(node);
-                            cy.animate({ fit: { eles: node.outgoers().connectedNodes(), padding: 30 },
+                            cy.animate({ fit: { eles: node.outgoers().connectedNodes(), padding: 80 },
                                 duration: ISA.defaults.animationDuration });
                         }
                     }, ISA.defaults.layout)
@@ -263,17 +265,23 @@ var ISA = {
 
                 // Add the nodes to the JStree
                 var tree = $j('#jstree').jstree(true);
-                data.jstree.forEach(function (childNode) {
-                    // Only add the node to the tree if its not already there
-                    var node = tree.get_node(childNode.id);
-                    if (!node || node.parent !== childNode.parent) {
-                        tree.create_node(childNode.parent, childNode, 'last');
-                    }
-                });
-                // Need to do this due to a little hack we used when drawing the tree
-                //  (to show a node as "openable" despite having no children)
                 tree.get_node(node.id()).state.loaded = true;
                 tree.get_node(node.id()).state.opened = true;
+
+                // We iterate backwards because parent nodes seem to appear after child nodes in the list, which breaks
+                //  jstree
+                for (var i = data.jstree.length - 1; i >= 0; i--) {
+                    var childNode = data.jstree[i];
+
+                    // Only add the node to the tree if its not already there
+                    var actualNode = tree.get_node(childNode.id);
+                    if (!actualNode || actualNode.parent !== childNode.parent) {
+                        tree.create_node(childNode.parent, childNode, 'last');
+                    }
+                }
+
+                // Need to do this due to a little hack we used when drawing the tree
+                //  (to show a node as "openable" despite having no children)
                 tree.redraw_node(node.id());
             }
         });
