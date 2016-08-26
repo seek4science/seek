@@ -324,6 +324,17 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute type.can_edit?
   end
 
+  test 'linked sample type factory' do
+    #test the factory, whilst setting it up
+    type = Factory(:linked_sample_type)
+    assert_equal 2,type.sample_attributes.count
+    assert_equal 'title', type.sample_attributes.first.title
+    assert_equal 'patient', type.sample_attributes.last.title
+
+    assert_equal 'String', type.sample_attributes.first.sample_attribute_type.base_type
+    assert type.sample_attributes.last.sample_attribute_type.is_seek_sample?
+  end
+
   test 'can delete' do
     type = Factory(:simple_sample_type)
     assert type.can_delete?
@@ -334,9 +345,10 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute type.new_record?
 
     #cannot delete if linked from another sample type
-    linked_attribute = Factory(:sample_sample_attribute, sample_type:Factory(:patient_sample_type))
-    type = linked_attribute.linked_sample_type
+    linked_sample_type = Factory(:linked_sample_type)
     refute type.can_delete?
+    linked_attribute = linked_sample_type.sample_attributes.last
+    type = linked_attribute.linked_sample_type
     assert_no_difference('SampleType.count') do
       assert_difference('SampleAttribute.count',-1) do
         linked_attribute.destroy

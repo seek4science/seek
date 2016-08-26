@@ -1303,3 +1303,11 @@ Factory.define(:apples_controlled_vocab_sample_type, :parent=>:sample_type) do |
     type.sample_attributes << Factory.build(:apples_controlled_vocab_attribute,title:'apples',is_title:true,required:true,sample_type:type)
   end
 end
+
+Factory.define(:linked_sample_type, :parent=>:sample_type) do |f|
+  f.sequence(:title) {|n| "linked sample type #{n}"}
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:sample_attribute,:title=>"title",:sample_attribute_type=>Factory(:string_sample_attribute_type),:required=>true,:is_title=>true, :sample_type => type)
+    type.sample_attributes << Factory.build(:sample_sample_attribute, title:'patient', linked_sample_type: Factory(:patient_sample_type),:required=>true, :sample_type => type)
+  end
+end

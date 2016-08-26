@@ -184,6 +184,24 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_not_empty assigns(:sample_type).errors
   end
 
+  test 'should show link to sample type for linked attribute' do
+    linked_type = Factory(:linked_sample_type)
+    linked_attribute = linked_type.sample_attributes.last
+
+    assert linked_attribute.sample_attribute_type.is_seek_sample?
+
+    sample_type_linked_to = linked_attribute.linked_sample_type
+    refute_nil sample_type_linked_to
+
+    get :show,id:linked_type.id
+
+    record_body
+    assert_select 'li',:text=>/patient \(#{linked_attribute.sample_attribute_type.title}/i do
+      assert_select 'a[href=?]',sample_type_path(sample_type_linked_to),text:sample_type_linked_to.title
+    end
+
+  end
+
   private
 
   def template_for_upload
