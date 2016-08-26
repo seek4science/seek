@@ -27,7 +27,8 @@ module ISAHelper
 
   def cytoscape_elements elements_hash
     begin
-      cytoscape_node_elements(elements_hash) + cytoscape_edge_elements(elements_hash)
+      elements = cytoscape_node_elements(elements_hash) + cytoscape_edge_elements(elements_hash)
+      #aggregate_hidden_nodes(elements)
     rescue Exception=>e
       raise e if Rails.env.development?
       Rails.logger.error("Error generating nodes and edges for the graph - #{e.message}")
@@ -44,7 +45,7 @@ module ISAHelper
       item_type = item.class.name
       data = { id: node_id(item) }
 
-      if item.can_view?
+      if node.can_view?
         if item.respond_to?(:description)
           data['description'] = truncate(h(item.description), length: 500)
         else
@@ -111,22 +112,12 @@ module ISAHelper
       e_id = edge_id(source_item, target_item)
       name = edge_label(source_item, target_item)
 
-      if target_item.can_view?
-        if target_item.kind_of?(Assay)
-          fave_color = BORDER_COLOURS[target_type][target_item.assay_class.key] || BORDER_COLOURS.default
-        else
-          fave_color = BORDER_COLOURS[target_type] || BORDER_COLOURS.default
-        end
-      else
-        fave_color = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
-      end
-
       elements << { group: 'edges',
                     data: { id: e_id,
                             name: name,
                             source: source,
                             target: target,
-                            faveColor: fave_color },
+                            faveColor: BORDER_COLOURS.default },
                     classes: 'resource-edge'
       }
     end
@@ -184,20 +175,17 @@ module ISAHelper
 
     node = hash[:nodes].detect { |n| n.object == object }
 
-    if object.can_view?
-      entry = {
+    entry = {
         id: node_id(object),
-        text: object.title,
         parent: parent_id,
-        icon: asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
-      }
+        data: { loadable: false }
+    }
+    if node.can_view?
+      entry[:text] = object.title
+      entry[:icon] = asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
     else
-      entry = {
-          id: node_id(object),
-          text: 'Hidden item',
-          parent: parent_id,
-          a_attr: { class: 'hidden-leaf none_text' }
-      }
+      entry[:text] = 'Hidden item'
+      entry[:a_attr] = { class: 'hidden-leaf none_text' }
     end
 
     if node.child_count > 0
@@ -205,7 +193,7 @@ module ISAHelper
         # This is a little hack to show a node as "openable" despite having no children
         entry[:children] = true
         entry[:state] = { opened: false }
-        entry[:data] = { loadable: true }
+        entry[:data][:loadable] = true
       else
         entry[:state] = { opened: true }
       end
@@ -214,6 +202,32 @@ module ISAHelper
     end
 
     entry
+  end
+
+  def aggregate_hidden_nodes(elements)
+    nodes = elements.select { |e| e[:group] == 'nodes' }
+    edges = elements.select { |e| e[:group] == 'edges' }
+
+    hidden_nodes = nodes.select { |n| n[:data]['type'] == 'Hidden' } # Get hidden nodes
+    hidden_nodes.select! { |n| edges.none? { |e| e[:data][:source] == n[:data][:id] } } # Filter out ones that have children
+    hidden_nodes.select! { |n| edges.count { |e| e[:data][:target] == n[:data][:id] } == 1 } # Filter out ones that have multiple parents
+
+    # Group the nodes by their parent
+    groups = hidden_nodes.group_by do |n|
+      edges.detect { |e| e[:data][:target] == n[:data][:id] }[:data][:source]
+    end
+
+    groups.each do |group, node_list|
+      if node_list.length > 1
+        aggregate = node_list.pop
+        aggregate[:data]['name'] = "#{node_list.length + 1} hidden items"
+        node_ids = node_list.map { |n| n[:data][:id] }
+        elements.delete_if { |e| node_ids.include?(e[:data][:target]) }
+        elements = elements - node_list
+      end
+    end
+
+    elements
   end
 
   private

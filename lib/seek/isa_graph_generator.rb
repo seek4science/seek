@@ -2,11 +2,15 @@ module Seek
 
   class IsaGraphNode
 
-    attr_accessor :object, :child_count
+    attr_accessor :object, :child_count, :can_view
 
     def initialize(object)
       @object = object
       @child_count = 0
+    end
+
+    def can_view?
+      can_view
     end
 
   end
@@ -17,7 +21,8 @@ module Seek
       @object = object
     end
 
-    def generate(depth: 1, deep: false, include_parents: false, include_self: true)
+    def generate(depth: 1, deep: false, include_parents: false, include_self: true, auth: true)
+      @auth = auth
       hash = { nodes: [], edges: [] }
 
       depth = deep ? nil : depth
@@ -57,6 +62,7 @@ module Seek
 
     def traverse(method, object, max_depth = nil, depth = 0)
       node = Seek::IsaGraphNode.new(object)
+      node.can_view = object.can_view? if @auth
 
       children = send(method, object)
       node.child_count = children.count
