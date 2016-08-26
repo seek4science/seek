@@ -15,7 +15,8 @@ var ISA = {
             directed: true,
             spacingFactor: 1.25,
             padding: 50
-        }
+        },
+        animationDuration: 300
     },
 
     drawGraph: function (elements, current_element_id) {
@@ -135,7 +136,7 @@ var ISA = {
                     //animate the current node
                     ISA.originNode = cy.nodes('[id=\'' + current_element_id + '\']')[0];
                     ISA.originNode.select();
-                    cy.animate({zoom: 0.8, center: {eles: ISA.originNode}});
+                    cy.animate({ zoom: 0.8, center: {eles: ISA.originNode}, duration: ISA.defaults.animationDuration });
                 } else {
                     $j('#isa-graph').hide();
                 }
@@ -177,7 +178,7 @@ var ISA = {
         ISA.displayNodeInfo(node);
     },
 
-    animateNode: function (node, zoom) {
+    highlightNode: function (node) {
         //first normalizing all nodes and fading all nodes and edges
         cy.$('node.connected').removeClass('connected');
         cy.$('edge.connected').removeClass('connected');
@@ -190,9 +191,12 @@ var ISA = {
         // Animate the selected node
         cy.$('node.selected').removeClass('selected');
         node.addClass('selected');
+    },
 
+    animateNode: function (node, zoom) {
+        ISA.highlightNode(node);
         // Center the view on the node
-        opts = { center: { eles: node } };
+        opts = { center: { eles: node }, duration: ISA.defaults.animationDuration };
         if (zoom)
             opts.zoom = zoom;
         cy.animate(opts);
@@ -243,7 +247,19 @@ var ISA = {
                 });
                 cy.add(data.cytoscape);
                 cy.remove(childCountNode);
-                cy.layout($j.extend({ fit: false, animate: true, animationDuration: 500 }, ISA.defaults.layout));
+
+                // Adjust the cytoscape layout to fit in the new nodes
+                cy.layout($j.extend({
+                        fit: false,
+                        animate: true,
+                        animationDuration: ISA.defaults.animationDuration,
+                        stop: function () {
+                            ISA.highlightNode(node);
+                            cy.animate({ fit: { eles: node.outgoers().connectedNodes(), padding: 30 },
+                                duration: ISA.defaults.animationDuration });
+                        }
+                    }, ISA.defaults.layout)
+                );
 
                 // Add the nodes to the JStree
                 var tree = $j('#jstree').jstree(true);
