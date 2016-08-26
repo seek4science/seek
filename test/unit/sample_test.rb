@@ -248,7 +248,6 @@ class SampleTest < ActiveSupport::TestCase
 
     # from a form
     sample.update_attributes(data: { the_title: 'fish', bool: '1' })
-    puts sample.errors.full_messages
     assert sample.valid?
     disable_authorization_checks { sample.save! }
     assert sample.get_attribute(:bool)
@@ -589,11 +588,13 @@ class SampleTest < ActiveSupport::TestCase
     patient = Factory(:patient_sample)
     linked_sample_type = Factory(:linked_sample_type)
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+
     linked_sample_type.save!
 
     sample = Sample.new(sample_type: linked_sample_type, project_ids: [Factory(:project).id])
     sample.set_attribute(:title, 'blah2')
     sample.set_attribute(:patient, patient.title)
+
     assert sample.valid?
     disable_authorization_checks { sample.save! }
 
