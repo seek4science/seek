@@ -57,11 +57,11 @@ class SampleAttributeType < ActiveRecord::Base
   end
 
   def check_value_against_base_type(value, additional_options)
-    base_type_handler.validate_value?(value, additional_options)
+    base_type_handler(additional_options).validate_value?(value)
   end
 
-  def pre_process_value(value)
-    base_type_handler.convert(value)
+  def pre_process_value(value, additional_options)
+    base_type_handler(additional_options).convert(value)
   end
 
   def is_controlled_vocab?
@@ -72,7 +72,7 @@ class SampleAttributeType < ActiveRecord::Base
     base_type == 'SeekSample'
   end
 
-  def base_type_handler
-    Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type)
+  def base_type_handler(additional_options)
+    Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type, additional_options)
   end
 end

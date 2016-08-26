@@ -263,6 +263,9 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
     assert attribute.validate_value?(good_sample.id)
     assert attribute.validate_value?(good_sample.id.to_s)
+    #also ok with title
+    assert attribute.validate_value?(good_sample.title)
+
 
     refute attribute.validate_value?(bad_sample.id)
     refute attribute.validate_value?(bad_sample.id.to_s)

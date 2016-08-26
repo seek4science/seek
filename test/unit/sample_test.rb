@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
+
   test 'validation' do
     sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
@@ -561,6 +562,52 @@ class SampleTest < ActiveSupport::TestCase
 
     assert_equal 2, sample.strains.size
     assert_equal [strain.title, strain2.title].sort, [sample.get_attribute(:seekstrain)['title'], sample.get_attribute(:seekstrain2)['title']].sort
+  end
+
+  test 'set linked sample by id' do
+    #setup sample type, to be linked to patient sample type
+    patient = Factory(:patient_sample)
+    linked_sample_type = Factory(:linked_sample_type)
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    linked_sample_type.save!
+
+    sample = Sample.new(sample_type: linked_sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:title, 'blah')
+    sample.set_attribute(:patient, patient.id)
+    assert sample.valid?
+    disable_authorization_checks { sample.save! }
+
+    sample = Sample.find(sample.id)
+
+    assert_equal patient.id, sample.get_attribute(:patient)
+    assert_equal [patient], sample.related_samples
+
+  end
+
+  test 'set linked sample by title' do
+    #setup sample type, to be linked to patient sample type
+    patient = Factory(:patient_sample)
+    linked_sample_type = Factory(:linked_sample_type)
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    linked_sample_type.save!
+
+    sample = Sample.new(sample_type: linked_sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:title, 'blah2')
+    sample.set_attribute(:patient, patient.title)
+    assert sample.valid?
+    disable_authorization_checks { sample.save! }
+
+    sample = Sample.find(sample.id)
+
+    assert_equal [patient], sample.related_samples
+
+
+    #invalid when title not recognised
+    sample = Sample.new(sample_type: linked_sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:title, 'blah3')
+    sample.set_attribute(:patient, 'a b c d e f 123')
+    refute sample.valid?
+
   end
 
   test 'sample responds to correct methods' do

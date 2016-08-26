@@ -15,6 +15,12 @@ class AttributeTypeHandlerFactoryTest  < ActiveSupport::TestCase
     end
   end
 
+  test 'passes additional options' do
+    type = @factory.for_base_type('SeekSample',{fish:'soup'})
+    options = type.send(:additional_options)
+    assert_equal({fish: 'soup'},options)
+  end
+
   test 'exception for invalid type' do
     assert_raise_with_message(Seek::Samples::AttributeTypeHandlers::UnrecognisedAttributeHandlerType, "unrecognised attribute base type 'fish'") do
       @factory.for_base_type('fish')

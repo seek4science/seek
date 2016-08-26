@@ -51,7 +51,7 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   def pre_process_value(value)
-    sample_attribute_type.pre_process_value(value)
+    sample_attribute_type.pre_process_value(value, controlled_vocab: sample_controlled_vocab, linked_sample_type: linked_sample_type)
   end
 
   private

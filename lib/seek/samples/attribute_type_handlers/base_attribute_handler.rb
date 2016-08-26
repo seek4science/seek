@@ -3,13 +3,16 @@ module Seek
     module AttributeTypeHandlers
       class AttributeHandlerException < Exception; end
       class BaseAttributeHandler
+        def initialize(additional_options)
+          self.additional_options = additional_options
+        end
+
         def convert(value)
           value
         end
 
-        def validate_value?(value, additional_options = {})
+        def validate_value?(value)
           begin
-            self.additional_options = additional_options
             test_value(value)
           rescue AttributeHandlerException => e
             raise e
@@ -20,6 +23,10 @@ module Seek
         end
 
         private
+
+        def convert_value(value)
+          value
+        end
 
         attr_accessor :additional_options
       end

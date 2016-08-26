@@ -2,7 +2,8 @@ module Seek
   module Samples
     module AttributeTypeHandlers
       class BooleanAttributeTypeHandler < BaseAttributeHandler
-        def initialize
+        def initialize(additional_options)
+          super(additional_options)
           @conversion_map = { '1' => true, '0' => false, 'true' => true, 'false' => false }
         end
 
