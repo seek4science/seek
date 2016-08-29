@@ -25,9 +25,13 @@
 
 
 <script type="text/javascript">
-    Droppables.add("remove_from_assay_drop_area", {accept:'draggable_assay_folder_item', hoverclass:'folder_hover', onDrop:function(element, droppable_element) {
-        remove_item_from_assay(element, droppable_element, <%= @project.id -%>);
-    }});
+  $j(document).ready(function () {
+    setupAssayRemoveDropTarget('remove_from_assay_drop_area');
+  });
+
+//    Droppables.add("remove_from_assay_drop_area", {accept:'draggable_assay_folder_item', hoverclass:'folder_hover', onDrop:function(element, droppable_element) {
+//        remove_item_from_assay(element, droppable_element, <%= @project.id -%>);
+//    }});
 </script>
 
 

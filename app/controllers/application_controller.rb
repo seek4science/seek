@@ -541,6 +541,10 @@ class ApplicationController < ActionController::Base
       }
   end
 
+  def redirect_to_sign_up_when_no_user
+    redirect_to signup_path if User.count==0
+  end
+
 end
 
 

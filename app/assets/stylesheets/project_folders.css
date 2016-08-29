@@ -33,36 +33,34 @@ div#remove_from_assay_drop_area p {
     vertical-align: middle;
 }
 
-
 .folder_hover {
-    background: black;
-    color: black;
+    background: #2f628f;
     font-weight: bolder;
 }
 
-.ygtvcontent.ygtvfocus < a {
+.ygtvcontent.ygtvfocus > a {
     background-color: green;
 }
 
 ul.asset_cards {
-    font-size:smaller;
+    font-size: smaller;
+    list-style-type: none;
 }
 
 ul.asset_cards li.asset_card_item {
     margin: 0.25em 0.25em 0.25em 0.25em;
-    padding-left: 0.2em;
-    padding-bottom: 0em;
-    border: #555 solid 1px;
-    min-width: 16em;
-    max-width: 16em;
+    padding: 0.25em;
+    border: #999 solid 1px;
+    min-width: 15em;
+    max-width: 15em;
     min-height: 5em;
     max-height: 5em;
     float: left;
 }
 
 li.asset_card_item img.asset_card_avatar {
-    width: 18px;
-    height: 18px;
+    width: 22px;
+    height: 22px;
     padding-right: 0.3em;
     vertical-align: middle;
     float: left;
@@ -92,8 +90,13 @@ li.asset_card_item {
     background-color: red;
 }
 
+ul#folder_details {
+    list-style-type: none;
+}
+
 ul#folder_details li {
     float: left;
+
 }
 
 ul#folder_details li.title_and_description {
@@ -104,4 +107,13 @@ ul#folder_details li.actions {
 
 }
 
+.asset_card_item + .tooltip > .tooltip-inner {
+    background-color: white;
+    color: #111;
+    border: 1px #999 solid;
+}
+
+.asset_card_item + .tooltip.top > .tooltip-arrow {
+    display: none;
+}
 

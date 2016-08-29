@@ -1,0 +1,5 @@
+$j('#<%= params[:asset_element_id] %>').fadeOut();
+
+
+updateFolderLabel('<%=@dest_folder.id %>','<%= @dest_folder.label %>');
+updateFolderLabel('<%=@origin_folder.id %>','<%= @origin_folder.label %>');

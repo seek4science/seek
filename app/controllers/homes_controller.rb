@@ -53,13 +53,6 @@ class HomesController < ApplicationController
     false
   end
 
-
-  def redirect_to_sign_up_when_no_user
-    if User.count == 0
-      redirect_to :controller => 'users', :action => 'new'
-    end
-  end
-
   def recent_changes
     respond_to do |format|
       format.html

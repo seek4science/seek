@@ -56,27 +56,18 @@ class FoldersController < ApplicationController
 
   #moves the asset identified by :asset_id and :asset_type from this folder to the folder identified by :dest_folder_id
   def move_asset_to
-    this_folder=resolve_folder params[:id]
-    dest_folder=resolve_folder params[:dest_folder_id]
-    dest_folder.move_assets @asset,this_folder
-    render :update do |page|
-      if (params[:dest_folder_element_id])
-        page[params[:dest_folder_element_id]].update(dest_folder.label)
-      end
-      if (params[:origin_folder_element_id] && dest_folder.is_a?(ProjectFolder))
-        page[params[:origin_folder_element_id]].update(this_folder.label)
-        page << "Effect.Fade(#{@asset.class.name}_#{@asset.id}_#{this_folder.id});"
-      end
+    @origin_folder=resolve_folder params[:id]
+    @dest_folder=resolve_folder params[:dest_folder_id]
+    @dest_folder.move_assets @asset,@origin_folder
+    respond_to do |format|
+      format.js
     end
   end
 
   def remove_asset
     @folder.remove_assets @asset
-    render :update do |page|
-       if (params[:origin_folder_element_id])
-        page[params[:origin_folder_element_id]].update(@folder.label)
-       end
-      page << "Effect.Fade(#{@asset.class.name}_#{@asset.id}_#{@folder.id});"
+    respond_to do |format|
+      format.js
     end
   end
 

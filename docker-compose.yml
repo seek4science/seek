@@ -6,7 +6,7 @@ services:
     env_file:
       - docker/db.env
     volumes:
-      - mysql-db:/var/lib/mysql
+      - seek-mysql-db:/var/lib/mysql
 
   seek: # The SEEK application, passenger, solr and delayed_job worker
     build: .
@@ -18,7 +18,7 @@ services:
     env_file:
       - docker/db.env
     volumes:
-      - seek-filestore:/home/app/seek/filestore
+      - seek-filestore:/usr/src/app/filestore
     ports:
       - "80:80"
     depends_on:
@@ -29,11 +29,16 @@ services:
       - solr
 
   solr:
-    build: ./docker/solr/
+    #build: ./docker/solr/
+    image: fairdom/seek-solr
+    volumes:
+      - seek-solr-data:/opt/solr/server/solr/seek/data
     restart: always
 
 volumes:
   seek-filestore:
     external: true
-  mysql-db:
+  seek-mysql-db:
+    external: true
+  seek-solr-data:
     external: true

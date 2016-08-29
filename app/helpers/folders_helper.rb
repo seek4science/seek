@@ -1,6 +1,6 @@
 module FoldersHelper
   def folder_asset_item_tooltip asset
-    text="<h3>#{h(asset.title)}</h3>"
+    text="<h4>#{h(asset.title)}</h4>"
     text << "<p><b>Description: </b><em>#{text_or_not_specified(asset.description)}</em></p>" if asset.respond_to?("description")
     text << "<p><em>#{text_or_not_specified(asset.abstract)}</em></p>" if asset.respond_to?("abstract")
 
@@ -49,6 +49,24 @@ module FoldersHelper
   def initial_folder project
     last_id = last_opened_folder_id(project)
     folder = ProjectFolder.find_by_id(last_id)
+  end
+
+  def folder_tree_json folders
+    json = folders.map do |folder|
+      folder_node(folder)
+    end
+
+    json.to_json
+  end
+
+  def folder_node folder
+    {
+        id: "folder_#{folder.id}",
+        text: h(folder.label),
+        data: {folder_id: folder.id, project_id:folder.project.id},
+        state: {opened:folder.children.any?},
+        children: folder.children.map{|child| folder_node(child) }
+    }
   end
 
 end

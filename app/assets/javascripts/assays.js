@@ -372,12 +372,6 @@ function updateSamples() {
 function check_show_add_assay() {
     i = $('possible_assays').selectedIndex;
     selected_id = $('possible_assays').options[i].value;
-    if (selected_id == '0') {
-        $('add_assay_link').hide();
-    }
-    else {
-        $('add_assay_link').show();
-    }
 }
 
 
@@ -420,7 +414,7 @@ function updateAssays() {
         id=assay[1];
         relationshipType = assay[2];
         relationshipText = (relationshipType == 'None') ? '' : ' <span class="assay_item_sup_info">(' + relationshipType + ')</span>';
-        titleText = '<span title="' + title + '">' + title.truncate(100) + '</span>';
+        titleText = '<span title="' + title + '">' + title.truncate(120) + '</span>';
         assay_text += '<li>' + titleText + relationshipText +
         '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeAssay('+i+'); return(false);">remove</a>]</small></li>';

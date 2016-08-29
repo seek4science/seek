@@ -123,12 +123,12 @@ class HomesControllerTest < ActionController::TestCase
     assert !@response.body.include?(model.title)
   end
 
-  test 'root should route to sign_up when no user, otherwise to home' do
+  test 'root should route to sign_up when no user otherwise to home' do
     User.all.each do |u|
       u.delete
     end
     get :index
-    assert_redirected_to :controller => 'users', :action => 'new'
+    assert_redirected_to signup_path
 
     Factory(:user)
     get :index

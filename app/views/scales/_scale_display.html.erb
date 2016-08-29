@@ -6,13 +6,14 @@
 <%= show_title("Browse by #{t("scale")}") %>
 
 <%= render :partial => 'scales/scale_slider', :locals => {:current_scale => current_scale_key,:scale_slider_function => (remote_function(
-        :url=>{:action=>'search', :controller=>'scales'},
-        :with=>"'scale_type='+this.id",
-        :before=>"show_ajax_loader(this.id+'_results')",
-        :condition=>'!loaded_scales[this.id]') +
-        "; loaded_scales[this.id] = true;
+    :url=>{:action=>'search', :controller=>'scales'},
+    :with=>"'scale_type='+this.id",
+    :before=>"show_ajax_loader(this.id+'_results')",
+    :condition=>'!loaded_scales[this.id]') +
+    "; loaded_scales[this.id] = true;
         $$('#scaled_items > div').invoke('hide');
         $(this.id+'_results').show();".html_safe)} %>
+
 <div style="clear:both"></div>
 <div id="scaled_items">
   <% keys = Scale.all.map(&:key)

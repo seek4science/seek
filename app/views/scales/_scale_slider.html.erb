@@ -35,9 +35,9 @@
 
 </style>
 
-<div id="wrapper">
+<div class="row" id="wrapper">
 
-
+  <div class="col-md-5 col-sm-5">
   <div id="options">
      <div id="minus">-</div>
     <ul id="scale_list" class="step">
@@ -51,13 +51,14 @@
      <div id="plus">+</div>
 
   </div>
-
+  </div>
+  <div class="col-md-6 col-sm-6">
   <div id="zoom" >
     <%= image_tag asset_path("scales/vl-scales/all.png"), {:alt=>"all", :id=>"scale_image_all", :class=>"scale_image"} %>
     <% Scale.all.reverse.each do |s| -%>
         <%= image_tag asset_path(s.image_path),{:alt=>s.image_name,:id=>"scale_image_#{s.key}",:class=>"scale_image"} %>
     <% end %>
-
+  </div>
   </div>
 </div>
 

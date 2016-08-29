@@ -14,12 +14,33 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute_includes blob.search_terms, 'http'
     refute_includes blob.search_terms, 'com'
 
-    blob = Factory(:rightfield_content_blob)
-    assert_includes blob.search_terms, 'rightfield.xls'
-    assert_includes blob.search_terms, 'xls'
+    blob = Factory(:txt_content_blob)
+    assert_includes blob.search_terms, 'txt_test.txt'
+    assert_includes blob.search_terms, 'txt'
 
   end
 
+  test 'max indexable text size' do
+    blob = Factory :large_txt_content_blob
+    size = blob.file_size
+    assert size > 1.megabyte
+    assert size < 2.megabyte
+
+    assert blob.is_text?
+
+    with_config_value :max_indexable_text_size,1 do
+      refute blob.is_indexable_text?
+    end
+
+    with_config_value :max_indexable_text_size,2 do
+      assert blob.is_indexable_text?
+    end
+
+    with_config_value :max_indexable_text_size,'2' do
+      assert blob.is_indexable_text?
+    end
+
+  end
 
   test 'md5sum_on_demand' do
     blob=Factory :rightfield_content_blob
@@ -520,32 +541,45 @@ class ContentBlobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'content should not be viewable when pdf_conversion is disabled' do
-    tmp = Seek::Config.pdf_conversion_enabled
-    Seek::Config.pdf_conversion_enabled = false
+  test 'content needing conversion should not be viewable when pdf_conversion is disabled' do
+    with_config_value :pdf_conversion_enabled, false do
+      viewable_formats= %w[application/msword]
+      viewable_formats << "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      viewable_formats << "application/vnd.ms-powerpoint"
+      viewable_formats << "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      viewable_formats << "application/vnd.oasis.opendocument.text"
+      viewable_formats << "application/vnd.oasis.opendocument.presentation"
 
-    viewable_formats= %w[application/msword]
-    viewable_formats << "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    viewable_formats << "application/vnd.ms-powerpoint"
-    viewable_formats << "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-    viewable_formats << "application/vnd.oasis.opendocument.text"
-    viewable_formats << "application/vnd.oasis.opendocument.presentation"
-    viewable_formats << "application/rtf"
-    viewable_formats << "text/plain"
+      viewable_formats.each do |viewable_format|
+        cb_with_content_viewable_format = Factory(:content_blob, :content_type=>viewable_format, :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
+        User.with_current_user cb_with_content_viewable_format.asset.contributor do
+          assert !cb_with_content_viewable_format.is_content_viewable?
+        end
+      end
 
-    viewable_formats.each do |viewable_format|
-      cb_with_content_viewable_format = Factory(:content_blob, :content_type=>viewable_format, :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
-      User.with_current_user cb_with_content_viewable_format.asset.contributor do
-        assert !cb_with_content_viewable_format.is_content_viewable?
+
+    end
+  end
+
+  test 'content not needing conversion should be viewable when pdf_conversion is disabled' do
+    pdf_content_blob = Factory(:content_blob, :content_type=>'application/pdf', :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
+
+    with_config_value :pdf_conversion_enabled, false do
+
+      viewable_formats= %w[text/plain text/csv text/tsv]
+
+      viewable_formats.each do |viewable_format|
+        cb_with_content_viewable_format = Factory(:content_blob, :content_type=>viewable_format, :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
+        User.with_current_user cb_with_content_viewable_format.asset.contributor do
+          assert cb_with_content_viewable_format.is_content_viewable?
+        end
+      end
+
+      User.with_current_user pdf_content_blob.asset.contributor do
+        assert pdf_content_blob.is_content_viewable?
       end
     end
 
-    pdf_content_blob = Factory(:content_blob, :content_type=>'application/pdf', :asset => Factory(:sop), :data => File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf","rb").read)
-    User.with_current_user pdf_content_blob.asset.contributor do
-      assert pdf_content_blob.is_content_viewable?
-    end
-
-    Seek::Config.pdf_conversion_enabled = tmp
   end
 
   test 'filter_text_content' do
