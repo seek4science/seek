@@ -7,6 +7,12 @@
 
 ## Quick start
 
+Create docker volumes:
+
+    docker volume create --name=seek-filestore
+    docker volume create --name=seek-mysql-db
+    docker volume create --name=seek-solr-data
+
 Load the database schema and seed data:
 
     docker-compose run seek bundle exec rake db:setup
