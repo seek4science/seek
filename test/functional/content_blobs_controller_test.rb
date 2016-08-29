@@ -287,6 +287,25 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal 'content_blobs', al.controller_name
   end
 
+  test 'log inline_view for viewing pdf and image' do
+    sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    assert_difference('ActivityLog.count') do
+      get :view_content, sop_id: sop.id, id: sop.content_blob.id
+    end
+    assert_response :success
+    al = ActivityLog.last
+    assert_equal 'inline_view', al.action
+
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy))
+    image_content_blob = Factory(:content_blob, :original_filename => 'test.png', :content_type => 'image/png', :asset => df)
+    assert_difference('ActivityLog.count') do
+      get :download, data_file_id: df.id, id: df.content_blob.id, disposition: 'inline'
+    end
+    assert_response :success
+    al = ActivityLog.last
+    assert_equal 'inline_view', al.action
+  end
+
   test 'should view content as correct format for type' do
     df = Factory(:data_file,content_blob:Factory(:csv_content_blob),policy: Factory(:all_sysmo_downloadable_policy))
     get :view_content,data_file_id:df.id, id:df.content_blob.id

@@ -49,7 +49,14 @@ module Seek
           size = filter_size size
           rtn = "#{rtn}/#{size}"
         end
-        rtn = "#{rtn}/#{id}.#{self.class.image_storage_format}" if include_local_name
+
+        if include_local_name
+          if self.class.respond_to?(:image_storage_format) && self.class.respond_to?(:image_storage_format_default)
+            rtn = "#{rtn}/#{id}.#{self.class.image_storage_format}"
+          else
+            rtn = "#{rtn}/#{id}.png"
+          end
+        end
 
         return rtn
       end

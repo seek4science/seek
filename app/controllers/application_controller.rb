@@ -413,8 +413,16 @@ class ApplicationController < ActionController::Base
                                :data => {:search_query => object, :result_count => @results.count})
           end
         when "content_blobs"
-          action = "inline_view" if action=="view_content"
-          if action=="inline_view" || (action=="download" && params['intent'].to_s != 'inline_view')
+          # action download applies for normal download
+          # action inline_view applies for viewing image and pdf file in browser
+          action = "inline_view" if action=="view_content" # view pdf
+          action = "inline_view" if action=="download" && params['disposition'].to_s == 'inline' # view image
+
+          #when viewing pdf content, first it goes to 'view_content' action, then 'download' action, with intent = 'inline_view'
+          #so do not log the 'download' action in this case
+          #just making a fake action here
+          action = 'feed_pdf_inline_view' if action=="download" && params['intent'].to_s == 'inline_view'
+          if ["download", "inline_view"].include?(action)
             activity_loggable = object.asset
             ActivityLog.create(:action => action,
                                :culprit => current_user,

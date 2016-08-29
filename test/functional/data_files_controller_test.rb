@@ -1349,7 +1349,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
 
-  test "explore logged as inline view" do
+  test "explore logged as inline_view" do
     data = Factory :small_test_spreadsheet_datafile,:policy=>Factory(:public_policy)
     assert_difference("ActivityLog.count") do
       get :explore,:id=>data
