@@ -129,6 +129,33 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     assert_not_includes result[:nodes].map(&:object), assay2
   end
 
+  test 'counts child assets of all ancestors' do
+    project = Factory(:project)
+    investigation = Factory(:investigation, projects: [project])
+    investigation2 = Factory(:investigation, projects: [project])
+    investigation3 = Factory(:investigation, projects: [project])
+    study = Factory(:study, investigation: investigation)
+    study2 = Factory(:study, investigation: investigation)
+    study3 = Factory(:study, investigation: investigation)
+    study4 = Factory(:study, investigation: investigation)
+    assay = Factory(:assay, study: study)
+
+    generator = Seek::IsaGraphGenerator.new(assay)
+    result = generator.generate(include_parents: true)
+
+    investigation_node = result[:nodes].detect { |n| n.object == investigation }
+    project_node = result[:nodes].detect { |n| n.object == project }
+
+    assert_equal 4, investigation_node.child_count
+    assert_equal 3, project_node.child_count
+
+    assert_not_includes result[:nodes].map(&:object), investigation2
+    assert_not_includes result[:nodes].map(&:object), investigation3
+    assert_not_includes result[:nodes].map(&:object), study2
+    assert_not_includes result[:nodes].map(&:object), study3
+    assert_not_includes result[:nodes].map(&:object), study4
+  end
+
 
 
 end
