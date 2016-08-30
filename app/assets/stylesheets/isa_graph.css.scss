@@ -85,6 +85,16 @@ a.graph_toggle {
       display: none;
     }
   }
+  .child-count-leaf {
+    color: $link-color;
+    &:hover {
+      color: $link-hover-color;
+      text-decoration: underline;
+    }
+    > i {
+      display: none;
+    }
+  }
 }
 
 .isa-footer {

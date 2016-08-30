@@ -238,6 +238,11 @@ var ISA = {
     },
 
     loadChildren: function (childCountNode) {
+        var tree = $j('#jstree').jstree(true);
+
+        // Show a spinner on the tree node
+        $j('#' + tree.get_node(childCountNode.id()).id).spinner('add');
+
         $j.ajax({
             url: childCountNode.data('url'),
             success: function (data) {
@@ -257,14 +262,13 @@ var ISA = {
                         animationDuration: ISA.defaults.animationDuration,
                         stop: function () {
                             ISA.highlightNode(node);
-                            cy.animate({ fit: { eles: node.outgoers().connectedNodes(), padding: 80 },
+                            cy.animate({ fit: { eles: node.union(node.outgoers().targets()), padding: 40 },
                                 duration: ISA.defaults.animationDuration });
                         }
                     }, ISA.defaults.layout)
                 );
 
                 // Add the nodes to the JStree
-                var tree = $j('#jstree').jstree(true);
                 tree.get_node(node.id()).state.loaded = true;
                 tree.get_node(node.id()).state.opened = true;
 
@@ -279,10 +283,14 @@ var ISA = {
                         tree.create_node(childNode.parent, childNode, 'last');
                     }
                 }
+                // Delete the "show x more" node
+                tree.delete_node(childCountNode.id());
 
                 // Need to do this due to a little hack we used when drawing the tree
                 //  (to show a node as "openable" despite having no children)
                 tree.redraw_node(node.id());
+
+                cy.resize();
             }
         });
     }

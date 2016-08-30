@@ -57,7 +57,13 @@ module Seek
     end
 
     def ancestors(object, max_depth = nil, depth = 0)
-      traverse(:parents, object, max_depth, depth)
+      hash = traverse(:parents, object, max_depth, depth)
+      # Set child count for the parent nodes
+      hash[:nodes].each do |node|
+        node.child_count = children(node.object).count
+      end
+
+      hash
     end
 
     def traverse(method, object, max_depth = nil, depth = 0)
@@ -65,7 +71,7 @@ module Seek
       node.can_view = object.can_view? if @auth
 
       children = send(method, object)
-      node.child_count = children.count
+      node.child_count = children.count if method == :children
 
       nodes = [node]
       edges = []

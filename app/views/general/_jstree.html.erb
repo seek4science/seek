@@ -8,14 +8,17 @@
       'check_callback': true,
       'data' : <%= tree_json(hash).html_safe -%>
     }}).on('activate_node.jstree', function (e, data) {
-      ISA.selectNode(ISA.getNode(data.node.id));
-    }).on('load_node.jstree', function (e, data) {
-      if (data.node.data && data.node.data.loadable) {
-        var childCountNode = ISA.getNode(data.node.id).outgoers().targets('.child-count');
+      if (data.node.data && data.node.data.child_count) {
+        var childCountNode = ISA.getNode(data.node.id);
         if (childCountNode.length) {
           ISA.loadChildren(childCountNode);
         }
+      } else {
+        ISA.selectNode(ISA.getNode(data.node.id));
       }
+    }).on('after_open.jstree', function () {
+      console.log('triggered!!!');
+      cy.resize();
     })
   });
 </script>

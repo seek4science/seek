@@ -27,7 +27,7 @@ module ISAHelper
 
   def cytoscape_elements elements_hash
     begin
-      elements = cytoscape_node_elements(elements_hash) + cytoscape_edge_elements(elements_hash)
+      elements = cytoscape_edge_elements(elements_hash) + cytoscape_node_elements(elements_hash)
       #aggregate_hidden_nodes(elements)
     rescue Exception=>e
       raise e if Rails.env.development?
@@ -82,11 +82,13 @@ module ISAHelper
         data['borderColor'] = BORDER_COLOURS['HiddenItem'] || BORDER_COLOURS.default
       end
 
+      elements << { group: 'nodes', data: data, classes: 'resource' }
+
       # If this node has children, but they aren't included in the set of nodes, create an info node that will load the children
       #  when clicked
       actual_child_count = hash[:edges].select { |source, _| source == item }.count
       if node.child_count > actual_child_count
-        cc_id = "#{data[:id]}-child-count"
+        cc_id = child_count_id(item)
         elements << { group: 'nodes', data: { id: cc_id,
                                               name: "Show #{node.child_count - actual_child_count} more",
                                               url: polymorphic_path(item, action: :isa_children) },
@@ -95,8 +97,6 @@ module ISAHelper
                                               source: data[:id],
                                               target: cc_id } }
       end
-
-      elements << { group: 'nodes', data: data, classes: 'resource' }
     end
 
     elements
@@ -159,11 +159,11 @@ module ISAHelper
       hash[:edges].none? { |parent, child| child == n.object }
     end
 
-    nodes = roots.map { |root| tree_node(hash, root.object) }
+    nodes = roots.map { |root| tree_node(hash, root.object) }.flatten
 
-    nodes = nodes + hash[:edges].map do |edge|
+    nodes = nodes + (hash[:edges].map do |edge|
       tree_node(hash, edge[1], node_id(edge[0]))
-    end
+    end).flatten
 
     nodes.to_json
   end
@@ -180,6 +180,8 @@ module ISAHelper
         parent: parent_id,
         data: { loadable: false }
     }
+    entries = [entry]
+
     if node.can_view?
       entry[:text] = object.title
       entry[:icon] = asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
@@ -190,18 +192,21 @@ module ISAHelper
 
     if node.child_count > 0
       if node.child_count > child_edges.count
-        # This is a little hack to show a node as "openable" despite having no children
-        entry[:children] = true
-        entry[:state] = { opened: false }
-        entry[:data][:loadable] = true
-      else
-        entry[:state] = { opened: true }
+        entries << {
+            id: child_count_id(object),
+            parent: entry[:id],
+            text: "Show #{node.child_count - child_edges.count} more",
+            a_attr: { class: 'child-count-leaf' },
+            data: { child_count: true }
+        }
       end
+
+      entry[:state] = { opened: true }
     else
       entry[:state] = { opened: false }
     end
 
-    entry
+    entries
   end
 
   def aggregate_hidden_nodes(elements)
@@ -238,6 +243,10 @@ module ISAHelper
 
   def edge_id(source, target)
     "#{node_id(source)}-#{node_id(target)}"
+  end
+
+  def child_count_id(object)
+    "#{node_id(object)}-child-count"
   end
 
 end
