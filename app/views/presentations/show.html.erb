@@ -17,7 +17,7 @@
 
     <%= rendered_asset_view(@display_presentation) %>
 
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @presentation, :current_item => @presentation, :deep => true} %>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @presentation, :deep => true, :include_parents => true} %>
   </div>
 
   <div class="col-md-3 col-sm-4">

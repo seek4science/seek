@@ -1,6 +1,5 @@
 class AssaysController < ApplicationController
 
-  include Seek::DotGenerator
   include Seek::IndexPager
   include Seek::AssetsCommon
 
@@ -16,6 +15,8 @@ class AssaysController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs
+
+  include Seek::IsaGraphExtensions
 
   def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])

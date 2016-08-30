@@ -3,6 +3,3 @@ languages:
    JavaScript: true
    Python: false
    PHP: false
-
-exclude_paths:
-   - "app/assets/javascripts/modified_cytoscape.js" # can't fix the problems with this for now. we want to get rid of it completely when next cytoscape version stabalized

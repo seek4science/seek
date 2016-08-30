@@ -33,6 +33,7 @@ div#remove_from_assay_drop_area p {
     vertical-align: middle;
 }
 
+
 .folder_hover {
     background: #2f628f;
     font-weight: bolder;
@@ -43,8 +44,7 @@ div#remove_from_assay_drop_area p {
 }
 
 ul.asset_cards {
-    font-size: smaller;
-    list-style-type: none;
+    font-size:smaller;
 }
 
 ul.asset_cards li.asset_card_item {

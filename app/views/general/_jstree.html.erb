@@ -1,0 +1,21 @@
+<div id="jstree"></div>
+
+<script type="text/javascript">
+  $j(document).ready(function () {
+    $j('#jstree').bind('loaded.jstree', function() {
+      $j(this).jstree(true).select_node(ISA.originNode.data('id'));
+    }).jstree({ 'core' : {
+      'check_callback': true,
+      'data' : <%= tree_json(hash).html_safe -%>
+    }}).on('activate_node.jstree', function (e, data) {
+      if (data.node.data && data.node.data.child_count) {
+        var childCountNode = ISA.getNode(data.node.id);
+        if (childCountNode.length) {
+          ISA.loadChildren(childCountNode);
+        }
+      } else {
+        ISA.selectNode(ISA.getNode(data.node.id));
+      }
+    })
+  });
+</script>

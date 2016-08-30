@@ -1,357 +1,297 @@
 var cy;
-var default_node_width = 250;
-var default_node_height = 65;
-var default_font_size = 16;
-var default_color = '#323232';
-var default_text_max_width = 245;
 
-jQuery.noConflict();
-var $j = jQuery;
+var ISA = {
+    originNode: null,
 
-function drawGraph(elements, current_element_id){
-    cy=cytoscape({
-        container: document.getElementById('cy'),
-        showOverlay: false,
-
+    defaults: {
+        nodeWidth: 200,
+        nodeHeight: 65,
+        fontSize: 16,
+        color: '#323232',
+        textMaxWidth: 195,
+        backgroundImageSize: 50,
         layout: {
             name: 'breadthfirst',
-            directed: true
+            directed: true,
+            spacingFactor: 1.25,
+            padding: 50
         },
+        animationDuration: 300
+    },
 
-        style: cytoscape.stylesheet()
-            .selector('node')
-            .css({
-                'shape': 'roundrectangle',
-                'border-color': 'data(borderColor)',
-                'border-width': 2,
-                'das': 'mapData(weight, 40, 80, 20, 60)',
-                'content': 'data(name)',
-                'text-valign': 'center',
-                'text-outline-width': 1,
-                'text-outline-color': 'data(faveColor)',
-                'background-color': 'data(faveColor)',
-                'color':default_color,
-                'width':default_node_width,
-                'height':default_node_height,
-                'font-size':default_font_size,
-                'text-wrap': 'wrap',
-                'text-max-width': default_text_max_width
-            })
+    drawGraph: function (elements, current_element_id) {
+        cy = window.cy = cytoscape({
+            container: document.getElementById('cy'),
 
-            .selector('edge')
-            .css({
-                'width': 1.5,
-                'target-arrow-shape': 'none',
-                'line-color': '#191975',
-                'source-arrow-color': 'data(faveColor)',
-                'target-arrow-color': 'data(faveColor)',
-                'content': 'data(name)',
-                'color': '#222222',
-                'text-background-color': '#eeeeff',
-                'text-background-shape': 'roundrectangle',
-                'text-background-opacity': 0.7,
-                'text-border-width': 1,
-                'text-border-style': 'solid',
-                'text-border-color': '#ccccdd',
-                'text-border-opacity': 0.7,
-                'font-size': (default_font_size)
-            }),
+            userZoomingEnabled: false,
+            panningEnabled: true,
+            userPanningEnabled: true,
+            maxZoom: 2,
 
-        elements: elements,
+            layout: ISA.defaults.layout,
 
-        ready: function(){
-            cy = this;
-            var nodes = cy.$('node');
-
-            //process only when having nodes
-            if (nodes.length > 0){
-                //processPanzoom();
-
-                nodes.on('click', function(e){
-                    var node = e.cyTarget;
-                    if(node.selected() === true){
-                        clickLabelLink(node, e.originalEvent);
-                    }else{
-                        animateNode(node);
-                        displayNodeInfo(node);
+            style: [
+                {
+                    selector: 'node.resource',
+                    css: {
+                        'shape': 'roundrectangle',
+                        'border-color': 'data(borderColor)',
+                        'border-width': 2,
+                        'das': 'mapData(weight, 40, 80, 20, 60)',
+                        'content': 'data(name)',
+                        'text-valign': 'center',
+                        'text-outline-width': 1,
+                        'text-outline-color': 'data(faveColor)',
+                        'background-color': 'data(faveColor)',
+                        // The following is a hacky way of making sure the image doesn't overlap the text
+                        'padding-left': ISA.defaults.backgroundImageSize + 10,
+                        'padding-right': ISA.defaults.backgroundImageSize + 10,
+                        'color': ISA.defaults.color,
+                        'width': ISA.defaults.nodeWidth,
+                        'height': ISA.defaults.nodeHeight,
+                        'font-size': ISA.defaults.fontSize,
+                        'text-wrap': 'wrap',
+                        'text-max-width': ISA.defaults.textMaxWidth,
+                        'opacity': 0.6
                     }
-                });
+                },
+                {
+                    selector: 'node.child-count',
+                    css: {
+                        'shape': 'roundrectangle',
+                        'content': 'data(name)',
+                        'text-valign': 'center',
+                        'background-color': '#eeeeee',
+                        'width': ISA.defaults.nodeWidth,
+                        'font-size': ISA.defaults.fontSize,
+                        'opacity': 0.6
+                    }
+                },
+                {
+                    selector: 'node[imageUrl]',
+                    css: {
+                        'background-image': 'data(imageUrl)',
+                        'background-width': ISA.defaults.backgroundImageSize,
+                        'background-height': ISA.defaults.backgroundImageSize,
+                        // The following is a hacky way of making sure the image doesn't overlap the text
+                        'background-position-x': -ISA.defaults.backgroundImageSize,
+                        'background-position-y': '50%'
+                    }
+                },
+                {
+                    selector: 'edge',
+                    css: {
+                        'width': 1.5,
+                        'target-arrow-shape': 'none',
+                        'line-color': '#bbb',
+                        'opacity': 0.5
+                    }
+                },
+                {
+                    selector: 'edge.resource-edge',
+                    css: {
+                        'width': 1.5,
+                        'target-arrow-shape': 'none',
+                        'line-color': '#191975',
+                        'source-arrow-color': '#71b7be',
+                        'target-arrow-color': '#71b7be',
+                        'content': 'data(name)',
+                        'color': '#222222',
+                        'text-background-color': '#eeeeff',
+                        'text-background-shape': 'roundrectangle',
+                        'text-background-opacity': 0.7,
+                        'text-border-width': 1,
+                        'text-border-style': 'solid',
+                        'text-border-color': '#ccccdd',
+                        'text-border-opacity': 0.7,
+                        'font-size': ISA.defaults.fontSize,
+                        'opacity': 0.5
+                    }
+                },
+                {
+                    selector: '.connected',
+                    css: {
+                        'opacity': 1
+                    }
+                },
+                {
+                    selector: '.selected', // Note this is not the same as cytoscape's ':selected'
+                    css: {
+                        'font-weight': 'bold',
+                        'text-max-width': ISA.defaults.textMaxWidth + 15,
+                        'width': ISA.defaults.nodeWidth + 35,
+                        'height': ISA.defaults.nodeHeight + 15,
+                        'transition-property': 'width, height',
+                        'transition-duration': 300,
+                        'opacity': 1
+                    }
+                }
+            ],
+            elements: elements,
 
-                //animate the current node
-                var current_node = cy.nodes('[id=\''+ current_element_id +'\']')[0];
-                animateNode(current_node);
-                displayNodeInfo(current_node);
+            ready: function () {
+                var nodes = cy.$('node');
 
-                //disableMouseWheel();
-                resizeGraph();
-                //need put zoom after resizeGraph, otherwise fit() does not work
-                cy.zoomingEnabled(false);
-            }else{
-                $j('.isa_graph')[0].hide();
+                //process only when having nodes
+                if (nodes.length > 0) {
+                    //animate the current node
+                    ISA.originNode = cy.nodes('[id=\'' + current_element_id + '\']')[0];
+                    ISA.originNode.select();
+                    cy.animate({ zoom: 0.8, center: {eles: ISA.originNode}, duration: ISA.defaults.animationDuration });
+                } else {
+                    $j('#isa-graph').hide();
+                }
             }
-        }
-    });
-}
-
-
-function animateNode(node){
-    var nodes = cy.$('node');
-    var edges = cy.$('edge');
-
-    var excluded_selected_nodes = [];
-    for (var i=0; i<nodes.length; i++){
-        var node_tmp = nodes[i];
-        if (node_tmp.data().id !== node.data().id)
-            excluded_selected_nodes.push(node_tmp);
-    }
-
-    //first normalizing all nodes and fading all nodes and edges
-    normalizingNodes(excluded_selected_nodes);
-
-    fadingNodes(nodes);
-    fadingEdges(edges);
-
-    //then appearing the chosen node and the connected nodes and edges
-    appearingNodes(node);
-    edges.each(function(i, edge){
-        var source = edge.source();
-        var target =edge.target();
-        if (source.id() === node.id()){
-            appearingEdges(edge);
-            appearingNodes(target);
-        }
-        if (target.id() === node.id()){
-            appearingEdges(edge);
-            appearingNodes(source);
-        }
-    });
-
-    node.animate({
-        css: { 'width':default_node_width+35, 'height':default_node_height+15 }
-    }, {
-        duration: 300
-    });
-    
-    node.css({
-        'font-size': default_font_size,
-        'text-max-width': default_text_max_width+15
-    });
-
-    if (node.data().name !== 'Hidden item'){
-        node.css({'color': '#0000e5'});
-    }
-    node.select();
-}
-
-function displayNodeInfo(node){
-
-    html = "<div class='isa-selected-item'><strong>Selected item: </strong>";
-    var item_data = node.data();
-    html += itemInfo(item_data);
-    html += '</div>';
-
-    var node_info = $('node_info');
-    $('node_info').innerHTML = html;
-
-
-}
-
-
-function itemInfo(item_data){
-    var html = '<span>';
-    html += item_data.item_info;
-    html += '</span>';
-    return html;
-}
-
-function connectedNodes(node){
-    var edges = cy.$('edge');
-    var connected_nodes = [];
-    edges.each(function(i, edge){
-        var source = edge.source();
-        var target =edge.target();
-        if (source.id() === node.id()){
-            connected_nodes.push(target);
-        }
-        if (target.id() === node.id()){
-            connected_nodes.push(source);
-        }
-    });
-    return connected_nodes;
-}
-
-function processPanzoom() {
-    //display panzoom
-    $j('#cy').cytoscapePanzoom({
-        panSpeed: 1
-    });
-
-    //set again the graph height if panzoom height is bigger
-    var panzoom_height = 220;
-    var graph_height = cy.container().style.height.split('px')[0];
-    cy.container().style.height = Math.max(graph_height, panzoom_height) +'px';
-
-    alignCenterVertical($j('.ui-cytoscape-panzoom')[0], panzoom_height);
-
-
-    //reset on panzoom also reset all nodes and edges css
-    $j('.ui-cytoscape-panzoom-reset').click(function () {
-        var nodes = cy.$('node');
-        normalizingNodes(nodes);
-        appearingNodes(nodes);
-        appearingEdges(cy.$('edge'));
-        Effect.Fade('node_info', { duration: 0.25 });
-    });
-}
-
-function alignCenterVertical(element, element_height){
-    var graph_height = cy.container().style.height.split('px')[0];
-    var distance_from_top = (graph_height - element_height)/2;
-    if (distance_from_top > 0){
-        element.style.top=distance_from_top+'px';
-    }else{
-        element.style.top='0px';
-    }
-}
-
-function appearingNodes(nodes){
-    nodes.css({'opacity': 1});
-}
-
-function appearingEdges(edges){
-    edges.css({'opacity': 1});
-}
-
-function fadingNodes(nodes){
-    nodes.css({'opacity': 0.6});
-}
-
-function fadingEdges(edges){
-    edges.css({'opacity': 0.5});
-}
-
-function normalizingNodes(nodes){
-    for (var i=0; i<nodes.length; i++){
-        var node = nodes[i];
-        node.css({
-            'width': default_node_width,
-            'height': default_node_height,
-            'font-size': default_font_size,
-            'font-weight': 'normal',
-            'color': default_color,
-            'text-max-width': default_text_max_width
         });
-        node.unselect();
 
-    }
-}
+        cy.panzoom({
+            panSpeed: 1,
+            zoomInIcon: 'glyphicon glyphicon-plus',
+            zoomOutIcon: 'glyphicon glyphicon-minus',
+            resetIcon: 'glyphicon glyphicon-resize-full',
+            maxZoom: 2
+        });
 
-function resizeGraph(){
-    cy.fit(50);
-    if (cy.zoom() > 1){
-        cy.reset();
-        cy.center();
-    }
-}
-
-function labelPosition(node, label_part, line_index, total_line){
-    var label_pos = {};
-    var graph_pos = $j('#cy')[0].getBoundingClientRect();
-    var node_posX = node.renderedPosition().x + graph_pos.left;
-    var node_posY = node.renderedPosition().y + graph_pos.top;
-    var font_size = node.renderedCss()['font-size'];
-    var ruler = $j('#ruler')[0];
-    ruler.style.fontSize = font_size;
-    ruler.style.fontWeight = 'bolder';
-    ruler.innerHTML = label_part;    
-    var label_width = ruler.offsetWidth;
-    var label_height = ruler.offsetHeight;
-    label_pos.minX = node_posX - label_width/2;
-    label_pos.maxX = node_posX + label_width/2;
-    label_pos.maxY = node_posY + (line_index - total_line/2)*label_height;
-    label_pos.minY = label_pos.maxY - label_height;
-    
-    return label_pos;
-}
-
-function labelLines(node){
-    var label = node.data().name;
-    var font_size = node.renderedCss()['font-size'];
-    var ruler = $j('#ruler')[0];
-    ruler.style.fontSize = font_size;
-    //ruler.style.fontWeight = 'bolder';
-    ruler.innerHTML = label;    
-    var label_width = ruler.offsetWidth;
-    var text_max_width = node.renderedCss()['text-max-width'];
-    var max_width = text_max_width.split('px')[0];
-    var max_width_integer = parseInt(max_width);
-    var lines = [];
-    if (label_width > max_width_integer){
-        var words = label.split(' ');
-        var line = '';
-        for( var i=0; i<words.length; i++){
-            var testLine = line + words[i] + ' ';
-            ruler.innerHTML = testLine;
-            var testWidth = ruler.offsetWidth;
-            if (testWidth > max_width_integer && i > 0) {
-                lines.push(line.trim());
-                line = words[i] + ' ';
+        cy.on('tap', 'node.resource:selected', function (event) {
+            if (ISA.recentlyClickedNode) {
+                ISA.visitNode(event.cyTarget);
+                ISA.recentlyClickedNode = null;
+            } else {
+                // Remember the click for half a second, so we can treat a follow-up click as a double click
+                ISA.rememberFirstClick(event.cyTarget);
             }
-            else {
-                line = testLine;
+        });
+
+        cy.on('select', 'node.resource', function (event) {
+            ISA.selectNode(event.cyTarget);
+            ISA.rememberFirstClick(event.cyTarget);
+        });
+
+        cy.on('select', 'node.child-count', function (event) {
+           ISA.loadChildren(event.cyTarget);
+        });
+    },
+
+    selectNode: function (node) {
+        var jsTree = $j('#jstree').jstree(true);
+        jsTree.deselect_all();
+        jsTree.select_node(node.data('id'));
+        ISA.animateNode(node, 0.8);
+        ISA.displayNodeInfo(node);
+    },
+
+    highlightNode: function (node) {
+        //first normalizing all nodes and fading all nodes and edges
+        cy.$('node.connected').removeClass('connected');
+        cy.$('edge.connected').removeClass('connected');
+
+        //then appearing the chosen node and the connected nodes and edges
+        node.addClass('connected');
+        node.connectedEdges().addClass('connected');
+        node.connectedEdges().connectedNodes().addClass('connected');
+
+        // Animate the selected node
+        cy.$('node.selected').removeClass('selected');
+        node.addClass('selected');
+    },
+
+    animateNode: function (node, zoom) {
+        ISA.highlightNode(node);
+        // Center the view on the node
+        opts = { center: { eles: node }, duration: ISA.defaults.animationDuration };
+        if (zoom)
+            opts.zoom = zoom;
+        cy.animate(opts);
+    },
+
+    displayNodeInfo: function (node) {
+        $j('#node_info').html(HandlebarsTemplates['isa/item_info'](node.data()));
+    },
+
+    decodeHTMLForElements: function (elements) {
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].data.name = decodeHTML(elements[i].data.name);
+        }
+    },
+
+    fullscreen: function (state) {
+        $j('#isa-graph').toggleClass('fullscreen', state);
+        cy.resize();
+    },
+
+    recentlyClickedNode: null,
+    rememberFirstClick: function (target) {
+        ISA.recentlyClickedNode = target;
+        setTimeout(function () {
+            ISA.recentlyClickedNode = null;
+        }, 500);
+    },
+
+    getNode: function (id) {
+        return cy.$('#' + id);
+    },
+
+    visitNode: function (node) {
+        if (node != ISA.originNode && node.data('url')) {
+            window.location = node.data('url');
+        }
+    },
+
+    loadChildren: function (childCountNode) {
+        var tree = $j('#jstree').jstree(true);
+
+        // Show a spinner on the tree node
+        $j('#' + tree.get_node(childCountNode.id()).id).spinner('add');
+
+        $j.ajax({
+            url: childCountNode.data('url'),
+            success: function (data) {
+                var node = childCountNode.incomers().sources();
+
+                // Set the child node positions to be on top of the node
+                data.cytoscape.forEach(function (childNode) {
+                    childNode.renderedPosition = node.renderedPosition();
+                });
+                cy.add(data.cytoscape);
+                cy.remove(childCountNode);
+
+                // Adjust the cytoscape layout to fit in the new nodes
+                cy.layout($j.extend({
+                        fit: false,
+                        animate: true,
+                        animationDuration: ISA.defaults.animationDuration,
+                        stop: function () {
+                            ISA.highlightNode(node);
+                            cy.animate({ fit: { eles: node.union(node.outgoers().targets()), padding: 40 },
+                                duration: ISA.defaults.animationDuration });
+                        }
+                    }, ISA.defaults.layout)
+                );
+
+                // Add the nodes to the JStree
+                tree.get_node(node.id()).state.loaded = true;
+                tree.get_node(node.id()).state.opened = true;
+
+                // We iterate backwards because parent nodes seem to appear after child nodes in the list, which breaks
+                //  jstree
+                for (var i = data.jstree.length - 1; i >= 0; i--) {
+                    var childNode = data.jstree[i];
+
+                    // Only add the node to the tree if its not already there
+                    var actualNode = tree.get_node(childNode.id);
+                    if (!actualNode || actualNode.parent !== childNode.parent) {
+                        tree.create_node(childNode.parent, childNode, 'last');
+                    }
+                }
+                // Delete the "show x more" node
+                tree.delete_node(childCountNode.id());
+
+                // Need to do this due to a little hack we used when drawing the tree
+                //  (to show a node as "openable" despite having no children)
+                tree.redraw_node(node.id());
+
+                cy.resize();
             }
-            //when last word, push line to lines
-            if (i === words.length-1){
-                lines.push(line.trim());
-            }
-        }
-    }else{
-        lines.push(label);
+        });
     }
-    return lines;
-}
-
-function mouseOnLabel(node, mouse_event){
-    var lines = labelLines(node);
-    var mouse_on_label = false;
-    for (var i=0; i<lines.length; i++){
-    	var label_pos = labelPosition(node, lines[i], i+1, lines.length);
-    	var mouse_posX = mouse_event.clientX;
-    	var mouse_posY = mouse_event.clientY;
-	    mouse_on_label = mouse_posX > label_pos.minX && mouse_posX < label_pos.maxX && mouse_posY > label_pos.minY && mouse_posY < label_pos.maxY;
-        if (mouse_on_label === true){
-	        return mouse_on_label;
-	    }
-    }
-
-    return mouse_on_label;
-}
-
-function clickLabelLink(node, mouse_event){
-    if (node.data().name !== "Hidden item"){
-        if (mouseOnLabel(node, mouse_event)){
-            var link = document.createElement('a');
-            link.href = node.data().item_info.split('"')[1];
-            clickLink(link);
-        }
-    }
-}
-
-function disableMouseWheel(){
-    var canvas_render = cy.renderer();
-    var bindings = canvas_render.bindings;
-    for( var i=0; i<bindings.length; i++){
-        binding = bindings[i];
-        var event = binding.event;
-        if (event.match(/wheel/i) !== null || event.match(/scroll/i) !==null){
-            binding.target.removeEventListener(event, binding.handler, binding.useCapture);
-        }
-    }
-}
-
-function decodeHTMLForElements(elements){
-    for( var i=0; i<elements.length; i++){
-        elements[i].data.name = decodeHTML(elements[i].data.name);
-        elements[i].data.item_info = decodeHTML(elements[i].data.item_info);
-    }
-}
+};

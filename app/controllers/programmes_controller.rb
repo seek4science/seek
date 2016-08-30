@@ -3,7 +3,7 @@ class ProgrammesController < ApplicationController
   include Seek::DestroyHandling
 
   before_filter :programmes_enabled?
-  before_filter :login_required, except: [:show, :index]
+  before_filter :login_required, except: [:show, :index, :isa_children]
   before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy, :storage_report]
   before_filter :find_requested_item, only: [:show, :admin, :initiate_spawn_project, :spawn_project,:activation_review,:accept_activation,:reject_activation,:reject_activation_confirmation]
   before_filter :find_activated_programmes, only: [:index]
@@ -14,6 +14,8 @@ class ProgrammesController < ApplicationController
   skip_before_filter :project_membership_required
 
   include Seek::BreadCrumbs
+
+  include Seek::IsaGraphExtensions
 
   respond_to :html
 

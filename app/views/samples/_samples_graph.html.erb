@@ -1,0 +1,6 @@
+<%
+  elements = cytoscape_elements(Seek::SampleGraphGenerator.new(sample).generate)
+  # reduced_elements = cytoscape_elements(Seek::SampleGraphGenerator.new(sample).generate(1))
+%>
+
+<%= render partial: 'general/cytoscape_graph', locals: { elements: elements, root_item: sample } %>

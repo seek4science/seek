@@ -1,9 +1,7 @@
 #require "flash_tool"
 class PresentationsController < ApplicationController
 
-
   include Seek::IndexPager
-  include Seek::DotGenerator
 
   include Seek::AssetsCommon
 
@@ -14,6 +12,8 @@ class PresentationsController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs
+
+  include Seek::IsaGraphExtensions
 
   def new_version
     if handle_upload_data

@@ -5,7 +5,6 @@ class ModelsController < ApplicationController
 
   include WhiteListHelper
   include Seek::IndexPager
-  include Seek::DotGenerator
   include Seek::AssetsCommon
 
   before_filter :models_enabled?
@@ -19,6 +18,8 @@ class ModelsController < ApplicationController
   include Seek::BreadCrumbs
   include Bives
   include Seek::DataciteDoi
+
+  include Seek::IsaGraphExtensions
 
   def find_other_version
     version = params[:other_version]

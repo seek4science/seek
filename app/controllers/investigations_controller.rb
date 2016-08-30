@@ -1,6 +1,5 @@
 class InvestigationsController < ApplicationController
 
-  include Seek::DotGenerator
   include Seek::IndexPager
   include Seek::DestroyHandling
   include Seek::AssetsCommon
@@ -18,6 +17,8 @@ class InvestigationsController < ApplicationController
   include Seek::AnnotationCommon
 
   include Seek::BreadCrumbs
+
+  include Seek::IsaGraphExtensions
 
   def new_object_based_on_existing_one
     @existing_investigation =  Investigation.find(params[:id])

@@ -1,0 +1,13 @@
+<div class='isa-selected-item'>
+    <div>
+        <strong>Selected:</strong>
+        {{#if url}}
+            <span>
+                <a href="{{url}}" title="{{{description}}}">{{{fullName}}}</a>
+            </span><br/>
+            <strong>Type:</strong> {{type}}
+        {{else}}
+            <span class="none_text">Hidden item</span>
+        {{/if}}
+    </div>
+</div>

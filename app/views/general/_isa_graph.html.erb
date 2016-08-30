@@ -1,78 +1,13 @@
-<%= stylesheet_link_tag 'cytoscape_isa_graph' %>
-<%= javascript_include_tag 'cytoscape_isa_graph' %>
-
-
 <%
-   current_item ||= nil
-   max_node_number ||= 10
-   force_max_node ||= true
-   cytoscape_elements = cytoscape_elements(root_item, deep, current_item)
+  include_parents ||= false
+  deep ||= false
+  depth ||= 1
+  hash =  Seek::IsaGraphGenerator.new(root_item).generate({ deep: deep, depth: depth, include_parents: include_parents })
+  elements = cytoscape_elements(hash)
 
-   #show only current node and connected nodes
-   #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
-   reduced_elements = reduced_elements(cytoscape_elements, max_node_number, force_max_node, root_item, current_item)
+  #show only current node and connected nodes
+  #if set force_max_node to true, show only max_node_number if (current node + connected nodes) is bigger then max_node_number
+  # reduced_elements = reduced_elements(elements, max_node_number, force_max_node, root_item)
 %>
 
-<div class="row">
-
-  <div class="hidden-xs">
-    <div class="col-md-12 col-sm-12 isa_graph box_about_actor curved with_smaller_shadow">
-
-      <% if cytoscape_elements.size > reduced_elements.size %>
-          <%= link_to_function ("Full graph "+image("expand")).html_safe,
-                               "drawGraph(elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
-                               :id => 'full_graph_expand_image',
-                               :class => 'graph_toggle'
-          -%>
-          <%= link_to_function ("Reduced graph "+image("collapse")).html_safe,
-                               "drawGraph(reduced_elements,current_element_id);$('full_graph_expand_image').toggle();$('reduced_graph_collapse_image').toggle();return false;",
-                               :id => 'reduced_graph_collapse_image',
-                               :style => "display:none",
-                               :class => 'graph_toggle'
-          -%>
-      <% end %>
-
-      <div class="row">
-        <div class="alert alert-info" role="alert" id="node_info">
-
-          </div>
-
-      <div id="cy"></div>
-      </div>
-    </div>
-
-    <span id="ruler" style="visibility: hidden"></span>
-  </div>
-</div>
-
-<script type="text/javascript">
-    var isa_graph = $j('.isa_graph')[0];
-    var elements = <%= cytoscape_elements.to_json.html_safe %>;
-    var reduced_elements = <%= reduced_elements.to_json.html_safe %>;
-    var current_element_id = '<%= controller_name.singularize.camelize %>' + '_' + '<%= params[:id] %>';
-
-    if (elements.error === 'error') {
-        isa_graph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
-        isa_graph.style['text-align'] = 'center';
-    }
-    else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)) {
-        isa_graph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
-        isa_graph.style['text-align'] = 'center';
-    } else {
-        decodeHTMLForElements(elements);
-        decodeHTMLForElements(reduced_elements);
-
-        drawGraph(reduced_elements, current_element_id);
-
-        //this is to overcome a z-index problem that prevents the bootstrap menu working ontop of the isa-graph.
-        //it forces a generated div, which is created with z-index:1000, to have a lower z-index.
-        $j('div#cy > div').css('z-index','0');
-
-    }
-</script>
-
-<style>
-  div#cy div {
-      z-index:0;
-  }
-</style>
+<%= render partial: 'general/cytoscape_graph', locals: { elements: elements, root_item: root_item, hash: hash } %>

@@ -100,7 +100,7 @@
           <% end %>
         </div>
     <% end %>
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @assay.study, :current_item => @assay, :deep => true} %>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @assay, :deep => true, :include_parents => true} %>
   </div>
 
   <div class="col-md-3 col-sm-4">

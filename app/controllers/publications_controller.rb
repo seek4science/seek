@@ -2,7 +2,6 @@
 class PublicationsController < ApplicationController
   
   include Seek::IndexPager
-  include Seek::DotGenerator
   include Seek::AssetsCommon
   include Seek::BioExtension
   include Seek::PreviewHandling
@@ -14,6 +13,8 @@ class PublicationsController < ApplicationController
   before_filter :associate_authors, :only => [:edit, :update]
 
   include Seek::BreadCrumbs
+
+  include Seek::IsaGraphExtensions
     
   # GET /publications/1
   # GET /publications/1.xml

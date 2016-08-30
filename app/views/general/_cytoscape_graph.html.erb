@@ -1,0 +1,70 @@
+<%= stylesheet_link_tag 'cytoscape_isa_graph' %>
+<%= javascript_include_tag 'cytoscape_isa_graph' %>
+
+<div class="row">
+  <div class="hidden-xs">
+    <div id="isa-graph" class="box_about_actor curved with_smaller_shadow">
+      <a href="#" id="exit-fullscreen-btn" aria-label="Close">&times;</a>
+      <div id="node_info"></div>
+      <div class="isa-wrapper">
+        <div id="cy"></div>
+        <%= render partial: 'general/jstree', locals: { hash: hash } %>
+      </div>
+      <div class="isa-footer">
+        <button class="btn btn-default" id="toggle-fullscreen-btn">
+          <span class="glyphicon glyphicon-resize-full" aria-hidden="true"></span>
+          Toggle fullscreen
+        </button>
+        <button class="btn btn-default" id="toggle-isa-sidebar-btn">
+          <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+          Toggle Sidebar
+        </button>
+      </div>
+    </div>
+
+    <span id="ruler" style="visibility: hidden"></span>
+  </div>
+</div>
+
+<script type="text/javascript">
+  var isaGraph = $j('.isa_graph')[0];
+  var elements = <%= elements.to_json.html_safe %>;
+  var originElementId = '<%= node_id(root_item) -%>';
+
+  if (elements.error === 'error') {
+    isaGraph.innerHTML = "<div class='none_text'>Currently unable to display the graph for this item</div>";
+    isaGraph.style['text-align'] = 'center';
+  }
+  else if (!isCanvasSupportBrowser() || !isIEVersionSupported(5)) {
+    isaGraph.innerHTML = "<div class='none_text'>Unable to display the graph for this browser version. Please upgrade your browser.</div>";
+    isaGraph.style['text-align'] = 'center';
+  } else {
+    ISA.decodeHTMLForElements(elements);
+    ISA.drawGraph(elements, originElementId);
+  }
+
+  $j(document).ready(function () {
+    $j('#toggle-isa-sidebar-btn').click(function () {
+      $j('#jstree').toggle();
+      cy.resize();
+      return false;
+    });
+
+    $j('#exit-fullscreen-btn').click(function () {
+      ISA.fullscreen(false);
+      return false;
+    });
+
+    $j('#toggle-fullscreen-btn').click(function () {
+      ISA.fullscreen();
+      return false;
+    });
+
+    $j(document).keyup(function(e) {
+      if (e.keyCode == 27) { // Escape key
+        ISA.fullscreen(false);
+      }
+    });
+  });
+
+</script>

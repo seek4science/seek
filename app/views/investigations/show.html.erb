@@ -10,7 +10,7 @@
         <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
       </div>
     </div>
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @investigation, :deep => false} %>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @investigation, :depth => 2, :include_parents => true} %>
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation, :creators => (@investigation.creators | [@investigation.contributing_user.try(:person)]).compact.uniq } %>

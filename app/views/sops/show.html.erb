@@ -16,7 +16,7 @@
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_sop} %>
       </div>
     </div>
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :current_item => @sop, :deep => true} %>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :deep => true, :include_parents => true} %>
   </div>
 
   <div class="col-md-3 col-sm-4">

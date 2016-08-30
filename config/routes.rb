@@ -202,6 +202,7 @@ SEEK::Application.routes.draw do
       get :admin_member_roles
       get :storage_report
       post :update_members
+      get :isa_children
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:only=>[:index]
@@ -265,6 +266,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       get :published
+      get :isa_children
     end
   end
 
@@ -291,6 +293,7 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       get :published
+      get :isa_children
     end
     resources :people,:projects,:assays,:investigations,:models,:sops,:data_files,:publications,:only=>[:index]
   end
@@ -320,6 +323,7 @@ SEEK::Application.routes.draw do
       post :publish
       get :published
       get :new_object_based_on_existing_one
+      get :isa_children
     end
     resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
@@ -384,6 +388,7 @@ SEEK::Application.routes.draw do
       get :extraction_status
       post :extract_samples
       delete :cancel_extraction
+      get :isa_children
     end
     resources :studied_factors do
       collection do
@@ -420,6 +425,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       post :new_version
       delete :destroy_version
+      get :isa_children
     end
     resources :content_blobs do
       member do
@@ -461,6 +467,7 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
+      get :isa_children
     end
     resources :model_images do
       collection do
@@ -503,6 +510,7 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       post :mint_doi
       get :mint_doi_confirm
+      get :isa_children
     end
     resources :experimental_conditions do
       collection do
@@ -543,6 +551,7 @@ SEEK::Application.routes.draw do
       get :reject_activation_confirmation
       post :spawn_project
       get :storage_report
+      get :isa_children
     end
     resources :people,:projects, :institutions, :investigations, :studies, :assays,
               :data_files, :models, :sops, :presentations, :events, :publications
@@ -672,6 +681,7 @@ SEEK::Application.routes.draw do
     end
     member do
       post :update_annotations_ajax
+      get :isa_children
     end
   end
 

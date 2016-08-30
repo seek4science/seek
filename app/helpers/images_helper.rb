@@ -44,14 +44,17 @@ module ImagesHelper
   end
 
   def resource_avatar resource,html_options={}
+    image_tag(resource_avatar_path(resource), html_options)
+  end
 
+  def resource_avatar_path(resource)
     if resource.avatar_key
-          image_tag(icon_filename_for_key(resource.avatar_key), html_options)
+      icon_filename_for_key(resource.avatar_key)
     elsif resource.use_mime_type_for_avatar?
-          image_tag(file_type_icon_url(resource), html_options)
+      file_type_icon_url(resource)
     end
   end
-  
+
   def icon_filename_for_key(key)
     (@@icon_dictionary ||= Seek::ImageFileDictionary.instance).image_filename_for_key(key)
   end

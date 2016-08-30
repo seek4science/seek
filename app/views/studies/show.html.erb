@@ -35,7 +35,7 @@
 
       </div>
     </div>
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @study.investigation, :current_item => @study, :deep => false} %>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @study, :deep => false, :include_parents => true} %>
   </div>
 
   <div class="col-md-3 col-sm-4">

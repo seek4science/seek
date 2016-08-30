@@ -48,7 +48,7 @@
     </div>
 
     <%= render :partial=>"model_visualisation" -%>
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @model, :current_item => @model, :deep => true} %>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @model, :deep => true, :include_parents => true} %>
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model,:versioned_resource=>@display_model } %>

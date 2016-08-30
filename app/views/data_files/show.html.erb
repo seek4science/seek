@@ -18,7 +18,7 @@
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>
       </div>
     </div>
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :current_item => @data_file, :deep => true} %>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :deep => true, :include_parents => true} %>
   </div>
 
   <div class="col-md-3 col-sm-4">
