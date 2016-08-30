@@ -16,9 +16,6 @@
       } else {
         ISA.selectNode(ISA.getNode(data.node.id));
       }
-    }).on('after_open.jstree', function () {
-      console.log('triggered!!!');
-      cy.resize();
     })
   });
 </script>
