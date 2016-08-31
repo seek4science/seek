@@ -8,7 +8,14 @@ SEEK::Application.configure do
   Mime::Type.register_alias "image/svg+xml", :svg
   Mime::Type.register_alias "text/plain", :dot
   Mime::Type.register "application/rdf+xml", :rdf
-  Mime::Type.register "application/x-endnote-refer", :enw
   Mime::Type.register "application/vnd.wf4ever.robundle+zip", :ro
+
+  # for publication export
+  # http://filext.com/file-extension/ENW
+  Mime::Type.register "application/x-endnote-refer", :enw
+  # http://filext.com/file-extension/bibtex
+  Mime::Type.register "application/x-bibtex", :bibtex
+  # http://filext.com/file-extension/EMBL
+  Mime::Type.register "chemical/x-embl-dl-nucleotide", :embl
 end
 

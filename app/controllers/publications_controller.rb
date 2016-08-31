@@ -23,7 +23,7 @@ class PublicationsController < ApplicationController
       format.html # show.html.erb
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.enw { send_data @publication.endnote, :type => "application/x-endnote-refer", :filename => "#{@publication.title}.enw" }
+      format.any( *Publication::EXPORT_TYPES.keys ) { send_data @publication.export(request.format.to_sym), :type => request.format.to_sym, :filename => "#{@publication.title}.#{request.format.to_sym}" }
     end
   end
 

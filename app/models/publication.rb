@@ -40,6 +40,19 @@ class Publication < ActiveRecord::Base
 
   after_update :update_creators_from_publication_authors
 
+  # http://bioruby.org/rdoc/Bio/Reference.html#method-i-format
+  # key for the file-extension and format used in the route
+  # value contains the format used by bioruby that name for the view and mimetype for the response
+  EXPORT_TYPES = Hash.new{ |hash, key| raise( "Export type #{ key } is not supported")}.update(
+    # http://filext.com/file-extension/ENW
+    :enw         => { :format => "endnote", :name => "Endnote", :mimetype => "application/x-endnote-refer"},
+    # http://filext.com/file-extension/bibtex
+    :bibtex      => { :format => "bibtex" , :name => "BiBTeX" , :mimetype => "application/x-bibtex"},  # (option available)
+    # http://filext.com/file-extension/EMBL
+    # ftp://ftp.embl.de/pub/databases/embl/doc/usrman.txt
+    :embl        => { :format => "embl"   , :name => "EMBL"   , :mimetype => "chemical/x-embl-dl-nucleotide"}
+  )
+
   def update_creators_from_publication_authors
     self.creators = seek_authors.map(&:person)
   end
@@ -198,8 +211,11 @@ class Publication < ActiveRecord::Base
     action == 'create'
   end
 
-  def endnote
-   bio_reference.endnote
+  # export the publication as one of the available types:
+  # http://bioruby.org/rdoc/Bio/Reference.html
+  # @export_type a registered mime_type that is a valid key to EXPORT_TYPES
+  def export(export_type)
+    bio_reference.format(EXPORT_TYPES[export_type][:format])
   end
 
   def publication_author_names
