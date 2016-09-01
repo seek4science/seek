@@ -124,6 +124,54 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test "should export publication as endnote" do
+    get :show, :id => publications(:one), :format => "enw"
+    assert_response :success
+    assert_match( /%0 Journal Article.*/, response.body)
+    assert_match( /.*%A Hendrickson, W\. A\..*/, response.body)
+    assert_match( /.*%A Ward, K\. B\..*/, response.body) 
+    assert_match( /.*%D 1975.*/, response.body) 
+    assert_match( /.*%T Atomic models for the polypeptide backbones of myohemerythrin and hemerythrin\..*/, response.body) 
+    assert_match( /.*%J Biochem Biophys Res Commun.*/, response.body) 
+    assert_match( /.*%V 66.*/, response.body) 
+    assert_match( /.*%N 4.*/, response.body) 
+    assert_match( /.*%P 1349-1356.*/, response.body) 
+    assert_match( /.*%M 5.*/, response.body) 
+    assert_match( /.*%U http:\/\/www.ncbi.nlm.nih.gov\/pubmed\/5.*/, response.body) 
+    assert_match( /.*%K Animals.*/, response.body) 
+    assert_match( /.*%K Cnidaria.*/, response.body) 
+    assert_match( /.*%K Computers.*/, response.body) 
+    assert_match( /.*%K \*Hemerythrin.*/, response.body) 
+    assert_match( /.*%K \*Metalloproteins.*/, response.body) 
+    assert_match( /.*%K Models, Molecular.*/, response.body) 
+    assert_match( /.*%K \*Muscle Proteins.*/, response.body) 
+    assert_match( /.*%K Protein Conformation.*/, response.body) 
+    assert_match( /.*%K Species Specificity.*/, response.body) 
+  end
+
+  test "should export publication as bibtex" do
+    get :show, :id => publications(:one), :format => "bibtex"
+    assert_response :success
+    assert_match( /@article{PMID:5,.*/, response.body) 
+    assert_match( /.*author.*/, response.body)
+    assert_match( /.*title.*/, response.body)
+    assert_match( /.*journal.*/, response.body)
+    assert_match( /.*year.*/, response.body)
+    assert_match( /.*number.*/, response.body)
+    assert_match( /.*pages.*/, response.body)
+    assert_match( /.*url.*/, response.body)
+  end
+
+  test "should export publication as embl" do
+    get :show, :id => publications(:one), :format => "embl"
+    assert_response :success
+    assert_match( /RX   PUBMED; 5\..*/, response.body) 
+    assert_match( /.*RT   \"Atomic models for the polypeptide backbones of myohemerythrin and\nRT   hemerythrin.\";.*/, response.body)
+    assert_match( /.*RA   Hendrickson W\.A\., Ward K\.B\.;.*/, response.body)
+    assert_match( /.*RL   Biochem Biophys Res Commun 66\(4\):1349-1356\(1975\)\..*/, response.body)
+    assert_match( /.*XX.*/, response.body)
+  end
+
   test "should get edit" do
     get :edit, :id => publications(:one)
     assert_response :success
