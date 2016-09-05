@@ -69,7 +69,6 @@ module HomesHelper
     html << '</span>'
     html << '</li>'
     html.html_safe
-
   end
 
   def determine_entry_date(entry)
@@ -84,7 +83,7 @@ module HomesHelper
     feed_title = entry.feed_title || 'Unknown publisher'
     entry_date = determine_entry_date(entry)
     entry_summary = truncate(strip_tags(entry.summary || entry.content), length: 500)
-    tt = tooltip("#{CGI::unescapeHTML(entry_summary)} (#{entry_date.strftime('%c') unless entry_date.nil?})")
+    tt = tooltip("#{CGI.unescapeHTML(entry_summary)} (#{entry_date.strftime('%c') unless entry_date.nil?})")
     [entry_date, entry_title, feed_title, tt]
   end
 
@@ -128,7 +127,7 @@ module HomesHelper
         description: item.respond_to?(:description) ? item.description : nil,
         abstract: item.respond_to?(:abstract) ? item.abstract : nil,
         created_at: log.created_at,
-        avatar_image: resource_avatar(item, class: 'home_asset_icon') || avatar(item, nil, true, nil, nil, true, 'home_asset_icon'),
+        avatar_image: avatar(item, nil, true, nil, nil, true, 'home_asset_icon'),
         url: show_resource_path(item),
         log_id: log.id
       }
@@ -166,9 +165,9 @@ module HomesHelper
   def frontpage_button(link, image_path, &block)
     link_to link, class: 'seek-homepage-button', target: :_blank do
       image_tag(image_path) +
-          content_tag(:span) do
-            block.call
-          end
+        content_tag(:span) do
+          block.call
+        end
     end
   end
 end

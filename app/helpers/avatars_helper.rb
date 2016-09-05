@@ -37,7 +37,7 @@ module AvatarsHelper
       when 'person', 'institution', 'project', 'programme'
         avatar_according_to_user_upload(alternative, item, size, css_class)
       else
-        resource_avatar(item, :alt => alt, :class => css_class, :style => "width: #{size}px; height: #{size}px")
+        resource_avatar(item, alt: alt, class: css_class, style: "width: #{size}px; height: #{size}px")
     end
   end
 
@@ -45,7 +45,7 @@ module AvatarsHelper
     if item.avatar_selected?
       image_tag avatar_url(item, item.avatar_id, size), alt: alternative, class: css_class
     else
-      default_avatar(item.class.name, size, alternative)
+      default_avatar(item.class.name, size, alternative, '', css_class)
     end
   end
 
@@ -74,13 +74,13 @@ module AvatarsHelper
     end
   end
 
-  def default_avatar(object_class_name, size = 200, alt = 'Anonymous', onclick_options = '')
+  def default_avatar(object_class_name, size = 200, alt = 'Anonymous', onclick_options = '', css_class = 'framed')
     avatar_filename = icon_filename_for_key("#{object_class_name.downcase}_avatar")
 
     image_tag avatar_filename,
               alt: alt,
               size: "#{size}x#{size}",
-              class: 'framed',
+              class: css_class,
               onclick: onclick_options
   end
 end
