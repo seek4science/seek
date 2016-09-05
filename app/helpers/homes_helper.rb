@@ -3,6 +3,7 @@ module HomesHelper
   include UsersHelper
   include AssetsHelper
   include ImagesHelper
+  include AvatarsHelper
 
   RECENT_SIZE = 5
 
