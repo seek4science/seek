@@ -73,6 +73,10 @@ module Seek
       def name
         return self.first_name + " " + self.last_name
       end
+      
+      def to_s
+        return self.last_name + ", " + self.first_name
+      end
     end
 
   end
