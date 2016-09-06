@@ -12,7 +12,7 @@ $j(document).ready(function() {
 
 function showTabFromHistory() {
     if(location.hash) {
-        var activeTab = $j('[href=' + location.hash + ']');
+        var activeTab = $j('[href="' + location.hash + '"]');
         if (activeTab.length) {
             activeTab.tab('show');
         } else {
