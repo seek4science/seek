@@ -36,7 +36,7 @@ function updateAttributionSettings() {
         }
         // update the page
         updateAttributionSettings();
-    })
+    });
 }
 
 function checkAttributionNotInList(attributable) {

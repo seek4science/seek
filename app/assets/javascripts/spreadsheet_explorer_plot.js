@@ -9,12 +9,12 @@ function generate_json_data() {
     var columns = $j('.col_heading.selected_heading').size();
     var headings;
     var rows = new Array();
-    var colors = ["red","blue","green","cyan","magenta","darkgreen"]
+    var colors = ["red","blue","green","cyan","magenta","darkgreen"];
 
     for (var i=0; i<cells.size(); i += columns) {
         var row = new Array();
         for (var j=0;j<columns;j+=1) {
-            row.push(cells.eq(i + j).html())
+            row.push(cells.eq(i + j).html());
         }
         if (i==0) {
             headings=row;
@@ -38,11 +38,11 @@ function generate_json_data() {
         json = {
             label : headings[col],
             data: data
-        }
+        };
 
         if (col<colors.size()) {
             json["color"]=colors[col-1];
-            json["curvedLines"]={show:true}
+            json["curvedLines"]={show:true};
         }
         result.push(json);
     }

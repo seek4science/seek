@@ -13,7 +13,7 @@ var SampleTypes = {
             handle: '.attribute-handle'
         }).on('sortupdate', function() {
             SampleTypes.recalculatePositions();
-        })
+        });
     },
 
     unbindSortable: function () {
@@ -96,7 +96,7 @@ var SampleTypeControlledVocab = {
     //to the form
     bindNewControlledVocabShowEvent: function () {
         $j('#cv-modal').on('show.bs.modal', function (event) {
-            var button = $j(event.relatedTarget) // Button that triggered the modal
+            var button = $j(event.relatedTarget); // Button that triggered the modal
             var dropdown = button.siblings('select');
             SampleTypeControlledVocab.controlledVocabSelectionTagId = (dropdown.prop('id'));
         });

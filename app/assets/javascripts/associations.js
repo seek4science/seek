@@ -17,10 +17,10 @@ function nestedOptionsFromJSONArray(array,prompt_option_text) {
         var item = array[i];
         if (parents[item.parent_id]) {
             var parent = parents[item.parent_id];
-            parent.children.push({id:item.id,title:item.title})
+            parent.children.push({id:item.id,title:item.title});
         }
         else {
-            var parent = {title:item.parent_title,id:item.parent_id,children:[]}
+            var parent = {title:item.parent_title,id:item.parent_id,children:[]};
             parent.children.push({id:item.id,title:item.title});
             parents[item['parent_id']]=parent;
         }
@@ -183,7 +183,7 @@ $j(document).ready(function () {
         var existingValues = $j('script[data-role="seek-existing-associations"]', self).html();
         if(existingValues) {
             JSON.parse(existingValues).forEach(function (value) {
-                list.add(value)
+                list.add(value);
             });
         }
     });
@@ -192,13 +192,13 @@ $j(document).ready(function () {
         var multilist = new Associations.MultiList($j(this), $j(this).data('groupingAttribute'));
         var self = $j(this);
         $j('[data-role="seek-associations-list"]', self).each(function () {
-            multilist.addList($j(this).data('multilistGroupValue'), $j(this).data('associationList'))
+            multilist.addList($j(this).data('multilistGroupValue'), $j(this).data('associationList'));
         });
 
         var existingValues = $j('script[data-role="seek-existing-associations"]', self).html();
         if(existingValues) {
             JSON.parse(existingValues).forEach(function (value) {
-                multilist.add(value)
+                multilist.add(value);
             });
         }
     });

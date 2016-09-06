@@ -17,7 +17,7 @@ function DropMenu1(id) {
     this.delay = {
         "show": 0,
         "hide": 300
-    }
+    };
     /* Change the default position of sub-menu by Y pixels from top and X pixels from left
      * Negative values are allowed
     this.position = {
@@ -44,7 +44,7 @@ function DropMenu1(id) {
         if (this.browser.ie && this.browser.ie5) { fixWrap(); }
         fixSections();
         parse(document.getElementById(this.id).childNodes, this.tree, this.id);
-    }
+    };
 
     /* Search for .section elements and set width for them */
     function fixSections() {
@@ -174,11 +174,11 @@ function DropMenu1(id) {
         if (self.sections.contains(id_section)) {
             self.sectionsHideCnt[self.sections.indexOf(id_section)]++;
             var cnt = self.sectionsShowCnt[self.sections.indexOf(id_section)];
-            setTimeout(function(a, b) { return function() { self.showSection(a, b); } } (id_section, cnt), self.delay.show);
+            setTimeout(function(a, b) { return function() { self.showSection(a, b); }; } (id_section, cnt), self.delay.show);
         } else {
             if (self.visible) {
                 var cnt = self.sectionsHideCnt[self.sections.indexOf(self.visible)];
-                setTimeout(function(a, b) { return function() { self.hideSection(a, b); } } (self.visible, cnt), self.delay.show);
+                setTimeout(function(a, b) { return function() { self.hideSection(a, b); }; } (self.visible, cnt), self.delay.show);
             }
         }
     }
@@ -190,7 +190,7 @@ function DropMenu1(id) {
             self.sectionsShowCnt[self.sections.indexOf(id_section)]++;
             if (id_section == self.visible) {
                 var cnt = self.sectionsHideCnt[self.sections.indexOf(id_section)];
-                setTimeout(function(a, b) { return function() { self.hideSection(a, b); } }(id_section, cnt), self.delay.hide);
+                setTimeout(function(a, b) { return function() { self.hideSection(a, b); }; }(id_section, cnt), self.delay.hide);
             }
         }
     }
@@ -209,7 +209,7 @@ function DropMenu1(id) {
     function sectionOut() {
         self.sectionsShowCnt[self.sections.indexOf(this.id)]++;
         var cnt = self.sectionsHideCnt[self.sections.indexOf(this.id)];
-        setTimeout(function(a, b) { return function() { self.hideSection(a, b); } }(this.id, cnt), self.delay.hide);
+        setTimeout(function(a, b) { return function() { self.hideSection(a, b); }; }(this.id, cnt), self.delay.hide);
     }
 
     /* Show section (1 argument passed)
@@ -232,7 +232,7 @@ function DropMenu1(id) {
         document.getElementById(id).style.visibility = "visible";
         document.getElementById(id).style.zIndex = this.zIndex.visible;
         this.visible = id;
-    }
+    };
 
     /* Hide section (1 argument passed)
      * Try to hide section (2 arguments passed) - check cnt with sectionHideCnt */
@@ -252,14 +252,14 @@ function DropMenu1(id) {
             return;
         }
         this.sectionsHideCnt[this.sections.indexOf(id)]++;
-    }
+    };
 
     /* Necessary when showing section that doesn't exist - hide currently visible section. See: item1over() */
     this.hideSelf = function(cnt) {
         if (this.visible && cnt == this.sectionsHideCnt[this.sections.indexOf(this.visible)]) {
             this.hideSection(this.visible);
         }
-    }
+    };
 
     /* Element (.section, .item2 etc) */
     function Element(id) {
@@ -269,7 +269,7 @@ function DropMenu1(id) {
             var a = s.split("-");
             a.pop();
             return new Element(this.menu.id + a.join("-"));
-        }
+        };
         this.menu = self;
         this.id = id;
     }
@@ -292,7 +292,7 @@ if (typeof Array.prototype.indexOf == "undefined") {
             }
         }
         return -1;
-    }
+    };
 }
 
 /* Check whether array contains given string */
@@ -304,5 +304,5 @@ if (typeof Array.prototype.contains == "undefined") {
             }
         }
         return false;
-    }
+    };
 }

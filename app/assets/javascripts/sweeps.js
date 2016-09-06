@@ -116,7 +116,7 @@ $j(document).ready(function () {
 
   $j('#submit_button').click(function (e) {
     if($j('input:checkbox:checked.sweep_inputs').length < 1) {
-      alert("You must select at least one input to sweep over.")
+      alert("You must select at least one input to sweep over.");
       return false;
     } else {
       return true;

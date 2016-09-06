@@ -107,7 +107,7 @@ function updateSops() {
 
     clearList('assay_sop_ids');
 
-    select=$('assay_sop_ids')
+    select=$('assay_sop_ids');
     for (i=0;i<sop_ids.length;i++) {
         id=sop_ids[i];
         o=document.createElement('option');
@@ -140,7 +140,7 @@ function addSelectedDataFile() {
     }
     else
     {
-        relationshipType="None"
+        relationshipType="None";
     }
 
     i = $('possible_data_files').selectedIndex;
@@ -164,7 +164,7 @@ function removeDataFile(index) {
 }
 
 function updateDataFiles() {
-    data_file_text='<ul class="related_asset_list">'
+    data_file_text='<ul class="related_asset_list">';
     
     for (var i=0;i<data_files_assets.length;i++) {        
         data_file=data_files_assets[i];
@@ -389,7 +389,7 @@ function addSelectedAssay() {
     }
     else
     {
-        relationshipType="None"
+        relationshipType="None";
     }
 
     i = $('possible_assays').selectedIndex;
@@ -407,7 +407,7 @@ function addSelectedAssay() {
 }
 
 function updateAssays() {
-    assay_text = '<ul class="related_asset_list">'
+    assay_text = '<ul class="related_asset_list">';
     for (var i=0;i<assays_array.length;i++) {
         assay=assays_array[i];
         title=assay[0];
@@ -436,10 +436,10 @@ function updateAssays() {
         relationshipType=assays_array[i][2];
         o=document.createElement('option');
         if (relationshipType != 'None'){
-          o.value=id + "," + relationshipType
+          o.value=id + "," + relationshipType;
         }
         else {
-            o.value=id
+            o.value=id;
         }
         o.text=id;
         o.selected=true;
