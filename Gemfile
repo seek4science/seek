@@ -97,8 +97,6 @@ gem 'bootstrap-sass', '3.1.1.0'
 gem 'sass-rails', '>= 3.2'
 
 gem 'ro-bundle'
-gem 'bootstrap-tagsinput-rails'
-gem 'bootstrap-typeahead-rails'
 gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 
@@ -111,6 +109,8 @@ gem 'rspec-rails'
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
+  gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'
+  gem 'rails-assets-bootstrap3-typeahead', '~> 4.0.1'
 end
 
 group :assets do

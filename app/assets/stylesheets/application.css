@@ -32,7 +32,6 @@
 *= require new_styles
 *= require jquery-ui-drag-drop
 *= require bootstrap-tagsinput
-*= require bootstrap-typeahead-rails
 *= require calendar_date_select/default
 *= require organisms
 *= require tweaks
