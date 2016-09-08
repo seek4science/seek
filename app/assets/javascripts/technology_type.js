@@ -6,7 +6,7 @@ function validateTechnologyTypeRequiredFields(submit_button_id) {
     }
     else {
         $(submit_button_id).disabled = true;
-        $(submit_button_id).value = "Creating..."
+        $(submit_button_id).value = "Creating...";
         $(submit_button_id).form.submit();
     }
 }

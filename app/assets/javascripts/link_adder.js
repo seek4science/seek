@@ -124,9 +124,9 @@ function addInstanceOfObject(resource_type, id, details) {
 		link_hash = {};
 		allLinks[resource_type] = link_hash;
 		var source_map = {};
-		checkedSourceMap[resource_type] = source_map
+		checkedSourceMap[resource_type] = source_map;
 		var in_source_map = {};
-		sourceMap[resource_type] = in_source_map
+		sourceMap[resource_type] = in_source_map;
 	}
 	link_hash[id] = false;
 	var link_data = allLinksData[resource_type];
@@ -134,9 +134,9 @@ function addInstanceOfObject(resource_type, id, details) {
 		link_data = {};
 		allLinksData[resource_type] = link_data;
 		var target_map = {};
-		checkedTargetMap[resource_type] = target_map
+		checkedTargetMap[resource_type] = target_map;
 		var in_target_map = {};
-		targetMap[resource_type] = in_target_map
+		targetMap[resource_type] = in_target_map;
 	}
 	link_data[id] = details;
 	//allLinks[id] = false;

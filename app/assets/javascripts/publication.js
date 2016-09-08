@@ -16,7 +16,7 @@ function addSelectedPublication() {
     }
     else
     {
-        relationshipType="None"
+        relationshipType="None";
     }
     if (id != "0"){
         if(checkNotInList(id,publication_array)) {
@@ -37,7 +37,7 @@ function removePublication(index) {
 }
 
 function updatePublications() {
-    publication_text='<ul class="related_asset_list">'
+    publication_text='<ul class="related_asset_list">';
     
     for (var i=0;i<publication_array.length;i++) {        
         publication=publication_array[i];

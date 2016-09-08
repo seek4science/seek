@@ -1,10 +1,10 @@
 var disciplines=new Array();
 
 function addSelectedDiscipline() {
-    selected_option_index=$("possible_disciplines").selectedIndex
-    selected_option=$("possible_disciplines").options[selected_option_index]
-    title=selected_option.text    
-    id=selected_option.value
+    selected_option_index=$("possible_disciplines").selectedIndex;
+    selected_option=$("possible_disciplines").options[selected_option_index];
+    title=selected_option.text;
+    id=selected_option.value;
 
     if(checkNotInList(id,disciplines)) {
         addDiscipline(title,id);
@@ -29,19 +29,19 @@ function removeDiscipline(id) {
 }
 
 function updateDisciplines() {
-    discipline_text=''
-    type="Discipline"
+    discipline_text='';
+    type="Discipline";
     discipline_ids=new Array();
 
     for (var i=0;i<disciplines.length;i++) {
-        discipline=disciplines[i]
-        title=discipline[0]
-        id=discipline[1]        
+        discipline=disciplines[i];
+        title=discipline[0];
+        id=discipline[1];       
         discipline_text += '<b>' + type + '</b>: ' + title
         //+ "&nbsp;&nbsp;<span style='color: #5F5F5F;'>(" + contributor + ")</span>"
         + '&nbsp;&nbsp;<small style="vertical-align: middle;">'
         + '[<a href="" onclick="javascript:removeDiscipline('+id+'); return(false);">remove</a>]</small><br/>';
-        discipline_ids.push(id)
+        discipline_ids.push(id);
     }
 
     // remove the last line break
@@ -59,13 +59,13 @@ function updateDisciplines() {
 
     clearList('person_discipline_ids');
 
-    select=$('person_discipline_ids')
+    select=$('person_discipline_ids');
     for (i=0;i<discipline_ids.length;i++) {
-        id=discipline_ids[i]
-        o=document.createElement('option')
-        o.value=id
-        o.text=id
-        o.selected=true
+        id=discipline_ids[i];
+        o=document.createElement('option');
+        o.value=id;
+        o.text=id;
+        o.selected=true;
         try {
             select.add(o); //for older IE version
         }
@@ -76,7 +76,7 @@ function updateDisciplines() {
 }
 
 function addDiscipline(title,id) {    
-    disciplines.push([title,id])
+    disciplines.push([title,id]);
 }
 
 function updateWorkGroupIds(){
@@ -97,11 +97,11 @@ function removePersonFromAdminDefinedRole(role,project_id) {
     var display_id = role+"_project_"+project_id;
     $(display_id).remove();
     var select = $('_roles_'+role);
-    var options = select.childElements().select(function(c){return c.selected && c.value==project_id})
+    var options = select.childElements().select(function(c){return c.selected && c.value==project_id;});
     if (options.length>0) {
         options[0].selected=false;
     }
-    if (select.childElements().select(function(c){return c.selected}).length==0) {
+    if (select.childElements().select(function(c){return c.selected;}).length==0) {
         addNoProjectAssignedForAdminDefinedRole(role);
     }
 }
@@ -116,7 +116,7 @@ function addPersonToAdminDefinedRole(role) {
 
     if (!isAdminDefinedRoleAlreadySelected(role,project_id)) {
         var select = $('_roles_'+role);
-        var options = select.childElements().select(function(c){return !c.selected && c.value==project_id})
+        var options = select.childElements().select(function(c){return !c.selected && c.value==project_id;});
         if (options.length>0) {
             options[0].selected=true;
         }
@@ -149,7 +149,7 @@ function addNoProjectAssignedForAdminDefinedRole(role) {
 
 function isAdminDefinedRoleAlreadySelected(role,project_id) {
     var select = $('_roles_'+role);
-    var options = select.childElements().select(function(c){return c.selected && c.value==project_id});
+    var options = select.childElements().select(function(c){return c.selected && c.value==project_id;});
     return options.length>0;
 }
 

@@ -29,7 +29,7 @@ function updateCreatorSettings() {
         }
         // update the page
         updateCreatorSettings();
-    })
+    });
 }
 
 function checkCreatorNotInList(creator) {
@@ -69,7 +69,7 @@ function updateInstitutionList(data, project_name){
 function addPeopleToList(data){
     data = data.evalJSON(true);
     for (var i = 0; i < data.people_list.length; i++) {
-        addCreator({name: data.people_list[i][0], email: data.people_list[i][1], id: data.people_list[i][2]})
+        addCreator({name: data.people_list[i][0], email: data.people_list[i][1], id: data.people_list[i][2]});
     }
     $j('#adv_creator_select_spinner').hide();
 }

@@ -67,8 +67,8 @@ function detect_browser(){
 }
 
 function isCanvasSupportBrowser(){
-    var test_canvas = document.createElement("canvas") //try and create sample canvas element
-    var canvas_check=(test_canvas.getContext)? true : false //check if object supports getContext() method, a method of the canvas element
+    var test_canvas = document.createElement("canvas"); //try and create sample canvas element
+    var canvas_check=(test_canvas.getContext)? true : false; //check if object supports getContext() method, a method of the canvas element
     return canvas_check;
 }
 

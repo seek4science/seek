@@ -1,6 +1,6 @@
 function others(element_id) {
     //check if the selected item is 'Other'
-    var selected_texts = selectedEntryTexts(element_id)
+    var selected_texts = selectedEntryTexts(element_id);
     var check_flag = false;
     for (var i = 0; i < selected_texts.length; i++) {
         if (selected_texts[i] == 'Others') {

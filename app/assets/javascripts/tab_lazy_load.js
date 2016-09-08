@@ -38,7 +38,7 @@ function tab_on_click(scale_title, resource_type, resource_ids, actions_partial_
                     }
                 });
         }
-    }
+    };
 
 }
 function deactivate_previous_tab(tab_element){
@@ -50,7 +50,7 @@ function deactivate_previous_tab(tab_element){
         if (scale_and_type.match("external_result") != null){
             scale_and_type = scale_and_type.split('external_result')[0];
             var resource_type = scale_and_type.split('_')[1].strip();
-            var external_tab_content = $(resource_type)
+            var external_tab_content = $(resource_type);
             if (external_tab_content != null){
                 external_tab_content.hide();
             }
@@ -112,7 +112,7 @@ function external_tab_on_click(scale_title, resource_type){
         deactivate_previous_tab(scale_title);
         click_tab.parentElement.className = 'tabberactive';
         $(resource_type).show();
-    }
+    };
 }
 
 //this is the case of search that include the result from external resources

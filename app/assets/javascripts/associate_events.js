@@ -27,7 +27,7 @@ function addSelectedEvent() {
 }
 
 function updateEvents() {
-    event_text = '<ul class="related_asset_list">'
+    event_text = '<ul class="related_asset_list">';
     for (var i = 0; i < events_array.length; i++) {
         var event = events_array[i];
         var title = event[0];
