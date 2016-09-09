@@ -31,6 +31,7 @@
 *= require settings
 *= require new_styles
 *= require jquery-ui-drag-drop
+*= require bootstrap-typeahead
 *= require bootstrap-tagsinput
 *= require calendar_date_select/default
 *= require organisms

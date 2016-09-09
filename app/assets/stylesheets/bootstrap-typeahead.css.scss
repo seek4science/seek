@@ -1,0 +1,45 @@
+@import 'variables';
+@import 'mixins';
+
+.twitter-typeahead {
+  display: inline !important;
+}
+
+.tt-hint {
+  display: none !important;
+}
+
+.twitter-typeahead .tt-query,
+.twitter-typeahead .tt-hint {
+    margin-bottom: 0;
+}
+
+.tt-dropdown-menu {
+    min-width: 160px;
+    margin-top: 2px;
+    padding: 5px 0;
+    background-color: $dropdown-bg;
+    border: 1px solid $dropdown-fallback-border; // IE8 fallback
+    border: 1px solid $dropdown-border;
+    border-radius: $border-radius-base;
+    @include box-shadow(0 6px 12px rgba(0,0,0,.175));
+}
+
+.tt-suggestion {
+    display: block;
+    padding: 3px 20px;
+}
+
+.tt-suggestion.tt-cursor {
+    color: $dropdown-link-active-color;
+    background-color: $dropdown-link-active-bg;
+    cursor: pointer;
+}
+
+.tt-suggestion.tt-cursor a {
+    color: $dropdown-link-active-color;
+}
+
+.tt-suggestion p {
+    margin: 0;
+}
