@@ -3,8 +3,7 @@ class SampleType < ActiveRecord::Base
 
   require 'seek/sample_templates/generator'
 
-
-  searchable(:auto_index=>false) do
+  searchable(auto_index: false) do
     text :attribute_search_terms
   end if Seek::Config.solr_enabled
 
@@ -19,7 +18,7 @@ class SampleType < ActiveRecord::Base
 
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 
-  has_one :content_blob, :as => :asset, dependent: :destroy
+  has_one :content_blob, as: :asset, dependent: :destroy
 
   alias_method :template, :content_blob
 
@@ -57,13 +56,13 @@ class SampleType < ActiveRecord::Base
     end
   end
 
-  #fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
+  # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
   # this is to help when a controlled vocab has been selected in the form, but then the type has been changed
   # rather than clearing the selected vocab each time
   def fix_up_controlled_vocabs
     sample_attributes.each do |attribute|
       unless attribute.sample_attribute_type.is_controlled_vocab?
-        attribute.sample_controlled_vocab=nil
+        attribute.sample_controlled_vocab = nil
       end
     end
   end
@@ -105,7 +104,7 @@ class SampleType < ActiveRecord::Base
     true
   end
 
-  #FIXME: these are just here to satisfy the Searchable module, as a quick fix
+  # FIXME: these are just here to satisfy the Searchable module, as a quick fix
   def assay_type_titles
     []
   end
@@ -114,37 +113,43 @@ class SampleType < ActiveRecord::Base
     []
   end
 
-  def can_edit?(user = User.current_user)
+  def can_edit?(_user = User.current_user)
     samples.empty?
   end
 
-  def can_delete?(user = User.current_user)
+  def can_delete?(_user = User.current_user)
     samples.empty? && linked_sample_attributes.empty?
   end
 
   def generate_template
-    sheet_name='Samples'
-    sheet_index=1
-    tmp_file="/tmp/#{UUID.generate}.xlxs"
-    columns = self.sample_attributes.collect{|a| {a.title=>[]}}
+    sheet_name = 'Samples'
+    sheet_index = 1
+    tmp_file = "/tmp/#{UUID.generate}.xlxs"
+    columns = sample_attributes.collect do |attribute|
+      values = []
+      if attribute.sample_attribute_type.is_controlled_vocab?
+        values = attribute.sample_controlled_vocab.labels
+      end
+      { attribute.title => values }
+    end
 
-    Seek::SampleTemplates.generate(sheet_name,sheet_index,columns,tmp_file)
-    template_attribute={ tmp_io_object: File.new(tmp_file),
-      url: nil,
-      external_link: false,
-      original_filename: "#{title} template.xlsx",
-      content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ,
-      make_local_copy: true,
-      asset_version: nil }
-    self.create_content_blob(template_attribute)
-    self.sample_attributes.each_with_index do |attribute,index|
-      attribute.update_attributes({template_column_index: index+1})
+    Seek::SampleTemplates.generate(sheet_name, sheet_index, columns, tmp_file)
+    template_attribute = { tmp_io_object: File.new(tmp_file),
+                           url: nil,
+                           external_link: false,
+                           original_filename: "#{title} template.xlsx",
+                           content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                           make_local_copy: true,
+                           asset_version: nil }
+    create_content_blob(template_attribute)
+    sample_attributes.each_with_index do |attribute, index|
+      attribute.update_attributes(template_column_index: index + 1)
     end
   end
 
   private
 
-  #required by Seek::ActsAsAsset::Searching - don't really need to full search terms, including content provided by Seek::ActsAsAsset::ContentBlobs
+  # required by Seek::ActsAsAsset::Searching - don't really need to full search terms, including content provided by Seek::ActsAsAsset::ContentBlobs
   # just the filename
   def content_blob_search_terms
     if content_blob
@@ -202,8 +207,6 @@ class SampleType < ActiveRecord::Base
   def attribute_search_terms
     sample_attributes.collect(&:title)
   end
-
-
 
   class UnknownAttributeException < Exception; end
 end

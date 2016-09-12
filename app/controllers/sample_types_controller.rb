@@ -37,7 +37,7 @@ class SampleTypesController < ApplicationController
 
   def create_from_template
     @sample_type = SampleType.new(params[:sample_type])
-    @sample_type.uploaded_template=true
+    @sample_type.uploaded_template = true
     @tab = 'from-template'
     handle_upload_data
     attributes = build_attributes_hash_for_content_blob(content_blob_params.first, nil)
@@ -108,8 +108,6 @@ class SampleTypesController < ApplicationController
   end
 
   private
-
-
 
   def get_sample_type
     @sample_type = SampleType.find(params[:id])
