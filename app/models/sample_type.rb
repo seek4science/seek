@@ -1,6 +1,8 @@
 class SampleType < ActiveRecord::Base
   attr_accessible :title, :uuid, :sample_attributes_attributes, :description
 
+  require 'seek/sample_templates/generator'
+
 
   searchable(:auto_index=>false) do
     text :attribute_search_terms
@@ -118,6 +120,26 @@ class SampleType < ActiveRecord::Base
 
   def can_delete?(user = User.current_user)
     samples.empty? && linked_sample_attributes.empty?
+  end
+
+  def generate_template
+    sheet_name='Samples'
+    sheet_index=1
+    tmp_file="/tmp/#{UUID.generate}.xlxs"
+    columns = self.sample_attributes.collect{|a| {a.title=>[]}}
+
+    Seek::SampleTemplates.generate(sheet_name,sheet_index,columns,tmp_file)
+    template_attribute={ tmp_io_object: File.new(tmp_file),
+      url: nil,
+      external_link: false,
+      original_filename: "#{title} template.xlsx",
+      content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ,
+      make_local_copy: true,
+      asset_version: nil }
+    self.create_content_blob(template_attribute)
+    self.sample_attributes.each_with_index do |attribute,index|
+      attribute.update_attributes({template_column_index: index+1})
+    end
   end
 
   private
