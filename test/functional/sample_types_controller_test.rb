@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTypesControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
 
   setup do
@@ -40,6 +41,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_redirected_to sample_type_path(assigns(:sample_type))
     assert_equal 2, assigns(:sample_type).sample_attributes.size
     assert_equal 'a string', assigns(:sample_type).sample_attributes.title_attributes.first.title
+    refute assigns(:sample_type).uploaded_template?
   end
 
   test 'should create with linked sample type' do
@@ -156,6 +158,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_redirected_to edit_sample_type_path(assigns(:sample_type))
     assert_empty assigns(:sample_type).errors
+    assert assigns(:sample_type).uploaded_template?
   end
 
   test 'create from template with some blank columns' do

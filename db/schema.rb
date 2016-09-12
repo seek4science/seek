@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160824142312) do
+ActiveRecord::Schema.define(:version => 20160912130902) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -153,11 +153,6 @@ ActiveRecord::Schema.define(:version => 20160824142312) do
 
   add_index "assay_organisms", ["assay_id"], :name => "index_assay_organisms_on_assay_id"
   add_index "assay_organisms", ["organism_id"], :name => "index_assay_organisms_on_organism_id"
-
-  create_table "assay_types_edges", :id => false, :force => true do |t|
-    t.integer "parent_id"
-    t.integer "child_id"
-  end
 
   create_table "assays", :force => true do |t|
     t.string   "title"
@@ -1355,11 +1350,12 @@ ActiveRecord::Schema.define(:version => 20160824142312) do
   create_table "sample_types", :force => true do |t|
     t.string   "title"
     t.string   "uuid"
-    t.datetime "created_at",                   :null => false
-    t.datetime "updated_at",                   :null => false
+    t.datetime "created_at",                                        :null => false
+    t.datetime "updated_at",                                        :null => false
     t.integer  "content_blob_id"
-    t.string   "first_letter",    :limit => 1
+    t.string   "first_letter",      :limit => 1
     t.text     "description"
+    t.boolean  "uploaded_template",              :default => false
   end
 
   create_table "samples", :force => true do |t|
@@ -1802,11 +1798,6 @@ ActiveRecord::Schema.define(:version => 20160824142312) do
     t.string   "file"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
-  end
-
-  create_table "technology_types_edges", :id => false, :force => true do |t|
-    t.integer "parent_id"
-    t.integer "child_id"
   end
 
   create_table "text_value_versions", :force => true do |t|
