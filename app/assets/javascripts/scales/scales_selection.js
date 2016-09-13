@@ -14,7 +14,7 @@ function addSelectedToFancy2(multiselect, value) {
         param: $('choose_parameter_for_scale_id').value,
         unit: $('choose_unit_for_scale_id').value
 
-    }
+    };
     if (!scale_and_params_selected(value)) {
         $(multiselect).setValue($F(multiselect).concat(value.scale_id));
         updateScaleAndParamsList(value);
@@ -50,9 +50,9 @@ function updateFancyMultiselect2(multiselect) {
     multiselect = $(multiselect);
     var display_area = $(multiselect.id + '_display_area');
 
-    var selected_options = multiselect.childElements().select(function(c){return c.selected});
+    var selected_options = multiselect.childElements().select(function(c){return c.selected;});
     if(selected_options.length > 0) {
-        display_area.innerHTML = '<ul class="related_asset_list"></ul>'
+        display_area.innerHTML = '<ul class="related_asset_list"></ul>';
         var list = display_area.select('ul')[0];
         selected_options.each(function(opt){
             insertFancyListItem2(multiselect, list, opt);
@@ -81,7 +81,7 @@ function insertFancyListItem2(multiselect, displaylist, option) {
 function fetchJsonForScale(scale_id) {
 
     var result=new Array();
-    var options = $('scale_ids_and_params').childElements().select(function(c){return c.selected});
+    var options = $('scale_ids_and_params').childElements().select(function(c){return c.selected;});
     options.each(function(opt) {
 
         var json = JSON.parse(opt.value);
@@ -98,7 +98,7 @@ function removeFromFancy2(multiselect, value,param) {
     console.log(value);
     console.log(param);
     $('scale_ids_and_params').select("option:selected").each(function(opt){
-        var item=JSON.parse(opt.value)
+        var item=JSON.parse(opt.value);
 
         if (item.scale_id == value && item.param==param) {
             console.log(opt.value);

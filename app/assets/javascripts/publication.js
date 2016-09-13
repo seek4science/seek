@@ -39,7 +39,7 @@ function removePublication(index) {
 function updatePublications() {
     publication_text='<ul class="related_asset_list">';
     
-    for (var i=0;i<publication_array.length;i++) {        
+    for (var i=0;i<publication_array.length;i++) {
         publication=publication_array[i];
         title=publication[0];
         id=publication[1];
