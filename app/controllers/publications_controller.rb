@@ -45,14 +45,23 @@ class PublicationsController < ApplicationController
   # POST /publications
   # POST /publications.xml
   def create
-    @publication = Publication.new(params[:publication])
+    publication_params = params[:publication].dup
+
+    @subaction = params[:subaction]
+
+    # publication authors need to be added separately
+    publication_params.delete(:publication_authors)
+
+    @publication = Publication.new(publication_params)
     @publication.pubmed_id=nil if @publication.pubmed_id.blank?
     @publication.doi=nil if @publication.doi.blank?
     pubmed_id,doi = preprocess_doi_or_pubmed @publication.pubmed_id,@publication.doi
     @publication.doi = doi
     @publication.pubmed_id = pubmed_id
-    result = get_data(@publication, @publication.pubmed_id, @publication.doi)
-    assay_ids = params[:assay_ids] || []
+
+    if params[:subaction] == 'Register'
+      result = get_data(@publication, @publication.pubmed_id, @publication.doi)
+      assay_ids = params[:assay_ids] || []
 
       if @publication.save
         update_scales @publication
@@ -75,12 +84,53 @@ class PublicationsController < ApplicationController
             format.xml  { render :xml => @publication, :status => :created, :location => @publication }
           end
         end
-      else
+      else # Publication save not successful
         respond_to do |format|
           format.html { render :action => "new" }
           format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
         end
       end
+    end # Register publication from doi or pubmedid
+
+    if params[:subaction] == 'Create'
+      assay_ids = params[:assay_ids] || []
+      # create publication authors
+      plain_authors = params[:publication][:publication_authors]
+      # plain_authors.split(',').each_with_index do |author, index| # text_field
+      plain_authors.each_with_index do |author, index| # multiselect
+        if author.empty?
+          next
+        end
+        first_name, last_name = PublicationAuthor.split_full_name author
+        pa = PublicationAuthor.new({
+          :publication  => @publication,
+          :first_name   => first_name,
+          :last_name    => last_name,
+          :author_index => index
+        })
+        @publication.publication_authors << pa
+      end
+
+      if @publication.save
+        update_scales @publication
+
+        create_or_update_associations assay_ids, "Assay", "edit"
+        if !@publication.parent_name.blank?
+          render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@publication, :parent_name=>@publication.parent_name}
+        else
+          respond_to do |format|
+            flash[:notice] = 'Publication was successfully created.'
+            format.html { redirect_to(edit_publication_url(@publication)) }
+            format.xml  { render :xml => @publication, :status => :created, :location => @publication }
+          end
+        end
+      else # Publication save not successful
+        respond_to do |format|
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
+        end
+      end
+    end # Create publication from all fields
   end
 
   # PUT /publications/1
@@ -188,7 +238,60 @@ class PublicationsController < ApplicationController
         page[:publication_preview_container].replace_html(render(:partial => "publications/publication_preview", :locals => {:publication => @publication, :authors => result.authors}))
       end
     end
+  end
 
+  def query_authors
+    respond_to do |format|
+      # query authors by first and last name each
+      authors_q = params[:authors]
+
+      if !authors_q
+        error = "require query parameter authors"
+        format.json { render :json => { :error => error }, :status => 422 }
+        format.xml  { render :xml => { :error => error }, :status => 422 }
+      end
+
+      authors = []
+      authors_q.each { |author_i, author_q|
+        params = { :first_name => author_q['first_name'], :last_name => author_q['last_name'] }
+
+        authors_db = PublicationAuthor.where(params).group( :id, :person_id, :first_name, :last_name).count.collect { |groups, count| { :id => groups[0], :person_id => groups[1], :first_name => groups[2], :last_name => groups[3], :count => count } }
+
+        if !authors_db.empty?
+          authors << authors_db[0]
+        else
+          authors << { :id => nil, :person_id => nil, :first_name => author_q['first_name'], :last_name => author_q['last_name'], :count => 0 }
+        end
+      }
+      
+      format.json { render :json => authors }
+      format.xml  { render :xml  => authors }
+    end
+  end
+
+  def query_authors_typeahead
+    respond_to do |format|
+      full_name  = params[:full_name]
+      if !full_name
+        error = "require query parameter full_name"
+        format.json { render :json => { :error => error }, :status => 422 }
+        format.xml  { render :xml  => { :error => error }, :status => 422 }
+      end
+
+      first_name, last_name = PublicationAuthor.split_full_name full_name
+
+      # all authors
+      authors = PublicationAuthor.group( :id, :person_id, :first_name, :last_name).count.collect { |groups, count| { :id => groups[0], :person_id => groups[1], :first_name => groups[2], :last_name => groups[3], :count => count } }
+      author = PublicationAuthor.where({ :first_name => first_name, :last_name => last_name}).limit(1)
+      
+      # add the queried author if he does not exist}
+      if author.empty?
+        authors << { :id => nil, :person_id => nil, :first_name => first_name, :last_name => last_name, :count => 0 }
+      end
+  
+      format.json { render :json => authors }
+      format.xml  { render :xml  => authors }
+    end
   end
   
   #Try and relate non_seek_authors to people in SEEK based on name and project
@@ -277,7 +380,7 @@ class PublicationsController < ApplicationController
         @error = result.error
       rescue => exception
         result ||= Bio::Reference.new({})
-        @error = "There was an problem contacting the PubMed query service. Please try again later"
+        @error = "There was a problem contacting the PubMed query service. Please try again later"
         if Seek::Config.exception_notification_enabled
           ExceptionNotifier.notify_exception(exception,:data=>{:message=>"Problem accessing ncbi using pubmed id #{pubmed_id}"})
         end
@@ -310,8 +413,6 @@ class PublicationsController < ApplicationController
     pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Fixnum)
     return pubmed_id,doi
   end
-
-
 
   def create_or_update_associations asset_ids, asset_type, required_action
     asset_ids.each do |id|
