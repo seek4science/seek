@@ -135,6 +135,8 @@ group :development do
   gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'quiet_assets'
+  gem 'ruby-debug-ide', '>= 0.6.1.beta2', require: false
+  gem 'debase', '>= 0.2.2.beta8', require: false
 end
 
 group :test do
