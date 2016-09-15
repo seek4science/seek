@@ -194,7 +194,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert asset.valid?
 
     asset=Publication.new :title=>"fred",:projects=>[project]
-    assert !asset.valid?
+    assert asset.valid?
 
     asset=Publication.new :projects=>[project],:doi=>"111"
     assert !asset.valid?
@@ -204,11 +204,11 @@ class PublicationTest < ActiveSupport::TestCase
       assert asset.valid?
     end
 
-    #cant have both a pubmed and doi
+    #can have both a pubmed and doi
     asset = Publication.new :title=>"bob",:doi=>"777",:projects=>[project]
     assert asset.valid?
     asset.pubmed_id="999"
-    assert !asset.valid?
+    assert asset.valid?
     asset.doi=nil
     assert asset.valid?
   end

@@ -561,6 +561,8 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :preview
+      get :query_authors
+      get :query_authors_typeahead
       post :fetch_preview
       post :items_for_result
       post :resource_in_tab
