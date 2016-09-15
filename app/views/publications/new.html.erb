@@ -85,12 +85,21 @@
   </div>
   </div>
   <div class="form-group">
-  <%= label_tag :publication_authors, 'Authors', :class => 'control-label col-sm-2' %>
-  <div class="col-sm-10">
+    <%= label_tag :publication_authors, 'Authors', :class => 'control-label col-sm-2' %>
+    <div class="col-sm-9">
       <%= publication_form.collection_select :publication_authors, @publication.publication_authors, :full_name, :full_name, {:selected => @publication.publication_authors.map(&:id)}, :class => 'form-control', :multiple => 'multiple' %>
-      <%#= publication_form.collection_select :publication_authors, [], :id, :full_name, {}, :class => 'form-control', :multiple => 'multiple' %>
-      <%#= publication_form.text_field :publication_authors, :class => 'form-control' %>
     </div>
+    <div class="col-sm-1">
+      <button type="button" class="btn btn-sm" data-toggle="popover" data-html="true" data-content="
+        <span class='tag label label-primary'>Author linked to User</span><br>
+        <span class='tag label label-success'>User</span><br>
+        <span class='tag label label-warning'>Known Author</span><br>
+        <span class='tag label label-danger'>New Author</span>
+      ">
+        Explain
+      </button>
+    </div>
+
   </div>
   <div class="form-group">
   <%= label_tag :abstract, nil, :class => 'control-label col-sm-2' %>  
@@ -165,30 +174,76 @@ jQuery(document).ready(function() {
     activate_tab.trigger('click');
   }
   
+  // activate popovers
+  jQuery('[data-toggle="popover"]').popover();
+  
   jQuery('div[id="Create"] select[id="publication_project_ids"]').multiselect({
     enableCaseInsensitiveFiltering: true
   });
+  
+  var bloodhound_authors = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace(['first_name','last_name']),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+      url: '<%= query_authors_typeahead_publications_path :format => :json, :full_name => 'FULL_NAME_QUERY' %>',
+      wildcard: 'FULL_NAME_QUERY'
+    },
+    limit: 10
+  });
+  bloodhound_authors.initialize();
+
+  var bloodhound_users = new Bloodhound({
+    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    remote: {
+      url: '<%= typeahead_people_path :format => :json, :query => 'FULL_NAME_QUERY' %>',
+      wildcard: 'FULL_NAME_QUERY'
+    },
+    limit: 10
+  });
+  bloodhound_authors.initialize();
+  bloodhound_users.initialize();
+  
   jQuery('#publication_publication_authors').tagsinput({
     tagClass: function(item){
+      // person/user and not an author
+      if( item.name) return 'label label-success';
       // this author does not exist yet
-      if( !item.id) return 'label label-warning';
+      if( item.count == 0) return 'label label-danger';
       // this author is associated with a know person
-      if( item.person_id) return 'label label-success';
+      if( item.person_id) return 'label label-primary';
       // this is an author that is already associated with a publication
-      return 'label label-primary';
+      return 'label label-warning';
     },
     freeInput: false,
     allowDuplicates: true,
-    // itemText: function(item) { return "<span class=\"text\">" + item.first_name + " " + item.last_name + "</span> <span class=\"badge\">" + item.count + "</span>" + (item.person_id ? " <span class=\"glyphicon glyphicon-user\"></span>" : ""); },
-    itemText: function(item) { return typeof item === "string" ? item : item.first_name + " " + item.last_name; },
-    itemValue: function(item) { return typeof item === "string" ? item : item.first_name + " " + item.last_name; },
-    // itemValue: function(item) { return item; },
-    itemTitle: function(item) { return typeof item === "string" ? item : item.first_name + " " + item.last_name + ": #publications " + item.count + ", seek_person? " + (item.person_id ? "yes" : "no"); },
-    typeahead: {
-      source: function(query) {
-        return jQuery.get( "<%= query_authors_typeahead_publications_path :format => :json %>", { "full_name": query}, null, "json");
-      }
-    }
+    itemText: function(item) { return item.name ? item.name : item.first_name + " " + item.last_name; },
+    itemValue: function(item) { return item.name ? item.name : item.first_name + " " + item.last_name; },
+    itemTitle: function(item) { return item.name ? item.name : ( item.first_name + " " + item.last_name + ": #publications " + item.count + ", seek_person? " + (item.person_id ? "yes" : "no")); },
+    typeaheadjs: [{
+        highlight: true,
+        minLength: 1
+      },
+      [
+        {
+          name: "authors",
+          displayKey: function(item){ return item.first_name + " " + item.last_name;},
+          source: bloodhound_authors.ttAdapter(),
+          templates: {
+            header: 'Authors',
+            suggestion: HandlebarsTemplates['typeahead/publication_author']
+          }
+        },{
+          name: "users",
+          displayKey: function(item){ return item.name;},
+          source: bloodhound_users.ttAdapter(),
+          templates: {
+            header: 'Users',
+            suggestion: HandlebarsTemplates['typeahead/hint']
+          }
+        }
+      ]
+    ]
   });
 
   // add all options of the multiselect
@@ -292,15 +347,15 @@ jQuery(document).ready(function() {
   });
 });
 
-// function updateProjectIds(){
-  // var form = $('new_publication');
-  // //need to query by classname, as there are now two elements with the same id publication_project_ids
-  // //this is the inactive element
-  // var inactive_project_select = form.getElementsByClassName('project_ids')[0];
-  // //this is the active element, that the selected value gets changed through UI
-  // var active_project_select = $('publication_project_ids');
-  // //need to update inactive element from active element
-  // inactive_project_select.setValue(active_project_select.getValue());
-// }
+function updateProjectIds(){
+  var form = $('new_publication');
+  //need to query by classname, as there are now two elements with the same id publication_project_ids
+  //this is the inactive element
+  var inactive_project_select = form.getElementsByClassName('project_ids')[0];
+  //this is the active element, that the selected value gets changed through UI
+  var active_project_select = $('div[id="Register"] select[id="publication_project_ids"]');
+  //need to update inactive element from active element
+  inactive_project_select.setValue(active_project_select.getValue());
+}
 
 </script>

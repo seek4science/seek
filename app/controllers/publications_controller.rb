@@ -241,54 +241,88 @@ class PublicationsController < ApplicationController
   end
 
   def query_authors
-    respond_to do |format|
-      # query authors by first and last name each
-      authors_q = params[:authors]
+    # query authors by first and last name each
+    authors_q = params[:authors]
 
-      if !authors_q
-        error = "require query parameter authors"
-        format.json { render :json => { :error => error }, :status => 422 }
-        format.xml  { render :xml => { :error => error }, :status => 422 }
+    if !authors_q
+      error = "require query parameter authors"
+      respond_to do |format|
+          format.json { render :json => { :error => error }, :status => 422 }
+          format.xml  { render :xml => { :error => error }, :status => 422 }
       end
+    end
 
-      authors = []
-      authors_q.each { |author_i, author_q|
-        params = { :first_name => author_q['first_name'], :last_name => author_q['last_name'] }
+    authors = []
+    authors_q.each { |author_i, author_q|
+      params = { :first_name => author_q['first_name'], :last_name => author_q['last_name'] }
 
-        authors_db = PublicationAuthor.where(params).group( :id, :person_id, :first_name, :last_name).count.collect { |groups, count| { :id => groups[0], :person_id => groups[1], :first_name => groups[2], :last_name => groups[3], :count => count } }
-
-        if !authors_db.empty?
-          authors << authors_db[0]
-        else
-          authors << { :id => nil, :person_id => nil, :first_name => author_q['first_name'], :last_name => author_q['last_name'], :count => 0 }
-        end
+      authors_db = PublicationAuthor.where(params)
+                                    .select([:person_id, :first_name, :last_name])
+                                    .group( :person_id, :first_name, :last_name)
+                                    .count
+                                    .collect {
+        |groups, count| {
+          :person_id => groups[0],
+          :first_name => groups[1],
+          :last_name => groups[2],
+          :count => count
+        }
       }
-      
+
+      if !authors_db.empty? # found at least one author
+        authors << authors_db[0]
+      else # no author found
+        users_db = Person.where(params)
+        if !users_db.empty? # is there a person with that name
+          user = users_db[0]
+          authors << { :name => user.name }
+        else # just add the queried name as author
+          authors << { :person_id => nil, :first_name => author_q['first_name'], :last_name => author_q['last_name'], :count => 0 }
+        end
+      end
+    }
+
+    respond_to do |format|
       format.json { render :json => authors }
       format.xml  { render :xml  => authors }
     end
   end
 
   def query_authors_typeahead
-    respond_to do |format|
-      full_name  = params[:full_name]
-      if !full_name
-        error = "require query parameter full_name"
+    full_name  = params[:full_name]
+    if !full_name
+      error = "require query parameter full_name"
+      respond_to do |format|
         format.json { render :json => { :error => error }, :status => 422 }
         format.xml  { render :xml  => { :error => error }, :status => 422 }
       end
+    end
 
-      first_name, last_name = PublicationAuthor.split_full_name full_name
+    first_name, last_name = PublicationAuthor.split_full_name full_name
 
-      # all authors
-      authors = PublicationAuthor.group( :id, :person_id, :first_name, :last_name).count.collect { |groups, count| { :id => groups[0], :person_id => groups[1], :first_name => groups[2], :last_name => groups[3], :count => count } }
-      author = PublicationAuthor.where({ :first_name => first_name, :last_name => last_name}).limit(1)
-      
-      # add the queried author if he does not exist}
-      if author.empty?
-        authors << { :id => nil, :person_id => nil, :first_name => first_name, :last_name => last_name, :count => 0 }
-      end
-  
+    # all authors
+    authors = PublicationAuthor.where("first_name LIKE :fnquery", :fnquery => "#{first_name}%")
+                               .where("last_name LIKE :lnquery", :lnquery => "#{last_name}%")
+                               .select([:person_id, :first_name, :last_name])
+                               .group( :person_id, :first_name, :last_name)
+                               .count
+                               .collect { 
+      |groups, count| {
+        :person_id => groups[0],
+        :first_name => groups[1],
+        :last_name => groups[2],
+        :count => count
+      }
+    }
+    authors.delete_if { |author| author[:first_name].empty? && author[:last_name].empty? }
+    author = PublicationAuthor.where({ :first_name => first_name, :last_name => last_name}).limit(1)
+
+    # add the queried author if he does not exist
+    if author.empty?
+      authors << { :person_id => nil, :first_name => first_name, :last_name => last_name, :count => 0 }
+    end
+
+    respond_to do |format|
       format.json { render :json => authors }
       format.xml  { render :xml  => authors }
     end
