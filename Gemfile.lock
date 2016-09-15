@@ -849,7 +849,7 @@ DEPENDENCIES
   rails (= 3.2.22)
   rails-assets-bootstrap-multiselect (~> 0.9.13)!
   rails-assets-bootstrap-tagsinput (~> 0.8.0)!
-  rails-assets-typeahead.js (~> 0.10.4)!
+  rails-assets-typeahead.js (~> 0.10.5)!
   rails_autolink
   rails_best_practices
   rdf-virtuoso (>= 0.1.6)
