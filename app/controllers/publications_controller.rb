@@ -47,7 +47,7 @@ class PublicationsController < ApplicationController
   def create
     publication_params = params[:publication].dup
 
-    @subaction = params[:subaction]
+    @subaction = params[:subaction] || 'Register'
 
     # publication authors need to be added separately
     publication_params.delete(:publication_authors)
@@ -59,7 +59,7 @@ class PublicationsController < ApplicationController
     @publication.doi = doi
     @publication.pubmed_id = pubmed_id
 
-    if params[:subaction] == 'Register'
+    if @subaction == 'Register'
       result = get_data(@publication, @publication.pubmed_id, @publication.doi)
       assay_ids = params[:assay_ids] || []
 
@@ -92,7 +92,7 @@ class PublicationsController < ApplicationController
       end
     end # Register publication from doi or pubmedid
 
-    if params[:subaction] == 'Create'
+    if @subaction == 'Create'
       assay_ids = params[:assay_ids] || []
       # create publication authors
       plain_authors = params[:publication][:publication_authors]
