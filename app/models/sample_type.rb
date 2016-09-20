@@ -1,7 +1,7 @@
 class SampleType < ActiveRecord::Base
   attr_accessible :title, :uuid, :sample_attributes_attributes, :description
 
-  require 'seek/sample_templates/generator'
+  require 'seek/sample_templates'
 
   searchable(auto_index: false) do
     text :attribute_search_terms
