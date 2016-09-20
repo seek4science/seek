@@ -65,6 +65,16 @@ module ApplicationHelper
     str.html_safe
   end
 
+  def persistent_resource_id resource
+    url = polymorphic_url(resource)
+    content_tag :p, class: :id do
+      content_tag(:label) do
+        "#{Seek::Config.application_name} ID: "
+      end + " " + link_to(url, url)
+
+    end
+  end
+
   def show_title title
     render :partial=>"general/page_title", :locals=>{:title=>title}
   end

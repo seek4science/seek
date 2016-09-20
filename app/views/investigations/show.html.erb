@@ -6,7 +6,7 @@
 
     <div class="row">
       <div class="col-md-6">
-        <p class="id"><strong>ID:</strong><%= @investigation.id -%></p>
+        <%= persistent_resource_id(@investigation) %>
         <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
       </div>
     </div>

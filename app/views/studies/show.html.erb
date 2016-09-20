@@ -7,10 +7,7 @@
     <div class="row">
       <div class="col-md-6">
 
-        <p class="id">
-          <label>ID: </label>
-          <%= @study.id -%>
-        </p>
+        <%= persistent_resource_id(@study) %>
 
         <p class="investigation">
           <label><%= t('investigation') %>:</label>

@@ -18,12 +18,7 @@
 
     <div class="row">
       <div class="col-md-6">
-        <p class="id">
-          <label>
-            ID:
-          </label>
-          <%= @assay.id -%>
-        </p>
+        <%= persistent_resource_id(@assay) %>
         <% if Seek::Config.modelling_analysis_enabled %>
             <p class="id">
               <label>
