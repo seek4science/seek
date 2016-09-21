@@ -435,6 +435,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :execute
       post :request_resource
+      get :simulate
       post :simulate
       delete :destroy_version
       post :mint_doi
