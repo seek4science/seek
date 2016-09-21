@@ -4,7 +4,10 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event}%>
+    <%= persistent_resource_id(@event) %>
+
+    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event} %>
+
     <% unless @event.contributor.nil? then %>
         <p>
           <label>Created by:</label>

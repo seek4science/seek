@@ -8,6 +8,7 @@ module ApplicationHelper
   include FancyMultiselectHelper
   include TavernaPlayer::RunsHelper
   include Recaptcha::ClientHelper
+  include VersionHelper
 
 
   def no_items_to_list_text
@@ -69,6 +70,17 @@ module ApplicationHelper
     end
 
     str.html_safe
+  end
+
+  # provide the block that shows the URL to the resource, including the version if it is a versioned resource
+  # label is based on the application name, for example <label>FAIRDOMHUB ID: </label>
+  def persistent_resource_id resource
+    url = polymorphic_url(resource)
+    content_tag :p, class: :id do
+      content_tag(:label) do
+        "#{Seek::Config.application_name} ID: "
+      end + " " + link_to(url, url)
+    end
   end
 
   def show_title title

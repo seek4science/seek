@@ -27,7 +27,7 @@ class JwsOnlineTest < ActionController::TestCase
 
   test "simulate" do
     model = Factory(:teusink_model,:policy=>Factory(:public_policy))
-    post :simulate,:id=>model.id
+    get :simulate,:id=>model.id, :version=>model.version
     assert_response :success
     assert assigns(:simulate_url)
 

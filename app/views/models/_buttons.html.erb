@@ -1,7 +1,6 @@
 <% if show_jws_simulate? %>
     <%= button_link_to("Simulate #{t('model')} on JWS", 'execute',
-                       simulate_model_path(item, :version => @display_model.version, :code => params[:code]),
-                       :method => :post, :title => "Simulate #{t('model')} on JWS") %>
+                       simulate_model_path(item, :version => @display_model.version, :code => params[:code]), :method=>:post,:title => "Simulate #{t('model')} on JWS") %>
 <% end %>
 <% if Seek::Config.sycamore_enabled && @display_model.contains_sbml? %>
     <% excutable_content_blob =  @display_model.content_blobs.detect{|cb| cb.is_sbml?}
