@@ -42,6 +42,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 2, assigns(:sample_type).sample_attributes.size
     assert_equal 'a string', assigns(:sample_type).sample_attributes.title_attributes.first.title
     refute assigns(:sample_type).uploaded_template?
+    assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
   end
 
   test 'should create with linked sample type' do
@@ -113,6 +114,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_includes assigns(:sample_type).sample_attributes.map(&:title), 'hello'
     refute assigns(:sample_type).sample_attributes[0].is_title?
     assert assigns(:sample_type).sample_attributes[1].is_title?
+    assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
   end
 
   test 'should not update sample_type if has existing samples' do

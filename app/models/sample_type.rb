@@ -1,5 +1,5 @@
 class SampleType < ActiveRecord::Base
-  attr_accessible :title, :uuid, :sample_attributes_attributes, :description
+  attr_accessible :title, :uuid, :sample_attributes_attributes, :description, :uploaded_template
 
   require 'seek/sample_templates'
 
@@ -27,6 +27,8 @@ class SampleType < ActiveRecord::Base
   validate :validate_one_title_attribute_present, :validate_template_file, :validate_attribute_title_unique
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
+
+  after_save :queue_template_generation
 
   grouped_pagination
 
@@ -119,6 +121,16 @@ class SampleType < ActiveRecord::Base
 
   def can_delete?(_user = User.current_user)
     samples.empty? && linked_sample_attributes.empty?
+  end
+
+  def queue_template_generation
+    unless uploaded_template?
+      if content_blob
+        content_blob.destroy
+        update_attribute(:content_blob,nil)
+      end
+      SampleTemplateGeneratorJob.new(self).queue_job
+    end
   end
 
   def generate_template
