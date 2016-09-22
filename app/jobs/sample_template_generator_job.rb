@@ -7,7 +7,7 @@ class SampleTemplateGeneratorJob < SeekJob
   end
 
   def perform_job(sample_type)
-
+    sample_type.generate_template
   end
 
   def gather_items
