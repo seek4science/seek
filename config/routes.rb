@@ -257,6 +257,7 @@ SEEK::Application.routes.draw do
         get :download
         get :export, to: :export_preview
         post :export, to: :export_submit
+        get :citation
       end
     end
     member do
@@ -284,6 +285,7 @@ SEEK::Application.routes.draw do
         get :download
         get :export, to: :export_preview
         post :export, to: :export_submit
+        get :citation
       end
     end
     member do
@@ -313,6 +315,7 @@ SEEK::Application.routes.draw do
         get :download
         get :export, to: :export_preview
         post :export, to: :export_submit
+        get :citation
       end
     end
     member do

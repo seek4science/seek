@@ -1,0 +1,37 @@
+<%= panel("Citation") do %>
+    <div id="snapshot-citation">
+      <%= render partial: 'snapshots/citation', locals: { style: 'apa' } %>
+    </div>
+
+    <select id="citation-style-select" class="form-control" autocomplete="off">
+      <option value="">Change citation style...</option>
+      <%= citation_style_options %>
+    </select>
+<% end %>
+
+<script>
+  $j(document).ready(function () {
+    $j('#citation-style-select').change(function () {
+      var style = $j(this).val();
+      var div = $j('#snapshot-citation');
+
+      if (style) {
+        $j.ajax({
+          url: '<%= polymorphic_path([@resource, @snapshot], action: 'citation') %>',
+          data: { style: style },
+          dataType: 'html',
+          success: function (html) {
+            div.html(html);
+          },
+          error: function () {
+            div.html('An error occurred, please try again.');
+          },
+          complete: function () {
+            div.spinner('remove');
+          }
+        });
+        div.spinner('add');
+      }
+    });
+  });
+</script>

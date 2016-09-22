@@ -87,6 +87,13 @@ class Snapshot < ActiveRecord::Base
          (resource.created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) <= Time.now
   end
 
+  def to_csl
+    Rails.cache.fetch("snapshot-csl-#{self.id}") do
+      resp = RestClient.get("http://dx.doi.org/#{self.doi}", accept: 'application/vnd.citationstyles.csl+json')
+      JSON.parse(resp)
+    end
+  end
+
   private
 
   def set_snapshot_number
