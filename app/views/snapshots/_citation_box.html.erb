@@ -1,5 +1,13 @@
-<%= panel("Citation") do %>
-    <div id="snapshot-citation">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <button class="btn-default btn btn-xs clipboard-btn pull-right" data-clipboard-target="#snapshot-citation">
+      <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
+      Copy
+    </button>
+    Citation
+  </div>
+  <div class="panel-body">
+    <div id="snapshot-citation" class="well well-sm">
       <%= render partial: 'snapshots/citation', locals: { style: 'apa' } %>
     </div>
 
@@ -7,10 +15,14 @@
       <option value="">Change citation style...</option>
       <%= citation_style_options %>
     </select>
-<% end %>
+  </div>
+</div>
+
 
 <script>
   $j(document).ready(function () {
+    new Clipboard('.clipboard-btn');
+
     $j('#citation-style-select').change(function () {
       var style = $j(this).val();
       var div = $j('#snapshot-citation');

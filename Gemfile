@@ -116,6 +116,7 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
   gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'
   gem 'rails-assets-typeahead.js', '~> 0.10.4'
+  gem 'rails-assets-clipboard', '~> 1.5.12'
 end
 
 group :assets do

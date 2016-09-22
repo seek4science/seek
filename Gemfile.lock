@@ -499,6 +499,7 @@ GEM
       rails-assets-jquery (>= 1.11.0)
     rails-assets-bootstrap-tagsinput (0.8.0)
       rails-assets-jquery (~> 2.1.1)
+    rails-assets-clipboard (1.5.12)
     rails-assets-jquery (2.1.4)
     rails-assets-typeahead.js (0.10.5)
       rails-assets-jquery (>= 1.7)
@@ -862,6 +863,7 @@ DEPENDENCIES
   rails (= 3.2.22)
   rails-assets-bootstrap-multiselect (~> 0.9.13)!
   rails-assets-bootstrap-tagsinput (~> 0.8.0)!
+  rails-assets-clipboard (~> 1.5.12)!
   rails-assets-typeahead.js (~> 0.10.4)!
   rails_autolink
   rails_best_practices
