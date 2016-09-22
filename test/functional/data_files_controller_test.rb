@@ -12,6 +12,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include RdfTestCases
   include SharingFormTestHelper
   include FunctionalAuthorizationTests
+  include MockHelper
 
   def setup
     login_as(:datafile_owner)
@@ -2485,6 +2486,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(data_file)
     assert_not_empty flash[:error]
     assert flash[:error].include?('Already extracted')
+  end
+
+  test "can get citation for data file with DOI" do
+    doi_citation_mock
+    data_file = Factory(:data_file, policy: Factory(:public_policy), doi: '10.5072/test')
+    login_as(data_file.contributor)
+
+    get :show, id: data_file
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/
   end
 
   private

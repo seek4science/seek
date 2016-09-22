@@ -8,7 +8,7 @@
   </div>
   <div class="panel-body">
     <div id="snapshot-citation" class="well well-sm">
-      <%= render partial: 'snapshots/citation', locals: { style: 'apa' } %>
+      <%= render partial: 'assets/citation', locals: { doi: doi, style: 'apa' } %>
     </div>
 
     <select id="citation-style-select" class="form-control" autocomplete="off">
@@ -29,7 +29,7 @@
 
       if (style) {
         $j.ajax({
-          url: '<%= polymorphic_path([@resource, @snapshot], action: 'citation') %>',
+          url: '<%= citation_path(doi) %>',
           data: { style: style },
           dataType: 'html',
           success: function (html) {

@@ -257,7 +257,6 @@ SEEK::Application.routes.draw do
         get :download
         get :export, to: :export_preview
         post :export, to: :export_submit
-        get :citation
       end
     end
     member do
@@ -285,7 +284,6 @@ SEEK::Application.routes.draw do
         get :download
         get :export, to: :export_preview
         post :export, to: :export_submit
-        get :citation
       end
     end
     member do
@@ -315,7 +313,6 @@ SEEK::Application.routes.draw do
         get :download
         get :export, to: :export_preview
         post :export, to: :export_submit
-        get :citation
       end
     end
     member do
@@ -745,6 +742,8 @@ SEEK::Application.routes.draw do
   match "/500" => "errors#error_500"
 
   match "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
+
+  get "/citation/*doi(.:format)" => "citations#fetch", :as => :citation
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.

@@ -7,6 +7,10 @@
     <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes,:creators=>creators,:title=>authors_title } -%>
 <% end -%>
 
+<% if resource.respond_to?(:doi) %>
+  <%= render :partial => "assets/citation_box", locals: { doi: resource.doi } unless resource.doi.blank? %>
+<% end %>
+
 <% if resource.respond_to?(:license) %>
     <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>

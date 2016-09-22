@@ -417,7 +417,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert flash[:error].include?('authorized')
   end
 
-  test "can get various citation styles for snapshot with DOI" do
+  test "can get citation for snapshot with DOI" do
     doi_citation_mock
     create_investigation_snapshot
     login_as(@user)
@@ -427,14 +427,6 @@ class SnapshotsControllerTest < ActionController::TestCase
     get :show, investigation_id: @investigation, id: @snapshot
     assert_response :success
     assert_select '#snapshot-citation', text: /Bacall, F/
-
-    get :citation, investigation_id: @investigation, id: @snapshot, style: 'the-lancet', format: :js
-    assert_response :success
-    assert @response.body.include?('Bacall F') # No comma
-
-    get :citation, investigation_id: @investigation, id: @snapshot, style: 'bibtex', format: :js
-    assert_response :success
-    assert @response.body.include?('author={Bacall, Finn and')
   end
 
   test "broken DOI metadata response doesn't raise exception" do
