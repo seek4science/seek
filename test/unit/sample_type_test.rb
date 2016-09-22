@@ -399,7 +399,8 @@ class SampleTypeTest < ActiveSupport::TestCase
     end
 
     type=Factory(:simple_sample_type)
-    assert_difference("Delayed::Job.count",1) do
+    Delayed::Job.destroy_all
+    assert_difference("Delayed::Job.count",2) do
       type.title="sample type test job"
       type.save!
       assert SampleTemplateGeneratorJob.new(type).exists?

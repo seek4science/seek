@@ -31,6 +31,8 @@ class SampleTemplateGeneratorJobTest < ActiveSupport::TestCase
       job.perform
     end
 
+    @sample_type.reload
+
     refute_nil @sample_type.content_blob
     assert File.exist?(@sample_type.content_blob.filepath)
     assert_equal "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",@sample_type.content_blob.content_type

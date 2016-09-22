@@ -1,7 +1,10 @@
 class SampleControlledVocab < ActiveRecord::Base
   attr_accessible :title, :description, :sample_controlled_vocab_terms_attributes
 
-  has_many :sample_controlled_vocab_terms, inverse_of: :sample_controlled_vocab, dependent: :destroy
+  has_many :sample_controlled_vocab_terms, inverse_of: :sample_controlled_vocab,
+           after_add: :update_sample_type_templates,
+           after_remove: :update_sample_type_templates,
+           dependent: :destroy
   has_many :sample_attributes, inverse_of: :sample_controlled_vocab
   has_many :sample_types, through: :sample_attributes
   has_many :samples, through: :sample_types
@@ -27,4 +30,13 @@ class SampleControlledVocab < ActiveRecord::Base
   def can_edit?(_user = User.current_user)
     samples.empty?
   end
+
+  private
+
+  def update_sample_type_templates(term)
+    unless new_record?
+      sample_types.each(&:queue_template_generation)
+    end
+  end
+
 end

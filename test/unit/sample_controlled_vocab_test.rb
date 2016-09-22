@@ -80,4 +80,41 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     cv = sample.sample_type.sample_attributes.first.sample_controlled_vocab
     refute cv.can_edit?
   end
+
+  test 'trigger regeneration of sample type templates when saved' do
+    type = Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test')
+    cv = type.sample_attributes.first.sample_controlled_vocab
+    refute_nil cv
+    refute cv.new_record?
+    assert_equal [type],cv.sample_types
+
+    Delayed::Job.destroy_all
+
+    assert_difference("Delayed::Job.count",1) do
+      cv.sample_controlled_vocab_terms.create(label: 'fsdfsdsdfsdf')
+    end
+    assert SampleTemplateGeneratorJob.new(type).exists?
+
+    Delayed::Job.destroy_all
+
+    assert_difference("Delayed::Job.count",1) do
+      term = cv.sample_controlled_vocab_terms.last
+      cv.sample_controlled_vocab_terms.destroy(term)
+    end
+    assert SampleTemplateGeneratorJob.new(type).exists?
+
+    Delayed::Job.destroy_all
+
+    #changing the title has no effect
+    assert_no_difference("Delayed::Job.count") do
+      cv.title="new title"
+      cv.save
+    end
+
+    refute SampleTemplateGeneratorJob.new(type).exists?
+
+
+
+  end
+
 end
