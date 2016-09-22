@@ -89,7 +89,7 @@ class Snapshot < ActiveRecord::Base
 
   def to_csl
     Rails.cache.fetch("snapshot-csl-#{self.id}") do
-      resp = RestClient.get("http://dx.doi.org/#{self.doi}", accept: 'application/vnd.citationstyles.csl+json')
+      resp = RestClient.get("https://dx.doi.org/#{self.doi}", accept: 'application/vnd.citationstyles.csl+json')
       JSON.parse(resp)
     end
   end

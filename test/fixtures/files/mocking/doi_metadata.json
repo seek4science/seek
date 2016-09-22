@@ -1,0 +1,24 @@
+{
+  "type":"misc",
+  "DOI":"10.5072\/test",
+  "URL":"https:\/\/doi.org\/10.5072\/test",
+  "title":"the title",
+  "publisher":"TestApp",
+  "issued":{
+    "date-parts":[
+      [
+        2016
+      ]
+    ]
+  },
+  "author":[
+    {
+      "family":"Bacall",
+      "given":"Finn"
+    },
+    {
+      "family":"Hendricks",
+      "given":"Christina"
+    }
+  ]
+}
