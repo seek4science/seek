@@ -73,4 +73,15 @@ module MockHelper
         to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/broken_doi_metadata_response.html"), status: 200)
   end
 
+  def publication_formatter_mock
+    stub_request(:post, "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi").
+        with(body: { 'db'=>'pubmed', 'email'=>'()', 'id'=>'5', 'retmode'=>'text', 'rettype'=>'medline', 'tool'=>'bioruby' },
+             headers: { 'Accept'=>'*/*',
+                        'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+                        'Content-Length'=>'69',
+                        'Content-Type'=>'application/x-www-form-urlencoded',
+                        'User-Agent'=>'Ruby' }).
+        to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))
+  end
+
 end

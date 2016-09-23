@@ -8,7 +8,8 @@ class PublicationsControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
-  
+  include MockHelper
+
   def setup
     login_as(:quentin)
   end
@@ -125,6 +126,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should export publication as endnote" do
+    publication_formatter_mock
     get :show, :id => publications(:one), :format => "enw"
     assert_response :success
     assert_match( /%0 Journal Article.*/, response.body)
@@ -150,6 +152,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should export publication as bibtex" do
+    publication_formatter_mock
     get :show, :id => publications(:one), :format => "bibtex"
     assert_response :success
     assert_match( /@article{PMID:5,.*/, response.body) 
@@ -163,6 +166,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should export publication as embl" do
+    publication_formatter_mock
     get :show, :id => publications(:one), :format => "embl"
     assert_response :success
     assert_match( /RX   PUBMED; 5\..*/, response.body) 
