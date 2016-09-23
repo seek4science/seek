@@ -245,3 +245,5 @@ end
 
 # Load seed data
 #load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
+
+WebMock.disable_net_connect!(allow_localhost: true)
