@@ -1428,6 +1428,72 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'related investigations should show where person is creator' do
+    person = Factory(:person)
+    inv1=Factory(:investigation, :contributor=>Factory(:person),:policy=>Factory(:public_policy))
+    AssetsCreator.create :asset=>inv1,:creator=> person
+    inv2=Factory(:investigation,:contributor=>person)
+
+    login_as(person)
+
+    get :show, :id=>person.id
+    assert_response :success
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', investigation_path(inv1), text: inv1.title
+          assert_select 'a[href=?]', investigation_path(inv2), text: inv2.title
+        end
+      end
+    end
+
+  end
+
+  test 'related studies should show where person is creator' do
+    person = Factory(:person)
+    study1=Factory(:study, :contributor=>Factory(:person),:policy=>Factory(:public_policy))
+    AssetsCreator.create :asset=>study1,:creator=> person
+    study2=Factory(:study,:contributor=>person)
+
+    login_as(person)
+
+    get :show, :id=>person.id
+    assert_response :success
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', study_path(study1), text: study1.title
+          assert_select 'a[href=?]', study_path(study2), text: study2.title
+        end
+      end
+    end
+
+  end
+
+  test 'related assays should show where person is creator' do
+    person = Factory(:person)
+    assay1=Factory(:assay, :contributor=>Factory(:person),:policy=>Factory(:public_policy))
+    AssetsCreator.create :asset=>assay1,:creator=> person
+    assay2=Factory(:assay,:contributor=>person)
+
+    login_as(person)
+
+    get :show, :id=>person.id
+    assert_response :success
+    assert_select 'h2', text: /Related items/i
+    assert_select 'div.list_items_container' do
+      assert_select 'div.list_item' do
+        assert_select 'div.list_item_title' do
+          assert_select 'a[href=?]', assay_path(assay1), text: assay1.title
+          assert_select 'a[href=?]', assay_path(assay2), text: assay2.title
+        end
+      end
+    end
+
+  end
+
   test "should not email user after assigned to a project if they are not registered" do
     new_person = Factory(:brand_new_person)
     admin = Factory(:admin)
@@ -1637,6 +1703,8 @@ class PeopleControllerTest < ActionController::TestCase
       assert_select 'div.list_item_title  a[href=?]', data_file_path(data_file2), text: /#{data_file2.title}/, count: 0
     end
   end
+
+
 
   test 'my items longer list' do
     #the myitems shows a longer list of 50, rather than the related_items_limit configuration
