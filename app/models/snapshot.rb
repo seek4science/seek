@@ -9,6 +9,7 @@ class Snapshot < ActiveRecord::Base
   has_one :content_blob, as: :asset, foreign_key: :asset_id
 
   before_create :set_snapshot_number
+  after_save :reindex_parent_resource
 
   # Must quack like an asset version to behave with DOI code
   alias_attribute :parent, :resource
@@ -109,6 +110,11 @@ class Snapshot < ActiveRecord::Base
 
   def parse_metadata
     Seek::ResearchObjects::SnapshotParser.new(research_object).parse
+  end
+
+  # Need to re-index the parent model to update its' "doi" field
+  def reindex_parent_resource
+    ReindexingJob.new.add_items_to_queue(self.resource) if self.doi_changed?
   end
 
 end

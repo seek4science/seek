@@ -216,6 +216,20 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_includes titles, 'p1'
   end
 
+  test 're-indexes parent model when DOI created' do
+    snapshot = @assay.create_snapshot
+
+    assert_difference("ReindexingQueue.count", 1) do
+      snapshot.doi = '10.5072/test'
+      snapshot.save
+    end
+
+    reindex_job = ReindexingQueue.last
+
+    assert_equal snapshot.resource_type, reindex_job.item_type
+    assert_equal snapshot.resource_id, reindex_job.item_id
+  end
+
   private
 
   def extract_keys(o, key)

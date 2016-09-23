@@ -12,6 +12,13 @@ module Seek #:nodoc:
 
           has_many :snapshots, as: :resource, foreign_key: :resource_id
 
+          # Index DOIs from snapshots in Solr
+          searchable(auto_index: false) do
+            text :doi do
+              self.snapshots.map(&:doi).compact
+            end
+          end
+
           class_eval do
             extend Seek::ResearchObjects::ActsAsSnapshottable::SingletonMethods
           end
