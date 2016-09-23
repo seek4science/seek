@@ -47,9 +47,11 @@ class Person < ActiveRecord::Base
   has_many :favourite_groups, :through => :favourite_group_memberships
 
 
-  has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"  
-  has_many :assays,:foreign_key => :owner_id
+  has_many :studies_for_person, :as=>:contributor, :class_name=>"Study"
+  has_many :assays_for_person, :foreign_key => :owner_id, :class_name=>"Assay"
+  alias_method :assays, :assays_for_person
   has_many :investigations_for_person,:as=>:contributor, :class_name=>"Investigation"
+
   has_many :presentations_for_person,:as=>:contributor, :class_name=>"Presentation"
   has_many :samples_for_person,:as=>:contributor, :class_name=>"Sample"
 
@@ -62,6 +64,10 @@ class Person < ActiveRecord::Base
   has_many :created_publications, :through => :assets_creators, :source => :asset, :source_type => "Publication"
   has_many :created_presentations,:through => :assets_creators,:source=>:asset,:source_type => "Presentation"
   has_many :created_samples,:through => :assets_creators,:source=>:asset,:source_type => "Sample"
+
+  has_many :created_investigations,:through => :assets_creators,:source=>:asset,:source_type => "Investigation"
+  has_many :created_studies,:through => :assets_creators,:source=>:asset,:source_type => "Study"
+  has_many :created_assays,:through => :assets_creators,:source=>:asset,:source_type => "Assay"
 
   searchable(:auto_index => false) do
     text :project_positions
@@ -177,22 +183,21 @@ class Person < ActiveRecord::Base
     self.shares_project?(other_item) || self.shares_programme?(other_item)
   end
 
-  RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events,:publications, :investigations]
+  RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:presentations,:events, :publications, :investigations,
+                            :studies, :assays]
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
       user_items = []
-      user_items =  user.try(:send,type) if user.respond_to?(type) && [:events,:investigations].include?(type)
+      user_items =  user.try(:send,type) if user.respond_to?(type)
       user_items =  user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
       user_items = user_items | self.send("#{type}_for_person".to_sym) if self.respond_to? "#{type}_for_person".to_sym
       user_items.uniq
     end
   end
 
-
   def self.userless_people
     Person.includes(:user).select{|p| p.user.nil?}
   end
-
 
   #returns an array of Person's where the first and last name match
   def self.duplicates
@@ -388,17 +393,17 @@ class Person < ActiveRecord::Base
   end
 
     #retrieve the items that this person is contributor (owner for assay)
-  def related_items
-     related_items = []
-     related_items |= assays
+  def contributed_items
+     items = []
+     items |= assays
      unless user.blank?
-       related_items |= user.assets
-       related_items |= user.presentations
-       related_items |= user.events
-       related_items |= user.investigations
-       related_items |= user.studies
+       items |= user.assets
+       items |= user.presentations
+       items |= user.events
+       items |= user.investigations
+       items |= user.studies
      end
-     related_items
+     items
   end
 
   def recent_activity(limit = 10)
@@ -437,7 +442,7 @@ class Person < ActiveRecord::Base
     remove_permissions
 
     #retrieve the items that this person is contributor (owner for assay)
-    person_related_items = related_items
+    person_related_items = contributed_items
 
     #check if anyone has manage right on the related_items
     #if not or if only the contributor then assign the manage right to pis||pals

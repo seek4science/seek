@@ -753,6 +753,22 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'related isa' do
+    person = Factory(:person)
+
+    AssetsCreator.create :asset=>(inv1=Factory(:investigation)),:creator=> person
+    inv2=Factory(:investigation,:contributor=>person)
+    assert_equal [inv1,inv2].sort, person.related_investigations.sort
+
+    AssetsCreator.create :asset=>(study1=Factory(:study)),:creator=> person
+    study2=Factory(:study,:contributor=>person)
+    assert_equal [study1,study2].sort, person.related_studies.sort
+
+    AssetsCreator.create :asset=>(assay1=Factory(:assay)),:creator=> person
+    assay2=Factory(:assay,:contributor=>person)
+    assert_equal [assay1,assay2].sort, person.related_assays.sort
+  end
+
 
   test "get the correct investigations and studides" do
     p = Factory(:person)
