@@ -480,6 +480,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test "should display the right author order after some authors are associate with seek-profiles" do
+    doi_citation_mock
     mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
     assert_difference('Publication.count') do
       post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
