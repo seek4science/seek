@@ -64,11 +64,15 @@ module MockHelper
   end
 
   def doi_citation_mock
+    stub_request(:get, /https:\/\/dx\.doi\.org\/.+/).
+        with(headers: {'Accept' => 'application/vnd.citationstyles.csl+json'}).
+        to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
     stub_request(:get, "https://dx.doi.org/10.5072/test").
         with(headers: {'Accept' => 'application/vnd.citationstyles.csl+json'}).
         to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
 
-    stub_request(:get, "https://dx.doi.org/10.5072/broken!").
+    stub_request(:get, "https://dx.doi.org/10.5072/broken").
         with(headers: {'Accept' => 'application/vnd.citationstyles.csl+json'}).
         to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/broken_doi_metadata_response.html"), status: 200)
   end

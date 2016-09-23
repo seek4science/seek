@@ -117,6 +117,7 @@ class RenderersTest < ActiveSupport::TestCase
 
     ['https://www.youtube.com/watch?v=1234abcd', 'https://youtu.be/1234abcd',
      'https://www.youtube.com/embed/1234abcd', 'https://www.youtube.com/v/1234abcd'].each do |url|
+      stub_request(:head, url).to_timeout
       cb = Factory(:content_blob, url: url)
       assert_equal "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/1234abcd\" frameborder=\"0\" allowfullscreen></iframe>",
         Seek::Renderers::YoutubeRenderer.new(cb).render

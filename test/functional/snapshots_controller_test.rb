@@ -5,6 +5,10 @@ class SnapshotsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include MockHelper
 
+  setup do
+    doi_citation_mock
+  end
+
   test "can get snapshot preview page" do
     user = Factory(:user)
     investigation = Factory(:investigation, :policy => Factory(:publicly_viewable_policy), :contributor => user.person)
@@ -210,6 +214,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     datacite_mock
     create_investigation_snapshot
     login_as(@user)
+    stub_request(:post, "http://test:test@idontexist.soup/metadata").to_return(status: 500)
 
     with_config_value(:datacite_url, 'http://idontexist.soup') do
       post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
@@ -418,7 +423,6 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test "can get citation for snapshot with DOI" do
-    doi_citation_mock
     create_investigation_snapshot
     login_as(@user)
     @snapshot.doi = '10.5072/test'
@@ -430,7 +434,6 @@ class SnapshotsControllerTest < ActionController::TestCase
   end
 
   test "broken DOI metadata response doesn't raise exception" do
-    doi_citation_mock
     create_investigation_snapshot
     login_as(@user)
     @snapshot.doi = '10.5072/broken'

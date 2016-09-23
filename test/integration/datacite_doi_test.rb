@@ -2,11 +2,14 @@ require 'test_helper'
 
 class DataciteDoiTest < ActionController::IntegrationTest
 
+  include MockHelper
+
   DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore}
 
-  def setup
+  setup do
     User.current_user = Factory(:user, :login => 'test')
     post '/session', :login => 'test', :password => 'blah'
+    doi_citation_mock
   end
 
   test 'doiable assets' do
