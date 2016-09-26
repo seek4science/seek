@@ -380,7 +380,6 @@ SEEK::Application.routes.draw do
       #MERGENOTE - this is a destroy, and should be the destroy method, not post since we are not updating or creating something.
       post :destroy_version
       get :mint_doi_confirm
-      get :minted_doi
       post :mint_doi
       get :samples_table
       get :select_sample_type
