@@ -20,7 +20,7 @@ class Snapshot < ActiveRecord::Base
 
   validates :snapshot_number, :uniqueness => { :scope =>  [:resource_type, :resource_id] }
 
-  acts_as_doi_mintable
+  acts_as_doi_mintable(proxy: :resource)
   acts_as_zenodo_depositable do |snapshot|
     snapshot.content_blob # The thing to be deposited
   end
@@ -92,14 +92,6 @@ class Snapshot < ActiveRecord::Base
 
   def set_snapshot_number
     self.snapshot_number ||= (resource.snapshots.maximum(:snapshot_number) || 0) + 1
-  end
-
-  def doi_resource_type
-    resource_type.downcase
-  end
-
-  def doi_resource_id
-    "#{resource_id}.#{snapshot_number}"
   end
 
   def doi_target_url

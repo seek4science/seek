@@ -10,7 +10,11 @@ module DataCite
 
     module ClassMethods
 
-      def acts_as_doi_mintable
+      def acts_as_doi_mintable(proxy: nil)
+        cattr_accessor :doi_proxy_resource
+
+        self.doi_proxy_resource = proxy
+
         include DataCite::ActsAsDoiMintable::InstanceMethods
 
         include Rails.application.routes.url_helpers # For URL generation
@@ -63,7 +67,11 @@ module DataCite
       end
 
       def suggested_doi
-        "#{Seek::Config.doi_prefix}/#{Seek::Config.doi_suffix}.#{doi_resource_type}.#{doi_resource_id}"
+        base = "#{Seek::Config.doi_prefix}/#{Seek::Config.doi_suffix}"
+        resource = ".#{doi_resource_type}.#{doi_resource_id}"
+        resource << ".#{doi_resource_suffix}" unless doi_resource_suffix.blank?
+
+        base + resource
       end
 
       def has_doi?
@@ -79,10 +87,14 @@ module DataCite
       end
 
       def doi_logs
-        AssetDoiLog.where(asset_type: self.class.name, asset_id: self.id, asset_version: self.try(:version))
+        AssetDoiLog.where(asset_type: doi_resource.class.name, asset_id: doi_resource_id, asset_version: doi_resource_suffix)
       end
 
       private
+
+      def doi_resource
+        @doi_resource ||= (self.class.doi_proxy_resource ? self.send(self.class.doi_proxy_resource) : self)
+      end
 
       def doi_target_url
         polymorphic_url(self,
@@ -91,19 +103,19 @@ module DataCite
       end
 
       def doi_resource_type
-        self.class.name.downcase
+        doi_resource.class.name.downcase
       end
 
       def doi_resource_id
-        ending = id.to_s
-        if respond_to?(:version) && !version.nil?
-          ending << ".#{version}"
-        end
-        ending
+        doi_resource.id
+      end
+
+      def doi_resource_suffix
+        version if respond_to?(:version) && !version.nil?
       end
 
       def create_log
-        AssetDoiLog.create(asset_type: self.class.name, asset_id: self.id, asset_version: self.try(:version),
+        AssetDoiLog.create(asset_type: doi_resource.class.name, asset_id: doi_resource_id, asset_version: doi_resource_suffix,
                            doi: suggested_doi, action: AssetDoiLog::MINT, user_id: User.current_user.try(:id))
       end
     end

@@ -111,6 +111,9 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal 1, snapshot.doi_logs.count
     log = snapshot.doi_logs.last
     assert_equal AssetDoiLog::MINT, log.action
+    assert_equal log.asset_type, snapshot.resource.class.name
+    assert_equal log.asset_id, snapshot.resource.id
+    assert_equal log.asset_version, snapshot.snapshot_number
   end
 
   test "doesn't create DOI if already minted" do
