@@ -19,6 +19,9 @@ class ProgrammesController < ApplicationController
 
   def create
     handle_administrators if params[:programme][:administrator_ids]
+
+    #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
+    funding_codes = params[:programme].delete(:funding_codes)
     @programme = Programme.new(params[:programme])
 
     if @programme.save
@@ -33,6 +36,7 @@ class ProgrammesController < ApplicationController
           Mailer.delay.programme_activation_required(@programme,current_person)
         end
       end
+      @programme.update_attribute(:funding_codes,funding_codes)
     end
 
     respond_with(@programme)
