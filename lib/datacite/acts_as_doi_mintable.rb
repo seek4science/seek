@@ -45,6 +45,10 @@ module DataCite
         endpoint.mint(suggested_doi, doi_target_url)
 
         update_attribute(:doi, suggested_doi)
+
+        create_log
+
+        suggested_doi
       end
 
       def datacite_metadata
@@ -74,6 +78,10 @@ module DataCite
         (created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) > Time.now
       end
 
+      def doi_logs
+        AssetDoiLog.where(asset_type: self.class.name, asset_id: self.id, asset_version: self.try(:version))
+      end
+
       private
 
       def doi_target_url
@@ -92,6 +100,11 @@ module DataCite
           ending << ".#{version}"
         end
         ending
+      end
+
+      def create_log
+        AssetDoiLog.create(asset_type: self.class.name, asset_id: self.id, asset_version: self.try(:version),
+                           doi: suggested_doi, action: AssetDoiLog::MINT, user_id: User.current_user.try(:id))
       end
     end
 

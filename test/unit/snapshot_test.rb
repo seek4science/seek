@@ -97,6 +97,21 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_empty snapshot.errors
   end
 
+  test 'logs when minting DOI' do
+    datacite_mock
+
+    snapshot = @investigation.create_snapshot
+
+    assert_equal 0, snapshot.doi_logs.count
+
+    assert_difference('AssetDoiLog.count', 1) do
+      snapshot.mint_doi
+    end
+
+    assert_equal 1, snapshot.doi_logs.count
+    log = snapshot.doi_logs.last
+    assert_equal AssetDoiLog::MINT, log.action
+  end
 
   test "doesn't create DOI if already minted" do
     datacite_mock

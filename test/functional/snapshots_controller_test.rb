@@ -152,6 +152,22 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert assigns(:snapshot).doi
   end
 
+  test "logs user when minting DOI for snapshot" do
+    datacite_mock
+    create_investigation_snapshot
+    login_as(@user)
+
+    assert_equal 0, @snapshot.doi_logs.count
+
+    assert_difference('AssetDoiLog.count', 1) do
+      post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    end
+
+    assert_equal 1, @snapshot.doi_logs.count
+    log = @snapshot.doi_logs.last
+    assert_equal @user, log.user
+  end
+
   test "can't mint DOI for snapshot if DOI minting disabled" do
     datacite_mock
     create_investigation_snapshot
