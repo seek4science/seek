@@ -50,7 +50,7 @@ This email will contain details about the Programme, who created it and also inc
 If you reject the programme, you will be asked for an explanation which will be passed on to the user that created it. If rejected, the Programme won't automatically be deleted and there is still the opportunity to Accept it again later
  if your reasons for rejection are addressed. You can also come back later and delete it if necessary.
 
-##Disabling Programme creation
+## Disabling Programme creation
 
 If you run your own installation of SEEK, you can disable both Programmes and also separately the ability for users to create
 their own Programmes. This will mean the Programmes, and therefore also Projects can only be created by a full administrator.
