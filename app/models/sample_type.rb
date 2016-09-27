@@ -72,10 +72,10 @@ class SampleType < ActiveRecord::Base
   end
 
   def matches_content_blob?(blob)
-    return false unless template
+    return false unless content_blob
+
     Rails.cache.fetch("st-match-#{blob.id}-#{content_blob.id}") do
-      other_handler = Seek::Templates::SamplesReader.new(blob)
-      compatible_template_file? && other_handler.compatible? && (template_handler.column_details == other_handler.column_details)
+      template_handler.matches?(blob)
     end
   end
 

@@ -32,6 +32,12 @@ module Seek
         end
       end
 
+      # whether the content blob passed matches the template held by this reader
+      def matches?(blob)
+        other_handler = Seek::Templates::SamplesReader.new(blob)
+        compatible? && other_handler.compatible? && (column_details == other_handler.column_details)
+      end
+
       private
 
       def sheet_index
