@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SamplesHandlerTest < ActiveSupport::TestCase
+class SamplesReaderTest < ActiveSupport::TestCase
   def setup
     # need a string type registered
     Factory(:string_sample_attribute_type, title: 'String')
@@ -11,43 +11,43 @@ class SamplesHandlerTest < ActiveSupport::TestCase
   end
 
   test 'compatible?' do
-    assert Seek::Templates::SamplesHandler.new(@content_blob).compatible?
-    assert Seek::Templates::SamplesHandler.new(@content_blob2).compatible?
+    assert Seek::Templates::SamplesReader.new(@content_blob).compatible?
+    assert Seek::Templates::SamplesReader.new(@content_blob2).compatible?
 
-    refute Seek::Templates::SamplesHandler.new(@binary_blob).compatible?
-    refute Seek::Templates::SamplesHandler.new(Factory(:rightfield_content_blob)).compatible?
-    refute Seek::Templates::SamplesHandler.new(nil).compatible?
+    refute Seek::Templates::SamplesReader.new(@binary_blob).compatible?
+    refute Seek::Templates::SamplesReader.new(Factory(:rightfield_content_blob)).compatible?
+    refute Seek::Templates::SamplesReader.new(nil).compatible?
   end
 
   test 'sheet index' do
-    handler = Seek::Templates::SamplesHandler.new(@content_blob)
+    handler = Seek::Templates::SamplesReader.new(@content_blob)
     assert_equal 2, handler.send(:sheet_index)
 
-    handler = Seek::Templates::SamplesHandler.new(@content_blob2)
+    handler = Seek::Templates::SamplesReader.new(@content_blob2)
     assert_equal 3, handler.send(:sheet_index)
   end
 
   test 'column details' do
-    handler = Seek::Templates::SamplesHandler.new(@content_blob)
+    handler = Seek::Templates::SamplesReader.new(@content_blob)
     column_details = handler.column_details
     labels = column_details.collect(&:label)
     assert_equal ['full name', 'date of birth', 'hair colour', 'eye colour'], labels
     columns = column_details.collect(&:column)
     assert_equal [1, 2, 3, 4], columns
 
-    handler = Seek::Templates::SamplesHandler.new(@content_blob2)
+    handler = Seek::Templates::SamplesReader.new(@content_blob2)
     column_details = handler.column_details
     labels = column_details.collect(&:label)
     assert_equal ['full name', 'date of birth', 'hair colour', 'eye colour'], labels
     columns = column_details.collect(&:column)
     assert_equal [3, 7, 10, 11], columns
 
-    handler = Seek::Templates::SamplesHandler.new(@binary_blob)
+    handler = Seek::Templates::SamplesReader.new(@binary_blob)
     assert_nil handler.column_details
   end
 
   test 'each record' do
-    handler = Seek::Templates::SamplesHandler.new(Factory(:sample_type_populated_template_content_blob))
+    handler = Seek::Templates::SamplesReader.new(Factory(:sample_type_populated_template_content_blob))
     rows = []
     data = []
     handler.each_record do |row, d|
@@ -69,7 +69,7 @@ class SamplesHandlerTest < ActiveSupport::TestCase
   end
 
   test 'each record restricted columns' do
-    handler = Seek::Templates::SamplesHandler.new(Factory(:sample_type_populated_template_content_blob))
+    handler = Seek::Templates::SamplesReader.new(Factory(:sample_type_populated_template_content_blob))
     rows = []
     data = []
     handler.each_record([1, 4]) do |row, d|

@@ -74,7 +74,7 @@ class SampleType < ActiveRecord::Base
   def matches_content_blob?(blob)
     return false unless template
     Rails.cache.fetch("st-match-#{blob.id}-#{content_blob.id}") do
-      other_handler = Seek::Templates::SamplesHandler.new(blob)
+      other_handler = Seek::Templates::SamplesReader.new(blob)
       compatible_template_file? && other_handler.compatible? && (template_handler.column_details == other_handler.column_details)
     end
   end
@@ -89,7 +89,7 @@ class SampleType < ActiveRecord::Base
     samples = []
     columns = sample_attributes.collect(&:template_column_index)
 
-    handler = Seek::Templates::SamplesHandler.new(content_blob)
+    handler = Seek::Templates::SamplesReader.new(content_blob)
     handler.each_record(columns) do |_row, data|
       samples << build_sample_from_template_data(data)
     end
@@ -123,7 +123,7 @@ class SampleType < ActiveRecord::Base
   end
 
   def generate_template
-    Seek::Templates::Generator.new(self).generate
+    Seek::Templates::SamplesWriter.new(self).generate
   end
 
   private
@@ -153,7 +153,7 @@ class SampleType < ActiveRecord::Base
   end
 
   def template_handler
-    @template_handler ||= Seek::Templates::SamplesHandler.new(content_blob)
+    @template_handler ||= Seek::Templates::SamplesReader.new(content_blob)
   end
 
   def default_attribute_type

@@ -2,7 +2,7 @@ require 'seek/sample_templates'
 
 module Seek
   module Templates
-    class Generator
+    class SamplesWriter
       attr_reader :sample_type, :tmp_file
 
       delegate :sample_attributes, :create_content_blob, to: :sample_type

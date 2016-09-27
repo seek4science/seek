@@ -1,6 +1,6 @@
 module Seek
   module Templates
-    class SamplesHandler < Handler
+    class SamplesReader < Reader
       ColumnDetails = Struct.new(:label, :column)
       Data = Struct.new(:column, :value)
 

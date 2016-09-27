@@ -1,6 +1,6 @@
 module Seek
   module Templates
-    class Handler
+    class Reader
       include SysMODB::SpreadsheetExtractor
 
       attr_reader :template_content_blob
