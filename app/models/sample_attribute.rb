@@ -64,7 +64,7 @@ class SampleAttribute < ActiveRecord::Base
 
   # provides the hash that defines the column definition for template generation
   def template_column_definition
-    {title=>controlled_vocab_labels}
+    { title => controlled_vocab_labels }
   end
 
   private

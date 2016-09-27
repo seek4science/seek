@@ -38,13 +38,13 @@ module Seek
         compatible? && other_handler.compatible? && (column_details == other_handler.column_details)
       end
 
-      def build_samples_from_datafile(sample_type,datafile_content_blob)
+      def build_samples_from_datafile(sample_type, datafile_content_blob)
         samples = []
         columns = sample_type.sample_attributes.collect(&:template_column_index)
 
         handler = Seek::Templates::SamplesReader.new(datafile_content_blob)
         handler.each_record(columns) do |_row, data|
-          samples << build_sample_from_template_data(sample_type,data)
+          samples << build_sample_from_template_data(sample_type, data)
         end
         samples
       end
@@ -53,16 +53,16 @@ module Seek
         column_details.each do |details|
           is_title = sample_type.sample_attributes.empty?
           sample_type.sample_attributes.build(title: details.label,
-                                                   sample_attribute_type: SampleAttributeType.default,
-                                                   is_title: is_title,
-                                                   required: is_title,
-                                                   template_column_index: details.column)
+                                              sample_attribute_type: SampleAttributeType.default,
+                                              is_title: is_title,
+                                              required: is_title,
+                                              template_column_index: details.column)
         end
       end
 
       private
 
-      def build_sample_from_template_data(sample_type,template_data)
+      def build_sample_from_template_data(sample_type, template_data)
         sample = Sample.new(sample_type: sample_type)
         template_data.each do |entry|
           attribute = sample_type.attribute_for_column(entry.column)

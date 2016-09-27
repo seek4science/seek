@@ -8,6 +8,9 @@ class SampleType < ActiveRecord::Base
   include Seek::ActsAsAsset::Searching
   include Seek::Search::BackgroundReindexing
 
+  # everything concerned with sample type templates
+  include Seek::Templates::SampleTypeTemplateConcerns
+
   acts_as_uniquely_identifiable
 
   has_many :samples, inverse_of: :sample_type
@@ -16,17 +19,11 @@ class SampleType < ActiveRecord::Base
 
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 
-  has_one :content_blob, as: :asset, dependent: :destroy
-
-  alias_method :template, :content_blob
-
   validates :title, presence: true
 
-  validate :validate_one_title_attribute_present, :validate_template_file, :validate_attribute_title_unique
+  validate :validate_one_title_attribute_present, :validate_attribute_title_unique
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
-
-  after_save :queue_template_generation
 
   grouped_pagination
 
@@ -40,14 +37,6 @@ class SampleType < ActiveRecord::Base
     attribute.validate_value?(value)
   end
 
-  def build_attributes_from_template
-    unless compatible_template_file?
-      errors.add(:base, "Invalid spreadsheet - Couldn't find a 'samples' sheet")
-      return
-    end
-    template_reader.build_sample_type_attributes(self)
-  end
-
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
   # this is to help when a controlled vocab has been selected in the form, but then the type has been changed
   # rather than clearing the selected vocab each time
@@ -57,28 +46,6 @@ class SampleType < ActiveRecord::Base
         attribute.sample_controlled_vocab = nil
       end
     end
-  end
-
-  def compatible_template_file?
-    template_reader.compatible?
-  end
-
-  def matches_content_blob?(blob)
-    return false unless content_blob
-
-    Rails.cache.fetch("st-match-#{blob.id}-#{content_blob.id}") do
-      template_reader.matches?(blob)
-    end
-  end
-
-  def self.sample_types_matching_content_blob(content_blob)
-    SampleType.all.select do |type|
-      type.matches_content_blob?(content_blob)
-    end
-  end
-
-  def build_samples_from_template(content_blob)
-    template_reader.build_samples_from_datafile(self, content_blob)
   end
 
   def can_download?
@@ -97,50 +64,11 @@ class SampleType < ActiveRecord::Base
     samples.empty? && linked_sample_attributes.empty?
   end
 
-  def queue_template_generation
-    unless uploaded_template?
-      if content_blob
-        content_blob.destroy
-        update_attribute(:content_blob, nil)
-      end
-      SampleTemplateGeneratorJob.new(self).queue_job
-    end
-  end
-
-  def generate_template
-    Seek::Templates::SamplesWriter.new(self).generate
-  end
-
-  def attribute_for_column(column)
-    @columns_and_attributes ||= Hash[sample_attributes.collect { |attr| [attr.template_column_index, attr] }]
-    @columns_and_attributes[column]
-  end
-
   private
-
-  # required by Seek::ActsAsAsset::Searching - don't really need to full search terms, including content provided by Seek::ActsAsAsset::ContentBlobs
-  # just the filename
-  def content_blob_search_terms
-    if content_blob
-      [content_blob.original_filename]
-    else
-      []
-    end
-  end
-
-  def template_reader
-    @template_handler ||= Seek::Templates::SamplesReader.new(content_blob)
-  end
 
   def validate_one_title_attribute_present
     unless (count = sample_attributes.select(&:is_title).count) == 1
       errors.add(:sample_attributes, "There must be 1 attribute which is the title, currently there are #{count}")
-    end
-  end
-
-  def validate_template_file
-    if template && !compatible_template_file?
-      errors.add(:template, 'Not a valid template file')
     end
   end
 
