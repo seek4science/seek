@@ -104,15 +104,6 @@ class SampleType < ActiveRecord::Base
     true
   end
 
-  # FIXME: these are just here to satisfy the Searchable module, as a quick fix
-  def assay_type_titles
-    []
-  end
-
-  def technology_type_titles
-    []
-  end
-
   def can_edit?(_user = User.current_user)
     samples.empty?
   end
