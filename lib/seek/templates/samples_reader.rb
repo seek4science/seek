@@ -49,6 +49,17 @@ module Seek
         samples
       end
 
+      def build_sample_type_attributes(sample_type)
+        column_details.each do |details|
+          is_title = sample_type.sample_attributes.empty?
+          sample_type.sample_attributes.build(title: details.label,
+                                                   sample_attribute_type: SampleAttributeType.default,
+                                                   is_title: is_title,
+                                                   required: is_title,
+                                                   template_column_index: details.column)
+        end
+      end
+
       private
 
       def build_sample_from_template_data(sample_type,template_data)

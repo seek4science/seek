@@ -45,15 +45,7 @@ class SampleType < ActiveRecord::Base
       errors.add(:base, "Invalid spreadsheet - Couldn't find a 'samples' sheet")
       return
     end
-
-    template_handler.column_details.each do |details|
-      is_title = sample_attributes.empty?
-      sample_attributes << SampleAttribute.new(title: details.label,
-                                               sample_attribute_type: default_attribute_type,
-                                               is_title: is_title,
-                                               required: is_title,
-                                               template_column_index: details.column)
-    end
+    template_handler.build_sample_type_attributes(self)
   end
 
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
@@ -138,10 +130,6 @@ class SampleType < ActiveRecord::Base
 
   def template_handler
     @template_handler ||= Seek::Templates::SamplesReader.new(content_blob)
-  end
-
-  def default_attribute_type
-    SampleAttributeType.default
   end
 
   def validate_one_title_attribute_present
