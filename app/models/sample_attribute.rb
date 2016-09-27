@@ -54,6 +54,19 @@ class SampleAttribute < ActiveRecord::Base
     sample_attribute_type.pre_process_value(value, controlled_vocab: sample_controlled_vocab, linked_sample_type: linked_sample_type)
   end
 
+  def controlled_vocab_labels
+    if sample_attribute_type.is_controlled_vocab?
+      sample_controlled_vocab.labels
+    else
+      []
+    end
+  end
+
+  # provides the hash that defines the column definition for template generation
+  def template_column_definition
+    {title=>controlled_vocab_labels}
+  end
+
   private
 
   def generate_accessor_name

@@ -21,15 +21,14 @@ module Seek
       def each_record(columns = nil)
         rows = template_xml_document.find("//ss:sheet[@index='#{sheet_index}']/ss:rows/ss:row")
         rows.each do |row|
-          if (row_index = row.attributes['index'].to_i) > 1
-            data = row.children.collect do |cell|
-              column = cell.attributes['column'].to_i
-              if columns.nil? || columns.include?(column)
-                Data.new(column, cell.content)
-              end
-            end.compact
-            yield(row_index, data)
-          end
+          next if (row_index = row.attributes['index'].to_i) <= 1
+          data = row.children.collect do |cell|
+            column = cell.attributes['column'].to_i
+            if columns.nil? || columns.include?(column)
+              Data.new(column, cell.content)
+            end
+          end.compact
+          yield(row_index, data)
         end
       end
 

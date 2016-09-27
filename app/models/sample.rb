@@ -78,6 +78,7 @@ class Sample < ActiveRecord::Base
     data[attr] = value
   end
 
+
   private
 
   def samples_this_links_to

@@ -1,8 +1,6 @@
 class SampleType < ActiveRecord::Base
   attr_accessible :title, :uuid, :sample_attributes_attributes, :description, :uploaded_template
 
-  require 'seek/sample_templates'
-
   searchable(auto_index: false) do
     text :attribute_search_terms
   end if Seek::Config.solr_enabled
@@ -38,7 +36,7 @@ class SampleType < ActiveRecord::Base
 
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
-    fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") if attribute.nil?
+    fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") unless attribute
     attribute.validate_value?(value)
   end
 
@@ -127,36 +125,14 @@ class SampleType < ActiveRecord::Base
     unless uploaded_template?
       if content_blob
         content_blob.destroy
-        update_attribute(:content_blob,nil)
+        update_attribute(:content_blob, nil)
       end
       SampleTemplateGeneratorJob.new(self).queue_job
     end
   end
 
   def generate_template
-    sheet_name = 'Samples'
-    sheet_index = 1
-    tmp_file = "/tmp/#{UUID.generate}.xlxs"
-    columns = sample_attributes.collect do |attribute|
-      values = []
-      if attribute.sample_attribute_type.is_controlled_vocab?
-        values = attribute.sample_controlled_vocab.labels
-      end
-      { attribute.title => values }
-    end
-
-    Seek::SampleTemplates.generate(sheet_name, sheet_index, columns, tmp_file)
-    template_attribute = { tmp_io_object: File.new(tmp_file),
-                           url: nil,
-                           external_link: false,
-                           original_filename: "#{title} template.xlsx",
-                           content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                           make_local_copy: true,
-                           asset_version: nil }
-    create_content_blob(template_attribute)
-    sample_attributes.each_with_index do |attribute, index|
-      attribute.update_attributes(template_column_index: index + 1)
-    end
+    Seek::Templates::Generator.new(self).generate
   end
 
   private
@@ -174,9 +150,8 @@ class SampleType < ActiveRecord::Base
   def build_sample_from_template_data(data)
     sample = Sample.new(sample_type: self)
     data.each do |entry|
-      if attribute = attribute_for_column(entry.column)
-        sample.set_attribute(attribute.hash_key, entry.value)
-      end
+      attribute = attribute_for_column(entry.column)
+      sample.set_attribute(attribute.hash_key, entry.value) if attribute
     end
     sample
   end

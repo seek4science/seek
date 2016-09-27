@@ -1,5 +1,5 @@
+# Job responsible for generating Excel spreadsheet templates from samples
 class SampleTemplateGeneratorJob < SeekJob
-
   attr_reader :sample_type_id
 
   def initialize(sample_type)
@@ -23,5 +23,4 @@ class SampleTemplateGeneratorJob < SeekJob
   def sample_type
     SampleType.find_by_id(sample_type_id)
   end
-
 end
