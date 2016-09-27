@@ -45,7 +45,7 @@ class SampleType < ActiveRecord::Base
       errors.add(:base, "Invalid spreadsheet - Couldn't find a 'samples' sheet")
       return
     end
-    template_handler.build_sample_type_attributes(self)
+    template_reader.build_sample_type_attributes(self)
   end
 
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
@@ -60,14 +60,14 @@ class SampleType < ActiveRecord::Base
   end
 
   def compatible_template_file?
-    template_handler.compatible?
+    template_reader.compatible?
   end
 
   def matches_content_blob?(blob)
     return false unless content_blob
 
     Rails.cache.fetch("st-match-#{blob.id}-#{content_blob.id}") do
-      template_handler.matches?(blob)
+      template_reader.matches?(blob)
     end
   end
 
@@ -78,7 +78,7 @@ class SampleType < ActiveRecord::Base
   end
 
   def build_samples_from_template(content_blob)
-    template_handler.build_samples_from_datafile(self,content_blob)
+    template_reader.build_samples_from_datafile(self, content_blob)
   end
 
   def can_download?
@@ -128,7 +128,7 @@ class SampleType < ActiveRecord::Base
     end
   end
 
-  def template_handler
+  def template_reader
     @template_handler ||= Seek::Templates::SamplesReader.new(content_blob)
   end
 
