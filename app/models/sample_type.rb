@@ -86,14 +86,7 @@ class SampleType < ActiveRecord::Base
   end
 
   def build_samples_from_template(content_blob)
-    samples = []
-    columns = sample_attributes.collect(&:template_column_index)
-
-    handler = Seek::Templates::SamplesReader.new(content_blob)
-    handler.each_record(columns) do |_row, data|
-      samples << build_sample_from_template_data(data)
-    end
-    samples
+    template_handler.build_samples_from_datafile(self,content_blob)
   end
 
   def can_download?
@@ -126,6 +119,11 @@ class SampleType < ActiveRecord::Base
     Seek::Templates::SamplesWriter.new(self).generate
   end
 
+  def attribute_for_column(column)
+    @columns_and_attributes ||= Hash[sample_attributes.collect { |attr| [attr.template_column_index, attr] }]
+    @columns_and_attributes[column]
+  end
+
   private
 
   # required by Seek::ActsAsAsset::Searching - don't really need to full search terms, including content provided by Seek::ActsAsAsset::ContentBlobs
@@ -136,20 +134,6 @@ class SampleType < ActiveRecord::Base
     else
       []
     end
-  end
-
-  def build_sample_from_template_data(data)
-    sample = Sample.new(sample_type: self)
-    data.each do |entry|
-      attribute = attribute_for_column(entry.column)
-      sample.set_attribute(attribute.hash_key, entry.value) if attribute
-    end
-    sample
-  end
-
-  def attribute_for_column(column)
-    @columns_and_attributes ||= Hash[sample_attributes.collect { |attr| [attr.template_column_index, attr] }]
-    @columns_and_attributes[column]
   end
 
   def template_handler

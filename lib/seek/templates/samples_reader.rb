@@ -38,7 +38,27 @@ module Seek
         compatible? && other_handler.compatible? && (column_details == other_handler.column_details)
       end
 
+      def build_samples_from_datafile(sample_type,datafile_content_blob)
+        samples = []
+        columns = sample_type.sample_attributes.collect(&:template_column_index)
+
+        handler = Seek::Templates::SamplesReader.new(datafile_content_blob)
+        handler.each_record(columns) do |_row, data|
+          samples << build_sample_from_template_data(sample_type,data)
+        end
+        samples
+      end
+
       private
+
+      def build_sample_from_template_data(sample_type,template_data)
+        sample = Sample.new(sample_type: sample_type)
+        template_data.each do |entry|
+          attribute = sample_type.attribute_for_column(entry.column)
+          sample.set_attribute(attribute.hash_key, entry.value) if attribute
+        end
+        sample
+      end
 
       def sheet_index
         matches = template_xml_document.find('//ss:sheet').select do |sheet|
