@@ -989,6 +989,37 @@ class AuthorizationTest < ActiveSupport::TestCase
     is_authorized = is_authorized || (scope <= policy.sharing_scope &&
         Seek::Permissions::Authorization.access_type_allows_action?(action, policy.access_type))
   end
+
+  test 'all users scope overrides more restrictive permissions' do
+    person=Factory(:person)
+
+    user = person.user
+
+    sop = Factory(:sop,:policy=>Factory(:public_policy,:permissions=>[
+        Factory(:permission,:contributor=>person, :access_type=>Policy::NO_ACCESS)
+    ]))
+    assert sop.can_view?(nil)
+    assert sop.can_download?(nil)
+    assert sop.can_view?(user)
+    assert sop.can_download?(user)
+
+    person2=Factory(:person)
+    user2 = person2.user
+
+    sop = Factory(:sop,:policy=>Factory(:publicly_viewable_policy,:permissions=>[
+        Factory(:permission,:contributor=>person, :access_type=>Policy::NO_ACCESS),
+        Factory(:permission,:contributor=>person2, :access_type=>Policy::ACCESSIBLE)
+    ]))
+
+    assert sop.can_view?(nil)
+    refute sop.can_download?(nil)
+    assert sop.can_view?(user)
+    refute sop.can_download?(user)
+
+    assert sop.can_view?(user2)
+    assert sop.can_download?(user2)
+
+  end
   
   def temp_get_group_permissions(policy)
     policy.permissions.select {|p| ["WorkGroup","Project","Institution"].include?(p.contributor_type)}
