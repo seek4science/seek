@@ -1393,6 +1393,12 @@ class ProjectsControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'no resource count stats' do
+    get :index
+    assert_response :success
+    assert_select '#resource-count-stats',:count=>0
+  end
+
   private
 
   def valid_project

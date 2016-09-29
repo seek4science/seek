@@ -6,6 +6,8 @@
 %>
 
 <%= index_title %>
+<%= render :partial => "assets/resource_counts" %>
+
 <% if show_new_button %>
     <%= render :partial => "assets/new_button", :locals => {:new_object_path => new_item_path, :label => new_item_label} %>
 <% end %>

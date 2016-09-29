@@ -2211,6 +2211,19 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'resource count stats' do
+    Factory(:data_file,policy: Factory(:public_policy))
+    Factory(:data_file,policy: Factory(:private_policy))
+    total = DataFile.count
+    visible=DataFile.all_authorized_for(:view).count
+    assert_not_equal total, visible
+    assert_not_equal 0,total
+    assert_not_equal 0,visible
+    get :index
+    assert_response :success
+    assert_select '#resource-count-stats', :text=>/#{visible} Data files visible.*#{total}/
+  end
+
   private
 
   def mock_http

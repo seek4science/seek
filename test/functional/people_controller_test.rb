@@ -1728,6 +1728,12 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'no resource count stats' do
+    get :index
+    assert_response :success
+    assert_select '#resource-count-stats',:count=>0
+  end
+
   def mask_for_admin
     Seek::Roles::Roles.instance.mask_for_role("admin")
   end

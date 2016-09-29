@@ -282,5 +282,11 @@ class OrganismsControllerTest < ActionController::TestCase
       end
     end
   end
+
+  test 'no resource count stats' do
+    get :index
+    assert_response :success
+    assert_select '#resource-count-stats',:count=>0
+  end
   
 end
