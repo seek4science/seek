@@ -391,7 +391,7 @@ class AuthorizationTest < ActiveSupport::TestCase
                                                people(:person_for_sysmo_user_in_blacklist).user, people(:person_for_sysmo_user_in_blacklist))
     assert temp, "test user is SysMO user and should have been authorized by policy"
 
-    res = Seek::Permissions::Authorization.is_authorized?("view", nil, sops(:sop_with_all_sysmo_users_policy), people(:person_for_sysmo_user_in_blacklist).user)
+    res = Seek::Permissions::Authorization.is_authorized?("view", sops(:sop_with_all_sysmo_users_policy), people(:person_for_sysmo_user_in_blacklist).user)
     assert !res, "test user is SysMO user, but is also in blacklist - should not have been authorized for viewing"
   end
 
