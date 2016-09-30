@@ -1740,6 +1740,16 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'dont show resource count for nested route' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    project = df.projects.first
+    df2 = Factory(:data_file,:policy=>Factory(:public_policy))
+    get :index,:project_id=>project.id
+    assert_response :success
+    assert_select '#resource-count-stats', :count=>0
+
+  end
+
   test "filtered data files for non existent study" do
     Factory :data_file #needs a data file to be sure that the problem being fixed is triggered
     study_id=999
