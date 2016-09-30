@@ -1,0 +1,10 @@
+<%
+  visible_total,full_total=resource_count_stats
+  resource_text = resource_text_from_controller.pluralize(visible_total)
+
+%>
+<% if klass_from_controller.authorization_supported? %>
+  <span id='resource-count-stats'>
+    <strong><%= visible_total %></strong> <%= resource_text %> visible to you, out of a total of <strong><%= full_total %></strong>
+  </span>
+<% end %>
