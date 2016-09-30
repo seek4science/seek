@@ -56,13 +56,12 @@ module Seek
             end
           end
         end
-
         # Check the user is "in scope" and also is performing an action allowed under the given access type
         is_authorized = (scope <= policy.sharing_scope &&
             access_type_allows_action?(action, policy.access_type))
 
         # == END BASIC POLICY
-        if !policy.permissions.empty? && user
+        if policy.permissions.any? && user
           # == CUSTOM PERMISSIONS
           # 1. Check if there is a specific permission relating to the user
           # 2. Check if there is a permission for a FavouriteGroup they're in
@@ -73,6 +72,7 @@ module Seek
                                         # nothing happens, otherwise empty hash
           p = thing.permission_for[person]
           permission = if p
+
                          p == :nil ? nil : p  # distinguish empty hash item from item with value :nil
                        else
                          # sort permissions by precedence
@@ -80,6 +80,12 @@ module Seek
                          # find the first permission, which actually overrides the permission
                          # later in that same list. E.g. a person permission will override
                          # a project permission
+
+                         #strip out the more restrictive persmissions if overall scope is EVERYONE
+                         if policy.sharing_scope==Policy::EVERYONE
+                           permissions.reject!{|permission| permission.access_type <= policy.access_type}
+                         end
+
                          permission = permissions.detect { |p| p.controls_access_for? user.person }
                          # turn nil into :nil, so that caching is possible
                          permission ? thing.permission_for[person] = permission : thing.permission_for[person] = :nil
