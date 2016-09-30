@@ -7,6 +7,19 @@ layout: page
 
 Latest version - {{ site.current_seek_version }}
 
+## Version 1.1.2
+
+Release date: _September 30th 2016_
+
+Fixes and small improvements, in particular:
+
+  * A new My Items page, available from the account menu, which gives quick access to your own items
+  * Fix to browsing text files, which was a particular problem for CSV and TSV files
+  * Models simulation page can now be shared as a URL by copying from the browser.
+  * Fix to include creators of Investigations, Studies and Assays in related items page
+
+Small fixes and minor improvements - for full details see [SEEK v1.1.2 release notes](release-notes-1.1.2.html)
+
 ## Version 1.1.1
 
 Release date: _June 21st 2016_
