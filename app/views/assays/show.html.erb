@@ -100,7 +100,6 @@
 
   <div class="col-md-3 col-sm-4">
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @assay, :creators => (@assay.creators | [@assay.owner]).compact.uniq } %>
-    <%= render :partial=>"snapshots/snapshots",:locals => { :snapshots => @assay.snapshots, :resource => @assay } if @assay.snapshots.any? %>
   </div>
 </div>
 

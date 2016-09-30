@@ -1,3 +1,5 @@
+<% snapshot ||= nil %>
+
 <div class="panel panel-default">
   <div class="panel-heading">
     <button class="btn-default btn btn-xs clipboard-btn pull-right" data-clipboard-target="#snapshot-citation">
@@ -15,9 +17,16 @@
       <option value="">Change citation style...</option>
       <%= citation_style_options %>
     </select>
+
+    <% if snapshot %>
+      <span class="subtle">
+        Note: This is a citation for
+        <%= link_to "Snapshot #{snapshot.snapshot_number}", polymorphic_path([snapshot.resource, snapshot]) %>
+        of this <%= snapshot.resource_type.humanize %>, the contents of which may vary from what is shown on this page.
+      </span>
+    <% end %>
   </div>
 </div>
-
 
 <script>
   $j(document).ready(function () {
