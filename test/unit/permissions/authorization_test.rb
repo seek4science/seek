@@ -198,19 +198,19 @@ class AuthorizationTest < ActiveSupport::TestCase
   
   # testing combinations of types of input parameters
   def test_is_authorized_for_model
-    res = Seek::Permissions::Authorization.is_authorized?("view", "Model", models(:teusink), users(:model_owner))
+    res = Seek::Permissions::Authorization.is_authorized?("view", models(:teusink), users(:model_owner))
     assert res, "model_owner should be able to view his own model"
   end
 
   def test_is_not_authorized_for_model
-    res = Seek::Permissions::Authorization.is_authorized?("view", "Model", models(:teusink), users(:quentin))
+    res = Seek::Permissions::Authorization.is_authorized?("view", models(:teusink), users(:quentin))
     assert res, "Quentin should not be able to view the model_owner's model"
   end
   
   # testing that asset owners can delete (plus verifying different options fur submitting the 'thing' and the 'user')
   
   def test_is_authorized_owner_who_is_not_policy_admin_can_delete
-    res = Seek::Permissions::Authorization.is_authorized?("delete", nil, sops(:sop_with_complex_permissions), users(:owner_of_my_first_sop))
+    res = Seek::Permissions::Authorization.is_authorized?("delete", sops(:sop_with_complex_permissions), users(:owner_of_my_first_sop))
     assert res, "owner of asset who isn't its policy admin couldn't delete the asset"
   end
   
@@ -227,7 +227,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     temp = (Policy::EDITING > FavouriteGroup::WHITELIST_ACCESS_TYPE)
     assert temp, "editing is now authorized by whitelist access type"
     
-    res = Seek::Permissions::Authorization.is_authorized?("edit", nil, sops(:sop_with_custom_permissions_policy), users(:test_user_only_in_whitelist))
+    res = Seek::Permissions::Authorization.is_authorized?("edit", sops(:sop_with_custom_permissions_policy), users(:test_user_only_in_whitelist))
     assert !res, "editing shouldn't have been authorized for a a person in the whitelist - flag to use whitelist was set"
   end
   
@@ -240,7 +240,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     temp = Seek::Permissions::Authorization.is_person_in_whitelist?(users(:test_user_only_in_whitelist).person, sops(:my_first_sop).contributor)
     assert temp, "test person should have been in the whitelist of the sop owner"
     
-    res = Seek::Permissions::Authorization.is_authorized?("download", nil, sops(:my_first_sop), users(:test_user_only_in_whitelist))
+    res = Seek::Permissions::Authorization.is_authorized?("download", sops(:my_first_sop), users(:test_user_only_in_whitelist))
     assert !res, "download shouldn't have been authorized for a a person in the whitelist - flag to use whitelist wasn't set"
   end
   
@@ -252,7 +252,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     temp = Seek::Permissions::Authorization.is_person_in_whitelist?(users(:registered_user_with_no_projects).person, sops(:my_first_sop).contributor)
     assert !temp, "test person shouldn't have been in the whitelist of the sop owner"
     
-    res = Seek::Permissions::Authorization.is_authorized?("download", nil, sops(:my_first_sop), users(:registered_user_with_no_projects))
+    res = Seek::Permissions::Authorization.is_authorized?("download", sops(:my_first_sop), users(:registered_user_with_no_projects))
     assert !res, "download shouldn't have been authorized for a a person not in the whitelist - especially when flag to use whitelist wasn't set"
   end
   
@@ -281,7 +281,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     temp = Seek::Permissions::Authorization.is_person_in_blacklist?(users(:owner_of_my_first_sop).person, users(:owner_of_a_sop_with_complex_permissions))
     assert temp, "test person should have been in the blacklist of the sop owner"
     
-    res = Seek::Permissions::Authorization.is_authorized?("view", nil, sops(:sop_with_complex_permissions), users(:owner_of_my_first_sop))
+    res = Seek::Permissions::Authorization.is_authorized?("view", sops(:sop_with_complex_permissions), users(:owner_of_my_first_sop))
     assert res, "view should have been authorized for a a person in the blacklist - flag to use blacklist wasn't set"
   end
   
@@ -293,7 +293,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     temp = Seek::Permissions::Authorization.is_person_in_blacklist?(users(:test_user_only_in_whitelist).person, sops(:sop_with_complex_permissions).contributor)
     assert !temp, "test person shouldn't have been in the blacklist of the sop owner"
     
-    res = Seek::Permissions::Authorization.is_authorized?("view", nil, sops(:sop_with_complex_permissions), users(:test_user_only_in_whitelist))
+    res = Seek::Permissions::Authorization.is_authorized?("view", sops(:sop_with_complex_permissions), users(:test_user_only_in_whitelist))
     assert res, "view should have been authorized for a a person not in the blacklist - especially when flag to use blacklist wasn't set"
   end
   
@@ -317,7 +317,7 @@ class AuthorizationTest < ActiveSupport::TestCase
                                                users(:sysmo_user_both_in_blacklist_and_whitelist), users(:sysmo_user_both_in_blacklist_and_whitelist).person)
     assert temp, "test user is SysMO user and should have been authorized by policy"
     
-    res = Seek::Permissions::Authorization.is_authorized?("view", nil, sops(:sop_with_all_sysmo_users_policy), users(:sysmo_user_both_in_blacklist_and_whitelist))
+    res = Seek::Permissions::Authorization.is_authorized?("view", sops(:sop_with_all_sysmo_users_policy), users(:sysmo_user_both_in_blacklist_and_whitelist))
   end
   
   
@@ -342,11 +342,11 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert permissions[0].access_type > sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing).policy.access_type, "expected that the permission would give the test user more access than general policy settings"
     
     # verify that individual permission will not be used, because blacklist has precedence
-    res = Seek::Permissions::Authorization.is_authorized?("download", nil, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:registered_user_with_no_projects))
+    res = Seek::Permissions::Authorization.is_authorized?("download", sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:registered_user_with_no_projects))
     assert !res, "test user shouldn't have been allowed to 'download' the SOP even having the individual permission and use_custom_sharing is set to true - blacklist membership should have had precedence"
     
     # in fact, even 'viewing' allowed by general policy settings shouldn't be allowed because of the blacklist
-    res = Seek::Permissions::Authorization.is_authorized?("view", nil, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:registered_user_with_no_projects))
+    res = Seek::Permissions::Authorization.is_authorized?("view", sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:registered_user_with_no_projects))
     assert !res, "test user shouldn't have been allowed to 'view' the SOP - blacklist membership should have denied this"
   end
   
@@ -370,7 +370,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !temp, "whitelist solely shouldn't allow 'editing' otherwise this test case doesn't make sense"
     
     # verify that individual permission will be used, because whitelist doesn't have precedence
-    res = Seek::Permissions::Authorization.is_authorized?("edit", nil, sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:owner_of_private_policy_using_custom_sharing))
+    res = Seek::Permissions::Authorization.is_authorized?("edit", sops(:sop_that_uses_whitelist_blacklist_and_custom_sharing), users(:owner_of_private_policy_using_custom_sharing))
     assert res, "test user should have been allowed to 'edit' the SOP having the individual permission and use_custom_sharing is set to true - whitelist membership should not have had precedence"
   end
 
@@ -403,7 +403,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     temp = Seek::Permissions::Authorization.is_person_in_whitelist?(users(:test_user_only_in_whitelist).person, sops(:sop_with_custom_permissions_policy).contributor)
     assert temp, "test person should have been in the whitelist of the sop owner"
 
-    res = Seek::Permissions::Authorization.is_authorized?("download", nil, sops(:sop_with_custom_permissions_policy), users(:test_user_only_in_whitelist))
+    res = Seek::Permissions::Authorization.is_authorized?("download", sops(:sop_with_custom_permissions_policy), users(:test_user_only_in_whitelist))
     assert res, "download should have been authorized for a a person in the whitelist - flag to use whitelist was set"
   end
   
@@ -439,13 +439,13 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert permissions[0].access_type == Policy::EDITING, "expected that the permission would give the test user access to the test SOP for editing"
     
     # ..and now verify that permissions from favourite groups won't get used, because individual permissions have precedence
-    res = Seek::Permissions::Authorization.is_authorized?("edit", nil, sops(:sop_with_download_for_all_sysmo_users_policy), users(:sysmo_user_who_wants_to_access_different_things))
+    res = Seek::Permissions::Authorization.is_authorized?("edit", sops(:sop_with_download_for_all_sysmo_users_policy), users(:sysmo_user_who_wants_to_access_different_things))
     assert !res, "test user should not have been allowed to 'edit' the SOP - individual permission should have denied the action"
     
-    res = Seek::Permissions::Authorization.is_authorized?("download", nil, sops(:sop_with_download_for_all_sysmo_users_policy), users(:sysmo_user_who_wants_to_access_different_things))
+    res = Seek::Permissions::Authorization.is_authorized?("download", sops(:sop_with_download_for_all_sysmo_users_policy), users(:sysmo_user_who_wants_to_access_different_things))
     assert !res, "test user should not have been allowed to 'download' the SOP - individual permission should have denied the action (these limit it to less that public access)"
     
-    res = Seek::Permissions::Authorization.is_authorized?("view", nil, sops(:sop_with_download_for_all_sysmo_users_policy), users(:sysmo_user_who_wants_to_access_different_things))
+    res = Seek::Permissions::Authorization.is_authorized?("view", sops(:sop_with_download_for_all_sysmo_users_policy), users(:sysmo_user_who_wants_to_access_different_things))
     assert res, "test user should have been allowed to 'view' the SOP - this is what individual permissions only allow"
   end
   
@@ -472,7 +472,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert permissions[0].access_type == Policy::EDITING, "expected that the permission would give the test user access to the test SOP for editing"
     
     # ..and now verify that permissions from favourite groups are actually used
-    res = Seek::Permissions::Authorization.is_authorized?("edit", nil, sops(:sop_with_download_for_all_sysmo_users_policy), users(:owner_of_my_first_sop))
+    res = Seek::Permissions::Authorization.is_authorized?("edit", sops(:sop_with_download_for_all_sysmo_users_policy), users(:owner_of_my_first_sop))
     assert res, "test user should have been allowed to 'edit' the SOP - because of favourite group membership and permissions"
   end
   
@@ -494,7 +494,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert person_permissions.empty?, 'there should be no person permissions for this policy'
 
     # ..all flags are checked to 'false'; only policy settings will be used
-    res = Seek::Permissions::Authorization.is_authorized?("edit", nil, sops(:sop_with_fully_public_policy), users(:sysmo_user_who_wants_to_access_different_things))
+    res = Seek::Permissions::Authorization.is_authorized?("edit", sops(:sop_with_fully_public_policy), users(:sysmo_user_who_wants_to_access_different_things))
     assert res, "test user should have been allowed to 'edit' the SOP - it uses fully public policy"
   end
   
@@ -513,10 +513,10 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert person_permissions.empty?, 'there should be no person permissions for this policy'
 
     # ..all flags are checked to 'false'; only policy settings will be used
-    res = Seek::Permissions::Authorization.is_authorized?("edit", nil, sops(:sop_with_public_download_and_no_custom_sharing), users(:sysmo_user_who_wants_to_access_different_things))
+    res = Seek::Permissions::Authorization.is_authorized?("edit", sops(:sop_with_public_download_and_no_custom_sharing), users(:sysmo_user_who_wants_to_access_different_things))
     assert !res, "test user shouldn't have been allowed to 'edit' the SOP - policy only allows downloading"
     
-    res = Seek::Permissions::Authorization.is_authorized?("download", nil, sops(:sop_with_public_download_and_no_custom_sharing), users(:sysmo_user_who_wants_to_access_different_things))
+    res = Seek::Permissions::Authorization.is_authorized?("download", sops(:sop_with_public_download_and_no_custom_sharing), users(:sysmo_user_who_wants_to_access_different_things))
     assert res, "test user should have been allowed to 'download' the SOP - policy allows downloading"
   end
   
@@ -544,7 +544,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert permissions[0].access_type == Policy::ACCESSIBLE, "expected that the permission would give the test user download access to the test SOP"
     
     # verify that group permissions work and access is granted
-    res = Seek::Permissions::Authorization.is_authorized?("download", nil, sops(:sop_for_test_with_workgroups), users(:owner_of_fully_public_policy))
+    res = Seek::Permissions::Authorization.is_authorized?("download", sops(:sop_for_test_with_workgroups), users(:owner_of_fully_public_policy))
     assert res, "test user should have been allowed to 'download' the SOP - because of group permission"
   end
   
@@ -607,7 +607,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert perm.access_type == Policy::EDITING, "expected that the permission would give the test user edit access to the test SOP"
     
     # verify that group permissions work and access is granted
-    res = Seek::Permissions::Authorization.is_authorized?("edit", nil, sops(:sop_for_test_with_projects_institutions), users(:owner_of_download_for_all_sysmo_users_policy))
+    res = Seek::Permissions::Authorization.is_authorized?("edit", sops(:sop_for_test_with_projects_institutions), users(:owner_of_download_for_all_sysmo_users_policy))
     assert res, "test user should have been allowed to 'download' the SOP - because of group permission: shared with test user's project"
   end
   
@@ -639,52 +639,52 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert perm.access_type == Policy::ACCESSIBLE, "expected that the permission would give the test user download access to the test SOP"
     
     # verify that group permissions work and access is granted
-    res = Seek::Permissions::Authorization.is_authorized?("download", nil, sops(:sop_for_test_with_projects_institutions), users(:owner_of_fully_public_policy))
+    res = Seek::Permissions::Authorization.is_authorized?("download", sops(:sop_for_test_with_projects_institutions), users(:owner_of_fully_public_policy))
     assert res, "test user should have been allowed to 'download' the SOP - because of group permission: shared with test user's institution"
   end
 
   def test_downloadable_data_file
     data_file=data_files(:downloadable_data_file)
-    res=Seek::Permissions::Authorization.is_authorized?("download",DataFile,data_file,users(:aaron))
+    res=Seek::Permissions::Authorization.is_authorized?("download",data_file,users(:aaron))
     assert res,"should be downloadable by all"
     assert data_file.can_download?(users(:aaron))
-    res=Seek::Permissions::Authorization.is_authorized?("edit",DataFile,data_file,users(:aaron))
+    res=Seek::Permissions::Authorization.is_authorized?("edit",data_file,users(:aaron))
     assert !res,"should not be editable"
     assert !data_file.can_edit?(users(:aaron))
   end
 
   def test_editable_data_file
     data_file=data_files(:editable_data_file)
-    res=Seek::Permissions::Authorization.is_authorized?("download",DataFile,data_file,users(:aaron))
+    res=Seek::Permissions::Authorization.is_authorized?("download",data_file,users(:aaron))
     assert res,"should be downloadable by all"
     assert data_file.can_download?(users(:aaron))
-    res=Seek::Permissions::Authorization.is_authorized?("edit",DataFile,data_file,users(:aaron))
+    res=Seek::Permissions::Authorization.is_authorized?("edit",data_file,users(:aaron))
     assert res,"should be editable"
     assert data_file.can_edit?(users(:aaron))
   end
 
   def test_downloadable_sop
     sop=sops(:downloadable_sop)
-    res=Seek::Permissions::Authorization.is_authorized?("download",Sop,sop,users(:aaron))
+    res=Seek::Permissions::Authorization.is_authorized?("download",sop,users(:aaron))
     assert res,"Should be able to download"
     assert sop.can_download?(users(:aaron))
 
     assert sop.can_view? users(:aaron)
 
-    res=Seek::Permissions::Authorization.is_authorized?("edit",Sop,sop,users(:aaron))
+    res=Seek::Permissions::Authorization.is_authorized?("edit",sop,users(:aaron))
     assert !res,"Should not be able to edit"
     assert !sop.can_edit?(users(:aaron))
   end
 
   def test_editable_sop
     sop=sops(:editable_sop)
-    res=Seek::Permissions::Authorization.is_authorized?("download",Sop,sop,users(:aaron))
+    res=Seek::Permissions::Authorization.is_authorized?("download",sop,users(:aaron))
     assert res,"Should be able to download"
     assert sop.can_download?(users(:aaron))
 
     assert sop.can_view?(users(:aaron))
 
-    res=Seek::Permissions::Authorization.is_authorized?("edit",Sop,sop,users(:aaron))
+    res=Seek::Permissions::Authorization.is_authorized?("edit",sop,users(:aaron))
     assert res,"Should be able to edit"
     assert sop.can_edit?(users(:aaron))
   end

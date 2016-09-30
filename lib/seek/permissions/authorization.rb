@@ -23,7 +23,7 @@ module Seek
       # 2) thing_type - this parameter is deprecated
       # 3) thing - instance of resource to be authorized
       # 4) user - instance of user
-      def self.is_authorized?(action, thing_type, thing, user=nil)
+      def self.is_authorized?(action, thing, user=nil)
 
         # initially not authorized, so if all tests fail -
         # safe result of being not authorized will get returned
