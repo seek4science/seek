@@ -223,10 +223,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     # ..and now verify that permissions from favourite groups won't get used, because individual permissions have precedence
     res = Seek::Permissions::Authorization.is_authorized?("edit", sops(:sop_with_download_for_all_sysmo_users_policy), users(:sysmo_user_who_wants_to_access_different_things))
     assert !res, "test user should not have been allowed to 'edit' the SOP - individual permission should have denied the action"
-    
-    res = Seek::Permissions::Authorization.is_authorized?("download", sops(:sop_with_download_for_all_sysmo_users_policy), users(:sysmo_user_who_wants_to_access_different_things))
-    assert !res, "test user should not have been allowed to 'download' the SOP - individual permission should have denied the action (these limit it to less that public access)"
-    
+
     res = Seek::Permissions::Authorization.is_authorized?("view", sops(:sop_with_download_for_all_sysmo_users_policy), users(:sysmo_user_who_wants_to_access_different_things))
     assert res, "test user should have been allowed to 'view' the SOP - this is what individual permissions only allow"
   end
@@ -491,42 +488,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !item.can_download?
     assert !item.can_delete?
     assert !item.can_manage?
-  end
-
-  def test_permission_has_precendence_over_policy
-    person = Factory :person
-    assert_equal 1,person.projects.count,"Should only be in 1 project"
-    project = person.projects.first
-    user=person.user
-    item = Factory :sop, :policy=>Factory(:all_sysmo_viewable_policy)
-    User.with_current_user user do
-      assert item.can_view?
-    end
-
-    User.with_current_user(item.contributor) do
-      sleep 2
-      item.policy.permissions.build Factory.build(:permission, :contributor => project, :access_type => Policy::NO_ACCESS, :policy => item.policy).attributes
-      item.save; item.reload
-    end
-
-    User.with_current_user user do
-      assert !item.can_view?
-    end
-
-    item = Factory :sop, :policy=>Factory(:private_policy)
-    User.with_current_user user do
-      assert !item.can_view?
-    end
-
-    User.with_current_user(item.contributor) do
-      sleep 2
-      item.policy.permissions.build Factory.build(:permission, :contributor => project, :access_type => Policy::VISIBLE, :policy => item.policy).attributes
-      item.save; item.reload
-    end
-
-    User.with_current_user user do
-      assert item.can_view?
-    end
   end
 
   def test_permissions
@@ -802,6 +763,45 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert sop.can_download?(user2)
 
   end
+
+  test 'permissions can only add more privileges, not remove them' do
+    person = Factory(:person)
+    user = person.user
+    public_item = Factory(:sop, policy: Factory(:all_sysmo_viewable_policy))
+    private_item = Factory(:sop, policy: Factory(:private_policy))
+
+    User.with_current_user(user) do
+      assert public_item.can_view?
+      refute public_item.can_edit?
+    end
+
+    User.with_current_user user do
+      refute private_item.can_view?
+      refute private_item.can_edit?
+    end
+    
+    # Add 'edit' permission to private item
+    User.with_current_user(private_item.contributor) do
+      Factory(:permission, contributor: person, access_type: Policy::EDITING, policy: private_item.policy)
+      private_item.reload
+    end
+    # Can edit?
+    User.with_current_user user do
+      assert private_item.can_view?
+      assert private_item.can_edit?
+    end
+
+    # Add 'no access' permission to public item
+    User.with_current_user(public_item.contributor) do
+      Factory(:permission, contributor: person, access_type: Policy::NO_ACCESS, policy: public_item.policy)
+      public_item.reload
+    end
+    # Can still view?
+    User.with_current_user user do
+      assert public_item.can_view?
+      refute public_item.can_edit?
+    end
+  end
   
   def temp_get_group_permissions(policy)
     policy.permissions.select {|p| ["WorkGroup","Project","Institution"].include?(p.contributor_type)}
@@ -816,6 +816,6 @@ class AuthorizationTest < ActiveSupport::TestCase
     #Use favourite_group_membership in place of permission. It has access_type so duck typing will save us.
     person.favourite_group_memberships.select {|x| favourite_group_ids.include?(x.favourite_group_id)}
   end
-
+  
 
 end
