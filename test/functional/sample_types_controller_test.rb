@@ -65,7 +65,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 2, sample_type.sample_attributes.size
     assert_equal 'a string', sample_type.sample_attributes.title_attributes.first.title
     assert_equal 'a sample', sample_type.sample_attributes.last.title
-    assert sample_type.sample_attributes.last.sample_attribute_type.is_seek_sample?
+    assert sample_type.sample_attributes.last.sample_attribute_type.seek_sample?
   end
 
   test 'should show sample_type' do
@@ -193,7 +193,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     linked_type = Factory(:linked_sample_type)
     linked_attribute = linked_type.sample_attributes.last
 
-    assert linked_attribute.sample_attribute_type.is_seek_sample?
+    assert linked_attribute.sample_attribute_type.seek_sample?
 
     sample_type_linked_to = linked_attribute.linked_sample_type
     refute_nil sample_type_linked_to

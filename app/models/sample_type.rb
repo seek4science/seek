@@ -42,7 +42,7 @@ class SampleType < ActiveRecord::Base
   # rather than clearing the selected vocab each time
   def fix_up_controlled_vocabs
     sample_attributes.each do |attribute|
-      unless attribute.sample_attribute_type.is_controlled_vocab?
+      unless attribute.sample_attribute_type.controlled_vocab?
         attribute.sample_controlled_vocab = nil
       end
     end

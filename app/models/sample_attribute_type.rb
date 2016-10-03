@@ -62,11 +62,11 @@ class SampleAttributeType < ActiveRecord::Base
     base_type_handler(additional_options).convert(value)
   end
 
-  def is_controlled_vocab?
+  def controlled_vocab?
     base_type == Seek::Samples::BaseType::CV
   end
 
-  def is_seek_sample?
+  def seek_sample?
     base_type == Seek::Samples::BaseType::SEEK_SAMPLE
   end
 
