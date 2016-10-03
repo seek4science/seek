@@ -10,7 +10,9 @@
                   :help_text => "Here you attribute this #{resource_type} to other people.") do %>
     <p>
       If this <%= resource_type %> was contributed by, or together with, other <%= Seek::Config.project_name %> members, please list their names below. <br/>
-      The <%= t('creator').pluralize -%> you specify will have the right to 'view and edit summary and contents' of this <%= resource_type %>.
+      <strong>
+      The <%= t('creator').pluralize -%> you specify will have permissions to 'view and edit summary and contents'.
+      </strong>
     </p>
 
     <p style="color: #666666;">
