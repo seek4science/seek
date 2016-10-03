@@ -3,7 +3,8 @@ require 'test_helper'
 class BaseTypeTest  < ActiveSupport::TestCase
 
   test 'all types' do
-    assert_equal %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample CV),Seek::Samples::BaseType::ALL_TYPES
+    assert_equal %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample CV).sort,
+                 Seek::Samples::BaseType::ALL_TYPES.sort
   end
 
   test 'constants' do
