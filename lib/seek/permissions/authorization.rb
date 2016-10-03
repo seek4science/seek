@@ -65,11 +65,6 @@ module Seek
             # later in that same list. E.g. a person permission will override
             # a project permission
 
-            #strip out the more restrictive persmissions if overall scope is EVERYONE
-            if thing.policy.sharing_scope == thing.policy::EVERYONE
-              permissions.reject!{ |permission| permission.access_type <= thing.policy.access_type }
-            end
-
             permission = permissions.detect { |p| p.controls_access_for? user.person }
 
             # Cache the permission (or lack thereof - could be nil)
