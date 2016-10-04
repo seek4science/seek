@@ -13,7 +13,7 @@ class SessionsController < ApplicationController
     
   end
 
-  def index    
+  def index
     redirect_to root_path
   end
 
@@ -30,7 +30,7 @@ class SessionsController < ApplicationController
     end
   end
 
-  def destroy    
+  def destroy
     logout_user
     flash[:notice] = "You have been logged out."
 
