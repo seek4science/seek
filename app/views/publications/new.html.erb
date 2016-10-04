@@ -165,6 +165,21 @@ function addAuthorsToPublication( authorlist, selector_tagsinput) {
   });
 }
 
+function addAuthorsFromSelect() {
+  // convert all options of the multiselect to an authorlist
+  var authorlist = jQuery('#publication_publication_authors option').map( function(index,element){
+   return { full_name: jQuery(element).val()};
+  }).get();
+  
+  addAuthorsToPublication( authorlist, '#publication_publication_authors');
+  return;
+  
+  // jQuery('#publication_publication_authors option').each(function(index,element){
+    // console.log('value:' + jQuery(element).val());
+    // jQuery('#publication_publication_authors').tagsinput('add', jQuery(element).val());
+  // });
+}
+
 jQuery(document).ready(function() {
   // activate tab of current subaction, but only if no hash is set
   if( !window.location.hash) {
@@ -247,9 +262,7 @@ jQuery(document).ready(function() {
   });
 
   // add all options of the multiselect
-  jQuery('#publication_publication_authors option').each(function(index,element){
-    jQuery('#publication_publication_authors').tagsinput('add', jQuery(element).val());
-  });
+  addAuthorsFromSelect();
 
   jQuery('#retrieve_from_crossref').on('click', function(e){
     e.preventDefault(); // prevent the default form submit action
@@ -274,7 +287,7 @@ jQuery(document).ready(function() {
         data.author.forEach(function(item,index){
           authorlist.push({"first_name": item.given, "last_name": item.family});
         });
-        addAuthorsToPublication( authorlist, '#publication_publication_authors');
+        addAuthorsToPublication(authorlist,'#publication_publication_authors');
       },
       // http://www.crosscite.org/cn/
       statusCode: {
@@ -337,7 +350,7 @@ jQuery(document).ready(function() {
           var lastname = jQuery(element).find('LastName').html();
           authorlist.push({"first_name": firstname, "last_name": lastname});
         });
-        addAuthorsToPublication(authorlist,"#publication_publication_authors");
+        addAuthorsToPublication(authorlist,'#publication_publication_authors');
       },
       error: function() {
         jQuery('#publication_pubmed_id').parents('.form-group').removeClass('has-success');

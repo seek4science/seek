@@ -254,7 +254,13 @@ class PublicationsController < ApplicationController
 
     authors = []
     authors_q.each { |author_i, author_q|
-      params = { :first_name => author_q['first_name'], :last_name => author_q['last_name'] }
+      params = { }
+      if author_q.key?('full_name')
+        first_name, last_name = PublicationAuthor::split_full_name author_q['full_name']
+        params = { :first_name => first_name, :last_name => last_name }
+      else
+        params = { :first_name => author_q['first_name'], :last_name => author_q['last_name'] }
+      end
 
       authors_db = PublicationAuthor.where(params)
                                     .select([:person_id, :first_name, :last_name])
