@@ -320,7 +320,7 @@ module Seek
       end
 
       def authorized_for_action user,action
-        (Authorization.is_authorized?(action, nil, self, user)) ||
+        (Authorization.is_authorized?(action, self, user)) ||
             (Ability.new(user).can?(action.to_sym, self)) ||
             (Ability.new(user).can?("#{action}_asset".to_sym, self))
       end
