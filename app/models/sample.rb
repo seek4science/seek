@@ -65,7 +65,7 @@ class Sample < ActiveRecord::Base
   end
 
   def strains
-    sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == 'SeekStrain' }.map do |sa|
+    sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_STRAIN }.map do |sa|
       Strain.find_by_id(get_attribute(sa.hash_key)['id'])
     end.compact
   end
@@ -82,7 +82,7 @@ class Sample < ActiveRecord::Base
 
   def samples_this_links_to
     return [] unless sample_type
-    seek_sample_attributes = sample_type.sample_attributes.select { |attr| attr.sample_attribute_type.is_seek_sample? }
+    seek_sample_attributes = sample_type.sample_attributes.select { |attr| attr.sample_attribute_type.seek_sample? }
     seek_sample_attributes.map { |attr| Sample.find_by_id(get_attribute(attr.hash_key)) }.compact
   end
 

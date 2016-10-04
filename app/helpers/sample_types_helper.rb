@@ -2,7 +2,7 @@ module SampleTypesHelper
   
   def sample_attribute_details(sample_type_attribute)
     type = sample_type_attribute.sample_attribute_type.title
-    if sample_type_attribute.sample_attribute_type.is_seek_sample?
+    if sample_type_attribute.sample_attribute_type.seek_sample?
       type += ' - ' + link_to(sample_type_attribute.linked_sample_type.title,sample_type_attribute.linked_sample_type)
     end
     unit = sample_type_attribute.unit ? "( #{ sample_type_attribute. unit.symbol } )" : ''

@@ -7,6 +7,10 @@ module Seek
         def self.supports_doi?
           true
         end
+
+        searchable(auto_index: false) do
+          text :doi
+        end
       end
 
       # TODO

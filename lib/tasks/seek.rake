@@ -316,6 +316,46 @@ namespace :seek do
     synchronizer.synchronize_assay_types
     synchronizer.synchronize_technology_types
   end
+  
+  desc("Dump auth lookup tables")
+  task(:dump_auth_lookup => :environment) do
+    tables = ["assay_auth_lookup",
+              "data_file_auth_lookup",
+              "deprecated_sample_auth_lookup",
+              "deprecated_specimen_auth_lookup",
+              "event_auth_lookup",
+              "investigation_auth_lookup",
+              "model_auth_lookup",
+              "presentation_auth_lookup",
+              "publication_auth_lookup",
+              "sample_auth_lookup",
+              "sop_auth_lookup",
+              "strain_auth_lookup",
+              "study_auth_lookup",
+              "sweep_auth_lookup",
+              "taverna_player_run_auth_lookup",
+              "workflow_auth_lookup"]
+
+    hashes = {}
+    File.open('auth_lookup_dump.txt', 'w') do |f|
+      f.write '{'
+      tables.each_with_index do |table, i|
+        puts "Dumping #{table} ..."
+        array = ActiveRecord::Base.connection.execute("SELECT * FROM #{table}").each
+        f.write "'#{table}' => "
+        f.write array.inspect
+        hashes[table] = array.hash
+        f.write ',' unless i == (tables.length - 1)
+      end
+      f.write '}'
+    end
+
+    puts
+    puts "Hashes:"
+    puts JSON.pretty_generate(hashes).gsub(":", " =>")
+    puts
+    puts "Done"
+  end
 
   def set_projects_parent array, parent
     array.each do |proj|

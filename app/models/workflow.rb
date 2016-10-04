@@ -1,10 +1,10 @@
-
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'title_trimmer'
 require 't2flow/model'
 require 't2flow/parser'
 require 't2flow/dot'
+require 'datacite/acts_as_doi_mintable'
 
 class Workflow < ActiveRecord::Base
 
@@ -43,6 +43,7 @@ class Workflow < ActiveRecord::Base
   has_many :sweeps, :class_name => "Sweep", :dependent => :destroy
 
   explicit_versioning(:version_column => "version") do
+    acts_as_doi_mintable(proxy: :parent)
     acts_as_versioned_resource
     acts_as_favouritable
 

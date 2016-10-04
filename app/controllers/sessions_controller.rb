@@ -7,7 +7,7 @@ class SessionsController < ApplicationController
   skip_before_filter :profile_for_login_required,:only=>[:new,:destroy]
   skip_before_filter :partially_registered?,:only=>[:create,:new]
   prepend_before_filter :strip_root_for_xml_requests
-  
+
   # render new.rhtml
   def new
     

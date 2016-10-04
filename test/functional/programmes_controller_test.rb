@@ -426,13 +426,17 @@ class ProgrammesControllerTest < ActionController::TestCase
     login_as(p)
     assert_difference("Programme.count") do
       assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do #activation email
-        post :create, :programme=>{:title=>"A programme"}
+        post :create, :programme=>{:title=>"A programme", :funding_codes=>"aaa,bbb", :web_page=>"", :description=>"",:funding_details=>""}
       end
     end
     prog = assigns(:programme)
+    assert_empty prog.errors
     assert_redirected_to prog
     p.reload
     assert p.is_programme_administrator?(prog)
+    assert_equal 2, prog.funding_codes.length
+    assert_includes prog.funding_codes, 'aaa'
+    assert_includes prog.funding_codes, 'bbb'
   end
 
   test "admin doesn't become programme administrator by default" do
@@ -759,6 +763,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_redirected_to programme_path(programme)
     refute_nil flash[:error]
   end
+
 
   test "admin can add and remove funding codes" do
     login_as(Factory(:admin))

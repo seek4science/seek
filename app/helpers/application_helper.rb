@@ -8,6 +8,7 @@ module ApplicationHelper
   include FancyMultiselectHelper
   include TavernaPlayer::RunsHelper
   include Recaptcha::ClientHelper
+  include VersionHelper
 
 
   def no_items_to_list_text
@@ -69,6 +70,17 @@ module ApplicationHelper
     end
 
     str.html_safe
+  end
+
+  # provide the block that shows the URL to the resource, including the version if it is a versioned resource
+  # label is based on the application name, for example <label>FAIRDOMHUB ID: </label>
+  def persistent_resource_id resource
+    url = polymorphic_url(resource)
+    content_tag :p, class: :id do
+      content_tag(:label) do
+        "#{Seek::Config.application_name} ID: "
+      end + " " + link_to(url, url)
+    end
   end
 
   def show_title title
@@ -559,8 +571,25 @@ module ApplicationHelper
     resource
   end
 
-  def klass_from_controller controller_name
+  #returns the class associated with the controller, e.g. DataFile for the data_files
+  #
+  def klass_from_controller controller_name=controller_name
     controller_name.singularize.camelize.constantize
+  end
+
+  #returns the count of the total visible items, and also the count of the all items, according to controller_name
+  # primarily used for the metrics on the item index page
+  def resource_count_stats
+    klass = klass_from_controller(controller_name)
+    full_total = klass.count
+    if klass.authorization_supported?
+      visible_total = klass.all_authorized_for("view").count
+    elsif klass.kind_of?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
+      visible_total = 0
+    else
+      visible_total = klass.count
+    end
+    return visible_total,full_total
   end
 
   def describe_visibility(model)

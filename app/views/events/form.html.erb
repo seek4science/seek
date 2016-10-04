@@ -42,7 +42,7 @@
 
       <div class="form-group">
         <%= f.label :country -%><br/>
-        <%= f.country_select :country, nil, {}, :class=>"form-control" -%>
+        <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
       </div>
 
       <% if current_user_authorized_to_manage -%>

@@ -97,6 +97,24 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_empty snapshot.errors
   end
 
+  test 'logs when minting DOI' do
+    datacite_mock
+
+    snapshot = @investigation.create_snapshot
+
+    assert_equal 0, snapshot.doi_logs.count
+
+    assert_difference('AssetDoiLog.count', 1) do
+      snapshot.mint_doi
+    end
+
+    assert_equal 1, snapshot.doi_logs.count
+    log = snapshot.doi_logs.last
+    assert_equal AssetDoiLog::MINT, log.action
+    assert_equal log.asset_type, snapshot.resource.class.name
+    assert_equal log.asset_id, snapshot.resource.id
+    assert_equal log.asset_version, snapshot.snapshot_number
+  end
 
   test "doesn't create DOI if already minted" do
     datacite_mock
@@ -214,6 +232,20 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_includes titles, 'a1'
     assert_includes titles, 'df1'
     assert_includes titles, 'p1'
+  end
+
+  test 're-indexes parent model when DOI created' do
+    snapshot = @assay.create_snapshot
+
+    assert_difference("ReindexingQueue.count", 1) do
+      snapshot.doi = '10.5072/test'
+      snapshot.save
+    end
+
+    reindex_job = ReindexingQueue.last
+
+    assert_equal snapshot.resource_type, reindex_job.item_type
+    assert_equal snapshot.resource_id, reindex_job.item_id
   end
 
   private

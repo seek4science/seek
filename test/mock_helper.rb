@@ -63,4 +63,29 @@ module MockHelper
     )
   end
 
+  def doi_citation_mock
+    stub_request(:get, /https:\/\/dx\.doi\.org\/.+/).
+        with(headers: {'Accept' => 'application/vnd.citationstyles.csl+json'}).
+        to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, "https://dx.doi.org/10.5072/test").
+        with(headers: {'Accept' => 'application/vnd.citationstyles.csl+json'}).
+        to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, "https://dx.doi.org/10.5072/broken").
+        with(headers: {'Accept' => 'application/vnd.citationstyles.csl+json'}).
+        to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/broken_doi_metadata_response.html"), status: 200)
+  end
+
+  def publication_formatter_mock
+    stub_request(:post, "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi").
+        with(body: { 'db'=>'pubmed', 'email'=>'()', 'id'=>'5', 'retmode'=>'text', 'rettype'=>'medline', 'tool'=>'bioruby' },
+             headers: { 'Accept'=>'*/*',
+                        'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+                        'Content-Length'=>'69',
+                        'Content-Type'=>'application/x-www-form-urlencoded',
+                        'User-Agent'=>'Ruby' }).
+        to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))
+  end
+
 end

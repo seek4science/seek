@@ -1,7 +1,7 @@
-
 require 'explicit_versioning'
 require 'title_trimmer'
 require 'acts_as_versioned_resource'
+require 'datacite/acts_as_doi_mintable'
 
 class Sop < ActiveRecord::Base
 
@@ -30,8 +30,10 @@ class Sop < ActiveRecord::Base
   has_many :deprecated_samples, :through => :sample_assets
 
   explicit_versioning(:version_column => "version") do
+    acts_as_doi_mintable(proxy: :parent)
     acts_as_versioned_resource
     acts_as_favouritable
+
     has_one :content_blob,:primary_key => :sop_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version,parent.class.name]}
     has_many :experimental_conditions, :primary_key => "sop_id", :foreign_key => "sop_id", :conditions =>  Proc.new{["experimental_conditions.sop_version =?",version]}
     

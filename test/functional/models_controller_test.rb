@@ -97,6 +97,8 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "should not download zip with only remote files" do
+    stub_request(:head, "http://www.abc.com").to_return(headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
+
     model = Factory :model_2_remote_files, :title=>"this_model", :policy=>Factory(:public_policy), :contributor=>User.current_user
     assert_difference("ActivityLog.count") do
       get :download, :id => model.id

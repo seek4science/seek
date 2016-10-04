@@ -26,6 +26,10 @@ module Acts #:nodoc:
           extend Acts::VersionedResource::SingletonMethods
         end
         include Acts::VersionedResource::InstanceMethods
+
+        delegate :tag_counts, :scales, :managers, :attributions, :creators, :assets_creators, :is_asset?,
+                 :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,
+                 :show_contributor_avatars?, :can_see_hidden_item?, :related_people, to: :parent
       end
     end
 
@@ -55,13 +59,6 @@ module Acts #:nodoc:
       end
 
       # assumes all versioned resources are also taggable
-      def tag_counts
-        parent.tag_counts
-      end
-
-      def scales
-        parent.scales
-      end
 
       def contains_downloadable_items?
         all_content_blobs.compact.any? { |blob| blob.is_downloadable? }
@@ -79,13 +76,6 @@ module Acts #:nodoc:
       end
       # returns a list of the people that can manage this file
       # which will be the contributor, and those that have manage permissions
-      def managers
-        parent.managers
-      end
-
-      def attributions
-        parent.attributions
-      end
 
       def assays(version_specific = false)
         if version_specific
@@ -100,48 +90,19 @@ module Acts #:nodoc:
         aa.select { |a| a.version == version } if version_specific
       end
 
-      def creators
-        parent.creators
-      end
-
-      def assets_creators
-        parent.assets_creators
-      end
-
       def contributing_user
         parent.try(:contributing_user)
-      end
-
-      def is_asset?
-        parent.is_asset?
-      end
-
-      def authorization_supported?
-        parent.authorization_supported?
-      end
-
-      def defines_own_avatar?
-        parent.defines_own_avatar?
-      end
-
-      def use_mime_type_for_avatar?
-        parent.use_mime_type_for_avatar?
-      end
-
-      def avatar_key
-        parent.avatar_key
-      end
-
-      def show_contributor_avatars?
-        parent.show_contributor_avatars?
       end
 
       def annotations
         parent.annotations if parent.respond_to? :annotations
       end
 
-      def can_see_hidden_item?(person)
-        parent.can_see_hidden_item?(person)
+      # For acts_as_doi_mintable...
+      def doi_target_url
+        polymorphic_url(parent, :version => self.version,
+                        :host => Seek::Config.host_with_port,
+                        :protocol => Seek::Config.host_scheme)
       end
     end
   end

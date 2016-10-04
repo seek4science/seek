@@ -106,10 +106,12 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   test "should not allow linking to an investigation from a project you are not a member of" do
-    login_as(:owner_of_my_first_sop)
-    inv = investigations(:metabolomics_investigation)
-    assert !inv.projects.map(&:people).flatten.include?(people(:person_for_owner_of_my_first_sop)), "this person should not be a member of the investigations project"
-    assert !inv.can_edit?(users(:owner_of_my_first_sop))
+    inv = Factory(:investigation)
+    user = Factory(:user)
+    login_as(user)
+
+    assert !inv.projects.map(&:people).flatten.include?(user.person), "this person should not be a member of the investigations project"
+    assert !inv.can_edit?(user)
     get :new, :investigation_id=>inv
     assert_response :success
 

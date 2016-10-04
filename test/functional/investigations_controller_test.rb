@@ -163,10 +163,12 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_select "a[href=?]",edit_investigation_path(investigations(:metabolomics_investigation)),:text=>/Edit #{I18n.t('investigation')}/i,:count=>1
   end
 
-  test "no add study button for person that can edit" do
-    login_as(:owner_of_my_first_sop)
-    inv = investigations(:metabolomics_investigation)
-    assert !inv.can_edit?,"Aaron should not be able to edit this investigation"
+  test "no add study button for person that cannot edit" do
+    inv = Factory(:investigation)
+    login_as(Factory(:user))
+
+    assert !inv.can_edit?
+
     get :show, :id=>inv
     assert_select "a",:text=>/Add a #{I18n.t('study')}/i,:count=>0
   end

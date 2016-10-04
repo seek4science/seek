@@ -2,11 +2,14 @@ require 'test_helper'
 
 class DataciteDoiTest < ActionController::IntegrationTest
 
+  include MockHelper
+
   DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect{|type| type.name.underscore}
 
-  def setup
-    User.current_user = Factory(:user, :login => 'test')
-    post '/session', :login => 'test', :password => 'blah'
+  setup do
+    @user = Factory(:user, :login => 'test')
+    login_as(@user)
+    doi_citation_mock
   end
 
   test 'doiable assets' do
@@ -44,8 +47,10 @@ class DataciteDoiTest < ActionController::IntegrationTest
   end
 
   test "authorization for mint_doi_confirm" do
-    skip("mint_doi_confirmation")
+    a_user = User.current_user = Factory(:user, :login => 'a_user')
+
     DOIABLE_ASSETS.each do |type|
+      login_as(@user)
       asset = Factory(type.to_sym, :policy=>Factory(:private_policy), :contributor => User.current_user)
       refute asset.is_published?
       assert asset.can_manage?
@@ -56,8 +61,8 @@ class DataciteDoiTest < ActionController::IntegrationTest
 
       asset.publish!
       assert asset.reload.is_published?
-      a_user = Factory(:user, :login => 'a_user')
-      post '/session', :login => 'a_user', :password => 'blah'
+
+      login_as(a_user)
       assert_equal a_user,User.current_user
       refute asset.can_manage?
       refute asset.is_doiable?(asset.version)
@@ -65,36 +70,6 @@ class DataciteDoiTest < ActionController::IntegrationTest
       get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
       assert_response :redirect
     end
-  end
-
-  test "generate_metadata_in_xml" do
-    metadata_param = datacite_metadata_param
-
-    metadata_in_xml = DataFilesController.new().generate_metadata_xml(metadata_param)
-    metadata_from_file = open("#{Rails.root}/test/fixtures/files/doi_metadata.xml").read
-
-    assert_equal metadata_from_file, metadata_in_xml
-  end
-
-  test "generate_metadata_in_xml does not contain empty node" do
-    metadata_param = {:identifier => '',
-                      :creators => [],
-                      :titles => ['test title'],
-                      :publisher => 'Fairdom',
-                      :publicationYear => '2014'
-    }
-
-    metadata_in_xml = DataFilesController.new().generate_metadata_xml(metadata_param)
-
-    assert !metadata_in_xml.include?('identifier')
-    assert !metadata_in_xml.include?('creators')
-    assert !metadata_in_xml.include?('creator')
-    assert !metadata_in_xml.include?('descriptions')
-
-    assert metadata_in_xml.include?('title')
-    assert metadata_in_xml.include?('titles')
-    assert metadata_in_xml.include?('publisher')
-    assert metadata_in_xml.include?('publicationYear')
   end
 
   test "mint_doi" do
@@ -121,25 +96,6 @@ class DataciteDoiTest < ActionController::IntegrationTest
 
         assert !AssetDoiLog.was_doi_minted_for?(asset.class.name, asset.id, asset.version)
       end
-    end
-  end
-
-  test 'minted_doi' do
-    skip("minted_doi")
-    DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym,:policy=>Factory(:public_policy))
-      assert asset.is_published?
-      assert asset.can_manage?
-
-      doi = '10.5072/my_test'
-      url = "#{root_url}data_files/#{asset.id}?version=#{asset.version}"
-
-      get "/#{type.pluralize}/#{asset.id}/minted_doi?version=#{asset.version}&doi=#{doi}&url=#{url}"
-      assert_response :success
-
-      assert_select "li", :text => /#{doi}/
-      assert_select "li", :text => "Resolved URL: http://test.host/data_files/#{asset.id}?version=1"
-      assert_select "li", :text => /#{asset.title}/
     end
   end
 
@@ -306,21 +262,12 @@ class DataciteDoiTest < ActionController::IntegrationTest
     stub_request(:post, "https://invalid:test@test.datacite.org/mds/metadata").to_return(:body => '401 Bad credentials', :status => 401)
   end
 
-  def datacite_metadata_param
-    {:identifier => '10.5072/my_test',
-     :creators => [{:creatorName => 'Last1, First1'}, {:creatorName => 'Last2, First2'}],
-     :titles => ['test title'],
-     :publisher => 'Fairdom',
-     :publicationYear => '2014',
-     :subjects => ['System Biology', 'Bioinformatic'],
-     :language => 'eng',
-     :resourceType => 'Dataset',
-     :version => '1.0',
-     :descriptions => ['test description']
-    }
-  end
-
   def asset_url asset
     "#{root_url}data_files/#{asset.id}?version=#{asset.version}"
+  end
+
+  def login_as(user)
+    User.current_user = user
+    post '/session', :login => user.login, :password => 'blah'
   end
 end

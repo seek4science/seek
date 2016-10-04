@@ -1,0 +1,58 @@
+<% snapshot ||= nil %>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <button class="btn-default btn btn-xs clipboard-btn pull-right" data-clipboard-target="#snapshot-citation">
+      <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
+      Copy
+    </button>
+    Citation
+  </div>
+  <div class="panel-body">
+    <div id="snapshot-citation" class="well well-sm">
+      <%= render partial: 'assets/citation', locals: { doi: doi, style: 'apa' } %>
+    </div>
+
+    <select id="citation-style-select" class="form-control" autocomplete="off">
+      <option value="">Change citation style...</option>
+      <%= citation_style_options %>
+    </select>
+
+    <% if snapshot %>
+      <span class="subtle">
+        Note: This is a citation for
+        <%= link_to "Snapshot #{snapshot.snapshot_number}", polymorphic_path([snapshot.resource, snapshot]) %>
+        of this <%= snapshot.resource_type.humanize %>, the contents of which may vary from what is shown on this page.
+      </span>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  $j(document).ready(function () {
+    new Clipboard('.clipboard-btn');
+
+    $j('#citation-style-select').change(function () {
+      var style = $j(this).val();
+      var div = $j('#snapshot-citation');
+
+      if (style) {
+        $j.ajax({
+          url: '<%= citation_path(doi) %>',
+          data: { style: style },
+          dataType: 'html',
+          success: function (html) {
+            div.html(html);
+          },
+          error: function () {
+            div.html('Could not generate citation in that style.');
+          },
+          complete: function () {
+            div.spinner('remove');
+          }
+        });
+        div.spinner('add');
+      }
+    });
+  });
+</script>

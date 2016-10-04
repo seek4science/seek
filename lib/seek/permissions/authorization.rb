@@ -14,116 +14,61 @@ module Seek
 
     module Authorization
 
-      def self.authorization_supported? thing
-        !thing.nil? && thing.authorization_supported?
+      def self.is_authorized?(action, thing, user=nil)
+        is_authorized_as_creator?(action, thing, user) ||
+            is_authorized_by_policy?(action, thing) ||
+            is_authorized_by_permission?(action, thing, user)
       end
 
+      private
 
-      # 1) action_name - name of the action that is about to happen with the "thing"
-      # 2) thing_type - this parameter is deprecated
-      # 3) thing - instance of resource to be authorized
-      # 4) user - instance of user
-      def self.is_authorized?(action, thing_type, thing, user=nil)
-
-        # initially not authorized, so if all tests fail -
-        # safe result of being not authorized will get returned
-        is_authorized = false
-
-        policy = thing.policy
-
-        # == BASIC POLICY
-        # 1. Check the user's "scope" level, to match the sharing scopes defined in policy.
-        # 2. If they're in "scope", check the action they're trying to perform is allowed by the access_type
-        scope = nil
-        if user.nil?
-          scope = Policy::EVERYONE
-        else
-          if thing.contributor == user || thing.contributor == user.person #Warning to future refactorers, this would pass in the case that
-                                                                           #  the user was nil (not logged in) and the contributor was also nil (jerm resource)
-                                                                           #  IF we didn't already check for a nil user above.
-            scope = Policy::PRIVATE
+      def self.is_authorized_as_creator?(action, thing, user = nil)
+        if user
+          # Is the uploader?
+          if thing.contributor == user || thing.contributor == user.person
             return true #contributor is always authorized
-                                                                           # have to do this because of inconsistancies with access_type that mess up later on
-                                                                           # (4 = can manage, 0 = can manage... if contributor) ???
-          elsif thing.is_downloadable? and thing.creators.include?(user.person) and access_type_allows_action?(action, Policy::EDITING)
-            scope = Policy::PRIVATE
+            # Is a creator?
+          elsif thing.is_downloadable? && thing.creators.include?(user.person) && access_type_allows_action?(action, Policy::EDITING)
             return true
-          else
-            if user.person && user.person.projects.empty?
-              scope = Policy::EVERYONE
-            else
-              scope = Policy::ALL_USERS
-            end
           end
         end
 
-        # Check the user is "in scope" and also is performing an action allowed under the given access type
-        is_authorized = (scope <= policy.sharing_scope &&
-            access_type_allows_action?(action, policy.access_type))
+        false
+      end
 
-        # == END BASIC POLICY
-        if !policy.permissions.empty? && user
+      def self.is_authorized_by_policy?(action, thing)
+        # Check the user is "in scope" and also is performing an action allowed under the given access type
+        access_type_allows_action?(action, thing.policy.access_type)
+      end
+
+      def self.is_authorized_by_permission?(action, thing, user = nil)
+        if thing.policy.permissions.any? && user
           # == CUSTOM PERMISSIONS
           # 1. Check if there is a specific permission relating to the user
           # 2. Check if there is a permission for a FavouriteGroup they're in
           # 3. Check if there is a permission for their project
           # 4. Check the action is allowed by the access_type of the permission
           person = user.person
-          thing.permission_for ||= {}   # if thing.permission_for is defined,
-                                        # nothing happens, otherwise empty hash
-          p = thing.permission_for[person]
-          permission = if p
-                         p == :nil ? nil : p  # distinguish empty hash item from item with value :nil
-                       else
-                         # sort permissions by precedence
-                         permissions = Permission.sort_for(person, policy.permissions)
-                         # find the first permission, which actually overrides the permission
-                         # later in that same list. E.g. a person permission will override
-                         # a project permission
-                         permission = permissions.detect { |p| p.controls_access_for? user.person }
-                         # turn nil into :nil, so that caching is possible
-                         permission ? thing.permission_for[person] = permission : thing.permission_for[person] = :nil
-                         # return the resulting value
-                         permission
-                       end
 
-          # now find out if the resulting permissions suffice
-          is_authorized = permission.allows_action? action, user.person if permission
-          # == END CUSTOM PERMISSIONS
-        end
+          thing.permission_for ||= {} # This is a little cache. Initialize it here.
 
-        # == BLACK/WHITE LISTS
-        # 1. Check if they're in the whitelist
-        # 2. Check if they're not in the blacklist (overrules whitelist)
-        contributor = thing.contributor
-        contributor = contributor.user if contributor.respond_to? :user
-        if contributor && user
-          # == WHITE LIST
-          if policy.use_whitelist && contributor.get_whitelist
-            is_authorized = true if is_person_in_whitelist?(user.person, contributor) && access_type_allows_action?(action, FavouriteGroup::WHITELIST_ACCESS_TYPE)
+          if thing.permission_for.key?(person) # Look-up in the cache first
+            permission = thing.permission_for[person]
+          else
+            # sort permissions by precedence
+            permissions = Permission.sort_for(person, thing.policy.permissions)
+            # find the first permission, which actually overrides the permission
+            # later in that same list. E.g. a person permission will override
+            # a project permission
+
+            permission = permissions.detect { |p| p.controls_access_for? user.person }
+
+            # Cache the permission (or lack thereof - could be nil)
+            thing.permission_for[person] = permission
           end
-          # == END WHITE LIST
-          # == BLACK LIST
-          if policy.use_blacklist && contributor.get_blacklist
-            is_authorized = false if is_person_in_blacklist?(user.person, contributor)
-          end
-          # == END BLACK LIST
+
+          permission ? permission.allows_action?(action, user.person) : false
         end
-        # == END BLACK/WHITE LISTS
-
-        return is_authorized
-      end
-
-      private
-
-      # checks if a person belongs to a blacklist of a particular user
-      def self.is_person_in_blacklist?(person, blacklist_owner)
-        return blacklist_owner.get_blacklist.people.include?(person)
-      end
-
-      # checks if a person belongs to a whitelist of a particular user
-      def self.is_person_in_whitelist?(person, whitelist_owner)
-        return whitelist_owner.get_whitelist.people.include?(person)
       end
 
       # checks if the "access_type" permits an action of a certain type (based on cascading permissions)

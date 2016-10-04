@@ -1138,42 +1138,42 @@ end
 
   Factory.define(:integer_sample_attribute_type,:class=>SampleAttributeType) do |f|
     f.sequence(:title) {|n| "Integer attribute type #{n}"}
-    f.base_type 'Integer'
+    f.base_type Seek::Samples::BaseType::INTEGER
   end
 
   Factory.define(:string_sample_attribute_type,:class=>SampleAttributeType) do |f|
     f.sequence(:title) {|n| "String attribute type #{n}"}
-    f.base_type 'String'
+    f.base_type Seek::Samples::BaseType::STRING
   end
 
   Factory.define(:float_sample_attribute_type,:class=>SampleAttributeType) do |f|
     f.sequence(:title) {|n| "Float attribute type #{n}"}
-    f.base_type 'Float'
+    f.base_type Seek::Samples::BaseType::FLOAT
   end
 
   Factory.define(:datetime_sample_attribute_type,:class=>SampleAttributeType) do |f|
     f.sequence(:title) {|n| "DateTime attribute type #{n}"}
-    f.base_type 'DateTime'
+    f.base_type Seek::Samples::BaseType::DATE_TIME
   end
 
   Factory.define(:text_sample_attribute_type,:class=>SampleAttributeType) do |f|
     f.sequence(:title) {|n| "Text attribute type #{n}"}
-    f.base_type 'Text'
+    f.base_type Seek::Samples::BaseType::TEXT
   end
 
   Factory.define(:boolean_sample_attribute_type,:class=>SampleAttributeType) do |f|
     f.sequence(:title) {|n| "Boolean attribute type #{n}"}
-    f.base_type 'Boolean'
+    f.base_type Seek::Samples::BaseType::BOOLEAN
   end
 
   Factory.define(:strain_sample_attribute_type,:class=>SampleAttributeType) do |f|
     f.sequence(:title) {|n| "Strain attribute type #{n}"}
-    f.base_type 'SeekStrain'
+    f.base_type Seek::Samples::BaseType::SEEK_STRAIN
   end
 
   Factory.define(:sample_sample_attribute_type,:class=>SampleAttributeType) do |f|
     f.sequence(:title) {|n| "Sample attribute type #{n}"}
-    f.base_type 'SeekSample'
+    f.base_type Seek::Samples::BaseType::SEEK_SAMPLE
   end
 
   Factory.define(:sample_attribute) do |f|

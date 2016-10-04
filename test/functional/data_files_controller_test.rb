@@ -12,6 +12,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include RdfTestCases
   include SharingFormTestHelper
   include FunctionalAuthorizationTests
+  include MockHelper
 
   def setup
     login_as(:datafile_owner)
@@ -1743,6 +1744,16 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'dont show resource count for nested route' do
+    df = Factory(:data_file,:policy=>Factory(:public_policy))
+    project = df.projects.first
+    df2 = Factory(:data_file,:policy=>Factory(:public_policy))
+    get :index,:project_id=>project.id
+    assert_response :success
+    assert_select '#resource-count-stats', :count=>0
+
+  end
+
   test "filtered data files for non existent study" do
     Factory :data_file #needs a data file to be sure that the problem being fixed is triggered
     study_id=999
@@ -2210,7 +2221,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template'
+    sample_type = SampleType.new title:'from template', uploaded_template: true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2218,7 +2229,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
 
-    sample_type = SampleType.new title:'from template'
+    sample_type = SampleType.new title:'from template', uploaded_template: true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2343,7 +2354,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template'
+    sample_type = SampleType.new title:'from template', uploaded_template: true
     sample_type.content_blob = Factory(:strain_sample_data_content_blob)
     sample_type.build_attributes_from_template
     attribute_type = sample_type.sample_attributes.last
@@ -2371,7 +2382,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template'
+    sample_type = SampleType.new title:'from template', uploaded_template: true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2409,7 +2420,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template'
+    sample_type = SampleType.new title:'from template', uploaded_template: true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2417,7 +2428,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
 
-    sample_type = SampleType.new title:'from template'
+    sample_type = SampleType.new title:'from template', uploaded_template: true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2443,7 +2454,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template'
+    sample_type = SampleType.new title:'from template', uploaded_template: true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2470,7 +2481,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template'
+    sample_type = SampleType.new title:'from template', uploaded_template: true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
@@ -2485,6 +2496,29 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(data_file)
     assert_not_empty flash[:error]
     assert flash[:error].include?('Already extracted')
+  end
+
+  test "can get citation for data file with DOI" do
+    doi_citation_mock
+    data_file = Factory(:data_file, policy: Factory(:public_policy), doi: '10.5072/test')
+    login_as(data_file.contributor)
+
+    get :show, id: data_file
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/
+  end
+
+  test 'resource count stats' do
+    Factory(:data_file,policy: Factory(:public_policy))
+    Factory(:data_file,policy: Factory(:private_policy))
+    total = DataFile.count
+    visible=DataFile.all_authorized_for(:view).count
+    assert_not_equal total, visible
+    assert_not_equal 0,total
+    assert_not_equal 0,visible
+    get :index
+    assert_response :success
+    assert_select '#resource-count-stats', :text=>/#{visible} Data files visible.*#{total}/
   end
 
   private

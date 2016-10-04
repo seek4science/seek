@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTypeTest < ActiveSupport::TestCase
+
   test 'validation' do
     sample_type = SampleType.new title: 'fish'
     refute sample_type.valid?
@@ -232,7 +233,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     non_template2 = Factory(:binary_content_blob)
 
     Factory(:string_sample_attribute_type, title: 'String')
-    sample_type = SampleType.new title: 'from template'
+    sample_type = SampleType.new title: 'from template', uploaded_template:true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
@@ -244,13 +245,13 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'sample_types_matching_content_blob' do
     Factory(:string_sample_attribute_type, title: 'String')
-    sample_type = SampleType.new title: 'from template'
+    sample_type = SampleType.new title: 'from template', uploaded_template:true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
 
     Factory(:string_sample_attribute_type, title: 'String')
-    sample_type2 = SampleType.new title: 'from template'
+    sample_type2 = SampleType.new title: 'from template', uploaded_template:true
     sample_type2.content_blob = Factory(:sample_type_template_content_blob2)
     sample_type2.build_attributes_from_template
     sample_type2.save!
@@ -283,9 +284,9 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'dependant destroy content blob' do
-    string_type = Factory(:string_sample_attribute_type, title: 'String')
+    Factory(:string_sample_attribute_type, title: 'String')
 
-    sample_type = SampleType.new title: 'from template'
+    sample_type = SampleType.new title: 'from template', uploaded_template:true
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
@@ -310,11 +311,11 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute type.valid?
     type.fix_up_controlled_vocabs
     assert_nil type.sample_attributes[0].sample_controlled_vocab
-    refute type.sample_attributes[0].sample_attribute_type.is_controlled_vocab?
+    refute type.sample_attributes[0].sample_attribute_type.controlled_vocab?
     assert_nil type.sample_attributes[1].sample_controlled_vocab
-    refute type.sample_attributes[1].sample_attribute_type.is_controlled_vocab?
+    refute type.sample_attributes[1].sample_attribute_type.controlled_vocab?
     refute_nil type.sample_attributes[2].sample_controlled_vocab
-    assert type.sample_attributes[2].sample_attribute_type.is_controlled_vocab?
+    assert type.sample_attributes[2].sample_attribute_type.controlled_vocab?
   end
 
   test 'can edit' do
@@ -332,7 +333,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert_equal 'patient', type.sample_attributes.last.title
 
     assert_equal 'String', type.sample_attributes.first.sample_attribute_type.base_type
-    assert type.sample_attributes.last.sample_attribute_type.is_seek_sample?
+    assert type.sample_attributes.last.sample_attribute_type.seek_sample?
   end
 
   test 'can delete' do
@@ -358,8 +359,67 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert type.can_delete?
   end
 
+  test 'queue template generation' do
+    # avoid the callback, which will automatically call queue_template_generation
+    SampleType.skip_callback(:save, :after, :queue_template_generation)
 
+    type=Factory(:simple_sample_type)
+    assert_difference("Delayed::Job.count",1) do
+      type.queue_template_generation
+    end
 
+    type_with_uploaded_template=Factory(:simple_sample_type,:content_blob=>Factory(:sample_type_template_content_blob),uploaded_template:true)
+    assert_no_difference("Delayed::Job.count") do
+      assert_no_difference("ContentBlob.count") do
+        type_with_uploaded_template.queue_template_generation
+        type_with_uploaded_template = SampleType.find(type_with_uploaded_template.id)
+        refute_nil type_with_uploaded_template.content_blob
+      end
+    end
+
+    type_with_blob=Factory(:simple_sample_type,:content_blob=>Factory(:sample_type_template_content_blob))
+    assert_difference("Delayed::Job.count",1) do
+      assert_difference("ContentBlob.count",-1) do
+        type_with_blob.queue_template_generation
+        type_with_blob = SampleType.find(type_with_blob.id)
+        assert_nil type_with_blob.content_blob
+      end
+    end
+
+    SampleType.set_callback(:save, :after, :queue_template_generation)
+  end
+
+  test 'trigger template generation on save' do
+
+    type=Factory.build(:simple_sample_type)
+    assert_difference("Delayed::Job.count",2) do #1 is a reindexing job
+      assert type.new_record?
+      type.save!
+      assert SampleTemplateGeneratorJob.new(type).exists?
+    end
+
+    type=Factory(:simple_sample_type)
+    Delayed::Job.destroy_all
+    assert_difference("Delayed::Job.count",2) do
+      type.title="sample type test job"
+      type.save!
+      assert SampleTemplateGeneratorJob.new(type).exists?
+    end
+
+  end
+
+  test 'generate template' do
+    SampleType.skip_callback(:save, :after, :queue_template_generation)
+    sample_type = Factory(:simple_sample_type)
+    SampleType.set_callback(:save, :after, :queue_template_generation)
+
+    sample_type.generate_template
+
+    refute_nil sample_type.content_blob
+    assert File.exist?(sample_type.content_blob.filepath)
+    assert_equal "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",sample_type.content_blob.content_type
+    assert_equal "#{sample_type.title} template.xlsx",sample_type.content_blob.original_filename
+  end
 
   test 'dependant attributes destroyed' do
     type = Factory(:patient_sample_type)

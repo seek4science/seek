@@ -12,6 +12,13 @@ module Seek #:nodoc:
 
           has_many :snapshots, as: :resource, foreign_key: :resource_id
 
+          # Index DOIs from snapshots in Solr
+          searchable(auto_index: false) do
+            text :doi do
+              self.snapshots.map(&:doi).compact
+            end
+          end
+
           class_eval do
             extend Seek::ResearchObjects::ActsAsSnapshottable::SingletonMethods
           end
@@ -46,6 +53,10 @@ module Seek #:nodoc:
 
         def snapshot(number)
           snapshots.where(:snapshot_number => number).first
+        end
+
+        def latest_citable_snapshot
+          snapshots.where('doi IS NOT NULL').last
         end
 
       end

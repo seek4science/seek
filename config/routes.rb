@@ -380,7 +380,6 @@ SEEK::Application.routes.draw do
       #MERGENOTE - this is a destroy, and should be the destroy method, not post since we are not updating or creating something.
       post :destroy_version
       get :mint_doi_confirm
-      get :minted_doi
       post :mint_doi
       get :samples_table
       get :select_sample_type
@@ -463,6 +462,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :execute
       post :request_resource
+      get :simulate
       post :simulate
       delete :destroy_version
       post :mint_doi
@@ -743,6 +743,8 @@ SEEK::Application.routes.draw do
   match "/500" => "errors#error_500"
 
   match "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
+
+  get "/citation/*doi(.:format)" => "citations#fetch", :as => :citation
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.

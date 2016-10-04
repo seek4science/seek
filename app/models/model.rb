@@ -1,7 +1,7 @@
-
 require 'acts_as_versioned_resource'
 require 'explicit_versioning'
 require 'title_trimmer'
+require 'datacite/acts_as_doi_mintable'
 
 class Model < ActiveRecord::Base
 
@@ -51,6 +51,7 @@ class Model < ActiveRecord::Base
 
   explicit_versioning(:version_column => "version") do
     include Seek::Models::ModelExtraction
+    acts_as_doi_mintable(proxy: :parent)
     acts_as_versioned_resource
     acts_as_favouritable
 

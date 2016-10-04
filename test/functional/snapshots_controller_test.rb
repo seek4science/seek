@@ -5,6 +5,10 @@ class SnapshotsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include MockHelper
 
+  setup do
+    doi_citation_mock
+  end
+
   test "can get snapshot preview page" do
     user = Factory(:user)
     investigation = Factory(:investigation, :policy => Factory(:publicly_viewable_policy), :contributor => user.person)
@@ -148,6 +152,22 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert assigns(:snapshot).doi
   end
 
+  test "logs user when minting DOI for snapshot" do
+    datacite_mock
+    create_investigation_snapshot
+    login_as(@user)
+
+    assert_equal 0, @snapshot.doi_logs.count
+
+    assert_difference('AssetDoiLog.count', 1) do
+      post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    end
+
+    assert_equal 1, @snapshot.doi_logs.count
+    log = @snapshot.doi_logs.last
+    assert_equal @user, log.user
+  end
+
   test "can't mint DOI for snapshot if DOI minting disabled" do
     datacite_mock
     create_investigation_snapshot
@@ -210,6 +230,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     datacite_mock
     create_investigation_snapshot
     login_as(@user)
+    stub_request(:post, "http://test:test@idontexist.soup/metadata").to_return(status: 500)
 
     with_config_value(:datacite_url, 'http://idontexist.soup') do
       post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
@@ -416,6 +437,31 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_redirected_to investigation_path(@investigation)
     assert flash[:error].include?('authorized')
   end
+
+  test "can get citation for snapshot with DOI" do
+    create_investigation_snapshot
+    login_as(@user)
+    @snapshot.doi = '10.5072/test'
+    @snapshot.save
+
+    get :show, investigation_id: @investigation, id: @snapshot
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/
+  end
+
+  test "broken DOI metadata response doesn't raise exception" do
+    create_investigation_snapshot
+    login_as(@user)
+    @snapshot.doi = '10.5072/broken'
+    @snapshot.save
+
+    assert_nothing_raised do
+      get :show, investigation_id: @investigation, id: @snapshot
+    end
+    assert_response :success
+    assert_select '#snapshot-citation', text: /error occurred/
+  end
+
 
   private
 

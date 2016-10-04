@@ -7,6 +7,16 @@
     <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes,:creators=>creators,:title=>authors_title } -%>
 <% end -%>
 
+<% if resource.respond_to?(:doi) %>
+  <%= render :partial => "assets/citation_box", locals: { doi: resource.doi } unless resource.doi.blank? %>
+<% elsif resource.respond_to?(:snapshots) && resource.snapshots.any? %>
+    <% if resource.latest_citable_snapshot %>
+        <%= render :partial => "assets/citation_box", locals: { doi: resource.latest_citable_snapshot.doi,
+                                                                snapshot: resource.latest_citable_snapshot }  %>
+    <% end %>
+    <%= render :partial => "snapshots/snapshots", locals: { snapshots: resource.snapshots, resource: resource } %>
+<% end %>
+
 <% if resource.respond_to?(:license) %>
     <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>
@@ -16,7 +26,6 @@
 <% if resource.class.is_taggable? && current_user-%>
     <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
 <% end -%>
-
 
 <% if resource.respond_to? :attributions_objects -%>
     <%= render :partial => "assets/resource_attributions_box",

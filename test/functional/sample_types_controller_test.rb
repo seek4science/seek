@@ -42,6 +42,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 2, assigns(:sample_type).sample_attributes.size
     assert_equal 'a string', assigns(:sample_type).sample_attributes.title_attributes.first.title
     refute assigns(:sample_type).uploaded_template?
+    assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
   end
 
   test 'should create with linked sample type' do
@@ -64,7 +65,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 2, sample_type.sample_attributes.size
     assert_equal 'a string', sample_type.sample_attributes.title_attributes.first.title
     assert_equal 'a sample', sample_type.sample_attributes.last.title
-    assert sample_type.sample_attributes.last.sample_attribute_type.is_seek_sample?
+    assert sample_type.sample_attributes.last.sample_attribute_type.seek_sample?
   end
 
   test 'should show sample_type' do
@@ -113,6 +114,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_includes assigns(:sample_type).sample_attributes.map(&:title), 'hello'
     refute assigns(:sample_type).sample_attributes[0].is_title?
     assert assigns(:sample_type).sample_attributes[1].is_title?
+    assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
   end
 
   test 'should not update sample_type if has existing samples' do
@@ -191,7 +193,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     linked_type = Factory(:linked_sample_type)
     linked_attribute = linked_type.sample_attributes.last
 
-    assert linked_attribute.sample_attribute_type.is_seek_sample?
+    assert linked_attribute.sample_attribute_type.seek_sample?
 
     sample_type_linked_to = linked_attribute.linked_sample_type
     refute_nil sample_type_linked_to

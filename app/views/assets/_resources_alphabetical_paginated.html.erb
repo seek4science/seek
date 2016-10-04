@@ -1,5 +1,9 @@
 <% objects = resources_alphabetical_paginated %>
 
+<%
+   visible_total,full_total=resource_count_stats
+%>
+
 <% if objects.public_methods.include?(:page_totals) %>
     <!-- only do the page links if the collection supports it -->
     <%= render :partial => "general/paginate_alphabetical", :locals => {:pages => objects.pages, :page_totals => objects.page_totals, :current_page => objects.page} -%>
@@ -9,16 +13,7 @@
   <%= render :partial => "assets/resource_list_item", :collection => objects %>
 </div>
 
-<%
-   klass = klass_from_controller(controller_name)
-   if klass.respond_to?(:all_authorized_for)
-     total = klass.all_authorized_for("view").count
-   elsif klass.kind_of?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
-     total = 0
-   else
-     total = klass.count
-   end
-%>
-<% if objects.respond_to?(:page) && objects.page == "latest" && total > Seek::Config.limit_latest %>
-    <%= render :partial => "general/paginate_see_all", :locals => {:total => total} %>
+
+<% if objects.respond_to?(:page) && objects.page == "latest" && visible_total > Seek::Config.limit_latest %>
+    <%= render :partial => "general/paginate_see_all", :locals => {:visible_total => visible_total} %>
 <% end %>

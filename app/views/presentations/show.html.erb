@@ -5,9 +5,10 @@
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
-    <%= item_description @display_presentation.description -%>
+    <%= item_description @display_presentation.description %>
     <div class="row">
       <div class="col-md-6">
+        <%= persistent_resource_id(@display_presentation) %>
 
         <%= render :partial => 'assets/fileinfo',:object=>@display_presentation.content_blob -%>
 

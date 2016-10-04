@@ -9,10 +9,8 @@ class SampleAttributeType < ActiveRecord::Base
 
   scope :primitive_string_types, where(base_type: 'String', regexp: '.*')
 
-  BASE_TYPES = %w(Integer Float String DateTime Date Text Boolean SeekStrain SeekSample CV)
-
   def validate_allowed_type
-    unless SampleAttributeType.allowed_base_types.include?(base_type)
+    unless Seek::Samples::BaseType.valid?(base_type)
       errors.add(:base_type, 'Not a valid base type')
     end
   end
@@ -64,12 +62,12 @@ class SampleAttributeType < ActiveRecord::Base
     base_type_handler(additional_options).convert(value)
   end
 
-  def is_controlled_vocab?
-    base_type == 'CV'
+  def controlled_vocab?
+    base_type == Seek::Samples::BaseType::CV
   end
 
-  def is_seek_sample?
-    base_type == 'SeekSample'
+  def seek_sample?
+    base_type == Seek::Samples::BaseType::SEEK_SAMPLE
   end
 
   def base_type_handler(additional_options)

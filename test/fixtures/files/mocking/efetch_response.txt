@@ -1,0 +1,46 @@
+
+PMID- 5
+OWN - NLM
+STAT- MEDLINE
+DA  - 19760110
+DCOM- 19760110
+LR  - 20160719
+IS  - 0006-291X (Print)
+IS  - 0006-291X (Linking)
+VI  - 66
+IP  - 4
+DP  - 1975 Oct 27
+TI  - Atomic models for the polypeptide backbones of myohemerythrin and hemerythrin.
+PG  - 1349-56
+FAU - Hendrickson, W A
+AU  - Hendrickson WA
+FAU - Ward, K B
+AU  - Ward KB
+LA  - eng
+GR  - CS/08/08/17/Department of Health/United Kingdom
+GR  - HCS/P10/009/Department of Health/United Kingdom
+GR  - NIHR-RP-011-015/Department of Health/United Kingdom
+PT  - Journal Article
+PL  - UNITED STATES
+TA  - Biochem Biophys Res Commun
+JT  - Biochemical and biophysical research communications
+JID - 0372516
+RN  - 0 (Hemerythrin)
+RN  - 0 (Metalloproteins)
+RN  - 0 (Muscle Proteins)
+SB  - IM
+MH  - Animals
+MH  - Cnidaria
+MH  - Computers
+MH  - *Hemerythrin
+MH  - *Metalloproteins
+MH  - Models, Molecular
+MH  - *Muscle Proteins
+MH  - Protein Conformation
+MH  - Species Specificity
+EDAT- 1975/10/27
+MHDA- 1975/10/27 00:01
+CRDT- 1975/10/27 00:00
+AID - 0006-291X(75)90508-2 [pii]
+PST - ppublish
+SO  - Biochem Biophys Res Commun. 1975 Oct 27;66(4):1349-56.

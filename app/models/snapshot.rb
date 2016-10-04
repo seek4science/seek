@@ -9,6 +9,7 @@ class Snapshot < ActiveRecord::Base
   has_one :content_blob, as: :asset, foreign_key: :asset_id
 
   before_create :set_snapshot_number
+  after_save :reindex_parent_resource
 
   # Must quack like an asset version to behave with DOI code
   alias_attribute :parent, :resource
@@ -19,7 +20,7 @@ class Snapshot < ActiveRecord::Base
 
   validates :snapshot_number, :uniqueness => { :scope =>  [:resource_type, :resource_id] }
 
-  acts_as_doi_mintable
+  acts_as_doi_mintable(proxy: :resource)
   acts_as_zenodo_depositable do |snapshot|
     snapshot.content_blob # The thing to be deposited
   end
@@ -93,14 +94,6 @@ class Snapshot < ActiveRecord::Base
     self.snapshot_number ||= (resource.snapshots.maximum(:snapshot_number) || 0) + 1
   end
 
-  def doi_resource_type
-    resource_type.downcase
-  end
-
-  def doi_resource_id
-    "#{resource_id}.#{snapshot_number}"
-  end
-
   def doi_target_url
     polymorphic_url([resource, self],
                     :host => Seek::Config.host_with_port,
@@ -109,6 +102,11 @@ class Snapshot < ActiveRecord::Base
 
   def parse_metadata
     Seek::ResearchObjects::SnapshotParser.new(research_object).parse
+  end
+
+  # Need to re-index the parent model to update its' "doi" field
+  def reindex_parent_resource
+    ReindexingJob.new.add_items_to_queue(self.resource) if self.doi_changed?
   end
 
 end
