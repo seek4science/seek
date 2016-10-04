@@ -20,5 +20,5 @@
     <%= f.hidden_field :doi %>
     <%= f.select :project_ids, Project.all.collect(&:id), {}, :selected=> @publication.project_ids, :multiple=>true, :style=>"display:none;", :class => 'project_ids' %>
 
-    <%= f.submit 'Register', :onclick => "updateProjectIds();", :class => 'btn btn-primary' %>
+    <%= f.submit 'Register', :name => "subaction", :value => 'Register', :onclick => "updateProjectIds();", :class => 'btn btn-primary' %>
 <% end %>

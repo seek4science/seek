@@ -36,8 +36,6 @@ class Publication < ActiveRecord::Base
   validate :check_uniqueness_of_identifier_within_project, :unless => "Seek::Config.is_virtualliver"
   validate :check_uniqueness_of_title_within_project, :unless => "Seek::Config.is_virtualliver"
 
-  validate :check_identifier_present
-
   after_update :update_creators_from_publication_authors
 
   # http://bioruby.org/rdoc/Bio/Reference.html#method-i-format
@@ -242,21 +240,6 @@ class Publication < ActiveRecord::Base
                           :authors => publication_authors.map {|e| e.person ? [e.person.last_name, e.person.first_name].join(', ') : [e.last_name, e.first_name].join(', ')},
                           :year => published_date.year}.with_indifferent_access)
     end
-  end
-
-  def check_identifier_present
-    if doi.blank? && pubmed_id.blank?
-      self.errors[:base] << "Please specify either a PubMed ID or DOI"
-      return false
-    end
-
-    if !doi.blank? && !pubmed_id.blank?
-      self.errors[:base] << "Can't have both a PubMed ID and a DOI"
-      return false
-    end
-
-    true
-
   end
 
   def check_uniqueness_of_identifier_within_project

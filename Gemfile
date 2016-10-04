@@ -115,7 +115,7 @@ gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
   gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'
-  gem 'rails-assets-typeahead.js', '~> 0.10.4'
+  gem 'rails-assets-typeahead.js', '~> 0.10.5'
   gem 'rails-assets-clipboard', '~> 1.5.12'
 end
 
@@ -140,6 +140,8 @@ group :development do
   gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'quiet_assets'
+  gem 'ruby-debug-ide', '>= 0.6.1.beta2', require: false
+  gem 'debase', '>= 0.2.2.beta8', require: false
 end
 
 group :test do
