@@ -283,7 +283,7 @@ class PublicationsController < ApplicationController
           user = users_db[0]
           authors << { :name => user.name }
         else # just add the queried name as author
-          authors << { :person_id => nil, :first_name => author_q['first_name'], :last_name => author_q['last_name'], :count => 0 }
+          authors << { :person_id => nil, :first_name => params[:first_name], :last_name => params[:last_name], :count => 0 }
         end
       end
     }

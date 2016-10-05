@@ -222,7 +222,7 @@ jQuery(document).ready(function() {
   jQuery('#publication_publication_authors').tagsinput({
     tagClass: function(item){
       // person/user and not an author
-      if( item.name) return 'label label-success';
+      if( item.name && typeof(item.count) == "undefined") return 'label label-success';
       // this author does not exist yet
       if( item.count == 0) return 'label label-danger';
       // this author is associated with a know person
@@ -241,11 +241,21 @@ jQuery(document).ready(function() {
       },
       [
         {
+          name: "typed",
+          displayKey: function(item){ return item.name;},
+          source: function(q, sync) {
+            return sync([{name: q, count: 0}]);
+          },
+          templates: {
+            suggestion: HandlebarsTemplates['typeahead/hint']
+          }
+        },
+        {
           name: "authors",
           displayKey: function(item){ return item.first_name + " " + item.last_name;},
           source: bloodhound_authors.ttAdapter(),
           templates: {
-            header: 'Authors',
+            header: 'Known Authors',
             suggestion: HandlebarsTemplates['typeahead/publication_author']
           }
         },{
@@ -253,7 +263,7 @@ jQuery(document).ready(function() {
           displayKey: function(item){ return item.name;},
           source: bloodhound_users.ttAdapter(),
           templates: {
-            header: 'Users',
+            header: 'People',
             suggestion: HandlebarsTemplates['typeahead/hint']
           }
         }
