@@ -323,11 +323,6 @@ class PublicationsController < ApplicationController
     authors.delete_if { |author| author[:first_name].empty? && author[:last_name].empty? }
     author = PublicationAuthor.where({ :first_name => first_name, :last_name => last_name}).limit(1)
 
-    # add the queried author if he does not exist
-    if author.empty?
-      authors << { :person_id => nil, :first_name => first_name, :last_name => last_name, :count => 0 }
-    end
-
     respond_to do |format|
       format.json { render :json => authors }
       format.xml  { render :xml  => authors }

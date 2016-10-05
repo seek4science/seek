@@ -508,9 +508,7 @@ class PublicationsControllerTest < ActionController::TestCase
     publication.reload
     joined_original_authors = original_authors.join(', ')
     get :show, :id => publication.id
-    assert_equal true, @response.body.include?(joined_original_authors)
-
-
+    assert @response.body.include?(joined_original_authors)
   end
 
   test 'should update page pagination when changing the setting from admin' do
@@ -570,6 +568,58 @@ class PublicationsControllerTest < ActionController::TestCase
       assert_select "a[href=?]", publication_path(publication), text: publication.title
       assert_select "a[href=?]", publication_path(publication2), text: publication2.title, count: 0
     end
+  end
+
+  test "query single authors for typeahead" do
+    query = "Bloggs"
+    get :query_authors_typeahead, :format => :json, :full_name => query
+    assert_response :success
+    authors = JSON.parse(@response.body)
+    assert_equal 1, authors.length, authors
+    assert authors[0].key?('person_id'), "missing author person_id"
+    assert authors[0].key?('first_name'), "missing author first name"
+    assert authors[0].key?('last_name'), "missing author last name"
+    assert authors[0].key?('count'), "missing author publication count"
+    assert_equal "J", authors[0]['first_name']
+    assert_equal "Bloggs", authors[0]['last_name']
+    assert_nil authors[0]['person_id']
+    assert_equal 1, authors[0]['count']
+  end
+
+  test "query single author for typeahead that is unknown" do
+    query = "Nobody knows this person"
+    get :query_authors_typeahead, :format => :json, :full_name => query
+    assert_response :success
+    authors = JSON.parse(@response.body)
+    assert_equal 0, authors.length
+  end
+
+  test "query authors for initilization" do
+    query_authors = {
+      "0" => { :full_name => "J Bloggs" },
+      "1" => { :full_name => "J Bauers" }
+    }
+    get :query_authors, :format => :json, :as => :json, :authors => query_authors
+    assert_response :success
+    authors = JSON.parse(@response.body)
+    assert_equal 2, authors.length, authors
+    assert authors[0].key?('person_id'), "missing author person_id"
+    assert authors[0].key?('first_name'), "missing author first name"
+    assert authors[0].key?('last_name'), "missing author last name"
+    assert authors[0].key?('count'), "missing author publication count"
+    assert_equal "J", authors[0]['first_name']
+    assert_equal "Bloggs", authors[0]['last_name']
+    assert_nil authors[0]['person_id']
+    assert_equal 1, authors[0]['count']
+
+    assert authors[1].key?('person_id'), "missing author person_id"
+    assert authors[1].key?('first_name'), "missing author first name"
+    assert authors[1].key?('last_name'), "missing author last name"
+    assert authors[1].key?('count'), "missing author publication count"
+    assert_equal "J", authors[1]['first_name']
+    assert_equal "Bauers", authors[1]['last_name']
+    assert_nil authors[1]['person_id']
+    assert_equal 0, authors[1]['count']
   end
 
   def mock_crossref options
