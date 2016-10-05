@@ -2,7 +2,6 @@ require 'test_helper'
 
 class AvatarsControllerTest < ActionController::TestCase
 
-
   include AuthenticatedTestHelper
 
   def setup
