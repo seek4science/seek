@@ -124,7 +124,15 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'controlled vocab sample type validate_value' do
+    vocab = Factory(:apples_sample_controlled_vocab)
+    assert vocab.includes_term?('Granny Smith')
+    assert_equal 4,vocab.sample_controlled_vocab_terms.count
     type = Factory(:apples_controlled_vocab_sample_type)
+    type.sample_attributes.first.sample_controlled_vocab=vocab
+    type.sample_attributes.first.save!
+    assert type.valid?
+    assert_equal 4,type.sample_attributes.first.sample_controlled_vocab.sample_controlled_vocab_terms.count
+
     assert type.validate_value?('apples', 'Granny Smith')
     refute type.validate_value?('apples', 'Orange')
     refute type.validate_value?('apples', 1)

@@ -64,7 +64,6 @@ class SearchController < ApplicationController
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
           sources = Seek::Util.searchable_types
-          sources.delete(DeprecatedSpecimen) if !Seek::Config.is_virtualliver
           sources.each do |source|
             search_result = source.search do |query|
               query.keywords(downcase_query)

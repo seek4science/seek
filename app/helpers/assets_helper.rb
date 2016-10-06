@@ -64,8 +64,6 @@ module AssetsHelper
       resource_type = resource_or_text.class.name
       if resource_or_text.is_a?(Assay)
         text = resource_or_text.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
-      elsif resource_or_text.is_a?(DeprecatedSpecimen)
-        text = t('biosamples.sample_parent_term')
       elsif !(translated = translate_resource_type(resource_type)).include?('translation missing')
         text = translated
       else

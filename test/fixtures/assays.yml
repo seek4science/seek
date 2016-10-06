@@ -8,7 +8,6 @@ metabolomics_assay:
   owner: person_for_model_owner
   assay_class: experimental_assay_class  
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 
 metabolomics_assay2:
@@ -20,7 +19,6 @@ metabolomics_assay2:
   assay_class: experimental_assay_class
   uuid: pppp-kkkk-eeee-wwww
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 metabolomics_assay3:
   title: Metabolomics Assay3
@@ -30,7 +28,6 @@ metabolomics_assay3:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 assay_with_just_a_study:
   title: Assay with just a Study
@@ -40,7 +37,6 @@ assay_with_just_a_study:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 assay_with_no_study_or_files:
   title: Assay with no Study or files
@@ -50,7 +46,6 @@ assay_with_no_study_or_files:
   assay_class: experimental_assay_class
   study: junk_study
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 assay_with_no_study_but_has_some_files:
   title: Assay with no Study but has some files
@@ -60,7 +55,6 @@ assay_with_no_study_but_has_some_files:
   assay_class: experimental_assay_class
   study: junk_study
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 assay_with_no_study_but_has_some_sops:
   title: Assay with no Study but has some sops
@@ -70,8 +64,6 @@ assay_with_no_study_but_has_some_sops:
   assay_class: experimental_assay_class
   study: junk_study
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
-
 
 assay_with_links_in_description:
   title: Assay with links in description
@@ -82,7 +74,6 @@ assay_with_links_in_description:
   study: study_with_links_in_description
   assay_class: experimental_assay_class
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 assay_with_public_and_private_sops_and_datafiles:
   title: Assay with 2 sops, and 2 datafiles - one of each public & private
@@ -93,7 +84,6 @@ assay_with_public_and_private_sops_and_datafiles:
   study: study_with_assay_with_public_private_sops_and_datafile
   assay_class: experimental_assay_class
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 modelling_assay_with_data_and_relationship:
   title: Modelling Assay with Data
@@ -112,7 +102,6 @@ assay_with_a_model:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 assay_with_a_publication:
   title: Assay with publication
@@ -122,7 +111,6 @@ assay_with_a_publication:
   owner: person_for_model_owner
   assay_class: experimental_assay_class
   policy: policy_for_viewable_data_file
-  deprecated_samples: [test_sample]
 
 modelling_assay:
   title: Modelling Assay

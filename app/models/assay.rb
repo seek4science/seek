@@ -59,9 +59,6 @@ class Assay < ActiveRecord::Base
 
   alias_attribute :contributor, :owner
 
-  #DEPRECATED
-  has_and_belongs_to_many :deprecated_samples
-
   def project_ids
     projects.map(&:id)
   end

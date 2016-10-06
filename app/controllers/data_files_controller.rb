@@ -265,16 +265,6 @@ class DataFilesController < ApplicationController
       end
     end
   end
-
-  def clear_population bio_samples
-      specimens = DeprecatedSpecimen.find_all_by_title bio_samples.instance_values["specimen_names"].values
-      samples = DeprecatedSample.find_all_by_title bio_samples.instance_values["sample_names"].values
-      samples.each do |s|
-        s.assays.clear
-        s.destroy
-      end
-      specimens.each &:destroy
-  end
   
   def matching_models
     #FIXME: should use the correct version
