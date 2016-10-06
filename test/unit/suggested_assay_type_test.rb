@@ -25,13 +25,13 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     at = Factory :suggested_assay_type, :ontology_uri => uri
     assert_equal 1, at.parents.count
     assert_equal ontology_class, at.parent
-    assert_equal true, ontology_class.children.include?(at)
+    assert ontology_class.children.include?(at)
     #suggested parent
     at1 = Factory :suggested_assay_type
     at2 = Factory :suggested_assay_type, :parent_id => at1.id
     assert_equal 1, at2.parents.count
     assert_equal at1, at2.parent
-    assert_equal true, at1.children.include?(at2)
+    assert at1.children.include?(at2)
 
     # default parent
     at = Factory :suggested_assay_type
@@ -165,18 +165,18 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     refute owner.is_admin?
 
     #owner can edit, cannot delete
-    assert_equal true, at.can_edit?
-    assert_equal false, at.can_destroy?
+    assert at.can_edit?
+    assert !at.can_destroy?
 
     #others cannot edit, cannot delete
     User.current_user = other_user
-    assert_equal false, at.can_edit?
-    assert_equal false, at.can_destroy?
+    assert !at.can_edit?
+    assert !at.can_destroy?
 
     #admins can edit, can delete
     User.current_user = admin
-    assert_equal true, at.can_edit?
-    assert_equal true, at.can_destroy?
+    assert at.can_edit?
+    assert at.can_destroy?
   end
 
   test "generated uri" do

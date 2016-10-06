@@ -9,7 +9,7 @@ class AssayTest < ActiveSupport::TestCase
     non_admin = Factory :user
     assert !non_admin.person.is_admin?
     assay = assays(:modelling_assay_with_data_and_relationship)
-    assert_equal false, assay.can_edit?(non_admin)
+    assert !assay.can_edit?(non_admin)
   end
 
   test "to_rdf" do

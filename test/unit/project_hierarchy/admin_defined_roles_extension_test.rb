@@ -13,10 +13,10 @@ class AdminDefinedRolesExtensionTest < ActiveSupport::TestCase
     assert_equal [@proj, @proj_child1, @proj_child2].sort, person.projects_and_descendants.sort
 
     [@proj, @proj_child1, @proj_child2].each do |p|
-      assert_equal false, person.is_asset_housekeeper?(p)
-      assert_equal false, person.is_project_administrator?(p)
-      assert_equal false, person.is_pal?(p)
-      assert_equal false, person.is_asset_gatekeeper?(p)
+      assert !person.is_asset_housekeeper?(p)
+      assert !person.is_project_administrator?(p)
+      assert !person.is_pal?(p)
+      assert !person.is_asset_gatekeeper?(p)
 
       assert p.asset_housekeepers.empty?
       assert p.project_administrators.empty?

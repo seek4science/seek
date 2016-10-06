@@ -64,13 +64,13 @@ class SamplesControllerTest < ActionController::TestCase
     end
     assert_not_nil sample = assigns(:sample)
     assert_equal 'ttt', sample.get_attribute(:the_title)
-    assert_equal true, sample.get_attribute(:bool)
+    assert sample.get_attribute(:bool)
     assert_no_difference('Sample.count') do
       put :update, id: sample.id, sample: { data: { the_title: 'ttt', bool: '0' } }
     end
     assert_not_nil sample = assigns(:sample)
     assert_equal 'ttt', sample.get_attribute(:the_title)
-    assert_equal false, sample.get_attribute(:bool)
+    assert !sample.get_attribute(:bool)
   end
 
   test 'show sample with boolean' do

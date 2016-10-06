@@ -188,8 +188,8 @@ class ModelTest < ActiveSupport::TestCase
     assert_not_nil model.policy
     assert_equal Policy::PRIVATE, model.policy.sharing_scope
     assert_equal Policy::NO_ACCESS, model.policy.access_type
-    assert_equal false,model.policy.use_whitelist
-    assert_equal false,model.policy.use_blacklist
+    assert !model.policy.use_whitelist
+    assert !model.policy.use_blacklist
     assert model.policy.permissions.empty?
   end
   
@@ -200,8 +200,8 @@ class ModelTest < ActiveSupport::TestCase
       assert !model.policy.valid?
       assert_blank model.policy.sharing_scope
       assert_blank model.policy.access_type
-      assert_equal false,model.policy.use_whitelist
-      assert_equal false,model.policy.use_blacklist
+      assert !model.policy.use_whitelist
+      assert !model.policy.use_blacklist
       assert_blank model.policy.permissions
     end
 
