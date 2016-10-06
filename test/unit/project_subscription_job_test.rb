@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class ProjectSubscriptionJobTest < ActiveSupport::TestCase
-  fixtures :all
 
   def setup
     Delayed::Job.destroy_all
@@ -52,7 +51,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     assert assets.empty?
 
     #create items for project
-    ps.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study' || t=='DeprecatedSample' || t=='DeprecatedSpecimen'}.each do |type|
+    ps.subscribable_types.collect(&:name).reject{|t| t=='Assay' || t=='Study'}.each do |type|
       Factory("#{type.underscore.gsub('/','_')}", :projects => [project])
     end
     project.reload
@@ -62,7 +61,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     Factory(:assay, :study => study)
 
     assets = ProjectSubscriptionJob.new(1).all_in_project project
-    assert_equal ps.subscribable_types.count-2, assets.count # -2 to account for the Sample and Specimen, which will be removed in future refactoring
+    assert_equal ps.subscribable_types.count, assets.count
   end
 
   test "perform" do

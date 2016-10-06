@@ -44,10 +44,6 @@ class Project < ActiveRecord::Base
   after_save :handle_pal_ids, if: '@pal_ids'
   after_save :handle_asset_housekeeper_ids, if: '@asset_housekeeper_ids'
 
-  #DEPRECATED
-  has_and_belongs_to_many :deprecated_specimens
-  has_and_belongs_to_many :deprecated_samples
-
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
     [programme].compact

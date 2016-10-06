@@ -36,9 +36,6 @@ class Strain < ActiveRecord::Base
 
   alias_attribute :description, :comment
 
-  #DEPRECATED
-  has_many :deprecated_specimens
-
   include Seek::Search::CommonFields
 
   searchable(:auto_index=>false) do
@@ -76,10 +73,6 @@ class Strain < ActiveRecord::Base
   #gives the long title that includes genotype and phenotype details
   def info
     title + " (" + genotype_info + ' / ' + phenotype_info + ')'
-  end
-
-  def state_allows_delete? *args
-    (deprecated_specimens.empty? || ((deprecated_specimens.count == 1) && deprecated_specimens.first.is_dummy? && deprecated_specimens.first.samples.empty?)) && super
   end
 
   def can_delete? user=User.current_user

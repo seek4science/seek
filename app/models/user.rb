@@ -26,9 +26,6 @@ class User < ActiveRecord::Base
 
   has_many :oauth_sessions, :dependent => :destroy
 
-  #DEPRECATED
-  has_many :deprecated_samples,:as=>:contributor
-
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
   attr_accessor :password, :password_confirmation

@@ -91,11 +91,6 @@ class DataFile < ActiveRecord::Base
      end
   end
 
-  #DEPRECATED
-  has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
-  has_many :deprecated_samples, :through => :sample_assets
-
-
   def relationship_type(assay)
     #FIXME: don't like this hardwiring to assay within data file, needs abstracting
     assay_assets.find_by_assay_id(assay.id).relationship_type  
