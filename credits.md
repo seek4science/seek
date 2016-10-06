@@ -7,6 +7,8 @@ layout: page
 
 ## Related Projects
 
+OpenBIS - http://fair-dom.org/platform/openbis/
+
 BioVel - http://www.biovel.eu/ (Portal based on SEEK -
 https://portal.biovel.eu/)
 
