@@ -457,7 +457,7 @@ GEM
     pmrpc-rails (1.0.1)
       railties (>= 3.1.0)
     polyglot (0.3.5)
-    pothoven-attachment_fu (3.2.15)
+    pothoven-attachment_fu (3.2.18)
     powerbar (1.0.12)
       ansi (~> 1.5.0)
       hashie (>= 1.1.0)
