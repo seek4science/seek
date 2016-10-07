@@ -74,8 +74,8 @@ class SopTest < ActiveSupport::TestCase
       assert sop.policy.valid?
       assert_equal Policy::PRIVATE, sop.policy.sharing_scope
       assert_equal Policy::NO_ACCESS, sop.policy.access_type
-      assert_equal false,sop.policy.use_whitelist
-      assert_equal false,sop.policy.use_blacklist
+      assert !sop.policy.use_whitelist
+      assert !sop.policy.use_blacklist
       assert_blank sop.policy.permissions
     end
   end
@@ -88,8 +88,8 @@ class SopTest < ActiveSupport::TestCase
       assert !sop.policy.valid?
       assert_blank sop.policy.sharing_scope
       assert_blank sop.policy.access_type
-      assert_equal false,sop.policy.use_whitelist
-      assert_equal false,sop.policy.use_blacklist
+      assert !sop.policy.use_whitelist
+      assert !sop.policy.use_blacklist
       assert_blank sop.policy.permissions
     end
   end

@@ -30,8 +30,8 @@ class PolicyTest < ActiveSupport::TestCase
     pol=Policy.private_policy
     assert_equal Policy::PRIVATE, pol.sharing_scope
     assert_equal Policy::NO_ACCESS, pol.access_type
-    assert_equal false,pol.use_whitelist
-    assert_equal false,pol.use_blacklist
+    assert !pol.use_whitelist
+    assert !pol.use_blacklist
     assert pol.permissions.empty?
   end
 
@@ -40,8 +40,8 @@ class PolicyTest < ActiveSupport::TestCase
       pol=Policy.default
       assert_equal Policy::PRIVATE, pol.sharing_scope
       assert_equal Policy::NO_ACCESS, pol.access_type
-      assert_equal false, pol.use_whitelist
-      assert_equal false, pol.use_blacklist
+      assert !pol.use_whitelist
+      assert !pol.use_blacklist
       assert pol.permissions.empty?
     end
   end
@@ -51,8 +51,8 @@ class PolicyTest < ActiveSupport::TestCase
       pol=Policy.default
       assert_blank pol.sharing_scope
       assert_blank pol.access_type
-      assert_equal false, pol.use_whitelist
-      assert_equal false, pol.use_blacklist
+      assert !pol.use_whitelist
+      assert !pol.use_blacklist
       assert pol.permissions.empty?
     end
   end

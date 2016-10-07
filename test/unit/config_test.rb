@@ -4,13 +4,13 @@ class ConfigTest < ActiveSupport::TestCase
   # Features enabled
 
   test 'events enabled' do
-    assert_equal true, Seek::Config.events_enabled
+    assert Seek::Config.events_enabled
   end
   test 'jerm_disabled' do
-    assert_equal false, Seek::Config.jerm_enabled
+    assert !Seek::Config.jerm_enabled
   end
   test 'solr enabled' do
-    assert_equal true, Seek::Config.solr_enabled
+    assert Seek::Config.solr_enabled
   end
 
   test 'is_virtualliver' do
@@ -27,7 +27,7 @@ class ConfigTest < ActiveSupport::TestCase
 
   test 'project_hierarchy_enabled' do
     with_config_value 'project_hierarchy_enabled', true do
-      assert_equal true, Seek::Config.project_hierarchy_enabled
+      assert Seek::Config.project_hierarchy_enabled
     end
   end
 
@@ -110,24 +110,24 @@ class ConfigTest < ActiveSupport::TestCase
 
   test 'email_enabled' do
     # NOTE: this is the value in seek_testing.rb, the actual default is 'false'
-    assert_equal true, Seek::Config.email_enabled
+    assert Seek::Config.email_enabled
   end
 
   test 'pdf_conversion_enabled' do
-    assert_equal true, Seek::Config.pdf_conversion_enabled
+    assert Seek::Config.pdf_conversion_enabled
   end
 
   test 'delete asset version enabled' do
-    assert_equal false, Seek::Config.delete_asset_version_enabled
+    assert !Seek::Config.delete_asset_version_enabled
   end
 
   test 'forum_enabled' do
-    assert_equal false, Seek::Config.forum_enabled
+    assert !Seek::Config.forum_enabled
   end
 
   test 'sample_parser_enabled' do
     # NOTE: this is the value in seek_testing.rb, the actual default is 'false'
-    assert_equal true, Seek::Config.sample_parser_enabled
+    assert Seek::Config.sample_parser_enabled
   end
 
   test 'smtp_settings port' do
@@ -170,11 +170,11 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'no-reply@sysmo-db.org', Seek::Config.noreply_sender
   end
   test 'jws enabled' do
-    assert_equal true, Seek::Config.jws_enabled
+    assert Seek::Config.jws_enabled
   end
 
   test 'exception_notification_enabled' do
-    assert_equal false, Seek::Config.exception_notification_enabled
+    assert !Seek::Config.exception_notification_enabled
   end
 
   test 'exception_notification_recipients' do
@@ -182,21 +182,21 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'hide_details_enabled' do
-    assert_equal false, Seek::Config.hide_details_enabled
+    assert !Seek::Config.hide_details_enabled
   end
 
   test 'activation_required_enabled' do
-    assert_equal false, Seek::Config.activation_required_enabled
+    assert !Seek::Config.activation_required_enabled
   end
   test 'google_analytics_enabled' do
-    assert_equal false, Seek::Config.google_analytics_enabled
+    assert !Seek::Config.google_analytics_enabled
   end
   test 'google_analytics_tracker_id' do
     assert_equal '000-000', Seek::Config.google_analytics_tracker_id
   end
 
   test 'piwik_analytics_enabled' do
-    assert_equal false, Seek::Config.piwik_analytics_enabled
+    assert !Seek::Config.piwik_analytics_enabled
   end
   test 'piwik_analytics_id_site' do
     assert_equal 1, Seek::Config.piwik_analytics_id_site
@@ -207,7 +207,7 @@ class ConfigTest < ActiveSupport::TestCase
 
   # homepage settings
   test 'project_news_enabled' do
-    assert_equal false, Seek::Config.project_news_enabled
+    assert !Seek::Config.project_news_enabled
   end
   test 'project_news_feed_urls' do
     assert_equal '', Seek::Config.project_news_feed_urls
@@ -217,7 +217,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'community_news_enabled' do
-    assert_equal false, Seek::Config.community_news_enabled
+    assert !Seek::Config.community_news_enabled
   end
   test 'community_news_feed_urls' do
     assert_equal '', Seek::Config.community_news_feed_urls
@@ -251,7 +251,7 @@ end
   end
 
   test 'header_image_enabled' do
-    assert_equal true, Seek::Config.header_image_enabled
+    assert Seek::Config.header_image_enabled
   end
   test 'header_image_link' do
     assert_equal 'http://www.sysmo-db.org', Seek::Config.header_image_link
@@ -325,7 +325,7 @@ end
   end
   
   test 'copyright_addendum_enabled' do
-    assert_equal false, Seek::Config.copyright_addendum_enabled
+    assert !Seek::Config.copyright_addendum_enabled
   end
   test 'copyright_addendum_content' do
     assert_equal 'Additions copyright ...', Seek::Config.copyright_addendum_content
@@ -407,11 +407,11 @@ end
   end
 
   test 'publish_button_enabled' do
-    assert_equal true, Seek::Config.publish_button_enabled
+    assert Seek::Config.publish_button_enabled
   end
 
   test 'recaptcha enabled' do
-    assert_equal true, Seek::Config.recaptcha_enabled
+    assert Seek::Config.recaptcha_enabled
   end
 
   test 'propagate bioportal api key' do
@@ -421,7 +421,7 @@ end
   end
 
   test 'imprint_enabled' do
-    assert_equal false, Seek::Config.imprint_enabled
+    assert !Seek::Config.imprint_enabled
   end
 
   test 'imprint_description' do

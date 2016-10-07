@@ -17,14 +17,14 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
     assert_equal ontology_class, tt.parent
 
     #ontology children include suggested, but subclasses do not
-    assert_equal true, ontology_class.children.include?(tt)
-    assert_equal false, ontology_class.subclasses.include?(tt)
+    assert ontology_class.children.include?(tt)
+    assert !ontology_class.subclasses.include?(tt)
     #suggested parent
     tt1 = Factory :suggested_technology_type
     tt2 = Factory :suggested_technology_type, :parent_id => tt1.id
     assert_equal 1, tt1.parents.count
     assert_equal tt1, tt2.parent
-    assert_equal true, tt1.children.include?(tt2)
+    assert tt1.children.include?(tt2)
 
     # default parent
     tt = Factory :suggested_technology_type
@@ -84,16 +84,16 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
 
     User.current_user = owner
     #owner can edit, cannot delete
-    assert_equal true, tt.can_edit?
-    assert_equal false, tt.can_destroy?
+    assert tt.can_edit?
+    assert !tt.can_destroy?
     #others cannot edit, cannot delete
     User.current_user = other_user
-    assert_equal false, tt.can_edit?
-    assert_equal false, tt.can_destroy?
+    assert !tt.can_edit?
+    assert !tt.can_destroy?
     #admins can edit, can delete
     User.current_user = admin
-    assert_equal true, tt.can_edit?
-    assert_equal true, tt.can_destroy?
+    assert tt.can_edit?
+    assert tt.can_destroy?
 
   end
 

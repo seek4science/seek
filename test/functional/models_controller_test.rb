@@ -153,9 +153,9 @@ class ModelsControllerTest < ActionController::TestCase
   test "should contain only model assays " do
     login_as(:aaron)
     assay = assays(:metabolomics_assay)
-    assert_equal false, assay.is_modelling?
+    assert !assay.is_modelling?
     assay = assays(:modelling_assay_with_data_and_relationship)
-    assert_equal true, assay.is_modelling?
+    assert assay.is_modelling?
 
   end
 

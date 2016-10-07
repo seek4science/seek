@@ -85,7 +85,7 @@ class AdminsControllerTest < ActionController::TestCase
   test 'string to boolean' do
     login_as(:quentin)
     post :update_features_enabled, :events_enabled => '1'
-    assert_equal true, Seek::Config.events_enabled
+    assert Seek::Config.events_enabled
   end
 
   test 'update visible tags and threshold' do

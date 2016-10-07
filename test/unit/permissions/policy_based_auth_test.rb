@@ -65,18 +65,18 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
       sop.update_lookup_table(other_user)
 
       permissions = sop.authorization_permissions user
-      assert_equal true,permissions.can_view
-      assert_equal true,permissions.can_download
-      assert_equal true,permissions.can_edit
-      assert_equal true,permissions.can_manage
-      assert_equal true,permissions.can_delete
+      assert permissions.can_view
+      assert permissions.can_download
+      assert permissions.can_edit
+      assert permissions.can_manage
+      assert permissions.can_delete
 
       permissions = sop.authorization_permissions other_user
-      assert_equal true,permissions.can_view
-      assert_equal true,permissions.can_download
-      assert_equal true,permissions.can_edit
-      assert_equal false,permissions.can_manage
-      assert_equal false,permissions.can_delete
+      assert permissions.can_view
+      assert permissions.can_download
+      assert permissions.can_edit
+      assert !permissions.can_manage
+      assert !permissions.can_delete
     end
 
   end
@@ -88,32 +88,32 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
       sop = Factory :sop, :contributor=>user, :policy=>Factory(:editing_public_policy)
       Sop.clear_lookup_table
       #check using the standard
-      assert_equal true,sop.authorized_for_view?(user)
-      assert_equal true,sop.authorized_for_download?(user)
-      assert_equal true,sop.authorized_for_edit?(user)
-      assert_equal true,sop.authorized_for_manage?(user)
-      assert_equal true,sop.authorized_for_delete?(user)
+      assert sop.authorized_for_view?(user)
+      assert sop.authorized_for_download?(user)
+      assert sop.authorized_for_edit?(user)
+      assert sop.authorized_for_manage?(user)
+      assert sop.authorized_for_delete?(user)
 
-      assert_equal true,sop.authorized_for_view?(other_user)
-      assert_equal true,sop.authorized_for_download?(other_user)
-      assert_equal true,sop.authorized_for_edit?(other_user)
-      assert_equal false,sop.authorized_for_manage?(other_user)
-      assert_equal false,sop.authorized_for_delete?(other_user)
+      assert sop.authorized_for_view?(other_user)
+      assert sop.authorized_for_download?(other_user)
+      assert sop.authorized_for_edit?(other_user)
+      assert !sop.authorized_for_manage?(other_user)
+      assert !sop.authorized_for_delete?(other_user)
 
       sop.update_lookup_table(user)
       sop.update_lookup_table(other_user)
 
-      assert_equal true,sop.authorized_for_view?(user)
-      assert_equal true,sop.authorized_for_download?(user)
-      assert_equal true,sop.authorized_for_edit?(user)
-      assert_equal true,sop.authorized_for_manage?(user)
-      assert_equal true,sop.authorized_for_delete?(user)
+      assert sop.authorized_for_view?(user)
+      assert sop.authorized_for_download?(user)
+      assert sop.authorized_for_edit?(user)
+      assert sop.authorized_for_manage?(user)
+      assert sop.authorized_for_delete?(user)
 
-      assert_equal true,sop.authorized_for_view?(other_user)
-      assert_equal true,sop.authorized_for_download?(other_user)
-      assert_equal true,sop.authorized_for_edit?(other_user)
-      assert_equal false,sop.authorized_for_manage?(other_user)
-      assert_equal false,sop.authorized_for_delete?(other_user)
+      assert sop.authorized_for_view?(other_user)
+      assert sop.authorized_for_download?(other_user)
+      assert sop.authorized_for_edit?(other_user)
+      assert !sop.authorized_for_manage?(other_user)
+      assert !sop.authorized_for_delete?(other_user)
     end
 
   end

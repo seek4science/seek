@@ -8,7 +8,7 @@ class ProjectExtensionTest <  ActiveSupport::TestCase
     parent_proj = Factory(:project, :title => "test parent")
     proj = Factory(:project, :parent_id => parent_proj.id)
     assert_equal proj.parent, parent_proj
-    assert_equal true, parent_proj.descendants.include?(proj)
+    assert parent_proj.descendants.include?(proj)
     parent_proj_changed = Factory(:project, :title => "changed test parent")
     proj.parent = parent_proj_changed
     disable_authorization_checks{proj.save!}
@@ -24,7 +24,7 @@ class ProjectExtensionTest <  ActiveSupport::TestCase
     project.institutions = institutions
 
     institutions.each do |ins|
-      assert_equal true, parent_proj.institutions.include?(ins)
+      assert parent_proj.institutions.include?(ins)
     end
   end
 
@@ -43,7 +43,7 @@ class ProjectExtensionTest <  ActiveSupport::TestCase
       proj.send "#{type.underscore.pluralize}=".to_sym, [Factory(type.underscore.to_sym)] unless ["Study", "Assay"].include?(type)
 
       proj.send("#{type.underscore.pluralize}".to_sym).each do |resource|
-        assert_equal true, parent_proj.send("related_#{type.underscore.pluralize}".to_sym).include?(resource)
+        assert parent_proj.send("related_#{type.underscore.pluralize}".to_sym).include?(resource)
       end
     end
   end

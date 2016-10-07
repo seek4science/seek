@@ -201,31 +201,31 @@ class SampleTest < ActiveSupport::TestCase
     sample.update_attributes(data: { the_title: 'fish', bool: '0' })
     assert sample.valid?
     disable_authorization_checks { sample.save! }
-    assert_equal false, sample.data[:bool]
+    assert !sample.data[:bool]
 
     # Mass assignment
     sample.data = { the_title: 'fish', bool: '1' }
     assert sample.valid?
     disable_authorization_checks { sample.save! }
-    assert_equal true, sample.data[:bool]
+    assert sample.data[:bool]
 
     # Setter
     sample.set_attribute(:bool, '0')
     assert sample.valid?
     disable_authorization_checks { sample.save! }
-    assert_equal false, sample.data[:bool]
+    assert !sample.data[:bool]
 
     # Method name
     sample.send((SampleAttribute::METHOD_PREFIX + 'bool=').to_sym, '1')
     assert sample.valid?
     disable_authorization_checks { sample.save! }
-    assert_equal true, sample.data[:bool]
+    assert sample.data[:bool]
 
     # Hash
     sample.data[:bool] = '0'
     assert sample.valid?
     disable_authorization_checks { sample.save! }
-    assert_equal false, sample.data[:bool]
+    assert !sample.data[:bool]
   end
 
   test 'handling booleans' do
