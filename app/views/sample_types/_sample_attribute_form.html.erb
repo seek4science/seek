@@ -70,9 +70,9 @@
 
   <td>
     <div class="btn-group" data-toggle="buttons">
+      <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', :autocomplete => 'off' %>
       <label class="btn btn-danger">
         Remove
-        <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', :autocomplete => 'off' %>
         <%= check_box_tag "#{field_name_prefix}[_destroy]", '1', false,
                           :class => 'destroy-attribute', :autocomplete => 'off' %>
       </label>

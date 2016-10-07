@@ -20,9 +20,6 @@ class Institution < ActiveRecord::Base
     text :city, :address
   end if Seek::Config.solr_enabled
 
-  #DEPRECATED
-  has_many :deprecated_specimens
-
   def people
     res = []
     work_groups.each do |wg|

@@ -7,6 +7,4 @@ class Genotype < ActiveRecord::Base
   accepts_nested_attributes_for :modification
   validates_presence_of :gene
 
-  #DEPRECATED
-  belongs_to :deprecated_specimen
 end

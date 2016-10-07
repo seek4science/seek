@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class PoliciesControllerTest < ActionController::TestCase
-  fixtures :all
+  fixtures :users
 
   include AuthenticatedTestHelper
 
@@ -94,23 +94,23 @@ class PoliciesControllerTest < ActionController::TestCase
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
     gatekeeper = Factory(:asset_gatekeeper)
     a_person = Factory(:person)
-    sample = DeprecatedSample.new
+    sop = Sop.new
 
     login_as(a_person.user)
-    assert sample.can_manage?
+    assert sop.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sample, gatekeeper.projects.first.id.to_s)
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, gatekeeper.projects.first.id.to_s)
     assert !updated_can_publish_immediately
   end
 
   test 'when creating an item, can publish the item if associate to it the project which has no gatekeeper' do
     a_person = Factory(:person)
-    sample = DeprecatedSample.new
+    sop = Sop.new
 
     login_as(a_person.user)
-    assert sample.can_manage?
+    assert sop.can_manage?
 
-    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sample, Factory(:project).id.to_s)
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(sop, Factory(:project).id.to_s)
     assert updated_can_publish_immediately
   end
 

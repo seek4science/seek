@@ -65,9 +65,9 @@
     </td>
     <td>
       <div class="btn-group" data-toggle="buttons">
+        <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][_destroy]", '0', :autocomplete => 'off' %>
         <label class="btn btn-danger">
           Remove
-          <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][_destroy]", '0', :autocomplete => 'off' %>
           <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][_destroy]", '1', false,
                             :class => 'destroy-attribute', :autocomplete => 'off' %>
         </label>

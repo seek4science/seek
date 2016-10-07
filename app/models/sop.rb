@@ -23,12 +23,6 @@ class Sop < ActiveRecord::Base
 
   has_many :experimental_conditions, :conditions =>  Proc.new{["experimental_conditions.sop_version =?", version]}
 
-  #DEPRECATED
-  has_many :sop_deprecated_specimens, :dependent => :destroy
-  has_many :deprecated_specimens,:through=>:sop_deprecated_specimens
-  has_many :deprecated_sample_assets,:dependent=>:destroy,:as => :asset
-  has_many :deprecated_samples, :through => :sample_assets
-
   explicit_versioning(:version_column => "version") do
     acts_as_doi_mintable(proxy: :parent)
     acts_as_versioned_resource
