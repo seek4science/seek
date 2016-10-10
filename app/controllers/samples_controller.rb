@@ -91,6 +91,7 @@ class SamplesController < ApplicationController
     @sample.update_attributes(params[:sample])
     update_sharing_policies @sample, params
     update_annotations(params[:tag_list], @sample)
+    update_relationships(@sample, params)
   end
 
   def find_index_assets
