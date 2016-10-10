@@ -222,7 +222,7 @@ class Project < ActiveRecord::Base
   end
 
   def can_delete?(user = User.current_user)
-    user.nil? ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
+    user && user.is_admin? && work_groups.collect(&:people).flatten.empty?
   end
 
   def lineage_ancestor_cannot_be_self
