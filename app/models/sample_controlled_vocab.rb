@@ -31,6 +31,10 @@ class SampleControlledVocab < ActiveRecord::Base
     samples.empty?
   end
 
+  def self.can_create?
+    User.logged_in_and_member? && Seek::Config.samples_enabled
+  end
+
   private
 
   def update_sample_type_templates(term)

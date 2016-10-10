@@ -40,7 +40,7 @@ class Sample < ActiveRecord::Base
   end
 
   def self.can_create?
-    User.logged_in_and_member?
+    User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
   def self.user_creatable?

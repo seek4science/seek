@@ -351,6 +351,16 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute type.can_edit?
   end
 
+  test 'can create' do
+    refute SampleType.can_create?
+    User.with_current_user Factory(:person).user do
+      assert SampleType.can_create?
+      with_config_value :samples_enabled,false do
+        refute SampleType.can_create?
+      end
+    end
+  end
+
   test 'linked sample type factory' do
     #test the factory, whilst setting it up
     type = Factory(:linked_sample_type)

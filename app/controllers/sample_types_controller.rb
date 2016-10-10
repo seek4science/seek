@@ -5,6 +5,7 @@ class SampleTypesController < ApplicationController
   include Seek::UploadHandling::DataUpload
   include Seek::IndexPager
 
+  before_filter :samples_enabled?
   before_filter :get_sample_type, only: [:show, :edit, :update, :destroy]
   before_filter :check_no_created_samples, only: [:edit, :update, :destroy]
   before_filter :find_assets, only: [:index]

@@ -611,6 +611,16 @@ class SampleTest < ActiveSupport::TestCase
 
   end
 
+  test 'can create' do
+    refute Sample.can_create?
+    User.with_current_user Factory(:person).user do
+      assert Sample.can_create?
+      with_config_value :samples_enabled,false do
+        refute Sample.can_create?
+      end
+    end
+  end
+
   test 'sample responds to correct methods' do
     sample_type = SampleType.new(title: 'Custom',:project_ids=>[Factory(:project).id])
     attribute1 = Factory(:any_string_sample_attribute, title: 'banana_type',

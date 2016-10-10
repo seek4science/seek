@@ -360,6 +360,31 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select 'div.related-items a[href=?]', strain_path(strain), text: /#{strain.title}/
   end
 
+  test 'cannot access when disabled' do
+    person = Factory(:person)
+    login_as(person.user)
+    with_config_value :samples_enabled,false do
+
+      get :show, id: populated_patient_sample.id
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      flash[:error]=nil
+
+      get :index
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      flash[:error]=nil
+
+      get :new
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+    end
+
+  end
+
   private
 
   def populated_patient_sample

@@ -30,7 +30,7 @@ class SampleType < ActiveRecord::Base
   grouped_pagination
 
   def self.can_create?
-    User.logged_in_and_member?
+    User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
   def validate_value?(attribute_name, value)
