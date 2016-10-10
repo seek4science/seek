@@ -426,23 +426,23 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'trigger template generation on save' do
-
+    Delayed::Job.destroy_all
     type=Factory.build(:simple_sample_type)
-    assert type.valid?
-    assert_difference("Delayed::Job.count",2) do #1 is a reindexing job
-      assert type.new_record?
-      type.save!
-      assert SampleTemplateGeneratorJob.new(type).exists?
-    end
+    refute SampleTemplateGeneratorJob.new(type).exists?
 
+    assert type.valid?
+
+    assert type.new_record?
+    type.save!
+    assert SampleTemplateGeneratorJob.new(type).exists?
+    
     type=Factory(:simple_sample_type)
     Delayed::Job.destroy_all
-    assert_difference("Delayed::Job.count",2) do
-      type.title="sample type test job"
-      type.save!
-      assert SampleTemplateGeneratorJob.new(type).exists?
-    end
+    refute SampleTemplateGeneratorJob.new(type).exists?
 
+    type.title="sample type test job"
+    type.save!
+    assert SampleTemplateGeneratorJob.new(type).exists?
   end
 
   test 'generate template' do
