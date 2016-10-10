@@ -194,6 +194,16 @@ namespace :seek do
     end
   end
 
+  task(:repopulate_auth_lookup_tables_new=>:environment) do
+    Seek::Util.authorized_types.each do |type|
+      type.all.each do |item|
+        unless AuthLookupUpdateQueue.exists?(item)
+          AuthLookupUpdateJob.new.add_items_to_queue item,5.seconds.from_now,1
+        end
+      end
+    end
+  end
+
   desc "Rebuilds all authorization tables for a given user - you are prompted for a user id"
   task(:repopulate_auth_lookup_for_user=>:environment) do
     puts "Please provide the user id:"
@@ -340,6 +350,35 @@ namespace :seek do
     puts JSON.pretty_generate(hashes).gsub(":", " =>")
     puts
     puts "Done"
+  end
+
+  task(:check_auth_lookup => :environment) do
+    output = StringIO.new('')
+    Seek::Util.authorized_types.each do |type|
+      puts "Checking #{type.name.pluralize}"
+      puts
+      output.puts type.name
+      users = User.all + [nil]
+      type.all.each do |item|
+        users.each do |user|
+          user_id = user.nil? ? 0 : user.id
+          ['view', 'edit', 'download', 'manage', 'delete'].each do |action|
+            lookup = type.lookup_for_asset(action, user_id, item.id)
+            actual = item.authorized_for_action(user, action)
+            unless lookup == actual
+              output.puts "  #{type.name} #{item.id} - User #{user_id}"
+              output.puts "    Lookup said: #{lookup}"
+              output.puts "    Expected: #{actual}"
+            end
+          end
+        end
+        print '.'
+      end
+      puts
+    end
+
+    output.rewind
+    puts output.read
   end
 
   def set_projects_parent array, parent
