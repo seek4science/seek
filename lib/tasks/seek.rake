@@ -319,22 +319,7 @@ namespace :seek do
   
   desc("Dump auth lookup tables")
   task(:dump_auth_lookup => :environment) do
-    tables = ["assay_auth_lookup",
-              "data_file_auth_lookup",
-              "deprecated_sample_auth_lookup",
-              "deprecated_specimen_auth_lookup",
-              "event_auth_lookup",
-              "investigation_auth_lookup",
-              "model_auth_lookup",
-              "presentation_auth_lookup",
-              "publication_auth_lookup",
-              "sample_auth_lookup",
-              "sop_auth_lookup",
-              "strain_auth_lookup",
-              "study_auth_lookup",
-              "sweep_auth_lookup",
-              "taverna_player_run_auth_lookup",
-              "workflow_auth_lookup"]
+    tables = Seek::Util.authorized_types.map(&:lookup_table_name)
 
     hashes = {}
     File.open('auth_lookup_dump.txt', 'w') do |f|
