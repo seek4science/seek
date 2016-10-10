@@ -106,10 +106,20 @@ class ProgrammeTest < ActiveSupport::TestCase
     programme_administrator = Factory(:programme_administrator)
     programme = programme_administrator.programmes.first
 
+    refute_empty programme.projects
+
     assert programme.can_delete?(admin)
     refute programme.can_delete?(programme_administrator)
     refute programme.can_delete?(person)
     refute programme.can_delete?(nil)
+
+    programme.projects = []
+    assert_empty programme.projects
+    assert programme.can_delete?(admin)
+    assert programme.can_delete?(programme_administrator)
+    refute programme.can_delete?(person)
+    refute programme.can_delete?(nil)
+
   end
 
   test 'can be edited by' do
