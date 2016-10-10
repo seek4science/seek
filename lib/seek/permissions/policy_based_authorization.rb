@@ -258,6 +258,55 @@ module Seek
         end
       end
 
+      def update_lookup_table_for_all_users
+        self.class.isolation_level(:repeatable_read) do #ensure it allows it see another worker may have inserted a record already
+          self.class.transaction do
+            #check to see if an insert of update is needed, action used is arbitary
+            insert = self.class.lookup_for_asset("view", 0, self.id).nil?
+
+            # Global permissions (Policy)
+            if insert
+              ([0] + User.pluck(:id)).each do |user_id|
+                sql = %(INSERT INTO #{self.class.lookup_table_name}
+                          (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
+                          VALUES (#{user_id}, #{self.id}, #{policy.allows_action?('view')}, #{policy.allows_action?('edit')},
+                                  #{policy.allows_action?('download')}, #{policy.allows_action?('manage')},
+                                  #{policy.allows_action?('delete')});)
+
+                ActiveRecord::Base.connection.execute(sql)
+              end
+            else
+              update_lookup(policy)
+            end
+
+            # Specific permissions (Permission)
+            sorted_permissions = self.policy.permissions.
+                sort_by { |p| Permission.precedence.index(p.contributor_type) }.
+                reverse
+
+            sorted_permissions.each do |permission|
+              if permission.contributor_type == 'FavouriteGroup'
+                permission.contributor.favourite_group_memberships.includes(:person).each do |group_permission|
+                  if group_permission.person.try(:user_id)
+                    update_lookup(group_permission, group_permission.person)
+                  end
+                end
+              else
+                update_lookup(permission, permission.affected_people)
+              end
+            end
+
+            # Role permissions (Role)
+            if self.asset_housekeeper_can_manage?
+              asset_housekeepers = self.projects.map(&:asset_housekeepers).flatten
+              if asset_housekeepers.any?
+                update_lookup([true, true, true, true, true], asset_housekeepers)
+              end
+            end
+          end
+        end
+      end
+
       def contributor_credited?
         !respond_to?(:creators) or creators.empty?
       end
@@ -306,8 +355,6 @@ module Seek
           self.contributor = default_contributor
         end
       end
-
-
 
       #use request_permission_summary to retrieve who can manage the item
       def people_can_manage
@@ -361,6 +408,46 @@ module Seek
       #members of project can see some information of hidden items of their project
       def can_see_hidden_item?(person)
         person.member_of?(self.projects)
+      end
+
+      # Check if ALL the managers of the items are no longer involved with ANY of the item's projects
+      def asset_housekeeper_can_manage?
+        self.managers.map { |manager| (self.projects - manager.person.former_projects).none? }.all?
+      end
+
+      private
+
+      # Note, nil user means ALL users, not guest user
+      def update_lookup(permission, user = nil)
+        if permission.is_a?(Array)
+          can_view, can_edit, can_download, can_manage, can_delete = *permission
+        else
+          can_view = permission.allows_action?('view')
+          can_edit = permission.allows_action?('edit')
+          can_download = permission.allows_action?('download')
+          can_manage = permission.allows_action?('manage')
+          can_delete = permission.allows_action?('delete')
+        end
+
+        sql = %(UPDATE #{self.class.lookup_table_name}
+                        SET can_view=#{can_view},
+                            can_edit=#{can_edit},
+                            can_download=#{can_download},
+                            can_manage=#{can_manage},
+                            can_delete=#{can_delete}
+                        WHERE asset_id=#{self.id})
+
+        if user.respond_to?(:each)
+          sql += " AND user_id IN (#{user.map(&:id).join(', ')})"
+        elsif user.is_a?(User)
+          sql += " AND user_id=#{user.id}"
+        elsif user.is_a?(Person)
+          sql += " AND user_id=#{user.user_id}"
+        end
+
+        sql += ';'
+
+        ActiveRecord::Base.connection.execute(sql)
       end
     end
   end
