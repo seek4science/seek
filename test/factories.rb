@@ -1134,6 +1134,7 @@ end
 
   Factory.define(:sample_type) do |f|
     f.sequence(:title) {|n| "SampleType #{n}"}
+    f.projects {[Factory.build(:project)]}
   end
 
   Factory.define(:integer_sample_attribute_type,:class=>SampleAttributeType) do |f|
