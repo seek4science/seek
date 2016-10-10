@@ -6,6 +6,8 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   setup do
     @person = Factory(:person)
+    @project = @person.projects.first
+    refute_nil @project
     login_as(@person)
     @sample_type = Factory(:simple_sample_type)
     @string_type = Factory(:string_sample_attribute_type)
@@ -24,8 +26,11 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should create sample_type' do
+    @person.projects.first
+
     assert_difference('SampleType.count') do
       post :create, sample_type: { title: 'Hello!',
+                                   project_ids:[@project.id],
                                    sample_attributes_attributes: {
                                      '0' => {
                                        pos: '1', title: 'a string', required: '1', is_title: '1',
@@ -41,6 +46,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_redirected_to sample_type_path(assigns(:sample_type))
     assert_equal 2, assigns(:sample_type).sample_attributes.size
     assert_equal 'a string', assigns(:sample_type).sample_attributes.title_attributes.first.title
+    assert_equal [@project],assigns(:sample_type).projects
     refute assigns(:sample_type).uploaded_template?
     assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
   end
@@ -49,6 +55,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     linked_sample_type = Factory(:sample_sample_attribute_type)
     assert_difference('SampleType.count') do
       post :create, sample_type: { title: 'Hello!',
+                                   project_ids:[@project.id],
                                    sample_attributes_attributes: {
                                        '0' => {
                                            pos: '1', title: 'a string', required: '1', is_title: '1',
@@ -154,7 +161,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('SampleType.count', 1) do
       assert_difference('ContentBlob.count', 1) do
-        post :create_from_template, sample_type: { title: 'Hello!' }, content_blobs: [blob]
+        post :create_from_template, sample_type: { title: 'Hello!',project_ids:[@project.id] }, content_blobs: [blob]
       end
     end
 
@@ -168,7 +175,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('SampleType.count', 1) do
       assert_difference('ContentBlob.count', 1) do
-        post :create_from_template, sample_type: { title: 'Hello!' }, content_blobs: [blob]
+        post :create_from_template, sample_type: { title: 'Hello!',project_ids:[@project.id] }, content_blobs: [blob]
       end
     end
 
