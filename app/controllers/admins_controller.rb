@@ -44,6 +44,7 @@ class AdminsController < ApplicationController
     #Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
+    Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
