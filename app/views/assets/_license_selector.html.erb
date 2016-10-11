@@ -1,13 +1,15 @@
 <% default_license ||= 'CC-BY-4.0' %>
-<% selected_license = resource.license %>
+<% accessor ||= :license %>
+<% selected_license = resource.send(accessor) %>
 <% selected_license = (resource.new_record? ? default_license : Seek::License::NULL_LICENSE) if selected_license.nil? %>
+<% label ||= 'License' %>
 
-<%= folding_panel('License', false,
+<%= folding_panel(label, false,
                   :help_text => "Here you can choose which license this #{text_for_resource(resource)} is available under.") do %>
     <div class="form-group" id="license-section">
-      <label>License</label>
+      <label><%= label %></label>
 
-      <%= grouped_license_select("#{resource.class.name.underscore}[license]", selected_license,
+      <%= grouped_license_select("#{resource.class.name.underscore}[#{accessor.to_s}]", selected_license,
                                  :id => 'license-select', :class => 'form-control',
                                  :source => Seek::License::OPENDEFINITION[:data]) %>
 
