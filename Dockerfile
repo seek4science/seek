@@ -48,6 +48,6 @@ RUN rm -rf /tmp/* /var/tmp/*
 EXPOSE 80
 
 # Shared
-VOLUME ["/usr/src/app/filestore"]
+VOLUME ["/usr/src/app/filestore", "/usr/src/app/db"]
 
 CMD ["docker/entrypoint.sh"]
