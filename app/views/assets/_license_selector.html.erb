@@ -24,4 +24,35 @@
         $j('#license-select').change(zenodoExport.setLicenseUrl); // Set URL on user change
         zenodoExport.setLicenseUrl(); // Set URL on initial page load
     });
+
+    <% if resource_for_controller && resource_for_controller.new_record? %>
+    //  this is to handle auto selecting the default license for a project, when the project is selected
+    //  it only occurs for new records, not when being edited.
+        $j(document).ready(function () {
+
+            <%
+                projects=current_user.person.projects.select{|proj| proj.default_license}
+                licences={}
+                projects.each{|proj| licences[proj.id]=proj.default_license}
+                license_json=licences.to_json.html_safe
+
+            %>
+            var projectLicenses = JSON.parse('<%= license_json %>');
+
+            var projectSelectID = '#<%= controller_name.singularize %>_project_ids';
+
+            $j(projectSelectID).on('change', function () {
+                var ids = $j(this).val();
+                if (ids != null) {
+                    var license = projectLicenses[ids.first()]
+                    if (license != null) {
+                        $j('#license-select').val(license);
+                    }
+                }
+            });
+
+            //trigger an initial change event, as an project may have been added before this elements loads
+            $j(projectSelectID).trigger('change');
+        });
+    <% end %>
 </script>
