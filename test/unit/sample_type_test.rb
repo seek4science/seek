@@ -477,7 +477,7 @@ class SampleTypeTest < ActiveSupport::TestCase
       type.tags="fish,sparrow"
     end
     type.save!
-    type.reload
+    type = SampleType.find(type.id)
     assert_equal ["fish","sparrow"],type.tags.sort
   end
 end

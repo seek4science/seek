@@ -42,7 +42,7 @@ class SampleTypesControllerTest < ActionController::TestCase
                                        sample_attribute_type_id: @int_type.id, _destroy: '0'
                                      }
                                    },
-                                  :tags=>"fish,#{golf.value.text}"
+                                  :tags=>"fish,golf"
 
       }
 
@@ -131,7 +131,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_includes assigns(:sample_type).sample_attributes.map(&:title), 'hello'
     refute assigns(:sample_type).sample_attributes[0].is_title?
     assert assigns(:sample_type).sample_attributes[1].is_title?
-    assert_equal ['fish','golf'],assigns(:sample_type).tags_as_text_array.sort
+    assert_equal ['fish','golf'],assigns(:sample_type).tags.sort
     assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
   end
 
