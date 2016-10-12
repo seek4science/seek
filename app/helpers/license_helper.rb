@@ -2,7 +2,6 @@ require 'json'
 require 'seek/license'
 
 module LicenseHelper
-
   def license_select(name, selected = nil, opts = {})
     select_tag(name, options_for_select(license_options(opts), selected), opts)
   end
@@ -20,8 +19,23 @@ module LicenseHelper
         link_to(license.title, license.url, target: :_blank)
       end
     else
-      content_tag(:span, 'No license specified', :class => 'none_text')
+      content_tag(:span, 'No license specified', class: 'none_text')
     end
+  end
+
+  # whether to enable to auto selection of the license based on the selected project
+  # only enabled if it is a new item, and the logged in person belongs to projects with a default license
+  def enable_auto_project_license?
+    resource_for_controller &&
+      resource_for_controller.new_record? &&
+      logged_in_and_registered? &&
+      current_user.person.projects.select(&:default_license).any?
+  end
+
+  #JSON that creates a lookup for project license by id
+  def project_licenses_json
+    projects = current_user.person.projects.select(&:default_license)
+    Hash[projects.collect { |proj| [proj.id, proj.default_license] }].to_json.html_safe
   end
 
   private
@@ -31,14 +45,14 @@ module LicenseHelper
   end
 
   def license_options(opts = {})
-    license_values(opts).map { |value| [value['title'], value['id'], {'data-url' => value['url']}] }
+    license_values(opts).map { |value| [value['title'], value['id'], { 'data-url' => value['url'] }] }
   end
 
   def grouped_license_options(opts = {})
     grouped_licenses = license_values(opts).group_by do |l|
-      if l.has_key?('is_generic') && l['is_generic']
+      if l.key?('is_generic') && l['is_generic']
         'Generic'
-      elsif l.has_key?('od_recommended') && l['od_recommended']
+      elsif l.key?('od_recommended') && l['od_recommended']
         'Recommended'
       else
         'Other'
@@ -55,11 +69,9 @@ module LicenseHelper
     end
 
     grouped_licenses.each do |_, licenses|
-      licenses.map! { |value| [value['title'], value['id'], {'data-url' => value['url']}] }
+      licenses.map! { |value| [value['title'], value['id'], { 'data-url' => value['url'] }] }
     end
 
     grouped_licenses
   end
-
-
 end

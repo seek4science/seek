@@ -72,6 +72,7 @@ SEEK::Application.configure do
   Seek::Config.default :project_hierarchy_enabled, false
   Seek::Config.default :show_announcements, true
   Seek::Config.default :programme_user_creation_enabled, false
+  Seek::Config.default :samples_enabled, true
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0

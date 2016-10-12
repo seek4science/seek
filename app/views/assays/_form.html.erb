@@ -101,7 +101,9 @@
                                                              :existing_creators => existing_creators,
                                                              :other_creators => @assay.other_creators} -%>
 
-    <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>
+    <% if Seek::Config.samples_enabled %>
+      <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>
+    <% end %>
 
 
     <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} %>

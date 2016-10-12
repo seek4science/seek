@@ -78,7 +78,8 @@ class Programme < ActiveRecord::Base
   end
 
   def can_delete?(user = User.current_user)
-    user && user.is_admin?
+    user && ( user.is_admin? ||
+              user.person.is_programme_administrator?(self) && projects.empty?)
   end
 
   def rejected?

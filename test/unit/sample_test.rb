@@ -331,7 +331,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'json metadata with awkward attributes' do
-    sample_type = SampleType.new title: 'with awkward attributes'
+    sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title', is_title: true, sample_type: sample_type)
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
@@ -452,7 +452,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample with clashing attribute names' do
-    sample_type = SampleType.new title: 'with awkward attributes'
+    sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'freeze', is_title: true, sample_type: sample_type)
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
@@ -473,7 +473,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample with clashing attribute names with private methods' do
-    sample_type = SampleType.new title: 'with awkward attributes'
+    sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
     sample_type.sample_attributes << Factory.build(:any_string_sample_attribute, title: 'format', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.save!
@@ -491,7 +491,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample with clashing attribute names with dynamic rails methods' do
-    sample_type = SampleType.new title: 'with awkward attributes'
+    sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_was', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.save!
@@ -611,8 +611,18 @@ class SampleTest < ActiveSupport::TestCase
 
   end
 
+  test 'can create' do
+    refute Sample.can_create?
+    User.with_current_user Factory(:person).user do
+      assert Sample.can_create?
+      with_config_value :samples_enabled,false do
+        refute Sample.can_create?
+      end
+    end
+  end
+
   test 'sample responds to correct methods' do
-    sample_type = SampleType.new(title: 'Custom')
+    sample_type = SampleType.new(title: 'Custom',:project_ids=>[Factory(:project).id])
     attribute1 = Factory(:any_string_sample_attribute, title: 'banana_type',
                                                        is_title: true, sample_type: sample_type)
     attribute2 = Factory(:any_string_sample_attribute, title: 'license',

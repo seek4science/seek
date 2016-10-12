@@ -35,12 +35,14 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'create' do
     person = Factory(:person)
+    creator = Factory(:person)
     login_as(person)
     type = Factory(:patient_sample_type)
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id,
                               data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' },
-                              project_ids: [person.projects.first.id] }
+                              project_ids: [person.projects.first.id] },
+           :creators=>[[creator.name,creator.id]].to_json
     end
     assert assigns(:sample)
     sample = assigns(:sample)
@@ -50,6 +52,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '22.1', sample.get_attribute(:weight)
     assert_equal 'M13 9PL', sample.get_attribute(:postcode)
     assert_equal person.user, sample.contributor
+    assert_equal [creator],sample.creators
   end
 
   test 'create and update with boolean' do
@@ -95,11 +98,16 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'update' do
     login_as(Factory(:person))
+    creator = Factory(:person)
     sample = populated_patient_sample
     type_id = sample.sample_type.id
 
+    assert_empty sample.creators
+
     assert_no_difference('Sample.count') do
-      put :update, id: sample.id, sample: { data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' } }
+      put :update, id: sample.id, sample: { data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' } },
+          :creators=>[[creator.name,creator.id]].to_json
+      assert_equal [creator],sample.creators
     end
 
     assert assigns(:sample)
@@ -350,6 +358,31 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'div.related-items a[href=?]', strain_path(strain), text: /#{strain.title}/
+  end
+
+  test 'cannot access when disabled' do
+    person = Factory(:person)
+    login_as(person.user)
+    with_config_value :samples_enabled,false do
+
+      get :show, id: populated_patient_sample.id
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      flash[:error]=nil
+
+      get :index
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+      flash[:error]=nil
+
+      get :new
+      assert_redirected_to :root
+      refute_nil flash[:error]
+
+    end
+
   end
 
   private

@@ -35,7 +35,7 @@ class Project < ActiveRecord::Base
   belongs_to :programme
 
   attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,
-                  :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids
+                  :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids, :default_license
 
   # for handling the assignment for roles
   attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids
@@ -222,7 +222,7 @@ class Project < ActiveRecord::Base
   end
 
   def can_delete?(user = User.current_user)
-    user.nil? ? false : (user.is_admin? && work_groups.collect(&:people).flatten.empty?)
+    user && user.is_admin? && work_groups.collect(&:people).flatten.empty?
   end
 
   def lineage_ancestor_cannot_be_self
