@@ -28,6 +28,8 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'should create sample_type' do
     @person.projects.first
 
+    golf = Factory :tag,:source=>@person.user,:annotatable=>Factory(:simple_sample_type),:value=>"golf"
+
     assert_difference('SampleType.count') do
       post :create, sample_type: { title: 'Hello!',
                                    project_ids:[@project.id],
@@ -39,8 +41,11 @@ class SampleTypesControllerTest < ActionController::TestCase
                                        pos: '2', title: 'a number', required: '1',
                                        sample_attribute_type_id: @int_type.id, _destroy: '0'
                                      }
-                                   }
+                                   },
+                                  :tags=>"fish,#{golf.value.text}"
+
       }
+
     end
 
     assert_redirected_to sample_type_path(assigns(:sample_type))
@@ -48,6 +53,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'a string', assigns(:sample_type).sample_attributes.title_attributes.first.title
     assert_equal [@project],assigns(:sample_type).projects
     refute assigns(:sample_type).uploaded_template?
+    assert_equal ['fish','golf'],assigns(:sample_type).tags.sort
     assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
   end
 
@@ -94,6 +100,9 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'should update sample_type' do
     sample_type = Factory(:patient_sample_type)
+    assert_empty sample_type.tags_as_text_array
+
+    golf = Factory :tag,:source=>@person.user,:annotatable=>Factory(:simple_sample_type),:value=>"golf"
 
     sample_attributes_fields = sample_type.sample_attributes.map do |attribute|
       { pos: attribute.pos, title: attribute.title,
@@ -112,7 +121,8 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('SampleAttribute.count', -1) do
       put :update, id: sample_type, sample_type: { title: 'Hello!',
-                                                   sample_attributes_attributes: sample_attributes_fields
+                                                   sample_attributes_attributes: sample_attributes_fields,
+                                                   :tags=>"fish,#{golf.value.text}"
       }
     end
     assert_redirected_to sample_type_path(assigns(:sample_type))
@@ -121,6 +131,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_includes assigns(:sample_type).sample_attributes.map(&:title), 'hello'
     refute assigns(:sample_type).sample_attributes[0].is_title?
     assert assigns(:sample_type).sample_attributes[1].is_title?
+    assert_equal ['fish','golf'],assigns(:sample_type).tags_as_text_array.sort
     assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
   end
 
