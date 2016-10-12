@@ -13,6 +13,10 @@ class SampleType < ActiveRecord::Base
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
 
+  include Seek::Taggable
+
+  acts_as_annotatable name_field: :title
+
   acts_as_uniquely_identifiable
 
   has_many :samples, inverse_of: :sample_type

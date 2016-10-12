@@ -468,4 +468,16 @@ class SampleTypeTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'tagging' do
+    assert SampleType.is_taggable?
+    type = Factory(:simple_sample_type)
+    assert_empty type.tags_as_text_array
+    User.with_current_user(Factory(:person).user) do
+      type.tag_with(["fish","sparrow"])
+    end
+    type.save!
+    type.reload
+    assert_equal ["fish","sparrow"],type.tags_as_text_array.sort
+  end
 end
