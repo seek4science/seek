@@ -23,8 +23,8 @@ class SessionsController < ApplicationController
 
   def create
     # authentication through omniauth
-    if Seek::Config.omniauth_enabled && env.has_key?('omniauth.auth')
-      create_omniauth(env['omniauth.auth'])
+    if Seek::Config.omniauth_enabled && request.env.has_key?('omniauth.auth')
+      create_omniauth(request.env['omniauth.auth'])
     else
       password_authentication
     end
