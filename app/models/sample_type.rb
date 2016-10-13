@@ -1,5 +1,5 @@
 class SampleType < ActiveRecord::Base
-  attr_accessible :title, :uuid, :sample_attributes_attributes, :description, :uploaded_template
+  attr_accessible :title, :uuid, :sample_attributes_attributes, :description, :uploaded_template, :project_ids
 
   searchable(auto_index: false) do
     text :attribute_search_terms
@@ -7,6 +7,8 @@ class SampleType < ActiveRecord::Base
 
   include Seek::ActsAsAsset::Searching
   include Seek::Search::BackgroundReindexing
+
+  include Seek::ProjectAssociation
 
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
@@ -28,7 +30,7 @@ class SampleType < ActiveRecord::Base
   grouped_pagination
 
   def self.can_create?
-    User.logged_in_and_member?
+    User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
   def validate_value?(attribute_name, value)

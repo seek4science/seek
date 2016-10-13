@@ -4,6 +4,7 @@ class SamplesController < ApplicationController
   include Seek::AssetsCommon
   include Seek::IndexPager
 
+  before_filter :samples_enabled?
   before_filter :find_index_assets, only: :index
   before_filter :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
 
@@ -91,6 +92,7 @@ class SamplesController < ApplicationController
     @sample.update_attributes(params[:sample])
     update_sharing_policies @sample, params
     update_annotations(params[:tag_list], @sample)
+    update_relationships(@sample, params)
   end
 
   def find_index_assets

@@ -3,7 +3,7 @@ require 'test_helper'
 class SampleTypeTest < ActiveSupport::TestCase
 
   test 'validation' do
-    sample_type = SampleType.new title: 'fish'
+    sample_type = SampleType.new title: 'fish', :project_ids=>[Factory(:project).id]
     refute sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
 
@@ -13,15 +13,22 @@ class SampleTypeTest < ActiveSupport::TestCase
     sample_type.title = ''
     refute sample_type.valid?
 
-    # cannot have 2 attributes with the same name
+    #needs to have a project
     sample_type = SampleType.new title: 'fish'
+    sample_type.sample_attributes << Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
+    refute sample_type.valid?
+    sample_type.projects=[Factory(:project)]
+    assert sample_type.valid?
+
+    # cannot have 2 attributes with the same name
+    sample_type = SampleType.new title: 'fish',:project_ids=>[Factory(:project).id]
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'a', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'a', is_title: false, sample_type: sample_type)
     refute sample_type.valid?
 
     # uniqueness check should be case insensitive
-    sample_type = SampleType.new title: 'fish'
+    sample_type = SampleType.new title: 'fish',:project_ids=>[Factory(:project).id]
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'aaa', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
     sample_type.sample_attributes << Factory(:simple_string_sample_attribute, title: 'aAA', is_title: false, sample_type: sample_type)
@@ -46,7 +53,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'associate sample attribute default order' do
-    sample_type = SampleType.new title: 'sample type'
+    sample_type = SampleType.new title: 'sample type',:project_ids=>[Factory(:project).id]
     attribute1 = Factory(:simple_string_sample_attribute, is_title: true, sample_type: sample_type)
     attribute2 = Factory(:simple_string_sample_attribute, sample_type: sample_type)
     sample_type.sample_attributes << attribute1
@@ -59,7 +66,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'associate sample attribute specify order' do
-    sample_type = SampleType.new title: 'sample type'
+    sample_type = SampleType.new title: 'sample type',:project_ids=>[Factory(:project).id]
     attribute3 = Factory(:simple_string_sample_attribute, pos: 3, sample_type: sample_type)
     attribute2 = Factory(:simple_string_sample_attribute, pos: 2, sample_type: sample_type)
     attribute1 = Factory(:simple_string_sample_attribute, pos: 1, is_title: true, sample_type: sample_type)
@@ -140,7 +147,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'must have one title attribute' do
-    type = SampleType.new title: 'No title'
+    type = SampleType.new title: 'No title',:project_ids=>[Factory(:project).id]
     type.sample_attributes << Factory(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: false, sample_type: type)
 
     refute type.valid?
@@ -157,7 +164,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     default_type = SampleAttributeType.default
     default_type ||= Factory(:string_sample_attribute_type, title: 'String')
 
-    sample_type = SampleType.new title: 'from template'
+    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     refute_nil sample_type.template
 
@@ -186,7 +193,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     default_type = SampleAttributeType.default
     default_type ||= Factory(:string_sample_attribute_type, title: 'String')
 
-    sample_type = SampleType.new title: 'from template'
+    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob2)
     refute_nil sample_type.template
 
@@ -235,13 +242,24 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample_type.compatible_template_file?
   end
 
+  test 'projects' do
+    sample_type = Factory(:simple_sample_type)
+    refute_empty sample_type.projects
+
+    project2=Factory(:project)
+    sample_type.projects = [project2]
+    sample_type.save!
+    sample_type.reload
+    assert_equal [project2],sample_type.projects
+  end
+
   test 'matches content blob?' do
     template_blob = Factory(:sample_type_populated_template_content_blob)
     non_template1 = Factory(:rightfield_content_blob)
     non_template2 = Factory(:binary_content_blob)
 
     Factory(:string_sample_attribute_type, title: 'String')
-    sample_type = SampleType.new title: 'from template', uploaded_template:true
+    sample_type = SampleType.new title: 'from template', uploaded_template:true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
@@ -253,13 +271,13 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'sample_types_matching_content_blob' do
     Factory(:string_sample_attribute_type, title: 'String')
-    sample_type = SampleType.new title: 'from template', uploaded_template:true
+    sample_type = SampleType.new title: 'from template', uploaded_template:true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
 
     Factory(:string_sample_attribute_type, title: 'String')
-    sample_type2 = SampleType.new title: 'from template', uploaded_template:true
+    sample_type2 = SampleType.new title: 'from template', uploaded_template:true,:project_ids=>[Factory(:project).id]
     sample_type2.content_blob = Factory(:sample_type_template_content_blob2)
     sample_type2.build_attributes_from_template
     sample_type2.save!
@@ -273,7 +291,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'build samples from template' do
     Factory(:string_sample_attribute_type, title: 'String')
-    sample_type = SampleType.new title: 'from template'
+    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
@@ -294,7 +312,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'dependant destroy content blob' do
     Factory(:string_sample_attribute_type, title: 'String')
 
-    sample_type = SampleType.new title: 'from template', uploaded_template:true
+    sample_type = SampleType.new title: 'from template', uploaded_template:true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!
@@ -331,6 +349,16 @@ class SampleTypeTest < ActiveSupport::TestCase
     assert type.can_edit?
     type = Factory(:patient_sample).sample_type
     refute type.can_edit?
+  end
+
+  test 'can create' do
+    refute SampleType.can_create?
+    User.with_current_user Factory(:person).user do
+      assert SampleType.can_create?
+      with_config_value :samples_enabled,false do
+        refute SampleType.can_create?
+      end
+    end
   end
 
   test 'linked sample type factory' do
@@ -398,22 +426,23 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'trigger template generation on save' do
-
+    Delayed::Job.destroy_all
     type=Factory.build(:simple_sample_type)
-    assert_difference("Delayed::Job.count",2) do #1 is a reindexing job
-      assert type.new_record?
-      type.save!
-      assert SampleTemplateGeneratorJob.new(type).exists?
-    end
+    refute SampleTemplateGeneratorJob.new(type).exists?
 
+    assert type.valid?
+
+    assert type.new_record?
+    type.save!
+    assert SampleTemplateGeneratorJob.new(type).exists?
+    
     type=Factory(:simple_sample_type)
     Delayed::Job.destroy_all
-    assert_difference("Delayed::Job.count",2) do
-      type.title="sample type test job"
-      type.save!
-      assert SampleTemplateGeneratorJob.new(type).exists?
-    end
+    refute SampleTemplateGeneratorJob.new(type).exists?
 
+    type.title="sample type test job"
+    type.save!
+    assert SampleTemplateGeneratorJob.new(type).exists?
   end
 
   test 'generate template' do

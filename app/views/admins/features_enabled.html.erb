@@ -5,13 +5,15 @@
                                "#{t('event').pluralize} enabled","Whether the #{t('event').pluralize} are displayed and can be added.") %>
 
     <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
-                               "Search enabled", "Whether search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after chaning this setting.") %>
+                               "Search enabled", "Whether the search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after changing this setting.") %>
     <%= admin_checkbox_setting(:programmes_enabled, 1, Seek::Config.programmes_enabled,
                                "#{t('programme').pluralize} enabled", "Whether #{t('programme').pluralize} are enabled. #{t('programme').pluralize} allow a collection of #{t('project').pluralize} to be grouped together. This is useful if you have a large number of #{t('project').pluralize} from different initiatives.",:onchange=>toggle_appear_javascript('programme_details')) %>
     <div id="programme_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.programmes_enabled -%>">
       <%= admin_checkbox_setting(:programme_user_creation_enabled, 1, Seek::Config.programme_user_creation_enabled,
                              "User creation of #{t('programme').pluralize} enabled", "Controls whether standard users can create their own #{t('programme').pluralize}. If disabled only full administrators will be able to create #{t('programme').pluralize}. If enabled a full administrator is still required to allow and activate the #{t('programme')}") %>
     </div>
+    <%= admin_checkbox_setting(:samples_enabled, 1, Seek::Config.samples_enabled,
+                               "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.") %>
 
     <%= admin_checkbox_setting(:show_announcements, 1, Seek::Config.show_announcements,
                                "Show announcements enabled", "Whether the announcements panel is displayed. If you don't make many announcements you may want to hide it to avoid showing old announcements") %>

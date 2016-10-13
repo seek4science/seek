@@ -5,8 +5,11 @@
             <li><%= image_tag_for_key('add',new_project_path(programme_id:item.id),"Create a #{t('Project')}",nil, "Create a #{t('Project')}") %></li>
         <% end %>
 
-        <% if admin_logged_in? -%>
+        <% if @programme.can_delete? %>
             <%= delete_icon(item, current_user) %>
+        <% end %>
+
+        <% if admin_logged_in? -%>
             <li><%= image_tag_for_key('edit', initiate_spawn_project_programme_path(item), "Spawn an existing #{t('project')}", nil, "Spawn an existing #{t('project')}") -%></li>
         <% end -%>
     <% end -%>

@@ -2221,7 +2221,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template', uploaded_template: true
+    sample_type = SampleType.new title:'from template', uploaded_template: true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2229,7 +2229,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
 
-    sample_type = SampleType.new title:'from template', uploaded_template: true
+    sample_type = SampleType.new title:'from template', uploaded_template: true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2324,7 +2324,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template'
+    sample_type = SampleType.new title:'from template',:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2354,7 +2354,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template', uploaded_template: true
+    sample_type = SampleType.new title:'from template', uploaded_template: true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:strain_sample_data_content_blob)
     sample_type.build_attributes_from_template
     attribute_type = sample_type.sample_attributes.last
@@ -2382,7 +2382,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template', uploaded_template: true
+    sample_type = SampleType.new title:'from template', uploaded_template: true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2420,7 +2420,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template', uploaded_template: true
+    sample_type = SampleType.new title:'from template', uploaded_template: true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2428,7 +2428,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
 
-    sample_type = SampleType.new title:'from template', uploaded_template: true
+    sample_type = SampleType.new title:'from template', uploaded_template: true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2454,7 +2454,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template', uploaded_template: true
+    sample_type = SampleType.new title:'from template', uploaded_template: true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     #this is to force the full name to be 2 words, so that one row fails
@@ -2481,7 +2481,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title:'from template', uploaded_template: true
+    sample_type = SampleType.new title:'from template', uploaded_template: true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     sample_type.save!

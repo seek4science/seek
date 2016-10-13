@@ -5,9 +5,7 @@
 
   <% if @sample.new_record? %>
       <div class="form-group">
-      <%= f.select :sample_type_id,
-                   options_for_select(SampleType.all.collect { |st| [st.title, st.id] }, @sample.sample_type_id),
-                   {:include_blank => 'Please select the appropriate Sample type' },:class => 'form-control' %>
+      <%= render :partial=>"sample_type_selection",:locals=>{:f=>f} %>
         <span id="new_sample_type_link">or <%= link_to 'Define new sample type',new_sample_type_path %></span>
       </div>
   <% end %>

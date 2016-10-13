@@ -63,6 +63,27 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal prog,proj.programme
   end
 
+  test "programme admin can destroy when no projects" do
+    programme_administrator = Factory(:programme_administrator)
+    login_as(programme_administrator)
+    programme = programme_administrator.programmes.first
+
+    refute_empty programme.projects
+
+    assert_no_difference("Programme.count") do
+      delete :destroy,:id=>programme.id
+    end
+    refute_nil flash[:error]
+
+    programme.projects = []
+    programme.save!
+
+    assert_difference("Programme.count",-1) do
+      delete :destroy,:id=>programme.id
+    end
+    assert_redirected_to programmes_path
+  end
+
   test "destroy" do
     login_as(Factory(:admin))
     prog = Factory(:programme)

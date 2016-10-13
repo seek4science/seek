@@ -2,6 +2,7 @@
         if (!$F(multiselect).include(value)) {
             $(multiselect).setValue($F(multiselect).concat(value));
             updateFancyMultiselect(multiselect);
+            $j('#'+multiselect).trigger('change');
         } else {
             alert('Item already exists!');
         }
@@ -10,6 +11,7 @@
     function removeFromFancy(multiselect, value) {
         $(multiselect).setValue($F(multiselect).without(value));
         updateFancyMultiselect(multiselect);
+        $j('#'+multiselect).trigger('change');
     }
 
     function insertFancyListItem(multiselect, displaylist, option) {
