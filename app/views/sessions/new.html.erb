@@ -1,22 +1,9 @@
 <% if logged_in? %>
-	<br/>
-	<p style="text-align:center;">You are already logged in.</p>
-	<p style="text-align:center;"><%= link_to "Sign out", logout_url %></p>
+    <br/>
+    <p class="text-center">You are already logged in.</p>
+    <p class="text-center"><%= link_to "Sign out", logout_url %></p>
 <% else %>
     <div class="container">
         <%= render :partial => "gadgets/sign_in", :locals => {:original_url => params[:return_to]} %>
     </div>
-        
-	<script language="javascript">
-      function focusLogin() {
-        document.getElementById('login').focus();
-      }
-
-      if (window.addEventListener){
-        window.addEventListener('load', focusLogin, false); 
-      } else if (window.attachEvent){
-        window.attachEvent('onload', focusLogin);
-      }
-    </script>
-	   
 <% end %>
