@@ -42,13 +42,25 @@ class SessionsController < ApplicationController
 
   protected
   
+  #def password_authentication
+  #  if @user = User.authenticate(params[:login], params[:password])
+  #    check_login
+  #  else
+  #    failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
+   # end  
+  #end
+  
   def password_authentication
     if @user = User.authenticate(params[:login], params[:password])
+      check_login
+    elsif Seek::Config.ldap_enabled
+      @user = User.authenticateLDAP(params[:login], params[:password])
       check_login
     else
       failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
     end  
   end
+  
 
   private
   

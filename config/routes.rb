@@ -51,7 +51,8 @@ SEEK::Application.routes.draw do
       post :get_user_stats
       post :update_admins
       post :update_rebrand
-      post :test_email_configuration
+      post :test_email_configuration      
+      post :test_ldap_connection
       post :update_others
       post :update_features_enabled
       post :update_pagination
