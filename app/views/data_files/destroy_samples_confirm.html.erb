@@ -1,0 +1,31 @@
+<%= render :partial => "general/item_title",:locals=>{:title=>"Delete extracted samples?",:item=>@data_file} %>
+<%
+review_link_text = "#{@data_file.extracted_samples.count} Samples that were extracted from it."
+review_link = link_to('Review samples',data_file_samples_path(@data_file),:target=>:_blank)
+%>
+<p>
+  The <%= "#{t('data_file')} you are about to delete is associated with #{@data_file.extracted_samples.count} that were extracted from it. (#{review_link})".html_safe %>
+</p>
+<p>
+  If you wish to also delete those samples, please tick the box below.<strong>This action is not reversible!</strong>
+</p>
+
+<%= form_for(@data_file, :method=>:delete) do |f| %>
+
+    <p class="alert alert-danger" role="alert">
+
+      <%= hidden_field_tag(:destroy_extracted_samples,'0') %>
+  <label>
+    <%=
+        check_box_tag(:destroy_extracted_samples)
+    %>
+    Also delete samples that had been extracted from this <%= t('data_file') %>?
+  </label>
+</p>
+
+
+    <%= f.submit "Continue", :id => "data_file_submit_btn",
+                 :class => 'btn btn-primary' -%>
+    or <%= cancel_button(data_file_path(@data_file)) -%>
+
+<% end %>

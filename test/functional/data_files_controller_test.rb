@@ -2521,7 +2521,77 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select '#resource-count-stats', :text=>/#{visible} Data files visible.*#{total}/
   end
 
+  test 'delete with data file with extracted samples' do
+    login_as(Factory(:person))
+    df=nil
+
+    df = data_file_with_extracted_samples
+
+
+    assert_no_difference("DataFile.count") do
+      delete :destroy, :id => df.id
+    end
+    assert_redirected_to destroy_samples_confirm_data_file_path(df)
+
+    assert_difference("DataFile.count",-1) do
+      assert_difference("Sample.count",-4) do
+        delete :destroy, :id => df.id, destroy_extracted_samples:'1'
+      end
+    end
+
+    assert_redirected_to data_files_path
+
+
+    df = data_file_with_extracted_samples
+
+    assert_difference("DataFile.count",-1) do
+      assert_no_difference("Sample.count") do
+        delete :destroy, :id => df.id, destroy_extracted_samples:'0'
+      end
+    end
+
+    assert_redirected_to data_files_path
+  end
+
+  test 'extract samples confirmation' do
+    login_as(Factory(:person))
+    df = data_file_with_extracted_samples
+    assert df.can_delete?
+    get :destroy_samples_confirm,:id=>df.id
+    assert_response :success
+  end
+
+  test 'extract samples confirmation not accessible if not can_delete?' do
+    login_as(Factory(:person))
+    df = data_file_with_extracted_samples(Factory(:person).user)
+    refute df.can_delete?
+    get :destroy_samples_confirm,:id=>df.id
+    assert_redirected_to data_file_path(df)
+    refute_nil flash[:error]
+  end
+
   private
+
+  def data_file_with_extracted_samples(contributor=User.current_user)
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                         policy: Factory(:private_policy), contributor: contributor
+    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    assert_difference("Sample.count",4) do
+      data_file.extract_samples(sample_type,true)
+      data_file.save!
+    end
+
+    data_file.reload
+
+    assert_equal 4, data_file.extracted_samples.count
+
+    data_file
+
+  end
 
   def mock_http
     stub_request(:get, "http://mockedlocation.com/a-piccy.png").to_return(:body => File.new("#{Rails.root}/test/fixtures/files/file_picture.png"), :status => 200, :headers=>{'Content-Type' => 'image/png'})

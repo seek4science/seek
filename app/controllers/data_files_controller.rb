@@ -58,6 +58,25 @@ class DataFilesController < ApplicationController
       format.html
     end
   end
+
+  def destroy
+    if @data_file.extracted_samples.any? && !params[:destroy_extracted_samples]
+      redirect_to destroy_samples_confirm_data_file_path(@data_file)
+    else
+      if params[:destroy_extracted_samples]=='1'
+        @data_file.extracted_samples.destroy_all
+      end
+      super
+    end
+  end
+
+  def destroy_samples_confirm
+    if @data_file.can_delete?
+      respond_to do |format|
+        format.html
+      end
+    end
+  end
     
   def new_version
     if handle_upload_data
