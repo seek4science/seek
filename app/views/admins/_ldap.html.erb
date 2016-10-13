@@ -1,0 +1,28 @@
+<%= admin_checkbox_setting(:ldap_enabled, 1, Seek::Config.ldap_enabled,
+                           "LDAP enabled", "Enables LDAP authentification.",
+                           :onchange=>toggle_appear_javascript('ldap_settings')) %>
+<div id="ldap_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.ldap_enabled) -%>;">
+  <div class="row">
+    <div class="col-sm-7">
+      <%= admin_text_setting(:ldap_address, Seek::Config.ldap_settings('ldap_address'), 'LDAP server') %>
+
+      <%= admin_text_setting(:ldap_port, Seek::Config.ldap_settings('ldap_port'), 'LDAP server port', nil, :onkeypress => "javascript: return onlyNumbers(event);") %>
+
+      <%= admin_text_setting(:ldap_base_dn, Seek::Config.ldap_settings('ldap_base_dn'), 'Base DN') %>
+
+    </div>
+    <div class="col-sm-5">
+      <%= panel('Test LDAP configuration') do %>
+          <p class="help-block">Here you can input a username for a testing connection.</p>
+          <%= text_field_tag :testing_ldap, '', :class => 'form-control' %>
+          <%= link_to_with_callbacks image("test",:title=>"Testing LDAP connection",:alt=>"Test")+" Test LDAP connection",
+                                     {:url=>{:action=>'test_ldap_connection'},
+                                      :method=>:post,
+                                      :with=>"'ldap_address=' + $F('ldap_address') + '&ldap_port=' + $F('ldap_port') + '&ldap_base_dn=' + $F('ldap_base_dn') + '&testing_ldap=' + $F('testing_ldap')",
+                                      :before => "show_ajax_loader('ajax_loader_position');"},
+                                     {:remote=>true, :class => 'btn btn-default'}-%>
+          <div id='ajax_loader_position'></div>
+      <% end %>
+    </div>
+  </div>
+</div>
