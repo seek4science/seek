@@ -224,7 +224,8 @@ class SessionsControllerTest < ActionController::TestCase
     new_user = User.find_by_login("new_ldap_user")
     assert_not_nil new_user
     assert !new_user.active?
-    assert !Person.where({:first_name => "new", :last_name => "ldap_user"}).empty?
+    assert_equal OmniAuth.config.mock_auth[:ldap][:info]['email'], new_user.person.email
+    assert_equal 1, Person.where({:first_name => "new", :last_name => "ldap_user"}).count
   end
 
   test 'should create and activate omni authenticated user' do
@@ -245,7 +246,7 @@ class SessionsControllerTest < ActionController::TestCase
 
   protected
 
-    def cookie_for(user)
-      users(user).remember_token
-    end
+  def cookie_for(user)
+    users(user).remember_token
+  end
 end

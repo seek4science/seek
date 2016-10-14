@@ -22,7 +22,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    # authentication through omniauth
+    # authentication through omniauth?
     if Seek::Config.omniauth_enabled && request.env.has_key?('omniauth.auth')
       create_omniauth(request.env['omniauth.auth'])
     else
@@ -114,25 +114,32 @@ class SessionsController < ApplicationController
   end
 
   def create_omniauth(auth)
-    require 'securerandom'
+    require 'securerandom' #to set the seek user password to something random when the user is created
 
-    # raise auth.to_yaml
+    # info contains username, first_ and last_name and email
     info = auth['info']
+    
+    # check if there is a user with that username as login
     user_by_omniauth = User.find_by_login( info['nickname'])
     if user_by_omniauth
       @user = user_by_omniauth
       check_login
+    # there is no such user, should we not create the user?
     elsif !Seek::Config.omniauth_user_create
       failed_login "the authenticated user: #{info['nickname']} cannot be found"
     else
       # create the user from the omniauth info
       @user = User.create({:login => info['nickname']})
+      # some random password, since authentication should happen through omniauth in the future
       @user.password              = SecureRandom.hex
       @user.password_confirmation = @user.password
+      # try to save
       if !@user.save
         failed_login "Cannot create a new user: #{info['nickname']}"
       else
+        # should we activate the user?
         @user.activate if Seek::Config.omniauth_user_activate
+        # when user was saved successfully, also create the Profile and save with the user
         person = Person.create(auth['info'].slice(:first_name, :last_name, :email))
         person.user = @user
         person.save
@@ -142,4 +149,3 @@ class SessionsController < ApplicationController
   end
 
 end
-
