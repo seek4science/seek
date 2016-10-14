@@ -56,6 +56,10 @@ class AdminsController < ApplicationController
 
     Seek::Config.support_email_address= params[:support_email_address]
 
+    Seek::Config.omniauth_enabled       = string_to_boolean params[:omniauth_enabled]
+    Seek::Config.omniauth_user_create   = string_to_boolean params[:omniauth_user_create]
+    Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
+
     Seek::Config.solr_enabled= string_to_boolean params[:solr_enabled]
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
     Seek::Config.jws_online_root= params[:jws_online_root]
@@ -534,7 +538,7 @@ class AdminsController < ApplicationController
       cl.run
       return nil
     rescue Cocaine::CommandNotFoundError => e
-      return 'The command the restart the background tasks could not be found!'
+      return 'The command to restart the background tasks could not be found!'
     rescue => e
       error =  e.message
       return error
