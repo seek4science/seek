@@ -467,7 +467,7 @@ class AdminsController < ApplicationController
       if ldap.search(:base => treebase, :filter => filter).blank?
         render :update do |page|
             page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
-            page.alert("LDAP found #{params[:testing_ldap]}")
+            page.alert("LDAP not found #{params[:testing_ldap]}")
           end
       else
         ldap.search(:base => treebase, :filter => filter) do |result| 
