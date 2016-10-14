@@ -22,6 +22,11 @@ class SampleDataExtractionJob
     end
   end
 
+  #either pending or running
+  def self.in_progress?(data_file)
+    [:pending,:running].include?(get_status(data_file))
+  end
+
   def initialize(data_file, sample_type, persist = false)
     @data_file_id = data_file.id
     @data_file = data_file
