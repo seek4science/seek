@@ -55,7 +55,7 @@ class SampleType < ActiveRecord::Base
     end
   end
 
-  def tags= tags
+  def tags=(tags)
     tag_annotations(tags, 'sample_type_tags')
   end
 
@@ -71,8 +71,8 @@ class SampleType < ActiveRecord::Base
     true
   end
 
-  def can_edit?(_user = User.current_user)
-    samples.empty?
+  def can_edit?(user = User.current_user)
+    user && user.person && ((projects & user.person.projects).any?)
   end
 
   def can_delete?(_user = User.current_user)
@@ -92,7 +92,7 @@ class SampleType < ActiveRecord::Base
     # to the sample type
     titles = sample_attributes.collect(&:title).collect(&:downcase)
     dups = titles.select { |title| titles.count(title) > 1 }.uniq
-    unless dups.empty?
+    if dups.any?
       errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups.join(', ')}")
     end
   end

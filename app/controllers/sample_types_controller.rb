@@ -7,7 +7,7 @@ class SampleTypesController < ApplicationController
 
   before_filter :samples_enabled?
   before_filter :get_sample_type, only: [:show, :edit, :update, :destroy]
-  before_filter :check_no_created_samples, only: [:edit, :update, :destroy]
+  before_filter :check_no_created_samples, only: [:destroy]
   before_filter :find_assets, only: [:index]
 
   # these checks are mostly coverered by the #check_no_created_samples filter, but will give an additional check based on can_xxx? methods

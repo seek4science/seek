@@ -9,7 +9,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     @project = @person.projects.first
     refute_nil @project
     login_as(@person)
-    @sample_type = Factory(:simple_sample_type)
+    @sample_type = Factory(:simple_sample_type,project_ids:[@project.id])
     @string_type = Factory(:string_sample_attribute_type)
     @int_type = Factory(:integer_sample_attribute_type)
   end
@@ -86,20 +86,15 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'should get edit if no samples' do
+  test 'should get edit' do
     get :edit, id: @sample_type
     assert_response :success
   end
 
-  test 'should not get edit if has existing samples' do
-    FactoryGirl.create_list(:sample, 3, sample_type: @sample_type)
-    get :edit, id: @sample_type
-    assert_response :redirect
-    assert_equal 'Cannot edit this sample type - There are 3 samples using it.', flash[:error]
-  end
+
 
   test 'should update sample_type' do
-    sample_type = Factory(:patient_sample_type)
+    sample_type = Factory(:patient_sample_type,project_ids:[@project.id])
     assert_empty sample_type.tags_as_text_array
 
     golf = Factory :tag,:source=>@person.user,:annotatable=>Factory(:simple_sample_type),:value=>"golf"
@@ -135,17 +130,22 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
   end
 
-  test 'should not update sample_type if has existing samples' do
-    FactoryGirl.create_list(:sample, 3, sample_type: @sample_type)
-    get :update, id: @sample_type, sample_attributes_attributes: {
-      pos: 1,
-      title: 'fish',
-      required: '1',
-      _destroy: '0',
-      id: @sample_type.sample_attributes.first.id
-    }
-    assert_response :redirect
-    assert_equal 'Cannot update this sample type - There are 3 samples using it.', flash[:error]
+  test 'other project member cannot update sample type' do
+    sample_type = Factory(:patient_sample_type,project_ids:[Factory(:project).id],title:'should not change')
+    refute sample_type.can_edit?
+    put :update, id: sample_type, sample_type: { title: 'Hello!' }
+    assert_redirected_to sample_type_path(sample_type)
+    refute_nil flash[:error]
+    sample_type.reload
+    assert_equal 'should not change',sample_type.title
+  end
+
+  test 'other project member cannot edit sample type' do
+    sample_type = Factory(:patient_sample_type,project_ids:[Factory(:project).id])
+    refute sample_type.can_edit?
+    get :edit, id:sample_type
+    assert_redirected_to sample_type_path(sample_type)
+    refute_nil flash[:error]
   end
 
   test 'should destroy sample_type' do
