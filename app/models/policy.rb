@@ -530,7 +530,7 @@ class Policy < ActiveRecord::Base
   end
 
   def allows_action?(action)
-    Authorization.access_type_allows_action?(action, self.access_type)
+    Seek::Permissions::Authorization.access_type_allows_action?(action, self.access_type)
   end
 
 end
