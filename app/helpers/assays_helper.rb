@@ -35,6 +35,23 @@ module AssaysHelper
     return result.html_safe
   end
 
+  #the selection dropdown box for selecting the study for an assay
+  def assay_study_selection assay,form
+    editable_studies = Study.all_authorized_for(:edit)
+    investigation_map={}
+    editable_studies.each do |study|
+      investigation_map[study.investigation] ||= []
+      investigation_map[study.investigation] << study
+    end
+    grouped_options = investigation_map.keys.collect do |investigation|
+      title=investigation.can_view? ? h(investigation.title) : "#{t('investigation')} title is hidden"
+      [title,investigation_map[investigation].collect{|study| [h(study.title),study.id]}]
+    end
+    blank = assay.study.blank? ? 'Not specified' : nil
+    form.select(:study_id,grouped_options_for_select(grouped_options, assay.study.try(:id)),
+               {include_blank:blank},class:'form-control',
+               ).html_safe
+  end
 
   def authorised_assays projects=nil,action="edit"
     authorised_assets(Assay, projects, action)
