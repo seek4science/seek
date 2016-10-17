@@ -286,9 +286,9 @@ module Seek
 
             sorted_permissions.each do |permission|
               if permission.contributor_type == 'FavouriteGroup'
-                permission.contributor.favourite_group_memberships.includes(:person).each do |group_permission|
-                  if group_permission.person.try(:user_id)
-                    update_lookup(group_permission, group_permission.person)
+                permission.contributor.favourite_group_memberships.includes(person: :user).each do |group_permission|
+                  if group_permission.person.try(:user)
+                    update_lookup(group_permission, group_permission.person.user)
                   end
                 end
               else
