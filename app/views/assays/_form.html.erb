@@ -25,7 +25,7 @@
     </div>
 <% end -%>
 
-<% if @assay.study.blank? or @assay.study.can_view? %>
+<% if @assay.study.blank? or @assay.study.can_edit? %>
     <div class="form-group">
       <label><%= t('study') -%></label><span class="required">*</span>
       <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %>
