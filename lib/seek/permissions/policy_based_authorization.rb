@@ -262,7 +262,7 @@ module Seek
         self.class.isolation_level(:repeatable_read) do #ensure it allows it see another worker may have inserted a record already
           self.class.transaction do
             #check to see if an insert of update is needed, action used is arbitary
-            insert = self.class.lookup_for_asset("view", 0, self.id).nil?
+            insert = self.class.lookup_for_asset('view', 0, self.id).nil?
 
             # Global permissions (Policy)
             if insert
@@ -296,8 +296,18 @@ module Seek
               end
             end
 
+            # Creator permissions
+            if is_downloadable? && creators.any?
+              update_lookup([true, true, true, false, false], creators.includes(:user).map(&:user).compact)
+            end
+
+            # Contributor permissions
+            if (contributor_user = (contributor.is_a?(Person) ? contributor.user : contributor))
+              update_lookup([true, true, true, true, true], contributor_user)
+            end
+
             # Role permissions (Role)
-            if self.asset_housekeeper_can_manage?
+            if asset_housekeeper_can_manage?
               asset_housekeepers = self.projects.map(&:asset_housekeepers).flatten
               if asset_housekeepers.any?
                 update_lookup([true, true, true, true, true], asset_housekeepers)
