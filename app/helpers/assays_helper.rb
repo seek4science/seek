@@ -37,9 +37,12 @@ module AssaysHelper
 
   #the selection dropdown box for selecting the study for an assay
   def assay_study_selection assay,form
-    editable_studies = Study.all_authorized_for(:edit)
+    studies = Study.all_authorized_for(:edit)
+    if assay.study && !assay.study.can_edit?
+      studies << assay.study
+    end
     investigation_map={}
-    editable_studies.each do |study|
+    studies.each do |study|
       investigation_map[study.investigation] ||= []
       investigation_map[study.investigation] << study
     end
@@ -48,8 +51,9 @@ module AssaysHelper
       [title,investigation_map[investigation].collect{|study| [h(study.title),study.id]}]
     end
     blank = assay.study.blank? ? 'Not specified' : nil
+    disabled = assay.study && !assay.study.can_edit?
     form.select(:study_id,grouped_options_for_select(grouped_options, assay.study.try(:id)),
-               {include_blank:blank},class:'form-control',
+               {include_blank:blank},class:'form-control',disabled:disabled
                ).html_safe
   end
 
