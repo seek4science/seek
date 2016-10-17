@@ -5,13 +5,13 @@ workgroup = WorkGroup.find_or_create_by_project_id_and_institution_id( project.i
 
 admin_user = User.find_or_create_by_login(
     :login => 'admin',
-    :email => 'admin@example.com',
+    :email => 'admin@test1000.com',
     :password => 'admin', :password_confirmation => 'admin'
 )
 
 #Admin and guest
 admin_user.activate
-admin_user.person ||= Person.create(:first_name => 'Admin', :last_name => 'User', :email => 'admin@example.com')
+admin_user.person ||= Person.create(:first_name => 'Admin', :last_name => 'User', :email => 'admin@test1000.com')
 admin_user.save
 admin_user.person.work_groups << workgroup
 admin_person = admin_user.person
@@ -20,7 +20,7 @@ puts "Seeded 1 admin."
 
 guest_user = User.find_or_create_by_login(
     :login => 'guest',
-    :email => 'guest@example.com',
+    :email => 'guest@test1000.com',
     :password => 'guest', :password_confirmation => 'guest'
 )
 guest_user.activate
@@ -241,7 +241,6 @@ Seek::Config.solr_enabled = true
 Seek::Config.programmes_enabled = true
 Seek::Config.programme_user_creation_enabled = true
 Seek::Config.front_page_buttons_enabled = true
-Seek::Config.site_base_host = 'https://sandbox.fairdomhub.org'
 Seek::Config.noreply_sender = 'no-reply@fair-dom.org'
 Seek::Config.project_name = 'SEEK SANDBOX'
 Seek::Config.application_name = 'SEEK SANDBOX'
@@ -251,5 +250,6 @@ Seek::Config.datacite_url = "https://mds.test.datacite.org/"
 Seek::Config.doi_prefix = "10.5072"
 Seek::Config.doi_suffix = "seek.5"
 puts "Finish configuration"
-puts "Now config manually: pubmed_api_email, crossref_api_email, bioportal_api_key, email, doi, admin email"
+puts "Please visit admin site for further configuration, e.g. site_base_host, pubmed_api_email, crossref_api_email, bioportal_api_key, email, doi, admin email"
+puts "Admin account: username admin, password admin. You might want to change admin password."
 puts "Then make sure solr, workers are running"
