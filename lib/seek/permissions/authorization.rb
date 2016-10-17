@@ -9,30 +9,28 @@
 # **********************************************************************************
 
 module Seek
-
   module Permissions
-
     module Authorization
-
-      def self.authorization_supported? thing
+      def self.authorization_supported?(thing)
         !thing.nil? && thing.authorization_supported?
       end
 
-      def self.is_authorized?(action, thing, user=nil)
-        is_authorized_as_creator?(action, thing, user) ||
-            is_authorized_by_policy?(action, thing) ||
-            is_authorized_by_permission?(action, thing, user)
+      def self.is_authorized?(action, thing, user = nil)
+        authorized_as_creator?(action, thing, user) ||
+          authorized_by_policy?(action, thing) ||
+          authorized_by_permission?(action, thing, user)
       end
 
       private
 
-      def self.is_authorized_as_creator?(action, thing, user = nil)
+      def self.authorized_as_creator?(action, thing, user = nil)
         if user
           # Is the uploader?
           if thing.contributor == user || thing.contributor == user.person
-            return true #contributor is always authorized
-            # Is a creator?
-          elsif thing.is_downloadable? && thing.creators.include?(user.person) && access_type_allows_action?(action, Policy::EDITING)
+            return true
+          # Is a creator?
+          elsif thing.is_downloadable? && thing.creators.include?(user.person) &&
+              access_type_allows_action?(action, Policy::EDITING)
             return true
           end
         end
@@ -40,18 +38,13 @@ module Seek
         false
       end
 
-      def self.is_authorized_by_policy?(action, thing)
+      def self.authorized_by_policy?(action, thing)
         # Check the user is "in scope" and also is performing an action allowed under the given access type
         access_type_allows_action?(action, thing.policy.access_type)
       end
 
-      def self.is_authorized_by_permission?(action, thing, user = nil)
+      def self.authorized_by_permission?(action, thing, user = nil)
         if thing.policy.permissions.any? && user
-          # == CUSTOM PERMISSIONS
-          # 1. Check if there is a specific permission relating to the user
-          # 2. Check if there is a permission for a FavouriteGroup they're in
-          # 3. Check if there is a permission for their project
-          # 4. Check the action is allowed by the access_type of the permission
           person = user.person
 
           thing.permission_for ||= {} # This is a little cache. Initialize it here.
@@ -59,13 +52,11 @@ module Seek
           if thing.permission_for.key?(person) # Look-up in the cache first
             permission = thing.permission_for[person]
           else
-            # sort permissions by precedence
+            # Get a list of the policy's permissions, and sort by precedence
             permissions = Permission.sort_for(person, thing.policy.permissions)
-            # find the first permission, which actually overrides the permission
-            # later in that same list. E.g. a person permission will override
-            # a project permission
 
-            permission = permissions.detect { |p| p.controls_access_for? user.person }
+            # Select only the permissions that relate to the user
+            permission = permissions.detect { |p| p.controls_access_for?(user.person) }
 
             # Cache the permission (or lack thereof - could be nil)
             thing.permission_for[person] = permission
@@ -78,19 +69,16 @@ module Seek
       # checks if the "access_type" permits an action of a certain type (based on cascading permissions)
       def self.access_type_allows_action?(action, access_type)
         case action
-          when "view"
-            return access_type >= Policy::VISIBLE
-          when "download"
-            return access_type >= Policy::ACCESSIBLE
-          when "edit"
-            return access_type >= Policy::EDITING
-          when "delete"
-            return access_type >= Policy::MANAGING
-          when "manage"
-            return access_type >= Policy::MANAGING
-          else
-            # any other type of action is not allowed by permissions
-            return false
+        when 'view'
+          return access_type >= Policy::VISIBLE
+        when 'download'
+          return access_type >= Policy::ACCESSIBLE
+        when 'edit'
+          return access_type >= Policy::EDITING
+        when 'delete', 'manage'
+          return access_type >= Policy::MANAGING
+        else
+          return false
         end
       end
     end
