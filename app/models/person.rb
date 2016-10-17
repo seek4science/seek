@@ -188,8 +188,8 @@ class Person < ActiveRecord::Base
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
       user_items = []
-      user_items =  user.try(:send,type) if user.respond_to?(type)
-      user_items =  user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
+      user_items = user.try(:send,type) if user.respond_to?(type)
+      user_items = user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
       user_items = user_items | self.send("#{type}_for_person".to_sym) if self.respond_to? "#{type}_for_person".to_sym
       user_items.uniq
     end

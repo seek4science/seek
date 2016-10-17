@@ -64,11 +64,13 @@
                              'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. #{Seek::Config.default_piwik_analytics_url} ") %>
     </div>
 
-    <%= render :partial=>"admins/doi_settings" %>
+    <%= render :partial => "admins/doi_settings" %>
 
-    <%= render :partial=>"admins/zenodo_settings" %>
+    <%= render :partial => "admins/zenodo_settings" %>
 
-    <%= render :partial => 'admins/email'  %>
+    <%= render :partial => 'admins/email' %>
+
+    <%= render :partial => 'admins/omniauth' %>
 
     <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path-%>

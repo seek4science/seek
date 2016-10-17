@@ -183,5 +183,22 @@ SEEK::Application.configure do
   Seek::Config.default :recent_contributions_number_of_entries, 20
 
   Seek::Config.default :front_page_buttons_enabled, false
-end
 
+  # omniauth settings and behaviour
+  Seek::Config.default :omniauth_enabled, false
+  Seek::Config.default :omniauth_user_create, false
+  Seek::Config.default :omniauth_user_activate, false
+  Seek::Config.default :omniauth_providers, {
+    # # https://github.com/intridea/omniauth-ldap
+    # :ldap => {
+      # :title => "organization-ldap",
+      # :host => 'localhost',
+      # :port => 389,
+      # :method => :plain,
+      # :base => 'DC=example,DC=com',
+      # :uid => 'samaccountname',
+      # :password => '',
+      # :bind_dn => ''
+    # }
+  }
+end

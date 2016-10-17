@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
   include SavageBeast::UserInit
 
   acts_as_tagger
-    
+
   belongs_to :person
 
   has_many :sops, :as=>:contributor
@@ -29,7 +29,7 @@ class User < ActiveRecord::Base
   #restful_authentication plugin generated code ...
   # Virtual attribute for the unencrypted password
   attr_accessor :password, :password_confirmation
-  
+
   validates     :login,presence: true
   validates     :password,presence: true, :if => :password_required?
   validates     :password_confirmation,presence: true, :if => :password_required?
