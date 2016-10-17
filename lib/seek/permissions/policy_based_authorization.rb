@@ -292,7 +292,7 @@ module Seek
                   end
                 end
               else
-                update_lookup(permission, permission.affected_people)
+                update_lookup(permission, permission.affected_people.map(&:user))
               end
             end
 
@@ -448,6 +448,8 @@ module Seek
                         WHERE asset_id=#{self.id})
 
         if user.respond_to?(:each)
+          user.compact!
+          return unless user.any?
           sql += " AND user_id IN (#{user.map(&:id).join(', ')})"
         elsif user.is_a?(User)
           sql += " AND user_id=#{user.id}"
