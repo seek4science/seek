@@ -44,7 +44,7 @@ module Seek
       end
 
       def self.authorized_by_permission?(action, thing, user = nil)
-        if thing.policy.permissions.any? && user
+        if thing.policy.permissions.any? && user && user.person
           person = user.person
 
           thing.permission_for ||= {} # This is a little cache. Initialize it here.
@@ -56,13 +56,13 @@ module Seek
             permissions = Permission.sort_for(person, thing.policy.permissions)
 
             # Select only the permissions that relate to the user
-            permission = permissions.detect { |p| p.controls_access_for?(user.person) }
+            permission = permissions.detect { |p| p.controls_access_for?(person) }
 
             # Cache the permission (or lack thereof - could be nil)
             thing.permission_for[person] = permission
           end
 
-          permission ? permission.allows_action?(action, user.person) : false
+          permission ? permission.allows_action?(action, person) : false
         end
       end
 

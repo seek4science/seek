@@ -22,7 +22,7 @@ class Permission < ActiveRecord::Base
   # TODO implement duplicate check in :before_create
 
   def controls_access_for?(person)
-    affected_people.include?(person)
+    affected_people.any? { |p| p && (p.id == person.id) } # Checking by object doesn't work for some reason, have to use ID!
   end
 
   #precedence of permission types. Highest precedence is listed first
