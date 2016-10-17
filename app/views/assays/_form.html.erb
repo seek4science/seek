@@ -31,7 +31,7 @@
       <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %>
 
       <% investigations = Investigation.all.select &:can_view? -%>
-      <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
+      <% options = "<option value=\"\">Not specified</option>" %>
       <% investigations.each do |i| %>
           <% studies = i.studies.select(&:can_edit?) %>
           <% unless studies.empty?%>
