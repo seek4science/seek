@@ -79,6 +79,10 @@ class SampleType < ActiveRecord::Base
     samples.empty? && linked_sample_attributes.empty?
   end
 
+  def editing_constraints
+    Seek::Samples::SampleTypeEditingConstraints.new(self)
+  end
+
   private
 
   def validate_one_title_attribute_present

@@ -94,8 +94,6 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
 
     sample_type
 
-
-
   end
 
 end
