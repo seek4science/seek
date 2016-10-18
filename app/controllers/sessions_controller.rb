@@ -120,15 +120,12 @@ class SessionsController < ApplicationController
 
     # create user if there is an entry
     if result
-      @user = User.create({ :login => login, :password => password, :password_confirmation => password })
+      @user = User.create({ :login => login, :password => password, :password_confirmation => password, :email => result[0].mail[0] })
       if !@user.save
          failed_login "Cannot create a new user: #{login}"
       else
-        person = Person.create({ :first_name => result[0].givenName[0],  :last_name => result[0].sn[0], :email => result[0].mail[0] })
-        person.user = @user
-        person.save
-        @user.activate
-        check_login 
+        self.current_user = @user
+        redirect_to(register_people_path({:email => result[0].mail[0], :first_name => result[0].givenName[0], :last_name => result[0].sn[0]}))
       end
     else
       failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
