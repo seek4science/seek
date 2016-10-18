@@ -122,7 +122,7 @@ class ApplicationController < ActionController::Base
     elsif resource_type == "Person" && Seek::Config.is_virtualliver && current_user.nil?
       authorized_resources = []
     else
-      authorized_resources = resources.select &:can_view?
+      authorized_resources = resources.select(&:can_view?)
     end
 
     render :update do |page|

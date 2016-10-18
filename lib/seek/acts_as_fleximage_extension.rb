@@ -68,7 +68,7 @@ module Seek
       def filter_size(size)
         size = size[0..-(Regexp.last_match(1).length.to_i + 2)] if size =~ /[0-9]+x[0-9]+\.([a-z0-9]+)/ # trim file extension
         max_size = MAX_SIZE
-        matches = size.match /([0-9]+)x([0-9]+).*/
+        matches = size.match(/([0-9]+)x([0-9]+).*/)
         if matches
           width = matches[1].to_i
           height = matches[2].to_i
@@ -76,7 +76,7 @@ module Seek
           height = max_size if height > max_size
           return "#{width}x#{height}"
         else
-          matches = size.match /([0-9]+)/
+          matches = size.match(/([0-9]+)/)
           if matches
             width = matches[1].to_i
             width = max_size if width > max_size

@@ -75,7 +75,7 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
         child_project.parent_id = @proj.id
         child_project.save!
       end
-      @subscribables_in_proj.each &:reload
+      @subscribables_in_proj.each(&:reload)
       assert @subscribables_in_proj.all?(&:subscribed?)
     end
 

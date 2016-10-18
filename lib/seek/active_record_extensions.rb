@@ -8,7 +8,7 @@ module Seek
         #define the instance method if it does not exist
         def self.after_initialize_with_ensure_base_exists *args
           define_method(:after_initialize) {} unless method_defined? :after_initialize
-          after_initialize_without_ensure_base_exists *args
+          after_initialize_without_ensure_base_exists(*args)
         end
 
         class_alias_method_chain :after_initialize, :ensure_base_exists

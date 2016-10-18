@@ -104,7 +104,7 @@ class Publication < ActiveRecord::Base
 
 
   def self.sort publications
-    publications.sort_by &:published_date
+    publications.sort_by(&:published_date)
   end
 
   def contributor_credited?

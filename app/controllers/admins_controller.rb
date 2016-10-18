@@ -178,7 +178,7 @@ class AdminsController < ApplicationController
     Seek::Config.set_default_page 'presentations', params[:presentations]
     Seek::Config.set_default_page 'events', params[:events]
     Seek::Config.limit_latest = params[:limit_latest] if only_positive_integer params[:limit_latest], 'latest limit'
-    update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'), 'pagination'
+    update_redirect_to only_positive_integer(params[:limit_latest], 'latest limit'), 'pagination'
   end
 
   def update_others
@@ -272,7 +272,7 @@ class AdminsController < ApplicationController
         attribute_name = a.attribute.name
         a.destroy unless replacement_tags.include?(@tag)
         replacement_tags.each do |tag|
-          if annotatable.annotations_with_attribute_and_by_source(attribute_name, source).select { |a| a.value == tag }.blank?
+          if annotatable.annotations_with_attribute_and_by_source(attribute_name, source).select { |an| an.value == tag }.blank?
             new_annotation = Annotation.new attribute_name: attribute_name, value: tag, annotatable: annotatable, source: source
             new_annotation.save!
           end

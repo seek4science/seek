@@ -40,7 +40,7 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_equal s1.content_blob.md5sum,s1.md5sum
     assert_equal s1.content_blob.sha1sum,s1.sha1sum
 
-    assert_match /\b([a-f0-9]{40})\b/,s1.sha1sum
+    assert_match(/\b([a-f0-9]{40})\b/,s1.sha1sum)
   end
 
   test 'can access snapshot metadata' do

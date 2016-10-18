@@ -51,7 +51,7 @@ class StudiesController < ApplicationController
         flash.now[:error] = "You do not have permission to associate the new #{t('study')} with the #{t('investigation')} '#{investigation.title}'."
       end
     end
-    investigations = Investigation.all.select &:can_view?
+    investigations = Investigation.all.select(&:can_view?)
     respond_to do |format|
       if investigations.blank?
        flash.now[:notice] = "No #{t('investigation')} available, you have to create a new one before creating your Study!"

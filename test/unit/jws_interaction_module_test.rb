@@ -10,7 +10,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
     token = determine_csrf_token
     refute_nil token
     assert token.length > 5
-    assert_match /^[a-zA-Z0-9]+$/,token
+    assert_match(/^[a-zA-Z0-9]+$/,token)
   end
 
   test "upload model blob" do
@@ -18,7 +18,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
     blob = model.content_blobs.first
     slug = upload_model_blob(blob)
     refute_nil slug
-    assert_match /^[a-zA-Z0-9-]+$/,slug
+    assert_match(/^[a-zA-Z0-9-]+$/,slug)
   end
 
   test "upload model blob using https" do
@@ -27,7 +27,7 @@ class JwsInteractionModuleTest < ActiveSupport::TestCase
       blob = model.content_blobs.first
       slug = upload_model_blob(blob)
       refute_nil slug
-      assert_match /^[a-zA-Z0-9-]+$/,slug
+      assert_match(/^[a-zA-Z0-9-]+$/,slug)
     end
   end
 
