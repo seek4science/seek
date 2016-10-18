@@ -476,7 +476,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
     sample_type.sample_attributes << Factory.build(:any_string_sample_attribute, title: 'format', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
-    sample_type.save!
+    disable_authorization_checks{sample_type.save!}
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
@@ -494,7 +494,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_was', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
-    sample_type.save!
+    disable_authorization_checks{sample_type.save!}
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
@@ -630,7 +630,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << attribute1
     sample_type.sample_attributes << attribute2
     assert sample_type.valid?
-    sample_type.save!
+    disable_authorization_checks{sample_type.save!}
     sample = Sample.new(title: 'testing', project_ids: [Factory(:project).id])
     sample.sample_type = sample_type
     sample.set_attribute(:banana_type, 'yellow')

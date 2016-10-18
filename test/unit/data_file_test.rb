@@ -480,7 +480,7 @@ class DataFileTest < ActiveSupport::TestCase
     sample_type = SampleType.new title:'from template', uploaded_template: true,:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
-    sample_type.save!
+    disable_authorization_checks{sample_type.save!}
 
     assert data_file.sample_template?
     assert_includes data_file.possible_sample_types, sample_type

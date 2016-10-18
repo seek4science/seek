@@ -1,0 +1,547 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created by JWS2SBML on 2013/02/02 18:37:06-->
+<sbml xmlns="http://www.sbml.org/sbml/level2/version4" level="2" version="4">
+<model name="ssolfGluconeogenesis201322191452631074201322183645459659">
+  <listOfCompartments>
+    <compartment id="compartment" name="compartment" spatialDimensions="3" size="1" constant="true"/>
+  </listOfCompartments>
+  <listOfSpecies>
+    <species id="P3G" name="P3G" compartment="compartment" initialConcentration="4.5" boundaryCondition="false"/>
+    <species id="ATP" name="ATP" compartment="compartment" initialConcentration="9.981" boundaryCondition="true" constant="true"/>
+    <species id="bisP" name="bisP" compartment="compartment" initialConcentration="0" boundaryCondition="false"/>
+    <species id="ADP" name="ADP" compartment="compartment" initialConcentration="0.019" boundaryCondition="true" constant="true"/>
+    <species id="nadph" name="nadph" compartment="compartment" initialConcentration="0.2" boundaryCondition="true" constant="true"/>
+    <species id="gap" name="gap" compartment="compartment" initialConcentration="0" boundaryCondition="false"/>
+    <species id="nadp" name="nadp" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+    <species id="pi" name="pi" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+    <species id="dhap" name="dhap" compartment="compartment" initialConcentration="0" boundaryCondition="false"/>
+    <species id="f6p" name="f6p" compartment="compartment" initialConcentration="0" boundaryCondition="false"/>
+    <species id="sink" name="sink" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+    <species id="sink2" name="sink2" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+    <species id="sink3" name="sink3" compartment="compartment" initialConcentration="0" boundaryCondition="true" constant="true"/>
+  </listOfSpecies>
+  <listOfParameters>
+    <parameter id="KaldDHAP" name="KaldDHAP" value="0.0356266975140382" constant="true"/>
+    <parameter id="KaldF6P" name="KaldF6P" value="1" constant="true"/>
+    <parameter id="KaldGAP" name="KaldGAP" value="0.0208229924875437" constant="true"/>
+    <parameter id="KbisP" name="KbisP" value="0.000361391122939812" constant="true"/>
+    <parameter id="kdbpg" name="kdbpg" value="1.05824" constant="true"/>
+    <parameter id="kddhap" name="kddhap" value="0.0225" constant="true"/>
+    <parameter id="kdgap" name="kdgap" value="0.0559" constant="true"/>
+    <parameter id="Kgap" name="Kgap" value="1.63541516706497" constant="true"/>
+    <parameter id="KiADP" name="KiADP" value="3.9345680269997" constant="true"/>
+    <parameter id="Knadp" name="Knadp" value="0.292865795009516" constant="true"/>
+    <parameter id="Knadph" name="Knadph" value="0.0558556960649001" constant="true"/>
+    <parameter id="KpgkADP" name="KpgkADP" value="0.0321191670871277" constant="true"/>
+    <parameter id="KpgkATP" name="KpgkATP" value="13.3576782604586" constant="true"/>
+    <parameter id="KpgkbisP" name="KpgkbisP" value="5.58999999854782" constant="true"/>
+    <parameter id="KpgkP3G" name="KpgkP3G" value="0.703672550780103" constant="true"/>
+    <parameter id="Kpi" name="Kpi" value="323.993799522825" constant="true"/>
+    <parameter id="KtimDHAP" name="KtimDHAP" value="0.518888549904879" constant="true"/>
+    <parameter id="KtimGAP" name="KtimGAP" value="0.498415077220458" constant="true"/>
+    <parameter id="KtimPEP" name="KtimPEP" value="0.848685943377774" constant="true"/>
+    <parameter id="n" name="n" value="1.64682193303383" constant="true"/>
+    <parameter id="pep" name="pep" value="2" constant="true"/>
+    <parameter id="protALDPase" name="protALDPase" value="0.0034" constant="true"/>
+    <parameter id="protGAPdh" name="protGAPdh" value="0.0394" constant="true"/>
+    <parameter id="protPGK" name="protPGK" value="0.0068" constant="true"/>
+    <parameter id="protTIM" name="protTIM" value="0.0008" constant="true"/>
+    <parameter id="Vmarev" name="Vmarev" value="19.5958267894745" constant="true"/>
+    <parameter id="VmfALD" name="VmfALD" value="2.4400286348037" constant="true"/>
+    <parameter id="Vmfor" name="Vmfor" value="17.7049189682351" constant="true"/>
+    <parameter id="VmfPGK" name="VmfPGK" value="13.5268050830795" constant="true"/>
+    <parameter id="VmfTIM" name="VmfTIM" value="250.307172194359" constant="true"/>
+    <parameter id="VmrPGK" name="VmrPGK" value="17.510831090958" constant="true"/>
+    <parameter id="VmrTIM" name="VmrTIM" value="227.335101788348" constant="true"/>
+  </listOfParameters>
+  <listOfReactions>
+    <reaction id="v1" name="v1">
+      <listOfReactants>
+        <speciesReference species="P3G" stoichiometry="1"/>
+        <speciesReference species="ATP" stoichiometry="1"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="bisP" stoichiometry="1"/>
+        <speciesReference species="ADP" stoichiometry="1"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <apply>
+              <times/>
+              <ci> protPGK </ci>
+              <apply>
+                <plus/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <minus/>
+                      <ci> VmrPGK </ci>
+                    </apply>
+                    <ci> ADP </ci>
+                    <ci> bisP </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KpgkADP </ci>
+                    <ci> KpgkbisP </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> VmfPGK </ci>
+                    <ci> ATP </ci>
+                    <ci> P3G </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KpgkATP </ci>
+                    <ci> KpgkP3G </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <plus/>
+              <cn type="integer"> 1 </cn>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <ci> P3G </ci>
+                  <ci> KpgkP3G </ci>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <divide/>
+                    <ci> ATP </ci>
+                    <ci> KpgkATP </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> ADP </ci>
+                    <ci> KiADP </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <times/>
+                <apply>
+                  <divide/>
+                  <ci> bisP </ci>
+                  <ci> KpgkbisP </ci>
+                </apply>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <divide/>
+                      <ci> ADP </ci>
+                      <ci> KpgkADP </ci>
+                    </apply>
+                    <apply>
+                      <plus/>
+                      <cn type="integer"> 1 </cn>
+                      <apply>
+                        <divide/>
+                        <ci> ADP </ci>
+                        <ci> KiADP </ci>
+                      </apply>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> ATP </ci>
+                    <ci> KpgkATP </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> ADP </ci>
+                    <ci> KiADP </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v2" name="v2">
+      <listOfReactants>
+        <speciesReference species="bisP" stoichiometry="1"/>
+        <speciesReference species="nadph" stoichiometry="1"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="gap" stoichiometry="1"/>
+        <speciesReference species="nadp" stoichiometry="1"/>
+        <speciesReference species="pi" stoichiometry="1"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <apply>
+              <times/>
+              <ci> protGAPdh </ci>
+              <apply>
+                <plus/>
+                <apply>
+                  <times/>
+                  <apply>
+                    <minus/>
+                    <ci> Vmarev </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <ci> gap </ci>
+                      <ci> nadp </ci>
+                    </apply>
+                    <apply>
+                      <times/>
+                      <ci> Kgap </ci>
+                      <ci> Knadp </ci>
+                    </apply>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <pi/>
+                    <ci> Kpi </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> Vmfor </ci>
+                    <ci> bisP </ci>
+                    <ci> nadph </ci>
+                  </apply>
+                  <apply>
+                    <times/>
+                    <ci> KbisP </ci>
+                    <ci> Knadph </ci>
+                  </apply>
+                </apply>
+              </apply>
+              <apply>
+                <power/>
+                <apply>
+                  <plus/>
+                  <apply>
+                    <divide/>
+                    <apply>
+                      <times/>
+                      <apply>
+                        <divide/>
+                        <ci> gap </ci>
+                        <ci> Kgap </ci>
+                      </apply>
+                      <pi/>
+                    </apply>
+                    <ci> Kpi </ci>
+                  </apply>
+                  <apply>
+                    <divide/>
+                    <ci> bisP </ci>
+                    <ci> KbisP </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <minus/>
+                  <ci> n </ci>
+                  <cn type="integer"> 1 </cn>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <times/>
+              <apply>
+                <plus/>
+                <cn type="integer"> 1 </cn>
+                <apply>
+                  <divide/>
+                  <ci> nadp </ci>
+                  <ci> Knadp </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <ci> nadph </ci>
+                  <ci> Knadph </ci>
+                </apply>
+              </apply>
+              <apply>
+                <minus/>
+                <apply>
+                  <plus/>
+                  <cn type="integer"> 1 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <plus/>
+                      <apply>
+                        <divide/>
+                        <ci> gap </ci>
+                        <ci> Kgap </ci>
+                      </apply>
+                      <apply>
+                        <divide/>
+                        <ci> bisP </ci>
+                        <ci> KbisP </ci>
+                      </apply>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <plus/>
+                      <apply>
+                        <divide/>
+                        <pi/>
+                        <ci> Kpi </ci>
+                      </apply>
+                      <apply>
+                        <divide/>
+                        <ci> bisP </ci>
+                        <ci> KbisP </ci>
+                      </apply>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <plus/>
+                      <apply>
+                        <times/>
+                        <apply>
+                          <divide/>
+                          <ci> gap </ci>
+                          <ci> Kgap </ci>
+                        </apply>
+                        <apply>
+                          <divide/>
+                          <pi/>
+                          <ci> Kpi </ci>
+                        </apply>
+                      </apply>
+                      <apply>
+                        <divide/>
+                        <ci> bisP </ci>
+                        <ci> KbisP </ci>
+                      </apply>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                </apply>
+                <apply>
+                  <times/>
+                  <cn type="integer"> 2 </cn>
+                  <apply>
+                    <power/>
+                    <apply>
+                      <divide/>
+                      <ci> bisP </ci>
+                      <ci> KbisP </ci>
+                    </apply>
+                    <ci> n </ci>
+                  </apply>
+                </apply>
+              </apply>
+            </apply>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v3" name="v3">
+      <listOfReactants>
+        <speciesReference species="gap" stoichiometry="1"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="dhap" stoichiometry="1"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <apply>
+              <times/>
+              <ci> protTIM </ci>
+              <apply>
+                <plus/>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <apply>
+                      <minus/>
+                      <ci> VmrTIM </ci>
+                    </apply>
+                    <ci> dhap </ci>
+                  </apply>
+                  <ci> KtimDHAP </ci>
+                </apply>
+                <apply>
+                  <divide/>
+                  <apply>
+                    <times/>
+                    <ci> VmfTIM </ci>
+                    <ci> gap </ci>
+                  </apply>
+                  <ci> KtimGAP </ci>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <plus/>
+              <cn type="integer"> 1 </cn>
+              <apply>
+                <divide/>
+                <ci> dhap </ci>
+                <ci> KtimDHAP </ci>
+              </apply>
+              <apply>
+                <divide/>
+                <ci> gap </ci>
+                <ci> KtimGAP </ci>
+              </apply>
+              <apply>
+                <divide/>
+                <ci> pep </ci>
+                <ci> KtimPEP </ci>
+              </apply>
+            </apply>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v4" name="v4">
+      <listOfReactants>
+        <speciesReference species="dhap" stoichiometry="1"/>
+        <speciesReference species="gap" stoichiometry="1"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="f6p" stoichiometry="1"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <divide/>
+            <apply>
+              <times/>
+              <ci> protALDPase </ci>
+              <apply>
+                <divide/>
+                <apply>
+                  <times/>
+                  <ci> VmfALD </ci>
+                  <ci> gap </ci>
+                  <ci> dhap </ci>
+                </apply>
+                <apply>
+                  <times/>
+                  <ci> KaldGAP </ci>
+                  <ci> KaldDHAP </ci>
+                </apply>
+              </apply>
+            </apply>
+            <apply>
+              <plus/>
+              <cn type="integer"> 1 </cn>
+              <apply>
+                <divide/>
+                <ci> gap </ci>
+                <ci> KaldGAP </ci>
+              </apply>
+              <apply>
+                <divide/>
+                <ci> dhap </ci>
+                <ci> KaldDHAP </ci>
+              </apply>
+              <apply>
+                <divide/>
+                <apply>
+                  <times/>
+                  <ci> gap </ci>
+                  <ci> dhap </ci>
+                </apply>
+                <apply>
+                  <times/>
+                  <ci> KaldGAP </ci>
+                  <ci> KaldDHAP </ci>
+                </apply>
+              </apply>
+              <apply>
+                <divide/>
+                <ci> f6p </ci>
+                <ci> KaldF6P </ci>
+              </apply>
+            </apply>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v5" name="v5">
+      <listOfReactants>
+        <speciesReference species="gap" stoichiometry="1"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="sink" stoichiometry="1"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <times/>
+            <ci> kdgap </ci>
+            <ci> gap </ci>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v6" name="v6">
+      <listOfReactants>
+        <speciesReference species="dhap" stoichiometry="1"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="sink2" stoichiometry="1"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <times/>
+            <ci> kddhap </ci>
+            <ci> dhap </ci>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+    <reaction id="v7" name="v7">
+      <listOfReactants>
+        <speciesReference species="bisP" stoichiometry="1"/>
+      </listOfReactants>
+      <listOfProducts>
+        <speciesReference species="sink3" stoichiometry="1"/>
+      </listOfProducts>
+      <kineticLaw>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+          <apply>
+            <times/>
+            <ci> kdbpg </ci>
+            <ci> bisP </ci>
+          </apply>
+        </math>
+      </kineticLaw>
+    </reaction>
+  </listOfReactions>
+</model></sbml>

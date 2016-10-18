@@ -7,40 +7,81 @@
       </div>
 
       <div class="panel-body">
+        <%# tabs if omniauth authentication with providers is enabled %>
+        <% if Seek::Config.omniauth_enabled && !Seek::Config.omniauth_providers.empty? %>
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+              <a href="#password_login" aria-controls="password_login" role="tab" data-toggle="tab">SEEK login</a>
+            </li>
+            <% Seek::Config.omniauth_providers.each do |provider, options| %>
+              <li role="presentation">
+                <a href="#<%= provider.to_s %>_login" aria-controls="<%= provider.to_s %>_login" role="tab" data-toggle="tab"><%= options[:title] || provider.to_s %> login</a>
+              </li>
+            <% end #each provider %>
+          </ul>
+        <% end #omniauth enabled and providers available %>
 
 
-        <%= form_tag main_app.session_path do %>
 
-            <% original_url ||= request.original_url %>
-            <%= hidden_field_tag "called_from[url]", original_url -%>
-            <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
-            <%= hidden_field_tag "called_from[action]", controller.action_name -%>
-            <%= hidden_field_tag "called_from[id]", params[:id] -%>
+        <div class="tab-content">
+          <div role="tabpanel" class="tab-pane active" id="password_login">
+            <%= form_tag main_app.session_path do %>
+              <% original_url ||= request.original_url %>
+              <%= hidden_field_tag "called_from[url]", original_url -%>
+              <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
+              <%= hidden_field_tag "called_from[action]", controller.action_name -%>
+              <%= hidden_field_tag "called_from[id]", params[:id] -%>
 
-            <div class="tab-content">
-              <div role="tabpanel" class="tab-pane active" id="password_login">
-                <div class="form-group">
-                  <label>Login</label>
-                  <%= text_field_tag 'login', nil, :class => 'form-control' -%>
-                </div>
-
-                <div class="form-group">
-                  <label>Password</label>
-                  <%= password_field_tag 'password', nil, :class => 'form-control' -%>
-                </div>
-
-                <div class="checkbox">
-                  <label>
-                    <%= check_box_tag 'remember_me',nil,false %> Remember me
-                  </label>
-                </div>
+              <div class="form-group">
+                <label>Login</label>
+                <%= text_field_tag 'login', nil, :class => 'form-control', :autofocus => true -%>
               </div>
 
+              <div class="form-group">
+                <label>Password</label>
+                <%= password_field_tag 'password', nil, :class => 'form-control' -%>
+              </div>
 
-            </div>
+              <div class="form-group">
+                <%= check_box_tag 'remember_me',nil,false %>
+                <%= label :remember, :me, "Remember me" %>
+              </div>
 
-            <%= submit_tag "Log in", :class => 'btn btn-default', :id=>"login_button",:onclick=>"$('login_button').disabled=true;this.form.submit();return(false);" %>
-        <% end %>
+              <div class="form-group">
+                <%= submit_tag "Log in", :class => 'btn btn-default', :id=>"login_button",:onclick=>"$('login_button').disabled=true;this.form.submit();return(false);" %>
+              </div>
+            <% end #form %>
+          </div>
+
+          <% if Seek::Config.omniauth_enabled && !Seek::Config.omniauth_providers.empty? %>
+            <% Seek::Config.omniauth_providers.each do |provider, options| %>
+              <div role="tabpanel" class="tab-pane" id="<%= provider.to_s %>_login">
+                <% if provider.to_s == "ldap" %>
+                  <%= form_tag '/auth/ldap/callback' do %>
+                    <% original_url ||= request.original_url %>
+                    <%= hidden_field_tag "called_from[url]", original_url -%>
+                    <div class="form-group">
+                      <label>Username</label>
+                      <%= text_field_tag 'username', nil, :class => 'form-control' -%>
+                    </div>
+      
+                    <div class="form-group">
+                      <label>Password</label>
+                      <%= password_field_tag 'password', nil, :class => 'form-control', :id => "login_#{provider}_password" -%>
+                    </div>
+      
+                    <div class="form-group">
+                      <%= submit_tag "Log in", :class => 'btn btn-default', :id => "login_#{provider}_button" %>
+                    </div>
+                  <% end #form %>
+                <% else # provider == :ldap %>
+                  <div class="alert alert-danger">No link for that omniauth provider yet</div>
+                <% end #provider != :ldap %>
+              </div>
+            <% end #each provider %>
+          <% end #omniauth enabled and providers available %>
+
+        </div>
       </div>
 
       <div class="panel-footer">

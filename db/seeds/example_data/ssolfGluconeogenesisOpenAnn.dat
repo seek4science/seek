@@ -1,0 +1,118 @@
+begin name
+ssolfGluconeogenesis
+end name
+begin reactions
+v[1] {1}$ATP + {1}$P3G = {1}bisP + {1}$ADP
+v[2] {1}bisP + {1}$nadph = {1}gap + {1}$nadp + {1}$pi
+v[3] {1}gap = {1}dhap
+v[4] {1}dhap + {1}gap = {1}$f6p
+v[5] {1}gap = {1}$sink
+v[6] {1}dhap = {1}$sink2
+v[7] {1}bisP = {1}$sink3
+end reactions
+begin rate equations
+v[1] = protPGK*(-VmrPGK*ADP*bisP[t]/(KpgkADP*KpgkbisP) + VmfPGK*(ATP*P3G)/(KpgkATP*KpgkP3G))/(1 + P3G/KpgkP3G*(1 + ATP/KpgkATP + ADP/KiADP) + bisP[t]/KpgkbisP*(1 + ADP/KpgkADP*(1 + ADP/KiADP) + ATP/KpgkATP + ADP/KiADP))
+v[2] = protGAPdh*((-Vmarev*(gap[t]*nadp/(Kgap*Knadp))*(pi/Kpi) + Vmfor*((bisP[t]*nadph))/(KbisP*Knadph))*(gap[t]/Kgap*pi/Kpi + bisP[t]/KbisP)^(n - 1))/((1 + nadp/Knadp + nadph/Knadph)*((1 + (gap[t]/Kgap + (bisP[t]/KbisP))^n + (pi/Kpi + (bisP[t]/KbisP))^n + ((gap[t]/Kgap)*(pi/Kpi) + (bisP[t]/KbisP))^n) - 2*(bisP[t]/KbisP)^n))
+v[3] = protTIM*(-VmrTIM*dhap[t]/KtimDHAP + VmfTIM*gap[t]/KtimGAP)/(1 +dhap[t]/KtimDHAP + gap[t]/KtimGAP + pep/KtimPEP)
+v[4] = protALDPase*(VmfALD*gap[t]*dhap[t]/(KaldGAP*KaldDHAP))/(1 + gap[t]/KaldGAP + dhap[t]/KaldDHAP + gap[t]*dhap[t]/(KaldGAP*KaldDHAP) + f6p/KaldF6P)
+v[5] = kdgap*gap[t]
+v[6] = kddhap*dhap[t]
+v[7] = kdbpg*bisP[t]
+end rate equations
+begin assignment rules
+end assignment rules
+begin function definitions
+end function definitions
+begin events
+end events
+begin parameters
+KaldDHAP = 0.035626697514038186
+KaldF6P = 1
+KaldGAP = 0.020822992487543684
+KbisP = 0.00036139112293981195
+kdbpg = 1.05824
+kddhap = 0.0225
+kdgap = 0.0559
+Kgap = 1.6354151670649708
+KiADP = 3.9345680269996968
+Knadp = 0.2928657950095164
+Knadph = 0.05585569606490011
+KpgkADP = 0.03211916708712771
+KpgkATP = 13.357678260458568
+KpgkbisP = 5.589999998547821
+KpgkP3G = 0.7036725507801032
+Kpi = 323.9937995228251
+KtimDHAP = 0.5188885499048785
+KtimGAP = 0.49841507722045825
+KtimPEP = 0.8486859433777743
+n = 1.6468219330338323
+pep = 2
+protALDPase = 0.0034
+protGAPdh = 0.0394
+protPGK = 0.0068
+protTIM = 0.0008
+Vmarev = 19.595826789474497
+VmfALD = 2.4400286348037037
+Vmfor = 17.70491896823507
+VmfPGK = 13.526805083079479
+VmfTIM = 250.307172194359
+VmrPGK = 17.51083109095804
+VmrTIM = 227.3351017883484
+P3G = 5
+ATP = 9.981
+nadph = 0.2
+ADP = 0.019
+nadp = 0
+pi = 0
+f6p = 0
+sink = 0
+sink2 = 0
+sink3 = 0
+end parameters
+begin initial conditions
+bisP[0] = bisPi
+dhap[0] = dhapi
+gap[0] = gapi
+end initial conditions
+begin initial values
+bisPi = 0
+dhapi = 0
+gapi = 0
+end initial values
+begin species annotations
+BPG urn:miriam:obo.chebi:28907 1,3-bisphosphoglyceric acid
+BPG urn:miriam:kegg.compound:C00236 1,3-bisphosphoglyceric acid
+F6P urn:miriam:obo.chebi:15946 D-fructose 6-phosphate
+F6P urn:miriam:kegg.compound:C00085 D-fructose 6-phosphate
+NADP urn:miriam:obo.chebi:18009 NADP(+)
+P3G urn:miriam:obo.chebi:17794 3-phospho-D-glyceric acid
+P3G urn:miriam:kegg.compound:C00197 3-phospho-D-glyceric acid
+NADPH urn:miriam:obo.chebi:16474 NADPH
+end species annotations
+begin process annotations
+v[1] urn:miriam:kegg.reaction:R01512 ATP:3-phospho-D-glycerate 1-phosphotransferase
+v[2] urn:miriam:kegg.reaction:R01063 D-glyceraldehyde-3-phosphate:NADP+ oxidoreductase (phosphorylating)
+v[3] urn:miriam:kegg.reaction:R01015 D-glyceraldehyde-3-phosphate aldose-ketose-isomerase
+end process annotations
+begin citation
+begin URL
+end URL
+begin URN
+end URN
+end citation
+begin model urn
+end model urn
+begin creators
+end creators
+begin creation date
+
+end creation date
+begin modification date
+
+end modification date
+begin terms of distribution
+
+end terms of distribution
+begin notes
+
+end notes

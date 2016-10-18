@@ -110,6 +110,9 @@ gem 'citeproc-ruby', '~> 1.1.4'
 gem 'citeproc', '~> 1.0.4'
 gem 'csl-styles', '~> 1.0.1.7'
 
+gem 'omniauth', '~> 1.3.1'
+gem 'omniauth-ldap', '~> 1.0.5'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do

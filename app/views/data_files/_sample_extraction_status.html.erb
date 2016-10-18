@@ -2,7 +2,7 @@
 <% waiting_for_confirmation = !Seek::Samples::Extractor.new(data_file).fetch.nil? %>
 
 <div id="sample-extraction-status">
-  <% if data_file.can_manage? && (waiting_for_confirmation || [:running, :pending].include?(@job_status)) %>
+  <% if data_file.can_manage? && (waiting_for_confirmation || SampleDataExtractionJob.in_progress?(data_file)) %>
       <div class="alert alert-info" role="alert">
         <strong>Sample extraction:</strong>
         <% if waiting_for_confirmation %>

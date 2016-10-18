@@ -3,14 +3,16 @@ require 'test_helper'
 class SampleExtractorTest < ActiveSupport::TestCase
   setup do
     @person = Factory(:person)
+    User.current_user=@person.user
     Factory(:string_sample_attribute_type, title: 'String')
     @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                      policy: Factory(:private_policy), contributor: @person.user
-    @sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
+    @sample_type = SampleType.new title: 'from template',:project_ids=>[@person.projects.first.id]
     @sample_type.content_blob = Factory(:sample_type_template_content_blob)
     @sample_type.build_attributes_from_template
     @sample_type.save!
     @extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
+    User.current_user=nil
   end
 
   test 'extracted samples are cached' do

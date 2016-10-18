@@ -18,6 +18,11 @@
 
     <%= render :partial => "projects/project_selector", :locals => { :resource => @sample_type } -%>
 
+    <div class="form-group">
+      <%= f.label :tags -%>
+      <%= tags_input('sample_type[tags]', @sample_type.tags, :typeahead => {:type => 'sample_type_tags'}) %>
+    </div>
+
     <h3>Attributes</h3>
     <p class="help-block">Re-arrange attributes by clicking and dragging the button on the left-hand side of each row.</p>
     <table class="table" id="attribute-table">

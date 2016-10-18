@@ -247,7 +247,7 @@ class ApplicationController < ActionController::Base
           'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link', 'describe_ports'
         'edit'
 
-      when 'destroy', 'destroy_item', 'cancel'
+      when 'destroy', 'destroy_item', 'cancel','destroy_samples_confirm'
         'delete'
 
       when 'manage', 'notification', 'read_interaction', 'write_interaction', 'report_problem', 'storage_report',

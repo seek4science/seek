@@ -1,5 +1,6 @@
 class SampleType < ActiveRecord::Base
-  attr_accessible :title, :uuid, :sample_attributes_attributes, :description, :uploaded_template, :project_ids
+  attr_accessible :title, :uuid, :sample_attributes_attributes,
+                  :description, :uploaded_template, :project_ids, :tags
 
   searchable(auto_index: false) do
     text :attribute_search_terms
@@ -12,6 +13,10 @@ class SampleType < ActiveRecord::Base
 
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
+
+  include Seek::Taggable
+
+  acts_as_annotatable name_field: :title
 
   acts_as_uniquely_identifiable
 
@@ -50,6 +55,14 @@ class SampleType < ActiveRecord::Base
     end
   end
 
+  def tags=(tags)
+    tag_annotations(tags, 'sample_type_tags')
+  end
+
+  def tags
+    annotations_with_attribute('sample_type_tags').collect(&:value_content)
+  end
+
   def can_download?
     true
   end
@@ -58,8 +71,8 @@ class SampleType < ActiveRecord::Base
     true
   end
 
-  def can_edit?(_user = User.current_user)
-    samples.empty?
+  def can_edit?(user = User.current_user)
+    user && user.person && ((projects & user.person.projects).any?)
   end
 
   def can_delete?(_user = User.current_user)
@@ -79,7 +92,7 @@ class SampleType < ActiveRecord::Base
     # to the sample type
     titles = sample_attributes.collect(&:title).collect(&:downcase)
     dups = titles.select { |title| titles.count(title) > 1 }.uniq
-    unless dups.empty?
+    if dups.any?
       errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups.join(', ')}")
     end
   end
