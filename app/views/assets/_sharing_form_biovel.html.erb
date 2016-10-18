@@ -159,7 +159,7 @@
                   <%= link_to "Add", "", :id => "add_f_group_link", :style => "font-weight: bold; vertical-align: middle;", :disabled => (favourite_groups.blank?),
                               :onclick => "javascript: if($('favourite_group_select').disabled) return(false); addContributor('FavouriteGroup', $('favourite_group_select').options[$('favourite_group_select').selectedIndex].text, parseInt($('favourite_group_select').options[$('favourite_group_select').selectedIndex].value), #{Policy::DETERMINED_BY_GROUP}); return(false);" -%>
                 </p>
-                <ul style="text-align: left; margin: 1em 0 0.5em 3.2em;">
+                <ul class="text-left" style="margin: 1em 0 0.5em 3.2em;">
                   <li id="edit_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;"><%= favourite_group_popup_link_action_edit(@resource.class.name) -%></li>
                   <li id="delete_f_group_li" style="display: <%= favourite_groups.blank? ? "none" : "block" -%>; list-style-type: disc; padding: 0;">
                     <%= link_to "Delete selected #{t('favourite_group').pluralize}", main_app.delete_favourite_group_path(0), :onclick => "deleteSelectedFavouriteGroup(); return(false);" -%>
@@ -243,7 +243,7 @@
                               :help_text => "Here you can specify individual people to share this #{@resource_type} with.") do %>
                 <div id="facebook" class="clearfix">
 
-                  <p style="text-align: justify;">
+                  <p class="text-justify">
                     Please type names of people to share this <%= @resource_type -%> with into the box below -
                     suggestions will be displayed as you type.
                     Select access rights from drop-down menu; these will be applied to all chosen people.
