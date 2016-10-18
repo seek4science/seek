@@ -144,26 +144,6 @@ class User < ActiveRecord::Base
     u && u.authenticated?(password) ? u : nil
   end
   
-  def self.authenticateLDAP(login, password)
-    ldap = Net::LDAP.new :host => Seek::Config.ldap[:ldap_address], :port => Seek::Config.ldap[:ldap_port], :base => Seek::Config.ldap[:ldap_base_dn]
-    ldap.auth login, password
-
-    result = ldap.bind_as(
-      :base => Seek::Config.ldap[:ldap_base_dn],
-      :filter => "(uid=#{login})",
-      :password => password
-    )
-      
-    # create user if there is an entry
-    if result
-      u = User.new({ :login => login, :password => password, :password_confirmation => password, :email => result[0].mail[0] })
-      u.save
-    end
-    
-    u = User.where(['login = ?', login]).first
-    u && u.authenticated?(password) ? u : nil
-  end
-
   # Encrypts some data with the salt.
   def self.encrypt(password, salt)
     Digest::SHA1.hexdigest("--#{salt}--#{password}--")

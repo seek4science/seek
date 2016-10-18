@@ -50,8 +50,8 @@ class SessionsController < ApplicationController
   def password_authentication
     if @user = User.authenticate(params[:login], params[:password])
       check_login
-    elsif Seek::Config.ldap_enabled and @user = User.authenticateLDAP(params[:login], params[:password])
-      check_login
+    elsif Seek::Config.ldap_enabled
+       authenticateLDAP(params[:login], params[:password])
     else
       failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
     end  
@@ -104,6 +104,36 @@ class SessionsController < ApplicationController
         return_to_url = session[:return_to] || request.env['HTTP_REFERER']
     end
     return_to_url
+  end
+
+
+  def authenticateLDAP(login, password)
+
+    ldap = Net::LDAP.new :host => Seek::Config.ldap[:ldap_address], :port => Seek::Config.ldap[:ldap_port], :base => Seek::Config.ldap[:ldap_base_dn]
+    ldap.auth login, password
+
+    result = ldap.bind_as(
+      :base => Seek::Config.ldap[:ldap_base_dn],
+      :filter => "(uid=#{login})",
+      :password => password
+    )
+
+    # create user if there is an entry
+    if result
+      @user = User.create({ :login => login, :password => password, :password_confirmation => password })
+      if !@user.save
+         failed_login "Cannot create a new user: #{login}"
+      else
+        person = Person.create({ :first_name => result[0].givenName[0],  :last_name => result[0].sn[0], :email => result[0].mail[0] })
+        person.user = @user
+        person.save
+        @user.activate
+        check_login 
+      end
+    else
+      failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
+    end
+
   end
 
   def failed_login(message)
