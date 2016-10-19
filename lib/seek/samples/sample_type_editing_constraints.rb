@@ -38,6 +38,24 @@ module Seek
         end
       end
 
+      def allow_title_change?(attr)
+        attr = attr.accessor_name if attr.is_a?(SampleAttribute)
+        if attr
+          !samples?
+        else
+          true
+        end
+      end
+
+      def allow_type_change?(attr)
+        attr = attr.accessor_name if attr.is_a?(SampleAttribute)
+        if attr
+          !samples?
+        else
+          true
+        end
+      end
+
       private
 
       def blanks?(attr)

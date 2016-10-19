@@ -22,6 +22,41 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
 
   end
 
+  test 'allow title change?' do
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
+    refute c.allow_title_change?(:address)
+    attr = c.sample_type.sample_attributes.detect{|t| t.accessor_name=="address"}
+    refute_nil attr
+    refute c.allow_title_change?(attr)
+    assert c.allow_title_change?(nil)
+
+    # ok if there are no samples
+    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    assert c.allow_title_change?(:the_title)
+    attr = c.sample_type.sample_attributes.detect{|t| t.accessor_name=="the_title"}
+    refute_nil attr
+    assert c.allow_title_change?(attr)
+    assert c.allow_title_change?(nil)
+  end
+
+  test 'allow type change?' do
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
+    refute c.allow_type_change?(:address)
+    attr = c.sample_type.sample_attributes.detect{|t| t.accessor_name=="address"}
+    refute_nil attr
+    refute c.allow_type_change?(attr)
+    assert c.allow_type_change?(nil)
+
+    # ok if there are no samples
+    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    assert c.allow_type_change?(:the_title)
+    attr = c.sample_type.sample_attributes.detect{|t| t.accessor_name=="the_title"}
+    refute_nil attr
+    assert c.allow_type_change?(attr)
+    assert c.allow_type_change?(nil)
+  end
+
+
   test 'allow_required?' do
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
     refute c.allow_required?(:address)
