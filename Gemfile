@@ -109,6 +109,7 @@ gem 'rspec-rails'
 gem 'citeproc-ruby', '~> 1.1.4'
 gem 'citeproc', '~> 1.0.4'
 gem 'csl-styles', '~> 1.0.1.7'
+gem 'bibtex-ruby', '~> 4.4.2'
 
 gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
