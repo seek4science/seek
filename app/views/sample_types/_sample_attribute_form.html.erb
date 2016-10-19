@@ -16,7 +16,7 @@
 <% allow_required = constraints.allow_required?(sample_attribute) %>
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
-<% allow_title_change = constraints.allow_title_change?(sample_attribute) %>
+<% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -28,7 +28,7 @@
   </th>
   <td>
     <%= text_field_tag "#{field_name_prefix}[title]", title, :class => 'form-control',
-                       :placeholder => 'Attribute name',disabled:!allow_title_change %>
+                       :placeholder => 'Attribute name',disabled:!allow_name_change %>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
