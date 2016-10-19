@@ -1,4 +1,4 @@
-# This controller handles the login/logout function of the site.  
+# This controller handles the login/logout function of the site. 
 class SessionsController < ApplicationController
 
   before_filter :redirect_to_sign_up_when_no_user,:only=>:new
@@ -109,26 +109,42 @@ class SessionsController < ApplicationController
 
   def authenticateLDAP(login, password)
 
-    ldap = Net::LDAP.new :host => Seek::Config.ldap[:ldap_address], :port => Seek::Config.ldap[:ldap_port], :base => Seek::Config.ldap[:ldap_base_dn]
-    ldap.auth login, password
+    begin
+      # create connection
+      ldap = Net::LDAP.new :host => Seek::Config.ldap[:ldap_address], :port => Seek::Config.ldap[:ldap_port], :base => Seek::Config.ldap[:ldap_base_dn]
+      ldap.auth login, password
 
-    result = ldap.bind_as(
-      :base => Seek::Config.ldap[:ldap_base_dn],
-      :filter => "(uid=#{login})",
-      :password => password
-    )
+      result = ldap.bind_as(
+        :base => Seek::Config.ldap[:ldap_base_dn],
+        :filter => "(#{Seek::Config.ldap[:ldap_login]}=#{login})",
+        :password => password
+      )
 
-    # create user if there is an entry
-    if result
-      @user = User.create({ :login => login, :password => password, :password_confirmation => password, :email => result[0].mail[0] })
-      if !@user.save
-         failed_login "Cannot create a new user: #{login}"
+      # create user if there is an entry
+      if result
+
+        # extract user informations
+        ldap_user = result.first
+        ldap_email = ldap_user[Seek::Config.ldap[:ldap_email]].first
+        ldap_fist_name = ldap_user[Seek::Config.ldap[:ldap_first_name]].first
+        ldap_last_name = ldap_user[Seek::Config.ldap[:ldap_last_name]].first
+
+        # create user
+        @user = User.create({ :login => login, :password => password, :password_confirmation => password, :email => ldap_email })
+
+        if !@user.save
+           failed_login "Cannot create a new user: #{login}"
+        else
+          self.current_user = @user 
+          # redirect to people creation using LDAP informations
+          redirect_to(register_people_path({:email => ldap_email, :first_name => ldap_fist_name, :last_name => ldap_last_name}))
+        end
       else
-        self.current_user = @user
-        redirect_to(register_people_path({:email => result[0].mail[0], :first_name => result[0].givenName[0], :last_name => result[0].sn[0]}))
+        failed_login "Invalid username/password using local and LDAP database. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
       end
-    else
-      failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
+
+    rescue => e
+        failed_login "Connection to LDAP failed, #{e.message}"
     end
 
   end

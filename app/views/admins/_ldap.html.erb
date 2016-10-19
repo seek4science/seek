@@ -4,11 +4,19 @@
 <div id="ldap_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.ldap_enabled) -%>;">
   <div class="row">
     <div class="col-sm-7">
-      <%= admin_text_setting(:ldap_address, Seek::Config.ldap_settings('ldap_address'), 'LDAP server') %>
+      <%= admin_text_setting(:ldap_address, Seek::Config.ldap_settings('ldap_address'), 'LDAP host') %>
 
-      <%= admin_text_setting(:ldap_port, Seek::Config.ldap_settings('ldap_port'), 'LDAP server port', nil, :onkeypress => "javascript: return onlyNumbers(event);") %>
+      <%= admin_text_setting(:ldap_port, Seek::Config.ldap_settings('ldap_port'), 'LDAP port', nil, :onkeypress => "javascript: return onlyNumbers(event);") %>
 
       <%= admin_text_setting(:ldap_base_dn, Seek::Config.ldap_settings('ldap_base_dn'), 'Base DN') %>
+
+      <%= admin_text_setting(:ldap_login, Seek::Config.ldap_settings('ldap_login'), 'LDAP Login Attribute') %>
+
+      <%= admin_text_setting(:ldap_email, Seek::Config.ldap_settings('ldap_email'), 'LDAP Email attribute') %>
+
+      <%= admin_text_setting(:ldap_first_name, Seek::Config.ldap_settings('ldap_first_name'), 'LDAP First name attribute') %>
+
+      <%= admin_text_setting(:ldap_last_name, Seek::Config.ldap_settings('ldap_last_name'), 'LDAP Last name attribute') %>
 
     </div>
     <div class="col-sm-5">
@@ -18,7 +26,7 @@
           <%= link_to_with_callbacks image("test",:title=>"Testing LDAP connection",:alt=>"Test")+" Test LDAP connection",
                                      {:url=>{:action=>'test_ldap_connection'},
                                       :method=>:post,
-                                      :with=>"'ldap_address=' + $F('ldap_address') + '&ldap_port=' + $F('ldap_port') + '&ldap_base_dn=' + $F('ldap_base_dn') + '&testing_ldap=' + $F('testing_ldap')",
+                                      :with=>"'ldap_address=' + $F('ldap_address') + '&ldap_port=' + $F('ldap_port') + '&ldap_base_dn=' + $F('ldap_base_dn') + '&ldap_login=' + $F('ldap_login') + '&testing_ldap=' + $F('testing_ldap')",
                                       :before => "show_ajax_loader('ajax_loader_position_ldap');"},
                                      {:remote=>true, :class => 'btn btn-default'}-%>
           <div id='ajax_loader_position_ldap'></div>
