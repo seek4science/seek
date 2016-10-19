@@ -11,7 +11,7 @@ module Seek
         @sample_type = sample_type
       end
 
-      def has_samples?
+      def samples?
         samples.any?
       end
 
@@ -19,19 +19,18 @@ module Seek
       # attr can be the attribute accessor name, or the attribute itself
       # if attr is nil, indicates a new attribute. required is not allowed if there are already samples
       def allow_required?(attr)
-        attr=attr.accessor_name if attr.kind_of?(SampleAttribute)
+        attr = attr.accessor_name if attr.is_a?(SampleAttribute)
         if attr
-          !has_blanks?(attr)
+          !blanks?(attr)
         else
-          !has_samples?
+          !samples?
         end
-
       end
 
       # an attribute could be removed if all are currently blank
       # attr can be the attribute accessor name, or the attribute itself
       def allow_attribute_removal?(attr)
-        attr=attr.accessor_name if attr.kind_of?(SampleAttribute)
+        attr = attr.accessor_name if attr.is_a?(SampleAttribute)
         if attr
           all_blank?(attr)
         else
@@ -41,7 +40,7 @@ module Seek
 
       private
 
-      def has_blanks?(attr)
+      def blanks?(attr)
         analysis_hash[attr.to_sym][:has_blanks]
       end
 
@@ -69,7 +68,6 @@ module Seek
       end
 
       def analyse_for_attribute(attr)
-        result = {}
         has_blanks = false
         all_blank = true
         samples.each do |sample|
@@ -77,9 +75,7 @@ module Seek
           all_blank &&= sample.get_attribute(attr).blank?
           break if has_blanks && !all_blank # no need to continue
         end
-        result[:has_blanks] = has_blanks
-        result[:all_blank] = all_blank
-        result
+        { has_blanks: has_blanks, all_blank: all_blank }
       end
 
       def cache_key

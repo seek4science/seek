@@ -13,12 +13,12 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     end
   end
 
-  test 'has samples?' do
+  test 'samples?' do
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
-    assert c.has_samples?
+    assert c.samples?
 
     c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
-    refute c.has_samples?
+    refute c.samples?
 
   end
 
@@ -69,12 +69,12 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     assert c.allow_attribute_removal?(nil)
   end
 
-  test 'has_blanks?' do
+  test 'blanks?' do
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
-    assert c.send(:has_blanks?,:address)
-    assert c.send(:has_blanks?,:postcode)
-    refute c.send(:has_blanks?,:age)
-    refute c.send(:has_blanks?,:full_name)
+    assert c.send(:blanks?, :address)
+    assert c.send(:blanks?, :postcode)
+    refute c.send(:blanks?, :age)
+    refute c.send(:blanks?, :full_name)
   end
 
   test 'all_blank?' do
