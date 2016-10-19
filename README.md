@@ -58,9 +58,9 @@ For more details on how and what you can contribute to SEEK please visit [Contri
 
 ## Credit
 
-SEEK is developed using the [RubyMine IDE](http://www.jetbrains.com/ruby/), for which we are provided a free open source license by JetBrains.
+SEEK is developed using the [RubyMine IDE](http://www.jetbrains.com/ruby/), for which we are provided a free open source license by [JetBrains](https://www.jetbrains.com/).
 
-![JetBrains](/app/assets/images/logos/icon_jetbrains.png)   ![RubyMine](/app/assets/images/logos/icon_rubymine.png)
+[![JetBrains](/app/assets/images/logos/icon_jetbrains.png)](https://www.jetbrains.com/)   [![RubyMine](/app/assets/images/logos/icon_rubymine.png)](http://www.jetbrains.com/ruby/)
 
 
 
