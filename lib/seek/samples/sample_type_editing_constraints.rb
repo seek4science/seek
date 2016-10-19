@@ -56,6 +56,10 @@ module Seek
         end
       end
 
+      def refresh_cache
+        do_analysis
+      end
+
       private
 
       def blanks?(attr)

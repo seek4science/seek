@@ -55,6 +55,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute assigns(:sample_type).uploaded_template?
     assert_equal ['fish','golf'],assigns(:sample_type).tags.sort
     assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
+    assert SampleTypeUpdateJob.new(assigns(:sample_type),true).exists?
   end
 
   test 'should create with linked sample type' do
@@ -128,6 +129,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert assigns(:sample_type).sample_attributes[1].is_title?
     assert_equal ['fish','golf'],assigns(:sample_type).tags.sort
     assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
+    assert SampleTypeUpdateJob.new(assigns(:sample_type),true).exists?
   end
 
   test 'other project member cannot update sample type' do

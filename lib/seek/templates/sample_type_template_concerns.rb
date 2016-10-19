@@ -5,7 +5,7 @@ module Seek
     module SampleTypeTemplateConcerns
       extend ActiveSupport::Concern
       included do
-        after_save :queue_template_generation
+        after_save :queue_template_generation, :queue_sample_type_update_job
         validate :validate_template_file
         has_one :content_blob, as: :asset, dependent: :destroy
         alias_method :template, :content_blob
@@ -22,6 +22,10 @@ module Seek
           end
           SampleTemplateGeneratorJob.new(self).queue_job
         end
+      end
+
+      def queue_sample_type_update_job
+        SampleTypeUpdateJob.new(self).queue_job
       end
 
       def generate_template
