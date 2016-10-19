@@ -60,9 +60,7 @@ For more details on how and what you can contribute to SEEK please visit [Contri
 
 SEEK is developed using the [RubyMine IDE](http://www.jetbrains.com/ruby/), for which we are provided a free open source license by JetBrains.
 
-![JetBrains](/app/assets/images/logos/icon_jetbrains.png)
-
-![RubyMine](/app/assets/images/logos/icon_rubymine.png)
+![JetBrains](/app/assets/images/logos/icon_jetbrains.png)   ![RubyMine](/app/assets/images/logos/icon_rubymine.png)
 
 
 
