@@ -1,5 +1,5 @@
 <%= admin_checkbox_setting(:ldap_enabled, 1, Seek::Config.ldap_enabled,
-                           "LDAP enabled", "Enables LDAP authentification.",
+                           "LDAP enabled", "Enables simple LDAP authentification.",
                            :onchange=>toggle_appear_javascript('ldap_settings')) %>
 <div id="ldap_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.ldap_enabled) -%>;">
   <div class="row">
@@ -21,7 +21,7 @@
     </div>
     <div class="col-sm-5">
       <%= panel('Test LDAP configuration') do %>
-          <p class="help-block">Here you can input a username for a testing connection.</p>
+          <p class="help-block">Here you can input a login for a testing connection.</p>
           <%= text_field_tag :testing_ldap, '', :class => 'form-control' %>
           <%= link_to_with_callbacks image("test",:title=>"Testing LDAP connection",:alt=>"Test")+" Test LDAP connection",
                                      {:url=>{:action=>'test_ldap_connection'},
