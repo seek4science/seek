@@ -6,7 +6,7 @@ class SampleTypesController < ApplicationController
   include Seek::IndexPager
 
   before_filter :samples_enabled?
-  before_filter :get_sample_type, only: [:show, :edit, :update, :destroy]
+  before_filter :find_sample_type, only: [:show, :edit, :update, :destroy]
   before_filter :check_no_created_samples, only: [:destroy]
   before_filter :find_assets, only: [:index]
 
@@ -64,7 +64,7 @@ class SampleTypesController < ApplicationController
   # POST /sample_types
   # POST /sample_types.json
   def create
-    #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
+    # because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
     tags = params[:sample_type].delete(:tags)
     @sample_type = SampleType.new(params[:sample_type])
 
@@ -74,7 +74,7 @@ class SampleTypesController < ApplicationController
 
     respond_to do |format|
       if @sample_type.save
-        @sample_type.update_attribute(:tags,tags)
+        @sample_type.update_attribute(:tags, tags)
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
         format.json { render json: @sample_type, status: :created, location: @sample_type }
       else
@@ -111,7 +111,7 @@ class SampleTypesController < ApplicationController
 
   private
 
-  def get_sample_type
+  def find_sample_type
     @sample_type = SampleType.find(params[:id])
   end
 

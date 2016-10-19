@@ -49,12 +49,12 @@ class SampleDataExtractionJob
     Delayed::Job.enqueue(self, priority: priority, queue: queue_name, run_at: time)
   end
 
-  def self.queue_name
-    'sample_extraction'
+  def default_priority
+    1
   end
 
   def queue_name
-    self.class.queue_name
+    QueueName::SAMPLES
   end
 
 end

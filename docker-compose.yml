@@ -9,7 +9,8 @@ services:
       - seek-mysql-db:/var/lib/mysql
 
   seek: # The SEEK application, passenger, solr and delayed_job worker
-    build: .
+    #build: .
+    image: fairdom/seek:master
     command: docker/entrypoint.sh
     restart: always
     environment:

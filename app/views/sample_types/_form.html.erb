@@ -39,10 +39,11 @@
       <tbody>
       <% @sample_type.sample_attributes.each_with_index do |sample_attribute, index| %>
         <%= render :partial => 'sample_attribute_form', :locals => { :index => index,
-                                                                     :sample_attribute => sample_attribute } %>
+                                                                     :sample_attribute => sample_attribute,
+                                                                     :sample_type=>@sample_type} %>
       <% end %>
 
-      <% unless @sample_type.uploaded_template? %>
+      <% unless @sample_type.uploaded_template? || @sample_type.editing_constraints.allow_new_attribute? %>
         <tr id="add-attribute-row">
           <td colspan="6">
             <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
@@ -62,7 +63,7 @@
 
 <table id="new-attribute-row" style="display: none">
   <tbody>
-    <%= render :partial => 'sample_attribute_form' %>
+    <%= render :partial => 'sample_attribute_form', :locals=> {:sample_type=>@sample_type} %>
   </tbody>
 </table>
 

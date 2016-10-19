@@ -12,6 +12,11 @@
 <% template_column_index = sample_attribute ? sample_attribute.template_column_index : nil %>
 <% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
 <% is_controlled_vocab = sample_attribute && sample_attribute.sample_attribute_type.try(:controlled_vocab?) %>
+<% constraints = sample_type.editing_constraints %>
+<% allow_required = constraints.allow_required?(sample_attribute) %>
+<% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
+<% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
+<% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -23,25 +28,26 @@
   </th>
   <td>
     <%= text_field_tag "#{field_name_prefix}[title]", title, :class => 'form-control',
-                       :placeholder => 'Attribute name' %>
+                       :placeholder => 'Attribute name',disabled:!allow_name_change %>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[required]", '1', required %>
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required,disabled:!allow_required %>
     </div>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title' %>
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled:!allow_required %>
     </div>
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
                    options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?, 'data-is-seek-sample'=>t.seek_sample? }] },
                                       attribute_type_id),
-                   :class => 'form-control sample-type-attribute-type'%>
+                   :class => 'form-control sample-type-attribute-type',
+                   disabled:!allow_type_change %>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless is_controlled_vocab %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
@@ -69,14 +75,18 @@
   </td>
 
   <td>
-    <div class="btn-group" data-toggle="buttons">
-      <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', :autocomplete => 'off' %>
-      <label class="btn btn-danger">
-        Remove
-        <%= check_box_tag "#{field_name_prefix}[_destroy]", '1', false,
-                          :class => 'destroy-attribute', :autocomplete => 'off' %>
-      </label>
-    </div>
+    <% if allow_attribute_removal %>
+      <div class="btn-group" data-toggle="buttons">
+        <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', :autocomplete => 'off' %>
+        <label class="btn btn-danger">
+          Remove
+          <%= check_box_tag "#{field_name_prefix}[_destroy]", '1', false,
+                            :class => 'destroy-attribute', :autocomplete => 'off' %>
+        </label>
+      </div>
+        <% else %>
+        <div>&nbsp;</div>
+    <% end %>
 
   </td>
 
