@@ -3,7 +3,9 @@ require 'time_test_helper'
 
 class SampleTypeUpdateJobTest < ActiveSupport::TestCase
   def setup
+    SampleType.skip_callback(:save, :after, :queue_sample_type_update_job)
     @sample_type = Factory(:simple_sample_type)
+    SampleType.set_callback(:save, :after, :queue_sample_type_update_job)
   end
 
   test 'exists' do
@@ -30,6 +32,12 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     type.sample_attributes.detect { |t| t.title == 'full name' }.is_title = false
     type.sample_attributes.detect { |t| t.title == 'postcode' }.is_title = true
     disable_authorization_checks { type.save! }
+
+    Delayed::Job.destroy_all
+
+    #check there is no existing job triggered from a sample.save
+    refute SampleTypeUpdateJob.new(type,false).exists?
+
     job = SampleTypeUpdateJob.new(type)
     pretend_now_is(Time.now + 1.minute) do
       job.perform
@@ -38,6 +46,9 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     assert_equal 'M12 9LL', sample.title
     # timestamps shouldn't change
     assert_equal updated_at, sample.updated_at
+
+    #a new job shouldn't be created by the sample.save
+    refute SampleTypeUpdateJob.new(type,false).exists?
   end
 
   test 'perform without refresh' do

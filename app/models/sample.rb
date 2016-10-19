@@ -31,10 +31,6 @@ class Sample < ActiveRecord::Base
   after_save :queue_sample_type_update_job
   after_destroy :queue_sample_type_update_job
 
-  def queue_sample_type_update_job
-    SampleTypeUpdateJob.new(sample_type, false).queue_job
-  end
-
   def sample_type=(type)
     super
     @data = Seek::Samples::SampleData.new(type)
@@ -143,5 +139,9 @@ class Sample < ActiveRecord::Base
     else
       super
     end
+  end
+
+  def queue_sample_type_update_job
+    SampleTypeUpdateJob.new(sample_type, false).queue_job
   end
 end

@@ -47,12 +47,15 @@ class SampleType < ActiveRecord::Base
   # refreshes existing samples following a change to the sample type. For example when changing the title field
   def refresh_samples
     Sample.record_timestamps = false
+    # prevent a job being created when the sample is saved
+    Sample.skip_callback :save, :after, :queue_sample_type_update_job
     begin
       disable_authorization_checks do
         samples.each(&:save)
       end
-      ensure
-        Sample.record_timestamps = true
+    ensure
+      Sample.record_timestamps = true
+      Sample.set_callback :save, :after, :queue_sample_type_update_job
     end
   end
 
