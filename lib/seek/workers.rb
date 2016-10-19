@@ -11,12 +11,12 @@ module Seek
       commands =
           ["--queue=#{Delayed::Worker.default_queue_name} -i #{number} #{action}"]
       if Seek::Config.auth_lookup_enabled
-        commands << "--queue=#{AuthLookupUpdateJob.new.queue_name} -i #{number + 1} #{action}"
+        commands << "--queue=#{QueueName::AUTH_LOOKUP} -i #{number + 1} #{action}"
       end
       if Seek::Config.cache_remote_files
-        commands << "--queue=#{RemoteContentFetchingJob.queue_name} -i #{number + 2} #{action}"
+        commands << "--queue=#{QueueName::REMOTE_CONTENT} -i #{number + 2} #{action}"
       end
-      commands << "--queue=#{SampleDataExtractionJob.queue_name} -i #{number + 3} #{action}"
+      commands << "--queue=#{QueueName::SAMPLES} -i #{number + 3} #{action}"
       if number > 0
         commands << "--queue=#{TavernaPlayer.job_queue_name} -n #{number} #{action}"
       end

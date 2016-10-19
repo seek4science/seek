@@ -28,6 +28,10 @@ class SampleTypeUpdateJob < SeekJob
     0
   end
 
+  def queue_name
+    QueueName::SAMPLES
+  end
+
   private
 
   def refresh_samples?
