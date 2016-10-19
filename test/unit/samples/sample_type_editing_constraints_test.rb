@@ -22,28 +22,20 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
 
   end
 
-  test 'has_blanks?' do
-    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
-    assert c.has_blanks?(:address)
-    assert c.has_blanks?(:postcode)
-    refute c.has_blanks?(:age)
-    refute c.has_blanks?(:full_name)
-  end
-
-  test 'all_blank?' do
-    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
-    refute c.all_blank?(:address)
-    assert c.all_blank?(:postcode)
-    refute c.all_blank?(:age)
-    refute c.all_blank?(:full_name)
-  end
-
   test 'allow_required?' do
     c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
     refute c.allow_required?(:address)
     refute c.allow_required?(:postcode)
     assert c.allow_required?(:age)
     assert c.allow_required?(:full_name)
+
+    #accespts attribute
+    attr = c.sample_type.sample_attributes.detect{|t| t.accessor_name=="address"}
+    refute_nil attr
+    refute c.allow_required?(attr)
+    attr = c.sample_type.sample_attributes.detect{|t| t.accessor_name=="age"}
+    refute_nil attr
+    assert c.allow_required?(attr)
   end
 
   test 'allow_attribute_removal?' do
@@ -52,6 +44,45 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     assert c.allow_attribute_removal?(:postcode)
     refute c.allow_attribute_removal?(:age)
     refute c.allow_attribute_removal?(:full_name)
+    #accespts attribute
+    attr = c.sample_type.sample_attributes.detect{|t| t.accessor_name=="address"}
+    refute_nil attr
+    refute c.allow_attribute_removal?(attr)
+    attr = c.sample_type.sample_attributes.detect{|t| t.accessor_name=="postcode"}
+    refute_nil attr
+    assert c.allow_attribute_removal?(attr)
+  end
+
+  test 'allow required? with nil' do
+    #nil indicates a new attribute, allow_required? is determined by whether there are already samples
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
+    refute c.allow_required?(nil)
+    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    assert c.allow_required?(nil)
+  end
+
+  test 'allow_attribute_removal? with nil' do
+    #nil indicates a new attribute, removal is always allowed
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
+    assert c.allow_attribute_removal?(nil)
+    c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
+    assert c.allow_attribute_removal?(nil)
+  end
+
+  test 'has_blanks?' do
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
+    assert c.send(:has_blanks?,:address)
+    assert c.send(:has_blanks?,:postcode)
+    refute c.send(:has_blanks?,:age)
+    refute c.send(:has_blanks?,:full_name)
+  end
+
+  test 'all_blank?' do
+    c = Seek::Samples::SampleTypeEditingConstraints.new(sample_type_with_samples)
+    refute c.send(:all_blank?,:address)
+    assert c.send(:all_blank?,:postcode)
+    refute c.send(:all_blank?,:age)
+    refute c.send(:all_blank?,:full_name)
   end
 
   private

@@ -16,14 +16,30 @@ module Seek
       end
 
       # an attribute can be changed to required, if no samples have that field blank
+      # attr can be the attribute accessor name, or the attribute itself
+      # if attr is nil, indicates a new attribute. required is not allowed if there are already samples
       def allow_required?(attr)
-        !has_blanks?(attr)
+        attr=attr.accessor_name if attr.kind_of?(SampleAttribute)
+        if attr
+          !has_blanks?(attr)
+        else
+          !has_samples?
+        end
+
       end
 
       # an attribute could be removed if all are currently blank
+      # attr can be the attribute accessor name, or the attribute itself
       def allow_attribute_removal?(attr)
-        all_blank?(attr)
+        attr=attr.accessor_name if attr.kind_of?(SampleAttribute)
+        if attr
+          all_blank?(attr)
+        else
+          true
+        end
       end
+
+      private
 
       def has_blanks?(attr)
         analysis_hash[attr.to_sym][:has_blanks]
@@ -32,8 +48,6 @@ module Seek
       def all_blank?(attr)
         analysis_hash[attr.to_sym][:all_blank]
       end
-
-      private
 
       def analysis_hash
         @analysis_hash ||= do_analysis
