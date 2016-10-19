@@ -44,6 +44,18 @@ class SampleType < ActiveRecord::Base
     attribute.validate_value?(value)
   end
 
+  # refreshes existing samples following a change to the sample type. For example when changing the title field
+  def refresh_samples
+    Sample.record_timestamps = false
+    begin
+      disable_authorization_checks do
+        samples.each(&:save)
+      end
+      ensure
+        Sample.record_timestamps = true
+    end
+  end
+
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
   # this is to help when a controlled vocab has been selected in the form, but then the type has been changed
   # rather than clearing the selected vocab each time
