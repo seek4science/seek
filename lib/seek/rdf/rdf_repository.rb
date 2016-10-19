@@ -26,17 +26,17 @@ module Seek
 
         #execute a selection query, which delegates to Rdf::Repository#query
         def select *args
-          get_repository_object.select *args
+          get_repository_object.select(*args)
         end
 
         #execute a insert query, which delegates to Rdf::Repository#query
         def insert *args
-          get_repository_object.insert *args
+          get_repository_object.insert(*args)
         end
 
         #execute a deletion query, which delegates to Rdf::Repository#query
         def delete *args
-          get_repository_object.delete *args
+          get_repository_object.delete(*args)
         end
 
         #send the rdf related to item to the repository, and update the rdf file

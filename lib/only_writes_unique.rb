@@ -5,7 +5,7 @@ module OnlyWritesUnique
       load_target
       args = flatten_deeper(args).reject {|record| target.include? record}.uniq
     end
-    concat_without_ignore_duplicates *args
+    concat_without_ignore_duplicates(*args)
   end
 
   def self.included base

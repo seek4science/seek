@@ -1,6 +1,5 @@
 #encoding: utf-8
 class PublicationsController < ApplicationController
-  
   include Seek::IndexPager
   include Seek::AssetsCommon
   include Seek::BioExtension

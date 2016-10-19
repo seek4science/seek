@@ -31,9 +31,9 @@ module Seek
 
           def touch_for_hierarchy_updates
             if changed_attributes.include? :parent_id
-              Permission.find_by_contributor_type("Project", :conditions => {:contributor_id => ([id] + ancestors.map(&:id) + descendants.map(&:id))}).each &:touch
-              ancestors.each &:touch
-              descendants.each &:touch
+              Permission.find_by_contributor_type("Project", :conditions => {:contributor_id => ([id] + ancestors.map(&:id) + descendants.map(&:id))}).each(&:touch)
+              ancestors.each(&:touch)
+              descendants.each(&:touch)
             end
           end
 

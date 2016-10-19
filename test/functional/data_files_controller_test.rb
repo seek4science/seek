@@ -1930,7 +1930,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     get :show,:id=>df
     assert_response :forbidden
-    assert_select "p[class=comment]",:text=>/#{comment}/
+    assert_select "p.comment",:text=>/#{comment}/
   end
 
   test "landing page for non-existing item" do
@@ -2366,7 +2366,7 @@ class DataFilesControllerTest < ActionController::TestCase
       post :extract_samples, id: data_file.id, confirm: 'true'
     end
 
-    assert (samples = assigns(:samples))
+    assert(samples = assigns(:samples))
     assert_equal 3, samples.count
     assert_equal samples.sort, data_file.extracted_samples.sort
   end
@@ -2396,7 +2396,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(data_file)
 
-    assert (samples = assigns(:samples))
+    assert(samples = assigns(:samples))
     assert_equal 3, samples.count
     assert_not_includes samples.map {|s| s.get_attribute(:full_name) }, "Bob"
 

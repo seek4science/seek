@@ -92,9 +92,9 @@ module ApplicationHelper
   end
 
   def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
-    items = all_items.select &:can_view?
+    items = all_items.select(&:can_view?)
     if Seek::Config.is_virtualliver
-      title_only_items = (all_items - items).select &:title_is_public?
+      title_only_items = (all_items - items).select(&:title_is_public?)
     else
       title_only_items = []
     end

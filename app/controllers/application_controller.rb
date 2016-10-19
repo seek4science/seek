@@ -122,7 +122,7 @@ class ApplicationController < ActionController::Base
     elsif resource_type == "Person" && Seek::Config.is_virtualliver && current_user.nil?
       authorized_resources = []
     else
-      authorized_resources = resources.select &:can_view?
+      authorized_resources = resources.select(&:can_view?)
     end
 
     render :update do |page|
@@ -542,7 +542,6 @@ class ApplicationController < ActionController::Base
     payload[:user_agent] = request.user_agent
   end
 
-
   def log_extra_exception_data
       request.env["exception_notifier.exception_data"] = {
           :current_logged_in_user=>current_user
@@ -554,6 +553,4 @@ class ApplicationController < ActionController::Base
   end
 
 end
-
-
 

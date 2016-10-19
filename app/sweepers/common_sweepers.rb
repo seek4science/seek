@@ -21,8 +21,8 @@ module CommonSweepers
   end
 
   def expire_header_and_footer
-    expire_fragment /header/
-    expire_fragment "footer"
+    expire_fragment(/header/)
+    expire_fragment("footer")
   end
 
   def expire_download_activity

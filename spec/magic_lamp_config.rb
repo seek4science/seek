@@ -4,11 +4,11 @@ FactoryGirl.find_definitions #It looks like requiring factory_girl _should_ do t
 
 FactoryGirl.class_eval do
   def self.create_with_privileged_mode *args
-    disable_authorization_checks {create_without_privileged_mode *args}
+    disable_authorization_checks {create_without_privileged_mode(*args)}
   end
 
   def self.build_with_privileged_mode *args
-    disable_authorization_checks {build_without_privileged_mode *args}
+    disable_authorization_checks {build_without_privileged_mode(*args)}
   end
 
   class_alias_method_chain :create, :privileged_mode

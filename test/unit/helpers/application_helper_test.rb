@@ -15,10 +15,10 @@ class ApplicationHelperTest < ActionView::TestCase
       #   <a href="http://test.host/assays/1035386651">http://test.host/assays/1035386651</a>
       # </p>
       assert_equal 'label',blocks.first.name
-      assert_match /TEST-TEST-TEST ID/,blocks.first.children.first.content
+      assert_match(/TEST-TEST-TEST ID/,blocks.first.children.first.content)
       assert_equal 'a',blocks.last.name
-      assert_match /http:\/\/test.host\/assays\/#{assay.id}/,blocks.last['href']
-      assert_match /http:\/\/test.host\/assays\/#{assay.id}/,blocks.last.children.first.content
+      assert_match(/http:\/\/test.host\/assays\/#{assay.id}/,blocks.last['href'])
+      assert_match(/http:\/\/test.host\/assays\/#{assay.id}/,blocks.last.children.first.content)
 
       versioned_sop=Factory(:sop_version)
       html = persistent_resource_id(versioned_sop)
@@ -29,14 +29,13 @@ class ApplicationHelperTest < ActionView::TestCase
       #   <a href="http://test.host/sops/1055250457?version=2">http://test.host/sops/1055250457?version=2</a>
       # </p>
       assert_equal 'label',blocks.first.name
-      assert_match /TEST-TEST-TEST ID/,blocks.first.children.first.content
+      assert_match(/TEST-TEST-TEST ID/,blocks.first.children.first.content)
       assert_equal 'a',blocks.last.name
-      assert_match /http:\/\/test.host\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/,blocks.last['href']
-      assert_match /http:\/\/test.host\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/,blocks.last.children.first.content
-
+      assert_match(/http:\/\/test.host\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/,blocks.last['href'])
+      assert_match(/http:\/\/test.host\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/,blocks.last.children.first.content)
     end
   end
-  
+
   def test_join_with_and
     assert_equal "a, b and c",join_with_and(["a","b","c"])
     assert_equal "a",join_with_and(["a"])

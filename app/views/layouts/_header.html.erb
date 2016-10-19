@@ -1,18 +1,18 @@
 <% cache "header" do -%>
     <table width="100%">
       <tr>
-      <td style="text-align:left">
+      <td class="text-left">
         <%= link_to image_tag("seek-logo-smaller.png",:alt=>"SEEK",:title=>"SEEK"),
           root_path %>
       </td>
       <td style="width:90%;">
         <%= render :partial=>"layouts/header_text_main" -%>
       </td>
-      <td style="text-align:right;">
+      <td class="text-right">
         <% if Seek::Config.header_image_enabled %>
             <%= header_logo_image %>
         <% end %>
       </td>
     </tr>
-    </table>      
+    </table>
 <% end -%>
