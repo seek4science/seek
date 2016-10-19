@@ -47,6 +47,9 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
     refute c.allow_type_change?(attr)
     assert c.allow_type_change?(nil)
 
+    #ok, if it is a field that is all blank
+    assert c.allow_type_change?(:postcode)
+
     # ok if there are no samples
     c = Seek::Samples::SampleTypeEditingConstraints.new(Factory(:simple_sample_type))
     assert c.allow_type_change?(:the_title)

@@ -57,7 +57,7 @@ module Seek
       def allow_type_change?(attr)
         attr = attr.accessor_name if attr.is_a?(SampleAttribute)
         if attr
-          !samples?
+          all_blank?(attr)
         else
           true
         end
