@@ -14,6 +14,6 @@ class RemoteContentFetchingJob < SeekJob
   end
 
   def queue_name
-    QueueName::REMOTE_CONTENT
+    QueueNames::REMOTE_CONTENT
   end
 end

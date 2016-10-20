@@ -54,7 +54,7 @@ class SampleDataExtractionJob
   end
 
   def queue_name
-    QueueName::SAMPLES
+    QueueNames::SAMPLES
   end
 
 end
