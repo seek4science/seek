@@ -1,4 +1,3 @@
-
 require 'grouped_pagination'
 require 'title_trimmer'
 require 'libxml'
@@ -49,7 +48,7 @@ class Publication < ActiveRecord::Base
     # http://filext.com/file-extension/EMBL
     # ftp://ftp.embl.de/pub/databases/embl/doc/usrman.txt
     :embl        => { :format => "embl"   , :name => "EMBL"   , :mimetype => "chemical/x-embl-dl-nucleotide"}
-  )
+  ).freeze
 
   def update_creators_from_publication_authors
     self.creators = seek_authors.map(&:person)
@@ -102,7 +101,6 @@ class Publication < ActiveRecord::Base
     publication_authors.find_all_by_person_id nil
   end
 
-
   def self.sort publications
     publications.sort_by(&:published_date)
   end
@@ -110,7 +108,6 @@ class Publication < ActiveRecord::Base
   def contributor_credited?
     false
   end
-
 
   def extract_metadata(reference)
     if reference.respond_to?(:pubmed)
@@ -120,8 +117,10 @@ class Publication < ActiveRecord::Base
     end
   end
 
+  # @param reference Bio::Reference
+  # @see https://github.com/bioruby/bioruby/blob/master/lib/bio/reference.rb
   def extract_pubmed_metadata(reference)
-    self.title = reference.title.chop #remove full stop
+    self.title = reference.title.chomp #remove full stop
     self.abstract = reference.abstract
     self.journal = reference.journal
     self.pubmed_id = reference.pubmed
@@ -129,6 +128,8 @@ class Publication < ActiveRecord::Base
     self.citation = reference.citation
   end
 
+  # @param doi_record DoiRecord
+  # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
     self.title = doi_record.title
     self.published_date = doi_record.date_published
@@ -136,6 +137,30 @@ class Publication < ActiveRecord::Base
     self.doi = doi_record.doi
     self.publication_type = doi_record.publication_type
     self.citation = doi_record.citation
+  end
+
+  # @param bibtex_record BibTeX entity from bibtex-ruby gem
+  def extract_bibtex_metadata(bibtex_record)
+    self.title           = bibtex_record.title
+    self.abstract        = bibtex_record[:abstract] || ""
+    self.journal         = bibtex_record.journal
+    self.published_date  = Date.new( bibtex_record.year.try(:to_i), bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1 )
+    self.doi             = bibtex_record[:doi]
+    self.pubmed_id       = bibtex_record[:pubmed_id]
+    plain_authors = bibtex_record[:author].split(" and ") # by bibtex definition
+    plain_authors.each_with_index do |author, index| # multiselect
+      if author.empty?
+        next
+      end
+      last_name, first_name = author.split(", ") # by bibtex definition
+      pa = PublicationAuthor.new({
+        :publication  => self,
+        :first_name   => first_name,
+        :last_name    => last_name,
+        :author_index => index
+      })
+      self.publication_authors << pa
+    end
   end
 
   def data_files

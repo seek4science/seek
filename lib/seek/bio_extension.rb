@@ -73,7 +73,9 @@ module Seek
       def name
         return self.first_name + " " + self.last_name
       end
-      
+
+      alias_method :full_name, :name
+
       def to_s
         return self.last_name + ", " + self.first_name
       end
