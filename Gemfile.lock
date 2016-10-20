@@ -203,6 +203,8 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     bcp47 (0.3.3)
       i18n
+    bibtex-ruby (4.4.2)
+      latex-decode (~> 0.0)
     bio (1.5.0)
     bives (1.0)
       open4 (~> 1.3.0)
@@ -355,6 +357,8 @@ GEM
     json-ld (1.1.8)
       rdf (~> 1.1, >= 1.1.7)
     kgio (2.9.3)
+    latex-decode (0.2.2)
+      unicode (~> 0.4)
     libxml-ruby (2.8.0)
     link_header (0.0.8)
     linkeddata (1.1.11)
@@ -757,6 +761,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.1)
+    unicode (0.4.4.2)
     unicorn (4.9.0)
       kgio (~> 2.6)
       rack
@@ -811,6 +816,7 @@ DEPENDENCIES
   acts_as_tree
   app_version!
   auto_strip_attributes
+  bibtex-ruby (~> 4.4.2)
   bio (~> 1.5.0)
   bioportal (>= 2.3)!
   bives
