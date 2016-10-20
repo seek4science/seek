@@ -17,7 +17,7 @@ class AuthLookupUpdateJob < SeekJob
   end
 
   def queue_name
-    QueueName::AUTH_LOOKUP
+    QueueNames::AUTH_LOOKUP
   end
 
   private

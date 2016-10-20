@@ -19,7 +19,7 @@ class SampleTemplateGeneratorJob < SeekJob
   end
 
   def queue_name
-    QueueName::SAMPLES
+    QueueNames::SAMPLES
   end
 
   private
