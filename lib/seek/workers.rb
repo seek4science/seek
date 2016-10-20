@@ -4,6 +4,7 @@ require 'delayed/command'
 module Seek
   module Workers
     def self.start(number_of_taverna_workers = 0, action = 'start')
+      @identifier = 0
       number_of_taverna_workers = 0 unless Seek::Config.workflows_enabled
 
       commands = create_commands(number_of_taverna_workers, action)
@@ -16,7 +17,6 @@ module Seek
     end
 
     def self.create_commands(number_of_taverna_workers, action)
-      identifier = 0
       commands = []
       queues = [Delayed::Worker.default_queue_name]
       queues << QueueNames::AUTH_LOOKUP if Seek::Config.auth_lookup_enabled
@@ -25,18 +25,17 @@ module Seek
       queues << TavernaPlayer.job_queue_name if number_of_taverna_workers > 0
       queues.each do |queue_name|
         number = (queue_name == TavernaPlayer.job_queue_name) ? number_of_taverna_workers : 1
-        commands << command(queue_name, identifier, number, action)
-        identifier += 1
+        commands << command(queue_name, number, action)
       end
       commands
     end
 
     def self.stop
-      Delayed::Command.new(['stop']).daemonize
+      daemonize_commands(['stop'])
     end
 
     def self.status
-      Delayed::Command.new(['status']).daemonize
+      daemonize_commands(['status'])
     end
 
     def self.restart(number = 0)
@@ -44,12 +43,13 @@ module Seek
     end
 
     def self.start_data_file_auth_lookup_worker(number = 1)
-      commands = [command(QueueNames::AUTH_LOOKUP, 0, number, 'start')]
+      @identifier = 0
+      commands = [command(QueueNames::AUTH_LOOKUP, number, 'start')]
       daemonize_commands(commands)
     end
 
-    def self.command(queue_name, identifier, number_of_workers, action)
-      "--queue=#{queue_name} -i #{identifier} -n #{number_of_workers} #{action}"
+    def self.command(queue_name, number_of_workers, action)
+      "--queue=#{queue_name} -i #{@identifier += 1} -n #{number_of_workers} #{action}"
     end
   end
 end
