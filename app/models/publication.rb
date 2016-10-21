@@ -141,12 +141,12 @@ class Publication < ActiveRecord::Base
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
-    self.title           = bibtex_record.title
-    self.abstract        = bibtex_record[:abstract] || ""
-    self.journal         = bibtex_record.journal
+    self.title           = bibtex_record.title.try(:to_s)
+    self.abstract        = bibtex_record[:abstract].try(:to_s) || ""
+    self.journal         = bibtex_record.journal.try(:to_s)
     self.published_date  = Date.new( bibtex_record.year.try(:to_i), bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1 )
-    self.doi             = bibtex_record[:doi]
-    self.pubmed_id       = bibtex_record[:pubmed_id]
+    self.doi             = bibtex_record[:doi].try(:to_s)
+    self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s)
     plain_authors = bibtex_record[:author].split(" and ") # by bibtex definition
     plain_authors.each_with_index do |author, index| # multiselect
       if author.empty?
@@ -273,7 +273,7 @@ class Publication < ActiveRecord::Base
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
         if !matching_projects.empty?
-          self.errors[:base] << "You cannot register the same DOI within the same project"
+          self.errors[:doi] << "You cannot register the same DOI within the same project"
           return false
         end
       end
@@ -283,7 +283,7 @@ class Publication < ActiveRecord::Base
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
         if !matching_projects.empty?
-          self.errors[:base] << "You cannot register the same PubMed ID within the same project"
+          self.errors[:pubmed_id] << "You cannot register the same PubMed ID within the same project"
           return false
         end
       end
@@ -296,7 +296,7 @@ class Publication < ActiveRecord::Base
     if !existing.empty?
       matching_projects = existing.collect(&:projects).flatten.uniq & projects
       if !matching_projects.empty?
-        self.errors[:base] << "You cannot register the same Title within the same project"
+        self.errors[:title] << "You cannot register the same Title \"#{self.title}\" within the same project: \"#{matching_projects[0].title}\""
         return false
       end
     end
