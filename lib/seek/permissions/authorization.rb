@@ -1,6 +1,7 @@
 # SysMO: lib/authorization.rb
 # Code taken from myExperiment and adopted for SysMO requirements.
 # Greatly simplified 22/7/2010
+# Greatlier simplified 24/10/2016
 # **********************************************************************************
 # * myExperiment: lib/is_authorized.rb
 # *
