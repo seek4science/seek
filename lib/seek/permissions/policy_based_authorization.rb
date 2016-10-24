@@ -264,19 +264,17 @@ module Seek
             #check to see if an insert of update is needed, action used is arbitary
             insert = self.class.lookup_for_asset('view', 0, self.id).nil?
 
-            # Global permissions (Policy)
+            # Blank-out permissions first
             if insert
               ([0] + User.pluck(:id)).each do |user_id|
                 sql = %(INSERT INTO #{self.class.lookup_table_name}
                           (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
-                          VALUES (#{user_id}, #{self.id}, #{policy.allows_action?('view')}, #{policy.allows_action?('edit')},
-                                  #{policy.allows_action?('download')}, #{policy.allows_action?('manage')},
-                                  #{policy.allows_action?('delete')});)
+                          VALUES (#{user_id}, #{self.id}, false, false, false, false, false);)
 
                 ActiveRecord::Base.connection.execute(sql)
               end
             else
-              update_lookup(policy, nil, true)
+              update_lookup([false, false, false, false, false], nil)
             end
 
             # Specific permissions (Permission)
@@ -313,6 +311,9 @@ module Seek
                 update_lookup([true, true, true, true, true], asset_housekeepers)
               end
             end
+
+            # Global permissions (Policy)
+            update_lookup(policy, nil, false)
           end
         end
       end
@@ -428,7 +429,7 @@ module Seek
       private
 
       # Note, nil user means ALL users, not guest user
-      def update_lookup(permission, user = nil, overwrite = false)
+      def update_lookup(permission, user = nil, overwrite = true)
         if permission.is_a?(Array)
           can_view, can_edit, can_download, can_manage, can_delete = *permission
         else
