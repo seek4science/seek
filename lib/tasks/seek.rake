@@ -184,8 +184,7 @@ namespace :seek do
     end
   end
   
-  desc "Creates background jobs to rebuild all authorization lookup table for all users."
-  task(:repopulate_auth_lookup_tables=>:environment) do
+  task(:repopulate_auth_lookup_tables_old => :environment) do
     AuthLookupUpdateJob.new.add_items_to_queue nil,5.seconds.from_now,1
     User.all.each do |user|
       unless AuthLookupUpdateQueue.exists?(user)
@@ -194,7 +193,8 @@ namespace :seek do
     end
   end
 
-  task(:repopulate_auth_lookup_tables_new=>:environment) do
+  desc "Creates background jobs to rebuild all authorization lookup table for all items."
+  task(:repopulate_auth_lookup_tables=>:environment) do
     Seek::Util.authorized_types.each do |type|
       type.all.each do |item|
         unless AuthLookupUpdateQueue.exists?(item)
