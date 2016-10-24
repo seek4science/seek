@@ -276,7 +276,7 @@ module Seek
                 ActiveRecord::Base.connection.execute(sql)
               end
             else
-              update_lookup(policy)
+              update_lookup(policy, nil, true)
             end
 
             # Specific permissions (Permission)
@@ -428,7 +428,7 @@ module Seek
       private
 
       # Note, nil user means ALL users, not guest user
-      def update_lookup(permission, user = nil)
+      def update_lookup(permission, user = nil, overwrite = false)
         if permission.is_a?(Array)
           can_view, can_edit, can_download, can_manage, can_delete = *permission
         else
@@ -440,12 +440,19 @@ module Seek
         end
 
         sql = %(UPDATE #{self.class.lookup_table_name}
-                        SET can_view=#{can_view},
-                            can_edit=#{can_edit},
-                            can_download=#{can_download},
-                            can_manage=#{can_manage},
-                            can_delete=#{can_delete}
-                        WHERE asset_id=#{self.id})
+                        SET )
+        sql += [:can_view, :can_edit, :can_download, :can_manage, :can_delete].map do |privilege|
+          setter = "#{privilege}="
+          if overwrite
+            setter += "#{binding.local_variable_get(privilege)}"
+          else
+            setter += "(#{privilege} OR #{binding.local_variable_get(privilege)})"
+          end
+
+          setter
+        end.join(",\n")
+
+        sql += " WHERE asset_id=#{self.id}"
 
         if user.respond_to?(:each)
           user.compact!
