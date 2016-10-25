@@ -6,7 +6,7 @@ class SampleTypesController < ApplicationController
   include Seek::IndexPager
 
   before_filter :samples_enabled?
-  before_filter :find_sample_type, only: [:show, :edit, :update, :destroy]
+  before_filter :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details]
   before_filter :check_no_created_samples, only: [:destroy]
   before_filter :find_assets, only: [:index]
 
@@ -107,6 +107,10 @@ class SampleTypesController < ApplicationController
       format.html { redirect_to sample_types_url }
       format.json { head :no_content }
     end
+  end
+
+  def template_details
+    render :partial=>'template'
   end
 
   private

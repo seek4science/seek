@@ -1,0 +1,26 @@
+<div id="template-details">
+
+  <% if @sample_type.template %>
+      <%= @sample_type.template.original_filename %> -    <%= link_to 'Download',download_sample_type_content_blob_path(@sample_type,@sample_type.template)  %>
+  <% elsif SampleTemplateGeneratorJob.new(@sample_type).exists?(false) %>
+      <div class="alert alert-info" role="alert">
+        A template for this Sample type is being generated and will be available soon.
+        <%= image 'spinner' %>
+      </div>
+      <script>
+        setTimeout(function () {
+          $j.ajax('<%= template_details_sample_type_path(@sample_type) %>', {
+                data: {  },
+                success: function (html) {
+                  $j('#template-details').replaceWith(html);
+                }
+              }
+          );
+        }, 5000);
+      </script>
+  <% else %>
+      <div class="alert alert-danger" role="alert">
+        There is no template is currently available for this Sample type, please check again later.
+      </div>
+  <% end %>
+</div>
