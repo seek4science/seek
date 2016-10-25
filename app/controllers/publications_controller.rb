@@ -62,8 +62,11 @@ class PublicationsController < ApplicationController
   def create
     @subaction = params[:subaction] || 'Register'
 
-    if @subaction == 'Import'
+    case @subaction
+    when "Import"
       return import_publication
+    when "ImportMultiple"
+      return import_publication_multiple
     end
 
     publication_params = params[:publication].dup
@@ -78,17 +81,12 @@ class PublicationsController < ApplicationController
     @publication.doi = doi
     @publication.pubmed_id = pubmed_id
 
-    if @subaction == 'Register'
+    case @subaction
+    when "Register" # Register publication from doi or pubmedid
       register_publication
-    end # Register publication from doi or pubmedid
-
-    if @subaction == 'Create'
+    when "Create" # Create publication from all fields
       create_publication
-    end # Create publication from all fields
-
-    # if @subaction == 'Import'
-      # import_publication
-    # end # import publication from file
+    end 
   end
 
   # PUT /publications/1
@@ -476,7 +474,7 @@ class PublicationsController < ApplicationController
 
   # create a publication from a reference file, at the moment supports only bibtex
   def import_publication
-    @publication = Publication.new
+    @publication = Publication.new(params[:publication].slice(:project_ids))
 
     require 'bibtex'
     if !params.has_key?(:publication) || !params[:publication].has_key?(:bibtex_file)
@@ -506,6 +504,66 @@ class PublicationsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :action => "new" }
+      end
+    end
+  end
+
+  # create a publication from a reference file, at the moment supports only bibtex
+  def import_publication_multiple
+    publication_params = params[:publication].slice(:project_ids)
+    @publication = Publication.new(publication_params)
+
+    require 'bibtex'
+    if !params.has_key?(:publication) || !params[:publication].has_key?(:bibtex_file)
+      @publication.errors[:bibtex_file] = "Upload a file!"
+    else
+      bibtex_file = params[:publication][:bibtex_file]
+      bibtex = BibTeX.parse( bibtex_file.read)
+      if bibtex['@article'].length < 1
+        @publication.errors[:bibtex_file] = "The bibtex file should contain at least one @article"
+      else
+        articles = bibtex['@article']
+        publications = []
+        publications_with_errors = []
+
+        # create publications from articles
+        articles.each do |article|
+          current_publication = Publication.new(publication_params)
+          current_publication.extract_bibtex_metadata(article)
+          if current_publication.save
+            publications << current_publication
+          else
+            publications_with_errors << current_publication
+          end
+        end
+
+        if publications.any?
+          flash[:notice] = "Successfully imported #{publications.length} publications"
+        else
+          @publication.errors[:bibtex_file] = "No article could be imported successfully"
+        end
+
+        if publications_with_errors.any?
+          flash[:error] = "There are #{publications_with_errors.length} publications that could not be saved"
+          publications_with_errors.each do |publication|
+            flash[:error] += "<br>" + publication.errors.full_messages.join("<br>")
+          end
+          flash[:error] = flash[:error].html_safe
+        end
+
+      end
+    end
+
+    if @publication.errors.any?
+      @subaction = 'Import'
+      respond_to do |format|
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to(:action => :index) }
+        format.xml  { render :xml => publications, :status => :created, :location => @publication }
       end
     end
   end

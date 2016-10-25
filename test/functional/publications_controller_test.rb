@@ -148,6 +148,46 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal publication[:authors].collect(&:full_name), p.publication_authors.collect(&:full_name)
     assert_equal publication[:published_date], p.published_date
   end
+  
+  test "should import multiple from bibtex file" do
+    publications = [{
+      :title        => "Taverna: a tool for building and running workflows of services.",
+      :journal      => "Nucleic Acids Res",
+      :authors      => [
+        PublicationAuthor.new({ :first_name => "D."   , :last_name => "Hull"        , :author_index => 0}),
+        PublicationAuthor.new({ :first_name => "K."   , :last_name => "Wolstencroft", :author_index => 1}),
+        PublicationAuthor.new({ :first_name => "R."   , :last_name => "Stevens"     , :author_index => 2}),
+        PublicationAuthor.new({ :first_name => "C."   , :last_name => "Goble"       , :author_index => 3}),
+        PublicationAuthor.new({ :first_name => "M. R.", :last_name => "Pocock"      , :author_index => 4}),
+        PublicationAuthor.new({ :first_name => "P."   , :last_name => "Li"          , :author_index => 5}),
+        PublicationAuthor.new({ :first_name => "T."   , :last_name => "Oinn"        , :author_index => 6})
+      ],
+      :published_date => Date.new(2006)
+    },
+    {
+      :authors        => [
+        PublicationAuthor.new({ :first_name => "J."   , :last_name => "Shmoe"     , :author_index => 0}),
+        PublicationAuthor.new({ :first_name => "M."   , :last_name => "Mustermann", :author_index => 1}),
+      ],
+      :title          => "Yet another tool for importing publications",
+      :journal        => "The second best journal",
+      :published_date =>  Date.new(2016)
+    }]
+    assert_difference('Publication.count',2) do
+      post :create, :subaction => "ImportMultiple", :publication => { :bibtex_file => fixture_file_upload('files/publications.bibtex'), :project_ids => [projects(:one).id] }
+      publication0 = Publication.find_by_title(publications[0][:title])
+      assert_not_nil publication0
+      assert_equal publications[0][:journal], publication0.journal
+      assert_equal publications[0][:authors].collect(&:full_name), publication0.publication_authors.collect(&:full_name)
+      assert_equal publications[0][:published_date], publication0.published_date
+      
+      publication1 = Publication.find_by_title(publications[1][:title])
+      assert_not_nil publication1
+      assert_equal publications[1][:journal], publication1.journal
+      assert_equal publications[1][:authors].collect(&:full_name), publication1.publication_authors.collect(&:full_name)
+      assert_equal publications[1][:published_date], publication1.published_date
+    end
+  end
 
   test "should only show the year for 1st Jan" do
     publication = Factory(:publication,:published_date=>Date.new(2013,1,1))

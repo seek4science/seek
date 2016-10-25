@@ -57,9 +57,9 @@
 <%= form_for @publication, :html => { :class => 'form-horizontal' } do |publication_form| %>
   <%= publication_form.hidden_field :parent_name %>
   <div class="form-group">
-  <%= label_tag :project_ids, 'Projects', :class => 'control-label col-sm-2' %>
-  <div class="col-sm-10">
-      <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control', :multiple => 'multiple' %>
+    <%= label_tag :project_ids, 'Projects', :class => 'control-label col-sm-2' %>
+    <div class="col-sm-10">
+      <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control projects-multiselect', :multiple => 'multiple' %>
     </div>
   </div>
   <div class="form-group">
@@ -136,8 +136,12 @@
 
 <div role="tabpanel" class="tab-pane" id="Import">
   <%= form_for @publication, :html => { :class => 'form-horizontal' } do |publication_form| %>
-    <div class="col-sm-12">
-      <p>On successful import, the 'Enter manually' tab will be opened and the form will be populated with the data from the imported file.</p>
+    <%= publication_form.hidden_field :parent_name %>
+    <div class="form-group">
+      <%= label_tag :project_ids, 'Projects', :class => 'control-label col-sm-2' %>
+      <div class="col-sm-10">
+        <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control projects-multiselect', :multiple => 'multiple' %>
+      </div>
     </div>
     <div class="form-group">
       <%= label_tag :bibtex_file, nil, :class => 'control-label col-sm-2' %>
@@ -146,9 +150,19 @@
       </div>
     </div>
     <div class="form-group">
-      <div class="col-sm-2 col-sm-offset-2">
-        <%= publication_form.submit 'Import', :name => "subaction", :value => 'Import', :class => 'btn btn-primary' %>
+      <div class="col-sm-5 col-sm-offset-2">
+        <p>On successful import, the 'Enter manually' tab will be opened and the form will be populated with the data from the first article from the imported file.</p>
       </div>
+      <div class="col-sm-5">
+        <p>On successful import, all publications will be saved. Any changes will need to be made inidividually afterwards.</p>
+      </div>
+      <div class="col-sm-5 col-sm-offset-2">
+        <%= publication_form.button 'Import first', :name => "subaction", :value => 'Import', :class => 'btn btn-primary' %>
+      </div>
+      <div class="col-sm-5">
+        <%= publication_form.button 'Import all', :name => "subaction", :value => 'ImportMultiple', :class => 'btn btn-primary' %>
+      </div>
+
     </div>
   <% end %>
 </div>
@@ -210,7 +224,7 @@ jQuery(document).ready(function() {
   // activate popovers
   jQuery('[data-toggle="popover"]').popover();
   
-  jQuery('div[id="Create"] select[id="publication_project_ids"]').multiselect({
+  jQuery('select.projects-multiselect').multiselect({
     enableCaseInsensitiveFiltering: true
   });
   
