@@ -43,7 +43,7 @@
                                                                      :sample_type=>@sample_type} %>
       <% end %>
 
-      <% unless @sample_type.uploaded_template? || @sample_type.editing_constraints.allow_new_attribute? %>
+      <% unless @sample_type.uploaded_template? || !@sample_type.editing_constraints.allow_new_attribute? %>
         <tr id="add-attribute-row">
           <td colspan="6">
             <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>

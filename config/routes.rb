@@ -4,6 +4,9 @@ SEEK::Application.routes.draw do
     collection do
       post :create_from_template
     end
+    member do
+      get :template_details
+    end
     resources :samples
     resources :content_blobs do
       member do
