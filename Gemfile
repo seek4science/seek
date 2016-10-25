@@ -114,6 +114,8 @@ gem 'bibtex-ruby', '~> 4.4.2'
 gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
 
+gem 'ransack', '~> 1.8.2'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
