@@ -227,10 +227,30 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   end
 
+  test 'add attribute button' do
+    type = Factory(:simple_sample_type,:project_ids=>[@project.id])
+    assert_empty type.samples
+    login_as(@person)
+    get :edit,id:type.id
+    assert_response :success
+    assert_select "a#add-attribute",count:1
+
+    sample = Factory(:patient_sample,contributor:@person.user,
+                     sample_type:Factory(:patient_sample_type,project_ids:[@project.id]))
+    type=sample.sample_type
+    refute_empty type.samples
+    assert type.can_edit?
+
+    get :edit,id:type.id
+    assert_response :success
+    assert_select "a#add-attribute",count:0
+
+  end
+
   test 'cannot access when disabled' do
-    person = Factory(:person)
+
     sample_type = Factory(:simple_sample_type)
-    login_as(person.user)
+    login_as(@person.user)
     with_config_value :samples_enabled,false do
 
       get :show, id: sample_type.id
