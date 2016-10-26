@@ -16,7 +16,7 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Improved Samples/Treatments/SOP handling | Summer 2016  |
+| Improved Samples/Treatments/SOP handling | Autumn 2016  |
 | Full integration with openBIS | Winter 2016  |
 
 
