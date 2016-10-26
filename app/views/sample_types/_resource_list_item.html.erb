@@ -1,5 +1,7 @@
 <%= list_item_description resource.description %>
-<b>Attributes: </b><%=
-    resource.sample_attributes.collect{|attr| sample_attribute_details(attr)}.join(", ").html_safe
-%>
+<p class="list_item_attribute">
+  <b>Attributes: </b><%=
+      resource.sample_attributes.collect{|attr| sample_attribute_details(attr)}.join(", ").html_safe
+  %>
+</p>
 

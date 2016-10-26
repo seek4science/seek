@@ -7,7 +7,12 @@ module SampleTypesHelper
     end
     unit = sample_type_attribute.unit ? "( #{ sample_type_attribute. unit.symbol } )" : ''
     req = sample_type_attribute.required? ? required_span : ''
-    "#{h sample_type_attribute.title} (#{type}) #{unit} #{req}".html_safe
+    attribute_css='sample-attribute'
+    attribute_css << ' sample-attribute-title' if sample_type_attribute.is_title?
+    content_tag :span, class:attribute_css do
+      "#{h sample_type_attribute.title} (#{type}) #{unit} #{req}".html_safe
+    end
+
   end
 
   def create_sample_controlled_vocab_model_button

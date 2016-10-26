@@ -10,3 +10,8 @@ input.sample_attribute_date {
 textarea.sample_attribute_text {
     height: 7em;
 }
+
+span.sample-attribute-title {
+    font-weight: bolder;
+    font-style: italic;
+}
