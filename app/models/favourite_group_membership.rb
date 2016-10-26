@@ -18,4 +18,8 @@ class FavouriteGroupMembership < ActiveRecord::Base
     Seek::Permissions::Authorization.access_type_allows_action?(action, self.access_type)
   end
 
+  def affected_people
+    [person]
+  end
+
 end

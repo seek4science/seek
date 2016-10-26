@@ -285,16 +285,17 @@ module Seek
                 sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }.
                 reverse
 
-            sorted_permissions.each do |permission|
+            # Extract the permissions from each FavouriteGroup and ensure they are also sorted by access_type
+            sorted_permissions.map! do |permission|
               if permission.contributor_type == 'FavouriteGroup'
-                permission.contributor.favourite_group_memberships.includes(person: :user).each do |group_permission|
-                  if group_permission.person.try(:user)
-                    update_lookup(group_permission, group_permission.person.user)
-                  end
-                end
+                permission.contributor.favourite_group_memberships.includes(person: :user).order('access_type ASC')
               else
-                update_lookup(permission, permission.affected_people.map(&:user))
+                permission
               end
+            end.flatten!
+
+            sorted_permissions.each do |permission|
+              update_lookup(permission, permission.affected_people.map(&:user))
             end
 
             # Creator permissions
