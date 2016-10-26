@@ -26,7 +26,7 @@ module TagsHelper
   def link_for_ann tag, options={}
     length=options[:truncate_length]
     length||=150
-    link = show_ann_path(tag)
+    link = show_ann_path(tag,type:options[:type])
 
     text = tag.text
     tooltip = text.length>length ? text : nil
@@ -34,6 +34,7 @@ module TagsHelper
   end
 
   def list_item_tags_list tags,options={}
+    return content_tag(:span,class:'none_text') {options[:blank] || 'Not specified'} if tags.blank?
     tags.map do |t|
       divider=tags.last==t ? "" : "<span class='spacer'>,</span> ".html_safe
       link_for_ann(t,options)+divider
