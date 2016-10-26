@@ -6,7 +6,7 @@ class TagsController < ApplicationController
 
     acceptable_attributes = ["expertise","tool","tag"]
 
-    @tagged_objects = select_authorised @tag.annotations.with_attribute_name(acceptable_attributes).collect{|a| a.annotatable}.uniq
+    @tagged_objects = @tag.annotations.with_attribute_name(acceptable_attributes).collect{|a| a.annotatable}.uniq.select(&:can_view?)
 
     if @tagged_objects.empty?
       flash.now[:notice]="No objects (or none that you are authorized to view) are tagged with '<b>#{h(@tag.text)}</b>'.".html_safe
@@ -51,11 +51,6 @@ class TagsController < ApplicationController
       end
 
     end
-  end
-
-  #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
-  def select_authorised collection
-    collection.select {|el| el.can_view?}
   end
 
   def get_tags
