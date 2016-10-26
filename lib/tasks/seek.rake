@@ -388,9 +388,13 @@ namespace :seek do
 
     puts "Refreshing auth lookup using new method..."
     new_method_start = Time.now
-    all_items.each do |item|
-      item.update_lookup_table_for_all_users
-      print '.'
+    Seek::Util.authorized_types.each do |type|
+      puts type.name
+      type.includes(policy: :permissions).all.each do |item|
+        item.update_lookup_table_for_all_users
+        print '.'
+      end
+      puts
     end
     new_method_time = Time.now - new_method_start
 
@@ -404,11 +408,15 @@ namespace :seek do
 
     puts "Refreshing auth lookup using old method..."
     old_method_start = Time.now
-    all_users.each do |user|
-      all_items.each do |item|
-        item.update_lookup_table(user)
+    Seek::Util.authorized_types.each do |type|
+      puts type.name
+      type.includes(policy: :permissions).all.each do |item|
+        all_users.each do |user|
+          item.update_lookup_table(user)
+        end
+        print '.'
       end
-      print '.'
+      puts
     end
     old_method_time = Time.now - old_method_start
 
