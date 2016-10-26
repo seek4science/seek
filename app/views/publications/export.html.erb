@@ -1,0 +1,18 @@
+<%= index_title -%>
+
+<%= search_form_for @query, :url => :export_publications do |f| %>
+  <%= f.label :title_cont %>
+  <%= f.search_field :title_cont %>
+
+  <%= f.label :projects_id_eq %>
+  <%= f.collection_select :projects_id_eq, Project.all, :id, :title, :include_blank => true %>
+
+  <%= f.label :persons_id_eq %>
+  <%= f.collection_select :persons_id_eq, Person.all, :id, :name, :include_blank => true %>
+
+  <%= f.submit %>
+<% end %>
+
+<div class="list_items_container">
+  <%= render :partial => "assets/resource_list_item", :collection => @publications %>
+</div>
