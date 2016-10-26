@@ -278,8 +278,11 @@ module Seek
             end
 
             # Specific permissions (Permission)
+
+            # Sort permissions according to precedence, then access type, so the most direct (People), permissive (Manage)
+            # permissions are applied last.
             sorted_permissions = self.policy.permissions.
-                sort_by { |p| Permission.precedence.index(p.contributor_type) }.
+                sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }.
                 reverse
 
             sorted_permissions.each do |permission|
@@ -296,7 +299,7 @@ module Seek
 
             # Creator permissions
             if is_downloadable? && creators.any?
-              update_lookup([true, true, true, false, false], creators.includes(:user).map(&:user).compact)
+              update_lookup([true, true, true, false, false], creators.includes(:user).map(&:user).compact, false)
             end
 
             # Contributor permissions
@@ -306,7 +309,7 @@ module Seek
 
             # Role permissions (Role)
             if asset_housekeeper_can_manage?
-              asset_housekeepers = self.projects.map(&:asset_housekeepers).flatten
+              asset_housekeepers = self.projects.map(&:asset_housekeepers).flatten.map(&:user).compact
               if asset_housekeepers.any?
                 update_lookup([true, true, true, true, true], asset_housekeepers)
               end
