@@ -45,7 +45,8 @@ class SamplesController < ApplicationController
   def update
     @sample = Sample.find(params[:id])
     update_sample_with_params
-    respond_with(@sample,notice:'The sample was successfully updated.')
+    flash[:notice] = 'The sample was successfully updated.' if @sample.save
+    respond_with(@sample)
   end
 
   def destroy
