@@ -1,7 +1,5 @@
 class SampleTypesController < ApplicationController
-  # GET /sample_types
-  # GET /sample_types.json
-
+  respond_to :html
   include Seek::UploadHandling::DataUpload
   include Seek::IndexPager
 
@@ -16,10 +14,7 @@ class SampleTypesController < ApplicationController
   # GET /sample_types/1
   # GET /sample_types/1.json
   def show
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @sample_type }
-    end
+    respond_with(@sample_type)
   end
 
   # GET /sample_types/new
@@ -30,35 +25,27 @@ class SampleTypesController < ApplicationController
     @sample_type = SampleType.new
     @sample_type.sample_attributes.build(is_title: true, required: true) # Initial attribute
 
-    respond_to do |format|
-      format.html # new.html.erb
-      format.json { render json: @sample_type }
-    end
+    respond_with(@sample_type)
   end
 
   def create_from_template
-    @sample_type = SampleType.new(params[:sample_type])
-    @sample_type.uploaded_template = true
+    build_sample_type_from_template
+
     @tab = 'from-template'
-    handle_upload_data
-    attributes = build_attributes_hash_for_content_blob(content_blob_params.first, nil)
-    @sample_type.create_content_blob(attributes)
-    @sample_type.build_attributes_from_template
 
     respond_to do |format|
       if @sample_type.errors.empty? && @sample_type.save
         format.html { redirect_to edit_sample_type_path(@sample_type), notice: 'Sample type was successfully created.' }
-        format.json { render json: @sample_type, status: :created, location: @sample_type }
       else
         @sample_type.content_blob.destroy if @sample_type.content_blob
         format.html { render action: 'new' }
-        format.json { render json: @sample_type.errors, status: :unprocessable_entity }
       end
     end
   end
 
   # GET /sample_types/1/edit
   def edit
+    respond_with(@sample_type)
   end
 
   # POST /sample_types
@@ -76,10 +63,8 @@ class SampleTypesController < ApplicationController
       if @sample_type.save
         @sample_type.update_attribute(:tags, tags)
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
-        format.json { render json: @sample_type, status: :created, location: @sample_type }
       else
         format.html { render action: 'new' }
-        format.json { render json: @sample_type.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -87,33 +72,38 @@ class SampleTypesController < ApplicationController
   # PUT /sample_types/1
   # PUT /sample_types/1.json
   def update
-    respond_to do |format|
-      if @sample_type.update_attributes(params[:sample_type])
-        format.html { redirect_to @sample_type, notice: 'Sample type was successfully updated.' }
-        format.json { head :no_content }
-      else
-        format.html { render action: 'edit' }
-        format.json { render json: @sample_type.errors, status: :unprocessable_entity }
-      end
-    end
+    @sample_type.update_attributes(params[:sample_type])
+    flash[:notice] = 'Sample type was successfully updated.' if @sample_type.save
+    respond_with(@sample_type)
   end
 
   # DELETE /sample_types/1
   # DELETE /sample_types/1.json
   def destroy
-    @sample_type.destroy
-
-    respond_to do |format|
-      format.html { redirect_to sample_types_url }
-      format.json { head :no_content }
+    if @sample_type.can_delete? && @sample_type.destroy
+      flash[:notice] = 'The sample type was successfully deleted.'
+    else
+      flash[:notice] = 'It was not possible to delete the sample type.'
     end
+
+    respond_with(@sample_type, location: sample_types_path)
   end
 
   def template_details
-    render :partial=>'template'
+    render partial: 'template'
   end
 
   private
+
+  def build_sample_type_from_template
+    @sample_type = SampleType.new(params[:sample_type])
+    @sample_type.uploaded_template = true
+
+    handle_upload_data
+    attributes = build_attributes_hash_for_content_blob(content_blob_params.first, nil)
+    @sample_type.create_content_blob(attributes)
+    @sample_type.build_attributes_from_template
+  end
 
   def find_sample_type
     @sample_type = SampleType.find(params[:id])

@@ -40,4 +40,8 @@ module SampleTypesHelper
     grouped_options = [["Sample types from your #{t('project').pluralize}", person_sample_types.collect { |type| [type.title, type.id] }]]
     grouped_options << ["Sample types form other #{t('project').pluralize}", other_sample_types.collect { |type| [type.title, type.id] }]
   end
+
+  def sample_type_tags_list(sample_type)
+    list_item_tags_list(sample_type.annotations_with_attribute('sample_type_tags').collect(&:value),type:'sample_type_tags')
+  end
 end

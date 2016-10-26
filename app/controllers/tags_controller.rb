@@ -4,7 +4,11 @@ class TagsController < ApplicationController
   
   def show
 
-    acceptable_attributes = ["expertise","tool","tag"]
+    if params[:type]
+      acceptable_attributes = [params[:type]]
+    else
+      acceptable_attributes = ["expertise","tool","tag", "sample_type_tags"]
+    end
 
     @tagged_objects = select_authorised @tag.annotations.with_attribute_name(acceptable_attributes).collect{|a| a.annotatable}.uniq
 
