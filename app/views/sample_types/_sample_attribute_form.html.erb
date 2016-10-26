@@ -60,7 +60,7 @@
     <div class='sample-type-block' style="<%= 'display:none;' unless is_controlled_vocab %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[linked_sample_type_id]",
-                     options_for_select(SampleType.all.map { |t| [t.title, t.id] },
+                     grouped_options_for_select(sample_type_grouped_options,
                                         linked_sample_type_id),
                      :include_blank => true,
                      :class => 'form-control linked-sample-type-selection' %>
