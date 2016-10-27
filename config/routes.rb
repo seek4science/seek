@@ -680,6 +680,7 @@ SEEK::Application.routes.draw do
     collection do
       post :create_from_template
       get :select
+      get :filter_for_select
     end
     member do
       get :template_details

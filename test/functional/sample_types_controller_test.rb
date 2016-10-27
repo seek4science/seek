@@ -273,6 +273,18 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   end
 
+  test 'select' do
+    get :select
+    assert_response :success
+  end
+
+  test 'select without login' do
+    logout
+    get :select
+    assert_redirected_to sample_types_path
+    refute_nil flash[:error]
+  end
+
   private
 
   def template_for_upload

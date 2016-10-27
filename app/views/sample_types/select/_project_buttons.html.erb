@@ -1,0 +1,9 @@
+
+<div data-toggle="buttons">
+  <% projects.each do |project| %>
+      <label class="btn btn-default">
+        <%= project.title %>
+        <%= check_box_tag "projects[]", project.id,false,class:'filter-option' %>
+      </label>
+  <% end %>
+</div>

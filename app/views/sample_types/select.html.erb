@@ -1,0 +1,57 @@
+<%
+  tags = Annotation.with_attribute_name("sample_type_tags").collect(&:value).uniq.collect(&:text)
+  projects = Project.all.select{|p| p.sample_types.any? }
+  your_projects = projects & current_user.person.projects
+  other_projects = projects - your_projects
+%>
+
+<div id="sample-type-filter-options">
+
+  <% if your_projects.any? %>
+    <h2>Your projects</h2>
+    <%= render partial: 'sample_types/select/project_buttons',locals:{projects:your_projects} %>
+  <% end %>
+
+  <% if other_projects.any? %>
+      <h2>Other projects</h2>
+      <%= render partial: 'sample_types/select/project_buttons',locals:{projects:other_projects,start_index:your_projects.count} %>
+  <% end %>
+
+  <% if tags.any? %>
+      <h2>Tags</h2>
+      <%= render partial: 'sample_types/select/tag_buttons',locals:{tags:tags} %>
+  <% end %>
+
+</div>
+
+<div id="selected-sample-types">
+
+</div>
+
+<script>
+  var SampleTypeFilters={
+    optionChanged:function() {
+      $j.ajax('<%= filter_for_select_sample_types_path %>', {
+            data: SampleTypeFilters.queryData(),
+            success: function (html) {
+              $j('#selected-sample-types').html(html);
+            },
+            beforeSend: function () {
+              $j('#selected-sample-types').html('<%= image('spinner') %>');
+            }
+
+          }
+      );
+    },
+
+    queryData:function() {
+      return $j('input.filter-option').serialize();
+    }
+  }
+
+  $j(document).ready(function () {
+
+    $j('#sample-type-filter-options').on('change', '.filter-option', SampleTypeFilters.optionChanged);
+
+  });
+</script>

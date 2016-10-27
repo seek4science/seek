@@ -1,0 +1,7 @@
+
+<div class="list_items_container">
+  <% @sample_types.each do |sample_type| %>
+      <%= render :partial => "assets/resource_list_item", :object => sample_type %>
+      <%= link_to "Use this",new_sample_path(:sample_type_id=>sample_type.id) %>
+  <% end %>
+</div>
