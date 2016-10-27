@@ -262,10 +262,13 @@ module Seek
         self.class.isolation_level(:repeatable_read) do #ensure it allows it see another worker may have inserted a record already
           self.class.transaction do
             #check to see if an insert of update is needed, action used is arbitary
-            insert = self.class.lookup_for_asset('view', 0, self.id).nil?
+            insert = self.class.lookup_for_asset('view', User.select(:id).last.id, self.id).nil?
 
             # Blank-out permissions first
             if insert
+              sql = %(DELETE FROM #{self.class.lookup_table_name} WHERE asset_id=#{self.id})
+              ActiveRecord::Base.connection.execute(sql)
+
               ([0] + User.pluck(:id)).each do |user_id|
                 sql = %(INSERT INTO #{self.class.lookup_table_name}
                           (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
