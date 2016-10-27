@@ -13,11 +13,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select '#samples-table table', count: 0
   end
 
-  test 'new' do
+  test 'new without sample type id' do
     login_as(Factory(:person))
     get :new
-    assert_response :success
-    assert assigns(:sample)
+    assert_redirected_to select_sample_types_path
   end
 
   test 'show' do

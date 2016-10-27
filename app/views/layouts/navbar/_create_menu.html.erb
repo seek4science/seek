@@ -47,7 +47,7 @@
 
         <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
         <% if Sample.can_create? %>
-            <li><%= link_to("Sample", new_sample_path) %></li>
+            <li><%= link_to("Sample", select_sample_types_path) %></li>
         <% end %>
         <% if SampleType.can_create? %>
             <li><%= link_to("Sample Type", new_sample_type_path) %></li>
