@@ -107,6 +107,7 @@ class SampleTypesController < ApplicationController
         (sample_type.annotations_as_text_array & params[:tags]).any?
       end
     end
+    @sample_types.uniq!
     render partial: 'sample_types/select/filtered_sample_types'
   end
 
