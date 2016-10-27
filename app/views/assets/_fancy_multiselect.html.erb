@@ -17,7 +17,7 @@
                   :help_text => "Here you can associate the #{object_type_text} with specific #{association.to_s.singularize.humanize.pluralize}.") do %>
     <div class="row">
       <div class="col-md-<%= preview_disabled ? '12' : '8'-%>">
-        <p style="color: #666666;">
+        <p class="help-block">
           <%= intro %>
         </p>
         <div id="<%= collection_id %>_display_area" class="box_editing_inner" style="line-height: 1.5;">
