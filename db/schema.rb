@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20161011101739) do
+ActiveRecord::Schema.define(:version => 20161027093957) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1218,13 +1218,6 @@ ActiveRecord::Schema.define(:version => 20161011101739) do
 
   add_index "publication_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_pub_user_id_asset_id_can_view"
   add_index "publication_auth_lookup", ["user_id", "can_view"], :name => "index_publication_auth_lookup_on_user_id_and_can_view"
-
-  create_table "publication_author_orders", :force => true do |t|
-    t.integer "order"
-    t.integer "author_id"
-    t.string  "author_type"
-    t.integer "publication_id"
-  end
 
   create_table "publication_authors", :force => true do |t|
     t.string   "first_name"

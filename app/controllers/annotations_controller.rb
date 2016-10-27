@@ -34,12 +34,4 @@ class AnnotationsController < ApplicationController
       end
     end
 
-    private
-
-    #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
-    def select_authorised collection
-      collection.select {|el| el.can_view?}
-    end
-
 end
-
