@@ -2,7 +2,7 @@
 
 <%= render :partial => "general/item_title", :locals => {:item => @sample_type,:buttons_partial => 'buttons'} %>
 
-<%= item_description @sample_type.description -%>
+<%= item_description h(@sample_type.description) -%>
 
 <h2>Template</h2>
 <%= render :partial=>"template" %>
@@ -10,13 +10,14 @@
 <h2>Attributes</h2>
 
 <ul>
-<% @sample_type.sample_attributes.each do |attribute| %>
-<li>
-  <%= sample_attribute_details(attribute) %>
-</li>
-
-
-<% end %>
+<%=
+  @sample_type.sample_attributes.collect do |attribute|
+    content_tag(:li){sample_attribute_details(attribute)}
+  end.join.html_safe
+%>
 </ul>
+
+<h2>Tags</h2>
+<%= sample_type_tags_list(@sample_type) %>
 
 <%= render :partial=>"general/items_related_to",:object => @sample_type %>

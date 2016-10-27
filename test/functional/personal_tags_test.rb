@@ -39,13 +39,13 @@ class PersonalTagsTest < ActionController::TestCase
 
     assert_select "div" do
       assert_select "p#expertise" do
-        assert_select "a[href=?]",show_ann_path(fishing_exp.value),:text=>"fishing",:count=>1
-        assert_select "a[href=?]",show_ann_path(bowling.value),:text=>"bowling",:count=>1
+        assert_select "a[href=?]",show_ann_path(fishing_exp.value,type:'expertise'),:text=>"fishing",:count=>1
+        assert_select "a[href=?]",show_ann_path(bowling.value,type:'expertise'),:text=>"bowling",:count=>1
         assert_select "a",:text=>"spade",:count=>0
       end
       assert_select "p#tools" do
-        assert_select "a[href=?]",show_ann_path(spade.value),:text=>"spade",:count=>1
-        assert_select "a[href=?]",show_ann_path(fishing_tool.value),:text=>"fishing",:count=>1
+        assert_select "a[href=?]",show_ann_path(spade.value,type:'tools'),:text=>"spade",:count=>1
+        assert_select "a[href=?]",show_ann_path(fishing_tool.value,type:'tools'),:text=>"fishing",:count=>1
         assert_select "a",:text=>"bowling",:count=>0
       end
 

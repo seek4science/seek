@@ -78,6 +78,7 @@ class SampleType < ActiveRecord::Base
     annotations_with_attribute('sample_type_tags').collect(&:value_content)
   end
 
+
   def can_download?
     true
   end
