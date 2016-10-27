@@ -7,7 +7,7 @@ class SampleTypesController < ApplicationController
   before_filter :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details]
   before_filter :check_no_created_samples, only: [:destroy]
   before_filter :find_assets, only: [:index]
-  before_filter :project_membership_required,:only=>[:create,:new, :select,:filter_for_select]
+  before_filter :project_membership_required, only: [:create, :new, :select, :filter_for_select]
 
   # these checks are mostly coverered by the #check_no_created_samples filter, but will give an additional check based on can_xxx? methods
   before_filter :find_and_authorize_requested_item, except: [:index, :new, :create]
@@ -94,20 +94,20 @@ class SampleTypesController < ApplicationController
     render partial: 'template'
   end
 
-  #current just for selecting a sample type for creating a sample, but easily has potential as a general browser
+  # current just for selecting a sample type for creating a sample, but easily has potential as a general browser
   def select
     respond_with(@sample_types)
   end
 
-  #used for ajax call to get the filtered sample types for selection
+  # used for ajax call to get the filtered sample types for selection
   def filter_for_select
-    @sample_types=SampleType.joins(:projects).where('projects.id'=>params[:projects])
+    @sample_types = SampleType.joins(:projects).where('projects.id' => params[:projects])
     unless params[:tags].blank?
       @sample_types.select! do |sample_type|
         (sample_type.annotations_as_text_array & params[:tags]).any?
       end
     end
-    render partial:'sample_types/select/filtered_sample_types'
+    render partial: 'sample_types/select/filtered_sample_types'
   end
 
   private
