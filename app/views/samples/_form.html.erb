@@ -1,4 +1,4 @@
-<% current_user_authorized_to_manage = @sample.new_record?|| @sample.can_manage? -%>
+
 
 <div class="asset_form">
   <%= render partial: 'sample_error_messages', locals: { object: @sample } %>
@@ -16,9 +16,9 @@
     <%= render :partial=>"sample_attributes_form",:locals=>{sample:@sample} %>
   </div>
 
-  <div id="sample_extra_details" style="display:none">
+  <div id="sample_extra_details">
     <%= render :partial => "projects/project_selector", :locals => { :resource => @sample,:allow_nil=> false} -%>
-    <% if current_user_authorized_to_manage -%>
+    <% if @sample.can_manage? -%>
         <%= render :partial => "assets/asset_form_bottom", :locals=>{:f=>f,attribution_enable:false,show_publications:false,sharing_link:false} %>
     <% end %>
   </div>
