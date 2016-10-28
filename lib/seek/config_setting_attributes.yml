@@ -166,5 +166,3 @@ news_number_of_entries:
   convert: :to_i
 front_page_buttons_enabled:
 samples_enabled:
-sample_age:
-sample_parser_enabled:
