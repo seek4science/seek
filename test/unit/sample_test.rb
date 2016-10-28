@@ -15,6 +15,16 @@ class SampleTest < ActiveSupport::TestCase
     refute sample.valid?
   end
 
+  test 'can_manage new record' do
+    sample=Sample.new(title:'can manage test')
+    assert sample.new_record?
+    assert sample.can_manage?
+
+    User.with_current_user(Factory(:user)) do
+      assert sample.can_manage?
+    end
+  end
+
   test 'test uuid generated' do
     sample = Factory.build(:sample, data: { the_title: 'fish' })
     assert_nil sample.attributes['uuid']

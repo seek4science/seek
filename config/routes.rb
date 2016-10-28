@@ -1,22 +1,5 @@
 SEEK::Application.routes.draw do
 
-  resources :sample_types do
-    collection do
-      post :create_from_template
-    end
-    member do
-      get :template_details
-    end
-    resources :samples
-    resources :content_blobs do
-      member do
-        get :download
-      end
-    end
-  end
-
-  resources :sample_controlled_vocabs
-
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
@@ -690,6 +673,29 @@ SEEK::Application.routes.draw do
       get :isa_children
     end
   end
+
+  ### SAMPLE TYPES ###
+
+  resources :sample_types do
+    collection do
+      post :create_from_template
+      get :select
+      get :filter_for_select
+    end
+    member do
+      get :template_details
+    end
+    resources :samples
+    resources :content_blobs do
+      member do
+        get :download
+      end
+    end
+  end
+
+  ### SAMPLE CONTROLLED VOCABS ###
+
+  resources :sample_controlled_vocabs
 
   ### ASSAY AND TECHNOLOGY TYPES ###
 

@@ -273,6 +273,62 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   end
 
+  test 'select' do
+    get :select
+    assert_response :success
+  end
+
+  test 'select without login' do
+    logout
+    get :select
+    assert_redirected_to sample_types_path
+    refute_nil flash[:error]
+  end
+
+  test 'filter for select' do
+    st1=Factory(:patient_sample_type)
+    st2=Factory(:patient_sample_type)
+    st3=Factory(:simple_sample_type)
+    st3.tags='fred,mary'
+    st1.tags='monkey'
+    st3.save!
+    st1.save!
+
+    get :filter_for_select,projects:[st1.projects.collect(&:id)],tags:['monkey']
+    assert_response :success
+    assert assigns(:sample_types)
+    assert_includes assigns(:sample_types),st1
+    refute_includes assigns(:sample_types),st2
+    refute_includes assigns(:sample_types),st3
+
+
+    get :filter_for_select,projects:[st2.projects.collect(&:id)]
+    assert_response :success
+    assert assigns(:sample_types)
+    assert_includes assigns(:sample_types),st2
+    refute_includes assigns(:sample_types),st1
+    refute_includes assigns(:sample_types),st3
+
+    get :filter_for_select
+    assert_response :success
+    assert assigns(:sample_types)
+    assert_empty assigns(:sample_types)
+
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id),tags:['fred','mary']]
+    assert_response :success
+    assert assigns(:sample_types)
+    assert_includes assigns(:sample_types),st1
+    assert_includes assigns(:sample_types),st3
+    refute_includes assigns(:sample_types),st2
+
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id),tags:['fred','mary','sparrow']]
+    assert_response :success
+    assert assigns(:sample_types)
+    assert_includes assigns(:sample_types),st1
+    assert_includes assigns(:sample_types),st3
+    refute_includes assigns(:sample_types),st2
+  end
+
   private
 
   def template_for_upload

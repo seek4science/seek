@@ -1,12 +1,5 @@
 #The terms should be capitalized at the first character.
 en:
-  #Biosamples renaming
-  biosamples:
-    sample_parent_term: "Cell culture"
-    specimen_culture_starting_date: "Culture starting date"
-    sample_age: "Age at sampling"
-    specimen_creators: "Creators"
-
   search_label: ""
   search_prompt: "Search here..."
 

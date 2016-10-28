@@ -125,11 +125,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert !Seek::Config.forum_enabled
   end
 
-  test 'sample_parser_enabled' do
-    # NOTE: this is the value in seek_testing.rb, the actual default is 'false'
-    assert Seek::Config.sample_parser_enabled
-  end
-
   test 'smtp_settings port' do
     assert_equal '25', Seek::Config.smtp_settings('port')
   end

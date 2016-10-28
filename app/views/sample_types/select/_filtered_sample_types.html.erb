@@ -1,0 +1,19 @@
+
+
+  <% @sample_types.each do |sample_type| %>
+      <div class="row">
+        <div class="col-sm-10">
+          <div class="list_items_container">
+            <%= render :partial => "assets/resource_list_item", :object => sample_type %>
+          </div>
+        </div>
+        <% if Sample.can_create? %>
+          <div class="col-sm-2">
+            <%= link_to "New sample", new_sample_path(:sample_type_id => sample_type.id), class: "btn btn-primary" %>
+          </div>
+        <% end %>
+      </div>
+  <% end %>
+
+
+

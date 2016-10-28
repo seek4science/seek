@@ -29,9 +29,6 @@
 
         <li role="presentation" class="dropdown-header"><%= t("menu.assets") -%></li>
         <li><%= link_to t("data_file"), new_data_file_path %></li>
-        <% if Seek::Config.sample_parser_enabled %>
-            <li><%= link_to "#{t('data_file')} with sample", new_data_file_url(:page_title=>"#{t('data_file')} with Sample Parsing", :is_with_sample=>true) %></li>
-        <% end %>
         <% if Seek::Config.models_enabled %>
             <li><%= link_to t("model"), new_model_path %></li>
         <% end %>
@@ -47,7 +44,7 @@
 
         <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
         <% if Sample.can_create? %>
-            <li><%= link_to("Sample", new_sample_path) %></li>
+            <li><%= link_to("Sample", select_sample_types_path) %></li>
         <% end %>
         <% if SampleType.can_create? %>
             <li><%= link_to("Sample Type", new_sample_type_path) %></li>

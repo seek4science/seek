@@ -201,12 +201,7 @@ module ApplicationHelper
 
   #selection of assets for new asset gadget
   def new_creatable_selection_list
-    creatable_options = Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, url_for({:controller => c.name.underscore.pluralize, :action => 'new'})] }
-    if Seek::Config.sample_parser_enabled
-      creatable_options << ["#{t('data_file')} with sample",
-                            new_data_file_url(:page_title=>"#{t('data_file')} with Sample Parsing", :is_with_sample=>true)]
-    end
-    creatable_options
+    Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, url_for({:controller => c.name.underscore.pluralize, :action => 'new'})] }
   end
 
   def is_nil_or_empty? thing
@@ -480,9 +475,7 @@ module ApplicationHelper
 
   def resource_tab_item_name resource_type,pluralize=true
     resource_type = resource_type.singularize
-    if resource_type == "Speciman"
-      result = t('biosamples.sample_parent_term')
-    elsif resource_type == "Assay"
+    if resource_type == "Assay"
       result = t('assays.assay')
     else
       translated_resource_type = translate_resource_type(resource_type)
@@ -493,9 +486,7 @@ module ApplicationHelper
 
   def internationalized_resource_name resource_type,pluralize=true
     resource_type = resource_type.singularize
-    if resource_type == "Speciman"
-      result = I18n.t('biosamples.sample_parent_term')
-    elsif resource_type == "Assay"
+    if resource_type == "Assay"
       result = I18n.t('assays.assay')
     elsif resource_type == "TavernaPlayer::Run"
       result = "Run"
@@ -542,7 +533,7 @@ module ApplicationHelper
     {Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
      Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
      Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
-     Strain=>"You cannot delete this Strain. It might be published or it has #{I18n.t('biosamples.sample_parent_term').pluralize}/Samples associated with it or you are not authorized.",
+     Strain=>"You cannot delete this Strain. Samples associated with it or you are not authorized.",
      Project=>"You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
      Institution=>"You cannot delete this Institution. It may have people associated with it.",
      SampleType=>"You cannot delete this Sample Type, is may have Samples associated with it",
@@ -626,7 +617,7 @@ module ApplicationHelper
   PAGE_TITLES={"home"=>"Home", "projects"=>I18n.t('project').pluralize,"institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search",
                "assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>I18n.t('sop').pluralize,"models"=>I18n.t('model').pluralize,"data_files"=>I18n.t('data_file').pluralize,
                "publications"=>"Publications","investigations"=>I18n.t('investigation').pluralize,"studies"=>I18n.t('study').pluralize,
-               "specimens"=>I18n.t('biosamples.sample_parent_term').pluralize,"samples"=>"Samples","strains"=>"Strains","organisms"=>"Organisms","biosamples"=>"Biosamples",
+               "samples"=>"Samples","strains"=>"Strains","organisms"=>"Organisms","biosamples"=>"Biosamples",
                "presentations"=>I18n.t('presentation').pluralize,"programmes"=>I18n.t('programme').pluralize,"events"=>I18n.t('event').pluralize,"help_documents"=>"Help"}
 end
 
