@@ -1,8 +1,81 @@
 require 'test_helper'
 
 class PublicationTest < ActiveSupport::TestCase
-  
+
   fixtures :all
+
+  test "create publication from hash" do
+    publication_hash = {
+      :title   => "SEEK publication",
+      :journal => "The testing journal",
+      :published_date => Date.new(2011,12,24),
+      :pubmed_id => nil,
+      :doi => nil
+    }
+    publication = Publication.new(publication_hash)
+    assert_equal publication_hash[:title]         , publication.title
+    assert_equal publication_hash[:journal]       , publication.journal
+    assert_equal publication_hash[:published_date], publication.published_date
+    assert_nil publication.pubmed_id
+    assert_nil publication.doi
+  end
+
+  test "create publication from metadata doi" do
+    publication_hash = {
+      :title   => "SEEK publication",
+      :journal => "The testing journal",
+      :pub_date => Date.new(2011,12,24),
+      :pubmed_id => nil,
+      :doi => nil
+    }
+    doi_record = DoiRecord.new(publication_hash)
+    publication = Publication.new
+    publication.extract_doi_metadata(doi_record)
+    assert_equal publication_hash[:title]   , publication.title
+    assert_equal publication_hash[:journal] , publication.journal
+    assert_equal publication_hash[:pub_date], publication.published_date
+    assert_nil publication.pubmed_id
+    assert_nil publication.doi
+  end
+
+  test "create publication from metadata pubmed" do
+    publication_hash = {
+      'title'   => "SEEK publication\\r", # test required? chomp
+      'journal' => "The testing journal",
+      'pubmed' => nil,
+      'doi' => nil
+    }
+    bio_reference = Bio::Reference.new(publication_hash)
+    publication = Publication.new
+    publication.extract_pubmed_metadata(bio_reference)
+    assert_equal publication_hash[:title.to_s]   , publication.title
+    assert_equal publication_hash[:journal.to_s] , publication.journal
+    assert_nil publication.pubmed_id
+    assert_nil publication.doi
+  end
+
+  test "create publication from metadata bibtex" do
+    require 'bibtex'
+    bibtex = BibTeX.parse <<-END
+    @article{PMID:26018949,
+      author       = {Putnam, D. K. and Weiner, B. E. and Woetzel, N. and Lowe, E. W. Jr and Meiler, J.},
+      title        = {BCL::SAXS},
+      journal      = {Proteins},
+      year         = {2015},
+      volume       = {83},
+      number       = {8},
+      pages        = {1500--1512},
+      url          = {http://www.ncbi.nlm.nih.gov/pubmed/26018949},
+    }
+    END
+
+    publication = Publication.new
+    publication.extract_bibtex_metadata(bibtex['@article'][0])
+    assert_equal "BCL::SAXS"       , publication.title
+    assert_equal "Proteins"        , publication.journal
+    assert_equal Date.new(2015,1,1), publication.published_date
+    assert_equal 5                 , publication.publication_authors.length
+  end
 
   test "event association" do
     publication = Factory :publication

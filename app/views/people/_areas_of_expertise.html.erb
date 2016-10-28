@@ -4,19 +4,14 @@
 <p id="expertise">
   <strong>Expertise:</strong>
 
-  <%  if expertise_list.blank? -%>
-      <span class='none_text'>Not known</span>
-  <% else %>
-      <%= list_item_tags_list expertise_list,:type=>:expertise %>
-  <% end %>
+
+  <%= list_item_tags_list expertise_list,type: :expertise %>
+
 </p>
 
 <p id="tools">
   <strong>Tools:</strong>
 
-  <%  if tools_list.blank? -%>
-      <span class='none_text'>Not known</span>
-  <% else %>
-      <%= list_item_tags_list tools_list,:type=>:tools %>
-  <% end %>
+  <%= list_item_tags_list tools_list,type: :tools %>
+
 </p>

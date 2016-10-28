@@ -3,43 +3,53 @@ require 'delayed/command'
 # module for handling interaction with delayed job workers
 module Seek
   module Workers
-    def self.start(number = 0, restart = false)
-      number = Seek::Config.workflows_enabled ? number : 0
+    def self.start(number_of_taverna_workers = 0, action = 'start')
+      @identifier = 0
+      number_of_taverna_workers = 0 unless Seek::Config.workflows_enabled
 
-      action = restart ? 'restart' : 'start'
+      commands = create_commands(number_of_taverna_workers, action)
 
-      commands =
-          ["--queue=#{Delayed::Worker.default_queue_name} -i #{number} #{action}"]
-      if Seek::Config.auth_lookup_enabled
-        commands << "--queue=#{AuthLookupUpdateJob.new.queue_name} -i #{number + 1} #{action}"
-      end
-      if Seek::Config.cache_remote_files
-        commands << "--queue=#{RemoteContentFetchingJob.queue_name} -i #{number + 2} #{action}"
-      end
-      commands << "--queue=#{SampleDataExtractionJob.queue_name} -i #{number + 3} #{action}"
-      if number > 0
-        commands << "--queue=#{TavernaPlayer.job_queue_name} -n #{number} #{action}"
-      end
+      daemonize_commands(commands)
+    end
 
-      commands.map { |c| Delayed::Command.new(c.split).daemonize }
+    def self.daemonize_commands(commands)
+      commands.map { |command| Delayed::Command.new(command.split).daemonize }
+    end
+
+    def self.create_commands(number_of_taverna_workers, action)
+      commands = []
+      queues = [Delayed::Worker.default_queue_name]
+      queues << QueueNames::AUTH_LOOKUP if Seek::Config.auth_lookup_enabled
+      queues << QueueNames::REMOTE_CONTENT if Seek::Config.cache_remote_files
+      queues << QueueNames::SAMPLES if Seek::Config.samples_enabled
+      queues << TavernaPlayer.job_queue_name if number_of_taverna_workers > 0
+      queues.each do |queue_name|
+        number = (queue_name == TavernaPlayer.job_queue_name) ? number_of_taverna_workers : 1
+        commands << command(queue_name, number, action)
+      end
+      commands
     end
 
     def self.stop
-      Delayed::Command.new(['stop']).daemonize
+      daemonize_commands(['stop'])
     end
 
     def self.status
-      Delayed::Command.new(['status']).daemonize
+      daemonize_commands(['status'])
     end
 
     def self.restart(number = 0)
-      start(number, true)
+      start(number, 'restart')
     end
 
-    def self.start_data_file_auth_lookup_worker(number=1, data_file_count=1)
-      action = "start"
-      commands = ["--queue=#{DataFileAuthLookupJob.new(data_file_count).queue_name} -n #{number} #{action}"]
-      commands.map { |c| Delayed::Command.new(c.split).daemonize }
+    def self.start_data_file_auth_lookup_worker(number = 1)
+      @identifier = 0
+      commands = [command(QueueNames::AUTH_LOOKUP, number, 'start')]
+      daemonize_commands(commands)
+    end
+
+    def self.command(queue_name, number_of_workers, action)
+      "--queue=#{queue_name} -i #{@identifier += 1} -n #{number_of_workers} #{action}"
     end
   end
 end

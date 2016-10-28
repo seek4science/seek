@@ -95,9 +95,9 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     assert_equal 2*count, SendPeriodicEmailsJob.new('monthly').activity_logs_since(1.month.ago).count
 
     Factory(:activity_log, :action => 'create', :activity_loggable => activity_loggable, :culprit => culprit, :created_at => 2.days.ago)
-    assert_equal 2*count, SendPeriodicEmailsJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
-    assert_equal (2*count + 1), SendPeriodicEmailsJob.new('weekly').activity_logs_since(7.days.ago).count
-    assert_equal (2*count + 1), SendPeriodicEmailsJob.new('monthly').activity_logs_since(1.month.ago).count
+    assert_equal 2*count    , SendPeriodicEmailsJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
+    assert_equal 2*count + 1, SendPeriodicEmailsJob.new('weekly').activity_logs_since(7.days.ago).count
+    assert_equal 2*count + 1, SendPeriodicEmailsJob.new('monthly').activity_logs_since(1.month.ago).count
   end
 
   test "create job" do

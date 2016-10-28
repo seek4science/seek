@@ -119,7 +119,7 @@ module AssetsHelper
   # assets are sorted by title except if they are projects and scales (because of hierarchies)
   def authorised_assets(asset_class, projects = nil, action = 'view')
     assets = asset_class.all_authorized_for action, User.current_user, projects
-    assets = assets.sort_by &:title if !assets.blank? && !%w(Project Scale).include?(assets.first.class.name)
+    assets = assets.sort_by(&:title) if !assets.blank? && !%w(Project Scale).include?(assets.first.class.name)
     assets
   end
 

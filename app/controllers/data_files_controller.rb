@@ -58,6 +58,25 @@ class DataFilesController < ApplicationController
       format.html
     end
   end
+
+  def destroy
+    if @data_file.extracted_samples.any? && !params[:destroy_extracted_samples]
+      redirect_to destroy_samples_confirm_data_file_path(@data_file)
+    else
+      if params[:destroy_extracted_samples]=='1'
+        @data_file.extracted_samples.destroy_all
+      end
+      super
+    end
+  end
+
+  def destroy_samples_confirm
+    if @data_file.can_delete?
+      respond_to do |format|
+        format.html
+      end
+    end
+  end
     
   def new_version
     if handle_upload_data
@@ -270,9 +289,9 @@ class DataFilesController < ApplicationController
     #FIXME: should use the correct version
     @matching_model_items = @data_file.matching_models
     #filter authorization
-    ids = @matching_model_items.collect &:primary_key
+    ids = @matching_model_items.collect(&:primary_key)
     models = Model.find_all_by_id(ids)
-    authorised_ids = Model.authorize_asset_collection(models,"view").collect &:id
+    authorised_ids = Model.authorize_asset_collection(models,"view").collect(&:id)
     @matching_model_items = @matching_model_items.select{|mdf| authorised_ids.include?(mdf.primary_key.to_i)}
 
     flash.now[:notice]="#{@matching_model_items.count} #{t('model').pluralize}  were found that may be relevant to this #{t('data_file')} "

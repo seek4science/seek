@@ -22,6 +22,11 @@ class SampleDataExtractionJob
     end
   end
 
+  #either pending or running
+  def self.in_progress?(data_file)
+    [:pending,:running].include?(get_status(data_file))
+  end
+
   def initialize(data_file, sample_type, persist = false)
     @data_file_id = data_file.id
     @data_file = data_file
@@ -44,12 +49,12 @@ class SampleDataExtractionJob
     Delayed::Job.enqueue(self, priority: priority, queue: queue_name, run_at: time)
   end
 
-  def self.queue_name
-    'sample_extraction'
+  def default_priority
+    1
   end
 
   def queue_name
-    self.class.queue_name
+    QueueNames::SAMPLES
   end
 
 end

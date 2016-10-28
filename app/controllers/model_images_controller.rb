@@ -68,7 +68,7 @@ class ModelImagesController < ApplicationController
 
   def filter_size size
     max_size=1500
-    matches = size.match /([0-9]+)x([0-9]+).*/
+    matches = size.match(/([0-9]+)x([0-9]+).*/)
     if matches
       width = matches[1].to_i
       height = matches[2].to_i
@@ -76,7 +76,7 @@ class ModelImagesController < ApplicationController
       height = max_size if height>max_size
       return "#{width}x#{height}"
     else
-      matches = size.match /([0-9]+)/
+      matches = size.match(/([0-9]+)/)
       if matches
         width=matches[1].to_i
         width = max_size if width>max_size

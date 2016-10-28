@@ -105,6 +105,10 @@ class Person < ActiveRecord::Base
     !project.nil? && self.projects == [project]
   end
 
+  def projects_with_default_license
+    projects.select(&:default_license)
+  end
+
   #those that have updated time stamps and avatars appear first. A future enhancement could be to judge activity by last asset updated timestamp
   def self.active
     Person.unscoped.order("avatar_id is null, updated_at DESC")
@@ -188,8 +192,8 @@ class Person < ActiveRecord::Base
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
       user_items = []
-      user_items =  user.try(:send,type) if user.respond_to?(type)
-      user_items =  user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
+      user_items = user.try(:send,type) if user.respond_to?(type)
+      user_items = user_items | self.send("created_#{type}".to_sym) if self.respond_to? "created_#{type}".to_sym
       user_items = user_items | self.send("#{type}_for_person".to_sym) if self.respond_to? "#{type}_for_person".to_sym
       user_items.uniq
     end

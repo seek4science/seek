@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20160912130902) do
+ActiveRecord::Schema.define(:version => 20161027093957) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1147,6 +1147,7 @@ ActiveRecord::Schema.define(:version => 20160912130902) do
     t.integer  "programme_id"
     t.integer  "ancestor_id"
     t.integer  "parent_id"
+    t.string   "default_license"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
@@ -1156,6 +1157,14 @@ ActiveRecord::Schema.define(:version => 20160912130902) do
 
   add_index "projects_publications", ["project_id"], :name => "index_projects_publications_on_project_id"
   add_index "projects_publications", ["publication_id", "project_id"], :name => "index_projects_publications_on_publication_id_and_project_id"
+
+  create_table "projects_sample_types", :id => false, :force => true do |t|
+    t.integer "project_id"
+    t.integer "sample_type_id"
+  end
+
+  add_index "projects_sample_types", ["project_id"], :name => "index_projects_sample_types_on_project_id"
+  add_index "projects_sample_types", ["sample_type_id", "project_id"], :name => "index_projects_sample_types_on_sample_type_id_and_project_id"
 
   create_table "projects_samples", :id => false, :force => true do |t|
     t.integer "project_id"
@@ -1209,13 +1218,6 @@ ActiveRecord::Schema.define(:version => 20160912130902) do
 
   add_index "publication_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_pub_user_id_asset_id_can_view"
   add_index "publication_auth_lookup", ["user_id", "can_view"], :name => "index_publication_auth_lookup_on_user_id_and_can_view"
-
-  create_table "publication_author_orders", :force => true do |t|
-    t.integer "order"
-    t.integer "author_id"
-    t.string  "author_type"
-    t.integer "publication_id"
-  end
 
   create_table "publication_authors", :force => true do |t|
     t.string   "first_name"

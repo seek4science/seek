@@ -35,7 +35,7 @@
   </thead>
   <% stats.sort_by {|s| -s[:unique_users] }.each do |wf_stats| %>
       <tr>
-        <td style="text-align: left"><%= link_to wf_stats[:workflow].title, wf_stats[:workflow] -%></td>
+        <td class="text-left"><%= link_to wf_stats[:workflow].title, wf_stats[:workflow] -%></td>
         <td><%= wf_stats[:public] -%></td>
         <td><%= wf_stats[:runs_count] -%></td>
         <td><%= wf_stats[:sweep_count] -%></td>

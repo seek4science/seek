@@ -1,6 +1,5 @@
 #encoding: utf-8
 class PublicationsController < ApplicationController
-  
   include Seek::IndexPager
   include Seek::AssetsCommon
   include Seek::BioExtension
@@ -15,7 +14,23 @@ class PublicationsController < ApplicationController
   include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
-    
+  
+  def index
+    if request.format.xml? || request.format.html?
+      super
+    else
+      respond_to do |format|
+        format.any( *Publication::EXPORT_TYPES.keys ) {
+          send_data(
+            @publications.collect { |publication| publication.export(request.format.to_sym) }.join("\n\n"),
+            :type => request.format.to_sym,
+            :filename => "publications.#{request.format.to_sym}"
+          )
+        }
+      end
+    end
+  end
+
   # GET /publications/1
   # GET /publications/1.xml
   def show
@@ -45,9 +60,16 @@ class PublicationsController < ApplicationController
   # POST /publications
   # POST /publications.xml
   def create
-    publication_params = params[:publication].dup
-
     @subaction = params[:subaction] || 'Register'
+
+    case @subaction
+    when "Import"
+      return import_publication
+    when "ImportMultiple"
+      return import_publication_multiple
+    end
+
+    publication_params = params[:publication].dup
 
     # publication authors need to be added separately
     publication_params.delete(:publication_authors)
@@ -55,82 +77,16 @@ class PublicationsController < ApplicationController
     @publication = Publication.new(publication_params)
     @publication.pubmed_id=nil if @publication.pubmed_id.blank?
     @publication.doi=nil if @publication.doi.blank?
-    pubmed_id,doi = preprocess_doi_or_pubmed @publication.pubmed_id,@publication.doi
+    pubmed_id,doi = preprocess_pubmed_or_doi @publication.pubmed_id,@publication.doi
     @publication.doi = doi
     @publication.pubmed_id = pubmed_id
 
-    if @subaction == 'Register'
-      result = get_data(@publication, @publication.pubmed_id, @publication.doi)
-      assay_ids = params[:assay_ids] || []
-
-      if @publication.save
-        update_scales @publication
-        result.authors.each_with_index do |author, index|
-          pa = PublicationAuthor.new()
-          pa.publication = @publication
-          pa.first_name = author.first_name
-          pa.last_name = author.last_name
-          pa.author_index = index
-          pa.save
-        end
-
-        create_or_update_associations assay_ids, "Assay", "edit"
-        if !@publication.parent_name.blank?
-          render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@publication, :parent_name=>@publication.parent_name}
-        else
-          respond_to do |format|
-            flash[:notice] = 'Publication was successfully created.'
-            format.html { redirect_to(edit_publication_url(@publication)) }
-            format.xml  { render :xml => @publication, :status => :created, :location => @publication }
-          end
-        end
-      else # Publication save not successful
-        respond_to do |format|
-          format.html { render :action => "new" }
-          format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
-        end
-      end
-    end # Register publication from doi or pubmedid
-
-    if @subaction == 'Create'
-      assay_ids = params[:assay_ids] || []
-      # create publication authors
-      plain_authors = params[:publication][:publication_authors]
-      # plain_authors.split(',').each_with_index do |author, index| # text_field
-      plain_authors.each_with_index do |author, index| # multiselect
-        if author.empty?
-          next
-        end
-        first_name, last_name = PublicationAuthor.split_full_name author
-        pa = PublicationAuthor.new({
-          :publication  => @publication,
-          :first_name   => first_name,
-          :last_name    => last_name,
-          :author_index => index
-        })
-        @publication.publication_authors << pa
-      end
-
-      if @publication.save
-        update_scales @publication
-
-        create_or_update_associations assay_ids, "Assay", "edit"
-        if !@publication.parent_name.blank?
-          render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@publication, :parent_name=>@publication.parent_name}
-        else
-          respond_to do |format|
-            flash[:notice] = 'Publication was successfully created.'
-            format.html { redirect_to(edit_publication_url(@publication)) }
-            format.xml  { render :xml => @publication, :status => :created, :location => @publication }
-          end
-        end
-      else # Publication save not successful
-        respond_to do |format|
-          format.html { render :action => "new" }
-          format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
-        end
-      end
-    end # Create publication from all fields
+    case @subaction
+    when "Register" # Register publication from doi or pubmedid
+      register_publication
+    when "Create" # Create publication from all fields
+      create_publication
+    end 
   end
 
   # PUT /publications/1
@@ -214,7 +170,7 @@ class PublicationsController < ApplicationController
     elsif protocol == "doi"
       doi = key
     end
-    pubmed_id,doi = preprocess_doi_or_pubmed pubmed_id,doi
+    pubmed_id,doi = preprocess_pubmed_or_doi pubmed_id,doi
     result = get_data(@publication, pubmed_id, doi)
     if !@error.nil?
       if protocol == "pubmed"
@@ -264,7 +220,7 @@ class PublicationsController < ApplicationController
 
       authors_db = PublicationAuthor.where(params)
                                     .select([:person_id, :first_name, :last_name])
-                                    .group( :person_id, :first_name, :last_name)
+                                    .group( :person_id, :first_name, :last_name, :author_index)
                                     .count
                                     .collect {
         |groups, count| {
@@ -310,7 +266,7 @@ class PublicationsController < ApplicationController
     authors = PublicationAuthor.where("first_name LIKE :fnquery", :fnquery => "#{first_name}%")
                                .where("last_name LIKE :lnquery", :lnquery => "#{last_name}%")
                                .select([:person_id, :first_name, :last_name])
-                               .group( :person_id, :first_name, :last_name)
+                               .group( :person_id, :first_name, :last_name, :author_index)
                                .count
                                .collect { 
       |groups, count| {
@@ -439,10 +395,180 @@ class PublicationsController < ApplicationController
     publication.extract_metadata(result) unless @error
     result
   end
-        
+
   private
 
-  def preprocess_doi_or_pubmed pubmed_id,doi
+  # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
+  def register_publication
+    result = get_data(@publication, @publication.pubmed_id, @publication.doi)
+    assay_ids = params[:assay_ids] || []
+
+    if @publication.save
+      update_scales @publication
+      result.authors.each_with_index do |author, index|
+        pa = PublicationAuthor.new()
+        pa.publication = @publication
+        pa.first_name = author.first_name
+        pa.last_name = author.last_name
+        pa.author_index = index
+        pa.save
+      end
+
+      create_or_update_associations assay_ids, "Assay", "edit"
+      if !@publication.parent_name.blank?
+        render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@publication, :parent_name=>@publication.parent_name}
+      else
+        respond_to do |format|
+          flash[:notice] = 'Publication was successfully created.'
+          format.html { redirect_to(edit_publication_url(@publication)) }
+          format.xml  { render :xml => @publication, :status => :created, :location => @publication }
+        end
+      end
+    else # Publication save not successful
+      respond_to do |format|
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # create a publication from a form that contains all the data
+  def create_publication
+    assay_ids = params[:assay_ids] || []
+    # create publication authors
+    plain_authors = params[:publication][:publication_authors]
+    plain_authors.each_with_index do |author, index| # multiselect
+      if author.empty?
+        next
+      end
+      first_name, last_name = PublicationAuthor.split_full_name author
+      pa = PublicationAuthor.new({
+        :publication  => @publication,
+        :first_name   => first_name,
+        :last_name    => last_name,
+        :author_index => index
+      })
+      @publication.publication_authors << pa
+    end
+
+    if @publication.save
+      update_scales @publication
+
+      create_or_update_associations assay_ids, "Assay", "edit"
+      if !@publication.parent_name.blank?
+        render :partial=>"assets/back_to_fancy_parent", :locals=>{:child=>@publication, :parent_name=>@publication.parent_name}
+      else
+        respond_to do |format|
+          flash[:notice] = 'Publication was successfully created.'
+          format.html { redirect_to(edit_publication_url(@publication)) }
+          format.xml  { render :xml => @publication, :status => :created, :location => @publication }
+        end
+      end
+    else # Publication save not successful
+      respond_to do |format|
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+
+  # create a publication from a reference file, at the moment supports only bibtex
+  def import_publication
+    @publication = Publication.new(params[:publication].slice(:project_ids))
+
+    require 'bibtex'
+    if !params.has_key?(:publication) || !params[:publication].has_key?(:bibtex_file)
+      @publication.errors[:bibtex_file] = "Upload a file!"
+    else
+      bibtex_file = params[:publication][:bibtex_file]
+      bibtex = BibTeX.parse( bibtex_file.read)
+      if bibtex['@article'].length < 1
+        @publication.errors[:bibtex_file] = "The bibtex file should contain at least one @article"
+      else
+        # warning if there are more than one article
+        if bibtex['@article'].length > 1
+          flash[:error] = "The bibtex file did contain more than one @article: #{bibtex['@article'].length}; only the first one is parsed"
+        end
+        article = bibtex['@article'][0]
+        @publication.extract_bibtex_metadata(article)
+        # the new form will be rendered with the information from the imported bibtex article
+        @subaction = "Create"
+      end
+    end
+
+    if @publication.errors.any?
+      respond_to do |format|
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
+      end
+    else
+      respond_to do |format|
+        format.html { render :action => "new" }
+      end
+    end
+  end
+
+  # create a publication from a reference file, at the moment supports only bibtex
+  def import_publication_multiple
+    publication_params = params[:publication].slice(:project_ids)
+    @publication = Publication.new(publication_params)
+
+    require 'bibtex'
+    if !params.has_key?(:publication) || !params[:publication].has_key?(:bibtex_file)
+      @publication.errors[:bibtex_file] = "Upload a file!"
+    else
+      bibtex_file = params[:publication][:bibtex_file]
+      bibtex = BibTeX.parse( bibtex_file.read)
+      if bibtex['@article'].length < 1
+        @publication.errors[:bibtex_file] = "The bibtex file should contain at least one @article"
+      else
+        articles = bibtex['@article']
+        publications = []
+        publications_with_errors = []
+
+        # create publications from articles
+        articles.each do |article|
+          current_publication = Publication.new(publication_params)
+          current_publication.extract_bibtex_metadata(article)
+          if current_publication.save
+            publications << current_publication
+          else
+            publications_with_errors << current_publication
+          end
+        end
+
+        if publications.any?
+          flash[:notice] = "Successfully imported #{publications.length} publications"
+        else
+          @publication.errors[:bibtex_file] = "No article could be imported successfully"
+        end
+
+        if publications_with_errors.any?
+          flash[:error] = "There are #{publications_with_errors.length} publications that could not be saved"
+          publications_with_errors.each do |publication|
+            flash[:error] += "<br>" + publication.errors.full_messages.join("<br>")
+          end
+          flash[:error] = flash[:error].html_safe
+        end
+
+      end
+    end
+
+    if @publication.errors.any?
+      @subaction = 'Import'
+      respond_to do |format|
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @publication.errors, :status => :unprocessable_entity }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to(:action => :index) }
+        format.xml  { render :xml => publications, :status => :created, :location => @publication }
+      end
+    end
+  end
+
+  def preprocess_pubmed_or_doi pubmed_id,doi
     doi = doi.sub(%r{doi\.*:}i,"").strip unless doi.nil?
     doi.strip! unless doi.nil?
     pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Fixnum)

@@ -220,9 +220,9 @@ class ModelsController < ApplicationController
     @matching_data_items = @model.matching_data_files
 
     #filter authorization
-    ids = @matching_data_items.collect &:primary_key
+    ids = @matching_data_items.collect(&:primary_key)
     data_files = DataFile.find_all_by_id(ids)
-    authorised_ids = DataFile.authorize_asset_collection(data_files, "view").collect &:id
+    authorised_ids = DataFile.authorize_asset_collection(data_files, "view").collect(&:id)
     @matching_data_items = @matching_data_items.select { |mdf| authorised_ids.include?(mdf.primary_key.to_i) }
 
     flash.now[:notice]="#{@matching_data_items.count} #{t('data_file').pluralize} found that may be relevant to this #{t('model')}"

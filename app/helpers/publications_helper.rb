@@ -28,19 +28,4 @@ module PublicationsHelper
     authorised_assets(Publication,projects)
   end
 
-  def author_display_list publication
-    if publication.publication_author_orders.empty?
-       "<span class='none_text'>Not specified</span>".html_safe
-    else
-      author_list = []
-      publication.publication_author_orders.sort_by(&:order).collect(&:author).each do |author|
-        if author.kind_of?(Person) && author.can_view?
-          author_list << link_to(get_object_title(author), show_resource_path(author))
-        else
-          author_list << h(author.first_name) + " " + h(author.last_name)
-        end
-      end
-      author_list.join(', ').html_safe
-    end
-  end
 end

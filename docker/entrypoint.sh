@@ -47,5 +47,7 @@ bundle exec puma -C config/puma.rb -d
 echo "STARTING WORKERS"
 bundle exec rake seek:workers:start &
 
+tail -f log/production.log &
+
 echo "STARTING NGINX"
 nginx -g 'daemon off;'

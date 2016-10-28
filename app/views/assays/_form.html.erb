@@ -25,28 +25,14 @@
     </div>
 <% end -%>
 
-<% if @assay.study.blank? or @assay.study.can_view? %>
-    <div class="form-group">
-      <label><%= t('study') -%></label><span class="required">*</span>
-      <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %>
 
-      <% investigations = Investigation.all.select &:can_view? -%>
-      <% options = @assay.study.nil? ? "<option value=\"\">Not specified</option>"  : "" %>
-      <% investigations.each do |i| %>
-          <% studies = i.studies.select(&:can_edit?) %>
-          <% unless studies.empty?%>
-              <% options << "<optgroup label=\"#{truncate(h(i.title), :length => 64)}\">\n" %>
-              <% studies.each do |s| %>
-                  <% options << "<option #{"selected=\"selected\"" if @assay.study && (s.id == @assay.study.id)} value=\"#{s.id}\" title=\"#{h(s.title)}\">#{truncate(h(s.title), :length => 256)}</option>\n" %>
-              <% end %>
-              <% options << "</optgroup>" %>
-          <% end %>
-      <% end %>
-      <select id="assay_study_id" name="assay[study_id]" onMouseOut="hideTitle()" class="form-control">
-        <%= options.html_safe %>
-      </select>
-    </div>
-<% end %>
+<div class="form-group">
+  <label><%= t('study') -%></label><span class="required">*</span>
+  <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %>
+
+  <%= assay_study_selection(@assay.study,f) %>
+</div>
+
 
 <%= f.hidden_field :assay_class_id -%>
 
@@ -101,7 +87,9 @@
                                                              :existing_creators => existing_creators,
                                                              :other_creators => @assay.other_creators} -%>
 
-    <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>
+    <% if Seek::Config.samples_enabled %>
+      <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>
+    <% end %>
 
 
     <%= render :partial=>"assays/associate_sop",:locals=>{:f=>f, :resource => @assay} %>

@@ -1,5 +1,6 @@
 class SampleType < ActiveRecord::Base
-  attr_accessible :title, :uuid, :sample_attributes_attributes, :description, :uploaded_template
+  attr_accessible :title, :uuid, :sample_attributes_attributes,
+                  :description, :uploaded_template, :project_ids, :tags
 
   searchable(auto_index: false) do
     text :attribute_search_terms
@@ -8,8 +9,14 @@ class SampleType < ActiveRecord::Base
   include Seek::ActsAsAsset::Searching
   include Seek::Search::BackgroundReindexing
 
+  include Seek::ProjectAssociation
+
   # everything concerned with sample type templates
   include Seek::Templates::SampleTypeTemplateConcerns
+
+  include Seek::Taggable
+
+  acts_as_annotatable name_field: :title
 
   acts_as_uniquely_identifiable
 
@@ -28,13 +35,28 @@ class SampleType < ActiveRecord::Base
   grouped_pagination
 
   def self.can_create?
-    User.logged_in_and_member?
+    User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") unless attribute
     attribute.validate_value?(value)
+  end
+
+  # refreshes existing samples following a change to the sample type. For example when changing the title field
+  def refresh_samples
+    Sample.record_timestamps = false
+    # prevent a job being created when the sample is saved
+    Sample.skip_callback :save, :after, :queue_sample_type_update_job
+    begin
+      disable_authorization_checks do
+        samples.each(&:save)
+      end
+    ensure
+      Sample.record_timestamps = true
+      Sample.set_callback :save, :after, :queue_sample_type_update_job
+    end
   end
 
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
@@ -48,6 +70,15 @@ class SampleType < ActiveRecord::Base
     end
   end
 
+  def tags=(tags)
+    tag_annotations(tags, 'sample_type_tags')
+  end
+
+  def tags
+    annotations_with_attribute('sample_type_tags').collect(&:value_content)
+  end
+
+
   def can_download?
     true
   end
@@ -56,12 +87,16 @@ class SampleType < ActiveRecord::Base
     true
   end
 
-  def can_edit?(_user = User.current_user)
-    samples.empty?
+  def can_edit?(user = User.current_user)
+    user && user.person && ((projects & user.person.projects).any?)
   end
 
   def can_delete?(_user = User.current_user)
     samples.empty? && linked_sample_attributes.empty?
+  end
+
+  def editing_constraints
+    Seek::Samples::SampleTypeEditingConstraints.new(self)
   end
 
   private
@@ -77,7 +112,7 @@ class SampleType < ActiveRecord::Base
     # to the sample type
     titles = sample_attributes.collect(&:title).collect(&:downcase)
     dups = titles.select { |title| titles.count(title) > 1 }.uniq
-    unless dups.empty?
+    if dups.any?
       errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups.join(', ')}")
     end
   end

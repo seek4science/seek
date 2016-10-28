@@ -4,6 +4,9 @@ SEEK::Application.routes.draw do
     collection do
       post :create_from_template
     end
+    member do
+      get :template_details
+    end
     resources :samples
     resources :content_blobs do
       member do
@@ -388,6 +391,7 @@ SEEK::Application.routes.draw do
       post :extract_samples
       delete :cancel_extraction
       get :isa_children
+      get :destroy_samples_confirm
     end
     resources :studied_factors do
       collection do
@@ -726,6 +730,7 @@ SEEK::Application.routes.draw do
 
   match '/logout' => 'sessions#destroy', :as => :logout
   match '/login' => 'sessions#new', :as => :login
+  match '/auth/:provider/callback' => 'sessions#create'
   match '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
   match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
   match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings

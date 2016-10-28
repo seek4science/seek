@@ -19,7 +19,7 @@ module RelatedItemsHelper
   def update_resource_items_for_authorization(resource_item)
     total_count = resource_item[:items].size
     total = resource_item[:items]
-    resource_item[:items] = resource_item[:items].select &:can_view?
+    resource_item[:items] = resource_item[:items].select(&:can_view?)
     resource_item[:hidden_items] = total - resource_item[:items]
     resource_item[:hidden_count] = total_count - resource_item[:items].size
   end

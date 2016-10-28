@@ -81,6 +81,16 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     refute cv.can_edit?
   end
 
+  test 'can create' do
+    refute SampleControlledVocab.can_create?
+    User.with_current_user Factory(:person).user do
+      assert SampleControlledVocab.can_create?
+      with_config_value :samples_enabled,false do
+        refute SampleControlledVocab.can_create?
+      end
+    end
+  end
+
   test 'trigger regeneration of sample type templates when saved' do
     type = Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test')
     cv = type.sample_attributes.first.sample_controlled_vocab

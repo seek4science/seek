@@ -28,6 +28,9 @@ class Sample < ActiveRecord::Base
   before_validation :update_json_metadata
   before_validation :set_title_to_title_attribute_value
 
+  after_save :queue_sample_type_update_job
+  after_destroy :queue_sample_type_update_job
+
   def sample_type=(type)
     super
     @data = Seek::Samples::SampleData.new(type)
@@ -40,7 +43,7 @@ class Sample < ActiveRecord::Base
   end
 
   def self.can_create?
-    User.logged_in_and_member?
+    User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
   def self.user_creatable?
@@ -136,5 +139,9 @@ class Sample < ActiveRecord::Base
     else
       super
     end
+  end
+
+  def queue_sample_type_update_job
+    SampleTypeUpdateJob.new(sample_type, false).queue_job
   end
 end

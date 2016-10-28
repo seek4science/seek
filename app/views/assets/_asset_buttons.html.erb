@@ -8,11 +8,17 @@
     <% if asset.extracted_samples.any? %>
         <%= button_link_to("View samples", 'view_samples', data_file_samples_path(asset)) %>
     <% end %>
+
     <% if (asset.can_manage? && display_asset.version == asset.version && asset.sample_template? && asset.extracted_samples.empty?) %>
-        <%= button_link_to("Extract samples", 'extract_samples',
-                           extract_samples_data_file_path(@data_file), method: :post) %>
+        <%# the job isn't in progress or waiting for confirmation of results %>
+        <% unless SampleDataExtractionJob.in_progress?(asset) || Seek::Samples::Extractor.new(asset).fetch %>
+            <%= button_link_to("Extract samples", 'extract_samples',
+                               extract_samples_data_file_path(@data_file), method: :post) %>
+        <% end %>
     <% end %>
+
 <% end %>
+
 
 <% if asset.is_downloadable? -%>
     <%# param code is used for temporary link -%>

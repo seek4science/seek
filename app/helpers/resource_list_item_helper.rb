@@ -145,12 +145,9 @@ module ResourceListItemHelper
   end
 
   def list_item_description text, auto_link=true, length=500
-    unless text.blank?
-      html = "<div class='list_item_desc'>"
-      html << text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
-      html << "</div>"
-      html.html_safe
-    end
+    content_tag :div,class:'list_item_desc' do
+      text_or_not_specified(text, :description => true, :auto_link=>auto_link, :length=>length)
+    end.html_safe
   end
 
   def small_list_item_description text, auto_link=true, length=150

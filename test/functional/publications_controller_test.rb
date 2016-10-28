@@ -98,6 +98,97 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_redirected_to edit_publication_path(assigns(:publication))
   end
 
+  test "should create publication from details" do
+    publication = {
+      :doi => "10.1371/journal.pone.0004803",
+      :title => "Clickstream Data Yields High-Resolution Maps of Science",
+      :abstract => "Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.",
+      :publication_authors => ["Johan Bollen", "Herbert Van de Sompel", "Aric Hagberg", "Luis Bettencourt", "Ryan Chute", "Marko A. Rodriguez", "Lyudmila Balakireva"],
+      :journal => "Public Library of Science (PLoS)",
+      :published_date => Date.new(2011,3),
+      :project_ids=>[projects(:sysmo_project).id]
+    }
+
+    assert_difference('Publication.count') do
+      post :create, :subaction => "Create", :publication => publication
+    end
+
+    assert_redirected_to edit_publication_path(assigns(:publication))
+    p=assigns(:publication)
+
+    assert_nil p.pubmed_id
+    assert_equal publication[:doi], p.doi
+    assert_equal publication[:title], p.title
+    assert_equal publication[:abstract], p.abstract
+    assert_equal publication[:journal], p.journal
+    assert_equal publication[:published_date], p.published_date
+    assert_equal publication[:publication_authors], p.publication_authors.collect { |author| author.full_name }
+    assert_equal publication[:project_ids], p.projects.collect { |project| project.id }
+  end
+
+  test "should import from bibtex file" do
+    publication = {
+      :title        => "Taverna: a tool for building and running workflows of services.",
+      :journal      => "Nucleic Acids Res",
+      :authors      => [
+        PublicationAuthor.new({ :first_name => "D."   , :last_name => "Hull"        , :author_index => 0}),
+        PublicationAuthor.new({ :first_name => "K."   , :last_name => "Wolstencroft", :author_index => 1}),
+        PublicationAuthor.new({ :first_name => "R."   , :last_name => "Stevens"     , :author_index => 2}),
+        PublicationAuthor.new({ :first_name => "C."   , :last_name => "Goble"       , :author_index => 3}),
+        PublicationAuthor.new({ :first_name => "M. R.", :last_name => "Pocock"      , :author_index => 4}),
+        PublicationAuthor.new({ :first_name => "P."   , :last_name => "Li"          , :author_index => 5}),
+        PublicationAuthor.new({ :first_name => "T."   , :last_name => "Oinn"        , :author_index => 6})
+      ],
+      :published_date => Date.new(2006)
+    }
+    post :create, :subaction => "Import", :publication => { :bibtex_file => fixture_file_upload('files/publication.bibtex') }
+    p = assigns(:publication)
+    assert_equal publication[:title], p.title
+    assert_equal publication[:journal], p.journal
+    assert_equal publication[:authors].collect(&:full_name), p.publication_authors.collect(&:full_name)
+    assert_equal publication[:published_date], p.published_date
+  end
+  
+  test "should import multiple from bibtex file" do
+    publications = [{
+      :title        => "Taverna: a tool for building and running workflows of services.",
+      :journal      => "Nucleic Acids Res",
+      :authors      => [
+        PublicationAuthor.new({ :first_name => "D."   , :last_name => "Hull"        , :author_index => 0}),
+        PublicationAuthor.new({ :first_name => "K."   , :last_name => "Wolstencroft", :author_index => 1}),
+        PublicationAuthor.new({ :first_name => "R."   , :last_name => "Stevens"     , :author_index => 2}),
+        PublicationAuthor.new({ :first_name => "C."   , :last_name => "Goble"       , :author_index => 3}),
+        PublicationAuthor.new({ :first_name => "M. R.", :last_name => "Pocock"      , :author_index => 4}),
+        PublicationAuthor.new({ :first_name => "P."   , :last_name => "Li"          , :author_index => 5}),
+        PublicationAuthor.new({ :first_name => "T."   , :last_name => "Oinn"        , :author_index => 6})
+      ],
+      :published_date => Date.new(2006)
+    },
+    {
+      :authors        => [
+        PublicationAuthor.new({ :first_name => "J."   , :last_name => "Shmoe"     , :author_index => 0}),
+        PublicationAuthor.new({ :first_name => "M."   , :last_name => "Mustermann", :author_index => 1}),
+      ],
+      :title          => "Yet another tool for importing publications",
+      :journal        => "The second best journal",
+      :published_date =>  Date.new(2016)
+    }]
+    assert_difference('Publication.count',2) do
+      post :create, :subaction => "ImportMultiple", :publication => { :bibtex_file => fixture_file_upload('files/publications.bibtex'), :project_ids => [projects(:one).id] }
+      publication0 = Publication.find_by_title(publications[0][:title])
+      assert_not_nil publication0
+      assert_equal publications[0][:journal], publication0.journal
+      assert_equal publications[0][:authors].collect(&:full_name), publication0.publication_authors.collect(&:full_name)
+      assert_equal publications[0][:published_date], publication0.published_date
+      
+      publication1 = Publication.find_by_title(publications[1][:title])
+      assert_not_nil publication1
+      assert_equal publications[1][:journal], publication1.journal
+      assert_equal publications[1][:authors].collect(&:full_name), publication1.publication_authors.collect(&:full_name)
+      assert_equal publications[1][:published_date], publication1.published_date
+    end
+  end
+
   test "should only show the year for 1st Jan" do
     publication = Factory(:publication,:published_date=>Date.new(2013,1,1))
     get :show,:id=>publication

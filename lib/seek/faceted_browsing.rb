@@ -59,7 +59,7 @@ module Seek
         if clazz.respond_to?(:authorize_asset_collection)
           items = clazz.authorize_asset_collection(items,"view")
         else
-          items = items.select &:can_view?
+          items = items.select(&:can_view?)
         end
       end
 

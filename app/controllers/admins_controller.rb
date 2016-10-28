@@ -44,6 +44,7 @@ class AdminsController < ApplicationController
     #Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
+    Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
 
     Seek::Config.set_smtp_settings 'address', params[:address]
@@ -54,6 +55,10 @@ class AdminsController < ApplicationController
     Seek::Config.set_smtp_settings 'enable_starttls_auto', params[:enable_starttls_auto] == '1'
 
     Seek::Config.support_email_address= params[:support_email_address]
+
+    Seek::Config.omniauth_enabled       = string_to_boolean params[:omniauth_enabled]
+    Seek::Config.omniauth_user_create   = string_to_boolean params[:omniauth_user_create]
+    Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
 
     Seek::Config.solr_enabled= string_to_boolean params[:solr_enabled]
     Seek::Config.jws_enabled= string_to_boolean params[:jws_enabled]
@@ -173,7 +178,7 @@ class AdminsController < ApplicationController
     Seek::Config.set_default_page 'presentations', params[:presentations]
     Seek::Config.set_default_page 'events', params[:events]
     Seek::Config.limit_latest = params[:limit_latest] if only_positive_integer params[:limit_latest], 'latest limit'
-    update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'), 'pagination'
+    update_redirect_to only_positive_integer(params[:limit_latest], 'latest limit'), 'pagination'
   end
 
   def update_others
@@ -267,7 +272,7 @@ class AdminsController < ApplicationController
         attribute_name = a.attribute.name
         a.destroy unless replacement_tags.include?(@tag)
         replacement_tags.each do |tag|
-          if annotatable.annotations_with_attribute_and_by_source(attribute_name, source).select { |a| a.value == tag }.blank?
+          if annotatable.annotations_with_attribute_and_by_source(attribute_name, source).select { |an| an.value == tag }.blank?
             new_annotation = Annotation.new attribute_name: attribute_name, value: tag, annotatable: annotatable, source: source
             new_annotation.save!
           end
@@ -533,7 +538,7 @@ class AdminsController < ApplicationController
       cl.run
       return nil
     rescue Cocaine::CommandNotFoundError => e
-      return 'The command the restart the background tasks could not be found!'
+      return 'The command to restart the background tasks could not be found!'
     rescue => e
       error =  e.message
       return error

@@ -15,6 +15,27 @@ class SessionsControllerTest < ActionController::TestCase
     @controller = SessionsController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
+
+    Seek::Config.omniauth_providers = {
+      :ldap => {
+        :title => "organization-ldap",
+        :host => 'localhost',
+        :port => 389,
+        :method => :plain,
+        :base => 'DC=example,DC=com',
+        :uid => 'samaccountname',
+        :password => '',
+        :bind_dn => ''
+      }
+    }
+
+    # add an omniauth user
+    auth_hash = {
+      :provider => 'ldap',
+      :uid => "new_ldap_user",
+      :info => { 'nickname' => "new_ldap_user", 'first_name' => "new", 'last_name' => "ldap_user", 'email' => 'new_ldap_user@example.com' }
+    }
+    OmniAuth.config.add_mock(:ldap, auth_hash)
   end
 
   test "sessions#index redirects to session#new" do
@@ -108,7 +129,7 @@ class SessionsControllerTest < ActionController::TestCase
     post :create, :login => user.login, :password => user.password
     assert !session[:user_id]
     assert_redirected_to login_path
-    assert_not_nil flash[:error]    
+    assert_not_nil flash[:error]
     assert flash[:error].include?("You still need to activate your account.")
   end
 
@@ -122,34 +143,110 @@ class SessionsControllerTest < ActionController::TestCase
   end
 
   test 'should redirect to root after logging out from the search result page' do
-      login_as :quentin
-      @request.env['HTTP_REFERER']= "http://test.host/search/"
-      get :destroy
-      assert_redirected_to :root
+    login_as :quentin
+    @request.env['HTTP_REFERER']= "http://test.host/search/"
+    get :destroy
+    assert_redirected_to :root
   end
 
   test 'should redirect to back after logging out from the page excepting search result page' do
-      login_as :quentin
-      @request.env['HTTP_REFERER']= "http://test.host/data_files/"
-      get :destroy
-      assert_redirected_to :back
+    login_as :quentin
+    @request.env['HTTP_REFERER']= "http://test.host/data_files/"
+    get :destroy
+    assert_redirected_to :back
   end
 
   test 'should redirect to root after logging in from the search result page' do
-      @request.env['HTTP_REFERER']= "http://test.host/search"
-      post :create, :login => 'quentin', :password => 'test'
-      assert_redirected_to :root
+    @request.env['HTTP_REFERER']= "http://test.host/search"
+    post :create, :login => 'quentin', :password => 'test'
+    assert_redirected_to :root
   end
 
   test 'should redirect to back after logging in from the page excepting search result page' do
-      @request.env['HTTP_REFERER']= "http://test.host/data_files/"
-      post :create, :login => 'quentin', :password => 'test'
-      assert_redirected_to :back
+    @request.env['HTTP_REFERER']= "http://test.host/data_files/"
+    post :create, :login => 'quentin', :password => 'test'
+    assert_redirected_to :back
+  end
+
+  test 'should have only seek login' do
+    assert !Seek::Config.omniauth_enabled
+    get :new
+    assert_response :success
+    assert_select 'title', :text => /The.*SEEK Login/, :count => 1
+    assert_select '#login-panel form', 1
+  end
+
+  test 'should have ldap login' do
+    #change the setting
+    Seek::Config.omniauth_enabled   = true
+    Seek::Config.omniauth_providers = {
+      :ldap => {
+        :title => "organization-ldap",
+        :host => 'localhost',
+        :port => 389,
+        :method => :plain,
+        :base => 'DC=example,DC=com',
+        :uid => 'samaccountname',
+        :password => '',
+        :bind_dn => ''
+      }
+    }
+
+    get :new
+    assert_response :success
+    assert_select '#login-panel form', 2
+    assert_select '#ldap_login input[name="username"]', 1
+    assert_select '#ldap_login input[name="password"]', 1
+  end
+
+  test 'should not create omni authenticated user' do
+    #change the setting
+    Seek::Config.omniauth_enabled     = true
+    Seek::Config.omniauth_user_create = false
+    @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
+
+    post :create
+    assert_redirected_to login_path
+    assert_match( /the authenticated user: .+ cannot be found/, flash[:error])
+    assert_nil User.find_by_login("new_ldap_user")
+  end
+
+  test 'should create omni authenticated user' do
+    #change the setting
+    Seek::Config.omniauth_enabled       = true
+    Seek::Config.omniauth_user_create   = true
+    Seek::Config.omniauth_user_activate = false
+    @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
+
+    post :create
+    assert_redirected_to login_path
+    assert_match( /You still need to activate your account. A validation email should have been sent to you./, flash[:error])
+    new_user = User.find_by_login("new_ldap_user")
+    assert_not_nil new_user
+    assert !new_user.active?
+    assert_equal OmniAuth.config.mock_auth[:ldap][:info]['email'], new_user.person.email
+    assert_equal 1, Person.where({:first_name => "new", :last_name => "ldap_user"}).count
+  end
+
+  test 'should create and activate omni authenticated user' do
+    #change the setting
+    Seek::Config.omniauth_enabled       = true
+    Seek::Config.omniauth_user_create   = true
+    Seek::Config.omniauth_user_activate = true
+    @request.env['omniauth.auth'] = OmniAuth.config.mock_auth[:ldap]
+
+    post :create
+    assert_redirected_to root_path
+    assert_match( /You have successfully logged in, New Ldap_user./, flash[:notice])
+    new_user = User.find_by_login("new_ldap_user")
+    assert_not_nil new_user
+    assert new_user.active?
+    assert !Person.where({:first_name => "new", :last_name => "ldap_user"}).empty?
   end
 
   protected
 
-    def cookie_for(user)
-      users(user).remember_token
-    end
+  def cookie_for(user)
+    users(user).remember_token
+  end
 end

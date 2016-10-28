@@ -4,7 +4,7 @@
 		<li><%= image_tag_for_key('avatar', new_model_image_link(image_for_instance), nil, {:onclick => "store_and_submit_unsaved_data(this, 'edit_model_#{image_for_instance.id}'); return(false);"}, 'Upload New Image') -%></li>
 	</ul>
 		
-	<p class="box_standout" style="text-align: center; padding: 0.3em 0.5em; margin: 1.5em 0 1em 0;">
+	<p class="box_standout text-center" style="padding: 0.3em 0.5em; margin: 1.5em 0 1em 0;">
 		Choose your default display image using a radio button below a image and clicking 'Update' at the bottom of the page.
 	</p>
 	
@@ -12,7 +12,7 @@
     <ul>
 	    
 	    <% image_for_instance.model_images.each do |image| -%>
-	      <li style="text-align: center;">
+	      <li class="text-center">
 	      	<%= image_tag model_image_url(image_for_instance, image.id, 60), :alt => h(image_for_instance.title), :onclick => "$('model_model_image_id_#{image.id}').checked = true;" -%>
 					<br/>
 					<%= form_instance.radio_button :model_image_id, image.id -%>
