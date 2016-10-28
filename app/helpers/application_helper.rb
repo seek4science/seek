@@ -201,12 +201,7 @@ module ApplicationHelper
 
   #selection of assets for new asset gadget
   def new_creatable_selection_list
-    creatable_options = Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, url_for({:controller => c.name.underscore.pluralize, :action => 'new'})] }
-    if Seek::Config.sample_parser_enabled
-      creatable_options << ["#{t('data_file')} with sample",
-                            new_data_file_url(:page_title=>"#{t('data_file')} with Sample Parsing", :is_with_sample=>true)]
-    end
-    creatable_options
+    Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, url_for({:controller => c.name.underscore.pluralize, :action => 'new'})] }
   end
 
   def is_nil_or_empty? thing
