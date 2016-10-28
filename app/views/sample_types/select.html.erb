@@ -30,6 +30,10 @@
   <% if tags.any? %>
       <h2>Tags</h2>
       <p class='help-block'>If selected, you can filter by a given tag. Once selected any sample types that match those tags will be diplayed.</p>
+      <label>
+        <%= check_box_tag :exclusive_tags,'1',false,class:'filter-option' %>
+        Match all tags?
+      </label>
       <%= render partial: 'sample_types/select/tag_buttons',locals:{tags:tags} %>
   <% end %>
 
