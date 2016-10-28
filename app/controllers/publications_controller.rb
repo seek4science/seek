@@ -558,10 +558,10 @@ class PublicationsController < ApplicationController
   def find_person_for_author author, projects
     matches = []
     #Get author by last name
-    last_name_matches = Person.find_all_by_last_name(author.last_name)
+    last_name_matches = Person.where( last_name: author.last_name)
     matches = last_name_matches
     #If no results, try searching by normalised name, taken from grouped_pagination.rb
-    if matches.size < 1
+    if matches.empty?
       text = author.last_name
       #handle the characters that can't be handled through normalization
       %w[ØO].each do |s|
@@ -571,7 +571,7 @@ class PublicationsController < ApplicationController
       codepoints = text.mb_chars.normalize(:d).split(//u)
       ascii=codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
 
-      last_name_matches = Person.find_all_by_last_name(ascii)
+      last_name_matches = Person.where( last_name: ascii)
       matches = last_name_matches
     end
 
