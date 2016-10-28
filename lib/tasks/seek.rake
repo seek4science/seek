@@ -184,12 +184,22 @@ namespace :seek do
     end
   end
   
-  desc "Creates background jobs to rebuild all authorization lookup table for all users."
-  task(:repopulate_auth_lookup_tables=>:environment) do
+  task(:repopulate_auth_lookup_tables_old => :environment) do
     AuthLookupUpdateJob.new.add_items_to_queue nil,5.seconds.from_now,1
     User.all.each do |user|
       unless AuthLookupUpdateQueue.exists?(user)
         AuthLookupUpdateJob.new.add_items_to_queue user,5.seconds.from_now,1
+      end
+    end
+  end
+
+  desc "Creates background jobs to rebuild all authorization lookup table for all items."
+  task(:repopulate_auth_lookup_tables=>:environment) do
+    Seek::Util.authorized_types.each do |type|
+      type.all.each do |item|
+        unless AuthLookupUpdateQueue.exists?(item)
+          AuthLookupUpdateJob.new.add_items_to_queue item,5.seconds.from_now,1
+        end
       end
     end
   end
@@ -319,22 +329,7 @@ namespace :seek do
   
   desc("Dump auth lookup tables")
   task(:dump_auth_lookup => :environment) do
-    tables = ["assay_auth_lookup",
-              "data_file_auth_lookup",
-              "deprecated_sample_auth_lookup",
-              "deprecated_specimen_auth_lookup",
-              "event_auth_lookup",
-              "investigation_auth_lookup",
-              "model_auth_lookup",
-              "presentation_auth_lookup",
-              "publication_auth_lookup",
-              "sample_auth_lookup",
-              "sop_auth_lookup",
-              "strain_auth_lookup",
-              "study_auth_lookup",
-              "sweep_auth_lookup",
-              "taverna_player_run_auth_lookup",
-              "workflow_auth_lookup"]
+    tables = Seek::Util.authorized_types.map(&:lookup_table_name)
 
     hashes = {}
     File.open('auth_lookup_dump.txt', 'w') do |f|
@@ -357,6 +352,86 @@ namespace :seek do
     puts "Done"
   end
 
+  task(:check_auth_lookup => :environment) do
+    output = StringIO.new('')
+    Seek::Util.authorized_types.each do |type|
+      puts "Checking #{type.name.pluralize}"
+      puts
+      output.puts type.name
+      users = User.all + [nil]
+      type.all.each do |item|
+        users.each do |user|
+          user_id = user.nil? ? 0 : user.id
+          ['view', 'edit', 'download', 'manage', 'delete'].each do |action|
+            lookup = type.lookup_for_asset(action, user_id, item.id)
+            actual = item.authorized_for_action(user, action)
+            unless lookup == actual
+              output.puts "  #{type.name} #{item.id} - User #{user_id}"
+              output.puts "    Lookup said: #{lookup}"
+              output.puts "    Expected: #{actual}"
+            end
+          end
+        end
+        print '.'
+      end
+      puts
+    end
+
+    output.rewind
+    puts output.read
+  end
+
+
+  task(:benchmark_auth_lookup => :environment) do
+    all_users = User.all.to_a
+    all_items = Seek::Util.authorized_types.map { |t| t.all }.flatten
+
+    puts "Refreshing auth lookup using new method..."
+    new_method_start = Time.now
+    Seek::Util.authorized_types.each do |type|
+      puts type.name
+      type.includes(policy: :permissions).all.each do |item|
+        item.update_lookup_table_for_all_users
+        print '.'
+      end
+      puts
+    end
+    new_method_time = Time.now - new_method_start
+
+    puts
+    puts new_method_time
+    puts
+
+    File.open('new_method_auth_lookup_dump.txt', 'w') do |f|
+      dump_auth_tables_to_file(f)
+    end
+
+    puts "Refreshing auth lookup using old method..."
+    old_method_start = Time.now
+    Seek::Util.authorized_types.each do |type|
+      puts type.name
+      type.includes(policy: :permissions).all.each do |item|
+        all_users.each do |user|
+          item.update_lookup_table(user)
+        end
+        print '.'
+      end
+      puts
+    end
+    old_method_time = Time.now - old_method_start
+
+    puts
+    puts old_method_time
+    puts
+
+    File.open('old_method_auth_lookup_dump.txt', 'w') do |f|
+      dump_auth_tables_to_file(f)
+    end
+
+    puts "New method took #{new_method_time} seconds"
+    puts "Old method took #{old_method_time} seconds"
+  end
+
   def set_projects_parent array, parent
     array.each do |proj|
       unless proj.nil?
@@ -370,6 +445,26 @@ namespace :seek do
     person.projects.each do |proj|
       person.project_subscriptions.build :project => proj
     end
+  end
+
+  def dump_auth_tables_to_file(f)
+    types = Seek::Util.authorized_types
+    f.write '{'
+    types.each_with_index do |type, i|
+      table = type.lookup_table_name
+      array = ActiveRecord::Base.connection.execute("SELECT * FROM #{table}").each
+      f.write "'#{table}' => [\n"
+      array.sort_by! { |a| a[1] * 10000 + a[0] }.each_with_index do |a, j|
+        f.write a.inspect
+        f.write "," unless j == (array.length - 1)
+        # Add a comment with some copy/pastable code to the end of each line to make debugging easier
+        f.write " # a = #{type}.find(#{a[1]}); u = User.find(#{a[0]})"
+        f.write "\n"
+      end
+      f.write "]"
+      f.write ",\n" unless i == (types.length - 1)
+    end
+    f.write '}'
   end
 
 end
