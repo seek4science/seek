@@ -1,4 +1,7 @@
 class Permission < ActiveRecord::Base
+
+  cattr_reader :precedence
+
   belongs_to :contributor, :polymorphic => true
   belongs_to :policy
 
@@ -18,12 +21,8 @@ class Permission < ActiveRecord::Base
   
   # TODO implement duplicate check in :before_create
 
-  def controls_access_for? person
-    if contributor.respond_to?(:people)
-      contributor.people.include? person
-    else
-      contributor == person
-    end
+  def controls_access_for?(person)
+    affected_people.any? { |p| p && (p.id == person.id) } # Checking by object doesn't work for some reason, have to use ID!
   end
 
   #precedence of permission types. Highest precedence is listed first
@@ -48,8 +47,7 @@ class Permission < ActiveRecord::Base
     yield(self) <=> yield(other)
   end
 
-
-  def allows_action? action, person
+  def allows_action? action, person = nil
     Seek::Permissions::Authorization.access_type_allows_action? action, access_type_for(person)
   end
 
@@ -62,4 +60,15 @@ class Permission < ActiveRecord::Base
       self.access_type
     end
   end
+
+  def affected_people
+    if contributor_type == 'Person'
+      [contributor]
+    elsif contributor.respond_to?(:people)
+      contributor.people
+    else
+      []
+    end
+  end
+
 end

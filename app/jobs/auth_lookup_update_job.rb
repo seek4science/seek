@@ -53,13 +53,7 @@ class AuthLookupUpdateJob < SeekJob
   end
 
   def update_for_each_user(item)
-    User.transaction(requires_new: :true) do
-      item.update_lookup_table(nil)
-      User.all.each do |user|
-        item.update_lookup_table(user)
-      end
-    end
-    GC.start
+    item.update_lookup_table_for_all_users
   end
 
   def update_assets_for_user(user)

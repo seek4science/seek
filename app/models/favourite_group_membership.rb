@@ -14,5 +14,12 @@ class FavouriteGroupMembership < ActiveRecord::Base
     AuthLookupUpdateJob.new.add_items_to_queue people.compact
   end
 
+  def allows_action?(action)
+    Seek::Permissions::Authorization.access_type_allows_action?(action, self.access_type)
+  end
+
+  def affected_people
+    [person]
+  end
 
 end

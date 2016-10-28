@@ -104,10 +104,9 @@ class AssetsHelperTest < ActionView::TestCase
   private
 
   def update_lookup_tables
-    User.all.push(nil).each do |u|
-      @assets.each{|a| a.update_lookup_table(u)}
+    @assets.each do |a|
+      a.update_lookup_table_for_all_users
     end
-
   end
 
   def create_a_bunch_of_assets
