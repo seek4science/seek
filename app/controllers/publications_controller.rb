@@ -289,48 +289,11 @@ class PublicationsController < ApplicationController
   #Try and relate non_seek_authors to people in SEEK based on name and project
   def associate_authors
     publication = @publication
-    projects = publication.projects
-    projects = current_person.projects if projects.empty?
+
     association = {}
     publication.publication_authors.each do |author|
       unless author.person
-        matches = []
-        #Get author by last name
-        last_name_matches = Person.find_all_by_last_name(author.last_name)
-        matches = last_name_matches
-        #If no results, try searching by normalised name, taken from grouped_pagination.rb
-        if matches.size < 1
-          text = author.last_name
-          #handle the characters that can't be handled through normalization
-          %w[ØO].each do |s|
-            text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
-          end
-
-          codepoints = text.mb_chars.normalize(:d).split(//u)
-          ascii=codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
-
-          last_name_matches = Person.find_all_by_last_name(ascii)
-          matches = last_name_matches
-        end
-
-        #If more than one result, filter by project
-        if matches.size > 1
-          project_matches = matches.select { |p| p.member_of?(projects) }
-          if project_matches.size >= 1 #use this result unless it resulted in no matches
-            matches = project_matches
-          end
-        end
-
-        #If more than one result, filter by first initial
-        if matches.size > 1
-          first_and_last_name_matches = matches.select { |p| p.first_name.at(0).upcase == author.first_name.at(0).upcase }
-          if first_and_last_name_matches.size >= 1 #use this result unless it resulted in no matches
-            matches = first_and_last_name_matches
-          end
-        end
-
-        #Take the first match as the guess
-        association[author.id] = matches.first
+        association[author.id] = find_person_for_author author, @publication.projects
       else
         association[author.id] = author.person
       end
@@ -349,11 +312,12 @@ class PublicationsController < ApplicationController
 
     unless result.nil?
       result.authors.each_with_index do |author, index|
-        pa = PublicationAuthor.new()
-        pa.publication = @publication
-        pa.first_name = author.first_name
-        pa.last_name = author.last_name
-        pa.author_index = index
+        pa = PublicationAuthor.new({
+          :publication  => @publication,
+          :first_name   => author.first_name,
+          :last_name    => author.last_name,
+          :author_index => index
+        })
         pa.save
       end
     end
@@ -571,7 +535,6 @@ class PublicationsController < ApplicationController
 
   def preprocess_pubmed_or_doi pubmed_id,doi
     doi = doi.sub(%r{doi\.*:}i,"").strip unless doi.nil?
-    doi.strip! unless doi.nil?
     pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Fixnum)
     return pubmed_id,doi
   end
@@ -592,4 +555,45 @@ class PublicationsController < ApplicationController
       end
     end
   end
+
+  def find_person_for_author author, projects
+    matches = []
+    #Get author by last name
+    last_name_matches = Person.where( last_name: author.last_name)
+    matches = last_name_matches
+    #If no results, try searching by normalised name, taken from grouped_pagination.rb
+    if matches.empty?
+      text = author.last_name
+      #handle the characters that can't be handled through normalization
+      %w[ØO].each do |s|
+        text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
+      end
+
+      codepoints = text.mb_chars.normalize(:d).split(//u)
+      ascii=codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
+
+      last_name_matches = Person.where( last_name: ascii)
+      matches = last_name_matches
+    end
+
+    #If more than one result, filter by project
+    if matches.size > 1
+      project_matches = matches.select { |p| p.member_of?(projects) }
+      if project_matches.size >= 1 #use this result unless it resulted in no matches
+        matches = project_matches
+      end
+    end
+
+    #If more than one result, filter by first initial
+    if matches.size > 1
+      first_and_last_name_matches = matches.select { |p| p.first_name.at(0).upcase == author.first_name.at(0).upcase }
+      if first_and_last_name_matches.size >= 1 #use this result unless it resulted in no matches
+        matches = first_and_last_name_matches
+      end
+    end
+
+    #Take the first match as the guess
+    return matches.first
+  end
+
 end
