@@ -438,6 +438,7 @@ class PublicationsController < ApplicationController
   end
 
   # create a publication from a reference file, at the moment supports only bibtex
+  # only sets the @publication and redirects to the create_publication with content from the bibtex file
   def import_publication
     @publication = Publication.new(params[:publication].slice(:project_ids))
 
@@ -473,7 +474,7 @@ class PublicationsController < ApplicationController
     end
   end
 
-  # create a publication from a reference file, at the moment supports only bibtex
+  # create publications from a reference file, at the moment supports only bibtex
   def import_publication_multiple
     publication_params = params[:publication].slice(:project_ids)
     @publication = Publication.new(publication_params)
@@ -556,6 +557,14 @@ class PublicationsController < ApplicationController
     end
   end
 
+  # given an author, the can be associated with a Person in SEEK
+  # this method tries to find a Person by last_name
+  # if this fails, it normalizes the last name and searches again
+  # if there are too many matches, they will be narrowed down by the given projects
+  # if there are still too many matches, they will be narrowed down by the first name initials
+  # @param author [PublicationAuthor] the author to find a matching person for
+  # @param projects [Array<Project>] projects to narrow matches is necessary
+  # @return [Person] the first match is returned or nil
   def find_person_for_author author, projects
     matches = []
     #Get author by last name
