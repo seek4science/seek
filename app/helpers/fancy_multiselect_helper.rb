@@ -61,7 +61,6 @@ module FancyMultiselectHelper
 
   def determine_object_type_text(object, object_type_text)
     object_type_text = object_type_text || object.class.name.underscore.humanize
-    object_type_text = (I18n.t 'biosamples.sample_parent_term') if object_type_text == 'Specimen'
     object_type_text
   end
 
