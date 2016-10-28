@@ -570,7 +570,6 @@ class PublicationsController < ApplicationController
 
   def preprocess_pubmed_or_doi pubmed_id,doi
     doi = doi.sub(%r{doi\.*:}i,"").strip unless doi.nil?
-    doi.strip! unless doi.nil?
     pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Fixnum)
     return pubmed_id,doi
   end
@@ -591,4 +590,5 @@ class PublicationsController < ApplicationController
       end
     end
   end
+
 end
