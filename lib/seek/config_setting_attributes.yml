@@ -166,3 +166,7 @@ news_number_of_entries:
   convert: :to_i
 front_page_buttons_enabled:
 samples_enabled:
+omniauth_enabled:
+omniauth_user_create:
+omniauth_user_activate:
+omniauth_providers:
