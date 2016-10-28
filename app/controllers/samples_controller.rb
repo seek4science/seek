@@ -54,7 +54,7 @@ class SamplesController < ApplicationController
     if @sample.can_delete? && @sample.destroy
       flash[:notice] = 'The sample was successfully deleted.'
     else
-      flash[:notice] = 'It was not possible to delete the sample.'
+      flash[:error] = 'It was not possible to delete the sample.'
     end
     respond_with(@sample, location: samples_path)
   end

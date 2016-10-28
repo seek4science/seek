@@ -220,7 +220,7 @@ module Seek
 
         #Rows with content
         def actual_rows
-          @rows.select {|r| !r.nil?}
+          @rows.compact
         end
       end
 
@@ -256,7 +256,7 @@ module Seek
 
         #Cells with content (present in XML - can still be blank with styles)
         def actual_cells
-          @cells.select {|c| !c.nil?}
+          @cells.compact
         end
       end
 

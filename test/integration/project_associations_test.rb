@@ -31,7 +31,7 @@ class ProjectAssociationsTest < ActionController::IntegrationTest
       end
 
       item.reload
-      assert_equal 2, item.policy.permissions.count
+      assert_equal 2, item.policy.permissions.count,"wrong value for #{type_name}"
     end
   end
 end
