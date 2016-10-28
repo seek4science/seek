@@ -802,6 +802,19 @@ class AuthorizationTest < ActiveSupport::TestCase
       refute public_item.can_edit?
     end
   end
+
+  test 'user with no project can still view ALL_USERS-scoped resources' do
+    public_item = Factory(:sop, policy: Factory(:all_sysmo_viewable_policy))
+    person = Factory(:person_not_in_project)
+
+    User.with_current_user(nil) do
+      assert public_item.can_view?
+    end
+
+    User.with_current_user(person.user) do
+      assert public_item.can_view?
+    end
+  end
   
   def temp_get_group_permissions(policy)
     policy.permissions.select {|p| ["WorkGroup","Project","Institution"].include?(p.contributor_type)}
