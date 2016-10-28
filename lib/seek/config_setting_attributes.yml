@@ -166,7 +166,6 @@ news_number_of_entries:
   convert: :to_i
 front_page_buttons_enabled:
 samples_enabled:
-specimen_culture_starting_date:
 sample_age:
 specimen_creators:
 sample_parser_enabled:
