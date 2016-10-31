@@ -269,10 +269,12 @@ module Seek
               sql = %(DELETE FROM #{self.class.lookup_table_name} WHERE asset_id=#{self.id})
               ActiveRecord::Base.connection.execute(sql)
 
+              f = ActiveRecord::Base.connection.quote(false)
+
               ([0] + User.pluck(:id)).each do |user_id|
                 sql = %(INSERT INTO #{self.class.lookup_table_name}
                           (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
-                          VALUES (#{user_id}, #{self.id}, false, false, false, false, false);)
+                          VALUES (#{user_id}, #{self.id}, #{f}, #{f}, #{f}, #{f}, #{f});)
 
                 ActiveRecord::Base.connection.execute(sql)
               end
@@ -457,10 +459,11 @@ module Seek
                         SET )
         sql += [:can_view, :can_edit, :can_download, :can_manage, :can_delete].map do |privilege|
           setter = "#{privilege}="
+          value = ActiveRecord::Base.connection.quote(binding.local_variable_get(privilege))
           if overwrite
-            setter += "#{binding.local_variable_get(privilege)}"
+            setter += "#{value}"
           else
-            setter += "(#{privilege} OR #{binding.local_variable_get(privilege)})"
+            setter += "(#{privilege} OR #{value})"
           end
 
           setter

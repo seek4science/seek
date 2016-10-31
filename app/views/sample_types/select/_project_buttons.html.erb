@@ -1,0 +1,10 @@
+
+<div data-toggle="buttons">
+  <% projects.each do |project| %>
+      <% member = project.has_member?(current_user) %>
+          <label class="btn btn-default <%= member ? 'active' : '' %>">
+        <%= h(project.title) %>
+        <%= check_box_tag "projects[]", project.id,member,class:'filter-option' %>
+      </label>
+  <% end %>
+</div>

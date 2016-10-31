@@ -10,17 +10,16 @@
 # **********************************************************************************
 
 module Seek
+
   module Permissions
+
     module Authorization
 
-      def self.authorization_supported?(thing)
-        !thing.nil? && thing.authorization_supported?
-      end
 
-      def self.is_authorized?(action, thing, user = nil)
+      def self.is_authorized?(action, thing, user=nil)
         authorized_as_creator?(action, thing, user) ||
-          authorized_by_policy?(action, thing) ||
-          authorized_by_permission?(action, thing, user)
+            authorized_by_policy?(action, thing) ||
+            authorized_by_permission?(action, thing, user)
       end
 
       private

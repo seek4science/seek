@@ -166,11 +166,6 @@ news_number_of_entries:
   convert: :to_i
 front_page_buttons_enabled:
 samples_enabled:
-sample_parent_term:
-specimen_culture_starting_date:
-sample_age:
-specimen_creators:
-sample_parser_enabled:
 omniauth_enabled:
 omniauth_user_create:
 omniauth_user_activate:

@@ -1,0 +1,8 @@
+<div data-toggle="buttons">
+  <% tags.each do |tag| %>
+      <label class="btn btn-default btn-sm">
+        <%= h(tag) %>
+        <%= check_box_tag "tags[]",tag,false,class:'filter-option' %>
+      </label>
+  <% end %>
+</div>
