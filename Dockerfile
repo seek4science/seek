@@ -21,19 +21,11 @@ RUN bundle config --global frozen 1 && \
     bundle install 
 
 # App code (picky about what gets copied to make caching of the assets:precompile more likely)
-COPY Rakefile config.ru ./
-COPY app app
-COPY config config
-COPY db db
-COPY lib lib
-COPY public public
-COPY spec spec
-COPY script script
-COPY solr solr
-COPY vendor vendor
+COPY . .
 
 # SQLite Database (for asset compilation)
-RUN cp docker/database.docker.sqlite.yml config/database.yml && \
+RUN mkdir sqlite3-db && \
+    cp docker/database.docker.sqlite3.yml config/database.yml && \
     bundle exec rake db:setup
 RUN bundle exec rake assets:precompile
 
