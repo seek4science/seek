@@ -19,6 +19,8 @@ class PublicationsController < ApplicationController
     @query = Publication.ransack(params[:query])
     @publications = @query.result(distinct: true)
                           .includes(:publication_authors,:projects)
+    # @query.build_condition
+    @query.build_sort if @query.sorts.empty?
 
     respond_to do |format|
       format.html
