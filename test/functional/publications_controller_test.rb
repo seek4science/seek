@@ -9,6 +9,7 @@ class PublicationsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include MockHelper
+  include Test::Unit::Assertions
 
   def setup
     login_as(:quentin)
@@ -265,6 +266,51 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_match( /.*RA   Hendrickson W\.A\., Ward K\.B\.;.*/, response.body)
     assert_match( /.*RL   Biochem Biophys Res Commun 66\(4\):1349-1356\(1975\)\..*/, response.body)
     assert_match( /.*XX.*/, response.body)
+  end
+
+  test "should filter publications by projects_id for export" do
+    # project without publications
+    get :export, :query => { :projects_id_in => [projects(:sysmo_project).id + 1] }
+    assert_response :success
+    p = assigns(:publications)
+    assert_equal 0, p.length
+    # project with publications
+    get :export, :query => { :projects_id_in => [projects(:sysmo_project).id]}
+    assert_response :success
+    p = assigns(:publications)
+    assert_equal 3, p.length
+  end
+
+  test "should filter publications sort by published date for export" do
+    # sort by published_date asc
+    get :export, :query => { :s => [{ :name => :published_date, :dir => :asc }] }
+    assert_response :success
+    p = assigns(:publications)
+    assert_operator p[0].published_date, :<=, p[1].published_date
+    assert_operator p[1].published_date, :<=, p[2].published_date
+
+    # sort by published_date desc
+    get :export, :query => { :s => [{ :name => :published_date, :dir => :desc }] }
+    assert_response :success
+    p = assigns(:publications)
+    assert_operator p[0].published_date, :>=, p[1].published_date
+    assert_operator p[1].published_date, :>=, p[2].published_date
+  end
+
+  test "should filter publications by title contains for export" do
+    # sort by published_date asc
+    get :export, :query => { :title_cont => "workflows" }
+    assert_response :success
+    p = assigns(:publications)
+    assert_equal 1, p.count
+  end
+
+  test "should filter publications by authour name contains for export" do
+    # sort by published_date asc
+    get :export, :query => { :publication_authors_last_name_cont => "Bau" }
+    assert_response :success
+    p = assigns(:publications)
+    assert_equal 1, p.count
   end
 
   test "should get edit" do

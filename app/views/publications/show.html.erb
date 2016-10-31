@@ -1,25 +1,25 @@
-<%= render :partial => "general/item_title",:locals => {:item=>@publication, :buttons_partial => 'publications/buttons'} %>
+<%= render :partial => "general/item_title",:locals => { :item => @publication, :buttons_partial => 'publications/buttons' } %>
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
-    <%=  item_description @publication.abstract,:label=>"Abstract",:none_text=>"No abstract specified" %>
+    <%= item_description @publication.abstract, :label => "Abstract", :none_text => "No abstract specified" %>
 
     <div class="row">
       <div class="col-md-6">
         <% unless @publication.pubmed_id.nil? %>
-            <p>
-              <strong>PubMed ID:</strong>
-              <%= link_to @publication.pubmed_id, @publication.pubmed_uri,{:target => "_blank"} %>
-            </p>
+          <p>
+            <strong>PubMed ID:</strong>
+            <%= link_to @publication.pubmed_id, @publication.pubmed_uri, { :target => "_blank" } %>
+          </p>
         <% end %>
         <% unless @publication.doi.nil? %>
-            <p>
-              <strong>DOI:</strong>
-              <%= link_to @publication.doi, @publication.doi_uri,{:target => "_blank"} %>
-            </p>
+          <p>
+            <strong>DOI:</strong>
+            <%= link_to @publication.doi, @publication.doi_uri, { :target => "_blank" } %>
+          </p>
         <% end %>
 
-        <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @publication}%>
+        <%= render :partial => 'projects/show_project_relationship', :locals => { :resource => @publication } %>
 
         <p>
           <strong><%= publication_type_text @publication.publication_type -%>:</strong>
@@ -37,23 +37,23 @@
         <p>
           <strong>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</strong>
           <% if @publication.publication_authors.empty? %>
-              <span class='none_text'>Not specified</span>
+            <span class='none_text'>Not specified</span>
           <% else %>
-              <%= @publication.publication_authors.map do |author|
-                if author.person && author.person.can_view?
-                  link_to get_object_title(author.person), show_resource_path(author.person)
-                else
-                  author.full_name
-                end
-              end.join(', ').html_safe %>
+            <%= @publication.publication_authors.map do |author|
+              if author.person && author.person.can_view?
+                link_to get_object_title(author.person), show_resource_path(author.person)
+              else
+                author.full_name
+              end
+            end.join(', ').html_safe %>
           <% end %>
         </p>
       </div>
     </div>
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @publication, :deep => true, :include_parents => true} %>
+    <%= render :partial => "general/isa_graph", :locals => { :root_item => @publication, :deep => true, :include_parents => true } %>
   </div>
   <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @publication, :authors_title=>"Authors" } -%>
+    <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @publication, :authors_title=>"Authors" } -%>
   </div>
 </div>
 

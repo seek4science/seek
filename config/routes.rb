@@ -550,6 +550,7 @@ SEEK::Application.routes.draw do
       get :preview
       get :query_authors
       get :query_authors_typeahead
+      get :export
       post :fetch_preview
       post :items_for_result
       post :resource_in_tab

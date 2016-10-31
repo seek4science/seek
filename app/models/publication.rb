@@ -21,6 +21,7 @@ class Publication < ActiveRecord::Base
   acts_as_asset
 
   has_many :publication_authors, :dependent => :destroy, :autosave => true
+  has_many :persons, :through => :publication_authors
 
   has_many :backwards_relationships,
            :class_name => 'Relationship',

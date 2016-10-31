@@ -14,20 +14,23 @@ class PublicationsController < ApplicationController
   include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
-  
-  def index
-    if request.format.xml? || request.format.html?
-      super
-    else
-      respond_to do |format|
-        format.any( *Publication::EXPORT_TYPES.keys ) {
-          send_data(
-            @publications.collect { |publication| publication.export(request.format.to_sym) }.join("\n\n"),
-            :type => request.format.to_sym,
-            :filename => "publications.#{request.format.to_sym}"
-          )
-        }
-      end
+
+  def export
+    @query = Publication.ransack(params[:query])
+    @publications = @query.result(distinct: true)
+                          .includes(:publication_authors,:projects)
+    # @query.build_condition
+    @query.build_sort if @query.sorts.empty?
+
+    respond_to do |format|
+      format.html
+      format.any( *Publication::EXPORT_TYPES.keys ) {
+        send_data(
+          @publications.collect { |publication| publication.export(request.format.to_sym) }.join("\n\n"),
+          :type => request.format.to_sym,
+          :filename => "publications.#{request.format.to_sym}"
+        )
+      }
     end
   end
 
@@ -288,48 +291,11 @@ class PublicationsController < ApplicationController
   #Try and relate non_seek_authors to people in SEEK based on name and project
   def associate_authors
     publication = @publication
-    projects = publication.projects
-    projects = current_person.projects if projects.empty?
+
     association = {}
     publication.publication_authors.each do |author|
       unless author.person
-        matches = []
-        #Get author by last name
-        last_name_matches = Person.find_all_by_last_name(author.last_name)
-        matches = last_name_matches
-        #If no results, try searching by normalised name, taken from grouped_pagination.rb
-        if matches.size < 1
-          text = author.last_name
-          #handle the characters that can't be handled through normalization
-          %w[ØO].each do |s|
-            text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
-          end
-
-          codepoints = text.mb_chars.normalize(:d).split(//u)
-          ascii=codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
-
-          last_name_matches = Person.find_all_by_last_name(ascii)
-          matches = last_name_matches
-        end
-
-        #If more than one result, filter by project
-        if matches.size > 1
-          project_matches = matches.select { |p| p.member_of?(projects) }
-          if project_matches.size >= 1 #use this result unless it resulted in no matches
-            matches = project_matches
-          end
-        end
-
-        #If more than one result, filter by first initial
-        if matches.size > 1
-          first_and_last_name_matches = matches.select { |p| p.first_name.at(0).upcase == author.first_name.at(0).upcase }
-          if first_and_last_name_matches.size >= 1 #use this result unless it resulted in no matches
-            matches = first_and_last_name_matches
-          end
-        end
-
-        #Take the first match as the guess
-        association[author.id] = matches.first
+        association[author.id] = find_person_for_author author, @publication.projects
       else
         association[author.id] = author.person
       end
@@ -348,11 +314,12 @@ class PublicationsController < ApplicationController
 
     unless result.nil?
       result.authors.each_with_index do |author, index|
-        pa = PublicationAuthor.new()
-        pa.publication = @publication
-        pa.first_name = author.first_name
-        pa.last_name = author.last_name
-        pa.author_index = index
+        pa = PublicationAuthor.new({
+          :publication  => @publication,
+          :first_name   => author.first_name,
+          :last_name    => author.last_name,
+          :author_index => index
+        })
         pa.save
       end
     end
@@ -473,6 +440,7 @@ class PublicationsController < ApplicationController
   end
 
   # create a publication from a reference file, at the moment supports only bibtex
+  # only sets the @publication and redirects to the create_publication with content from the bibtex file
   def import_publication
     @publication = Publication.new(params[:publication].slice(:project_ids))
 
@@ -508,7 +476,7 @@ class PublicationsController < ApplicationController
     end
   end
 
-  # create a publication from a reference file, at the moment supports only bibtex
+  # create publications from a reference file, at the moment supports only bibtex
   def import_publication_multiple
     publication_params = params[:publication].slice(:project_ids)
     @publication = Publication.new(publication_params)
@@ -570,7 +538,6 @@ class PublicationsController < ApplicationController
 
   def preprocess_pubmed_or_doi pubmed_id,doi
     doi = doi.sub(%r{doi\.*:}i,"").strip unless doi.nil?
-    doi.strip! unless doi.nil?
     pubmed_id.strip! unless pubmed_id.nil? || pubmed_id.is_a?(Fixnum)
     return pubmed_id,doi
   end
@@ -591,4 +558,53 @@ class PublicationsController < ApplicationController
       end
     end
   end
+
+  # given an author, the can be associated with a Person in SEEK
+  # this method tries to find a Person by last_name
+  # if this fails, it normalizes the last name and searches again
+  # if there are too many matches, they will be narrowed down by the given projects
+  # if there are still too many matches, they will be narrowed down by the first name initials
+  # @param author [PublicationAuthor] the author to find a matching person for
+  # @param projects [Array<Project>] projects to narrow matches is necessary
+  # @return [Person] the first match is returned or nil
+  def find_person_for_author author, projects
+    matches = []
+    #Get author by last name
+    last_name_matches = Person.where( last_name: author.last_name)
+    matches = last_name_matches
+    #If no results, try searching by normalised name, taken from grouped_pagination.rb
+    if matches.empty?
+      text = author.last_name
+      #handle the characters that can't be handled through normalization
+      %w[ØO].each do |s|
+        text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
+      end
+
+      codepoints = text.mb_chars.normalize(:d).split(//u)
+      ascii=codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
+
+      last_name_matches = Person.where( last_name: ascii)
+      matches = last_name_matches
+    end
+
+    #If more than one result, filter by project
+    if matches.size > 1
+      project_matches = matches.select { |p| p.member_of?(projects) }
+      if project_matches.size >= 1 #use this result unless it resulted in no matches
+        matches = project_matches
+      end
+    end
+
+    #If more than one result, filter by first initial
+    if matches.size > 1
+      first_and_last_name_matches = matches.select { |p| p.first_name.at(0).upcase == author.first_name.at(0).upcase }
+      if first_and_last_name_matches.size >= 1 #use this result unless it resulted in no matches
+        matches = first_and_last_name_matches
+      end
+    end
+
+    #Take the first match as the guess
+    return matches.first
+  end
+
 end
