@@ -455,18 +455,16 @@ module Seek
           can_delete = permission.allows_action?('delete')
         end
 
-        sql = %(UPDATE #{self.class.lookup_table_name}
-                        SET )
-        sql += [:can_view, :can_edit, :can_download, :can_manage, :can_delete].map do |privilege|
-          setter = "#{privilege}="
-          value = ActiveRecord::Base.connection.quote(binding.local_variable_get(privilege))
-          if overwrite
-            setter += "#{value}"
-          else
-            setter += "(#{privilege} OR #{value})"
-          end
+        sql = %(UPDATE #{self.class.lookup_table_name} SET )
+        fields_to_set = [:can_view, :can_edit, :can_download, :can_manage, :can_delete].select do |privilege|
+          # Only set "true" values if not overwriting
+          overwrite || binding.local_variable_get(privilege)
+        end
 
-          setter
+        return if fields_to_set.empty?
+
+        sql += fields_to_set.map do |privilege|
+            "#{privilege}=#{ActiveRecord::Base.connection.quote(binding.local_variable_get(privilege))}"
         end.join(",\n")
 
         sql += " WHERE asset_id=#{self.id}"
