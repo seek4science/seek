@@ -2,6 +2,9 @@ FROM ruby:2.1
 
 MAINTAINER Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall
 
+ENV APP_DIR /seek
+ENV RAILS_ENV=production
+
 RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends libssl-dev build-essential git libreadline-dev \
             libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3 libcurl4-gnutls-dev \
@@ -11,9 +14,9 @@ RUN apt-get update -qq && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-ENV RAILS_ENV=production
+RUN mkdir -p $APP_DIR
+
+WORKDIR $APP_DIR
 
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
 COPY Gemfile* ./
@@ -27,10 +30,10 @@ COPY . .
 RUN mkdir sqlite3-db && \
     cp docker/database.docker.sqlite3.yml config/database.yml && \
     bundle exec rake db:setup
+
 RUN bundle exec rake assets:precompile
 
 # Docker specific configs
-COPY docker docker
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 
 # Cleanup
@@ -40,6 +43,6 @@ RUN rm -rf /tmp/* /var/tmp/*
 EXPOSE 80
 
 # Shared
-VOLUME ["/usr/src/app/filestore", "/usr/src/app/sqlite3-db"]
+VOLUME ["/seek/filestore", "/seek/sqlite3-db"]
 
 CMD ["docker/entrypoint.sh"]
