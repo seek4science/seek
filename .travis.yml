@@ -9,6 +9,7 @@ cache: bundler
 
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
+  - SUITE="rake test:units" DB_TYPE=sqlite3
   - SUITE="rake test:functionals" DB_TYPE=mysql
   - SUITE="rake test:integration" DB_TYPE=mysql
   - SUITE="rake test:integration" DB_TYPE=postgres
