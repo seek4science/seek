@@ -24,7 +24,8 @@ RUN bundle config --global frozen 1 && \
 COPY . .
 
 # SQLite Database (for asset compilation)
-RUN cp docker/database.docker.sqlite.yml config/database.yml && \
+RUN mkdir sqlite3-db && \
+    cp docker/database.docker.sqlite3.yml config/database.yml && \
     bundle exec rake db:setup
 RUN bundle exec rake assets:precompile
 
