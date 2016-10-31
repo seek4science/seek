@@ -29,8 +29,7 @@ RUN mkdir sqlite3-db && \
     bundle exec rake db:setup
 RUN bundle exec rake assets:precompile
 
-# Docker specific configs
-COPY docker docker
+# NGINX config
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 
 # Cleanup
