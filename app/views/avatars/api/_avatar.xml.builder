@@ -10,8 +10,8 @@ core_xlink(avatar).merge(is_root ? xml_root_attributes : {}) do
     parent_xml.tag! "owner" do
       api_partial(parent_xml,avatar.owner)
     end
-    parent_xml.tag! "content_length", File.size(@cache_file)    
+    parent_xml.tag! "content_length", File.size(@cache_file)
     parent_xml.tag! "dimensions",params[:size]
-    parent_xml.tag! "data",ActiveSupport::Base64.encode64(open(@cache_file) { |io| io.read }),{:type=>@type}             
+    parent_xml.tag! "data",ActiveSupport::Base64.encode64(open(@cache_file) { |io| io.read }),{:type=>@type}
   end
 end
