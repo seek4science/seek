@@ -24,7 +24,7 @@ RUN bundle config --global frozen 1 && \
 COPY . .
 
 # SQLite Database (for asset compilation)
-RUN cp config/database.sqlite.yml config/database.yml && \
+RUN cp docker/database.docker.sqlite.yml config/database.yml && \
     bundle exec rake db:setup
 RUN bundle exec rake assets:precompile
 
@@ -39,6 +39,6 @@ RUN rm -rf /tmp/* /var/tmp/*
 EXPOSE 80
 
 # Shared
-VOLUME ["/usr/src/app/filestore", "/usr/src/app/db"]
+VOLUME ["/usr/src/app/filestore", "/usr/src/app/sqlite3-db"]
 
 CMD ["docker/entrypoint.sh"]
