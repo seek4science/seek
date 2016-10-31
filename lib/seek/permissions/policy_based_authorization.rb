@@ -262,7 +262,7 @@ module Seek
         self.class.isolation_level(:repeatable_read) do #ensure it allows it see another worker may have inserted a record already
           self.class.transaction do
             #check to see if an insert of update is needed, action used is arbitary
-            insert = self.class.lookup_for_asset('view', User.select(:id).last.id, self.id).nil?
+            insert = lookup_count <= 2
 
             # Blank-out permissions first
             if insert
@@ -439,6 +439,11 @@ module Seek
       # Check if ALL the managers of the items are no longer involved with ANY of the item's projects
       def asset_housekeeper_can_manage?
         self.managers.map { |manager| (self.projects - manager.person.former_projects).none? }.all?
+      end
+
+      def lookup_count
+        sql = "select count(*) from #{self.class.lookup_table_name} where asset_id = #{self.id}"
+        ActiveRecord::Base.connection.select_one(sql).values[0].to_i
       end
 
       private
