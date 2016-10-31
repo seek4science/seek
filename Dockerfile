@@ -29,6 +29,7 @@ COPY . .
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \
     cp docker/database.docker.sqlite3.yml config/database.yml && \
+    chmod +x docker/upgrade.sh && \
     bundle exec rake db:setup
 
 RUN bundle exec rake assets:precompile
