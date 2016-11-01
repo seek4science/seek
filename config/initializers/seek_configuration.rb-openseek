@@ -82,7 +82,7 @@ SEEK::Application.configure do
   Seek::Config.default :header_tagline_text_enabled, true
 
 #time in minutes that the feeds on the front page are cached for
-  Seek::Config.default :home_feeds_cache_timeout,2
+  Seek::Config.default :home_feeds_cache_timeout,30
 # Branding
   Seek::Config.default :project_name,'FAIRDOM'
   Seek::Config.default :project_type,''
