@@ -214,12 +214,12 @@ class AdminsControllerTest < ActionController::TestCase
 
   end
 
-  test "file usage stats" do
+  test "storage usage stats" do
     admin=Factory(:admin)
     Factory(:rightfield_datafile)
     Factory(:rightfield_annotated_datafile)
     login_as(admin)
-    xml_http_request :get,:get_stats,{:id=>"file_usage_stats"}
+    xml_http_request :get,:get_stats,{:id=>"storage_usage_stats"}
     assert_response :success
   end
 
