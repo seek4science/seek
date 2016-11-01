@@ -46,6 +46,7 @@ module SampleTypesHelper
   end
 
   def all_sample_type_tags
-    Annotation.with_attribute_name("sample_type_tags").collect(&:value).uniq.sort_by(&:tag_count).reverse
+    tags = Annotation.with_attribute_name("sample_type_tags").collect(&:value)
+    tags.uniq.sort_by(&:tag_count).reverse
   end
 end
