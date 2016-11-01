@@ -309,49 +309,27 @@ class AdminsController < ApplicationController
   end
 
   def get_stats
-    type = nil
     @page = params[:id]
-    case @page
-      when 'contents'
-        type = 'content_stats'
-      when 'activity'
-        type = 'activity_stats'
-      when 'search'
-        type = 'search_stats'
-      when 'job_queue'
-        type = 'job_queue'
-      when 'auth_consistency'
-        type = 'auth_consistency'
-      when 'monthly_stats'
-        monthly_stats = get_monthly_stats
-        type = "monthly_statistics"
-      when "workflow_stats"
-        type = "workflow_stats"
-      when "storage_usage_stats"
-        type="storage_usage_stats"
-      when "none"
-        type = "none"
-    end
     respond_to do |format|
-      case type
+      case @page
         when "content_stats"
-          format.html { render :partial => "admins/content_stats", :locals => {:stats => Seek::Stats::ContentStats.generate} }
+          format.html { render :partial => "admins/stats/content_stats", :locals => {:stats => Seek::Stats::ContentStats.generate} }
         when "activity_stats"
-          format.html { render :partial => "admins/activity_stats", :locals => {:stats => Seek::Stats::ActivityStats.new} }
+          format.html { render :partial => "admins/stats/activity_stats", :locals => {:stats => Seek::Stats::ActivityStats.new} }
         when "search_stats"
-          format.html { render :partial => "admins/search_stats", :locals => {:stats => Seek::Stats::SearchStats.new} }
+          format.html { render :partial => "admins/stats/search_stats", :locals => {:stats => Seek::Stats::SearchStats.new} }
         when "job_queue"
-          format.html { render :partial => "admins/job_queue" }
+          format.html { render :partial => "admins/stats/job_queue" }
         when "auth_consistency"
-          format.html { render :partial => "admins/auth_consistency" }
-        when "monthly_statistics"
-          format.html { render :partial => "admins/monthly_statistics", :locals => {:stats => monthly_stats}}
+          format.html { render :partial => "admins/stats/auth_consistency" }
+        when "monthly_stats"
+          format.html { render :partial => "admins/stats/monthly_stats", :locals => {:stats => get_monthly_stats} }
         when "workflow_stats"
-          format.html { render :partial => "admins/workflow_stats" }
+          format.html { render :partial => "admins/stats/workflow_stats" }
         when "storage_usage_stats"
-          format.html { render :partial => "admins/storage_usage_stats" }
+          format.html { render :partial => "admins/stats/storage_usage_stats" }
         when "none"
-          format.html { render :text=>"" }
+          format.html { render :text => "" }
       end
     end
   end

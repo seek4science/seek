@@ -159,7 +159,7 @@ class AdminsControllerTest < ActionController::TestCase
 
   test "get project content stats" do
     login_as(:quentin)
-    xml_http_request :get, :get_stats,{:id=>"contents"}
+    xml_http_request :get, :get_stats,{:id=>"content_stats"}
     assert_response :success
   end
 
