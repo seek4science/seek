@@ -214,6 +214,15 @@ class AdminsControllerTest < ActionController::TestCase
 
   end
 
+  test "file usage stats" do
+    admin=Factory(:admin)
+    Factory(:rightfield_datafile)
+    Factory(:rightfield_annotated_datafile)
+    login_as(admin)
+    xml_http_request :get,:get_stats,{:id=>"file_usage_stats"}
+    assert_response :success
+  end
+
   test "update home page settings" do
     login_as Factory(:admin).user
     assert_not_equal "This is the home description",Seek::Config.home_description

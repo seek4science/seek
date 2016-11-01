@@ -309,9 +309,7 @@ class AdminsController < ApplicationController
   end
 
   def get_stats
-    collection = []
     type = nil
-    title = nil
     @page = params[:id]
     case @page
       when 'contents'
@@ -329,6 +327,8 @@ class AdminsController < ApplicationController
         type = "monthly_statistics"
       when "workflow_stats"
         type = "workflow_stats"
+      when "file_usage_stats"
+        type="file_usage_stats"
       when "none"
         type = "none"
     end
@@ -348,6 +348,8 @@ class AdminsController < ApplicationController
           format.html { render :partial => "admins/monthly_statistics", :locals => {:stats => monthly_stats}}
         when "workflow_stats"
           format.html { render :partial => "admins/workflow_stats" }
+        when "file_usage_stats"
+          format.html { render :partial => "admins/file_usage_stats" }
         when "none"
           format.html { render :text=>"" }
       end
