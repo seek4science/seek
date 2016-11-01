@@ -1,5 +1,5 @@
 <%
-  tags = Annotation.with_attribute_name("sample_type_tags").collect(&:value).uniq.collect(&:text)
+  tags = all_sample_type_tags.collect(&:text)
   projects = Project.all.select{|p| p.sample_types.any? }
   your_projects = projects & current_user.person.projects
   other_projects = projects - your_projects

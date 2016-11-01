@@ -262,7 +262,7 @@ module Seek
         self.class.isolation_level(:repeatable_read) do #ensure it allows it see another worker may have inserted a record already
           self.class.transaction do
             #check to see if an insert of update is needed, action used is arbitary
-            insert = self.class.lookup_for_asset('view', User.select(:id).last.id, self.id).nil?
+            insert = lookup_count <= 2
 
             # Blank-out permissions first
             if insert
@@ -441,6 +441,11 @@ module Seek
         self.managers.map { |manager| (self.projects - manager.person.former_projects).none? }.all?
       end
 
+      def lookup_count
+        sql = "select count(*) from #{self.class.lookup_table_name} where asset_id = #{self.id}"
+        ActiveRecord::Base.connection.select_one(sql).values[0].to_i
+      end
+
       private
 
       # Note, nil user means ALL users, not guest user
@@ -455,18 +460,16 @@ module Seek
           can_delete = permission.allows_action?('delete')
         end
 
-        sql = %(UPDATE #{self.class.lookup_table_name}
-                        SET )
-        sql += [:can_view, :can_edit, :can_download, :can_manage, :can_delete].map do |privilege|
-          setter = "#{privilege}="
-          value = ActiveRecord::Base.connection.quote(binding.local_variable_get(privilege))
-          if overwrite
-            setter += "#{value}"
-          else
-            setter += "(#{privilege} OR #{value})"
-          end
+        sql = %(UPDATE #{self.class.lookup_table_name} SET )
+        fields_to_set = [:can_view, :can_edit, :can_download, :can_manage, :can_delete].select do |privilege|
+          # Only set "true" values if not overwriting
+          overwrite || binding.local_variable_get(privilege)
+        end
 
-          setter
+        return if fields_to_set.empty?
+
+        sql += fields_to_set.map do |privilege|
+            "#{privilege}=#{ActiveRecord::Base.connection.quote(binding.local_variable_get(privilege))}"
         end.join(",\n")
 
         sql += " WHERE asset_id=#{self.id}"

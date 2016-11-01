@@ -705,7 +705,6 @@ SEEK::Application.routes.draw do
   get '/technology_types/',:to=>"technology_types#show",:as=>"technology_types"
 
 
-  resources :statistics, :only => [:index]
   ### MISC MATCHES ###
   match '/search/' => 'search#index', :as => :search
   match '/search/save' => 'search#save', :as => :save_search

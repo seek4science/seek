@@ -104,8 +104,8 @@ class SampleTypesController < ApplicationController
     @sample_types = SampleType.joins(:projects).where('projects.id' => params[:projects])
     unless params[:tags].blank?
       @sample_types.select! do |sample_type|
-        if params[:exclusive_tags]
-          (sample_type.annotations_as_text_array & params[:tags]) == params[:tags]
+        if params[:exclusive_tags]=='1'
+          (params[:tags] - sample_type.annotations_as_text_array).empty?
         else
           (sample_type.annotations_as_text_array & params[:tags]).any?
         end

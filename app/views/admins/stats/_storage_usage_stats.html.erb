@@ -1,0 +1,64 @@
+
+<%
+  programmes = Programme.all.sort_by(&:total_asset_size).reverse
+  projects_with_programme = Project.where('programme_id IS NULL').sort_by(&:total_asset_size).reverse
+%>
+
+
+<% unless programmes.empty? %>
+    <h4><%= t('programme').pluralize %> and their <%= t('project').pluralize %></h4>
+    <table id="storage-stats">
+      <thead>
+      <th class='storage-name'>Title</th>
+      <th class='storage-size'>Usage</th>
+      </thead>
+      <tbody>
+      <% programmes.each do |programme| %>
+          <tr class="programme-storage-stat">
+            <td class>
+              <%= link_to(h(programme.title), programme) %>
+            </td>
+            <td>
+              <%= number_to_human_size(programme.total_asset_size) %>
+            </td>
+          </tr>
+
+          <% programme.projects.sort_by(&:total_asset_size).reverse.each do |project| %>
+              <tr class="project-storage-stat">
+                <td>
+                  <%= link_to(h(project.title), project) %>
+                </td>
+                <td>
+                  <%= number_to_human_size(project.total_asset_size) %>
+                </td>
+              </tr>
+          <% end %>
+
+      <% end %>
+      </tbody>
+    </table>
+
+<% end %>
+
+<% unless projects_with_programme.empty? %>
+    <h4>Stand alone <%= t('project').pluralize %></h4>
+    <table id="storage-stats">
+      <thead>
+      <th class='storage-name'>Title</th>
+      <th class='storage-size'>Usage</th>
+      </thead>
+      <tbody>
+      <% projects_with_programme.each do |project| %>
+          <tr>
+            <td>
+              <%= link_to(h(project.title), project) %>
+            </td>
+            <td>
+              <%= number_to_human_size(project.total_asset_size) %>
+            </td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+<% end %>
+
