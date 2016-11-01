@@ -314,19 +314,66 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert assigns(:sample_types)
     assert_empty assigns(:sample_types)
 
-    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id),tags:['fred','mary']]
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id)],tags:['fred','mary']
     assert_response :success
     assert assigns(:sample_types)
-    assert_includes assigns(:sample_types),st1
     assert_includes assigns(:sample_types),st3
     refute_includes assigns(:sample_types),st2
+    refute_includes assigns(:sample_types),st1
 
-    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id),tags:['fred','mary','sparrow']]
-    assert_response :success
-    assert assigns(:sample_types)
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id)],tags:['fred','mary','monkey']
+
     assert_includes assigns(:sample_types),st1
     assert_includes assigns(:sample_types),st3
     refute_includes assigns(:sample_types),st2
+  end
+
+  test 'filter for select exclusive tags' do
+    st1=Factory(:simple_sample_type,projects:[@project])
+    st2=Factory(:simple_sample_type,projects:[@project])
+    st3=Factory(:simple_sample_type,projects:[@project])
+    st1.tags='fred,mary'
+    st2.tags='fred,bob,jane'
+    st3.tags='frank,john,jane,peter'
+    st1.save!
+    st2.save!
+    st3.save!
+
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id)],tags:['fred','bob']
+    assert_response :success
+    assert results = assigns(:sample_types)
+    results.sort!
+    assert_equal [st1,st2].sort,results
+
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id)],tags:['fred','bob'],exclusive_tags:'0'
+    assert_response :success
+    assert results = assigns(:sample_types)
+    results.sort!
+    assert_equal [st1,st2].sort,results
+
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id)],tags:['fred','bob'],exclusive_tags:'1'
+    assert_response :success
+    assert results = assigns(:sample_types)
+    results.sort!
+    assert_equal [st2],results
+
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id)],tags:['jane','frank'],exclusive_tags:'1'
+    assert_response :success
+    assert results = assigns(:sample_types)
+    results.sort!
+    assert_equal [st3],results
+
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id)],tags:['peter','frank','jane'],exclusive_tags:'1'
+    assert_response :success
+    assert results = assigns(:sample_types)
+    results.sort!
+    assert_equal [st3],results
+
+    get :filter_for_select,projects:[(st1.projects + st3.projects).collect(&:id)],tags:['frank','jane','bob'],exclusive_tags:'1'
+    assert_response :success
+    assert results = assigns(:sample_types)
+    assert_empty results
+
   end
 
   private

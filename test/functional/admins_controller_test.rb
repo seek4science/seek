@@ -159,7 +159,7 @@ class AdminsControllerTest < ActionController::TestCase
 
   test "get project content stats" do
     login_as(:quentin)
-    xml_http_request :get, :get_stats,{:id=>"contents"}
+    xml_http_request :get, :get_stats,{:id=>"content_stats"}
     assert_response :success
   end
 
@@ -212,6 +212,15 @@ class AdminsControllerTest < ActionController::TestCase
       assert_select "td > span[class='none_text']",:text=>/No date defined/,:count=>1
     end
 
+  end
+
+  test "storage usage stats" do
+    admin=Factory(:admin)
+    Factory(:rightfield_datafile)
+    Factory(:rightfield_annotated_datafile)
+    login_as(admin)
+    xml_http_request :get,:get_stats,{:id=>"storage_usage_stats"}
+    assert_response :success
   end
 
   test "update home page settings" do
