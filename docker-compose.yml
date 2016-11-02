@@ -1,0 +1,48 @@
+version: '2'
+services:
+  db: # Database implementation, in this case MySQL
+    image: mysql:5.7
+    container_name: seek-mysql
+    restart: always
+    env_file:
+      - docker/db.env
+    volumes:
+      - seek-mysql-db:/var/lib/mysql
+
+  seek: # The SEEK application, passenger, solr and delayed_job worker
+    #build: .
+    image: fairdom/seek:1.1
+    container_name: seek
+    command: docker/entrypoint.sh
+    restart: always
+    environment:
+      RAILS_ENV: production
+      SOLR_PORT: 8983
+    env_file:
+      - docker/db.env
+    volumes:
+      - seek-filestore:/seek/filestore
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+      - solr
+    links:
+      - db
+      - solr
+
+  solr:
+    #build: ./docker/solr/
+    image: fairdom/seek-solr
+    container_name: seek-solr
+    volumes:
+      - seek-solr-data:/opt/solr/server/solr/seek/data
+    restart: always
+
+volumes:
+  seek-filestore:
+    external: true
+  seek-mysql-db:
+    external: true
+  seek-solr-data:
+    external: true
