@@ -48,8 +48,15 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
-    # refute attribute.validate_value?(1.0)
-    #  refute attribute.validate_value?('1.0')
+    #contriversial, but after much argument decided to allow these values as integers
+    assert attribute.validate_value?(1.0)
+    assert attribute.validate_value?('1.0')
+    assert attribute.validate_value?(1.00)
+    assert attribute.validate_value?('1.00')
+    assert attribute.validate_value?(1.000)
+    assert attribute.validate_value?('1.000')
+    assert attribute.validate_value?(2.0)
+    assert attribute.validate_value?('2.0')
 
     attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::STRING, regexp: '.*yyy')
     assert attribute.validate_value?('yyy')
@@ -72,6 +79,8 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     assert attribute.validate_value?(1.2)
     assert attribute.validate_value?(0.78)
     assert attribute.validate_value?('0.78')
+    assert attribute.validate_value?(12.70)
+    assert attribute.validate_value?('12.70')
     refute attribute.validate_value?('fish')
     refute attribute.validate_value?('2 Feb 2015')
     refute attribute.validate_value?(nil)
