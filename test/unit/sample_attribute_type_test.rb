@@ -79,6 +79,8 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     assert attribute.validate_value?(1.2)
     assert attribute.validate_value?(0.78)
     assert attribute.validate_value?('0.78')
+    assert attribute.validate_value?(12.70)
+    assert attribute.validate_value?('12.70')
     refute attribute.validate_value?('fish')
     refute attribute.validate_value?('2 Feb 2015')
     refute attribute.validate_value?(nil)
