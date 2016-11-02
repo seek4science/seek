@@ -32,7 +32,6 @@ services:
       - solr
 
   solr:
-    #build: ./docker/solr/
     image: fairdom/seek-solr
     container_name: seek-solr
     volumes:
