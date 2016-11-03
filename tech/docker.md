@@ -28,7 +28,7 @@ which also provides an [Installation Guide](https://docs.docker.com/compose/inst
 ## Running a basic container
 
 A single container is available for SEEK that runs on the SQLite3 database, 
-which is fine for a small to medium number of concurrent users.
+which is fine for a small to medium number of concurrent users. For larger deployments see [Docker compose](#using-docker-compose)
 
 This is a good way to try out your own local installation of SEEK. 
 
@@ -127,7 +127,40 @@ Jumping say, 1.1 -> 1.3 may introduce errors or missed steps during the upgrade.
 
 ## Using docker compose
 
-_COMING SOON_
+If necessary, you can run SEEK in Docker together with MySQL and SOLR running in its own containers. 
+To do this you use Docker Compose. 
+See the [Installation Guide](https://docs.docker.com/compose/install/) for how to install.
+ 
+Once installed, all you need is the [docker-compose.yml](https://github.com/seek4science/seek/blob/master/docker-compose.yml), and the [docker/db.env](https://github.com/seek4science/seek/blob/master/docker/db.env),
+although you can simply check out the SEEK source from GitHub.
+
+First you need to create 3 volumes
+
+    docker volume create --name=seek-filestore
+    docker volume create --name=seek-mysql-db
+    docker volume create --name=seek-solr-data
+    
+and then to start up, with the docker-compose.yml in your currently directory run
+    
+    docker-compose -d up
+    
+and go to http://localhost:8080
+
+to stop run
+    
+    docker-compose down
+        
+You change the port, and image in the docker-compose.yml by editing
+    
+    seek:
+        ..
+        ..
+        image: fairdom/seek:1.2
+        ..
+        ..
+        ports:
+              - "8080:80"                  
+    
 
 ## Building your own docker image
 
