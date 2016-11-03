@@ -39,8 +39,6 @@ layout: page
      - [Publications](generic-linking-variables.html#publications)
      - [Experimental assays and Modelling analysis](generic-linking-variables.html#experimental-assays-and-Modelling-analysis)
      - [Events](generic-linking-variables.html#events)
-
-
      - [Making public](investigation-snapshots.html#making-public)
      - [Snapshotting](investigation-snapshots.html#snapshotting)
      - [Creating a Research Object](investigation-snapshots.html#creating-a-research-object)
