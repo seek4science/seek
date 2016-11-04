@@ -14,7 +14,7 @@ This is a good way to try out your own local installation of SEEK.
 
 Once Docker is installed it can be started simply with:
  
-    docker run -d -p 80:80 --name seek fairdom/seek:1.2
+    docker run -d -p 8080:80 --name seek fairdom/seek:1.2
     
 This will start the container, and will be then available at [http://localhost:8080](http://localhost:8080) 
 after a short few seconds wait for things to start up.
