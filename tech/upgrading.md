@@ -8,7 +8,7 @@ redirect_from: "/upgrading.html"
 
 If you have an existing SEEK installation, and you haven't done so already,
 please take a moment to fill out our very short,optional [SEEK Registration
-Form](http://www.sysmo-db.org/seek-registration). Doing so will be very useful
+Form](http://www.seek4science.org/seek-registration). Doing so will be very useful
 to us in the future when we try and raise further funding to develop and
 support SEEK and the associated tools.
 

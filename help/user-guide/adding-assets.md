@@ -21,15 +21,15 @@ SEEK will show a preview of the link
 ![add data 4](/images/user-guide/add_data_4.png){:.screenshot}
 
 
-Assets in SEEK can be described using a number of fields:
+Assets in SEEK can be described using a number of fields, for example:
 
-* [Title](#title)
-* [Description](#description)
-* [Projects](#projects)
-* [Sharing](#sharing)
-* [Tags](#tags)
-* [Attributions](#attributions)
-* [Contributors](#contributors)
-* [Publications](#publications)
-* [Experimental assays and Modelling analysis](#experimental assays and Modelling analysis)
-* [Events](#events)
+* [Title](generic-linking-variables.html#title)
+* [Description](generic-linking-variables.html#description)
+* [Projects](generic-linking-variables.html#projects)
+* [Sharing](generic-linking-variables.html#sharing)
+* [Tags](generic-linking-variables.html#tags)
+* [Attributions](generic-linking-variables.html#attributions)
+* [Contributors](generic-linking-variables.html#contributors)
+* [Publications](generic-linking-variables.html#publications)
+* [Experimental assays and Modelling analysis](generic-linking-variables.html#experimental-assays-and-modelling-analysis)
+* [Events](generic-linking-variables.html#events)

@@ -40,7 +40,7 @@ You can select a technology type from the drop down menu, or where appropriate c
 
 ![Technology Type 1](/images/user-guide/technology_type_1.png){:.screenshot}
 
-## Organism
+## Organisms
 [Assay specific]
 You can select an organism from the drop down menu.
 

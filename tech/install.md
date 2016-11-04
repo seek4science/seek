@@ -10,7 +10,7 @@ redirect_from: "/install.html"
 
 If you have installed SEEK, please take a moment to fill out our very
 short,optional [SEEK Registration
-Form](http://www.sysmo-db.org/seek-registration)
+Form](http://seek4science.org/seek-registration)
 
 If you have any problems or questions, you should contact us. The following
 link will give you details on how to [Contact Us](/contacting_us.html)

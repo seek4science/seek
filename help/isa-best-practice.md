@@ -16,7 +16,7 @@ For more information on the ISA community work, please see:
 
 ## Examples
 
-There are many ways to describe your projects and the relationships between the different work-packages and research topics. The following guidelines provide a general description of the ISA Infrastructure and examples of how this may fit with your SEEK project. We use examples from the [Bioinvestigation Index (BII)](http://www.ebi.ac.uk/bioinvindex/), which is a public database of ISA compliant data. We also use examples already available in SEEK
+There are many ways to describe your projects and the relationships between the different work-packages and research topics. The following guidelines provide a general description of the ISA Infrastructure and examples of how this may fit with your SEEK project. We use examples from the [Bioinvestigation Index (BII)](https://github.com/ISA-tools/BioInvIndex), which is a public database of ISA compliant data. We also use examples already available in SEEK
 
 * **Investigation:** a high level description of the area and the main aims of a project
     * In SEEK, this may be the overall aims as stated on your grant.   

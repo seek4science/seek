@@ -77,10 +77,7 @@ These additional licenses are also available to be used in SEEK.
     </tr>
     <tr>
         <td>GNU Free Documentation License 1.3 with no cover texts and no invariant sections</td><td><a href="http://www.opendefinition.org/licenses/gfdl" target="_blank">http://www.opendefinition.org/licenses/gfdl</a></td>
-    </tr>
-    <tr>
-        <td>Geogratis</td><td><a href="http://geogratis.gc.ca/geogratis/licenceGG" target="_blank">http://geogratis.gc.ca/geogratis/licenceGG</a></td>
-    </tr>
+    </tr>    
     <tr>
         <td>Higher Education Statistics Agency Copyright with data.gov.uk rights</td><td><a href="http://www.hesa.ac.uk/index.php?option=com_content&task=view&id=2619&Itemid=209" target="_blank">http://www.hesa.ac.uk/index.php?option=com_content&task=view&id=2619&Itemid=209</a></td>
     </tr>

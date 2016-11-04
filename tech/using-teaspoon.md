@@ -24,5 +24,3 @@ To write javascript test in SEEK, add your *_spec.js file under spec/javascripts
 
 You can find an example here: [upload_selection_spec.js](https://github.com/seek4science/seek/blob/master/spec/javascripts/upload_selection_spec.js)
 
-Or another example of using Sinon: [biosample_spec.js](https://github.com/seek4science/seek/blob/master/spec/javascripts/biosample_spec.js)
-
