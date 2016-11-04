@@ -10,6 +10,8 @@ cache: bundler
 branches:
   only:
     - gh-pages
+    - gh-pages-1.2
+    - gh-pages-master
 
 script: bundle exec rake test
 
