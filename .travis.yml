@@ -7,6 +7,10 @@ sudo: false
 
 cache: bundler
 
+branches:
+  only:
+    - gh-pages
+
 script: bundle exec rake test
 
 notifications:
