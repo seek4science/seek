@@ -27,13 +27,21 @@ RUN bundle config --local frozen 1 && \
     bundle install --deployment --without development test
 
 # App code
-COPY . .
+COPY app app
+COPY config config
+COPY db db
+COPY docker docker
+COPY lib lib
+COPY public public
+COPY solr solr
+COPY vendor vendor
+COPY Rakefile Rakefile
+COPY config.ru config.ru
+RUN mkdir log tmp
 
 USER root
-RUN chown -R www-data *
+RUN chown -R www-data solr config docker/upgrade.sh public
 USER www-data
-
-RUN ls -l
 
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \
@@ -41,14 +49,14 @@ RUN mkdir sqlite3-db && \
     chmod +x docker/upgrade.sh && \
     bundle exec rake db:setup
 
+
 RUN bundle exec rake assets:precompile
 
 #root access needed for next couple of steps
 USER root
 
 # NGINX config
-COPY docker/nginx.conf /etc/nginx/sites-available/default
-COPY docker/nginx-system.conf /etc/nginx/nginx.conf
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # Cleanup
 RUN rm -rf /tmp/* /var/tmp/*
