@@ -174,20 +174,22 @@ class PublicationsControllerTest < ActionController::TestCase
       :journal        => "The second best journal",
       :published_date =>  Date.new(2016)
     }]
+
     assert_difference('Publication.count',2) do
       post :create, :subaction => "ImportMultiple", :publication => { :bibtex_file => fixture_file_upload('files/publications.bibtex'), :project_ids => [projects(:one).id] }
-      publication0 = Publication.find_by_title(publications[0][:title])
-      assert_not_nil publication0
-      assert_equal publications[0][:journal], publication0.journal
-      assert_equal publications[0][:authors].collect(&:full_name), publication0.publication_authors.collect(&:full_name)
-      assert_equal publications[0][:published_date], publication0.published_date
-      
-      publication1 = Publication.find_by_title(publications[1][:title])
-      assert_not_nil publication1
-      assert_equal publications[1][:journal], publication1.journal
-      assert_equal publications[1][:authors].collect(&:full_name), publication1.publication_authors.collect(&:full_name)
-      assert_equal publications[1][:published_date], publication1.published_date
     end
+
+    publication0 = Publication.where( title: publications[0][:title]).first
+    assert_not_nil publication0
+    assert_equal publications[0][:journal], publication0.journal
+    assert_equal publications[0][:authors].collect(&:full_name), publication0.publication_authors.collect(&:full_name)
+    assert_equal publications[0][:published_date], publication0.published_date
+
+    publication1 = Publication.where( title: publications[1][:title]).first
+    assert_not_nil publication1
+    assert_equal publications[1][:journal], publication1.journal
+    assert_equal publications[1][:authors].collect(&:full_name), publication1.publication_authors.collect(&:full_name)
+    assert_equal publications[1][:published_date], publication1.published_date
   end
 
   test "should only show the year for 1st Jan" do
