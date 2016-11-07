@@ -66,3 +66,4 @@ SEEK is developed using the [RubyMine IDE](http://www.jetbrains.com/ruby/), for 
 
 Please check our [CREDITS](http://docs.seek4science.org/credits.html) for additional credits and acknowledgements
 
+

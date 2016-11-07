@@ -15,16 +15,33 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p $APP_DIR
+RUN chown www-data $APP_DIR
+
+USER www-data
 
 WORKDIR $APP_DIR
 
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
 COPY Gemfile* ./
-RUN bundle config --global frozen 1 && \
-    bundle install --without development test
+RUN bundle config --local frozen 1 && \
+    bundle install --deployment --without development test
 
 # App code
-COPY . .
+COPY app app
+COPY config config
+COPY db db
+COPY docker docker
+COPY lib lib
+COPY public public
+COPY solr solr
+COPY vendor vendor
+COPY Rakefile Rakefile
+COPY config.ru config.ru
+RUN mkdir log tmp
+
+USER root
+RUN chown -R www-data solr config docker/upgrade.sh public
+USER www-data
 
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \
@@ -32,16 +49,22 @@ RUN mkdir sqlite3-db && \
     chmod +x docker/upgrade.sh && \
     bundle exec rake db:setup
 
+
 RUN bundle exec rake assets:precompile
 
+#root access needed for next couple of steps
+USER root
+
 # NGINX config
-COPY docker/nginx.conf /etc/nginx/sites-available/default
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # Cleanup
 RUN rm -rf /tmp/* /var/tmp/*
 
+USER www-data
+
 # Network
-EXPOSE 80
+EXPOSE 3000
 
 # Shared
 VOLUME ["/seek/filestore", "/seek/sqlite3-db"]

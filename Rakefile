@@ -8,14 +8,4 @@ require File.expand_path('../config/application', __FILE__)
 
 SEEK::Application.load_tasks
 
-#require(File.join(File.dirname(__FILE__), 'config', 'boot'))
-#
-#require 'rake'
-#require 'rake/testtask'
-#
-#
-#require 'tasks/rails'
-#require 'sunspot/solr/tasks'
-#
-#begin; require 'parallel_tests/tasks'; rescue LoadError; end
 

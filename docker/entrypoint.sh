@@ -3,7 +3,7 @@
 # Change secret token
 sed -i "s/secret_token = '.*'/key = '"`bundle exec rake secret`"'/" config/initializers/secret_token.rb
 
-# Force search on
+# Set the search to be enabled by default
 if [ ! -f config/initializers/seek_local.rb ]
 then
     cp docker/seek_local.rb config/initializers/seek_local.rb
