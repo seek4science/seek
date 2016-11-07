@@ -10,7 +10,7 @@ services:
       - seek-mysql-db:/var/lib/mysql
 
   seek: # The SEEK application, passenger, solr and delayed_job worker
-    build: .
+    #build: .
     image: fairdom/seek:1.2
     container_name: seek
     command: docker/entrypoint.sh
@@ -23,7 +23,7 @@ services:
     volumes:
       - seek-filestore:/seek/filestore
     ports:
-      - "8080:80"
+      - "3000:3000"
     depends_on:
       - db
       - solr
