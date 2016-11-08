@@ -14,12 +14,11 @@ This is a good way to try out your own local installation of SEEK.
 
 Once Docker is installed it can be started simply with:
  
-    docker run -d -p 8080:80 --name seek fairdom/seek:1.2
+    docker run -d -p 3000:3000 --name seek fairdom/seek:1.2
     
-This will start the container, and will be then available at [http://localhost:8080](http://localhost:8080) 
+This will start the container, and will be then available at [http://localhost:3000](http://localhost:3000) 
 after a short few seconds wait for things to start up.
-_( -p 8080:80 maps port 8080 to the standard http port 80, if you wish
- to use port 80 then use -p 80:80, or use another port such as -p 3000:80 )_     
+_( the container exposes port 3000 by default, if you want to map to a different port, e.g standard port 80, you can use -p 80:3000 )_     
     
 If you wish to see the logs you can use
     
@@ -61,7 +60,7 @@ and lost once the container is deleted.
 You can avoid this by telling the container to use a couple of Docker volumes for the database and filestore.
   
   
-    docker run -d -p 8080:80 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.2
+    docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.2
     
 this will create 2 volumes called _seek-filestore_ and _seek-db_, which you can see and manage with docker volumes, e.g
     
@@ -82,14 +81,14 @@ Switching to a newer build of the same version is as simple as:
     docker stop seek
     docker rm seek
     docker pull fairdom/seek:1.2
-    docker run -d -p 8080:80 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.2
+    docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.2
     docker exec seek bundle exec seek:reindex_all #(to rebuild the search index)
     
 However, if moving between versions it is necessary to run some upgrade steps which can be achieved by usiung a temporary container.
 
 If for example you have been running SEEK 1.1 with     
 
-    docker run -d -p 8080:80 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.1
+    docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.1
     
 and you now wish to upgrade to 1.2 then do:
     
@@ -97,7 +96,7 @@ and you now wish to upgrade to 1.2 then do:
     docker rm seek
     docker pull fairdom/seek:1.2
     docker run --rm -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db fairdom/seek:1.2 docker/upgrade.sh
-    docker run -d -p 8080:80 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.2
+    docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.2
         
 You will now be running an upgraded SEEK 1.2
         

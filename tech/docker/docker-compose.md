@@ -24,7 +24,7 @@ and then to start up, with the docker-compose.yml in your currently directory ru
     
     docker-compose -d up
     
-and go to http://localhost:8080
+and go to [http://localhost:3000](http://localhost:3000)
 
 to stop run
     
@@ -39,4 +39,19 @@ You change the port, and image in the docker-compose.yml by editing
         ..
         ..
         ports:
-              - "8080:80"
+              - "3000:3000"
+              
+Alternatively to changing the port (particularly if running several instances on
+same machine), you can proxy through Apache or Nginx. E.g. for Nginx you would configure a virtual host
+like the following:
+
+    server {
+        listen 80; 
+        server_name www.my-seek.org;
+        
+        location / {
+            proxy_set_header   X-Real-IP $remote_addr;
+            proxy_set_header   Host      $http_host;
+            proxy_pass         http://127.0.0.1:3000;
+        }
+    }
