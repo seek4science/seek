@@ -143,6 +143,17 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute web_type.validate_value?('moonbeam')
   end
 
+  test 'uri attribute type' do
+    type = SampleAttributeType.new title: 'URI', base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s
+    type.save!
+    type.reload
+    assert type.validate_value?('zzz:222')
+    assert type.validate_value?('http://ontology.org#term')
+    refute type.validate_value?('fish')
+    refute type.validate_value?('fish;cow')
+
+  end
+
   test 'boolean' do
     bool_type = SampleAttributeType.new title: 'bool', base_type: Seek::Samples::BaseType::BOOLEAN
     assert bool_type.valid?
