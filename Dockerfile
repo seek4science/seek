@@ -40,7 +40,7 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 RUN rm -rf /tmp/* /var/tmp/*
 
 # Network
-EXPOSE 80
+EXPOSE 3000
 
 # Shared
 VOLUME ["/seek/filestore", "/seek/sqlite3-db"]

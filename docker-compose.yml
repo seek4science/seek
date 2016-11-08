@@ -23,7 +23,7 @@ services:
     volumes:
       - seek-filestore:/seek/filestore
     ports:
-      - "8080:80"
+      - "3000:3000"
     depends_on:
       - db
       - solr
@@ -32,7 +32,6 @@ services:
       - solr
 
   solr:
-    #build: ./docker/solr/
     image: fairdom/seek-solr
     container_name: seek-solr
     volumes:
