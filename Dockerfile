@@ -37,6 +37,7 @@ COPY solr solr
 COPY vendor vendor
 COPY Rakefile Rakefile
 COPY config.ru config.ru
+COPY script/rails script/rails
 RUN mkdir log tmp
 
 USER root
