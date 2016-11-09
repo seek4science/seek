@@ -69,6 +69,7 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::TEXT, regexp: '.*yyy')
     assert attribute.validate_value?('yyy')
     assert attribute.validate_value?('happpp - yyy')
+
     refute attribute.validate_value?('')
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?(1)
@@ -114,6 +115,21 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(1.2)
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('30 Feb 2015')
+  end
+
+  test 'validate text with newlines' do
+    attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::TEXT)
+
+
+    assert attribute.validate_value?('fish\\n\\rsoup')
+    assert attribute.validate_value?('fish\n\rsoup')
+    assert attribute.validate_value?('fish\r\nsoup')
+    assert attribute.validate_value?('   fish\n\rsoup ')
+    str= %!with
+  a
+  new
+  line%!
+    assert attribute.validate_value?(str)
   end
 
   test 'regular expression match' do
