@@ -35,6 +35,11 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute sample_type.valid?
   end
 
+  test 'is favouritable?' do
+    type=Factory(:simple_sample_type)
+    assert type.is_favouritable?
+  end
+
   test 'test uuid generated' do
     sample_type = SampleType.new title: 'fish'
     assert_nil sample_type.attributes['uuid']

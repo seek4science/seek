@@ -20,6 +20,8 @@ class SampleType < ActiveRecord::Base
 
   acts_as_uniquely_identifiable
 
+  acts_as_favouritable
+
   has_many :samples, inverse_of: :sample_type
 
   has_many :sample_attributes, order: :pos, inverse_of: :sample_type, dependent: :destroy

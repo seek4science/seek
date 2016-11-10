@@ -631,6 +631,11 @@ class SampleTest < ActiveSupport::TestCase
     end
   end
 
+  test 'is favouritable?' do
+    sample=Factory(:sample)
+    assert sample.is_favouritable?
+  end
+
   test 'sample responds to correct methods' do
     sample_type = SampleType.new(title: 'Custom',:project_ids=>[Factory(:project).id])
     attribute1 = Factory(:any_string_sample_attribute, title: 'banana_type',
