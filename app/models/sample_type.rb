@@ -66,8 +66,19 @@ class SampleType < ActiveRecord::Base
   # rather than clearing the selected vocab each time
   def fix_up_controlled_vocabs
     sample_attributes.each do |attribute|
-      unless attribute.sample_attribute_type.controlled_vocab?
+      unless attribute.controlled_vocab?
         attribute.sample_controlled_vocab = nil
+      end
+    end
+  end
+
+  # fixes the consistency of the attribute seek samples where the attribute doesn't match.
+  # this is to help when a seek sample has been selected in the form, but then the type has been changed
+  # rather than clearing the selected sample type each time
+  def fix_up_seek_samples
+    sample_attributes.each do |attribute|
+      unless attribute.seek_sample?
+        attribute.linked_sample_type = nil
       end
     end
   end

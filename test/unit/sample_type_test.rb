@@ -342,11 +342,32 @@ class SampleTypeTest < ActiveSupport::TestCase
     refute type.valid?
     type.fix_up_controlled_vocabs
     assert_nil type.sample_attributes[0].sample_controlled_vocab
-    refute type.sample_attributes[0].sample_attribute_type.controlled_vocab?
+    refute type.sample_attributes[0].controlled_vocab?
     assert_nil type.sample_attributes[1].sample_controlled_vocab
-    refute type.sample_attributes[1].sample_attribute_type.controlled_vocab?
+    refute type.sample_attributes[1].controlled_vocab?
     refute_nil type.sample_attributes[2].sample_controlled_vocab
-    assert type.sample_attributes[2].sample_attribute_type.controlled_vocab?
+    assert type.sample_attributes[2].controlled_vocab?
+
+    assert type.valid?
+  end
+
+  test 'fix up seek samples' do
+    type = Factory(:simple_sample_type)
+    string_attribute = Factory(:simple_string_sample_attribute, sample_type: type, title: 'string type')
+    string_attribute.linked_sample_type = Factory(:simple_sample_type)
+    type.sample_attributes << string_attribute
+    type.sample_attributes << Factory(:sample_sample_attribute, sample_type: type, title: 'seek sample type')
+
+    refute type.valid?
+    type.fix_up_seek_samples
+    assert_nil type.sample_attributes[0].linked_sample_type
+    refute type.sample_attributes[0].seek_sample?
+    assert_nil type.sample_attributes[1].linked_sample_type
+    refute type.sample_attributes[1].seek_sample?
+    refute_nil type.sample_attributes[2].linked_sample_type
+    assert type.sample_attributes[2].seek_sample?
+
+    assert type.valid?
   end
 
   test 'can edit' do

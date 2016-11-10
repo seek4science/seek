@@ -75,6 +75,7 @@ class SampleTypesController < ApplicationController
   def update
     @sample_type.update_attributes(params[:sample_type])
     @sample_type.fix_up_controlled_vocabs
+    @sample_type.fix_up_seek_samples
     flash[:notice] = 'Sample type was successfully updated.' if @sample_type.save
     respond_with(@sample_type)
   end
