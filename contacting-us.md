@@ -8,12 +8,6 @@ redirect_from: "/contacting_us.html"
 
 We have a number of ways you can contact us:
 
-## Support forum
-
-If your query or feedback is of a non confidential nature, we would prefer that you
-contact us through our new support forum at [http://fair-dom.org/support](http://fair-dom.org./support) - please register and ask questions here.
-
-You can also raise feature requests and bugs here.
 
 ## Mailing lists
 
