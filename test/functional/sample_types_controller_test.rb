@@ -132,6 +132,75 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert SampleTypeUpdateJob.new(assigns(:sample_type),true).exists?
   end
 
+  test 'update changing from a CV attribute' do
+    sample_type = Factory(:apples_controlled_vocab_sample_type, project_ids: [@project.id])
+    assert sample_type.valid?
+    assert sample_type.can_edit?
+    assert_equal 1, sample_type.sample_attributes.count
+    attribute = sample_type.sample_attributes.first
+    assert attribute.controlled_vocab?
+
+    #change to String
+    attribute_fields=[
+        {pos: attribute.pos, title: 'A String',
+         required: (attribute.required ? '1' : '0'),
+         sample_attribute_type_id: @string_type.id,
+         _destroy: '0',
+         id: attribute.id
+        }
+    ]
+    put :update, id: sample_type, sample_type: {title: sample_type.title,
+                                                sample_attributes_attributes: attribute_fields
+    }
+    assert_redirected_to sample_type_path(assigns(:sample_type))
+    assert_nil flash[:error]
+    sample_type=assigns(:sample_type)
+    attribute = sample_type.sample_attributes.first
+    refute attribute.controlled_vocab?
+    assert_equal 'A String', attribute.title
+    assert_equal @string_type, attribute.sample_attribute_type
+
+  end
+
+  test 'update changing from a Sample Type attribute' do
+    sample_type = Factory(:linked_sample_type, project_ids: [@project.id])
+    assert sample_type.valid?
+    assert sample_type.can_edit?
+    assert_equal 2, sample_type.sample_attributes.count
+    attribute = sample_type.sample_attributes.last
+    assert attribute.seek_sample?
+
+    #this won't be changed
+    first_attribute = sample_type.sample_attributes.first
+
+    #change to String
+    attribute_fields=[
+        {pos: first_attribute.pos, title:first_attribute.title,
+         required: (first_attribute.required ? '1' : '0'),
+         sample_attribute_type_id: first_attribute.sample_attribute_type.id,
+         _destroy: '0',
+         id: first_attribute.id
+        },
+        {pos: attribute.pos, title: 'A String',
+         required: (attribute.required ? '1' : '0'),
+         sample_attribute_type_id: @string_type.id,
+         _destroy: '0',
+         id: attribute.id
+        }
+    ]
+    put :update, id: sample_type, sample_type: {title: sample_type.title,
+                                                sample_attributes_attributes: attribute_fields
+    }
+    assert_redirected_to sample_type_path(assigns(:sample_type))
+    assert_nil flash[:error]
+    sample_type=assigns(:sample_type)
+    attribute = sample_type.sample_attributes.last
+    refute attribute.seek_sample?
+    assert_equal 'A String', attribute.title
+    assert_equal @string_type, attribute.sample_attribute_type
+
+  end
+
   test 'other project member cannot update sample type' do
     sample_type = Factory(:patient_sample_type,project_ids:[Factory(:project).id],title:'should not change')
     refute sample_type.can_edit?

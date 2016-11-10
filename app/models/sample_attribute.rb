@@ -25,6 +25,8 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, where(is_title: true)
 
+  delegate :controlled_vocab?, :seek_sample?,to: :sample_attribute_type,:allow_nil => true
+
   def title=(title)
     super
     generate_accessor_name
@@ -55,7 +57,7 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   def controlled_vocab_labels
-    if sample_attribute_type.controlled_vocab?
+    if controlled_vocab?
       sample_controlled_vocab.labels
     else
       []
@@ -85,19 +87,19 @@ class SampleAttribute < ActiveRecord::Base
   end
 
   def sample_controlled_vocab_and_attribute_type_consistency
-    if sample_attribute_type && sample_controlled_vocab && !sample_attribute_type.controlled_vocab?
+    if sample_attribute_type && sample_controlled_vocab && !controlled_vocab?
       errors.add(:sample_attribute_type, 'Attribute type must be CV if controlled vocabulary set')
     end
-    if sample_attribute_type && sample_attribute_type.controlled_vocab? && sample_controlled_vocab.nil?
+    if controlled_vocab? && sample_controlled_vocab.nil?
       errors.add(:sample_controlled_vocab, 'Controlled vocabulary must be set if attribute type is CV')
     end
   end
 
   def linked_sample_type_and_attribute_type_consistency
-    if sample_attribute_type && linked_sample_type && !sample_attribute_type.seek_sample?
+    if sample_attribute_type && linked_sample_type && !seek_sample?
       errors.add(:sample_attribute_type, 'Attribute type must be SeekSample if linked sample type set')
     end
-    if sample_attribute_type && sample_attribute_type.seek_sample? && linked_sample_type.nil?
+    if seek_sample? && linked_sample_type.nil?
       errors.add(:sample_controlled_vocab, 'Linked Sample Type must be set if attribute type is SeekSample')
     end
   end

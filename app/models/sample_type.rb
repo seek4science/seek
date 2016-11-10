@@ -72,6 +72,7 @@ class SampleType < ActiveRecord::Base
     end
   end
 
+
   def tags=(tags)
     tag_annotations(tags, 'sample_type_tags')
   end
