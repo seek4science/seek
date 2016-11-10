@@ -519,6 +519,23 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   end
 
+  test 'generate template with cv, with quote in attribute name' do
+    SampleType.skip_callback(:save, :after, :queue_template_generation)
+    sample_type = Factory(:simple_sample_type,project_ids:[Factory(:project).id])
+    sample_type.sample_attributes.first.title="With a ' in the title"
+    sample_type.sample_attributes.first.save!
+    sample_type.save!
+    SampleType.set_callback(:save, :after, :queue_template_generation)
+
+    sample_type.generate_template
+
+    refute_nil sample_type.content_blob
+    assert File.exist?(sample_type.content_blob.filepath)
+    assert_equal 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', sample_type.content_blob.content_type
+    assert_equal "#{sample_type.title} template.xlsx", sample_type.content_blob.original_filename
+
+  end
+
   test 'dependant attributes destroyed' do
     type = Factory(:patient_sample_type)
     attribute_count = type.sample_attributes.count
