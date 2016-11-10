@@ -340,7 +340,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     type.sample_attributes << Factory(:apples_controlled_vocab_attribute, sample_type: type, title: 'cv type')
 
     refute type.valid?
-    type.fix_up_controlled_vocabs
+    type.resolve_inconsistencies
     assert_nil type.sample_attributes[0].sample_controlled_vocab
     refute type.sample_attributes[0].controlled_vocab?
     assert_nil type.sample_attributes[1].sample_controlled_vocab
@@ -359,7 +359,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     type.sample_attributes << Factory(:sample_sample_attribute, sample_type: type, title: 'seek sample type')
 
     refute type.valid?
-    type.fix_up_seek_samples
+    type.resolve_inconsistencies
     assert_nil type.sample_attributes[0].linked_sample_type
     refute type.sample_attributes[0].seek_sample?
     assert_nil type.sample_attributes[1].linked_sample_type
