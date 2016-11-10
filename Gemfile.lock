@@ -222,7 +222,7 @@ GEM
       csl (~> 1.4)
     climate_control (0.0.3)
       activesupport (>= 3.0)
-    cocaine (0.5.7)
+    cocaine (0.5.8)
       climate_control (>= 0.0.3, < 1.0)
     code_analyzer (0.4.5)
       sexp_processor
@@ -426,7 +426,7 @@ GEM
       minitest (>= 2.12, < 5.0)
       powerbar
     modporter-plugin (0.1.0)
-    multi_json (1.11.2)
+    multi_json (1.12.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
     mysql2 (0.3.18)
@@ -643,7 +643,7 @@ GEM
       virtus (~> 1.0)
     rubyzip (1.1.7)
     safe_yaml (1.0.4)
-    sample-template-generator (0.3.0)
+    sample-template-generator (0.3.3)
       cocaine
       rdoc
     sass (3.4.13)
