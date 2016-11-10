@@ -22,8 +22,8 @@ class SamplesController < ApplicationController
 
   def new
     if params[:sample_type_id]
-    @sample = Sample.new(sample_type_id: params[:sample_type_id])
-    respond_with(@sample)
+      @sample = Sample.new(sample_type_id: params[:sample_type_id])
+      respond_with(@sample)
     else
       redirect_to select_sample_types_path
     end

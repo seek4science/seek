@@ -25,7 +25,7 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, where(is_title: true)
 
-  delegate :controlled_vocab?, :seek_sample?,to: :sample_attribute_type,:allow_nil => true
+  delegate :controlled_vocab?, :seek_sample?, to: :sample_attribute_type, allow_nil: true
 
   def title=(title)
     super
