@@ -24,7 +24,7 @@ class SampleType < ActiveRecord::Base
 
   has_many :samples, inverse_of: :sample_type
 
-  has_many :sample_attributes, order: :pos, inverse_of: :sample_type, dependent: :destroy,after_add: :detect_link_back_to_self
+  has_many :sample_attributes, order: :pos, inverse_of: :sample_type, dependent: :destroy, after_add: :detect_link_back_to_self
 
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 
@@ -90,8 +90,10 @@ class SampleType < ActiveRecord::Base
 
   def can_delete?(user = User.current_user)
     can_edit?(user) && samples.empty? &&
-        linked_sample_attributes.detect{|attr| attr.sample_type &&
-            attr.sample_type!=self}.nil?
+      linked_sample_attributes.detect do|attr|
+        attr.sample_type &&
+          attr.sample_type != self
+      end.nil?
   end
 
   def editing_constraints
@@ -141,7 +143,7 @@ class SampleType < ActiveRecord::Base
   # callback when the attribute is added to the sample type. it can now be linked to this sample type now we know what it is
   def detect_link_back_to_self(sample_attribute)
     if sample_attribute.deferred_link_to_self
-      sample_attribute.linked_sample_type=self
+      sample_attribute.linked_sample_type = self
     end
   end
 
