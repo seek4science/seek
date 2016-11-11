@@ -425,15 +425,23 @@ class SampleTypeTest < ActiveSupport::TestCase
 
     # cannot delete if linked from another sample type
     linked_sample_type = Factory(:linked_sample_type)
-    refute type.can_delete?
     linked_attribute = linked_sample_type.sample_attributes.last
     type = linked_attribute.linked_sample_type
+    refute_equal linked_sample_type,type
+
+    refute type.can_delete?
     assert_no_difference('SampleType.count') do
       assert_difference('SampleAttribute.count', -1) do
         linked_attribute.destroy
       end
     end
 
+    type.reload
+    assert type.can_delete?
+
+    #however, can delete if linked to itself
+    type = Factory(:linked_sample_type_to_self)
+    assert_equal type,type.sample_attributes.last.linked_sample_type
     assert type.can_delete?
   end
 
