@@ -58,11 +58,18 @@
     </div>
     <div class='sample-type-block' style="<%= 'display:none;' unless sample_attribute.try(:seek_sample?) %>">
       <br/>
+      <%
+        options = sample_type_grouped_options
+        #if a new record, then include the option to link to itself
+        if sample_type.new_record?
+          options = [['Special',[['<This Sample Type>','self']]]] + options
+        end
+      %>
       <%= select_tag "#{field_name_prefix}[linked_sample_type_id]",
-                     grouped_options_for_select(sample_type_grouped_options,
+                     grouped_options_for_select(options,
                                         linked_sample_type_id),
-                     :include_blank => true,
-                     :class => 'form-control linked-sample-type-selection' %>
+                     include_blank: true,
+                     class: 'form-control linked-sample-type-selection' %>
     </div>
   </td>
   <td>

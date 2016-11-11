@@ -27,10 +27,19 @@ class SampleAttribute < ActiveRecord::Base
 
   delegate :controlled_vocab?, :seek_sample?, to: :sample_attribute_type, allow_nil: true
 
+  #to store that this attribute should be linked to the sample_type it is being assigned to, but needs to wait until the
+  #sample type exists
+  attr_reader :deferred_link_to_self
+
   def title=(title)
     super
     generate_accessor_name
     self.title
+  end
+
+  def linked_sample_type_id=id
+    @deferred_link_to_self=true if id=='self'
+    super(id)
   end
 
   def validate_value?(value)
