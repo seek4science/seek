@@ -88,8 +88,10 @@ class SampleType < ActiveRecord::Base
     user && user.person && ((projects & user.person.projects).any?)
   end
 
-  def can_delete?(_user = User.current_user)
-    samples.empty? && linked_sample_attributes.detect{|attr| attr.sample_type && attr.sample_type!=self}.nil?
+  def can_delete?(user = User.current_user)
+    can_edit?(user) && samples.empty? &&
+        linked_sample_attributes.detect{|attr| attr.sample_type &&
+            attr.sample_type!=self}.nil?
   end
 
   def editing_constraints

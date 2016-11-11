@@ -415,34 +415,55 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'can delete' do
-    type = Factory(:simple_sample_type)
-    assert type.can_delete?
-    type = Factory(:patient_sample).sample_type
+    person = Factory(:person)
+    project=person.projects.first
+    type = Factory(:simple_sample_type,project_ids:[project.id])
     refute type.can_delete?
+    assert type.can_delete?(person.user)
+    User.with_current_user(person.user) do
+      assert type.can_delete?
 
-    # double check the type has been saved (due to an issue when running all tests together)
-    refute type.new_record?
+      #cannot delete with samples
+      type = Factory(:patient_sample,project_ids:[project.id]).sample_type
+      refute type.can_delete?
 
-    # cannot delete if linked from another sample type
-    linked_sample_type = Factory(:linked_sample_type)
-    linked_attribute = linked_sample_type.sample_attributes.last
-    type = linked_attribute.linked_sample_type
-    refute_equal linked_sample_type,type
+      # double check the type has been saved (due to an issue when running all tests together)
+      refute type.new_record?
 
-    refute type.can_delete?
-    assert_no_difference('SampleType.count') do
-      assert_difference('SampleAttribute.count', -1) do
-        linked_attribute.destroy
+      # cannot delete if linked from another sample type
+      linked_sample_type = Factory(:linked_sample_type,project_ids:[project.id])
+      linked_attribute = linked_sample_type.sample_attributes.last
+      type = linked_attribute.linked_sample_type
+
+      #some sanity checking
+      assert_empty type.samples
+      assert_include type.projects,project
+      assert type.can_edit?
+      refute_equal linked_sample_type,type
+      refute type.can_delete?
+
+      assert_no_difference('SampleType.count') do
+        assert_difference('SampleAttribute.count', -1) do
+          linked_attribute.destroy
+        end
       end
+
+      type.reload
+      assert type.can_delete?
+
+      #however, can delete if linked to itself
+      type = Factory(:linked_sample_type_to_self,project_ids:[project.id])
+      assert_equal type,type.sample_attributes.last.linked_sample_type
+      assert type.can_delete?
+    end
+    another_person = Factory(:person)
+    refute_includes another_person.projects,project
+    type = Factory(:simple_sample_type,project_ids:[project.id])
+    refute type.can_delete?(another_person.user)
+    User.with_current_user(another_person.user) do
+      refute type.can_delete?
     end
 
-    type.reload
-    assert type.can_delete?
-
-    #however, can delete if linked to itself
-    type = Factory(:linked_sample_type_to_self)
-    assert_equal type,type.sample_attributes.last.linked_sample_type
-    assert type.can_delete?
   end
 
   test 'queue template generation' do
