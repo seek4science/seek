@@ -7,7 +7,6 @@ class ApplicationHelperTest < ActionView::TestCase
 
       assay = Factory(:assay)
       html = persistent_resource_id(assay)
-      puts html
       blocks=HTML::Document.new(html).root.children.first.children
       # should be something like
       # <p class="id">
