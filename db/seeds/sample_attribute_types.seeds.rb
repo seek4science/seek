@@ -13,5 +13,6 @@ SampleAttributeType.find_or_create_by_title("Boolean",base_type:Seek::Samples::B
 SampleAttributeType.find_or_create_by_title("SEEK Strain",base_type:Seek::Samples::BaseType::SEEK_STRAIN)
 SampleAttributeType.find_or_create_by_title("SEEK Sample",base_type:Seek::Samples::BaseType::SEEK_SAMPLE)
 SampleAttributeType.find_or_create_by_title("Controlled Vocabulary",base_type:Seek::Samples::BaseType::CV)
+SampleAttributeType.find_or_create_by_title("URI",base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s)
 
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types."

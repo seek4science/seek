@@ -536,7 +536,7 @@ module ApplicationHelper
      Strain=>"You cannot delete this Strain. Samples associated with it or you are not authorized.",
      Project=>"You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
      Institution=>"You cannot delete this Institution. It may have people associated with it.",
-     SampleType=>"You cannot delete this Sample Type, is may have Samples associated with it",
+     SampleType=>"You cannot delete this Sample Type, it may have Samples associated with it or have another Sample Type linked to it",
      SampleControlledVocab=>"You can delete this Controlled Vocabulary, it may be associated with a Sample Type"
     }
   end

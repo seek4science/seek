@@ -56,8 +56,8 @@ class SampleTypesController < ApplicationController
     tags = params[:sample_type].delete(:tags)
     @sample_type = SampleType.new(params[:sample_type])
 
-    # removes controlled vocabularies set on attributes where the type is not CV
-    @sample_type.fix_up_controlled_vocabs
+    # removes controlled vocabularies or linked seek samples where the type may differ
+    @sample_type.resolve_inconsistencies
     @tab = 'manual'
 
     respond_to do |format|
@@ -74,6 +74,7 @@ class SampleTypesController < ApplicationController
   # PUT /sample_types/1.json
   def update
     @sample_type.update_attributes(params[:sample_type])
+    @sample_type.resolve_inconsistencies
     flash[:notice] = 'Sample type was successfully updated.' if @sample_type.save
     respond_with(@sample_type)
   end
@@ -104,7 +105,7 @@ class SampleTypesController < ApplicationController
     @sample_types = SampleType.joins(:projects).where('projects.id' => params[:projects])
     unless params[:tags].blank?
       @sample_types.select! do |sample_type|
-        if params[:exclusive_tags]=='1'
+        if params[:exclusive_tags] == '1'
           (params[:tags] - sample_type.annotations_as_text_array).empty?
         else
           (sample_type.annotations_as_text_array & params[:tags]).any?

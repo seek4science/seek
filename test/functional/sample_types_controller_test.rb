@@ -7,9 +7,10 @@ class SampleTypesControllerTest < ActionController::TestCase
   setup do
     @person = Factory(:person)
     @project = @person.projects.first
+    @project_ids=[@project.id]
     refute_nil @project
     login_as(@person)
-    @sample_type = Factory(:simple_sample_type,project_ids:[@project.id])
+    @sample_type = Factory(:simple_sample_type,project_ids:@project_ids)
     @string_type = Factory(:string_sample_attribute_type)
     @int_type = Factory(:integer_sample_attribute_type)
   end
@@ -32,7 +33,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('SampleType.count') do
       post :create, sample_type: { title: 'Hello!',
-                                   project_ids:[@project.id],
+                                   project_ids:@project_ids,
                                    sample_attributes_attributes: {
                                      '0' => {
                                        pos: '1', title: 'a string', required: '1', is_title: '1',
@@ -80,6 +81,33 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'a string', sample_type.sample_attributes.title_attributes.first.title
     assert_equal 'a sample', sample_type.sample_attributes.last.title
     assert sample_type.sample_attributes.last.sample_attribute_type.seek_sample?
+    assert_equal @sample_type,sample_type.sample_attributes.last.linked_sample_type
+  end
+
+  test 'should create with linked sample type of itself' do
+    linked_sample_type = Factory(:sample_sample_attribute_type)
+    assert_difference('SampleType.count') do
+      post :create, sample_type: { title: 'Hello!',
+                                   project_ids:@project_ids,
+                                   sample_attributes_attributes: {
+                                       '0' => {
+                                           pos: '1', title: 'a string', required: '1', is_title: '1',
+                                           sample_attribute_type_id: @string_type.id, _destroy: '0' },
+                                       '1' => {
+                                           pos: '2', title: 'a sample', required: '1',
+                                           sample_attribute_type_id: linked_sample_type.id, linked_sample_type_id:'self', _destroy: '0'
+                                       }
+                                   }
+      }
+    end
+    refute_nil sample_type=assigns(:sample_type)
+    assert_redirected_to sample_type_path(sample_type)
+    assert_equal 2, sample_type.sample_attributes.size
+    assert_equal 'a string', sample_type.sample_attributes.title_attributes.first.title
+    assert_equal 'a sample', sample_type.sample_attributes.last.title
+    assert sample_type.sample_attributes.last.sample_attribute_type.seek_sample?
+    assert_equal sample_type,sample_type.sample_attributes.last.linked_sample_type
+
   end
 
   test 'should show sample_type' do
@@ -95,7 +123,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
 
   test 'should update sample_type' do
-    sample_type = Factory(:patient_sample_type,project_ids:[@project.id])
+    sample_type = Factory(:patient_sample_type,project_ids:@project_ids)
     assert_empty sample_type.tags_as_text_array
 
     golf = Factory :tag,:source=>@person.user,:annotatable=>Factory(:simple_sample_type),:value=>"golf"
@@ -130,6 +158,75 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal ['fish','golf'],assigns(:sample_type).tags.sort
     assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
     assert SampleTypeUpdateJob.new(assigns(:sample_type),true).exists?
+  end
+
+  test 'update changing from a CV attribute' do
+    sample_type = Factory(:apples_controlled_vocab_sample_type, project_ids: @project_ids)
+    assert sample_type.valid?
+    assert sample_type.can_edit?
+    assert_equal 1, sample_type.sample_attributes.count
+    attribute = sample_type.sample_attributes.first
+    assert attribute.controlled_vocab?
+
+    #change to String
+    attribute_fields=[
+        {pos: attribute.pos, title: 'A String',
+         required: (attribute.required ? '1' : '0'),
+         sample_attribute_type_id: @string_type.id,
+         _destroy: '0',
+         id: attribute.id
+        }
+    ]
+    put :update, id: sample_type, sample_type: {title: sample_type.title,
+                                                sample_attributes_attributes: attribute_fields
+    }
+    assert_redirected_to sample_type_path(assigns(:sample_type))
+    assert_nil flash[:error]
+    sample_type=assigns(:sample_type)
+    attribute = sample_type.sample_attributes.first
+    refute attribute.controlled_vocab?
+    assert_equal 'A String', attribute.title
+    assert_equal @string_type, attribute.sample_attribute_type
+
+  end
+
+  test 'update changing from a Sample Type attribute' do
+    sample_type = Factory(:linked_sample_type, project_ids: @project_ids)
+    assert sample_type.valid?
+    assert sample_type.can_edit?
+    assert_equal 2, sample_type.sample_attributes.count
+    attribute = sample_type.sample_attributes.last
+    assert attribute.seek_sample?
+
+    #this won't be changed
+    first_attribute = sample_type.sample_attributes.first
+
+    #change to String
+    attribute_fields=[
+        {pos: first_attribute.pos, title:first_attribute.title,
+         required: (first_attribute.required ? '1' : '0'),
+         sample_attribute_type_id: first_attribute.sample_attribute_type.id,
+         _destroy: '0',
+         id: first_attribute.id
+        },
+        {pos: attribute.pos, title: 'A String',
+         required: (attribute.required ? '1' : '0'),
+         sample_attribute_type_id: @string_type.id,
+         _destroy: '0',
+         id: attribute.id
+        }
+    ]
+    put :update, id: sample_type, sample_type: {title: sample_type.title,
+                                                sample_attributes_attributes: attribute_fields
+    }
+    assert_redirected_to sample_type_path(assigns(:sample_type))
+    assert_nil flash[:error]
+    sample_type=assigns(:sample_type)
+    attribute = sample_type.sample_attributes.last
+    refute attribute.seek_sample?
+    assert_equal 'A String', attribute.title
+    assert_equal @string_type, attribute.sample_attribute_type
+
   end
 
   test 'other project member cannot update sample type' do
@@ -174,7 +271,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('SampleType.count', 1) do
       assert_difference('ContentBlob.count', 1) do
-        post :create_from_template, sample_type: { title: 'Hello!',project_ids:[@project.id] }, content_blobs: [blob]
+        post :create_from_template, sample_type: { title: 'Hello!',project_ids:@project_ids }, content_blobs: [blob]
       end
     end
 
@@ -188,7 +285,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('SampleType.count', 1) do
       assert_difference('ContentBlob.count', 1) do
-        post :create_from_template, sample_type: { title: 'Hello!',project_ids:[@project.id] }, content_blobs: [blob]
+        post :create_from_template, sample_type: { title: 'Hello!',project_ids:@project_ids }, content_blobs: [blob]
       end
     end
 
@@ -210,7 +307,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show link to sample type for linked attribute' do
-    linked_type = Factory(:linked_sample_type)
+    linked_type = Factory(:linked_sample_type,project_ids:@project_ids)
     linked_attribute = linked_type.sample_attributes.last
 
     assert linked_attribute.sample_attribute_type.seek_sample?
@@ -220,7 +317,6 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     get :show,id:linked_type.id
 
-    record_body
     assert_select 'li',:text=>/patient \(#{linked_attribute.sample_attribute_type.title}/i do
       assert_select 'a[href=?]',sample_type_path(sample_type_linked_to),text:sample_type_linked_to.title
     end
@@ -228,7 +324,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'add attribute button' do
-    type = Factory(:simple_sample_type,:project_ids=>[@project.id])
+    type = Factory(:simple_sample_type,:project_ids=>@project_ids)
     assert_empty type.samples
     login_as(@person)
     get :edit,id:type.id
@@ -236,7 +332,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_select "a#add-attribute",count:1
 
     sample = Factory(:patient_sample,contributor:@person.user,
-                     sample_type:Factory(:patient_sample_type,project_ids:[@project.id]))
+                     sample_type:Factory(:patient_sample_type,project_ids:@project_ids))
     type=sample.sample_type
     refute_empty type.samples
     assert type.can_edit?
@@ -244,15 +340,12 @@ class SampleTypesControllerTest < ActionController::TestCase
     get :edit,id:type.id
     assert_response :success
     assert_select "a#add-attribute",count:0
-
   end
 
   test 'cannot access when disabled' do
-
     sample_type = Factory(:simple_sample_type)
     login_as(@person.user)
     with_config_value :samples_enabled,false do
-
       get :show, id: sample_type.id
       assert_redirected_to :root
       refute_nil flash[:error]
@@ -268,9 +361,7 @@ class SampleTypesControllerTest < ActionController::TestCase
       get :new
       assert_redirected_to :root
       refute_nil flash[:error]
-
     end
-
   end
 
   test 'select' do

@@ -576,7 +576,7 @@ class SampleTest < ActiveSupport::TestCase
   test 'set linked sample by id' do
     #setup sample type, to be linked to patient sample type
     patient = Factory(:patient_sample)
-    linked_sample_type = Factory(:linked_sample_type)
+    linked_sample_type = Factory(:linked_sample_type,project_ids:[Factory(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
     linked_sample_type.save!
 
@@ -596,7 +596,7 @@ class SampleTest < ActiveSupport::TestCase
   test 'set linked sample by title' do
     #setup sample type, to be linked to patient sample type
     patient = Factory(:patient_sample)
-    linked_sample_type = Factory(:linked_sample_type)
+    linked_sample_type = Factory(:linked_sample_type,project_ids:[Factory(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
 
     linked_sample_type.save!
@@ -629,6 +629,11 @@ class SampleTest < ActiveSupport::TestCase
         refute Sample.can_create?
       end
     end
+  end
+
+  test 'is favouritable?' do
+    sample=Factory(:sample)
+    assert sample.is_favouritable?
   end
 
   test 'sample responds to correct methods' do

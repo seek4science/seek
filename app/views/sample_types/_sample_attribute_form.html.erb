@@ -11,7 +11,6 @@
 <% unit_id = sample_attribute ? sample_attribute.unit_id : nil %>
 <% template_column_index = sample_attribute ? sample_attribute.template_column_index : nil %>
 <% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
-<% is_controlled_vocab = sample_attribute && sample_attribute.sample_attribute_type.try(:controlled_vocab?) %>
 <% constraints = sample_type.editing_constraints %>
 <% allow_required = constraints.allow_required?(sample_attribute) %>
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
@@ -48,7 +47,7 @@
                                       attribute_type_id),
                    :class => 'form-control sample-type-attribute-type',
                    disabled:!allow_type_change %>
-    <div class='controlled-vocab-block' style="<%= 'display:none;' unless is_controlled_vocab %>">
+    <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
                      options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id] },
@@ -57,13 +56,20 @@
                      :class => 'form-control controlled-vocab-selection' %>
         <%= create_sample_controlled_vocab_model_button %>
     </div>
-    <div class='sample-type-block' style="<%= 'display:none;' unless is_controlled_vocab %>">
+    <div class='sample-type-block' style="<%= 'display:none;' unless sample_attribute.try(:seek_sample?) %>">
       <br/>
+      <%
+        options = sample_type_grouped_options
+        #if a new record, then include the option to link to itself
+        if sample_type.new_record?
+          options = [['Special',[['<This Sample Type>','self']]]] + options
+        end
+      %>
       <%= select_tag "#{field_name_prefix}[linked_sample_type_id]",
-                     grouped_options_for_select(sample_type_grouped_options,
+                     grouped_options_for_select(options,
                                         linked_sample_type_id),
-                     :include_blank => true,
-                     :class => 'form-control linked-sample-type-selection' %>
+                     include_blank: true,
+                     class: 'form-control linked-sample-type-selection' %>
     </div>
   </td>
   <td>

@@ -27,16 +27,7 @@ RUN bundle config --local frozen 1 && \
     bundle install --deployment --without development test
 
 # App code
-COPY app app
-COPY config config
-COPY db db
-COPY docker docker
-COPY lib lib
-COPY public public
-COPY solr solr
-COPY vendor vendor
-COPY Rakefile Rakefile
-COPY config.ru config.ru
+COPY . .
 RUN mkdir log tmp
 
 USER root
