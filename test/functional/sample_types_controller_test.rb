@@ -5,7 +5,8 @@ class SampleTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   setup do
-    @person = Factory(:person)
+    Factory(:person)#to prevent person being first person and therefore admin
+    @person = Factory(:project_administrator)
     @project = @person.projects.first
     @project_ids=[@project.id]
     refute_nil @project
