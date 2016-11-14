@@ -132,14 +132,19 @@ class SampleType < ActiveRecord::Base
   def validate_attribute_title_unique
     # TODO: would like to have done this with uniquness{scope: :sample_type_id} on the attribute, but that leads to an exception when being added
     # to the sample type
-    titles = sample_attributes.collect(&:title).collect(&:downcase)
+    titles = attribute_titles.collect(&:downcase)
     dups = titles.select { |title| titles.count(title) > 1 }.uniq
     if dups.any?
-      errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups.join(', ')}")
+      dups_text=dups.join(', ')
+      errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups_text}")
     end
   end
 
   def attribute_search_terms
+    attribute_titles
+  end
+
+  def attribute_titles
     sample_attributes.collect(&:title)
   end
 

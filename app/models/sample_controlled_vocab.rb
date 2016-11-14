@@ -32,8 +32,8 @@ class SampleControlledVocab < ActiveRecord::Base
   end
 
   def self.can_create?
-    can = User.logged_in_and_member? && Seek::Config.samples_enabled
-    can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.is_admin_or_project_administrator?)
+    #criteria is the same, and likely to always be
+    SampleType.can_create?
   end
 
   private
