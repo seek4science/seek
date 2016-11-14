@@ -2211,7 +2211,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'can disambiguate sample type' do
-    person = Factory(:person)
+    person = Factory(:project_administrator)
     login_as(person)
 
     Factory(:string_sample_attribute_type, title:'String')
@@ -2314,7 +2314,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "can't extract from data file if no permissions" do
-    person = Factory(:person)
+    person = Factory(:project_administrator)
     another_person = Factory(:person)
     login_as(person)
 
@@ -2344,7 +2344,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
 
   test 'strain samples successfully extracted from spreadsheet' do
-    person = Factory(:person)
+    person = Factory(:project_administrator)
     login_as(person)
 
     Factory(:string_sample_attribute_type, title:'String')
@@ -2372,7 +2372,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'extract from data file' do
-    person = Factory(:person)
+    person = Factory(:project_administrator)
     login_as(person)
 
     Factory(:string_sample_attribute_type, title:'String')
@@ -2410,7 +2410,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'extract from data file with multiple matching sample types redirects to selection page' do
-    person = Factory(:person)
+    person = Factory(:project_administrator)
     login_as(person)
 
     Factory(:string_sample_attribute_type, title:'String')
@@ -2444,7 +2444,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'extract from data file queues job' do
-    person = Factory(:person)
+    person = Factory(:project_administrator)
     login_as(person)
 
     Factory(:string_sample_attribute_type, title:'String')
@@ -2472,7 +2472,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "can't extract from data file if samples already extracted" do
-    person = Factory(:person)
+    person = Factory(:project_administrator)
     login_as(person)
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
