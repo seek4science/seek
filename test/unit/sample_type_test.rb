@@ -516,6 +516,33 @@ class SampleTypeTest < ActiveSupport::TestCase
       end
     end
 
+    with_config_value :project_admin_sample_type_restriction, true do
+      project_admin = Factory(:project_administrator)
+      another_project_admin = Factory(:project_administrator)
+      seek_admin=Factory(:admin)
+      type = Factory(:simple_sample_type,project_ids:[project_admin.projects.first.id])
+      refute type.can_delete?
+      refute type.can_delete?(@person.user)
+      User.with_current_user(@person.user) do
+        refute type.can_delete?
+      end
+
+      refute type.can_delete?(another_project_admin.user)
+      User.with_current_user(another_project_admin.user) do
+        refute type.can_delete?
+      end
+
+      assert type.can_delete?(project_admin.user)
+      User.with_current_user(project_admin.user) do
+        assert type.can_delete?
+      end
+
+      assert type.can_delete?(seek_admin.user)
+      User.with_current_user(seek_admin.user) do
+        assert type.can_delete?
+      end
+    end
+
 
   end
 

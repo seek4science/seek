@@ -23,8 +23,8 @@ class SampleControlledVocab < ActiveRecord::Base
     labels.include?(value)
   end
 
-  def can_delete?(_user = User.current_user)
-    sample_types.empty?
+  def can_delete?(user = User.current_user)
+    sample_types.empty? && can_edit?(user)
   end
 
   def can_edit?(user = User.current_user)

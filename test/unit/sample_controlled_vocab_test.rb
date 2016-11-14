@@ -43,22 +43,53 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
 
   test 'destroy' do
     cv = Factory(:apples_sample_controlled_vocab)
-    assert_difference('SampleControlledVocab.count', -1) do
-      assert_difference('SampleControlledVocabTerm.count', -4) do
-        assert cv.destroy
+    with_config_value :project_admin_sample_type_restriction, false do
+      assert_difference('SampleControlledVocab.count', -1) do
+        assert_difference('SampleControlledVocabTerm.count', -4) do
+          assert cv.destroy
+        end
       end
     end
   end
 
   test 'cannot destroy if linked to sample type' do
     type = Factory(:apples_controlled_vocab_sample_type)
-    cv = type.sample_attributes.first.sample_controlled_vocab
-    refute cv.can_delete?
-    assert_no_difference('SampleControlledVocab.count') do
-      assert_no_difference('SampleControlledVocabTerm.count') do
-        refute cv.destroy
+    with_config_value :project_admin_sample_type_restriction, false do
+      cv = type.sample_attributes.first.sample_controlled_vocab
+      refute cv.can_delete?
+      assert_no_difference('SampleControlledVocab.count') do
+        assert_no_difference('SampleControlledVocabTerm.count') do
+          refute cv.destroy
+        end
       end
     end
+  end
+
+  test 'can delete?' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    cv_with_sample_type = Factory(:apples_controlled_vocab_sample_type).sample_attributes.first.sample_controlled_vocab
+    admin=Factory(:admin)
+    proj_admin=Factory(:project_administrator)
+    person=Factory(:person)
+
+    with_config_value :project_admin_sample_type_restriction, false do
+      assert cv.can_delete?(admin.user)
+      assert cv.can_delete?(proj_admin.user)
+      assert cv.can_delete?(person.user)
+      refute cv_with_sample_type.can_delete?(admin.user)
+      refute cv_with_sample_type.can_delete?(proj_admin.user)
+      refute cv_with_sample_type.can_delete?(person.user)
+    end
+
+    with_config_value :project_admin_sample_type_restriction, true do
+      assert cv.can_delete?(admin.user)
+      assert cv.can_delete?(proj_admin.user)
+      refute cv.can_delete?(person.user)
+      refute cv_with_sample_type.can_delete?(admin.user)
+      refute cv_with_sample_type.can_delete?(proj_admin.user)
+      refute cv_with_sample_type.can_delete?(person.user)
+    end
+
   end
 
   test 'can edit' do
