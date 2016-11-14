@@ -111,6 +111,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'can create' do
+    admin = Factory(:admin)
     none_admin = Factory(:person)
     proj_admin = Factory(:project_administrator)
     refute SampleControlledVocab.can_create?
@@ -128,6 +129,12 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
         refute SampleControlledVocab.can_create?
       end
       User.with_current_user proj_admin.user do
+        assert SampleControlledVocab.can_create?
+        with_config_value :samples_enabled,false do
+          refute SampleControlledVocab.can_create?
+        end
+      end
+      User.with_current_user admin.user do
         assert SampleControlledVocab.can_create?
         with_config_value :samples_enabled,false do
           refute SampleControlledVocab.can_create?

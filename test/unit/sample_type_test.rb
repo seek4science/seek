@@ -4,7 +4,7 @@ require 'time_test_helper'
 class SampleTypeTest < ActiveSupport::TestCase
 
   def setup
-    Factory(:person)#to prevent person being first person and therefore admin
+    Factory(:admin)#to prevent person being first person and therefore admin
     @person = Factory(:person)
     @project = @person.projects.first
     @project_ids=[@project.id]
@@ -410,14 +410,19 @@ class SampleTypeTest < ActiveSupport::TestCase
       end
       project_admin=Factory(:project_administrator)
       another_project_admin = Factory(:project_administrator)
+      admin = Factory(:admin)
       type = Factory(:simple_sample_type, project_ids: [project_admin.projects.first.id])
       assert type.can_edit?(project_admin.user)
       refute type.can_edit?(another_project_admin.user)
       User.with_current_user(project_admin.user) do
-        assert type.can_edit?(project_admin.user)
+        assert type.can_edit?
       end
-      User.with_current_user(project_admin.user) do
-        refute type.can_edit?(another_project_admin.user)
+      User.with_current_user(another_project_admin.user) do
+        refute type.can_edit?
+      end
+      assert type.can_edit?(admin)
+      User.with_current_user(admin.user) do
+        assert type.can_edit?
       end
     end
 
@@ -441,6 +446,9 @@ class SampleTypeTest < ActiveSupport::TestCase
         refute SampleType.can_create?
       end
       User.with_current_user Factory(:project_administrator).user do
+        assert SampleType.can_create?
+      end
+      User.with_current_user Factory(:admin).user do
         assert SampleType.can_create?
       end
     end

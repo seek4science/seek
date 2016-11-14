@@ -82,10 +82,11 @@ class SampleType < ActiveRecord::Base
 
   def self.can_create?
     can = User.logged_in_and_member? && Seek::Config.samples_enabled
-    can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.person.is_project_administrator_of_any_project?)
+    can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.person.is_project_administrator_of_any_project? || User.current_user.person.is_admin?)
   end
 
   def can_edit?(user = User.current_user)
+    return true if user && user.person && user.person.is_admin?
     can = user && user.person && ((projects & user.person.projects).any?) && Seek::Config.samples_enabled
     can && (!Seek::Config.project_admin_sample_type_restriction || projects.detect{|project| project.can_be_administered_by?(user)})
   end
