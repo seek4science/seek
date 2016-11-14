@@ -82,13 +82,30 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'can create' do
+    none_admin = Factory(:person)
+    proj_admin = Factory(:project_administrator)
     refute SampleControlledVocab.can_create?
-    User.with_current_user Factory(:person).user do
-      assert SampleControlledVocab.can_create?
-      with_config_value :samples_enabled,false do
-        refute SampleControlledVocab.can_create?
+    with_config_value :project_admin_sample_type_restriction, false do
+      User.with_current_user none_admin.user do
+        assert SampleControlledVocab.can_create?
+        with_config_value :samples_enabled,false do
+          refute SampleControlledVocab.can_create?
+        end
       end
     end
+
+    with_config_value :project_admin_sample_type_restriction, true do
+      User.with_current_user none_admin.user do
+        refute SampleControlledVocab.can_create?
+      end
+      User.with_current_user proj_admin.user do
+        assert SampleControlledVocab.can_create?
+        with_config_value :samples_enabled,false do
+          refute SampleControlledVocab.can_create?
+        end
+      end
+    end
+
   end
 
   test 'trigger regeneration of sample type templates when saved' do

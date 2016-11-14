@@ -32,7 +32,8 @@ class SampleControlledVocab < ActiveRecord::Base
   end
 
   def self.can_create?
-    User.logged_in_and_member? && Seek::Config.samples_enabled
+    can = User.logged_in_and_member? && Seek::Config.samples_enabled
+    can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.person.is_project_administrator_of_any_project?)
   end
 
   private
