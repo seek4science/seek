@@ -2,9 +2,9 @@ class SampleControlledVocab < ActiveRecord::Base
   attr_accessible :title, :description, :sample_controlled_vocab_terms_attributes
 
   has_many :sample_controlled_vocab_terms, inverse_of: :sample_controlled_vocab,
-           after_add: :update_sample_type_templates,
-           after_remove: :update_sample_type_templates,
-           dependent: :destroy
+                                           after_add: :update_sample_type_templates,
+                                           after_remove: :update_sample_type_templates,
+                                           dependent: :destroy
   has_many :sample_attributes, inverse_of: :sample_controlled_vocab
   has_many :sample_types, through: :sample_attributes
   has_many :samples, through: :sample_types
@@ -28,20 +28,17 @@ class SampleControlledVocab < ActiveRecord::Base
   end
 
   def can_edit?(user = User.current_user)
-    samples.empty? && user && user.person && (!Seek::Config.project_admin_sample_type_restriction || user.person.is_project_administrator_of_any_project? || user.person.is_admin?)
+    samples.empty? && user && (!Seek::Config.project_admin_sample_type_restriction || user.is_admin_or_project_administrator?) && Seek::Config.samples_enabled
   end
 
   def self.can_create?
     can = User.logged_in_and_member? && Seek::Config.samples_enabled
-    can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.person.is_project_administrator_of_any_project? || User.current_user.person.is_admin?)
+    can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.is_admin_or_project_administrator?)
   end
 
   private
 
-  def update_sample_type_templates(term)
-    unless new_record?
-      sample_types.each(&:queue_template_generation)
-    end
+  def update_sample_type_templates(_term)
+    sample_types.each(&:queue_template_generation) unless new_record?
   end
-
 end
