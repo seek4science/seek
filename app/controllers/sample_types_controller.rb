@@ -7,6 +7,7 @@ class SampleTypesController < ApplicationController
   before_filter :find_sample_type, only: [:show, :edit, :update, :destroy, :template_details]
   before_filter :check_no_created_samples, only: [:destroy]
   before_filter :find_assets, only: [:index]
+  before_filter :auth_to_create, only: [:new, :create]
   before_filter :project_membership_required, only: [:create, :new, :select, :filter_for_select]
 
   # these checks are mostly coverered by the #check_no_created_samples filter, but will give an additional check based on can_xxx? methods

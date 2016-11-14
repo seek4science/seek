@@ -2,31 +2,39 @@ require 'test_helper'
 
 class SampleControlledVocabTest < ActiveSupport::TestCase
   test 'association with terms' do
-    vocab = SampleControlledVocab.new(title: 'test')
-    vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'fish')
-    vocab.save!
-    vocab = SampleControlledVocab.find(vocab.id)
-    assert_equal ['fish'], vocab.sample_controlled_vocab_terms.collect(&:label)
+    User.with_current_user(Factory(:project_administrator).user) do
+      vocab = SampleControlledVocab.new(title: 'test')
+      vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'fish')
+      vocab.save!
+      vocab = SampleControlledVocab.find(vocab.id)
+      assert_equal ['fish'], vocab.sample_controlled_vocab_terms.collect(&:label)
+    end
+
   end
 
   test 'labels' do
-    vocab = SampleControlledVocab.new(title: 'test')
-    vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'fish')
-    vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'sprout')
-    vocab.save!
-    assert_equal %w(fish sprout), vocab.labels.sort
+    User.with_current_user(Factory(:project_administrator).user) do
+      vocab = SampleControlledVocab.new(title: 'test')
+      vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'fish')
+      vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'sprout')
+      vocab.save!
+      assert_equal %w(fish sprout), vocab.labels.sort
+    end
+
   end
 
   test 'validation' do
-    vocab = SampleControlledVocab.new
-    refute vocab.valid?
-    vocab.title = 'test'
-    assert vocab.valid?
-    vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'fish')
-    assert vocab.valid?
-    vocab.save!
-    vocab2 = SampleControlledVocab.new(title: 'test')
-    refute vocab2.valid?
+    User.with_current_user(Factory(:project_administrator).user) do
+      vocab = SampleControlledVocab.new
+      refute vocab.valid?
+      vocab.title = 'test'
+      assert vocab.valid?
+      vocab.sample_controlled_vocab_terms << SampleControlledVocabTerm.new(label: 'fish')
+      assert vocab.valid?
+      vocab.save!
+      vocab2 = SampleControlledVocab.new(title: 'test')
+      refute vocab2.valid?
+    end
   end
 
   test 'apples factory' do
@@ -43,18 +51,21 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
 
   test 'destroy' do
     cv = Factory(:apples_sample_controlled_vocab)
-    with_config_value :project_admin_sample_type_restriction, false do
+
+    User.with_current_user(Factory(:project_administrator).user) do
+      assert cv.can_delete?
       assert_difference('SampleControlledVocab.count', -1) do
         assert_difference('SampleControlledVocabTerm.count', -4) do
           assert cv.destroy
         end
       end
     end
+
   end
 
   test 'cannot destroy if linked to sample type' do
     type = Factory(:apples_controlled_vocab_sample_type)
-    with_config_value :project_admin_sample_type_restriction, false do
+    User.with_current_user(Factory(:project_administrator).user) do
       cv = type.sample_attributes.first.sample_controlled_vocab
       refute cv.can_delete?
       assert_no_difference('SampleControlledVocab.count') do
@@ -95,15 +106,17 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   test 'can edit' do
     admin = Factory(:admin)
     person = Factory(:person)
+    cv = Factory(:apples_sample_controlled_vocab, title: 'for can_edit test')
     with_config_value :project_admin_sample_type_restriction, false do
-      cv = Factory(:apples_sample_controlled_vocab, title: 'for can_edit test')
+      assert_empty cv.samples
       refute cv.can_edit? #nobody logged in
       User.with_current_user(person) do
         assert cv.can_edit?
 
         type = Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test')
-        cv = type.sample_attributes.first.sample_controlled_vocab
-        assert cv.can_edit?
+        cv_with_sample_type = type.sample_attributes.first.sample_controlled_vocab
+        assert_empty cv_with_sample_type.samples
+        assert cv_with_sample_type.can_edit?
 
         # cannot edit if linked to samples
         sample = Sample.new(sample_type: Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
@@ -113,15 +126,16 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
           assert sample.save!
         end
 
-        cv = sample.sample_type.sample_attributes.first.sample_controlled_vocab
-        refute cv.can_edit?
+        cv_with_samples = sample.sample_type.sample_attributes.first.sample_controlled_vocab
+        refute_empty cv_with_samples.samples
+        refute cv_with_samples.can_edit?
       end
     end
 
     #need to be a project administrator if restriction configured
     with_config_value :project_admin_sample_type_restriction, true do
       project_admin = Factory(:project_administrator)
-      cv = Factory(:apples_sample_controlled_vocab, title: 'for can_edit test with project admin')
+      assert_empty cv.samples
       refute cv.can_edit?(person.user)
       User.with_current_user(person.user) do
         refute cv.can_edit?
