@@ -36,10 +36,6 @@ class SampleType < ActiveRecord::Base
 
   grouped_pagination
 
-  def self.can_create?
-    User.logged_in_and_member? && Seek::Config.samples_enabled
-  end
-
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") unless attribute
@@ -82,6 +78,11 @@ class SampleType < ActiveRecord::Base
 
   def self.user_creatable?
     true
+  end
+
+  def self.can_create?
+    can = User.logged_in_and_member? && Seek::Config.samples_enabled
+    can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.person.is_project_administrator_of_any_project?)
   end
 
   def can_edit?(user = User.current_user)

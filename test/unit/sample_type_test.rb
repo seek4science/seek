@@ -402,13 +402,27 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'can create' do
+    refute @person.is_project_administrator_of_any_project?
     refute SampleType.can_create?
-    User.with_current_user @person.user do
-      assert SampleType.can_create?
-      with_config_value :samples_enabled, false do
-        refute SampleType.can_create?
+    with_config_value :project_admin_sample_type_restriction, false do
+      User.with_current_user @person.user do
+
+        assert SampleType.can_create?
+        with_config_value :samples_enabled, false do
+          refute SampleType.can_create?
+        end
       end
     end
+
+    with_config_value :project_admin_sample_type_restriction, true do
+      User.with_current_user @person.user do
+        refute SampleType.can_create?
+      end
+      User.with_current_user Factory(:project_administrator).user do
+        assert SampleType.can_create?
+      end
+    end
+
   end
 
   test 'linked sample type factory' do
