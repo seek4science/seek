@@ -166,3 +166,4 @@ news_number_of_entries:
   convert: :to_i
 front_page_buttons_enabled:
 samples_enabled:
+project_admin_sample_type_restriction:
