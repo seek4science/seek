@@ -27,8 +27,8 @@ class SampleControlledVocab < ActiveRecord::Base
     sample_types.empty?
   end
 
-  def can_edit?(_user = User.current_user)
-    samples.empty?
+  def can_edit?(user = User.current_user)
+    samples.empty? && user && user.person && (!Seek::Config.project_admin_sample_type_restriction || user.person.is_project_administrator_of_any_project? || user.person.is_admin?)
   end
 
   def self.can_create?

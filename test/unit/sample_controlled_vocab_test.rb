@@ -62,23 +62,52 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   end
 
   test 'can edit' do
-    cv = Factory(:apples_sample_controlled_vocab, title: 'for can_edit test')
-    assert cv.can_edit?
+    admin = Factory(:admin)
+    person = Factory(:person)
+    with_config_value :project_admin_sample_type_restriction, false do
+      cv = Factory(:apples_sample_controlled_vocab, title: 'for can_edit test')
+      refute cv.can_edit? #nobody logged in
+      User.with_current_user(person) do
+        assert cv.can_edit?
 
-    type = Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test')
-    cv = type.sample_attributes.first.sample_controlled_vocab
-    assert cv.can_edit?
+        type = Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test')
+        cv = type.sample_attributes.first.sample_controlled_vocab
+        assert cv.can_edit?
 
-    # cannot edit if linked to samples
-    sample = Sample.new(sample_type: Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
-                        title: 'testing cv can edit', project_ids: [Factory(:project).id])
-    sample.set_attribute(:apples, 'Bramley')
-    disable_authorization_checks do
-      assert sample.save!
+        # cannot edit if linked to samples
+        sample = Sample.new(sample_type: Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
+                            title: 'testing cv can edit', project_ids: [Factory(:project).id])
+        sample.set_attribute(:apples, 'Bramley')
+        disable_authorization_checks do
+          assert sample.save!
+        end
+
+        cv = sample.sample_type.sample_attributes.first.sample_controlled_vocab
+        refute cv.can_edit?
+      end
     end
 
-    cv = sample.sample_type.sample_attributes.first.sample_controlled_vocab
-    refute cv.can_edit?
+    #need to be a project administrator if restriction configured
+    with_config_value :project_admin_sample_type_restriction, true do
+      project_admin = Factory(:project_administrator)
+      cv = Factory(:apples_sample_controlled_vocab, title: 'for can_edit test with project admin')
+      refute cv.can_edit?(person.user)
+      User.with_current_user(person.user) do
+        refute cv.can_edit?
+      end
+
+      assert cv.can_edit?(project_admin.user)
+      User.with_current_user(project_admin.user) do
+        assert cv.can_edit?
+      end
+
+      assert cv.can_edit?(admin.user)
+      User.with_current_user(admin.user) do
+        assert cv.can_edit?
+      end
+
+    end
+
   end
 
   test 'can create' do
