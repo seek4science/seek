@@ -6,6 +6,10 @@ class SamplesControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include HtmlHelper
 
+  def setup
+    Factory(:person)#to prevent person being first person and therefore admin
+  end
+
   test 'index' do
     Factory(:sample, policy: Factory(:public_policy))
     get :index

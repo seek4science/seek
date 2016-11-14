@@ -86,7 +86,8 @@ class SampleType < ActiveRecord::Base
   end
 
   def can_edit?(user = User.current_user)
-    user && user.person && ((projects & user.person.projects).any?)
+    can = user && user.person && ((projects & user.person.projects).any?) && Seek::Config.samples_enabled
+    can && (!Seek::Config.project_admin_sample_type_restriction || projects.detect{|project| project.can_be_administered_by?(user)})
   end
 
   def can_delete?(user = User.current_user)
