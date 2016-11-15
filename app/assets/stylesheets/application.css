@@ -33,6 +33,7 @@
 *= require jquery-ui-drag-drop
 *= require bootstrap-typeahead
 *= require bootstrap-tagsinput
+*= require bootstrap-multiselect
 *= require calendar_date_select/default
 *= require organisms
 *= require tweaks

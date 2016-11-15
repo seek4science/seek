@@ -1,23 +1,21 @@
 <% if !item.pubmed_id.nil? %>
-    <%= button_link_to('View Publication On PubMed', 'visit_pubmed', item.pubmed_uri, :target => "_blank") -%>
+  <%= button_link_to('View Publication On PubMed', 'visit_pubmed', item.pubmed_uri, :target => "_blank") -%>
 <% elsif !item.doi.nil? %>
-    <%= button_link_to('View Publication', 'visit_pubmed', item.doi_uri, :target => "_blank") -%>
+  <%= button_link_to('View Publication', 'visit_pubmed', item.doi_uri, :target => "_blank") -%>
 <% end -%>
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item } -%>
 <%= dropdown_button('Export', 'export', menu_options: { class: 'pull-right' }) do %>
-	<% Publication::EXPORT_TYPES.each do |key,value| %>
-	  <li><%= image_tag_for_key(key.to_s, publication_path(item, :format => key), nil, nil, value[:name]) -%></li>
-	<% end %>
+  <% Publication::EXPORT_TYPES.each do |key,value| %>
+    <li><%= image_tag_for_key(key.to_s, publication_path(item, :format => key), nil, nil, value[:name]) -%></li>
+  <% end %>
 <% end %>
 
 <%= admin_dropdown do %>
-    <% if item.can_edit? -%>
-        <li><%= image_tag_for_key('manage', edit_publication_path(item), nil, nil, 'Manage Publication') -%></li>
-    <% end -%>
+  <% if item.can_edit? -%>
+    <li><%= image_tag_for_key('manage', edit_publication_path(item), nil, nil, 'Manage Publication') -%></li>
+  <% end -%>
 
-    <% if item.can_delete? -%>
-        <li><%= image_tag_for_key('destroy', publication_path(item), nil, { :confirm => 'This will unregister this publication with SEEK. Are you sure wish to do this?', :method => :delete }, 'Unregister') -%></li>
-    <% end -%>
+  <% if item.can_delete? -%>
+    <li><%= image_tag_for_key('destroy', publication_path(item), nil, { :confirm => 'This will unregister this publication with SEEK. Are you sure wish to do this?', :method => :delete }, 'Unregister') -%></li>
+  <% end -%>
 <% end -%>
-
-

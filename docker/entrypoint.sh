@@ -3,7 +3,7 @@
 # Change secret token
 sed -i "s/secret_token = '.*'/key = '"`bundle exec rake secret`"'/" config/initializers/secret_token.rb
 
-# Force search on
+# Set the search to be enabled by default
 if [ ! -f config/initializers/seek_local.rb ]
 then
     cp docker/seek_local.rb config/initializers/seek_local.rb
@@ -17,7 +17,12 @@ then
 
     cp docker/database.docker.mysql.yml config/database.yml
 
-    if ! mysql -uroot -p$MYSQL_ROOT_PASSWORD -h db -e "use $MYSQL_DATABASE"
+    while ! mysqladmin ping -h db --silent; do
+        echo "WAITING FOR MYSQL"
+        sleep 3
+    done
+
+    if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h db -e "desc $MYSQL_DATABASE.users" > /dev/null
     then
         echo "SETTING UP MYSQL DB"
         bundle exec rake db:setup

@@ -7,7 +7,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'rails/test_help'
 
 require "minitest/reporters"
-Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new()]
+MiniTest::Reporters.use! MiniTest::Reporters::DefaultReporter.new
 
 require 'rest_test_cases'
 require 'rdf_test_cases'
@@ -37,11 +37,11 @@ FactoryGirl.find_definitions #It looks like requiring factory_girl _should_ do t
 
 FactoryGirl.class_eval do
   def self.create_with_privileged_mode *args
-    disable_authorization_checks {create_without_privileged_mode *args}
+    disable_authorization_checks {create_without_privileged_mode(*args)}
   end
 
   def self.build_with_privileged_mode *args
-    disable_authorization_checks {build_without_privileged_mode *args}
+    disable_authorization_checks {build_without_privileged_mode(*args)}
   end
 
   class_alias_method_chain :create, :privileged_mode

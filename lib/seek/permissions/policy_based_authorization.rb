@@ -258,6 +258,81 @@ module Seek
         end
       end
 
+      def update_lookup_table_for_all_users
+        self.class.isolation_level(:repeatable_read) do #ensure it allows it see another worker may have inserted a record already
+          self.class.transaction do
+            #check to see if an insert of update is needed, action used is arbitary
+            insert = lookup_count <= 2
+
+            # Blank-out permissions first
+            if insert
+              sql = %(DELETE FROM #{self.class.lookup_table_name} WHERE asset_id=#{self.id})
+              ActiveRecord::Base.connection.execute(sql)
+
+              f = ActiveRecord::Base.connection.quote(false)
+
+              ([0] + User.pluck(:id)).each do |user_id|
+                sql = %(INSERT INTO #{self.class.lookup_table_name}
+                          (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
+                          VALUES (#{user_id}, #{self.id}, #{f}, #{f}, #{f}, #{f}, #{f});)
+
+                ActiveRecord::Base.connection.execute(sql)
+              end
+            else
+              update_lookup([false, false, false, false, false], nil)
+            end
+
+            # Specific permissions (Permission)
+
+            # Sort permissions according to precedence, then access type, so the most direct (People), permissive (Manage)
+            # permissions are applied last.
+            sorted_permissions = self.policy.permissions.
+                sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }.
+                reverse
+
+            # Extract the individual member permissions from each FavouriteGroup and ensure they are also sorted by access_type
+            # Record the index where the favourite group permissions start
+            fav_group_perm_index = sorted_permissions.index { |p| p.contributor_type == 'FavouriteGroup' }
+            if fav_group_perm_index
+              # Split the favourite group permissions out
+              group_permissions, sorted_permissions = sorted_permissions.partition { |p| p.contributor_type == 'FavouriteGroup' }
+
+              group_members_permissions = FavouriteGroupMembership.includes(person: :user).where(favourite_group_id: group_permissions.map(&:contributor_id)).
+                  order('access_type ASC').to_a
+
+              # Add them back in
+              sorted_permissions.insert(fav_group_perm_index, *group_members_permissions)
+            end
+
+            # Update the lookup for each permission
+            sorted_permissions.each do |permission|
+              update_lookup(permission, permission.affected_people.map(&:user))
+            end
+
+            # Creator permissions
+            if is_downloadable? && creators.any?
+              update_lookup([true, true, true, false, false], creators.includes(:user).map(&:user).compact, false)
+            end
+
+            # Contributor permissions
+            if (contributor_user = (contributor.is_a?(Person) ? contributor.user : contributor))
+              update_lookup([true, true, true, true, true], contributor_user)
+            end
+
+            # Role permissions (Role)
+            if asset_housekeeper_can_manage?
+              asset_housekeepers = self.projects.map(&:asset_housekeepers).flatten.map(&:user).compact
+              if asset_housekeepers.any?
+                update_lookup([true, true, true, true, true], asset_housekeepers)
+              end
+            end
+
+            # Global permissions (Policy)
+            update_lookup(policy, nil, false)
+          end
+        end
+      end
+
       def contributor_credited?
         !respond_to?(:creators) or creators.empty?
       end
@@ -306,8 +381,6 @@ module Seek
           self.contributor = default_contributor
         end
       end
-
-
 
       #use request_permission_summary to retrieve who can manage the item
       def people_can_manage
@@ -361,6 +434,59 @@ module Seek
       #members of project can see some information of hidden items of their project
       def can_see_hidden_item?(person)
         person.member_of?(self.projects)
+      end
+
+      # Check if ALL the managers of the items are no longer involved with ANY of the item's projects
+      def asset_housekeeper_can_manage?
+        self.managers.map { |manager| (self.projects - manager.person.former_projects).none? }.all?
+      end
+
+      def lookup_count
+        sql = "select count(*) from #{self.class.lookup_table_name} where asset_id = #{self.id}"
+        ActiveRecord::Base.connection.select_one(sql).values[0].to_i
+      end
+
+      private
+
+      # Note, nil user means ALL users, not guest user
+      def update_lookup(permission, user = nil, overwrite = true)
+        if permission.is_a?(Array)
+          can_view, can_edit, can_download, can_manage, can_delete = *permission
+        else
+          can_view = permission.allows_action?('view')
+          can_edit = permission.allows_action?('edit')
+          can_download = permission.allows_action?('download')
+          can_manage = permission.allows_action?('manage')
+          can_delete = permission.allows_action?('delete')
+        end
+
+        sql = %(UPDATE #{self.class.lookup_table_name} SET )
+        fields_to_set = [:can_view, :can_edit, :can_download, :can_manage, :can_delete].select do |privilege|
+          # Only set "true" values if not overwriting
+          overwrite || binding.local_variable_get(privilege)
+        end
+
+        return if fields_to_set.empty?
+
+        sql += fields_to_set.map do |privilege|
+            "#{privilege}=#{ActiveRecord::Base.connection.quote(binding.local_variable_get(privilege))}"
+        end.join(",\n")
+
+        sql += " WHERE asset_id=#{self.id}"
+
+        if user.respond_to?(:each)
+          user.compact!
+          return unless user.any?
+          sql += " AND user_id IN (#{user.map(&:id).join(', ')})"
+        elsif user.is_a?(User)
+          sql += " AND user_id=#{user.id}"
+        elsif user.is_a?(Person)
+          sql += " AND user_id=#{user.user_id}"
+        end
+
+        sql += ';'
+
+        ActiveRecord::Base.connection.execute(sql)
       end
     end
   end

@@ -2,16 +2,20 @@ require 'test_helper'
 
 
 class ProjectAssociationsTest < ActionController::IntegrationTest
-  ASSETS_WITH_MULTIPLE_PROJECTS = %w[data_files events investigations models publications sops presentations samples]
+  ASSETS_WITH_MULTIPLE_PROJECTS = %w[data_files events investigations models publications sops presentations samples publications]
   def setup
     User.current_user = Factory(:user, :login => 'test')
     post '/session', :login => 'test', :password => 'blah'
   end
 
   test 'form allows setting project_ids' do
-    #TODO: update publications edit/new
     ASSETS_WITH_MULTIPLE_PROJECTS.each do |type_name|
-      get "/#{type_name}/new"
+      if type_name=="samples"
+        get "/#{type_name}/new?sample_type_id=#{Factory(:simple_sample_type).id}"
+      else
+        get "/#{type_name}/new"
+      end
+
       assert_select "form select[name=?]", "#{type_name.singularize}[project_ids][]"
 
       get "/#{type_name}/#{Factory(type_name.singularize.to_sym, :policy => Factory(:public_policy)).id}/edit"
@@ -31,7 +35,7 @@ class ProjectAssociationsTest < ActionController::IntegrationTest
       end
 
       item.reload
-      assert_equal 2, item.policy.permissions.count
+      assert_equal 2, item.policy.permissions.count,"wrong value for #{type_name}"
     end
   end
 end

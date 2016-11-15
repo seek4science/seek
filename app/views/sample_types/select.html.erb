@@ -1,0 +1,76 @@
+<%
+  tags = all_sample_type_tags.collect(&:text)
+  projects = Project.all.select{|p| p.sample_types.any? }
+  your_projects = projects & current_user.person.projects
+  other_projects = projects - your_projects
+%>
+<h1>Select Sample Type</h1>
+<p>
+  Use the filters to find the sample type you are looking for, and then click the New Sample button to create one of this type.
+</p>
+
+<div id="sample-type-filter-options">
+
+  <% if your_projects.any? %>
+    <h2>Your <%= t('project').pluralize %></h2>
+      <p class='help-block'>
+        These are the <%= t('project').pluralize %> you are a member of that have sample types defined. Select a <%= t('project') %> to filter by that <%= t('project') %>
+      </p>
+    <%= render partial: 'sample_types/select/project_buttons',locals:{projects:your_projects} %>
+  <% end %>
+
+  <% if other_projects.any? %>
+      <h2>Other <%= t('project').pluralize %></h2>
+      <p class='help-block'>
+        These are the <%= t('project').pluralize %> you are not a member of that have sample types defined. Select a <%= t('project') %> to filter by that <%= t('project') %>
+      </p>
+      <%= render partial: 'sample_types/select/project_buttons',locals:{projects:other_projects,start_index:your_projects.count} %>
+  <% end %>
+
+  <% if tags.any? %>
+      <h2>Tags</h2>
+      <p class='help-block'>If selected, you can filter by a given tag. Once selected any sample types that match those tags will be diplayed.</p>
+      <label>
+        <%= check_box_tag :exclusive_tags,'1',false,class:'filter-option' %>
+        Match all tags?
+      </label>
+      <%= render partial: 'sample_types/select/tag_buttons',locals:{tags:tags} %>
+  <% end %>
+
+</div>
+
+<br/>
+
+<div id="selected-sample-types">
+
+</div>
+
+<script>
+  var SampleTypeFilters={
+    optionChanged:function() {
+      $j.ajax('<%= filter_for_select_sample_types_path %>', {
+            data: SampleTypeFilters.queryData(),
+            success: function (html) {
+              $j('#selected-sample-types').html(html);
+            },
+            beforeSend: function () {
+              $j('#selected-sample-types').html('<%= image('spinner') %>');
+            }
+
+          }
+      );
+    },
+
+    queryData:function() {
+      return $j('input.filter-option').serialize();
+    }
+  }
+
+  $j(document).ready(function () {
+
+    $j('#sample-type-filter-options').on('change', '.filter-option', SampleTypeFilters.optionChanged);
+
+    SampleTypeFilters.optionChanged();
+
+  });
+</script>

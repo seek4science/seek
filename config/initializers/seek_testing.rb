@@ -22,7 +22,6 @@ SEEK::Application.configure do
 
       Settings.defaults[:publish_button_enabled] = true
       Settings.defaults[:auth_lookup_enabled] = false
-      Settings.defaults[:sample_parser_enabled] = true
       Settings.defaults[:project_browser_enabled] = true
       Settings.defaults[:experimental_features_enabled] = true
       Settings.defaults[:filestore_path] = "tmp/testing-filestore"

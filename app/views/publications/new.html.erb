@@ -8,6 +8,7 @@
 <ul class="nav nav-tabs" role="tablist" id="new_publication_tabs" data-subaction="<%= subaction %>">
   <li role="presentation"><a href="#Register" aria-controls="Register" role="tab" data-toggle="tab">From Identifier</a></li>
   <li role="presentation"><a href="#Create" aria-controls="Create" role="tab" data-toggle="tab">Enter manually</a></li>
+  <li role="presentation"><a href="#Import" aria-controls="Import" role="tab" data-toggle="tab">Import from file</a></li>
 </ul>
 
 <!-- Tab panes -->
@@ -19,7 +20,8 @@
                              :success => "Element.show('publication_preview_container'); Element.hide('publication_error'); new Effect.Highlight('publication_preview_container', { duration: 1.0 });",
                              :failure => "Element.show('publication_error'); Element.hide('publication_preview_container');new Effect.Highlight('publication_error', { duration: 1.0, startcolor: '#FF5555' });",
                              :loading => "Element.hide('publication_preview_container');Element.show('spinner');$('fetch_button').disabled=true;",
-                             :complete => "Element.hide('spinner');$('fetch_button').disabled=false;"}) do %>    <p>
+                             :complete => "Element.hide('spinner');$('fetch_button').disabled=false;"}) do %>
+    <p>
       Choose whether to search by PubMed ID or DOI using the dropdown menu below, then enter the document identifier into the text box and click "Fetch".<br>
       If SEEK successfully retrieves your publication, click "Register" to process to the next step.
     </p>
@@ -55,9 +57,9 @@
 <%= form_for @publication, :html => { :class => 'form-horizontal' } do |publication_form| %>
   <%= publication_form.hidden_field :parent_name %>
   <div class="form-group">
-  <%= label_tag :project_ids, 'Projects', :class => 'control-label col-sm-2' %>
-  <div class="col-sm-10">
-      <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control', :multiple => 'multiple' %>
+    <%= label_tag :project_ids, 'Projects', :class => 'control-label col-sm-2' %>
+    <div class="col-sm-10">
+      <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control projects-multiselect', :multiple => 'multiple' %>
     </div>
   </div>
   <div class="form-group">
@@ -79,10 +81,10 @@
     </div>
   </div>
   <div class="form-group">
-  <%= label_tag :title, 'Title', :class => 'control-label col-sm-2' %>  
-  <div class="col-sm-10">
-    <%= publication_form.text_area :title, :class => 'form-control', :rows => 2, :cols => 100 %>
-  </div>
+    <%= label_tag :title, 'Title', :class => 'control-label col-sm-2' %>
+    <div class="col-sm-10">
+      <%= publication_form.text_area :title, :class => 'form-control', :rows => 2, :cols => 100 %>
+    </div>
   </div>
   <div class="form-group">
     <%= label_tag :publication_authors, 'Authors', :class => 'control-label col-sm-2' %>
@@ -99,11 +101,10 @@
         Explain
       </button>
     </div>
-
   </div>
   <div class="form-group">
-  <%= label_tag :abstract, nil, :class => 'control-label col-sm-2' %>  
-  <div class="col-sm-10">
+    <%= label_tag :abstract, nil, :class => 'control-label col-sm-2' %>
+    <div class="col-sm-10">
       <%= publication_form.text_area :abstract, :class => 'form-control', :rows => 5, :cols => 100 %>
     </div>
   </div>
@@ -114,13 +115,13 @@
     </div>
   </div>
   <div class="form-group">
-  <%= label_tag :citation, nil, :class => 'control-label col-sm-2' %>
-  <div class="col-sm-10">
+    <%= label_tag :citation, nil, :class => 'control-label col-sm-2' %>
+    <div class="col-sm-10">
       <%= publication_form.text_field :citation, :class => 'form-control' %>
     </div>
   </div>
   <div class="form-group date-select">
-  <%= label_tag :published_date, nil, :class => 'control-label col-sm-2' %>  
+  <%= label_tag :published_date, nil, :class => 'control-label col-sm-2' %>
   <div class="col-sm-10">
       <%= publication_form.calendar_date_select :published_date, :class => 'form-control' %>
     </div>
@@ -130,9 +131,40 @@
       <%= publication_form.submit 'Create', :name => "subaction", :value => 'Create', :class => 'btn btn-primary' %>
     </div>
   </div>
-
 <% end %>
-  
+</div>
+
+<div role="tabpanel" class="tab-pane" id="Import">
+  <%= form_for @publication, :html => { :class => 'form-horizontal' } do |publication_form| %>
+    <%= publication_form.hidden_field :parent_name %>
+    <div class="form-group">
+      <%= label_tag :project_ids, 'Projects', :class => 'control-label col-sm-2' %>
+      <div class="col-sm-10">
+        <%= publication_form.collection_select :project_ids, User.current_user.person.projects, :id, :title, {}, :class => 'form-control projects-multiselect', :multiple => 'multiple' %>
+      </div>
+    </div>
+    <div class="form-group">
+      <%= label_tag :bibtex_file, nil, :class => 'control-label col-sm-2' %>
+      <div class="col-sm-10">
+        <%= publication_form.file_field :bibtex_file %>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="col-sm-5 col-sm-offset-2">
+        <p>On successful import, the 'Enter manually' tab will be opened and the form will be populated with the data from the first article from the imported file.</p>
+      </div>
+      <div class="col-sm-5">
+        <p>On successful import, all publications will be saved. Any changes will need to be made inidividually afterwards.</p>
+      </div>
+      <div class="col-sm-5 col-sm-offset-2">
+        <%= publication_form.button 'Import first', :name => "subaction", :value => 'Import', :class => 'btn btn-primary' %>
+      </div>
+      <div class="col-sm-5">
+        <%= publication_form.button 'Import all', :name => "subaction", :value => 'ImportMultiple', :class => 'btn btn-primary' %>
+      </div>
+
+    </div>
+  <% end %>
 </div>
 
 </div><!--end Tab panes -->
@@ -192,7 +224,7 @@ jQuery(document).ready(function() {
   // activate popovers
   jQuery('[data-toggle="popover"]').popover();
   
-  jQuery('div[id="Create"] select[id="publication_project_ids"]').multiselect({
+  jQuery('select.projects-multiselect').multiselect({
     enableCaseInsensitiveFiltering: true
   });
   

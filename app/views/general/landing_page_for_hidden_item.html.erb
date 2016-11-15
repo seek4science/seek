@@ -2,13 +2,13 @@
   <% asset_type =  t("#{controller_name.singularize}") %>
   <h2 class="forbidden">The <%= asset_type %> is not visible to you.</h2>
   <% unless logged_in? %>
-    <p style="text-align: center;">You may need to login to access this <%= asset_type %>.</p>
+    <p class="text-center">You may need to login to access this <%= asset_type %>.</p>
   <% end %>
 
   <% if item.class.authorization_supported? %>
       <%  hidden_item_contributor_links = hidden_item_contributor_links([item])%>
       <% unless hidden_item_contributor_links.empty? %>
-        <p style="text-align: center;">You may want to contact the authors: <%= hidden_item_contributor_links([item]).join(', ').html_safe%></p>
+        <p class="text-center">You may want to contact the authors: <%= hidden_item_contributor_links([item]).join(', ').html_safe%></p>
       <% end %>
   <% end %>
 
@@ -17,7 +17,7 @@
       <% asset_doi_log = AssetDoiLog.where(asset_type: item.class.name, asset_id: item.id, asset_version: version, action: AssetDoiLog::UNPUBLISH).last %>
       <% comment = asset_doi_log.try(:comment) %>
       <% unless comment.blank? %>
-        <p class="comment" style="text-align: center;">The authors left the reason for un-publishing the <%= asset_type %>: <%= comment.html_safe %></p>
+        <p class="comment text-center">The authors left the reason for un-publishing the <%= asset_type %>: <%= comment.html_safe %></p>
       <% end %>
   <% end %>
 </div>

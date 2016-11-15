@@ -2,7 +2,8 @@ require 'test_helper'
 
 class SampleExtractorTest < ActiveSupport::TestCase
   setup do
-    @person = Factory(:person)
+    Factory(:admin) #to avoid first person automatically becoming admin
+    @person = Factory(:project_administrator)
     User.current_user=@person.user
     Factory(:string_sample_attribute_type, title: 'String')
     @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),

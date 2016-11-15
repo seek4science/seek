@@ -1,9 +1,14 @@
 require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include HtmlHelper
+
+  def setup
+    Factory(:person)#to prevent person being first person and therefore admin
+  end
 
   test 'index' do
     Factory(:sample, policy: Factory(:public_policy))
@@ -12,11 +17,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select '#samples-table table', count: 0
   end
 
-  test 'new' do
+  test 'new without sample type id' do
     login_as(Factory(:person))
     get :new
-    assert_response :success
-    assert assigns(:sample)
+    assert_redirected_to select_sample_types_path
   end
 
   test 'show' do
@@ -53,6 +57,9 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'M13 9PL', sample.get_attribute(:postcode)
     assert_equal person.user, sample.contributor
     assert_equal [creator],sample.creators
+
+    #job should have been triggered
+    assert SampleTypeUpdateJob.new(type,false).exists?
   end
 
   test 'create and update with boolean' do
@@ -120,6 +127,8 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal '47', updated_sample.get_attribute(:age)
     assert_nil updated_sample.get_attribute(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute(:postcode)
+    #job should have been triggered
+    assert SampleTypeUpdateJob.new(sample.sample_type,false).exists?
   end
 
   test 'associate with project on create' do
@@ -383,6 +392,20 @@ class SamplesControllerTest < ActionController::TestCase
 
     end
 
+  end
+
+  test 'destroy' do
+    person=Factory(:person)
+    sample = Factory(:patient_sample,contributor:person)
+    type = sample.sample_type
+    login_as(person.user)
+    assert sample.can_delete?
+    assert_difference("Sample.count",-1) do
+      delete :destroy, id: sample
+    end
+    assert_redirected_to samples_path
+    #job should have been triggered
+    assert SampleTypeUpdateJob.new(type,false).exists?
   end
 
   private

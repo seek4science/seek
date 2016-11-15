@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleControlledVocabsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
 
   def setup
@@ -29,13 +30,27 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
-  test 'new' do
+  test 'project admin required for new if configured' do
     login_as(Factory(:person))
+    with_config_value :project_admin_sample_type_restriction, false do
+      get :new
+      assert_response :success
+      refute flash[:error]
+    end
+    with_config_value :project_admin_sample_type_restriction, true do
+      get :new
+      assert_response :redirect
+      assert flash[:error]
+    end
+  end
+
+  test 'new' do
+    login_as(Factory(:project_administrator))
     assert_response :success
   end
 
   test 'create' do
-    login_as(Factory(:person))
+    login_as(Factory(:project_administrator))
     assert_difference('SampleControlledVocab.count') do
       assert_difference('SampleControlledVocabTerm.count', 2) do
         post :create, sample_controlled_vocab: { title: 'fish', description: 'About fish',
@@ -86,7 +101,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
   end
 
   test 'update' do
-    login_as(Factory(:person))
+    login_as(Factory(:project_administrator))
     cv = Factory(:apples_sample_controlled_vocab)
     term_ids = cv.sample_controlled_vocab_terms.collect(&:id)
     assert_no_difference('SampleControlledVocab.count') do
@@ -130,7 +145,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
   end
 
   test 'edit' do
-    login_as(Factory(:person))
+    login_as(Factory(:project_administrator))
     cv = Factory(:apples_sample_controlled_vocab)
     get :edit, id: cv.id
     assert_response :success
@@ -149,7 +164,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
   end
 
   test 'destroy' do
-    login_as(Factory(:person))
+    login_as(Factory(:project_administrator))
     cv = Factory(:apples_sample_controlled_vocab)
     assert_difference('SampleControlledVocab.count', -1) do
       assert_difference('SampleControlledVocabTerm.count', -4) do

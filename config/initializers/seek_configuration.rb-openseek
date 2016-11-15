@@ -41,7 +41,6 @@ SEEK::Application.configure do
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
-  Seek::Config.default :sample_parser_enabled,false
   Seek::Config.default :external_search_enabled, true
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
@@ -49,7 +48,6 @@ SEEK::Application.configure do
   Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
-  Seek::Config.default :biosamples_enabled, false
   Seek::Config.default :modelling_analysis_enabled,true
   Seek::Config.default :organisms_enabled,true
   Seek::Config.default :models_enabled,true
@@ -75,6 +73,7 @@ SEEK::Application.configure do
   Seek::Config.default :show_announcements, true
   Seek::Config.default :programme_user_creation_enabled, false
   Seek::Config.default :samples_enabled, true
+  Seek::Config.default :project_admin_sample_type_restriction, true #only project admins can create and edit sample types and controlled vocabs
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
@@ -85,7 +84,7 @@ SEEK::Application.configure do
   Seek::Config.default :header_tagline_text_enabled, true
 
 #time in minutes that the feeds on the front page are cached for
-  Seek::Config.default :home_feeds_cache_timeout,2
+  Seek::Config.default :home_feeds_cache_timeout,30
 # Branding
   Seek::Config.default :project_name,'FAIRDOM'
   Seek::Config.default :project_type,''

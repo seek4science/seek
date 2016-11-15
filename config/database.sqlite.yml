@@ -1,4 +1,4 @@
-# Postgres running on a host: "db"
+#sqlite 3 database config
 
 development:
   adapter: sqlite3

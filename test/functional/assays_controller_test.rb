@@ -399,7 +399,7 @@ class AssaysControllerTest < ActionController::TestCase
         assert_select "p#organism" do
           assert_select "a[href=?]",organism_path(o1),:text=>"Frog"
           assert_select "a[href=?]",organism_path(o2),:text=>"Slug"
-          assert_select "span.strain_info",:text=>str.info
+          assert_select "a.strain_info",:text=>str.info
         end
   end
 

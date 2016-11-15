@@ -1,0 +1,85 @@
+<%= javascript_include_tag 'jquery.ui.effect' %>
+
+<%= index_title -%>
+
+<div class="row">
+  <div class="col-sm-2">
+    <button class="btn btn-primary" type="button" data-toggle="collapse" href="#collapseFilter" aria-expanded="<%= params.has_key?(:query) ? 'true' : 'false' %>" aria-controls="collapseFilter">
+      <span class="glyphicon glyphicon-filter" aria-hidden="true"></span> Filter <span class="servicedrop glyphicon glyphicon-chevron-down">
+    </button>
+  </div>
+  <div class="col-sm-2">
+    <%= dropdown_button('Export', 'export', menu_options: { class: 'pull-right' }) do %>
+      <% Publication::EXPORT_TYPES.each do |key,value| %>
+        <li><%= image_tag_for_key(key.to_s, export_publications_path( :format => key, :params => params), nil, nil, value[:name]) -%></li>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="collapse<%= '.in' if params.has_key?(:query) %>" id="collapseFilter">
+  <div class="well">
+    <%= search_form_for @query, :url => :export_publications, :html => { :class => 'form-horizontal' } do |f| %>
+      <div class="form-group">
+        <%= f.sort_fields do |s| %>
+          <%= s.label "Sort by", nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-4">
+            <%= s.attribute_select Hash.new, :class => 'form-control' %>
+          </div>
+          <%= s.label "direction", nil, :class => 'control-label col-sm-2' %>
+          <div class="col-sm-4">
+            <%= s.sort_direction_select Hash.new, :class => 'form-control' %>
+          </div>
+        <% end %>
+      </div>
+      <div class="form-group">
+        <%= f.label :title_cont, nil, :class => 'control-label col-sm-2' %>
+        <div class="col-sm-4">
+          <%= f.search_field :title_cont, :class => 'form-control' %>
+        </div>
+      </div>
+      <div class="form-group">
+        <%= f.label :projects_id_in, "Projects", :class => 'control-label col-sm-2' %>
+        <div class="col-sm-4">
+          <%= f.collection_select :projects_id_in, Project.all, :id, :title, {}, :class => 'form-control projects-multiselect', :multiple => 'multiple' %>
+        </div>
+      </div>
+    
+      <div class="form-group">
+        <%= f.label :persons_id_in, "Persons", :class => 'control-label col-sm-2' %>
+        <div class="col-sm-4">
+          <%= f.collection_select :persons_id_in, Person.all, :id, :name, {}, :class => 'form-control persons-multiselect', :multiple => 'multiple' %>
+        </div>
+        <%= f.label :publication_authors_last_name_cont, "Author last name contains", :class => 'control-label col-sm-2' %>
+        <div class="col-sm-4">
+          <%= f.search_field :publication_authors_last_name_cont, :class => 'form-control' %>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">
+          <%= f.submit 'Filter', :class => 'btn btn-success' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="list_items_container">
+  <%= render :partial => "assets/resource_list_item", :collection => @publications %>
+</div>
+
+<script type="text/javascript">
+jQuery(document).ready(function() {
+  jQuery('select.projects-multiselect, select.persons-multiselect').multiselect({
+    enableCaseInsensitiveFiltering: true,
+    maxHeight: 200
+  });
+  jQuery('#collapseFilter').on('show.bs.collapse', function() {
+    jQuery('span.servicedrop').switchClass('glyphicon-chevron-down', 'glyphicon-chevron-up');
+  });
+  jQuery('#collapseFilter').on('hidden.bs.collapse', function() {
+    jQuery('span.servicedrop').switchClass('glyphicon-chevron-up', 'glyphicon-chevron-down');
+  });
+});
+</script>

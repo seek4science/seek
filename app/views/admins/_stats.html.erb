@@ -1,11 +1,12 @@
 <div class="form-group form-inline">
   <%
      options = [["Select query ...","none"],
-                ["Content Statistics","contents"],
-                ["Activity Statistics","activity"],
-                ["Search Statistics","search"],
+                ["Content Statistics","content_stats"],
+                ["Activity Statistics","activity_stats"],
+                ["Search Statistics","search_stats"],
                 ["Job queue","job_queue"],
-                ["Auth table consistency","auth_consistency"]
+                ["Auth table consistency","auth_consistency"],
+                ["Storage usage","storage_usage_stats"]
      ]
      options = options | [["Workflow Statistics", "workflow_stats"]] if Seek::Config.workflows_enabled
   %>

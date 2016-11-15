@@ -11,7 +11,7 @@
           </tr>
           <% project_subscriptions.sort{|ps1,ps2|ps1.project.title <=> ps2.project.title}.each do |project_subscription| %>
               <tr>
-                <td style="text-align: left"> <%= link_to project_subscription.project.title, project_subscription.project %> </td>
+                <td class="text-left"> <%= link_to project_subscription.project.title, project_subscription.project %> </td>
                 <td> <%= project_subscription.frequency %> </td>
               </tr>
           <% end %>

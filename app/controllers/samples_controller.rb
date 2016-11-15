@@ -21,8 +21,12 @@ class SamplesController < ApplicationController
   end
 
   def new
-    @sample = Sample.new(sample_type_id: params[:sample_type_id])
-    respond_with(@sample)
+    if params[:sample_type_id]
+      @sample = Sample.new(sample_type_id: params[:sample_type_id])
+      respond_with(@sample)
+    else
+      redirect_to select_sample_types_path
+    end
   end
 
   def create
@@ -54,9 +58,9 @@ class SamplesController < ApplicationController
     if @sample.can_delete? && @sample.destroy
       flash[:notice] = 'The sample was successfully deleted.'
     else
-      flash[:notice] = 'It was not possible to delete the sample.'
+      flash[:error] = 'It was not possible to delete the sample.'
     end
-    respond_with(@sample, location: root_path)
+    respond_with(@sample, location: samples_path)
   end
 
   # called from AJAX, returns the form containing the attributes for the sample_type_id

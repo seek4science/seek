@@ -219,8 +219,6 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    record_body
-
     assert_select '#recently_added ul.feed' do
       assert_select 'a.file-type-icon[href=?]', project_path(project) do
         assert_select 'img.home_asset_icon[src=?]', "/assets/#{Seek::ImageFileDictionary.instance.image_filename_for_key('project_avatar')}"

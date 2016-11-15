@@ -48,8 +48,15 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
-    # refute attribute.validate_value?(1.0)
-    #  refute attribute.validate_value?('1.0')
+    #contriversial, but after much argument decided to allow these values as integers
+    assert attribute.validate_value?(1.0)
+    assert attribute.validate_value?('1.0')
+    assert attribute.validate_value?(1.00)
+    assert attribute.validate_value?('1.00')
+    assert attribute.validate_value?(1.000)
+    assert attribute.validate_value?('1.000')
+    assert attribute.validate_value?(2.0)
+    assert attribute.validate_value?('2.0')
 
     attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::STRING, regexp: '.*yyy')
     assert attribute.validate_value?('yyy')
@@ -62,6 +69,7 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::TEXT, regexp: '.*yyy')
     assert attribute.validate_value?('yyy')
     assert attribute.validate_value?('happpp - yyy')
+
     refute attribute.validate_value?('')
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?(1)
@@ -72,6 +80,8 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     assert attribute.validate_value?(1.2)
     assert attribute.validate_value?(0.78)
     assert attribute.validate_value?('0.78')
+    assert attribute.validate_value?(12.70)
+    assert attribute.validate_value?('12.70')
     refute attribute.validate_value?('fish')
     refute attribute.validate_value?('2 Feb 2015')
     refute attribute.validate_value?(nil)
@@ -107,6 +117,21 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('30 Feb 2015')
   end
 
+  test 'validate text with newlines' do
+    attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::TEXT)
+
+
+    assert attribute.validate_value?('fish\\n\\rsoup')
+    assert attribute.validate_value?('fish\n\rsoup')
+    assert attribute.validate_value?('fish\r\nsoup')
+    assert attribute.validate_value?('   fish\n\rsoup ')
+    str= %!with
+  a
+  new
+  line%!
+    assert attribute.validate_value?(str)
+  end
+
   test 'regular expression match' do
     # whole string must match
     attribute = SampleAttributeType.new(title: 'first name', base_type: Seek::Samples::BaseType::STRING, regexp: '[A-Z][a-z]+')
@@ -132,6 +157,17 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     assert web_type.validate_value?('http://google.com')
     assert web_type.validate_value?('https://google.com')
     refute web_type.validate_value?('moonbeam')
+  end
+
+  test 'uri attribute type' do
+    type = SampleAttributeType.new title: 'URI', base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s
+    type.save!
+    type.reload
+    assert type.validate_value?('zzz:222')
+    assert type.validate_value?('http://ontology.org#term')
+    refute type.validate_value?('fish')
+    refute type.validate_value?('fish;cow')
+
   end
 
   test 'boolean' do

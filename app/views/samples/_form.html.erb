@@ -1,22 +1,25 @@
-<% current_user_authorized_to_manage = @sample.new_record?|| @sample.can_manage? -%>
+
 
 <div class="asset_form">
   <%= render partial: 'sample_error_messages', locals: { object: @sample } %>
 
-  <% if @sample.new_record? %>
-      <div class="form-group">
-      <%= render :partial=>"sample_type_selection",:locals=>{:f=>f} %>
-        <span id="new_sample_type_link">or <%= link_to 'Define new sample type',new_sample_type_path %></span>
-      </div>
-  <% end %>
+  <p id="sample-type">
+    <label>Sample type: </label> <%= link_to(h(@sample.sample_type.title), @sample.sample_type) %>
+    <% if @sample.new_record? %>
+      <span style="font-size:smaller">
+        (<%= link_to('change', select_sample_types_path) %>)
+      </span>
+    <% end %>
+    <%= f.hidden_field(:sample_type_id) %>
+  </p>
 
   <div id="sample_attributes">
     <%= render :partial=>"sample_attributes_form",:locals=>{sample:@sample} %>
   </div>
 
-  <div id="sample_extra_details" style="display:none">
+  <div id="sample_extra_details">
     <%= render :partial => "projects/project_selector", :locals => { :resource => @sample,:allow_nil=> false} -%>
-    <% if current_user_authorized_to_manage -%>
+    <% if @sample.can_manage? -%>
         <%= render :partial => "assets/asset_form_bottom", :locals=>{:f=>f,attribution_enable:false,show_publications:false,sharing_link:false} %>
     <% end %>
   </div>
@@ -28,42 +31,10 @@
 </div>
 
 <script>
-    <% unless @sample.sample_type.nil? %>
-        $j('#sample_extra_details').show();
-    <% end %>
-
-    $j('#sample_sample_type_id').on('change', function () {
-        if (this.value) {
-            $j.ajax({
-                url:"<%= attribute_form_samples_path %>",
-                type: "get",
-                data: {sample_type_id: this.value},
-                dataType: "json",
-                success: function(data) {
-                    var replacement = "<div id='sample_attributes'>"+data["form"]+"</div>"
-                    $j('#sample_attributes').replaceWith(replacement);
-                    $j('#sample_submit_btn').prop('disabled',false);
-                    $j('#sample_extra_details').show();
-                    $j('#new_sample_type_link').hide();
-                },
-                error: function(data) {
-                    $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
-                    $j('#sample_submit_btn').prop('disabled',true);
-                }
-            });
-        }
-        else {
-            $j('#sample_attributes').replaceWith("<div id='sample_attributes'/>");
-            $j('#sample_submit_btn').prop('disabled',true);
-            $j('#sample_extra_details').hide();
-            $j('#new_sample_type_link').show();
-        }
-    });
 
     $j('#sample_submit_btn').on('click', function() {
         previewPermissions();
         return(false);
     });
-
 
 </script>
