@@ -7,7 +7,7 @@ namespace :seek_rdf do
   desc "Queues background jobs, which will update or create the RDF (including sending to a configured triple store) for every compatible asset."
   task(:generate=>:environment) do
     Seek::Util.rdf_capable_types.sort_by(&:name).each do |type|
-      type.all.each do |instance|
+      type.find_each do |instance|
         begin
           RdfGenerationJob.new(instance,false).queue_job
         rescue Exception=>e

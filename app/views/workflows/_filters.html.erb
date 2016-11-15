@@ -46,7 +46,7 @@
   <% end %>
   <h3>Filter by category</h3>
   <ul>
-    <% WorkflowCategory.all.each do |category| %>
+    <% WorkflowCategory.find_each do |category| %>
       <li><%= workflow_filter category.name, params, :category_id, category.id -%></li>
     <% end %>
   </ul>

@@ -388,7 +388,7 @@ class AdminsController < ApplicationController
       time_range = (x.month.ago.beginning_of_month.to_date..x.month.ago.end_of_month.to_date)
       registrations = User.where(created_at: time_range).count
       active_users = 0
-      User.all.each do |user|
+      User.find_each do |user|
         active_users += 1 unless user.taverna_player_runs.where(created_at: time_range, saved_state: 'finished').empty?
       end
       complete_runs = TavernaPlayer::Run.where(created_at: time_range, saved_state: 'finished').count
