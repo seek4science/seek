@@ -502,17 +502,19 @@ class ApplicationController < ActionController::Base
     if filters.size>0
       params[:page]||="all"
       params[:filtered]=true
-    end
+      resources.select do |res|
+        filters.all? do |filter, value|
+          filter = filter.to_s
+          klass = filter.camelize.constantize
+          value = klass.find value.to_i
 
-    resources.select do |res|
-      filters.all? do |filter, value|
-        filter = filter.to_s
-        klass = filter.camelize.constantize
-        value = klass.find value.to_i
-
-        detect_for_filter(filter, res, value)
+          detect_for_filter(filter, res, value)
+        end
       end
+    else
+      resources
     end
+
   end
 
   def detect_for_filter(filter, resource, value)
