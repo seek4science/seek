@@ -387,4 +387,11 @@
 <% if !disable_advanced_view -%>
   updateCustomSharingSettings();
 <% end %>
+
+    var permissionsChanged = <%= @resource.new_record? -%>;
+    $j(document).ready(function () {
+      $j('#sharing_form :input').change(function () {
+        permissionsChanged = true;
+      });
+    });
 </script>
