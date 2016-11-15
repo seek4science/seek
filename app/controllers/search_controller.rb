@@ -87,6 +87,8 @@ class SearchController < ApplicationController
         external_results = external_search downcase_query,type
         @results |= external_results
       end
+
+      @results = apply_filters(@results)
     end
 
   end
