@@ -1399,6 +1399,11 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select '#resource-count-stats',:count=>0
   end
 
+  test 'search route' do
+    assert_generates '/projects/1/search', controller: 'search', action: 'index', project_id: '1'
+    assert_routing '/projects/1/search',{controller:"search",action:"index",project_id:"1"}
+  end
+
   private
 
   def valid_project
