@@ -19,3 +19,10 @@ function check_mysql {
         fi
     fi
 }
+
+function enable_search {
+    if [ ! -f config/initializers/seek_local.rb ]
+    then
+        cp docker/seek_local.rb config/initializers/seek_local.rb
+    fi
+}
