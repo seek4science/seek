@@ -1,5 +1,5 @@
 <ul>
-  <% HelpDocument.all.each do |doc| %>
+  <% HelpDocument.find_each do |doc| %>
     <li><%= link_to doc.identifier, doc, :target => "blank" -%> - <i><%= doc.title -%></i></li>
   <% end %>
 </ul>

@@ -59,7 +59,7 @@ class AuthLookupUpdateJob < SeekJob
   def update_assets_for_user(user)
     User.transaction(requires_new: :true) do
       Seek::Util.authorized_types.each do |type|
-        type.all.each do |item|
+        type.find_each do |item|
           item.update_lookup_table(user)
         end
       end

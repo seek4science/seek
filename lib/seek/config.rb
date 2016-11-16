@@ -371,6 +371,10 @@ module Seek
     extend Propagators
     extend CustomAccessors
 
+    PERMISSION_POPUP_ALWAYS = 0
+    PERMISSION_POPUP_ON_CHANGE = 1
+    PERMISSION_POPUP_NEVER = 2
+
     # reads the available attributes from config_setting_attributes.yml
     def self.read_setting_attributes
       yaml = YAML.load_file(File.join(File.dirname(File.expand_path(__FILE__)), 'config_setting_attributes.yml'))

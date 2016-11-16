@@ -1,6 +1,6 @@
 <h1>Choose an analysis...</h1>
 <div>
-  <% WorkflowCategory.all.each do |category| %>
+  <% WorkflowCategory.find_each do |category| %>
     <% if category.name != WorkflowCategory::OTHER %>
       <% visible_workflow_count = Workflow.where(:category_id => category.id).select {|w| w.can_view?}.count %>
       <% if visible_workflow_count > 0 %>

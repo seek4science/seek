@@ -53,9 +53,9 @@
 
 <hr/>
 <%= form_tag(extract_samples_data_file_path(@data_file)) do %>
-    <%= hidden_field_tag(:sample_type_id, @samples.first.sample_type_id) %>
+    <%= hidden_field_tag(:sample_type_id, @sample_type.id) if @sample_type %>
     <%= hidden_field_tag(:confirm, 'true') %>
-    <%= submit_tag "Confirm", :class => 'btn btn-primary'-%>
+    <%= submit_tag "Confirm", :class => 'btn btn-primary',disabled: @samples.empty? -%>
     or <%= cancel_button(cancel_extraction_data_file_path(@data_file), button_text: 'Cancel Extraction', method: :delete) -%>
 <% end %>
 

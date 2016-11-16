@@ -6,13 +6,12 @@ module SubstancesHelper
     all_substances = []
 
     # From Compounds table
-    compounds =  Compound.all
-    compounds.each do |compound|
+    Compound.find_each do |compound|
       all_substances << substance_for_compound(compound)
     end
 
     # From Synonyms table
-    Synonym.all.each do |synonym|
+    Synonym.find_each do |synonym|
       all_substances << substance_for_synonym(synonym)
     end
     all_substances
