@@ -353,6 +353,8 @@ class DataFilesController < ApplicationController
 
   def confirm_extraction
     @samples, @rejected_samples = Seek::Samples::Extractor.new(@data_file).fetch.partition(&:valid?)
+    @sample_type=@samples.first.sample_type if @samples.any?
+    @sample_type||=@rejected_samples.first.sample_type if @rejected_samples.any?
 
     respond_to do |format|
       format.html
