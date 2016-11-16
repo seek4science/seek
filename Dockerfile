@@ -31,7 +31,7 @@ COPY . .
 RUN mkdir log tmp
 
 USER root
-RUN chown -R www-data solr config docker/upgrade.sh public
+RUN chown -R www-data solr config docker public
 USER www-data
 
 # SQLite Database (for asset compilation)
