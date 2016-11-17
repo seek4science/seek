@@ -22,6 +22,8 @@ SEEK::Application.configure do
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
   Seek::Config.default :hide_details_enabled,false
+  Seek::Config.default :registration_disabled,false
+  Seek::Config.default :registration_disabled_description,'Registration is not available, please contact your administrator'
   Seek::Config.default :activation_required_enabled,false
   Seek::Config.default :google_analytics_enabled, false
   Seek::Config.default :google_analytics_tracker_id, '000-000'
@@ -162,4 +164,3 @@ SEEK::Application.configure do
 
   Seek::Config.default :front_page_buttons_enabled, false
 end
-

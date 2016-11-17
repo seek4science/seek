@@ -151,7 +151,7 @@ class AdminsControllerTest < ActionController::TestCase
     login_as(:quentin)
     quentin=people(:quentin_person)
     aaron=people(:aaron_person)
-    
+
     assert quentin.is_admin?
     assert !aaron.is_admin?
 
