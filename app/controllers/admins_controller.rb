@@ -69,6 +69,10 @@ class AdminsController < ApplicationController
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
 
     Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
+
+    Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
+    Seek::Config.registration_disabled_description = params[:registration_disabled_description]
+
     Seek::Config.activation_required_enabled = string_to_boolean params[:activation_required_enabled]
 
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
