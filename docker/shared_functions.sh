@@ -26,3 +26,19 @@ function enable_search {
         cp docker/seek_local.rb config/initializers/seek_local.rb
     fi
 }
+
+function start_soffice {
+    echo "STARTING SOFFICE"
+    soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1 &
+}
+
+function start_or_setup_search {
+    if [ ! -z $SOLR_PORT ]
+    then
+      echo "USING SOLR CONTAINER"
+      cp docker/sunspot.docker.yml config/sunspot.yml
+    else
+      echo "STARTING SOLR"
+      bundle exec rake sunspot:solr:start
+    fi
+}

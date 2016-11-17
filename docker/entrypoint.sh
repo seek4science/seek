@@ -12,20 +12,11 @@ enable_search
 # DB config
 check_mysql
 
-
 # Soffice service
-echo "STARTING SOFFICE"
-soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1 &
+start_soffice
 
 # Search
-if [ ! -z $SOLR_PORT ]
-then
-  echo "USING SOLR CONTAINER"
-  cp docker/sunspot.docker.yml config/sunspot.yml
-else
-  echo "STARTING SOLR"
-  bundle exec rake sunspot:solr:start
-fi
+start_or_setup_search
 
 # Start Rails
 echo "STARTING SEEK"

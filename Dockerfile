@@ -37,7 +37,7 @@ USER www-data
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \
     cp docker/database.docker.sqlite3.yml config/database.yml && \
-    chmod +x docker/upgrade.sh && \
+    chmod +x docker/upgrade.sh docker/start_workers.sh && \
     bundle exec rake db:setup
 
 
