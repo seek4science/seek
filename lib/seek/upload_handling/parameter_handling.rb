@@ -25,9 +25,9 @@ module Seek
         params[:model_image] && params[:model_image][:image_file]
       end
 
-      def check_for_data_or_url(blob_params)
-        if (blob_params[:data]).blank? && (blob_params[:data_url]).blank?
-          if blob_params.include?(:data_url)
+      def check_for_data_or_url(blob_param)
+        if blob_param[:data].blank? && blob_param[:data_url].blank?
+          if blob_param.include?(:data_url)
             flash.now[:error] = 'Please select a file to upload or provide a URL to the data.'
           else
             flash.now[:error] = 'Please select a file to upload.'

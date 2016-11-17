@@ -404,7 +404,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(:model_owner)
       assert_difference('Model.count') do
         assert_difference('ModelImage.count') do
-          post :create, :model => valid_model, :content_blobs => [{:data_url => ''}], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+          post :create, :model => valid_model, :content_blobs => [], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
         end
       end
 
@@ -416,7 +416,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should not create model without image and without content_blob" do
       login_as(:model_owner)
       assert_no_difference('Model.count') do
-        post :create, :model => valid_model, :content_blobs => [{:data_url => ''}], :sharing=>valid_sharing
+        post :create, :model => valid_model, :content_blobs => [], :sharing=>valid_sharing
       end
       assert_not_nil flash[:error]
   end
