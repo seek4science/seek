@@ -31,7 +31,7 @@
                                "Activation required", "Whether activation is required when registering, as an additional check that the person is genuine and provided a correct email address. Since an activation email is sent, you need to make sure email is setup and working") %>
 
     <%= admin_checkbox_setting(:registration_disabled, 1, Seek::Config.registration_disabled,
-                              "Registration disabled", "Whether creating new accounts is disabled. Can be useful with external authentification (e.g. LDAP)",
+                              "Registration disabled", "Whether new accounts creation is disabled. Can be useful in combinaison with external authentification (e.g. LDAP)",
                               :onchange=>toggle_appear_javascript('registration_disabled_textarea')) %>
 
     <div id="registration_disabled_textarea" class="additional_settings" style="<%= show_or_hide_block Seek::Config.registration_disabled -%>">
