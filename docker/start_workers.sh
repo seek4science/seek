@@ -3,7 +3,8 @@
 #Stop the search reverting to disabled if its setting hasn't been changed
 enable_search
 
-check_mysql
+wait_for_mysql
+wait_for_database
 
 # Soffice service
 start_soffice

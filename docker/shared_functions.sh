@@ -1,5 +1,20 @@
 #!/bin/sh
 
+function wait_for_mysql {
+    while ! mysqladmin ping -h db --silent; do
+            echo "WAITING FOR MYSQL"
+            sleep 2
+    done
+}
+
+function wait_for_database {
+    while ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h db -e "desc $MYSQL_DATABASE.users" > /dev/null
+    do
+            echo "WAITING FOR DATABASE"
+            sleep 2
+    done
+}
+
 function check_mysql {
     if [ ! -z $MYSQL_DATABASE ]
     then
@@ -7,10 +22,7 @@ function check_mysql {
 
         cp docker/database.docker.mysql.yml config/database.yml
 
-        while ! mysqladmin ping -h db --silent; do
-            echo "WAITING FOR MYSQL"
-            sleep 3
-        done
+        wait_for_mysql
 
         if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h db -e "desc $MYSQL_DATABASE.users" > /dev/null
         then
