@@ -82,6 +82,15 @@ class DataFile < ActiveRecord::Base
     end
   end
 
+  #temporary whilst swapping to multiple content blobs.
+  def content_blob
+    content_blobs.first
+  end
+
+  def content_blob=blob
+    content_blobs=[blob]
+  end
+
   def included_to_be_copied? symbol
      case symbol.to_s
        when "activity_logs","versions","attributions","relationships","inverse_relationships", "annotations"

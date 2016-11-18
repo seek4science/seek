@@ -8,18 +8,19 @@ class DataFileTest < ActiveSupport::TestCase
     datafile_owner = Factory :user
     datafile=Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy),:contributor=> datafile_owner
     assert_equal datafile_owner,datafile.contributor
-    unless datafile.content_blob.nil?
-      datafile.content_blob.destroy
+    unless datafile.content_blobs.empty?
+      datafile.content_blobs.each(&:destroy)
     end
 
     blob=Factory.create(:content_blob,:original_filename=>"df.ppt", :content_type=>"application/ppt",:asset => datafile,:asset_version=>datafile.version)#content_blobs(:picture_blob)
     datafile.reload
-    assert_equal blob,datafile.content_blob
+    assert_equal 1,datafile.content_blobs.count
+    assert_equal blob,datafile.content_blobs.first
   end
 
   test "content blob search terms" do
     check_for_soffice
-    df = Factory :data_file, :content_blob=>Factory(:doc_content_blob,:original_filename=>"word.doc")
+    df = Factory :data_file, :content_blobs=>[Factory(:doc_content_blob,:original_filename=>"word.doc")]
     assert_equal ["This is a ms word doc format","doc","word.doc"],df.content_blob_search_terms.sort
 
     df = Factory :xlsx_spreadsheet_datafile
@@ -165,8 +166,8 @@ class DataFileTest < ActiveSupport::TestCase
   test "make sure content blob is preserved after deletion" do
     df = Factory :data_file #data_files(:picture)
     User.current_user = df.contributor
-    assert_not_nil df.content_blob,"Must have an associated content blob for this test to work"
-    cb=df.content_blob
+    assert_equal 1, df.content_blobs.count,"Must have an associated content blob for this test to work"
+    cb=df.content_blobs.first
     assert_difference("DataFile.count",-1) do
       assert_no_difference("ContentBlob.count") do
         df.destroy
@@ -439,7 +440,7 @@ class DataFileTest < ActiveSupport::TestCase
       user = Factory :user
       User.with_current_user user do
         data=File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls","rb").read
-        df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data,:content_type=>"application/excel")
+        df = Factory :data_file,:contributor=>user,:content_blobs=>[Factory(:content_blob,:data=>data,:content_type=>"application/excel")]
         assert_not_nil df.spreadsheet_xml
         assert_not_nil df.treatments
         assert_equal 2,df.treatments.values.keys.count
@@ -457,22 +458,22 @@ class DataFileTest < ActiveSupport::TestCase
     User.with_current_user(user) do
       mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", "http://mockedlocation.com/picture.png"
 
-      data_file = Factory :data_file, :content_blob => ContentBlob.new(:url => "http://mockedlocation.com/picture.png", :original_filename => "picture.png")
+      data_file = Factory :data_file, content_blobs: [ContentBlob.new(:url => "http://mockedlocation.com/picture.png", :original_filename => "picture.png")]
 
       data_file.save!
 
-      assert !data_file.content_blob.file_exists?
+      refute data_file.content_blobs.first.file_exists?
 
       data_file.cache_remote_content_blob
 
-      assert data_file.content_blob.file_exists?
+      assert data_file.content_blobs.first.file_exists?
     end
   end
 
   test 'sample template?' do
     Factory(:string_sample_attribute_type, title:'String')
 
-    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob), :policy=>Factory(:public_policy)
+    data_file = Factory :data_file, :content_blobs => [Factory(:sample_type_populated_template_content_blob)], :policy=>Factory(:public_policy)
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
