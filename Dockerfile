@@ -31,7 +31,7 @@ COPY . .
 RUN mkdir log tmp
 
 USER root
-RUN chown -R www-data solr config docker public
+RUN chown -R www-data solr config docker public /var/www
 USER www-data
 RUN touch config/using-docker #allows us to see within SEEK we are running in a container
 
