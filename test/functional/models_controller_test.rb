@@ -120,7 +120,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]    
   end
 
-
   test 'creators show in list item' do
     p1=Factory :person
     p2=Factory :person
@@ -138,11 +137,9 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "a[href=?]",person_path(p2) do
         assert_select "img"
       end
-
     end
   end
 
-  
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"

@@ -30,7 +30,7 @@ namespace :seek_scales do
   desc("transfer vl scalings to annotations")
     task(:scalings_to_annotations => :environment) do
       disable_authorization_checks do
-        Scaling.all.each do |s|
+        Scaling.find_each do |s|
            annotation = Annotation.new(
               :source => s.person.user,
               :annotatable => s.scalable,

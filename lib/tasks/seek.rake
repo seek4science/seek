@@ -12,16 +12,6 @@ namespace :seek do
   desc 'an alternative to the doc:seek task'
   task(:docs=>["doc:seek"])
 
-  desc 'set age_unit to be week for Virtual Liver old specimens which use week as age unit'
-  task(:update_age_unit => :environment) do
-    DeprecatedSpecimen.all.each do |sp|
-      sp.age_unit = "week" unless sp.age_unit
-      disable_authorization_checks do
-        sp.save!
-      end
-    end
-  end
-
   desc 'updates the md5sum, and makes a local cache, for existing remote assets'
   task(:cache_remote_content_blobs=>:environment) do
     resources = Sop.all
@@ -163,7 +153,7 @@ namespace :seek do
     ######update work groups##############
     puts "update work groups,it may take some time..."
     disable_authorization_checks do
-      Project.all.each do |proj|
+      Project.find_each do |proj|
         proj.institutions.each do |i|
           proj.parent.institutions << i unless proj.parent.nil? || proj.parent.institutions.include?(i)
         end
@@ -178,7 +168,7 @@ namespace :seek do
   #Run this after the subscriptions, and all subscribable classes have had their tables created by migrations
   #You can also run it any time you want to force everyone to subscribe to something they would be subscribed to by default
   task :create_default_subscriptions => :environment do
-    Person.all.each do |p|
+    Person.find_each do |p|
       set_default_subscriptions  p
       disable_authorization_checks {p.save(:validate=>false)}
     end
@@ -186,7 +176,7 @@ namespace :seek do
   
   task(:repopulate_auth_lookup_tables_old => :environment) do
     AuthLookupUpdateJob.new.add_items_to_queue nil,5.seconds.from_now,1
-    User.all.each do |user|
+    User.find_each do |user|
       unless AuthLookupUpdateQueue.exists?(user)
         AuthLookupUpdateJob.new.add_items_to_queue user,5.seconds.from_now,1
       end
@@ -196,7 +186,7 @@ namespace :seek do
   desc "Creates background jobs to rebuild all authorization lookup table for all items."
   task(:repopulate_auth_lookup_tables=>:environment) do
     Seek::Util.authorized_types.each do |type|
-      type.all.each do |item|
+      type.find_each do |item|
         unless AuthLookupUpdateQueue.exists?(item)
           AuthLookupUpdateJob.new.add_items_to_queue item,5.seconds.from_now,1
         end
@@ -359,7 +349,7 @@ namespace :seek do
       puts
       output.puts type.name
       users = User.all + [nil]
-      type.all.each do |item|
+      type.find_each do |item|
         users.each do |user|
           user_id = user.nil? ? 0 : user.id
           ['view', 'edit', 'download', 'manage', 'delete'].each do |action|
@@ -390,7 +380,7 @@ namespace :seek do
     new_method_start = Time.now
     Seek::Util.authorized_types.each do |type|
       puts type.name
-      type.includes(policy: :permissions).all.each do |item|
+      type.includes(policy: :permissions).find_each do |item|
         item.update_lookup_table_for_all_users
         print '.'
       end
@@ -410,7 +400,7 @@ namespace :seek do
     old_method_start = Time.now
     Seek::Util.authorized_types.each do |type|
       puts type.name
-      type.includes(policy: :permissions).all.each do |item|
+      type.includes(policy: :permissions).find_each do |item|
         all_users.each do |user|
           item.update_lookup_table(user)
         end

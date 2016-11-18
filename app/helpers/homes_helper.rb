@@ -11,6 +11,10 @@ module HomesHelper
     Seek::Config.home_description.html_safe
   end
 
+  def registration_disabled_description_text
+    Seek::Config.registration_disabled_description.html_safe
+  end
+
   def imprint_text
     simple_format(auto_link(Seek::Config.imprint_description.html_safe, sanitize: false), {}, sanitize: false)
   end
