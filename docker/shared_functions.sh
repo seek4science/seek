@@ -15,12 +15,16 @@ function wait_for_database {
     done
 }
 
+function use_mysql_db {
+    cp docker/database.docker.mysql.yml config/database.yml
+}
+
 function check_mysql {
     if [ ! -z $MYSQL_DATABASE ]
     then
         echo "USING MYSQL"
 
-        cp docker/database.docker.mysql.yml config/database.yml
+        use_mysql_db
 
         wait_for_mysql
 
@@ -41,7 +45,7 @@ function enable_search {
 
 function start_soffice {
     echo "STARTING SOFFICE"
-    soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1 &
+    soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard &
 }
 
 function start_or_setup_search {
