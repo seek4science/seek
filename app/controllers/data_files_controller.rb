@@ -26,31 +26,6 @@ class DataFilesController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
-  def convert_to_presentation
-    @data_file = DataFile.find params[:id]
-    @presentation = @data_file.to_presentation
-
-    respond_to do |format|
-
-      if !@presentation.new_record?
-        disable_authorization_checks do
-          # first reload all associations which are already assigned to the presentation. Otherwise, all associations will be destroyed when data file is destroyed
-          @data_file.reload
-          @data_file.destroy
-        end
-
-        ActivityLog.create :action=>"create",:culprit=>current_user,:activity_loggable=>@presentation,:controller_name=>controller_name.downcase
-        flash[:notice]="#{t('data_file')} '#{@presentation.title}' is successfully converted to #{t('presentation')}"
-        format.html { redirect_to presentation_path(@presentation) }
-      else
-        flash[:error] = "#{t('data_file')} failed to convert to #{t('presentation')}!!"
-        format.html {
-          redirect_to data_file_path @data_file
-        }
-      end
-    end
-  end
-
   def plot
     sheet = params[:sheet] || 2
     @csv_data = spreadsheet_to_csv(open(@data_file.content_blob.filepath),sheet,true)

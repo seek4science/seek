@@ -1726,47 +1726,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 1, current_person.subscriptions.count
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
   end
-    test "can move to presentations" do
-     data_file = Factory :data_file, :contributor => User.current_user
-     assert_difference("DataFile.count",  -1) do
-       assert_difference("Presentation.count") do
-         post :convert_to_presentation, :id => data_file
-       end
-     end
-     assert assigns(:presentation)
-     assert_redirected_to assigns(:presentation)
-   end
- 
-   test "converting to presentation logs creation activity" do
-     data_file = Factory :data_file,:contributor=>User.current_user
-     assert_difference("ActivityLog.count") do
-           post :convert_to_presentation, :id=>data_file
-     end
-     assert assigns(:presentation)
-     presentation = assigns(:presentation)
- 
-     #needs to mimic the logging of a presentation being created
-     al = ActivityLog.last
-     assert_equal "create",al.action
-     assert_equal User.current_user,al.culprit
-     assert_equal presentation,al.activity_loggable
-     assert_equal "data_files",al.controller_name
-   end
- 
-   test "converted presentations have correct attributions" do
-     data_file = Factory :data_file,:contributor=>User.current_user
-     disable_authorization_checks {data_file.relationships.create :other_object => Factory(:data_file), :subject => data_file, :predicate => Relationship::ATTRIBUTED_TO}
-     df_attributions = data_file.attributions_objects
-     assert_difference("DataFile.count",  -1) do
-       assert_difference("Presentation.count") do
-         post :convert_to_presentation, :id=>data_file.id
-       end
-     end
- 
-     assert_equal df_attributions, assigns(:presentation).attributions_objects
-     assert !assigns(:presentation).attributions_objects.empty?
-   end
-
 
   test "project data files through nested routing" do
     assert_routing 'projects/2/data_files',{controller:"data_files",action:"index",project_id:"2"}

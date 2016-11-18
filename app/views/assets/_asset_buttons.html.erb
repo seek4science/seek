@@ -68,10 +68,6 @@
 
     <%= delete_icon(asset, current_user)%>
 
-    <% if Seek::Config.is_virtualliver && (asset.can_delete? || current_user.try(:admin?)) && asset.respond_to?(:to_presentation) %>
-        <li><%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:title => "click to move this #{t('data_file')} to #{t('presentation').pluralize}", :confirm => "Are you sure you wish to move this #{t('data_file')} to #{t('presentation').pluralize}? Doing so is irreversible!", :method => :post}, "Move to #{t('presentation').pluralize}" %></li>
-    <% end %>
-
     <% if asset.supports_doi? && asset.is_doiable?(display_asset.version) %>
         <li><%= image_tag_for_key('doi', polymorphic_path(asset, :action => 'mint_doi_confirm', :version => display_asset.version), nil,{},"Generate a DOI") -%></li>
     <% end %>
