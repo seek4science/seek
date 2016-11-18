@@ -491,6 +491,16 @@ class DataFileTest < ActiveSupport::TestCase
 
   end
 
+  test 'factory test' do
+    #sanity check that the updated factories work whilst fixing them, no harm leaving this test here
+    df = Factory(:rightfield_annotated_datafile)
+    assert_equal 1,df.content_blobs.count
+    blob = df.content_blobs.first
+    assert blob.file_exists?
+    assert_equal 'simple_populated_rightfield.xls',blob.original_filename
+    assert_equal 'application/excel',blob.content_type
+  end
+
   private
 
   def data_file_with_sample_parser filepath,filename,content_type
