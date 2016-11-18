@@ -31,13 +31,14 @@ COPY . .
 RUN mkdir log tmp
 
 USER root
-RUN chown -R www-data solr config docker/upgrade.sh public
+RUN chown -R www-data solr config docker public /var/www
 USER www-data
+RUN touch config/using-docker #allows us to see within SEEK we are running in a container
 
 # SQLite Database (for asset compilation)
 RUN mkdir sqlite3-db && \
     cp docker/database.docker.sqlite3.yml config/database.yml && \
-    chmod +x docker/upgrade.sh && \
+    chmod +x docker/upgrade.sh docker/start_workers.sh && \
     bundle exec rake db:setup
 
 

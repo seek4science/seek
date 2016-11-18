@@ -1,22 +1,8 @@
 #!/bin/bash
-
+. docker/shared_functions.sh
 #Stop the search reverting to disabled if its setting hasn't been changed
-if [ ! -f config/initializers/seek_local.rb ]
-then
-    cp docker/seek_local.rb config/initializers/seek_local.rb
-fi
+enable_search
 
-if [ ! -z $MYSQL_DATABASE ]
-then
-    echo "USING MYSQL"
-
-    cp docker/database.docker.mysql.yml config/database.yml
-
-    if ! mysql -uroot -p$MYSQL_ROOT_PASSWORD -h db -e "use $MYSQL_DATABASE"
-    then
-        echo "SETTING UP MYSQL DB"
-        bundle exec rake db:setup
-    fi
-fi
+check_mysql
 
 bundle exec rake seek:upgrade
