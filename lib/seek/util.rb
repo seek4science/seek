@@ -99,7 +99,7 @@ module Seek
 
     def self.multi_files_asset_types
       #FIXME: needs to be discovered rather than hard-code classes here
-      [Model]
+      [DataFile,Model]
     end
 
     def self.doiable_asset_types

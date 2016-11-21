@@ -144,8 +144,8 @@ module AssetsHelper
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})
     download_button = icon_link_to('Download', 'download', download_path, opts)
     link_button_or_nil = link_url ? icon_link_to('External Link', 'external_link', link_url, opts.merge(target: 'blank')) : nil
-    return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob)
     return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ? download_button : link_button_or_nil if asset.respond_to?(:content_blobs)
+    return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob)
   end
 
   def view_content_button(asset)

@@ -8,10 +8,13 @@ module Seek
         end
 
         def all_content_blobs
-          blobs = []
-          blobs << content_blob if self.respond_to?(:content_blob)
-          blobs = blobs | content_blobs if self.respond_to?(:content_blobs)
-          blobs
+          if self.respond_to?(:content_blobs)
+            self.content_blobs
+          elsif self.respond_to?(:content_blob)
+            [self.content_blob]
+          else
+            []
+          end
         end
 
         def single_content_blob

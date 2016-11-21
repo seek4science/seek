@@ -67,7 +67,7 @@ class JsonMetaTest < ActiveSupport::TestCase
   end
 
   test "should not encode filename in encodes block if it has a space" do
-    item = Factory :data_file,:content_blob=>Factory(:content_blob,:original_filename=>"file with space.xls"),:policy=>Factory(:public_policy)
+    item = Factory :data_file,content_blobs:[Factory(:content_blob,:original_filename=>"file with space.xls")],:policy=>Factory(:public_policy)
     json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
     json = JSON.parse(json)
     filename = json["contains"].first

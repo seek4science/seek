@@ -628,7 +628,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should show webpage as a link" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
 
-    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com")
+    df = Factory :data_file,:content_blobs=>[Factory(:content_blob,:url=>"http://webpage.com")]
 
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
@@ -646,7 +646,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "should show URL with unrecognized scheme as a link" do
-    df = Factory :data_file,:content_blob=>Factory(:content_blob, :url=>"spotify:track:3vX71b5ey9twzyCqJwBEvY")
+    df = Factory :data_file,:content_blobs=>[Factory(:content_blob, :url=>"spotify:track:3vX71b5ey9twzyCqJwBEvY")]
 
     assert df.content_blob.show_as_external_link?
     login_as(df.contributor.user)
@@ -718,7 +718,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test "dont show download button or count for website/external_link data file" do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html","http://webpage.com",{'Content-Type' => 'text/html'}
-    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
+    df = Factory :data_file,:content_blobs=>[Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)]
     assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
     assert df.can_download?(df.contributor.user)
@@ -1425,7 +1425,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "correctly displays links in spreadsheet explorer" do
     df = Factory(:data_file,
                  :policy=>Factory(:public_policy),
-                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,:data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+                 :content_blobs=>[Factory(:small_test_spreadsheet_content_blob,:data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read)])
     assert df.can_download?
     get :explore, :id=>df
     assert_response :success
@@ -1436,7 +1436,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test "correctly displays rows in spreadsheet explorer" do
     df = Factory(:data_file,
                  :policy=>Factory(:public_policy),
-                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,:data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+                 :content_blobs=>[Factory(:small_test_spreadsheet_content_blob,:data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read)])
 
     get :explore, :id=>df
     assert_response :success
@@ -1465,8 +1465,8 @@ class DataFilesControllerTest < ActionController::TestCase
   test "correctly displays number of rows in spreadsheet explorer" do
     df = Factory(:data_file,
                  :policy=>Factory(:public_policy),
-                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,
-                                        :data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+                 :content_blobs=>[Factory(:small_test_spreadsheet_content_blob,
+                                        :data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read)])
 
     get :explore, :id=>df, :page_rows => 5
     assert_response :success
@@ -1479,8 +1479,8 @@ class DataFilesControllerTest < ActionController::TestCase
   test "correctly displays pagination in spreadsheet explorer" do
     df = Factory(:data_file,
                  :policy=>Factory(:public_policy),
-                 :content_blob=>Factory(:small_test_spreadsheet_content_blob,
-                                        :data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read))
+                 :content_blobs=>[Factory(:small_test_spreadsheet_content_blob,
+                                        :data=>File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls","rb").read)])
 
     page_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS/2 + 1
     get :explore, :id=>df, :page_rows => page_rows
@@ -2003,7 +2003,7 @@ class DataFilesControllerTest < ActionController::TestCase
       end
 
       assert_redirected_to data_file_path(assigns(:data_file))
-      blob = assigns(:data_file).content_blob
+      blob = assigns(:data_file).content_blobs.first
       assert !blob.cachable?
       assert !blob.url.blank?
       assert_equal "small.txt", blob.original_filename
@@ -2021,6 +2021,7 @@ class DataFilesControllerTest < ActionController::TestCase
     },
                content_blobs: [{
                                    data_url: "http://mockedlocation.com/big.txt",
+                                   original_filename:'',
                                    make_local_copy: '1'
                                }],
                sharing: valid_sharing
@@ -2035,8 +2036,8 @@ class DataFilesControllerTest < ActionController::TestCase
       end
 
       assert_redirected_to data_file_path(assigns(:data_file))
-      blob = assigns(:data_file).content_blob
-      assert blob.make_local_copy
+      blob = assigns(:data_file).content_blobs.first
+      refute blob.external_link?
       assert !blob.cachable?
       assert !blob.url.blank?
       assert_equal "big.txt", blob.original_filename
@@ -2069,14 +2070,14 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    blob = assigns(:data_file).content_blob
-    assert !blob.make_local_copy
-    assert !blob.cachable?
-    assert !blob.url.blank?
+    blob = assigns(:data_file).content_blobs.first
+    refute blob.make_local_copy
+    refute blob.cachable?
+    refute blob.url.blank?
     assert_equal "big.txt", blob.original_filename
     assert_equal "text/plain", blob.content_type
     assert_equal 5000, blob.file_size
-    assert !blob.caching_job.exists?
+    refute blob.caching_job.exists?
   end
 
   test "should not automatically create cache job for webpage links" do
@@ -2131,8 +2132,9 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    blob = assigns(:data_file).content_blob
-    assert blob.make_local_copy
+    assert_equal 1,assigns(:data_file).content_blobs.count
+    blob = assigns(:data_file).content_blobs.first
+    refute blob.external_link?
     assert !blob.cachable?
     assert !blob.url.blank?
     assert_equal "big.txt", blob.original_filename
@@ -2212,7 +2214,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title:'String')
 
-    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+    data_file = Factory :data_file, :content_blobs => [Factory(:sample_type_populated_template_content_blob)],
                         :policy=>Factory(:private_policy), :contributor=>person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2345,7 +2347,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title:'String')
 
-    data_file = Factory :data_file, :content_blob => Factory(:strain_sample_data_content_blob),
+    data_file = Factory :data_file, :content_blobs => [Factory(:strain_sample_data_content_blob)],
                         :policy=>Factory(:private_policy), :contributor=>person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2373,7 +2375,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title:'String')
 
-    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+    data_file = Factory :data_file, :content_blobs => [Factory(:sample_type_populated_template_content_blob)],
                         :policy=>Factory(:private_policy), :contributor=>person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2411,7 +2413,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title:'String')
 
-    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+    data_file = Factory :data_file, :content_blobs => [Factory(:sample_type_populated_template_content_blob)],
                         :policy=>Factory(:private_policy), :contributor=>person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2445,7 +2447,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title:'String')
 
-    data_file = Factory :data_file, :content_blob => Factory(:sample_type_populated_template_content_blob),
+    data_file = Factory :data_file, :content_blobs => [Factory(:sample_type_populated_template_content_blob)],
                         :policy=>Factory(:private_policy), :contributor=>person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2471,7 +2473,7 @@ class DataFilesControllerTest < ActionController::TestCase
     person = Factory(:project_administrator)
     login_as(person)
 
-    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
                         policy: Factory(:private_policy),
                         contributor: person.user
     refute data_file.sample_template?
@@ -2569,7 +2571,7 @@ class DataFilesControllerTest < ActionController::TestCase
   private
 
   def data_file_with_extracted_samples(contributor=User.current_user)
-    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
                          policy: Factory(:private_policy), contributor: contributor
     sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)

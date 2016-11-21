@@ -6,7 +6,7 @@ class SampleExtractorTest < ActiveSupport::TestCase
     @person = Factory(:project_administrator)
     User.current_user=@person.user
     Factory(:string_sample_attribute_type, title: 'String')
-    @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+    @data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
                                      policy: Factory(:private_policy), contributor: @person.user
     @sample_type = SampleType.new title: 'from template',:project_ids=>[@person.projects.first.id]
     @sample_type.content_blob = Factory(:sample_type_template_content_blob)
