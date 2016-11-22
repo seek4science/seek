@@ -697,7 +697,7 @@
 
   <xsd:complexType name="DataFile">
     <xsd:complexContent>
-      <xsd:extension base="AssetType">
+      <xsd:extension base="MultipleContentBlobsAssetType">
         <xsd:sequence>
           <xsd:element name="associated" type="AssociatedItems"
                        minOccurs="1" maxOccurs="1"></xsd:element>
