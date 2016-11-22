@@ -43,7 +43,7 @@ class DataFile < ActiveRecord::Base
       content_blobs.first
     end
 
-    #FIXME: should be possible to do this with a has_many: rather than method, same for Model::Version
+    #FIXME: should be possible to do this with a has_many: rather than method, same for Model::Version - (seems it needs foreign_type added in Rails 4)
     def content_blobs
       ContentBlob.where(["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
     end
