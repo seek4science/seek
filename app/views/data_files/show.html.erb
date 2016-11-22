@@ -13,7 +13,7 @@
       <div class="col-md-6">
         <%= persistent_resource_id(@display_data_file) %>
 
-        <%= render :partial => 'assets/fileinfo',:object=>@display_data_file.content_blob -%>
+        <%= render :partial=>"assets/multiple_fileinfo", :object=>@display_data_file -%>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
 

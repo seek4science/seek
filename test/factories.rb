@@ -572,14 +572,16 @@ end
 
 Factory.define(:data_file_version_with_blob, parent: :data_file_version) do |f|
   f.after_create do |data_file_version|
-    if data_file_version.content_blob.blank?
-      data_file_version.content_blob = Factory.create(:pdf_content_blob,
-                                                      asset: data_file_version.data_file,
-                                                      asset_version: data_file_version.version)
+    if data_file_version.content_blobs.empty?
+      Factory.create(:pdf_content_blob,
+                     asset: data_file_version.data_file,
+                     asset_version: data_file_version.version)
     else
-      data_file_version.content_blob.asset = data_file_version.data_file
-      data_file_version.content_blob.asset_version = data_file_version.version
-      data_file_version.content_blob.save
+      data_file_version.content_blobs.each do |blob|
+        blob.asset = data_file_version.data_file
+        blob.asset_version = data_file_version.version
+        blob.save
+      end
     end
   end
 end

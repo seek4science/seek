@@ -1,11 +1,12 @@
 <%= javascript_include_tag "upload_selection" %>
 <%
     new_version ||= false
+    resource ||=nil
 %>
- <% resource ||=nil %>
+
 
 <%= panel('Upload') do %>
-    <% if !resource.nil? && resource.respond_to?(:content_blobs) %>
+    <% if !resource.nil? && Seek::Util.multi_files_asset_types.include?(resource.class) %>
         <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version,:batch=>true, :with_image_file=>resource.is_a?(Model)} -%>
     <% else %>
         <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version} -%>

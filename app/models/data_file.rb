@@ -39,7 +39,14 @@ class DataFile < ActiveRecord::Base
     acts_as_versioned_resource
     acts_as_favouritable
 
-    has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version,parent.class.name]}
+    def content_blob
+      content_blobs.first
+    end
+
+    #FIXME: should be possible to do this with a has_many: rather than method, same for Model::Version
+    def content_blobs
+      ContentBlob.where(["asset_id =? and asset_type =? and asset_version =?", self.parent.id, self.parent.class.name, self.version])
+    end
     
     has_many :studied_factors, :primary_key => "data_file_id", :foreign_key => "data_file_id", :conditions => Proc.new{["studied_factors.data_file_version =?", version]}
     
