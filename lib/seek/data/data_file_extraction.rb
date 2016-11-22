@@ -7,7 +7,7 @@ module Seek
       # include Seek::Data::SearchExtraction
 
       def contains_extractable_spreadsheet?
-        content_blob.is_extractable_spreadsheet?
+        content_blobs.first.is_extractable_spreadsheet?
       end
 
     end

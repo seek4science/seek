@@ -230,7 +230,7 @@ class DataFilesController < ApplicationController
     @data_file =  DataFile.find(params[:id])
     sheet = params[:sheet] || 1
     trim = params[:trim] || false
-    content_blob = @data_file.content_blob
+    content_blob = @data_file.content_blobs.first
     file = open(content_blob.filepath)
     mime_extensions = mime_extensions(content_blob.content_type)
     if !(["xls","xlsx"] & mime_extensions).empty?

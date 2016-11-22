@@ -13,7 +13,7 @@
       <div class="col-md-6">
         <%= persistent_resource_id(@display_data_file) %>
 
-        <%= render :partial=>"assets/multiple_fileinfo", :object=>@display_data_file -%>
+        <%= render(:partial=>"assets/multiple_fileinfo", :object=>@display_data_file) if @data_file.can_download?-%>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
 

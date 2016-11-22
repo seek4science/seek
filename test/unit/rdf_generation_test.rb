@@ -7,7 +7,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
 
   test "rightfield rdf generation" do
     df=Factory :rightfield_annotated_datafile
-    assert_not_nil(df.content_blob)
+    assert_not_nil(df.content_blobs.first)
     rdf = generate_rightfield_rdf(df)
     assert_not_nil(rdf)
 
@@ -49,7 +49,7 @@ class RDFGenerationTest < ActiveSupport::TestCase
 
   test "rdf with problem excel file" do
     #a file that was found to cause an error during the RightField part of the RDF generation.
-    df = Factory(:data_file,:content_blob=>Factory(:spreadsheet_content_blob,:data=> File.new("#{Rails.root}/test/fixtures/files/test_file_FakStudied_OK.xls","rb").read))
+    df = Factory(:data_file,:content_blobs=>[Factory(:spreadsheet_content_blob,:data=> File.new("#{Rails.root}/test/fixtures/files/test_file_FakStudied_OK.xls","rb").read)])
     rdf = df.to_rdf
     assert_not_nil(rdf)
 

@@ -26,9 +26,9 @@ class SampleExtractorTest < ActiveSupport::TestCase
     @extractor.extract
 
     # Delete data file so re-extracting would raise an error
-    disable_authorization_checks { @data_file.content_blob.destroy }
+    disable_authorization_checks { @data_file.content_blobs.first.destroy }
     @data_file.reload
-    assert_nil @data_file.content_blob
+    assert_nil @data_file.content_blobs.first
     assert_difference('Sample.count', 4) do
       @extractor.persist
     end

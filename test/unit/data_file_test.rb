@@ -94,12 +94,8 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   def test_avatar_key
-
-    assert_nil data_files(:picture).avatar_key
-    assert data_files(:picture).use_mime_type_for_avatar?
-
-    assert_nil data_file_versions(:picture_v1).avatar_key
-    assert data_file_versions(:picture_v1).use_mime_type_for_avatar?
+    assert_equal 'data_file_avatar', data_files(:picture).avatar_key
+    refute data_files(:picture).use_mime_type_for_avatar?
   end
 
   test "projects" do
@@ -321,7 +317,7 @@ class DataFileTest < ActiveSupport::TestCase
         assert_equal ["Dilution_rate","pH"],df.treatments.values.keys.sort
 
         data=File.new("#{Rails.root}/test/fixtures/files/file_picture.png","rb").read
-        df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data)
+        df = Factory :data_file,:contributor=>user,:content_blobs=>[Factory(:content_blob,:data=>data)]
         assert_not_nil df.treatments
         assert_equal 0,df.treatments.values.keys.count
       end
@@ -360,7 +356,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert data_file.sample_template?
     assert_includes data_file.possible_sample_types, sample_type
 
-    data_file = Factory :data_file, :content_blob => Factory(:small_test_spreadsheet_content_blob), :policy=>Factory(:public_policy)
+    data_file = Factory :data_file, :content_blobs => [Factory(:small_test_spreadsheet_content_blob)], :policy=>Factory(:public_policy)
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 

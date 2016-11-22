@@ -9,9 +9,9 @@ module Seek
       #returns an instance of Seek::Treatment, populated according to the contents of the spreadsheet if it matches a known template
       def treatments
         Seek::Data::Treatments #this is just to load the class, incase it is already in the cache. Otherwise an underfined class/module error may occur
-        Rails.cache.fetch("treatments_#{content_blob.cache_key}") do
+        Rails.cache.fetch("treatments_#{content_blobs.first.cache_key}") do
           begin
-            if content_blob.is_extractable_spreadsheet?
+            if content_blobs.first.is_extractable_spreadsheet?
               xml = spreadsheet_xml
               Seek::Data::Treatments.new xml
             else

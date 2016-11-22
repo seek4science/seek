@@ -72,15 +72,6 @@ class DataFile < ActiveRecord::Base
     end
   end
 
-  #temporary whilst swapping to multiple content blobs.
-  def content_blob
-    content_blobs.first
-  end
-
-  def content_blob=blob
-    content_blobs=[blob]
-  end
-
   def included_to_be_copied? symbol
      case symbol.to_s
        when "activity_logs","versions","attributions","relationships","inverse_relationships", "annotations"
@@ -96,7 +87,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def use_mime_type_for_avatar?
-    true
+    false
   end
 
   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
@@ -123,7 +114,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def possible_sample_types
-    SampleType.sample_types_matching_content_blob(content_blob)
+    SampleType.sample_types_matching_content_blob(content_blobs.first)
   end
 
   #a simple container for handling the matching results returned from #matching_data_files
@@ -171,7 +162,7 @@ class DataFile < ActiveRecord::Base
   # Extracts samples using the given sample_type
   # Returns a list of extracted samples, including
   def extract_samples(sample_type, confirm = false)
-    samples = sample_type.build_samples_from_template(self.content_blob)
+    samples = sample_type.build_samples_from_template(self.content_blobs.first)
     extracted = []
     samples.each do |sample|
       sample.project_ids = self.project_ids

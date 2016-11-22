@@ -256,12 +256,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'report error when file unavailable for download' do
     df = Factory :data_file, policy: Factory(:public_policy)
-    df.content_blob.dump_data_to_file
-    assert df.content_blob.file_exists?
-    FileUtils.rm df.content_blob.filepath
-    assert !df.content_blob.file_exists?
+    df.content_blobs.first.dump_data_to_file
+    assert df.content_blobs.first.file_exists?
+    FileUtils.rm df.content_blobs.first.filepath
+    refute df.content_blobs.first.file_exists?
 
-    get :download, data_file_id: df, id: df.content_blob
+    get :download, data_file_id: df, id: df.content_blobs.first
 
     assert_redirected_to df
     assert flash[:error].match(/Unable to find a copy of the file for download/)
@@ -299,7 +299,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy))
     image_content_blob = Factory(:content_blob, :original_filename => 'test.png', :content_type => 'image/png', :asset => df)
     assert_difference('ActivityLog.count') do
-      get :download, data_file_id: df.id, id: df.content_blob.id, disposition: 'inline'
+      get :download, data_file_id: df.id, id: df.content_blobs.first.id, disposition: 'inline'
     end
     assert_response :success
     al = ActivityLog.last
@@ -343,13 +343,13 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     get :download, data_file_id: df, id: df.content_blobs.first
 
-    assert_redirected_to df.content_blob.url
+    assert_redirected_to df.content_blobs.first.url
   end
 
   test 'should download' do
     df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user
     assert_difference('ActivityLog.count') do
-      get :download, data_file_id: df, id: df.content_blob
+      get :download, data_file_id: df, id: df.content_blobs.first
     end
     assert_response :success
     assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"", @response.header['Content-Disposition']
@@ -360,7 +360,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'should not log download for inline view intent' do
     df = Factory :small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user
     assert_no_difference('ActivityLog.count') do
-      get :download, data_file_id: df, id: df.content_blob, intent: :inline_view
+      get :download, data_file_id: df, id: df.content_blobs.first, intent: :inline_view
     end
     assert_response :success
   end
