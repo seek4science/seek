@@ -546,12 +546,10 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/Filename:/
-      assert_select "p",:text=>/rightfield\.xls/
-      assert_select "p > b",:text=>/Format:/
-      assert_select "p",:text=>/Spreadsheet/
-      assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/9 KB/
+      assert_select 'ul' do
+        assert_select 'li',:text=>/rightfield\.xls/
+        assert_select "li > span.subtle",:text=>"(Spreadsheet - 9 KB)"
+      end
     end
 
   end
@@ -638,10 +636,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "#buttons a.btn[href=?]","http://webpage.com",:text=>'External Link'
 
     assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/Link:/
-      assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com"
-      assert_select "p > b",:text=>/Format:/,:count=>0
-      assert_select "p > b",:text=>/Size:/,:count=>0
+      assert_select 'ul' do
+        assert_select 'li' do
+          assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com"
+        end
+        assert_select "li > span.subtle",:text=>"(Website)"
+      end
     end
   end
 
@@ -656,10 +656,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select "#buttons a.btn[href=?]","spotify:track:3vX71b5ey9twzyCqJwBEvY",:text=>'External Link'
 
     assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/Link:/
-      assert_select "a[href=?][target=_blank]","spotify:track:3vX71b5ey9twzyCqJwBEvY",:text=>"spotify:track:3vX71b5ey9twzyCqJwBEvY"
-      assert_select "p > b",:text=>/Format:/,:count=>0
-      assert_select "p > b",:text=>/Size:/,:count=>0
+      assert_select 'ul' do
+        assert_select 'li' do
+          assert_select "a[href=?][target=_blank]","spotify:track:3vX71b5ey9twzyCqJwBEvY",:text=>"spotify:track:3vX71b5ey9twzyCqJwBEvY"
+        end
+        assert_select "li > span.subtle",:text=>"(Website)"
+      end
     end
   end
 
