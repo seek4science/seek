@@ -58,8 +58,9 @@ class AssetButtonsTest < ActionController::IntegrationTest
           assert_download_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
 
           create_content_blobs item, [html_blob_attrs, pdf_blob_without_local_copy_attrs]
-          assert_neither_download_nor_link_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
-
+          unless klass==DataFile
+            assert_neither_download_nor_link_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
+          end
         else
           item.create_content_blob pdf_blob_with_local_copy_attrs
           assert_download_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
