@@ -39,6 +39,47 @@
         </tbody>
       </table>
     </div>
+    <%= button_link_to('Share with a person', 'add', '#', id: 'add-person-permission-button') %>
+    <%= button_link_to('Share with a project/institution', 'add', '#', id: 'add-project-permission-button') %>
+
+    <%= modal(id: 'add-person-permission-modal', size: 'm') do %>
+        <%= modal_header('Share with people') %>
+        <%= modal_body do %>
+            <div class="form-group">
+              <label>The following people...</label>
+              <%= objects_input('permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.email } } }) -%>
+              <p class="help-block">Start typing a person's name and select from the list that appears. You can select multiple people.</p>
+            </div>
+            <div class="form-group">
+              <label>can...</label>
+              <%= select_tag('permission-people-access-type', policy_selection_options(nil, nil, Policy::ACCESSIBLE), class: 'form-control') -%>
+            </div>
+        <% end %>
+        <%= modal_footer do %>
+            <%= link_to('Add', '#', id: 'permission-people-confirm', class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
+        <% end %>
+    <% end %>
+
+    <%= modal(id: 'add-project-permission-modal', size: 'm') do %>
+        <%= modal_header('Share with a project and/or institution') %>
+        <%= modal_body do %>
+            <div class="form-group">
+              <label>Members of...</label>
+              <%= select_tag('permission-project-id', projects_grouped_by_programme, prompt: 'any project', class: 'form-control') -%>
+            </div>
+            <div class="form-group">
+              <label>working at...</label>
+              <%= select_tag('permission-institution-id', options_for_select(Institution.all.sort_by(&:title).map { |i| [i.title, i.id] }), prompt: 'any institution', class: 'form-control') -%>
+            </div>
+            <div class="form-group">
+              <label>can...</label>
+              <%= select_tag('permission-project-access-type', policy_selection_options(nil, nil, Policy::ACCESSIBLE), class: 'form-control') -%>
+            </div>
+        <% end %>
+        <%= modal_footer do %>
+            <%= link_to('Add', '#', id: 'permission-project-confirm', class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
+        <% end %>
+    <% end %>
 <% end %>
 
 <%= content_tag :script, permissions_json(@resource.policy), type: 'application/json', id: 'permissions-json' %>
@@ -74,6 +115,13 @@
       $j('.permission-row:gt(0)').each(function () {
         $j('.privilege-cell:lt(' + index + ')', $j(this)).removeClass('enabled').addClass('disabled');
       });
+    },
+
+    addPermission: function (permission) {
+      if (!$j('[data-contributor-id="'+permission.contributor_id+'"][data-contributor-type="'+permission.contributor_type+'"]').length) {
+        var row = HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Policy.accessTypes });
+        $j('.permissions-table').append(row);
+      }
     }
   };
 
@@ -96,11 +144,83 @@
     Policy.setMinimumPrivileges();
   });
 
+  $j('#add-person-permission-button').click(function () {
+    $j('#add-person-permission-modal').modal('show');
+    $j('#permission-people-ids').tagsinput('focus');
+
+    return false;
+  });
+
+  $j('#add-project-permission-button').click(function () {
+    $j('#add-project-permission-modal').modal('show');
+
+    return false;
+  });
+
+  $j('#permission-people-confirm').click(function () {
+    var people = $j('#permission-people-ids').tagsinput('items');
+
+    people.forEach(function (person, index) {
+      var uniqueishId = new Date().valueOf() * 100 + index;
+      Policy.addPermission(
+          { index: uniqueishId,
+            contributor_type: 'Person',
+            contributor_id: person.id,
+            title: person.name,
+            access_type: $j('#permission-people-access-type').val() });
+    });
+
+    Policy.highlightPrivileges();
+    // Reset form
+    $j('#permission-people-ids').tagsinput('removeAll');
+  });
+
+  $j('#permission-project-confirm').click(function () {
+    var projectId = $j('#permission-project-id').val();
+    var institutionId = $j('#permission-institution-id').val();
+    var projectTitle = $j('#permission-project-id :selected').text();
+    var institutionTitle = $j('#permission-institution-id :selected').text();
+    var permission = {
+      index: new Date().valueOf() * 100,
+      access_type: $j('#permission-project-access-type').val()
+    };
+
+    if (projectId) {
+      if (institutionId) {
+        permission.contributor_type = 'WorkGroup';
+        // Not a real database ID, but is enough to stop duplicate rows being added to the matrix:
+        permission.contributor_id = 'p' + projectId + 'i' + institutionId;
+        permission.project_id = projectId;
+        permission.institution_id = institutionId;
+        permission.title = '' + projectTitle + ' @ ' + institutionTitle;
+      } else {
+        permission.contributor_type = 'Project';
+        permission.contributor_id = projectId;
+        permission.title = projectTitle;
+      }
+    } else {
+      if (institutionId) {
+        permission.contributor_type = 'Institution';
+        permission.contributor_id = institutionId;
+        permission.title = institutionTitle;
+      } else {
+        alert('Please select either a project or institution.');
+        return false;
+      }
+    }
+
+    Policy.addPermission(permission);
+    Policy.highlightPrivileges();
+    // Reset form
+    $j('#permission-project-id').val('');
+    $j('#permission-institution-id').val('');
+  });
+
   Policy.accessTypes = {
     noAccess: <%= Policy::NO_ACCESS -%>,
     visible: <%= Policy::VISIBLE -%>,
     accessible: <%= Policy::ACCESSIBLE -%>,
     editing: <%= Policy::EDITING -%>,
     managing: <%= Policy::MANAGING -%>
-  }
+  };
 </script>

@@ -123,4 +123,16 @@ module ProjectsHelper
   def person_can_remove_themself?(person, project)
     return false unless person && project
   end
+
+  def projects_grouped_by_programme(selected = nil)
+    if Seek::Config.programmes_enabled
+      array = Project.all.sort_by(&:title).group_by {|p| p.programme.try(:title) || 'Independent projects' }.each_value do |projects|
+        projects.map! { |p| [p.title, p.id ]}
+      end.to_a
+
+      grouped_options_for_select(array, selected)
+    else
+      options_for_select(Project.all.sort_by(&:title).map { |p| [p.title, p.id] }, selected)
+    end
+  end
 end
