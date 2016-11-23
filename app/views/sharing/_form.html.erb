@@ -85,11 +85,11 @@
 <%= content_tag :script, permissions_json(@resource.policy), type: 'application/json', id: 'permissions-json' %>
 
 <script>
-  var Policy = {
+  var Sharing = {
     renderPermissions: function () {
       var permissions = JSON.parse($j('#permissions-json').text());
       permissions.forEach(function (permission) {
-        var row = HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Policy.accessTypes });
+        var row = HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Sharing.accessTypes });
         $j('.permissions-table').append(row);
       });
     },
@@ -119,31 +119,31 @@
 
     addPermission: function (permission) {
       if (!$j('[data-contributor-id="'+permission.contributor_id+'"][data-contributor-type="'+permission.contributor_type+'"]').length) {
-        var row = HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Policy.accessTypes });
+        var row = HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Sharing.accessTypes });
         $j('.permissions-table').append(row);
       }
     }
   };
 
   $j(document).ready(function () {
-    Policy.renderPermissions();
-    Policy.highlightPrivileges();
-    Policy.setMinimumPrivileges();
+    Sharing.renderPermissions();
+    Sharing.highlightPrivileges();
+    Sharing.setMinimumPrivileges();
   });
 
   $j('.permissions-table').on('click', '.privilege-cell', function () {
     if (!$j(this).hasClass('disabled')) {
       $j('input[type=radio]', $j(this)).prop('checked', true);
-      Policy.highlightPrivileges();
-      Policy.setMinimumPrivileges();
+      Sharing.highlightPrivileges();
+      Sharing.setMinimumPrivileges();
     }
   });
-
   $j('.permissions-table').on('change', '.permission-row input[type=radio]', function () {
-    Policy.highlightPrivileges();
-    Policy.setMinimumPrivileges();
+    Sharing.highlightPrivileges();
+    Sharing.setMinimumPrivileges();
   });
 
+  // Display person modal
   $j('#add-person-permission-button').click(function () {
     $j('#add-person-permission-modal').modal('show');
     $j('#permission-people-ids').tagsinput('focus');
@@ -151,18 +151,20 @@
     return false;
   });
 
+  // Display project/institution/workgroup modal
   $j('#add-project-permission-button').click(function () {
     $j('#add-project-permission-modal').modal('show');
 
     return false;
   });
 
+  // Add a person permission to the table
   $j('#permission-people-confirm').click(function () {
     var people = $j('#permission-people-ids').tagsinput('items');
 
     people.forEach(function (person, index) {
       var uniqueishId = new Date().valueOf() * 100 + index;
-      Policy.addPermission(
+      Sharing.addPermission(
           { index: uniqueishId,
             contributor_type: 'Person',
             contributor_id: person.id,
@@ -170,11 +172,12 @@
             access_type: $j('#permission-people-access-type').val() });
     });
 
-    Policy.highlightPrivileges();
+    Sharing.highlightPrivileges();
     // Reset form
     $j('#permission-people-ids').tagsinput('removeAll');
   });
 
+  // Add a project/institution/workgroup permission to the table
   $j('#permission-project-confirm').click(function () {
     var projectId = $j('#permission-project-id').val();
     var institutionId = $j('#permission-institution-id').val();
@@ -188,10 +191,7 @@
     if (projectId) {
       if (institutionId) {
         permission.contributor_type = 'WorkGroup';
-        // Not a real database ID, but is enough to stop duplicate rows being added to the matrix:
-        permission.contributor_id = 'p' + projectId + 'i' + institutionId;
-        permission.project_id = projectId;
-        permission.institution_id = institutionId;
+        permission.contributor_id = institutionId; // The "institution" select contains the work group ID in this case
         permission.title = '' + projectTitle + ' @ ' + institutionTitle;
       } else {
         permission.contributor_type = 'Project';
@@ -209,14 +209,47 @@
       }
     }
 
-    Policy.addPermission(permission);
-    Policy.highlightPrivileges();
-    // Reset form
-    $j('#permission-project-id').val('');
-    $j('#permission-institution-id').val('');
+    Sharing.addPermission(permission);
+    Sharing.highlightPrivileges();
   });
 
-  Policy.accessTypes = {
+  // Update the institution list when a project is selected
+  $j('#permission-project-id').change(function () {
+    var institutionSelect = $j('#permission-institution-id');
+    var projectId = $j(this).val();
+    institutionSelect.attr('disabled', 'disabled').spinner('add');
+
+    var url;
+    var idIndex;
+    // 0: Name, 1: ID, 2: WorkGroupID
+    if (projectId) {
+      url = Sharing.requestInstitutionsUrl;
+      idIndex = 2;
+    } else {
+      url = Sharing.requestAllInstitutionsUrl;
+      idIndex = 1;
+    }
+
+    $j.ajax(url, {
+          data: { 'id': projectId },
+          success: function (data) {
+            institutionSelect.html('');
+            institutionSelect.html('<option value="">any institution</option>');
+            data.institution_list.forEach(function (i) {
+              institutionSelect.append('<option value="'+i[idIndex]+'">'+i[0]+'</option>');
+            });
+          },
+          complete: function () {
+            institutionSelect.removeAttr('disabled').spinner('remove');
+          }
+        }
+    );
+  });
+
+  Sharing.requestInstitutionsUrl = '<%= main_app.request_institutions_projects_path -%>';
+  Sharing.requestAllInstitutionsUrl = '<%= main_app.request_all_institutions_path -%>';
+
+  Sharing.accessTypes = {
     noAccess: <%= Policy::NO_ACCESS -%>,
     visible: <%= Policy::VISIBLE -%>,
     accessible: <%= Policy::ACCESSIBLE -%>,
