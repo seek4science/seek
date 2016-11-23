@@ -986,17 +986,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(data_files(:viewable_data_file))
     assert flash[:error]    
   end
-  
-  def test_should_not_allow_factors_studies_edited_for_downloadable_file
-    login_as(:aaron)
-    d = data_files(:downloadable_data_file)
-    d.save
-    assert_difference('ActivityLog.count') do
-      get :show, :id=>d
-    end
-    assert_response :success
-    assert_select "a",:text=>/Edit factors studied/,:count=>0
-  end
+
   
   test "should update data file" do
     assert_difference('ActivityLog.count') do
@@ -1004,32 +994,6 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-  end
-  
-  def test_should_duplicate_factors_studied_for_new_version
-    StudiedFactor.destroy_all
-    d= Factory(:data_file,:contributor=>User.current_user)
-    d.save! #v1
-    sf = StudiedFactor.create(:unit_id => units(:gram).id,:measured_item => measured_items(:weight),
-                              :start_value => 1, :end_value => 2, :data_file_id => d.id, :data_file_version => d.version)
-
-    d.reload
-    assert_equal 1,d.studied_factors.count
-
-    assert d.can_manage?
-    assert_difference("DataFile::Version.count", 1) do
-      assert_difference("StudiedFactor.count",1) do
-        post :new_version, :id=>d.id, :data_file=>{},:content_blobs => [{:data=>file_for_upload}], :revision_comment=>"This is a new revision" #v2
-      end
-    end
-
-    assert_redirected_to d
-    d.reload
-
-    assert_equal 1, d.find_version(1).studied_factors.count
-    assert_equal 1, d.find_version(2).studied_factors.count
-    assert_not_equal d.find_version(1).studied_factors, d.find_version(2).studied_factors
-
   end
   
   test "should destroy DataFile" do

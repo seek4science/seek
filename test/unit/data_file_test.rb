@@ -372,30 +372,4 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal 'application/excel',blob.content_type
   end
 
-  private
-
-  def data_file_with_sample_parser filepath,filename,content_type
-      user = User.current_user
-      data=File.new("#{filepath}","rb").read
-      df = Factory :data_file,:contributor=>user,:content_blob=>Factory(:content_blob,:data=>data,:content_type=>content_type,:original_filename=>filename)
-      xml = df.spreadsheet_xml
-      doc = LibXML::XML::Parser.string(xml).parse
-      doc.root.namespaces.default_prefix = "ss"
-      template_sheet = doc.find_first("//ss:sheet[@name='IDF']")
-
-      bio_samples =  df.bio_samples_population
-
-      assay_type_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Class"
-      study_title = bio_samples.send :hunt_for_horizontal_field_value ,template_sheet, "Experiment Description"
-
-      study = Study.find_by_title_and_contributor_id study_title, user.id
-      assay_title = filename
-      assay_class = AssayClass.find_by_title("Experimental Assay")
-      assay_type = AssayType.find_by_title(assay_type_title)
-      assay = Assay.all.detect{|a|a.title == assay_title and a.study_id == study.id and a.assay_class_id == assay_class.try(:id) and a.assay_type == assay_type and a.owner_id == user.person.id}
-
-
-      return df, assay, bio_samples
-  end
-
 end
