@@ -18,7 +18,7 @@ module Seek
         end
       end
 
-      def handle_good_ftp_response(url, info)
+      def handle_good_ftp_response(_url, info)
         @is_webpage = false
         @size = info[:file_size]
         @content_type = info[:content_type]

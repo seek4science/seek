@@ -9,7 +9,7 @@ module Seek
         allow_empty_content_blob = model_image_present?
 
         unless allow_empty_content_blob || retained_content_blob_ids.present?
-          if !blob_params || blob_params.empty? || blob_params.none?{ |p| check_for_data_or_url(p) }
+          if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
             flash.now[:error] ||= 'Please select a file to upload or provide a URL to the data.'
             return false
           end
@@ -55,7 +55,6 @@ module Seek
           else
             asset.create_content_blob(attributes)
           end
-
         end
         retain_previous_content_blobs(asset)
       end

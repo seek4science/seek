@@ -18,7 +18,7 @@ module Seek
       end
 
       def retained_content_blob_ids
-        (params[:retained_content_blob_ids] || []).map { |id| id.to_i }.sort
+        (params[:retained_content_blob_ids] || []).map(&:to_i).sort
       end
 
       def model_image_present?

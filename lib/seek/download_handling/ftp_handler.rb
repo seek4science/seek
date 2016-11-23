@@ -11,9 +11,7 @@ module Seek
 
       def info
         uri = URI(@url)
-        unless uri.userinfo.nil?
-          username, password = uri.userinfo.split(/:/)
-        end
+        username, password = uri.userinfo.split(/:/) unless uri.userinfo.nil?
 
         size = nil
         Net::FTP.open(uri.host) do |ftp|
@@ -41,7 +39,6 @@ module Seek
 
         file
       end
-
     end
   end
 end

@@ -3,12 +3,11 @@ require 'simple-spreadsheet-extractor'
 module Seek
   module Data
     module TreatmentExtraction
-
       include SysMODB::SpreadsheetExtractor
 
-      #returns an instance of Seek::Treatment, populated according to the contents of the spreadsheet if it matches a known template
+      # returns an instance of Seek::Treatment, populated according to the contents of the spreadsheet if it matches a known template
       def treatments
-        Seek::Data::Treatments #this is just to load the class, incase it is already in the cache. Otherwise an underfined class/module error may occur
+        Seek::Data::Treatments # this is just to load the class, incase it is already in the cache. Otherwise an underfined class/module error may occur
         Rails.cache.fetch("treatments_#{content_blobs.first.cache_key}") do
           begin
             if content_blobs.first.is_extractable_spreadsheet?
