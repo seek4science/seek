@@ -1840,14 +1840,14 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "new with biovel sharing form" do
-    with_alternative_rendering({:seek_partial=>"assets/sharing_form"},"assets/sharing_form_biovel") do
+    with_alternative_rendering({:seek_partial=>"sharing/form"},"sharing/form_biovel") do
       get :new
       assert_response :success
     end
   end
 
   test "edit with biovel sharing form" do
-    with_alternative_rendering({:seek_partial=>"assets/sharing_form"},"assets/sharing_form_biovel") do
+    with_alternative_rendering({:seek_partial=>"sharing/form"},"sharing/form_biovel") do
       df = Factory :data_file,:policy=>Factory(:public_policy)
       get :edit, :id=>df
       assert_response :success

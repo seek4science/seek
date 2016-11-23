@@ -73,7 +73,7 @@ SEEK::Application.configure do
       ActionView::Renderer.clear_alternative({:controller=>:homes,:seek_template=>:index})
       ActionView::Renderer.clear_alternative({:seek_partial=>"people/resource_list_item"})
       ActionView::Renderer.clear_alternative({:seek_partial=>"projects/resource_list_item"})
-      ActionView::Renderer.clear_alternative({:seek_partial=>"assets/sharing_form"})
+      ActionView::Renderer.clear_alternative({:seek_partial=>"sharing/form"})
       ActionView::Renderer.clear_alternative({:controller=>:people,:seek_partial=>"general/items_related_to"})
 
 
