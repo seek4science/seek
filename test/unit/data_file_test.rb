@@ -365,4 +365,16 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal 'simple_populated_rightfield.xls', blob.original_filename
     assert_equal 'application/excel', blob.content_type
   end
+
+  test 'spreadsheet annotation search fields' do
+    cr = Factory(:cell_range)
+    Annotation.create(:source => Factory(:user),
+                  :annotatable => cr,
+                  :attribute_name => 'annotation',
+                  :value => 'fish')
+    df=cr.worksheet.content_blob.asset
+    df.reload
+    fields = df.spreadsheet_annotation_search_fields
+    assert_equal ['fish'],fields
+  end
 end

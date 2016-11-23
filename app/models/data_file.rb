@@ -95,8 +95,8 @@ class DataFile < ActiveRecord::Base
   # the annotation string values to be included in search indexing
   def spreadsheet_annotation_search_fields
     annotations = []
-    unless content_blob.nil?
-      content_blob.worksheets.each do |ws|
+    content_blobs.each do |blob|
+      blob.worksheets.each do |ws|
         ws.cell_ranges.each do |cell_range|
           annotations |= cell_range.annotations.collect { |a| a.value.text }
         end
