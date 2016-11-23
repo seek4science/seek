@@ -26,7 +26,7 @@
         </thead>
         <tbody>
         <tr class="permission-row">
-          <td>Everyone</td>
+          <td>Public</td>
           <td class="privilege-cell no-access">
             <%= radio_button_tag('policy[access_type]', Policy::NO_ACCESS, (@resource.policy.access_type == Policy::NO_ACCESS), autocomplete: 'off') %>
           </td>
@@ -118,10 +118,24 @@
     },
 
     addPermission: function (permission) {
+      permission.index = permission.index || Sharing.generateUniqueIndex();
       if (!$j('[data-contributor-id="'+permission.contributor_id+'"][data-contributor-type="'+permission.contributor_type+'"]').length) {
         var row = HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Sharing.accessTypes });
         $j('.permissions-table').append(row);
       }
+    },
+
+    addPermissionForProject: function (projectId, element) {
+      Sharing.addPermission({
+        contributor_type: 'Project',
+        contributor_id: projectId,
+        title: $j(':selected', $j(element)).text(),
+        access_type: Sharing.associatedProjectAccessType });
+      Sharing.highlightPrivileges();
+    },
+
+    generateUniqueIndex: function () {
+      return (new Date().valueOf() * 100 + $j('.permissions-table .permission-row').length);
     }
   };
 
@@ -163,10 +177,8 @@
     var people = $j('#permission-people-ids').tagsinput('items');
 
     people.forEach(function (person, index) {
-      var uniqueishId = new Date().valueOf() * 100 + index;
       Sharing.addPermission(
-          { index: uniqueishId,
-            contributor_type: 'Person',
+          { contributor_type: 'Person',
             contributor_id: person.id,
             title: person.name,
             access_type: $j('#permission-people-access-type').val() });
@@ -184,7 +196,6 @@
     var projectTitle = $j('#permission-project-id :selected').text();
     var institutionTitle = $j('#permission-institution-id :selected').text();
     var permission = {
-      index: new Date().valueOf() * 100,
       access_type: $j('#permission-project-access-type').val()
     };
 
@@ -256,4 +267,6 @@
     editing: <%= Policy::EDITING -%>,
     managing: <%= Policy::MANAGING -%>
   };
+
+  Sharing.associatedProjectAccessType = <%= Seek::Config.default_associated_projects_access_type %>;
 </script>

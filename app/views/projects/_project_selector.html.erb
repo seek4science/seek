@@ -4,18 +4,23 @@
 <%# - disable_project_select - selection should only be available on 'new' action, but not on 'edit'; this parameter has a default of "false" -%>
 
 <%
-   allow_nil ||= false
-   allow_all ||= Seek::Config.is_virtualliver
+  allow_nil ||= false
+  allow_all ||= Seek::Config.is_virtualliver
 
-   possibilities ||= allow_all  ? Project.all : (User.current_user.person.projects + resource.try(:projects)).uniq
+  possibilities ||= allow_all  ? Project.all : (User.current_user.person.projects + resource.try(:projects)).uniq
 
-   resource ||= nil
-   if resource       
-       selected_project_ids = [possibilities.first.id] if resource.new_record? && resource.errors.empty? && possibilities.count==1
-       selected_project_ids ||= resource.project_ids
-   else
-     selected_project_ids = []
-   end
+  resource ||= nil
+  if resource
+    selected_project_ids = [possibilities.first.id] if resource.new_record? && resource.errors.empty? && possibilities.count == 1
+    selected_project_ids ||= resource.project_ids
+  else
+    selected_project_ids = []
+  end
 %>
 
-<%= fancy_multiselect resource, :projects, :hidden=>false, :possibilities => possibilities, :selected => selected_project_ids, :required => (!allow_nil) %>
+<%= fancy_multiselect resource, :projects,
+                      hidden: false,
+                      possibilities: possibilities,
+                      selected: selected_project_ids,
+                      required: !allow_nil,
+                      add_callback: 'Sharing.addPermissionForProject' %>
