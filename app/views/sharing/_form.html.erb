@@ -22,11 +22,12 @@
           <th class="permission-column">Download</th>
           <th class="permission-column">Edit</th>
           <th class="permission-column">Manage</th>
+          <th class="actions-column"></th>
         </tr>
         </thead>
         <tbody>
-        <tr class="permission-row">
-          <td>Public</td>
+        <tr class="permission-row mandatory">
+          <td class="name-cell">Public</td>
           <td class="privilege-cell no-access">
             <%= radio_button_tag('policy[access_type]', Policy::NO_ACCESS, (@resource.policy.access_type == Policy::NO_ACCESS), autocomplete: 'off') %>
           </td>
@@ -35,6 +36,7 @@
                 <%= radio_button_tag('policy[access_type]', privilege, (@resource.policy.access_type == privilege), autocomplete: 'off') %>
               </td>
           <% end %>
+          <td class="actions-cell"></td>
         </tr>
         </tbody>
       </table>
@@ -65,11 +67,14 @@
         <%= modal_body do %>
             <div class="form-group">
               <label>Members of...</label>
-              <%= select_tag('permission-project-id', projects_grouped_by_programme, prompt: 'any project', class: 'form-control') -%>
+              <%= select_tag('permission-project-id', projects_grouped_by_programme,
+                             prompt: 'any project', class: 'form-control', autocomplete: 'off') -%>
             </div>
             <div class="form-group">
               <label>working at...</label>
-              <%= select_tag('permission-institution-id', options_for_select(Institution.all.sort_by(&:title).map { |i| [i.title, i.id] }), prompt: 'any institution', class: 'form-control') -%>
+              <%= select_tag('permission-institution-id',
+                             options_for_select(Institution.all.sort_by(&:title).map { |i| [i.title, i.id] }),
+                             prompt: 'any institution', class: 'form-control', autocomplete: 'off') -%>
             </div>
             <div class="form-group">
               <label>can...</label>
@@ -118,20 +123,32 @@
     },
 
     addPermission: function (permission) {
-      permission.index = permission.index || Sharing.generateUniqueIndex();
+      // Check the row doesn't already exist in the table
       if (!$j('[data-contributor-id="'+permission.contributor_id+'"][data-contributor-type="'+permission.contributor_type+'"]').length) {
-        var row = HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Sharing.accessTypes });
-        $j('.permissions-table').append(row);
+        permission.index = permission.index || Sharing.generateUniqueIndex();
+        var row = $j(HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Sharing.accessTypes }));
+
+        if (permission.mandatory)
+          row.addClass('mandatory');
+
+        // Ensure "mandatory" permissions are at the top
+        if (permission.mandatory)
+          row.insertAfter('.permissions-table .permission-row.mandatory:last');
+        else
+          row.appendTo('.permissions-table');
       }
     },
 
     addPermissionForProject: function (projectId, element) {
-      Sharing.addPermission({
-        contributor_type: 'Project',
-        contributor_id: projectId,
-        title: $j(':selected', $j(element)).text(),
-        access_type: Sharing.associatedProjectAccessType });
-      Sharing.highlightPrivileges();
+      if (projectId > 0) {
+        Sharing.addPermission({
+          contributor_type: 'Project',
+          contributor_id: projectId,
+          title: $j(':selected', $j(element)).text(),
+          access_type: Sharing.associatedProjectAccessType,
+          mandatory: true });
+        Sharing.highlightPrivileges();
+      }
     },
 
     generateUniqueIndex: function () {
@@ -152,9 +169,16 @@
       Sharing.setMinimumPrivileges();
     }
   });
+
   $j('.permissions-table').on('change', '.permission-row input[type=radio]', function () {
     Sharing.highlightPrivileges();
     Sharing.setMinimumPrivileges();
+  });
+
+  $j('.permissions-table').on('click', '.permission-row .remove-permission', function () {
+    $j(this).parents('.permission-row').remove();
+
+    return false;
   });
 
   // Display person modal

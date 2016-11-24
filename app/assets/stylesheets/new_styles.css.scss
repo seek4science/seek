@@ -469,15 +469,15 @@ img.avatar-corner-icon {
 
 .permissions-table {
   width: auto;
-  border-left-width: 0;
-  border-top-width: 0;
+  border: none;
 
   .name-column {
     border: none;
+    width: 30%;
   }
 
   td {
-    border-color: #555;
+    vertical-align: middle !important;
   }
 
   .permission-column.no-access, .privilege-cell.no-access {
@@ -486,10 +486,28 @@ img.avatar-corner-icon {
   }
 
   .permission-column {
-    width: 12%;
     text-align: center;
-    min-width: 7em;
-    border-top-width: 1px;
+    width: 7em;
+    border-top: 1px solid #ddd !important;
+  }
+
+  .actions-column, .actions-cell {
+    border: none;
+    text-align: left;
+  }
+
+  .name-cell {
+    border-left: 1px solid #ddd;
+  }
+
+  .permission-row.mandatory {
+    .name-cell, .privilege-cell {
+      background-color: #def;
+    }
+
+    .name-cell {
+      font-weight: bold;
+    }
   }
 
   .privilege-cell {
