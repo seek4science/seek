@@ -182,7 +182,6 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     member do
-      get :openbis_spaces
       get :asset_report
       get :admin
       get :admin_members
@@ -193,6 +192,7 @@ SEEK::Application.routes.draw do
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search, :only=>[:index]
+    resources :openbis_spaces
     resources :avatars do
       member do
         post :select
