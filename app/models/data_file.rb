@@ -4,7 +4,6 @@ require 'title_trimmer'
 require 'datacite/acts_as_doi_mintable'
 
 class DataFile < ActiveRecord::Base
-  include Seek::Data::DataFileExtraction
   include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
 
@@ -32,7 +31,6 @@ class DataFile < ActiveRecord::Base
   scope :with_extracted_samples, -> { joins(:extracted_samples).uniq }
 
   explicit_versioning(version_column: 'version') do
-    include Seek::Data::DataFileExtraction
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent)
     acts_as_versioned_resource

@@ -8,6 +8,10 @@ module Seek
       MIN_ROWS = 35
       MIN_COLS = 10
 
+      def contains_extractable_spreadsheet?
+        content_blobs.first.is_extractable_spreadsheet?
+      end
+
       def spreadsheet_annotations
         content_blobs.first.worksheets.collect { |w| w.cell_ranges.collect(&:annotations) }.flatten
       end

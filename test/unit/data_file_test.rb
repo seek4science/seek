@@ -302,23 +302,6 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-  test 'get treatments' do
-    user = Factory :user
-    User.with_current_user user do
-      data = File.new("#{Rails.root}/test/fixtures/files/treatments-normal-case.xls", 'rb').read
-      df = Factory :data_file, contributor: user, content_blobs: [Factory(:content_blob, data: data, content_type: 'application/excel')]
-      assert_not_nil df.spreadsheet_xml
-      assert_not_nil df.treatments
-      assert_equal 2, df.treatments.values.keys.count
-      assert_equal %w(Dilution_rate pH), df.treatments.values.keys.sort
-
-      data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
-      df = Factory :data_file, contributor: user, content_blobs: [Factory(:content_blob, data: data)]
-      assert_not_nil df.treatments
-      assert_equal 0, df.treatments.values.keys.count
-    end
-  end
-
   test 'cache_remote_content' do
     user = Factory :user
     User.with_current_user(user) do
