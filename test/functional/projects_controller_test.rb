@@ -135,23 +135,24 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(proj_admin)
     project=proj_admin.projects.first
     another_project=Factory(:project)
+
     with_config_value(:openbis_enabled,true) do
       get :show,id:project
       assert_response :success
       assert_select 'ul#item-admin-menu' do
-        assert_select 'a[href=?]',openbis_spaces_project_path(project),text:/Administer OpenBis/
+        assert_select 'a[href=?]',openbis_spaces_project_path(project),text:/Administer openBIS/
       end
 
       get :show,id:another_project
       assert_response :success
       assert_select 'a[href=?]',openbis_spaces_project_path(project), count:0
-
     end
+
     with_config_value(:openbis_enabled,false) do
       get :show,id:project
       assert_response :success
       assert_select 'ul#item-admin-menu' do
-        assert_select 'a[href=?]',openbis_spaces_project_path(project),text:/Administer OpenBis/,count:0
+        assert_select 'a[href=?]',openbis_spaces_project_path(project),text:/Administer openBIS/,count:0
       end
     end
 
