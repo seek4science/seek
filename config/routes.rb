@@ -182,6 +182,7 @@ SEEK::Application.routes.draw do
       post :resource_in_tab
     end
     member do
+      get :openbis_spaces
       get :asset_report
       get :admin
       get :admin_members

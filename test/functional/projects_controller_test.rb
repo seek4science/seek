@@ -130,6 +130,33 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project_path(project)
   end
 
+  test 'programme administrator sees admin openbis link' do
+    proj_admin=Factory(:project_administrator)
+    login_as(proj_admin)
+    project=proj_admin.projects.first
+    another_project=Factory(:project)
+    with_config_value(:openbis_enabled,true) do
+      get :show,id:project
+      assert_response :success
+      assert_select 'ul#item-admin-menu' do
+        assert_select 'a[href=?]',openbis_spaces_project_path(project),text:/Administer OpenBis/
+      end
+
+      get :show,id:another_project
+      assert_response :success
+      assert_select 'a[href=?]',openbis_spaces_project_path(project), count:0
+
+    end
+    with_config_value(:openbis_enabled,false) do
+      get :show,id:project
+      assert_response :success
+      assert_select 'ul#item-admin-menu' do
+        assert_select 'a[href=?]',openbis_spaces_project_path(project),text:/Administer OpenBis/,count:0
+      end
+    end
+
+  end
+
   def test_should_show_project
 
     proj = Factory(:project)
