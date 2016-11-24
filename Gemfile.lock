@@ -1,4 +1,10 @@
 GIT
+  remote: https://github.com/FAIRdom/openseek-api-gem.git
+  revision: 9a7fbb94a0769ee1eb6b320529bddf2463f057e8
+  specs:
+    openseek-api-gem (0.2.0)
+
+GIT
   remote: https://github.com/SysMO-DB/acts_as_activity_logged.git
   revision: da0b6d8e4ccabfa231c39aa89522c8ba73f03c0e
   specs:
@@ -881,6 +887,7 @@ DEPENDENCIES
   nokogiri
   omniauth (~> 1.3.1)
   omniauth-ldap (~> 1.0.5)
+  openseek-api-gem!
   paperclip (~> 4.2.0)
   passenger
   pg
@@ -947,4 +954,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.12.5
+   1.13.6
