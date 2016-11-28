@@ -501,10 +501,6 @@ img.avatar-corner-icon {
   }
 
   .permission-row.mandatory {
-    .name-cell, .privilege-cell {
-      background-color: #def;
-    }
-
     .name-cell {
       font-weight: bold;
     }
@@ -521,6 +517,10 @@ img.avatar-corner-icon {
 
       input {
         display: none;
+      }
+
+      &:hover {
+        opacity: 0.7;
       }
     }
 
@@ -540,6 +540,10 @@ img.avatar-corner-icon {
       &.enabled {
         background-color: #ffc2c4;
         background-image: url(asset-path("famfamfam_silk/cross.png", image));
+
+        &:hover {
+          opacity: 0.7;
+        }
       }
     }
 
