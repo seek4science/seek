@@ -1,5 +1,5 @@
 class Policy < ActiveRecord::Base
-  
+
   has_many :permissions,
            :dependent => :destroy,
            :order => "created_at ASC",
@@ -17,7 +17,7 @@ class Policy < ActiveRecord::Base
       record.errors[:base] << "Sharing policy is invalid" unless value.is_a? Integer
     end
   end
-  
+
   alias_attribute :title, :name
 
   after_commit :queue_update_auth_table
@@ -38,24 +38,24 @@ class Policy < ActiveRecord::Base
       type.where(:policy_id=>id)
     end.flatten.uniq
   end
-  
-  
+
+
   # *****************************************************************************
   #  This section defines constants for "sharing_scope" and "access_type" values
-  
+
   # NB! It is critical to all algorithms using these constants, that the latter
   # have their integer values increased along with the access they provide
   # (so, for example, "editing" should have greated value than "viewing")
-  
+
   # In other words, this means that for both(!) sharing_scope and access_type 
   # constants it is crucial that order of these (imposed by their integer values)
   # is preserved
-  
+
   # sharing_scope
   PRIVATE = 0
   ALL_USERS = 2
   EVERYONE = 4
-  
+
   # access_type
   DETERMINED_BY_GROUP = -1  # used for whitelist/blacklist (meaning that it doesn't matter what value this field has)
   NO_ACCESS = 0             # i.e. only for anyone; only owner has access
@@ -64,12 +64,12 @@ class Policy < ActiveRecord::Base
   EDITING = 3               # accessible, visible and editing
   MANAGING = 4              # any actions that owner of the asset can perform (including "destroy"ing)
   PUBLISHING = 5            # publish the item
-    
+
   # "true" value for flag-type fields
   TRUE_VALUE = 1
   FALSE_VALUE = 0
   # *****************************************************************************
-  
+
   #makes a copy of the policy, and its associated permissions.
   def deep_copy
     copy=self.dup
@@ -161,7 +161,7 @@ class Policy < ActiveRecord::Base
       end
     end
   end
-    
+
   # returns a default policy for a project
   # (all the related permissions will still be linked to the returned policy)
   def self.project_default(project)
@@ -169,7 +169,7 @@ class Policy < ActiveRecord::Base
     # has to perform further actions in such case
     return project.default_policy
   end
-  
+
   def self.private_policy
     Policy.new(:name => "default private",
                :sharing_scope => PRIVATE,
@@ -213,7 +213,7 @@ class Policy < ActiveRecord::Base
       Policy.new(:name => "default accessible", :use_whitelist => false, :use_blacklist => false)
     end
   end
-   
+
   # translates access type codes into human-readable form  
   def self.get_access_type_wording(access_type, downloadable=false)
     case access_type
@@ -233,8 +233,8 @@ class Policy < ActiveRecord::Base
         return "Invalid access type"
     end
   end
-  
-  
+
+
   # extracts the "settings" of the policy, discarding other information
   # (e.g. contributor, creation time, etc.)
   def get_settings
@@ -245,8 +245,8 @@ class Policy < ActiveRecord::Base
     settings['use_blacklist'] = self.use_blacklist
     return settings
   end
-  
-  
+
+
   # extract the "settings" from all permissions associated to the policy;
   # creates array containing 2-item arrays per each policy in the form:
   # [ ... , [ permission_id, {"contributor_id" => id, "contributor_type" => type, "access_type" => access} ]  , ...  ] 
@@ -259,16 +259,16 @@ class Policy < ActiveRecord::Base
       params_hash["contributor_type"] = p.contributor_type
       params_hash["access_type"] = p.access_type
       params_hash["contributor_name"] = (p.contributor_type == "Person" ? (p.contributor.first_name + " " + p.contributor.last_name) : p.contributor.name)
-      
+
       # some of the contributor types will have special additional parameters
       case p.contributor_type
         when "FavouriteGroup"
           params_hash["whitelist_or_blacklist"] = [FavouriteGroup::WHITELIST_NAME, FavouriteGroup::BLACKLIST_NAME].include?(p.contributor.name)
       end
-      
+
       p_settings << [ p.id, params_hash ]
     end
-    
+
     return p_settings
   end
 
@@ -531,6 +531,10 @@ class Policy < ActiveRecord::Base
 
   def allows_action?(action)
     Seek::Permissions::Authorization.access_type_allows_action?(action, self.access_type)
+  end
+
+  def self.max_public_access_type
+    Policy::ACCESSIBLE
   end
 
 end

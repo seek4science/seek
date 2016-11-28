@@ -32,8 +32,10 @@
             <%= radio_button_tag('policy[access_type]', Policy::NO_ACCESS, (@resource.policy.access_type == Policy::NO_ACCESS), autocomplete: 'off') %>
           </td>
           <% [Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING].each do |privilege| %>
-              <td class="privilege-cell">
-                <%= radio_button_tag('policy[access_type]', privilege, (@resource.policy.access_type == privilege), autocomplete: 'off') %>
+              <td class="privilege-cell <%= 'disabled' if privilege > Policy.max_public_access_type -%>">
+                <% if privilege <= Policy.max_public_access_type %>
+                    <%= radio_button_tag('policy[access_type]', privilege, (@resource.policy.access_type == privilege), autocomplete: 'off') %>
+                <% end %>
               </td>
           <% end %>
           <td class="actions-cell"></td>
@@ -115,9 +117,9 @@
 
     // Show that the user cannot apply privileges than what is set for "Everyone"
     setMinimumPrivileges: function () {
-      $j('.privilege-cell').removeClass('disabled');
       var index = $j('[name="policy[access_type]"]').index($j('[name="policy[access_type]"]:checked'));
       $j('.permission-row:gt(0)').each(function () {
+        $j('.privilege-cell', $j(this)).removeClass('disabled');
         $j('.privilege-cell:lt(' + index + ')', $j(this)).removeClass('enabled').addClass('disabled');
       });
     },
