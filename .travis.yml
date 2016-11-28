@@ -13,7 +13,6 @@ env:
   - SUITE="rake test:functionals" DB_TYPE=sqlite3
   - SUITE="rake test:functionals" DB_TYPE=postgres
   - SUITE="rake test:integration" DB_TYPE=mysql
-  - SUITE="rake test:integration" DB_TYPE=postgres
   - SUITE="rspec spec" DB_TYPE=mysql
   - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
   - SUITE="rake teaspoon" DB_TYPE=mysql DISPLAY=":99.0"

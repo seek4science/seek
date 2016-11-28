@@ -763,7 +763,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     programme_administrator = Factory(:programme_administrator)
     programme = programme_administrator.programmes.first
     data_file = Factory(:data_file, :project_ids => [programme.projects.first.id])
-    size = data_file.content_blob.file_size
+    size = data_file.content_blobs.first.file_size
     assert size > 0
 
     login_as(programme_administrator)

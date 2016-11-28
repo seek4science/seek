@@ -329,34 +329,46 @@ Factory.define(:data_file) do |f|
   f.projects { [Factory.build(:project)] }
   f.association :contributor, factory: :person
   f.after_create do |data_file|
-    if data_file.content_blob.blank?
-      data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+    if data_file.content_blobs.blank?
+      data_file.content_blobs = [Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)]
     else
-      data_file.content_blob.asset = data_file
-      data_file.content_blob.asset_version = data_file.version
-      data_file.content_blob.save
+      data_file.content_blobs.each do |blob|
+        blob.asset = data_file
+        blob.asset_version = data_file.version
+        blob.save
+      end
     end
   end
 end
 
 Factory.define(:rightfield_datafile, parent: :data_file) do |f|
-  f.association :content_blob, factory: :rightfield_content_blob
+  f.after_create do |df|
+    df.content_blobs=[Factory.create(:rightfield_content_blob)]
+  end
 end
 
 Factory.define(:rightfield_annotated_datafile, parent: :data_file) do |f|
-  f.association :content_blob, factory: :rightfield_annotated_content_blob
+  f.after_create do |df|
+    df.content_blobs=[Factory.create(:rightfield_annotated_content_blob)]
+  end
 end
 
 Factory.define(:non_spreadsheet_datafile, parent: :data_file) do |f|
-  f.association :content_blob, factory: :cronwright_model_content_blob
+  f.after_create do |df|
+    df.content_blobs=[Factory.create(:cronwright_model_content_blob)]
+  end
 end
 
 Factory.define(:xlsx_spreadsheet_datafile, parent: :data_file) do |f|
-  f.association :content_blob, factory: :xlsx_content_blob
+  f.after_create do |df|
+    df.content_blobs=[Factory.create(:xlsx_content_blob)]
+  end
 end
 
 Factory.define(:small_test_spreadsheet_datafile, parent: :data_file) do |f|
-  f.association :content_blob, factory: :small_test_spreadsheet_content_blob
+  f.after_create do |df|
+    df.content_blobs=[Factory.create(:small_test_spreadsheet_content_blob)]
+  end
 end
 
 # Model
@@ -560,14 +572,16 @@ end
 
 Factory.define(:data_file_version_with_blob, parent: :data_file_version) do |f|
   f.after_create do |data_file_version|
-    if data_file_version.content_blob.blank?
-      data_file_version.content_blob = Factory.create(:pdf_content_blob,
-                                                      asset: data_file_version.data_file,
-                                                      asset_version: data_file_version.version)
+    if data_file_version.content_blobs.empty?
+      Factory.create(:pdf_content_blob,
+                     asset: data_file_version.data_file,
+                     asset_version: data_file_version.version)
     else
-      data_file_version.content_blob.asset = data_file_version.data_file
-      data_file_version.content_blob.asset_version = data_file_version.version
-      data_file_version.content_blob.save
+      data_file_version.content_blobs.each do |blob|
+        blob.asset = data_file_version.data_file
+        blob.asset_version = data_file_version.version
+        blob.save
+      end
     end
   end
 end

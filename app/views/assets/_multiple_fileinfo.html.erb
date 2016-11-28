@@ -18,6 +18,7 @@
    external_links  = multiple_fileinfo.content_blobs.select &:show_as_external_link?
    files =   multiple_fileinfo.content_blobs  - external_links
 %>
+
 <strong>
   <%= pluralize(n, 'item') -%><%= model_image_text -%> <%= (n==1 && image_count==0) ? "is" : "are" %> associated with this <%= resource_text %>:
 </strong>

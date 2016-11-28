@@ -16,7 +16,7 @@ class SnapshotTest < ActiveSupport::TestCase
     @assay2 = Factory(:assay, :title => 'a2', :study => @study, :contributor => @investigation.contributor,
                       :policy => Factory(:downloadable_public_policy))
     @data_file = Factory(:data_file, :title => 'df1', :contributor => @investigation.contributor,
-                         :content_blob => Factory(:doc_content_blob, :original_filename=>"word.doc"),
+                         :content_blobs => [Factory(:doc_content_blob, :original_filename=>"word.doc")],
                          :policy => Factory(:downloadable_public_policy))
     @publication = Factory(:publication, :title => 'p1', :contributor => @investigation.contributor,
                            :policy => Factory(:downloadable_public_policy))

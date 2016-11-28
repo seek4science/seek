@@ -1,6 +1,6 @@
 module Seek
   module Data
-    #methods used for generating checksums, currently used by ContentBlob. Could be adapted to be reused by other file-based models
+    # methods used for generating checksums, currently used by ContentBlob. Could be adapted to be reused by other file-based models
     module Checksums
       extend ActiveSupport::Concern
 
@@ -41,7 +41,6 @@ module Seek
           send("#{digest_type.to_s.downcase}sum=", digest.hexdigest)
         end
       end
-
     end
   end
 end

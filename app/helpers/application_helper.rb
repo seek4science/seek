@@ -245,7 +245,7 @@ module ApplicationHelper
     list_item = "<li>"
     if icon_type.downcase == "flag"
       list_item += flag_icon(item.country)
-    elsif icon_type == "data_file" || icon_type == "sop"
+    elsif icon_type == "sop"
       list_item += file_type_icon(item)
     else
       list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
@@ -611,6 +611,10 @@ module ApplicationHelper
     html_options[:class] << ' btn btn-default'
     text = html_options.delete(:button_text) || 'Cancel'
     link_to text, path, html_options
+  end
+
+  def using_docker?
+    Seek::Docker.using_docker?
   end
 
   private  

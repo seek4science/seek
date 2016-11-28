@@ -9,7 +9,7 @@
     <div class="asset_form">
       <%= error_messages_for :data_file -%>
 
-      <%= render :partial=>"assets/upload_box" -%>
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
 
       <div class="form-group">
         <label>Title <span class="required">*</span></label>

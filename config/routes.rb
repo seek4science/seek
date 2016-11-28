@@ -361,7 +361,6 @@ SEEK::Application.routes.draw do
       post :publish_related_items
       post :publish
       post :request_resource
-      post :convert_to_presentation
       post :update_annotations_ajax
       post :new_version
       #MERGENOTE - this is a destroy, and should be the destroy method, not post since we are not updating or creating something.

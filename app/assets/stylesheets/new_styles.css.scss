@@ -282,7 +282,7 @@ div.hidden_list_item {
 .date-select img.calendar_date_select_popup_icon {
   position: absolute;
   bottom: 8px;
-  padding-left: 8px;
+  left: 8px;
 }
 
 a.select_assay_class {
@@ -369,10 +369,11 @@ a.seek-homepage-button {
   }
 }
 
-#isa-graph {
+div.isa_graph {
   background: $panel-bg;
   border-color: $panel-default-border;
 }
+
 
 #user-menu-button {
   height: $navbar-height;
@@ -404,65 +405,5 @@ a.seek-homepage-button {
   color: $btn-success-color;
   padding: 0px 10px;
   border-radius: 5px;
-  display: inline-block;
-}
-.sample-attribute .attribute-handle {
-}
-
-.sample-attribute .attribute-position .glyphicon {
-  color: #fff;
-}
-
-a.remove-association {
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 21px;
-  color: $brand-danger;
-  &:hover {
-    text-decoration: none;
-  }
-}
-
-.association-candidate-list {
-  border: 1px solid $list-group-border;
-  max-height: 200px;
-  overflow-y: scroll;
-
-  .list-group-item {
-    border-radius: 0;
-  }
-}
-
-a.selectable.selected,
-a.selectable.selected:hover,
-a.selectable.selected:focus,
-.selectable.selected,
-.selectable.selected:hover,
-.selectable.selected:focus {
-  color: $list-group-active-color;
-  background-color: $list-group-active-bg;
-}
-
-.samples-table-container {
-  overflow: auto;
-}
-
-table > tbody > tr > td.sample-field-error {
-  background-color: $state-danger-bg;
-  padding: 0;
-
-  > div {
-    padding: 8px;
-  }
-}
-
-img.avatar-corner-icon {
-  display: block;
-  position: absolute;
-  right: 1px;
-  bottom: 1px;
-}
-
-.favouritable {
   display: inline-block;
 }
