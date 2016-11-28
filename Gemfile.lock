@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/FAIRdom/openseek-api-gem.git
-  revision: 9a7fbb94a0769ee1eb6b320529bddf2463f057e8
+  revision: 079887cc1d79a99134e5195ad8fd9d9068fbd7a5
   specs:
-    openseek-api-gem (0.2.0)
+    openseek-api-gem (0.3.0)
 
 GIT
   remote: https://github.com/SysMO-DB/acts_as_activity_logged.git
