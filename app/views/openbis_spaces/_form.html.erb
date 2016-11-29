@@ -1,4 +1,4 @@
-<%= form_for([@project,@openbis_space]) do |f| %>
+<%= form_for([@project,@openbis_space],html:{id:'openbis-space-form'}) do |f| %>
 
     <%= f.error_messages %>
 
@@ -27,15 +27,9 @@
       <%= f.text_field :space_name, :class=>"form-control login-credential"-%>
     </div>
 
-    <span style="border:1px black solid;" id="test-endpoint">Test!</span>
-    <span id="result"></span>
+    <span id="check-result"></span>
 
-    <%= f.submit(@openbis_space.new_record? ? "Add" : "Update",
-                 disabled:true ,
-                 disable_with: @openbis_space.new_record? ? "Adding ..." : "Updating ...",
-                 class:'btn btn-primary',
-                 id:'submit-button')
-    %>
+    <%= content_tag(:button,type:'button',class:'btn btn-primary',id:'submit-button'){@openbis_space.new_record? ? "Add" : "Update"} %>
     or
     <%= cancel_button(project_openbis_spaces_path(@project)) %>
 
@@ -49,22 +43,23 @@
           data: $j('input.login-credential').serialize(),
           success: function (data) {
             if (data.result==true) {
-              $j('#result').html('Passed')
-              $j('#submit-button').prop('disabled', false);
+              $j('#check-result').html('Authentication succeeded')
+              $j('form#openbis-space-form').submit();
             }
             else {
-              $j('#result').html('Failed')
-              $j('#submit-button').prop('disabled', true);
+              $j('#check-result').html('Authentication failed!')
+              $j('#submit-button').prop('disabled', false);
             }
           },
           beforeSend: function () {
-            $j('#result').html('<%= image('spinner') %>');
+            $j('#check-result').html('<%= image('spinner') %> Checking authentication');
           }
         }
     );
   }
 
-  $j('#test-endpoint').on('click', function() {
+  $j('#submit-button').on('click', function() {
+    $j('#submit-button').prop('disabled', true);
     testEndpoint();
   });
 
