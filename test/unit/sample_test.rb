@@ -671,4 +671,17 @@ class SampleTest < ActiveSupport::TestCase
       sample.send(attribute1.method_name.to_sym)
     end
   end
+
+  test 'samples extracted from a data file cannot be edited' do
+    sample = Factory(:sample_from_file)
+
+    refute sample.state_allows_edit?
+  end
+
+  test 'samples not extracted from a data file can be edited' do
+    sample = Factory(:sample)
+
+    assert sample.state_allows_edit?
+  end
+
 end

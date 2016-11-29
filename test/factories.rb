@@ -359,6 +359,10 @@ Factory.define(:small_test_spreadsheet_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :small_test_spreadsheet_content_blob
 end
 
+Factory.define(:strain_sample_data_file, parent: :data_file) do |f|
+  f.association :content_blob, factory: :strain_sample_data_content_blob
+end
+
 # Model
 Factory.define(:model) do |f|
   f.sequence(:title) { |n| "A Model #{n}" }
@@ -1314,4 +1318,13 @@ Factory.define(:linked_sample_type_to_self, parent: :sample_type) do |f|
   end
 end
 
-
+Factory.define(:sample_from_file, parent: :sample) do |f|
+  f.sequence(:title) { |n| "Sample #{n}" }
+  f.association :sample_type, factory: :strain_sample_type
+  f.projects { [Factory.build(:project)] }
+  f.association :originating_data_file, factory: :strain_sample_data_file
+  f.after_build do |sample|
+    sample.set_attribute(:name, sample.title) if sample.data.key?(:name)
+    sample.set_attribute(:seekstrain, '1234')
+  end
+end
