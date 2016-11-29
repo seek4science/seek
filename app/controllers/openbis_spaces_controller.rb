@@ -1,12 +1,38 @@
 class OpenbisSpacesController < ApplicationController
+  respond_to :html
 
   before_filter :get_project
   before_filter :project_required
   before_filter :project_can_admin?
+  before_filter :get_spaces,only:[:index]
 
+
+  def index
+    respond_with(@openbis_spaces)
+  end
+
+  def new
+    @openbis_space=OpenbisSpace.new
+    respond_with(@openbis_space)
+  end
+
+  def test_endpoint
+    space = OpenbisSpace.new(params[:openbis_space])
+    result = space.test_authentication
+
+    respond_to do |format|
+      format.json {render(json:{result:result})}
+    end
+  end
+
+  ### Filters
 
   def project_required
     return false unless @project
+  end
+
+  def get_spaces
+    @openbis_spaces=@project.openbis_spaces
   end
 
   def get_project

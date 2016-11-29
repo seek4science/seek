@@ -13,4 +13,14 @@ class OpenbisSpace < ActiveRecord::Base
     user && project.can_be_administered_by?(user) && Seek::Config.openbis_enabled
   end
 
+  def test_authentication
+    begin
+      str=Fairdom::OpenbisApi::Authentication.new(username, password, url).login['token']
+      puts str.inspect
+      !str.nil?
+    rescue Fairdom::OpenbisApi::OpenbisQueryException=>e
+      false
+    end
+  end
+
 end

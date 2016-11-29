@@ -192,7 +192,11 @@ SEEK::Application.routes.draw do
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search, :only=>[:index]
-    resources :openbis_spaces
+    resources :openbis_spaces do
+      collection do
+        get :test_endpoint
+      end
+    end
     resources :avatars do
       member do
         post :select
