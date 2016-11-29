@@ -1259,9 +1259,11 @@ end
 
 Factory.define(:strain_sample_type, parent: :sample_type) do |f|
   f.title 'Strain type'
+  f.association :content_blob, factory: :strain_sample_data_content_blob
+  f.uploaded_template true
   f.after_build do |type|
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'name', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'seekstrain', sample_attribute_type: Factory(:strain_sample_attribute_type), required: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, template_column_index: 1, title: 'name', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, template_column_index: 2, title: 'seekstrain', sample_attribute_type: Factory(:strain_sample_attribute_type), required: true, sample_type: type)
   end
 end
 

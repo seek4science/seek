@@ -223,7 +223,7 @@ class DataFile < ActiveRecord::Base
       sample.project_ids = self.project_ids
       sample.contributor = self.contributor
       sample.originating_data_file = self
-      sample.policy = self.policy.deep_copy
+      sample.policy = self.policy
       sample.save if sample.valid? && confirm
 
       extracted << sample
