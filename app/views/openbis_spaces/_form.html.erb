@@ -1,8 +1,15 @@
 <%= form_for([@project,@openbis_space]) do |f| %>
 
+    <%= f.error_messages %>
+
     <div class="form-group">
-      <%= f.label :endpoint -%><span class="required">*</span>
-      <%= f.text_field :url, :class=>"form-control login-credential"-%>
+      <label>AS Endpoint</label><span class="required">*</span>
+      <%= f.text_field :as_endpoint, :class=>"form-control login-credential"-%>
+    </div>
+
+    <div class="form-group">
+      <label>DSS Endpoint</label><span class="required">*</span>
+      <%= f.text_field :dss_endpoint, :class=>"form-control login-credential"-%>
     </div>
 
     <div class="form-group">
@@ -15,11 +22,17 @@
       <%= f.password_field :password, :class=>"form-control login-credential"-%>
     </div>
 
+    <div class="form-group">
+      <%= f.label :space -%><span class="required">*</span>
+      <%= f.text_field :space_name, :class=>"form-control login-credential"-%>
+    </div>
+
     <span style="border:1px black solid;" id="test-endpoint">Test!</span>
     <span id="result"></span>
 
     <%= f.submit(@openbis_space.new_record? ? "Add" : "Update",
-                 disabled:@openbis_space.new_record? ,
+                 disabled:true ,
+                 disable_with: @openbis_space.new_record? ? "Adding ..." : "Updating ...",
                  class:'btn btn-primary',
                  id:'submit-button')
     %>

@@ -16,6 +16,31 @@ class OpenbisSpacesController < ApplicationController
     respond_with(@openbis_space)
   end
 
+  def edit
+    @openbis_space=OpenbisSpace.find(params[:id])
+    respond_with(@openbis_space)
+  end
+
+  def update
+    @openbis_space=OpenbisSpace.find(params[:id])
+    respond_with(@project,@openbis_space) do |format|
+      if @openbis_space.update_attributes(params[:openbis_space])
+        flash[:notice] = 'The space was successfully updated.'
+        format.html {redirect_to project_openbis_spaces_path(@project)}
+      end
+    end
+  end
+
+  def create
+    @openbis_space=@project.openbis_spaces.build(params[:openbis_space])
+    respond_with(@project,@openbis_space) do |format|
+      if @openbis_space.save
+        flash[:notice] = 'The space was successfully associated with the project.'
+        format.html {redirect_to project_openbis_spaces_path(@project)}
+      end
+    end
+  end
+
   def test_endpoint
     space = OpenbisSpace.new(params[:openbis_space])
     result = space.test_authentication
