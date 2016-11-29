@@ -2,10 +2,12 @@ require 'test_helper'
 
 class OpenbisSpaceTest < ActiveSupport::TestCase
 
-
   test 'validation' do
     project=Factory(:project)
-    space = OpenbisSpace.new project:project,username:'fred',password:'12345',url:'http://my-openbis.org/openbis',space_name:'mmmm'
+    space = OpenbisSpace.new project:project,username:'fred',password:'12345',
+                             as_endpoint:'http://my-openbis.org/openbis',
+                             dss_endpoint:'http://my-openbis.org/openbis',
+                             space_name:'mmmm'
 
     assert space.valid?
     space.username=nil
@@ -23,11 +25,18 @@ class OpenbisSpaceTest < ActiveSupport::TestCase
     space.space_name='mmmmm'
     assert space.valid?
 
-    space.url=nil
+    space.as_endpoint=nil
     refute space.valid?
-    space.url='fish'
+    space.as_endpoint='fish'
     refute space.valid?
-    space.url='http://my-openbis.org/openbis'
+    space.as_endpoint='http://my-openbis.org/openbis'
+    assert space.valid?
+
+    space.dss_endpoint=nil
+    refute space.valid?
+    space.dss_endpoint='fish'
+    refute space.valid?
+    space.dss_endpoint='http://my-openbis.org/openbis'
     assert space.valid?
 
     space.project=nil
@@ -41,8 +50,8 @@ class OpenbisSpaceTest < ActiveSupport::TestCase
     project=pa.projects.first
     User.with_current_user(pa.user) do
       with_config_value :openbis_enabled,true do
-        space = OpenbisSpace.create project:project,username:'fred',password:'12345',url:'http://my-openbis.org/openbis',space_name:'aaa'
-        space2 = OpenbisSpace.create project:project,username:'fred',password:'12345',url:'http://my-openbis.org/openbis',space_name:'bbb'
+        space = OpenbisSpace.create project:project,username:'fred',password:'12345',as_endpoint:'http://my-openbis.org/openbis',dss_endpoint:'http://my-openbis.org/openbis',space_name:'aaa'
+        space2 = OpenbisSpace.create project:project,username:'fred',password:'12345',as_endpoint:'http://my-openbis.org/openbis',dss_endpoint:'http://my-openbis.org/openbis',space_name:'bbb'
         space.save!
         space2.save!
         project.reload
@@ -86,7 +95,7 @@ class OpenbisSpaceTest < ActiveSupport::TestCase
   test 'can edit?' do
     pa=Factory(:project_administrator).user
     user=Factory(:person).user
-    space = OpenbisSpace.create project:pa.person.projects.first,username:'fred',password:'12345',url:'http://my-openbis.org/openbis',space_name:'aaa'
+    space = OpenbisSpace.create project:pa.person.projects.first,username:'fred',password:'12345',as_endpoint:'http://my-openbis.org/openbis',dss_endpoint:'http://my-openbis.org/openbis',space_name:'aaa'
     User.with_current_user(pa) do
       with_config_value :openbis_enabled,true do
         assert space.can_edit?

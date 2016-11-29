@@ -2,8 +2,9 @@
 class OpenbisSpace < ActiveRecord::Base
   belongs_to :project
 
-  validates :url, url: { allow_nil: true, allow_blank: true }
-  validates :project, :url, :username, :password, :space_name, presence: true
+  validates :as_endpoint, url: { allow_nil: true, allow_blank: true }
+  validates :dss_endpoint, url: { allow_nil: true, allow_blank: true }
+  validates :project, :as_endpoint, :dss_endpoint, :username, :password, :space_name, presence: true
 
   def self.can_create?
     User.logged_in_and_member? && User.current_user.is_admin_or_project_administrator? && Seek::Config.openbis_enabled
