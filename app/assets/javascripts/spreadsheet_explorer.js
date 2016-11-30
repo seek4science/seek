@@ -557,10 +557,20 @@ function select_cells(startCol, startRow, endCol, endRow, sheetNumber) {
     $j('.requires_selection').show();
 }
 
-function activateSheet(sheet, sheetTab) {
+function activateSheet(sheet, sheetTab, fileIndex) {
+    var root_element = null;
     if (sheetTab == null) {
         var i = sheet - 1;
-        sheetTab = $j("a.sheet_tab:eq(" + i + ")");
+        if (fileIndex == null) {
+            sheetTab = $j("a.sheet_tab:eq(" + i + ")");
+            /* this is entered only when coming from a search_matched_spreadsheets_content.html.erb,
+             being the only caller with a third argument (fileIndex).
+             Handles the case where there are many spreadsheet containers in the page, not just one.
+             */
+        } else {
+            sheetTab = $j("a.sheet_tab." + fileIndex + ":eq(" + i + ")");
+            root_element = sheetTab.closest("div.spreadsheet_container");
+        }
     }
 
     var sheetIndex = sheetTab.attr("index");
@@ -578,8 +588,11 @@ function activateSheet(sheet, sheetTab) {
     $j('.active_sheet').removeClass('active_sheet');
 
     //Hide sheets
-    $j('div.sheet_container').hide();
-
+    if (root_element == null) {
+        $j('div.sheet_container').hide();
+    } else {
+        $j('div.sheet_container', root_element).hide();
+    }
     //Hide paginates
     $j('div.pagination').hide();
 
@@ -672,6 +685,7 @@ function changeRowsPerPage(){
             }
         }
     }
+
 
     window.location.href = update_href;
 }
