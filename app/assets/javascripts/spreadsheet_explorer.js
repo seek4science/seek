@@ -58,7 +58,9 @@ $j(document).ready(function ($) {
     //Clickable worksheet tabs
     $("a.sheet_tab")
         .click(function () {
-            activateSheet(null, $(this));
+            if ($('div#spreadsheet_outer_frame').length > 0) {
+                activateSheet(null, $(this));
+            }
         })
         .mouseover(function (){
             this.style.cursor = 'pointer';
