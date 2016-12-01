@@ -202,7 +202,7 @@ GEM
       thread_safe (~> 0.3, >= 0.3.1)
     bcp47 (0.3.3)
       i18n
-    bio (1.5.0)
+    bio (1.5.1)
     bives (1.0)
       open4 (~> 1.3.0)
     bootstrap-multiselect-rails (0.0.4)
@@ -768,7 +768,7 @@ DEPENDENCIES
   acts_as_tree
   app_version!
   auto_strip_attributes
-  bio (~> 1.5.0)
+  bio (~> 1.5.1)
   bioportal (>= 2.3)!
   bives
   bootstrap-multiselect-rails
@@ -875,4 +875,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.11.2
+   1.12.5
