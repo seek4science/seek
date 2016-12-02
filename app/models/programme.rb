@@ -19,6 +19,10 @@ class Programme < ActiveRecord::Base
 
   # associations
   has_many :projects, dependent: :nullify
+  has_many :work_groups, through: :projects
+  has_many :group_memberships, through: :work_groups
+  has_many :people, through: :group_memberships, order: 'last_name ASC', uniq: true
+  has_many :institutions, through: :work_groups, uniq: true
   has_many :admin_defined_role_programmes, :dependent => :destroy
   accepts_nested_attributes_for :projects
 
@@ -34,14 +38,6 @@ class Programme < ActiveRecord::Base
   scope :activated, where(is_activated: true)
   scope :not_activated, where(is_activated: false)
   scope :rejected, where("is_activated = ? AND activation_rejection_reason IS NOT NULL",false)
-
-  def people
-    projects.collect(&:people).flatten.uniq
-  end
-
-  def institutions
-    projects.includes(:institutions).collect(&:institutions).flatten.uniq
-  end
 
   def investigations(include_clause = :investigations)
     projects.includes(include_clause).collect(&:investigations).flatten.uniq
