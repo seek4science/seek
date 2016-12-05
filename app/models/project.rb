@@ -30,6 +30,9 @@ class Project < ActiveRecord::Base
 
   has_many :work_groups, dependent: :destroy
   has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?
+  has_many :group_memberships, through: :work_groups
+  # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
+  has_many :people, through: :group_memberships, order: 'last_name ASC', uniq: true
 
   has_many :admin_defined_role_projects
 
@@ -154,14 +157,6 @@ class Project < ActiveRecord::Base
     # infer all project's locations from the institutions where the person is member of
     locations = institutions.collect(&:country).select { |l| !l.blank? }
     locations
-  end
-
-  # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
-  def people
-    # TODO: look into doing this with a scope or direct query
-    res = work_groups.collect(&:people).flatten.uniq.compact
-    # TODO: write a test to check they are ordered
-    res.sort_by { |a| (a.last_name.blank? ? a.name : a.last_name) }
   end
 
   def studies
