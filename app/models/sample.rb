@@ -81,6 +81,10 @@ class Sample < ActiveRecord::Base
     data[attr] = value
   end
 
+  def state_allows_edit?(*args)
+    (id.nil? || originating_data_file.nil?) && super
+  end
+
   private
 
   def samples_this_links_to

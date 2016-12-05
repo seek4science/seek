@@ -195,4 +195,13 @@ class InstitutionTest < ActiveSupport::TestCase
     User.current_user = person.user
     refute Institution.can_create?
   end
+
+  test "can list people even if they don't have a last name" do
+    work_group = Factory(:work_group)
+    person = Factory(:person, last_name: nil, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    person2 = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+
+    assert_includes work_group.institution.people, person
+  end
+
 end

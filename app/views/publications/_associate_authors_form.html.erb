@@ -13,7 +13,9 @@
               <% people_by_project = people_by_project_options(Project.all) -%>
               <% publication.publication_authors.each do |author| %>
                   <div class="form-group">
-                    <label class="control-label col-sm-4"><%= author.first_name + " " + author.last_name -%></label>
+                    <label class="control-label col-sm-4">
+                      <%= author.first_name -%> <%= author.last_name -%>
+                    </label>
                     <div class="col-sm-8">
                       <%= select_tag "author[#{author.id}]", "<option value=''>None</option>#{people_by_project}".html_safe,
                                      :class => 'form-control' %>
