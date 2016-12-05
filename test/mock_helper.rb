@@ -78,7 +78,7 @@ module MockHelper
   end
 
   def publication_formatter_mock
-    stub_request(:post, "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi").
+    stub_request(:post, "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi").
         with(body: { 'db'=>'pubmed', 'email'=>'()', 'id'=>'5', 'retmode'=>'text', 'rettype'=>'medline', 'tool'=>'bioruby' },
              headers: { 'Accept'=>'*/*',
                         'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
