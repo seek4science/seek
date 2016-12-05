@@ -372,7 +372,9 @@ Factory.define(:small_test_spreadsheet_datafile, parent: :data_file) do |f|
 end
 
 Factory.define(:strain_sample_data_file, parent: :data_file) do |f|
-  f.association :content_blob, factory: :strain_sample_data_content_blob
+  f.after_create do |df|
+    df.content_blobs=[Factory.create(:strain_sample_data_content_blob)]
+  end
 end
 
 # Model
