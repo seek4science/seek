@@ -1,9 +1,10 @@
+<% tab ||= 'manual' %>
+
 <span id='modal-dialogues'>
     <%= sample_controlled_vocab_model_dialog('cv-modal') %>
 </span>
 
-<%= form_for(@sample_type) do |f| %>
-
+<%= form_for(@sample_type, html: { multipart: true }) do |f| %>
     <%= f.error_messages %>
 
     <div class="form-group">
@@ -18,41 +19,53 @@
 
     <%= render :partial => "projects/project_selector", :locals => { :resource => @sample_type } -%>
 
-    <div class="form-group">
-      <%= f.label :tags -%>
-      <%= tags_input('sample_type[tags]', @sample_type.tags, :typeahead => {:type => 'sample_type_tags'}) %>
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
+        <div class="form-group">
+          <%= f.label :tags -%>
+          <%= tags_input('sample_type[tags]', @sample_type.tags, :typeahead => {:type => 'sample_type_tags'}) %>
+        </div>
+
+        <h3>Attributes</h3>
+        <p class="help-block">Re-arrange attributes by clicking and dragging the button on the left-hand side of each row.</p>
+        <table class="table" id="attribute-table">
+          <thead>
+          <tr>
+            <th width="5em">Order</th>
+            <th>Name</th>
+            <th width="5em">Required?</th>
+            <th width="5em">Title?</th>
+            <th>Type</th>
+            <th>Unit</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% @sample_type.sample_attributes.each_with_index do |sample_attribute, index| %>
+              <%= render :partial => 'sample_attribute_form', :locals => { :index => index,
+                                                                           :sample_attribute => sample_attribute,
+                                                                           :sample_type=>@sample_type} %>
+          <% end %>
+
+          <% unless @sample_type.uploaded_template? || !@sample_type.editing_constraints.allow_new_attribute? %>
+              <tr id="add-attribute-row">
+                <td colspan="6">
+                  <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
+                </td>
+              </tr>
+          <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <% if @sample_type.new_record? %>
+          <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-template' -%>" id="from-template">
+            <div class="form-group">
+              <label>File to upload<span class="required">*</span></label>
+              <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => false } -%>
+            </div>
+          </div>
+      <% end %>
     </div>
-
-    <h3>Attributes</h3>
-    <p class="help-block">Re-arrange attributes by clicking and dragging the button on the left-hand side of each row.</p>
-    <table class="table" id="attribute-table">
-      <thead>
-      <tr>
-        <th width="5em">Order</th>
-        <th>Name</th>
-        <th width="5em">Required?</th>
-        <th width="5em">Title?</th>
-        <th>Type</th>
-        <th>Unit</th>
-      </tr>
-      </thead>
-      <tbody>
-      <% @sample_type.sample_attributes.each_with_index do |sample_attribute, index| %>
-        <%= render :partial => 'sample_attribute_form', :locals => { :index => index,
-                                                                     :sample_attribute => sample_attribute,
-                                                                     :sample_type=>@sample_type} %>
-      <% end %>
-
-      <% unless @sample_type.uploaded_template? || !@sample_type.editing_constraints.allow_new_attribute? %>
-        <tr id="add-attribute-row">
-          <td colspan="6">
-            <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
-          </td>
-        </tr>
-      <% end %>
-
-      </tbody>
-    </table>
 
     <p class="actions">
       <%= f.submit (@sample_type.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
@@ -69,8 +82,6 @@
 
 <script>
     //used to hold the element Id that needs updating after creating a new CV
-
-
     $j(document).ready(function () {
         SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
         SampleTypeControlledVocab.resetModalControlledVocabForm();
@@ -97,16 +108,7 @@
         });
 
         $j('#attribute-table').on('change', '.destroy-attribute', SampleTypes.removeAttribute);
-
         $j('#attribute-table').on('change', '.sample-type-is-title', SampleTypes.singleIsTitle);
-
         $j('#attribute-table').on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
-
-
     });
-
-
-
-
-
 </script>
