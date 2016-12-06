@@ -533,4 +533,8 @@ class Policy < ActiveRecord::Base
     Seek::Permissions::Authorization.access_type_allows_action?(action, self.access_type)
   end
 
+  def destroy_if_redundant
+    destroy if assets.none?
+  end
+
 end
