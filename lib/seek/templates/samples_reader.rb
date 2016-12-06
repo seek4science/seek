@@ -73,7 +73,7 @@ module Seek
 
       def sheet_index
         matches = template_xml_document.find('//ss:sheet').select do |sheet|
-          sheet.attributes['name'] =~ /.*samples.*/i
+          sheet.attributes['name'] =~ /.*sample.*/i
         end
         matches.last.attributes['index'].to_i
       rescue
