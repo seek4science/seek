@@ -850,6 +850,12 @@ Factory.define(:sample_type_populated_template_content_blob, parent: :content_bl
   f.data File.new("#{Rails.root}/test/fixtures/files/sample-type-populated.xlsx", 'rb').read
 end
 
+Factory.define(:sample_type_populated_template_blank_rows_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'sample-type-populated-blank-rows.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data File.new("#{Rails.root}/test/fixtures/files/sample-type-populated-blank-rows.xlsx", 'rb').read
+end
+
 Factory.define(:strain_sample_data_content_blob, parent: :content_blob) do |f|
   f.original_filename 'strain-sample-data.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
