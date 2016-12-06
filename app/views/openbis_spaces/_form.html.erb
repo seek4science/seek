@@ -2,6 +2,8 @@
 
     <%= f.error_messages %>
 
+    <%= f.hidden_field :project_id, :class=>"login-credential" %>
+
     <div class="form-group">
       <label>AS Endpoint</label><span class="required">*</span>
       <%= f.text_field :as_endpoint, :class=>"form-control login-credential"-%>

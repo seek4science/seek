@@ -12,8 +12,8 @@ class OpenbisSpacesController < ApplicationController
   end
 
   def new
-    @openbis_space=OpenbisSpace.new(username:'apiuser',password:'apiuser',
-                                    as_endpoint:'https://openbis-api.fair-dom.org/openbis/openbis',dss_endpoint:'https://openbis-api.fair-dom.org/openbis/openbis')
+    @openbis_space=OpenbisSpace.new
+    @openbis_space.project=@project
     respond_with(@openbis_space)
   end
 
@@ -53,9 +53,8 @@ class OpenbisSpacesController < ApplicationController
 
   def fetch_spaces
     space = OpenbisSpace.new(params[:openbis_space])
-    result = space.available_spaces
     respond_to do |format|
-      format.html {render partial:'available_spaces',locals:{spaces:result}}
+      format.html {render partial:'available_spaces',locals:{space:space}}
     end
   end
 
