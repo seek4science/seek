@@ -1,0 +1,4 @@
+<div class="form-group">
+  <%= label_tag :space -%><span class="required">*</span>
+  <%= select_tag "openbis_space[space_name]", options_from_collection_for_select(spaces, "code", "perm_id"),:class=>"form-control" -%>
+</div>

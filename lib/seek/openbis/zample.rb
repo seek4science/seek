@@ -2,9 +2,11 @@ module Seek
   module Openbis
     class Zample < Entity
 
-      attr_reader :sample_type,:experiment_id,:dataset_ids,:identifier
+      attr_reader :sample_type,:experiment_id,:dataset_ids,:identifier,:properties
 
       def populate_from_json(json)
+        @properties=json["properties"]
+        @properties.delete_if {|key, value| key == "@type" }
         @sample_type=json["sample_type"]
         @dataset_ids = json["datasets"].last
         @experiment_id = json["experiment"]

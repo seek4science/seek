@@ -19,4 +19,11 @@ class OpenbisSpace < ActiveRecord::Base
   rescue Fairdom::OpenbisApi::OpenbisQueryException => e
     false
   end
+
+  def available_spaces
+    Seek::Openbis::ConnectionInfo.setup(username, password, as_endpoint,dss_endpoint)
+    spaces = Seek::Openbis::Space.all
+    # known = project.openbis_spaces.select{|space| space.as_endpoint==self.as_endpoint}.collect(&:space_name)
+    # spaces.select{|sp| !known.include?(sp.code)} #reject any that have already been used
+  end
 end

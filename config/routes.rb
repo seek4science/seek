@@ -195,6 +195,7 @@ SEEK::Application.routes.draw do
     resources :openbis_spaces do
       collection do
         get :test_endpoint
+        get :fetch_spaces
       end
     end
     resources :avatars do

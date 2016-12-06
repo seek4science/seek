@@ -22,14 +22,21 @@
       <%= f.password_field :password, :class=>"form-control login-credential"-%>
     </div>
 
-    <div class="form-group">
-      <%= f.label :space -%><span class="required">*</span>
-      <%= f.text_field :space_name, :class=>"form-control login-credential"-%>
+    <div id="check-result">
+
     </div>
 
-    <span id="check-result"></span>
+    <div id="spaces">
 
-    <%= content_tag(:button,type:'button',class:'btn btn-primary',id:'submit-button'){@openbis_space.new_record? ? "Add" : "Update"} %>
+    </div>
+
+    <%= content_tag(:button,type:'button',class:'btn btn-primary',id:'fetch-spaces-button'){"Fetch Spaces"} %>
+
+    <%= f.submit(@openbis_space.new_record? ? "Add" : "Update",
+                 disabled:true ,
+                 class:'btn btn-primary',
+                 id:'submit-button')
+    %>
     or
     <%= cancel_button(project_openbis_spaces_path(@project)) %>
 
@@ -44,23 +51,40 @@
           success: function (data) {
             if (data.result==true) {
               $j('#check-result').html('Authentication succeeded')
-              $j('form#openbis-space-form').submit();
+              fetchSpaces();
             }
             else {
               $j('#check-result').html('Authentication failed!')
-              $j('#submit-button').prop('disabled', false);
+              $j('#submit-button').prop('disabled', true);
             }
           },
           beforeSend: function () {
+            $j('#spaces').html('')
             $j('#check-result').html('<%= image('spinner') %> Checking authentication');
           }
         }
     );
   }
 
-  $j('#submit-button').on('click', function() {
-    $j('#submit-button').prop('disabled', true);
+  function fetchSpaces() {
+    $j.ajax('<%= fetch_spaces_project_openbis_spaces_path(@project) %>', {
+      data: $j('input.login-credential').serialize(),
+      success: function (html) {
+        $j('#check-result').html('');
+        $j('#spaces').html(html);
+        $j('#submit-button').prop('disabled', false);
+      },
+      beforeSend: function () {
+        $j('#spaces').html('<%= image('spinner') %> Fetching spaces');
+      }
+
+    });
+  }
+
+  $j('#fetch-spaces-button').on('click', function() {
+    $j('#fetch-spaces-button').prop('disabled', true);
     testEndpoint();
+    $j('#fetch-spaces-button').prop('disabled', false);
   });
 
 </script>

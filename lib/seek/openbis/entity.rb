@@ -2,7 +2,7 @@ module Seek
   module Openbis
     class Entity
 
-      attr_reader :json,:modifier,:registration_date,:modification_date,:code,:perm_id,:properties,:registrator
+      attr_reader :json,:modifier,:registration_date,:modification_date,:code,:perm_id,:registrator
 
       def self.all
         self.new.all
@@ -32,8 +32,6 @@ module Seek
         @modifier=json["modifier"]
         @code=json["code"]
         @perm_id=json["permId"]
-        @properties=json["properties"]
-        @properties.delete_if {|key, value| key == "@type" }
         @registrator=json["registerator"]
         @registration_date=Time.at(json["registrationDate"].last.to_i/1000).to_datetime
         @modification_date=Time.at(json["modificationDate"].last.to_i/1000).to_datetime
