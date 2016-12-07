@@ -2,9 +2,6 @@ require 'rubygems'
 require 'rake'
 require 'time'
 require 'active_record/fixtures'
-
-
-
 require 'csv'
 
 namespace :seek do
@@ -161,8 +158,6 @@ namespace :seek do
     end
 
   end
-
-  private
 
   desc "Subscribes users to the items they would normally be subscribed to by default"
   #Run this after the subscriptions, and all subscribable classes have had their tables created by migrations
@@ -421,6 +416,15 @@ namespace :seek do
     puts "New method took #{new_method_time} seconds"
     puts "Old method took #{old_method_time} seconds"
   end
+
+  desc "dump the old biosamples data into YAML"
+  task(:dump_old_biosamples_data => :environment) do
+    filename = 'old_biosamples.yml'
+    bytes = File.write(filename, Deprecated::Specimen.all.to_yaml)
+    puts "#{bytes} bytes written to #{filename}"
+  end
+
+  private
 
   def set_projects_parent array, parent
     array.each do |proj|
