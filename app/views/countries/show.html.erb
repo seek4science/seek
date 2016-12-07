@@ -16,7 +16,7 @@
                     <% inst_members.each do |p| -%>
                         <li>
                           <%= image_tag_for_key(p.class.name.downcase, nil, p.class.name.downcase.camelize, nil, "") -%>
-                          <%= link_to (p.first_name + " " + p.last_name), person_path(p) -%>
+                          <%= link_to "#{p.first_name} #{p.last_name}", person_path(p) -%>
                         </li>
                     <% end -%>
                   </ul>
