@@ -783,4 +783,25 @@ class SampleTest < ActiveSupport::TestCase
     refute sample.can_view?(nil)
   end
 
+  test 'strains linked through join table' do
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+
+    assert_includes sample.referenced_strains, strain
+    assert_not_includes sample.strains, strain
+    assert_not_includes strain.samples, sample
+
+    assert_difference('SampleResourceLink.count', 1) do
+      sample.save
+    end
+
+    assert_includes sample.referenced_strains, strain
+    assert_includes sample.strains, strain
+    assert_includes strain.samples, sample
+  end
+
 end
