@@ -24,7 +24,7 @@ module Seek
 
       def populate_from_perm_id perm_id
         json = query_application_server_by_perm_id(perm_id)
-        populate_from_json(json[json_key][1].first)
+        populate_from_json(json[json_key])
       end
 
       def populate_from_json(json)
@@ -33,8 +33,8 @@ module Seek
         @code=json["code"]
         @perm_id=json["permId"]
         @registrator=json["registerator"]
-        @registration_date=Time.at(json["registrationDate"].last.to_i/1000).to_datetime
-        @modification_date=Time.at(json["modificationDate"].last.to_i/1000).to_datetime
+        @registration_date=Time.at(json["registrationDate"].to_i/1000).to_datetime
+        @modification_date=Time.at(json["modificationDate"].to_i/1000).to_datetime
         self
       end
 
@@ -44,7 +44,7 @@ module Seek
       end
 
       def construct_from_json(json)
-        json[json_key][1].collect do |json|
+        json[json_key].collect do |json|
           self.class.new.populate_from_json(json)
         end.sort_by(&:modification_date).reverse
       end
