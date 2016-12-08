@@ -726,4 +726,61 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal old_policy_id, sample.policy_id
   end
 
+  test 'extracted samples inherit projects from data file' do
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy)
+    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks { sample_type.save! }
+    samples = data_file.extract_samples(sample_type,true)
+    sample = samples.first
+
+    assert_equal sample.projects, data_file.projects
+    assert_equal sample.project_ids, data_file.project_ids
+
+    # Change the projects
+    new_projects = [Factory(:project), Factory(:project)]
+    disable_authorization_checks do
+      data_file.projects = new_projects
+      data_file.save!
+    end
+
+    assert_equal new_projects.sort, sample.projects.sort
+    assert_equal sample.projects.sort, data_file.projects.sort
+    assert_equal sample.project_ids.sort, data_file.project_ids.sort
+  end
+
+  test 'extracted samples inherit creators from data file' do
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy)
+    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks { sample_type.save! }
+    samples = data_file.extract_samples(sample_type,true)
+    sample = samples.first
+    creator = Factory(:person)
+
+    assert_equal sample.creators, data_file.creators
+    assert_not_includes sample.creators, creator
+
+    refute data_file.can_view?(creator.user)
+    refute sample.can_view?(creator.user)
+    refute sample.can_view?(nil)
+
+    # Add a creator
+    disable_authorization_checks do
+      data_file.creators << creator
+      data_file.save!
+    end
+
+    assert_includes data_file.creators, creator
+    assert_includes sample.creators, creator
+
+    assert data_file.can_view?(creator.user)
+    assert sample.can_view?(creator.user)
+    refute sample.can_view?(nil)
+  end
+
 end

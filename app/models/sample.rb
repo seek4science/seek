@@ -85,6 +85,22 @@ class Sample < ActiveRecord::Base
     (id.nil? || originating_data_file.nil?) && super
   end
 
+  def extracted?
+    !!originating_data_file
+  end
+
+  def projects
+    extracted? ? originating_data_file.projects : super
+  end
+
+  def project_ids
+    extracted? ? originating_data_file.project_ids : super
+  end
+
+  def creators
+    extracted? ? originating_data_file.creators : super
+  end
+
   private
 
   def samples_this_links_to
@@ -148,4 +164,5 @@ class Sample < ActiveRecord::Base
   def queue_sample_type_update_job
     SampleTypeUpdateJob.new(sample_type, false).queue_job
   end
+
 end
