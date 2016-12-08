@@ -4,6 +4,7 @@ module Seek
       attr_accessor :description
 
       def populate_from_json(json)
+        pp json
         @description = json["description"] || ''
         super(json)
       end
