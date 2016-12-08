@@ -3,6 +3,7 @@ require 'test_helper'
 class SpaceTest  < ActiveSupport::TestCase
 
   def setup
+    #FIXME: these tests rely on an external resource. This is currently useful whilst implementiong, but eventually need mocking out somehow
     Seek::Openbis::ConnectionInfo.setup('apiuser','apiuser','https://openbis-api.fair-dom.org/openbis/openbis','https://openbis-api.fair-dom.org/openbis/openbis')
   end
 
