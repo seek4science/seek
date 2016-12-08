@@ -549,6 +549,28 @@ class SampleTest < ActiveSupport::TestCase
     assert_nil sample.get_attribute(:seekstrain)['title'] # can't look up the title because that strain doesn't exist!
   end
 
+  test 'strain field can be left blank if optional' do
+    sample_type = Factory(:optional_strain_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, '')
+
+    assert sample.valid?
+  end
+
+  test 'strain field cannot be left blank if required' do
+    sample_type = Factory(:strain_sample_type)
+    strain_attribute = sample_type.sample_attributes.where(title: 'seekstrain').first
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, '')
+
+    refute sample.valid?
+    assert_not_empty sample.errors[strain_attribute.method_name]
+  end
+
   test 'strain attributes can appear as related items' do
     sample_type = Factory(:strain_sample_type)
     sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'seekstrain2',
@@ -796,12 +818,32 @@ class SampleTest < ActiveSupport::TestCase
     assert_not_includes strain.samples, sample
 
     assert_difference('SampleResourceLink.count', 1) do
-      sample.save
+      disable_authorization_checks { sample.save }
     end
 
     assert_includes sample.referenced_strains, strain
     assert_includes sample.strains, strain
     assert_includes strain.samples, sample
+  end
+
+
+  test 'link to strain removed when no longer referenced' do
+    sample_type = Factory(:optional_strain_sample_type)
+    strain = Factory(:strain)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+    disable_authorization_checks { sample.save }
+
+    assert_difference('SampleResourceLink.count', -1) do
+      sample.set_attribute(:seekstrain, '')
+      disable_authorization_checks { sample.save }
+    end
+
+    assert_not_includes sample.referenced_strains, strain
+    assert_not_includes sample.strains, strain
+    assert_not_includes strain.samples, sample
   end
 
 end
