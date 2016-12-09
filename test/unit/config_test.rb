@@ -113,6 +113,10 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.email_enabled
   end
 
+  test 'ldap_enabled' do
+    assert Seek::Config.ldap_enabled
+  end
+
   test 'pdf_conversion_enabled' do
     assert Seek::Config.pdf_conversion_enabled
   end
