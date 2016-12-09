@@ -18,6 +18,7 @@ SEEK::Application.configure do
       Settings.defaults[:external_help_url] = "http://seek4science.github.io/seek/help"
 
       Settings.defaults[:email_enabled] = true
+      Settings.defaults[:ldap_enabled] = false
       Settings.defaults[:solr_enabled] = false
 
       Settings.defaults[:publish_button_enabled] = true
@@ -103,4 +104,3 @@ SEEK::Application.configure do
     end
   end
 end
-
