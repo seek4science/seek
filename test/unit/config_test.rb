@@ -114,7 +114,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'ldap_enabled' do
-    assert Seek::Config.ldap_enabled
+    assert !Seek::Config.ldap_enabled
   end
 
   test 'pdf_conversion_enabled' do
