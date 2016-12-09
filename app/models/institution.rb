@@ -15,23 +15,13 @@ class Institution < ActiveRecord::Base
 
   has_many :work_groups, dependent: :destroy
   has_many :projects, through: :work_groups
+  has_many :programmes, through: :projects, uniq: true
+  has_many :group_memberships, through: :work_groups
+  has_many :people, through: :group_memberships, order: 'last_name ASC', uniq: true
 
   searchable(auto_index: false) do
     text :city, :address
   end if Seek::Config.solr_enabled
-
-  def people
-    res = []
-    work_groups.each do |wg|
-      wg.people.each { |p| res << p unless res.include? p }
-    end
-    # TODO: write a test to check they are ordered
-    res.sort { |a, b| a.last_name <=> b.last_name }
-  end
-
-  def programmes
-    projects.collect(&:programme).uniq
-  end
 
   def can_be_edited_by?(user)
     return false if user.nil?

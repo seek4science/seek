@@ -99,8 +99,21 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'edit' do
     login_as(Factory(:person))
+
     get :edit, id: populated_patient_sample.id
+
     assert_response :success
+  end
+
+  test "can't edit if extracted from a data file" do
+    person = Factory(:person)
+    sample = Factory(:sample_from_file, contributor: person)
+    login_as(person)
+
+    get :edit, id: sample.id
+
+    assert_redirected_to sample_path(sample)
+    assert_not_nil flash[:error]
   end
 
   test 'update' do

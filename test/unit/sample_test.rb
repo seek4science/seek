@@ -671,4 +671,59 @@ class SampleTest < ActiveSupport::TestCase
       sample.send(attribute1.method_name.to_sym)
     end
   end
+
+  test 'samples extracted from a data file cannot be edited' do
+    sample = Factory(:sample_from_file)
+
+    refute sample.state_allows_edit?
+  end
+
+  test 'samples not extracted from a data file can be edited' do
+    sample = Factory(:sample)
+
+    assert sample.state_allows_edit?
+  end
+
+  test 'extracted samples inherit permissions from data file' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    sample_type = Factory(:strain_sample_type)
+    data_file = Factory(:strain_sample_data_file, policy: Factory(:public_policy), contributor: person)
+
+    samples = data_file.extract_samples(sample_type, true)
+    sample = samples.first
+
+    assert sample.can_view?(person.user)
+    assert sample.can_view?(nil)
+    assert sample.can_view?(other_person.user)
+
+    policy = data_file.policy
+    disable_authorization_checks do
+      policy.access_type = Policy::NO_ACCESS
+      policy.sharing_scope = Policy::PRIVATE
+      policy.save
+      sample.reload
+    end
+
+    assert sample.can_view?(person.user)
+    refute sample.can_view?(nil)
+    refute sample.can_view?(other_person.user)
+  end
+
+  test 'sample policy persists even after originating data file deleted' do
+    person = Factory(:person)
+    sample_type = Factory(:strain_sample_type)
+    data_file = Factory(:strain_sample_data_file, policy: Factory(:public_policy), contributor: person)
+    samples = data_file.extract_samples(sample_type, true)
+    sample = samples.first
+
+    assert_equal sample.policy_id, data_file.policy_id
+
+    old_policy_id = sample.policy_id
+    disable_authorization_checks { data_file.destroy }
+
+    assert_not_nil sample.reload.policy
+    assert_equal old_policy_id, sample.policy_id
+  end
+
 end
