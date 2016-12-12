@@ -36,7 +36,7 @@ class Project < ActiveRecord::Base
 
   has_many :admin_defined_role_projects
 
-  has_many :openbis_spaces
+  has_many :openbis_endpoints
 
   belongs_to :programme
 

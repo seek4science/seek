@@ -1,5 +1,5 @@
 # represents the details to connect to an openbis space
-class OpenbisSpace < ActiveRecord::Base
+class OpenbisEndpoint < ActiveRecord::Base
   belongs_to :project
 
   validates :as_endpoint, url: { allow_nil: true, allow_blank: true }

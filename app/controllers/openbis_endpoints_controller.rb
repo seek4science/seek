@@ -1,4 +1,4 @@
-class OpenbisSpacesController < ApplicationController
+class OpenbisEndpointsController < ApplicationController
   respond_to :html
 
   before_filter :get_project
@@ -12,22 +12,22 @@ class OpenbisSpacesController < ApplicationController
   end
 
   def new
-    @openbis_space=OpenbisSpace.new
+    @openbis_space=OpenbisEndpoint.new
     @openbis_space.project=@project
     respond_with(@openbis_space)
   end
 
   def edit
-    @openbis_space=OpenbisSpace.find(params[:id])
+    @openbis_space=OpenbisEndpoint.find(params[:id])
     respond_with(@openbis_space)
   end
 
   def update
-    @openbis_space=OpenbisSpace.find(params[:id])
+    @openbis_space=OpenbisEndpoint.find(params[:id])
     respond_with(@project,@openbis_space) do |format|
       if @openbis_space.update_attributes(params[:openbis_space])
         flash[:notice] = 'The space was successfully updated.'
-        format.html {redirect_to project_openbis_spaces_path(@project)}
+        format.html {redirect_to project_openbis_endpoints_path(@project)}
       end
     end
   end
@@ -37,13 +37,13 @@ class OpenbisSpacesController < ApplicationController
     respond_with(@project,@openbis_space) do |format|
       if @openbis_space.save
         flash[:notice] = 'The space was successfully associated with the project.'
-        format.html {redirect_to project_openbis_spaces_path(@project)}
+        format.html {redirect_to project_openbis_endpoints_path(@project)}
       end
     end
   end
 
   def test_endpoint
-    space = OpenbisSpace.new(params[:openbis_space])
+    space = OpenbisEndpoint.new(params[:openbis_space])
     result = space.test_authentication
 
     respond_to do |format|
@@ -52,7 +52,7 @@ class OpenbisSpacesController < ApplicationController
   end
 
   def fetch_spaces
-    space = OpenbisSpace.new(params[:openbis_space])
+    space = OpenbisEndpoint.new(params[:openbis_space])
     respond_to do |format|
       format.html {render partial:'available_spaces',locals:{space:space}}
     end

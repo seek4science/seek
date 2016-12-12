@@ -140,19 +140,19 @@ class ProjectsControllerTest < ActionController::TestCase
       get :show,id:project
       assert_response :success
       assert_select 'ul#item-admin-menu' do
-        assert_select 'a[href=?]',project_openbis_spaces_path(project),text:/Administer openBIS/
+        assert_select 'a[href=?]', project_openbis_endpoints_path(project), text:/Administer openBIS/
       end
 
       get :show,id:another_project
       assert_response :success
-      assert_select 'a[href=?]',project_openbis_spaces_path(project), count:0
+      assert_select 'a[href=?]', project_openbis_endpoints_path(project), count:0
     end
 
     with_config_value(:openbis_enabled,false) do
       get :show,id:project
       assert_response :success
       assert_select 'ul#item-admin-menu' do
-        assert_select 'a[href=?]',project_openbis_spaces_path(project),text:/Administer openBIS/,count:0
+        assert_select 'a[href=?]', project_openbis_endpoints_path(project), text:/Administer openBIS/, count:0
       end
     end
 

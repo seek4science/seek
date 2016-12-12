@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20161129143735) do
+ActiveRecord::Schema.define(:version => 20161212133015) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -939,7 +939,7 @@ ActiveRecord::Schema.define(:version => 20161129143735) do
 
   add_index "oauth_sessions", ["user_id"], :name => "index_oauth_sessions_on_user_id"
 
-  create_table "openbis_spaces", :force => true do |t|
+  create_table "openbis_endpoints", :force => true do |t|
     t.string   "as_endpoint"
     t.string   "space_name"
     t.string   "username"
