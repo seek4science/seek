@@ -4,11 +4,11 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :get_project
   before_filter :project_required
   before_filter :project_can_admin?
-  before_filter :get_endpoints,only:[:index]
+  before_filter :get_endpoints,only:[:index, :browse]
 
 
   def index
-    respond_with(@openbis_endpoints)
+    respond_with(@project,@openbis_endpoints)
   end
 
   def new
@@ -32,6 +32,10 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
+  def browse
+    respond_with(@project,@openbis_endpoints)
+  end
+
   def create
     @openbis_endpoint=@project.openbis_endpoints.build(params[:openbis_endpoint])
     respond_with(@project,@openbis_endpoint) do |format|
@@ -39,6 +43,20 @@ class OpenbisEndpointsController < ApplicationController
         flash[:notice] = 'The space was successfully associated with the project.'
         format.html {redirect_to project_openbis_endpoints_path(@project)}
       end
+    end
+  end
+
+  def show_item_count
+    endpoint = OpenbisEndpoint.find(params[:id])
+    respond_to do |format|
+      format.html {render(text:"#{endpoint.space.dataset_count} datasets found")}
+    end
+  end
+
+  def show_items
+    endpoint = OpenbisEndpoint.find(params[:id])
+    respond_to do |format|
+      format.html {render(partial:'show_items_for_space',locals:{space:endpoint.space})}
     end
   end
 

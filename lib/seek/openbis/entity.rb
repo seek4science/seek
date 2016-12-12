@@ -59,6 +59,7 @@ module Seek
 
       def query_application_server_by_perm_id(perm_id = '')
         Rails.cache.fetch(cache_key(perm_id)) do
+          puts "NO CACHE, FETCHING FROM SERVER #{perm_id}"
           application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
         end
       end
@@ -80,12 +81,7 @@ module Seek
       end
 
       def datasets
-        unless @datasets
-          @datasets = dataset_ids.collect do |id|
-            Seek::Openbis::Dataset.new(id)
-          end
-        end
-        @datasets
+        @datasets ||= Seek::Openbis::Dataset.find_by_perm_ids(dataset_ids)
       end
 
       # provides the number of datasets without having to fetch and construct as you would with datasets.count

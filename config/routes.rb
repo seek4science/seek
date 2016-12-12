@@ -196,6 +196,9 @@ SEEK::Application.routes.draw do
       collection do
         get :test_endpoint
         get :fetch_spaces
+        get :show_item_count
+        get :show_items
+        get :browse
       end
     end
     resources :avatars do

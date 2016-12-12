@@ -1,5 +1,7 @@
 Openbis spaces for <%= link_to(@project.title, @project) %>
-
+<br/>
+<%= link_to "Browse openbis",browse_project_openbis_endpoints_path(@project) %>
+<br/>
 Add a new space: <%= link_to('add', new_project_openbis_endpoint_path(@project)) %>
 
 <ul>

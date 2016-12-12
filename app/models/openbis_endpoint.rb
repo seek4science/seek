@@ -23,8 +23,21 @@ class OpenbisEndpoint < ActiveRecord::Base
   def available_spaces
     Seek::Openbis::ConnectionInfo.setup(username, password, as_endpoint, dss_endpoint)
     all_spaces = Seek::Openbis::Space.all
-    # known = project.openbis_spaces.select{|space| space.as_endpoint==self.as_endpoint}.collect(&:space_name)
+    # known = project.openbis_endpoints.select{|space| space.as_endpoint==self.as_endpoint}.collect(&:space_name)
     # spaces = all_spaces.select{|sp| !known.include?(sp.code)} #reject any that have already been used
     # spaces | [self.space_name].compact
   end
+
+  def space
+    @space||= begin
+      Seek::Openbis::ConnectionInfo.setup(username, password, as_endpoint, dss_endpoint)
+      Seek::Openbis::Space.new(space_perm_id)
+    end
+    @space
+  end
+
+  def title
+    "#{as_endpoint} : #{space_perm_id}"
+  end
+
 end

@@ -1,0 +1,55 @@
+Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_select(@openbis_endpoints,:id,:title),id:'select-endpoints',include_blank:true %>
+
+<div id="count">
+
+</div>
+
+<div id="contents">
+
+</div>
+
+<script>
+
+  function fetchCountForSpace(spaceId) {
+    $j.ajax('<%= show_item_count_project_openbis_endpoints_path(@project) %>', {
+          data: {id: spaceId},
+          success: function (html) {
+              $j('#count').html(html);
+          },
+          beforeSend: function () {
+            $j('#count').html('<%= image('spinner') %>');
+          }
+        }
+    );
+  }
+
+  function fetchItemsForSpace(spaceId) {
+    $j.ajax('<%= show_items_project_openbis_endpoints_path(@project) %>', {
+          data: {id: spaceId},
+          success: function (html) {
+            $j('#contents').html(html);
+          },
+          beforeSend: function () {
+            $j('#contents').html('<%= image('large_spinner') %>');
+          }
+        }
+    );
+  }
+
+
+  function endpointChanged() {
+    var id = $j('#select-endpoints option:selected').val();
+    if (id.trim()) {
+      $j('#contents').html('<%= image('large_spinner') %>');
+      fetchCountForSpace(id);
+      fetchItemsForSpace(id);
+    }
+
+  }
+  ;
+
+  $j('#select-endpoints').change(function () {
+    endpointChanged();
+  });
+
+</script>
