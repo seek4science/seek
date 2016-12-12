@@ -4,7 +4,7 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   validates :as_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :dss_endpoint, url: { allow_nil: true, allow_blank: true }
-  validates :project, :as_endpoint, :dss_endpoint, :username, :password, :space_name, presence: true
+  validates :project, :as_endpoint, :dss_endpoint, :username, :password, :space_perm_id, presence: true
 
   def self.can_create?
     User.logged_in_and_member? && User.current_user.is_admin_or_project_administrator? && Seek::Config.openbis_enabled
@@ -21,7 +21,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def available_spaces
-    Seek::Openbis::ConnectionInfo.setup(username, password, as_endpoint,dss_endpoint)
+    Seek::Openbis::ConnectionInfo.setup(username, password, as_endpoint, dss_endpoint)
     all_spaces = Seek::Openbis::Space.all
     # known = project.openbis_spaces.select{|space| space.as_endpoint==self.as_endpoint}.collect(&:space_name)
     # spaces = all_spaces.select{|sp| !known.include?(sp.code)} #reject any that have already been used

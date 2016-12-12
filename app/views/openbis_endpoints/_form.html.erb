@@ -1,4 +1,4 @@
-<%= form_for([@project,@openbis_space],html:{id:'openbis-space-form'}) do |f| %>
+<%= form_for([@project,@openbis_endpoint],html:{id:'openbis-space-form'}) do |f| %>
 
     <%= f.error_messages %>
 
@@ -34,7 +34,7 @@
 
     <%= content_tag(:button,type:'button',class:'btn btn-primary',id:'fetch-spaces-button'){"Fetch Spaces"} %>
 
-    <%= f.submit(@openbis_space.new_record? ? "Add" : "Update",
+    <%= f.submit(@openbis_endpoint.new_record? ? "Add" : "Update",
                  disabled:true ,
                  class:'btn btn-primary',
                  id:'submit-button')
@@ -48,7 +48,7 @@
 <script>
 
   function testEndpoint() {
-    $j.ajax('<%= test_endpoint_project_openbis_spaces_path(@project) %>', {
+    $j.ajax('<%= test_endpoint_project_openbis_endpoints_path(@project) %>', {
           data: $j('input.login-credential').serialize(),
           success: function (data) {
             if (data.result==true) {
@@ -69,7 +69,7 @@
   }
 
   function fetchSpaces() {
-    $j.ajax('<%= fetch_spaces_project_openbis_spaces_path(@project) %>', {
+    $j.ajax('<%= fetch_spaces_project_openbis_endpoints_path(@project) %>', {
       data: $j('input.login-credential').serialize(),
       success: function (html) {
         $j('#check-result').html('');

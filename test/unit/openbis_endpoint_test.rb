@@ -7,7 +7,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint = OpenbisEndpoint.new project:project, username:'fred', password:'12345',
                                 as_endpoint:'http://my-openbis.org/openbis',
                                 dss_endpoint:'http://my-openbis.org/openbis',
-                                space_name:'mmmm'
+                                space_perm_id:'mmmm'
 
     assert endpoint.valid?
     endpoint.username=nil
@@ -20,9 +20,9 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint.password='12345'
     assert endpoint.valid?
 
-    endpoint.space_name=nil
+    endpoint.space_perm_id=nil
     refute endpoint.valid?
-    endpoint.space_name='mmmmm'
+    endpoint.space_perm_id='mmmmm'
     assert endpoint.valid?
 
     endpoint.as_endpoint=nil
@@ -50,8 +50,8 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     project=pa.projects.first
     User.with_current_user(pa.user) do
       with_config_value :openbis_enabled,true do
-        endpoint = OpenbisEndpoint.create project:project, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis', space_name:'aaa'
-        endpoint2 = OpenbisEndpoint.create project:project, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis', space_name:'bbb'
+        endpoint = OpenbisEndpoint.create project:project, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis', space_perm_id:'aaa'
+        endpoint2 = OpenbisEndpoint.create project:project, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis', space_perm_id:'bbb'
         endpoint.save!
         endpoint2.save!
         project.reload
@@ -95,7 +95,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   test 'can edit?' do
     pa=Factory(:project_administrator).user
     user=Factory(:person).user
-    endpoint = OpenbisEndpoint.create project:pa.person.projects.first, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis', space_name:'aaa'
+    endpoint = OpenbisEndpoint.create project:pa.person.projects.first, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis', space_perm_id:'aaa'
     User.with_current_user(pa) do
       with_config_value :openbis_enabled,true do
         assert endpoint.can_edit?

@@ -3,9 +3,9 @@ Openbis spaces for <%= link_to(@project.title, @project) %>
 Add a new space: <%= link_to('add', new_project_openbis_endpoint_path(@project)) %>
 
 <ul>
-<% @project.openbis_spaces.each do |space| %>
+<% @project.openbis_endpoints.each do |space| %>
   <li>
-    <%= space.as_endpoint %>, <%= space.space_name %>, <%= link_to 'Edit', edit_project_openbis_endpoint_path(@project, space) %>
+    <%= space.as_endpoint %>, <%= space.space_perm_id %>, <%= link_to 'Edit', edit_project_openbis_endpoint_path(@project, space) %>
   </li>
 <% end %>
 </ul>
