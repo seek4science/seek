@@ -1,15 +1,14 @@
 module Seek
   module Openbis
     class Dataset < Entity
-
-      attr_reader :dataset_type,:experiment_id,:sample_ids,:properties
+      attr_reader :dataset_type, :experiment_id, :sample_ids, :properties
 
       def populate_from_json(json)
-        @properties=json["properties"]
-        @properties.delete_if {|key, value| key == "@type" }
-        @dataset_type=json["dataset_type"]
-        @experiment_id = json["experiment"]
-        @sample_ids = json["samples"].last
+        @properties = json['properties']
+        @properties.delete_if { |key, _value| key == '@type' }
+        @dataset_type = json['dataset_type']
+        @experiment_id = json['experiment']
+        @sample_ids = json['samples'].last
         super(json)
       end
 
@@ -20,11 +19,11 @@ module Seek
       end
 
       def dataset_type_description
-        dataset_type["description"]
+        dataset_type['description']
       end
 
       def dataset_type_code
-        dataset_type["code"]
+        dataset_type['code']
       end
 
       def dataset_file
