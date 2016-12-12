@@ -18,13 +18,12 @@ module Seek
 
       def initialize(perm_id=nil)
         if (perm_id)
-          populate_from_perm_id(perm_id)
+          json = query_application_server_by_perm_id(perm_id)
+          if !json[json_key]
+            raise Seek::Openbis::EntityNotFoundException.new("Unable to find #{type_name} with perm id #{perm_id}")
+          end
+          populate_from_json(json[json_key].first)
         end
-      end
-
-      def populate_from_perm_id perm_id
-        json = query_application_server_by_perm_id(perm_id)
-        populate_from_json(json[json_key].first)
       end
 
       def populate_from_json(json)
