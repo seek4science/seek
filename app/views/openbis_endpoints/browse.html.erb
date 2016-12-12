@@ -44,6 +44,10 @@ Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_
       fetchCountForSpace(id);
       fetchItemsForSpace(id);
     }
+    else {
+      $j('#contents').html('');
+      $j('#count').html('');
+    }
 
   }
   ;
