@@ -3,7 +3,7 @@ require 'test_helper'
 class SpaceTest  < ActiveSupport::TestCase
 
   def setup
-    #FIXME: these tests rely on an external resource. This is currently useful whilst implementiong, but eventually need mocking out somehow
+    #FIXME: these tests rely on an external resource. This is currently useful whilst implementing, but eventually need mocking out somehow
     Seek::Openbis::ConnectionInfo.setup('apiuser','apiuser','https://openbis-api.fair-dom.org/openbis/openbis','https://openbis-api.fair-dom.org/openbis/openbis')
   end
 
@@ -36,7 +36,7 @@ class SpaceTest  < ActiveSupport::TestCase
     assert_equal 2,spaces.count
     assert_equal ['API-SPACE','DEFAULT'],spaces.collect(&:code).sort
   end
-  
+
   test 'dataset count' do
     space = Seek::Openbis::Space.new('API-SPACE')
     assert_equal 8,space.dataset_count
