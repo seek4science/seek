@@ -18,4 +18,22 @@ class SpaceTest  < ActiveSupport::TestCase
     assert_equal '',all.last.description
   end
 
+  test 'initialize with permid' do
+    space = Seek::Openbis::Space.new('API-SPACE')
+    assert_equal 'API-SPACE',space.perm_id
+    assert_equal 'API-SPACE',space.code
+    assert_equal 'use for testing openbis api integration ',space.description
+  end
+
+  test 'dataset count' do
+    space = Seek::Openbis::Space.new('API-SPACE')
+    assert_equal 8,space.dataset_count
+  end
+
+  test 'datasets' do
+    space = Seek::Openbis::Space.new('API-SPACE')
+    assert_equal 8,space.datasets.count
+    assert_includes space.datasets.collect(&:perm_id),'20160210130454955-23'
+  end
+
 end

@@ -24,7 +24,7 @@ module Seek
 
       def populate_from_perm_id perm_id
         json = query_application_server_by_perm_id(perm_id)
-        populate_from_json(json[json_key])
+        populate_from_json(json[json_key].first)
       end
 
       def populate_from_json(json)
@@ -90,10 +90,21 @@ module Seek
         @datasets
       end
 
+      #provides the number of datasets without having to fetch and construct as you would with datasets.count
+      def dataset_count
+        dataset_ids.count
+      end
+
       protected
 
       def json_key
         type_name.downcase.pluralize
+      end
+
+      private
+
+      def dataset_ids
+        json['datasets']
       end
 
     end
