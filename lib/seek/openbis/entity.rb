@@ -42,12 +42,15 @@ module Seek
       end
 
       def construct_from_json(json)
+        return [] unless json[json_key]
         json[json_key].collect do |json|
           self.class.new.populate_from_json(json)
         end.sort_by(&:modification_date).reverse
       end
 
       def find_by_perm_ids(perm_ids)
+        #insert a dummy id if empty, otherwise a blank query occurs which returns everything
+        perm_ids << "xxx222111sddd-dummy" if perm_ids.empty?
         ids_str = perm_ids.compact.uniq.join(',')
         json = query_application_server_by_perm_id(ids_str)
         construct_from_json(json)

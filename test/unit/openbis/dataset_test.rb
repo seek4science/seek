@@ -11,6 +11,10 @@ class DatasetTest < ActiveSupport::TestCase
     sets = Seek::Openbis::Dataset.find_by_perm_ids(ids)
     assert_equal 2, sets.count
     assert_equal ['20160210130454955-23', '20160215111736723-31'], sets.collect(&:perm_id).sort
+
+    #should be empty when presenting no ids
+    sets = Seek::Openbis::Space.find_by_perm_ids([])
+    assert_empty sets
   end
 
   test 'initialize' do

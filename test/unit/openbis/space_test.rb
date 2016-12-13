@@ -34,6 +34,11 @@ class SpaceTest < ActiveSupport::TestCase
     spaces = Seek::Openbis::Space.find_by_perm_ids(ids)
     assert_equal 2, spaces.count
     assert_equal ['API-SPACE', 'DEFAULT'], spaces.collect(&:code).sort
+
+    #should be empty when presenting no ids
+    spaces = Seek::Openbis::Space.find_by_perm_ids([])
+    assert_empty spaces
+
   end
 
   test 'dataset count' do
