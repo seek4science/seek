@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20161027093957) do
+ActiveRecord::Schema.define(:version => 20161213105545) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1298,8 +1298,9 @@ ActiveRecord::Schema.define(:version => 20161027093957) do
     t.string   "title"
     t.string   "base_type"
     t.text     "regexp"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+    t.string   "placeholder"
   end
 
   create_table "sample_attributes", :force => true do |t|
@@ -1349,12 +1350,20 @@ ActiveRecord::Schema.define(:version => 20161027093957) do
     t.string   "first_letter", :limit => 1
   end
 
+  create_table "sample_resource_links", :force => true do |t|
+    t.integer "sample_id"
+    t.integer "resource_id"
+    t.string  "resource_type"
+  end
+
+  add_index "sample_resource_links", ["resource_id", "resource_type"], :name => "index_sample_resource_links_on_resource_id_and_resource_type"
+  add_index "sample_resource_links", ["sample_id"], :name => "index_sample_resource_links_on_sample_id"
+
   create_table "sample_types", :force => true do |t|
     t.string   "title"
     t.string   "uuid"
     t.datetime "created_at",                                        :null => false
     t.datetime "updated_at",                                        :null => false
-    t.integer  "content_blob_id"
     t.string   "first_letter",      :limit => 1
     t.text     "description"
     t.boolean  "uploaded_template",              :default => false
