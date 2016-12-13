@@ -2,7 +2,8 @@
 count = SampleAttributeType.count
 SampleAttributeType.find_or_initialize_by_title('Date time').update_attributes(base_type: Seek::Samples::BaseType::DATE_TIME, placeholder: 'January 1, 2015 11:30 AM')
 SampleAttributeType.find_or_initialize_by_title('Date').update_attributes(base_type: Seek::Samples::BaseType::DATE, placeholder: 'January 1, 2015')
-SampleAttributeType.find_or_initialize_by_title('Float').update_attributes(base_type: Seek::Samples::BaseType::FLOAT, placeholder: '3.6')
+SampleAttributeType.find_or_initialize_by_title('Float').update_attributes(title: 'Real number') unless SampleAttributeType.where(title: 'Real number').first
+SampleAttributeType.find_or_initialize_by_title('Real number').update_attributes(base_type: Seek::Samples::BaseType::FLOAT, placeholder: '3.6')
 SampleAttributeType.find_or_initialize_by_title('Integer').update_attributes(base_type: Seek::Samples::BaseType::INTEGER, placeholder: '1')
 SampleAttributeType.find_or_initialize_by_title('Web link').update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp(%w(http https)).to_s, placeholder: 'http://www.example.com')
 SampleAttributeType.find_or_initialize_by_title('Email address').update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: RFC822::EMAIL.to_s, placeholder: 'someone@example.com')
