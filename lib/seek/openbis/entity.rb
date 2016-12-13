@@ -61,14 +61,16 @@ module Seek
       end
 
       def query_application_server_by_perm_id(perm_id = '')
-        Rails.cache.fetch(cache_key(perm_id)) do
-          puts "NO CACHE, FETCHING FROM SERVER #{perm_id}"
+        key=cache_key(perm_id)
+        Rails.logger.info("CACHE KEY = #{key}")
+        Rails.cache.fetch(key) do
+          Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")
           application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
         end
       end
 
       def cache_key(perm_id)
-        "openbis-application-server-#{type_name}-#{Digest::SHA2.hexdigest(perm_id)}"
+        "openbis-#{Digest::SHA2.hexdigest(application_server_endpoint)}-#{type_name}-#{Digest::SHA2.hexdigest(perm_id)}"
       end
 
       def application_server_query_instance
@@ -99,6 +101,10 @@ module Seek
       end
 
       private
+
+      def application_server_endpoint
+        Seek::Openbis::ConnectionInfo.instance.as_endpoint
+      end
 
       def dataset_ids
         json['datasets']
