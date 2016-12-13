@@ -30,7 +30,7 @@ module Seek
           if thing.contributor && (thing.contributor == user || thing.contributor == user.person)
             return true
           # Is a creator?
-          elsif thing.is_downloadable? && user.person && thing.creators.include?(user.person) &&
+          elsif thing.respond_to?(:creators) && user.person && thing.creators.include?(user.person) &&
               access_type_allows_action?(action, Policy::EDITING)
             return true
           end

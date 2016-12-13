@@ -6,11 +6,11 @@ ENV APP_DIR /seek
 ENV RAILS_ENV=production
 
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends libssl-dev build-essential git libreadline-dev \
-            libxml++2.6-dev openjdk-7-jdk libsqlite3-dev sqlite3 libcurl4-gnutls-dev \
-            poppler-utils libreoffice libmagick++-dev libxslt1-dev libpq-dev ruby2.1 ruby2.1-dev \
-            nodejs build-essential mysql-client postgresql-client nginx \
-            telnet vim links && \
+    apt-get install -y --no-install-recommends build-essential git \ 
+		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
+		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
+		libxslt1-dev mysql-client nginx nodejs openjdk-7-jdk poppler-utils \
+		postgresql-client ruby2.1-dev sqlite3 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -31,7 +31,7 @@ COPY . .
 RUN mkdir log tmp
 
 USER root
-RUN chown -R www-data solr config docker public /var/www
+RUN chown -R www-data solr config docker public /var/www db/schema.rb
 USER www-data
 RUN touch config/using-docker #allows us to see within SEEK we are running in a container
 

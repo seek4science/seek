@@ -21,6 +21,8 @@ class Strain < ActiveRecord::Base
 
   has_many :assay_organisms
   has_many :assays,:through=>:assay_organisms
+  has_many :sample_resource_links, as: :resource, dependent: :destroy
+  has_many :samples, through: :sample_resource_links
 
   before_destroy :destroy_genotypes_phenotypes
   scope :by_title

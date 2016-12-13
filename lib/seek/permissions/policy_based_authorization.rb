@@ -22,9 +22,9 @@ module Seek
           belongs_to :policy, :autosave => true #, :required_access_to_owner => :manage
           enforce_required_access_for_owner :policy,:manage
 
-
           after_commit :check_to_queue_update_auth_table
           after_destroy :remove_from_lookup_table
+          after_destroy { |record| record.policy.try(:destroy_if_redundant) }
         end
       end
       #the can_#{action}? methods are split into 2 parts, to differentiate between pure authorization and additional permissions based upon the state of the object or other objects it depends upon)
