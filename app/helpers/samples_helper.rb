@@ -3,13 +3,15 @@ module SamplesHelper
     base_type = attribute.sample_attribute_type.base_type
     clz = "sample_attribute_#{base_type.downcase}"
     attribute_method_name = attribute.method_name
+    placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
+
     case base_type
       when Seek::Samples::BaseType::TEXT
         text_area :sample, attribute_method_name, class: "form-control #{clz}"
       when Seek::Samples::BaseType::DATE_TIME
-        calendar_date_select :sample, attribute_method_name, time: :mixed, class: "form-control  #{clz}"
+        calendar_date_select :sample, attribute_method_name, time: :mixed, class: "form-control  #{clz}", placeholder: placeholder
       when Seek::Samples::BaseType::DATE
-        calendar_date_select :sample, attribute_method_name, time: false, class: "form-control  #{clz}"
+        calendar_date_select :sample, attribute_method_name, time: false, class: "form-control  #{clz}", placeholder: placeholder
       when Seek::Samples::BaseType::BOOLEAN
         check_box :sample, attribute_method_name, class: "#{clz}"
       when Seek::Samples::BaseType::SEEK_STRAIN
@@ -24,7 +26,7 @@ module SamplesHelper
         collection_select :sample, attribute_method_name, terms, :id, :title,
                           { include_blank: !attribute.required? }, class: "form-control #{clz}"
       else
-        text_field :sample, attribute_method_name, class: "form-control #{clz}"
+        text_field :sample, attribute_method_name, class: "form-control #{clz}", placeholder: placeholder
     end
   end
 
