@@ -42,7 +42,7 @@ class SampleExtractorTest < ActiveSupport::TestCase
   end
 
   test 'blank rows are ignored from sample spreadsheets' do
-    @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_blank_rows_content_blob),
+    @data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_blank_rows_content_blob)],
                          policy: Factory(:private_policy), contributor: @person.user
     @extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
 
