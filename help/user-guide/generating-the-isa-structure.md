@@ -13,12 +13,12 @@ The investigation is a high level concept that links related studies. To generat
 
 An investigation is described and linked using the following fields:
 
-* Title
-* Description
-* Projects
-* Sharing
-* Contributors
-* Publications
+* [Title](generic-linking-variables.html#title)
+* [Description](generic-linking-variables.html#description)
+* [Contributors](generic-linking-variables.html#contributors)
+* [Sharing](generic-linking-variables.html#sharing)
+* [Publications](generic-linking-variables.html#publications)
+
 
 
 ## Creating a study

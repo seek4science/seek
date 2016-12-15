@@ -54,6 +54,10 @@ layout: page
           - [Add and remove people from a project](administer-project-members.html#add-and-remove-people-from-a-project)
           - [Assign people to project roles](administer-project-members.html#assign-people-to-project-roles)
           - [Flag when a person becomes inactive in a project](administer-project-members.html#flag-when-a-person-becomes-inactive-in-a-project)
+- [Samples](samples.html) 
+     - [Create a Sample Type](create-sample-type.html)
+     - [Create a Sample](create-sample.html)
+     - [Legacy Biosamples](legacy-biosamples.html)
 - [Executing a model on JWS Online](http://jws-docs.readthedocs.org/)
 - [Contributing to these SEEK Documents](/contributing.html)
 
