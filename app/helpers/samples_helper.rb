@@ -15,8 +15,9 @@ module SamplesHelper
       when Seek::Samples::BaseType::BOOLEAN
         check_box :sample, attribute_method_name, class: "#{clz}"
       when Seek::Samples::BaseType::SEEK_STRAIN
-        grouped_collection_select :sample, attribute_method_name, Organism.all, :strains, :title, :id, :title,
-                                  { include_blank: !attribute.required? }, class: "form-control #{clz}"
+        selected_id = @sample ? @sample.send(attribute_method_name).try(:[], 'id') : nil
+        options = option_groups_from_collection_for_select(Organism.all, :strains, :title, :id, :title, selected_id)
+        select(:sample, attribute_method_name, options, { include_blank: !attribute.required? }, class: "form-control #{clz}")
       when Seek::Samples::BaseType::CV
         terms = attribute.sample_controlled_vocab.sample_controlled_vocab_terms
         collection_select :sample, attribute_method_name, terms, :label, :label,
