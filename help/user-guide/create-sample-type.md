@@ -7,6 +7,9 @@ layout: page
 
 Sample Types are templates that detail the key information that needs to be included to describe a given sample correctly.
 
+By default, SEEK only allows a [Project administrator](roles.html#project-administrator) to create sample types for their
+project.
+
 
 To create a new sample type, select create from the drop down menu, and then select Sample Type from the list
 
