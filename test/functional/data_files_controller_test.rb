@@ -2487,6 +2487,19 @@ class DataFilesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  test 'cannot upload new version if samples have been extracted' do
+    data_file = Factory(:data_file, contributor: User.current_user)
+    Factory(:sample, originating_data_file: data_file)
+
+    assert_no_difference('DataFile::Version.count') do
+      post :new_version, id: data_file.id, data_file: {}, content_blobs: [{ data: file_for_upload }],
+           revision_comment: 'This is a new revision'
+    end
+
+    assert_redirected_to data_file
+    assert flash[:error].downcase.include?('samples')
+  end
+
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)

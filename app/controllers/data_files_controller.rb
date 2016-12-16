@@ -2,6 +2,7 @@
 require 'simple-spreadsheet-extractor'
 
 class DataFilesController < ApplicationController
+
   include Seek::IndexPager
   include SysMODB::SpreadsheetExtractor
   include MimeTypesHelper
@@ -15,6 +16,7 @@ class DataFilesController < ApplicationController
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_filter :get_sample_type, only: :extract_samples
   before_filter :check_already_extracted, only: :extract_samples
+  before_filter :forbid_new_version_if_samples, :only => :new_version	
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -393,4 +395,14 @@ class DataFilesController < ApplicationController
       end
     end
   end
+
+  def forbid_new_version_if_samples
+    if @data_file.extracted_samples.any?
+      flash[:error] = "Cannot upload a new version if samples have been extracted"
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
+    end
+  end
+
 end

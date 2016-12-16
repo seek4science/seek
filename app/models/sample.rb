@@ -18,6 +18,8 @@ class Sample < ActiveRecord::Base
 
   belongs_to :sample_type, inverse_of: :samples
   belongs_to :originating_data_file, class_name: 'DataFile'
+  has_many :sample_resource_links, dependent: :destroy
+  has_many :strains, through: :sample_resource_links, source: :resource, source_type: 'Strain'
 
   scope :default_order, order('title')
 
@@ -28,6 +30,7 @@ class Sample < ActiveRecord::Base
   before_validation :update_json_metadata
   before_validation :set_title_to_title_attribute_value
 
+  before_save :update_sample_strain_links
   after_save :queue_sample_type_update_job
   after_destroy :queue_sample_type_update_job
 
@@ -67,7 +70,7 @@ class Sample < ActiveRecord::Base
     @data ||= Seek::Samples::SampleData.new(sample_type, json_metadata)
   end
 
-  def strains
+  def referenced_strains
     sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_STRAIN }.map do |sa|
       Strain.find_by_id(get_attribute(sa.hash_key)['id'])
     end.compact
@@ -83,6 +86,22 @@ class Sample < ActiveRecord::Base
 
   def state_allows_edit?(*args)
     (id.nil? || originating_data_file.nil?) && super
+  end
+
+  def extracted?
+    !!originating_data_file
+  end
+
+  def projects
+    extracted? ? originating_data_file.projects : super
+  end
+
+  def project_ids
+    extracted? ? originating_data_file.project_ids : super
+  end
+
+  def creators
+    extracted? ? originating_data_file.creators : super
   end
 
   private
@@ -148,4 +167,9 @@ class Sample < ActiveRecord::Base
   def queue_sample_type_update_job
     SampleTypeUpdateJob.new(sample_type, false).queue_job
   end
+
+  def update_sample_strain_links
+    self.strains = referenced_strains
+  end
+
 end

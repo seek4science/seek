@@ -549,6 +549,28 @@ class SampleTest < ActiveSupport::TestCase
     assert_nil sample.get_attribute(:seekstrain)['title'] # can't look up the title because that strain doesn't exist!
   end
 
+  test 'strain field can be left blank if optional' do
+    sample_type = Factory(:optional_strain_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, '')
+
+    assert sample.valid?
+  end
+
+  test 'strain field cannot be left blank if required' do
+    sample_type = Factory(:strain_sample_type)
+    strain_attribute = sample_type.sample_attributes.where(title: 'seekstrain').first
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, '')
+
+    refute sample.valid?
+    assert_not_empty sample.errors[strain_attribute.method_name]
+  end
+
   test 'strain attributes can appear as related items' do
     sample_type = Factory(:strain_sample_type)
     sample_type.sample_attributes << Factory.build(:sample_attribute, title: 'seekstrain2',
@@ -724,6 +746,104 @@ class SampleTest < ActiveSupport::TestCase
 
     assert_not_nil sample.reload.policy
     assert_equal old_policy_id, sample.policy_id
+  end
+
+  test 'extracted samples inherit projects from data file' do
+    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+                        policy: Factory(:private_policy)
+    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks { sample_type.save! }
+    samples = data_file.extract_samples(sample_type,true)
+    sample = samples.first
+
+    assert_equal sample.projects, data_file.projects
+    assert_equal sample.project_ids, data_file.project_ids
+
+    # Change the projects
+    new_projects = [Factory(:project), Factory(:project)]
+    disable_authorization_checks do
+      data_file.projects = new_projects
+      data_file.save!
+    end
+
+    assert_equal new_projects.sort, sample.projects.sort
+    assert_equal sample.projects.sort, data_file.projects.sort
+    assert_equal sample.project_ids.sort, data_file.project_ids.sort
+  end
+
+  test 'extracted samples inherit creators from data file' do
+    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+                        policy: Factory(:private_policy)
+    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    disable_authorization_checks { sample_type.save! }
+    samples = data_file.extract_samples(sample_type,true)
+    sample = samples.first
+    creator = Factory(:person)
+
+    assert_equal sample.creators, data_file.creators
+    assert_not_includes sample.creators, creator
+
+    refute data_file.can_view?(creator.user)
+    refute sample.can_view?(creator.user)
+    refute sample.can_view?(nil)
+
+    # Add a creator
+    disable_authorization_checks do
+      data_file.creators << creator
+      data_file.save!
+    end
+
+    assert_includes data_file.creators, creator
+    assert_includes sample.creators, creator
+
+    assert data_file.can_view?(creator.user)
+    assert sample.can_view?(creator.user)
+    refute sample.can_view?(nil)
+  end
+
+  test 'strains linked through join table' do
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+
+    assert_includes sample.referenced_strains, strain
+    assert_not_includes sample.strains, strain
+    assert_not_includes strain.samples, sample
+
+    assert_difference('SampleResourceLink.count', 1) do
+      disable_authorization_checks { sample.save }
+    end
+
+    assert_includes sample.referenced_strains, strain
+    assert_includes sample.strains, strain
+    assert_includes strain.samples, sample
+  end
+
+
+  test 'link to strain removed when no longer referenced' do
+    sample_type = Factory(:optional_strain_sample_type)
+    strain = Factory(:strain)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+    disable_authorization_checks { sample.save }
+
+    assert_difference('SampleResourceLink.count', -1) do
+      sample.set_attribute(:seekstrain, '')
+      disable_authorization_checks { sample.save }
+    end
+
+    assert_not_includes sample.referenced_strains, strain
+    assert_not_includes sample.strains, strain
+    assert_not_includes strain.samples, sample
   end
 
 end

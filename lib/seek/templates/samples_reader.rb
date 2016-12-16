@@ -24,10 +24,11 @@ module Seek
           next if (row_index = row.attributes['index'].to_i) <= 1
           data = row.children.collect do |cell|
             column = cell.attributes['column'].to_i
-            if columns.nil? || columns.include?(column)
+            if !cell.content.strip.blank? && (columns.nil? || columns.include?(column))
               Data.new(column, cell.content)
             end
           end.compact
+          next if data.empty?
           yield(row_index, data)
         end
       end
@@ -73,7 +74,7 @@ module Seek
 
       def sheet_index
         matches = template_xml_document.find('//ss:sheet').select do |sheet|
-          sheet.attributes['name'] =~ /.*samples.*/i
+          sheet.attributes['name'] =~ /.*sample.*/i
         end
         matches.last.attributes['index'].to_i
       rescue
