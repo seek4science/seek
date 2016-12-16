@@ -26,8 +26,8 @@ module Seek
         dataset_type['code']
       end
 
-      def dataset_file
-        Seek::Openbis::DatasetFile.new(perm_id)
+      def dataset_files
+        Seek::Openbis::DatasetFile.find_by_dataset_perm_id(perm_id)
       end
 
       def type_name

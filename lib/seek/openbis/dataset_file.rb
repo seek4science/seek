@@ -1,12 +1,14 @@
 module Seek
   module Openbis
     class DatasetFile < Entity
-      File = Struct.new(:path, :name, :size, :is_directory, :dataset_id)
-      attr_reader :files
+      attr_accessor :path, :size, :is_directory, :dataset_perm_id, :file_perm_id
 
-      def find_by_perm_ids(perm_ids)
-        ids_str = perm_ids.compact.uniq.join(',')
-        json = query_datastore_server_by_perm_id(ids_str)
+      def self.find_by_dataset_perm_id(perm_id)
+        DatasetFile.new.find_by_dataset_perm_id(perm_id)
+      end
+
+      def find_by_dataset_perm_id(perm_id)
+        json = query_datastore_server_by_dataset_perm_id(perm_id)
         construct_from_json(json)
       end
 
@@ -16,18 +18,12 @@ module Seek
       end
 
       def populate_from_json(json)
-        @files = []
-        json.each do |json_file|
-          path = json_file['filePermId']['filePath']
-          name = path.split('/').last
-          dataset_id = json_file['filePermId']['dataSetId']['permId']
-          # TODO size in human readable format
-          size = json_file['fileLength'].last
-          is_directory = json_file['isDirectory']
-
-          @files << File.new(path, name, size, is_directory, dataset_id)
-        end
-        @files
+        @path = json['path']
+        @dataset_perm_id=json['dataset']
+        @file_perm_id=json['filePermId']
+        @is_directory=json['isDirectory']
+        @size=json['fileLength']
+        self
       end
 
       def populate_from_perm_id(perm_id)
@@ -36,12 +32,15 @@ module Seek
       end
 
       def construct_from_json(json)
-        self.class.new.populate_from_json(json[json_key][1])
+        super.sort_by(&:path)
       end
 
-      def query_datastore_server_by_perm_id(perm_id = '')
-        cache_key = "openbis-datastore-server-#{type_name}-#{Digest::SHA2.hexdigest(perm_id)}"
-        Rails.cache.fetch(cache_key) do
+
+      def query_datastore_server_by_dataset_perm_id(perm_id = '')
+        key=cache_key(perm_id)
+        Rails.logger.info("CACHE KEY = #{key}")
+        Rails.cache.fetch(key) do
+          Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")
           datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
         end
       end

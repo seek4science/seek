@@ -3,6 +3,11 @@
     <div class="openbis-item">
       Perm ID: <%= dataset.perm_id %>
       Code: <%= dataset.code %>
+      <ul>
+      <% dataset.dataset_files.reject(&:is_directory).each do |file| %>
+      <li><%= file.path %></li>
+      <% end %>
+      </ul>
     </div>
 
 <% end %>

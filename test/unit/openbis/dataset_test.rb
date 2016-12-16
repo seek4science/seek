@@ -3,7 +3,7 @@ require 'test_helper'
 class DatasetTest < ActiveSupport::TestCase
   def setup
     # FIXME: these tests rely on an external resource. This is currently useful whilst implementing, but eventually need mocking out somehow
-    Seek::Openbis::ConnectionInfo.setup('apiuser', 'apiuser', 'https://openbis-api.fair-dom.org/openbis/openbis', 'https://openbis-api.fair-dom.org/openbis/openbis')
+    Seek::Openbis::ConnectionInfo.setup('apiuser', 'apiuser', 'https://openbis-api.fair-dom.org/openbis/openbis', 'https://openbis-api.fair-dom.org/datastore_server')
   end
 
   test 'find by perm ids' do
@@ -18,9 +18,9 @@ class DatasetTest < ActiveSupport::TestCase
   end
 
   test 'initialize' do
-    space = Seek::Openbis::Dataset.new('20160210130454955-23')
-    assert_equal '20160210130454955-23', space.perm_id
-    assert_equal '20160210130454955-23', space.code
+    dataset = Seek::Openbis::Dataset.new('20160210130454955-23')
+    assert_equal '20160210130454955-23', dataset.perm_id
+    assert_equal '20160210130454955-23', dataset.code
 
     # not recognised
     assert_raise_with_message(Seek::Openbis::EntityNotFoundException, 'Unable to find DataSet with perm id NOT-A-PERM-ID') do
@@ -32,5 +32,10 @@ class DatasetTest < ActiveSupport::TestCase
     all = Seek::Openbis::Dataset.all
     assert_equal 8, all.count
     assert_includes all.collect(&:perm_id), '20160210130454955-23'
+  end
+
+  test 'dataset files' do
+    dataset = Seek::Openbis::Dataset.new('20160210130454955-23')
+    files = dataset.dataset_files
   end
 end
