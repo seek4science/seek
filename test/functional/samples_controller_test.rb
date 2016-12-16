@@ -416,7 +416,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference("Sample.count",-1) do
       delete :destroy, id: sample
     end
-    assert_redirected_to samples_path
+    assert_redirected_to root_path
     #job should have been triggered
     assert SampleTypeUpdateJob.new(type,false).exists?
   end
