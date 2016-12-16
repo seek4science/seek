@@ -58,7 +58,9 @@ $j(document).ready(function ($) {
     //Clickable worksheet tabs
     $("a.sheet_tab")
         .click(function () {
-            activateSheet(null, $(this));
+            if ($('div#spreadsheet_outer_frame').length > 0) {
+                activateSheet(null, $(this));
+            }
         })
         .mouseover(function (){
             this.style.cursor = 'pointer';
@@ -67,27 +69,28 @@ $j(document).ready(function ($) {
     //Cell selection
     $("table.sheet td.cell")
         .mousedown(function () {
-            if(!isMouseDown) {
-                //Update the cell info box to contain either the value of the cell or the formula
-                // also make hovering over the info box display all the text.
-                if($(this).attr("title"))
-                {
-                    $('#cell_info').val($(this).attr("title"));
-                    $('#cell_info').attr("title", $(this).attr("title"));
+            //enable selection of cells only in spreadsheet explore, not search preview.
+            if ($('div#spreadsheet_outer_frame').length > 0) {
+                if (!isMouseDown) {
+                    //Update the cell info box to contain either the value of the cell or the formula
+                    // also make hovering over the info box display all the text.
+                    if ($(this).attr("title")) {
+                        $('#cell_info').val($(this).attr("title"));
+                        $('#cell_info').attr("title", $(this).attr("title"));
+                    }
+                    else {
+                        $('#cell_info').val($(this).html());
+                        $('#cell_info').attr("title", $(this).html());
+                    }
+                    isMouseDown = true;
+                    startRow = parseInt($(this).attr("row"));
+                    startCol = parseInt($(this).attr("col"));
                 }
-                else
-                {
-                    $('#cell_info').val($(this).html());
-                    $('#cell_info').attr("title", $(this).html());
-                }
-                isMouseDown = true;
-                startRow = parseInt($(this).attr("row"));
-                startCol = parseInt($(this).attr("col"));
+
+                select_cells(startCol, startRow, startCol, startRow, null);
+
+                return false; // prevent text selection
             }
-
-            select_cells(startCol, startRow, startCol, startRow, null);
-
-            return false; // prevent text selection
         })
         .mouseover(function (e) {
             if (isMouseDown) {
@@ -202,16 +205,26 @@ $j(document).ready(function ($) {
             minWidth: 20,
             handles: 'e',
             stop: function (){
-                $("table.active_sheet col:eq("+($(this).index()-1)+")").width($(this).width());
+                var obj_id = $(this)[0].parentNode.parentNode.parentNode.id.split('_')[1];
+                //use table number in search preview mode, cause "active_sheet" is irrelevant.
+                if ($("table."+obj_id).length > 0) {
+                    $("table." + obj_id + " col:eq(" + ($(this).index() - 1) + ")").width($(this).width());
+                //when in spreadsheet "explore"
+                } else {
+                    $("table.active_sheet col:eq(" + ($(this).index() - 1) + ")").width($(this).width());
+                }
                 if ($j("div.spreadsheet_container").width()>max_container_width()) {
                     adjust_container_dimensions();
                 }
             }
         })
         .mousedown(function(){
-            var col = $(this).index();
-            var last_row = $(this).parent().parent().parent().find("div.row_heading").size();
-            select_cells(col,1,col,last_row,null);
+            //enable selection of cells only in spreadsheet explore, not search preview.
+            if ($('div#spreadsheet_outer_frame').length > 0) {
+                var col = $(this).index();
+                var last_row = $(this).parent().parent().parent().find("div.row_heading").size();
+                select_cells(col, 1, col, last_row, null);
+            }
         })
     ;
     $( "div.row_heading" )
@@ -220,13 +233,23 @@ $j(document).ready(function ($) {
             handles: 's',
             stop: function (){
                 var height = $(this).height();
-                $("table.active_sheet tr:eq("+$(this).index()+")").height(height).css('line-height', height-2 + "px");
+                var obj_id = $(this)[0].parentNode.parentNode.parentNode.id.split('_')[1];
+                //use table number in search preview mode, cause "active_sheet" is irrelevant.
+                if ($("table."+obj_id).length > 0) {
+                    $("table."+ obj_id +" tr:eq(" + $(this).index() + ")").height(height).css('line-height', height - 2 + "px");
+                 //when in spreadsheet "explore"
+                } else {
+                    $("table.active_sheet tr:eq(" + $(this).index() + ")").height(height).css('line-height', height - 2 + "px");
+                }
             }
         })
         .mousedown(function(){
-            var row = $(this).index() + 1;
-            var last_col = $(this).parent().parent().parent().find("div.col_heading").size();
-            select_cells(1,row,last_col,row,null);
+            //enable selection of cells only in spreadsheet explore, not search preview.
+            if ($('div#spreadsheet_outer_frame').length > 0) {
+                var row = $(this).index() + 1;
+                var last_col = $(this).parent().parent().parent().find("div.col_heading").size();
+                select_cells(1, row, last_col, row, null);
+            }
         })
     ;
 
@@ -557,10 +580,20 @@ function select_cells(startCol, startRow, endCol, endRow, sheetNumber) {
     $j('.requires_selection').show();
 }
 
-function activateSheet(sheet, sheetTab) {
+function activateSheet(sheet, sheetTab, fileIndex) {
+    var root_element = null;
     if (sheetTab == null) {
         var i = sheet - 1;
-        sheetTab = $j("a.sheet_tab:eq(" + i + ")");
+        if (fileIndex == null) {
+            sheetTab = $j("a.sheet_tab:eq(" + i + ")");
+            /* this is entered only when coming from a search_matched_spreadsheets_content.html.erb,
+             being the only caller with a third argument (fileIndex).
+             Handles the case where there are many spreadsheet containers in the page, not just one.
+             */
+        } else {
+            sheetTab = $j("a.sheet_tab." + fileIndex + ":eq(" + i + ")");
+            root_element = sheetTab.closest("div.spreadsheet_container");
+        }
     }
 
     var sheetIndex = sheetTab.attr("index");
@@ -578,8 +611,11 @@ function activateSheet(sheet, sheetTab) {
     $j('.active_sheet').removeClass('active_sheet');
 
     //Hide sheets
-    $j('div.sheet_container').hide();
-
+    if (root_element == null) {
+        $j('div.sheet_container').hide();
+    } else {
+        $j('div.sheet_container', root_element).hide();
+    }
     //Hide paginates
     $j('div.pagination').hide();
 
@@ -672,6 +708,7 @@ function changeRowsPerPage(){
             }
         }
     }
+
 
     window.location.href = update_href;
 }

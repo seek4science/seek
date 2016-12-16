@@ -6,13 +6,12 @@
 %>
 <% per_page = params[:page_rows].try(:to_i) || default_per_page %>
 
+<div class="spreadsheet_container" onselectstart="return false;">
 <% workbook.sheets.each_with_index do |sheet, sheet_index| -%>
     <% unless sheet.rows.empty? %>
         <a index="<%= sheet_index + 1 -%>" class="sheet_tab curved_top with_smaller_shadow <%= "selected_tab" if workbook.sheets.first == sheet -%>"><%= h(sheet.name) -%></a>
     <% end %>
 <% end %>
-
-<div class="spreadsheet_container" onselectstart="return false;">
   <!--- Sheets --->
   <% workbook.sheets.each_with_index do |sheet,index| -%>
       <% sheet_index = index + 1 %>
