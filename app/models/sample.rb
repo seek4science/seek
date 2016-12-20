@@ -84,6 +84,10 @@ class Sample < ActiveRecord::Base
     data[attr] = value
   end
 
+  def blank_attribute?(attr)
+    data[attr].blank? || (data[attr].respond_to?(:values) && data[attr].values.all?(&:blank?))
+  end
+
   def state_allows_edit?(*args)
     (id.nil? || originating_data_file.nil?) && super
   end
