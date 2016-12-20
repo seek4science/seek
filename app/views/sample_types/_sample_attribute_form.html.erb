@@ -53,8 +53,9 @@
                      options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id] },
                                         sample_controlled_vocab_id),
                      :include_blank => true,
-                     :class => 'form-control controlled-vocab-selection' %>
-        <%= create_sample_controlled_vocab_model_button %>
+                     :class => 'form-control controlled-vocab-selection',
+                     disabled:!allow_type_change %>
+        <%= create_sample_controlled_vocab_model_button if allow_type_change %>
     </div>
     <div class='sample-type-block' style="<%= 'display:none;' unless sample_attribute.try(:seek_sample?) %>">
       <br/>
@@ -77,7 +78,8 @@
                    options_for_select(Unit.all.map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
                                       unit_id),
                    :include_blank => true,
-                   :class => 'form-control'%>
+                   :class => 'form-control',
+                   disabled:!allow_type_change %>
   </td>
 
   <td>
