@@ -132,14 +132,28 @@ class Sample < ActiveRecord::Base
   end
 
   def set_title_to_title_attribute_value
-    self.title = title_attribute_value
+    attr = title_attribute
+    if attr
+      value = get_attribute(title_attribute.hash_key)
+      if attr.seek_strain?
+        value = value[:title]
+      elsif attr.seek_sample?
+        value = Sample.find_by_id(value).try(:title)
+      else
+        value = value.to_s
+      end
+    end
+    self.title = value
   end
 
   # the value of the designated title attribute
   def title_attribute_value
     return nil unless sample_type && sample_type.sample_attributes.title_attributes.any?
-    title_attr = sample_type.sample_attributes.title_attributes.first
-    get_attribute(title_attr.hash_key)
+    get_attribute(title_attribute.hash_key)
+  end
+
+  def title_attribute
+    sample_type.sample_attributes.title_attributes.first
   end
 
   def respond_to_missing?(method_name, include_private = false)
@@ -175,5 +189,4 @@ class Sample < ActiveRecord::Base
   def update_sample_strain_links
     self.strains = referenced_strains
   end
-
 end
