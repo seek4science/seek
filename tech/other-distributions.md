@@ -15,27 +15,13 @@ distribution packages, and any other differences we are aware of from our
 general install guide.
 
 
-## Linux Mint 16
+## Linux Mint 18
 
 There shoudn't be any problems once SEEK is installed and
-running, but there are a couple of minor differences that need to be followed during the installation.
+running. The only difference we have found is that MySql doesn't ask for a root password when installing the packages.
+To initially connect to mysql to setup permissions you may need to do the following:
 
-First, there is an additional package required:
-
-    sudo apt-get install libcurl4-gnutls-dev
-
-before running bundle install run the following:
-
-    bundle config build.nokogiri --use-system-libraries
-
-This forces the *nokogiri* gem to rebuild against the newer installed version
-of *LibXML*. If you have already run bundle install before reading this, set
-that variable and then run:
-
-    gem uninstall nokogiri
-    bundle install
-
-Following this you can proceed with the standard installation steps.
+    sudo mysql -u root
 
 ## Fedora 20 / RHEL / CentOS
 
