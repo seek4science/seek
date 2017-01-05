@@ -25,7 +25,7 @@ describing Ruby on Rails can be found at http://rubyonrails.org/documentation
 SEEK is based on the 3.2 version of Rails, and requires Ruby 2.1.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
-[Ubuntu (14.04 LTS)](http://releases.ubuntu.com/14.04/) system. However, running on other Linux distributions the
+[Ubuntu (16.04 LTS)](http://releases.ubuntu.com/16.04/) system. However, running on other Linux distributions the
 main difference is the name of the required packages that have to be installed
 for that distribution, other than that the steps will be the same. If you want
 to install on different distribution or version please visit [Other
@@ -58,7 +58,7 @@ you will need this later.
 
 The remaining packages are:
 
-    sudo apt-get install build-essential libssl-dev openssh-server git libreadline-dev libxml++2.6-dev openjdk-7-jdk libgmp-dev libcurl4-gnutls-dev nodejs poppler-utils libreoffice libmysqlclient-dev libmagick++-dev imagemagick libxslt1-dev libpq-dev
+    sudo apt-get install build-essential libssl-dev openssh-server git libreadline-dev libxml++2.6-dev openjdk-8-jdk libgmp-dev libcurl4-gnutls-dev nodejs poppler-utils libreoffice libmysqlclient-dev libmagick++-dev imagemagick libxslt1-dev libpq-dev
 
 Installing these packages now will make installing Ruby easier later on:
 
