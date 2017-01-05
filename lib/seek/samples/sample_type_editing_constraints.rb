@@ -100,8 +100,8 @@ module Seek
         has_blanks = false
         all_blank = true
         samples.each do |sample|
-          has_blanks = sample.get_attribute(attr).blank? unless has_blanks
-          all_blank &&= sample.get_attribute(attr).blank?
+          has_blanks = sample.blank_attribute?(attr) unless has_blanks
+          all_blank &&= sample.blank_attribute?(attr)
           break if has_blanks && !all_blank # no need to continue
         end
         { has_blanks: has_blanks, all_blank: all_blank }
