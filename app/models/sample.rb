@@ -142,17 +142,13 @@ class Sample < ActiveRecord::Base
       else
         value = value.to_s
       end
+      self.title = value
     end
-    self.title = value
   end
 
-  # the value of the designated title attribute
-  def title_attribute_value
-    return nil unless sample_type && sample_type.sample_attributes.title_attributes.any?
-    get_attribute(title_attribute.hash_key)
-  end
-
+  # the designated title attribute
   def title_attribute
+    return nil unless sample_type && sample_type.sample_attributes.title_attributes.any?
     sample_type.sample_attributes.title_attributes.first
   end
 
