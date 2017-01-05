@@ -91,7 +91,7 @@ These additional licenses are also available to be used in SEEK.
         <td>Non-Profit Open Software License 3.0</td><td><a href="http://www.opensource.org/licenses/NPOSL-3.0" target="_blank">http://www.opensource.org/licenses/NPOSL-3.0</a></td>
     </tr>
     <tr>
-        <td>Open Government Licence 1.0 (United Kingdom)</td><td><a href="http://reference.data.gov.uk/id/open-government-licence" target="_blank">http://reference.data.gov.uk/id/open-government-licence</a></td>
+        <td>Open Government Licence 1.0 (United Kingdom)</td><td><a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/1/" target="_blank">http://reference.data.gov.uk/id/open-government-licence</a></td>
     </tr>
     <tr>
         <td>Open Government Licence 2.0 (United Kingdom)</td><td><a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/" target="_blank">https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/</a></td>
