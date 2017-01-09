@@ -14,7 +14,7 @@ Release date: _January xxth 2017_
 Large update with many new features and improvements, in particular a new approach to handling Sample information.
 
   * A major reimplementation and design of our support for Samples
-    * Developed as part of our discussions within the Samples Club, which was setup specifically to overcome problems with
+    * Developed as part of our discussions within the [FAIRDOM-ELIXIR Samples Club](http://fair-dom.org/communities/samplesclub/), which was setup specifically to overcome problems with
      our old BioSamples
     * Flexible system that allows users to design their own Sample Type standards, which are associated with an 
     extractable spreadsheet template
@@ -33,7 +33,8 @@ Large update with many new features and improvements, in particular a new approa
     * This new framework now has possibility to support the SampleTab standard, allowing SEEK to deposit to the EBI Biosamples registry    
     * A more flexible approach to handling Samples was an important requirement for full openBIS integration.
     * It is a framework that can be built upon and enhanced according to user needs in future versions.
-  * An improved Graphical and interactive ISA graph viewer. It now contains all details but expands at the user interacts 
+    * There is documentation available in our [SEEK Samples User Guide](/help/user-guide/samples.html)
+  * An improved Graphical and interactive ISA graph viewer. It now contains all details but expands as the user interacts 
   with it, avoiding the problem of over-complex graphs. A tree view is also now available to navigate the graph, 
   which includes the Programmes and Projects. A full view of the graph is available if necessary.
   * Authorization speedup. A significant improvement in speed and scale when updating the permissions of an item, 
@@ -41,13 +42,14 @@ Large update with many new features and improvements, in particular a new approa
   needs updating when a state changes. This resulted in a noticeable delay observed between users when permissions are changed 
   (as a background task updates the cache), sometimes causing confusion. This delay has now been significantly reduced, 
   and the delay is not dependent on the number of items.
-  * Support for Docker, along with documentation. Docker images are automatically built for different versions and can be 
-  run either as a single container or multiple micro-services split across different containers. 
-  Supports upgrades and persistent data. Docker allows SEEK to be setup and run with a single command. This our expected 
+  * Support for [Docker](https://docker.com), along with documentation. Docker images are automatically built for
+   different versions and can be run either as a single container or multiple micro-services split across different containers. 
+  Handles upgrades and persistent data. Docker allows SEEK to be setup and run with a single command. This our expected 
   approach to simple packaging of SEEK with openBIS.
-  * A Project administator to specify the default license for their project which is automatically selected when 
+    * Documentation on using SEEK with Docker is available in our [Docker Guide](/tech/docker.html)
+  * A Project administrator to specify the default license for their project which is automatically selected when 
   defining a new Asset, but can be changed by the user if necessary.
-  * Improved usabilty of adding new Publications from a DOI or PubmedID
+  * Improved usability of adding new Publications from a DOI or PubmedID
   * Arbitrary URL schemes for remote files, that can be handled outside of SEEK. For example, and scp:// url could be 
   provided for and openSSH based resource
   * Storage metrics in one place available to SEEK administrator, split by Project and Programme. 
