@@ -5,7 +5,7 @@
       Code: <%= dataset.code %>
       <ul>
       <% dataset.dataset_files.reject(&:is_directory).each do |file| %>
-      <li><%= file.path %></li>
+      <li><%= file.path %> - <%= number_to_human_size(file.size) %></li>
       <% end %>
       </ul>
     </div>
