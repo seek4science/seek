@@ -6,6 +6,7 @@
 <%#                                                               'true' to use a partial with fewer information; suitable for 'show' pages for people/projects -%>
 <%# - authorization_already_done: boolean value indicating whether all items in the collection have already been authorized for the current user to view or not -%>
 <%
+   tabs_id ||= "resource_list_by_class"
    narrow_view ||= false
    authorization_already_done ||= false
    actions_partial_disable ||= false
@@ -13,6 +14,7 @@
    item ||= nil
    limit ||= nil
    hide_view_all ||= false
+   display_immediately ||= false
 
    ordered_resource_types = prepare_resource_hash(resource_hash, authorization_already_done, limit, show_empty_tabs)
 
@@ -66,3 +68,9 @@
       </div>
     </div>
 <% end -%>
+
+<% if display_immediately %>
+    <script>
+      displayTabs();
+    </script>
+<% end %>

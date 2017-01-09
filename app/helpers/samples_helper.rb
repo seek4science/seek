@@ -45,7 +45,7 @@ module SamplesHelper
 
   def display_attribute(sample, attribute, options = {})
     value = sample.get_attribute(attribute.hash_key)
-    unless value
+    if value.blank?
       text_or_not_specified(value)
     else
       case attribute.sample_attribute_type.base_type

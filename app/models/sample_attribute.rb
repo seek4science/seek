@@ -25,10 +25,10 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, where(is_title: true)
 
-  delegate :controlled_vocab?, :seek_sample?, to: :sample_attribute_type, allow_nil: true
+  delegate :controlled_vocab?, :seek_sample?, :seek_strain?, to: :sample_attribute_type, allow_nil: true
 
-  #to store that this attribute should be linked to the sample_type it is being assigned to, but needs to wait until the
-  #sample type exists
+  # to store that this attribute should be linked to the sample_type it is being assigned to, but needs to wait until the
+  # sample type exists
   attr_reader :deferred_link_to_self
 
   def title=(title)
@@ -37,8 +37,8 @@ class SampleAttribute < ActiveRecord::Base
     self.title
   end
 
-  def linked_sample_type_id=id
-    @deferred_link_to_self=true if id=='self'
+  def linked_sample_type_id=(id)
+    @deferred_link_to_self = true if id == 'self'
     super(id)
   end
 

@@ -533,6 +533,43 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal strain.title, sample.get_attribute(:seekstrain)['title']
   end
 
+  test 'strain as title' do
+    sample_type = Factory(:strain_sample_type)
+    sample_type.sample_attributes.first.is_title=false
+    sample_type.sample_attributes.last.is_title=true
+    sample_type.save!
+
+    strain = Factory(:strain,title:'glow fish')
+    sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+
+    assert sample.valid?
+    disable_authorization_checks { sample.save! }
+    sample = Sample.find(sample.id)
+
+    assert_equal 'glow fish',sample.title
+
+  end
+
+  test 'linked sample as title' do
+    #setup sample type, to be linked to patient sample type
+    patient = Factory(:patient_sample)
+    assert_equal 'Fred Bloggs',patient.title
+    linked_sample_type = Factory(:linked_sample_type,project_ids:[Factory(:project).id])
+    linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    linked_sample_type.sample_attributes.last.is_title=true
+    linked_sample_type.sample_attributes.first.is_title=false
+
+    linked_sample_type.save!
+
+    sample = Sample.new(sample_type: linked_sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute(:title, 'blah2')
+    sample.set_attribute(:patient, patient.id)
+    sample.save!
+    assert_equal 'Fred Bloggs',sample.title
+  end
+
   test 'strain type still stores missing strain info' do
     sample_type = Factory(:strain_sample_type)
     strain = Factory(:strain)

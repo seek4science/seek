@@ -1,0 +1,81 @@
+<% unless matched_items.empty? -%>
+    <%= stylesheet_link_tag('spreadsheet_explorer', 'jquery.ui.resizable', 'lightbox') %>
+    <%= javascript_include_tag 'jquery.ui.all', 'spreadsheet_explorer', 'zoom/lightbox' %>
+    <!--- multiple  sheets --->
+    <% matched_items.each do |item| -%>
+        <% if authorization_for_showing_already_done || item.can_download? -%>
+            <%= render :partial => "spreadsheets/matched_lines", :locals => {:sheet_array => sheet_array.select { |a| a[3] == item.id }, :object => item} %>
+        <% end -%>
+    <% end %>
+    <!--- merged sheets --->
+    <%#= render :partial => "spreadsheets/merged_sheets", :locals => {:sheet_array => sheet_array}  if authorization_for_showing_already_done%>
+<% end %>
+<script type="text/javascript">
+    window.onload = function () {
+        var tabberOptions = {
+            'onLoad': function() {
+
+                /* In order to avoid adjusting spreadsheets container multiple times, boolean property 'spreadsheet_container_adjusted' is added to each tab */
+                var tabber = arguments[0]["tabber"];
+                AddNewPropertyToTabs({'tabber': tabber, 'property_name': 'spreadsheet_container_adjusted','property_value':false });
+
+                displayTabsImmediately();
+            },
+            'onTabDisplay': function() {
+                var tabber = arguments[0]["tabber"];
+                var tabberIndex = arguments[0]["index"];
+                if (tabber.tabs[tabberIndex].spreadsheet_container_adjusted === false && $j("div.spreadsheet_container:visible").length > 0) {
+                     adjust_container_dimensions();
+                    tabber.tabs[tabberIndex].spreadsheet_container_adjusted = true
+                }
+
+            }
+        };
+
+
+        tabberAutomatic(tabberOptions);
+        showMatchedItems();
+
+    };
+
+    function AddNewPropertyToTabs() {
+        var tabber = arguments[0]["tabber"];
+        var property_name = arguments[0]["property_name"];
+        if (tabber != null) {
+            for (var i = 0; i < tabber.tabs.length; i++) {
+                tabber.tabs[i][property_name] = arguments[0]["property_value"];
+            }
+
+        }
+    }
+    function displayTabsImmediately() {
+        for (var i = 0; i < tabber_ids.length; i++) {
+            var tabber_id = tabber_ids[i];
+            var spinner = $(tabber_id + "_spinner");
+            if (spinner != null) {
+                spinner.hide();
+                $(tabber_id).show();
+            }
+        }
+    }
+    function addSpreadsheetContainerAdjustedToTabber(){
+        for (var i = 0; i < tabber_ids.length; i++) {
+            var tabber_id = tabber_ids[i];
+            $(tabber_id).show();
+        }
+    }
+    function showMatchedItems() {
+        var item_ids = new Array();
+        <% matched_items.each do |item|%>
+        item_ids.push("<%= item.id %>");
+        <% end %>
+        for (var i = 0; i < item_ids.length; i++) {
+            activateSheet(1, null, item_ids[i]);
+            //displayRowsPerPage(item_ids[i]);
+            //enableTableSorter(<%#= object_id %>);
+        }
+    }
+
+</script>
+
+
