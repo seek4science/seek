@@ -19,7 +19,8 @@ SEEK::Application.configure do
 
   #This can be very useful in development when you have code that interacts directly with Rails.cache,
   #but caching may interfere with being able to see the results of code changes.
-  config.cache_store = :null_store
+  #config.cache_store = :null_store
+  config.cache_store = :memory_store, { size: 256.megabytes }
 
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = false

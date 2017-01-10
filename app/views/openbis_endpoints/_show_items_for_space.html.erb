@@ -1,13 +1,21 @@
 <% space.datasets.each do |dataset| %>
 
+    <% files_id="files-#{dataset.perm_id }" %>
+    <% files = dataset.dataset_files.reject(&:is_directory) %>
+
     <div class="openbis-item">
       Perm ID: <%= dataset.perm_id %>
       Code: <%= dataset.code %>
-      <ul>
-      <% dataset.dataset_files.reject(&:is_directory).each do |file| %>
-      <li><%= file.path %> - <%= number_to_human_size(file.size) %></li>
-      <% end %>
-      </ul>
+      <a data-toggle="collapse" href="#<%= files_id %>" aria-expanded="false" aria-controls="collapseExample">
+        <%= "#{files.count} Files" %>
+      </a>
+      <div class="collapse" id="<%= files_id %>">
+        <ul>
+          <% files.each do |file| %>
+              <li><%= file.path %> - <%= number_to_human_size(file.size) %></li>
+          <% end %>
+        </ul>
+      </div>
     </div>
 
 <% end %>
