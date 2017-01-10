@@ -172,6 +172,8 @@ class DataFile < ActiveRecord::Base
 
   #creates a new DataFile that registers an openBIS dataset
   def self.build_from_openbis(openbis_endpoint,dataset_perm_id)
-    return DataFile.first
+    openbis_endpoint.space #this is temporary and causes it to setup the authentication
+    dataset = Seek::Openbis::Dataset.new(dataset_perm_id)
+    dataset.create_seek_datafile(openbis_endpoint)
   end
 end

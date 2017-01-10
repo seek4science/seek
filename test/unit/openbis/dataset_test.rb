@@ -34,8 +34,39 @@ class DatasetTest < ActiveSupport::TestCase
     assert_includes all.collect(&:perm_id), '20160210130454955-23'
   end
 
+  test 'populated?' do
+    dataset = Seek::Openbis::Dataset.new('wibble')
+    refute dataset.populated?
+    dataset = Seek::Openbis::Dataset.new('20160210130454955-23')
+    assert dataset.populated?
+  end
+
   test 'dataset files' do
     dataset = Seek::Openbis::Dataset.new('20160210130454955-23')
+    assert dataset.populated?
     files = dataset.dataset_files
+    assert_equal 3,files.count
+    file=files.sort.last
+    assert_equal 549820,file.size
+    assert_equal 'original/autumn.jpg',file.path
+    refute file.is_directory
   end
+
+  test 'create datafile' do
+    User.current_user=Factory(:person).user
+    Factory(:data_file)
+    endpoint = OpenbisEndpoint.new(project:Factory(:project),
+                        dss_endpoint:'https://openbis-api.fair-dom.org/datastore_server',
+                        as_endpoint:'https://openbis-api.fair-dom.org/openbis/openbis',
+                        username:'apiuser',password:'apiuser',space_perm_id:'API-SPACE')
+    refute_nil endpoint.space
+    disable_authorization_checks{endpoint.save!}
+    dataset = Seek::Openbis::Dataset.new('20160210130454955-23')
+    datafile = dataset.create_seek_datafile(endpoint)
+    assert_equal DataFile,datafile.class
+    assert_equal 1,datafile.content_blobs.count
+    assert datafile.valid?
+    assert datafile.content_blobs.first.valid?
+  end
+
 end
