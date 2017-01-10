@@ -5,6 +5,7 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :project_required
   before_filter :project_can_admin?
   before_filter :get_endpoints,only:[:index, :browse]
+  before_filter :get_endpoint,only:[:add_dataset]
 
 
   def index
@@ -32,6 +33,11 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
+  def add_dataset
+    datafile=DataFile.build_from_openbis(@openbis_endpoint,params[:perm_id])
+    redirect_to datafile
+  end
+
   def browse
     respond_with(@project,@openbis_endpoints)
   end
@@ -56,7 +62,7 @@ class OpenbisEndpointsController < ApplicationController
   def show_items
     endpoint = OpenbisEndpoint.find(params[:id])
     respond_to do |format|
-      format.html {render(partial:'show_items_for_space',locals:{space:endpoint.space})}
+      format.html {render(partial:'show_items_for_space',locals:{openbis_endpoint:endpoint})}
     end
   end
 
@@ -84,6 +90,10 @@ class OpenbisEndpointsController < ApplicationController
 
   def get_endpoints
     @openbis_endpoints=@project.openbis_endpoints
+  end
+
+  def get_endpoint
+    @openbis_endpoint = OpenbisEndpoint.find(params[:id])
   end
 
   def get_project

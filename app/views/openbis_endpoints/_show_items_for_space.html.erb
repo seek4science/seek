@@ -1,4 +1,4 @@
-<% space.datasets.each do |dataset| %>
+<% openbis_endpoint.space.datasets.each do |dataset| %>
 
     <% files_id="files-#{dataset.perm_id }" %>
     <% files = dataset.dataset_files.reject(&:is_directory) %>
@@ -9,6 +9,7 @@
       <a data-toggle="collapse" href="#<%= files_id %>" aria-expanded="false" aria-controls="collapseExample">
         <%= "#{files.count} Files" %>
       </a>
+      <%= link_to('Register with SEEK',add_dataset_project_openbis_endpoint_path(@project,openbis_endpoint,dataset_perm_id:dataset.perm_id),method: :post) %>
       <div class="collapse" id="<%= files_id %>">
         <ul>
           <% files.each do |file| %>

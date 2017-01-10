@@ -169,4 +169,9 @@ class DataFile < ActiveRecord::Base
     end
     extracted
   end
+
+  #creates a new DataFile that registers an openBIS dataset
+  def self.build_from_openbis(openbis_endpoint,dataset_perm_id)
+    return DataFile.first
+  end
 end
