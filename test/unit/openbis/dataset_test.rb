@@ -62,12 +62,16 @@ class DatasetTest < ActiveSupport::TestCase
 
     assert datafile.openbis?
     assert datafile.content_blobs.first.openbis?
+    assert datafile.content_blobs.first.custom_integration?
+    refute datafile.content_blobs.first.external_link?
+    refute datafile.content_blobs.first.show_as_external_link?
 
     assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23",datafile.content_blobs.first.url
 
     normal = Factory(:data_file)
     refute normal.openbis?
     refute normal.content_blobs.first.openbis?
+    refute normal.content_blobs.first.custom_integration?
   end
 
 end

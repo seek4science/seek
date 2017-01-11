@@ -76,10 +76,12 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def show_as_external_link?
+    return false if custom_integration? || url.blank?
+    return true if unhandled_url_scheme?
     no_local_copy =  !file_exists?
     html_content =  is_webpage? || content_type == 'text/html'
     show_as_link = Seek::Config.show_as_external_link_enabled ? no_local_copy : html_content
-    !url.blank? && (show_as_link || unhandled_url_scheme?)
+    show_as_link
   end
   # include all image types
 
@@ -173,6 +175,11 @@ class ContentBlob < ActiveRecord::Base
     else
       [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
     end
+  end
+
+  #whether this content blob represents a custom integration, such as integrated with openBIS
+  def custom_integration?
+    openbis?
   end
 
   def is_downloadable?
