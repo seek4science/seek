@@ -30,6 +30,10 @@ module Seek
         @dataset_files ||= Seek::Openbis::DatasetFile.find_by_dataset_perm_id(perm_id)
       end
 
+      def dataset_files_no_directories
+        dataset_files.reject(&:is_directory)
+      end
+
       def type_name
         'DataSet'
       end

@@ -10,7 +10,7 @@
     <%= item_description @display_data_file.description -%>
 
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-10">
         <%= persistent_resource_id(@display_data_file) %>
         <% if @data_file.can_download? %>
           <% if @data_file.openbis? %>

@@ -6,7 +6,7 @@
     <div class="openbis-item">
       Perm ID: <%= dataset.perm_id %>
       Code: <%= dataset.code %>
-      <a data-toggle="collapse" href="#<%= files_id %>" aria-expanded="false" aria-controls="collapseExample">
+      <a data-toggle="collapse" href="#<%= files_id %>" aria-expanded="false">
         <%= "#{files.count} Files" %>
       </a>
       <%= link_to('Register with SEEK',add_dataset_project_openbis_endpoint_path(@project,openbis_endpoint,dataset_perm_id:dataset.perm_id),method: :post) %>

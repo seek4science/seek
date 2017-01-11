@@ -1,3 +1,26 @@
 <% dataset = data_file.content_blobs.first.openbis_dataset %>
 
-<%= dataset.inspect %>
+<div id="openbis-dataset">
+
+<p>
+  <label>Dataset Perm ID:</label><%= dataset.perm_id %>
+</p>
+<p>
+  <label>Dataset Type:</label> <%= dataset.dataset_type_code %>
+</p>
+
+<p>
+  <a href="#dataset-files" data-toggle="collapse" aria-expanded="false">
+  Dataset Files (<%= dataset.dataset_files_no_directories.count %>)
+  </a>
+  <div class="collapse" id="dataset-files">
+    <ul>
+      <% dataset.dataset_files_no_directories.each do |file| %>
+          <li><%= dataset_file_list_item(file) %></li>
+      <% end %>
+    </ul>
+  </div>
+</p>
+<p>
+
+</div>
