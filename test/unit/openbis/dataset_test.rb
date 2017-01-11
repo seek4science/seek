@@ -60,14 +60,14 @@ class DatasetTest < ActiveSupport::TestCase
     assert datafile.valid?
     assert datafile.content_blobs.first.valid?
 
-    assert datafile.is_openbis?
-    assert datafile.content_blobs.first.is_openbis?
+    assert datafile.openbis?
+    assert datafile.content_blobs.first.openbis?
 
     assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23",datafile.content_blobs.first.url
 
     normal = Factory(:data_file)
-    refute normal.is_openbis?
-    refute normal.content_blobs.first.is_openbis?
+    refute normal.openbis?
+    refute normal.content_blobs.first.openbis?
   end
 
 end

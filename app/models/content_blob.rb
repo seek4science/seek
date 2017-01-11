@@ -131,22 +131,20 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
-
-
   def file
     @file ||= File.open(filepath)
   end
 
   def retrieve
     self.tmp_io_object = remote_content_handler.fetch
-    self.save
+    save
   end
 
   def cachable?
     Seek::Config.cache_remote_files &&
-        !is_webpage? &&
-        file_size &&
-        file_size < Seek::Config.max_cachable_size
+      !is_webpage? &&
+      file_size &&
+      file_size < Seek::Config.max_cachable_size
   end
 
   def caching_job(ignore_locked = true)
@@ -161,8 +159,8 @@ class ContentBlob < ActiveRecord::Base
 
   def search_terms
     if url
-      url_ignore_terms = ['http','https','www','com','co','org','uk','de']
-      url_search_terms = [url,url.split(/\W+/)].flatten - url_ignore_terms
+      url_ignore_terms = %w(http https www com co org uk de)
+      url_search_terms = [url, url.split(/\W+/)].flatten - url_ignore_terms
     else
       url_search_terms = []
     end
@@ -175,7 +173,6 @@ class ContentBlob < ActiveRecord::Base
     else
       [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
     end
-
   end
 
   def is_downloadable?
@@ -235,7 +232,7 @@ class ContentBlob < ActiveRecord::Base
 
   def calculate_file_size
     if file_exists?
-      self.file_size = File.size(self.filepath)
+      self.file_size = File.size(filepath)
     elsif url
       self.file_size = remote_headers[:content_length]
     else
@@ -250,11 +247,11 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def remote_content_handler
-    case URI(self.url).scheme
+    case URI(url).scheme
       when 'ftp'
-        Seek::DownloadHandling::FTPHandler.new(self.url)
+        Seek::DownloadHandling::FTPHandler.new(url)
       when 'http', 'https'
-        Seek::DownloadHandling::HTTPHandler.new(self.url)
+        Seek::DownloadHandling::HTTPHandler.new(url)
       else
         nil
     end

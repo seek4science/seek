@@ -178,7 +178,8 @@ class DataFile < ActiveRecord::Base
   end
 
   #indicates that this is an openBIS based DataFile
-  def is_openbis?
-    content_blobs.count==1 && content_blobs.first.is_openbis?
+  def openbis?
+    content_blobs.count==1 && content_blobs.first.openbis?
   end
+
 end

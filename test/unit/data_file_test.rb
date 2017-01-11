@@ -361,13 +361,13 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal ['fish'],fields
   end
 
-  test 'is_openbis?' do
+  test 'openbis?' do
     stub_request(:head, 'http://www.abc.com').to_return(
         :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
 
-    refute Factory(:data_file).is_openbis?
-    refute Factory(:data_file,content_blobs:[Factory(:url_content_blob)]).is_openbis?
-    assert Factory(:data_file,content_blobs:[Factory(:url_content_blob,url:'openbis:1:dataset:2222')]).is_openbis?
+    refute Factory(:data_file).openbis?
+    refute Factory(:data_file,content_blobs:[Factory(:url_content_blob)]).openbis?
+    assert Factory(:data_file,content_blobs:[Factory(:url_content_blob,url:'openbis:1:dataset:2222')]).openbis?
   end
 
 end
