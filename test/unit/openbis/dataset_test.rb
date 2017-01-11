@@ -34,16 +34,8 @@ class DatasetTest < ActiveSupport::TestCase
     assert_includes all.collect(&:perm_id), '20160210130454955-23'
   end
 
-  test 'populated?' do
-    dataset = Seek::Openbis::Dataset.new('wibble')
-    refute dataset.populated?
-    dataset = Seek::Openbis::Dataset.new('20160210130454955-23')
-    assert dataset.populated?
-  end
-
   test 'dataset files' do
     dataset = Seek::Openbis::Dataset.new('20160210130454955-23')
-    assert dataset.populated?
     files = dataset.dataset_files
     assert_equal 3,files.count
     file=files.sort.last
