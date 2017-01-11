@@ -37,7 +37,7 @@ module Seek
       def create_seek_datafile(endpoint)
         df = DataFile.new(projects:[endpoint.project],title:"OpenBIS #{perm_id}")
         if df.save
-          df.content_blobs.create(url:"openbis:#{endpoint.id}:#{perm_id}",make_local_copy:false,external_link:false,original_filename:"openbis-#{perm_id}")
+          df.content_blobs.create(url:"openbis:#{endpoint.id}:dataset:#{perm_id}",make_local_copy:false,external_link:false,original_filename:"openbis-#{perm_id}")
         end
         df
       end

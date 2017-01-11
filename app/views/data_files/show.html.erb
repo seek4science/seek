@@ -12,8 +12,13 @@
     <div class="row">
       <div class="col-md-6">
         <%= persistent_resource_id(@display_data_file) %>
-
-        <%= render(:partial=>"assets/multiple_fileinfo", :object=>@display_data_file) if @data_file.can_download?-%>
+        <% if @data_file.can_download? %>
+          <% if @data_file.is_openbis? %>
+            <%= render(partial:"data_files/openbis/dataset", locals:{data_file:@data_file}) %>
+          <% else %>
+            <%= render(partial:"assets/multiple_fileinfo", object:@display_data_file) %>
+          <% end %>
+        <% end %>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
 
@@ -24,11 +29,11 @@
   </div>
 
   <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } -%>
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } %>
   </div>
 </div>
 
-<%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
+<%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} %>
 
 <%= render :partial=>"general/items_related_to",:object => @data_file -%>
 

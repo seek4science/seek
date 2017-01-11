@@ -9,6 +9,7 @@ class ContentBlob < ActiveRecord::Base
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
   include Seek::Data::Checksums
+  include Seek::Openbis::Blob
 
   belongs_to :asset, polymorphic: true
 

@@ -176,4 +176,9 @@ class DataFile < ActiveRecord::Base
     dataset = Seek::Openbis::Dataset.new(dataset_perm_id)
     dataset.create_seek_datafile(openbis_endpoint)
   end
+
+  #indicates that this is an openBIS based DataFile
+  def is_openbis?
+    content_blobs.count==1 && content_blobs.first.is_openbis?
+  end
 end

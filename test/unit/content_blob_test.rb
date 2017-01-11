@@ -752,4 +752,14 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute Factory(:binary_content_blob).is_text?
   end
 
+  test 'is_openbis?' do
+    stub_request(:head, 'http://www.abc.com').to_return(
+        :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+
+    refute Factory(:txt_content_blob).is_openbis?
+    refute Factory(:binary_content_blob).is_openbis?
+    refute Factory(:url_content_blob,make_local_copy:false).is_openbis?
+    assert Factory(:url_content_blob,make_local_copy:false,url:'openbis:1:dataset:2222').is_openbis?
+  end
+
 end

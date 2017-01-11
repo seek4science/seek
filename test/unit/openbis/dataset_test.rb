@@ -46,7 +46,7 @@ class DatasetTest < ActiveSupport::TestCase
 
   test 'create datafile' do
     User.current_user=Factory(:person).user
-    Factory(:data_file)
+
     endpoint = OpenbisEndpoint.new(project:Factory(:project),
                         dss_endpoint:'https://openbis-api.fair-dom.org/datastore_server',
                         as_endpoint:'https://openbis-api.fair-dom.org/openbis/openbis',
@@ -59,6 +59,15 @@ class DatasetTest < ActiveSupport::TestCase
     assert_equal 1,datafile.content_blobs.count
     assert datafile.valid?
     assert datafile.content_blobs.first.valid?
+
+    assert datafile.is_openbis?
+    assert datafile.content_blobs.first.is_openbis?
+
+    assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23",datafile.content_blobs.first.url
+
+    normal = Factory(:data_file)
+    refute normal.is_openbis?
+    refute normal.content_blobs.first.is_openbis?
   end
 
 end
