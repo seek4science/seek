@@ -16,7 +16,7 @@
   <div class="collapse" id="dataset-files">
     <ul>
       <% dataset.dataset_files_no_directories.each do |file| %>
-          <li><%= dataset_file_list_item(file) %></li>
+          <li><%= dataset_file_list_item(data_file,file) %></li>
       <% end %>
     </ul>
   </div>

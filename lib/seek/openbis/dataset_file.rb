@@ -12,6 +12,10 @@ module Seek
         construct_from_json(json)
       end
 
+      def filename
+        path.split('/').last
+      end
+
       def all
         json = query_datastore_server_by_perm_id
         construct_from_json(json)
@@ -35,7 +39,6 @@ module Seek
         super.sort_by(&:path)
       end
 
-
       def query_datastore_server_by_dataset_perm_id(perm_id = '')
         key=cache_key(perm_id)
         Rails.logger.info("CACHE KEY = #{key}")
@@ -45,8 +48,8 @@ module Seek
         end
       end
 
-      def download_by_perm_id(type, perm_id, source, dest)
-        datastore_server_download_instance.download(downloadType: type, permID: perm_id, source: source, dest: dest)
+      def download(dest)
+        datastore_server_download_instance.download(downloadType: 'file', permID: dataset_perm_id, source: path, dest: dest)
       end
 
       def datastore_server_query_instance
