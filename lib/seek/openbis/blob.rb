@@ -23,9 +23,9 @@ module Seek
       #overide and ignore the url
       def url_search_terms
         if openbis?
-          super
-        else
           []
+        else
+          super
         end
       end
 
