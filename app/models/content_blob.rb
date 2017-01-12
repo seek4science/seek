@@ -9,7 +9,7 @@ class ContentBlob < ActiveRecord::Base
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
   include Seek::Data::Checksums
-  include Seek::Openbis::Blob
+  prepend Seek::Openbis::Blob
 
   belongs_to :asset, polymorphic: true
 
@@ -160,12 +160,6 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def search_terms
-    if url
-      url_ignore_terms = %w(http https www com co org uk de)
-      url_search_terms = [url, url.split(/\W+/)].flatten - url_ignore_terms
-    else
-      url_search_terms = []
-    end
     if is_text?
       if is_indexable_text?
         [original_filename, url, file_extension, text_contents_for_search] | url_search_terms
@@ -175,6 +169,16 @@ class ContentBlob < ActiveRecord::Base
     else
       [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
     end
+  end
+
+  def url_search_terms
+    if url
+      url_ignore_terms = %w(http https www com co org uk de)
+      url_search_terms = [url, url.split(/\W+/)].flatten - url_ignore_terms
+    else
+      url_search_terms = []
+    end
+    url_search_terms
   end
 
   #whether this content blob represents a custom integration, such as integrated with openBIS
