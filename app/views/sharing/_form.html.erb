@@ -13,7 +13,7 @@
       </p>
     </div>
     <div class="table-responsive">
-      <table class="table table-bordered permissions-table">
+      <table class="table table-bordered permissions-table" id="permissions-table">
         <thead>
         <tr>
           <th class="name-column"></th>
@@ -28,17 +28,25 @@
         <tbody>
         <tr class="permission-row mandatory">
           <td class="name-cell">Public</td>
-          <td class="privilege-cell no-access">
-            <%= radio_button_tag('policy[access_type]', Policy::NO_ACCESS, (@resource.policy.access_type == Policy::NO_ACCESS), autocomplete: 'off') %>
+          <td class="privilege-cell" v-bind:class="getClass(accessType, publicAccessType, false)" v-for="accessType in accessTypes" v-on:click="setPublicAccessType(accessType.value)">
+            <input autocomplete="off" type="radio" name="policy[access_type]" v-model="publicAccessType" v-bind:value="accessType.value"/>
           </td>
-          <% [Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING].each do |privilege| %>
-              <td class="privilege-cell <%= 'disabled' if privilege > Policy.max_public_access_type -%>">
-                <% if privilege <= Policy.max_public_access_type %>
-                    <%= radio_button_tag('policy[access_type]', privilege, (@resource.policy.access_type == privilege), autocomplete: 'off') %>
-                <% end %>
-              </td>
-          <% end %>
           <td class="actions-cell"></td>
+        </tr>
+        <tr class="permission-row" v-for="(permission, index) in permissions">
+          <td class="name-cell">
+            ({{ permission.contributor_type }}) {{ permission.title }}
+            <input type="hidden" v-bind:name="'policy[permissions][' + index +'][contributor_type]'" v-model="permission.contributor_type"/>
+            <input type="hidden" v-bind:name="'policy[permissions][' + index +'][contributor_id]'" v-model="permission.contributor_id"/>
+          </td>
+          <td class="privilege-cell" v-bind:class="getClass(accessType, permission.access_type, true)" v-for="accessType in accessTypes" v-on:click="setAccessType(index, accessType.value)">
+            <input autocomplete="off" type="radio" v-bind:name="'policy[permissions][' + index +'][access_type]'" v-model="permission.access_type" v-bind:value="accessType.value"/>
+          </td>
+          <td class="actions-cell">
+            <a v-if="!permission.mandatory" v-on:click="deletePermission(index)" class="btn btn-xs btn-danger remove-permission" title="Remove this permission">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </a>
+          </td>
         </tr>
         </tbody>
       </table>
@@ -91,54 +99,20 @@
 
 <%= content_tag :script, permissions_json(@resource.policy), type: 'application/json', id: 'permissions-json' %>
 
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
 <script>
   var Sharing = {
-    renderPermissions: function () {
-      var permissions = JSON.parse($j('#permissions-json').text());
-      permissions.forEach(function (permission) {
-        var row = HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Sharing.accessTypes });
-        $j('.permissions-table').append(row);
-      });
-    },
-
-    // Display tick icons in all the privileges up to and including the selected one.
-    // e.g. clicking on "Edit" should show ticks in the "View" and "Download" cells
-    highlightPrivileges: function () {
-      $j('.permissions-table .permission-row').each(function () {
-        $j('td', $j(this)).removeClass('enabled');
-        var cell = $j('input[type=radio]:checked', $j(this)).parent('.privilege-cell');
-        var otherCells = cell.prevAll('.privilege-cell').andSelf();
-        if (!cell.hasClass('no-access')) {
-          otherCells = otherCells.not('.no-access');
-        }
-        otherCells.addClass('enabled');
-      });
-    },
-
-    // Show that the user cannot apply privileges than what is set for "Everyone"
-    setMinimumPrivileges: function () {
-      var index = $j('[name="policy[access_type]"]').index($j('[name="policy[access_type]"]:checked'));
-      $j('.permission-row:gt(0)').each(function () {
-        $j('.privilege-cell', $j(this)).removeClass('disabled');
-        $j('.privilege-cell:lt(' + index + ')', $j(this)).removeClass('enabled').addClass('disabled');
-      });
-    },
-
     addPermission: function (permission) {
-      // Check the row doesn't already exist in the table
-      if (!$j('[data-contributor-id="'+permission.contributor_id+'"][data-contributor-type="'+permission.contributor_type+'"]').length) {
-        permission.index = permission.index || Sharing.generateUniqueIndex();
-        var row = $j(HandlebarsTemplates['sharing/permission_row']({ permission: permission, accessTypes: Sharing.accessTypes }));
-
-        if (permission.mandatory)
-          row.addClass('mandatory');
-
-        // Ensure "mandatory" permissions are at the top
-        if (permission.mandatory)
-          row.insertAfter('.permissions-table .permission-row.mandatory:last');
-        else
-          row.appendTo('.permissions-table');
+      // Update if already existing, otherwise add a new row
+      for (var i = 0; i < permissionsTable.permissions.length; i++) {
+        var p = permissionsTable.permissions[i];
+        if (p.contributor_type == permission.contributor_type && p.contributor_id == permission.contributor_id) {
+          permissionsTable.permissions.splice(i, 1, permission);
+          return false;
+        }
       }
+
+      permissionsTable.permissions.push(permission);
     },
 
     addPermissionForProject: function (projectId, element) {
@@ -151,37 +125,8 @@
           mandatory: true });
         Sharing.highlightPrivileges();
       }
-    },
-
-    generateUniqueIndex: function () {
-      return (new Date().valueOf() * 100 + $j('.permissions-table .permission-row').length);
     }
   };
-
-  $j(document).ready(function () {
-    Sharing.renderPermissions();
-    Sharing.highlightPrivileges();
-    Sharing.setMinimumPrivileges();
-  });
-
-  $j('.permissions-table').on('click', '.privilege-cell', function () {
-    if (!$j(this).hasClass('disabled')) {
-      $j('input[type=radio]', $j(this)).prop('checked', true);
-      Sharing.highlightPrivileges();
-      Sharing.setMinimumPrivileges();
-    }
-  });
-
-  $j('.permissions-table').on('change', '.permission-row input[type=radio]', function () {
-    Sharing.highlightPrivileges();
-    Sharing.setMinimumPrivileges();
-  });
-
-  $j('.permissions-table').on('click', '.permission-row .remove-permission', function () {
-    $j(this).parents('.permission-row').remove();
-
-    return false;
-  });
 
   // Display person modal
   $j('#add-person-permission-button').click(function () {
@@ -207,10 +152,9 @@
           { contributor_type: 'Person',
             contributor_id: person.id,
             title: person.name,
-            access_type: $j('#permission-people-access-type').val() });
+            access_type: parseInt($j('#permission-people-access-type').val()) });
     });
 
-    Sharing.highlightPrivileges();
     // Reset form
     $j('#permission-people-ids').tagsinput('removeAll');
   });
@@ -222,7 +166,7 @@
     var projectTitle = $j('#permission-project-id :selected').text();
     var institutionTitle = $j('#permission-institution-id :selected').text();
     var permission = {
-      access_type: $j('#permission-project-access-type').val()
+      access_type: parseInt($j('#permission-project-access-type').val())
     };
 
     if (projectId) {
@@ -247,7 +191,6 @@
     }
 
     Sharing.addPermission(permission);
-    Sharing.highlightPrivileges();
   });
 
   // Update the institution list when a project is selected
@@ -295,4 +238,54 @@
   };
 
   Sharing.associatedProjectAccessType = <%= Seek::Config.default_associated_projects_access_type %>;
+
+  var permissionsTable = new Vue({
+    el: '#permissions-table',
+    data: {
+      publicAccessType: <%= @resource.policy.access_type %>,
+      permissions: [],
+      accessTypes: [
+        { title: 'No Access', value: Sharing.accessTypes.noAccess, cellClass: 'no-access' },
+        { title: 'View', value: Sharing.accessTypes.visible },
+        { title: 'Download', value: Sharing.accessTypes.accessible },
+        { title: 'Edit', value: Sharing.accessTypes.editing },
+        { title: 'Manage', value: Sharing.accessTypes.managing }
+      ]
+    },
+    methods: {
+      deletePermission: function (index) {
+        this.permissions.splice(index, 1);
+      },
+      setAccessType: function (index, accessType) {
+        this.permissions[index].access_type = accessType;
+      },
+      setPublicAccessType: function (accessType) {
+        this.publicAccessType = accessType;
+      },
+      getClass: function (accessType, permissionAccessType, setDisabled) {
+        var classes = [];
+        if (accessType.value === Sharing.accessTypes.noAccess) {
+          classes.push('no-access');
+        }
+
+        if (setDisabled && (accessType.value < this.publicAccessType)) {
+          classes.push('disabled');
+        } else {
+          if (accessType.value === Sharing.accessTypes.noAccess) {
+            if (permissionAccessType === accessType.value) {
+              classes.push('enabled');
+            }
+          } else if (accessType.value <= permissionAccessType) {
+            classes.push('enabled');
+          }
+        }
+
+        return classes;
+      }
+    }
+  });
+
+  $j(document).ready(function () {
+    permissionsTable.permissions = JSON.parse($j('#permissions-json').text());
+  });
 </script>
