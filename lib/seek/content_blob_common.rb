@@ -9,7 +9,7 @@ module Seek
 
       asset.just_used
 
-      if asset.respond_to?(:openbis) && asset.openbis?
+      if asset.respond_to?(:openbis?) && asset.openbis?
         handle_openbis_download(asset)
       else
         if asset_version.respond_to?(:content_blobs)
