@@ -42,21 +42,21 @@ module Seek
         'DataSet'
       end
 
-      def download(dest_folder,zip_path)
+      def download(dest_folder, zip_path)
         Rails.logger.info("Downloading folders for #{perm_id} to #{dest_folder}")
-        datastore_server_download_instance.download(downloadType: 'dataset', permID: perm_id, source:'',dest: dest_folder)
+        datastore_server_download_instance.download(downloadType: 'dataset', permID: perm_id, source: '', dest: dest_folder)
 
-        if File.exists?(zip_path)
+        if File.exist?(zip_path)
           Rails.logger.info("Deleting old zip file #{zip_path}")
           FileUtils.rm(zip_path)
         end
 
         Rails.logger.info("Creating zip file #{zip_path}")
         Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
-          Dir.glob("#{dest_folder}/**/*").reject{|f| File.directory?(f)}.each do |path|
-            file_path=Pathname(path).relative_path_from(Pathname(dest_folder)).to_s
+          Dir.glob("#{dest_folder}/**/*").reject { |f| File.directory?(f) }.each do |path|
+            file_path = Pathname(path).relative_path_from(Pathname(dest_folder)).to_s
             Rails.logger.info("Adding #{path} as #{file_path} to zip file #{zip_path}")
-            zipfile.add(file_path,path)
+            zipfile.add(file_path, path)
           end
         end
         Rails.logger.info("Zip file #{zip_path} created")
@@ -65,9 +65,9 @@ module Seek
       end
 
       def create_seek_datafile(endpoint)
-        df = DataFile.new(projects:[endpoint.project],title:"OpenBIS #{perm_id}")
+        df = DataFile.new(projects: [endpoint.project], title: "OpenBIS #{perm_id}")
         if df.save
-          df.content_blobs.create(url:"openbis:#{endpoint.id}:dataset:#{perm_id}",make_local_copy:false,external_link:false,original_filename:"openbis-#{perm_id}")
+          df.content_blobs.create(url: "openbis:#{endpoint.id}:dataset:#{perm_id}", make_local_copy: false, external_link: false, original_filename: "openbis-#{perm_id}")
         end
         df
       end

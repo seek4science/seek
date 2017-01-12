@@ -23,10 +23,10 @@ module Seek
 
       def populate_from_json(json)
         @path = json['path']
-        @dataset_perm_id=json['dataset']
-        @file_perm_id=json['filePermId']
-        @is_directory=json['isDirectory']
-        @size=json['fileLength']
+        @dataset_perm_id = json['dataset']
+        @file_perm_id = json['filePermId']
+        @is_directory = json['isDirectory']
+        @size = json['fileLength']
         self
       end
 
@@ -40,7 +40,7 @@ module Seek
       end
 
       def query_datastore_server_by_dataset_perm_id(perm_id = '')
-        key=cache_key(perm_id)
+        key = cache_key(perm_id)
         Rails.logger.info("CACHE KEY = #{key}")
         Rails.cache.fetch(key) do
           Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")

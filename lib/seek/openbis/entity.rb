@@ -49,8 +49,8 @@ module Seek
       end
 
       def find_by_perm_ids(perm_ids)
-        #insert a dummy id if empty, otherwise a blank query occurs which returns everything
-        perm_ids << "xxx222111sddd-dummy" if perm_ids.empty?
+        # insert a dummy id if empty, otherwise a blank query occurs which returns everything
+        perm_ids << 'xxx222111sddd-dummy' if perm_ids.empty?
         ids_str = perm_ids.compact.uniq.join(',')
         json = query_application_server_by_perm_id(ids_str)
         construct_from_json(json)
@@ -61,7 +61,7 @@ module Seek
       end
 
       def query_application_server_by_perm_id(perm_id = '')
-        key=cache_key(perm_id)
+        key = cache_key(perm_id)
         Rails.logger.info("CACHE KEY = #{key}")
         Rails.cache.fetch(key) do
           Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")
