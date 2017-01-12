@@ -73,11 +73,6 @@ module Seek
         "openbis-#{Digest::SHA2.hexdigest(application_server_endpoint)}-#{type_name}-#{Digest::SHA2.hexdigest(perm_id)}"
       end
 
-      def application_server_query_instance
-        info = Seek::Openbis::ConnectionInfo.instance
-        Fairdom::OpenbisApi::ApplicationServerQuery.new(info.as_endpoint, info.session_token)
-      end
-
       def samples
         unless @samples
           @samples = Seek::Openbis::Zample.find_by_perm_ids(sample_ids)
@@ -104,6 +99,21 @@ module Seek
 
       def application_server_endpoint
         Seek::Openbis::ConnectionInfo.instance.as_endpoint
+      end
+
+      def application_server_query_instance
+        info = Seek::Openbis::ConnectionInfo.instance
+        Fairdom::OpenbisApi::ApplicationServerQuery.new(info.as_endpoint, info.session_token)
+      end
+
+      def datastore_server_query_instance
+        info = Seek::Openbis::ConnectionInfo.instance
+        Fairdom::OpenbisApi::DataStoreQuery.new(info.dss_endpoint, info.session_token)
+      end
+
+      def datastore_server_download_instance
+        info = Seek::Openbis::ConnectionInfo.instance
+        Fairdom::OpenbisApi::DataStoreDownload.new(info.dss_endpoint, info.session_token)
       end
 
       def dataset_ids

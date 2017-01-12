@@ -95,15 +95,6 @@ class ContentBlobsController < ApplicationController
 
   private
 
-  def handle_openbis_download(asset,dataset_file_perm_id)
-    dataset = asset.content_blobs.first.openbis_dataset
-    dataset_file = dataset.dataset_files.detect{|f| f.file_perm_id == dataset_file_perm_id}
-    raise "No dataset file found for id" unless dataset_file
-    dest = File.join(Seek::Config.temporary_filestore_path,"#{asset.id.to_s}-#{dataset_file.dataset_perm_id}-#{dataset_file.filename}")
-    dataset_file.download(dest) unless File.exists?(dest)
-    send_file dest, :filename => dataset_file.filename, :type => "application/octet-stream", :disposition => 'attachment'
-  end
-
   def pdf_url
     polymorphic_path([@asset, @content_blob], :action => 'download', :intent => :inline_view, :format => 'pdf', :code => params[:code])
   end

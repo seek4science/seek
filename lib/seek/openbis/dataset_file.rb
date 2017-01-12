@@ -52,16 +52,6 @@ module Seek
         datastore_server_download_instance.download(downloadType: 'file', permID: dataset_perm_id, source: path, dest: dest)
       end
 
-      def datastore_server_query_instance
-        info = Seek::Openbis::ConnectionInfo.instance
-        Fairdom::OpenbisApi::DataStoreQuery.new(info.dss_endpoint, info.session_token)
-      end
-
-      def datastore_server_download_instance
-        info = Seek::Openbis::ConnectionInfo.instance
-        Fairdom::OpenbisApi::DataStoreDownload.new(info.dss_endpoint, info.session_token)
-      end
-
       def type_name
         'DataSetFile'
       end
