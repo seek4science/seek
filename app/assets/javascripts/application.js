@@ -10,6 +10,7 @@
 //= require scriptaculous
 //= require controls
 //= require bootstrap
+//= require vue/vue
 //= require collapsible_panels
 //= require redbox
 //= require builder

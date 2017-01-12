@@ -522,6 +522,7 @@ GEM
     rails-assets-jquery (2.1.4)
     rails-assets-typeahead.js (0.10.5)
       rails-assets-jquery (>= 1.7)
+    rails-assets-vue (2.1.8)
     rails_autolink (1.1.6)
       rails (> 3.1)
     rails_best_practices (1.15.7)
@@ -898,6 +899,7 @@ DEPENDENCIES
   rails-assets-bootstrap-tagsinput (~> 0.8.0)!
   rails-assets-clipboard (~> 1.5.12)!
   rails-assets-typeahead.js (~> 0.10.5)!
+  rails-assets-vue (~> 2.1.8)!
   rails_autolink
   rails_best_practices
   ransack (~> 1.8.2)
@@ -947,4 +949,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.12.5
+   1.13.7
