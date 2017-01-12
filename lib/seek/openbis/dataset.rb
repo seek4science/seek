@@ -34,6 +34,10 @@ module Seek
         dataset_files.reject(&:is_directory)
       end
 
+      def size
+        dataset_files_no_directories.sum(&:size)
+      end
+
       def type_name
         'DataSet'
       end
