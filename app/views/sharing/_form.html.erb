@@ -59,12 +59,12 @@
         <%= modal_body do %>
             <div class="form-group">
               <label>The following people...</label>
-              <%= objects_input('permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.email } } }) -%>
+              <%= objects_input('permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.email } } }, name: nil) -%>
               <p class="help-block">Start typing a person's name and select from the list that appears. You can select multiple people.</p>
             </div>
             <div class="form-group">
               <label>can...</label>
-              <%= select_tag('permission-people-access-type', policy_selection_options(nil, nil, Policy::ACCESSIBLE), class: 'form-control') -%>
+              <%= select_tag('permission-people-access-type', policy_selection_options(nil, nil, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
             </div>
         <% end %>
         <%= modal_footer do %>
@@ -77,18 +77,18 @@
         <%= modal_body do %>
             <div class="form-group">
               <label>Members of...</label>
-              <%= select_tag('permission-project-id', projects_grouped_by_programme,
+              <%= select_tag('permission-project-id', projects_grouped_by_programme, name: nil,
                              prompt: 'any project', class: 'form-control', autocomplete: 'off') -%>
             </div>
             <div class="form-group">
               <label>working at...</label>
               <%= select_tag('permission-institution-id',
-                             options_for_select(Institution.all.sort_by(&:title).map { |i| [i.title, i.id] }),
+                             options_for_select(Institution.all.sort_by(&:title).map { |i| [i.title, i.id] }), name: nil,
                              prompt: 'any institution', class: 'form-control', autocomplete: 'off') -%>
             </div>
             <div class="form-group">
               <label>can...</label>
-              <%= select_tag('permission-project-access-type', policy_selection_options(nil, nil, Policy::ACCESSIBLE), class: 'form-control') -%>
+              <%= select_tag('permission-project-access-type', policy_selection_options(nil, nil, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
             </div>
         <% end %>
         <%= modal_footer do %>
