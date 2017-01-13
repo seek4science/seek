@@ -37,15 +37,8 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
   private
 
   def openbis_linked_content_blob
-    endpoint = OpenbisEndpoint.new(project:Factory(:project),
-                                  dss_endpoint:'https://openbis-api.fair-dom.org/datastore_server',
-                                  as_endpoint:'https://openbis-api.fair-dom.org/openbis/openbis',
-                                  username:'apiuser',password:'apiuser',space_perm_id:'API-SPACE')
-    disable_authorization_checks{endpoint.save!}
-    refute_nil endpoint.space
-
+    endpoint = Factory(:openbis_endpoint)
     Factory(:url_content_blob,make_local_copy:false,url:"openbis:#{endpoint.id}:dataset:20160210130454955-23")
-
   end
 
 end

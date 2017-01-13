@@ -1359,3 +1359,12 @@ Factory.define(:sample_from_file, parent: :sample) do |f|
     sample.set_attribute(:seekstrain, '1234')
   end
 end
+
+Factory.define(:openbis_endpoint) do |f|
+  f.as_endpoint 'https://openbis-api.fair-dom.org/openbis/openbis'
+  f.dss_endpoint 'https://openbis-api.fair-dom.org/datastore_server'
+  f.username 'apiuser'
+  f.password 'apiuser'
+  f.space_perm_id 'API-SPACE'
+  f.association :project, factory: :project
+end

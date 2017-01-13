@@ -1,21 +1,14 @@
 module Seek
   module Openbis
     class Entity
-      attr_reader :json, :modifier, :registration_date, :modification_date, :code, :perm_id, :registrator
-
-      def self.all
-        new.all
-      end
-
-      def self.find_by_perm_ids(perm_ids)
-        new.find_by_perm_ids(perm_ids)
-      end
+      attr_reader :json, :modifier, :registration_date, :modification_date, :code, :perm_id, :registrator, :openbis_endpoint
 
       def ==(other)
         perm_id == other.perm_id
       end
 
-      def initialize(perm_id = nil)
+      def initialize(openbis_endpoint,perm_id = nil)
+        @openbis_endpoint=openbis_endpoint
         if perm_id
           json = query_application_server_by_perm_id(perm_id)
           unless json[json_key]
@@ -44,7 +37,7 @@ module Seek
       def construct_from_json(json)
         return [] unless json[json_key]
         json[json_key].collect do |json|
-          self.class.new.populate_from_json(json)
+          self.class.new(openbis_endpoint).populate_from_json(json)
         end.sort_by(&:modification_date).reverse
       end
 
@@ -70,7 +63,7 @@ module Seek
       end
 
       def cache_key(perm_id)
-        "openbis-#{Digest::SHA2.hexdigest(application_server_endpoint)}-#{type_name}-#{Digest::SHA2.hexdigest(perm_id)}"
+        "openbis-#{openbis_endpoint.id}-#{type_name}-#{Digest::SHA2.hexdigest(perm_id)}"
       end
 
       def samples
@@ -81,7 +74,7 @@ module Seek
       end
 
       def datasets
-        @datasets ||= Seek::Openbis::Dataset.find_by_perm_ids(dataset_ids)
+        @datasets ||= Seek::Openbis::Dataset.new(openbis_endpoint).find_by_perm_ids(dataset_ids)
       end
 
       # provides the number of datasets without having to fetch and construct as you would with datasets.count
@@ -102,18 +95,15 @@ module Seek
       end
 
       def application_server_query_instance
-        info = Seek::Openbis::ConnectionInfo.instance
-        Fairdom::OpenbisApi::ApplicationServerQuery.new(info.as_endpoint, info.session_token)
+        Fairdom::OpenbisApi::ApplicationServerQuery.new(openbis_endpoint.as_endpoint, openbis_endpoint.session_token)
       end
 
       def datastore_server_query_instance
-        info = Seek::Openbis::ConnectionInfo.instance
-        Fairdom::OpenbisApi::DataStoreQuery.new(info.dss_endpoint, info.session_token)
+        Fairdom::OpenbisApi::DataStoreQuery.new(openbis_endpoint.dss_endpoint, openbis_endpoint.session_token)
       end
 
       def datastore_server_download_instance
-        info = Seek::Openbis::ConnectionInfo.instance
-        Fairdom::OpenbisApi::DataStoreDownload.new(info.dss_endpoint, info.session_token)
+        Fairdom::OpenbisApi::DataStoreDownload.new(openbis_endpoint.dss_endpoint, openbis_endpoint.session_token)
       end
 
       def dataset_ids

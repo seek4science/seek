@@ -12,8 +12,7 @@ module Seek
         return nil unless openbis?
         parts = url.split(':')
         endpoint = OpenbisEndpoint.find(parts[1])
-        endpoint.space # temporarily needed to authenticate
-        Seek::Openbis::Dataset.new(parts[3])
+        Seek::Openbis::Dataset.new(endpoint,parts[3])
       end
 
       def search_terms

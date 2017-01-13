@@ -3,10 +3,6 @@ module Seek
     class DatasetFile < Entity
       attr_accessor :path, :size, :is_directory, :dataset_perm_id, :file_perm_id
 
-      def self.find_by_dataset_perm_id(perm_id)
-        DatasetFile.new.find_by_dataset_perm_id(perm_id)
-      end
-
       def find_by_dataset_perm_id(perm_id)
         json = query_datastore_server_by_dataset_perm_id(perm_id)
         construct_from_json(json)
