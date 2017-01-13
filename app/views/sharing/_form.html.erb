@@ -28,8 +28,8 @@
         <tbody>
         <tr class="permission-row mandatory">
           <td class="name-cell">Public</td>
-          <td class="privilege-cell" v-bind:class="getClass(accessType, access_type, false)" v-for="accessType in accessTypes" v-on:click="setPublicAccessType(accessType.value)">
-            <input autocomplete="off" type="radio" name="policy[access_type]" v-model="access_type" v-bind:value="accessType.value"/>
+          <td class="privilege-cell" v-bind:class="getClass(accessType, access_type, true)" v-for="accessType in accessTypes" v-on:click="setPublicAccessType(accessType.value)">
+            <input v-if="accessType.value <= maxPublicAccessType" autocomplete="off" type="radio" name="policy[access_type]" v-model="access_type" v-bind:value="accessType.value"/>
           </td>
           <td class="actions-cell"></td>
         </tr>
@@ -39,7 +39,7 @@
             <input type="hidden" v-bind:name="'policy[permissions][' + index +'][contributor_type]'" v-model="permission.contributor_type"/>
             <input type="hidden" v-bind:name="'policy[permissions][' + index +'][contributor_id]'" v-model="permission.contributor_id"/>
           </td>
-          <td class="privilege-cell" v-bind:class="getClass(accessType, permission.access_type, true)" v-for="accessType in accessTypes" v-on:click="setAccessType(index, accessType.value)">
+          <td class="privilege-cell" v-bind:class="getClass(accessType, permission.access_type, false)" v-for="accessType in accessTypes" v-on:click="setAccessType(index, accessType.value)">
             <input autocomplete="off" type="radio" v-bind:name="'policy[permissions][' + index +'][access_type]'" v-model="permission.access_type" v-bind:value="accessType.value"/>
           </td>
           <td class="actions-cell">
@@ -238,6 +238,7 @@
 
   Sharing.associatedProjectAccessType = <%= Seek::Config.default_associated_projects_access_type %>;
   Sharing.allVisitorsAccessType = <%= Seek::Config.default_all_visitors_access_type %>;
+  Sharing.maxPublicAccessType = <%= Policy.max_public_access_type %>;
 
   var permissionsTable = new Vue({
     el: '#permissions-table',
@@ -250,7 +251,8 @@
         { title: 'Download', value: Sharing.accessTypes.accessible },
         { title: 'Edit', value: Sharing.accessTypes.editing },
         { title: 'Manage', value: Sharing.accessTypes.managing }
-      ]
+      ],
+      maxPublicAccessType: Sharing.maxPublicAccessType
     },
     methods: {
       deletePermission: function (index) {
@@ -262,13 +264,14 @@
       setPublicAccessType: function (accessType) {
         this.access_type = accessType;
       },
-      getClass: function (accessType, permissionAccessType, setDisabled) {
+      getClass: function (accessType, permissionAccessType, isPublicSetting) {
         var classes = [];
         if (accessType.value === Sharing.accessTypes.noAccess) {
           classes.push('no-access');
         }
 
-        if (setDisabled && (accessType.value < this.access_type)) {
+        if ((!isPublicSetting && (accessType.value < this.access_type)) ||
+            (isPublicSetting && (accessType.value > this.maxPublicAccessType))) {
           classes.push('disabled');
         } else {
           if (accessType.value === Sharing.accessTypes.noAccess) {
