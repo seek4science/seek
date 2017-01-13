@@ -985,7 +985,44 @@ function getCreators(){
 }
 
 
+// NEW SHARING STUFF. Above can probably be deleted?
+var Sharing = {
+  addPermission: function (permission) {
+    // Update if already existing, otherwise add a new row
+    for (var i = 0; i < permissionsTable.permissions.length; i++) {
+      var p = permissionsTable.permissions[i];
+      if (p.contributor_type == permission.contributor_type && p.contributor_id == permission.contributor_id) {
+        permissionsTable.permissions.splice(i, 1, permission);
+        return false;
+      }
+    }
 
+    permissionsTable.permissions.push(permission);
+  },
 
+  addPermissionForProject: function (projectId, element) {
+    if (projectId > 0) {
+      Sharing.addPermission({
+        contributor_type: 'Project',
+        contributor_id: projectId,
+        title: $j(':selected', $j(element)).text(),
+        access_type: Sharing.associatedProjectAccessType,
+        mandatory: true });
+    }
+  },
 
+  requestInstitutionsUrl: '<%= Rails.application.routes.url_helpers.request_institutions_projects_path %>',
+  requestAllInstitutionsUrl: '<%= Rails.application.routes.url_helpers.request_all_institutions_path %>',
 
+  accessTypes: {
+    noAccess: <%= Policy::NO_ACCESS %>,
+    visible: <%= Policy::VISIBLE %>,
+    accessible: <%= Policy::ACCESSIBLE %>,
+    editing: <%= Policy::EDITING %>,
+    managing: <%= Policy::MANAGING %>
+  },
+
+  associatedProjectAccessType: <%= Seek::Config.default_associated_projects_access_type %>,
+  allVisitorsAccessType: <%= Seek::Config.default_all_visitors_access_type %>,
+  maxPublicAccessType: <%= Policy.max_public_access_type %>
+};
