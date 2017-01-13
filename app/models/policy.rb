@@ -107,58 +107,26 @@ class Policy < ActiveRecord::Base
   end
 
 
-  def set_attributes_with_sharing sharing, projects
+  def set_attributes_with_sharing policy_params, projects
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     self.tap do |policy|
-      if sharing
+      # Set attributes on the policy
+      policy.access_type = policy_params[:access_type]
 
-        # obtain parameters from sharing hash
-        policy.sharing_scope = sharing[:sharing_scope]
-
-        policy.access_type = sharing["access_type_#{sharing_scope}"].blank? ? 0 : sharing["access_type_#{sharing_scope}"]
-
-        # NOW PROCESS THE PERMISSIONS
-
-        # read the permission data from sharing
-        unless sharing[:permissions].blank? or sharing[:permissions][:contributor_types].blank?
-          contributor_types = ActiveSupport::JSON.decode(sharing[:permissions][:contributor_types]) || []
-          new_permission_data = ActiveSupport::JSON.decode(sharing[:permissions][:values]) || {}
-        else
-          contributor_types = []
-          new_permission_data = {}
-        end
-
-        #if share with your project is chosen
-
-        if (sharing[:sharing_scope].to_i == Policy::ALL_USERS) and !projects.map(&:id).compact.blank?
-          #add Project to contributor_type
-          contributor_types << "Project" if !contributor_types.include? "Project"
-          #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
-          new_permission_data["Project"] = {} unless new_permission_data["Project"]
-          projects.each {|project| new_permission_data["Project"][project.id.to_s] = {"access_type" => sharing[:your_proj_access_type].to_i}}
-        end
-
-        # --- Synchronise All Permissions for the Policy ---
-        # first delete or update any old memberships
-        policy.permissions.each do |p|
-          if permission_access = (new_permission_data[p.contributor_type.to_s].try :delete, p.contributor_id.to_s)
-            p.access_type = permission_access["access_type"]
-          else
-            p.mark_for_destruction
-          end
-        end
-
-        # now add any remaining new memberships
-        contributor_types.try :each do |contributor_type|
-          new_permission_data[contributor_type.to_s].try :each do |p|
-            if policy.new_record? or !Permission.where(:contributor_type => contributor_type, :contributor_id => p[0], :policy_id => policy.id).first
-              p = policy.permissions.build :contributor_type => contributor_type, :contributor_id => p[0], :access_type => p[1]["access_type"]
-            end
-          end
-        end
-
+      # Set attributes on the policy's permissions
+      # Find or initialize permissions based on the "contributor"
+      new_permissions = policy_params[:permissions].values.map do |pp|
+        permission = policy.permissions.find_or_initialize_by_contributor_type_and_contributor_id(
+            pp[:contributor_type], pp[:contributor_id])
+        permission.reload if permission.marked_for_destruction? # Clear the destroy flag
+        permission.access_type = pp[:access_type]
+        permission
       end
+
+      # Assign the new permissions to the policy.
+      #  Updates/inserts/deletes will happen when the policy is saved (after the resource is saved)
+      policy.permissions = new_permissions
     end
   end
 
