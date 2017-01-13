@@ -160,7 +160,9 @@ module PolicyHelper
   end
 
   def permissions_json(policy)
-    policy.permissions.select([:id, :access_type, :contributor_id, :contributor_type]).each do |permission|
+    hash = { access_type: policy.access_type }
+
+    hash[:permissions] = policy.permissions.select([:id, :access_type, :contributor_id, :contributor_type]).each do |permission|
       permission[:index] = permission.id
       permission[:title] = if permission.contributor_type == "Person"
             (permission.contributor.first_name + " " + permission.contributor.last_name)
@@ -169,6 +171,8 @@ module PolicyHelper
           else
             permission.contributor.title
           end
-    end.to_json.html_safe
+    end
+
+    hash.to_json.html_safe
   end
 end

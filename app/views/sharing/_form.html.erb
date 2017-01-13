@@ -1,7 +1,7 @@
 <%
   object ||= nil
   set_parameters_for_sharing_form object
-  @resource.policy.access_type ||= Seek::Config.default_all_visitors_access_type
+  @resource.policy.access_type = Seek::Config.default_all_visitors_access_type if @resource.new_record?
 %>
 
 <%= folding_panel('Sharing', false, :id => 'sharing_form', :body_options => {:id => 'creator_fold_content'},
@@ -28,8 +28,8 @@
         <tbody>
         <tr class="permission-row mandatory">
           <td class="name-cell">Public</td>
-          <td class="privilege-cell" v-bind:class="getClass(accessType, publicAccessType, false)" v-for="accessType in accessTypes" v-on:click="setPublicAccessType(accessType.value)">
-            <input autocomplete="off" type="radio" name="policy[access_type]" v-model="publicAccessType" v-bind:value="accessType.value"/>
+          <td class="privilege-cell" v-bind:class="getClass(accessType, access_type, false)" v-for="accessType in accessTypes" v-on:click="setPublicAccessType(accessType.value)">
+            <input autocomplete="off" type="radio" name="policy[access_type]" v-model="access_type" v-bind:value="accessType.value"/>
           </td>
           <td class="actions-cell"></td>
         </tr>
@@ -237,11 +237,12 @@
   };
 
   Sharing.associatedProjectAccessType = <%= Seek::Config.default_associated_projects_access_type %>;
+  Sharing.allVisitorsAccessType = <%= Seek::Config.default_all_visitors_access_type %>;
 
   var permissionsTable = new Vue({
     el: '#permissions-table',
     data: {
-      publicAccessType: <%= @resource.policy.access_type %>,
+      access_type: Sharing.allVisitorsAccessType,
       permissions: [],
       accessTypes: [
         { title: 'No Access', value: Sharing.accessTypes.noAccess, cellClass: 'no-access' },
@@ -259,7 +260,7 @@
         this.permissions[index].access_type = accessType;
       },
       setPublicAccessType: function (accessType) {
-        this.publicAccessType = accessType;
+        this.access_type = accessType;
       },
       getClass: function (accessType, permissionAccessType, setDisabled) {
         var classes = [];
@@ -267,7 +268,7 @@
           classes.push('no-access');
         }
 
-        if (setDisabled && (accessType.value < this.publicAccessType)) {
+        if (setDisabled && (accessType.value < this.access_type)) {
           classes.push('disabled');
         } else {
           if (accessType.value === Sharing.accessTypes.noAccess) {
@@ -285,6 +286,8 @@
   });
 
   $j(document).ready(function () {
-    permissionsTable.permissions = JSON.parse($j('#permissions-json').text());
+    var policy = JSON.parse($j('#permissions-json').text());
+    permissionsTable.permissions = policy.permissions;
+    permissionsTable.access_type = policy.access_type;
   });
 </script>
