@@ -138,4 +138,13 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     end
   end
 
+  test 'session token' do
+    endpoint = OpenbisEndpoint.new(project:Factory(:project),
+                                   dss_endpoint:'https://openbis-api.fair-dom.org/datastore_server',
+                                   as_endpoint:'https://openbis-api.fair-dom.org/openbis/openbis',
+                                   username:'apiuser',password:'apiuser',space_perm_id:'API-SPACE')
+
+    refute_nil endpoint.session_token
+  end
+
 end

@@ -28,6 +28,11 @@ class OpenbisEndpoint < ActiveRecord::Base
     # spaces | [self.space_name].compact
   end
 
+  # session token used for authentication, provided when logging in
+  def session_token
+    @session_token ||= Fairdom::OpenbisApi::Authentication.new(username, password, as_endpoint).login['token']
+  end
+
   def space
     @space||= begin
       Seek::Openbis::ConnectionInfo.setup(username, password, as_endpoint, dss_endpoint)
