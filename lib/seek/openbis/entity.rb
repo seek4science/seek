@@ -9,6 +9,7 @@ module Seek
 
       def initialize(openbis_endpoint,perm_id = nil)
         @openbis_endpoint=openbis_endpoint
+        raise 'OpenbisEndpoint expected and required' unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
         if perm_id
           json = query_application_server_by_perm_id(perm_id)
           unless json[json_key]

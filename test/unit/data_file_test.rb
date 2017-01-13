@@ -370,4 +370,14 @@ class DataFileTest < ActiveSupport::TestCase
     assert Factory(:data_file,content_blobs:[Factory(:url_content_blob,url:'openbis:1:dataset:2222')]).openbis?
   end
 
+  test 'build from openbis' do
+    User.with_current_user(Factory(:person).user) do
+      endpoint=Factory(:openbis_endpoint)
+      df = DataFile.build_from_openbis(endpoint,'20160210130454955-23')
+      refute_nil df
+      assert df.openbis?
+      assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23", df.content_blobs.first.url
+    end
+  end
+
 end

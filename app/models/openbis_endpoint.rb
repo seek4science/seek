@@ -15,14 +15,13 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def test_authentication
-    !Fairdom::OpenbisApi::Authentication.new(username, password, as_endpoint).login['token'].nil?
+    !session_token.nil?
   rescue Fairdom::OpenbisApi::OpenbisQueryException => e
     false
   end
 
   def available_spaces
-    Seek::Openbis::ConnectionInfo.setup(username, password, as_endpoint, dss_endpoint)
-    all_spaces = Seek::Openbis::Space.all
+    all_spaces = Seek::Openbis::Space.new(self).all
     # known = project.openbis_endpoints.select{|space| space.as_endpoint==self.as_endpoint}.collect(&:space_name)
     # spaces = all_spaces.select{|sp| !known.include?(sp.code)} #reject any that have already been used
     # spaces | [self.space_name].compact
@@ -34,11 +33,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def space
-    @space||= begin
-      Seek::Openbis::ConnectionInfo.setup(username, password, as_endpoint, dss_endpoint)
-      Seek::Openbis::Space.new(space_perm_id)
-    end
-    @space
+    @space ||= Seek::Openbis::Space.new(self,space_perm_id)
   end
 
   def title

@@ -92,6 +92,20 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     end
   end
 
+  test 'available spaces' do
+    endpoint = Factory(:openbis_endpoint)
+    spaces = endpoint.available_spaces
+    assert_equal 2,spaces.count
+  end
+
+  test 'space' do
+    endpoint = Factory(:openbis_endpoint)
+    space = endpoint.space
+    refute_nil space
+    assert_equal 'API-SPACE',space.perm_id
+  end
+
+
   test 'can edit?' do
     pa=Factory(:project_administrator).user
     user=Factory(:person).user

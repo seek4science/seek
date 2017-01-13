@@ -48,7 +48,7 @@ class DatasetTest < ActiveSupport::TestCase
 
 
     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint,'20160210130454955-23')
-    datafile = dataset.create_seek_datafile(@openbis_endpoint)
+    datafile = dataset.create_seek_datafile
     assert_equal DataFile,datafile.class
     assert_equal 1,datafile.content_blobs.count
     assert datafile.valid?
