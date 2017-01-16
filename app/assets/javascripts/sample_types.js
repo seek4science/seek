@@ -1,4 +1,5 @@
 var SampleTypes = {
+
     recalculatePositions: function () {
         $j('#attribute-table tr.sample-attribute .attribute-position').each(function (index, item) {
             $j('.attribute-position-label', $j(item)).html(index + 1);
@@ -113,5 +114,22 @@ var SampleTypeControlledVocab = {
         $j('#modal-dialogues').append(SampleTypeControlledVocab.blankControlledVocabModelForm.clone());
         initialiseCVForm();
         SampleTypeControlledVocab.bindNewControlledVocabShowEvent();
+    },
+
+    //selected CV item changed
+    controlledVocabChanged: function() {
+        var id=$j(this).find(':selected')[0].value;
+        var editable=$j(this).find(':selected').data('editable');
+        var link='/sample_controlled_vocabs/'+id+'/edit';
+        var button=$j(this).siblings('.cv-edit-button');
+        if (editable) {
+            button.show();
+            button.attr('disabled',false);
+        }
+        else {
+            button.show();
+            button.attr('disabled',true);
+        }
+        button.prop('href',link);
     }
 };
