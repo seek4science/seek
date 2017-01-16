@@ -91,10 +91,6 @@ module Seek
 
       private
 
-      def application_server_endpoint
-        Seek::Openbis::ConnectionInfo.instance.as_endpoint
-      end
-
       def application_server_query_instance
         Fairdom::OpenbisApi::ApplicationServerQuery.new(openbis_endpoint.as_endpoint, openbis_endpoint.session_token)
       end
