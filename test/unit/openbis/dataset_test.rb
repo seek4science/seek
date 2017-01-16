@@ -1,7 +1,9 @@
 require 'test_helper'
+require 'openbis_test_helper'
 
 class DatasetTest < ActiveSupport::TestCase
   def setup
+    mock_openbis_calls
     @openbis_endpoint=Factory(:openbis_endpoint)
   end
 

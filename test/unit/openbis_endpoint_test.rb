@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'openbis_test_helper'
 
 class OpenbisEndpointTest < ActiveSupport::TestCase
 
@@ -153,6 +154,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'session token' do
+    mock_openbis_calls
     endpoint = OpenbisEndpoint.new(project:Factory(:project),
                                    dss_endpoint:'https://openbis-api.fair-dom.org/datastore_server',
                                    as_endpoint:'https://openbis-api.fair-dom.org/openbis/openbis',

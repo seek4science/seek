@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'openbis_test_helper'
 
 class DataFileTest < ActiveSupport::TestCase
   fixtures :all
@@ -371,6 +372,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'build from openbis' do
+    mock_openbis_calls
     User.with_current_user(Factory(:person).user) do
       endpoint=Factory(:openbis_endpoint)
       df = DataFile.build_from_openbis(endpoint,'20160210130454955-23')

@@ -1,7 +1,12 @@
 require 'test_helper'
+require 'openbis_test_helper'
 
 # ContentBlob related tests specific to OpenBIS
 class OpenbisContentBlobTest < ActiveSupport::TestCase
+
+  def setup
+    mock_openbis_calls
+  end
 
   test 'openbis?' do
     stub_request(:head, 'http://www.abc.com').to_return(
