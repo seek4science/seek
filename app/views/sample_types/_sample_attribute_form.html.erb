@@ -50,12 +50,16 @@
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id] },
+                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?}] },
                                         sample_controlled_vocab_id),
                      include_blank: true,
                      class: 'form-control controlled-vocab-selection',
                      disabled: !allow_type_change %>
-        <%= create_sample_controlled_vocab_model_button if allow_type_change %>
+      <% if allow_type_change %>
+        <a class="btn btn-default cv-edit-button" href="#" role="button" disabled="true" target="_blank">Edit</a>
+        <%= create_sample_controlled_vocab_model_button  %>
+      <% end %>
+
     </div>
     <div class='sample-type-block' style="<%= 'display:none;' unless sample_attribute.try(:seek_sample?) %>">
       <br/>
