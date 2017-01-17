@@ -93,7 +93,7 @@ var SampleTypeControlledVocab = {
     controlledVocabSelectionTagId: "",
     blankControlledVocabModelForm: null,
 
-    //binds the show event to the modal dialogue, for determining with button, and therefore dropdown selection, is linked
+    //binds the show event to the modal dialogue, for determining which button, and therefore dropdown selection, is linked
     //to the form
     bindNewControlledVocabShowEvent: function () {
         $j('#cv-modal').on('show.bs.modal', function (event) {
