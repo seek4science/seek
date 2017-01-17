@@ -6,6 +6,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   validates :dss_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :web_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :project, :as_endpoint, :dss_endpoint, :web_endpoint, :username, :password, :space_perm_id, presence: true
+  validates :space_perm_id,uniqueness:{scope: [:dss_endpoint, :as_endpoint,:space_perm_id,:project_id], message:'the endpoints and the space must be unique for this project'}
 
   def self.can_create?
     User.logged_in_and_member? && User.current_user.is_admin_or_project_administrator? && Seek::Config.openbis_enabled

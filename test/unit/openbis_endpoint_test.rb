@@ -54,6 +54,20 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert endpoint.valid?
   end
 
+  test 'validates uniqueness' do
+    endpoint = Factory(:openbis_endpoint)
+    endpoint2 = Factory.build(:openbis_endpoint)
+    assert endpoint.valid? #different project
+    endpoint2 = Factory.build(:openbis_endpoint,project:endpoint.project)
+    refute endpoint2.valid?
+    endpoint2.as_endpoint='http://fish.com'
+    assert endpoint2.valid?
+    endpoint2.as_endpoint=endpoint.as_endpoint
+    refute endpoint2.valid?
+    endpoint2.dss_endpoint='http://fish.com'
+    assert endpoint2.valid?
+  end
+
   test 'link to project' do
     pa=Factory(:project_administrator)
     project=pa.projects.first
