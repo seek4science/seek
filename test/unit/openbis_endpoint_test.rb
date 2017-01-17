@@ -5,10 +5,11 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'validation' do
     project=Factory(:project)
-    endpoint = OpenbisEndpoint.new project:project, username:'fred', password:'12345',
-                                as_endpoint:'http://my-openbis.org/openbis',
-                                dss_endpoint:'http://my-openbis.org/openbis',
-                                space_perm_id:'mmmm'
+    endpoint = OpenbisEndpoint.new project: project, username: 'fred', password: '12345',
+                                   web_endpoint: 'http://my-openbis.org/openbis',
+                                   as_endpoint: 'http://my-openbis.org/openbis',
+                                   dss_endpoint: 'http://my-openbis.org/openbis',
+                                   space_perm_id: 'mmmm'
 
     assert endpoint.valid?
     endpoint.username=nil
@@ -40,6 +41,13 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint.dss_endpoint='http://my-openbis.org/openbis'
     assert endpoint.valid?
 
+    endpoint.web_endpoint=nil
+    refute endpoint.valid?
+    endpoint.web_endpoint='fish'
+    refute endpoint.valid?
+    endpoint.web_endpoint='http://my-openbis.org/openbis'
+    assert endpoint.valid?
+
     endpoint.project=nil
     refute endpoint.valid?
     endpoint.project=Factory(:project)
@@ -51,8 +59,8 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     project=pa.projects.first
     User.with_current_user(pa.user) do
       with_config_value :openbis_enabled,true do
-        endpoint = OpenbisEndpoint.create project:project, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis', space_perm_id:'aaa'
-        endpoint2 = OpenbisEndpoint.create project:project, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis', space_perm_id:'bbb'
+        endpoint = OpenbisEndpoint.create project:project, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis',web_endpoint:'http://my-openbis.org/openbis', space_perm_id:'aaa'
+        endpoint2 = OpenbisEndpoint.create project:project, username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis',web_endpoint:'http://my-openbis.org/openbis', space_perm_id:'bbb'
         endpoint.save!
         endpoint2.save!
         project.reload
@@ -94,12 +102,14 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'available spaces' do
+    mock_openbis_calls
     endpoint = Factory(:openbis_endpoint)
     spaces = endpoint.available_spaces
     assert_equal 2,spaces.count
   end
 
   test 'space' do
+    mock_openbis_calls
     endpoint = Factory(:openbis_endpoint)
     space = endpoint.space
     refute_nil space
