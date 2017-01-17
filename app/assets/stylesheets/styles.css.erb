@@ -176,6 +176,10 @@ span.disabled, span.disabled-button,
 a.disabled, a.disabled-button{
     filter:progid:DXImageTransform.Microsoft.Alpha( Opacity=50 );
     opacity: 0.50;
+    pointer-events: none;
+}
+a[disabled] {
+  pointer-events: none;
 }
 
 .show_basic #tool_list {
@@ -1671,3 +1675,4 @@ table#storage-stats {
 table#storage-stats thead {
   font-weight: bolder;
 }
+
