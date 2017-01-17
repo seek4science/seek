@@ -39,7 +39,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def title
-    "#{as_endpoint} : #{space_perm_id}"
+    "#{web_endpoint} : #{space_perm_id}"
   end
 
 end

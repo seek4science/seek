@@ -97,9 +97,9 @@
   });
 
   $j('#openbis_endpoint_web_endpoint').focusout(function() {
-    var url=$j('#openbis_endpoint_web_endpoint')[0].value;
+    var url=$j('#openbis_endpoint_web_endpoint').val();
     var uri=new URI(url);
-    if ((uri.protocol()=='http' || uri.protocol()=='https') && uri.segment().last()=='openbis') {
+    if ((uri.protocol()=='http' || uri.protocol()=='https') && (uri.segment().last()=='openbis' || uri.segment(-2)=='openbis')) {
       if (!$j('#openbis_endpoint_as_endpoint').val()) {
         var as=uri.clone().segment('openbis');
         $j('#openbis_endpoint_as_endpoint').val(as)
