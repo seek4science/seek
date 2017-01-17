@@ -37,7 +37,6 @@
     <% end %>
     <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
     <% if Seek::Config.samples_enabled %>
-      <li><%= link_to("Samples", samples_path) %></li>
       <li><%= link_to("Sample types", sample_types_path) %></li>
     <% end %>
     <% if Seek::Config.organisms_enabled %>
