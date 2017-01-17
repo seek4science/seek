@@ -1,8 +1,15 @@
+<%= javascript_include_tag :uri %>
+
 <%= form_for([@project,@openbis_endpoint],html:{id:'openbis-space-form'}) do |f| %>
 
     <%= f.error_messages %>
 
     <%= f.hidden_field :project_id, :class=>"login-credential" %>
+
+    <div class="form-group">
+      <label>Front page url</label><span class="required">*</span>
+      <%= f.text_field :web_endpoint, :class=>"form-control login-credential"-%>
+    </div>
 
     <div class="form-group">
       <label>AS Endpoint</label><span class="required">*</span>
@@ -87,6 +94,23 @@
     $j('#fetch-spaces-button').prop('disabled', true);
     testEndpoint();
     $j('#fetch-spaces-button').prop('disabled', false);
+  });
+
+  $j('#openbis_endpoint_web_endpoint').focusout(function() {
+    var url=$j('#openbis_endpoint_web_endpoint')[0].value;
+    var uri=new URI(url);
+    if ((uri.protocol()=='http' || uri.protocol()=='https') && uri.segment().last()=='openbis') {
+      if (!$j('#openbis_endpoint_as_endpoint').val()) {
+        var as=uri.clone().segment('openbis');
+        $j('#openbis_endpoint_as_endpoint').val(as)
+      }
+      if (!$j('#openbis_endpoint_dss_endpoint').val()) {
+        var dss = uri.clone().segment(-1,'datastore_server');
+        $j('#openbis_endpoint_dss_endpoint').val(dss)
+      }
+
+
+    }
   });
 
 </script>
