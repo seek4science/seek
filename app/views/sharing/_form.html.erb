@@ -26,17 +26,8 @@
         </tr>
         </thead>
         <tbody>
-        <% if false %>
-        <tr class="permission-row mandatory">
-          <td class="name-cell">Public</td>
-          <td class="privilege-cell" v-bind:class="getClass(accessType, access_type, true)" v-for="accessType in accessTypes" v-on:click="setPublicAccessType(accessType)">
-            <input v-if="accessType.value <= maxPublicAccessType" autocomplete="off" type="radio" name="policy[access_type]" v-model="access_type" v-bind:value="accessType.value"/>
-          </td>
-          <td class="actions-cell"></td>
-        </tr>
-        <% end %>
-        <tr is="permission-row" :index="index" :permission="{ access_type: access_type, public: true, mandatory: true, title: 'Public' }" :access-types="accessTypes" :public-access-type="access_type" field-prefix-orig="policy"></tr>
-        <tr is="permission-row" v-for="(permission, index) in permissions" :index="index" :permission="permission" :access-types="accessTypes" :public-access-type="access_type" v-on:delete-permission="deletePermission(index)"></tr>
+          <tr is="permission-row" :permission="publicPermission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" field-prefix-orig="policy"></tr>
+          <tr is="permission-row" v-for="(permission, index) in permissions" :index="index" :permission="permission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" v-on:delete-permission="deletePermission(index)"></tr>
         </tbody>
       </table>
     </div>
@@ -50,13 +41,15 @@
 <script>
   Vue.component('permission-row', {
     props: ['index', 'permission', 'accessTypes', 'publicAccessType', 'fieldPrefixOrig'],
-    template: '<tr class="permission-row" v-bind:class="{ mandatory: permission.mandatory }">' +
+    template:
+    '<tr class="permission-row" :class="{ mandatory: permission.mandatory }">' +
       '<td class="name-cell"><span v-if="permission.contributor_type">({{ permission.contributor_type }}) </span>{{ permission.title }}' +
-        '<input v-if="!permission.contributor_type" type="hidden" v-bind:name="fieldPrefix+\'[contributor_type]\'" v-model="permission.contributor_type"/>' +
-        '<input v-if="!permission.contributor_id" type="hidden" v-bind:name="fieldPrefix+\'[contributor_id]\'" v-model="permission.contributor_id"/></td>' +
+        '<input v-if="permission.contributor_type" type="hidden" :name="fieldPrefix+\'[contributor_type]\'" v-model="permission.contributor_type"/>' +
+        '<input v-if="permission.contributor_id" type="hidden" :name="fieldPrefix+\'[contributor_id]\'" v-model="permission.contributor_id"/>' +
+      '</td>' +
       '<td is="privilege-cell" v-for="accessType in accessTypes" :fieldPrefix="fieldPrefix" :permission="permission" :access-type="accessType" :public-access-type="publicAccessType"></td>' +
       '<td class="actions-cell">'+
-        '<a v-if="!permission.mandatory" v-on:click="$emit(\'delete-permission\')" class="btn btn-xs btn-danger" title="Remove this permission">' +
+        '<a v-if="!permission.mandatory" @click="$emit(\'delete-permission\')" class="btn btn-xs btn-danger" title="Remove this permission">' +
           '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>' +
         '</a>' +
       '</td>' +
@@ -67,11 +60,11 @@
       }
     }
   });
-  // TODO: Fix public  setting not updating
   Vue.component('privilege-cell', {
     props: ['fieldPrefix', 'permission', 'accessType', 'publicAccessType'],
-    template: '<td class="privilege-cell" v-bind:class="classes" v-on:click="permission.access_type = accessType.value">' +
-      '<input v-if="!disabled" autocomplete="off" type="radio" v-bind:name="fieldPrefix+\'[access_type]\'" v-model="permission.access_type" v-bind:value="accessType.value"/>' +
+    template:
+    '<td class="privilege-cell" :class="classes" @click="permission.access_type = accessType.value">' +
+      '<input v-if="!disabled" autocomplete="off" type="radio" :name="fieldPrefix+\'[access_type]\'" v-model="permission.access_type" :value="accessType.value"/>' +
     '</td>',
     computed: {
       disabled: function () {
@@ -91,7 +84,11 @@
   var permissionsTable = new Vue({
     el: '#permissions-table',
     data: {
-      access_type: Sharing.allVisitorsAccessType,
+      publicPermission: {
+        access_type: Sharing.allVisitorsAccessType, // Uses snake case because that's how rails returns the JSON
+        title: 'Public',
+        public: true,
+        mandatory: true },
       permissions: [],
       accessTypes: [
         { title: 'No Access', value: Sharing.accessTypes.noAccess },
@@ -101,41 +98,9 @@
         { title: 'Manage', value: Sharing.accessTypes.managing }
       ]
     },
-    computed: {
-      publicPermission: function () {
-        return { access_type: this.access_type, public: true, mandatory: true, title: 'Public' };
-      }
-    },
     methods: {
       deletePermission: function (index) {
         this.permissions.splice(index, 1);
-      },
-      setPublicAccessType: function (accessType) {
-        if (accessType.value <= this.maxPublicAccessType) {
-          this.access_type = accessType.value;
-        }
-      },
-      // TODO: Get rid of this
-      getClass: function (accessType, permissionAccessType, isPublicSetting) {
-        var classes = [];
-        if (accessType.value === Sharing.accessTypes.noAccess) {
-          classes.push('no-access');
-        }
-
-        // Disable options for the public access type if they grant too many privileges (probably don't want to allow anyone to edit)
-        // Also disable options that grant lower privileges than the public setting provides
-        if (!isPublicSetting && accessType.disabled ||
-            (isPublicSetting && (accessType.value > this.maxPublicAccessType))) {
-          classes.push('disabled');
-        } else {
-          if (permissionAccessType === accessType.value) {
-            classes.push('enabled');
-          } else if (accessType.value !== Sharing.accessTypes.noAccess && accessType.value <= permissionAccessType) {
-            classes.push('enabled');
-          }
-        }
-
-        return classes;
       }
     }
   });
@@ -143,6 +108,6 @@
   $j(document).ready(function () {
     var policy = JSON.parse($j('#permissions-json').text());
     permissionsTable.permissions = policy.permissions;
-    permissionsTable.access_type = policy.access_type;
+    permissionsTable.publicPermission.access_type = policy.access_type;
   });
 </script>
