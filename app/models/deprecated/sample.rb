@@ -7,7 +7,11 @@ module Deprecated
     has_many :deprecated_sample_assets, class_name: 'Deprecated::SampleAsset', foreign_key: 'deprecated_sample_id'
     has_and_belongs_to_many :projects, foreign_key: 'deprecated_sample_id', join_table: 'deprecated_samples_projects'
     has_and_belongs_to_many :tissue_and_cell_types, foreign_key: 'deprecated_sample_id', join_table: 'deprecated_samples_tissue_and_cell_types'
+    belongs_to :contributor, polymorphic: true
+    belongs_to :policy
+    belongs_to :age_at_sampling_unit, class_name: 'Unit'
 
+    # This adds extra fields to the generated YAML when #to_yaml is called
     def encode_with(coder)
       h = super(coder)
       h['deprecated_treatments'] = deprecated_treatments
