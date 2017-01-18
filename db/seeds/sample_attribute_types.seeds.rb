@@ -61,7 +61,7 @@ disable_authorization_checks do
   )
 
   biosample_type = SampleType.where(title: 'SysMO Biosample').first_or_create(
-      project_ids: [Project.find_by_title('Default Project').id],
+      project_ids: [Project.first.id],
       sample_attributes_attributes: [
           { title: 'Sample ID or name', sample_attribute_type: string_type, required: true, is_title: true },
           { title: 'Cell culture name', sample_attribute_type: string_type, required: true },
