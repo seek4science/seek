@@ -13,7 +13,7 @@
       </p>
     </div>
     <div class="table-responsive">
-      <policy-table class="table table-bordered" id="permissions-table" :permissions="permissions" :public-permission="publicPermission"></policy-table>
+      <permissions-table class="table table-bordered" id="permissions-table" :permissions="permissions" :public-permission="publicPermission"></permissions-table>
     </div>
 
     <%= render partial: 'sharing/person_permission_modal' %>
@@ -23,84 +23,6 @@
 <%= content_tag :script, permissions_json(@resource.policy), type: 'application/json', id: 'permissions-json' %>
 
 <script>
-  Vue.component('permission-row', {
-    props: ['index', 'permission', 'accessTypes', 'publicAccessType', 'fieldPrefixOrig'],
-    template:
-    '<tr class="permission-row" :class="{ mandatory: permission.mandatory }">' +
-      '<td class="name-cell"><span v-if="permission.contributor_type">({{ permission.contributor_type }}) </span>{{ permission.title }}' +
-        '<input v-if="permission.contributor_type" type="hidden" :name="fieldPrefix+\'[contributor_type]\'" v-model="permission.contributor_type"/>' +
-        '<input v-if="permission.contributor_id" type="hidden" :name="fieldPrefix+\'[contributor_id]\'" v-model="permission.contributor_id"/>' +
-      '</td>' +
-      '<td is="privilege-cell" v-for="accessType in accessTypes" :fieldPrefix="fieldPrefix" :permission="permission" :access-type="accessType" :public-access-type="publicAccessType"></td>' +
-      '<td class="actions-cell">'+
-        '<a v-if="!permission.mandatory" @click="$emit(\'delete-permission\')" class="btn btn-xs btn-danger" title="Remove this permission">' +
-          '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>' +
-        '</a>' +
-      '</td>' +
-    '</tr>',
-    computed: {
-      fieldPrefix: function () {
-        return (this.fieldPrefixOrig ? this.fieldPrefixOrig : 'policy[permissions][' + this.index + ']');
-      }
-    }
-  });
-
-  Vue.component('privilege-cell', {
-    props: ['fieldPrefix', 'permission', 'accessType', 'publicAccessType'],
-    template:
-    '<td class="privilege-cell" :class="classes" @click="permission.access_type = accessType.value">' +
-      '<input v-if="!disabled" autocomplete="off" type="radio" :name="fieldPrefix+\'[access_type]\'" v-model="permission.access_type" :value="accessType.value"/>' +
-    '</td>',
-    computed: {
-      disabled: function () {
-        return (this.permission.public ? (this.accessType.value > Sharing.maxPublicAccessType) : (this.accessType.value < this.publicAccessType));
-      },
-      enabled: function () {
-        return this.permission.access_type === this.accessType.value ||
-            (this.accessType.value !== Sharing.accessTypes.noAccess && this.permission.access_type > this.accessType.value);
-      },
-      classes: function () {
-        return { 'enabled': !this.disabled && this.enabled,
-                 'disabled': this.disabled,
-                 'no-access': this.accessType.value === Sharing.accessTypes.noAccess };
-      }
-    }
-  });
-
-  Vue.component('policy-table', {
-    props: ['publicPermission', 'permissions'],
-    template:
-    '<table class="permissions-table" id="permissions-table">' +
-      '<thead>' +
-        '<tr>' +
-          '<th class="name-column"></th>' +
-          '<th class="permission-column" v-for="accessType in accessTypes" :class="accessType.class">{{ accessType.title }}</th>' +
-          '<th class="actions-column"></th>' +
-        '</tr>' +
-      '</thead>' +
-      '<tbody>' +
-        '<tr is="permission-row" :permission="publicPermission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" field-prefix-orig="policy"></tr>' +
-        '<tr is="permission-row" v-for="(permission, index) in permissions" :index="index" :permission="permission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" v-on:delete-permission="deletePermission(index)"></tr>' +
-      '</tbody>'+
-    '</table>',
-    data: function () {
-      return {
-        accessTypes: [
-          { title: 'No Access', value: Sharing.accessTypes.noAccess, class: 'no-access' },
-          { title: 'View', value: Sharing.accessTypes.visible },
-          { title: 'Download', value: Sharing.accessTypes.accessible },
-          { title: 'Edit', value: Sharing.accessTypes.editing },
-          { title: 'Manage', value: Sharing.accessTypes.managing }
-        ]
-      };
-    },
-    methods: {
-      deletePermission: function (index) {
-        this.permissions.splice(index, 1);
-      }
-    }
-  });
-
   var permissionsTable = new Vue({
     el: '#permissions-table',
     data: {
