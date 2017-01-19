@@ -1,43 +1,6 @@
 <%
-  object ||= nil
-  set_parameters_for_sharing_form object
-  @resource.policy.access_type = Seek::Config.default_all_visitors_access_type if @resource.new_record?
+  object ||= resource_for_controller
+  policy ||= (object.policy || Policy.default)
 %>
-
-<%= folding_panel('Sharing', false, :id => 'sharing_form', :body_options => {:id => 'creator_fold_content'},
-                  :help_text => "Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") do %>
-    <div class="alert alert-info">
-      <p>
-        Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type -%>.
-        <%= link_to_function(("More info " + expand_image).html_safe, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3)) -%>
-      </p>
-    </div>
-    <div class="table-responsive">
-      <permissions-table class="table table-bordered" id="permissions-table" :permissions="permissions" :public-permission="publicPermission"></permissions-table>
-    </div>
-
-    <%= render partial: 'sharing/person_permission_modal' %>
-    <%= render partial: 'sharing/group_permission_modal' %>
-<% end %>
-
-<%= content_tag :script, permissions_json(@resource.policy), type: 'application/json', id: 'permissions-json' %>
-
-<script>
-  var permissionsTable = new Vue({
-    el: '#permissions-table',
-    data: {
-      publicPermission: {
-        access_type: Sharing.allVisitorsAccessType, // Uses snake case because that's how rails returns the JSON
-        title: 'Public',
-        public: true,
-        mandatory: true },
-      permissions: []
-    }
-  });
-
-  $j(document).ready(function () {
-    var policy = JSON.parse($j('#permissions-json').text());
-    permissionsTable.permissions = policy.permissions;
-    permissionsTable.publicPermission.access_type = policy.access_type;
-  });
-</script>
+<% # TODO: Implement the biovel special sharing form settings %>
+<%= render partial: 'sharing/form', locals: { object: object, policy: policy } %>
