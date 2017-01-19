@@ -163,21 +163,21 @@ module PolicyHelper
     hash = { access_type: policy.access_type }
 
     hash[:permissions] = policy.permissions.select([:id, :access_type, :contributor_id, :contributor_type]).map do |permission|
-      hash = { id: permission.id,
+      h = { id: permission.id,
                access_type: permission.access_type,
                contributor_id: permission.contributor_id,
                contributor_type: permission.contributor_type,
                index: permission.id }
 
       if permission.contributor_type == "Person"
-        hash[:title] = (permission.contributor.first_name + " " + permission.contributor.last_name)
+        h[:title] = (permission.contributor.first_name + " " + permission.contributor.last_name)
       elsif permission.contributor_type == "WorkGroup"
-        hash[:title] = permission.contributor.project.title + " @ " + permission.contributor.institution.title
+        h[:title] = permission.contributor.project.title + " @ " + permission.contributor.institution.title
       else
-        hash[:title] = permission.contributor.title
+        h[:title] = permission.contributor.title
       end
 
-      hash
+      h
     end
 
     hash.to_json.html_safe
