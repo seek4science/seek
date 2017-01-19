@@ -17,8 +17,8 @@
       <%= content_tag :script, permissions_json(policy), type: 'application/json', id: 'permissions-json' %>
     </div>
 
-    <%= render partial: 'sharing/person_permission_modal' %>
-    <%= render partial: 'sharing/group_permission_modal' %>
+    <%= render partial: 'sharing/person_permission_modal', locals: { object: object } %>
+    <%= render partial: 'sharing/group_permission_modal', locals: { object: object } %>
 <% end %>
 
 <script>

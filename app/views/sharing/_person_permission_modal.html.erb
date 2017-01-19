@@ -10,7 +10,7 @@
         </div>
         <div class="form-group">
           <label>can...</label>
-          <%= select_tag('permission-people-access-type', policy_selection_options(nil, nil, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
+          <%= select_tag('permission-people-access-type', policy_selection_options(nil, object, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
         </div>
     <% end %>
     <%= modal_footer do %>

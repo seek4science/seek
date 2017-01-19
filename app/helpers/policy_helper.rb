@@ -1,20 +1,20 @@
 module PolicyHelper
   
-  def policy_selection_options policies = nil, resource = nil, access_type = nil
-    policies ||= [Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING]
+  def policy_selection_options access_types = nil, resource = nil, selected_access_type = nil
+    access_types ||= [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING]
+
     unless resource.try(:is_downloadable?)
-      policies.delete(Policy::ACCESSIBLE)
-      if access_type == Policy::ACCESSIBLE
+      access_types.delete(Policy::ACCESSIBLE)
+
+      if selected_access_type == Policy::ACCESSIBLE
         #handle access_type = ACCESSIBLE, and !resource.is_downloadable?
         # In that case set access_type to VISIBLE
-        access_type = Policy::VISIBLE
+        selected_access_type = Policy::VISIBLE
       end
     end
-    options=""
-    policies.each do |policy|
-      options << "<option value='#{policy}' #{"selected='selected'" if access_type == policy}>#{Policy.get_access_type_wording(policy, resource.try(:is_downloadable?))} </option>"
-    end
-    options.html_safe
+
+    options_for_select(access_types.map { |t| [Policy.get_access_type_wording(t, resource.try(:is_downloadable?)), t] },
+                       selected_access_type)
   end
 
   # return access_type of your project if this permission is available in the policy
