@@ -1034,25 +1034,32 @@ Vue.component('permissions-table', {
     '<thead>' +
       '<tr>' +
         '<th class="name-column"></th>' +
-        '<th class="permission-column" v-for="accessType in accessTypes" :class="accessType.class">{{ accessType.title }}</th>' +
+        '<th class="permission-column" v-for="accessType in accessTypes" :class="accessType.classes">{{ accessType.title }}</th>' +
        '<th class="actions-column"></th>' +
       '</tr>' +
     '</thead>' +
     '<tbody>' +
       '<tr is="permission-row" :permission="publicPermission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" field-prefix-orig="policy"></tr>' +
-      '<tr is="permission-row" v-for="(permission, index) in permissions" :index="index" :permission="permission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" v-on:delete-permission="deletePermission(index)"></tr>' +
+      '<tr is="permission-row" v-for="(permission, index) in sortedPermissions" :index="index" :permission="permission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" v-on:delete-permission="deletePermission(index)"></tr>' +
     '</tbody>'+
   '</table>',
   data: function () {
     return {
       accessTypes: [
-        { title: 'No Access', value: Sharing.accessTypes.noAccess, class: 'no-access' },
+        { title: 'No Access', value: Sharing.accessTypes.noAccess, classes: 'no-access' },
         { title: 'View', value: Sharing.accessTypes.visible },
         { title: 'Download', value: Sharing.accessTypes.accessible },
         { title: 'Edit', value: Sharing.accessTypes.editing },
         { title: 'Manage', value: Sharing.accessTypes.managing }
       ]
     };
+  },
+  computed: {
+    sortedPermissions: function () {
+      return this.permissions.sort(function (a, b) {
+        return (b.mandatory || false) - (a.mandatory || false);
+      });
+    }
   },
   methods: {
     deletePermission: function (index) {
