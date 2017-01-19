@@ -1,6 +1,6 @@
 module Deprecated
   class Sample < ActiveRecord::Base
-    set_table_name 'deprecated_samples'
+    self.table_name = 'deprecated_samples'
 
     belongs_to :deprecated_specimen, class_name: 'Deprecated::Specimen', foreign_key: 'deprecated_specimen_id'
     has_many :deprecated_treatments, class_name: 'Deprecated::Treatment', foreign_key: 'deprecated_sample_id'
