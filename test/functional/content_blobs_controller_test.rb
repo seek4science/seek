@@ -296,8 +296,10 @@ class ContentBlobsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'inline_view', al.action
 
-    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy))
-    image_content_blob = Factory(:content_blob, :original_filename => 'test.png', :content_type => 'image/png', :asset => df)
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
+                 content_blob: Factory(:image_content_blob,
+                                       :original_filename => 'test.png',
+                                       :content_type => 'image/png'))
     assert_difference('ActivityLog.count') do
       get :download, data_file_id: df.id, id: df.content_blob.id, disposition: 'inline'
     end
@@ -317,6 +319,15 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :view_content,data_file_id:df.id, id:df.content_blob.id
     assert_response :success
     assert_equal 'text/html',@response.content_type
+  end
+
+  test 'can view content of an image file' do
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
+                 content_blob: Factory(:image_content_blob))
+
+    get :download, data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900'
+
+    assert_response :success
   end
 
   test 'should transparently redirect on download for 302 url' do
