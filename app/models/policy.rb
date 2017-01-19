@@ -537,4 +537,8 @@ class Policy < ActiveRecord::Base
     destroy if assets.none?
   end
 
+  def self.max_public_access_type
+    Policy::ACCESSIBLE
+  end
+
 end
