@@ -1093,7 +1093,7 @@ Vue.component('permission-row', {
 Vue.component('privilege-cell', {
   props: ['fieldPrefix', 'permission', 'accessType', 'publicAccessType'],
   template:
-  '<td class="privilege-cell" :class="classes" @click="permission.access_type = accessType.value">' +
+  '<td class="privilege-cell" :class="classes" @click="if (!disabled) permission.access_type = accessType.value">' +
     '<input v-if="!disabled" autocomplete="off" type="radio" :name="fieldPrefix+\'[access_type]\'" v-model="permission.access_type" :value="accessType.value"/>' +
   '</td>',
   computed: {
