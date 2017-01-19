@@ -110,23 +110,27 @@ class Policy < ActiveRecord::Base
   def set_attributes_with_sharing policy_params, projects
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
-    self.tap do |policy|
-      # Set attributes on the policy
-      policy.access_type = policy_params[:access_type]
+    if policy_params
+      self.tap do |policy|
+        # Set attributes on the policy
+        policy.access_type = policy_params[:access_type]
 
-      # Set attributes on the policy's permissions
-      # Find or initialize permissions based on the "contributor"
-      new_permissions = policy_params[:permissions].values.map do |pp|
-        permission = policy.permissions.find_or_initialize_by_contributor_type_and_contributor_id(
-            pp[:contributor_type], pp[:contributor_id])
-        permission.reload if permission.marked_for_destruction? # Clear the destroy flag
-        permission.access_type = pp[:access_type]
-        permission
+        # Set attributes on the policy's permissions
+        # Find or initialize permissions based on the "contributor"
+        if policy_params[:permissions]
+          new_permissions = policy_params[:permissions].values.map do |pp|
+            permission = policy.permissions.find_or_initialize_by_contributor_type_and_contributor_id(
+                pp[:contributor_type], pp[:contributor_id])
+            permission.reload if permission.marked_for_destruction? # Clear the destroy flag
+            permission.access_type = pp[:access_type]
+            permission
+          end
+
+          # Assign the new permissions to the policy.
+          #  Updates/inserts/deletes will happen when the policy is saved (after the resource is saved)
+          policy.permissions = new_permissions
+        end
       end
-
-      # Assign the new permissions to the policy.
-      #  Updates/inserts/deletes will happen when the policy is saved (after the resource is saved)
-      policy.permissions = new_permissions
     end
   end
 
