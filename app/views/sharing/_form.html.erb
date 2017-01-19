@@ -1,26 +1,25 @@
 <%
-  object ||= nil
-  set_parameters_for_sharing_form object
-  @resource.policy.access_type = Seek::Config.default_all_visitors_access_type if @resource.new_record?
+  object ||= resource_for_controller
+  policy ||= (object.policy || Policy.default)
+  resource_type = text_for_resource(object)
 %>
 
-<%= folding_panel('Sharing', false, :id => 'sharing_form', :body_options => {:id => 'creator_fold_content'},
-                  :help_text => "Here you can specify who can <b>see</b>#{', <b>download</b>' if @resource.is_downloadable?} and <b>edit</b> this #{@resource_type}.") do %>
+<%= folding_panel('Sharing', false, id: 'sharing_form',
+                  help_text: "Here you can specify who can view, access and manage this #{resource_type}.") do %>
     <div class="alert alert-info">
-      <p>
-        Here you can specify who can <b>view</b> the summary of<% if @resource.is_downloadable? %>, <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= @resource_type -%>.
-        <%= link_to_function(("More info " + expand_image).html_safe, visual_effect(:toggle_blind, "more_sharing_info", :duration => 0.3)) -%>
-      </p>
+        Here you can specify who can <b>view</b> the summary of<% if object.is_downloadable? %>,
+            <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= resource_type -%>.
     </div>
+
     <div class="table-responsive">
-      <permissions-table class="table table-bordered" id="permissions-table" :permissions="permissions" :public-permission="publicPermission"></permissions-table>
+      <permissions-table class="table table-bordered" id="permissions-table"
+                         :permissions="permissions" :public-permission="publicPermission"></permissions-table>
+      <%= content_tag :script, permissions_json(policy), type: 'application/json', id: 'permissions-json' %>
     </div>
 
     <%= render partial: 'sharing/person_permission_modal' %>
     <%= render partial: 'sharing/group_permission_modal' %>
 <% end %>
-
-<%= content_tag :script, permissions_json(@resource.policy), type: 'application/json', id: 'permissions-json' %>
 
 <script>
   var permissionsTable = new Vue({

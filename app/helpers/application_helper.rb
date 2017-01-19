@@ -419,52 +419,6 @@ module ApplicationHelper
     "this.checked ? $j('##{block_id}').slideDown() : $j('##{block_id}').slideUp();".html_safe
   end
 
-  def set_parameters_for_sharing_form object=nil
-    object ||= resource_for_controller
-    policy = nil
-    policy_type = ""
-
-    # obtain a policy to use
-    if object
-      if object.instance_of? Project
-        if object.default_policy
-          policy = object.default_policy
-          policy_type ="project"
-        else
-          policy = Policy.default
-          policy_type = "system"
-        end
-      elsif (policy = object.policy)
-        # object exists and has a policy associated with it - normal case
-        policy_type = "asset"
-      end
-    end
-
-    unless policy
-      policy = Policy.default
-      policy_type = "system"
-    end
-
-    # set the parameters
-    # ..from policy
-    @policy = policy
-    @policy_type = policy_type
-    @sharing_mode = policy.sharing_scope
-    @access_mode = policy.access_type
-    @use_custom_sharing = !policy.permissions.empty?
-    @use_whitelist = (policy.use_whitelist == true || policy.use_whitelist == 1)
-    @use_blacklist = (policy.use_blacklist == true || policy.use_blacklist == 1)
-
-    # ..other
-    @resource_type = text_for_resource object
-    @favourite_groups = current_user.favourite_groups
-    @resource = object
-
-    @all_people_as_json = Person.get_all_as_json
-
-    @enable_black_white_listing = @resource.nil? || (@resource.respond_to?(:contributor) and !@resource.contributor.nil?)
-  end
-
   def folding_box id, title, options = nil
     render :partial => 'assets/folding_box', :locals =>
         {:fold_id => id,

@@ -177,12 +177,12 @@ class Policy < ActiveRecord::Base
   end
 
   #The default policy to use when creating authorized items if no other policy is specified
-  def self.default resource=nil
+  def self.default
     #FIXME: - would like to revisit this, remove is_virtualiver, and make the default policy itself a configuration
     unless Seek::Config.is_virtualliver
       private_policy
     else
-      Policy.new(:name => "default accessible", :use_whitelist => false, :use_blacklist => false)
+      Policy.new(name: 'default policy', access_type: Seek::Config.default_all_visitors_access_type)
     end
   end
 
