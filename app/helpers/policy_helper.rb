@@ -162,15 +162,22 @@ module PolicyHelper
   def permissions_json(policy)
     hash = { access_type: policy.access_type }
 
-    hash[:permissions] = policy.permissions.select([:id, :access_type, :contributor_id, :contributor_type]).each do |permission|
-      permission[:index] = permission.id
-      permission[:title] = if permission.contributor_type == "Person"
-            (permission.contributor.first_name + " " + permission.contributor.last_name)
-          elsif permission.contributor_type == "WorkGroup"
-            permission.contributor.project.title + " @ " + permission.contributor.institution.title
-          else
-            permission.contributor.title
-          end
+    hash[:permissions] = policy.permissions.select([:id, :access_type, :contributor_id, :contributor_type]).map do |permission|
+      hash = { id: permission.id,
+               access_type: permission.access_type,
+               contributor_id: permission.contributor_id,
+               contributor_type: permission.contributor_type,
+               index: permission.id }
+
+      if permission.contributor_type == "Person"
+        hash[:title] = (permission.contributor.first_name + " " + permission.contributor.last_name)
+      elsif permission.contributor_type == "WorkGroup"
+        hash[:title] = permission.contributor.project.title + " @ " + permission.contributor.institution.title
+      else
+        hash[:title] = permission.contributor.title
+      end
+
+      hash
     end
 
     hash.to_json.html_safe
