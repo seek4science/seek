@@ -3,8 +3,7 @@ class Policy < ActiveRecord::Base
   has_many :permissions,
            :dependent => :destroy,
            :order => "created_at ASC",
-           :autosave => true,
-           :after_add => proc {|policy, perm| perm.policy = policy}
+           :autosave => true
 
   #basically the same as validates_numericality_of :sharing_scope, :access_type
   #but with a more generic error message because our users don't know what
@@ -106,8 +105,7 @@ class Policy < ActiveRecord::Base
     return policy
   end
 
-
-  def set_attributes_with_sharing policy_params, projects
+  def set_attributes_with_sharing(policy_params, projects_UNUSED = [])
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     if policy_params
@@ -116,19 +114,23 @@ class Policy < ActiveRecord::Base
         policy.access_type = policy_params[:access_type]
 
         # Set attributes on the policy's permissions
-        # Find or initialize permissions based on the "contributor"
         if policy_params[:permissions]
-          new_permissions = policy_params[:permissions].values.map do |pp|
-            permission = policy.permissions.find_or_initialize_by_contributor_type_and_contributor_id(
-                pp[:contributor_type], pp[:contributor_id])
-            permission.reload if permission.marked_for_destruction? # Clear the destroy flag
-            permission.access_type = pp[:access_type]
-            permission
+          current_permissions = policy.permissions
+          new_permissions = policy_params[:permissions].values.map do |perm_params|
+            # See if a permission already exists with that contributor
+            if perm = current_permissions.detect { |p| p.contributor_type == perm_params[:contributor_type] &&
+                                                   p.contributor_id == perm_params[:contributor_id].to_i }
+              # If so, update the attributes (will be autosaved later)
+              perm.assign_attributes(perm_params)
+            else # If not, build one
+              perm = policy.permissions.build(perm_params)
+            end
+
+            perm
           end
 
-          # Assign the new permissions to the policy.
-          #  Updates/inserts/deletes will happen when the policy is saved (after the resource is saved)
-          policy.permissions = new_permissions
+          # Get the unused permissions and mark them for destruction (after policy is saved)
+          (current_permissions - new_permissions).each(&:mark_for_destruction)
         end
       end
     end
