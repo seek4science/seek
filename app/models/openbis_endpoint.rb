@@ -42,4 +42,13 @@ class OpenbisEndpoint < ActiveRecord::Base
     "#{web_endpoint} : #{space_perm_id}"
   end
 
+  def cache_key
+    if new_record?
+      str="#{space_perm_id}-#{as_endpoint}-#{dss_endpoint}-#{username}-#{password}"
+      "#{super}-#{Digest::SHA2.hexdigest(str)}"
+    else
+      super
+    end
+  end
+
 end

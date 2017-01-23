@@ -179,12 +179,19 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'session token' do
     mock_openbis_calls
-    endpoint = OpenbisEndpoint.new(project:Factory(:project),
-                                   dss_endpoint:'https://openbis-api.fair-dom.org/datastore_server',
-                                   as_endpoint:'https://openbis-api.fair-dom.org/openbis/openbis',
-                                   username:'apiuser',password:'apiuser',space_perm_id:'API-SPACE')
+    endpoint = Factory(:openbis_endpoint)
 
     refute_nil endpoint.session_token
+  end
+
+  test 'cache key' do
+    endpoint = OpenbisEndpoint.new username:'fred', password:'12345', as_endpoint:'http://my-openbis.org/openbis', dss_endpoint:'http://my-openbis.org/openbis', space_perm_id:'aaa'
+    assert_equal 'openbis_endpoints/new-ddf17b57f57098ff63383825125f00089a1e1c1cc4de18b27e30e3b9642854a9',endpoint.cache_key
+    endpoint.space_perm_id='bbb'
+    assert_equal 'openbis_endpoints/new-867be42425f47d36cc6b91926853a714251da75cea9c7517046e610d2f0201ca',endpoint.cache_key
+
+    endpoint = Factory(:openbis_endpoint)
+    assert_equal "openbis_endpoints/#{endpoint.id}-#{endpoint.updated_at.utc.to_s(:number)}",endpoint.cache_key
   end
 
 end
