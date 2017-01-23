@@ -98,8 +98,11 @@
 
   $j('#openbis_endpoint_web_endpoint').focusout(function() {
     var url=$j('#openbis_endpoint_web_endpoint').val();
+    if (url.slice(-1)=='/') { //trim last slash if url has it at the end, to simplify segment parsing
+      url=url.slice(0,-1)
+    }
     var uri=new URI(url);
-    if ((uri.protocol()=='http' || uri.protocol()=='https') && (uri.segment().last()=='openbis' || uri.segment(-2)=='openbis')) {
+    if ((uri.protocol()=='http' || uri.protocol()=='https') && uri.segment().last()=='openbis') {
       if (!$j('#openbis_endpoint_as_endpoint').val()) {
         var as=uri.clone().segment('openbis');
         $j('#openbis_endpoint_as_endpoint').val(as)
