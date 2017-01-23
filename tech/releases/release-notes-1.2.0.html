@@ -1,1 +1,411 @@
-sdf
+
+Release Notes - openSEEK - Version 1.2.0
+
+<h2>        New Feature
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-827'>OPSK-827</a>] -         Allow installations to disable permission summary pop-up
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-849'>OPSK-849</a>] -         Feature request: Accept sftp links
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-872'>OPSK-872</a>] -         Default license for a project
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-917'>OPSK-917</a>] -         Delete extracted samples when deleting a datafile
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-928'>OPSK-928</a>] -         Interlinking between sample types
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-940'>OPSK-940</a>] -         Generation of excel template for sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-966'>OPSK-966</a>] -         Tags for samples types
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-978'>OPSK-978</a>] -         Sample types only editable by project members
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-995'>OPSK-995</a>] -         Show an overview of data usage for programme/project on admin apge
+    </li>
+</ul>
+
+
+<h2>        Improvement
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-725'>OPSK-725</a>] -         Handle sample type attribute name clashes
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-795'>OPSK-795</a>] -         Organisation of seed data
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-840'>OPSK-840</a>] -         Description for Sample Type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-841'>OPSK-841</a>] -         SampleType can_edit? and can_destroy?
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-843'>OPSK-843</a>] -         Provide citation suggestion for assets and snapshots
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-855'>OPSK-855</a>] -         Support for arbitrary URL schemes for remote files
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-918'>OPSK-918</a>] -         Redefine the sample title field
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-921'>OPSK-921</a>] -         update the project browser to use jstree instead of yui
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-924'>OPSK-924</a>] -         Sample dropdown menus aren&#39;t bootstrapped
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-937'>OPSK-937</a>] -         Create an enumerator for sample attribute base types
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-951'>OPSK-951</a>] -         Index DOIs in Solr so the related thing is found when searched for
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-960'>OPSK-960</a>] -         Authorization improvements
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-975'>OPSK-975</a>] -         Don&#39;t show &quot;Extract Samples&quot; whilst pending
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-976'>OPSK-976</a>] -         Create Sample button on Sample Type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-977'>OPSK-977</a>] -         Sample Type - pending template generation box
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1000'>OPSK-1000</a>] -         Allow a sample type to link to its own type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1001'>OPSK-1001</a>] -         Investigate filtering search by project id as params
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1004'>OPSK-1004</a>] -         Sample / Sample type should be favouritable
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1007'>OPSK-1007</a>] -         Add URI attribute type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1017'>OPSK-1017</a>] -         Model.find_each preferred over Model.all.each
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1028'>OPSK-1028</a>] -         Docker - split off delayedjob for docker compose
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1031'>OPSK-1031</a>] -         SampleDataExtractionJob should just be able to take the data file id
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1032'>OPSK-1032</a>] -         Provide some descriptive text for attribute types
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1047'>OPSK-1047</a>] -         Samples extracted from a template should be none editable
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1055'>OPSK-1055</a>] -         Sample extraction should recognise sheet with &#39;sample&#39; in the name
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1056'>OPSK-1056</a>] -         Projects selector broken on &quot;Use spreadsheet template&quot; tab of new sample type form
+    </li>
+</ul>
+
+<h2>        Story
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-622'>OPSK-622</a>] -         Deprecation of old sample data &amp; models
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-628'>OPSK-628</a>] -         Custom Sample Type Definitions
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-636'>OPSK-636</a>] -         Assay updated for new Sample framework
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-712'>OPSK-712</a>] -         Create Sample Type from Spreadsheet
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-713'>OPSK-713</a>] -         Populate samples from template spreadsheet
+    </li>
+</ul>
+
+<h2>        Task
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-691'>OPSK-691</a>] -         Associating samples with projects
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-692'>OPSK-692</a>] -         Sample authorization
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-693'>OPSK-693</a>] -         Sample resource list items, and related to
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-697'>OPSK-697</a>] -         Indexing of Samples for search
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-706'>OPSK-706</a>] -         Prevent sample types being changed after they have been used
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-708'>OPSK-708</a>] -         Sample#title as an attribute
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-730'>OPSK-730</a>] -         Samples framework work loose ends
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-745'>OPSK-745</a>] -         Ability to turn samples on and off
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-781'>OPSK-781</a>] -         SEEK Strain ID attribute type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-782'>OPSK-782</a>] -         Boolean sample attribute type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-783'>OPSK-783</a>] -         Add sample attribute types to seed data
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-784'>OPSK-784</a>] -         Simpler way of handling accessor_name
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-785'>OPSK-785</a>] -         Sample code reviewing and cleaning and documenting
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-787'>OPSK-787</a>] -         Extract samples from template as a background job
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-808'>OPSK-808</a>] -         Remove the Deprecated sample models
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-821'>OPSK-821</a>] -         Add attribute type seed data to upgrade task
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-830'>OPSK-830</a>] -         Upgrade task to add the sample attribute seed data
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-856'>OPSK-856</a>] -         SEEK4Science website needs new logo, and favicon
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-896'>OPSK-896</a>] -         Also show the number of all assets
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-915'>OPSK-915</a>] -         Resurrect Project Browser / Organiser
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-947'>OPSK-947</a>] -         Document docker
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-971'>OPSK-971</a>] -         Check if old samples related configs are needed
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-988'>OPSK-988</a>] -         Sample type selector for SEEK Sample, group by project
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-989'>OPSK-989</a>] -         Improve resource list item for sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-990'>OPSK-990</a>] -         highlight title field in sample type view
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-991'>OPSK-991</a>] -         Remove text pointing to biostars forum
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1014'>OPSK-1014</a>] -         Sample type needs a better icon
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1019'>OPSK-1019</a>] -         Rake task to get the old samples &amp; cell cultures
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1027'>OPSK-1027</a>] -         SEEK 1.2 release notes
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1045'>OPSK-1045</a>] -         Remove index view for samples
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1046'>OPSK-1046</a>] -         Extracted samples should always inheritic permissions from data file
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1065'>OPSK-1065</a>] -         Selected Strain not set when editing a sample
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1066'>OPSK-1066</a>] -         Prevent a new data file version ability being available if samples have been extracted
+    </li>
+</ul>
+
+<h2>        Sub-task
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-623'>OPSK-623</a>] -         rename Sample -&gt; DeprecatedSamples
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-624'>OPSK-624</a>] -         rename Specimen -&gt; DeprecatedSpecimens
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-625'>OPSK-625</a>] -         rename SampleAsset -&gt; DeprecatedSampleAssets
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-626'>OPSK-626</a>] -         rename SopSpecimen -&gt; DeprecatedSpecimenSop
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-627'>OPSK-627</a>] -         rename Treatment -&gt; DeprecatedTreatments
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-629'>OPSK-629</a>] -         Create bare Sample model
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-630'>OPSK-630</a>] -         Create SampleType model
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-631'>OPSK-631</a>] -         Ability to define sample type for a sample and store values
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-632'>OPSK-632</a>] -         A pre-defined list of supported attribute types
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-633'>OPSK-633</a>] -         Page for defining sample types
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-634'>OPSK-634</a>] -         Simple page for adding a new Sample
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-635'>OPSK-635</a>] -         Add support for required fields
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-637'>OPSK-637</a>] -         Define 0 or more incoming samples
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-638'>OPSK-638</a>] -         Define 0 or more “outgoing” samples
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-641'>OPSK-641</a>] -         Remove Biosamples browser
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-642'>OPSK-642</a>] -         Remove biosamples_enabled config
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-644'>OPSK-644</a>] -         Remove Sample &amp; Specimen views and controllers
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-663'>OPSK-663</a>] -         Remove Biosample search fields
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-685'>OPSK-685</a>] -         Support units for sample attribute
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-686'>OPSK-686</a>] -         Support for controlled vocabulary sample attribute type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-705'>OPSK-705</a>] -         Index page for sample types
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-714'>OPSK-714</a>] -         Ability to upload a spreadsheet and associate with a new sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-715'>OPSK-715</a>] -         Defined sample type attributes from columns in spreadsheet
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-716'>OPSK-716</a>] -         Submit new sample type for template
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-717'>OPSK-717</a>] -         After uploading data file, identify whether it matches a sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-718'>OPSK-718</a>] -         Provide option to extract samples
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-719'>OPSK-719</a>] -         Handle problematic sample entries
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-720'>OPSK-720</a>] -         Ability to download template associated with a sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-724'>OPSK-724</a>] -         SampleAttributes not destroyed when SampleType is
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-731'>OPSK-731</a>] -         Samples in Browse Menu
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-732'>OPSK-732</a>] -         Add Sample Type to Create Menu
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-733'>OPSK-733</a>] -         Creating sample type manually or from template in separate tabs
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-734'>OPSK-734</a>] -         Sample Type is missing required * next to title
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-735'>OPSK-735</a>] -         Hide Add Attribute button when defining from a template
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-736'>OPSK-736</a>] -         Javascript for title constraints in sample type form
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-737'>OPSK-737</a>] -         Put extract samples button in proper menu
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-738'>OPSK-738</a>] -         Add confirmation step, and select sample type if &gt; 1, when extracting samples
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-739'>OPSK-739</a>] -         Summary of extracted samples after extraction
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-740'>OPSK-740</a>] -         Show samples linked to Data File
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-741'>OPSK-741</a>] -         Show originating data file for sample
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-742'>OPSK-742</a>] -         Add a attribute type for Date (in addition to date time)
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-744'>OPSK-744</a>] -         Dependant destroy for sampe_type#content_blob
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-746'>OPSK-746</a>] -         Authorise the sample extraction action
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-748'>OPSK-748</a>] -         Integers should be accepted as a valid Float
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-749'>OPSK-749</a>] -         Show page for Sample Type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-750'>OPSK-750</a>] -         Searchable sample types
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-751'>OPSK-751</a>] -         Better error reporting for uploading a none valid template
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-752'>OPSK-752</a>] -         Default attribute type to String when creating sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-753'>OPSK-753</a>] -         Weblink types should be shown as a link
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-754'>OPSK-754</a>] -         Sample type link from sample page can now go to sample type show page
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-755'>OPSK-755</a>] -         Table view for samples under a data file/sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-780'>OPSK-780</a>] -         Update ISA graph to show inputs and outputs rather than just links
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-929'>OPSK-929</a>] -         Define Sample Type attribute type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-930'>OPSK-930</a>] -         Allow selection of Sample Type attribute type, along with sample type in the form
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-931'>OPSK-931</a>] -         Allow selection of sample when creating a sample linked to a sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-932'>OPSK-932</a>] -         Prevent a sample type being deleted when used as an interlinked sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-933'>OPSK-933</a>] -         Handle samples defined in a spreadsheet
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-934'>OPSK-934</a>] -         Display sample as a link when showing parent sample
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-935'>OPSK-935</a>] -         Include interlinked sample in related items list
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-939'>OPSK-939</a>] -         Show the sample type in attributes for SEEK Sample
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-941'>OPSK-941</a>] -         Small java apache poi library to generate spreadsheet
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-942'>OPSK-942</a>] -         Generate spreadsheet include CV data validations
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-943'>OPSK-943</a>] -         Include sample and strain list as a dropdown
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-944'>OPSK-944</a>] -         Determine when the template needs regenerating
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-945'>OPSK-945</a>] -         Bundle up as a ruby gem and integrate with SEEK
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-946'>OPSK-946</a>] -         Concider whether the template could be generated as a back ground process
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-961'>OPSK-961</a>] -         More efficient auth lookup refresh
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-962'>OPSK-962</a>] -         Re-structure &quot;is_authorized?&quot; method
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-968'>OPSK-968</a>] -         Cluster sample types by tag
+    </li>
+</ul>
+
+<h2>        Bug
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-747'>OPSK-747</a>] -         Can extract samples multiple times
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-758'>OPSK-758</a>] -         &quot;Remove&quot; sample attribute broken
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-792'>OPSK-792</a>] -         Replace tooltip plugin with more modern one
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-809'>OPSK-809</a>] -         Sample extraction fails if no matching samples
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-819'>OPSK-819</a>] -         Title of sample not linked for source datafile
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-822'>OPSK-822</a>] -         Floats ending in 0 are not accepted in samples extraction
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-825'>OPSK-825</a>] -         References to Specimens still appear in assets_creators
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-826'>OPSK-826</a>] -         Samples and SampleType are not correctly using the grouped pagination
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-829'>OPSK-829</a>] -         SampleTypes must be paginated
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-833'>OPSK-833</a>] -         Cytoscape visualisation
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-851'>OPSK-851</a>] -         Split up contributors and creators
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-853'>OPSK-853</a>] -         XSS on sample type show page
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-862'>OPSK-862</a>] -         First user is no longer added to the default project and institution
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-882'>OPSK-882</a>] -         Check and Fix Gemfile env seperation
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-886'>OPSK-886</a>] -         there is an extra &#39;add&#39; icon at admin avatar, when it is the contributor of an asset
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-887'>OPSK-887</a>] -         New study but on edit page
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-888'>OPSK-888</a>] -         db:setup shows the entries seeded in the log, but no entries in database
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-894'>OPSK-894</a>] -         file_path points to the filestore/tmp/image_assets/
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-895'>OPSK-895</a>] -         when &#39;view content&#39;, it is counted as download, but not when &#39;explore&#39;
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-912'>OPSK-912</a>] -         On the sandboxed SEEK I can&#39;t create a strain (also problem on test SEEK)
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-914'>OPSK-914</a>] -         Error when clicking link to a scale
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-926'>OPSK-926</a>] -         Samples creators always &#39;None&#39; in resource list item
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-927'>OPSK-927</a>] -         Samples are not included in person related items
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-938'>OPSK-938</a>] -         Asset Creator not behaving correctly for sample
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-949'>OPSK-949</a>] -         Problem with creators box
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-957'>OPSK-957</a>] -         XSS in JStree
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-964'>OPSK-964</a>] -         inconsistent writing of SOP/sop
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-969'>OPSK-969</a>] -         Associate sample type with a project
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-970'>OPSK-970</a>] -         Document samples
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-992'>OPSK-992</a>] -         Match all tags option for sample type selection not working as expected
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-998'>OPSK-998</a>] -         auth lookup task seems to be not triggered when removing a permission
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-999'>OPSK-999</a>] -         search turned off after an upgrade 1.1 -&gt; 1.2
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1002'>OPSK-1002</a>] -         Update message for why you can&#39;t delete a sample type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1005'>OPSK-1005</a>] -         Sample type edit - some drop downs become incorrectly visible
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1009'>OPSK-1009</a>] -         Error generating sample template with a CV for apples
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1010'>OPSK-1010</a>] -         Error when trying to change type from CV
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1011'>OPSK-1011</a>] -         Sample Text attribute didn&#39;t like new line
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1015'>OPSK-1015</a>] -         should only be able to delete sample type if a member of the project
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1016'>OPSK-1016</a>] -         Limit sample type creation and editing to project administrators
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1042'>OPSK-1042</a>] -         error when trying to create a sample type with project missing
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1043'>OPSK-1043</a>] -         When Strain is not required, there is not a blank default option
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1044'>OPSK-1044</a>] -         Strain linked to samples doesn&#39;t show samples as related items
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1050'>OPSK-1050</a>] -         content_blob_id on SampleType is unused
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1071'>OPSK-1071</a>] -         The Sample Type administer menu button always appears
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1072'>OPSK-1072</a>] -         Error when creating sample with the title set to a SEEK entity
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1079'>OPSK-1079</a>] -         Not clear how to edit controlled vocabulary
+    </li>
+</ul>
+
+

@@ -9,7 +9,7 @@ Latest version - {{ site.current_seek_version }}
 
 ## Version 1.2.0
 
-Release date: _January xxth 2017_
+Release date: _January 23rd 2017_
 
 Large update with many new features and improvements, in particular a new approach to handling Sample information.
 
