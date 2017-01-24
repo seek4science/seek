@@ -118,15 +118,11 @@ class Policy < ActiveRecord::Base
           current_permissions = policy.permissions
           new_permissions = policy_params[:permissions].values.map do |perm_params|
             # See if a permission already exists with that contributor
-            if perm = current_permissions.detect { |p| p.contributor_type == perm_params[:contributor_type] &&
-                                                   p.contributor_id == perm_params[:contributor_id].to_i }
-              # If so, update the attributes (will be autosaved later)
-              perm.assign_attributes(perm_params)
-            else # If not, build one
-              perm = policy.permissions.build(perm_params)
-            end
+            permission = current_permissions.detect { |p| p.contributor_type == perm_params[:contributor_type] &&
+                                                          p.contributor_id == perm_params[:contributor_id].to_i }
+            permission ||= policy.permissions.build # ...if not, build a new one
 
-            perm
+            permission.tap { |p| p.assign_attributes(perm_params) }
           end
 
           # Get the unused permissions and mark them for destruction (after policy is saved)
