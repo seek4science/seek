@@ -1,0 +1,6 @@
+$navbar-default-bg: #33495C;
+$navbar-default-border: darken($navbar-default-bg, 6.5%);
+$navbar-default-link-active-bg: darken($navbar-default-bg, 6.5%);
+$navbar-default-link-color: #cce6f3;
+$navbar-default-link-active-color: lighten($navbar-default-link-color, 30%);
+$navbar-default-link-hover-color: lighten($navbar-default-link-color, 40%);
