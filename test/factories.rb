@@ -696,6 +696,12 @@ Factory.define(:pdf_content_blob, parent: :content_blob) do |f|
   f.data File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read
 end
 
+Factory.define(:image_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'image_file.png'
+  f.content_type 'image/png'
+  f.data File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
+end
+
 Factory.define(:rightfield_content_blob, parent: :content_blob) do |f|
   f.content_type 'application/excel'
   f.original_filename 'rightfield.xls'

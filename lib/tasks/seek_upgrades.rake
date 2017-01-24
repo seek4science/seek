@@ -11,17 +11,18 @@ namespace :seek do
 
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
-           :environment,
-           :seed_sample_attribute_types
-       ]
+      :environment,
+      :seed_sample_attribute_types,
+      :ensure_maximum_public_access_type
+  ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
   task :standard_upgrade_tasks => [
-           :environment,
-           :clear_filestore_tmp,
-           :repopulate_auth_lookup_tables,
-           :resynchronise_ontology_types
-       ]
+      :environment,
+      :clear_filestore_tmp,
+      :repopulate_auth_lookup_tables,
+      :resynchronise_ontology_types
+  ]
 
   desc("upgrades SEEK from the last released version to the latest released version")
   task(:upgrade => [:environment, "db:migrate", "tmp:clear"]) do
@@ -61,6 +62,14 @@ namespace :seek do
   task(:seed_sample_attribute_types => :environment) do
     Rake::Task["db:seed:sample_attribute_types"].invoke
     puts "Done"
+  end
+
+  task(:ensure_maximum_public_access_type => :environment) do
+    policies = Policy.where('access_type > ?', Policy.max_public_access_type)
+    count = policies.count
+    policies.each { |p| p.update_column(:access_type, Policy.max_public_access_type)}
+
+    puts "#{count} policies updated"
   end
 
 end
