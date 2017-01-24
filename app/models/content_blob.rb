@@ -38,6 +38,22 @@ class ContentBlob < ActiveRecord::Base
 
   delegate :read, :close, :rewind, :path, to: :file
 
+  acts_as_fleximage do
+    image_directory Seek::Config.temporary_filestore_path + '/image_assets'
+    use_creation_date_based_directories false
+    image_storage_format :png
+    require_image false
+    invalid_image_message 'was not a readable image'
+  end
+
+  acts_as_fleximage_extension
+
+  # This overrides the method from acts_as_fleximage so that the original image is read from the default SEEK filestore
+  #  rather than the special `image_directory` specified above. Resized images will still go in there, though.
+  def file_path
+    filepath
+  end
+
   def original_filename_or_url
     if original_filename.blank? && url.blank?
       errors.add(:base, 'Need to specify either original_filename or url')
