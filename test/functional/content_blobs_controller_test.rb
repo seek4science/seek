@@ -323,9 +323,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'can view content of an image file' do
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
-                 content_blob: Factory(:image_content_blob))
+                 content_blobs: [Factory(:image_content_blob)])
 
-    get :download, data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900'
+    get :download, data_file_id: df.id, id: df.content_blobs.first.id, disposition: 'inline', image_size: '900'
 
     assert_response :success
   end
