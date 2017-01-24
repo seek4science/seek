@@ -58,7 +58,7 @@ class EventsController < ApplicationController
 
     if params[:policy]
       @event.policy_or_default unless is_new
-      @event.policy.set_attributes_with_sharing params[:policy], @event.projects
+      @event.policy.set_attributes_with_sharing(params[:policy])
     end
 
     respond_to do | format |

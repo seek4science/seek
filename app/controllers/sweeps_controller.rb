@@ -30,7 +30,7 @@ class SweepsController < ApplicationController
 
     if params[:policy]
       @sweep.policy_or_default
-      @sweep.policy.set_attributes_with_sharing params[:policy], @sweep.projects
+      @sweep.policy.set_attributes_with_sharing(params[:policy])
     end
 
     if @sweep.save
@@ -53,7 +53,7 @@ class SweepsController < ApplicationController
     raise if @workflow.nil?
     # Manually add projects of current user, as they aren't prompted for this information in the form
     @sweep.projects = current_person.projects
-    @sweep.policy.set_attributes_with_sharing params[:policy], @sweep.projects
+    @sweep.policy.set_attributes_with_sharing(params[:policy])
     respond_to do |format|
       if @sweep.save
         format.html { redirect_to sweep_path(@sweep) }

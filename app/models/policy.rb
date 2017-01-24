@@ -105,7 +105,7 @@ class Policy < ActiveRecord::Base
     return policy
   end
 
-  def set_attributes_with_sharing(policy_params, projects_UNUSED = [])
+  def set_attributes_with_sharing(policy_params)
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     if policy_params

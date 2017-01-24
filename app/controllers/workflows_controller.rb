@@ -63,7 +63,7 @@ class WorkflowsController < ApplicationController
     if handle_upload_data
 
       @workflow = Workflow.new params[:workflow]
-      @workflow.policy.set_attributes_with_sharing params[:policy], @workflow.projects
+      @workflow.policy.set_attributes_with_sharing(params[:policy])
       if @workflow.save
         update_annotations(params[:tag_list], @workflow)
 
@@ -107,7 +107,7 @@ class WorkflowsController < ApplicationController
 
      if params[:policy]
        @workflow.policy_or_default
-       @workflow.policy.set_attributes_with_sharing params[:policy], @workflow.projects
+       @workflow.policy.set_attributes_with_sharing(params[:policy])
      end
 
     if @workflow.save && !params[:sharing_form]

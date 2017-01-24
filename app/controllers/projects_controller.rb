@@ -173,7 +173,7 @@ class ProjectsController < ApplicationController
     end
     @project = Project.new(params[:project])
 
-    @project.default_policy.set_attributes_with_sharing params[:policy], [@project]
+    @project.default_policy.set_attributes_with_sharing(params[:policy])
 
 
 
@@ -200,7 +200,7 @@ class ProjectsController < ApplicationController
   # PUT /projects/1.xml
   def update
 
-    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:policy], [@project] if params[:policy]
+    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy]) if params[:policy]
 
     begin
       respond_to do |format|
