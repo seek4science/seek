@@ -297,9 +297,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal 'inline_view', al.action
 
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
-                 content_blob: Factory(:image_content_blob,
+                 content_blobs: [Factory(:image_content_blob,
                                        :original_filename => 'test.png',
-                                       :content_type => 'image/png'))
+                                       :content_type => 'image/png')])
     assert_difference('ActivityLog.count') do
       get :download, data_file_id: df.id, id: df.content_blobs.first.id, disposition: 'inline'
     end
