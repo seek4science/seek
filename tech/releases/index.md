@@ -34,6 +34,7 @@ Large update with many new features and improvements, in particular a new approa
     * A more flexible approach to handling Samples was an important requirement for full openBIS integration.
     * It is a framework that can be built upon and enhanced according to user needs in future versions.
     * There is documentation available in our [SEEK Samples User Guide](/help/user-guide/samples.html)
+  * Projects can now define their default license which is automatically selected when creating new items
   * An improved Graphical and interactive ISA graph viewer. It now contains all details but expands as the user interacts 
   with it, avoiding the problem of over-complex graphs. A tree view is also now available to navigate the graph, 
   which includes the Programmes and Projects. A full view of the graph is available if necessary.
