@@ -146,8 +146,6 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
-
-
   def file
     @file ||= File.open(filepath)
   end
@@ -202,6 +200,10 @@ class ContentBlob < ActiveRecord::Base
   end
 
   private
+
+  def valid_url?
+    self.url && self.url =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
+  end
 
   def remote_headers
     if @headers
@@ -265,6 +267,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def remote_content_handler
+    return nil unless valid_url?
     case URI(self.url).scheme
       when 'ftp'
         Seek::DownloadHandling::FTPHandler.new(self.url)
