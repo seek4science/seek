@@ -1,13 +1,19 @@
-Openbis spaces for <%= link_to(@project.title, @project) %>
-<br/>
-<%= link_to "Browse openbis",browse_project_openbis_endpoints_path(@project) %>
-<br/>
-Add a new space: <%= link_to('add', new_project_openbis_endpoint_path(@project)) %>
 
-<ul>
+<%=
+  content_tag(:h2) do
+    "OpenBIS Spaces for the project #{link_to(@project.title,@project)}".html_safe
+  end
+
+%>
+
+<%= button_link_to('Add new openBIS space','add',new_project_openbis_endpoint_path(@project)) %>
+
+<br/>
+<br/>
+<br/>
+
+<div class="list_items_container">
 <% @project.openbis_endpoints.each do |space| %>
-  <li>
-    <%= space.as_endpoint %>, <%= space.space_perm_id %>, <%= link_to 'Edit', edit_project_openbis_endpoint_path(@project, space) %>
-  </li>
+  <%= render partial:'space_list_item',locals:{space:space,project:@project} %>
 <% end %>
-</ul>
+</div>
