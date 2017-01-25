@@ -1,4 +1,4 @@
-Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_select(@openbis_endpoints,:id,:title),id:'select-endpoints',include_blank:true %>
+Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_select(@openbis_endpoints,:id,:title),id:'select-endpoints' %>
 
 <div id="count">
 
@@ -55,5 +55,11 @@ Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_
   $j('#select-endpoints').change(function () {
     endpointChanged();
   });
+
+  <% if @openbis_endpoints.any? %>
+    $j( document ).ready(function() {
+      endpointChanged();
+    });
+  <% end %>
 
 </script>
