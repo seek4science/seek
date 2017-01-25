@@ -34,7 +34,6 @@ Large update with many new features and improvements, in particular a new approa
     * A more flexible approach to handling Samples was an important requirement for full openBIS integration.
     * It is a framework that can be built upon and enhanced according to user needs in future versions.
     * There is documentation available in our [SEEK Samples User Guide](/help/user-guide/samples.html)
-  * Projects can now define their default license which is automatically selected when creating new items
   * An improved Graphical and interactive ISA graph viewer. It now contains all details but expands as the user interacts 
   with it, avoiding the problem of over-complex graphs. A tree view is also now available to navigate the graph, 
   which includes the Programmes and Projects. A full view of the graph is available if necessary.
@@ -48,8 +47,7 @@ Large update with many new features and improvements, in particular a new approa
   Handles upgrades and persistent data. Docker allows SEEK to be setup and run with a single command. This our expected 
   approach to simple packaging of SEEK with openBIS.
     * Documentation on using SEEK with Docker is available in our [Docker Guide](/tech/docker.html)
-  * A Project administrator to specify the default license for their project which is automatically selected when 
-  defining a new Asset, but can be changed by the user if necessary.
+  * A Project administrator may now specify the default license for their project which is automatically selected when creating a new item, but can be changed by the user if necessary.
   * Improved usability of adding new Publications from a DOI or PubmedID
   * Arbitrary URL schemes for remote files, that can be handled outside of SEEK. For example, and scp:// url could be 
   provided for and openSSH based resource
