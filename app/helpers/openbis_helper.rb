@@ -8,4 +8,9 @@ module OpenbisHelper
 
     (result + size + download).html_safe
   end
+
+  def can_browse_openbis?(project,user=User.current_user)
+    Seek::Config.openbis_enabled && project.has_member?(user) && project.openbis_endpoints.any?
+  end
+
 end
