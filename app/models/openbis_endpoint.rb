@@ -16,6 +16,10 @@ class OpenbisEndpoint < ActiveRecord::Base
     user && project.can_be_administered_by?(user) && Seek::Config.openbis_enabled
   end
 
+  def can_delete?(user = User.current_user)
+    true
+  end
+
   def test_authentication
     !session_token.nil?
   rescue Fairdom::OpenbisApi::OpenbisQueryException => e

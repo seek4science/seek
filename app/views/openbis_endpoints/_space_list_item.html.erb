@@ -20,6 +20,9 @@
         <% if space.can_edit? %>
           <%= button_link_to 'Edit', 'edit', edit_project_openbis_endpoint_path(project, space), :class => 'btn-xs' -%>
         <% end %>
+
+        <%= button_link_to 'Delete', 'destroy', project_openbis_endpoint_path(project, space), class:'btn-xs', disabled:!space.can_delete?,confirm:"Are you sure?",method: :delete -%>
+
       </div>
     </div>
     <div class="row">
