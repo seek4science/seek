@@ -1,3 +1,5 @@
+require 'seek/samples/sample_type_editing_constraints'
+
 # Job responsible for reacting to an update to a sample type
 # refreshes the associated samples, and recreates the editing constraints cache
 class SampleTypeUpdateJob < SeekJob
