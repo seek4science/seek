@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170117145632) do
+ActiveRecord::Schema.define(:version => 20170124172923) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -1159,7 +1159,7 @@ ActiveRecord::Schema.define(:version => 20170117145632) do
     t.integer  "programme_id"
     t.integer  "ancestor_id"
     t.integer  "parent_id"
-    t.string   "default_license"
+    t.string   "default_license",                :default => "CC-BY-4.0"
   end
 
   create_table "projects_publications", :id => false, :force => true do |t|
