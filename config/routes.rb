@@ -202,6 +202,7 @@ SEEK::Application.routes.draw do
         get :show_item_count
         get :show_items
         get :show_dataset_files
+        post :refresh_browse_cache
         get :browse
       end
     end

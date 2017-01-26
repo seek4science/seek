@@ -5,7 +5,7 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :project_required
   before_filter :project_can_admin?
   before_filter :get_endpoints,only:[:index, :browse]
-  before_filter :get_endpoint,only:[:add_dataset]
+  before_filter :get_endpoint,only:[:add_dataset, :show_item_count,:show_items, :edit, :update, :show_dataset_files,:refresh_browse_cache]
 
 
   def index
@@ -19,12 +19,10 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def edit
-    @openbis_endpoint=OpenbisEndpoint.find(params[:id])
     respond_with(@openbis_endpoint)
   end
 
   def update
-    @openbis_endpoint=OpenbisEndpoint.find(params[:id])
     respond_with(@project,@openbis_endpoint) do |format|
       if @openbis_endpoint.update_attributes(params[:openbis_endpoint])
         flash[:notice] = 'The space was successfully updated.'
@@ -55,22 +53,27 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def show_item_count
-    endpoint = OpenbisEndpoint.find(params[:id])
     respond_to do |format|
-      format.html {render(text:"#{endpoint.space.dataset_count} DataSets found")}
+      format.html {render(text:"#{@openbis_endpoint.space.dataset_count} DataSets found")}
     end
   end
 
   def show_items
-    endpoint = OpenbisEndpoint.find(params[:id])
     respond_to do |format|
-      format.html {render(partial:'show_items_for_space',locals:{openbis_endpoint:endpoint})}
+      format.html {render(partial:'show_items_for_space',locals:{openbis_endpoint:@openbis_endpoint})}
     end
   end
 
+  def refresh_browse_cache
+    if (@openbis_endpoint.test_authentication)
+      @openbis_endpoint.clear_cache
+    end
+
+    show_items
+  end
+
   def show_dataset_files
-    endpoint = OpenbisEndpoint.find(params[:id])
-    dataset=Seek::Openbis::Dataset.new(endpoint,params[:perm_id])
+    dataset=Seek::Openbis::Dataset.new(@openbis_endpoint,params[:perm_id])
     respond_to do |format|
       format.html {render(partial:'dataset_files_list',locals:{dataset:dataset})}
     end

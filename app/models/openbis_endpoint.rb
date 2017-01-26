@@ -46,6 +46,16 @@ class OpenbisEndpoint < ActiveRecord::Base
     "#{web_endpoint} : #{space_perm_id}"
   end
 
+  def clear_cache
+    if @openbis_endpoint && @openbis_endpoint.test_authentication
+      Rails.logger.info("Authentication test for Openbis Space #{@openbis_endpoint.id} failed, so not deleting CACHE")
+    else
+      Rails.logger.info("CLEARING CACHE FOR #{cache_key}.*")
+    end
+
+    Rails.cache.delete_matched(/#{cache_key}.*/)
+  end
+
   def cache_key
     if new_record?
       str="#{space_perm_id}-#{as_endpoint}-#{dss_endpoint}-#{username}-#{password}"

@@ -1,5 +1,7 @@
 <%= modal_openbis_file_view('openbis-file-view') %>
 
+
+<%= button_link_to('Refresh Cache','refresh','#','data-endpoint-id'=>openbis_endpoint.id,id:'refresh-cache') %>
 <div class='row' id="openbis-dataset-cards">
   <%= render partial:'openbis_dataset_card',collection:openbis_endpoint.space.datasets %>
 </div>
@@ -21,10 +23,31 @@
             }
           }
       );
+    },
+
+    refreshCache:function() {
+      if (confirm('Are you sure you wish to refresh the cache?')) {
+        var endpointId=$j(this).data('endpoint-id');
+        $j.ajax('<%= refresh_browse_cache_project_openbis_endpoints_path(@project) %>', {
+              method:'POST',
+              data: {id: endpointId},
+              success: function (html) {
+                $j('#openbis-datasets #contents').html(html);
+              },
+              beforeSend: function () {
+                $j('#openbis-datasets #contents').html('<%= image('large_spinner') %>');
+              }
+            }
+        );
+        //FIXME: this will possible happen before, or even during, the cache being cleared
+        fetchCountForSpace(endpointId);
+      }
     }
 
   };
 
   $j('#openbis-dataset-cards').on('click', '.view-files-link', OpenBis.showFiles);
+  $j('#refresh-cache').on('click',OpenBis.refreshCache);
+
 
 </script>

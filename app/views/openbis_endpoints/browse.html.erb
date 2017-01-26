@@ -3,12 +3,14 @@
 
 Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_select(@openbis_endpoints,:id,:title),id:'select-endpoints' %>
 
+<div id="openbis-datasets">
 <div id="openbis-dataset-count">
 
 </div>
 
 <div id="contents">
 
+</div>
 </div>
 
 <script>
@@ -17,10 +19,10 @@ Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_
     $j.ajax('<%= show_item_count_project_openbis_endpoints_path(@project) %>', {
           data: {id: spaceId},
           success: function (html) {
-              $j('#openbis-dataset-count').html(html);
+              $j('#openbis-datasets #openbis-dataset-count').html(html);
           },
           beforeSend: function () {
-            $j('#openbis-dataset-count').html('<%= image('spinner') %>');
+            $j('#openbis-datasets  #openbis-dataset-count').html('<%= image('spinner') %>');
           }
         }
     );
@@ -30,10 +32,10 @@ Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_
     $j.ajax('<%= show_items_project_openbis_endpoints_path(@project) %>', {
           data: {id: spaceId},
           success: function (html) {
-            $j('#contents').html(html);
+            $j('#openbis-datasets #contents').html(html);
           },
           beforeSend: function () {
-            $j('#contents').html('<%= image('large_spinner') %>');
+            $j('#openbis-datasets #contents').html('<%= image('large_spinner') %>');
           }
         }
     );
