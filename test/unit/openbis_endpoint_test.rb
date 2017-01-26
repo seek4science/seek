@@ -203,4 +203,24 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute Rails.cache.exist?(key)
   end
 
+  test 'create_refresh_cache_job' do
+    endpoint=Factory(:openbis_endpoint)
+    Delayed::Job.destroy_all
+    refute OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
+    assert_difference('Delayed::Job.count',1) do
+      endpoint.create_refresh_cache_job
+    end
+    assert_no_difference('Delayed::Job.count') do
+      endpoint.create_refresh_cache_job
+    end
+    assert OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
+
+  end
+
+  test 'create job on creation' do
+    Delayed::Job.destroy_all
+    endpoint=Factory(:openbis_endpoint)
+    assert OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
+  end
+
 end

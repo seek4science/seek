@@ -35,6 +35,10 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
     60.minutes
   end
 
+  def self.create_initial_jobs
+    OpenbisEndpoint.all.each(&:create_refresh_cache_job)
+  end
+
   private
 
   def endpoint

@@ -6,6 +6,7 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
   def setup
     @endpoint = Factory(:openbis_endpoint)
     @job = OpenbisEndpointCacheRefreshJob.new(@endpoint)
+    Delayed::Job.destroy_all #avoids jobs created from the after_create callback, this is tested for OpenbisEndpoint
   end
 
   test 'exists' do
