@@ -34,6 +34,16 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
     60.minutes
   end
 
+  # overidden to ignore_locked false by default
+  def exists?(ignore_locked = false)
+    super(ignore_locked)
+  end
+
+  # overidden to ignore_locked false by default
+  def count(ignore_locked = false)
+    super(ignore_locked)
+  end
+
   def self.create_initial_jobs
     OpenbisEndpoint.all.each(&:create_refresh_cache_job)
   end
