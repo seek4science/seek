@@ -7,3 +7,21 @@
 .openbis-card-heading span {
     padding-left:1em;
 }
+
+#openbis-file-list {
+  max-height: 80vh;
+  overflow: scroll;
+}
+
+#openbis-file-list table {
+    width:98%;
+    margin:0.5em;
+}
+
+#openbis-file-list table tr {
+    border: 1px solid #ddd;
+}
+
+#openbis-file-list table td.filesize {
+    min-width: 3em;
+}

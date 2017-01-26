@@ -68,6 +68,14 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
+  def show_dataset_files
+    endpoint = OpenbisEndpoint.find(params[:id])
+    dataset=Seek::Openbis::Dataset.new(endpoint,params[:perm_id])
+    respond_to do |format|
+      format.html {render(partial:'dataset_files_list',locals:{dataset:dataset})}
+    end
+  end
+
   def test_endpoint
     endpoint = OpenbisEndpoint.new(params[:openbis_endpoint])
     result = endpoint.test_authentication

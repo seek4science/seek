@@ -201,6 +201,7 @@ SEEK::Application.routes.draw do
         get :fetch_spaces
         get :show_item_count
         get :show_items
+        get :show_dataset_files
         get :browse
       end
     end

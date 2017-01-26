@@ -1,6 +1,30 @@
+<%= modal_openbis_file_view('openbis-file-view') %>
 
-<div class='row'>
+<div class='row' id="openbis-dataset-cards">
   <%= render partial:'openbis_dataset_card',collection:openbis_endpoint.space.datasets %>
 </div>
 
+<script>
 
+  var OpenBis = {
+    showFiles:function() {
+      var permId=$j(this).data('perm-id');
+      var endpointId=$j(this).data('endpoint-id');
+
+      $j.ajax('<%= show_dataset_files_project_openbis_endpoints_path(@project) %>', {
+            data: {id: endpointId,perm_id:permId},
+            success: function (html) {
+              $j('#openbis-file-view #contents').html(html);
+            },
+            beforeSend: function () {
+              $j('#openbis-file-view #contents').html('<%= image('spinner') %>');
+            }
+          }
+      );
+    }
+
+  };
+
+  $j('#openbis-dataset-cards').on('click', '.view-files-link', OpenBis.showFiles);
+
+</script>

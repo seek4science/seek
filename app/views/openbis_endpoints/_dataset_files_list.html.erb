@@ -1,0 +1,14 @@
+<h3>
+  <%= dataset.dataset_file_count %> Files - <%= number_to_human_size(dataset.size) %>
+</h3>
+
+<div id="openbis-file-list">
+  <table>
+    <% dataset.dataset_files_no_directories.each do |file| %>
+        <tr>
+          <td class='filename'><%= file.path %></td>
+          <td class='filesize'><%= number_to_human_size(file.size) %></td>
+        </tr>
+    <% end %>
+  </table>
+</div>
