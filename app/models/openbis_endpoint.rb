@@ -70,4 +70,5 @@ class OpenbisEndpoint < ActiveRecord::Base
   def create_refresh_cache_job
     OpenbisEndpointCacheRefreshJob.new(self).queue_job
   end
+
 end

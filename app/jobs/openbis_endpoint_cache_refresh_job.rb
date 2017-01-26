@@ -11,7 +11,7 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
       endpoint.clear_cache
       space = endpoint.space
       if space
-        space.datasets each do |dataset|
+        space.datasets.each do |dataset|
           dataset.dataset_files if dataset
         end
       end
@@ -32,6 +32,10 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
 
   def follow_on_delay
     60.minutes
+  end
+
+  def follow_on_job?
+    true
   end
 
   # overidden to ignore_locked false by default
