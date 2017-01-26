@@ -57,7 +57,7 @@ class OpenbisEndpointsController < ApplicationController
   def show_item_count
     endpoint = OpenbisEndpoint.find(params[:id])
     respond_to do |format|
-      format.html {render(text:"#{endpoint.space.dataset_count} datasets found")}
+      format.html {render(text:"#{endpoint.space.dataset_count} DataSets found")}
     end
   end
 
