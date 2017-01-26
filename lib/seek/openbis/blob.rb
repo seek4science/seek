@@ -12,14 +12,14 @@ module Seek
         return nil unless openbis?
         parts = url.split(':')
         endpoint = OpenbisEndpoint.find(parts[1])
-        Seek::Openbis::Dataset.new(endpoint,parts[3])
+        Seek::Openbis::Dataset.new(endpoint, parts[3])
       end
 
       def search_terms
         super | openbis_search_terms
       end
 
-      #overide and ignore the url
+      # overide and ignore the url
       def url_search_terms
         if openbis?
           []
@@ -31,13 +31,12 @@ module Seek
       private
 
       def openbis_search_terms
-        return [] unless openbis? && dataset=openbis_dataset
-        terms = [dataset.perm_id,dataset.dataset_type_code,dataset.dataset_type_description, dataset.experiment_id]
+        return [] unless openbis? && dataset = openbis_dataset
+        terms = [dataset.perm_id, dataset.dataset_type_code, dataset.dataset_type_description, dataset.experiment_id]
         terms | dataset.dataset_files_no_directories.collect do |file|
           [file.perm_id, file.path, file.filename]
         end.flatten
       end
-
     end
   end
 end

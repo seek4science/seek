@@ -1,16 +1,15 @@
-#job to periodically clear and refresh the cache
+# job to periodically clear and refresh the cache
 class OpenbisEndpointCacheRefreshJob < SeekJob
-
   attr_accessor :openbis_endpoint_id
 
   def initialize(openbis_endpoint)
-    @openbis_endpoint_id=openbis_endpoint.id
+    @openbis_endpoint_id = openbis_endpoint.id
   end
 
   def perform_job(endpoint)
     if endpoint.test_authentication
       endpoint.clear_cache
-      space=endpoint.space
+      space = endpoint.space
       if space
         space.datasets each do |dataset|
           dataset.dataset_files if dataset
@@ -44,5 +43,4 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
   def endpoint
     OpenbisEndpoint.find_by_id(openbis_endpoint_id)
   end
-
 end

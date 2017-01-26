@@ -6,7 +6,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   validates :dss_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :web_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :project, :as_endpoint, :dss_endpoint, :web_endpoint, :username, :password, :space_perm_id, presence: true
-  validates :space_perm_id,uniqueness:{scope: [:dss_endpoint, :as_endpoint,:space_perm_id,:project_id], message:'the endpoints and the space must be unique for this project'}
+  validates :space_perm_id, uniqueness: { scope: [:dss_endpoint, :as_endpoint, :space_perm_id, :project_id], message: 'the endpoints and the space must be unique for this project' }
 
   after_create :create_refresh_cache_job
 
@@ -18,7 +18,7 @@ class OpenbisEndpoint < ActiveRecord::Base
     user && project.can_be_administered_by?(user) && Seek::Config.openbis_enabled
   end
 
-  def can_delete?(user = User.current_user)
+  def can_delete?(_user = User.current_user)
     true
   end
 
@@ -41,7 +41,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def space
-    @space ||= Seek::Openbis::Space.new(self,space_perm_id)
+    @space ||= Seek::Openbis::Space.new(self, space_perm_id)
   end
 
   def title
@@ -49,10 +49,10 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def clear_cache
-    if self.test_authentication
+    if test_authentication
       Rails.logger.info("CLEARING CACHE FOR #{cache_key}.*")
     else
-      Rails.logger.info("Authentication test for Openbis Space #{self.id} failed, so not deleting CACHE")
+      Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not deleting CACHE")
     end
 
     Rails.cache.delete_matched(/#{cache_key}.*/)
@@ -60,7 +60,7 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def cache_key
     if new_record?
-      str="#{space_perm_id}-#{as_endpoint}-#{dss_endpoint}-#{username}-#{password}"
+      str = "#{space_perm_id}-#{as_endpoint}-#{dss_endpoint}-#{username}-#{password}"
       "#{super}-#{Digest::SHA2.hexdigest(str)}"
     else
       super
@@ -70,5 +70,4 @@ class OpenbisEndpoint < ActiveRecord::Base
   def create_refresh_cache_job
     OpenbisEndpointCacheRefreshJob.new(self).queue_job
   end
-
 end

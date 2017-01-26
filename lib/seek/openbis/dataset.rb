@@ -34,7 +34,7 @@ module Seek
         dataset_files.reject(&:is_directory)
       end
 
-      #FIMXE: we can speed things up and get this directly from the first API call rather than fetching the datasets, only getting the datasets on demand
+      # FIMXE: we can speed things up and get this directly from the first API call rather than fetching the datasets, only getting the datasets on demand
       def dataset_file_count
         dataset_files_no_directories.count
       end
