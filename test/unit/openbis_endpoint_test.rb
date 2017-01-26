@@ -194,4 +194,13 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal "openbis_endpoints/#{endpoint.id}-#{endpoint.updated_at.utc.to_s(:number)}",endpoint.cache_key
   end
 
+  test 'clear cache' do
+    mock_openbis_calls
+    endpoint = Factory(:openbis_endpoint)
+    key = endpoint.space.cache_key(endpoint.space_perm_id)
+    assert Rails.cache.exist?(key)
+    endpoint.clear_cache
+    refute Rails.cache.exist?(key)
+  end
+
 end

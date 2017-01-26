@@ -47,10 +47,10 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def clear_cache
-    if @openbis_endpoint && @openbis_endpoint.test_authentication
-      Rails.logger.info("Authentication test for Openbis Space #{@openbis_endpoint.id} failed, so not deleting CACHE")
-    else
+    if self.test_authentication
       Rails.logger.info("CLEARING CACHE FOR #{cache_key}.*")
+    else
+      Rails.logger.info("Authentication test for Openbis Space #{self.id} failed, so not deleting CACHE")
     end
 
     Rails.cache.delete_matched(/#{cache_key}.*/)
@@ -63,6 +63,10 @@ class OpenbisEndpoint < ActiveRecord::Base
     else
       super
     end
+  end
+
+  def create_refresh_cache_job
+    OpenbisEndpointCacheRefreshJob.new(self).queue_job
   end
 
 end
