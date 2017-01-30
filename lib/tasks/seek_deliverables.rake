@@ -60,7 +60,7 @@ namespace :seek_deliverables do
   task :projects_and_assets => :environment do
     puts "Programme / Projects / No of assets"
 
-    projects = Project.all.sort_by(&:programme)
+    projects = Project.all.sort_by(&:programme_id)
     projects.each do |project|
       asset_count = project.assets.count
       programme_title = project.programme.try(:title)
