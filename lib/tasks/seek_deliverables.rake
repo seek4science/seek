@@ -146,7 +146,7 @@ namespace :seek_deliverables do
       not_era=all-only_era
       recent_not_era = not_era.collect(&:id) & recent.collect(&:id)
 
-      recent_download_count = ActivityLog.where(:action => 'download', :activity_loggable_type => "#{type.name}", :created_at => (t1..t2)).count
+      recent_download_count = ActivityLog.where(:action => 'download', :activity_loggable_type => "#{type.name}", :created_at => (t1..t2)).no_spider.count
 
       puts "#{recent.count} #{recent_era.count} #{recent_not_era.count} #{recent_download_count}"
     end
