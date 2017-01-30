@@ -152,6 +152,12 @@ namespace :seek_deliverables do
     end
   end
 
+  task :users_30_months => :environment do
+    t1=Time.new(2014, 8, 01)
+    t2=Time.new(2017, 02, 01)
+    puts ActivityLog.where(:created_at => (t1..t2)).select("distinct culprit_id").count
+  end
+
   task :asset_statistic_30_months => :environment do
     puts "30 months statistic"
     puts "all / erasysapp / not erasysapp"
