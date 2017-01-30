@@ -11,4 +11,16 @@ class AssetDoiLog < ActiveRecord::Base
   def self.was_doi_minted_for?(asset_type, asset_id, asset_version)
     !AssetDoiLog.where(asset_type: asset_type, asset_id: asset_id, asset_version: asset_version, action: AssetDoiLog::MINT).empty?
   end
+
+  def self.minted
+    where(action: MINT)
+  end
+
+  def self.deleted
+    where(action: DELETE)
+  end
+
+  def self.unpublished
+    where(action: UNPUBLISH)
+  end
 end

@@ -1,0 +1,74 @@
+<h2>Snapshots</h2>
+
+<strong>Number of Snapshots:</strong> <%= Snapshot.count %>
+
+<% groups = Snapshot.all.group_by(&:resource_type) %>
+<% if groups.empty? %>
+    <span class="none_text">No snapshots</span>
+<% else %>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>Type</th>
+        <th># of Snapshots</th>
+        <th># of Resources with Snapshots</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% groups.each do |type_name, snapshots| %>
+          <% resources = snapshots.map(&:resource).uniq %>
+          <tr>
+            <td><%= type_name.humanize %></td>
+            <td><%= snapshots.count %></td>
+            <td>
+              <%= resources.count %>
+              (<%= ((resources.count / type_name.constantize.count.to_f) * 100).round(4) %>%)
+            </td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+<% end %>
+
+<h2>DOIs</h2>
+<%
+  classes = [DataFile, Model, Sop, Workflow]
+  snapshot_classes = [Investigation, Study, Assay]
+  groups = {}
+  classes.each do |c|
+    things_with_dois = c.where('doi IS NOT NULL').uniq
+    groups[c] = things_with_dois if things_with_dois.any?
+  end
+
+  snapshot_classes.each do |c|
+    things_with_dois = c.includes(:snapshots).where('snapshots.doi IS NOT NULL').uniq
+    groups[c] = things_with_dois if things_with_dois.any?
+  end
+%>
+<strong>Number of DOIs minted:</strong> <%= AssetDoiLog.minted.count %><br/>
+<strong>Number of DOIs unpublished:</strong> <%= AssetDoiLog.unpublished.count %><br/>
+<strong>Number of DOIs deleted:</strong> <%= AssetDoiLog.deleted.count %><br/>
+
+<% if groups.empty? %>
+    <span class="none_text">No DOIs</span>
+<% else %>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>Type</th>
+        <th># with DOI</th>
+      </tr>
+      </thead>
+      <tbody>
+      <% groups.each do |type, resources| %>
+          <tr>
+            <td><%= type.name.humanize %></td>
+            <td>
+              <%= resources.count %>
+              (<%= ((resources.count / type.count.to_f) * 100).round(4) %>%)
+            </td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+<% end %>
