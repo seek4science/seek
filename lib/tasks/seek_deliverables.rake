@@ -57,12 +57,10 @@ namespace :seek_deliverables do
     end
   end
 
-  task :projects_and_assets_12_months => :environment do
-    puts "12 months statistic"
+  task :projects_and_assets => :environment do
     puts "Programme / Projects / No of assets"
-    t1=Time.new(2016, 02, 01)
-    t2=Time.new(2017, 02, 01)
-    projects = Project.where(:created_at => (t1..t2))
+
+    projects = Project.all
     projects.each do |project|
       asset_count = project.assets.count
       programme_title = project.programme.try(:title)
