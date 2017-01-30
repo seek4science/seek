@@ -8,7 +8,7 @@ class PolicyHelperTest < ActionView::TestCase
     selected_access_type = Policy::NO_ACCESS
     actual_options = policy_selection_options policies, resource, selected_access_type
 
-    expected_options = "<option value='0' selected='selected'>No access </option><option value='1' >View summary </option><option value='3' >View and edit summary </option>"
+    expected_options = "<option value=\"0\" selected=\"selected\">No access</option>\n<option value=\"1\">View summary</option>\n<option value=\"3\">View and edit summary</option>"
 
     assert_equal expected_options, actual_options
   end
@@ -21,7 +21,7 @@ class PolicyHelperTest < ActionView::TestCase
     selected_access_type = Policy::ACCESSIBLE
     actual_options = policy_selection_options policies, resource, selected_access_type
 
-    expected_options = "<option value='0' >No access </option><option value='1' selected='selected'>View summary </option><option value='3' >View and edit summary </option>"
+    expected_options = "<option value=\"0\">No access</option>\n<option value=\"1\" selected=\"selected\">View summary</option>\n<option value=\"3\">View and edit summary</option>"
 
     assert_equal expected_options, actual_options, "default selected access type should change from accessible
 to visible if item is not downloadable and the accessible option is removed."
@@ -33,7 +33,7 @@ to visible if item is not downloadable and the accessible option is removed."
     selected_access_type = Policy::ACCESSIBLE
     actual_options = policy_selection_options policies, resource, selected_access_type
 
-    expected_options = "<option value='0' >No access </option><option value='1' >View summary only </option><option value='2' selected='selected'>View summary and get contents </option><option value='3' >View and edit summary and contents </option>"
+    expected_options = "<option value=\"0\">No access</option>\n<option value=\"1\">View summary only</option>\n<option value=\"2\" selected=\"selected\">View summary and get contents</option>\n<option value=\"3\">View and edit summary and contents</option>"
 
     assert_equal expected_options, actual_options, "default selected access type should change from accessible
 to visible if item is not downloadable and the accessible option is removed."
