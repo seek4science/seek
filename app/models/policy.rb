@@ -131,7 +131,7 @@ class Policy < ActiveRecord::Base
 
         #if share with your project is chosen
 
-        if (sharing[:sharing_scope].to_i == Policy::ALL_USERS) and !projects.map(&:id).compact.blank?
+        if (sharing[:sharing_scope].to_i == Policy::ALL_USERS) && projects.any?
           #add Project to contributor_type
           contributor_types << "Project" if !contributor_types.include? "Project"
           #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
