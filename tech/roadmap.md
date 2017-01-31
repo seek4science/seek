@@ -16,8 +16,9 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Improved Samples/Treatments/SOP handling | Winter 2017  |
+
 | Full integration with openBIS | Winter 2017  |
+| Application Programming Interface (API) supporting writes | Summer 2017  |
 
 
 
@@ -27,14 +28,15 @@ These are completed Roadmap features, and includes the version of SEEK the featu
 
 You can find more details about each release in our [Change Logs](/tech/releases/)
 
-| Feature | Milestone date | SEEK version |
+| Feature | SEEK version |
 | --- | --- | --- |
-| Licensing of Assets | June 2016 | 1.1 |
-| Research Object Snapshots of Assays and Studies | June 2016 | 1.1 |
-| Self management of projects and programmes | December 2015  | 1.0 |
-| Self management of organisms | December 2015  | 1.0 |
-| Improved registration workflow | December 2015  | 1.0 |
-| Support for [Research Objects](http://www.researchobject.org/) | December 2015 | 1.0 |
-| DOI's for Investigation snapshots for citation | December 2015 | 1.0 |
-| New user-interface based on [Bootstrap](http://getbootstrap.com) | September 2015  | 0.23 |
+| Improved Samples/Treatments/SOP handling | 1.2  |
+| Licensing of Assets | 1.1 |
+| Research Object Snapshots of Assays and Studies | 1.1 |
+| Self management of projects and programmes | 1.0 |
+| Self management of organisms | 1.0 |
+| Improved registration workflow | 1.0 |
+| Support for [Research Objects](http://www.researchobject.org/) | 1.0 |
+| DOI's for Investigation snapshots for citation | 1.0 |
+| New user-interface based on [Bootstrap](http://getbootstrap.com) | 0.23 |
 
