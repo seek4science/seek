@@ -5,9 +5,10 @@ class Study < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  belongs_to :investigation
-  has_many :projects, through: :investigation
-  has_many :assays
+  #FIXME: needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
+  def projects
+    investigation.try(:projects) || []
+  end
 
   searchable(:auto_index => false) do
     text :experimentalists

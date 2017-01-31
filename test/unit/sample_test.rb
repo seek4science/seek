@@ -788,7 +788,7 @@ class SampleTest < ActiveSupport::TestCase
   test 'extracted samples inherit projects from data file' do
     data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
                         policy: Factory(:private_policy)
-    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
+    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
@@ -805,41 +805,9 @@ class SampleTest < ActiveSupport::TestCase
       data_file.save!
     end
 
-    data_file = data_file.reload
-    sample = sample.reload
-
     assert_equal new_projects.sort, sample.projects.sort
     assert_equal sample.projects.sort, data_file.projects.sort
     assert_equal sample.project_ids.sort, data_file.project_ids.sort
-  end
-
-  test 'extracted samples inherit programmes from data file' do
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
-                        policy: Factory(:private_policy), projects: [Factory(:programme_project)]
-    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
-    sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    sample_type.build_attributes_from_template
-    disable_authorization_checks { sample_type.save! }
-    samples = data_file.extract_samples(sample_type,true)
-    sample = samples.first
-
-    assert_equal sample.programmes, data_file.programmes
-    assert_equal sample.programme_ids, data_file.programme_ids
-
-    # Change the projects & programmes
-    new_projects = [Factory(:programme_project), Factory(:programme_project)]
-    disable_authorization_checks do
-      data_file.projects = new_projects
-      data_file.save!
-    end
-
-    data_file = data_file.reload
-    sample = sample.reload
-
-    new_programmes = new_projects.map(&:programme)
-    assert_equal new_programmes.sort, sample.programmes.sort
-    assert_equal sample.programmes.sort, data_file.programmes.sort
-    assert_equal sample.programme_ids.sort, data_file.programme_ids.sort
   end
 
   test 'extracted samples inherit creators from data file' do
