@@ -104,6 +104,14 @@ class Sample < ActiveRecord::Base
     extracted? ? originating_data_file.project_ids : super
   end
 
+  def programmes
+    extracted? ? originating_data_file.programmes : super
+  end
+
+  def programme_ids
+    extracted? ? originating_data_file.programme_ids : super
+  end
+
   def creators
     extracted? ? originating_data_file.creators : super
   end

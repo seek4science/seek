@@ -133,6 +133,10 @@ Factory.define(:project) do |f|
   f.sequence(:title) { |n| "A Project: -#{n}" }
 end
 
+Factory.define(:programme_project, parent: :project) do |f|
+  f.programme
+end
+
 # Institution
 Factory.define(:institution) do |f|
   f.sequence(:title) { |n| "An Institution: #{n}" }

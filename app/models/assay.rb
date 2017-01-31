@@ -7,10 +7,10 @@ class Assay < ActiveRecord::Base
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
-  #needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
-  def projects
-    study.try(:projects) || []
-  end
+  belongs_to :study
+  has_one :investigation, through: :study
+  has_many :projects, through: :investigation, uniq: true
+
 
   #needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
   searchable(:auto_index=>false) do
@@ -28,7 +28,6 @@ class Assay < ActiveRecord::Base
 
   belongs_to :institution
 
-  belongs_to :study
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
   has_many :assay_organisms, :dependent=>:destroy
@@ -42,8 +41,6 @@ class Assay < ActiveRecord::Base
   has_many :sops, :through => :assay_assets, :source => :asset, :source_type => "Sop"
   has_many :models, :through => :assay_assets, :source => :asset, :source_type => "Model"
   has_many :samples, :through => :assay_assets, :source => :asset, :source_type => "Sample"
-
-  has_one :investigation,:through=>:study
 
   validates_presence_of :assay_type_uri
   validates_presence_of :technology_type_uri, :unless=>:is_modelling?

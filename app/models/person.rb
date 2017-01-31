@@ -29,7 +29,9 @@ class Person < ActiveRecord::Base
   has_and_belongs_to_many :disciplines
 
   has_many :group_memberships, :dependent => :destroy
-  has_many :work_groups, :through=>:group_memberships
+  has_many :work_groups, through: :group_memberships
+  has_many :projects, through: :work_groups, uniq: true
+  has_many :programmes, through: :projects, uniq: true
 
   has_many :former_group_memberships, :class_name => 'GroupMembership',
            :conditions => proc { ["time_left_at IS NOT NULL AND time_left_at <= ?", Time.now] }, :dependent => :destroy
@@ -163,10 +165,6 @@ class Person < ActiveRecord::Base
     result
   end
 
-  def programmes
-    self.projects.collect{|p| p.programme}.uniq
-  end
-
   #whether this person belongs to a programme in common with the other item - generally a person or project
   def shares_programme? other_item
     (self.programmes & other_item.programmes).any?
@@ -257,16 +255,13 @@ class Person < ActiveRecord::Base
     self.try(:user).try(:sweeps) || []
   end
 
-  def projects # ALL projects, former and current
-    #updating workgroups doesn't change groupmemberships until you save. And vice versa.
-    work_groups.collect {|wg| wg.project }.uniq | group_memberships.collect{|gm| gm.work_group.project}
-  end
-
+  # TODO: Do this using an association
   def current_projects
     (current_work_groups.collect {|wg| wg.project }.uniq | current_group_memberships.collect{|gm| gm.work_group.project})
   end
 
   # Projects that the person has let completely (i.e. not still involved with through a different institution)
+  # TODO: Do this using an association
   def former_projects
     old_projects = (former_work_groups.collect {|wg| wg.project }.uniq | former_group_memberships.collect{|gm| gm.work_group.project})
 
