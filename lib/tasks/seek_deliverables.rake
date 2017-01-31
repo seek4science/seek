@@ -12,7 +12,7 @@ namespace :seek_deliverables do
     users.each do |user|
       id = user.id
       created_at = user.created_at
-      last_active = ActivityLog.where(culprit_id:id).order(:created_at).last.created_at
+      last_active = ActivityLog.where(culprit_id:id).order(:created_at).last.try(:created_at)
       last_active ||= created_at
       puts "#{id},#{created_at.strftime('%d-%m-%Y')},#{last_active.strftime('%d-%m-%Y')}"
     end
