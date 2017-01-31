@@ -6,6 +6,18 @@ require 'csv'
 
 namespace :seek_deliverables do
 
+  task :user_retention => :environment do
+    users = User.all.select{|u| u.person } #only those with profiles
+    puts 'id, registered, last activity'
+    users.each do |user|
+      id = user.id
+      created_at = user.created_at
+      last_active = ActivityLog.where(culprit_id:id).order(:created_at).last.created_at
+      last_active ||= created_at
+      puts "#{id},#{created_at.strftime('%d-%m-%Y')},#{last_active.strftime('%d-%m-%Y')}"
+    end
+  end
+
   #the first two tasks are for D2.2
   task :erasys_statistic_12_months => :environment do
     puts "12 months statistic"
