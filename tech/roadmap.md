@@ -13,7 +13,6 @@ It is an overview of the main priorities, and milestones. SEEK is developed foll
 They are expected to be added to SEEK in roughly the order they are presented here.
 
 
-
 | Feature | Milestone date |
 | --- | --- |
 | Full integration with openBIS | Winter 2017  |
@@ -26,6 +25,7 @@ They are expected to be added to SEEK in roughly the order they are presented he
 These are completed Roadmap features, and includes the version of SEEK the feature was included in.
 
 You can find more details about each release in our [Change Logs](/tech/releases/)
+
 
 | Feature | SEEK version |
 | --- | --- | --- |

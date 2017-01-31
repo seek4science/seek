@@ -94,3 +94,7 @@ img.screenshot {
     margin-right: auto;
     cursor: pointer;
 }
+
+thead > tr {
+    background-color: #f8f8f8;
+}
