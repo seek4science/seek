@@ -333,6 +333,8 @@ class AdminsController < ApplicationController
           format.html { render partial: 'admins/stats/workflow_stats' }
         when 'storage_usage_stats'
           format.html { render partial: 'admins/stats/storage_usage_stats' }
+        when 'snapshot_and_doi_stats'
+          format.html { render partial: 'admins/stats/snapshot_and_doi_stats' }
         when 'none'
           format.html { render text: '' }
       end
