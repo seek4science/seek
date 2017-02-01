@@ -13,8 +13,9 @@
 
     <div class="table-responsive">
       <permissions-table class="table table-bordered" id="permissions-table"
-                         :permissions="permissions" :public-permission="publicPermission"></permissions-table>
-      <%= content_tag :script, permissions_json(policy), type: 'application/json', id: 'permissions-json' %>
+                         :permissions="permissions" :public-permission="publicPermission">
+      </permissions-table>
+      <%= content_tag :script, permissions_json(policy, object.projects), type: 'application/json', id: 'permissions-json' %>
     </div>
 
     <%= render partial: 'sharing/person_permission_modal', locals: { object: object } %>

@@ -1,9 +1,11 @@
 var Sharing = {
-  addPermission: function (permission) {
+  addPermission: function (permission, preserveAccessType) {
     // Update if already existing, otherwise add a new row
     for (var i = 0; i < permissionsTable.permissions.length; i++) {
       var p = permissionsTable.permissions[i];
       if (p.contributor_type == permission.contributor_type && p.contributor_id == permission.contributor_id) {
+        if (preserveAccessType)
+          permission.access_type = p.access_type;
         permissionsTable.permissions.splice(i, 1, permission);
         return false;
       }
@@ -13,14 +15,24 @@ var Sharing = {
   },
 
   // Add a permission when a new project is associated with the resource via the dropdown menu
-  addPermissionForProject: function (projectId, element) {
-    if (projectId > 0) {
+  addPermissionForProject: function (project) {
       Sharing.addPermission({
         contributor_type: 'Project',
-        contributor_id: projectId,
-        title: $j(':selected', $j(element)).text(),
+        contributor_id: project.id,
+        title: project.title,
         access_type: Sharing.associatedProjectAccessType,
-        mandatory: true });
+        mandatory: true }, true);
+  },
+
+  removePermissionForProject: function (project) {
+    for (var i = 0; i < permissionsTable.permissions.length; i++) {
+      if (permissionsTable.permissions[i].contributor_id === project.id)
+        break;
+    }
+    if (confirm('Do you want to want to remove any permissions for ' + project.title + '?')) {
+      permissionsTable.permissions.splice(i, 1);
+    } else {
+      permissionsTable.permissions[i].mandatory = false;
     }
   },
 

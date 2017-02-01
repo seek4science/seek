@@ -552,3 +552,13 @@ img.avatar-corner-icon {
     }
   }
 }
+
+a.remove-project {
+  text-decoration: none;
+  font-weight: bold;
+  vertical-align: text-top;
+  color: $brand-danger;
+  &:hover {
+    text-decoration: none;
+  }
+}

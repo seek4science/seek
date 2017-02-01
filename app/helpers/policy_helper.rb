@@ -159,7 +159,8 @@ module PolicyHelper
 
   end
 
-  def permissions_json(policy)
+  def permissions_json(policy, associated_projects)
+    project_ids = associated_projects.map(&:id)
     hash = { access_type: policy.access_type }
 
     hash[:permissions] = policy.permissions.select([:id, :access_type, :contributor_id, :contributor_type]).map do |permission|
@@ -168,6 +169,9 @@ module PolicyHelper
                contributor_id: permission.contributor_id,
                contributor_type: permission.contributor_type,
                index: permission.id }
+      if permission.contributor_type == "Project" && project_ids.include?(permission.contributor_id)
+        h[:mandatory] = true
+      end
 
       if permission.contributor_type == "Person"
         h[:title] = (permission.contributor.first_name + " " + permission.contributor.last_name)
