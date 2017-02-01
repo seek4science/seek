@@ -7,7 +7,7 @@ require 'csv'
 namespace :seek_deliverables do
 
   task :asset_creation_dates => :environment do
-    types=[DataFile,Model,Sop,Presentation,Assay,Study,Investigation]
+    types=[DataFile,Model,Sop,Presentation,Assay,Study,Investigation,Project]
     puts 'type, creation date'
     types.each do |type|
       type_str=type.to_s
