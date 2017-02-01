@@ -6,6 +6,18 @@ require 'csv'
 
 namespace :seek_deliverables do
 
+  task :asset_creation_dates => :environment do
+    types=[DataFile,Model,Sop,Presentation,Assay,Study,Investigation]
+    puts 'type, creation date'
+    types.each do |type|
+      type_str=type.to_s
+      type.send(:all).each do |item|
+        puts "#{type_str}, #{item.created_at.strftime('%d-%m-%Y')}"
+      end
+    end
+  end
+
+
   task :user_retention => :environment do
     users = User.all.select{|u| u.person } #only those with profiles
     puts 'id, registered, last activity'
