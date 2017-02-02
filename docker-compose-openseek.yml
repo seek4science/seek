@@ -19,6 +19,8 @@ services:
       RAILS_ENV: production
       SOLR_PORT: 8983
       NO_ENTRYPOINT_WORKERS: 1
+      OPENBIS_USERNAME: 'admin',
+      OPENBIS_PASSWORD: 'changeit'
     env_file:
       - docker/db.env
     volumes:
