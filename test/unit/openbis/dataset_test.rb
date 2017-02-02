@@ -29,6 +29,17 @@ class DatasetTest < ActiveSupport::TestCase
     end
   end
 
+  test 'dates' do
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint,'20160210130454955-23')
+    reg = dataset.registration_date
+    assert reg.is_a?(DateTime)
+    assert_equal '10 02 2016 12:04:55',reg.strftime('%d %m %Y %H:%M:%S')
+
+    mod = dataset.modification_date
+    assert mod.is_a?(DateTime)
+    assert_equal '10 02 2016 12:04:55',mod.strftime('%d %m %Y %H:%M:%S')
+  end
+
   test 'all' do
     all = Seek::Openbis::Dataset.new(@openbis_endpoint).all
     assert_equal 8, all.count

@@ -25,8 +25,8 @@ module Seek
         @code = json['code']
         @perm_id = json['permId']
         @registrator = json['registerator']
-        @registration_date = Time.at(json['registrationDate'].to_i / 1000).to_datetime
-        @modification_date = Time.at(json['modificationDate'].to_i / 1000).to_datetime
+        @registration_date = DateTime.parse(json['registrationDate'])
+        @modification_date = DateTime.parse(json['modificationDate'])
         self
       end
 

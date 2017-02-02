@@ -30,6 +30,17 @@ class SpaceTest < ActiveSupport::TestCase
     end
   end
 
+  test 'dates' do
+    space = Seek::Openbis::Space.new(@openbis_endpoint,'API-SPACE')
+    reg = space.registration_date
+    assert reg.is_a?(DateTime)
+    assert_equal '16 12 2015 12:51:20',reg.strftime('%d %m %Y %H:%M:%S')
+
+    mod = space.modification_date
+    assert mod.is_a?(DateTime)
+    assert_equal '16 12 2015 12:51:20',mod.strftime('%d %m %Y %H:%M:%S')
+  end
+
   test 'find by perm ids' do
     ids = ['API-SPACE', 'not a perm id', 'DEFAULT']
     spaces = Seek::Openbis::Space.new(@openbis_endpoint).find_by_perm_ids(ids)
