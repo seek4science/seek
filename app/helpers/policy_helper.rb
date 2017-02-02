@@ -159,7 +159,7 @@ module PolicyHelper
 
   end
 
-  def permissions_json(policy, associated_projects)
+  def policy_json(policy, associated_projects)
     project_ids = associated_projects.map(&:id)
     hash = { access_type: policy.access_type }
 

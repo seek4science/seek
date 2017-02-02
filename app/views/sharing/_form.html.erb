@@ -15,7 +15,6 @@
       <permissions-table class="table table-bordered" id="permissions-table"
                          :permissions="permissions" :public-permission="publicPermission">
       </permissions-table>
-      <%= content_tag :script, permissions_json(policy, object.projects), type: 'application/json', id: 'permissions-json' %>
     </div>
 
     <%= render partial: 'sharing/person_permission_modal', locals: { object: object } %>
@@ -23,21 +22,17 @@
 <% end %>
 
 <script>
+  var policy = <%= policy_json(policy, object.projects) -%>;
+
   var permissionsTable = new Vue({
     el: '#permissions-table',
     data: {
       publicPermission: {
-        access_type: Sharing.allVisitorsAccessType, // Uses snake case because that's how rails returns the JSON
+        access_type: policy.access_type, // Uses snake case because that's how rails returns the JSON
         title: 'Public',
         public: true,
         mandatory: true },
-      permissions: []
+      permissions: policy.permissions
     }
-  });
-
-  $j(document).ready(function () {
-    var policy = JSON.parse($j('#permissions-json').text());
-    permissionsTable.permissions = policy.permissions;
-    permissionsTable.publicPermission.access_type = policy.access_type;
   });
 </script>
