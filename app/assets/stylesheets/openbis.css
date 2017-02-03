@@ -8,6 +8,10 @@
     padding-left:1em;
 }
 
+.openbis-card + .registered  {
+    opacity: 0.65;
+}
+
 #openbis-file-list {
   max-height: 80vh;
   overflow: scroll;

@@ -5,7 +5,7 @@
   files_text = "#{file_count} File".pluralize(file_count)
 %>
 
-<div class='col-md-3'>
+<div class="col-md-3 openbis-card <%= 'registered' if dataset.registered? %>">
    <div class='panel panel-default'>
      <div class='openbis-card-heading'>
        <span>
@@ -31,7 +31,11 @@
          %>
        </p>
        <p class="list_item_attribute">
-         <%= link_to('Register with SEEK', add_dataset_project_openbis_endpoint_path(@project, openbis_endpoint, dataset_perm_id: dataset.perm_id), method: :post) %>
+         <% if dataset.registered? %>
+             Already registered
+         <% else %>
+             <%= link_to('Register with SEEK', add_dataset_project_openbis_endpoint_path(@project, openbis_endpoint, dataset_perm_id: dataset.perm_id), method: :post) %>
+         <% end %>
        </p>
      </div>
    </div>

@@ -59,7 +59,6 @@ class DatasetTest < ActiveSupport::TestCase
   test 'create datafile' do
     User.current_user=Factory(:person).user
 
-
     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint,'20160210130454955-23')
     datafile = dataset.create_seek_datafile
     assert_equal DataFile,datafile.class
@@ -79,6 +78,16 @@ class DatasetTest < ActiveSupport::TestCase
     refute normal.openbis?
     refute normal.content_blobs.first.openbis?
     refute normal.content_blobs.first.custom_integration?
+  end
+
+  test 'registered?' do
+    blob = openbis_linked_content_blob('20160210130454955-23',@openbis_endpoint)
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint,'20160210130454955-23')
+    dataset2 = Seek::Openbis::Dataset.new(@openbis_endpoint,'20160215111736723-31')
+
+    assert dataset.registered?
+    refute dataset2.registered?
+
   end
 
 end
