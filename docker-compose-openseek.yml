@@ -19,7 +19,7 @@ services:
       RAILS_ENV: production
       SOLR_PORT: 8983
       NO_ENTRYPOINT_WORKERS: 1
-      OPENBIS_USERNAME: 'admin',
+      OPENBIS_USERNAME: 'admin'
       OPENBIS_PASSWORD: 'changeit'
     env_file:
       - docker/db.env
@@ -62,7 +62,6 @@ services:
         - openbis-state:/home/openbis/openbis_state
       ports:
         - "4000:443"
-
 
   solr:
     image: fairdom/seek-solr
