@@ -32,9 +32,9 @@ GIT
 
 GIT
   remote: https://github.com/SysMO-DB/doi_query_tool.git
-  revision: d87ae6ffa2393beba4bbb49817cf04a60f520fee
+  revision: aeba4284dd380b985edbfad5756fa672deb30843
   specs:
-    doi_query_tool (0.0.0)
+    doi_query_tool (0.0.1)
 
 GIT
   remote: https://github.com/SysMO-DB/fleximage.git
@@ -919,4 +919,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.12.5
+   1.13.6
