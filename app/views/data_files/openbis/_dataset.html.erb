@@ -1,28 +1,80 @@
-<% dataset = data_file.content_blobs.first.openbis_dataset %>
+<%
+  dataset = data_file.content_blobs.first.openbis_dataset
+  openbis_endpoint = dataset.openbis_endpoint
+  file_count=dataset.dataset_file_count
+  files_text = "#{file_count} File".pluralize(file_count)
+%>
 
-<div id="openbis-dataset">
+<%= modal_openbis_file_view('openbis-file-view') %>
 
-  <p>
-    <label>Dataset Perm ID:</label><%= dataset.perm_id %>
-  </p>
-  <p>
-    <label>Dataset Type:</label> <%= dataset.dataset_type_code %>
-  </p>
-  <p>
-    <label>Total size:</label> <%= number_to_human_size(dataset.size) %>
-  </p>
+<div class="panel panel-default" id="openbis-details">
+  <div class="panel-body">
+    <p>
+      <%= image(:openbis) %>
+    </p>
 
+    <div class="row">
+      <div class="col-md-5">
+        <div>
+          <label>Dataset Perm ID: </label> <%= dataset.perm_id %>
+        </div>
+        <div>
+          <label>Dataset Type: </label> <%= dataset.dataset_type_description %>
+        </div>
+        <div>
+          <label>Total size: </label> <%= number_to_human_size(dataset.size) %>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div>
+          <label>Dataset Type Code: </label> <%= dataset.dataset_type_code %>
+        </div>
+        <div>
+          <label>Registration date: </label> <%= date_as_string(dataset.registration_date, true) %>
+        </div>
+        <div>
+          <label>Last modification date: </label> <%= date_as_string(dataset.modification_date, true) %>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        <%= link_to(files_text, '#', class: 'view-files-link',
+                    'data-toggle' => 'modal',
+                    'data-target' => "#openbis-file-view",
+                    'data-perm-id' => "#{dataset.perm_id}",
+                    'data-endpoint-id' => "#{openbis_endpoint.id}")
+        %>
+      </div>
+    </div>
 
-  <a href="#dataset-files" data-toggle="collapse" aria-expanded="false">
-    Dataset Files (<%= dataset.dataset_files_no_directories.count %>)
-  </a>
-  <div class="collapse" id="dataset-files">
-    <ul>
-      <% dataset.dataset_files_no_directories.each do |file| %>
-          <li><%= dataset_file_list_item(data_file, file) %></li>
-      <% end %>
-    </ul>
   </div>
-
-
 </div>
+
+<script>
+
+  //FIXME: copy and paste job from _show_items_for_space.html.erb
+  var OpenBis = {
+    showFiles: function () {
+      var permId = $j(this).data('perm-id');
+      var endpointId = $j(this).data('endpoint-id');
+
+      $j.ajax('<%= show_dataset_files_project_openbis_endpoints_path(@data_file.projects.first) %>', {
+            data: {id: endpointId, perm_id: permId},
+            success: function (html) {
+              $j('#openbis-file-view #contents').html(html);
+            },
+            beforeSend: function () {
+              $j('#openbis-file-view #contents').html('<%= image('spinner') %>');
+            }
+          }
+      );
+    },
+
+  };
+
+  $j(document).ready(function () {
+    $j('#openbis-details').on('click', '.view-files-link', OpenBis.showFiles);
+  });
+
+</script>
