@@ -96,7 +96,7 @@ Vue.component('permissions-table', {
 Vue.component('permission-row', {
   props: ['index', 'permission', 'accessTypes', 'publicAccessType', 'fieldPrefixOrig'],
   template:
-  '<tr class="permission-row" :class="{ mandatory: permission.mandatory }">' +
+  '<tr class="permission-row" :class="{ mandatory: permission.mandatory, hidden: permission.contributor_type === \'FavouriteGroup\' }">' +
   '<td class="name-cell"><span v-if="permission.contributor_type">({{ permission.contributor_type }}) </span>{{ permission.title }}' +
   '<input v-if="permission.contributor_type" type="hidden" :name="fieldPrefix+\'[contributor_type]\'" v-model="permission.contributor_type"/>' +
   '<input v-if="permission.contributor_id" type="hidden" :name="fieldPrefix+\'[contributor_id]\'" v-model="permission.contributor_id"/>' +
