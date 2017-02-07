@@ -120,7 +120,7 @@ class Policy < ActiveRecord::Base
             # See if a permission already exists with that contributor
             permission = current_permissions.detect { |p| p.contributor_type == perm_params[:contributor_type] &&
                                                           p.contributor_id == perm_params[:contributor_id].to_i }
-            permission ||= policy.permissions.build # ...if not, build a new one
+            permission ||= policy.permissions.build(policy: policy) # ...if not, build a new one
 
             permission.tap { |p| p.assign_attributes(perm_params) }
           end
