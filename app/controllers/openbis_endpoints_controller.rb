@@ -65,14 +65,18 @@ class OpenbisEndpointsController < ApplicationController
 
   def refresh_browse_cache
     @openbis_endpoint.clear_cache if @openbis_endpoint.test_authentication
-
     show_items
   end
 
   def show_dataset_files
-    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:perm_id])
+    if data_file=DataFile.find_by_id(params[:data_file_id])
+      dataset=data_file.content_blobs.first.openbis_dataset
+    else
+      dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:perm_id])
+    end
+
     respond_to do |format|
-      format.html { render(partial: 'dataset_files_list', locals: { dataset: dataset }) }
+      format.html { render(partial: 'dataset_files_list', locals: { dataset: dataset, data_file:data_file }) }
     end
   end
 

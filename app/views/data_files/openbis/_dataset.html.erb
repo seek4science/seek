@@ -2,7 +2,7 @@
   dataset = data_file.content_blobs.first.openbis_dataset
   openbis_endpoint = dataset.openbis_endpoint
   file_count=dataset.dataset_file_count
-  files_text = "#{file_count} File".pluralize(file_count)
+  files_text = "#{file_count} File".pluralize(file_count) + " : #{number_to_human_size(dataset.size)}"
 %>
 
 <%= modal_openbis_file_view('openbis-file-view') %>
@@ -21,9 +21,6 @@
         <div>
           <label>Dataset Type: </label> <%= dataset.dataset_type_description %>
         </div>
-        <div>
-          <label>Total size: </label> <%= number_to_human_size(dataset.size) %>
-        </div>
       </div>
       <div class="col-md-5">
         <div>
@@ -39,11 +36,14 @@
     </div>
     <div class="row">
       <div class="col-md-5">
+        <label>Files: </label> <%=  %>
         <%= link_to(files_text, '#', class: 'view-files-link',
                     'data-toggle' => 'modal',
                     'data-target' => "#openbis-file-view",
                     'data-perm-id' => "#{dataset.perm_id}",
-                    'data-endpoint-id' => "#{openbis_endpoint.id}")
+                    'data-endpoint-id' => "#{openbis_endpoint.id}",
+                    'data-datafile-id' => "#{@data_file.id}",
+                    'data-project-id' => "#{@data_file.projects.first.id}")
         %>
       </div>
     </div>
@@ -58,9 +58,12 @@
     showFiles: function () {
       var permId = $j(this).data('perm-id');
       var endpointId = $j(this).data('endpoint-id');
+      var dataFileId=$j(this).data('datafile-id');
+      var projectId=$j(this).data('project-id');
+      var path='/projects/'+projectId+'/openbis_endpoints/show_dataset_files'
 
-      $j.ajax('<%= show_dataset_files_project_openbis_endpoints_path(@data_file.projects.first) %>', {
-            data: {id: endpointId, perm_id: permId},
+      $j.ajax(path, {
+            data: {id: endpointId, data_file_id:dataFileId, perm_id:permId},
             success: function (html) {
               $j('#openbis-file-view #contents').html(html);
             },
