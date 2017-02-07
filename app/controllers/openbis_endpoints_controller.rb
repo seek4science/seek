@@ -69,14 +69,14 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def show_dataset_files
-    if data_file=DataFile.find_by_id(params[:data_file_id])
-      dataset=data_file.content_blobs.first.openbis_dataset
+    if data_file = DataFile.find_by_id(params[:data_file_id])
+      dataset = data_file.content_blobs.first.openbis_dataset
     else
       dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:perm_id])
     end
 
     respond_to do |format|
-      format.html { render(partial: 'dataset_files_list', locals: { dataset: dataset, data_file:data_file }) }
+      format.html { render(partial: 'dataset_files_list', locals: { dataset: dataset, data_file: data_file }) }
     end
   end
 
