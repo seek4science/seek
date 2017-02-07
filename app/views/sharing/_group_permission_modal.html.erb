@@ -35,8 +35,8 @@
 
   // Add a project/institution/workgroup permission to the table
   $j('#permission-project-confirm').click(function () {
-    var projectId = $j('#permission-project-id').val();
-    var institutionId = $j('#permission-institution-id').val();
+    var projectId = parseInt($j('#permission-project-id').val());
+    var institutionId = parseInt($j('#permission-institution-id').val());
     var projectTitle = $j('#permission-project-id :selected').text();
     var institutionTitle = $j('#permission-institution-id :selected').text();
     var permission = {

@@ -11,6 +11,17 @@ var Sharing = {
       }
     }
 
+    // This ensures that if a project permission is added, and that project is associated with the resource, it gains
+    //  the "mandatory" flag.
+    if (permission.contributor_type === 'Project') {
+      for (var j = 0; j < projectsSelector.selected.length; j++) {
+        if (projectsSelector.selected[j].id === permission.contributor_id) {
+          permission.mandatory = true;
+          break;
+        }
+      }
+    }
+
     permissionsTable.permissions.push(permission);
   },
 

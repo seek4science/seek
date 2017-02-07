@@ -34,7 +34,7 @@
     people.forEach(function (person, index) {
       Sharing.addPermission(
           { contributor_type: 'Person',
-            contributor_id: person.id,
+            contributor_id: parseInt(person.id),
             title: person.name,
             access_type: parseInt($j('#permission-people-access-type').val()) });
     });
