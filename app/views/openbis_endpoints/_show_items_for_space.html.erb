@@ -1,53 +1,14 @@
 <%= modal_openbis_file_view('openbis-file-view') %>
 
 
-<%= button_link_to('Refresh Cache','refresh','#','data-endpoint-id'=>openbis_endpoint.id,id:'refresh-cache') %>
+<%= button_link_to('Refresh Cache','refresh','#','data-endpoint-id'=>openbis_endpoint.id,'data-project-id'=> @project.id, id:'refresh-cache') %>
 <div class='row' id="openbis-dataset-cards">
   <%= render partial:'openbis_dataset_card',collection:openbis_endpoint.space.datasets %>
 </div>
 
 <script>
 
-  var OpenBis = {
-    showFiles:function() {
-      var permId=$j(this).data('perm-id');
-      var endpointId=$j(this).data('endpoint-id');
-
-      $j.ajax('<%= show_dataset_files_project_openbis_endpoints_path(@project) %>', {
-            data: {id: endpointId,perm_id:permId},
-            success: function (html) {
-              $j('#openbis-file-view #contents').html(html);
-            },
-            beforeSend: function () {
-              $j('#openbis-file-view #contents').html('<%= image('spinner') %>');
-            }
-          }
-      );
-    },
-
-    refreshCache:function() {
-      if (confirm('Are you sure you wish to refresh the cache?')) {
-        var endpointId=$j(this).data('endpoint-id');
-        $j.ajax('<%= refresh_browse_cache_project_openbis_endpoints_path(@project) %>', {
-              method:'POST',
-              data: {id: endpointId},
-              success: function (html) {
-                $j('#openbis-datasets #contents').html(html);
-              },
-              beforeSend: function () {
-                $j('#openbis-datasets #contents').html('<%= image('large_spinner') %>');
-              }
-            }
-        );
-        //FIXME: this will possible happen before, or even during, the cache being cleared
-        fetchCountForSpace(endpointId);
-      }
-    }
-
-  };
-
   $j('#openbis-dataset-cards').on('click', '.view-files-link', OpenBis.showFiles);
   $j('#refresh-cache').on('click',OpenBis.refreshCache);
-
 
 </script>

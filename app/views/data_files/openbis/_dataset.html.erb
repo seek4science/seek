@@ -53,28 +53,7 @@
 
 <script>
 
-  //FIXME: copy and paste job from _show_items_for_space.html.erb
-  var OpenBis = {
-    showFiles: function () {
-      var permId = $j(this).data('perm-id');
-      var endpointId = $j(this).data('endpoint-id');
-      var dataFileId=$j(this).data('datafile-id');
-      var projectId=$j(this).data('project-id');
-      var path='/projects/'+projectId+'/openbis_endpoints/show_dataset_files'
 
-      $j.ajax(path, {
-            data: {id: endpointId, data_file_id:dataFileId, perm_id:permId},
-            success: function (html) {
-              $j('#openbis-file-view #contents').html(html);
-            },
-            beforeSend: function () {
-              $j('#openbis-file-view #contents').html('<%= image('spinner') %>');
-            }
-          }
-      );
-    },
-
-  };
 
   $j(document).ready(function () {
     $j('#openbis-details').on('click', '.view-files-link', OpenBis.showFiles);
