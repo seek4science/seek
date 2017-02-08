@@ -134,7 +134,8 @@ Vue.component('privilege-cell', {
   '</td>',
   computed: {
     disabled: function () {
-      return (this.permission.public ? (this.accessType.value > Sharing.maxPublicAccessType) : (this.accessType.value < this.publicAccessType));
+      //return (this.permission.public ? (this.accessType.value > Sharing.maxPublicAccessType) : (this.accessType.value < this.publicAccessType));
+      return (this.permission.public ? (this.accessType.value > Sharing.maxPublicAccessType) : false);
     },
     enabled: function () {
       return this.permission.access_type === this.accessType.value ||
