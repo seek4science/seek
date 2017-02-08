@@ -235,6 +235,19 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal "openbis_endpoints/#{endpoint.id}-#{endpoint.updated_at.utc.to_s(:number)}",endpoint.cache_key
   end
 
+  test 'destroy' do
+    pa = Factory(:project_administrator)
+    endpoint = Factory(:openbis_endpoint,project:pa.projects.first)
+    key = endpoint.space.cache_key(endpoint.space_perm_id)
+    assert Rails.cache.exist?(key)
+    assert_difference('OpenbisEndpoint.count',-1) do
+      User.with_current_user(pa.user) do
+        endpoint.destroy
+      end
+    end
+    refute Rails.cache.exist?(key)
+  end
+
   test 'clear cache' do
     endpoint = Factory(:openbis_endpoint)
     key = endpoint.space.cache_key(endpoint.space_perm_id)

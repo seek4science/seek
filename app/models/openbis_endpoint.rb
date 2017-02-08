@@ -9,6 +9,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   validates :space_perm_id, uniqueness: { scope: [:dss_endpoint, :as_endpoint, :space_perm_id, :project_id], message: 'the endpoints and the space must be unique for this project' }
 
   after_create :create_refresh_cache_job
+  after_destroy :clear_cache
 
   def self.can_create?
     User.logged_in_and_member? && User.current_user.is_admin_or_project_administrator? && Seek::Config.openbis_enabled
