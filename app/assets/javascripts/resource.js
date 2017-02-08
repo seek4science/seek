@@ -14,16 +14,6 @@ function showCompareVersions(form) {
 // ***************  Resource Upload Validation  *****************
 
 function validateResourceFields(is_new_file, resource_name, is_managed) {
-    // check if sharing rights are defined
-    if (!($(document.getElementById('sharing_scope_0')).checked) &&
-        !($(document.getElementById('sharing_scope_2')).checked) &&
-        !($(document.getElementById('sharing_scope_4')).checked))
-        {
-        alert('Sharing rights are not defined!');
-        $(document.getElementById('sharing_scope_0')).focus();
-        return(false);
-    }
-
     // only make this test if that's a new SOP
     if(is_new_file) {
         var respond_to_content_blobs = resource_name=='model' ? true :false;
@@ -38,8 +28,6 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
         return(false);
     }
     if (is_managed){
-
-
         // check if no tokens remain in the attributions autocompleter
         // (only do this if the fold with attributions is expanded)
         if($('attributions_fold_content').style.display == "block" &&
@@ -51,13 +39,12 @@ function validateResourceFields(is_new_file, resource_name, is_managed) {
         }
         previewPermissions();
     }
-    else{
+    else {
         // filename and title set - can submit
         $(resource_name + '_submit_btn').disabled = true;
         $(resource_name + '_submit_btn').value = (is_new_file==true ? "Creating..." : "Updating...");
         $(resource_name + '_submit_btn').form.submit();
     }
-
 }
 
 function addTempLink(){
@@ -100,8 +87,6 @@ function createOrUpdateResource(is_new_file, resource_name){
     $(resource_name + '_submit_btn').disabled = true;
     $(resource_name + '_submit_btn').value = (is_new_file=='true' ? "Creating..." : "Updating...");
     $(resource_name + '_submit_btn').form.submit();
-
-    RedBox.close();
 }
 
 function validateUploadFormFields(respond_to_content_blobs, resource_name) {
