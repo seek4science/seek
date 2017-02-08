@@ -3,9 +3,12 @@ class OpenbisEndpointsController < ApplicationController
 
   include Seek::DestroyHandling
 
+  before_filter :openbis_enabled?
+
   before_filter :get_project
   before_filter :project_required
-  before_filter :project_can_admin?
+  before_filter :project_is_member?
+  before_filter :project_can_admin?, except: [:browse,:add_dataset,:show_dataset_files,:show_items, :show_item_count]
   before_filter :get_endpoints, only: [:index, :browse]
   before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_browse_cache, :destroy]
 
@@ -122,4 +125,12 @@ class OpenbisEndpointsController < ApplicationController
       return false
     end
   end
+
+  def project_is_member?
+    unless @project.has_member?(User.current_user)
+      error('Must be a member of the project','No permission')
+      return false
+    end
+  end
+
 end
