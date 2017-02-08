@@ -181,30 +181,15 @@ class ModelTest < ActiveSupport::TestCase
 
   end
 
-  def test_defaults_to_private_policy
-    model=Model.new Factory.attributes_for(:model, :policy => nil)
-    model.save!
-    model.reload
-    assert_not_nil model.policy
-    assert_equal Policy::PRIVATE, model.policy.sharing_scope
-    assert_equal Policy::NO_ACCESS, model.policy.access_type
-    assert !model.policy.use_whitelist
-    assert !model.policy.use_blacklist
-    assert model.policy.permissions.empty?
-  end
-  
-  def test_defaults_to_blank_policy_for_vln
-    with_config_value "is_virtualliver",true do
+  test 'policy defaults to system default' do
+    with_config_value 'default_all_visitors_access_type', Policy::VISIBLE do
       model=Model.new Factory.attributes_for(:model, :policy => nil)
-      assert !model.valid?
-      assert !model.policy.valid?
-      assert_blank model.policy.sharing_scope
-      assert_blank model.policy.access_type
-      assert !model.policy.use_whitelist
-      assert !model.policy.use_blacklist
-      assert_blank model.policy.permissions
+      model.save!
+      model.reload
+      assert_not_nil model.policy
+      assert_equal Policy::VISIBLE, model.policy.access_type
+      assert model.policy.permissions.empty?
     end
-
   end
 
   test "creators through asset" do

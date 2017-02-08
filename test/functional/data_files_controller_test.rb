@@ -453,54 +453,31 @@ class DataFilesControllerTest < ActionController::TestCase
     Seek::Config.admin_impersonation_enabled = old_admin_impersonation
   end
 
-  def test_missing_sharing_should_default_to_private
-    data_file,blob = valid_data_file
-    assert_difference('ActivityLog.count') do
-      assert_difference('DataFile.count') do
-        assert_difference('ContentBlob.count') do
-          post :create, :data_file => data_file,:content_blobs => [blob]
-
-        end
-      end
-    end
-    assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal users(:datafile_owner),assigns(:data_file).contributor
-    assert assigns(:data_file)
-
-    df=assigns(:data_file)
-    private_policy = policies(:private_policy_for_asset_of_my_first_sop)
-    assert_equal private_policy.sharing_scope,df.policy.sharing_scope
-    assert_equal private_policy.access_type,df.policy.access_type
-    assert_equal private_policy.use_whitelist,df.policy.use_whitelist
-    assert_equal private_policy.use_blacklist,df.policy.use_blacklist
-    assert df.policy.permissions.empty?
-
-    #check it doesn't create an error when retreiving the index
-    get :index
-    assert_response :success
-  end
-
-  def test_missing_sharing_should_default_to_blank_for_vln
-    data_file,blob = valid_data_file
-    with_config_value "is_virtualliver",true do
-      assert_no_difference('ActivityLog.count') do
-        assert_no_difference('DataFile.count') do
-          assert_no_difference('ContentBlob.count') do
+  test "missing sharing should default" do
+    with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
+      data_file,blob = valid_data_file
+      assert_difference('ActivityLog.count') do
+        assert_difference('DataFile.count') do
+          assert_difference('ContentBlob.count') do
             post :create, :data_file => data_file,:content_blobs => [blob]
 
           end
         end
       end
+      assert_redirected_to data_file_path(assigns(:data_file))
+      assert_equal users(:datafile_owner),assigns(:data_file).contributor
+      assert assigns(:data_file)
 
       df=assigns(:data_file)
-      assert !df.valid?
-      assert !df.policy.valid?
-      assert_blank df.policy.sharing_scope
-      assert_blank df.policy.access_type
-      assert_blank df.policy.permissions
+      assert_equal Policy::NO_ACCESS, df.policy.access_type
+      assert df.policy.permissions.empty?
+
+      #check it doesn't create an error when retreiving the index
+      get :index
+      assert_response :success
     end
   end
-  
+
   test "should show data file" do
     d = Factory :rightfield_datafile,:policy=>Factory(:public_policy)
     assert_difference('ActivityLog.count') do

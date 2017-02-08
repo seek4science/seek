@@ -317,26 +317,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_includes assay.models, assigns(:model)
   end
 
-  def test_missing_sharing_should_default_to_blank_for_vln
-    with_config_value "is_virtualliver",true do
-      assert_no_difference('Model.count') do
-        assert_no_difference('ContentBlob.count') do
-          post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}]
-
-        end
-      end
-
-      m = assigns(:model)
-      assert !m.valid?
-      assert !m.policy.valid?
-      assert_blank m.policy.sharing_scope
-      assert_blank m.policy.access_type
-      assert_blank m.policy.permissions
-    end
-  end
-
-  def test_missing_sharing_should_default_to_private
-    with_config_value "is_virtualliver",false do
+  test 'missing sharing should default to private' do
+    with_config_value "default_all_visitors_access_type", Policy::NO_ACCESS do
       assert_difference('Model.count',1) do
         assert_difference('ContentBlob.count',1) do
           post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}]
@@ -347,12 +329,10 @@ class ModelsControllerTest < ActionController::TestCase
       m = assigns(:model)
       assert m.valid?
       assert m.policy.valid?
-      assert_equal Policy::PRIVATE, m.policy.sharing_scope
       assert_equal Policy::NO_ACCESS, m.policy.access_type
       assert_blank m.policy.permissions
     end
   end
-  
 
   test "should create model with image" do
       login_as(:model_owner)
