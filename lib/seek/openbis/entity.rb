@@ -37,8 +37,8 @@ module Seek
 
       def construct_from_json(json)
         return [] unless json[json_key]
-        json[json_key].collect do |json|
-          self.class.new(openbis_endpoint).populate_from_json(json)
+        json[json_key].collect do |element|
+          self.class.new(openbis_endpoint).populate_from_json(element)
         end.sort_by(&:modification_date).reverse
       end
 

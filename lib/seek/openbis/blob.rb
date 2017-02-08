@@ -40,7 +40,7 @@ module Seek
       private
 
       def openbis_search_terms
-        return [] unless openbis? && dataset = openbis_dataset
+        return [] unless openbis? && (dataset = openbis_dataset)
         terms = [dataset.perm_id, dataset.dataset_type_code, dataset.dataset_type_description, dataset.experiment_id]
         terms | dataset.dataset_files_no_directories.collect do |file|
           [file.perm_id, file.path, file.filename]
