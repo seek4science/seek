@@ -1,8 +1,10 @@
-.openbis-card-heading {
+.openbis-card .openbis-card-heading {
     background-color: rgba(39, 106, 158, 0.27);
     border-bottom: 1px solid #ccc;
 
 }
+
+
 
 .openbis-card-heading span {
     padding-left:1em;
@@ -10,6 +12,12 @@
 
 .openbis-card + .registered  {
     opacity: 0.65;
+    display:none;
+}
+
+.openbis-card + .registered .openbis-card-heading {
+    background-color: rgba(221, 12, 20, 0.26);
+    border-bottom: 1px solid #ccc;
 }
 
 #openbis-file-list {

@@ -24,14 +24,20 @@
       </div>
       <div class="col-md-5">
         <div>
-          <label>Dataset Type Code: </label> <%= dataset.dataset_type_code %>
-        </div>
-        <div>
           <label>Registration date: </label> <%= date_as_string(dataset.registration_date, true) %>
         </div>
         <div>
-          <label>Last modification date: </label> <%= date_as_string(dataset.modification_date, true) %>
+          <label>Registered by: </label> <%= dataset.registrator %>
         </div>
+        <% if dataset.registration_date != dataset.modification_date %>
+            <div>
+              <label>Modification date: </label> <%= date_as_string(dataset.modification_date, true) %>
+            </div>
+            <div>
+              <label>Modified by: </label> <%= dataset.modifier %>
+            </div>
+        <% end %>
+
       </div>
     </div>
     <div class="row">
