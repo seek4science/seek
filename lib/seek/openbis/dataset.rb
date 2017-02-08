@@ -71,7 +71,7 @@ module Seek
 
       def create_seek_datafile
         fail 'Already registered' if registered?
-        df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}")
+        df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}",license:openbis_endpoint.project.default_license)
         if df.save
           df.content_blobs.create(url: content_blob_uri, make_local_copy: false, external_link: false, original_filename: "openbis-#{perm_id}")
         end

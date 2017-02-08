@@ -37,4 +37,23 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     #other scenerios are covered in the unit tests for can_delete?
   end
 
+  test 'add dataset' do
+    person = Factory(:project_administrator)
+    project=person.projects.first
+    disable_authorization_checks do
+      project.update_attributes(default_license:'wibble')
+    end
+    endpoint = Factory(:openbis_endpoint,project:project)
+    perm_id='20160210130454955-23'
+    login_as(person)
+    assert_difference("DataFile.count") do
+      post :add_dataset,id:endpoint.id,project_id:project.id,dataset_perm_id:perm_id
+      assert_nil flash[:error]
+    end
+    data_file=assigns(:data_file)
+    assert_redirected_to data_file
+    assert_equal '20160210130454955-23',data_file.content_blobs.first.openbis_dataset.perm_id
+    assert_equal 'wibble',data_file.license
+  end
+
 end

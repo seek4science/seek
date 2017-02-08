@@ -58,6 +58,7 @@ class DatasetTest < ActiveSupport::TestCase
 
   test 'create datafile' do
     User.current_user=Factory(:person).user
+    @openbis_endpoint.project.update_attributes(default_license:'wibble')
 
     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint,'20160210130454955-23')
     datafile = dataset.create_seek_datafile
@@ -73,6 +74,7 @@ class DatasetTest < ActiveSupport::TestCase
     refute datafile.content_blobs.first.show_as_external_link?
 
     assert_equal "openbis:#{@openbis_endpoint.id}:dataset:20160210130454955-23",datafile.content_blobs.first.url
+    assert_equal 'wibble',datafile.license
 
     normal = Factory(:data_file)
     refute normal.openbis?

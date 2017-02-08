@@ -35,8 +35,8 @@ class OpenbisEndpointsController < ApplicationController
   def add_dataset
     perm_id = params[:dataset_perm_id]
     fail 'No perm_id passed' unless perm_id
-    datafile = DataFile.build_from_openbis(@openbis_endpoint, params[:dataset_perm_id])
-    redirect_to datafile
+    @data_file = DataFile.build_from_openbis(@openbis_endpoint, params[:dataset_perm_id])
+    redirect_to @data_file
   end
 
   def browse
@@ -97,13 +97,6 @@ class OpenbisEndpointsController < ApplicationController
       format.html { render partial: 'available_spaces', locals: { endpoint: endpoint } }
     end
   end
-
-  # def destroy
-  #   unless @openbis_endpoint.can_delete?
-  #     error("You are not able to delete this endpoint", "No permission")
-  #     return false
-  #   end
-  # end
 
   ### Filters
 
