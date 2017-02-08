@@ -3,6 +3,12 @@ require 'openbis_test_helper'
 
 class OpenbisEndpointTest < ActiveSupport::TestCase
 
+  def setup
+    #avoids first person being admin
+    person = Factory(:person)
+    mock_openbis_calls
+  end
+
   test 'validation' do
     project=Factory(:project)
     endpoint = OpenbisEndpoint.new project: project, username: 'fred', password: '12345',
@@ -115,15 +121,51 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     end
   end
 
+  test 'can_delete?' do
+
+    person = Factory(:person)
+    ep = Factory(:openbis_endpoint,project:person.projects.first)
+    refute ep.can_delete?(person.user)
+    User.with_current_user(person.user) do
+      refute ep.can_delete?
+    end
+
+    pa = Factory(:project_administrator)
+    ep = Factory(:openbis_endpoint,project:pa.projects.first)
+    assert ep.can_delete?(pa.user)
+    User.with_current_user(pa.user) do
+      assert ep.can_delete?
+    end
+
+    another_pa = Factory(:project_administrator)
+    refute ep.can_delete?(another_pa.user)
+    User.with_current_user(another_pa.user) do
+      refute ep.can_delete?
+    end
+
+    #cannot delete if linked
+    #first check another linked endpoint doesn't prevent delete
+    refute_nil openbis_linked_content_blob("20160210130454955-23")
+    assert ep.can_delete?(pa.user)
+    User.with_current_user(pa.user) do
+      assert ep.can_delete?
+    end
+
+    refute_nil openbis_linked_content_blob("20160210130454955-23",ep)
+    refute ep.can_delete?(pa.user)
+    User.with_current_user(pa.user) do
+      refute ep.can_delete?
+    end
+
+  end
+
   test 'available spaces' do
-    mock_openbis_calls
     endpoint = Factory(:openbis_endpoint)
     spaces = endpoint.available_spaces
     assert_equal 2,spaces.count
   end
 
   test 'space' do
-    mock_openbis_calls
     endpoint = Factory(:openbis_endpoint)
     space = endpoint.space
     refute_nil space
@@ -178,7 +220,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'session token' do
-    mock_openbis_calls
     endpoint = Factory(:openbis_endpoint)
 
     refute_nil endpoint.session_token
@@ -195,7 +236,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'clear cache' do
-    mock_openbis_calls
     endpoint = Factory(:openbis_endpoint)
     key = endpoint.space.cache_key(endpoint.space_perm_id)
     assert Rails.cache.exist?(key)

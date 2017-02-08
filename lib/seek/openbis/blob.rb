@@ -4,6 +4,17 @@ module Seek
     # FIXME: wanted to call ContentBlob but rails loader didn't like it and got confused
     # ... over the model ContentBlob disregarding the namespacing. Need to investigate why?
     module Blob
+
+      #NOTE: the fact is it prepended rather than included seems to prevent the use of Concern's which doesn't handle prepend
+      def self.prepended(base)
+        base.class_eval do
+          scope :for_openbis_endpoint,->(endpoint) do
+            where("url LIKE 'openbis:#{endpoint.id}%'")
+          end
+        end
+
+      end
+
       def openbis?
         url && URI.parse(url).scheme == 'openbis' && url.split(':').count == 4
       end

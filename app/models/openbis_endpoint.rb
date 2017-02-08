@@ -18,8 +18,8 @@ class OpenbisEndpoint < ActiveRecord::Base
     user && project.can_be_administered_by?(user) && Seek::Config.openbis_enabled
   end
 
-  def can_delete?(_user = User.current_user)
-    true
+  def can_delete?(user = User.current_user)
+    can_edit?(user) && associated_content_blobs.empty?
   end
 
   def test_authentication
@@ -71,4 +71,7 @@ class OpenbisEndpoint < ActiveRecord::Base
     OpenbisEndpointCacheRefreshJob.new(self).queue_job
   end
 
+  def associated_content_blobs
+    ContentBlob.for_openbis_endpoint(self)
+  end
 end
