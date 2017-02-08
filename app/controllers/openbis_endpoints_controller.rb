@@ -1,11 +1,13 @@
 class OpenbisEndpointsController < ApplicationController
   respond_to :html
 
+  include Seek::DestroyHandling
+
   before_filter :get_project
   before_filter :project_required
   before_filter :project_can_admin?
   before_filter :get_endpoints, only: [:index, :browse]
-  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_browse_cache]
+  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_browse_cache,:destroy]
 
   def index
     respond_with(@project, @openbis_endpoints)
@@ -95,6 +97,13 @@ class OpenbisEndpointsController < ApplicationController
       format.html { render partial: 'available_spaces', locals: { endpoint: endpoint } }
     end
   end
+
+  # def destroy
+  #   unless @openbis_endpoint.can_delete?
+  #     error("You are not able to delete this endpoint", "No permission")
+  #     return false
+  #   end
+  # end
 
   ### Filters
 
