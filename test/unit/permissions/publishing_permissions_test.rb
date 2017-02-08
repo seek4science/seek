@@ -284,17 +284,17 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
 
   test 'disable authorization check for publishing_auth' do
       df = Factory(:data_file)
-      assert_equal Policy::PRIVATE, df.policy.sharing_scope
+      assert_equal Policy::NO_ACCESS, df.policy.access_type
       user = Factory(:user)
       User.with_current_user user do
         assert !df.can_publish?
       end
 
       disable_authorization_checks do
-        df.policy.sharing_scope = Policy::EVERYONE
+        df.policy.access_type = Policy::ACCESSIBLE
         assert df.save
         df.reload
-        assert_equal Policy::EVERYONE, df.policy.sharing_scope
+        assert_equal Policy::ACCESSIBLE, df.policy.access_type
       end
     end
 end
