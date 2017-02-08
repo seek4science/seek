@@ -24,15 +24,12 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def test_authentication
     !session_token.nil?
-  rescue Fairdom::OpenbisApi::OpenbisQueryException => e
+  rescue Fairdom::OpenbisApi::OpenbisQueryException
     false
   end
 
   def available_spaces
-    all_spaces = Seek::Openbis::Space.new(self).all
-    # known = project.openbis_endpoints.select{|space| space.as_endpoint==self.as_endpoint}.collect(&:space_name)
-    # spaces = all_spaces.select{|sp| !known.include?(sp.code)} #reject any that have already been used
-    # spaces | [self.space_name].compact
+    Seek::Openbis::Space.new(self).all
   end
 
   # session token used for authentication, provided when logging in

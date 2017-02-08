@@ -7,7 +7,7 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :project_required
   before_filter :project_can_admin?
   before_filter :get_endpoints, only: [:index, :browse]
-  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_browse_cache,:destroy]
+  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_browse_cache, :destroy]
 
   def index
     respond_with(@project, @openbis_endpoints)
