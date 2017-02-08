@@ -476,8 +476,9 @@ img.avatar-corner-icon {
     width: 30%;
   }
 
-  td {
-    vertical-align: middle !important;
+  tbody > tr > td {
+    vertical-align: middle;
+    padding: 5px;
   }
 
   .permission-column.no-access, .privilege-cell.no-access {
@@ -557,7 +558,7 @@ img.avatar-corner-icon {
   }
 }
 
-a.remove-project {
+a.remove-button {
   text-decoration: none;
   font-weight: bold;
   vertical-align: text-top;

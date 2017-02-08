@@ -75,7 +75,7 @@ Vue.component('permissions-table', {
   '</tr>' +
   '</thead>' +
   '<tbody>' +
-  '<tr is="permission-row" :permission="publicPermission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" field-prefix-orig="policy"></tr>' +
+  '<tr is="permission-row" class="public-permission-row" :permission="publicPermission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" field-prefix-orig="policy"></tr>' +
   '<tr is="permission-row" v-for="(permission, index) in sortedPermissions" :index="index" :permission="permission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" v-on:delete-permission="deletePermission(index)"></tr>' +
   '</tbody>'+
   '</table>',
@@ -114,8 +114,8 @@ Vue.component('permission-row', {
   '</td>' +
   '<td is="privilege-cell" v-for="accessType in accessTypes" :fieldPrefix="fieldPrefix" :permission="permission" :access-type="accessType" :public-access-type="publicAccessType"></td>' +
   '<td class="actions-cell">'+
-  '<a v-if="!permission.mandatory" @click="$emit(\'delete-permission\')" class="btn btn-xs btn-danger" title="Remove this permission">' +
-  '<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>' +
+  '<a v-if="!permission.mandatory" @click="$emit(\'delete-permission\')" class="clickable remove-button" title="Remove this permission">' +
+  '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
   '</a>' +
   '</td>' +
   '</tr>',
