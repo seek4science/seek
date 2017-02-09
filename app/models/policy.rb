@@ -3,7 +3,8 @@ class Policy < ActiveRecord::Base
   has_many :permissions,
            :dependent => :destroy,
            :order => "created_at ASC",
-           :autosave => true
+           :autosave => true,
+           :inverse_of => :policy
 
   #basically the same as validates_numericality_of :sharing_scope, :access_type
   #but with a more generic error message because our users don't know what
@@ -120,7 +121,7 @@ class Policy < ActiveRecord::Base
             # See if a permission already exists with that contributor
             permission = current_permissions.detect { |p| p.contributor_type == perm_params[:contributor_type] &&
                                                           p.contributor_id == perm_params[:contributor_id].to_i }
-            permission ||= policy.permissions.build(policy: policy) # ...if not, build a new one
+            permission ||= policy.permissions.build
 
             permission.tap { |p| p.assign_attributes(perm_params) }
           end
@@ -169,7 +170,7 @@ class Policy < ActiveRecord::Base
                           :access_type => VISIBLE
       )
       projects.each do |project|
-        policy.permissions << Permission.new(:contributor => project, :access_type => ACCESSIBLE)
+        policy.permissions.build(:contributor => project, :access_type => ACCESSIBLE)
       end
       return policy
   end
