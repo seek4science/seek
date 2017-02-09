@@ -368,7 +368,7 @@ class ProjectsController < ApplicationController
   end
 
   def auth_params
-    restricted_params={:sharing => User.admin_logged_in?,
+    restricted_params={:policy_attributes => User.admin_logged_in?,
                        :site_root_uri => User.admin_logged_in?,
                        :site_username => User.admin_logged_in?,
                        :site_password => User.admin_logged_in?,
