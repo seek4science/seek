@@ -5,7 +5,7 @@ module PublicationsHelper
     options = ""
     projects.each do |project|
       project_options = "<optgroup id=#{project.id} title=\"#{h project.title}\" label=\"#{h truncate(project.title)}\">"
-      project.people.sort{|a,b| (a.last_name.nil? ? nil : a.last_name.capitalize) <=> (b.last_name.nil? ? nil : b.last_name.capitalize)}.each do |person|
+      project.people.each do |person|
         project_options << "<option value=\"#{person.id}\" title=\"#{h person.name}\">#{h truncate(person.name)}</option>"
       end
       project_options << "</optgroup>"

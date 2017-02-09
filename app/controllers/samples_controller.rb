@@ -60,7 +60,7 @@ class SamplesController < ApplicationController
     else
       flash[:error] = 'It was not possible to delete the sample.'
     end
-    respond_with(@sample, location: samples_path)
+    respond_with(@sample, location: root_path)
   end
 
   # called from AJAX, returns the form containing the attributes for the sample_type_id

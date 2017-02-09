@@ -86,7 +86,7 @@ namespace :seek_stats do
       # Disabling email is the only way to prevent an email job being created when an activity log is saved
       Seek::Config.email_enabled = false
       # Log single runs (not part of a sweep)
-      TavernaPlayer::Run.where(:sweep_id => nil).all.each do |run|
+      TavernaPlayer::Run.where(:sweep_id => nil).find_each do |run|
         unless ActivityLog.where(:activity_loggable_id => run.id, :activity_loggable_type => 'TavernaPlayer::Run', :action => 'create').exists?
           ActivityLog.create(:activity_loggable => run, :action => 'create', :culprit => run.contributor,
                              :referenced => run.workflow, :user_agent => 'script', :created_at => run.created_at,
@@ -98,7 +98,7 @@ namespace :seek_stats do
       end
 
       # Log sweeps
-      Sweep.all.each do |sweep|
+      Sweep.find_each do |sweep|
         unless ActivityLog.where(:activity_loggable_id => sweep.id, :activity_loggable_type => 'Sweep', :action => 'create').exists?
           ActivityLog.create(:activity_loggable => sweep, :action => 'create', :culprit => sweep.contributor,
                              :referenced => sweep.workflow, :user_agent => 'script', :created_at => sweep.created_at,

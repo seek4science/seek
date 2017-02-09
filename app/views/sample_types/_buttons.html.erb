@@ -13,6 +13,8 @@
     <% if sample_type.can_edit? -%>
         <li><%= image_tag_for_key('edit', edit_sample_type_path(sample_type), nil, nil, "Edit Sample Type") -%></li>
     <% end -%>
-<%= delete_icon(sample_type, current_user) %>
+    <% if sample_type.can_delete? %>
+        <%= delete_icon(sample_type, current_user) %>
+    <% end %>
 
 <% end %>

@@ -26,6 +26,6 @@
     <%= render :partial => 'admins/registration' %>
 <% end %>
 
-<%= render :partial => "admins/restart_buttons" -%>
+<%= render :partial => "admins/restart_buttons" unless using_docker? %>
 
 <small><%= git_link_tag %></small>

@@ -6,8 +6,8 @@ class SpreadsheetTest < ActiveSupport::TestCase
 
   test "spreadsheets are spreadsheets" do
     datafile = Factory :small_test_spreadsheet_datafile
-    assert datafile.content_blob.is_excel?
-    assert datafile.content_blob.is_extractable_spreadsheet?
+    assert datafile.content_blobs.first.is_excel?
+    assert datafile.content_blobs.first.is_extractable_spreadsheet?
   end
 
   test "spreadsheet is properly parsed" do
@@ -32,13 +32,13 @@ class SpreadsheetTest < ActiveSupport::TestCase
   test "spreadsheet xml is cached" do
     datafile = Factory :small_test_spreadsheet_datafile
     Rails.cache.clear
-    assert_nil Rails.cache.fetch("blob_ss_xml-#{datafile.content_blob.cache_key}")
+    assert_nil Rails.cache.fetch("blob_ss_xml-#{datafile.content_blobs.first.cache_key}")
 
 
     #Creates spreadsheet
-    assert !datafile.spreadsheet.nil?
+    refute datafile.spreadsheet.nil?
 
-    assert_not_nil Rails.cache.fetch("blob_ss_xml-#{datafile.content_blob.cache_key}")
+    assert_not_nil Rails.cache.fetch("blob_ss_xml-#{datafile.content_blobs.first.cache_key}")
   end
 
   test "alphabetical and numeric column conversion" do

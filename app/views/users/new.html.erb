@@ -8,47 +8,56 @@
     <% end %>
 <% end -%>
 
-<div class="row">
-  <div class="col-md-5 col-md-push-7">
-    <p>
-      <b>By registering, you are indicating that you have read and agree that:</b>
-      You are responsible for any content that you upload. We receive and store certain types of information whenever you
-      interact with us which we will use only for operational purposes. We will not make
-      personally identifiable data available to third parties without consent.
-      Please contact us if you have any queries about our terms or our privacy policy.
-    </p>
-    <p>
-      If you have previously provided a login and password but didn't select or create a profile, then your details have already been stored
-      and you should Login to continue the registration process.
-    </p>
-  </div>
-  <div class="col-md-7 col-md-pull-5">
-    <%= form_for @user do |f| -%>
 
-
-        <div class="form-group">
-          <label>Login name</label>
-          <%= f.text_field :login, :class => 'form-control' %>
-          <p class="help-block">Login should contain a minimum of 3 characters.</p>
-        </div>
-
-        <div class="form-group">
-          <label>Email address</label>
-          <%= f.text_field :email, :class => 'form-control' %>
-        </div>
-
-        <div class="form-group">
-          <label>Password</label>
-          <%= f.password_field :password, :class => 'form-control' %>
-          <p class="help-block">Password should contain a minimum of 4 characters.</p>
-        </div>
-
-        <div class="form-group">
-          <label>Confirm Password</label>
-          <%= f.password_field :password_confirmation, :class => 'form-control' %>
-        </div>
-
-        <%= submit_tag 'Register', :disable_with=>"Registering...", :class => 'btn btn-primary' %>
-    <% end -%>
+<% if Seek::Config.registration_disabled -%>
+<div class="panel panel-default" id="home_description">
+  <div class="panel-body">
+    <%= registration_disabled_description_text -%>
   </div>
 </div>
+<% else  %>
+  <div class="row">
+    <div class="col-md-5 col-md-push-7">
+      <p>
+        <b>By registering, you are indicating that you have read and agree that:</b>
+        You are responsible for any content that you upload. We receive and store certain types of information whenever you
+        interact with us which we will use only for operational purposes. We will not make
+        personally identifiable data available to third parties without consent.
+        Please contact us if you have any queries about our terms or our privacy policy.
+      </p>
+      <p>
+        If you have previously provided a login and password but didn't select or create a profile, then your details have already been stored
+        and you should Login to continue the registration process.
+      </p>
+    </div>
+    <div class="col-md-7 col-md-pull-5">
+      <%= form_for @user do |f| -%>
+
+
+          <div class="form-group">
+            <label>Login name</label>
+            <%= f.text_field :login, :class => 'form-control' %>
+            <p class="help-block">Login should contain a minimum of 3 characters.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Email address</label>
+            <%= f.text_field :email, :class => 'form-control' %>
+          </div>
+
+          <div class="form-group">
+            <label>Password</label>
+            <%= f.password_field :password, :class => 'form-control' %>
+            <p class="help-block">Password should contain a minimum of 4 characters.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <%= f.password_field :password_confirmation, :class => 'form-control' %>
+          </div>
+
+          <%= submit_tag 'Register', :disable_with=>"Registering...", :class => 'btn btn-primary' %>
+      <% end -%>
+    </div>
+  </div>
+<% end -%>

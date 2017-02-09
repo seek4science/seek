@@ -22,6 +22,8 @@ SEEK::Application.configure do
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
   Seek::Config.default :hide_details_enabled,false
+  Seek::Config.default :registration_disabled,false
+  Seek::Config.default :registration_disabled_description,'Registration is not available, please contact your administrator'
   Seek::Config.default :activation_required_enabled,false
   Seek::Config.default :google_analytics_enabled, false
   Seek::Config.default :google_analytics_tracker_id, '000-000'
@@ -46,7 +48,6 @@ SEEK::Application.configure do
   Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
-  Seek::Config.default :biosamples_enabled, false
   Seek::Config.default :modelling_analysis_enabled,true
   Seek::Config.default :organisms_enabled,true
   Seek::Config.default :models_enabled,true
@@ -72,6 +73,7 @@ SEEK::Application.configure do
   Seek::Config.default :show_announcements, true
   Seek::Config.default :programme_user_creation_enabled, false
   Seek::Config.default :samples_enabled, true
+  Seek::Config.default :project_admin_sample_type_restriction, true #only project admins can create and edit sample types and controlled vocabs
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
@@ -155,11 +157,13 @@ SEEK::Application.configure do
 
   #MERGENOTE - remove this from config and replace with alternative partial
   Seek::Config.default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
-  
+
   # Set default permissions
   Seek::Config.default :default_associated_projects_access_type, Policy::ACCESSIBLE
   Seek::Config.default :default_consortium_access_type, Policy::VISIBLE
   Seek::Config.default :default_all_visitors_access_type, Policy::ACCESSIBLE
+
+  Seek::Config.default :permissions_popup, Seek::Config::PERMISSION_POPUP_ALWAYS
 
   Seek::Config.fixed :css_prepended,''
   Seek::Config.fixed :css_appended,''

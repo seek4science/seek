@@ -104,7 +104,7 @@ class AssetTest < ActiveSupport::TestCase
     assert df.contains_downloadable_items?
     assert df.latest_version.contains_downloadable_items?
 
-    df = Factory :data_file,:content_blob=>Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)
+    df = Factory :data_file,:content_blobs=>[Factory(:content_blob,:url=>"http://webpage.com", :external_link => true)]
     assert !df.contains_downloadable_items?
     assert !df.latest_version.contains_downloadable_items?
 

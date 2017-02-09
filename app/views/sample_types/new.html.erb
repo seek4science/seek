@@ -8,21 +8,37 @@
 </p>
 
 <div>
-  <ul class="nav nav-tabs" role="tablist">
+  <ul id="sample-type-tabs" class="nav nav-tabs" role="tablist">
     <li role="presentation" <%= 'class="active"'.html_safe if tab == 'manual' -%>>
-      <a href="#manual" aria-controls="home" role="tab" data-toggle="tab">Form</a>
+      <a href="#manual" aria-controls="from-template" role="tab" data-toggle="tab">Form</a>
     </li>
     <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-template' -%>>
-      <a href="#from-template" aria-controls="profile" role="tab" data-toggle="tab">Use spreadsheet template</a>
+      <a href="#from-template" aria-controls="manual" role="tab" data-toggle="tab">Use spreadsheet template</a>
     </li>
   </ul>
 
-  <div class="tab-content">
-    <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
-      <%= render 'form' %>
-    </div>
-    <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'from-template' -%>" id="from-template">
-      <%= render 'from_template'%>
-    </div>
-  </div>
+  <%= render partial: 'sample_types/form', locals: { tab: tab } %>
 </div>
+
+<script>
+  $j(document).ready(function () {
+    // A function to switch the form action depending on which tab is selected.
+    // Also disables form elements in the hidden tab.
+    var switchFormTarget = function () {
+      var form = $j('#new_sample_type');
+      var id = $j('.tab-pane.active', form)[0].id;
+      $j('.tab-pane :input', form).attr('disabled', true);
+      $j('.tab-pane.active :input', form).attr('disabled', false);
+
+      if (id == 'from-template') {
+        form[0].action = '<%= create_from_template_sample_types_path -%>';
+      } else {
+        form[0].action = '<%= sample_types_path -%>';
+      }
+    };
+
+    $j('#sample-type-tabs a[data-toggle="tab"]').on('shown.bs.tab', switchFormTarget);
+
+    switchFormTarget();
+  });
+</script>

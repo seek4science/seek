@@ -2,25 +2,12 @@ require 'rubygems'
 require 'rake'
 require 'time'
 require 'active_record/fixtures'
-
-
-
 require 'csv'
 
 namespace :seek do
 
   desc 'an alternative to the doc:seek task'
   task(:docs=>["doc:seek"])
-
-  desc 'set age_unit to be week for Virtual Liver old specimens which use week as age unit'
-  task(:update_age_unit => :environment) do
-    DeprecatedSpecimen.all.each do |sp|
-      sp.age_unit = "week" unless sp.age_unit
-      disable_authorization_checks do
-        sp.save!
-      end
-    end
-  end
 
   desc 'updates the md5sum, and makes a local cache, for existing remote assets'
   task(:cache_remote_content_blobs=>:environment) do
@@ -163,7 +150,7 @@ namespace :seek do
     ######update work groups##############
     puts "update work groups,it may take some time..."
     disable_authorization_checks do
-      Project.all.each do |proj|
+      Project.find_each do |proj|
         proj.institutions.each do |i|
           proj.parent.institutions << i unless proj.parent.nil? || proj.parent.institutions.include?(i)
         end
@@ -172,13 +159,11 @@ namespace :seek do
 
   end
 
-  private
-
   desc "Subscribes users to the items they would normally be subscribed to by default"
   #Run this after the subscriptions, and all subscribable classes have had their tables created by migrations
   #You can also run it any time you want to force everyone to subscribe to something they would be subscribed to by default
   task :create_default_subscriptions => :environment do
-    Person.all.each do |p|
+    Person.find_each do |p|
       set_default_subscriptions  p
       disable_authorization_checks {p.save(:validate=>false)}
     end
@@ -186,7 +171,7 @@ namespace :seek do
   
   task(:repopulate_auth_lookup_tables_old => :environment) do
     AuthLookupUpdateJob.new.add_items_to_queue nil,5.seconds.from_now,1
-    User.all.each do |user|
+    User.find_each do |user|
       unless AuthLookupUpdateQueue.exists?(user)
         AuthLookupUpdateJob.new.add_items_to_queue user,5.seconds.from_now,1
       end
@@ -196,7 +181,7 @@ namespace :seek do
   desc "Creates background jobs to rebuild all authorization lookup table for all items."
   task(:repopulate_auth_lookup_tables=>:environment) do
     Seek::Util.authorized_types.each do |type|
-      type.all.each do |item|
+      type.find_each do |item|
         unless AuthLookupUpdateQueue.exists?(item)
           AuthLookupUpdateJob.new.add_items_to_queue item,5.seconds.from_now,1
         end
@@ -359,7 +344,7 @@ namespace :seek do
       puts
       output.puts type.name
       users = User.all + [nil]
-      type.all.each do |item|
+      type.find_each do |item|
         users.each do |user|
           user_id = user.nil? ? 0 : user.id
           ['view', 'edit', 'download', 'manage', 'delete'].each do |action|
@@ -390,7 +375,7 @@ namespace :seek do
     new_method_start = Time.now
     Seek::Util.authorized_types.each do |type|
       puts type.name
-      type.includes(policy: :permissions).all.each do |item|
+      type.includes(policy: :permissions).find_each do |item|
         item.update_lookup_table_for_all_users
         print '.'
       end
@@ -410,7 +395,7 @@ namespace :seek do
     old_method_start = Time.now
     Seek::Util.authorized_types.each do |type|
       puts type.name
-      type.includes(policy: :permissions).all.each do |item|
+      type.includes(policy: :permissions).find_each do |item|
         all_users.each do |user|
           item.update_lookup_table(user)
         end
@@ -431,6 +416,109 @@ namespace :seek do
     puts "New method took #{new_method_time} seconds"
     puts "Old method took #{old_method_time} seconds"
   end
+
+  desc "dump the old biosamples data into YAML"
+  task(:dump_old_biosamples_data => :environment) do
+    filename = 'old_biosamples.yml'
+    bytes = File.write(filename, Deprecated::Specimen.all.to_yaml)
+    puts "#{bytes} bytes written to #{filename}"
+  end
+
+  desc "convert old biosamples data into new format"
+  task :convert_old_biosamples_data, [:filename] => :environment do |t, args|
+    sample_type = SampleType.find_by_title('SysMO Biosample')
+
+    if sample_type.nil?
+      raise "Couldn't find 'SysMO Biosample' sample type - maybe need to run `rake db:seed:sample_attribute_types`?"
+    end
+
+    filename = args[:filename]
+
+    if filename
+      # The following line stops the YAML loader from complaining about missing modules/classes
+      [Deprecated::Sample, Deprecated::Specimen, Deprecated::SampleAsset, Deprecated::Treatment]
+      puts "Loading biosamples data from file: #{filename}"
+      specimens = YAML.load(File.read(filename))
+    else
+      puts "Loading biosamples data from database"
+      specimens = Deprecated::Specimen.all
+    end
+
+    puts "Converting samples:\n"
+    total = 0
+    saved = 0
+    errored = []
+    specimens.each do |old_specimen|
+      old_specimen.deprecated_samples.each do |old_sample|
+        total += 1
+        sample = Sample.new(sample_type: sample_type)
+
+        converted_age = old_sample.age_at_sampling
+
+        unless converted_age.blank?
+          converted_age = converted_age.to_i
+          case old_sample.age_at_sampling_unit.try(:title)
+            when 'day'
+              converted_age = converted_age * 60 * 60 * 24
+            when 'hour'
+              converted_age = converted_age * 60 * 60
+            when 'minute'
+              converted_age = converted_age * 60
+          end
+        end
+
+        sample.data = {
+          sample_id_or_name: old_sample.title,
+          cell_culture_name: old_specimen.title,
+          cell_culture_lab_identifier: old_specimen.lab_internal_number,
+          cell_culture_start_date: old_specimen.born,
+          cell_culture_growth_type: old_specimen.culture_growth_type.try(:title),
+          cell_culture_comment: old_specimen.comments,
+          cell_culture_provider_name: old_specimen.provider_name,
+          cell_culture_provider_identifier: old_specimen.provider_id,
+          cell_culture_strain: old_specimen.strain_id,
+          sample_lab_identifier: old_sample.lab_internal_number,
+          sampling_date: old_sample.sampling_date,
+          age_at_sampling: converted_age,
+          sample_provider_name: old_sample.provider_name,
+          sample_provider_identifier: old_sample.provider_id,
+          sample_comment: old_sample.comments,
+          sample_organism_part: old_sample.organism_part == 'Not specified' ? '' : old_sample.organism_part.capitalize
+        }
+        sample.contributor = old_sample.contributor
+        sample.policy = old_sample.policy || Policy.public_policy
+        sample.project_ids = old_sample.project_ids
+        sample.created_at = old_sample.created_at
+        sample.updated_at = old_sample.updated_at
+
+        if Sample.find_by_id(old_sample.id).nil?
+          sample.id = old_sample.id
+        end
+
+        if sample.save
+          print '.'
+          saved += 1
+        else
+          print 'E'
+          errored << sample
+        end
+      end
+    end
+
+    puts
+    if errored.any?
+      puts "Errors:"
+      errored.each do |s|
+        puts "Sample #{s.id}:"
+        puts s.errors.full_messages.join("\n")
+        puts
+      end
+    end
+
+    puts "Done - (#{saved}/#{total} converted)"
+  end
+
+  private
 
   def set_projects_parent array, parent
     array.each do |proj|

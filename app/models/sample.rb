@@ -18,6 +18,8 @@ class Sample < ActiveRecord::Base
 
   belongs_to :sample_type, inverse_of: :samples
   belongs_to :originating_data_file, class_name: 'DataFile'
+  has_many :sample_resource_links, dependent: :destroy
+  has_many :strains, through: :sample_resource_links, source: :resource, source_type: 'Strain'
 
   scope :default_order, order('title')
 
@@ -28,6 +30,7 @@ class Sample < ActiveRecord::Base
   before_validation :update_json_metadata
   before_validation :set_title_to_title_attribute_value
 
+  before_save :update_sample_strain_links
   after_save :queue_sample_type_update_job
   after_destroy :queue_sample_type_update_job
 
@@ -67,7 +70,7 @@ class Sample < ActiveRecord::Base
     @data ||= Seek::Samples::SampleData.new(sample_type, json_metadata)
   end
 
-  def strains
+  def referenced_strains
     sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_STRAIN }.map do |sa|
       Strain.find_by_id(get_attribute(sa.hash_key)['id'])
     end.compact
@@ -79,6 +82,30 @@ class Sample < ActiveRecord::Base
 
   def set_attribute(attr, value)
     data[attr] = value
+  end
+
+  def blank_attribute?(attr)
+    data[attr].blank? || (data[attr].respond_to?(:values) && data[attr].values.all?(&:blank?))
+  end
+
+  def state_allows_edit?(*args)
+    (id.nil? || originating_data_file.nil?) && super
+  end
+
+  def extracted?
+    !!originating_data_file
+  end
+
+  def projects
+    extracted? ? originating_data_file.projects : super
+  end
+
+  def project_ids
+    extracted? ? originating_data_file.project_ids : super
+  end
+
+  def creators
+    extracted? ? originating_data_file.creators : super
   end
 
   private
@@ -105,14 +132,24 @@ class Sample < ActiveRecord::Base
   end
 
   def set_title_to_title_attribute_value
-    self.title = title_attribute_value
+    attr = title_attribute
+    if attr
+      value = get_attribute(title_attribute.hash_key)
+      if attr.seek_strain?
+        value = value[:title]
+      elsif attr.seek_sample?
+        value = Sample.find_by_id(value).try(:title)
+      else
+        value = value.to_s
+      end
+      self.title = value
+    end
   end
 
-  # the value of the designated title attribute
-  def title_attribute_value
+  # the designated title attribute
+  def title_attribute
     return nil unless sample_type && sample_type.sample_attributes.title_attributes.any?
-    title_attr = sample_type.sample_attributes.title_attributes.first
-    get_attribute(title_attr.hash_key)
+    sample_type.sample_attributes.title_attributes.first
   end
 
   def respond_to_missing?(method_name, include_private = false)
@@ -143,5 +180,9 @@ class Sample < ActiveRecord::Base
 
   def queue_sample_type_update_job
     SampleTypeUpdateJob.new(sample_type, false).queue_job
+  end
+
+  def update_sample_strain_links
+    self.strains = referenced_strains
   end
 end

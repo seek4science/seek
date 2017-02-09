@@ -36,10 +36,6 @@ class SampleType < ActiveRecord::Base
 
   grouped_pagination
 
-  def self.can_create?
-    User.logged_in_and_member? && Seek::Config.samples_enabled
-  end
-
   def validate_value?(attribute_name, value)
     attribute = sample_attributes.detect { |attr| attr.title == attribute_name }
     fail UnknownAttributeException.new("Unknown attribute #{attribute_name}") unless attribute
@@ -84,8 +80,15 @@ class SampleType < ActiveRecord::Base
     true
   end
 
+  def self.can_create?
+    can = User.logged_in_and_member? && Seek::Config.samples_enabled
+    can && (!Seek::Config.project_admin_sample_type_restriction || User.current_user.is_admin_or_project_administrator?)
+  end
+
   def can_edit?(user = User.current_user)
-    user && user.person && ((projects & user.person.projects).any?)
+    return true if user && user.is_admin? && Seek::Config.samples_enabled
+    can = user && user.person && ((projects & user.person.projects).any?) && Seek::Config.samples_enabled
+    can && (!Seek::Config.project_admin_sample_type_restriction || projects.detect { |project| project.can_be_administered_by?(user) })
   end
 
   def can_delete?(user = User.current_user)
@@ -129,14 +132,19 @@ class SampleType < ActiveRecord::Base
   def validate_attribute_title_unique
     # TODO: would like to have done this with uniquness{scope: :sample_type_id} on the attribute, but that leads to an exception when being added
     # to the sample type
-    titles = sample_attributes.collect(&:title).collect(&:downcase)
+    titles = attribute_titles.collect(&:downcase)
     dups = titles.select { |title| titles.count(title) > 1 }.uniq
     if dups.any?
-      errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups.join(', ')}")
+      dups_text=dups.join(', ')
+      errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups_text}")
     end
   end
 
   def attribute_search_terms
+    attribute_titles
+  end
+
+  def attribute_titles
     sample_attributes.collect(&:title)
   end
 

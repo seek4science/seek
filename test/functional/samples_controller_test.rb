@@ -6,6 +6,10 @@ class SamplesControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include HtmlHelper
 
+  def setup
+    Factory(:person)#to prevent person being first person and therefore admin
+  end
+
   test 'index' do
     Factory(:sample, policy: Factory(:public_policy))
     get :index
@@ -95,8 +99,21 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'edit' do
     login_as(Factory(:person))
+
     get :edit, id: populated_patient_sample.id
+
     assert_response :success
+  end
+
+  test "can't edit if extracted from a data file" do
+    person = Factory(:person)
+    sample = Factory(:sample_from_file, contributor: person)
+    login_as(person)
+
+    get :edit, id: sample.id
+
+    assert_redirected_to sample_path(sample)
+    assert_not_nil flash[:error]
   end
 
   test 'update' do
@@ -399,7 +416,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference("Sample.count",-1) do
       delete :destroy, id: sample
     end
-    assert_redirected_to samples_path
+    assert_redirected_to root_path
     #job should have been triggered
     assert SampleTypeUpdateJob.new(type,false).exists?
   end

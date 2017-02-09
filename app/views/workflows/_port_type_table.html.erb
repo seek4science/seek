@@ -6,7 +6,7 @@
     <table>
       <tr>
         <th class="port-name">Inputs</th>
-        <% WorkflowInputPortType.all.each do |t| %>
+        <% WorkflowInputPortType.find_each do |t| %>
           <th class="port-type">
             <%= t.name -%>
           </th>
@@ -24,7 +24,7 @@
             <%= i.hidden_field(:name) %>
             <%= i.hidden_field(:description) %>
             <%= i.hidden_field(:example_value) %>
-            <% WorkflowInputPortType.all.each do |t| %>
+            <% WorkflowInputPortType.find_each do |t| %>
               <td class="port-type">
                 <label>
                   <%= i.radio_button(:port_type_id, t.id) %>
@@ -39,7 +39,7 @@
       <% end %>
       <tr>
         <th class="port-name">Outputs</th>
-        <% WorkflowOutputPortType.all.each do |t| %>
+        <% WorkflowOutputPortType.find_each do |t| %>
           <th class="port-type">
             <%= t.name -%>
           </th>
@@ -58,7 +58,7 @@
             <%= o.hidden_field(:name) %>
             <%= o.hidden_field(:description) %>
             <%= o.hidden_field(:example_value) %>
-            <% WorkflowOutputPortType.all.each do |t| %>
+            <% WorkflowOutputPortType.find_each do |t| %>
               <td class="port-type">
                 <label>
                   <%= o.radio_button(:port_type_id, t.id) %>

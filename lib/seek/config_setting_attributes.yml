@@ -1,4 +1,4 @@
-#keys that create the Seek::Config settigs.
+#keys that create the Seek::Config settings.
 #e.g. Seek::Config.home_description
 
 # N.B. Settings that require a conversion to integer should NOT be set here.
@@ -14,6 +14,8 @@ jws_online_root:
 internal_help_enabled:
 external_help_url:
 hide_details_enabled:
+registration_disabled:
+registration_disabled_description:
 activation_required_enabled:
 project_name:
 smtp:
@@ -165,7 +167,10 @@ news_feed_urls:
 news_number_of_entries:
   convert: :to_i
 front_page_buttons_enabled:
+permissions_popup:
+  convert: :to_i
 samples_enabled:
+project_admin_sample_type_restriction:
 omniauth_enabled:
 omniauth_user_create:
 omniauth_user_activate:

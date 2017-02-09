@@ -69,6 +69,10 @@ class AdminsController < ApplicationController
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
 
     Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
+
+    Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
+    Seek::Config.registration_disabled_description = params[:registration_disabled_description]
+
     Seek::Config.activation_required_enabled = string_to_boolean params[:activation_required_enabled]
 
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
@@ -206,6 +210,7 @@ class AdminsController < ApplicationController
     Seek::Config.default_associated_projects_access_type = params[:default_associated_projects_access_type]
     Seek::Config.default_consortium_access_type = params[:default_consortium_access_type]
     Seek::Config.default_all_visitors_access_type = params[:default_all_visitors_access_type]
+    Seek::Config.permissions_popup = params[:permissions_popup]
 
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
     Seek::Config.max_cachable_size = params[:max_cachable_size]
@@ -328,6 +333,8 @@ class AdminsController < ApplicationController
           format.html { render partial: 'admins/stats/workflow_stats' }
         when 'storage_usage_stats'
           format.html { render partial: 'admins/stats/storage_usage_stats' }
+        when 'snapshot_and_doi_stats'
+          format.html { render partial: 'admins/stats/snapshot_and_doi_stats' }
         when 'none'
           format.html { render text: '' }
       end
@@ -391,7 +398,7 @@ class AdminsController < ApplicationController
       time_range = (x.month.ago.beginning_of_month.to_date..x.month.ago.end_of_month.to_date)
       registrations = User.where(created_at: time_range).count
       active_users = 0
-      User.all.each do |user|
+      User.find_each do |user|
         active_users += 1 unless user.taverna_player_runs.where(created_at: time_range, saved_state: 'finished').empty?
       end
       complete_runs = TavernaPlayer::Run.where(created_at: time_range, saved_state: 'finished').count

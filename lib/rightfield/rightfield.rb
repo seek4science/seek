@@ -7,7 +7,7 @@ module RightField
 
   def invoke_command datafile
     id=rdf_resource_uri(datafile)
-    "java -jar #{JAR_PATH} -export -format rdf -id #{id} #{datafile.content_blob.filepath}"
+    "java -jar #{JAR_PATH} -export -format rdf -id #{id} #{datafile.content_blobs.first.filepath}"
   end
 
   def rdf_resource_uri datafile

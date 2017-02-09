@@ -13,7 +13,7 @@
       <div class="col-md-6">
         <%= persistent_resource_id(@display_data_file) %>
 
-        <%= render :partial => 'assets/fileinfo',:object=>@display_data_file.content_blob -%>
+        <%= render(:partial=>"assets/multiple_fileinfo", :object=>@display_data_file) if @data_file.can_download?-%>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
 
@@ -27,8 +27,6 @@
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } -%>
   </div>
 </div>
-
-<%= render(:partial=>"data_files/vl_samples_info") if Seek::Config.is_virtualliver -%>
 
 <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} -%>
 

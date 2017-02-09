@@ -43,9 +43,9 @@
 <% end -%>
 
 <%= admin_dropdown do %>
+    <% edit_verb = 'edit' %>
     <% if asset.can_manage? -%>
-
-        <% if asset.is_downloadable?-%>
+        <% if asset.is_downloadable? && !(asset.respond_to?(:extracted_samples) && asset.extracted_samples.any?) -%>
             <li>
                 <% if asset.supports_doi? && asset.is_any_doi_minted?  -%>
                     <%= link_to_function image("new")+" Upload new version", "javascript:alert('After DOI is generated, uploading new version is not possible')", :class=>"disabled" -%>
@@ -55,11 +55,11 @@
             </li>
         <% end -%>
 
-        <li><%= image_tag_for_key('manage', polymorphic_path(asset, :action => :edit), nil, nil, "Manage #{human_name}") -%></li>
+        <% edit_verb = 'manage' %>
+    <% end %>
 
-    <% elsif asset.can_edit? -%>
-        <%# this is not owner, but current user can edit -%>
-        <li><%= image_tag_for_key('edit', polymorphic_path(asset,:action=>:edit), nil, nil, "Edit #{human_name}") -%></li>
+    <% if asset.can_edit? -%>
+        <li><%= image_tag_for_key(edit_verb, polymorphic_path(asset,:action=>:edit), nil, nil, "#{edit_verb.capitalize} #{human_name}") -%></li>
     <% end -%>
 
     <% if asset.is_in_isa_publishable? && asset.can_publish? -%>
@@ -67,10 +67,6 @@
     <% end -%>
 
     <%= delete_icon(asset, current_user)%>
-
-    <% if Seek::Config.is_virtualliver && (asset.can_delete? || current_user.try(:admin?)) && asset.respond_to?(:to_presentation) %>
-        <li><%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:title => "click to move this #{t('data_file')} to #{t('presentation').pluralize}", :confirm => "Are you sure you wish to move this #{t('data_file')} to #{t('presentation').pluralize}? Doing so is irreversible!", :method => :post}, "Move to #{t('presentation').pluralize}" %></li>
-    <% end %>
 
     <% if asset.supports_doi? && asset.is_doiable?(display_asset.version) %>
         <li><%= image_tag_for_key('doi', polymorphic_path(asset, :action => 'mint_doi_confirm', :version => display_asset.version), nil,{},"Generate a DOI") -%></li>

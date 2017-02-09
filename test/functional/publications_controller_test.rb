@@ -762,20 +762,20 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   def mock_crossref options
-    url= "http://www.crossref.org/openurl/"
+    url= "https://www.crossref.org/openurl/"
     params={}
     params[:format] = "unixref"
     params[:id] = "doi:"+options[:doi]
     params[:pid] = options[:email]
     params[:noredirect] = true
-    url = "http://www.crossref.org/openurl/?" + params.to_param
+    url = "https://www.crossref.org/openurl/?" + params.to_param
     file=options[:content_file]
     stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
 
   end
 
   def mock_pubmed options
-    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
     file=options[:content_file]
     stub_request(:post,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
   end

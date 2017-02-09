@@ -92,14 +92,23 @@ module Seek
       end
     end
 
+    def self.asset_types
+      @@asset_types ||= begin
+        persistent_classes.select do |c|
+          c.is_asset?
+        end.sort_by(&:name)
+      end
+    end
+
     def self.inline_viewable_content_types
       #FIXME: needs to be discovered rather than hard-code classes here
       [DataFile, Model, Presentation, Sop]
     end
 
     def self.multi_files_asset_types
-      #FIXME: needs to be discovered rather than hard-code classes here
-      [Model]
+      asset_types.select do |c|
+        c.instance_methods.include?(:content_blobs)
+      end
     end
 
     def self.doiable_asset_types

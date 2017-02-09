@@ -154,4 +154,21 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal I18n.t('sop').pluralize,internationalized_resource_name("Sop")
     assert_equal I18n.t('sop'),internationalized_resource_name("Sop",false)
   end
+
+  test 'using_docker?' do
+    path = Seek::Docker::FLAG_FILE_PATH
+    assert_equal path,File.join(Rails.root,'config','using-docker')
+    begin
+      refute File.exists?(path)
+      refute using_docker?
+      FileUtils.touch(path)
+      assert using_docker?
+    rescue
+        raise e
+    ensure
+      File.delete(path)
+      refute File.exists?(path)
+    end
+  end
+
 end

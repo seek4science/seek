@@ -9,8 +9,6 @@ class ModelsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include FunctionalAuthorizationTests
-
-  #MERGENOTE - needs tests for adding multiple files, urls, and a mixture
   
   def setup
     login_as(:model_owner)
@@ -120,7 +118,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]    
   end
 
-
   test 'creators show in list item' do
     p1=Factory :person
     p2=Factory :person
@@ -138,11 +135,9 @@ class ModelsControllerTest < ActionController::TestCase
       assert_select "a[href=?]",person_path(p2) do
         assert_select "img"
       end
-
     end
   end
 
-  
   test "shouldn't show hidden items in index" do
     login_as(:aaron)
     get :index, :page => "all"
@@ -319,6 +314,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'missing sharing should default to private' do
     with_config_value "default_all_visitors_access_type", Policy::NO_ACCESS do
+
       assert_difference('Model.count',1) do
         assert_difference('ContentBlob.count',1) do
           post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}]
@@ -332,6 +328,43 @@ class ModelsControllerTest < ActionController::TestCase
       assert_equal Policy::NO_ACCESS, m.policy.access_type
       assert_blank m.policy.permissions
     end
+  end
+
+  test "should create model with mixture of blobs" do
+    stub_request(:head, "http://fair-dom.org/").to_return(:status=>200,:headers=>{'Content-Type' => 'text/html'})
+    stub_request(:head, "http://fair-dom.org/piccy.png").to_return(:status=>200,:headers=>{'Content-Type' => 'image/png'})
+    person = Factory(:person)
+    login_as(person.user)
+    project = person.projects.first
+    refute_nil project
+    content_blob1 = {data:file_for_upload}
+    content_blob2 = {data_url:'http://fair-dom.org',original_filename:'',make_local_copy:'0'}
+    content_blob3 = {data_url:'http://fair-dom.org/piccy.png',original_filename:'',make_local_copy:'0'}
+    assert_difference('Model.count') do
+      assert_difference('ContentBlob.count',3) do
+        post :create, :model => { :title=>"Test Create",:project_ids=>[project.id]},:content_blobs => [content_blob1,content_blob2,content_blob3], :sharing=>valid_sharing
+      end
+    end
+
+    assert_redirected_to model_path(model=assigns(:model))
+    assert_equal 'Test Create',model.title
+    assert_equal [project],model.projects
+    assert_equal person.user, model.contributor
+    assert_equal 3,model.content_blobs.count
+    blob1=model.content_blobs.first
+    blob2=model.content_blobs[1]
+    blob3=model.content_blobs.last
+    assert_equal 'little_file_v2.txt',blob1.original_filename
+    assert blob1.file_exists?
+
+    assert_equal 'http://fair-dom.org',blob2.url
+    refute blob2.file_exists?
+    assert blob2.is_webpage?
+    assert_equal 'text/html',blob2.content_type
+
+    assert_equal 'http://fair-dom.org/piccy.png',blob3.url
+    refute blob3.is_webpage?
+    assert_equal 'image/png',blob3.content_type
   end
 
   test "should create model with image" do
@@ -352,7 +385,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(:model_owner)
       assert_difference('Model.count') do
         assert_difference('ModelImage.count') do
-          post :create, :model => valid_model, :content_blobs => [{:data_url => ''}], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+          post :create, :model => valid_model, :content_blobs => [], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
         end
       end
 
@@ -364,7 +397,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should not create model without image and without content_blob" do
       login_as(:model_owner)
       assert_no_difference('Model.count') do
-        post :create, :model => valid_model, :content_blobs => [{:data_url => ''}], :sharing=>valid_sharing
+        post :create, :model => valid_model, :content_blobs => [], :sharing=>valid_sharing
       end
       assert_not_nil flash[:error]
   end

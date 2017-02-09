@@ -19,7 +19,7 @@
 
   }
 
-<% Project.all.each do |p| %>
+<% Project.find_each do |p| %>
     run_times[<%= p.id %>]="<%= p.last_jerm_run.blank? ? "Never" : p.last_jerm_run.to_s %>";
 <% end %>
 

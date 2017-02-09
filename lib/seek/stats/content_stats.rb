@@ -49,7 +49,7 @@ module Seek
 
       def self.generate
         result = []
-        Project.all.each do |project|
+        Project.find_each do |project|
           project_stats = ProjectStats.new
           project_stats.project = project
           project_stats.people = project.people

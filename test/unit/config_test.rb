@@ -318,7 +318,7 @@ end
       assert_equal 'http', Seek::Config.host_scheme
     end
   end
-  
+
   test 'copyright_addendum_enabled' do
     assert !Seek::Config.copyright_addendum_enabled
   end
@@ -395,6 +395,12 @@ end
     assert_equal 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.', Seek::Config.home_description
     Seek::Config.home_description = 'A new description'
     assert_equal 'A new description', Seek::Config.home_description
+  end
+
+  test 'registration_disabled_description' do
+    assert_equal 'Registration is not available, please contact your administrator', Seek::Config.registration_disabled_description
+    Seek::Config.registration_disabled_description = 'A new description'
+    assert_equal 'A new description', Seek::Config.registration_disabled_description
   end
 
   test 'sabiork_ws_base_url' do

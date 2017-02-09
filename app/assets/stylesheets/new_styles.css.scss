@@ -282,7 +282,7 @@ div.hidden_list_item {
 .date-select img.calendar_date_select_popup_icon {
   position: absolute;
   bottom: 8px;
-  padding-left: 8px;
+  left: 8px;
 }
 
 a.select_assay_class {
@@ -369,10 +369,11 @@ a.seek-homepage-button {
   }
 }
 
-#isa-graph {
+div.isa_graph {
   background: $panel-bg;
   border-color: $panel-default-border;
 }
+
 
 #user-menu-button {
   height: $navbar-height;
@@ -406,8 +407,8 @@ a.seek-homepage-button {
   border-radius: 5px;
   display: inline-block;
 }
-.sample-attribute .attribute-handle {
-}
+
+.sample-attribute .attribute-handle { }
 
 .sample-attribute .attribute-position .glyphicon {
   color: #fff;
