@@ -98,7 +98,7 @@ module Seek
       #whether a new version is allowed for this asset.
       # for example if it has come from openbis or has extracted samples then it is not allowed
       def new_version_supported?
-        is_versioned? &&
+        versioned? &&
             is_downloadable? &&
             !(respond_to?(:extracted_samples) && extracted_samples.any?) &&
             !(respond_to?(:openbis?) && openbis?) &&

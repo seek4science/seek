@@ -49,7 +49,7 @@ module Seek
       (respond_to?(:content_blob) || respond_to?(:content_blobs))
     end
 
-    def is_versioned?
+    def versioned?
       respond_to? :versions
     end
 
