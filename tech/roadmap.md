@@ -30,6 +30,7 @@ You can find more details about each release in our [Change Logs](/tech/releases
 | Feature | SEEK version |
 | --- | --- | --- |
 | Improved Samples/Treatments/SOP handling | 1.2  |
+| Docker and Docker Compose support | 1.2 |
 | Licensing of Assets | 1.1 |
 | Research Object Snapshots of Assays and Studies | 1.1 |
 | Self management of projects and programmes | 1.0 |
