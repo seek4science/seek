@@ -53,7 +53,8 @@ module Seek
       respond_to? :versions
     end
 
-    def is_suggested_type?
+    #FIXME: why is this even here? Surely just relates to the ontology term types
+    def suggested_type?
       self.class.include? Seek::Ontologies::SuggestedType
     end
   end
