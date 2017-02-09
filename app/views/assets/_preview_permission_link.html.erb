@@ -10,7 +10,7 @@
 
     function previewPermissions() {
         if (permissionPopupSetting === 'always' ||
-            permissionPopupSetting === 'on_change' && permissionsChanged) {
+            permissionPopupSetting === 'on_change' && Sharing.permissionsChanged()) {
             var project_ids;
             var resource_name = '<%= resource_name -%>';
             //in case of study, return the id of investigation, then from the server side, the project_ids are retrieved
@@ -27,42 +27,39 @@
                 }).join(',');
             }
 
-            if (permissionPopupSetting === 'always' ||
-                permissionPopupSetting === 'on_change' && permissionsChanged) {
-                $j('#permissions_spinner').show();
+            $j('#permissions_spinner').show();
 
-                var data = {
-                    sharing_scope: permissionsTable.publicPermission.access_type === Sharing.accessTypes.noAccess ? <%= Policy::PRIVATE -%> : <%= Policy::EVERYONE -%>,
-                    access_type: permissionsTable.publicPermission.access_type,
-                    project_ids: project_ids, // Controller expects this to be a string containing IDs separated by a comma
-                    creators: $j('#creators').val(),
-                    contributor_id: '<%= contributor_id -%>',
-                    resource_name: '<%= resource_name -%>',
-                    resource_id: '<%= resource_id -%>',
-                    is_new_file: '<%= is_new_file -%>',
-                    authenticity_token: $j('meta[name=csrf-token]').attr('content') // is this necessary?
-                };
+            var data = {
+                sharing_scope: permissionsTable.publicPermission.access_type === Sharing.accessTypes.noAccess ? <%= Policy::PRIVATE -%> : <%= Policy::EVERYONE -%>,
+                access_type: permissionsTable.publicPermission.access_type,
+                project_ids: project_ids, // Controller expects this to be a string containing IDs separated by a comma
+                creators: $j('#creators').val(),
+                contributor_id: '<%= contributor_id -%>',
+                resource_name: '<%= resource_name -%>',
+                resource_id: '<%= resource_id -%>',
+                is_new_file: '<%= is_new_file -%>',
+                authenticity_token: $j('meta[name=csrf-token]').attr('content') // is this necessary?
+            };
 
-                $j.ajax({
-                    type: "POST",
-                    url: '<%= url -%>',
-                    data: $j('#permissions-table :input').serialize() + '&' + $j.param(data),
-                    success: function (result) {
-                        $j('#permissions-preview-wrapper').html(result);
-                        $j('#preview_permissions').modal('show');
-                    },
-                    error: function () {
-                        alert('Sorry, an error has occurred.');
-                    },
-                    complete: function () {
-                        $j('#permissions_spinner').hide();
-                    }
-                });
-                return false;
-            } else {
-                createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')
-                return false;
-            }
+            $j.ajax({
+                type: "POST",
+                url: '<%= url -%>',
+                data: $j('#permissions-table :input').serialize() + '&' + $j.param(data),
+                success: function (result) {
+                    $j('#permissions-preview-wrapper').html(result);
+                    $j('#preview_permissions').modal('show');
+                },
+                error: function () {
+                    alert('Sorry, an error has occurred.');
+                },
+                complete: function () {
+                    $j('#permissions_spinner').hide();
+                }
+            });
+            return false;
+        } else {
+            createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')
+            return false;
         }
     }
 </script>

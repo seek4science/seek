@@ -23,12 +23,14 @@
 
 <script>
   var policy = <%= policy_json(policy, object.projects) -%>;
+  <%# A deep copy of the policy that is used in `Sharing.permissionsChanged` to check if it has been modified %>
+  var originalPolicy = $j.extend(true, {}, policy);
 
   var permissionsTable = new Vue({
     el: '#permissions-table',
     data: {
       publicPermission: {
-        access_type: policy.access_type, // Uses snake case because that's how rails returns the JSON
+        access_type: policy.access_type, <%# Uses snake case because that's how rails returns the JSON %>
         title: 'Public',
         public: true,
         mandatory: true },

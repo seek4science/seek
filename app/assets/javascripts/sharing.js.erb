@@ -60,7 +60,26 @@ var Sharing = {
 
   associatedProjectAccessType: <%= Seek::Config.default_associated_projects_access_type %>,
   allVisitorsAccessType: <%= Seek::Config.default_all_visitors_access_type %>,
-  maxPublicAccessType: <%= Policy.max_public_access_type %>
+  maxPublicAccessType: <%= Policy.max_public_access_type %>,
+
+  permissionsChanged: function () {
+    if (originalPolicy.access_type !== permissionsTable.publicPermission.access_type)
+      return true;
+    if (originalPolicy.permissions.length !== permissionsTable.permissions.length)
+      return true;
+    for (var i = 0; i < permissionsTable.permissions.length; i++) {
+      for (var j = 0; j < originalPolicy.permissions.length; j++) {
+          var p1 = permissionsTable.permissions[i];
+          var p2 = originalPolicy.permissions[j];
+          if (p1.contributor_type == p2.contributor_type &&
+              p1.contributor_id == p2.contributor_id &&
+              p1.access_type !== p2.access_type)
+              return true;
+      }
+    }
+
+    return false;
+  }
 };
 
 Vue.component('permissions-table', {
