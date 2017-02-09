@@ -39,7 +39,7 @@
         <h4 class="modal-title" id="preview_permissions_title">Preview of your sharing settings</h4>
       </div>
       <div class="modal-body">
-        <% if polcy.access_type == Policy::NO_ACCESS %>
+        <% if policy.access_type == Policy::NO_ACCESS %>
             <%= policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name) %>
         <% else %>
             <%= policy_and_permissions_for_public_scope(policy, permissions, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval) %>
