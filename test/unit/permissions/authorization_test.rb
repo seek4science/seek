@@ -665,19 +665,19 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   test 'unauthorized_change_to_autosave?' do
     df = Factory(:data_file)
-    assert_equal Policy::PRIVATE, df.policy.sharing_scope
-    df.policy.sharing_scope = Policy::ALL_USERS
+    assert_equal Policy::NO_ACCESS, df.policy.access_type
+    df.policy.access_type = Policy::ACCESSIBLE
     assert !df.save
     assert !df.errors.empty?
     df.reload
-    assert_equal Policy::PRIVATE, df.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, df.policy.access_type
 
     disable_authorization_checks do
-      df.policy.sharing_scope = Policy::ALL_USERS
+      df.policy.access_type = Policy::NO_ACCESS
       assert df.save
       assert df.errors.empty?
       df.reload
-      assert_equal Policy::ALL_USERS, df.policy.sharing_scope
+      assert_equal Policy::NO_ACCESS, df.policy.access_type
     end
   end
 
