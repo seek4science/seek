@@ -75,7 +75,7 @@ Vue.component('permissions-table', {
   '</tr>' +
   '</thead>' +
   '<tbody>' +
-  '<tr is="permission-row" class="public-permission-row" :permission="publicPermission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" field-prefix-orig="policy"></tr>' +
+  '<tr is="permission-row" class="public-permission-row" :permission="publicPermission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" field-prefix-orig="policy_attributes"></tr>' +
   '<tr is="permission-row" v-for="(permission, index) in sortedPermissions" :index="index" :permission="permission" :access-types="accessTypes" :public-access-type="publicPermission.access_type" v-on:delete-permission="deletePermission(index)"></tr>' +
   '</tbody>'+
   '</table>',
@@ -121,7 +121,7 @@ Vue.component('permission-row', {
   '</tr>',
   computed: {
     fieldPrefix: function () {
-      return (this.fieldPrefixOrig ? this.fieldPrefixOrig : 'policy[permissions][' + this.index + ']');
+      return (this.fieldPrefixOrig ? this.fieldPrefixOrig : 'policy_attributes[permissions_attributes][' + this.index + ']');
     }
   }
 });

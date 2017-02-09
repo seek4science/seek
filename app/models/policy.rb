@@ -114,9 +114,9 @@ class Policy < ActiveRecord::Base
         policy.access_type = policy_params[:access_type]
 
         # Set attributes on the policy's permissions
-        if policy_params[:permissions]
+        if policy_params[:permissions_attributes]
           current_permissions = policy.permissions
-          new_permissions = policy_params[:permissions].values.map do |perm_params|
+          new_permissions = policy_params[:permissions_attributes].values.map do |perm_params|
             # See if a permission already exists with that contributor
             permission = current_permissions.detect { |p| p.contributor_type == perm_params[:contributor_type] &&
                                                           p.contributor_id == perm_params[:contributor_id].to_i }

@@ -68,7 +68,7 @@ class PoliciesController < ApplicationController
 
       resource_class = params[:resource_name].camelize.constantize
       resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
-      policy = resource.policy.set_attributes_with_sharing(params[:policy])
+      policy = resource.policy.set_attributes_with_sharing(params[:policy_attributes])
 
       privileged_people = {}
       #exclude the current_person from the privileged people
