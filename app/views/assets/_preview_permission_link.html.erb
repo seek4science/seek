@@ -30,7 +30,6 @@
             $j('#permissions_spinner').show();
 
             var data = {
-                sharing_scope: permissionsTable.publicPermission.access_type === Sharing.accessTypes.noAccess ? <%= Policy::PRIVATE -%> : <%= Policy::EVERYONE -%>,
                 access_type: permissionsTable.publicPermission.access_type,
                 project_ids: project_ids, // Controller expects this to be a string containing IDs separated by a comma
                 creators: $j('#creators').val(),

@@ -81,7 +81,6 @@ class PoliciesController < ApplicationController
       respond_to do |format|
         format.html { render :partial => "permissions/preview_permissions",
                              :locals => {:policy => policy, :privileged_people => privileged_people,
-                                         :sharing_scope => params[:sharing_scope].to_i,
                                          :updated_can_publish_immediately => updated_can_publish_immediately(resource),
                                          :send_request_publish_approval => !resource.is_waiting_approval?(current_user)}}
       end
