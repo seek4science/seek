@@ -45,9 +45,14 @@
 <%= admin_dropdown do %>
     <% edit_verb = 'edit' %>
     <% if asset.can_manage? -%>
-        <% if asset.new_version_allowed? -%>
+        <% if asset.is_versioned? -%>
             <li>
-              <%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%>
+              <% if asset.new_version_supported? %>
+                  <%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") %>
+                  <% else %>
+                  <%= link_to_function image("new")+" Upload new version", nil,disabled:true, class:'disabled' %>
+                  <% end %>
+
             </li>
         <% end -%>
 
