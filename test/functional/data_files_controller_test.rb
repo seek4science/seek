@@ -41,7 +41,9 @@ class DataFilesControllerTest < ActionController::TestCase
     content_blob3 = { data_url: 'http://fair-dom.org/piccy.png', original_filename: '', make_local_copy: '0' }
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count', 3) do
-        post :create, data_file: { title: 'Test Create', project_ids: [project.id] }, content_blobs: [content_blob1, content_blob2, content_blob3], sharing: valid_sharing
+        post :create, data_file: { title: 'Test Create', project_ids: [project.id] },
+             content_blobs: [content_blob1, content_blob2, content_blob3],
+             policy_attributes: valid_sharing
       end
     end
 
@@ -105,18 +107,6 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_select 'div.panel-heading', text: /#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p', text: /The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
-  end
-
-  test 'download and view options for anonymous sharing' do
-    login_as(Factory(:user))
-    get :new
-    assert_response :success
-    assert_select '#simple_sharing' do
-      assert_select 'select#access_type_select_4' do
-        assert_select 'option[value=?]', 1, text: /#{Regexp.escape(I18n.t('access.visible_downloadable'))}/i
-        assert_select "option[value=?][selected='selected']", 2, text: /#{I18n.t('access.accessible_downloadable')}/i
-      end
-    end
   end
 
   test 'correct title and text for associating an assay for edit' do
@@ -261,7 +251,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], sharing: valid_sharing
+          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
         end
       end
     end
@@ -274,7 +264,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [{}], sharing: valid_sharing
+          post :create, data_file: df, content_blobs: [{}], policy_attributes: valid_sharing
         end
       end
     end
@@ -288,7 +278,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], sharing: valid_sharing
+        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
       end
     end
 
@@ -307,7 +297,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], sharing: valid_sharing
+        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
       end
     end
 
@@ -328,7 +318,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, data_file: { title: 'Test' }, content_blobs: [{ data_url: uri.to_s }], sharing: valid_sharing
+          post :create, data_file: { title: 'Test' }, content_blobs: [{ data_url: uri.to_s }], policy_attributes: valid_sharing
         end
       end
     end
@@ -345,7 +335,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, data_file: data, content_blobs: [blob],
-                        sharing: valid_sharing
+                        policy_attributes: valid_sharing
         end
       end
     end
@@ -367,7 +357,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, data_file: data, content_blobs: [blob],
-                        sharing: valid_sharing
+                        policy_attributes: valid_sharing
         end
       end
     end
@@ -386,7 +376,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('DataFile.count') do
         assert_no_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], sharing: valid_sharing
+          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
         end
       end
     end
@@ -402,7 +392,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('DataFile::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, data_file: data_file, content_blobs: [blob], sharing: valid_sharing, assay_ids: [assay.id.to_s]
+            post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [assay.id.to_s]
           end
         end
       end
@@ -525,7 +515,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], sharing: valid_sharing
+        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
       end
     end
 
@@ -548,7 +538,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], sharing: valid_sharing
+        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
       end
     end
 
@@ -571,7 +561,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('DataFile.count') do
       assert_difference('ContentBlob.count') do
         @request.env['HTTP_USER_AGENT'] = 'Windows'
-        post :create, data_file: data_file, content_blobs: [blob], sharing: valid_sharing
+        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
       end
     end
 
@@ -661,7 +651,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, id: data_files(:picture)
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('data_file')}/
-    assert_select 'label', text: /Keep this #{I18n.t('data_file')} private/i
+    assert_select "div.alert-info", text: /the #{I18n.t('data_file')}/i
   end
 
   test 'publications included in form for datafile' do
@@ -766,7 +756,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], sharing: valid_sharing
+          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
         end
       end
     end
@@ -791,7 +781,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], sharing: valid_sharing
+          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
         end
       end
     end
@@ -816,7 +806,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], sharing: valid_sharing
+          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
         end
       end
     end
@@ -840,7 +830,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: df, content_blobs: [blob], sharing: valid_sharing
+          post :create, data_file: df, content_blobs: [blob], policy_attributes: valid_sharing
         end
       end
     end
@@ -1091,7 +1081,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !df.can_manage?(user), 'data file should be editable but not manageable for this test'
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: { title: 'new title' }, sharing: { :use_whitelist => '0', :user_blacklist => '0', :sharing_scope => Policy::ALL_USERS, "access_type_#{Policy::ALL_USERS}" => Policy::NO_ACCESS }
+      put :update, id: df, data_file: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
     end
 
     assert_redirected_to data_file_path(df)
@@ -1109,7 +1099,11 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !df.can_manage?(user), 'data file should be editable but not manageable for this test'
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: { title: 'new title' }, sharing: { permissions: { contributor_types: ActiveSupport::JSON.encode('Person'), values: ActiveSupport::JSON.encode('Person' => { user.person.id =>  { 'access_type' =>  Policy::MANAGING } }) } }
+      put :update, id: df, data_file: { title: 'new title' },
+          policy_attributes: { access_type: Policy::NO_ACCESS,
+                               permissions_attributes: { contributor_type: 'Person',
+                                                         contributor_id: user.person.id,
+                                                         access_type: Policy::MANAGING } }
     end
 
     assert_redirected_to data_file_path(df)
@@ -1131,7 +1125,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert df.can_manage?(user), 'data file should be editable and manageable for this test'
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: { title: 'new title' }, sharing: { :use_whitelist => '0', :user_blacklist => '0', :sharing_scope => Policy::ALL_USERS, "access_type_#{Policy::ALL_USERS}" => Policy::NO_ACCESS }
+      put :update, id: df, data_file: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
     end
 
     assert_redirected_to data_file_path(df)
@@ -1230,14 +1224,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
-          post :create, data_file: data_file, content_blobs: [blob], sharing: { "access_type_#{Policy::ALL_USERS}" => Policy::VISIBLE, :sharing_scope => Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE }
+          post :create, data_file: data_file, content_blobs: [blob],
+               policy_attributes: projects_policy(Policy::VISIBLE, data_file[:project_ids], Policy::ACCESSIBLE)
         end
       end
     end
 
     df = assigns(:data_file)
     assert_redirected_to data_file_path(df)
-    assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     assert_equal Policy::VISIBLE, df.policy.access_type
     assert_equal df.policy.permissions.count, 1
 
@@ -1252,7 +1246,6 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(:datafile_owner)
     df = data_files(:editable_data_file)
     assert df.can_manage?
-    assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     assert_equal Policy::EDITING, df.policy.access_type
     assert_equal df.policy.permissions.length, 1
 
@@ -1261,12 +1254,12 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: {}, sharing: { "access_type_#{Policy::ALL_USERS}" => Policy::ACCESSIBLE, :sharing_scope => Policy::ALL_USERS, :your_proj_access_type => Policy::EDITING }
+      put :update, id: df, data_file: {},
+          policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
     end
     df.reload
 
     assert_redirected_to data_file_path(df)
-    assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE, df.policy.access_type
     assert_equal 1, df.policy.permissions.length
 
@@ -1283,7 +1276,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as(df.contributor)
 
-    put :update, id: df, sharing: { "access_type_#{Policy::ALL_USERS}" => Policy::NO_ACCESS, :sharing_scope => Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE }
+    put :update, id: df, policy_attributes: projects_policy(Policy::NO_ACCESS, df.projects, Policy::ACCESSIBLE)
 
     df.reload
     permissions = df.policy.permissions
@@ -1417,10 +1410,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'uploader can publish the item when projects associated with the item have no gatekeeper' do
     uploader = Factory(:user)
     data_file = Factory(:data_file, contributor: uploader)
-    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, data_file.policy.access_type
     login_as(uploader)
-    put :update, id: data_file, sharing: { :sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}".to_sym => Policy::VISIBLE }
 
+    put :update, id: data_file, policy_attributes: { access_type: Policy::VISIBLE }
+
+    assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
   end
 
@@ -1430,11 +1425,13 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
     data_file = Factory(:data_file, policy: policy)
     assert data_file.asset_gatekeepers.empty?
-    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, data_file.policy.access_type
     login_as(person.user)
     assert data_file.can_manage?
-    put :update, id: data_file, sharing: { :sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}".to_sym => Policy::VISIBLE }
 
+    put :update, id: data_file, policy_attributes: { access_type: Policy::VISIBLE }
+
+    assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
   end
 
@@ -1443,58 +1440,61 @@ class DataFilesControllerTest < ActionController::TestCase
     policy = Factory(:policy, sharing_scope: Policy::EVERYONE)
     Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
     data_file = Factory(:data_file, policy: policy)
-    assert_equal Policy::EVERYONE, data_file.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, data_file.policy.access_type
     login_as(person.user)
     assert data_file.can_manage?
-    put :update, id: data_file, sharing: { :sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}".to_sym => Policy::VISIBLE }
 
+    put :update, id: data_file, policy_attributes: { access_type: Policy::VISIBLE }
+
+    assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
   end
 
-  test "should enable the policy scope 'all visitor...' when uploader edit the item" do
-    uploader = Factory(:user)
-    data_file = Factory(:data_file, contributor: uploader)
-    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
-    login_as(uploader)
-    get :edit, id: data_file
-
-    assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", count: 0
-  end
-
-  test "should enable the policy scope 'all visitor...' for the manager in case the asset needs gatekeeper's approval" do
-    person = Factory(:person)
-    policy = Factory(:policy)
-    Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
-
-    project = Factory(:project)
-    work_group = Factory(:work_group, project: project)
-    gatekeeper = Factory(:asset_gatekeeper, group_memberships: [Factory(:group_membership, work_group: work_group)])
-
-    data_file = Factory(:data_file, policy: policy, project_ids: [project.id])
-    assert_not_equal Policy::EVERYONE, data_file.policy.sharing_scope
-    login_as(person.user)
-    assert data_file.can_manage?
-    assert data_file.can_publish?
-    assert data_file.gatekeeper_required?
-
-    get :edit, id: data_file
-
-    assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", count: 0
-  end
-
-  test "should enable the policy scope 'all visitor...' for the manager in case the asset does not need gatekeeper's approval" do
-    person = Factory(:person)
-    policy = Factory(:policy, sharing_scope: Policy::EVERYONE)
-    Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
-    data_file = Factory(:data_file, policy: policy)
-    assert_equal Policy::EVERYONE, data_file.policy.sharing_scope
-    login_as(person.user)
-    assert data_file.can_manage?
-
-    get :edit, id: data_file
-
-    assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", count: 0
-  end
+  # TODO: Permission UI testing - Replace these with Jasmine tests
+  # test "should enable the policy scope 'all visitor...' when uploader edit the item" do
+  #   uploader = Factory(:user)
+  #   data_file = Factory(:data_file, contributor: uploader)
+  #   assert_equal Policy::NO_ACCESS, data_file.policy.access_type
+  #   login_as(uploader)
+  #   get :edit, id: data_file
+  #
+  #   assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", count: 0
+  # end
+  #
+  # test "should enable the policy scope 'all visitor...' for the manager in case the asset needs gatekeeper's approval" do
+  #   person = Factory(:person)
+  #   policy = Factory(:policy)
+  #   Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
+  #
+  #   project = Factory(:project)
+  #   work_group = Factory(:work_group, project: project)
+  #   gatekeeper = Factory(:asset_gatekeeper, group_memberships: [Factory(:group_membership, work_group: work_group)])
+  #
+  #   data_file = Factory(:data_file, policy: policy, project_ids: [project.id])
+  #   assert_equal Policy::NO_ACCESS, data_file.policy.access_type
+  #   login_as(person.user)
+  #   assert data_file.can_manage?
+  #   assert data_file.can_publish?
+  #   assert data_file.gatekeeper_required?
+  #
+  #   get :edit, id: data_file
+  #
+  #   assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", count: 0
+  # end
+  #
+  # test "should enable the policy scope 'all visitor...' for the manager in case the asset does not need gatekeeper's approval" do
+  #   person = Factory(:person)
+  #   policy = Factory(:policy, access_type: Policy::ACCESSIBLE)
+  #   Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
+  #   data_file = Factory(:data_file, policy: policy)
+  #   assert_equal Policy::ACCESSIBLE, data_file.policy.access_type
+  #   login_as(person.user)
+  #   assert data_file.can_manage?
+  #
+  #   get :edit, id: data_file
+  #
+  #   assert_select "input[type=radio][id='sharing_scope_4'][value='4'][disabled='true']", count: 0
+  # end
 
   test 'should show the latest version if the params[:version] is not specified' do
     data_file = data_files(:editable_data_file)
@@ -1594,17 +1594,18 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div', text: /another creator/, count: 1
   end
 
-  test 'should select the correct sharing access_type when updating the datafile' do
-    df = Factory(:data_file, policy: Factory(:policy, sharing_scope: Policy::EVERYONE, access_type: Policy::ACCESSIBLE))
-    login_as(df.contributor)
-
-    get :edit, id: df.id
-    assert_response :success
-
-    assert_select 'select#access_type_select_4' do
-      assert_select "option[selected='selected']", text: /#{I18n.t("access.accessible_downloadable")}/
-    end
-  end
+  # TODO: Permission UI testing - Replace this with a Jasmine test
+  # test 'should select the correct sharing access_type when updating the datafile' do
+  #   df = Factory(:data_file, policy: Factory(:policy, sharing_scope: Policy::EVERYONE, access_type: Policy::ACCESSIBLE))
+  #   login_as(df.contributor)
+  #
+  #   get :edit, id: df.id
+  #   assert_response :success
+  #
+  #   assert_select 'select#access_type_select_4' do
+  #     assert_select "option[selected='selected']", text: /#{I18n.t("access.accessible_downloadable")}/
+  #   end
+  # end
 
   test 'you should not subscribe to the asset created by the person whose projects overlap with you' do
     proj = Factory(:project)
@@ -1619,7 +1620,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     df_param = { title: 'Test', project_ids: [proj.id] }
     blob = { data: file_for_upload }
-    post :create, data_file: df_param, content_blobs: [blob], sharing: valid_sharing
+    post :create, data_file: df_param, content_blobs: [blob], policy_attributes: valid_sharing
 
     df = assigns(:data_file)
 
@@ -1860,7 +1861,7 @@ class DataFilesControllerTest < ActionController::TestCase
                  data_url: 'http://mockedlocation.com/small.txt',
                  make_local_copy: '0'
                }],
-               sharing: valid_sharing
+               policy_attributes: valid_sharing
     }
 
     assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
@@ -1891,7 +1892,7 @@ class DataFilesControllerTest < ActionController::TestCase
                  data_url: 'http://mockedlocation.com/small.txt',
                  make_local_copy: '0'
                }],
-               sharing: valid_sharing
+               policy_attributes: valid_sharing
     }
 
     with_config_value(:cache_remote_files, false) do
@@ -1925,7 +1926,7 @@ class DataFilesControllerTest < ActionController::TestCase
                  original_filename: '',
                  make_local_copy: '1'
                }],
-               sharing: valid_sharing
+               policy_attributes: valid_sharing
     }
     with_config_value(:cache_remote_files, false) do
       assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
@@ -1958,7 +1959,7 @@ class DataFilesControllerTest < ActionController::TestCase
                  data_url: 'http://mockedlocation.com/big.txt',
                  make_local_copy: '0'
                }],
-               sharing: valid_sharing
+               policy_attributes: valid_sharing
     }
 
     assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
@@ -1989,7 +1990,7 @@ class DataFilesControllerTest < ActionController::TestCase
                content_blobs: [{
                  data_url: 'http://mockedlocation.com'
                }],
-               sharing: valid_sharing
+               policy_attributes: valid_sharing
     }
 
     assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
@@ -2019,7 +2020,7 @@ class DataFilesControllerTest < ActionController::TestCase
                  data_url: 'http://mockedlocation.com/big.txt',
                  make_local_copy: '1'
                }],
-               sharing: valid_sharing
+               policy_attributes: valid_sharing
     }
 
     assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
