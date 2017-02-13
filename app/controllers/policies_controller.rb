@@ -91,7 +91,7 @@ class PoliciesController < ApplicationController
     cloned_resource = resource.dup
     cloned_resource.policy = resource.policy.deep_copy
     cloned_resource = resource_with_assigned_projects cloned_resource,project_ids
-    if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
+    if !resource.new_record? && resource.is_published?
       updated_can_publish_immediately = true
       #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
     elsif cloned_resource.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(cloned_resource)
