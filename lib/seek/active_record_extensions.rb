@@ -53,6 +53,10 @@ module Seek
       respond_to? :versions
     end
 
+    def suggested_type?
+      self.class.include? Seek::Ontologies::SuggestedType
+    end
+
   end
 end
 
