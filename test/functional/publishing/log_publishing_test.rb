@@ -18,7 +18,7 @@ class LogPublishingTest < ActionController::TestCase
     sop_params,blob = valid_sop
     sop_params[:project_ids] = [Factory(:project).id] #this project has no gatekeeper
     assert_difference ('ResourcePublishLog.count') do
-      post :create, :sop => sop_params,:content_blobs => [blob], :sharing => public_sharing
+      post :create, :sop => sop_params,:content_blobs => [blob], policy_attributes: public_sharing
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
@@ -31,7 +31,7 @@ class LogPublishingTest < ActionController::TestCase
     sop,blob = valid_sop
     @controller = SopsController.new()
     assert_difference ('ResourcePublishLog.count') do
-      post :create, :sop => sop,:content_blobs => [blob], :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      post :create, :sop => sop,:content_blobs => [blob], policy_attributes: { access_type: Policy::VISIBLE }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -45,10 +45,9 @@ class LogPublishingTest < ActionController::TestCase
     sop,blob = valid_sop
     assert_no_difference ('ResourcePublishLog.count') do
       post :create, :sop => sop, :content_blobs => [blob]
-
     end
 
-    assert_not_equal Policy::EVERYONE, assigns(:sop).policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, assigns(:sop).policy.access_type
   end
 
   test 'log when updating an item from non-public to public' do
@@ -57,11 +56,11 @@ class LogPublishingTest < ActionController::TestCase
     login_as(owner.user)
 
     sop = Factory(:sop,:contributor=>owner.user)
-    assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
     assert sop.can_publish?
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, :id => sop.id, :sharing => public_sharing
+      put :update, :id => sop.id, policy_attributes: public_sharing
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
@@ -76,11 +75,11 @@ class LogPublishingTest < ActionController::TestCase
     login_as(owner.user)
 
     sop = Factory(:sop,:project_ids=>[@gatekeeper.projects.first.id],:contributor=>owner.user)
-    assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
     assert sop.can_publish?
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -94,10 +93,10 @@ class LogPublishingTest < ActionController::TestCase
     owner = Factory(:person)
     login_as(owner.user)
     sop = Factory(:sop,:contributor=>owner.user)
-    assert_not_equal Policy::EVERYONE, sop.policy.sharing_scope
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
 
     assert_no_difference ('ResourcePublishLog.count') do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS}
+      put :update, :id => sop.id, policy_attributes: { access_type: Policy::NO_ACCESS }
     end
   end
 
@@ -107,13 +106,13 @@ class LogPublishingTest < ActionController::TestCase
     login_as(owner.user)
 
     sop = Factory(:sop,:contributor=>owner.user,:policy=>Factory(:public_policy))
-    assert_equal Policy::EVERYONE, sop.policy.sharing_scope
+    assert_not_equal Policy::NO_ACCESS, sop.policy.access_type
 
     #create a published log for the published sop
     ResourcePublishLog.create(:resource => sop, :user => User.current_user, :publish_state => ResourcePublishLog::PUBLISHED)
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE, "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS}
+      put :update, :id => sop.id, policy_attributes: { access_type: Policy::NO_ACCESS }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::UNPUBLISHED, publish_log.publish_state.to_i
@@ -127,7 +126,7 @@ class LogPublishingTest < ActionController::TestCase
     df = Factory(:data_file, :project_ids => @gatekeeper.projects.collect(&:id))
 
     login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+    put :update, :id => df.id, policy_attributes: { access_type: Policy::VISIBLE }
 
     logout
 
@@ -153,7 +152,7 @@ class LogPublishingTest < ActionController::TestCase
     df = Factory(:data_file, :project_ids => gatekeeper2.projects.collect(&:id))
 
     login_as(df.contributor)
-    put :update, :id => df.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+    put :update, :id => df.id, policy_attributes: { access_type: Policy::VISIBLE }
 
     logout
 
@@ -217,7 +216,7 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   def public_sharing
-    {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::ACCESSIBLE}
+    { access_type: Policy::ACCESSIBLE }
   end
 end
 
