@@ -233,11 +233,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id, title: 'My Sample',
                               data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' },
-                              project_ids: [person.projects.first.id] }, sharing: valid_sharing
+                              project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing
     end
     assert sample = assigns(:sample)
     assert_equal person.user, sample.contributor
-    assert_equal Policy::ALL_USERS, sample.policy.sharing_scope
     assert sample.can_view?(Factory(:person).user)
   end
 
@@ -252,10 +251,9 @@ class SamplesControllerTest < ActionController::TestCase
     sample.reload
     refute sample.can_view?(other_person.user)
 
-    put :update, id: sample.id, sample: { title: 'Updated Sample',  data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }, project_ids: [] }, sharing: valid_sharing
+    put :update, id: sample.id, sample: { title: 'Updated Sample',  data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' }, project_ids: [] }, policy_attributes: valid_sharing
 
     assert sample = assigns(:sample)
-    assert_equal Policy::ALL_USERS, sample.policy.sharing_scope
     assert sample.can_view?(other_person.user)
   end
 
