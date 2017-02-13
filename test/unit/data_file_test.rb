@@ -92,11 +92,6 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal df.contributor, df.latest_version.contributor
   end
 
-  def test_avatar_key
-    assert_equal 'data_file_avatar', data_files(:picture).avatar_key
-    refute data_files(:picture).use_mime_type_for_avatar?
-  end
-
   test 'projects' do
     df = data_files(:sysmo_data_file)
     p = projects(:sysmo_project)
