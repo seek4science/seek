@@ -30,7 +30,6 @@
             $j('#permissions_spinner').show();
 
             var data = {
-                access_type: permissionsTable.publicPermission.access_type,
                 project_ids: project_ids, // Controller expects this to be a string containing IDs separated by a comma
                 creators: $j('#creators').val(),
                 contributor_id: '<%= contributor_id -%>',
@@ -40,10 +39,13 @@
                 authenticity_token: $j('meta[name=csrf-token]').attr('content') // is this necessary?
             };
 
+            // Take the fields from the permissions table and serialize them along with the above hash
+            data = $j('#permissions-table :input').serialize() + '&' + $j.param(data);
+
             $j.ajax({
                 type: "POST",
                 url: '<%= url -%>',
-                data: $j('#permissions-table :input').serialize() + '&' + $j.param(data),
+                data: data,
                 success: function (result) {
                     $j('#permissions-preview-wrapper').html(result);
                     $j('#preview_permissions').modal('show');
