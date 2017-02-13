@@ -189,8 +189,8 @@ module ResourceListItemHelper
     html  = ""
     policy = item.policy
 
-    case policy.sharing_scope
-      when Policy::PRIVATE
+    case policy.access_type
+      when Policy::NO_ACCESS
         if policy.permissions.empty?
           title = "Private"
           html << image('lock', :title=>title, :class => css_class)
@@ -198,15 +198,7 @@ module ResourceListItemHelper
           title = "Custom policy"
           html << image('manage', :title=>title, :class => css_class)
         end
-      when Policy::ALL_USERS
-        if policy.access_type > 0
-          title = "Visible to all #{Seek::Config.project_name} #{t('project').pluralize}"
-          html << image('open', :title=>title, :class => css_class)
-        else
-          title = "Visible to the #{t('project').pluralize.downcase} associated with this item"
-          html << image('open', :title=>title, :class => css_class)
-        end
-      when Policy::EVERYONE
+      else
         if !item.is_downloadable? || (item.is_downloadable? && policy.access_type >= Policy::ACCESSIBLE)
           title = "Was published"
           html << image('world', :title=>title, :class => css_class)
