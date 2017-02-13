@@ -351,13 +351,14 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'spreadsheet annotation search fields' do
-    skip('currently being awkward, seems to be a setup rather functional problem since worksheets are missing')
-    cr = Factory(:cell_range)
+    df = Factory(:data_file)
+    cr = Factory(:cell_range,worksheet:Factory(:worksheet,content_blob:df.content_blob))
+
     Annotation.create(:source => Factory(:user),
                   :annotatable => cr,
                   :attribute_name => 'annotation',
                   :value => 'fish')
-    df=cr.worksheet.content_blob.asset
+
     df.reload
     refute_empty df.content_blob.worksheets
     fields = df.spreadsheet_annotation_search_fields

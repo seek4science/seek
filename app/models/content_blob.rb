@@ -33,7 +33,7 @@ class ContentBlob < ActiveRecord::Base
   before_save :calculate_file_size
   after_create :create_retrieval_job
 
-  has_many :worksheets, dependent: :destroy
+  has_many :worksheets, inverse_of: :content_blob, dependent: :destroy
 
   validate :original_filename_or_url
 
