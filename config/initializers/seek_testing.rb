@@ -100,6 +100,8 @@ SEEK::Application.configure do
 
       Settings.defaults[:orcid_required] = false
       Settings.defaults[:site_base_host] = "http://localhost:3000"
+
+      Settings.defaults[:openbis_enabled] = true
     end
   end
 end
