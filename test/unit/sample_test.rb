@@ -786,7 +786,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'extracted samples inherit projects from data file' do
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                         policy: Factory(:private_policy)
     sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
@@ -811,7 +811,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'extracted samples inherit creators from data file' do
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                         policy: Factory(:private_policy)
     sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
