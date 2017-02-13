@@ -63,23 +63,23 @@ class DatasetTest < ActiveSupport::TestCase
     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint,'20160210130454955-23')
     datafile = dataset.create_seek_datafile
     assert_equal DataFile,datafile.class
-    assert_equal 1,datafile.content_blobs.count
+    refute_nil 1,datafile.content_blob
     assert datafile.valid?
-    assert datafile.content_blobs.first.valid?
+    assert datafile.content_blob.valid?
 
     assert datafile.openbis?
-    assert datafile.content_blobs.first.openbis?
-    assert datafile.content_blobs.first.custom_integration?
-    refute datafile.content_blobs.first.external_link?
-    refute datafile.content_blobs.first.show_as_external_link?
+    assert datafile.content_blob.openbis?
+    assert datafile.content_blob.custom_integration?
+    refute datafile.content_blob.external_link?
+    refute datafile.content_blob.show_as_external_link?
 
-    assert_equal "openbis:#{@openbis_endpoint.id}:dataset:20160210130454955-23",datafile.content_blobs.first.url
+    assert_equal "openbis:#{@openbis_endpoint.id}:dataset:20160210130454955-23",datafile.content_blob.url
     assert_equal 'wibble',datafile.license
 
     normal = Factory(:data_file)
     refute normal.openbis?
-    refute normal.content_blobs.first.openbis?
-    refute normal.content_blobs.first.custom_integration?
+    refute normal.content_blob.openbis?
+    refute normal.content_blob.custom_integration?
   end
 
   test 'registered?' do
