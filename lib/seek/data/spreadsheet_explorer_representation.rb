@@ -9,19 +9,19 @@ module Seek
       MIN_COLS = 10
 
       def contains_extractable_spreadsheet?
-        content_blobs.first.is_extractable_spreadsheet?
+        content_blob && content_blob.is_extractable_spreadsheet?
       end
 
       def spreadsheet_annotations
-        content_blobs.first.worksheets.collect { |w| w.cell_ranges.collect(&:annotations) }.flatten
+        content_blob.worksheets.collect { |w| w.cell_ranges.collect(&:annotations) }.flatten
       end
 
       # Return the data file's spreadsheet
       # If it doesn't exist yet, it gets created
       def spreadsheet
-        if content_blobs.first.is_extractable_spreadsheet?
+        if contains_extractable_spreadsheet?
           workbook = parse_spreadsheet_xml(spreadsheet_xml)
-          if content_blobs.first.worksheets.empty?
+          if content_blob.worksheets.empty?
             workbook.sheets.each_with_index do |sheet, sheet_number|
               content_blobs.first.worksheets << Worksheet.create(sheet_number: sheet_number, last_row: sheet.last_row, last_column: sheet.last_col)
             end
@@ -36,9 +36,9 @@ module Seek
       # Return the data file's spreadsheet XML
       # If it doesn't exist yet, it gets created
       def spreadsheet_xml
-        if content_blobs.first.is_extractable_spreadsheet?
-          Rails.cache.fetch("blob_ss_xml-#{content_blobs.first.cache_key}") do
-            spreadsheet_to_xml(open(content_blobs.first.filepath))
+        if contains_extractable_spreadsheet?
+          Rails.cache.fetch("blob_ss_xml-#{content_blob.cache_key}") do
+            spreadsheet_to_xml(open(content_blob.filepath))
           end
         else
           nil
