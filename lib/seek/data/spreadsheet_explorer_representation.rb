@@ -23,9 +23,9 @@ module Seek
           workbook = parse_spreadsheet_xml(spreadsheet_xml)
           if content_blob.worksheets.empty?
             workbook.sheets.each_with_index do |sheet, sheet_number|
-              content_blobs.first.worksheets << Worksheet.create(sheet_number: sheet_number, last_row: sheet.last_row, last_column: sheet.last_col)
+              content_blob.worksheets << Worksheet.create(sheet_number: sheet_number, last_row: sheet.last_row, last_column: sheet.last_col)
             end
-            content_blobs.first.save
+            content_blob.save
           end
           return workbook
         else

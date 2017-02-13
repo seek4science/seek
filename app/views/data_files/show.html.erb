@@ -16,7 +16,7 @@
           <% if @data_file.openbis? %>
             <%= render(partial:"data_files/openbis/dataset", locals:{data_file:@data_file}) %>
           <% else %>
-            <%= render(partial:"assets/multiple_fileinfo", object:@display_data_file) %>
+                <%= render partial:'assets/fileinfo',object:@display_data_file.content_blob -%>
           <% end %>
         <% end %>
 

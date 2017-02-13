@@ -29,43 +29,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'title', text: /The Sysmo SEEK Data.*/, count: 1
   end
 
-  test 'should create data file with mixture of blobs' do
-    stub_request(:head, 'http://fair-dom.org/').to_return(status: 200, headers: { 'Content-Type' => 'text/html' })
-    stub_request(:head, 'http://fair-dom.org/piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
-    person = Factory(:person)
-    login_as(person.user)
-    project = person.projects.first
-    refute_nil project
-    content_blob1 = { data: file_for_upload }
-    content_blob2 = { data_url: 'http://fair-dom.org', original_filename: '', make_local_copy: '0' }
-    content_blob3 = { data_url: 'http://fair-dom.org/piccy.png', original_filename: '', make_local_copy: '0' }
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count', 3) do
-        post :create, data_file: { title: 'Test Create', project_ids: [project.id] }, content_blobs: [content_blob1, content_blob2, content_blob3], sharing: valid_sharing
-      end
-    end
-
-    assert_redirected_to data_file_path(data_file = assigns(:data_file))
-    assert_equal 'Test Create', data_file.title
-    assert_equal [project], data_file.projects
-    assert_equal person.user, data_file.contributor
-    assert_equal 3, data_file.content_blobs.count
-    blob1 = data_file.content_blobs.first
-    blob2 = data_file.content_blobs[1]
-    blob3 = data_file.content_blobs.last
-    assert_equal 'file_picture.png', blob1.original_filename
-    assert blob1.file_exists?
-
-    assert_equal 'http://fair-dom.org', blob2.url
-    refute blob2.file_exists?
-    assert blob2.is_webpage?
-    assert_equal 'text/html', blob2.content_type
-
-    assert_equal 'http://fair-dom.org/piccy.png', blob3.url
-    refute blob3.is_webpage?
-    assert_equal 'image/png', blob3.content_type
-  end
-
   # because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent
   # the log being saved, unless it is public, since it has passed out of the around filter and User.current_user is nil
   test 'download and view activity logging for private items' do
@@ -294,11 +257,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blobs.first.url.blank?
-    assert assigns(:data_file).content_blobs.first.data_io_object.nil?
-    assert !assigns(:data_file).content_blobs.first.file_exists?
-    assert_equal 'text/plain', assigns(:data_file).content_blobs.first.content_type
-    assert_equal 'txt_test.txt', assigns(:data_file).content_blobs.first.original_filename
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
+    assert_equal 'txt_test.txt', assigns(:data_file).content_blob.original_filename
   end
 
   test 'should create data file with https_url' do
@@ -313,11 +276,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blobs.first.url.blank?
-    assert assigns(:data_file).content_blobs.first.data_io_object.nil?
-    assert !assigns(:data_file).content_blobs.first.file_exists?
-    assert_equal 'txt_test.txt', assigns(:data_file).content_blobs.first.original_filename
-    assert_equal 'text/plain', assigns(:data_file).content_blobs.first.content_type
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal 'txt_test.txt', assigns(:data_file).content_blob.original_filename
+    assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
   end
 
   test 'should not create data file with file url' do
@@ -352,9 +315,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blobs.first.url.blank?
-    assert_equal 'txt_test.txt', assigns(:data_file).content_blobs.first.original_filename
-    assert_equal 'text/plain', assigns(:data_file).content_blobs.first.content_type
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert_equal 'txt_test.txt', assigns(:data_file).content_blob.original_filename
+    assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
   end
 
   test 'should create data file and store with url even with http protocol missing' do
@@ -374,9 +337,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blobs.first.url.blank?
-    assert_equal 'txt_test.txt', assigns(:data_file).content_blobs.first.original_filename
-    assert_equal 'text/plain', assigns(:data_file).content_blobs.first.content_type
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert_equal 'txt_test.txt', assigns(:data_file).content_blob.original_filename
+    assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
   end
 
   test 'should correctly handle 404 url' do
@@ -410,8 +373,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
 
-    assert !assigns(:data_file).content_blobs.first.data_io_object.read.nil?
-    assert assigns(:data_file).content_blobs.first.url.blank?
+    assert !assigns(:data_file).content_blob.data_io_object.read.nil?
+    assert assigns(:data_file).content_blob.url.blank?
     assert_equal 1, assigns(:data_file).version
     assert_not_nil assigns(:data_file).latest_version
     assay.reload
@@ -443,8 +406,8 @@ class DataFilesControllerTest < ActionController::TestCase
     df.reload
     assert_equal users(:datafile_owner), df.contributor
 
-    assert !df.content_blobs.first.data_io_object.read.nil?
-    assert df.content_blobs.first.url.blank?
+    assert !df.content_blob.data_io_object.read.nil?
+    assert df.content_blob.url.blank?
     assert df.policy
     assert df.policy.permissions
     assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
@@ -469,8 +432,8 @@ class DataFilesControllerTest < ActionController::TestCase
     df.reload
     assert_equal users(:datafile_owner), df.contributor
 
-    assert !df.content_blobs.first.data_io_object.read.nil?
-    assert df.content_blobs.first.url.blank?
+    assert !df.content_blob.data_io_object.read.nil?
+    assert df.content_blob.url.blank?
     assert df.policy
     assert df.policy.permissions
     assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
@@ -532,11 +495,13 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
 
-    assert_select 'div.box_about_actor' do
-      assert_select 'ul' do
-        assert_select 'li', text: /rightfield\.xls/
-        assert_select 'li > span.subtle', text: '(Spreadsheet - 9 KB)'
-      end
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Filename:/
+      assert_select "p",:text=>/rightfield\.xls/
+      assert_select "p > b",:text=>/Format:/
+      assert_select "p",:text=>/Spreadsheet/
+      assert_select "p > b",:text=>/Size:/
+      assert_select "p",:text=>/9 KB/
     end
   end
 
@@ -554,13 +519,13 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    refute assigns(:data_file).content_blobs.first.url.blank?
-    assert assigns(:data_file).content_blobs.first.data_io_object.nil?
-    refute assigns(:data_file).content_blobs.first.file_exists?
-    assert_equal '', assigns(:data_file).content_blobs.first.original_filename
-    assert assigns(:data_file).content_blobs.first.is_webpage?
-    assert_equal 'http://webpage.com', assigns(:data_file).content_blobs.first.url
-    assert_equal 'text/html', assigns(:data_file).content_blobs.first.content_type
+    refute assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    refute assigns(:data_file).content_blob.file_exists?
+    assert_equal '', assigns(:data_file).content_blob.original_filename
+    assert assigns(:data_file).content_blob.is_webpage?
+    assert_equal 'http://webpage.com', assigns(:data_file).content_blob.url
+    assert_equal 'text/html', assigns(:data_file).content_blob.content_type
   end
 
   test 'should add link to a webpage with http protocol missing' do
@@ -577,13 +542,13 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    refute assigns(:data_file).content_blobs.first.url.blank?
-    assert assigns(:data_file).content_blobs.first.data_io_object.nil?
-    refute assigns(:data_file).content_blobs.first.file_exists?
-    assert_equal '', assigns(:data_file).content_blobs.first.original_filename
-    assert assigns(:data_file).content_blobs.first.is_webpage?
-    assert_equal 'http://webpage.com', assigns(:data_file).content_blobs.first.url
-    assert_equal 'text/html', assigns(:data_file).content_blobs.first.content_type
+    refute assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    refute assigns(:data_file).content_blob.file_exists?
+    assert_equal '', assigns(:data_file).content_blob.original_filename
+    assert assigns(:data_file).content_blob.is_webpage?
+    assert_equal 'http://webpage.com', assigns(:data_file).content_blob.url
+    assert_equal 'text/html', assigns(:data_file).content_blob.content_type
   end
 
   test 'should add link to a webpage from windows browser' do
@@ -600,60 +565,56 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    assert !assigns(:data_file).content_blobs.first.url.blank?
-    assert assigns(:data_file).content_blobs.first.data_io_object.nil?
-    assert !assigns(:data_file).content_blobs.first.file_exists?
-    assert_equal '', assigns(:data_file).content_blobs.first.original_filename
-    assert assigns(:data_file).content_blobs.first.is_webpage?
-    assert_equal 'http://webpage.com', assigns(:data_file).content_blobs.first.url
-    assert_equal 'text/html', assigns(:data_file).content_blobs.first.content_type
+    assert !assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    assert !assigns(:data_file).content_blob.file_exists?
+    assert_equal '', assigns(:data_file).content_blob.original_filename
+    assert assigns(:data_file).content_blob.is_webpage?
+    assert_equal 'http://webpage.com', assigns(:data_file).content_blob.url
+    assert_equal 'text/html', assigns(:data_file).content_blob.content_type
   end
 
   test 'should show webpage as a link' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
 
-    df = Factory :data_file, content_blobs: [Factory(:content_blob, url: 'http://webpage.com')]
+    df = Factory :data_file, content_blob: Factory(:content_blob, url: 'http://webpage.com')
 
-    assert df.content_blobs.first.is_webpage?
+    assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
     get :show, id: df
     assert_response :success
 
-    assert_select '#buttons a.btn[href=?]', 'http://webpage.com', text: 'External Link'
+    assert_select "#buttons a.btn[href=?]","http://webpage.com",:text=>'External Link'
 
-    assert_select 'div.box_about_actor' do
-      assert_select 'ul' do
-        assert_select 'li' do
-          assert_select 'a[href=?][target=_blank]', 'http://webpage.com', text: 'http://webpage.com'
-        end
-        assert_select 'li > span.subtle', text: '(Website)'
-      end
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Link:/
+      assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com"
+      assert_select "p > b",:text=>/Format:/,:count=>0
+      assert_select "p > b",:text=>/Size:/,:count=>0
     end
   end
 
   test 'should show URL with unrecognized scheme as a link' do
-    df = Factory :data_file, content_blobs: [Factory(:content_blob, url: 'spotify:track:3vX71b5ey9twzyCqJwBEvY')]
+    df = Factory :data_file, content_blob: Factory(:content_blob, url: 'spotify:track:3vX71b5ey9twzyCqJwBEvY')
 
-    assert df.content_blobs.first.show_as_external_link?
+    assert df.content_blob.show_as_external_link?
     login_as(df.contributor.user)
     get :show, id: df
     assert_response :success
 
     assert_select '#buttons a.btn[href=?]', 'spotify:track:3vX71b5ey9twzyCqJwBEvY', text: 'External Link'
 
-    assert_select 'div.box_about_actor' do
-      assert_select 'ul' do
-        assert_select 'li' do
-          assert_select 'a[href=?][target=_blank]', 'spotify:track:3vX71b5ey9twzyCqJwBEvY', text: 'spotify:track:3vX71b5ey9twzyCqJwBEvY'
-        end
-        assert_select 'li > span.subtle', text: '(Website)'
-      end
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Link:/
+      assert_select "a[href=?][target=_blank]","spotify:track:3vX71b5ey9twzyCqJwBEvY",:text=>"spotify:track:3vX71b5ey9twzyCqJwBEvY"
+      assert_select "p > b",:text=>/Format:/,:count=>0
+      assert_select "p > b",:text=>/Size:/,:count=>0
     end
   end
 
   test 'should not show website link for viewable but inaccessible data but should show request button' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
-    df = Factory :data_file, content_blobs: [Factory(:content_blob, url: 'http://webpage.com')], policy: Factory(:all_sysmo_viewable_policy)
+    df = Factory :data_file, content_blob: Factory(:content_blob, url: 'http://webpage.com'), policy: Factory(:all_sysmo_viewable_policy)
     user = Factory :user
     assert df.can_view?(user)
     assert !df.can_download?(user)
@@ -661,12 +622,13 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show, id: df
     assert_response :success
 
-    assert_select 'div.box_about_actor' do
-      assert_select 'a[href=?][target=_blank]', 'http://webpage.com', text: 'http://webpage.com', count: 0
+    assert_select "div.box_about_actor" do
+      assert_select "p > b",:text=>/Link/,:count=>0
+      assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com",:count=>0
     end
 
-    assert_select '#buttons' do
-      assert_select 'a', text: /Request/, count: 1
+    assert_select "#buttons" do
+      assert_select "a",:text=>/Request/,:count=>1
     end
   end
 
@@ -699,8 +661,8 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'dont show download button or count for website/external_link data file' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
-    df = Factory :data_file, content_blobs: [Factory(:content_blob, url: 'http://webpage.com', external_link: true)]
-    assert df.content_blobs.first.is_webpage?
+    df = Factory :data_file, content_blob: Factory(:content_blob, url: 'http://webpage.com', external_link: true)
+    assert df.content_blob.is_webpage?
     login_as(df.contributor.user)
     assert df.can_download?(df.contributor.user)
     get :show, id: df
@@ -796,15 +758,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    refute assigns(:data_file).content_blobs.first.url.blank?
-    assert assigns(:data_file).content_blobs.first.data_io_object.nil?
-    refute assigns(:data_file).content_blobs.first.file_exists?
-    assert_equal 'file.txt', assigns(:data_file).content_blobs.first.original_filename
-    assert_equal 'text/plain', assigns(:data_file).content_blobs.first.content_type
+    refute assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    refute assigns(:data_file).content_blob.file_exists?
+    assert_equal 'file.txt', assigns(:data_file).content_blob.original_filename
+    assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
 
     get :download, id: assigns(:data_file)
 
-    assert_redirected_to assigns(:data_file).content_blobs.first.url
+    assert_redirected_to assigns(:data_file).content_blob.url
   end
 
   test 'should redirect and show error on download for 403 url' do
@@ -821,15 +783,15 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    refute assigns(:data_file).content_blobs.first.url.blank?
-    assert assigns(:data_file).content_blobs.first.data_io_object.nil?
-    refute assigns(:data_file).content_blobs.first.file_exists?
-    assert_equal 'file.txt', assigns(:data_file).content_blobs.first.original_filename
-    assert_equal 'text/plain', assigns(:data_file).content_blobs.first.content_type
+    refute assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    refute assigns(:data_file).content_blob.file_exists?
+    assert_equal 'file.txt', assigns(:data_file).content_blob.original_filename
+    assert_equal 'text/plain', assigns(:data_file).content_blob.content_type
 
     get :download, id: assigns(:data_file)
 
-    assert_redirected_to assigns(:data_file).content_blobs.first.url
+    assert_redirected_to assigns(:data_file).content_blob.url
   end
 
   test 'should create and redirect on download for 302 url' do
@@ -846,11 +808,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    refute assigns(:data_file).content_blobs.first.url.blank?
-    assert assigns(:data_file).content_blobs.first.data_io_object.nil?
-    refute assigns(:data_file).content_blobs.first.file_exists?
-    assert_equal '', assigns(:data_file).content_blobs.first.original_filename
-    assert_equal 'text/html', assigns(:data_file).content_blobs.first.content_type
+    refute assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    refute assigns(:data_file).content_blob.file_exists?
+    assert_equal '', assigns(:data_file).content_blob.original_filename
+    assert_equal 'text/html', assigns(:data_file).content_blob.content_type
 
     get :download, id: assigns(:data_file)
     assert_response :success
@@ -870,11 +832,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(assigns(:data_file))
     assert_equal users(:datafile_owner), assigns(:data_file).contributor
-    refute assigns(:data_file).content_blobs.first.url.blank?
-    assert assigns(:data_file).content_blobs.first.data_io_object.nil?
-    refute assigns(:data_file).content_blobs.first.file_exists?
-    assert_equal '', assigns(:data_file).content_blobs.first.original_filename
-    assert_equal 'text/html', assigns(:data_file).content_blobs.first.content_type
+    refute assigns(:data_file).content_blob.url.blank?
+    assert assigns(:data_file).content_blob.data_io_object.nil?
+    refute assigns(:data_file).content_blob.file_exists?
+    assert_equal '', assigns(:data_file).content_blob.original_filename
+    assert_equal 'text/html', assigns(:data_file).content_blob.content_type
 
     get :download, id: assigns(:data_file)
     assert_response :success
@@ -882,10 +844,10 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'report error when file unavailable for download' do
     df = Factory :data_file, policy: Factory(:public_policy)
-    df.content_blobs.first.dump_data_to_file
-    assert df.content_blobs.first.file_exists?
-    FileUtils.rm df.content_blobs.first.filepath
-    assert !df.content_blobs.first.file_exists?
+    df.content_blob.dump_data_to_file
+    assert df.content_blob.file_exists?
+    FileUtils.rm df.content_blob.filepath
+    assert !df.content_blob.file_exists?
 
     get :download, id: df
 
@@ -896,7 +858,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should handle inline download when specify the inline disposition' do
     data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
     df = Factory :data_file,
-                 content_blobs: [Factory(:content_blob, data: data, content_type: 'images/png')],
+                 content_blob: Factory(:content_blob, data: data, content_type: 'images/png'),
                  policy: Factory(:downloadable_public_policy)
 
     get :download, id: df, disposition: 'inline'
@@ -907,7 +869,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should handle normal attachment download' do
     data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
     df = Factory :data_file,
-                 content_blobs: [Factory(:content_blob, data: data, content_type: 'images/png')],
+                 content_blob: Factory(:content_blob, data: data, content_type: 'images/png'),
                  policy: Factory(:downloadable_public_policy)
 
     get :download, id: df
@@ -1354,7 +1316,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correctly displays links in spreadsheet explorer' do
     df = Factory(:data_file,
                  policy: Factory(:public_policy),
-                 content_blobs: [Factory(:small_test_spreadsheet_content_blob, data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read)])
+                 content_blob: Factory(:small_test_spreadsheet_content_blob, data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
     assert df.can_download?
     get :explore, id: df
     assert_response :success
@@ -1365,7 +1327,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correctly displays rows in spreadsheet explorer' do
     df = Factory(:data_file,
                  policy: Factory(:public_policy),
-                 content_blobs: [Factory(:small_test_spreadsheet_content_blob, data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read)])
+                 content_blob: Factory(:small_test_spreadsheet_content_blob, data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
 
     get :explore, id: df
     assert_response :success
@@ -1394,8 +1356,8 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correctly displays number of rows in spreadsheet explorer' do
     df = Factory(:data_file,
                  policy: Factory(:public_policy),
-                 content_blobs: [Factory(:small_test_spreadsheet_content_blob,
-                                         data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read)])
+                 content_blob: Factory(:small_test_spreadsheet_content_blob,
+                                         data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
 
     get :explore, id: df, page_rows: 5
     assert_response :success
@@ -1408,8 +1370,8 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correctly displays pagination in spreadsheet explorer' do
     df = Factory(:data_file,
                  policy: Factory(:public_policy),
-                 content_blobs: [Factory(:small_test_spreadsheet_content_blob,
-                                         data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read)])
+                 content_blob: Factory(:small_test_spreadsheet_content_blob,
+                                         data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
 
     page_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS / 2 + 1
     get :explore, id: df, page_rows: page_rows
@@ -1895,7 +1857,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    blob = assigns(:data_file).content_blobs.first
+    blob = assigns(:data_file).content_blob
     assert blob.cachable?
     assert !blob.url.blank?
     assert_equal 'small.txt', blob.original_filename
@@ -1927,7 +1889,7 @@ class DataFilesControllerTest < ActionController::TestCase
       end
 
       assert_redirected_to data_file_path(assigns(:data_file))
-      blob = assigns(:data_file).content_blobs.first
+      blob = assigns(:data_file).content_blob
       assert !blob.cachable?
       assert !blob.url.blank?
       assert_equal 'small.txt', blob.original_filename
@@ -1960,7 +1922,7 @@ class DataFilesControllerTest < ActionController::TestCase
       end
 
       assert_redirected_to data_file_path(assigns(:data_file))
-      blob = assigns(:data_file).content_blobs.first
+      blob = assigns(:data_file).content_blob
       refute blob.external_link?
       assert !blob.cachable?
       assert !blob.url.blank?
@@ -1993,7 +1955,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    blob = assigns(:data_file).content_blobs.first
+    blob = assigns(:data_file).content_blob
     refute blob.make_local_copy
     refute blob.cachable?
     refute blob.url.blank?
@@ -2024,7 +1986,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    blob = assigns(:data_file).content_blobs.first
+    blob = assigns(:data_file).content_blob
     assert !blob.cachable?
     assert !blob.url.blank?
     assert_blank blob.original_filename
@@ -2054,8 +2016,8 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
-    assert_equal 1, assigns(:data_file).content_blobs.count
-    blob = assigns(:data_file).content_blobs.first
+    refute_nil assigns(:data_file).content_blob
+    blob = assigns(:data_file).content_blob
     refute blob.external_link?
     assert !blob.cachable?
     assert !blob.url.blank?
@@ -2136,7 +2098,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title: 'String')
 
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2240,7 +2202,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title: 'String')
 
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)], policy: Factory(:private_policy), contributor: person.user
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:private_policy), contributor: person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -2268,7 +2230,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title: 'String')
 
-    data_file = Factory :data_file, content_blobs: [Factory(:strain_sample_data_content_blob)],
+    data_file = Factory :data_file, content_blob: Factory(:strain_sample_data_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2296,7 +2258,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title: 'String')
 
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2334,7 +2296,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title: 'String')
 
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2368,7 +2330,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     Factory(:string_sample_attribute_type, title: 'String')
 
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
@@ -2394,7 +2356,7 @@ class DataFilesControllerTest < ActionController::TestCase
     person = Factory(:project_administrator)
     login_as(person)
 
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy),
                                     contributor: person.user
     refute data_file.sample_template?
@@ -2503,7 +2465,7 @@ class DataFilesControllerTest < ActionController::TestCase
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: contributor
     sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
