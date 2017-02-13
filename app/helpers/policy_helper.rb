@@ -46,22 +46,6 @@ module PolicyHelper
     html.html_safe
   end
 
-  def policy_and_permissions_for_network_scope(policy, permissions, privileged_people, resource_name)
-    html =''
-
-    if policy.access_type != Policy::NO_ACCESS
-      html << "<h3>You will share this #{resource_name.humanize} with:</h3>"
-      html << "<p class='shared'>All the #{t('project')} members within the network can "
-      html << Policy.get_access_type_wording(policy.access_type, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase
-      html << "</p>"
-      html << process_permissions(permissions, resource_name, true)
-    else
-      html << process_permissions(permissions, resource_name)
-    end
-
-    html.html_safe
-  end
-
   def policy_and_permissions_for_public_scope(policy, permissions, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval)
     html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
     html << "<p class='public'>All visitors (including anonymous visitors with no login) can #{Policy.get_access_type_wording(policy.access_type, resource_name.camelize.constantize.new()).downcase} </p>"
