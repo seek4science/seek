@@ -9,7 +9,7 @@ class Policy < ActiveRecord::Base
   #basically the same as validates_numericality_of :sharing_scope, :access_type
   #but with a more generic error message because our users don't know what
   #sharing_scope and access_type are.
-  validates_each(:sharing_scope, :access_type) do |record, attr, value|
+  validates_each(:access_type) do |record, attr, value|
     raw_value = record.send("#{attr}_before_type_cast") || value
     begin
       Kernel.Float(raw_value)
@@ -164,10 +164,9 @@ class Policy < ActiveRecord::Base
       )
   end
 
-  def self.sysmo_and_projects_policy projects=[]
-      policy = Policy.new(:name => "default sysmo and projects policy",
-                          :sharing_scope => ALL_USERS,
-                          :access_type => VISIBLE
+  def self.projects_policy projects=[]
+      policy = Policy.new(:name => "default projects policy",
+                          :access_type => NO_ACCESS
       )
       projects.each do |project|
         policy.permissions.build(:contributor => project, :access_type => ACCESSIBLE)
@@ -239,11 +238,11 @@ class Policy < ActiveRecord::Base
   end
 
   def private?
-    sharing_scope == Policy::PRIVATE && permissions.empty?
+    access_type == Policy::NO_ACCESS && permissions.empty?
   end
 
   def public?
-    sharing_scope == Policy::EVERYONE
+    access_type > Policy::NO_ACCESS
   end
 
 #return the hash: key is access_type, value is the array of people

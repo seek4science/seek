@@ -36,7 +36,6 @@ module Seek
             false
           else
             policy.access_type = Policy::ACCESSIBLE
-            policy.sharing_scope = Policy::EVERYONE
             policy.save
             # FIXME:may need to add comment
             resource_publish_logs.create(publish_state: ResourcePublishLog::PUBLISHED,
@@ -107,13 +106,13 @@ module Seek
       end
 
       # while item is waiting for publishing approval,set the policy of the item to:
-      # new item: sysmo_and_project_policy
+      # new item: projects_policy
       # updated item: keep the policy as before
       def temporary_policy_while_waiting_for_publishing_approval
         return true unless authorization_checks_enabled
-        if policy.sharing_scope == Policy::EVERYONE && !self.is_a?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
+        if policy.public? && !self.is_a?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
           if self.new_record?
-            self.policy = Policy.sysmo_and_projects_policy projects
+            self.policy = Policy.projects_policy(projects)
           else
             self.policy = Policy.find_by_id(policy.id)
           end
