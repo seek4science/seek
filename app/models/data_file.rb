@@ -23,7 +23,7 @@ class DataFile < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-  has_many :content_blobs, as: :asset, foreign_key: :asset_id, conditions: proc { ['content_blobs.asset_version =?', version] }
+  has_many :content_blob, as: :asset, foreign_key: :asset_id, conditions: proc { ['content_blobs.asset_version =?', version] }
 
   has_many :studied_factors, conditions: proc { ['studied_factors.data_file_version =?', version] }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
