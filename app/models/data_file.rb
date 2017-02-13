@@ -75,7 +75,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def use_mime_type_for_avatar?
-    false
+    true
   end
 
   # defines that this is a user_creatable object type, and appears in the "New Object" gadget
