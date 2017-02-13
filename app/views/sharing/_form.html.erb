@@ -22,7 +22,7 @@
 <% end %>
 
 <script>
-  var policy = <%= policy_json(policy, object.projects) -%>;
+  var policy = <%= policy_json(policy, object.respond_to?(:projects) ? projects : []) -%>;
   <%# A deep copy of the policy that is used in `Sharing.permissionsChanged` to check if it has been modified %>
   var originalPolicy = $j.extend(true, {}, policy);
 
