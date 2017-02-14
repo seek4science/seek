@@ -165,11 +165,11 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     end
   end
 
-  test "updates for person" do
+  test "updates when a person registers or their role changes" do
     user = Factory :user
     person=nil
     assert_difference("AuthLookupUpdateQueue.count", 1) do
-      person = Factory :person, :user=>user
+      person = Factory.create(:brand_new_person, user: user)
     end
     assert_equal person, AuthLookupUpdateQueue.last(:order=>:id).item
 
@@ -181,6 +181,15 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
       end
     end
     assert_equal person, AuthLookupUpdateQueue.last(:order=>:id).item
+  end
+
+  test "does not update when a person updates their profile" do
+    person = Factory.create(:brand_new_person, user: Factory(:user))
+    assert_no_difference('AuthLookupUpdateQueue.count') do
+      disable_authorization_checks do
+        person.update_attributes(first_name: 'Dave')
+      end
+    end
   end
 
   test "updates for group membership" do
