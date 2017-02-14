@@ -1201,7 +1201,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'request file button visibility when logged in and out' do
-    df = Factory :data_file, policy: Factory(:policy, sharing_scope: Policy::EVERYONE, access_type: Policy::VISIBLE)
+    df = Factory :data_file, policy: Factory(:policy, access_type: Policy::VISIBLE)
 
     assert !df.can_download?, 'The datafile must not be downloadable for this test to succeed'
     assert_difference('ActivityLog.count') do
@@ -1437,7 +1437,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'the person who has the manage right to the item, CAN publish the item, if the item WAS published' do
     person = Factory(:person)
-    policy = Factory(:policy, sharing_scope: Policy::EVERYONE)
+    policy = Factory(:policy)
     Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
     data_file = Factory(:data_file, policy: policy)
     assert_equal Policy::NO_ACCESS, data_file.policy.access_type

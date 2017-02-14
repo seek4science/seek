@@ -33,7 +33,7 @@ class ProjectAssociationsTest < ActionController::IntegrationTest
       item.projects = [Factory(:project), Factory(:project)]
       disable_authorization_checks do
         put "/#{type_name}/#{item.id}", "#{item.class.name.downcase}".to_sym => {:id => item.id},
-           :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+           :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE, :your_proj_access_type => Policy::ACCESSIBLE}
       end
 
       item.reload

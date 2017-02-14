@@ -759,7 +759,6 @@ class SampleTest < ActiveSupport::TestCase
     policy = data_file.policy
     disable_authorization_checks do
       policy.access_type = Policy::NO_ACCESS
-      policy.sharing_scope = Policy::PRIVATE
       policy.save
       sample.reload
     end

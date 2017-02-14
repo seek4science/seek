@@ -17,28 +17,6 @@ module PolicyHelper
                        selected_access_type)
   end
 
-  # return access_type of your project if this permission is available in the policy
-  def your_project_access_type policy = nil, resource = nil
-    unless policy.nil? or resource.nil? or !(policy.sharing_scope == Policy::ALL_USERS)
-      unless policy.permissions.empty?
-        my_project_ids = if resource.class == Project then [resource.id] else resource.project_ids end
-        my_project_perms = policy.permissions.select {|p| p.contributor_type == 'Project' and my_project_ids.include? p.contributor_id}
-        access_types = my_project_perms.map(&:access_type)
-        return access_types.first if access_types.all?{|acc| acc == access_types.first}
-      else
-        policy.access_type
-      end
-    end
-  end
-
-  #returns a message that there are additional advanced permissions for the resource outside of the provided scope, and if the policy matches the scope.
-  #if a resource has has Policy::ALL_USERS then it is concidered to have advanced permissions if it has permissions that includes contributors other than the associated projects
-  def additional_advanced_permissions_included resource,scope
-    if resource.respond_to?(:policy) && resource.policy && (resource.policy.sharing_scope == scope) && resource.has_advanced_permissions?
-      "<span class='additional_permissions'>there are also additional Advanced Permissions defined below</span>".html_safe
-    end
-  end
-
   def policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name)
     html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
     html << "<p class='private'>You keep this #{resource_name.humanize.downcase} private (only visible to you)</p>"

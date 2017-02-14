@@ -702,35 +702,8 @@ class AuthorizationTest < ActiveSupport::TestCase
   #To save me re-writing lots of tests. Code copied from authorization.rb
   #Mimics how authorized_by_policy method used to work, but with my changes.
   def temp_authorized_by_policy?(policy, thing, action, user, not_used_2)
-    is_authorized = false
-    
-    # == BASIC POLICY
-    # 1. Check the user's "scope" level, to match the sharing scopes defined in policy.
-    # 2. If they're in "scope", check the action they're trying to perform is allowed by the access_type    
-    scope = nil
-    if user.nil?
-      scope = Policy::EVERYONE
-    else
-      if thing.contributor == user
-        scope = Policy::PRIVATE
-        return true #contributor is always authorized 
-        # have to do this because of inconsistancies with access_type that mess up later on
-        # (4 = can manage, 0 = can manage... if contributor) ???
-      elsif thing.is_downloadable? and thing.creators.include?(user.person) and access_type_allows_action?(action, Policy::EDITING)
-        scope = Policy::PRIVATE
-        return true
-      else
-        if user.person && user.person.projects.empty?
-          scope = Policy::EVERYONE
-        else
-          scope = Policy::ALL_USERS
-        end
-      end
-    end
-    
     # Check the user is "in scope" and also is performing an action allowed under the given access type
-    is_authorized = is_authorized || (scope <= policy.sharing_scope &&
-        Seek::Permissions::Authorization.access_type_allows_action?(action, policy.access_type))
+    Seek::Permissions::Authorization.access_type_allows_action?(action, policy.access_type)
   end
 
   test 'all users scope overrides more restrictive permissions' do

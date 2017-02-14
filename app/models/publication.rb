@@ -81,7 +81,7 @@ class Publication < ActiveRecord::Base
   end
 
   def default_policy
-    policy = Policy.new(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+    policy = Policy.new(:name => "publication_policy", :access_type => Policy::VISIBLE)
     #add managers (authors + contributor)
     creators.each do |author|
       policy.permissions << Permissions.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)

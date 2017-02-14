@@ -8,7 +8,6 @@ class PolicyTest < ActiveSupport::TestCase
     policy = policies(:download_for_all_sysmo_users_policy)
 
     copy = policy.deep_copy    
-    assert_equal policy.sharing_scope,copy.sharing_scope
     assert_equal policy.access_type,copy.access_type
     assert_equal policy.name,copy.name
     assert_not_equal policy.id,copy.id
@@ -28,7 +27,6 @@ class PolicyTest < ActiveSupport::TestCase
   
   test "private policy" do
     pol=Policy.private_policy
-    assert_equal Policy::PRIVATE, pol.sharing_scope
     assert_equal Policy::NO_ACCESS, pol.access_type
     assert !pol.use_whitelist
     assert !pol.use_blacklist

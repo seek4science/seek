@@ -6,7 +6,7 @@ class Policy < ActiveRecord::Base
            :autosave => true,
            :inverse_of => :policy
 
-  #basically the same as validates_numericality_of :sharing_scope, :access_type
+  #basically the same as validates_numericality_of :access_type
   #but with a more generic error message because our users don't know what
   #sharing_scope and access_type are.
   validates_each(:access_type) do |record, attr, value|
@@ -41,17 +41,13 @@ class Policy < ActiveRecord::Base
 
 
   # *****************************************************************************
-  #  This section defines constants for "sharing_scope" and "access_type" values
+  #  This section defines constants for "access_type" values
 
-  # NB! It is critical to all algorithms using these constants, that the latter
+  # NB! It is critical to all algorithms using these constants, that they
   # have their integer values increased along with the access they provide
-  # (so, for example, "editing" should have greated value than "viewing")
+  # (so, for example, "editing" should have greater value than "viewing")
 
-  # In other words, this means that for both(!) sharing_scope and access_type 
-  # constants it is crucial that order of these (imposed by their integer values)
-  # is preserved
-
-  # sharing_scope
+  # sharing_scope - NO LONGER USED
   PRIVATE = 0
   ALL_USERS = 2
   EVERYONE = 4
@@ -85,7 +81,6 @@ class Policy < ActiveRecord::Base
 
   def self.new_for_upload_tool(resource, recipient)
     policy = resource.build_policy(:name               => 'auto',
-                                    :sharing_scope      => Policy::PRIVATE,
                                     :access_type        => Policy::NO_ACCESS)
     policy.permissions.build :contributor_type => "Person", :contributor_id => recipient, :access_type => Policy::ACCESSIBLE
     return policy
@@ -93,7 +88,6 @@ class Policy < ActiveRecord::Base
 
   def self.new_from_email(resource, recipients, accessors)
     policy = resource.build_policy(:name               => 'auto',
-                                   :sharing_scope      => Policy::PRIVATE,
                                    :access_type        => Policy::NO_ACCESS)
     recipients.each do |id|
       policy.permissions.build :contributor_type => "Person", :contributor_id => id, :access_type => Policy::EDITING
@@ -143,7 +137,6 @@ class Policy < ActiveRecord::Base
 
   def self.private_policy
     Policy.new(:name => "default private",
-               :sharing_scope => PRIVATE,
                :access_type => NO_ACCESS,
                :use_whitelist => false,
                :use_blacklist => false)
@@ -151,7 +144,6 @@ class Policy < ActiveRecord::Base
 
   def self.registered_users_accessible_policy
     Policy.new(:name => "default accessible",
-               :sharing_scope => ALL_USERS,
                :access_type => ACCESSIBLE,
                :use_whitelist => false,
                :use_blacklist => false)
@@ -159,8 +151,7 @@ class Policy < ActiveRecord::Base
 
   def self.public_policy
       Policy.new(:name => "default public",
-                          :sharing_scope => EVERYONE,
-                          :access_type => ACCESSIBLE
+                 :access_type => ACCESSIBLE
       )
   end
 
@@ -176,7 +167,7 @@ class Policy < ActiveRecord::Base
 
   #The default policy to use when creating authorized items if no other policy is specified
   def self.default
-    Policy.new(name: 'default policy', access_type: Seek::Config.default_all_visitors_access_type, sharing_scope: EVERYONE)
+    Policy.new(name: 'default policy', access_type: Seek::Config.default_all_visitors_access_type)
   end
 
   # translates access type codes into human-readable form  
@@ -204,7 +195,6 @@ class Policy < ActiveRecord::Base
   # (e.g. contributor, creation time, etc.)
   def get_settings
     settings = {}
-    settings['sharing_scope'] = self.sharing_scope
     settings['access_type'] = self.access_type
     settings['use_whitelist'] = self.use_whitelist
     settings['use_blacklist'] = self.use_blacklist
@@ -252,7 +242,7 @@ class Policy < ActiveRecord::Base
         #the result return: a hash contain the access_type as key, and array of people as value
         grouped_people_by_access_type = {}
 
-        policy_to_people_group people_in_group, contributor
+        people_in_group['Public'] = self.access_type
 
         permissions_to_people_group permissions, people_in_group
 
@@ -305,26 +295,6 @@ class Policy < ActiveRecord::Base
         grouped_people_by_access_type = Hash[grouped_people_by_access_type.sort]
 
         return grouped_people_by_access_type
-  end
-
-  def policy_to_people_group people_in_group, contributor=User.current_user.person
-      if sharing_scope == Policy::ALL_USERS
-         people_in_network = get_people_in_network access_type
-         people_in_group['Network'] |= people_in_network unless people_in_network.blank?
-      elsif sharing_scope == Policy::EVERYONE
-        people_in_group['Public'] = access_type
-      end
-      #if blacklist/whitelist is used
-      if use_whitelist
-        people_in_whitelist = get_people_in_FG(contributor, nil, true, nil)
-        people_in_group['WhiteList'] |= people_in_whitelist unless people_in_whitelist.blank?
-      end
-      #if blacklist/whitelist is used
-      if use_blacklist
-        people_in_blacklist = get_people_in_FG(contributor, nil, nil, true)
-        people_in_group['BlackList'] |= people_in_blacklist unless people_in_blacklist.blank?
-      end
-      people_in_group
   end
 
   def permissions_to_people_group permissions, people_in_group

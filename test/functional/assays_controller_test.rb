@@ -877,7 +877,6 @@ class AssaysControllerTest < ActionController::TestCase
     assay = Factory(:assay, :contributor => User.current_user.person,
                     :study => Factory(:study, :investigation => Factory(:investigation, :project_ids => [proj.id])),
                     :policy => Factory(:policy,
-                                       :sharing_scope => Policy::ALL_USERS,
                                        :access_type => Policy::NO_ACCESS,
                                        :permissions => [Factory(:permission, :contributor => proj, :access_type => Policy::EDITING)]))
     get :edit, :id => assay.id
@@ -921,7 +920,6 @@ class AssaysControllerTest < ActionController::TestCase
                    :study => study)
 
     assert assay.can_manage?
-    assert_equal Policy::PRIVATE, assay.policy.sharing_scope
     assert_equal Policy::NO_ACCESS, assay.policy.access_type
     assert assay.policy.permissions.empty?
 
