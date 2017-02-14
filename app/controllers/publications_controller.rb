@@ -424,6 +424,12 @@ class PublicationsController < ApplicationController
       begin
         query = DoiQuery.new(Seek::Config.crossref_api_email)
         result = query.fetch(doi)
+        if result.blank?
+          @error = "Unable to get result"
+        end
+        if result.title.blank?
+          @error = "Unable to get DOI"
+        end
       rescue RuntimeError => exception
         @error = "There was an problem contacting the DOI query service. Please try again later"
         if Seek::Config.exception_notification_enabled

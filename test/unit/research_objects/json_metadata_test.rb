@@ -40,7 +40,7 @@ class JsonMetaTest < ActiveSupport::TestCase
   end
 
   test "metadata contents for publication" do
-    item = Factory :publication, :doi=>"10.111.1.1", :pubmed_id=>nil
+    item = Factory :publication, :doi=>"10.1111/ecog.01552", :pubmed_id=>nil
     json = Seek::ResearchObjects::JSONMetadata.instance.metadata_content(item)
     json = JSON.parse(json)
 
@@ -48,8 +48,8 @@ class JsonMetaTest < ActiveSupport::TestCase
     assert_equal item.title,json["title"]
     assert_empty json["contains"]
 
-    assert_equal "10.111.1.1",json["doi"]
-    assert_equal "https://dx.doi.org/10.111.1.1",json["doi_uri"]
+    assert_equal "10.1111/ecog.01552",json["doi"]
+    assert_equal "https://dx.doi.org/10.1111/ecog.01552",json["doi_uri"]
     assert_nil json["pubmed_id"]
     assert_nil json["pubmed_uri"]
 
