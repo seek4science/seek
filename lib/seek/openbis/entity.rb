@@ -54,15 +54,6 @@ module Seek
         properties['COMMENT'] || ''
       end
 
-      def query_application_server_by_perm_id(perm_id = '')
-        key = cache_key(perm_id)
-        Rails.logger.info("CACHE KEY = #{key}")
-        Rails.cache.fetch(key) do
-          Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")
-          application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
-        end
-      end
-
       def cache_key(perm_id)
         "#{openbis_endpoint.cache_key}/#{type_name}/#{Digest::SHA2.hexdigest(perm_id)}"
       end
@@ -90,6 +81,28 @@ module Seek
       end
 
       private
+
+      def query_application_server_by_perm_id(perm_id = '')
+        cached_query_by_perm_id(perm_id) do
+          application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
+        end
+      end
+
+      def query_datastore_server_by_dataset_perm_id(perm_id = '')
+        cached_query_by_perm_id(perm_id) do
+          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
+        end
+      end
+
+      def cached_query_by_perm_id(perm_id)
+        fail 'Block required for doing query' unless block_given?
+        key = cache_key(perm_id)
+        Rails.logger.info("CACHE KEY = #{key}")
+        Rails.cache.fetch(key) do
+          Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")
+          yield
+        end
+      end
 
       def application_server_query_instance
         Fairdom::OpenbisApi::ApplicationServerQuery.new(openbis_endpoint.as_endpoint, openbis_endpoint.session_token)

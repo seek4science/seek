@@ -35,15 +35,6 @@ module Seek
         super.sort_by(&:path)
       end
 
-      def query_datastore_server_by_dataset_perm_id(perm_id = '')
-        key = cache_key(perm_id)
-        Rails.logger.info("CACHE KEY = #{key}")
-        Rails.cache.fetch(key) do
-          Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")
-          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
-        end
-      end
-
       def download(dest)
         datastore_server_download_instance.download(downloadType: 'file', permID: dataset_perm_id, source: path, dest: dest)
       end
