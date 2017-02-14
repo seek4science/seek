@@ -15,12 +15,12 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
 
     assert !df.has_advanced_permissions?
     Factory(:permission,:contributor=>person1,:access_type=>Policy::EDITING, :policy => df.policy)
-    assert df.has_advanced_permissions?
+    assert df.reload.has_advanced_permissions?
 
     model = Factory :model,:policy=>Factory(:public_policy),:contributor=>user.person,:projects=>[proj1,proj2]
-    assert !model.has_advanced_permissions?
+    assert !model.reload.has_advanced_permissions?
     Factory(:permission,:contributor=>Factory(:institution),:access_type=>Policy::ACCESSIBLE, :policy => model.policy)
-    assert model.has_advanced_permissions?
+    assert model.reload.has_advanced_permissions?
 
     #when having a sharing_scope policy of Policy::ALL_USERS it is concidered to have advanced permissions if any of the permissions do not relate to the projects associated with the resource (ISA or Asset))
     #this is a temporary work-around for the loss of the custom_permissions flag when defining a pre-canned permission of shared with sysmo, but editable/downloadable within mhy project
@@ -28,15 +28,15 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     assay.policy.permissions << Factory(:permission,:contributor=>proj1,:access_type=>Policy::EDITING)
     assay.policy.permissions << Factory(:permission,:contributor=>proj2,:access_type=>Policy::EDITING)
     assay.save!
-    assert !assay.has_advanced_permissions?
+    assert !assay.reload.has_advanced_permissions?
     proj_permission = Factory(:permission,:contributor=>Factory(:project),:access_type=>Policy::EDITING)
     assay.policy.permissions << proj_permission
-    assert assay.has_advanced_permissions?
+    assert assay.reload.has_advanced_permissions?
     assay.policy.permissions.delete(proj_permission)
     assay.save!
-    assert !assay.has_advanced_permissions?
+    assert !assay.reload.has_advanced_permissions?
     assay.policy.permissions << Factory(:permission,:contributor=>Factory(:project),:access_type=>Policy::VISIBLE)
-    assert assay.has_advanced_permissions?
+    assert assay.reload.has_advanced_permissions?
   end
 
   test "people within the same project can_see_hidden_item" do
