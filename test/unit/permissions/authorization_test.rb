@@ -128,12 +128,12 @@ class AuthorizationTest < ActiveSupport::TestCase
   # 'all SysMO users' policy
   def test_authorized_by_policy_all_sysmo_users_policy_anonymous_user
     res = temp_authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), sops(:sop_with_all_sysmo_users_policy), "download", nil, nil)
-    assert !res, "policy with sharing_scope = 'Policy::ALL_USERS' would allow not logged in users to perform allowed action"
+    assert res, "policy with sharing_scope = 'Policy::ALL_USERS' wouldn't allow anonymous users to perform allowed action"
   end
   
   def test_authorized_by_policy_all_sysmo_users_policy_registered_user
     res = temp_authorized_by_policy?(policies(:editing_for_all_sysmo_users_policy), sops(:sop_with_all_sysmo_users_policy), "download", users(:registered_user_with_no_projects), users(:registered_user_with_no_projects).person)
-    assert !res, "policy with sharing_scope = 'Policy::ALL_USERS' would allow registered user to perform allowed action"
+    assert res, "policy with sharing_scope = 'Policy::ALL_USERS' wouldn't allow registered user to perform allowed action"
   end
   
   def test_authorized_by_policy_all_sysmo_users_policy_sysmo_user
@@ -702,8 +702,7 @@ class AuthorizationTest < ActiveSupport::TestCase
   #To save me re-writing lots of tests. Code copied from authorization.rb
   #Mimics how authorized_by_policy method used to work, but with my changes.
   def temp_authorized_by_policy?(policy, thing, action, user, not_used_2)
-    # Check the user is "in scope" and also is performing an action allowed under the given access type
-    Seek::Permissions::Authorization.access_type_allows_action?(action, policy.access_type)
+    Seek::Permissions::Authorization.send(:authorized_by_policy?, action, thing)
   end
 
   test 'all users scope overrides more restrictive permissions' do
