@@ -310,7 +310,7 @@ module Seek
             end
 
             # Creator permissions
-            if is_downloadable? && creators.any?
+            if respond_to?(:creators) && creators.any?
               update_lookup([true, true, true, false, false], creators.includes(:user).map(&:user).compact, false)
             end
 
