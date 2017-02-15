@@ -43,7 +43,6 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
   test 'defaults' do
     assert_equal 3,@job.default_priority
     refute @job.allow_duplicate_jobs?
-    assert_equal 60.minutes,@job.follow_on_delay
     assert @job.follow_on_job?
   end
 
