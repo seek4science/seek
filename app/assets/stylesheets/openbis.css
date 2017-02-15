@@ -37,3 +37,7 @@
 #openbis-file-list table td.filesize {
     min-width: 3em;
 }
+
+#openbis-file-list table tr:hover {
+    background-color: #e8e8e8;
+}

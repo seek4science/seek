@@ -75,7 +75,7 @@ class OpenbisEndpointsController < ApplicationController
 
   def show_dataset_files
     if data_file = DataFile.find_by_id(params[:data_file_id])
-      dataset = data_file.content_blobs.first.openbis_dataset
+      dataset = data_file.content_blob.openbis_dataset
     else
       dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:perm_id])
     end
