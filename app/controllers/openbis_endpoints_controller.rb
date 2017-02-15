@@ -8,7 +8,7 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :get_project
   before_filter :project_required
   before_filter :project_is_member?
-  before_filter :project_can_admin?, except: [:browse,:add_dataset,:show_dataset_files,:show_items, :show_item_count]
+  before_filter :project_can_admin?, except: [:browse, :add_dataset, :show_dataset_files, :show_items, :show_item_count]
   before_filter :get_endpoints, only: [:index, :browse]
   before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_browse_cache, :destroy]
 
@@ -56,22 +56,12 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
-  def show_item_count
-    respond_to do |format|
-      format.html { render(text: "#{@openbis_endpoint.space.dataset_count} DataSets found") }
-    end
-  end
-
-  def show_items
-    respond_to do |format|
-      format.html { render(partial: 'show_items_for_space', locals: { openbis_endpoint: @openbis_endpoint }) }
-    end
-  end
-
   def refresh_browse_cache
     @openbis_endpoint.clear_cache if @openbis_endpoint.test_authentication
     show_items
   end
+
+  ## AJAX calls
 
   def show_dataset_files
     if data_file = DataFile.find_by_id(params[:data_file_id])
@@ -98,6 +88,18 @@ class OpenbisEndpointsController < ApplicationController
     endpoint = OpenbisEndpoint.new(params[:openbis_endpoint])
     respond_to do |format|
       format.html { render partial: 'available_spaces', locals: { endpoint: endpoint } }
+    end
+  end
+
+  def show_item_count
+    respond_to do |format|
+      format.html { render(text: "#{@openbis_endpoint.space.dataset_count} DataSets found") }
+    end
+  end
+
+  def show_items
+    respond_to do |format|
+      format.html { render(partial: 'show_items_for_space', locals: { openbis_endpoint: @openbis_endpoint }) }
     end
   end
 
@@ -128,9 +130,8 @@ class OpenbisEndpointsController < ApplicationController
 
   def project_is_member?
     unless @project.has_member?(User.current_user)
-      error('Must be a member of the project','No permission')
+      error('Must be a member of the project', 'No permission')
       return false
     end
   end
-
 end

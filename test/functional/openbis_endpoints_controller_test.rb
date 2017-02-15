@@ -2,124 +2,246 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class OpenbisEndpointsControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
 
   def setup
-    Factory(:person)
     mock_openbis_calls
+    Factory(:person)
+    @project_administrator = Factory(:project_administrator)
+    @project = @project_administrator.projects.first
   end
 
   test 'destroy' do
-    pa = Factory(:project_administrator)
-    project=pa.projects.first
-    ep = Factory(:openbis_endpoint,project:project)
-    login_as(pa)
+    ep = Factory(:openbis_endpoint, project: @project)
+    login_as(@project_administrator)
     assert ep.can_delete?
 
-    assert_difference('OpenbisEndpoint.count',-1) do
-      delete :destroy, id: ep.id,project_id:project.id
-      assert_redirected_to project_openbis_endpoints_path(project)
+    assert_difference('OpenbisEndpoint.count', -1) do
+      delete :destroy, id: ep.id, project_id: @project.id
+      assert_redirected_to project_openbis_endpoints_path(@project)
     end
 
     person = Factory(:person)
-    project=person.projects.first
-    ep = Factory(:openbis_endpoint,project:project)
+    project = person.projects.first
+    ep = Factory(:openbis_endpoint, project: project)
     login_as(person)
     refute ep.can_delete?
 
     assert_no_difference('OpenbisEndpoint.count') do
-      delete :destroy, id: ep.id,project_id:project.id
+      delete :destroy, id: ep.id, project_id: project.id
       assert_redirected_to :root
       refute_nil flash[:error]
     end
 
-    #other scenerios are covered in the unit tests for can_delete?
+    # other scenerios are covered in the unit tests for can_delete?
   end
 
   test 'add dataset' do
-    person = Factory(:project_administrator)
-    project=person.projects.first
     disable_authorization_checks do
-      project.update_attributes(default_license:'wibble')
+      @project.update_attributes(default_license: 'wibble')
     end
-    endpoint = Factory(:openbis_endpoint,project:project)
-    perm_id='20160210130454955-23'
-    login_as(person)
-    assert_difference("DataFile.count") do
-      post :add_dataset,id:endpoint.id,project_id:project.id,dataset_perm_id:perm_id
+    endpoint = Factory(:openbis_endpoint, project: @project)
+    perm_id = '20160210130454955-23'
+    login_as(@project_administrator)
+    assert_difference('DataFile.count') do
+      post :add_dataset, id: endpoint.id, project_id: @project.id, dataset_perm_id: perm_id
       assert_nil flash[:error]
     end
-    data_file=assigns(:data_file)
+    data_file = assigns(:data_file)
     assert_redirected_to data_file
-    assert_equal '20160210130454955-23',data_file.content_blob.openbis_dataset.perm_id
-    assert_equal 'wibble',data_file.license
+    assert_equal '20160210130454955-23', data_file.content_blob.openbis_dataset.perm_id
+    assert_equal 'wibble', data_file.license
   end
 
   test 'add dataset permissions' do
-    #already tests for project admin in test add dataset
+    # already tests for project admin in test add dataset
 
-    #project member
+    # project member
     person = Factory(:person)
-    project=person.projects.first
-    endpoint = Factory(:openbis_endpoint,project:project)
-    perm_id='20160210130454955-23'
+    project = person.projects.first
+    endpoint = Factory(:openbis_endpoint, project: project)
+    perm_id = '20160210130454955-23'
     login_as(person)
-    assert_difference("DataFile.count") do
-      post :add_dataset,id:endpoint.id,project_id:project.id,dataset_perm_id:perm_id
+    assert_difference('DataFile.count') do
+      post :add_dataset, id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id
       assert_nil flash[:error]
     end
 
     logout
 
-    #none project member
+    # none project member
     person = Factory(:person)
-    endpoint = Factory(:openbis_endpoint,project:Factory(:project))
-    perm_id='20160210130454955-23'
+    endpoint = Factory(:openbis_endpoint, project: Factory(:project))
+    perm_id = '20160210130454955-23'
     login_as(person)
-    assert_no_difference("DataFile.count") do
-      post :add_dataset,id:endpoint.id,project_id:project.id,dataset_perm_id:perm_id
+    assert_no_difference('DataFile.count') do
+      post :add_dataset, id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id
       refute_nil flash[:error]
     end
   end
 
   test 'browse' do
-
-    #project admin can browse
-    project_admin=Factory(:project_administrator)
-    project=project_admin.projects.first
-    login_as(project_admin)
-    get :browse,project_id:project.id
+    # project admin can browse
+    login_as(@project_administrator)
+    get :browse, project_id: @project.id
     assert_response :success
 
     logout
 
-    #project member can browse
-    person=Factory(:person)
-    project=person.projects.first
+    # project member can browse
+    person = Factory(:person)
+    project = person.projects.first
     login_as(person)
-    get :browse,project_id:project.id
+    get :browse, project_id: project.id
     assert_response :success
 
     logout
 
-    #non project member cannot browse
-    person=Factory(:person)
+    # non project member cannot browse
+    person = Factory(:person)
     login_as(person)
-    get :browse,project_id:Factory(:project).id
+    get :browse, project_id: Factory(:project).id
     assert_redirected_to :root
 
     logout
 
-    #not enabled
-    with_config_value(:openbis_enabled,false) do
-      project_admin=Factory(:project_administrator)
-      project=project_admin.projects.first
+    # not enabled
+    with_config_value(:openbis_enabled, false) do
+      project_admin = Factory(:project_administrator)
+      project = project_admin.projects.first
       login_as(project_admin)
-      get :browse,project_id:project.id
+      get :browse, project_id: project.id
       assert_redirected_to :root
     end
-
   end
 
+  test 'show items' do
+    login_as(@project_administrator)
+    endpoint = Factory(:openbis_endpoint, project: @project)
+    get :show_items, project_id: @project.id, id: endpoint.id
+    assert_response :success
+
+    logout
+
+    # normal project member can access
+    person = Factory(:person)
+
+    login_as(person)
+
+    project = person.projects.first
+    endpoint = Factory(:openbis_endpoint, project: project)
+    get :show_items, project_id: project.id, id: endpoint.id
+    assert_response :success
+
+    # none project member cannot
+    project = Factory(:project)
+    endpoint = Factory(:openbis_endpoint, project: project)
+    get :show_items, project_id: project.id, id: endpoint.id
+    assert_response :redirect
+  end
+
+  test 'show item count' do
+    login_as(@project_administrator)
+    endpoint = Factory(:openbis_endpoint, project: @project)
+    get :show_item_count, project_id: @project.id, id: endpoint.id
+    assert_response :success
+    assert_equal '8 DataSets found', @response.body
+
+    logout
+
+    # normal project member can access
+    person = Factory(:person)
+
+    login_as(person)
+
+    project = person.projects.first
+    endpoint = Factory(:openbis_endpoint, project: project)
+    get :show_item_count, project_id: project.id, id: endpoint.id
+    assert_response :success
+    assert_equal '8 DataSets found', @response.body
+
+    # none project member cannot
+    project = Factory(:project)
+    endpoint = Factory(:openbis_endpoint, project: project)
+    get :show_item_count, project_id: project.id, id: endpoint.id
+    assert_response :redirect
+    refute_equal '8 DataSets found', @response.body
+  end
+
+  test 'fetch spaces' do
+    login_as(@project_administrator)
+    post :fetch_spaces, project_id: @project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+                        username: 'wibble',
+                        password: 'wobble'
+    assert_response :success
+    assert @response.body.include?('API-SPACE')
+
+    logout
+
+    # normal project member cannot access
+    person = Factory(:person)
+
+    login_as(person)
+
+    project = person.projects.first
+    post :fetch_spaces, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+                        username: 'wibble',
+                        password: 'wobble'
+    assert_response :redirect
+    refute @response.body.include?('API-SPACE')
+
+    # none project member cannot
+    project = Factory(:project)
+    post :fetch_spaces, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+                        username: 'wibble',
+                        password: 'wobble'
+    assert_response :redirect
+    refute @response.body.include?('API-SPACE')
+  end
+
+  test 'test endpoint' do
+    login_as(@project_administrator)
+    get :test_endpoint, project_id: @project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+                        username: 'wibble',
+                        password: 'wobble',
+                        format: :json
+    assert_response :success
+    assert @response.body.include?('true')
+
+    logout
+
+    # normal project member cannot access
+    person = Factory(:person)
+
+    login_as(person)
+
+    project = person.projects.first
+    get :test_endpoint, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+                        username: 'wibble',
+                        password: 'wobble',
+                        format: :json
+    assert_response :redirect
+    refute @response.body.include?('true')
+
+    # none project member cannot
+    project = Factory(:project)
+    get :test_endpoint, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+                        username: 'wibble',
+                        password: 'wobble',
+                        format: :json
+    assert_response :redirect
+    refute @response.body.include?('true')
+  end
 end
