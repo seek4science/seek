@@ -945,11 +945,11 @@ ActiveRecord::Schema.define(:version => 20170215145129) do
     t.string   "username"
     t.string   "password"
     t.integer  "project_id"
-    t.datetime "created_at",                          :null => false
-    t.datetime "updated_at",                          :null => false
+    t.datetime "created_at",                           :null => false
+    t.datetime "updated_at",                           :null => false
     t.string   "dss_endpoint"
     t.string   "web_endpoint"
-    t.integer  "refresh_period_mins", :default => 60
+    t.integer  "refresh_period_mins", :default => 120
   end
 
   create_table "organisms", :force => true do |t|

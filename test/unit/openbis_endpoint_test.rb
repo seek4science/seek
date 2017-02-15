@@ -71,6 +71,10 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert endpoint.valid?
   end
 
+  test 'default refresh period' do
+    assert_equal 120, OpenbisEndpoint.new.refresh_period_mins
+  end
+
   test 'validates uniqueness' do
     endpoint = Factory(:openbis_endpoint)
     endpoint2 = Factory.build(:openbis_endpoint)
