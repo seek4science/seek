@@ -215,8 +215,6 @@ GEM
     cancan (1.6.10)
     celluloid (0.16.0)
       timers (~> 4.0.0)
-    childprocess (0.5.6)
-      ffi (~> 1.0, >= 1.0.11)
     citeproc (1.0.4)
       namae (~> 0.8)
     citeproc-ruby (1.1.4)
@@ -686,11 +684,6 @@ GEM
       wasabi (~> 2.5.0)
     sax-machine (1.3.2)
     seedbank (0.3.0)
-    selenium-webdriver (2.47.1)
-      childprocess (~> 0.5)
-      multi_json (~> 1.0)
-      rubyzip (~> 1.0)
-      websocket (~> 1.0)
     sexp_processor (4.7.0)
     shellany (0.0.1)
     simple-spreadsheet-extractor (0.15.2)
@@ -805,7 +798,6 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
     webrobots (0.1.1)
-    websocket (1.2.2)
     will_paginate (3.0.7)
     yaml_db (0.3.0)
       rails (>= 3.0, < 4.3)
@@ -924,7 +916,6 @@ DEPENDENCIES
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
   seedbank
-  selenium-webdriver
   simple-spreadsheet-extractor (~> 0.15.2)
   sqlite3
   sunspot_matchers
@@ -950,4 +941,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.13.7
+   1.14.3

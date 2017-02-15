@@ -158,12 +158,11 @@ group :test do
   gem 'minitest-reporters'
   gem 'coveralls', require: false
   gem 'sunspot_matchers'
-  gem 'magic_lamp'
   gem 'database_cleaner'
 end
 
 group :test, :development do
-  gem 'selenium-webdriver'
+  gem 'magic_lamp'
   gem 'webmock'
   gem 'teaspoon'
   gem 'teaspoon-mocha'

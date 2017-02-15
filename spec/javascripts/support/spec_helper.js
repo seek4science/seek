@@ -4,6 +4,7 @@
 //= require support/chai
 // require support/chai-jq-0.0.7
 // require support/your-support-file
+//= require magic_lamp
 
 
 //
