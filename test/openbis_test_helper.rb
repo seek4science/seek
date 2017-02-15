@@ -70,6 +70,15 @@ def record_openbis_calls
   end
 end
 
+def openbis_linked_data_file user=User.current_user
+  User.with_current_user(user) do
+    endpoint=Factory(:openbis_endpoint)
+    df = DataFile.build_from_openbis(endpoint,'20160210130454955-23')
+    assert df.openbis?
+    df
+  end
+end
+
 def openbis_linked_content_blob perm_id="20160210130454955-23",endpoint=nil
   endpoint ||= Factory(:openbis_endpoint)
   Factory(:url_content_blob,make_local_copy:false,url:"openbis:#{endpoint.id}:dataset:#{perm_id}")

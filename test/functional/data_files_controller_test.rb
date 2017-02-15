@@ -2,6 +2,7 @@
 require 'test_helper'
 require 'libxml'
 require 'webmock/test_unit'
+require 'openbis_test_helper'
 
 class DataFilesControllerTest < ActionController::TestCase
   fixtures :all
@@ -2460,6 +2461,18 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file
     assert flash[:error].downcase.include?('samples')
+  end
+
+  test 'show openbis datafile' do
+    mock_openbis_calls
+    login_as(Factory(:person))
+    df=openbis_linked_data_file
+
+    get :show,id:df.id
+    assert_response :success
+    assert assigns(:data_file)
+    assert_equal df,assigns(:data_file)
+    assert_select 'div#openbis-details',count:1
   end
 
   private

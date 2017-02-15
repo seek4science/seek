@@ -1,5 +1,5 @@
 <%
-  dataset = data_file.content_blobs.first.openbis_dataset
+  dataset = data_file.content_blob.openbis_dataset
   openbis_endpoint = dataset.openbis_endpoint
   file_count=dataset.dataset_file_count
   files_text = "#{file_count} File".pluralize(file_count) + " : #{number_to_human_size(dataset.size)}"
