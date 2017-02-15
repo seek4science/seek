@@ -276,4 +276,16 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
   end
 
+  test 'job destroyed on delete' do
+    Delayed::Job.destroy_all
+    pa = Factory(:project_administrator)
+    endpoint = Factory(:openbis_endpoint,project:pa.projects.first)
+    assert_difference('Delayed::Job.count',-1) do
+      User.with_current_user(pa.user) do
+        endpoint.destroy
+      end
+    end
+    refute OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
+  end
+
 end
