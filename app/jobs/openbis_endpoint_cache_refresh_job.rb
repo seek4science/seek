@@ -31,7 +31,11 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
   end
 
   def follow_on_delay
-    60.minutes
+    if endpoint
+      endpoint.refresh_period_mins.minutes
+    else
+      120.minutes
+    end
   end
 
   def follow_on_job?
