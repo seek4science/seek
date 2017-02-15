@@ -15,7 +15,9 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
                                    web_endpoint: 'http://my-openbis.org/openbis',
                                    as_endpoint: 'http://my-openbis.org/openbis',
                                    dss_endpoint: 'http://my-openbis.org/openbis',
-                                   space_perm_id: 'mmmm'
+                                   space_perm_id: 'mmmm',
+                                   refresh_period_mins:60
+
 
     assert endpoint.valid?
     endpoint.username=nil
@@ -52,6 +54,15 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint.web_endpoint='fish'
     refute endpoint.valid?
     endpoint.web_endpoint='http://my-openbis.org/openbis'
+    assert endpoint.valid?
+
+    endpoint.refresh_period_mins=nil
+    refute endpoint.valid?
+    endpoint.refresh_period_mins=0
+    refute endpoint.valid?
+    endpoint.refresh_period_mins=10
+    refute endpoint.valid?
+    endpoint.refresh_period_mins=60
     assert endpoint.valid?
 
     endpoint.project=nil

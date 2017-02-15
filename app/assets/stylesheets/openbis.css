@@ -41,3 +41,7 @@
 #openbis-file-list table tr:hover {
     background-color: #e8e8e8;
 }
+
+form#openbis-space-form select#openbis_endpoint_refresh_period_mins {
+    max-width: 5em;
+}
