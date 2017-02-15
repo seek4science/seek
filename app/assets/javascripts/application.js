@@ -63,4 +63,5 @@
 //= require samples
 //= require jstree
 //= require clipboard
+//= require upload_selection
 //= require_tree ./templates
