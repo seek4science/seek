@@ -133,7 +133,7 @@ class ActiveSupport::TestCase
   #always create initial person, as this will always be an admin. Avoid some confusion in the tests where a person
   #is unexpectedly an admin
   def create_initial_person
-    Factory(:admin)
+    Factory(:admin,first_name:'default admin')
   end
 
   def clear_rails_cache

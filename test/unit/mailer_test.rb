@@ -4,6 +4,10 @@ require 'time_test_helper'
 class MailerTest < ActionMailer::TestCase
   fixtures :all
 
+  def setup
+    Person.where('first_name == ?','default admin').destroy_all
+  end
+
   test "signup" do
     @expected.subject = 'Sysmo SEEK account activation'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
