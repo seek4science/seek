@@ -132,6 +132,7 @@ class ActiveSupport::TestCase
 
   def clear_rails_cache
     Rails.cache.clear
+    Seek::Config.clear_temporary_filestore
   end
 
   def clear_current_user
