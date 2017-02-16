@@ -98,7 +98,7 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
-  setup :clear_rails_cache
+  setup :clear_rails_cache, :create_initial_person
   teardown :clear_current_user
 
 
@@ -128,6 +128,12 @@ class ActiveSupport::TestCase
 
   def skip_rest_schema_check?
     false
+  end
+
+  #always create initial person, as this will always be an admin. Avoid some confusion in the tests where a person
+  #is unexpectedly an admin
+  def create_initial_person
+    Factory(:admin)
   end
 
   def clear_rails_cache

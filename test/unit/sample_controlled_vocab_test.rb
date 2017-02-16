@@ -2,9 +2,6 @@ require 'test_helper'
 
 class SampleControlledVocabTest < ActiveSupport::TestCase
 
-  def setup
-    Factory(:person) #avoids first person being admin by default
-  end
 
   test 'association with terms' do
     User.with_current_user(Factory(:project_administrator).user) do
