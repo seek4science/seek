@@ -6,19 +6,18 @@ class InstitutionTest < ActiveSupport::TestCase
   # Replace this with your real tests.
 
   def test_delete_inst_deletes_workgroup
-    n_wg = WorkGroup.count
-    n_inst = Institution.count
-    
-    i=Institution.find(1)
+    i=Factory(:person).institutions.first
     
     assert_equal 1,i.work_groups.size
 
     wg = i.work_groups.first
     wg.people=[]
-    User.current_user = Factory(:admin).user
-    i.destroy
-    assert_equal nil, Institution.find_by_id(i.id)
-    assert_equal nil, WorkGroup.find_by_id(wg.id), "the workgroup should also have been destroyed"
+    User.with_current_user(Factory(:admin).user) do
+      i.destroy
+    end
+
+    assert_nil Institution.find_by_id(i.id)
+    assert_nil WorkGroup.find_by_id(wg.id), "the workgroup should also have been destroyed"
   end
 
   test "programmes" do

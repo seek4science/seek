@@ -6,8 +6,7 @@ class ProjectTest < ActiveSupport::TestCase
 
   #checks that the dependent work_groups are destroyed when the project s
   def test_delete_work_groups_when_project_deleted
-    n_wg=WorkGroup.all.size
-    p=Project.find(2)
+    p=Factory(:person).projects.first
     assert_equal 1,p.work_groups.size
     wg = p.work_groups.first
         

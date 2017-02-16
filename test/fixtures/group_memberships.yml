@@ -17,7 +17,7 @@ four:
   work_group: three
 
 five:
-  person_id: aaron_person
+  person: aaron_person
   work_group: four
 
 

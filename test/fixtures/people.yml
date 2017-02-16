@@ -1,7 +1,6 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 quentin_person:
-  id: 2
   first_name: "quentin"
   last_name: "jones"
   email: "quentin@email.com"
@@ -9,7 +8,6 @@ quentin_person:
 
 
 aaron_person:
-  id: 3
   first_name: "aaron"
   last_name: "spiggle"
   email: "aaron@email.com"

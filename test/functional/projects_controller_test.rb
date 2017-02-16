@@ -188,6 +188,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def test_should_destroy_project
     project = projects(:four)
+    assert project.can_delete?
     get :show, :id => project
     assert_select "#buttons a", :text => /Delete #{I18n.t('project')}/i, :count => 1
 
@@ -788,7 +789,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test "should not unassign institution out of project if there are people in this workgroup" do
-    wg=WorkGroup.find(1)
+    wg=Factory(:person).work_groups.first
     assert !wg.people.empty?
     project = wg.project
 

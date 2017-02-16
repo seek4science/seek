@@ -158,7 +158,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
 
   test "shouldn't allow non-admins to create for external help" do
     with_config_value :internal_help_enabled, false do
-      login_as(:aaron)
+      login_as(Factory(:person))
       get :new
       assert_response :redirect
       assert_redirected_to Seek::Config.external_help_url

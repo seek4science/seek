@@ -13,8 +13,8 @@ three:
   institution: three
 
 four:
-  project: four
-  institution: four
+  project: three
+  institution: two
 
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********
