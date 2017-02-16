@@ -1,32 +1,33 @@
 require 'test_helper'
 
 class WorkGroupTest < ActiveSupport::TestCase
-  fixtures :people, :projects,:institutions, :work_groups, :group_memberships
+
+  def setup
+    @person = Factory(:person)
+    @wg = @person.projects.first.work_groups.first
+  end
   
   def test_people
-    wg=WorkGroup.find(1)
-    assert_equal 2,wg.people.size
+    wg=
+    assert_equal [@person],@wg.people
   end
   
   def test_cannot_destroy_with_people
-    wg=WorkGroup.find(1)
-    assert !wg.people.empty?
-    
-    
-    #todo how to check message?
-    assert_raise(Exception) {wg.destroy}
+    refute @wg.people.empty?
+
+    assert_raise(Exception) {@wg.destroy}
   end
   
-  def test_can_destroy_with_no_people  
-    wg=WorkGroup.find(1)
-    wg.people=[]
-    assert wg.people.empty?
-    wg.destroy
+  def test_can_destroy_with_no_people
+    @wg.people=[]
+    assert @wg.people.empty?
+    @wg.destroy
   end
-  
+
   def test_description
-    wg=work_groups(:one)
-    assert_equal "Project1 at Institution1",wg.description
+    proj = @wg.project
+    inst = @wg.institution
+    assert_equal "#{proj.title} at #{inst.title}",@wg.description
   end
   
 end
