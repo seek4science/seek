@@ -211,11 +211,10 @@ class PublicationTest < ActiveSupport::TestCase
     assert !asset.valid?
     
     #invalid pubmed
-    # This part does not work for some reason.
-#    asset = Publication.new :title=>"fred",:pubmed_id =>"01",:projects=>[project]
-#    assert !asset.valid?
+    asset = Publication.new :title=>"fred",:pubmed_id =>0,:projects=>[project]
+    assert !asset.valid?
 
-    asset = Publication.new :title=>"fred2",:pubmed_id =>"1234",:projects=>[project]
+    asset = Publication.new :title=>"fred2",:pubmed_id =>1234,:projects=>[project]
     assert asset.valid?
 #    puts asset.errors.full_messages.inspect
 
