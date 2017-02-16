@@ -4,8 +4,6 @@ require 'openbis_test_helper'
 class OpenbisEndpointTest < ActiveSupport::TestCase
 
   def setup
-    #avoids first person being admin
-    person = Factory(:person)
     mock_openbis_calls
   end
 
