@@ -1,5 +1,5 @@
 class AuthLookupUpdateJob < SeekJob
-  BATCHSIZE = 1
+  BATCHSIZE = 10
 
   def add_items_to_queue(items, time = default_delay.from_now, priority = 0, queuepriority = default_priority)
     if Seek::Config.auth_lookup_enabled
@@ -23,7 +23,6 @@ class AuthLookupUpdateJob < SeekJob
   private
 
   def perform_job(item)
-
     if item.nil?
       update_assets_for_user nil
     elsif item.authorization_supported?
@@ -33,7 +32,7 @@ class AuthLookupUpdateJob < SeekJob
     elsif item.is_a?(Person)
       update_assets_for_user item.user unless item.user.nil?
     else
-      Delayed::Job.logger.error("Unexepected type encountered: #{item.class.name}")
+      Delayed::Job.logger.error("Unexpected type encountered: #{item.class.name}")
     end
 
     # required to make sure that cached fragments that contain details related to authorization are regenerated after the job has run
@@ -45,7 +44,7 @@ class AuthLookupUpdateJob < SeekJob
   end
 
   def gather_items
-    # including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to tha happy coincidence
+    # including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to the happy coincidence
     # that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
     AuthLookupUpdateQueue.order('priority,item_type,id').limit(BATCHSIZE).collect do |queued|
       take_queued_item(queued)
