@@ -6,9 +6,10 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :openbis_enabled?
 
   before_filter :get_project
-  before_filter :project_required
-  before_filter :project_is_member?
+  before_filter :project_required, except: [:show_dataset_files]
+  before_filter :project_member?, except: [:show_dataset_files]
   before_filter :project_can_admin?, except: [:browse, :add_dataset, :show_dataset_files, :show_items, :show_item_count]
+  before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
   before_filter :get_endpoints, only: [:index, :browse]
   before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_browse_cache, :destroy]
 
@@ -64,14 +65,14 @@ class OpenbisEndpointsController < ApplicationController
   ## AJAX calls
 
   def show_dataset_files
-    if data_file = DataFile.find_by_id(params[:data_file_id])
-      dataset = data_file.content_blob.openbis_dataset
+    if @data_file
+      dataset = @data_file.content_blob.openbis_dataset
     else
       dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:perm_id])
     end
 
     respond_to do |format|
-      format.html { render(partial: 'dataset_files_list', locals: { dataset: dataset, data_file: data_file }) }
+      format.html { render(partial: 'dataset_files_list', locals: { dataset: dataset, data_file: @data_file }) }
     end
   end
 
@@ -103,6 +104,8 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
+  private
+
   ### Filters
 
   def project_required
@@ -128,10 +131,24 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
-  def project_is_member?
+  def project_member?
     unless @project.has_member?(User.current_user)
       error('Must be a member of the project', 'No permission')
       return false
+    end
+  end
+
+  # whether the dataset files can be shown. Depends on whether viewing a data file or now.
+  # if data_file_id is present then the access controls on that data file is checked, otherwise needs to be a project member
+  def authorise_show_dataset_files
+    @data_file = DataFile.find_by_id(params[:data_file_id])
+    if @data_file
+      unless @data_file.can_download?
+        error('DataFile cannot be accessed', 'No permission')
+        return false
+      end
+    else
+      project_member?
     end
   end
 end
