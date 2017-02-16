@@ -23,7 +23,7 @@ end
 MagicLamp.configure do |config|
   #Dir[Rails.root.join("spec", "support", "magic_lamp_helpers/**/*.rb")].each { |f| load f }
 
-  DatabaseCleaner.strategy = :transaction
+  DatabaseCleaner.strategy = :truncation
 
   config.before_each do
     DatabaseCleaner.start
