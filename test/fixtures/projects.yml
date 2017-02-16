@@ -1,23 +1,19 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  id: 1
   title: Project1
   web_page: "http://www.goggle.com"
   wiki_page: "http://www.goggle.com"
 
 two:
-  id: 2
   title: Project2
   
 
 three:
-  id: 3
   title: Project3
   
 #a project not associated with any Workgroups or People
 four:
-  id: 4
   title: Project4
 
 

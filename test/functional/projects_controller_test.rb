@@ -535,10 +535,12 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test "filter projects by person" do
-    get :index, :filter => {:person => 1}
+    person=Factory(:person)
+    project=person.projects.first
+    get :index, :filter => {:person => person.id}
     assert_response :success
     projects = assigns(:projects)
-    assert_equal Project.all.select {|proj|proj.people.include? Person.find_by_id(1)}, projects
+    assert_equal [project], projects
     assert projects.count < Project.all.count
   end
 
