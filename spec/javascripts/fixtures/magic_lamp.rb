@@ -35,3 +35,17 @@ MagicLamp.register_fixture(controller: SopsController, name: 'sops/edit') do
   }
   render :edit
 end
+
+MagicLamp.register_fixture(name: 'sharing/form') do
+  @sop = Factory(:sop, policy: Factory(:public_policy))
+  @sop.valid?
+  @display_sop = @sop.latest_version
+  User.current_user = @sop.contributor
+  session[:user_id] = User.current_user.id.to_s
+  request.env["action_dispatch.request.path_parameters"] = {
+      action: "edit",
+      controller: "sops",
+      id: @sop.id
+  }
+  render partial: 'sharing/form', locals: { object: @sop }
+end
