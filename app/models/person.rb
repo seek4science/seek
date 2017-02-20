@@ -95,7 +95,7 @@ class Person < ActiveRecord::Base
   end
 
   def queue_update_auth_table
-    if previous_changes.keys.include?("roles_mask") || transaction_record_state(:new_record)
+    if previous_changes.keys.include?("roles_mask")
       AuthLookupUpdateJob.new.add_items_to_queue self
     end
   end

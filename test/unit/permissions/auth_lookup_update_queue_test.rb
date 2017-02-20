@@ -165,13 +165,17 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     end
   end
 
-  test "updates when a person registers or their role changes" do
-    user = Factory :user
-    person=nil
+  test "updates when a user registers" do
     assert_difference("AuthLookupUpdateQueue.count", 1) do
-      person = Factory.create(:brand_new_person, user: user)
+      user = Factory(:brand_new_user)
+      assert_equal user, AuthLookupUpdateQueue.last(order: :id).item
     end
-    assert_equal person, AuthLookupUpdateQueue.last(:order=>:id).item
+  end
+
+  test "updates when a person's role changes" do
+    person = Factory(:person)
+    person.is_admin = false
+    disable_authorization_checks { person.save! }
 
     AuthLookupUpdateQueue.destroy_all
     assert_difference("AuthLookupUpdateQueue.count", 1) do
@@ -183,8 +187,19 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_equal person, AuthLookupUpdateQueue.last(:order=>:id).item
   end
 
+  test "does not update when a user changes their password" do
+    user = Factory(:user)
+
+    assert_no_difference('AuthLookupUpdateQueue.count') do
+      disable_authorization_checks do
+        user.update_attributes(password: '123456789', password_confirmation: '123456789')
+      end
+    end
+  end
+
   test "does not update when a person updates their profile" do
     person = Factory.create(:brand_new_person, user: Factory(:user))
+
     assert_no_difference('AuthLookupUpdateQueue.count') do
       disable_authorization_checks do
         person.update_attributes(first_name: 'Dave')
