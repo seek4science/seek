@@ -22,6 +22,8 @@ class InstitutionsController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
+      format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
+      #format.json { render json: @institution }
     end
   end
 
@@ -93,11 +95,11 @@ class InstitutionsController < ApplicationController
 
     institution_id = white_list(params[:id])
     institution_list = Institution.get_all_institutions_listing
-
     respond_to do |format|
-      format.json do
-        render json: { status: 200, institution_list: institution_list }
-      end
+      #format.json { render json: @Institution.all }
+       format.json do
+         render json: { status: 200, institution_list: institution_list }
+       end
     end
   end
 
