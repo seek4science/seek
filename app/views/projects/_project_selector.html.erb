@@ -60,7 +60,7 @@
 <%= content_tag :script, selected_projects_json.html_safe, type: 'application/json', id: 'project-selector-selected-json' %>
 
 <script>
-  var projectsSelector = new Vue({
+  Sharing.projectsSelector = new Vue({
     el: '#project-selector',
     data: {
       possibilities: JSON.parse($j('#project-selector-possibilities-json').text()),
@@ -78,11 +78,11 @@
   $j(document).ready(function () {
     $j('#projects-selector-select').change(function () {
       if ($j(this).val()) {
-        for (var i = 0; i < projectsSelector.possibilities.length; i++) {
-          if (projectsSelector.possibilities[i].id == $j(this).val()) {
-            projectsSelector.selected.push(projectsSelector.possibilities[i]);
-            Sharing.addPermissionForProject(projectsSelector.possibilities[i]);
-            projectsSelector.possibilities.splice(i, 1);
+        for (var i = 0; i < Sharing.projectsSelector.possibilities.length; i++) {
+          if (Sharing.projectsSelector.possibilities[i].id == $j(this).val()) {
+            Sharing.projectsSelector.selected.push(Sharing.projectsSelector.possibilities[i]);
+            Sharing.addPermissionForProject(Sharing.projectsSelector.possibilities[i]);
+            Sharing.projectsSelector.possibilities.splice(i, 1);
           }
         }
       }

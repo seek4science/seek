@@ -1,12 +1,12 @@
 var Sharing = {
   addPermission: function (permission, preserveAccessType) {
     // Update if already existing, otherwise add a new row
-    for (var i = 0; i < permissionsTable.permissions.length; i++) {
-      var p = permissionsTable.permissions[i];
+    for (var i = 0; i < Sharing.permissionsTable.permissions.length; i++) {
+      var p = Sharing.permissionsTable.permissions[i];
       if (p.contributor_type == permission.contributor_type && p.contributor_id == permission.contributor_id) {
         if (preserveAccessType)
           permission.access_type = p.access_type;
-        permissionsTable.permissions.splice(i, 1, permission);
+        Sharing.permissionsTable.permissions.splice(i, 1, permission);
         return false;
       }
     }
@@ -14,15 +14,15 @@ var Sharing = {
     // This ensures that if a project permission is added, and that project is associated with the resource, it gains
     //  the "mandatory" flag.
     if (permission.contributor_type === 'Project') {
-      for (var j = 0; j < projectsSelector.selected.length; j++) {
-        if (projectsSelector.selected[j].id === permission.contributor_id) {
+      for (var j = 0; j < Sharing.projectsSelector.selected.length; j++) {
+        if (Sharing.projectsSelector.selected[j].id === permission.contributor_id) {
           permission.mandatory = true;
           break;
         }
       }
     }
 
-    permissionsTable.permissions.push(permission);
+    Sharing.permissionsTable.permissions.push(permission);
   },
 
   // Add a permission when a new project is associated with the resource via the dropdown menu
@@ -36,14 +36,14 @@ var Sharing = {
   },
 
   removePermissionForProject: function (project) {
-    for (var i = 0; i < permissionsTable.permissions.length; i++) {
-      if (permissionsTable.permissions[i].contributor_id === project.id)
+    for (var i = 0; i < Sharing.permissionsTable.permissions.length; i++) {
+      if (Sharing.permissionsTable.permissions[i].contributor_id === project.id)
         break;
     }
     if (confirm('Do you want to want to remove any permissions for ' + project.title + '?')) {
-      permissionsTable.permissions.splice(i, 1);
+      Sharing.permissionsTable.permissions.splice(i, 1);
     } else {
-      permissionsTable.permissions[i].mandatory = false;
+      Sharing.permissionsTable.permissions[i].mandatory = false;
     }
   },
 
@@ -63,13 +63,13 @@ var Sharing = {
   maxPublicAccessType: <%= Policy.max_public_access_type %>,
 
   permissionsChanged: function () {
-    if (originalPolicy.access_type !== permissionsTable.publicPermission.access_type)
+    if (originalPolicy.access_type !== Sharing.permissionsTable.publicPermission.access_type)
       return true;
-    if (originalPolicy.permissions.length !== permissionsTable.permissions.length)
+    if (originalPolicy.permissions.length !== Sharing.permissionsTable.permissions.length)
       return true;
-    for (var i = 0; i < permissionsTable.permissions.length; i++) {
+    for (var i = 0; i < Sharing.permissionsTable.permissions.length; i++) {
       for (var j = 0; j < originalPolicy.permissions.length; j++) {
-          var p1 = permissionsTable.permissions[i];
+          var p1 = Sharing.permissionsTable.permissions[i];
           var p2 = originalPolicy.permissions[j];
           if (p1.contributor_type == p2.contributor_type &&
               p1.contributor_id == p2.contributor_id &&

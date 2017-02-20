@@ -22,7 +22,7 @@
                 project_ids = $F('assay_study_id');
             }
             else {
-                project_ids = projectsSelector.selected.map(function (x) {
+                project_ids = Sharing.projectsSelector.selected.map(function (x) {
                     return x.id
                 }).join(',');
             }

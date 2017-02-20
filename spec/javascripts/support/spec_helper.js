@@ -35,6 +35,14 @@
 // If you're using Chai, you'll probably want to initialize your preferred assertion style. You can read more about Chai
 // at: http://chaijs.com/guide/styles
 //
- window.assert = chai.assert;
- window.expect = chai.expect;
- window.should = chai.should;
+
+window.assert = chai.assert;
+window.expect = chai.expect;
+window.should = chai.should;
+
+// `el.click()` is not supported by phantomJS, and JQuery's `trigger('click')` does not trigger Vue events
+function click(el){
+ var e = document.createEvent('Events');
+ e.initEvent('click', true, false);
+ el.dispatchEvent(e);
+}

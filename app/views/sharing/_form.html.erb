@@ -26,7 +26,7 @@
   <%# A deep copy of the policy that is used in `Sharing.permissionsChanged` to check if it has been modified %>
   var originalPolicy = $j.extend(true, {}, policy);
 
-  var permissionsTable = new Vue({
+  Sharing.permissionsTable = new Vue({
     el: '#permissions-table',
     data: {
       publicPermission: {
