@@ -182,11 +182,11 @@ namespace :seek do
   task(:repopulate_auth_lookup_tables=>:environment) do
     Seek::Util.authorized_types.each do |type|
       type.find_each do |item|
-        unless AuthLookupUpdateQueue.exists?(item)
-          AuthLookupUpdateJob.new.add_items_to_queue item,5.seconds.from_now,1
-        end
+        AuthLookupUpdateQueue.create(item: item, priority: 1) unless AuthLookupUpdateQueue.exists?(item)
       end
     end
+    # 5 is an arbitrary number to take advantage of there being more than 1 worker dedicated to auth refresh
+    5.times { AuthLookupUpdateJob.new.queue_job(1, 5.seconds.from_now) }
   end
 
   desc "Rebuilds all authorization tables for a given user - you are prompted for a user id"
