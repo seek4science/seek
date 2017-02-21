@@ -14,7 +14,7 @@ Release date: _February 21st 2017_
 Small bug fix release to fix:
 
   * Crossref endpoint for DOI querying requires https://
-  * DOI and Pubmed validation
+  * Better DOI and Pubmed validation
   * Manual entry of publications currently disabled
   * Further improvements to authorization caching update speed and fix a small inconsistency with incomplete user registrations
   
