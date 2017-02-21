@@ -49,6 +49,10 @@
            'Permissions Summary Settings',
            'Choose when/if to display the "Preview of your sharing settings" pop-up when creating or updating a resource') %>
 
+    <%= admin_text_setting(:auth_lookup_update_batch_size, Seek::Config.auth_lookup_update_batch_size,
+                           'Authorization update batch size', 'The number of authorization updates to process per cycle of the job. Setting this too high may cause transactions to timeout.',
+                           :onkeypress => "javascript: return onlyNumbers(event);") %>
+
 
     <%= admin_checkbox_setting(:recaptcha_enabled, 1, Seek::Config.recaptcha_enabled,
                                'Captcha enabled', 'Enable to show a captcha on forms susceptible to spam',
