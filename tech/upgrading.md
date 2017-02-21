@@ -54,8 +54,7 @@ required versions of Rails and Ruby.
 **When upgrading between patch versions (i.e between 1.2.0 and 1.2.1)** it
 should only be necessary to run *bundle install* and the *db:migrate* rake
 task. Using seek:upgrade should still work, but could take a lot of
-unnecessary time. There is more details and an example towards the end of the
-this page.
+unnecessary time. 
 
 ## Steps to upgrade from 1.1.x to 1.2.x
 
