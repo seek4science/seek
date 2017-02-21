@@ -97,6 +97,23 @@ class AuthLookupJobTest  < ActiveSupport::TestCase
     assert Sop.lookup_table_consistent?(other_user.id)
   end
 
+  test 'takes items from queue according to batch size configuration' do
+    sop = Factory(:sop)
+    20.times do
+      AuthLookupUpdateQueue.create(item: sop, priority: 0)
+    end
 
+    with_config_value(:auth_lookup_update_batch_size, 3) do
+      assert_difference('AuthLookupUpdateQueue.count',-3) do
+        AuthLookupUpdateJob.new.perform
+      end
+    end
+
+    with_config_value(:auth_lookup_update_batch_size, 7) do
+      assert_difference('AuthLookupUpdateQueue.count',-7) do
+        AuthLookupUpdateJob.new.perform
+      end
+    end
+  end
 
 end
