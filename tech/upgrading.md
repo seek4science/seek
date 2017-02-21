@@ -51,7 +51,7 @@ will generally follow the same pattern. Upgrading to version 0.18 is an
 exception and involves some additional steps - due to the upgrade of the
 required versions of Rails and Ruby.
 
-**When upgrading between patch versions (i.e between 0.16.0 and 0.16.3)** it
+**When upgrading between patch versions (i.e between 1.2.0 and 1.2.1)** it
 should only be necessary to run *bundle install* and the *db:migrate* rake
 task. Using seek:upgrade should still work, but could take a lot of
 unnecessary time. There is more details and an example towards the end of the
