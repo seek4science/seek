@@ -31,7 +31,7 @@
     <th>Asset last ID</th>
   </tr>
   </thead>
-  <% User.all.push(nil).each do |user| -%>
+  <% User.where('person_id IS NOT NULL').all.push(nil).each do |user| -%>
       <% Seek::Util.authorized_types.each do |type| -%>
 
            <%  if !type.lookup_table_consistent?(user)
