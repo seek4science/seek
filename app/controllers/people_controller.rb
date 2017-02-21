@@ -74,7 +74,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml
-      format.json { render json: @people }
+      format.json  #{ render json: @people }
     end
   end
 
@@ -85,7 +85,7 @@ class PeopleController < ApplicationController
       format.html # show.html.erb
       format.rdf { render :template=>'rdf/show'}
       format.xml
-      format.json {render json: @person}
+      format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@person).target!) }
     end
   end
 
