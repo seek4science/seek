@@ -7,6 +7,20 @@ layout: page
 
 Latest version - {{ site.current_seek_version }}
 
+## Version 1.2.1
+
+Release date: _February 21st 2017_
+
+Small bug fix release to fix:
+
+  * Crossref endpoint for DOI querying requires https://
+  * DOI and Pubmed validation
+  * Manual entry of publications currently disabled
+  * Further improvements to authorization caching update speed and fix a small inconsistency with incomplete user registrations
+  
+A full list of changes included in this release can be found in the [SEEK v1.2.1 release notes](release-notes-1.2.1.html).  
+    
+
 ## Version 1.2.0
 
 Release date: _January 23rd 2017_
