@@ -67,6 +67,10 @@ class User < ActiveRecord::Base
   delegate :is_admin_or_project_administrator?, to: :person, allow_nil: true
   delegate :is_programme_administrator?, to: :person, allow_nil: true
 
+  after_commit :queue_update_auth_table, on: :create
+
+  after_destroy :remove_from_auth_tables
+
   # related_#{type} are resources that user created
   RELATED_RESOURCE_TYPES = [:data_files,:models,:sops,:events,:presentations,:publications]
   RELATED_RESOURCE_TYPES.each do |type|
@@ -301,6 +305,15 @@ class User < ActiveRecord::Base
       return false
     end
   end
-    
-end
 
+  def queue_update_auth_table
+    AuthLookupUpdateJob.new.add_items_to_queue(self)
+  end
+
+  def remove_from_auth_tables
+    Seek::Util.authorized_types.each do |type|
+      ActiveRecord::Base.connection.execute("delete from #{type.lookup_table_name} where user_id=#{id}")
+    end
+  end
+
+end

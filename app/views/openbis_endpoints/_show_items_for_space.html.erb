@@ -1,0 +1,21 @@
+<%= modal_openbis_file_view('openbis-file-view') %>
+
+
+<%= button_link_to('Refresh Cache','refresh','#','data-endpoint-id'=>openbis_endpoint.id,'data-project-id'=> @project.id, id:'refresh-cache') %>
+<p>
+<%= check_box_tag(:toggle_registered,'Hide registered',true) %> Hide registered
+</p>
+<div class='row' id="openbis-dataset-cards">
+  <%= render partial:'openbis_dataset_card',collection:openbis_endpoint.space.datasets %>
+</div>
+
+<script>
+  $j( document ).ready(function() {
+    $j('#openbis-dataset-cards').on('click', '.view-files-link', OpenBis.showFiles);
+    $j('#refresh-cache').on('click',OpenBis.refreshCache);
+    $j('#toggle_registered').on('change',function() {
+      $j('.openbis-card + .registered').toggle();
+    });
+  });
+
+</script>

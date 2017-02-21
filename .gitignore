@@ -28,6 +28,7 @@ debug.log
 
 tmp/pids/*
 tmp/cache/*
+tmp/dev-cache/*
 tmp/avatars/*
 tmp/models/*
 tmp/model_images/*

@@ -1,0 +1,124 @@
+<%= javascript_include_tag :uri %>
+
+<%= form_for([@project,@openbis_endpoint],html:{id:'openbis-space-form'}) do |f| %>
+
+    <%= f.error_messages %>
+
+    <%= f.hidden_field :project_id, :class=>"login-credential" %>
+
+    <div class="form-group">
+      <label>Main Web URL</label><span class="required">*</span>
+      <%= f.text_field :web_endpoint, :class=>"form-control login-credential"-%>
+    </div>
+
+    <div class="form-group">
+      <label>Application Server Endpoint</label><span class="required">*</span>
+      <%= f.text_field :as_endpoint, :class=>"form-control login-credential"-%>
+    </div>
+
+    <div class="form-group">
+      <label>DataStore Server Endpoint</label><span class="required">*</span>
+      <%= f.text_field :dss_endpoint, :class=>"form-control login-credential"-%>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :username -%><span class="required">*</span>
+      <%= f.text_field :username, :class=>"form-control login-credential"-%>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :password -%><span class="required">*</span>
+      <%= f.password_field :password, :class=>"form-control login-credential"-%>
+    </div>
+
+    <div class="form-group">
+      <%= f.label 'Automated refresh period (hours)' %><span class="required">*</span>
+      <%= f.select :refresh_period_mins,(1..24).collect{|x| [x,x*60]},{},class:"form-control" %>
+    </div>
+
+    <div id="check-result">
+
+    </div>
+
+    <div id="spaces">
+
+    </div>
+
+    <%= content_tag(:button,type:'button',class:'btn btn-primary',id:'fetch-spaces-button'){"Fetch Spaces"} %>
+
+    <%= f.submit(@openbis_endpoint.new_record? ? "Add" : "Update",
+                 disabled:true ,
+                 class:'btn btn-primary',
+                 id:'submit-button')
+    %>
+    or
+    <%= cancel_button(project_openbis_endpoints_path(@project)) %>
+
+
+<% end %>
+
+<script>
+
+  function testEndpoint() {
+    $j.ajax('<%= test_endpoint_project_openbis_endpoints_path(@project) %>', {
+          data: $j('input.login-credential').serialize(),
+          success: function (data) {
+            if (data.result==true) {
+              $j('#check-result').html('Authentication succeeded')
+              fetchSpaces();
+            }
+            else {
+              $j('#check-result').html('Authentication failed!')
+              $j('#submit-button').prop('disabled', true);
+            }
+          },
+          beforeSend: function () {
+            $j('#spaces').html('')
+            $j('#check-result').html('<%= image('spinner') %> Checking authentication');
+          }
+        }
+    );
+  }
+
+  function fetchSpaces() {
+    $j.ajax('<%= fetch_spaces_project_openbis_endpoints_path(@project) %>', {
+      data: $j('input.login-credential').serialize(),
+      success: function (html) {
+        $j('#check-result').html('');
+        $j('#spaces').html(html);
+        $j('#submit-button').prop('disabled', false);
+      },
+      beforeSend: function () {
+        $j('#spaces').html('<%= image('spinner') %> Fetching spaces');
+      }
+
+    });
+  }
+
+  $j('#fetch-spaces-button').on('click', function() {
+    $j('#fetch-spaces-button').prop('disabled', true);
+    testEndpoint();
+    $j('#fetch-spaces-button').prop('disabled', false);
+  });
+
+  $j('#openbis_endpoint_web_endpoint').focusout(function() {
+    var url=$j('#openbis_endpoint_web_endpoint').val();
+    if (url.slice(-1)=='/') { //trim last slash if url has it at the end, to simplify segment parsing
+      url=url.slice(0,-1)
+    }
+    var uri=new URI(url);
+    if ((uri.protocol()=='http' || uri.protocol()=='https') && uri.segment().last()=='openbis') {
+      if (!$j('#openbis_endpoint_as_endpoint').val()) {
+        var as=uri.clone().segment('openbis');
+        $j('#openbis_endpoint_as_endpoint').val(as)
+      }
+      if (!$j('#openbis_endpoint_dss_endpoint').val()) {
+        var dss = uri.clone().segment(-1,'datastore_server');
+        $j('#openbis_endpoint_dss_endpoint').val(dss)
+      }
+
+
+    }
+  });
+
+</script>

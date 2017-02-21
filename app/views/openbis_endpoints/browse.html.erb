@@ -1,0 +1,70 @@
+<p>
+  <%= image(:openbis, :width=>'75px') %>
+</p>
+Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_select(@openbis_endpoints,:id,:title),id:'select-endpoints',class:'form-control' %>
+
+<div id="openbis-datasets">
+<div id="openbis-dataset-count">
+
+</div>
+
+<div id="contents">
+
+</div>
+</div>
+
+<script>
+
+  function fetchCountForSpace(spaceId) {
+    $j.ajax('<%= show_item_count_project_openbis_endpoints_path(@project) %>', {
+          data: {id: spaceId},
+          success: function (html) {
+              $j('#openbis-datasets #openbis-dataset-count').html(html);
+          },
+          beforeSend: function () {
+            $j('#openbis-datasets  #openbis-dataset-count').html('<%= image('spinner') %>');
+          }
+        }
+    );
+  }
+
+  function fetchItemsForSpace(spaceId) {
+    $j.ajax('<%= show_items_project_openbis_endpoints_path(@project) %>', {
+          data: {id: spaceId},
+          success: function (html) {
+            $j('#openbis-datasets #contents').html(html);
+          },
+          beforeSend: function () {
+            $j('#openbis-datasets #contents').html('<%= image('large_spinner') %>');
+          }
+        }
+    );
+  }
+
+
+  function endpointChanged() {
+    var id = $j('#select-endpoints option:selected').val();
+    if (id.trim()) {
+      $j('#contents').html('<%= image('large_spinner') %>');
+      fetchCountForSpace(id);
+      fetchItemsForSpace(id);
+    }
+    else {
+      $j('#contents').html('');
+      $j('#count').html('');
+    }
+
+  }
+  ;
+
+  $j('#select-endpoints').change(function () {
+    endpointChanged();
+  });
+
+  <% if @openbis_endpoints.any? %>
+    $j( document ).ready(function() {
+      endpointChanged();
+    });
+  <% end %>
+
+</script>

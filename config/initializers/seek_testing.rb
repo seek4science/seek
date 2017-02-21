@@ -102,6 +102,7 @@ SEEK::Application.configure do
       Settings.defaults[:site_base_host] = "http://localhost:3000"
 
       Settings.defaults[:default_all_visitors_access_type] = Policy::NO_ACCESS
+      Settings.defaults[:openbis_enabled] = true
     end
   end
 end

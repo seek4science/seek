@@ -323,6 +323,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "associates assay" do
     login_as(:model_owner) #can edit assay
     p = publications(:taverna_paper_pubmed)
+    refute_nil p.contributor
     original_assay = assays(:assay_with_a_publication)
     assert p.assays.include?(original_assay)
     assert original_assay.publications.include?(p)

@@ -6,7 +6,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   
   def setup
-    login_as(:aaron)
+    login_as(Factory(:admin))
   end
 
   test "should show assay types to public" do

@@ -287,6 +287,14 @@ class SinglePublishingTest < ActionController::TestCase
   end
 
   test "do publish some" do
+
+    x=group_memberships(:one)
+    assert_equal people(:quentin_person),x.person
+    refute_nil x.work_group
+
+    person=people(:quentin_person)
+    refute person.projects.empty?
+
     df=data_with_isa
 
     assays=df.assays

@@ -11,5 +11,5 @@ New Institutions: Another Institute
 Of these, the following Projects have Project administrators that will have also been notified by email:
 - Project X: -project_path-
 
-For the person details: http://localhost:3000/people/2, whose email address is aaron@email.com .
+For the person details: http://localhost:3000/people/-person_id-, whose email address is aaron@email.com .
 -- end --

@@ -64,4 +64,5 @@
 //= require jstree
 //= require clipboard
 //= require upload_selection
+//= require openbis
 //= require_tree ./templates

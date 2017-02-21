@@ -23,6 +23,7 @@ services:
       - docker/db.env
     volumes:
       - seek-filestore:/seek/filestore
+      - seek-cache:/seek/tmp/cache
     ports:
       - "3000:3000"
     depends_on:
@@ -45,6 +46,7 @@ services:
         - docker/db.env
       volumes:
         - seek-filestore:/seek/filestore
+        - seek-cache:/seek/tmp/cache
       depends_on:
         - db
         - solr
@@ -65,4 +67,6 @@ volumes:
   seek-mysql-db:
     external: true
   seek-solr-data:
+    external: true
+  seek-cache:
     external: true

@@ -18,6 +18,12 @@ start_soffice
 # Search
 start_or_setup_search
 
+# SETUP for OpenSEEK only, to link to openBIS if necessary
+if [ ! -z $OPENBIS_USERNAME ]
+then
+    bundle exec rake db:seed:openseek:default_openbis_endpoint
+fi
+
 # Start Rails
 echo "STARTING SEEK"
 bundle exec puma -C config/puma.rb -d

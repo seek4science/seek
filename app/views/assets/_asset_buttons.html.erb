@@ -45,13 +45,14 @@
 <%= admin_dropdown do %>
     <% edit_verb = 'edit' %>
     <% if asset.can_manage? -%>
-        <% if asset.is_downloadable? && !(asset.respond_to?(:extracted_samples) && asset.extracted_samples.any?) -%>
+        <% if asset.versioned? -%>
             <li>
-                <% if asset.supports_doi? && asset.is_any_doi_minted?  -%>
-                    <%= link_to_function image("new")+" Upload new version", "javascript:alert('After DOI is generated, uploading new version is not possible')", :class=>"disabled" -%>
-                <% else %>
-                    <%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%>
-                <% end %>
+              <% if asset.new_version_supported? %>
+                  <%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") %>
+                  <% else %>
+                  <%= link_to_function image("new")+" Upload new version", nil,disabled:true, class:'disabled' %>
+                  <% end %>
+
             </li>
         <% end -%>
 

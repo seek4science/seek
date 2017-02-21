@@ -82,6 +82,9 @@
 
     <%= render :partial => 'admins/omniauth' %>
 
+    <%= admin_checkbox_setting(:openbis_enabled, 1, Seek::Config.openbis_enabled,
+                               "openBIS enabled", "Whether support for a project to connect to openBIS is enabled.") %>
+
     <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path-%>
 <% end -%>
