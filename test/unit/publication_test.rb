@@ -216,7 +216,6 @@ class PublicationTest < ActiveSupport::TestCase
 
     asset = Publication.new :title=>"fred2",:pubmed_id =>1234,:projects=>[project]
     assert asset.valid?
-#    puts asset.errors.full_messages.inspect
 
     asset = Publication.new :title=>"fred",:pubmed_id =>"bogus",:projects=>[project]
     assert !asset.valid?
