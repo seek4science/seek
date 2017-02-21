@@ -38,7 +38,7 @@ module Seek
     end
 
     def handle_openbis_download(asset,dataset_file_perm_id=nil)
-      dataset = asset.content_blobs.first.openbis_dataset
+      dataset = asset.content_blob.openbis_dataset
       if dataset_file_perm_id
         dataset_file = dataset.dataset_files.detect{|f| f.file_perm_id == dataset_file_perm_id}
         raise "No dataset file found for id" unless dataset_file
