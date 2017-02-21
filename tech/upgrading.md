@@ -38,22 +38,11 @@ You can also tell which version you have installed by looking at the
     minor: 13
     patch: 2
 
-## General notes about versions and upgrading
 
+## Upgrading between patch versions (e.g. between 1.2.0 and 1.2.1) 
 
-
-**When upgrading between minor versions (i.e. from 0.11.x to 0.13.x)** it is
-necessary to run a seek:upgrade rake task to perform upgrade changes and
-import any new data. The upgrade task may require an internet connection, and
-sometimes can take some time to run, so please be patient. There are
-instructions for upgrading between each minor version listed below, but they
-will generally follow the same pattern. Upgrading to version 0.18 is an
-exception and involves some additional steps - due to the upgrade of the
-required versions of Rails and Ruby.
-
-**When upgrading between patch versions (i.e between 1.2.0 and 1.2.1)** it
-should only be necessary to run *bundle install* and the *db:migrate* rake
-task. Using seek:upgrade should still work, but could take a lot of
+It should only be necessary to run *bundle install* and the *db:migrate* rake
+task. Using *seek:upgrade* should still work, but could take a lot of
 unnecessary time. 
 
 ## Steps to upgrade from 1.1.x to 1.2.x
