@@ -125,12 +125,12 @@ module PolicyHelper
     project_ids = associated_projects.map(&:id)
     hash = { access_type: policy.access_type }
 
-    hash[:permissions] = policy.permissions.select([:id, :access_type, :contributor_id, :contributor_type]).map do |permission|
+    hash[:permissions] = policy.permissions.map do |permission|
       h = { id: permission.id,
-               access_type: permission.access_type,
-               contributor_id: permission.contributor_id,
-               contributor_type: permission.contributor_type,
-               index: permission.id }
+            access_type: permission.access_type,
+            contributor_id: permission.contributor_id,
+            contributor_type: permission.contributor_type,
+            index: permission.id }
       if permission.contributor_type == "Project" && project_ids.include?(permission.contributor_id)
         h[:mandatory] = true
       end
