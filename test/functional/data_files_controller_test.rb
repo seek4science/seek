@@ -30,45 +30,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'title', text: /The Sysmo SEEK Data.*/, count: 1
   end
 
-  test 'should create data file with mixture of blobs' do
-    stub_request(:head, 'http://fair-dom.org/').to_return(status: 200, headers: { 'Content-Type' => 'text/html' })
-    stub_request(:head, 'http://fair-dom.org/piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
-    person = Factory(:person)
-    login_as(person.user)
-    project = person.projects.first
-    refute_nil project
-    content_blob1 = { data: file_for_upload }
-    content_blob2 = { data_url: 'http://fair-dom.org', original_filename: '', make_local_copy: '0' }
-    content_blob3 = { data_url: 'http://fair-dom.org/piccy.png', original_filename: '', make_local_copy: '0' }
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count', 3) do
-        post :create, data_file: { title: 'Test Create', project_ids: [project.id] },
-             content_blobs: [content_blob1, content_blob2, content_blob3],
-             policy_attributes: valid_sharing
-      end
-    end
-
-    assert_redirected_to data_file_path(data_file = assigns(:data_file))
-    assert_equal 'Test Create', data_file.title
-    assert_equal [project], data_file.projects
-    assert_equal person.user, data_file.contributor
-    assert_equal 3, data_file.content_blobs.count
-    blob1 = data_file.content_blobs.first
-    blob2 = data_file.content_blobs[1]
-    blob3 = data_file.content_blobs.last
-    assert_equal 'file_picture.png', blob1.original_filename
-    assert blob1.file_exists?
-
-    assert_equal 'http://fair-dom.org', blob2.url
-    refute blob2.file_exists?
-    assert blob2.is_webpage?
-    assert_equal 'text/html', blob2.content_type
-
-    assert_equal 'http://fair-dom.org/piccy.png', blob3.url
-    refute blob3.is_webpage?
-    assert_equal 'image/png', blob3.content_type
-  end
-
   # because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent
   # the log being saved, unless it is public, since it has passed out of the around filter and User.current_user is nil
   test 'download and view activity logging for private items' do
