@@ -169,6 +169,10 @@ module Seek
       append_filestore_path 'tmp'
     end
 
+    def clear_temporary_filestore
+      FileUtils.rm_r(temporary_filestore_path)
+    end
+
     def converted_filestore_path
       append_filestore_path 'converted-assets'
     end

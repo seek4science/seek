@@ -1,7 +1,6 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 quentin_person:
-  id: 1
   first_name: "quentin"
   last_name: "jones"
   email: "quentin@email.com"
@@ -9,13 +8,11 @@ quentin_person:
 
 
 aaron_person:
-  id: 2
   first_name: "aaron"
   last_name: "spiggle"
   email: "aaron@email.com"
 
 three:
-  id: 3
   first_name: "no_user"
   last_name: "smith"
   email: "no_user@email.com"
@@ -26,29 +23,24 @@ fred:
   email: "fred@email.com"
 
 no_first_name:
-  id: 6
   last_name: "lastname"
   email: "lastname@email.com"
 
 no_last_name:
-  id: 7        
   first_name: "firstname"
   email: "firstname@email.com"
 
 double_firstname:
-  id: 8        
   first_name: "Fred David"
   last_name: "Bloggs"
   email: "fred_blogs@email.com"
 
 double_lastname:
-  id: 9        
   first_name: "Fred"
   last_name: "Smith Jones"
   email: "Fred1@email.com"
 
 double_barrelled_lastname:
-  id: 10        
   first_name: "Fred"
   last_name: "Smith-Jones"
   email: "Fred2@email.com"

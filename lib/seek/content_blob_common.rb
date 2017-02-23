@@ -9,33 +9,53 @@ module Seek
 
       asset.just_used
 
-      if asset_version.respond_to?(:content_blobs)
-        content_blobs = asset_version.content_blobs
+      if asset.respond_to?(:openbis?) && asset.openbis?
+        handle_openbis_download(asset)
       else
-        content_blobs = [asset_version.content_blob]
-      end
-
-      has_image = asset_version.respond_to?(:model_image) && asset_version.model_image
-
-      if content_blobs.length == 1 && !has_image
-        download_single(content_blobs.first)
-      elsif content_blobs.length > 1 || (content_blobs.length == 1 && has_image)
-        downloadable_content_blobs = content_blobs.select { |c| c.file_exists? }
-        if downloadable_content_blobs.length == 1 && !has_image
-          download_single(downloadable_content_blobs.first)
-        elsif downloadable_content_blobs.length > 1 || (downloadable_content_blobs.length == 1 && has_image)
-          handle_download_zip(asset_version)
+        if asset_version.respond_to?(:content_blobs)
+          content_blobs = asset_version.content_blobs
         else
-          redirect_on_error(asset, "Cannot create zip file from remote content.")
+          content_blobs = [asset_version.content_blob]
         end
+
+        has_image = asset_version.respond_to?(:model_image) && asset_version.model_image
+
+        if content_blobs.length == 1 && !has_image
+          download_single(content_blobs.first)
+        elsif content_blobs.length > 1 || (content_blobs.length == 1 && has_image)
+          downloadable_content_blobs = content_blobs.select { |c| c.file_exists? }
+          if downloadable_content_blobs.length == 1 && !has_image
+            download_single(downloadable_content_blobs.first)
+          elsif downloadable_content_blobs.length > 1 || (downloadable_content_blobs.length == 1 && has_image)
+            handle_download_zip(asset_version)
+          else
+            redirect_on_error(asset, "Cannot create zip file from remote content.")
+          end
+        else
+          redirect_on_error(asset, "No downloadable files found for this asset.")
+        end
+      end
+    end
+
+    def handle_openbis_download(asset,dataset_file_perm_id=nil)
+      dataset = asset.content_blobs.first.openbis_dataset
+      if dataset_file_perm_id
+        dataset_file = dataset.dataset_files.detect{|f| f.file_perm_id == dataset_file_perm_id}
+        raise "No dataset file found for id" unless dataset_file
+        dest = File.join(Seek::Config.temporary_filestore_path,"#{asset.id.to_s}-dataset_file-#{dataset_file.dataset_perm_id}-#{dataset_file.filename}")
+        dataset_file.download(dest) unless File.exists?(dest)
+        send_file dest, :filename => dataset_file.filename, :type => "application/octet-stream", :disposition => 'attachment'
       else
-        redirect_on_error(asset, "No downloadable files found for this asset.")
+        dest_folder=File.join(Seek::Config.temporary_filestore_path,"#{asset.id.to_s}-dataset-#{dataset.perm_id}")
+        zip_name=File.join(Seek::Config.temporary_filestore_path,"#{asset.id.to_s}-dataset-#{dataset.perm_id}.zip")
+        dataset.download(dest_folder,zip_name)
+        send_file zip_name, :filename => "#{dataset.perm_id}.zip", :type => "application/octet-stream", :disposition => 'attachment'
       end
     end
 
     private
 
-    #for data files, SOPs and presentations, that only have a single content-blob
+    #for assets that only have a single content-blob
     def download_single(content_blob)
       @content_blob = content_blob
 
@@ -105,25 +125,6 @@ module Seek
       if @content_blob.url.blank?
         if @content_blob.file_exists?
           if image_size && @content_blob.is_image?
-            class << @content_blob
-              def image_assets_storage_directory
-                path = Seek::Config.temporary_filestore_path + '/image_assets'
-                FileUtils.mkdir_p path unless File.exist?(path)
-                path
-              end
-
-              acts_as_fleximage_extension
-
-              def copy_image
-                copy_to_path = image_assets_storage_directory
-                copy_to_path << "/#{id}.png"
-                if file_exists? && !File.exist?(copy_to_path)
-                  FileUtils.cp filepath, copy_to_path
-                end
-              end
-            end
-
-            @content_blob.copy_image
             @content_blob.resize_image(image_size)
             filepath = @content_blob.full_cache_path(image_size)
             headers["Content-Length"]=File.size(filepath).to_s

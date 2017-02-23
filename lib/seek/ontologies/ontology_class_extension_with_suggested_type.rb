@@ -22,7 +22,7 @@ module Seek
         end
       end
 
-      def is_suggested_type?
+      def suggested_type?
         false
       end
 

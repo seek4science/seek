@@ -104,7 +104,7 @@ module BootstrapHelper
     end
 
     unless opts.blank?
-      dropdown_button(text, icon, menu_options: { class: 'pull-right' }) do
+      dropdown_button(text, icon, menu_options: { class: 'pull-right',id:'item-admin-menu' }) do
         opts
       end
     end

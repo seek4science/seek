@@ -19,7 +19,9 @@ SEEK::Application.configure do
 
   #This can be very useful in development when you have code that interacts directly with Rails.cache,
   #but caching may interfere with being able to see the results of code changes.
-  config.cache_store = :null_store
+  #config.cache_store = :null_store
+  config.action_controller.cache_store = [:file_store, "#{Rails.root}/tmp/dev-cache"]
+  config.cache_store = [:file_store, "#{Rails.root}/tmp/dev-cache"]
 
   # Don't care if the mailer can't send
   config.action_mailer.raise_delivery_errors = false

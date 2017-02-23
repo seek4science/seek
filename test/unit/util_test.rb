@@ -52,7 +52,7 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'multi-file assets' do
-    expected = [DataFile,Model]
+    expected = [Model]
     types = Seek::Util.multi_files_asset_types
     # first as strings for more readable failed assertion message
     assert_equal expected.map { |t| t.to_s }, types.map { |t| t.to_s }

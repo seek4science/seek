@@ -2,9 +2,6 @@ require 'rubygems'
 require 'rake'
 require 'time'
 require 'active_record/fixtures'
-
-
-
 require 'csv'
 
 namespace :seek do
@@ -162,8 +159,6 @@ namespace :seek do
 
   end
 
-  private
-
   desc "Subscribes users to the items they would normally be subscribed to by default"
   #Run this after the subscriptions, and all subscribable classes have had their tables created by migrations
   #You can also run it any time you want to force everyone to subscribe to something they would be subscribed to by default
@@ -187,11 +182,11 @@ namespace :seek do
   task(:repopulate_auth_lookup_tables=>:environment) do
     Seek::Util.authorized_types.each do |type|
       type.find_each do |item|
-        unless AuthLookupUpdateQueue.exists?(item)
-          AuthLookupUpdateJob.new.add_items_to_queue item,5.seconds.from_now,1
-        end
+        AuthLookupUpdateQueue.create(item: item, priority: 1) unless AuthLookupUpdateQueue.exists?(item)
       end
     end
+    # 5 is an arbitrary number to take advantage of there being more than 1 worker dedicated to auth refresh
+    5.times { AuthLookupUpdateJob.new.queue_job(1, 5.seconds.from_now) }
   end
 
   desc "Rebuilds all authorization tables for a given user - you are prompted for a user id"
@@ -421,6 +416,109 @@ namespace :seek do
     puts "New method took #{new_method_time} seconds"
     puts "Old method took #{old_method_time} seconds"
   end
+
+  desc "dump the old biosamples data into YAML"
+  task(:dump_old_biosamples_data => :environment) do
+    filename = 'old_biosamples.yml'
+    bytes = File.write(filename, Deprecated::Specimen.all.to_yaml)
+    puts "#{bytes} bytes written to #{filename}"
+  end
+
+  desc "convert old biosamples data into new format"
+  task :convert_old_biosamples_data, [:filename] => :environment do |t, args|
+    sample_type = SampleType.find_by_title('SysMO Biosample')
+
+    if sample_type.nil?
+      raise "Couldn't find 'SysMO Biosample' sample type - maybe need to run `rake db:seed:sample_attribute_types`?"
+    end
+
+    filename = args[:filename]
+
+    if filename
+      # The following line stops the YAML loader from complaining about missing modules/classes
+      [Deprecated::Sample, Deprecated::Specimen, Deprecated::SampleAsset, Deprecated::Treatment]
+      puts "Loading biosamples data from file: #{filename}"
+      specimens = YAML.load(File.read(filename))
+    else
+      puts "Loading biosamples data from database"
+      specimens = Deprecated::Specimen.all
+    end
+
+    puts "Converting samples:\n"
+    total = 0
+    saved = 0
+    errored = []
+    specimens.each do |old_specimen|
+      old_specimen.deprecated_samples.each do |old_sample|
+        total += 1
+        sample = Sample.new(sample_type: sample_type)
+
+        converted_age = old_sample.age_at_sampling
+
+        unless converted_age.blank?
+          converted_age = converted_age.to_i
+          case old_sample.age_at_sampling_unit.try(:title)
+            when 'day'
+              converted_age = converted_age * 60 * 60 * 24
+            when 'hour'
+              converted_age = converted_age * 60 * 60
+            when 'minute'
+              converted_age = converted_age * 60
+          end
+        end
+
+        sample.data = {
+          sample_id_or_name: old_sample.title,
+          cell_culture_name: old_specimen.title,
+          cell_culture_lab_identifier: old_specimen.lab_internal_number,
+          cell_culture_start_date: old_specimen.born,
+          cell_culture_growth_type: old_specimen.culture_growth_type.try(:title),
+          cell_culture_comment: old_specimen.comments,
+          cell_culture_provider_name: old_specimen.provider_name,
+          cell_culture_provider_identifier: old_specimen.provider_id,
+          cell_culture_strain: old_specimen.strain_id,
+          sample_lab_identifier: old_sample.lab_internal_number,
+          sampling_date: old_sample.sampling_date,
+          age_at_sampling: converted_age,
+          sample_provider_name: old_sample.provider_name,
+          sample_provider_identifier: old_sample.provider_id,
+          sample_comment: old_sample.comments,
+          sample_organism_part: old_sample.organism_part == 'Not specified' ? '' : old_sample.organism_part.capitalize
+        }
+        sample.contributor = old_sample.contributor
+        sample.policy = old_sample.policy || Policy.public_policy
+        sample.project_ids = old_sample.project_ids
+        sample.created_at = old_sample.created_at
+        sample.updated_at = old_sample.updated_at
+
+        if Sample.find_by_id(old_sample.id).nil?
+          sample.id = old_sample.id
+        end
+
+        if sample.save
+          print '.'
+          saved += 1
+        else
+          print 'E'
+          errored << sample
+        end
+      end
+    end
+
+    puts
+    if errored.any?
+      puts "Errors:"
+      errored.each do |s|
+        puts "Sample #{s.id}:"
+        puts s.errors.full_messages.join("\n")
+        puts
+      end
+    end
+
+    puts "Done - (#{saved}/#{total} converted)"
+  end
+
+  private
 
   def set_projects_parent array, parent
     array.each do |proj|

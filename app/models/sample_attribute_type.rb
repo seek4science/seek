@@ -1,5 +1,5 @@
 class SampleAttributeType < ActiveRecord::Base
-  attr_accessible :base_type, :regexp, :title
+  attr_accessible :base_type, :regexp, :title, :placeholder
 
   validates :title, :base_type, :regexp, presence: true
   validate :validate_allowed_type, :validate_regular_expression
@@ -68,6 +68,10 @@ class SampleAttributeType < ActiveRecord::Base
 
   def seek_sample?
     base_type == Seek::Samples::BaseType::SEEK_SAMPLE
+  end
+
+  def seek_strain?
+    base_type == Seek::Samples::BaseType::SEEK_STRAIN
   end
 
   def base_type_handler(additional_options)

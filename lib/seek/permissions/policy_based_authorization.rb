@@ -22,9 +22,9 @@ module Seek
           belongs_to :policy, :autosave => true #, :required_access_to_owner => :manage
           enforce_required_access_for_owner :policy,:manage
 
-
           after_commit :check_to_queue_update_auth_table
           after_destroy :remove_from_lookup_table
+          after_destroy { |record| record.policy.try(:destroy_if_redundant) }
         end
       end
       #the can_#{action}? methods are split into 2 parts, to differentiate between pure authorization and additional permissions based upon the state of the object or other objects it depends upon)
@@ -261,20 +261,20 @@ module Seek
       def update_lookup_table_for_all_users
         self.class.isolation_level(:repeatable_read) do #ensure it allows it see another worker may have inserted a record already
           self.class.transaction do
-            #check to see if an insert of update is needed, action used is arbitary
-            insert = lookup_count <= 2
-
             # Blank-out permissions first
-            if insert
+
+            # 1 entry for each user + anonymous
+            if lookup_count != (User.count + 1)
               sql = %(DELETE FROM #{self.class.lookup_table_name} WHERE asset_id=#{self.id})
               ActiveRecord::Base.connection.execute(sql)
 
               f = ActiveRecord::Base.connection.quote(false)
 
-              ([0] + User.pluck(:id)).each do |user_id|
+              # Insert in batches of 10
+              ([0] + User.pluck(:id)).each_slice(10) do |batch|
                 sql = %(INSERT INTO #{self.class.lookup_table_name}
                           (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
-                          VALUES (#{user_id}, #{self.id}, #{f}, #{f}, #{f}, #{f}, #{f});)
+                          VALUES #{batch.map { |user_id| "(#{user_id}, #{self.id}, #{f}, #{f}, #{f}, #{f}, #{f})" }.join(', ')};)
 
                 ActiveRecord::Base.connection.execute(sql)
               end
@@ -290,17 +290,20 @@ module Seek
                 sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }.
                 reverse
 
-            # Extract the individual member permissions from each FavouriteGroup and ensure they are also sorted by access_type
-            # Record the index where the favourite group permissions start
+            # Extract the individual member permissions from each FavouriteGroup and ensure they are also sorted by access_type:
+            # 1. Record the index where the FavouriteGroup permissions start
             fav_group_perm_index = sorted_permissions.index { |p| p.contributor_type == 'FavouriteGroup' }
             if fav_group_perm_index
-              # Split the favourite group permissions out
+              # 2. Split them out of the array.
               group_permissions, sorted_permissions = sorted_permissions.partition { |p| p.contributor_type == 'FavouriteGroup' }
 
-              group_members_permissions = FavouriteGroupMembership.includes(person: :user).where(favourite_group_id: group_permissions.map(&:contributor_id)).
+              # 3. Gather the FavouriteGroupMemberships for each of the FavouriteGroups referenced by the permissions.
+              group_members_permissions = FavouriteGroupMembership.includes(person: :user).
+                  where(favourite_group_id: group_permissions.map(&:contributor_id)).
                   order('access_type ASC').to_a
 
-              # Add them back in
+              # 4. Add them in to the array at the point where the FavouriteGroup permissions were removed
+              #    to preserve the order of precedence.
               sorted_permissions.insert(fav_group_perm_index, *group_members_permissions)
             end
 
@@ -310,7 +313,7 @@ module Seek
             end
 
             # Creator permissions
-            if is_downloadable? && creators.any?
+            if respond_to?(:creators) && creators.any?
               update_lookup([true, true, true, false, false], creators.includes(:user).map(&:user).compact, false)
             end
 

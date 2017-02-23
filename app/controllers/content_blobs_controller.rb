@@ -78,12 +78,18 @@ class ContentBlobsController < ApplicationController
   def download
     @asset.just_used if @asset.respond_to?(:just_used)
 
-    disposition = params[:disposition] || 'attachment'
-    image_size = params[:image_size]
+    if @asset.respond_to?(:openbis?) && @asset.openbis?
+      respond_to do |format|
+        format.html { handle_openbis_download(@asset,params[:perm_id]) }
+      end
+    else
+      disposition = params[:disposition] || 'attachment'
+      image_size = params[:image_size]
 
-    respond_to do |format|
-      format.html { handle_download(disposition, image_size) }
-      format.pdf { get_pdf }
+      respond_to do |format|
+        format.html { handle_download(disposition, image_size) }
+        format.pdf { get_pdf }
+      end
     end
   end
 

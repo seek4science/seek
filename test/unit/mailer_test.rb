@@ -4,6 +4,10 @@ require 'time_test_helper'
 class MailerTest < ActionMailer::TestCase
   fixtures :all
 
+  def setup
+    Person.where('first_name = ?','default admin').destroy_all
+  end
+
   test "signup" do
     @expected.subject = 'Sysmo SEEK account activation'
     @expected.to = "Aaron Spiggle <aaron@email.com>"
@@ -29,7 +33,6 @@ class MailerTest < ActionMailer::TestCase
     expected_text.gsub!("-unique_key-",recipient.notifiee_info.unique_key)
 
     assert_equal expected_text, encode_mail(Mailer.announcement_notification(announcement,recipient.notifiee_info))
-
   end
 
   test "feedback anonymously" do
@@ -51,8 +54,10 @@ class MailerTest < ActionMailer::TestCase
     @expected.reply_to = "Aaron Spiggle <aaron@email.com>"
 
     @expected.body    = read_fixture('feedback_non_anon')
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",users(:aaron).person.id.to_s)
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.feedback(users(:aaron),"This is a test feedback","testing the feedback message", false))
+    assert_equal expected_text,encode_mail(Mailer.feedback(users(:aaron),"This is a test feedback","testing the feedback message", false))
 
   end
 
@@ -68,7 +73,10 @@ class MailerTest < ActionMailer::TestCase
     user=users(:aaron)
     details="here are some more details"
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.request_resource(user,resource,details))
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",user.person.id.to_s)
+
+    assert_equal expected_text,encode_mail(Mailer.request_resource(user,resource,details))
 
   end
 
@@ -86,7 +94,10 @@ class MailerTest < ActionMailer::TestCase
     user=users(:aaron)
     details=""
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.request_resource(user,resource,details))
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",user.person.id.to_s)
+
+    assert_equal expected_text,encode_mail(Mailer.request_resource(user,resource,details))
 
   end
 
@@ -127,9 +138,12 @@ class MailerTest < ActionMailer::TestCase
     publisher = people(:aaron_person)
     owner = people(:person_for_datafile_owner)
 
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",publisher.id.to_s)
+
     resources=[assays(:metabolomics_assay),data_files(:picture),models(:teusink),assays(:metabolomics_assay2),data_files(:sysmo_data_file)]
 
-    assert_equal encode_mail(@expected),encode_mail(Mailer.request_publishing(owner,publisher,resources))
+    assert_equal expected_text,encode_mail(Mailer.request_publishing(owner,publisher,resources))
 
   end
 
@@ -207,7 +221,10 @@ class MailerTest < ActionMailer::TestCase
     params[:other_projects]="Another Project"
     params[:other_institutions]="Another Institute"
 
-    assert_equal encode_mail(@expected),
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",users(:aaron).person.id.to_s)
+
+    assert_equal expected_text,
                  encode_mail(Mailer.contact_admin_new_user(params, users(:aaron)))
   end
 
@@ -232,6 +249,7 @@ class MailerTest < ActionMailer::TestCase
     params[:other_institutions]="Another Institute"
 
     expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",users(:aaron).person.id.to_s)
     expected_text.gsub!("-project_path-","http://localhost:3000/projects/#{project.id}")
 
     assert_equal expected_text,
@@ -259,7 +277,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!("-pr_name-",admin_project.title)
     expected_text.gsub!("-pr_id-",admin_project.id.to_s)
-
+    expected_text.gsub!("-person_id-",users(:aaron).person.id.to_s)
     actual_text = encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron)))
 
     assert_equal expected_text,actual_text
@@ -272,8 +290,10 @@ class MailerTest < ActionMailer::TestCase
     @expected.from    = "no-reply@sysmo-db.org"
     
     @expected.body = read_fixture('welcome')
+    expected_text = encode_mail(@expected)
+    expected_text.gsub!("-person_id-",users(:quentin).person.id.to_s)
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.welcome(users(:quentin)))
+    assert_equal expected_text, encode_mail(Mailer.welcome(users(:quentin)))
 
   end
 

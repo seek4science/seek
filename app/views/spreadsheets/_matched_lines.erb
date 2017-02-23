@@ -1,0 +1,27 @@
+<% unless sheet_array.blank? %>
+    <div class="list_item with_smaller_shadow curved">
+      <%= list_item_title object %>
+      <div id="item_<%= object.id %>">
+        <%= render :partial => "spreadsheets/row", :locals => {:sheet_array => sheet_array, :object_id => object.id} %>
+        <%= link_to_function ("View more details " + expand_image).html_safe, :style => "background_display: block;", :id => 'show_details_image_' + object.id.to_s do |page|
+          page << "if ($('item_#{object.id}_details') === null) {"
+          page.insert_html :after, "item_" + object.id.to_s, "<div id='item_#{object.id}_details' style='display: block;'></div>"
+          page.replace_html 'item_'+ object.id.to_s + "_details", :partial => "assets/resource_list_item", :locals => {:resource_list_item => object}
+          page << "}"
+          page << "else {"
+          page.visual_effect :toggle_blind, "item_#{object.id}_details", :duration => 0.5
+          page << "}"
+
+          page["show_details_image_#{object.id}"].toggle
+          page["hide_details_image_#{object.id}"].toggle
+        end
+        -%>
+        <%= link_to_function ("View more details " + collapse_image).html_safe, :style => "display: none;", :id => 'hide_details_image_' + object.id.to_s do |page|
+          page.visual_effect :toggle_blind, "item_#{object.id}_details", :duration => 0.5
+          page["show_details_image_#{object.id}"].toggle
+          page["hide_details_image_#{object.id}"].toggle
+        end
+        -%>
+      </div>
+    </div>
+<% end %>

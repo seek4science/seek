@@ -16,11 +16,11 @@
       </div>
 
       <%# only the owner should be able to change sharing permissions -%>
-      <% if current_user_authorized_to_manage -%>
-          <%= render :partial => "projects/project_selector", :locals => {:resource => @data_file, :allow_nil => Seek::Config.is_virtualliver } %>
-
-          <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>
+      <% if current_user_authorized_to_manage && !@data_file.openbis?-%>
+          <%= render :partial => "projects/project_selector", :locals => {:resource => @data_file } %>
       <% end %>
+
+      <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @data_file } %>
 

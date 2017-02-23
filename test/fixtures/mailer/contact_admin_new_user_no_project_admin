@@ -10,5 +10,5 @@ New Institutions: Another Institute
 
 There are NO Project administrators for these Projects.
 
-For the person details: http://localhost:3000/people/2, whose email address is aaron@email.com .
+For the person details: http://localhost:3000/people/-person_id-, whose email address is aaron@email.com .
 -- end --

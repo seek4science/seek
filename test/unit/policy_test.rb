@@ -199,4 +199,36 @@ class PolicyTest < ActiveSupport::TestCase
     end
   end
 
+  test 'policy not destroyed if still referenced by assets' do
+    policy = Factory(:public_policy)
+    sample_type = Factory(:strain_sample_type)
+    data_file = Factory(:strain_sample_data_file, policy: policy)
+    samples = data_file.extract_samples(sample_type, true).select(&:persisted?)
+    sample = samples.first
+
+    assert_equal sample.policy, data_file.policy
+
+    assert_no_difference('Policy.count') do
+      disable_authorization_checks { data_file.destroy }
+    end
+
+    assert_not_nil sample.reload.policy
+    assert_not_nil Policy.find_by_id(policy.id)
+  end
+
+  test 'policy destroyed when no longer referenced' do
+    policy = Factory(:public_policy)
+    sample_type = Factory(:strain_sample_type)
+    data_file = Factory(:strain_sample_data_file, policy: policy)
+    samples = data_file.extract_samples(sample_type, true).select(&:persisted?)
+
+    disable_authorization_checks { data_file.destroy }
+
+    assert_difference('Policy.count', -1) do
+      disable_authorization_checks { samples.each(&:destroy) }
+    end
+
+    assert_nil Policy.find_by_id(policy.id)
+  end
+
 end

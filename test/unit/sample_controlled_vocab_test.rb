@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class SampleControlledVocabTest < ActiveSupport::TestCase
+
+
   test 'association with terms' do
     User.with_current_user(Factory(:project_administrator).user) do
       vocab = SampleControlledVocab.new(title: 'test')

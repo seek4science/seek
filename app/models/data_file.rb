@@ -23,7 +23,7 @@ class DataFile < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-  has_many :content_blobs, as: :asset, foreign_key: :asset_id, conditions: proc { ['content_blobs.asset_version =?', version] }
+  has_one :content_blob, as: :asset, foreign_key: :asset_id, conditions: proc { ['content_blobs.asset_version =?', version] }
 
   has_many :studied_factors, conditions: proc { ['studied_factors.data_file_version =?', version] }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
@@ -36,14 +36,7 @@ class DataFile < ActiveRecord::Base
     acts_as_versioned_resource
     acts_as_favouritable
 
-    def content_blob
-      content_blobs.first
-    end
-
-    # FIXME: should be possible to do this with a has_many: rather than method, same for Model::Version - (seems it needs foreign_type added in Rails 4)
-    def content_blobs
-      ContentBlob.where(['asset_id =? and asset_type =? and asset_version =?', parent.id, parent.class.name, version])
-    end
+    has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version,parent.class.name]}
 
     has_many :studied_factors, primary_key: 'data_file_id', foreign_key: 'data_file_id', conditions: proc { ['studied_factors.data_file_version =?', version] }
 
@@ -82,7 +75,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def use_mime_type_for_avatar?
-    false
+    true
   end
 
   # defines that this is a user_creatable object type, and appears in the "New Object" gadget
@@ -93,10 +86,10 @@ class DataFile < ActiveRecord::Base
   # the annotation string values to be included in search indexing
   def spreadsheet_annotation_search_fields
     annotations = []
-    content_blobs.each do |blob|
-      blob.worksheets.each do |ws|
+    if content_blob
+      content_blob.worksheets.each do |ws|
         ws.cell_ranges.each do |cell_range|
-          annotations |= cell_range.annotations.collect { |a| a.value.text }
+          annotations = annotations | cell_range.annotations.collect{|a| a.value.text}
         end
       end
     end
@@ -109,7 +102,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def possible_sample_types
-    SampleType.sample_types_matching_content_blob(content_blobs.first)
+    SampleType.sample_types_matching_content_blob(content_blob)
   end
 
   # a simple container for handling the matching results returned from #matching_data_files
@@ -156,7 +149,7 @@ class DataFile < ActiveRecord::Base
   # Extracts samples using the given sample_type
   # Returns a list of extracted samples, including
   def extract_samples(sample_type, confirm = false)
-    samples = sample_type.build_samples_from_template(content_blobs.first)
+    samples = sample_type.build_samples_from_template(content_blob)
     extracted = []
     samples.each do |sample|
       sample.project_ids = project_ids
@@ -169,4 +162,16 @@ class DataFile < ActiveRecord::Base
     end
     extracted
   end
+
+  #creates a new DataFile that registers an openBIS dataset
+  def self.build_from_openbis(openbis_endpoint,dataset_perm_id)
+    dataset = Seek::Openbis::Dataset.new(openbis_endpoint,dataset_perm_id)
+    dataset.create_seek_datafile
+  end
+
+  #indicates that this is an openBIS based DataFile
+  def openbis?
+    content_blob && content_blob.openbis?
+  end
+
 end

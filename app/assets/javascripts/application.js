@@ -62,4 +62,5 @@
 //= require samples
 //= require jstree
 //= require clipboard
+//= require openbis
 //= require_tree ./templates

@@ -2,7 +2,7 @@ Hi Quentin Jones,
 
 Welcome to Sysmo SEEK. You have now registered and activated your account.
 
-You may now update your profile at http://localhost:3000/people/1/edit
+You may now update your profile at http://localhost:3000/people/-person_id-/edit
 
 
 - The SysMO-DB Team

@@ -5,11 +5,6 @@ class ProgrammesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include ActionView::Helpers::NumberHelper
 
-  #this is needed to ensure the first user exists as admin, to stop it being automatically created as no fixtures are used.
-  def setup
-    Factory(:admin)
-  end
-
   #for now just admins can create programmes, later we will change this
   test "new page accessible admin" do
     login_as(Factory(:admin))
@@ -763,7 +758,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     programme_administrator = Factory(:programme_administrator)
     programme = programme_administrator.programmes.first
     data_file = Factory(:data_file, :project_ids => [programme.projects.first.id])
-    size = data_file.content_blobs.first.file_size
+    size = data_file.content_blob.file_size
     assert size > 0
 
     login_as(programme_administrator)

@@ -82,7 +82,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   
   test "should not destroy" do
     ann = Factory(:feed_announcement)
-    login_as(:aaron)
+    login_as(Factory(:person))
     assert_no_difference("SiteAnnouncement.count") do
       delete :destroy,:id=>ann.id
     end   
@@ -98,7 +98,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
   
   test "should not get new" do
-    login_as(:aaron)
+    login_as(Factory(:person))
     get :new
     assert_response :redirect
     assert_redirected_to(root_url)    
@@ -106,7 +106,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
   
   test "should not get edit" do
-    login_as(:aaron)
+    login_as(Factory(:person))
     announcement=Factory(:feed_announcement)
     assert_not_nil announcement.announcer
     get :edit,:id=>announcement
@@ -116,7 +116,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
   
   test "should not create" do
-    login_as(:aaron)
+    login_as(Factory(:person))
     assert_no_difference("SiteAnnouncement.count") do
       post :create,:site_announcement=>{:title=>"fred"}
     end    
@@ -140,7 +140,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
   end
 
   test "feed with empty announcements" do
-    login_as(:aaron)
+    login_as(Factory(:person))
     SiteAnnouncement.delete_all
     get :feed,:format=>"atom"
     assert_response :success

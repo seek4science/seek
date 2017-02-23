@@ -23,38 +23,43 @@
       <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
       <span class="attribute-position-label"><%= pos %></span>
     </div>
-    <%= hidden_field_tag "#{field_name_prefix}[pos]", pos, :readonly => true %>
+    <%= hidden_field_tag "#{field_name_prefix}[pos]", pos, readonly: true %>
   </th>
   <td>
-    <%= text_field_tag "#{field_name_prefix}[title]", title, :class => 'form-control',
-                       :placeholder => 'Attribute name',disabled:!allow_name_change %>
+    <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
+                       placeholder: 'Attribute name',disabled: !allow_name_change %>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[required]", '1', required,disabled:!allow_required %>
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required,disabled: !allow_required %>
     </div>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled:!allow_required %>
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled: !allow_required %>
     </div>
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
                    options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?, 'data-is-seek-sample'=>t.seek_sample? }] },
                                       attribute_type_id),
-                   :class => 'form-control sample-type-attribute-type',
-                   disabled:!allow_type_change %>
+                   class: 'form-control sample-type-attribute-type',
+                   disabled: !allow_type_change %>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id] },
+                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?}] },
                                         sample_controlled_vocab_id),
-                     :include_blank => true,
-                     :class => 'form-control controlled-vocab-selection' %>
-        <%= create_sample_controlled_vocab_model_button %>
+                     include_blank: true,
+                     class: 'form-control controlled-vocab-selection',
+                     disabled: !allow_type_change %>
+      <% if allow_type_change %>
+        <a class="btn btn-default cv-edit-button" href="#" role="button" disabled="true" target="_blank">Edit</a>
+        <%= create_sample_controlled_vocab_model_button  %>
+      <% end %>
+
     </div>
     <div class='sample-type-block' style="<%= 'display:none;' unless sample_attribute.try(:seek_sample?) %>">
       <br/>
@@ -76,18 +81,19 @@
     <%= select_tag "#{field_name_prefix}[unit_id]",
                    options_for_select(Unit.all.map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
                                       unit_id),
-                   :include_blank => true,
-                   :class => 'form-control'%>
+                   include_blank: true,
+                   class: 'form-control',
+                   disabled: !allow_type_change %>
   </td>
 
   <td>
     <% if allow_attribute_removal %>
       <div class="btn-group" data-toggle="buttons">
-        <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', :autocomplete => 'off' %>
+        <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
         <label class="btn btn-danger">
           Remove
           <%= check_box_tag "#{field_name_prefix}[_destroy]", '1', false,
-                            :class => 'destroy-attribute', :autocomplete => 'off' %>
+                            class: 'destroy-attribute', autocomplete: 'off' %>
         </label>
       </div>
         <% else %>

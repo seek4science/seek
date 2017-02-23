@@ -4,10 +4,6 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
-  def setup
-    # create a dummy user, to prevent the first becoming an admin
-    person = Factory(:person)
-  end
 
   test 'show' do
     cv = Factory(:apples_sample_controlled_vocab)

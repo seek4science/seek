@@ -94,6 +94,17 @@ module Seek
       def just_used
         update_column(:last_used_at, Time.now)
       end
+
+      #whether a new version is allowed for this asset.
+      # for example if it has come from openbis or has extracted samples then it is not allowed
+      def new_version_supported?
+        versioned? &&
+            is_downloadable? &&
+            !(respond_to?(:extracted_samples) && extracted_samples.any?) &&
+            !(respond_to?(:openbis?) && openbis?) &&
+            !(supports_doi? && is_any_doi_minted?)
+      end
+
     end
   end
 end

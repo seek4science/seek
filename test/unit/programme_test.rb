@@ -2,10 +2,6 @@ require 'test_helper'
 
 class ProgrammeTest < ActiveSupport::TestCase
 
-  def setup
-    #make sure an admin exists as the first user
-    Factory(:admin)
-  end
 
   test 'has_member?' do
     programme_administrator = Factory(:programme_administrator)

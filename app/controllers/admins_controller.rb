@@ -105,6 +105,8 @@ class AdminsController < ApplicationController
     Seek::Config.zenodo_client_id = params[:zenodo_client_id].try(:strip)
     Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].try(:strip)
 
+    Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
+
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
     Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
@@ -343,6 +345,8 @@ class AdminsController < ApplicationController
           format.html { render partial: 'admins/stats/workflow_stats' }
         when 'storage_usage_stats'
           format.html { render partial: 'admins/stats/storage_usage_stats' }
+        when 'snapshot_and_doi_stats'
+          format.html { render partial: 'admins/stats/snapshot_and_doi_stats' }
         when 'none'
           format.html { render text: '' }
       end

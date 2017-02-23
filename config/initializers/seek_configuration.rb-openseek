@@ -206,4 +206,5 @@ SEEK::Application.configure do
       # :bind_dn => ''
     # }
   }
+  Seek::Config.default :openbis_enabled,false
 end

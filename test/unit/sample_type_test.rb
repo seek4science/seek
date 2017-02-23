@@ -4,7 +4,6 @@ require 'time_test_helper'
 class SampleTypeTest < ActiveSupport::TestCase
 
   def setup
-    Factory(:admin)#to prevent person being first person and therefore admin
     @person = Factory(:person)
     @project = @person.projects.first
     @project_ids=[@project.id]

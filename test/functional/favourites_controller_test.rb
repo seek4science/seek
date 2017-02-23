@@ -8,11 +8,12 @@ class FavouritesControllerTest < ActionController::TestCase
   fixtures :users, :favourites, :projects, :people, :institutions
   
   def setup
-    login_as(:quentin)
+    @person=Factory(:person)
+    login_as(@person)
   end
   
   test "can add valid favourite" do
-    project = projects(:one)    
+    project = @person.projects.first
 
     fav=Favourite.find_by_resource_type_and_resource_id("Project",project.id)
     assert_nil fav
@@ -26,11 +27,12 @@ class FavouritesControllerTest < ActionController::TestCase
   end
 
   test "can't add duplicate favourite" do
-    project = projects(:two)    
+    project = @person.projects.first
+    Favourite.create(resource:project,user:@person.user)
 
     #sanity check that it does actually already exist
-    fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,users(:quentin).id)
-    assert_not_nil fav, "The project with id 2 should already exist for quentin"
+    fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,@person.user.id)
+    refute_nil fav
 
     xml_http_request(:post, :add, {:resource_type => project.class.name, :resource_id => project.id})
     
@@ -126,10 +128,13 @@ class FavouritesControllerTest < ActionController::TestCase
   end
 
   test "can delete favourite" do
-    project = projects(:two)  
-    xml_http_request(:delete, :delete, {:id=>favourites(:project_fav).id})
+    project = @person.projects.first
+    fav=Favourite.create(resource:project,user:@person.user)
+    assert_difference('Favourite.count',-1) do
+      xml_http_request(:delete, :delete, {:id=>fav.id})
+    end
     assert_response :success
-    fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,users(:quentin).id)
+    fav=Favourite.find_by_resource_type_and_resource_id_and_user_id("Project",project.id,@person.user.id)
     assert_nil fav, "Favourite should have been destroyed"
   end
 

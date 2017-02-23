@@ -6,9 +6,9 @@ class SampleExtractorTest < ActiveSupport::TestCase
     @person = Factory(:project_administrator)
     User.current_user=@person.user
     Factory(:string_sample_attribute_type, title: 'String')
-    @data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)],
+    @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                      policy: Factory(:private_policy), contributor: @person.user
-    @sample_type = SampleType.new title: 'from template',:project_ids=>[@person.projects.first.id]
+    @sample_type = SampleType.new title: 'from template', project_ids: [@person.projects.first.id]
     @sample_type.content_blob = Factory(:sample_type_template_content_blob)
     @sample_type.build_attributes_from_template
     @sample_type.save!
@@ -26,9 +26,9 @@ class SampleExtractorTest < ActiveSupport::TestCase
     @extractor.extract
 
     # Delete data file so re-extracting would raise an error
-    disable_authorization_checks { @data_file.content_blobs.first.destroy }
+    disable_authorization_checks { @data_file.content_blob.destroy }
     @data_file.reload
-    assert_nil @data_file.content_blobs.first
+    assert_nil @data_file.content_blob
     assert_difference('Sample.count', 4) do
       @extractor.persist
     end
@@ -39,5 +39,18 @@ class SampleExtractorTest < ActiveSupport::TestCase
     assert_not_nil @extractor.fetch
     @extractor.clear
     assert_nil @extractor.fetch
+  end
+
+  test 'blank rows are ignored from sample spreadsheets' do
+    @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_blank_rows_content_blob),
+                         policy: Factory(:private_policy), contributor: @person.user
+    @extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
+
+    accepted, rejected = @extractor.extract.partition(&:valid?)
+
+    assert_equal 4, accepted.length
+    assert_equal 0, rejected.length
+    assert_equal ['Bob Monkhouse', 'Jesus Jones', 'Fred Flintstone', 'Bob'].sort,
+                 accepted.map { |s| s.data[:full_name] }.sort
   end
 end

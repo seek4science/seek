@@ -1,21 +1,18 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  id: 1
   title: Institution1
   address: MyText
   city: MyString  
   country: MyString
 
 two:
-  id: 2
   title: Institution2
   address: MyText
   city: MyString  
   country: MyString
 
 three:
-  id: 3
   title: Institution3
   address: MyText
   city: MyString  
@@ -23,7 +20,6 @@ three:
 
 #an institution not associated with any workgroups or people
 four:
-  id: 4
   title: Institution4
   address: MyText
   city: MyString  

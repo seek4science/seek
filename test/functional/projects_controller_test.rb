@@ -130,6 +130,34 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project_path(project)
   end
 
+  test 'programme administrator sees admin openbis link' do
+    proj_admin=Factory(:project_administrator)
+    login_as(proj_admin)
+    project=proj_admin.projects.first
+    another_project=Factory(:project)
+
+    with_config_value(:openbis_enabled,true) do
+      get :show,id:project
+      assert_response :success
+      assert_select 'ul#item-admin-menu' do
+        assert_select 'a[href=?]', project_openbis_endpoints_path(project), text:/Administer openBIS/
+      end
+
+      get :show,id:another_project
+      assert_response :success
+      assert_select 'a[href=?]', project_openbis_endpoints_path(project), count:0
+    end
+
+    with_config_value(:openbis_enabled,false) do
+      get :show,id:project
+      assert_response :success
+      assert_select 'ul#item-admin-menu' do
+        assert_select 'a[href=?]', project_openbis_endpoints_path(project), text:/Administer openBIS/, count:0
+      end
+    end
+
+  end
+
   def test_should_show_project
 
     proj = Factory(:project)
@@ -160,6 +188,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def test_should_destroy_project
     project = projects(:four)
+    assert project.can_delete?
     get :show, :id => project
     assert_select "#buttons a", :text => /Delete #{I18n.t('project')}/i, :count => 1
 
@@ -507,10 +536,12 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test "filter projects by person" do
-    get :index, :filter => {:person => 1}
+    person=Factory(:person)
+    project=person.projects.first
+    get :index, :filter => {:person => person.id}
     assert_response :success
     projects = assigns(:projects)
-    assert_equal Project.all.select {|proj|proj.people.include? Person.find_by_id(1)}, projects
+    assert_equal [project], projects
     assert projects.count < Project.all.count
   end
 
@@ -758,7 +789,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test "should not unassign institution out of project if there are people in this workgroup" do
-    wg=WorkGroup.find(1)
+    wg=Factory(:person).work_groups.first
     assert !wg.people.empty?
     project = wg.project
 
@@ -1372,7 +1403,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project_administrator = Factory(:project_administrator)
     project = project_administrator.projects.first
     data_file = Factory(:data_file, :project_ids => [project.id])
-    size = data_file.content_blobs.first.file_size
+    size = data_file.content_blob.file_size
     assert size > 0
 
     login_as(project_administrator)

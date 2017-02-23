@@ -35,15 +35,23 @@ class SeekJob
     count(ignore_locked) != 0
   end
 
+  def delete_jobs
+    find_jobs(false).destroy_all
+  end
+
   def count(ignore_locked = true)
-    if ignore_locked
-      Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?', job_yaml, nil, nil]).count
-    else
-      Delayed::Job.where(['handler = ? AND failed_at IS ?', job_yaml, nil]).count
-    end
+    find_jobs(ignore_locked).count
   end
 
   private
+
+  def find_jobs(ignore_locked)
+    if ignore_locked
+      Delayed::Job.where(['handler = ? AND locked_at IS ? AND failed_at IS ?', job_yaml, nil, nil])
+    else
+      Delayed::Job.where(['handler = ? AND failed_at IS ?', job_yaml, nil])
+    end
+  end
 
   def job_yaml
     to_yaml

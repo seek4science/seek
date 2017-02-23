@@ -1,23 +1,25 @@
 require 'test_helper'
+require 'openbis_test_helper'
 
 class DataFileTest < ActiveSupport::TestCase
   fixtures :all
 
-  test 'associations' do
+  test "associations" do
     datafile_owner = Factory :user
-    datafile = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy), contributor: datafile_owner
-    assert_equal datafile_owner, datafile.contributor
-    datafile.content_blobs.each(&:destroy) unless datafile.content_blobs.empty?
+    datafile=Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy),:contributor=> datafile_owner
+    assert_equal datafile_owner,datafile.contributor
+    unless datafile.content_blob.nil?
+      datafile.content_blob.destroy
+    end
 
-    blob = Factory.create(:content_blob, original_filename: 'df.ppt', content_type: 'application/ppt', asset: datafile, asset_version: datafile.version) # content_blobs(:picture_blob)
+    blob=Factory.create(:content_blob,:original_filename=>"df.ppt", :content_type=>"application/ppt",:asset => datafile,:asset_version=>datafile.version)#content_blobs(:picture_blob)
     datafile.reload
-    assert_equal 1, datafile.content_blobs.count
-    assert_equal blob, datafile.content_blobs.first
+    assert_equal blob,datafile.content_blob
   end
 
   test 'content blob search terms' do
     check_for_soffice
-    df = Factory :data_file, content_blobs: [Factory(:doc_content_blob, original_filename: 'word.doc')]
+    df = Factory :data_file, content_blob: Factory(:doc_content_blob, original_filename: 'word.doc')
     assert_equal ['This is a ms word doc format', 'doc', 'word.doc'], df.content_blob_search_terms.sort
 
     df = Factory :xlsx_spreadsheet_datafile
@@ -90,11 +92,6 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal df.contributor, df.latest_version.contributor
   end
 
-  def test_avatar_key
-    assert_equal 'data_file_avatar', data_files(:picture).avatar_key
-    refute data_files(:picture).use_mime_type_for_avatar?
-  end
-
   test 'projects' do
     df = data_files(:sysmo_data_file)
     p = projects(:sysmo_project)
@@ -159,8 +156,8 @@ class DataFileTest < ActiveSupport::TestCase
   test 'make sure content blob is preserved after deletion' do
     df = Factory :data_file # data_files(:picture)
     User.current_user = df.contributor
-    assert_equal 1, df.content_blobs.count, 'Must have an associated content blob for this test to work'
-    cb = df.content_blobs.first
+    refute_nil df.content_blob, 'Must have an associated content blob for this test to work'
+    cb = df.content_blob
     assert_difference('DataFile.count', -1) do
       assert_no_difference('ContentBlob.count') do
         df.destroy
@@ -307,22 +304,22 @@ class DataFileTest < ActiveSupport::TestCase
     User.with_current_user(user) do
       mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://mockedlocation.com/picture.png'
 
-      data_file = Factory :data_file, content_blobs: [ContentBlob.new(url: 'http://mockedlocation.com/picture.png', original_filename: 'picture.png')]
+      data_file = Factory :data_file, content_blob: ContentBlob.new(url: 'http://mockedlocation.com/picture.png', original_filename: 'picture.png')
 
       data_file.save!
 
-      refute data_file.content_blobs.first.file_exists?
+      refute data_file.content_blob.file_exists?
 
       data_file.cache_remote_content_blob
 
-      assert data_file.content_blobs.first.file_exists?
+      assert data_file.content_blob.file_exists?
     end
   end
 
   test 'sample template?' do
     Factory(:string_sample_attribute_type, title: 'String')
 
-    data_file = Factory :data_file, content_blobs: [Factory(:sample_type_populated_template_content_blob)], policy: Factory(:public_policy)
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:public_policy)
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
@@ -334,7 +331,7 @@ class DataFileTest < ActiveSupport::TestCase
     assert data_file.sample_template?
     assert_includes data_file.possible_sample_types, sample_type
 
-    data_file = Factory :data_file, content_blobs: [Factory(:small_test_spreadsheet_content_blob)], policy: Factory(:public_policy)
+    data_file = Factory :data_file, content_blob: Factory(:small_test_spreadsheet_content_blob), policy: Factory(:public_policy)
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
   end
@@ -342,22 +339,45 @@ class DataFileTest < ActiveSupport::TestCase
   test 'factory test' do
     # sanity check that the updated factories work whilst fixing them, no harm leaving this test here
     df = Factory(:rightfield_annotated_datafile)
-    assert_equal 1, df.content_blobs.count
-    blob = df.content_blobs.first
+    blob = df.content_blob
     assert blob.file_exists?
     assert_equal 'simple_populated_rightfield.xls', blob.original_filename
     assert_equal 'application/excel', blob.content_type
   end
 
   test 'spreadsheet annotation search fields' do
-    cr = Factory(:cell_range)
+    df = Factory(:data_file)
+    cr = Factory(:cell_range,worksheet:Factory(:worksheet,content_blob:df.content_blob))
+
     Annotation.create(:source => Factory(:user),
                   :annotatable => cr,
                   :attribute_name => 'annotation',
                   :value => 'fish')
-    df=cr.worksheet.content_blob.asset
+
     df.reload
+    refute_empty df.content_blob.worksheets
     fields = df.spreadsheet_annotation_search_fields
     assert_equal ['fish'],fields
   end
+
+  test 'openbis?' do
+    stub_request(:head, 'http://www.abc.com').to_return(
+        :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+
+    refute Factory(:data_file).openbis?
+    refute Factory(:data_file,content_blob:Factory(:url_content_blob)).openbis?
+    assert Factory(:data_file,content_blob:Factory(:url_content_blob,url:'openbis:1:dataset:2222')).openbis?
+  end
+
+  test 'build from openbis' do
+    mock_openbis_calls
+    User.with_current_user(Factory(:person).user) do
+      endpoint=Factory(:openbis_endpoint)
+      df = DataFile.build_from_openbis(endpoint,'20160210130454955-23')
+      refute_nil df
+      assert df.openbis?
+      assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23", df.content_blob.url
+    end
+  end
+
 end

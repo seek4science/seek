@@ -10,8 +10,7 @@ one:
   title: A paper on blabla
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
-  contributor_id: 1
-  contributor_type: User
+  contributor: quentin (User)
   published_date: <%= 5.days.ago.to_s :db %>  
   pubmed_id: 5
   projects: [sysmo_project]
@@ -21,8 +20,7 @@ pubmed_2:
   title: Another paper on blabla
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
-  contributor_id: 1
-  contributor_type: User
+  contributor: quentin (User)
   published_date: <%= 4.days.ago.to_s :db %>
   pubmed_id: 2
   projects: [sysmo_project]
@@ -32,8 +30,7 @@ taverna_paper_pubmed:
   title: "Taverna: a tool for building and running workflows of services"
   abstract: WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD  
   journal: JOURNAL OF SCIENCE
-  contributor_id: 1
-  contributor_type: User
+  contributor: quentin (User)
   published_date: <%= 3.days.ago.to_s :db %>
   pubmed_id: 16845108
   projects: [sysmo_project]

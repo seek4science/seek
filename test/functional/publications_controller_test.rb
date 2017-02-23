@@ -323,6 +323,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test "associates assay" do
     login_as(:model_owner) #can edit assay
     p = publications(:taverna_paper_pubmed)
+    refute_nil p.contributor
     original_assay = assays(:assay_with_a_publication)
     assert p.assays.include?(original_assay)
     assert original_assay.publications.include?(p)
@@ -762,13 +763,13 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   def mock_crossref options
-    url= "http://www.crossref.org/openurl/"
+    url= "https://www.crossref.org/openurl/"
     params={}
     params[:format] = "unixref"
     params[:id] = "doi:"+options[:doi]
     params[:pid] = options[:email]
     params[:noredirect] = true
-    url = "http://www.crossref.org/openurl/?" + params.to_param
+    url = "https://www.crossref.org/openurl/?" + params.to_param
     file=options[:content_file]
     stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
 
