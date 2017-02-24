@@ -4,6 +4,9 @@
 
   assay_assets = resource.assay_assets.where(asset_type: 'Sample').includes(:asset)
 
+  samples = Sample.joins(:projects).where(projects: { id: current_user.person.projects.map(&:id) }).limit(100).order('updated_at DESC')
+  authorized_samples = Sample.authorize_asset_collection(samples, :view)
+
   if params[:samples] && params[:samples].any?
     collapse_panel = false
     associated_samples_json = associations_json_from_params(Sample, params[:samples])
@@ -47,7 +50,8 @@
     <%= association_selector('sample_to_list', 'Add individual samples', 'Select samples') do %>
         <label>Select samples</label>
         <%= filterable_association_select(filter_samples_path(:assay_id => resource.id), :multiple => true) do %>
-            <%= render :partial => 'samples/association_preview', :collection => Sample.limit(20),
+            <%= render :partial => 'samples/association_preview',
+                       :collection => authorized_samples,
                        :locals => { :existing => resource.samples }
             %>
         <% end %>
