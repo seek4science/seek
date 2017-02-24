@@ -12,6 +12,7 @@ class SeekJob
           perform_job(item)
         end
       rescue Exception => exception
+        raise exception if Rails.env.test?
         unless item.destroyed?
           report_exception(exception,item)
           retry_item(item)

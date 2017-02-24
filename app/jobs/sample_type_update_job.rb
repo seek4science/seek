@@ -1,5 +1,3 @@
-require 'seek/samples/sample_type_editing_constraints'
-
 # Job responsible for reacting to an update to a sample type
 # refreshes the associated samples, and recreates the editing constraints cache
 class SampleTypeUpdateJob < SeekJob
@@ -14,7 +12,7 @@ class SampleTypeUpdateJob < SeekJob
 
   def perform_job(item)
     item.refresh_samples if refresh_samples?
-    Seek::Samples::SampleTypeEditingConstraints(item).refresh_cache
+    Seek::Samples::SampleTypeEditingConstraints.new(item).refresh_cache
   end
 
   def gather_items
