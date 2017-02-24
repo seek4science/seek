@@ -213,6 +213,7 @@ class AdminsController < ApplicationController
     Seek::Config.default_consortium_access_type = params[:default_consortium_access_type]
     Seek::Config.default_all_visitors_access_type = params[:default_all_visitors_access_type]
     Seek::Config.permissions_popup = params[:permissions_popup]
+    Seek::Config.auth_lookup_update_batch_size = params[:auth_lookup_update_batch_size]
 
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
     Seek::Config.max_cachable_size = params[:max_cachable_size]

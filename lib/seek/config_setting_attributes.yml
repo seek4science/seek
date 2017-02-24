@@ -169,6 +169,8 @@ news_number_of_entries:
 front_page_buttons_enabled:
 permissions_popup:
   convert: :to_i
+auth_lookup_update_batch_size:
+  convert: :to_i
 samples_enabled:
 project_admin_sample_type_restriction:
 omniauth_enabled:
