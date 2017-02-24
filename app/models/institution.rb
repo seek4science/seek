@@ -57,9 +57,10 @@ class Institution < ActiveRecord::Base
     attrs
   end
 
-  def json_api_relations (options = {})
-    %w(projects people avatar programmes)
-  end
+  # TO DO: is it redundant to have people and projects here?
+  #def json_api_relations (options = {})
+  #  %w(projects people avatar programmes)
+  #end
 
   def json_api_meta (options = {})
     { uuid: self.uuid, created: self.created_at, modified: self.updated_at }

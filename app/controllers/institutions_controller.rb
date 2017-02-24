@@ -58,6 +58,9 @@ class InstitutionsController < ApplicationController
   # POST /institutions
   # POST /institutions.xml
   def create
+
+    #if not params has attr ("title") do
+    #    params = process_jsonapi(params)
     @institution = Institution.new(params[:institution])
 
     respond_to do |format|

@@ -33,6 +33,7 @@ gem 'linkeddata'
 gem 'openseek-api'
 gem 'jbuilder'
 gem 'jbuilder-json_api'
+gem 'jsonapi-serializers'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
