@@ -96,7 +96,7 @@ Wizards.Wizard.prototype.updateNav = function () {
 };
 Wizards.Wizard.prototype.reset = function () {
     for(var i = 0; i < this.steps.length; i++)
-        this.steps[i].locked = true;
+        this.steps[i].lock();
 
     this.gotoStep(1);
 };
