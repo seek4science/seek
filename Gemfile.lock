@@ -39,12 +39,6 @@ GIT
     convert_office (0.9.1)
 
 GIT
-  remote: https://github.com/SysMO-DB/doi_query_tool.git
-  revision: aeba4284dd380b985edbfad5756fa672deb30843
-  specs:
-    doi_query_tool (0.0.1)
-
-GIT
   remote: https://github.com/SysMO-DB/fleximage.git
   revision: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
   ref: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
@@ -140,6 +134,13 @@ GIT
   revision: 977048211b94599fe0f08eb37a481f3d69df48f6
   specs:
     calendar_date_select (1.16.2)
+
+GIT
+  remote: https://github.com/seek4science/DOI-query-tool.git
+  revision: a389b760db2a1d00cc79319ad0bd48fd86b9d960
+  specs:
+    doi_query_tool (1.0.0)
+      libxml-ruby (>= 2.6.0)
 
 GIT
   remote: https://github.com/seek4science/zenodo-client.git
@@ -348,7 +349,7 @@ GEM
       multi_xml (>= 0.5.2)
     httpi (1.1.1)
       rack
-    i18n (0.7.0)
+    i18n (0.8.1)
     ice_nine (0.11.2)
     in_place_editing (1.2.0)
     jbuilder (2.2.13)
@@ -872,7 +873,7 @@ DEPENDENCIES
   in_place_editing
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
-  libxml-ruby (>= 2.6.0)
+  libxml-ruby (~> 2.8.0)
   linkeddata
   lograge
   magic_lamp
@@ -957,4 +958,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.13.6
+   1.14.3

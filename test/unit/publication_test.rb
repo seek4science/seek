@@ -2,6 +2,8 @@ require 'test_helper'
 
 class PublicationTest < ActiveSupport::TestCase
 
+  include MockHelper
+
   fixtures :all
 
   test "create publication from hash" do
@@ -28,7 +30,7 @@ class PublicationTest < ActiveSupport::TestCase
       :pubmed_id => nil,
       :doi => nil
     }
-    doi_record = DoiRecord.new(publication_hash)
+    doi_record = DOI::Record.new(publication_hash)
     publication = Publication.new
     publication.extract_doi_metadata(doi_record)
     assert_equal publication_hash[:title]   , publication.title
@@ -192,9 +194,9 @@ class PublicationTest < ActiveSupport::TestCase
 
   test "book chapter doi" do
     mock_crossref(:email=>"fred@email.com",:doi=>"10.1007/978-3-642-16239-8_8",:content_file=>"cross_ref1.xml")
-    query=DoiQuery.new("fred@email.com")
+    query=DOI::Query.new("fred@email.com")
     result = query.fetch("10.1007/978-3-642-16239-8_8")
-    assert_equal 3,result.publication_type
+    assert_equal :book_chapter, result.publication_type
     assert_equal "Prediction with Confidence Based on a Random Forest Classifier",result.title
     assert_equal 2,result.authors.size
     assert_equal "IFIP Advances in Information and Communication Technology 339 : 37", result.citation
@@ -212,23 +214,23 @@ class PublicationTest < ActiveSupport::TestCase
 
   test "doi with not resolvable error" do
     mock_crossref(:email=>"fred@email.com",:doi=>"10.4230/OASIcs.GCB.2012.1",:content_file=>"cross_ref_no_resolve.xml")
-    query=DoiQuery.new("fred@email.com")
-    result = query.fetch("10.4230/OASIcs.GCB.2012.1")
-    assert_equal "The DOI could not be resolved",result.error
-    assert_equal "10.4230/OASIcs.GCB.2012.1",result.doi
+    assert_raises DOI::NotFoundException do
+      query = DOI::Query.new("fred@email.com")
+      query.fetch("10.4230/OASIcs.GCB.2012.1")
+    end
   end
 
   test "malformed doi" do
-    mock_crossref(:email=>"fred@email.com",:doi=>"10.1.11.1",:content_file=>"cross_ref_malformed_doi.xml")
-    query=DoiQuery.new("fred@email.com")
-    result = query.fetch("10.1.11.1")
-    assert_equal "Not a valid DOI",result.error
-    assert_equal "10.1.11.1",result.doi
+    mock_crossref(:email=>"fred@email.com",:doi=>"10.1.11.1",:content_file=>"cross_ref_malformed_doi.html")
+    assert_raises DOI::MalformedDOIException do
+      query = DOI::Query.new("fred@email.com")
+      query.fetch("10.1.11.1")
+    end
   end
 
   test "editor should not be author" do
     mock_crossref(:email=>"fred@email.com",:doi=>"10.1371/journal.pcbi.1002352",:content_file=>"cross_ref2.xml")
-    query=DoiQuery.new("fred@email.com")
+    query=DOI::Query.new("fred@email.com")
     result = query.fetch("10.1371/journal.pcbi.1002352")
     assert result.error.nil?, "There should not be an error"
     assert !result.authors.collect{|auth| auth.last_name}.include?("Papin")
@@ -414,23 +416,4 @@ class PublicationTest < ActiveSupport::TestCase
     end
   end
 
-  def mock_crossref options
-    url= "https://www.crossref.org/openurl/"
-    params={}
-    params[:format] = "unixref"
-    params[:id] = "doi:"+options[:doi]
-    params[:pid] = options[:email]
-    params[:noredirect] = true
-    url = "https://www.crossref.org/openurl/?" + params.to_param
-    file=options[:content_file]
-    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
-
-  end
-
-  def mock_pubmed options
-    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-    file=options[:content_file]
-    stub_request(:post,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
-  end
-  
 end

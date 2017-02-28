@@ -10,6 +10,7 @@ class PublicationsControllerTest < ActionController::TestCase
   include RdfTestCases
   include MockHelper
   include Test::Unit::Assertions
+  include MockHelper
 
   def setup
     login_as(:quentin)
@@ -762,22 +763,4 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, authors[1]['count']
   end
 
-  def mock_crossref options
-    url= "https://www.crossref.org/openurl/"
-    params={}
-    params[:format] = "unixref"
-    params[:id] = "doi:"+options[:doi]
-    params[:pid] = options[:email]
-    params[:noredirect] = true
-    url = "https://www.crossref.org/openurl/?" + params.to_param
-    file=options[:content_file]
-    stub_request(:get,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
-
-  end
-
-  def mock_pubmed options
-    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-    file=options[:content_file]
-    stub_request(:post,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
-  end
 end

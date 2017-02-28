@@ -1,4 +1,4 @@
-require 'doi_record'
+require 'doi/record'
 
 module PublicationsHelper
   def people_by_project_options(projects)
@@ -15,9 +15,9 @@ module PublicationsHelper
   end
 
   def publication_type_text type
-    if type==DoiRecord::PUBLICATION_TYPES[:conference]
+    if type == :conference
       "Conference"
-    elsif type == DoiRecord::PUBLICATION_TYPES[:book_chapter]
+    elsif type == :book_chapter
       "Book"
     else
       "Journal"

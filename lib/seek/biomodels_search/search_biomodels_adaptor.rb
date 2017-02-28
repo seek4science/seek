@@ -72,7 +72,7 @@ module Seek
 
       def populate_from_doi
         query_result = Rails.cache.fetch("biomodels_doi_fetch_#{self.publication_id}", :expires_in=>1.week) do
-          query = DoiQuery.new(Seek::Config.crossref_api_email)
+          query = DOI::Query.new(Seek::Config.crossref_api_email)
           result = query.fetch(self.publication_id)
           hash = {}
           hash[:published_date] = result.date_published
