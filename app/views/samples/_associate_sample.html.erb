@@ -7,6 +7,8 @@
   samples = Sample.joins(:projects).where(projects: { id: current_user.person.projects.map(&:id) }).limit(100).order('updated_at DESC')
   authorized_samples = Sample.authorize_asset_collection(samples, :view)
 
+  data_files = DataFile.with_extracted_samples.all_authorized_for('view').select { |d| d.extracted_samples.any? }.first(20)
+
   if params[:samples] && params[:samples].any?
     collapse_panel = false
     associated_samples_json = associations_json_from_params(Sample, params[:samples])
@@ -60,7 +62,8 @@
 
         <div class="form-group">
           <label>Select sample direction</label>
-          <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
+          <%= select_tag(:direction, direction_options, :class => 'form-control', :autocomplete => 'off',
+                         'data-role' => 'seek-association-common-field') %>
         </div>
     <% end %>
 
@@ -73,7 +76,7 @@
               <label>Select data file</label>
               <%= filterable_association_select(filter_data_files_path(with_samples: true)) do %>
                   <%= render :partial => 'data_files/association_preview',
-                             :collection => DataFile.with_extracted_samples.all_authorized_for('view').select { |d| d.extracted_samples.any? }.first(20),
+                             :collection => data_files,
                              :locals => { :existing => resource.samples }
                   %>
               <% end %>
@@ -87,7 +90,8 @@
             <div data-role="seek-wizard-step" data-step-name="Select sample direction">
               <div class="form-group">
                 <label>Select sample direction</label>
-                <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
+                <%= select_tag(:direction, direction_options, :class => 'form-control', :autocomplete => 'off',
+                               'data-role' => 'seek-association-common-field') %>
               </div>
             </div>
         <% end %>
@@ -102,7 +106,16 @@
 <% end %>
 
 <script>
+  var wizard;
   $j(document).ready(function () {
+    // Reset the "Add individual samples" modal after it is closed
+    $j('#modalAddIndividualSamples').on('hidden.bs.modal', function () {
+      var filterField = $j('[data-role="seek-association-filter"]', $j(this));
+      filterField.val('');
+      Associations.filter(filterField[0]);
+      $j('select', $j(this)).val('0');
+    });
+
     var samplesList = $j('#sample_to_list').data('associationList');
     var batchSamplesForm = new Associations.Form(samplesList, $j('#AddSamplesFromDataFileModal'));
     $j('#AddSamplesFromDataFileModal :input[data-role="seek-association-common-field"]').each(function () {
@@ -150,7 +163,7 @@
     });
 
     // Wizard steps
-    var wizard = new Wizards.Wizard($j('#AddSamplesFromDataFileModal'));
+    wizard = new Wizards.Wizard($j('#AddSamplesFromDataFileModal'));
 
     // On final step, show the confirm button
     wizard.step(3).onShow = function () {
@@ -162,6 +175,9 @@
 
     // Reset the wizard when the modal is closed
     $j('#AddSamplesFromDataFileModal').on('hide.bs.modal', function () {
+      var filterField = $j('[data-role="seek-association-filter"]', $j(this));
+      filterField.val('');
+      Associations.filter(filterField[0]);
       samplesTable.rows().deselect();
       wizard.reset();
     });
@@ -183,5 +199,4 @@
       return false;
     })
   });
-
 </script>
