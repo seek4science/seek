@@ -88,4 +88,22 @@ module MockHelper
         to_return(status: 200, body: File.new("#{Rails.root}/test/fixtures/files/mocking/efetch_response.txt"))
   end
 
+  def mock_crossref(options)
+    params={}
+    params[:format] = "unixref"
+    params[:id] = "doi:"+options[:doi]
+    params[:pid] = options[:email]
+    params[:noredirect] = true
+    url = "https://doi.crossref.org/openurl?" + params.to_param
+    file=options[:content_file]
+    content_type = file.split('.').last == 'xml' ? 'text/xml' : 'text/html'
+    stub_request(:get, url).to_return(headers: { content_type: content_type }, body: File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
+  end
+
+  def mock_pubmed(options)
+    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+    file=options[:content_file]
+    stub_request(:post,url).to_return(:body=>File.new("#{Rails.root}/test/fixtures/files/mocking/#{file}"))
+  end
+
 end
