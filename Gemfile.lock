@@ -39,14 +39,6 @@ GIT
     convert_office (0.9.1)
 
 GIT
-  remote: https://github.com/SysMO-DB/doi_query_tool.git
-  revision: 0f61d72468c0ade77657974356c6ec74cdb4ee72
-  specs:
-    doi_query_tool (1.0.0)
-      activesupport (~> 3.2.22)
-      libxml-ruby (>= 2.6.0)
-
-GIT
   remote: https://github.com/SysMO-DB/fleximage.git
   revision: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
   ref: bb1182f2716a9bf1b5d85e186d8bb7eec436797b
@@ -142,6 +134,13 @@ GIT
   revision: 977048211b94599fe0f08eb37a481f3d69df48f6
   specs:
     calendar_date_select (1.16.2)
+
+GIT
+  remote: https://github.com/seek4science/DOI-query-tool.git
+  revision: 8d2f7be73d3cee85cba320c5eeded49cfb65a3db
+  specs:
+    doi_query_tool (1.0.0)
+      libxml-ruby (>= 2.6.0)
 
 GIT
   remote: https://github.com/seek4science/zenodo-client.git
