@@ -1,4 +1,4 @@
-require 'doi_record'
+require 'doi/record'
 
 module PublicationsHelper
   def people_by_project_options(projects)
