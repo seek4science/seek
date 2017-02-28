@@ -136,7 +136,7 @@ class Publication < ActiveRecord::Base
     self.citation = reference.citation
   end
 
-  # @param doi_record DoiRecord
+  # @param doi_record DOI::Record
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
     self.title = doi_record.title
