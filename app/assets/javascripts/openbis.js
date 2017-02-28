@@ -40,6 +40,33 @@ var OpenBis = {
                 }
             );
         }
+    },
+
+    fetchItemsForBrowseSpace: function (spaceId, projectId) {
+        var path = '/projects/' + projectId + '/openbis_endpoints/show_items'
+        $j.ajax(path, {
+                data: {id: spaceId},
+                success: function (html) {
+                    $j('#openbis-datasets #contents').html(html);
+                },
+                beforeSend: function () {
+                    OpenBis.showBrowseWaitingMessage();
+                }
+            }
+        );
+    },
+
+
+    browseEndpointChanged: function () {
+        var selected = $j('#select-endpoints option:selected')
+        var endpointId = selected.val();
+        var projectId = selected.data('project-id');
+        if (endpointId.trim()) {
+            OpenBis.fetchItemsForBrowseSpace(endpointId, projectId);
+        }
+        else {
+            $j('#openbis-datasets #contents').html('');
+        }
     }
 
 };

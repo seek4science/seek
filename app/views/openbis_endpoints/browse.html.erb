@@ -3,8 +3,10 @@
 <p>
   <%= image(:openbis, :width => '75px') %>
 </p>
-
-Select Endpoint: <%= select_tag :selected_endpoints, options_from_collection_for_select(@openbis_endpoints, :id, :title), id: 'select-endpoints', class: 'form-control' %>
+<%
+  options = options_for_select(@openbis_endpoints.map { |endpoint| [endpoint.title, endpoint.id, {'data-project-id' => endpoint.project.id}] })
+%>
+Select Endpoint: <%= select_tag :selected_endpoints, options, id: 'select-endpoints', class: 'form-control' %>
 
 <div id="openbis-dataset-count">
 
@@ -15,41 +17,16 @@ Select Endpoint: <%= select_tag :selected_endpoints, options_from_collection_for
   </div>
 </div>
 
+
 <script>
 
-
-  function fetchItemsForSpace(spaceId) {
-    $j.ajax('<%= show_items_project_openbis_endpoints_path(@project) %>', {
-          data: {id: spaceId},
-          success: function (html) {
-            $j('#openbis-datasets #contents').html(html);
-          },
-          beforeSend: function () {
-            OpenBis.showBrowseWaitingMessage();
-          }
-        }
-    );
-  }
-
-
-  function endpointChanged() {
-    var id = $j('#select-endpoints option:selected').val();
-    if (id.trim()) {
-      fetchItemsForSpace(id);
-    }
-    else {
-      $j('#contents').html('');
-    }
-  }
-  ;
-
   $j('#select-endpoints').change(function () {
-    endpointChanged();
+    OpenBis.browseEndpointChanged();
   });
 
   <% if @openbis_endpoints.any? %>
   $j(document).ready(function () {
-    endpointChanged();
+    OpenBis.browseEndpointChanged();
   });
   <% end %>
 
