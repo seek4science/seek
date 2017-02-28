@@ -639,12 +639,11 @@ class ProjectsControllerTest < ActionController::TestCase
 
     #Set up the sharing param to share with one person (aaron)
     sharing = {}
-    sharing[:permissions] = {}
-    sharing[:permissions][:contributor_types] = ActiveSupport::JSON.encode(["Person"])
-    sharing[:permissions][:values] = ActiveSupport::JSON.encode({"Person"=>{(person.id)=>{"access_type"=>0}}})
-    sharing[:sharing_scope] = Policy::EVERYONE
-    sharing["access_type_#{sharing[:sharing_scope]}"] = Policy::VISIBLE
-    put :update, :id => project.id, :project => valid_project, :sharing => sharing
+    sharing[:permissions_attributes] = {}
+    sharing[:permissions_attributes]['1'] = { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::NO_ACCESS }
+    sharing[:access_type] = Policy::VISIBLE
+
+    put :update, :id => project.id, :project => valid_project, policy_attributes: sharing
 
     project = Project.find(project.id)
     assert_redirected_to project
@@ -741,19 +740,13 @@ class ProjectsControllerTest < ActionController::TestCase
     project = project_administrator.projects.first
     policy = project.default_policy
 
-    sharing = {}
-    sharing[:sharing_scope] = Policy::EVERYONE
-    sharing["access_type_#{sharing[:sharing_scope]}"] = Policy::VISIBLE
-
-    assert_not_equal policy.sharing_scope, sharing[:sharing_scope]
-    assert_not_equal policy.access_type, sharing["access_type_#{sharing[:sharing_scope]}"]
+    assert_not_equal policy.access_type, Policy::VISIBLE
 
     login_as(project_administrator.user)
-    put :update, :id => project.id, :project => valid_project, :sharing => sharing
+    put :update, :id => project.id, :project => valid_project, policy_attributes: { access_type: Policy::VISIBLE }
     project.reload
     assert_redirected_to project
-    assert_not_equal project.default_policy.sharing_scope, sharing[:sharing_scope]
-    assert_not_equal project.default_policy.access_type, sharing["access_type_#{sharing[:sharing_scope]}"]
+    assert_not_equal project.default_policy.access_type, Policy::VISIBLE
   end
 
   test 'project administrator can not administer jerm detail' do

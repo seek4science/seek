@@ -247,7 +247,10 @@ module Seek
       end
 
       def is_gatekeeper_approval_required?(object)
-        params[:sharing] && params[:sharing][:sharing_scope].to_i == Policy::EVERYONE && object.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(object)
+        params[:policy_attributes] &&
+            params[:policy_attributes][:access_type].to_i > Policy::NO_ACCESS &&
+            object.gatekeeper_required? &&
+            !User.current_user.person.is_asset_gatekeeper_of?(object)
       end
 
       def was_item_unpublished?(object)

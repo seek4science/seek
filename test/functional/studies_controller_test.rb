@@ -148,7 +148,7 @@ class StudiesControllerTest < ActionController::TestCase
 
   test "should create" do
     assert_difference("Study.count") do
-      post :create,:study=>{:title=>"test",:investigation_id=>investigations(:metabolomics_investigation).id}, :sharing=>valid_sharing
+      post :create,:study=>{:title=>"test",:investigation_id=>investigations(:metabolomics_investigation).id}, policy_attributes: valid_sharing
 
     end
     s=assigns(:study)
@@ -160,14 +160,12 @@ class StudiesControllerTest < ActionController::TestCase
     s = Factory :study,:contributor => User.current_user.person, :policy => Factory(:public_policy)
     assert s.can_manage?(User.current_user),"This user should be able to manage this study"
     
-    assert_equal Policy::MANAGING,s.policy.sharing_scope
     assert_equal Policy::EVERYONE,s.policy.access_type
 
-    put :update,:id=>s,:study=>{},:sharing=>{"access_type_#{Policy::NO_ACCESS}"=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
+    put :update,:id=>s,:study=>{}, policy_attributes: { access_type: Policy::NO_ACCESS }
     s=assigns(:study)
     assert_response :redirect
     s.reload
-    assert_equal Policy::PRIVATE,s.policy.sharing_scope
     assert_equal Policy::NO_ACCESS,s.policy.access_type
   end
 
@@ -176,14 +174,12 @@ class StudiesControllerTest < ActionController::TestCase
     s = Factory :study,:contributor => Factory(:person), :policy => Factory(:public_policy)
     assert s.can_manage?(User.current_user),"This user should be able to manage this study"
 
-    assert_equal Policy::MANAGING, s.policy.sharing_scope
     assert_equal Policy::EVERYONE, s.policy.access_type
 
-    put :update,:id=>s,:study=>{},:sharing=>{"access_type_#{Policy::NO_ACCESS}"=>Policy::NO_ACCESS,:sharing_scope=>Policy::PRIVATE}
+    put :update,:id=>s,:study=>{}, policy_attributes: { access_type: Policy::NO_ACCESS }
     s=assigns(:study)
     assert_response :success
     s.reload
-    assert_equal Policy::MANAGING, s.policy.sharing_scope
     assert_equal Policy::EVERYONE, s.policy.access_type
   end
 
@@ -397,7 +393,6 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory(:study, :contributor => User.current_user.person,
                     :investigation => Factory(:investigation, :project_ids => [proj.id]),
                     :policy => Factory(:policy,
-                                       :sharing_scope => Policy::ALL_USERS,
                                        :access_type => Policy::NO_ACCESS,
                                        :permissions => [Factory(:permission, :contributor => proj, :access_type => Policy::EDITING)]))
     get :edit, :id => study.id

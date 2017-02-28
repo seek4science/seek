@@ -154,27 +154,30 @@ class StrainsControllerTest < ActionController::TestCase
   end
 
   test "should not be able to update the policy of the strain when having no manage rights" do
-    strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_USERS, :access_type => Policy::EDITING))
+    strain = Factory(:strain, :policy => Factory(:policy, :access_type => Policy::EDITING))
     user = Factory(:user)
     assert strain.can_edit? user
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, :id => strain.id, :sharing => {:sharing_scope => Policy::EVERYONE, :access_type_4 => Policy::EDITING}
+    put :update, :id => strain.id, policy_attributes: { access_type: Policy::MANAGING }
     assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
-    assert_equal Policy::ALL_USERS, updated_strain.policy.sharing_scope
+    assert_equal Policy::EDITING, updated_strain.policy.access_type
   end
 
   test "should not be able to update the permissions of the strain when having no manage rights" do
-    strain = Factory(:strain, :policy => Factory(:policy, :sharing_scope => Policy::ALL_USERS, :access_type => Policy::EDITING))
+    strain = Factory(:strain, :policy => Factory(:policy, :access_type => Policy::EDITING))
     user = Factory(:user)
     assert strain.can_edit? user
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, :id => strain.id, :sharing => {:permissions => {:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {user.person.id => {"access_type" => Policy::MANAGING}}})}}
+    put :update, :id => strain.id,
+        policy_attributes: { permissions_attributes: {
+            '1' => { contributor_type: 'Person', contributor_id: user.person.id, access_type: Policy::MANAGING }
+        } }
     assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
@@ -241,7 +244,7 @@ class StrainsControllerTest < ActionController::TestCase
     strain_in_gatekept_project = {:title => "Test", :project_ids => [Factory(:asset_gatekeeper).projects.first.id], :organism_id => Factory(:organism).id}
     assert_difference ('ResourcePublishLog.count') do
       assert_emails 1 do
-        post :create, :strain => strain_in_gatekept_project, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+        post :create, :strain => strain_in_gatekept_project, policy_attributes: { access_type: Policy::VISIBLE}
       end
     end
     publish_log = ResourcePublishLog.last

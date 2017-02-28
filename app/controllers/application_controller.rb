@@ -287,7 +287,7 @@ class ApplicationController < ActionController::Base
 
     if is_auth?(object, action)
       eval "@#{name} = object"
-      params.delete :sharing unless object.can_manage?(current_user)
+      params.delete :policy_attributes unless object.can_manage?(current_user)
     else
       respond_to do |format|
         format.html do

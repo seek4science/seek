@@ -4,18 +4,88 @@
 <%# - disable_project_select - selection should only be available on 'new' action, but not on 'edit'; this parameter has a default of "false" -%>
 
 <%
-   allow_nil ||= false
-   allow_all ||= Seek::Config.is_virtualliver
+  allow_nil ||= false
+  allow_all ||= Seek::Config.is_virtualliver
+  resource ||= nil
 
-   possibilities ||= allow_all  ? Project.all : (User.current_user.person.projects + resource.try(:projects)).uniq
+  selected_projects = resource ? resource.projects : []
+  possible_projects = allow_all ? Project.all : (User.current_user.person.projects + resource.try(:projects)).uniq
+  possible_projects = possible_projects - selected_projects
 
-   resource ||= nil
-   if resource       
-       selected_project_ids = [possibilities.first.id] if resource.new_record? && resource.errors.empty? && possibilities.count==1
-       selected_project_ids ||= resource.project_ids
-   else
-     selected_project_ids = []
-   end
+  possible_projects_json, selected_projects_json = [possible_projects, selected_projects].map do |projects|
+    projects.to_a.map { |p| { id: p.id, title: p.title }}.to_json
+  end
+
+  field_name = "#{resource.class.name.underscore}[project_ids][]"
+  title = 'Projects'
+  title += '<span class="required">*</span>'.html_safe unless allow_nil
+
+  object_type_text = resource.class.name.underscore.humanize
 %>
 
-<%= fancy_multiselect resource, :projects, :hidden=>false, :possibilities => possibilities, :selected => selected_project_ids, :required => (!allow_nil) %>
+<%= folding_panel(title, false, id: "add_projects_form",
+                  help_text: "Here you can associate the #{object_type_text} with specific projects.") do %>
+    <p class="help-block">
+      The following projects are associated with this <%= object_type_text -%>:
+    </p>
+    <div id="project-selector">
+      <%# The following line ensures that the parameter is always sent, even when nothing is selected.
+        It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
+        value of the parameter will be ["","1","2","3"]. This is compatible with the rails
+        association association_ids= methods, which reject 'blank' values automatically.%>
+      <%= hidden_field_tag field_name, '' %>
+      <div class="box_editing_inner">
+        <ul class="related_asset_list">
+          <span v-if="selected.length == 0" class="none_text">None</span>
+          <li v-for="(project, index) in selected">
+            <span :title="project.title">{{ project.title }}</span>
+            <a class="clickable remove-button" @click="remove(project, index)">
+              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </a>
+            <input type="hidden" name="<%= field_name -%>" v-model="project.id"/>
+          </li>
+        </ul>
+      </div>
+      <div class="association_step">
+        <div class="form-group">
+          <select autocomplete="off" class="form-control" id="projects-selector-select">
+            <option selected="selected">Select a project...</option>
+            <option v-for="project in possibilities" :value="project.id">{{ project.title }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+<% end %>
+<%= content_tag :script, possible_projects_json.html_safe, type: 'application/json', id: 'project-selector-possibilities-json' %>
+<%= content_tag :script, selected_projects_json.html_safe, type: 'application/json', id: 'project-selector-selected-json' %>
+
+<script>
+  Sharing.projectsSelector = new Vue({
+    el: '#project-selector',
+    data: {
+      possibilities: JSON.parse($j('#project-selector-possibilities-json').text()),
+      selected: JSON.parse($j('#project-selector-selected-json').text())
+    },
+    methods: {
+      remove: function (project, index) {
+        this.possibilities.push(project);
+        this.selected.splice(index, 1);
+        Sharing.removePermissionForProject(project);
+      }
+    }
+  });
+
+  $j(document).ready(function () {
+    $j('#projects-selector-select').change(function () {
+      if ($j(this).val()) {
+        for (var i = 0; i < Sharing.projectsSelector.possibilities.length; i++) {
+          if (Sharing.projectsSelector.possibilities[i].id == $j(this).val()) {
+            Sharing.projectsSelector.selected.push(Sharing.projectsSelector.possibilities[i]);
+            Sharing.addPermissionForProject(Sharing.projectsSelector.possibilities[i]);
+            Sharing.projectsSelector.possibilities.splice(i, 1);
+          }
+        }
+      }
+    })
+  });
+</script>

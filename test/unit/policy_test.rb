@@ -8,7 +8,6 @@ class PolicyTest < ActiveSupport::TestCase
     policy = policies(:download_for_all_sysmo_users_policy)
 
     copy = policy.deep_copy    
-    assert_equal policy.sharing_scope,copy.sharing_scope
     assert_equal policy.access_type,copy.access_type
     assert_equal policy.name,copy.name
     assert_not_equal policy.id,copy.id
@@ -28,17 +27,15 @@ class PolicyTest < ActiveSupport::TestCase
   
   test "private policy" do
     pol=Policy.private_policy
-    assert_equal Policy::PRIVATE, pol.sharing_scope
     assert_equal Policy::NO_ACCESS, pol.access_type
     assert !pol.use_whitelist
     assert !pol.use_blacklist
     assert pol.permissions.empty?
   end
 
-  test "default policy" do
-    with_config_value "is_virtualliver",false do
-      pol=Policy.default
-      assert_equal Policy::PRIVATE, pol.sharing_scope
+  test 'default policy is private' do
+    with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
+      pol = Policy.default
       assert_equal Policy::NO_ACCESS, pol.access_type
       assert !pol.use_whitelist
       assert !pol.use_blacklist
@@ -46,25 +43,24 @@ class PolicyTest < ActiveSupport::TestCase
     end
   end
 
-  test "default policy for virtual liver" do
-    with_config_value "is_virtualliver",true do
-      pol=Policy.default
-      assert_blank pol.sharing_scope
-      assert_blank pol.access_type
+  test 'default policy is accessible' do
+    with_config_value 'default_all_visitors_access_type', Policy::ACCESSIBLE do
+      pol = Policy.default
+      assert_equal Policy::ACCESSIBLE, pol.access_type
       assert !pol.use_whitelist
       assert !pol.use_blacklist
       assert pol.permissions.empty?
     end
   end
 
-  test "policy access type presedence" do
+  test "policy access type precedence" do
     assert Policy::NO_ACCESS < Policy::VISIBLE
     assert Policy::VISIBLE < Policy::ACCESSIBLE
     assert Policy::ACCESSIBLE < Policy::EDITING
     assert Policy::EDITING < Policy::MANAGING
   end
 
-  test "policy sharing scope presedence" do
+  test "policy sharing scope precedence" do
     assert Policy::PRIVATE < Policy::ALL_USERS
     assert Policy::ALL_USERS < Policy::EVERYONE
   end

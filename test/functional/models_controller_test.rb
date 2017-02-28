@@ -16,7 +16,6 @@ class ModelsControllerTest < ActionController::TestCase
 
   def rest_api_test_object
     @object=Factory :model_2_files, :contributor=>User.current_user, :policy=>Factory(:private_policy),:organism=>Factory(:organism)
-
   end
 
   test "should get index" do
@@ -112,7 +111,7 @@ class ModelsControllerTest < ActionController::TestCase
    
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :model => { :title=>"Test"},:content_blobs => [{:data_url=>uri.to_s}], :sharing=>valid_sharing
+        post :create, :model => { :title=>"Test"},:content_blobs => [{:data_url=>uri.to_s}], policy_attributes: valid_sharing
       end
     end
     assert_not_nil flash[:error]    
@@ -214,7 +213,7 @@ class ModelsControllerTest < ActionController::TestCase
     blob={:data_url=>"http://sdfsdfkh.com/sdfsd.png",:original_filename=>"",:make_local_copy=>"0"}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :model => model,:content_blobs => [blob], :sharing=>valid_sharing
+        post :create, :model => model,:content_blobs => [blob], policy_attributes: valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -224,7 +223,7 @@ class ModelsControllerTest < ActionController::TestCase
     model={:title=>"Test"}
     assert_no_difference('Model.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :model => model,:content_blobs => [{}], :sharing=>valid_sharing
+        post :create, :model => model,:content_blobs => [{}], policy_attributes: valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -257,7 +256,7 @@ class ModelsControllerTest < ActionController::TestCase
     model_params = valid_model
 
     assert_difference("Model.count") do
-      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:content_blobs => [{:data=>file_for_upload}], :sharing => valid_sharing
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:content_blobs => [{:data=>file_for_upload}], policy_attributes: valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m
@@ -278,7 +277,7 @@ class ModelsControllerTest < ActionController::TestCase
                           "{\"scale_id\":\"#{scale1.id}\",\"param\":\"soup\",\"unit\":\"minute\"}"]
 
     assert_difference("Model.count") do
-      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:scale_ids_and_params=>scale_ids_and_params,:content_blobs => [{:data=>file_for_upload}], :sharing => valid_sharing
+      post :create,:model => model_params,:scale_ids=>[scale1.id.to_s,scale2.id.to_s],:scale_ids_and_params=>scale_ids_and_params,:content_blobs => [{:data=>file_for_upload}], policy_attributes: valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m
@@ -304,12 +303,30 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assay = assays(:modelling_assay)
     assert_difference('Model.count') do
-      post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}], :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+      post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}], policy_attributes: valid_sharing, :assay_ids => [assay.id.to_s]
     end
     
     assert_redirected_to model_path(assigns(:model))
     assay.reload
     assert_includes assay.models, assigns(:model)
+  end
+
+  test 'missing sharing should default to private' do
+    with_config_value "default_all_visitors_access_type", Policy::NO_ACCESS do
+
+      assert_difference('Model.count',1) do
+        assert_difference('ContentBlob.count',1) do
+          post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}]
+
+        end
+      end
+
+      m = assigns(:model)
+      assert m.valid?
+      assert m.policy.valid?
+      assert_equal Policy::NO_ACCESS, m.policy.access_type
+      assert_blank m.policy.permissions
+    end
   end
 
   test "should create model with mixture of blobs" do
@@ -324,7 +341,7 @@ class ModelsControllerTest < ActionController::TestCase
     content_blob3 = {data_url:'http://fair-dom.org/piccy.png',original_filename:'',make_local_copy:'0'}
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count',3) do
-        post :create, :model => { :title=>"Test Create",:project_ids=>[project.id]},:content_blobs => [content_blob1,content_blob2,content_blob3], :sharing=>valid_sharing
+        post :create, :model => { :title=>"Test Create",:project_ids=>[project.id]},:content_blobs => [content_blob1,content_blob2,content_blob3], policy_attributes: valid_sharing
       end
     end
 
@@ -349,48 +366,11 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 'image/png',blob3.content_type
   end
 
-  def test_missing_sharing_should_default_to_blank_for_vln
-    with_config_value "is_virtualliver",true do
-      assert_no_difference('Model.count') do
-        assert_no_difference('ContentBlob.count') do
-          post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}]
-
-        end
-      end
-
-      m = assigns(:model)
-      assert !m.valid?
-      assert !m.policy.valid?
-      assert_blank m.policy.sharing_scope
-      assert_blank m.policy.access_type
-      assert_blank m.policy.permissions
-    end
-  end
-
-  def test_missing_sharing_should_default_to_private
-    with_config_value "is_virtualliver",false do
-      assert_difference('Model.count',1) do
-        assert_difference('ContentBlob.count',1) do
-          post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}]
-
-        end
-      end
-
-      m = assigns(:model)
-      assert m.valid?
-      assert m.policy.valid?
-      assert_equal Policy::PRIVATE, m.policy.sharing_scope
-      assert_equal Policy::NO_ACCESS, m.policy.access_type
-      assert_blank m.policy.permissions
-    end
-  end
-  
-
   test "should create model with image" do
       login_as(:model_owner)
       assert_difference('Model.count') do
         assert_difference('ModelImage.count') do
-          post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+          post :create, :model => valid_model,:content_blobs => [{:data=>file_for_upload}], policy_attributes: valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
         end
       end
 
@@ -404,7 +384,7 @@ class ModelsControllerTest < ActionController::TestCase
       login_as(:model_owner)
       assert_difference('Model.count') do
         assert_difference('ModelImage.count') do
-          post :create, :model => valid_model, :content_blobs => [], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+          post :create, :model => valid_model, :content_blobs => [], policy_attributes: valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
         end
       end
 
@@ -416,7 +396,7 @@ class ModelsControllerTest < ActionController::TestCase
   test "should not create model without image and without content_blob" do
       login_as(:model_owner)
       assert_no_difference('Model.count') do
-        post :create, :model => valid_model, :content_blobs => [], :sharing=>valid_sharing
+        post :create, :model => valid_model, :content_blobs => [], policy_attributes: valid_sharing
       end
       assert_not_nil flash[:error]
   end
@@ -455,7 +435,7 @@ class ModelsControllerTest < ActionController::TestCase
     model_details[:imported_url]="http://biomodels/model.xml"
 
     assert_difference('Model.count') do
-      post :create, :model => model_details, :sharing=>valid_sharing,:content_blobs => [{:data=>file_for_upload}], :sharing=>valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
+      post :create, :model => model_details, policy_attributes: valid_sharing,:content_blobs => [{:data=>file_for_upload}], policy_attributes: valid_sharing, :model_image => {:image_file => fixture_file_upload('files/file_picture.png', 'image/png')}
     end
     model = assigns(:model)
     assert_redirected_to model_path(model)
@@ -468,7 +448,7 @@ class ModelsControllerTest < ActionController::TestCase
     model,blob = valid_model_with_url
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model =>model ,:content_blobs => [blob], :sharing=>valid_sharing
+        post :create, :model =>model ,:content_blobs => [blob], policy_attributes: valid_sharing
       end
     end
     model = assigns(:model)
@@ -487,7 +467,7 @@ class ModelsControllerTest < ActionController::TestCase
     blob[:make_local_copy]="1"
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => model_details,:content_blobs => [blob], :sharing=>valid_sharing
+        post :create, :model => model_details,:content_blobs => [blob], policy_attributes: valid_sharing
       end
     end
     model = assigns(:model)
@@ -508,7 +488,7 @@ class ModelsControllerTest < ActionController::TestCase
     model,blob = valid_model_with_url
     assert_difference('Model.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :model => model,:content_blobs => [{:data_url=>"http://news.bbc.co.uk"}], :sharing=>valid_sharing
+        post :create, :model => model,:content_blobs => [{:data_url=>"http://news.bbc.co.uk"}], policy_attributes: valid_sharing
       end
     end
     model = assigns(:model)
@@ -526,7 +506,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model.count') do
       model=valid_model
       model[:recommended_environment_id]=recommended_model_environments(:jws).id
-      post :create, :model => model,:content_blobs => [{:data=>file_for_upload} ],:sharing=>valid_sharing
+      post :create, :model => model,:content_blobs => [{:data=>file_for_upload} ],policy_attributes: valid_sharing
     end
     
     m=assigns(:model)
@@ -751,7 +731,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.can_edit?(user), "sop should be editable but not manageable for this test"
     assert !model.can_manage?(user), "sop should be editable but not manageable for this test"
     assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
-    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_USERS, "access_type_#{Policy::ALL_USERS}"=>Policy::NO_ACCESS}
+    put :update, :id => model, :model => {:title=>"new title"}, policy_attributes: { access_type: Policy::NO_ACCESS }
     assert_redirected_to model_path(model)
     model.reload
 
@@ -767,7 +747,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.can_edit?(user), "sop should be editable and manageable for this test"
     assert model.can_manage?(user), "sop should be editable and manageable for this test"
     assert_equal Policy::EDITING, model.policy.access_type, "data file should have an initial policy with access type for editing"
-    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_USERS, "access_type_#{Policy::ALL_USERS}"=>Policy::NO_ACCESS}
+    put :update, :id => model, :model => {:title=>"new title"}, policy_attributes: { access_type: Policy::NO_ACCESS }
     assert_redirected_to model_path(model)
     model.reload
     assert_equal "new title", model.title
@@ -776,13 +756,12 @@ class ModelsControllerTest < ActionController::TestCase
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
     model={ :title=>"Test",:project_ids=>[projects(:moses_project).id]}
-    post :create, :model => model,:content_blobs => [{:data=>file_for_upload}], :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
+    post :create, :model => model,:content_blobs => [{:data=>file_for_upload}], policy_attributes: { access_type: Policy::VISIBLE }
     assert_redirected_to model_path(assigns(:model))
     assert_equal users(:model_owner),assigns(:model).contributor
     assert assigns(:model)
 
     model=assigns(:model)
-    assert_equal Policy::EVERYONE,model.policy.sharing_scope
     assert_equal Policy::VISIBLE,model.policy.access_type
     #check it doesn't create an error when retreiving the index
     get :index
@@ -796,12 +775,11 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.can_edit?(user), "model should be editable and manageable for this test"
     assert model.can_manage?(user), "model should be editable and manageable for this test"
     assert_equal Policy::NO_ACCESS, model.policy.access_type, "data file should have an initial policy with access type of no access"
-    put :update, :id => model, :model => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::EVERYONE, "access_type_#{Policy::EVERYONE}"=>Policy::VISIBLE}
+    put :update, :id => model, :model => {:title=>"new title"}, policy_attributes: { access_type: Policy::VISIBLE }
     assert_redirected_to model_path(model)
     model.reload
 
     assert_equal "new title", model.title
-    assert_equal Policy::EVERYONE, model.policy.sharing_scope, "policy should have been changed to everyone"
     assert_equal Policy::VISIBLE, model.policy.access_type, "policy should have been updated to visible"
   end
 
@@ -867,8 +845,8 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "do publish" do
-    model=models(:teusink_with_project_without_gatekeeper)
-    assert model.can_manage?,"The sop must be manageable for this test to succeed"
+    model = Factory(:model, contributor: users(:model_owner), policy: Factory(:private_policy))
+    assert model.can_manage?,"The model must be manageable for this test to succeed"
     post :publish,:id=>model
     assert_response :redirect
     assert_nil flash[:error]
@@ -876,9 +854,9 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "do not publish if not can_manage?" do
+    model = Factory(:model, contributor: users(:model_owner), policy: Factory(:private_policy))
     login_as(:quentin)
-    model=models(:teusink_with_project_without_gatekeeper)
-    assert !model.can_manage?,"The sop must not be manageable for this test to succeed"
+    assert !model.can_manage?,"The model must not be manageable for this test to succeed"
     post :publish,:id=>model
     assert_redirected_to :root
     assert_not_nil flash[:error]

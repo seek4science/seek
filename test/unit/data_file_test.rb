@@ -99,33 +99,16 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal [p], df.latest_version.projects
   end
 
-  def test_defaults_to_private_policy
-    df_hash = Factory.attributes_for(:data_file)
-    df_hash[:policy] = nil
-    df = DataFile.new(df_hash)
-    df.save!
-    df.reload
-    assert_not_nil df.policy
-    assert_equal Policy::PRIVATE, df.policy.sharing_scope
-    assert_equal Policy::NO_ACCESS, df.policy.access_type
-    assert !df.policy.use_whitelist
-    assert !df.policy.use_blacklist
-    assert df.policy.permissions.empty?
-  end
-
-  def test_defaults_to_blank_policy_for_vln
-    with_config_value 'is_virtualliver', true do
+  test 'policy defaults to system default' do
+    with_config_value 'default_all_visitors_access_type', Policy::ACCESSIBLE do
       df_hash = Factory.attributes_for(:data_file)
       df_hash[:policy] = nil
-      df = DataFile.new(df_hash)
-
-      assert !df.valid?
-      assert !df.policy.valid?
-      assert_blank df.policy.sharing_scope
-      assert_blank df.policy.access_type
-      assert !df.policy.use_whitelist
-      assert !df.policy.use_blacklist
-      assert_blank df.policy.permissions
+      df=DataFile.new(df_hash)
+      df.save!
+      df.reload
+      assert_not_nil df.policy
+      assert_equal Policy::ACCESSIBLE, df.policy.access_type
+      assert df.policy.permissions.empty?
     end
   end
 
@@ -198,7 +181,7 @@ class DataFileTest < ActiveSupport::TestCase
 
   test 'title_trimmed' do
     User.with_current_user Factory(:user) do
-      df = Factory :data_file, policy: Factory(:policy, sharing_scope: Policy::ALL_USERS, access_type: Policy::EDITING) # data_files(:picture)
+      df = Factory :data_file, policy: Factory(:policy, access_type: Policy::EDITING) # data_files(:picture)
       df.title = ' should be trimmed'
       df.save!
       assert_equal 'should be trimmed', df.title

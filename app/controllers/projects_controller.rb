@@ -42,7 +42,7 @@ class ProjectsController < ApplicationController
       #now select those with a policy set to downloadable to all-sysmo-users
       projects_shared  = projects_shared.select do |item|
         access_type = type.is_isa? ? Policy::VISIBLE : Policy::ACCESSIBLE
-        (item.policy.sharing_scope == Policy::ALL_USERS && item.policy.access_type == access_type)
+        item.policy.access_type == access_type
       end
       #just those shared with sysmo but NOT shared publicly
       @semi_public_assets[type]  = projects_shared  - @public_assets[type]
@@ -173,7 +173,7 @@ class ProjectsController < ApplicationController
     end
     @project = Project.new(params[:project])
 
-    @project.default_policy.set_attributes_with_sharing params[:sharing], [@project]
+    @project.default_policy.set_attributes_with_sharing(params[:policy_attributes])
 
 
 
@@ -200,7 +200,7 @@ class ProjectsController < ApplicationController
   # PUT /projects/1.xml
   def update
 
-    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing params[:sharing], [@project] if params[:sharing]
+    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
     begin
       respond_to do |format|
@@ -368,7 +368,7 @@ class ProjectsController < ApplicationController
   end
 
   def auth_params
-    restricted_params={:sharing => User.admin_logged_in?,
+    restricted_params={:policy_attributes => User.admin_logged_in?,
                        :site_root_uri => User.admin_logged_in?,
                        :site_username => User.admin_logged_in?,
                        :site_password => User.admin_logged_in?,

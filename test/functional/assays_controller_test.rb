@@ -255,7 +255,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference("Assay.count") do
       post :create, :assay=>{:title=>"test",
                              :study_id=>studies(:metabolomics_study).id,
-                             :assay_class_id=>assay_classes(:modelling_assay_class).id}, :sharing => valid_sharing
+                             :assay_class_id=>assay_classes(:modelling_assay_class).id}, :policy_attributes => valid_sharing
     end
 
     assay = assigns(:assay)
@@ -270,7 +270,7 @@ class AssaysControllerTest < ActionController::TestCase
       post :create, :assay=>{:title=>"test",
                              :study_id=>studies(:metabolomics_study).id,
                              :assay_class_id=>assay_classes(:modelling_assay_class).id},
-           :assay_organism_ids => [organism.id, strain.title,strain.id, growth_type.title].join(","), :sharing => valid_sharing
+           :assay_organism_ids => [organism.id, strain.title,strain.id, growth_type.title].join(","), :policy_attributes => valid_sharing
     end
     a=assigns(:assay)
     assert_equal 1, a.assay_organisms.count
@@ -288,7 +288,7 @@ class AssaysControllerTest < ActionController::TestCase
                                :assay_type_uri=>"http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics",
                                :study_id => Factory(:study).id,
                                :assay_class_id => Factory(:experimental_assay_class).id},
-           :sharing => valid_sharing
+           :policy_attributes => valid_sharing
     end
     assert assigns(:assay)
     assay = assigns(:assay)
@@ -307,7 +307,7 @@ class AssaysControllerTest < ActionController::TestCase
                                :assay_type_uri=>assay_type.uri,
                                :study_id => Factory(:study).id,
                                :assay_class_id => Factory(:experimental_assay_class).id},
-           :sharing => valid_sharing
+           :policy_attributes => valid_sharing
     end
     assert assigns(:assay)
     assay = assigns(:assay)
@@ -328,7 +328,7 @@ class AssaysControllerTest < ActionController::TestCase
                              :technology_type_uri=>tech_type.uri,
                              :assay_type_uri=>assay_type.uri
                              },
-         :sharing => valid_sharing
+         :policy_attributes => valid_sharing
 
     assay.reload
     assert_equal assay_type,assay.suggested_assay_type
@@ -716,7 +716,7 @@ class AssaysControllerTest < ActionController::TestCase
               :assay_type_uri=>"http://some-uri#assay",
               :study_id=>studies(:metabolomics_study).id,
               :assay_class_id=>assay_classes(:modelling_assay_class).id
-          }, :sharing => valid_sharing ,
+          }, :policy_attributes => valid_sharing ,
                :assay_sop_ids=>["#{sop.id}"],
                :model_ids=>["#{model.id}"],
                :data_files=>[{id: datafile.id, relationship_type: rel.id}]
@@ -764,7 +764,7 @@ class AssaysControllerTest < ActionController::TestCase
                :model_ids=>["#{model.id}"],
                :data_files=>[{id: df.id, relationship_type: rel.id}],
                :related_publication_ids=>["#{pub.id}"],
-               :sharing => valid_sharing # default policy is nil in VLN
+               :policy_attributes => valid_sharing # default policy is nil in VLN
           end
         end
       end
@@ -877,7 +877,6 @@ class AssaysControllerTest < ActionController::TestCase
     assay = Factory(:assay, :contributor => User.current_user.person,
                     :study => Factory(:study, :investigation => Factory(:investigation, :project_ids => [proj.id])),
                     :policy => Factory(:policy,
-                                       :sharing_scope => Policy::ALL_USERS,
                                        :access_type => Policy::NO_ACCESS,
                                        :permissions => [Factory(:permission, :contributor => proj, :access_type => Policy::EDITING)]))
     get :edit, :id => assay.id
@@ -885,18 +884,21 @@ class AssaysControllerTest < ActionController::TestCase
 
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     login_as(:quentin)
+    study = studies(:metabolomics_study)
+
     a = {:title=>"test",
-         :study_id=>studies(:metabolomics_study).id,
+         :study_id=>study.id,
          :assay_class_id=>assay_classes(:experimental_assay_class).id}
     assert_difference('ActivityLog.count') do
       assert_difference('Assay.count') do
-        post :create, :assay => a, :sharing=>{"access_type_#{Policy::ALL_USERS}"=>Policy::VISIBLE, :sharing_scope=>Policy::ALL_USERS, :your_proj_access_type => Policy::ACCESSIBLE}
+        post :create, :assay => a,
+             policy_attributes: { access_type: Policy::VISIBLE,
+                                  permissions_attributes: project_permissions(study.projects, Policy::ACCESSIBLE) }
       end
     end
 
     assay=assigns(:assay)
     assert_redirected_to assay_path(assay)
-    assert_equal Policy::ALL_USERS, assay.policy.sharing_scope
     assert_equal Policy::VISIBLE, assay.policy.access_type
     assert_equal assay.policy.permissions.count, 1
 
@@ -910,24 +912,25 @@ class AssaysControllerTest < ActionController::TestCase
 
   test "should update sharing permissions 'with your project and with all SysMO members'" do
     login_as Factory(:user)
+    study = Factory(:study, :investigation => (Factory(:investigation,
+                                                       :project_ids => [Factory(:project).id, Factory(:project).id])))
     assay= Factory(:assay,
                    :policy => Factory(:private_policy),
                    :contributor => User.current_user.person,
-                   :study => (Factory(:study, :investigation => (Factory(:investigation,
-                                                                         :project_ids => [Factory(:project).id, Factory(:project).id])))))
+                   :study => study)
 
     assert assay.can_manage?
-    assert_equal Policy::PRIVATE, assay.policy.sharing_scope
     assert_equal Policy::NO_ACCESS, assay.policy.access_type
     assert assay.policy.permissions.empty?
 
     assert_difference('ActivityLog.count') do
-      put :update, :id => assay, :assay => {}, :sharing => {"access_type_#{Policy::ALL_USERS}"=>Policy::ACCESSIBLE, :sharing_scope => Policy::ALL_USERS, :your_proj_access_type => Policy::EDITING}
+      put :update, :id => assay, :assay => {},
+          policy_attributes: { access_type: Policy::ACCESSIBLE,
+                               permissions_attributes: project_permissions(study.projects, Policy::EDITING) }
     end
 
     assay.reload
     assert_redirected_to assay_path(assay)
-    assert_equal Policy::ALL_USERS, assay.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE, assay.policy.access_type
     assert_equal 2, assay.policy.permissions.length
 

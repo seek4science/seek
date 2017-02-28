@@ -44,7 +44,7 @@
     <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
 <% end %>
 
-<%= render :seek_partial=>"assets/sharing_form" if @study.can_manage? -%>
+<%= render :seek_partial=>"sharing/form" if @study.can_manage? -%>
 
 <%= render :partial => "assets/associate_publication", :locals => { :resource_type => t('study'),
                                                                         :related_publications => @study.publications} -%>

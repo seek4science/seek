@@ -19,7 +19,7 @@
     </div>
 
     <% unless @run.using_sweep_policy? || current_user.guest_project_member?%>
-        <%= render :seek_partial => "assets/sharing_form" -%>
+        <%= render :seek_partial => "sharing/form" -%>
     <% end %>
 
     <%= submit_tag 'Save', :class => 'btn btn-primary' -%>

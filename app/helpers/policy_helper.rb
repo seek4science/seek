@@ -1,64 +1,26 @@
 module PolicyHelper
   
-  def policy_selection_options policies = nil, resource = nil, access_type = nil
-    policies ||= [Policy::NO_ACCESS,Policy::VISIBLE,Policy::ACCESSIBLE,Policy::EDITING,Policy::MANAGING]
+  def policy_selection_options access_types = nil, resource = nil, selected_access_type = nil
+    access_types ||= [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING]
+
     unless resource.try(:is_downloadable?)
-      policies.delete(Policy::ACCESSIBLE)
-      if access_type == Policy::ACCESSIBLE
+      access_types.delete(Policy::ACCESSIBLE)
+
+      if selected_access_type == Policy::ACCESSIBLE
         #handle access_type = ACCESSIBLE, and !resource.is_downloadable?
         # In that case set access_type to VISIBLE
-        access_type = Policy::VISIBLE
+        selected_access_type = Policy::VISIBLE
       end
     end
-    options=""
-    policies.each do |policy|
-      options << "<option value='#{policy}' #{"selected='selected'" if access_type == policy}>#{Policy.get_access_type_wording(policy, resource.try(:is_downloadable?))} </option>"
-    end
-    options.html_safe
-  end
 
-  # return access_type of your project if this permission is available in the policy
-  def your_project_access_type policy = nil, resource = nil
-    unless policy.nil? or resource.nil? or !(policy.sharing_scope == Policy::ALL_USERS)
-      unless policy.permissions.empty?
-        my_project_ids = if resource.class == Project then [resource.id] else resource.project_ids end
-        my_project_perms = policy.permissions.select {|p| p.contributor_type == 'Project' and my_project_ids.include? p.contributor_id}
-        access_types = my_project_perms.map(&:access_type)
-        return access_types.first if access_types.all?{|acc| acc == access_types.first}
-      else
-        policy.access_type
-      end
-    end
-  end
-
-  #returns a message that there are additional advanced permissions for the resource outside of the provided scope, and if the policy matches the scope.
-  #if a resource has has Policy::ALL_USERS then it is concidered to have advanced permissions if it has permissions that includes contributors other than the associated projects
-  def additional_advanced_permissions_included resource,scope
-    if resource.respond_to?(:policy) && resource.policy && (resource.policy.sharing_scope == scope) && resource.has_advanced_permissions?
-      "<span class='additional_permissions'>there are also additional Advanced Permissions defined below</span>".html_safe
-    end
+    options_for_select(access_types.map { |t| [Policy.get_access_type_wording(t, resource.try(:is_downloadable?)), t] },
+                       selected_access_type)
   end
 
   def policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name)
     html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
     html << "<p class='private'>You keep this #{resource_name.humanize.downcase} private (only visible to you)</p>"
     html << process_permissions(permissions, resource_name)
-    html.html_safe
-  end
-
-  def policy_and_permissions_for_network_scope(policy, permissions, privileged_people, resource_name)
-    html =''
-
-    if policy.access_type != Policy::NO_ACCESS
-      html << "<h3>You will share this #{resource_name.humanize} with:</h3>"
-      html << "<p class='shared'>All the #{t('project')} members within the network can "
-      html << Policy.get_access_type_wording(policy.access_type, resource_name.camelize.constantize.new().try(:is_downloadable?)).downcase
-      html << "</p>"
-      html << process_permissions(permissions, resource_name, true)
-    else
-      html << process_permissions(permissions, resource_name)
-    end
-
     html.html_safe
   end
 
@@ -157,5 +119,33 @@ module PolicyHelper
       end
     end
 
+  end
+
+  def policy_json(policy, associated_projects)
+    project_ids = associated_projects.map(&:id)
+    hash = { access_type: policy.access_type }
+
+    hash[:permissions] = policy.permissions.map do |permission|
+      h = { id: permission.id,
+            access_type: permission.access_type,
+            contributor_id: permission.contributor_id,
+            contributor_type: permission.contributor_type,
+            index: permission.id }
+      if permission.contributor_type == "Project" && project_ids.include?(permission.contributor_id)
+        h[:mandatory] = true
+      end
+
+      if permission.contributor_type == "Person"
+        h[:title] = (permission.contributor.first_name + " " + permission.contributor.last_name)
+      elsif permission.contributor_type == "WorkGroup"
+        h[:title] = permission.contributor.project.title + " @ " + permission.contributor.institution.title
+      else
+        h[:title] = permission.contributor.title
+      end
+
+      h
+    end
+
+    hash.to_json.html_safe
   end
 end

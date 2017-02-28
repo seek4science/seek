@@ -37,14 +37,14 @@ investigation = Investigation.new(title: "Central Carbon Metabolism of Sulfolobu
                                  )
 investigation.projects = [project]
 investigation.contributor = guest_user
-investigation.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
+investigation.policy = Policy.create(name: 'default policy', access_type: 1)
 investigation.save
 puts "Seeded 1 investigation."
 
 study = Study.new(title: "Carbon loss at high T"
 )
 study.contributor = guest_user
-study.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
+study.policy = Policy.create(name: 'default policy', access_type: 1)
 study.investigation = investigation
 study.save
 puts "Seeded 1 study."
@@ -53,7 +53,7 @@ exp_assay = Assay.new(title: "Reconstituted system reference state",
                   description: "The four purified enzymes were incubated in assay buffer and consumption of 3PG and production of F6P were measured in time, together with GAP and DHAP concentrations."
 )
 exp_assay.owner = guest_person
-exp_assay.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
+exp_assay.policy = Policy.create(name: 'default policy', access_type: 1)
 exp_assay.study = study
 exp_assay.assay_class = AssayClass.first
 exp_assay.save
@@ -63,7 +63,7 @@ model_assay = Assay.new(title: "Model reconstituted system",
                    description: "Mathematical model for the reconstituted system with PGK, GAPDH, TPI and FBPAase."
 )
 model_assay.owner = guest_person
-model_assay.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
+model_assay.policy = Policy.create(name: 'default policy', access_type: 1)
 model_assay.study = study
 model_assay.assay_class = AssayClass.last
 model_assay.save
@@ -77,7 +77,7 @@ data_file1 = DataFile.new(title: "Metabolite concentrations during reconstituted
 data_file1.contributor = guest_user
 data_file1.projects = [project]
 relationship = RelationshipType.where(title: 'Validation data').first
-data_file1.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
+data_file1.policy = Policy.create(name: 'default policy', access_type: 1)
 data_file1.content_blob = ContentBlob.new(original_filename: 'ValidationReference.xlsx',
                                          content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 )
@@ -98,7 +98,7 @@ data_file2 = DataFile.new(title: "Model simulation and Exp data for reconstitute
 )
 data_file2.contributor = guest_user
 data_file2.projects = [project]
-data_file2.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
+data_file2.policy = Policy.create(name: 'default policy', access_type: 1)
 data_file2.content_blob = ContentBlob.new(original_filename: 'combinedPlot.jpg',
                                           content_type: 'image/jpeg'
 )
@@ -123,7 +123,7 @@ model.model_format = ModelFormat.find_by_title('SBML')
 model.contributor = guest_user
 model.projects = [project]
 model.assays = [model_assay]
-model.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
+model.policy = Policy.create(name: 'default policy', access_type: 1)
 model.model_type = ModelType.where(title: "Ordinary differential equations (ODE)").first
 model.model_format = ModelFormat.where(title: "SBML").first
 model.recommended_environment = RecommendedModelEnvironment.where(title: "JWS Online").first
@@ -164,7 +164,7 @@ sop = Sop.new(title: "Default title",
 sop.contributor = guest_user
 sop.projects = [project]
 sop.assays = [exp_assay]
-sop.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
+sop.policy = Policy.create(name: 'default policy', access_type: 1)
 sop.content_blob = ContentBlob.new(original_filename: 'test_sop.txt',
                                       content_type: 'text'
 )
@@ -189,7 +189,7 @@ publication = Publication.new(pubmed_id: "23865479",
 
 publication.contributor = guest_user
 publication.projects = [project]
-publication.policy = Policy.create(name: 'default policy', sharing_scope: 4, access_type: 1)
+publication.policy = Policy.create(name: 'default policy', access_type: 1)
 publication_author1 = PublicationAuthor.new(first_name: 'T.',
                                             last_name: 'Kouril',
                                             author_index: 1

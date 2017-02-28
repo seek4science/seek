@@ -1,0 +1,40 @@
+<%
+  object ||= resource_for_controller
+  policy ||= (object.policy || Policy.default)
+  resource_type = text_for_resource(object)
+%>
+
+<%= folding_panel('Sharing', false, id: 'sharing_form',
+                  help_text: "Here you can specify who can view, access and manage this #{resource_type}.") do %>
+    <div class="alert alert-info">
+        Here you can specify who can <b>view</b> the summary of<% if object.is_downloadable? %>,
+            <b>get</b> access to the content of,<% end %> and <b>edit</b> the <%= resource_type -%>.
+    </div>
+
+    <div class="table-responsive">
+      <permissions-table class="table table-bordered" id="permissions-table"
+                         :permissions="permissions" :public-permission="publicPermission">
+      </permissions-table>
+    </div>
+
+    <%= render partial: 'sharing/person_permission_modal', locals: { object: object } %>
+    <%= render partial: 'sharing/group_permission_modal', locals: { object: object } %>
+<% end %>
+
+<script>
+  var policy = <%= policy_json(policy, object.respond_to?(:projects) ? object.projects : []) -%>;
+  <%# A deep copy of the policy that is used in `Sharing.permissionsChanged` to check if it has been modified %>
+  var originalPolicy = $j.extend(true, {}, policy);
+
+  Sharing.permissionsTable = new Vue({
+    el: '#permissions-table',
+    data: {
+      publicPermission: {
+        access_type: policy.access_type, <%# Uses snake case because that's how rails returns the JSON %>
+        title: 'Public',
+        public: true,
+        mandatory: true },
+      permissions: policy.permissions
+    }
+  });
+</script>

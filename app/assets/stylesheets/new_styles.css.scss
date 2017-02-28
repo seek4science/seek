@@ -408,8 +408,7 @@ div.isa_graph {
   display: inline-block;
 }
 
-.sample-attribute .attribute-handle {
-}
+.sample-attribute .attribute-handle { }
 
 .sample-attribute .attribute-position .glyphicon {
   color: #fff;
@@ -467,4 +466,105 @@ img.avatar-corner-icon {
 
 .favouritable {
   display: inline-block;
+}
+
+.permissions-table {
+  width: auto;
+  border: none;
+
+  .name-column {
+    border: none;
+    width: 30%;
+  }
+
+  tbody > tr > td {
+    vertical-align: middle;
+    padding: 5px;
+  }
+
+  .permission-column.no-access, .privilege-cell.no-access {
+    border-left-width: 3px;
+    border-right-width: 3px;
+  }
+
+  .permission-column {
+    text-align: center;
+    width: 7em;
+    border-top: 1px solid #ddd !important;
+  }
+
+  .actions-column, .actions-cell {
+    border: none;
+    text-align: left;
+  }
+
+  .name-cell {
+    border-left: 1px solid #ddd;
+  }
+
+  .permission-row.mandatory {
+    .name-cell {
+      font-weight: bold;
+    }
+  }
+
+  .permission-row.hidden {
+    display: none;
+  }
+
+  .privilege-cell {
+    text-align: center;
+
+    &.enabled {
+      background-color: #c3e8b9;
+      background-image: url(asset-path("crystal_project/16x16/apps/clean.png", image));
+      background-position: center center;
+      background-repeat: no-repeat;
+
+      input {
+        display: none;
+      }
+
+      &:hover {
+        opacity: 0.7;
+      }
+    }
+
+    &.disabled {
+      background-image: linear-gradient(45deg,rgba(200,200,200,.15) 25%,transparent 25%,transparent 50%,rgba(200,200,200,.15) 50%,rgba(200,200,200,.15) 75%,transparent 75%,transparent);
+      background-size: 40px;
+      &:hover {
+        cursor: auto;
+      }
+
+      input {
+        display: none;
+      }
+    }
+
+    &.no-access {
+      &.enabled {
+        background-color: #ffc2c4;
+        background-image: url(asset-path("famfamfam_silk/cross.png", image));
+
+        &:hover {
+          opacity: 0.7;
+        }
+      }
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+a.remove-button {
+  text-decoration: none;
+  font-weight: bold;
+  vertical-align: text-top;
+  color: $brand-danger;
+  &:hover {
+    text-decoration: none;
+  }
 }

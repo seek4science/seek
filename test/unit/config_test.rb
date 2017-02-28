@@ -345,7 +345,9 @@ end
   end
 
   test 'default all visitors access permission is accessible' do
-    assert_equal Policy::ACCESSIBLE, Seek::Config.default_all_visitors_access_type
+    with_config_value :default_all_visitors_access_type, Policy::ACCESSIBLE do
+      assert_equal Policy::ACCESSIBLE, Seek::Config.default_all_visitors_access_type
+    end
   end
 
   test 'changing default_consortium_access_type' do

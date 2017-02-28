@@ -17,9 +17,9 @@ module TavernaPlayer
     def update
       @run.update_attributes(params[:run])
 
-      if params[:sharing]
+      if params[:policy_attributes]
         @run.policy_or_default
-        @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
+        @run.policy.set_attributes_with_sharing(params[:policy_attributes])
         @run.save
       end
 
@@ -35,7 +35,7 @@ module TavernaPlayer
       auth_workflow
       # Manually add projects of current user, as they aren't prompted for this information in the form
       @run.projects = @run.contributor.person.projects
-      @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
+      @run.policy.set_attributes_with_sharing(params[:policy_attributes])
 
       if @run.save
         flash[:notice] = "Run was successfully created."

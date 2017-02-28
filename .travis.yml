@@ -18,7 +18,7 @@ env:
   - SUITE="rake test:integration" DB_TYPE=mysql
   - SUITE="rspec spec" DB_TYPE=mysql
   - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
-  - SUITE="rake teaspoon" DB_TYPE=mysql DISPLAY=":99.0"
+  - SUITE="rake teaspoon" RAILS_ENV=test DB_TYPE=mysql
 
 before_script:
   - sh -e /etc/init.d/xvfb start

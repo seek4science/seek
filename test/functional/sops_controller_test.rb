@@ -8,6 +8,7 @@ class SopsControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
+  include HtmlHelper
 
   def setup
     login_as(:quentin)
@@ -68,7 +69,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "request file button visibility when logged in and out" do
 
-    sop = Factory :sop,:policy => Factory(:policy, :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+    sop = Factory :sop,:policy => Factory(:policy, :access_type => Policy::VISIBLE)
 
     assert !sop.can_download?, "The SOP must not be downloadable for this test to succeed"
 
@@ -94,7 +95,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => {:title=>"Test"},:content_blobs => [{:data_url=>uri.to_s}], :sharing=>valid_sharing
+        post :create, :sop => {:title=>"Test"},:content_blobs => [{:data_url=>uri.to_s}], policy_attributes: valid_sharing
       end
     end
     assert_not_nil flash[:error]
@@ -143,7 +144,7 @@ class SopsControllerTest < ActionController::TestCase
     blob = {:data_url=>"http://sdfsdfds.com/sdf.png"}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => sop,:content_blobs => [blob], :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blobs => [blob], policy_attributes: valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -153,7 +154,7 @@ class SopsControllerTest < ActionController::TestCase
     blob={:data_url=>"s  df::sd:dfds.com/sdf.png"}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => sop,:content_blobs => [blob], :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blobs => [blob], policy_attributes: valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -163,7 +164,7 @@ class SopsControllerTest < ActionController::TestCase
     sop={:title=>"Test",:project_ids=>[projects(:sysmo_project).id]}
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, :sop => sop,:content_blobs => [{}], :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blobs => [{}], policy_attributes: valid_sharing
       end
     end
     assert_not_nil flash.now[:error]
@@ -198,7 +199,7 @@ class SopsControllerTest < ActionController::TestCase
     assay=assays(:assay_can_edit_by_my_first_sop_owner1)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => sop, :content_blobs => [blob], :sharing=>valid_sharing, :assay_ids => [assay.id.to_s]
+        post :create, :sop => sop, :content_blobs => [blob], policy_attributes: valid_sharing, :assay_ids => [assay.id.to_s]
       end
     end
 
@@ -213,28 +214,11 @@ class SopsControllerTest < ActionController::TestCase
     assert_includes assay.sops,assigns(:sop)
   end
 
-  def test_missing_sharing_should_not_default
-    sop,blob = valid_sop
-    with_config_value "is_virtualliver",true do
-      assert_no_difference('Sop.count') do
-        assert_no_difference('ContentBlob.count') do
-          post :create, :sop => sop,:content_blobs => [blob]
-
-        end
-      end
-      s = assigns(:sop)
-      assert !s.valid?
-      assert !s.policy.valid?
-      assert_blank s.policy.sharing_scope
-      assert_blank s.policy.access_type
-    end
-  end
-
   test "should create sop with url" do
     sop,blob = valid_sop_with_url
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => sop,:content_blobs => [blob], :sharing=>valid_sharing
+        post :create, :sop => sop,:content_blobs => [blob], policy_attributes: valid_sharing
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -251,7 +235,7 @@ class SopsControllerTest < ActionController::TestCase
     blob[:make_local_copy]="1"
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, :sop => sop_details,:content_blobs => [blob], :sharing=>valid_sharing
+        post :create, :sop => sop_details,:content_blobs => [blob], policy_attributes: valid_sharing
       end
     end
     assert_redirected_to sop_path(assigns(:sop))
@@ -294,7 +278,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_select "h1", :text=>/Editing #{I18n.t('sop')}/
 
     #this is to check the SOP is all upper case in the sharing form
-    assert_select "label",:text=>/Keep this #{I18n.t('sop')} private/i
+    assert_select "div.alert-info",:text=>/the #{I18n.t('sop')}/i
   end
 
   test "publications excluded in form for sops" do
@@ -310,7 +294,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should update sop" do
     login_as(:owner_of_my_first_sop)
-    put :update, :id => sops(:my_first_sop).id, :sop => {:title=>"Test2"}, :sharing=>valid_sharing
+    put :update, :id => sops(:my_first_sop).id, :sop => {:title=>"Test2"}, policy_attributes: valid_sharing
     assert_redirected_to sop_path(assigns(:sop))
   end
 
@@ -480,7 +464,7 @@ class SopsControllerTest < ActionController::TestCase
   def test_editing_doesnt_change_contributor
     login_as(:model_owner) #this user is a member of sysmo, and can edit this sop
     sop=sops(:sop_with_no_contributor)
-    put :update, :id => sop, :sop => {:title=>"blah blah blah"}, :sharing=>valid_sharing
+    put :update, :id => sop, :sop => {:title=>"blah blah blah"}, policy_attributes: valid_sharing
     updated_sop=assigns(:sop)
     assert_redirected_to sop_path(updated_sop)
     assert_equal "blah blah blah", updated_sop.title, "Title should have been updated"
@@ -533,22 +517,21 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?(user), "sop should be editable but not manageable for this test"
     assert !sop.can_manage?(user), "sop should be editable but not manageable for this test"
     assert_equal Policy::EDITING, sop.policy.access_type, "data file should have an initial policy with access type for editing"
-    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_USERS, "access_type_#{Policy::ALL_USERS}"=>Policy::NO_ACCESS}
+    put :update, :id => sop, :sop => {:title=>"new title"}, :policy_attributes => { :access_type => Policy::NO_ACCESS }
     assert_redirected_to sop_path(sop)
     sop.reload
 
     assert_equal "new title", sop.title
     assert_equal Policy::EDITING, sop.policy.access_type, "policy should not have been updated"
-
   end
 
   test "owner should be able to update sharing" do
     user = Factory(:user)
     login_as(user)
 
-    sop = Factory :sop, :contributor => User.current_user, :policy => Factory(:policy, :sharing_scope => Policy::ALL_USERS, :access_type => Policy::EDITING)
+    sop = Factory :sop, :contributor => User.current_user, :policy => Factory(:policy, :access_type => Policy::EDITING)
 
-    put :update, :id => sop, :sop => {:title=>"new title"}, :sharing=>{:use_whitelist=>"0", :user_blacklist=>"0", :sharing_scope =>Policy::ALL_USERS, "access_type_#{Policy::ALL_USERS}"=>Policy::NO_ACCESS}
+    put :update, :id => sop, :sop => { :title => "new title" }, :policy_attributes => { :access_type => Policy::NO_ACCESS }
     assert_redirected_to sop_path(sop)
     sop.reload
 
@@ -621,16 +604,15 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
-  test "should set the policy to sysmo_and_projects if the item is requested to be published, when creating new sop" do
+  test "should set the policy to projects_policy if the item is requested to be published, when creating new sop" do
     as_not_virtualliver do
       gatekeeper = Factory(:asset_gatekeeper)
     post :create, :sop => {:title => 'test', :project_ids => gatekeeper.projects.collect(&:id)},:content_blobs => [{:data => file_for_upload}],
-         :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+         :policy_attributes => { :access_type => Policy::VISIBLE }
       sop = assigns(:sop)
       assert_redirected_to (sop)
       policy = sop.policy
-      assert_equal Policy::ALL_USERS, policy.sharing_scope
-      assert_equal Policy::VISIBLE, policy.access_type
+      assert_equal Policy::NO_ACCESS, policy.access_type
       assert_equal 1, policy.permissions.count
       assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
       assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
@@ -639,11 +621,11 @@ class SopsControllerTest < ActionController::TestCase
 
   test "should not change the policy if the item is requested to be published, when managing sop" do
       gatekeeper = Factory(:asset_gatekeeper)
-      policy = Factory(:policy, :sharing_scope => Policy::PRIVATE, :permissions => [Factory(:permission)])
+      policy = Factory(:policy, :access_type => Policy::NO_ACCESS, :permissions => [Factory(:permission)])
       sop = Factory(:sop, :project_ids => gatekeeper.projects.collect(&:id), :policy => policy)
       login_as(sop.contributor)
       assert sop.can_manage?
-      put :update, :id => sop.id, :sop =>{}, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :sop =>{}, :policy_attributes => { :access_type => Policy::VISIBLE }
       sop = assigns(:sop)
       assert_redirected_to(sop)
       updated_policy = sop.policy
@@ -696,7 +678,7 @@ class SopsControllerTest < ActionController::TestCase
     sop,blob = valid_sop
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop.count', 1) do
-        post :create, :sop => sop,:content_blobs => [blob], :sharing => valid_sharing
+        post :create, :sop => sop,:content_blobs => [blob], :policy_attributes => valid_sharing
       end
     end
     al1= ActivityLog.last
@@ -725,7 +707,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should not create duplication sop_versions_projects when uploading sop' do
     sop,blob = valid_sop
-    post :create, :sop => sop,:content_blobs => [blob], :sharing => valid_sharing
+    post :create, :sop => sop,:content_blobs => [blob], :policy_attributes => valid_sharing
 
     sop = assigns(:sop)
     assert_equal 1, sop.versions.count
@@ -754,7 +736,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     assert sop.can_publish?
     assert_emails 1 do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :policy_attributes => { :access_type => Policy::VISIBLE}
     end
   end
 
@@ -767,7 +749,7 @@ class SopsControllerTest < ActionController::TestCase
     assert !sop.is_published?
     assert sop.can_publish?
     assert_emails 0 do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :policy_attributes => { :access_type => Policy::VISIBLE}
     end
   end
 
@@ -780,11 +762,11 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_publish?
     #send the first time
     assert_emails 1 do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :policy_attributes => { :access_type => Policy::VISIBLE}
     end
     #dont send again
     assert_emails 0 do
-      put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::EVERYONE, "access_type_#{Policy::EVERYONE}" => Policy::VISIBLE}
+      put :update, :id => sop.id, :policy_attributes => { :access_type => Policy::VISIBLE}
     end
   end
 
@@ -797,25 +779,25 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory :sop, :contributor => User.current_user, :policy => policy
     assert sop.can_manage?
 
-    put :update, :id => sop.id, :sharing => {:sharing_scope => Policy::PRIVATE,
-                                             "access_type_#{Policy::PRIVATE}" => Policy::NO_ACCESS,
-                                             :permissions =>{:contributor_types => ActiveSupport::JSON.encode(['Person']), :values => ActiveSupport::JSON.encode({"Person" => {a_person.id =>  {"access_type" =>  Policy::MANAGING}}})}
-                                            }
+    put :update, :id => sop.id, :policy_attributes => { :access_type => Policy::NO_ACCESS,
+                                             :permissions_attributes => { '1' => { :contributor_type => 'Person',
+                                                                           :contributor_id => a_person.id,
+                                                                           :access_type => Policy::MANAGING }}
+    }
 
     assert_redirected_to sop
     assert_equal 1, sop.reload.policy.permissions.count
   end
 
-  test "should not loose project assignment when an asset is managed by a person from different project" do
+  test "should not lose project assignment when an asset is managed by a person from different project" do
     sop = Factory :sop, :contributor => User.current_user
     assert_not_equal sop.projects.first, User.current_user.person.projects.first
 
     get :edit, :id => sop
     assert_response :success
 
-    assert_select "select#sop_project_ids" do
-      assert_select "option[selected=selected][value=?]", sop.projects.first.id, :count => 1
-    end
+    selected = JSON.parse(select_node_contents('#project-selector-selected-json'))
+    assert_equal selected.first['id'], sop.projects.first.id
   end
 
   test "should show tags box according to config" do

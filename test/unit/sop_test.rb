@@ -65,31 +65,14 @@ class SopTest < ActiveSupport::TestCase
     assert sop_versions(:my_first_sop_v1).use_mime_type_for_avatar?
   end
 
-  def test_defaults_to_private_policy
-    with_config_value "is_virtualliver",false do
+  test 'policy defaults to system default' do
+    with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
       sop=Sop.new Factory.attributes_for(:sop,:policy=>nil)
       sop.save!
       sop.reload
       assert sop.valid?
       assert sop.policy.valid?
-      assert_equal Policy::PRIVATE, sop.policy.sharing_scope
       assert_equal Policy::NO_ACCESS, sop.policy.access_type
-      assert !sop.policy.use_whitelist
-      assert !sop.policy.use_blacklist
-      assert_blank sop.policy.permissions
-    end
-  end
-
-  def test_defaults_to_blank_policy_for_vln
-    with_config_value "is_virtualliver",true do
-      sop=Sop.new Factory.attributes_for(:sop,:policy=>nil)
-      sop.save
-      assert !sop.valid?
-      assert !sop.policy.valid?
-      assert_blank sop.policy.sharing_scope
-      assert_blank sop.policy.access_type
-      assert !sop.policy.use_whitelist
-      assert !sop.policy.use_blacklist
       assert_blank sop.policy.permissions
     end
   end

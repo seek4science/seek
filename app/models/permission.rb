@@ -3,7 +3,7 @@ class Permission < ActiveRecord::Base
   cattr_reader :precedence
 
   belongs_to :contributor, :polymorphic => true
-  belongs_to :policy
+  belongs_to :policy, :inverse_of => :permissions
 
   validates_presence_of :contributor
   validates_presence_of :policy

@@ -122,7 +122,6 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
       item = Factory(type_name.singularize.to_sym)
       if item.respond_to?(:policy)
         policy = item.policy
-        policy.sharing_scope = Policy::EVERYONE
         policy.access_type = Policy::VISIBLE
         policy.save
         item.reload

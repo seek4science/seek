@@ -135,7 +135,7 @@ class PublicationsController < ApplicationController
 
         #Create policy if not present (should be)
         if @publication.policy.nil?
-          @publication.policy = Policy.create(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+          @publication.policy = Policy.create(:name => "publication_policy", :access_type => Policy::VISIBLE)
           @publication.save
         end
         

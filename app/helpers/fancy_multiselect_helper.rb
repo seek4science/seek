@@ -69,7 +69,9 @@ module FancyMultiselectHelper
     onchange = options[:possibilities_options][:onchange] || ''
 
     collection_id = options[:name].to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
-    onchange += "addSelectedToFancy('#{collection_id}', $F('possible_#{collection_id}'));"
+    onchange += "addSelectedToFancy('#{collection_id}', $F('possible_#{collection_id}'), this"
+    onchange += ("," + options[:add_callback]) if options[:add_callback]
+    onchange += ");"
 
     # - AjaxPreview
     unless options[:preview_disabled]
