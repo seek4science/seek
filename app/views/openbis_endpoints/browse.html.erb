@@ -1,32 +1,22 @@
-<p>
-  <%= image(:openbis, :width=>'75px') %>
-</p>
-Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_select(@openbis_endpoints,:id,:title),id:'select-endpoints',class:'form-control' %>
+<%= render(partial: 'waiting_for_items_message') %>
 
-<div id="openbis-datasets">
+<p>
+  <%= image(:openbis, :width => '75px') %>
+</p>
+
+Select Endpoint: <%= select_tag :selected_endpoints, options_from_collection_for_select(@openbis_endpoints, :id, :title), id: 'select-endpoints', class: 'form-control' %>
+
 <div id="openbis-dataset-count">
 
 </div>
+<div id="openbis-datasets">
+  <div id="contents">
 
-<div id="contents">
-
-</div>
+  </div>
 </div>
 
 <script>
 
-  function fetchCountForSpace(spaceId) {
-    $j.ajax('<%= show_item_count_project_openbis_endpoints_path(@project) %>', {
-          data: {id: spaceId},
-          success: function (html) {
-              $j('#openbis-datasets #openbis-dataset-count').html(html);
-          },
-          beforeSend: function () {
-            $j('#openbis-datasets  #openbis-dataset-count').html('<%= image('spinner') %>');
-          }
-        }
-    );
-  }
 
   function fetchItemsForSpace(spaceId) {
     $j.ajax('<%= show_items_project_openbis_endpoints_path(@project) %>', {
@@ -35,7 +25,7 @@ Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_
             $j('#openbis-datasets #contents').html(html);
           },
           beforeSend: function () {
-            $j('#openbis-datasets #contents').html('<%= image('large_spinner') %>');
+            OpenBis.showBrowseWaitingMessage();
           }
         }
     );
@@ -45,15 +35,11 @@ Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_
   function endpointChanged() {
     var id = $j('#select-endpoints option:selected').val();
     if (id.trim()) {
-      $j('#contents').html('<%= image('large_spinner') %>');
-      fetchCountForSpace(id);
       fetchItemsForSpace(id);
     }
     else {
       $j('#contents').html('');
-      $j('#count').html('');
     }
-
   }
   ;
 
@@ -62,9 +48,9 @@ Select Endpoint: <%= select_tag :selected_endpoints,options_from_collection_for_
   });
 
   <% if @openbis_endpoints.any? %>
-    $j( document ).ready(function() {
-      endpointChanged();
-    });
+  $j(document).ready(function () {
+    endpointChanged();
+  });
   <% end %>
 
 </script>

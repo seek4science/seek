@@ -1,5 +1,9 @@
 var OpenBis = {
 
+    showBrowseWaitingMessage: function () {
+        $j('#openbis-datasets #contents').html($j('#waiting-for-items').clone().show());
+    },
+
     showFiles: function () {
         var permId = $j(this).data('perm-id');
         var endpointId = $j(this).data('endpoint-id');
@@ -31,12 +35,10 @@ var OpenBis = {
                         $j('#openbis-datasets #contents').html(html);
                     },
                     beforeSend: function () {
-                        $j('#openbis-datasets #contents').html("<span class='large_spinner'></span>");
+                        OpenBis.showBrowseWaitingMessage();
                     }
                 }
             );
-            //FIXME: this will possible happen before, or even during, the cache being cleared
-            fetchCountForSpace(endpointId);
         }
     }
 
