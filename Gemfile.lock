@@ -137,7 +137,7 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
-  revision: 8d2f7be73d3cee85cba320c5eeded49cfb65a3db
+  revision: 27935d07ad41a250bad814cc4c4f1f6d66d387a9
   specs:
     doi_query_tool (1.0.0)
       libxml-ruby (>= 2.6.0)
@@ -368,7 +368,7 @@ GEM
     kgio (2.9.3)
     latex-decode (0.2.2)
       unicode (~> 0.4)
-    libxml-ruby (2.9.0)
+    libxml-ruby (2.8.0)
     link_header (0.0.8)
     linkeddata (1.1.11)
       equivalent-xml (~> 0.5)
@@ -873,7 +873,7 @@ DEPENDENCIES
   in_place_editing
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
-  libxml-ruby (>= 2.6.0)
+  libxml-ruby (~> 2.8.0)
   linkeddata
   lograge
   magic_lamp
@@ -958,4 +958,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.13.7
+   1.14.3
