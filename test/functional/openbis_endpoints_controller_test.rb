@@ -127,7 +127,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     disable_authorization_checks do
       @project.update_attributes(default_license: 'wibble')
     end
-    endpoint = Factory(:openbis_endpoint, project: @project)
+    endpoint = Factory(:openbis_endpoint, project: @project,policy:Factory(:private_policy,permissions:[Factory(:permission, contributor:@project)]))
     perm_id = '20160210130454955-23'
     login_as(@project_administrator)
     assert_difference('DataFile.count') do
@@ -138,6 +138,13 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     assert_redirected_to data_file
     assert_equal '20160210130454955-23', data_file.content_blob.openbis_dataset.perm_id
     assert_equal 'wibble', data_file.license
+
+    refute_equal data_file.policy, endpoint.policy
+    assert_equal endpoint.policy.access_type,data_file.policy.access_type
+    assert_equal 1,data_file.policy.permissions.length
+    permission=data_file.policy.permissions.first
+    assert_equal @project,permission.contributor
+    assert_equal Policy::NO_ACCESS,permission.access_type
   end
 
   test 'add dataset permissions' do

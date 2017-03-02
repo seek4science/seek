@@ -166,7 +166,9 @@ class DataFile < ActiveRecord::Base
   #creates a new DataFile that registers an openBIS dataset
   def self.build_from_openbis(openbis_endpoint,dataset_perm_id)
     dataset = Seek::Openbis::Dataset.new(openbis_endpoint,dataset_perm_id)
-    dataset.create_seek_datafile
+    df=dataset.create_seek_datafile
+    df.policy=openbis_endpoint.policy.deep_copy
+    df
   end
 
   #indicates that this is an openBIS based DataFile
