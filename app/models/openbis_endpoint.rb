@@ -1,16 +1,18 @@
 # represents the details to connect to an openbis space
 class OpenbisEndpoint < ActiveRecord::Base
   belongs_to :project
+  belongs_to :policy, autosave: true
 
   validates :as_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :dss_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :web_endpoint, url: { allow_nil: true, allow_blank: true }
-  validates :project, :as_endpoint, :dss_endpoint, :web_endpoint, :username, :password, :space_perm_id, :refresh_period_mins, presence: true
+  validates :project, :as_endpoint, :dss_endpoint, :web_endpoint, :username, :password, :space_perm_id, :refresh_period_mins, :policy, presence: true
   validates :refresh_period_mins, numericality: { greater_than_or_equal_to: 60 }
   validates :space_perm_id, uniqueness: { scope: [:dss_endpoint, :as_endpoint, :space_perm_id, :project_id], message: 'the endpoints and the space must be unique for this project' }
 
   after_create :create_refresh_cache_job
   after_destroy :clear_cache, :remove_refresh_cache_job
+  after_initialize :default_policy, autosave: true
 
   def self.can_create?
     User.logged_in_and_member? && User.current_user.is_admin_or_project_administrator? && Seek::Config.openbis_enabled
@@ -76,5 +78,13 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def associated_content_blobs
     ContentBlob.for_openbis_endpoint(self)
+  end
+
+  def policy_or_default
+    self.policy = Policy.default unless policy
+  end
+
+  def default_policy
+    policy_or_default if new_record?
   end
 end

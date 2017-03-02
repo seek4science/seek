@@ -67,6 +67,9 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute endpoint.valid?
     endpoint.project=Factory(:project)
     assert endpoint.valid?
+
+    endpoint.policy=nil
+    refute endpoint.valid?
   end
 
   test 'default refresh period' do
@@ -85,6 +88,11 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute endpoint2.valid?
     endpoint2.dss_endpoint='http://fish.com'
     assert endpoint2.valid?
+  end
+
+  test 'default policy' do
+    endpoint = OpenbisEndpoint.new
+    refute_nil endpoint.policy
   end
 
   test 'link to project' do

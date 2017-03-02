@@ -46,6 +46,8 @@
 
     <%= content_tag(:button,type:'button',class:'btn btn-primary',id:'fetch-spaces-button'){"Fetch Spaces"} %>
 
+    <%= render :seek_partial => "sharing/form" %>
+
     <%= f.submit(@openbis_endpoint.new_record? ? "Add" : "Update",
                  disabled:true ,
                  class:'btn btn-primary',

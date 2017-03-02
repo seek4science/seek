@@ -900,7 +900,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay=assigns(:assay)
     assert_redirected_to assay_path(assay)
     assert_equal Policy::VISIBLE, assay.policy.access_type
-    assert_equal assay.policy.permissions.count, 1
+    assert_equal 1,assay.policy.permissions.count
 
     assay.policy.permissions.each do |permission|
       assert_equal permission.contributor_type, 'Project'
@@ -932,7 +932,7 @@ class AssaysControllerTest < ActionController::TestCase
     assay.reload
     assert_redirected_to assay_path(assay)
     assert_equal Policy::ACCESSIBLE, assay.policy.access_type
-    assert_equal 2, assay.policy.permissions.length
+    assert_equal 2, assay.policy.permissions.count
 
     assay.policy.permissions.each do |update_permission|
       assert_equal update_permission.contributor_type, 'Project'

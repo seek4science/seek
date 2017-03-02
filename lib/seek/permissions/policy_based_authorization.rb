@@ -19,7 +19,7 @@ module Seek
 
           include Seek::ProjectAssociation unless method_defined? :projects
 
-          belongs_to :policy, :autosave => true #, :required_access_to_owner => :manage
+          belongs_to :policy, :autosave => true
           enforce_required_access_for_owner :policy,:manage
 
           after_commit :check_to_queue_update_auth_table
@@ -353,9 +353,7 @@ module Seek
       end
 
       def policy_or_default
-        if self.policy.nil?
-          self.policy = default_policy
-        end
+        self.policy = default_policy unless self.policy
       end
 
       def policy_or_default_if_new

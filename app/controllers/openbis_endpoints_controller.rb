@@ -1,4 +1,6 @@
 class OpenbisEndpointsController < ApplicationController
+  include Seek::AssetsStandardControllerActions
+
   respond_to :html
 
   include Seek::DestroyHandling
@@ -28,8 +30,11 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def update
+    @openbis_endpoint.update_attributes(params[:openbis_endpoint])
+    update_sharing_policies @openbis_endpoint, params
+
     respond_with(@project, @openbis_endpoint) do |format|
-      if @openbis_endpoint.update_attributes(params[:openbis_endpoint])
+      if @openbis_endpoint.save
         flash[:notice] = 'The space was successfully updated.'
         format.html { redirect_to project_openbis_endpoints_path(@project) }
       end
@@ -49,6 +54,7 @@ class OpenbisEndpointsController < ApplicationController
 
   def create
     @openbis_endpoint = @project.openbis_endpoints.build(params[:openbis_endpoint])
+    update_sharing_policies @openbis_endpoint, params
     respond_with(@project, @openbis_endpoint) do |format|
       if @openbis_endpoint.save
         flash[:notice] = 'The space was successfully associated with the project.'

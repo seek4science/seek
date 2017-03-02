@@ -293,9 +293,15 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test "should update sop" do
-    login_as(:owner_of_my_first_sop)
-    put :update, :id => sops(:my_first_sop).id, :sop => {:title=>"Test2"}, policy_attributes: valid_sharing
-    assert_redirected_to sop_path(assigns(:sop))
+    login_as(person=Factory(:person))
+    sop = Factory(:sop,contributor:person)
+    assert_empty sop.policy.permissions
+    put :update, :id => sop.id, :sop => {:title=>"Test2"}, policy_attributes: { access_type: Policy::ACCESSIBLE,permissions_attributes: project_permissions(sop.projects, Policy::ACCESSIBLE) }
+    sop = assigns(:sop)
+    assert_redirected_to sop_path(sop)
+    assert_equal 'Test2',sop.title
+    assert_equal Policy::ACCESSIBLE,sop.policy.access_type
+    assert_equal 1,sop.policy.permissions.count
   end
 
 

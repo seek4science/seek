@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170215145129) do
+ActiveRecord::Schema.define(:version => 20170301154749) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -950,6 +950,7 @@ ActiveRecord::Schema.define(:version => 20170215145129) do
     t.string   "dss_endpoint"
     t.string   "web_endpoint"
     t.integer  "refresh_period_mins", :default => 120
+    t.integer  "policy_id"
   end
 
   create_table "organisms", :force => true do |t|

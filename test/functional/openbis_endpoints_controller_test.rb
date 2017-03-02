@@ -1,7 +1,10 @@
 require 'test_helper'
 require 'openbis_test_helper'
 
+include SharingFormTestHelper
+
 class OpenbisEndpointsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
 
   def setup
@@ -34,6 +37,90 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     end
 
     # other scenerios are covered in the unit tests for can_delete?
+  end
+
+  test 'create' do
+    login_as(@project_administrator)
+
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
+
+    assert_difference('OpenbisEndpoint.count') do
+      assert_difference('Delayed::Job.count') do
+        post :create, project_id: @project.id, openbis_endpoint:
+            {
+              as_endpoint: 'http://as.com',
+              dss_endpoint: 'http://dss.com',
+              web_endpoint: 'http://web.com',
+              username: 'fred',
+              password: 'secret',
+              refresh_period_mins: '123',
+              space_perm_id: 'space-id'
+            },
+                      policy_attributes: policy_attributes
+      end
+    end
+    assert assigns(:openbis_endpoint)
+    ep = assigns(:openbis_endpoint)
+    assert_equal 'http://as.com', ep.as_endpoint
+    assert_equal 'http://dss.com', ep.dss_endpoint
+    assert_equal 'http://web.com', ep.web_endpoint
+    assert_equal 'fred', ep.username
+    assert_equal 'secret', ep.password
+    assert_equal 123, ep.refresh_period_mins
+    assert_equal 'space-id', ep.space_perm_id
+
+    assert_equal Policy::ACCESSIBLE, ep.policy.access_type
+    assert_equal 1, ep.policy.permissions.count
+
+    ep.policy.permissions.each do |permission|
+      assert_equal permission.contributor_type, 'Project'
+      assert_equal @project.id, (permission.contributor_id)
+      assert_equal permission.policy_id, ep.policy_id
+      assert_equal permission.access_type, Policy::ACCESSIBLE
+    end
+  end
+
+  test 'update' do
+    login_as(@project_administrator)
+    ep = Factory(:openbis_endpoint, project: @project)
+    refute_equal Policy::ACCESSIBLE, ep.policy.access_type
+    assert_empty ep.policy.permissions
+
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
+
+    put :update, id: ep.id, project_id: @project.id, openbis_endpoint:
+        {
+          as_endpoint: 'http://as.com',
+          dss_endpoint: 'http://dss.com',
+          web_endpoint: 'http://web.com',
+          username: 'fred',
+          password: 'secret',
+          refresh_period_mins: '123',
+          space_perm_id: 'space-id'
+        },
+                 policy_attributes: policy_attributes
+
+    assert assigns(:openbis_endpoint)
+    ep = assigns(:openbis_endpoint)
+    assert_equal 'http://as.com', ep.as_endpoint
+    assert_equal 'http://dss.com', ep.dss_endpoint
+    assert_equal 'http://web.com', ep.web_endpoint
+    assert_equal 'fred', ep.username
+    assert_equal 'secret', ep.password
+    assert_equal 123, ep.refresh_period_mins
+    assert_equal 'space-id', ep.space_perm_id
+
+    assert_equal Policy::ACCESSIBLE, ep.policy.access_type
+    assert_equal 1, ep.policy.permissions.count
+
+    ep.policy.permissions.each do |permission|
+      assert_equal permission.contributor_type, 'Project'
+      assert_equal @project.id, (permission.contributor_id)
+      assert_equal permission.policy_id, ep.policy_id
+      assert_equal permission.access_type, Policy::ACCESSIBLE
+    end
   end
 
   test 'add dataset' do
