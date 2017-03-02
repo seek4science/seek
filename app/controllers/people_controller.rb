@@ -70,22 +70,24 @@ class PeopleController < ApplicationController
     else
       @people = @people.select(&:can_view?).reject {|p| p.projects.empty?}
     end
-
+    options = {:is_collection=>true}
     respond_to do |format|
       format.html # index.html.erb
       format.xml
-      format.json  #{ render json: @people }
+      format.json  { render json: JSONAPI::Serializer.serialize(@people, options) }
     end
   end
 
   # GET /people/1
   # GET /people/1.xml
-  def show                
+  def show
+    options = {:is_collection=>false, :include=>['associated']}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render :template=>'rdf/show'}
       format.xml
-      format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@person).target!) }
+      format.json {render json: JSONAPI::Serializer.serialize(@person,options)}
+      #format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@person).target!) }
     end
   end
 

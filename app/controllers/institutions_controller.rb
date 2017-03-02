@@ -18,12 +18,14 @@ class InstitutionsController < ApplicationController
   # GET /institutions/1
   # GET /institutions/1.xml
   def show
+    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json #{ render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
-      #format.json { render json: @institution }
+      # format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
+      #format.json { render json: @institution } #normal json
+      format.json {render json: JSONAPI::Serializer.serialize(@institution,options)}
     end
   end
 
