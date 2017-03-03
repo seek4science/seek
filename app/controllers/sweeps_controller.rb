@@ -1,5 +1,7 @@
 class SweepsController < ApplicationController
 
+  include Seek::AssetsStandardControllerActions
+
   before_filter :workflows_enabled?
 
   skip_before_filter :restrict_guest_user, :only => :new
@@ -28,10 +30,7 @@ class SweepsController < ApplicationController
   def update
     @sweep.attributes = params[:sweep]
 
-    if params[:policy_attributes]
-      @sweep.policy_or_default
-      @sweep.policy.set_attributes_with_sharing(params[:policy_attributes])
-    end
+    update_sharing_policies @sweep, params
 
     if @sweep.save
       respond_to do |format|

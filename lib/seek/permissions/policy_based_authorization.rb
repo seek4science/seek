@@ -352,13 +352,9 @@ module Seek
         Policy.default
       end
 
-      def policy_or_default
-        self.policy = default_policy unless self.policy
-      end
-
       def policy_or_default_if_new
         if self.new_record?
-          policy_or_default
+          self.policy = default_policy unless self.policy
         end
       end
 

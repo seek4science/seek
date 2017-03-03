@@ -1,6 +1,7 @@
 module TavernaPlayer
   class RunsController < TavernaPlayer::ApplicationController
     include TavernaPlayer::Concerns::Controllers::RunsController
+    include Seek::AssetsStandardControllerActions
 
     before_filter :workflows_enabled?
 
@@ -17,11 +18,7 @@ module TavernaPlayer
     def update
       @run.update_attributes(params[:run])
 
-      if params[:policy_attributes]
-        @run.policy_or_default
-        @run.policy.set_attributes_with_sharing(params[:policy_attributes])
-        @run.save
-      end
+      update_sharing_policies @run, params
 
       respond_with(@run)
     end
