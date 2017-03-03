@@ -37,10 +37,12 @@ class PublicationsController < ApplicationController
   # GET /publications/1
   # GET /publications/1.xml
   def show
+    options = {:is_collection=>false, :include=>['associated']}
     respond_to do |format|
       format.html # show.html.erb
       format.xml
       format.rdf { render :template=>'rdf/show'}
+      format.json {render json: JSONAPI::Serializer.serialize(@publication,options)}
       format.any( *Publication::EXPORT_TYPES.keys ) { send_data @publication.export(request.format.to_sym), :type => request.format.to_sym, :filename => "#{@publication.title}.#{request.format.to_sym}" }
     end
   end
@@ -60,6 +62,14 @@ class PublicationsController < ApplicationController
   def edit
   end
 
+  def index
+    options = {:is_collection=>true}
+    respond_to do |format|
+      format.html
+      format.xml
+      format.json {render json: JSONAPI::Serializer.serialize(@publications,options)}
+    end
+  end
   # POST /publications
   # POST /publications.xml
   def create

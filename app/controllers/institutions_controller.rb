@@ -18,7 +18,7 @@ class InstitutionsController < ApplicationController
   # GET /institutions/1
   # GET /institutions/1.xml
   def show
-    options = {:is_collection=>false}
+    options = {:is_collection=>false, :include=>['associated']}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
@@ -97,13 +97,13 @@ class InstitutionsController < ApplicationController
   def request_all
     # listing all institutions is public data, but still
     # we require login to protect from unwanted requests
-
+    options = {:is_collection=>true}
     institution_id = white_list(params[:id])
     institution_list = Institution.get_all_institutions_listing
     respond_to do |format|
-      #format.json { render json: @Institution.all }
        format.json do
-         render json: { status: 200, institution_list: institution_list }
+         render json: JSONAPI::Serializer.serialize(institution_list, options)
+         #render json: { status: 200, institution_list: institution_list }
        end
     end
   end
