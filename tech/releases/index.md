@@ -7,6 +7,15 @@ layout: page
 
 Latest version - {{ site.current_seek_version }}
 
+## Version 1.2.2
+
+Release date: _March 3rd 2017_
+
+Fixes a couple of issues caused by some missing CSS (Stylesheet) elements related to Samples. Although minor this
+ affected some of the functional behaviour.
+  
+A full list of changes included in this release can be found in the [SEEK v1.2.2 release notes](release-notes-1.2.2.html).  
+
 ## Version 1.2.1
 
 Release date: _February 21st 2017_

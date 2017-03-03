@@ -39,7 +39,7 @@ You can also tell which version you have installed by looking at the
     patch: 2
 
 
-## Upgrading between patch versions (e.g. between 1.2.0 and 1.2.1) 
+## Upgrading between patch versions (e.g. between 1.2.0 and 1.2.2) 
 
 It should only be necessary to run *bundle install* and the *db:migrate* rake
 task. Using *seek:upgrade* should still work, but could take a lot of
@@ -65,16 +65,16 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull https://github.com/seek4science/seek.git
-    git checkout v1.2.1
+    git checkout v1.2.2
 
 ### Updating using the tarball
 
 Starting with version 0.22, we've started making SEEK available as a download.
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.2.1.tar.gz> You can
+<https://bitbucket.org/seek4science/seek/downloads/seek-1.2.2.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.2.1.tar.gz
+    tar zxvf seek-1.2.2.tar.gz
 
 and then copy across your existing filestore and database configuration file
 from your previous installation and continue with the upgrade steps. The
