@@ -90,7 +90,7 @@ module Seek
 
     def update_sharing_policies item, params
       if params[:policy_attributes]
-        item.policy_or_default
+        #item.policy_or_default
         item.policy.set_attributes_with_sharing(params[:policy_attributes])
       end
     end
