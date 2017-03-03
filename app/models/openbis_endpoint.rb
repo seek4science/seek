@@ -85,4 +85,9 @@ class OpenbisEndpoint < ActiveRecord::Base
   def default_policy
     self.policy = Policy.default if new_record? && policy.nil?
   end
+
+  #this is necessary for the sharing form to include the project by default
+  def projects
+    [project]
+  end
 end

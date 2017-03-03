@@ -22,6 +22,7 @@ class OpenbisEndpointsController < ApplicationController
   def new
     @openbis_endpoint = OpenbisEndpoint.new
     @openbis_endpoint.project = @project
+    @openbis_endpoint.policy.permissions.build(:contributor=>@project,access_type:Seek::Config.default_associated_projects_access_type)
     respond_with(@openbis_endpoint)
   end
 
