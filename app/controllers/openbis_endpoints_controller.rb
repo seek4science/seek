@@ -22,7 +22,7 @@ class OpenbisEndpointsController < ApplicationController
   def new
     @openbis_endpoint = OpenbisEndpoint.new
     @openbis_endpoint.project = @project
-    @openbis_endpoint.policy.permissions.build(:contributor=>@project,access_type:Seek::Config.default_associated_projects_access_type)
+    @openbis_endpoint.policy.permissions.build(contributor: @project, access_type: Seek::Config.default_associated_projects_access_type)
     respond_with(@openbis_endpoint)
   end
 
@@ -32,11 +32,14 @@ class OpenbisEndpointsController < ApplicationController
 
   def update
     @openbis_endpoint.update_attributes(params[:openbis_endpoint])
-    update_sharing_policies @openbis_endpoint, params
+    save_and_respond 'The space was successfully updated.'
+  end
 
+  def save_and_respond(flash_msg)
+    update_sharing_policies @openbis_endpoint, params
     respond_with(@project, @openbis_endpoint) do |format|
       if @openbis_endpoint.save
-        flash[:notice] = 'The space was successfully updated.'
+        flash[:notice] = flash_msg
         format.html { redirect_to project_openbis_endpoints_path(@project) }
       end
     end
@@ -55,13 +58,7 @@ class OpenbisEndpointsController < ApplicationController
 
   def create
     @openbis_endpoint = @project.openbis_endpoints.build(params[:openbis_endpoint])
-    update_sharing_policies @openbis_endpoint, params
-    respond_with(@project, @openbis_endpoint) do |format|
-      if @openbis_endpoint.save
-        flash[:notice] = 'The space was successfully associated with the project.'
-        format.html { redirect_to project_openbis_endpoints_path(@project) }
-      end
-    end
+    save_and_respond 'The space was successfully created.'
   end
 
   def refresh_browse_cache
