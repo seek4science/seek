@@ -98,7 +98,7 @@ module Seek
 
       def query_datastore_server_by_dataset_perm_id(perm_id = '')
         cached_query_by_perm_id(perm_id) do
-          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
+          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'DataSetPermID', attributeValue: perm_id)
         end
       end
 

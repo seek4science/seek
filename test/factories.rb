@@ -1345,7 +1345,7 @@ Factory.define(:openbis_endpoint) do |f|
   f.as_endpoint 'https://openbis-api.fair-dom.org/openbis/openbis'
   f.dss_endpoint 'https://openbis-api.fair-dom.org/datastore_server'
   f.web_endpoint 'https://openbis-api.fair-dom.org/openbis'
-  f.username 'fred'
+  f.username 'apiuser'
   f.password 'apiuser'
   f.space_perm_id 'API-SPACE'
   f.association :project, factory: :project
