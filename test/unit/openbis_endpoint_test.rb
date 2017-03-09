@@ -309,4 +309,25 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
   end
 
+  test 'encrypted password' do
+    endpoint = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
+                                   web_endpoint: 'http://my-openbis.org/openbis',
+                                   as_endpoint: 'http://my-openbis.org/openbis',
+                                   dss_endpoint: 'http://my-openbis.org/openbis',
+                                   space_perm_id: 'mmmm',
+                                   refresh_period_mins:60
+    assert_equal 'frog',endpoint.password
+    refute_nil endpoint.encrypted_password
+    refute_nil endpoint.encrypted_password_iv
+
+    disable_authorization_checks do
+      assert endpoint.save
+    end
+
+    endpoint=OpenbisEndpoint.find(endpoint.id)
+    assert_equal 'frog',endpoint.password
+    refute_nil endpoint.encrypted_password
+    refute_nil endpoint.encrypted_password_iv
+  end
+
 end

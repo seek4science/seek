@@ -57,6 +57,7 @@ gem 'lograge'
 gem 'psych'
 gem 'transaction_isolation'
 gem 'validate_url'
+gem "attr_encrypted", "~> 3.0.0"
 
 # gem for BiVeS and BudHat
 gem 'bives'

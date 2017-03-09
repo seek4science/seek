@@ -2,6 +2,7 @@
 class OpenbisEndpoint < ActiveRecord::Base
   belongs_to :project
   belongs_to :policy, autosave: true
+  attr_encrypted :password, key: :password_key
 
   validates :as_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :dss_endpoint, url: { allow_nil: true, allow_blank: true }
@@ -89,5 +90,9 @@ class OpenbisEndpoint < ActiveRecord::Base
   #this is necessary for the sharing form to include the project by default
   def projects
     [project]
+  end
+
+  def password_key
+    '1D8637107CDF55F3C779AA54BFAC707ED48B2EE00BC7F47661EED77FB9DD1102'
   end
 end
