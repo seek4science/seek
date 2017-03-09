@@ -49,7 +49,9 @@ class OpenbisEndpointsController < ApplicationController
     perm_id = params[:dataset_perm_id]
     fail 'No perm_id passed' unless perm_id
     @data_file = DataFile.build_from_openbis(@openbis_endpoint, params[:dataset_perm_id])
-    redirect_to @data_file
+    if @data_file.save
+      redirect_to @data_file
+    end
   end
 
   def browse

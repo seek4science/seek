@@ -135,6 +135,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       assert_nil flash[:error]
     end
     data_file = assigns(:data_file)
+    data_file=DataFile.find(data_file)
     assert_redirected_to data_file
     assert_equal '20160210130454955-23', data_file.content_blob.openbis_dataset.perm_id
     assert_equal 'wibble', data_file.license
