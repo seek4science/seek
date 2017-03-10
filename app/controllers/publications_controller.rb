@@ -63,7 +63,7 @@ class PublicationsController < ApplicationController
   end
 
   def index
-    options = {:is_collection=>true}
+    options = {:is_collection=>true, :jsonapi=>{version: "1.0"}, :meta=>{base_url: Seek::Config.site_base_host}
     respond_to do |format|
       format.html
       format.xml
