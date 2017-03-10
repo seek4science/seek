@@ -7,9 +7,10 @@ class PersonSerializer < BaseSerializer
   #   object.title.upcase
   # end
 
+  has_many :work_groups
   has_many :associated do
     #object.institutions
-    associated_resources(object)
+    associated_resources(object) # ||  { "data": [] }
   end
 
 end

@@ -4,7 +4,7 @@ class InstitutionSerializer < BaseSerializer
              :web_page, :avatars
 
   has_many :associated do
-    associated_resources(object)
+    associated_resources(object) # ||  { "data": [] }
   end
 end
 
