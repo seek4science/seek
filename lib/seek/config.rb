@@ -161,6 +161,20 @@ module Seek
       end
     end
 
+    def attr_encrypted_key_path
+      dir = append_filestore_path 'attr_encrypted'
+      File.join(dir,'key')
+    end
+
+    def attr_encrypted_key
+      if File.exists?(attr_encrypted_key_path)
+        File.read(attr_encrypted_key_path)
+      else
+        write_attr_encrypted_key
+        attr_encrypted_key
+      end
+    end
+
     def rdf_filestore_path
       append_filestore_path 'rdf'
     end
@@ -235,11 +249,13 @@ module Seek
       value
     end
 
+    #TODO: update to use attr_encrypted
     def datacite_password_decrypt
       datacite_password = Seek::Config.datacite_password
       decrypt_value(datacite_password)
     end
 
+    #TODO: update to use attr_encrypted
     def decrypt_value(value)
       unless value.blank?
         begin
@@ -251,6 +267,7 @@ module Seek
       end
     end
 
+    #TODO: update to use attr_encrypted
     def datacite_password_encrypt(password)
       unless password.blank?
         Seek::Config.datacite_password = encrypt(password, generate_key(GLOBAL_PASSPHRASE))
@@ -284,6 +301,12 @@ module Seek
 
     def host_scheme
       URI(Seek::Config.site_base_host).scheme
+    end
+
+    def write_attr_encrypted_key
+      File.open(attr_encrypted_key_path,'w') do |f|
+        f << OpenSSL::Cipher::Cipher.new("AES-256-CBC").random_key.unpack('H*').first
+      end
     end
 
   end

@@ -464,4 +464,15 @@ end
       end
     end
   end
+
+  test 'attr encrypted key' do
+    assert_equal "#{Rails.root}/tmp/testing-filestore/attr_encrypted/key",Seek::Config.attr_encrypted_key_path
+    FileUtils.rm(Seek::Config.attr_encrypted_key_path) if File.exist?(Seek::Config.attr_encrypted_key_path)
+    refute_nil key=Seek::Config.attr_encrypted_key
+    assert File.exist?(Seek::Config.attr_encrypted_key_path)
+    FileUtils.rm(Seek::Config.attr_encrypted_key_path)
+
+    #check it regenerates it different each time
+    refute_equal key,Seek::Config.attr_encrypted_key
+  end
 end

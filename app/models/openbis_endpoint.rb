@@ -93,6 +93,6 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def password_key
-    '1D8637107CDF55F3C779AA54BFAC707ED48B2EE00BC7F47661EED77FB9DD1102'
+    Seek::Config.attr_encrypted_key
   end
 end
