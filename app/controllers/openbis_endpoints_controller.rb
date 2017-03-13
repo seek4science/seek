@@ -64,6 +64,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def refresh_browse_cache
+    raise 'fish'
     @openbis_endpoint.clear_cache if @openbis_endpoint.test_authentication
     show_items
   end

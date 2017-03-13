@@ -4,6 +4,10 @@ var OpenBis = {
         $j('#openbis-datasets #contents').html($j('#waiting-for-items').clone().show());
     },
 
+    showBrowseErrorMessage: function (element_id) {
+        $j(element_id).html($j('#something-went-wrong').clone().show());
+    },
+
     showFiles: function () {
         var permId = $j(this).data('perm-id');
         var endpointId = $j(this).data('endpoint-id');
@@ -15,6 +19,9 @@ var OpenBis = {
                 data: {id: endpointId, data_file_id: dataFileId, perm_id: permId},
                 success: function (html) {
                     $j('#openbis-file-view #contents').html(html);
+                },
+                error: function(jqXHR,textStatus,errorThrown) {
+                    OpenBis.showBrowseErrorMessage('#openbis-file-view #contents');
                 },
                 beforeSend: function () {
                     $j('#openbis-file-view #contents').html("<span class='spinner'>&nbsp;</span>");
@@ -34,6 +41,9 @@ var OpenBis = {
                     success: function (html) {
                         $j('#openbis-datasets #contents').html(html);
                     },
+                    error: function(jqXHR,textStatus,errorThrown) {
+                        OpenBis.showBrowseErrorMessage('#openbis-datasets #contents');
+                    },
                     beforeSend: function () {
                         OpenBis.showBrowseWaitingMessage();
                     }
@@ -48,6 +58,9 @@ var OpenBis = {
                 data: {id: spaceId},
                 success: function (html) {
                     $j('#openbis-datasets #contents').html(html);
+                },
+                error: function(jqXHR,textStatus,errorThrown) {
+                    OpenBis.showBrowseErrorMessage('#openbis-datasets #contents');
                 },
                 beforeSend: function () {
                     OpenBis.showBrowseWaitingMessage();
