@@ -131,8 +131,10 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     perm_id = '20160210130454955-23'
     login_as(@project_administrator)
     assert_difference('DataFile.count') do
-      post :add_dataset, id: endpoint.id, project_id: @project.id, dataset_perm_id: perm_id
-      assert_nil flash[:error]
+      assert_difference('ActivityLog.count') do
+        post :add_dataset, id: endpoint.id, project_id: @project.id, dataset_perm_id: perm_id
+        assert_nil flash[:error]
+      end
     end
     data_file = assigns(:data_file)
     data_file=DataFile.find(data_file)
@@ -146,6 +148,12 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     permission=data_file.policy.permissions.first
     assert_equal @project,permission.contributor
     assert_equal Policy::NO_ACCESS,permission.access_type
+
+    log = ActivityLog.last
+    assert_equal 'create',log.action
+    assert_equal data_file,log.activity_loggable
+    assert_equal @project_administrator.user,log.culprit
+    assert_equal endpoint,log.referenced
   end
 
   test 'add dataset permissions' do
