@@ -1,36 +1,36 @@
 module Seek
-  #A class to represent a ProjectFolder for an Assay, which takes on the title and description of the assay,
+  # A class to represent a ProjectFolder for an Assay, which takes on the title and description of the assay,
   # and is neither editable,deletable or an incoming folder
   class AssayFolder
-    attr_reader :assay, :project,:children,:parent
+    attr_reader :assay, :project, :children, :parent
 
-    ["editable","deletable","incoming"].each do |m|
-        define_method "#{m}?" do
-          false
-        end
+    %w(editable deletable incoming).each do |m|
+      define_method "#{m}?" do
+        false
       end
-
-    def initialize assay,project
-      raise Exception.new("#{t('project')} does not match those related to the #{t('assays.assay').downcase}") unless assay.projects.include?(project)
-      @assay = assay
-      @project = project
-      @parent=nil
-      @children=[]
     end
 
-    def self.assay_folders project
-       assays = project.assays.select{|assay| assay.is_experimental? && assay.can_edit?}.collect do |assay|
-         Seek::AssayFolder.new assay,project
-       end
+    def initialize(assay, project)
+      fail Exception.new("#{t('project')} does not match those related to the #{t('assays.assay').downcase}") unless assay.projects.include?(project)
+      @assay = assay
+      @project = project
+      @parent = nil
+      @children = []
+    end
+
+    def self.assay_folders(project)
+      assays = project.assays.select { |assay| assay.is_experimental? && assay.can_edit? }.collect do |assay|
+        Seek::AssayFolder.new assay, project
+      end
     end
 
     def assets
-       assay.assets | assay.publications
+      assay.assets | assay.publications
     end
 
-    #assets that are authorized to be shown for the current user
+    # assets that are authorized to be shown for the current user
     def authorized_assets
-      assets.select{|a| a.can_view?}
+      assets.select(&:can_view?)
     end
 
     def title
@@ -49,20 +49,20 @@ module Seek
       "Assay_#{assay.id}"
     end
 
-    def move_assets assets, src_folder
+    def move_assets(assets, _src_folder)
       assets = Array(assets)
       assets.each do |asset|
         if asset.is_a?(Publication)
-          Relationship.create :subject=>assay,:other_object=>asset,:predicate=>Relationship::RELATED_TO_PUBLICATION
+          Relationship.create subject: assay, other_object: asset, predicate: Relationship::RELATED_TO_PUBLICATION
         else
           assay.associate(asset)
         end
       end
     end
 
-    def remove_assets assets
-      assets=Array(assets)
-      to_keep=[]
+    def remove_assets(assets)
+      assets = Array(assets)
+      to_keep = []
       assay.assay_assets.each do |aa|
         aa.destroy if assets.include?(aa.asset)
       end
@@ -70,6 +70,5 @@ module Seek
         rel.destroy if assets.include?(rel.other_object)
       end
     end
-
   end
 end

@@ -18,7 +18,7 @@ module Seek
     private
 
     def dictionary_definition
-      dictionary_filepath = File.join(Rails.root, "config/image_files", "image_file_dictionary.yml")
+      dictionary_filepath = File.join(Rails.root, 'config/image_files', 'image_file_dictionary.yml')
       YAML.load(File.read(dictionary_filepath))
     end
   end

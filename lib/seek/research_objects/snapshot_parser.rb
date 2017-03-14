@@ -2,7 +2,7 @@ module Seek
   module ResearchObjects
     class SnapshotParser
       def self.read(filepath)
-        self.new(ROBundle::File.open(filepath))
+        new(ROBundle::File.open(filepath))
       end
 
       def initialize(ro)
@@ -18,7 +18,7 @@ module Seek
       # Build a tree of the ISA + Asset structure by stitching together metadata.json files
       def parse_isa_tree(path)
         hash = JSON.parse(@ro.read(path))
-        ['contents', 'assays', 'studies', 'assets'].each do |key|
+        %w(contents assays studies assets).each do |key|
           if hash[key] && hash[key].any?
             hash[key].map! { |p| parse_isa_tree("#{p}metadata.json") }
           end

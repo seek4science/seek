@@ -6,7 +6,6 @@ module Seek
       included do
         include Seek::Search::CommonFields
         searchable(auto_index: false) do
-
           text :creators do
             creators.compact.map(&:name) if self.respond_to?(:creators)
           end
@@ -26,7 +25,6 @@ module Seek
           text :technology_type_titles do
             technology_type_titles if self.respond_to?(:technology_type_titles)
           end
-
         end if Seek::Config.solr_enabled
       end
     end

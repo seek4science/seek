@@ -1,7 +1,7 @@
 module Seek
   module Permissions
     module StateBasedPermissions
-      def self.included klass
+      def self.included(_klass)
         AUTHORIZATION_ACTIONS.each do |action|
           eval <<-END_EVAL
             def state_allows_#{action}? user = User.current_user

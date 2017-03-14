@@ -10,18 +10,15 @@
 # **********************************************************************************
 
 module Seek
-
   module Permissions
-
     module Authorization
-
       # TO FUTURE REFACTORERS: Any changes to the method below (or to the methods that it calls) need to be reflected
       #   in the  batch update method `update_lookup_table_for_all_users` (lib/seek/permissions/policy_based_authorization.rb).
       #   If not, the auth table will not be accurate.
       def self.is_authorized?(action, thing, user = nil)
         authorized_as_creator?(action, thing, user) ||
-            authorized_by_policy?(action, thing) ||
-            authorized_by_permission?(action, thing, user)
+          authorized_by_policy?(action, thing) ||
+          authorized_by_permission?(action, thing, user)
       end
 
       private
@@ -33,7 +30,7 @@ module Seek
             return true
           # Is a creator?
           elsif thing.respond_to?(:creators) && user.person && thing.creators.include?(user.person) &&
-              access_type_allows_action?(action, Policy::EDITING)
+                access_type_allows_action?(action, Policy::EDITING)
             return true
           end
         end

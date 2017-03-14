@@ -56,7 +56,6 @@ module Seek
     def suggested_type?
       self.class.include? Seek::Ontologies::SuggestedType
     end
-
   end
 end
 

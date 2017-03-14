@@ -6,14 +6,12 @@ module Seek
         def add_new_to_folder
           projects.each do |project|
             pf = ProjectFolder.new_items_folder project
-            unless pf.nil?
-              pf.add_assets self
-            end
+            pf.add_assets self unless pf.nil?
           end
         end
 
         def folders
-          project_folder_assets.map { |pfa| pfa.project_folder }
+          project_folder_assets.map(&:project_folder)
         end
       end
 

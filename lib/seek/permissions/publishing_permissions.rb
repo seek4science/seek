@@ -9,8 +9,8 @@ module Seek
       end
 
       def contains_publishable_items?
-        items = [:studies,:study,:assays,:investigation,:assets].collect do |accessor|
-          self.send(accessor) if self.respond_to?(accessor)
+        items = [:studies, :study, :assays, :investigation, :assets].collect do |accessor|
+          send(accessor) if self.respond_to?(accessor)
         end.flatten
         items.uniq.compact.detect(&:can_publish?).present?
       end
@@ -30,14 +30,14 @@ module Seek
         end
       end
 
-      def publish!(comment = nil, force=false)
-        if (force || can_publish?)
+      def publish!(comment = nil, force = false)
+        if force || can_publish?
           if gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
             false
           else
             policy.access_type = Policy::ACCESSIBLE
             policy.save
-            # FIXME:may need to add comment
+            # FIXME: may need to add comment
             resource_publish_logs.create(publish_state: ResourcePublishLog::PUBLISHED,
                                          user: User.current_user,
                                          comment: comment)
@@ -100,9 +100,9 @@ module Seek
         is_downloadable?
       end
 
-      #the last ResourcePublishingLog made
+      # the last ResourcePublishingLog made
       def last_publishing_log
-        ResourcePublishLog.last(conditions: ['resource_type=? and resource_id=?', self.class.name, self.id])
+        ResourcePublishLog.last(conditions: ['resource_type=? and resource_id=?', self.class.name, id])
       end
 
       # while item is waiting for publishing approval,set the policy of the item to:

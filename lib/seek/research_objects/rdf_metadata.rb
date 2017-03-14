@@ -5,7 +5,7 @@ module Seek
     class RdfMetadata < Metadata
       include Singleton
 
-      def metadata_content(item, parents = [])
+      def metadata_content(item, _parents = [])
         item.to_rdf
       end
 

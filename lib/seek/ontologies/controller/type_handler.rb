@@ -25,14 +25,13 @@ module Seek
             flash.now[:notice] = "Undefined #{type_text} with label <b> #{params[:label]} </b>. Did you mean #{link_to_alternative}?".html_safe
             @type_class = nil
           end
-
         end
 
         def find_ontology_type_class
           uri = params[:uri] || ontology_readers.first.default_parent_class_uri.to_s
           suggested_scheme = "suggested_#{controller_name.singularize}:"
           if uri.start_with?(suggested_scheme)
-            @type_class=suggested_type_class.find(uri.gsub(suggested_scheme, ""))
+            @type_class = suggested_type_class.find(uri.gsub(suggested_scheme, ''))
           else
             @type_class = ontology_readers.map do |ontology_reader|
               @type_class || ontology_reader.class_hierarchy.hash_by_uri[uri]

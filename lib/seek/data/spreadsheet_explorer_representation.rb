@@ -40,8 +40,6 @@ module Seek
           Rails.cache.fetch("blob_ss_xml-#{content_blob.cache_key}") do
             spreadsheet_to_xml(open(content_blob.filepath))
           end
-        else
-          nil
         end
       end
 
@@ -58,69 +56,69 @@ module Seek
         doc.find('//ss:style').each do |s|
           style = Style.new(s['id'])
           s.children.each do |a|
-            style.attributes[a.name] = a.content unless (a.name == 'text')
+            style.attributes[a.name] = a.content unless a.name == 'text'
           end
           workbook.styles[style.name] = style
         end
 
         doc.find('//ss:sheet').each do |s|
-          unless s['hidden'] == 'true' || s['very_hidden'] == 'true'
-            sheet = Sheet.new(s['name'])
-            workbook.sheets << sheet
-            # Load into memory
-            min_rows = MIN_ROWS
-            min_cols = MIN_COLS
-            # Grab columns
-            columns = s.find('./ss:columns/ss:column')
-            col_index = 0
-            # Add columns
-            columns.each do |c|
-              col_index = c['index'].to_i
-              col = Column.new(col_index, c['width'])
+          next if s['hidden'] == 'true' || s['very_hidden'] == 'true'
+          sheet = Sheet.new(s['name'])
+          workbook.sheets << sheet
+          # Load into memory
+          min_rows = MIN_ROWS
+          min_cols = MIN_COLS
+          # Grab columns
+          columns = s.find('./ss:columns/ss:column')
+          col_index = 0
+          # Add columns
+          columns.each do |c|
+            col_index = c['index'].to_i
+            col = Column.new(col_index, c['width'])
+            sheet.columns << col
+          end
+          # Pad columns (so it's at least 10 cols wide)
+          if col_index < min_cols
+            for i in ((col_index + 1)..min_cols)
+              col = Column.new(i, 2964.to_s)
               sheet.columns << col
             end
-            # Pad columns (so it's at least 10 cols wide)
-            if col_index < min_cols
-              for i in ((col_index + 1)..min_cols)
-                col = Column.new(i, 2964.to_s)
-                sheet.columns << col
-              end
-            else
-              min_cols = col_index
-            end
-            # Grab rows
-            rows = s.find('./ss:rows/ss:row')
-            row_index = 0
-            # Add rows
-            rows.each do |r|
-              row_index = r['index'].to_i
-              row = Row.new(row_index, r['height'])
-              sheet.rows[row_index] = row
-              # Add cells
-              r.find('./ss:cell').each do |c|
-                col_index = c['column'].to_i
-                content = c.content
-                cell = Cell.new(content, row_index, col_index, c['formula'], c['style'])
-                row.cells[col_index] = cell
-              end
-            end
-            # Pad rows
-            if row_index < min_rows
-              for i in ((row_index + 1)..min_rows)
-                row = Row.new(i, 1000.to_s)
-                sheet.rows << row
-              end
-              min_rows = MIN_ROWS
-            else
-              min_rows = row_index
-            end
-            sheet.last_row = min_rows
-            sheet.last_col = min_cols
+          else
+            min_cols = col_index
           end
+          # Grab rows
+          rows = s.find('./ss:rows/ss:row')
+          row_index = 0
+          # Add rows
+          rows.each do |r|
+            row_index = r['index'].to_i
+            row = Row.new(row_index, r['height'])
+            sheet.rows[row_index] = row
+            # Add cells
+            r.find('./ss:cell').each do |c|
+              col_index = c['column'].to_i
+              content = c.content
+              cell = Cell.new(content, row_index, col_index, c['formula'], c['style'])
+              row.cells[col_index] = cell
+            end
+          end
+          # Pad rows
+          if row_index < min_rows
+            for i in ((row_index + 1)..min_rows)
+              row = Row.new(i, 1000.to_s)
+              sheet.rows << row
+            end
+            min_rows = MIN_ROWS
+          else
+            min_rows = row_index
+          end
+          sheet.last_row = min_rows
+          sheet.last_col = min_cols
         end
 
         workbook
       end
+
       # Turns a numeric column ID into an Excel letter representation
       # eg. 1 > A, 10 > J, 28 > AB etc.
       def to_alpha(col)

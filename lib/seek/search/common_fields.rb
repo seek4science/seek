@@ -3,23 +3,17 @@ module Seek
     module CommonFields
       include Seek::ExperimentalFactors::SearchFields
 
-      def self.included klass
+      def self.included(klass)
         klass.class_eval do
           searchable(auto_index: false) do
             text :title do
-              if self.respond_to?(:title)
-                title
-              end
+              title if self.respond_to?(:title)
             end
             text :description do
-              if self.respond_to?(:description)
-                description
-              end
+              description if self.respond_to?(:description)
             end
             text :searchable_tags do
-              if self.respond_to?(:searchable_tags)
-                searchable_tags
-              end
+              searchable_tags if self.respond_to?(:searchable_tags)
             end
             text :contributor do
               if self.respond_to?(:contributor)
@@ -27,9 +21,7 @@ module Seek
               end
             end
             text :projects do
-              if self.respond_to?(:projects)
-                projects.collect(&:title)
-              end
+              projects.collect(&:title) if self.respond_to?(:projects)
             end
           end if Seek::Config.solr_enabled
         end

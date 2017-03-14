@@ -20,7 +20,7 @@ module Seek
         end
 
         file_name = determine_filename_from_url(@url)
-        content_type =  content_type_from_filename(file_name)
+        content_type = content_type_from_filename(file_name)
 
         {
           file_size: size,

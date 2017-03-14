@@ -1,7 +1,5 @@
 module Seek
-
   class IsaGraphNode
-
     attr_accessor :object, :child_count, :can_view
 
     def initialize(object)
@@ -12,11 +10,9 @@ module Seek
     def can_view?
       can_view
     end
-
   end
 
   class IsaGraphGenerator
-
     def initialize(object)
       @object = object
     end
@@ -99,44 +95,43 @@ module Seek
 
     def associations(object)
       case object
-        when Programme
-          {
-              children: object.projects,
-          }
-        when Project
-          {
-              children: object.investigations,
-              parents: object.programme ? [object.programme] : []
-          }
-        when Investigation
-          {
-              children: object.studies,
-              parents: object.projects,
-              related: object.publications
-          }
-        when Study
-          {
-              children: object.assays,
-              parents: [object.investigation],
-              related: object.publications
-          }
-        when Assay
-          {
-              children: object.assets,
-              parents: [object.study],
-              related: object.publications
-          }
-        when Publication
-          {
-              parents: object.assays | object.studies | object.investigations | object.data_files | object.models
-          }
-        when DataFile, Model, Sop, Sample, Presentation
-          {
-              parents: object.assays,
-              related: object.publications
-          }
+      when Programme
+        {
+          children: object.projects
+        }
+      when Project
+        {
+          children: object.investigations,
+          parents: object.programme ? [object.programme] : []
+        }
+      when Investigation
+        {
+          children: object.studies,
+          parents: object.projects,
+          related: object.publications
+        }
+      when Study
+        {
+          children: object.assays,
+          parents: [object.investigation],
+          related: object.publications
+        }
+      when Assay
+        {
+          children: object.assets,
+          parents: [object.study],
+          related: object.publications
+        }
+      when Publication
+        {
+          parents: object.assays | object.studies | object.investigations | object.data_files | object.models
+        }
+      when DataFile, Model, Sop, Sample, Presentation
+        {
+          parents: object.assays,
+          related: object.publications
+        }
       end.reverse_merge!(parents: [], children: [], related: [])
     end
-
   end
 end

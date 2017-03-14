@@ -55,7 +55,6 @@ module Seek
         include Seek::Search::BackgroundReindexing
         include Seek::Subscribable
         extend SingletonMethods
-
       end
 
       def is_asset?
@@ -63,18 +62,18 @@ module Seek
       end
     end
 
-    #the class methods that get added when calling acts_as_asset
+    # the class methods that get added when calling acts_as_asset
     module SingletonMethods
       def get_all_as_json(user)
         all = all_authorized_for 'view', user
-        with_contributors = all.map{ |d|
+        with_contributors = all.map do |d|
           contributor = d.contributor
           { 'id' => d.id,
             'title' => h(d.title),
             'contributor' => contributor.nil? ? '' : 'by ' + h(contributor.person.name),
             'type' => name
           }
-        }
+        end
         with_contributors.to_json
       end
 
@@ -95,16 +94,15 @@ module Seek
         update_column(:last_used_at, Time.now)
       end
 
-      #whether a new version is allowed for this asset.
+      # whether a new version is allowed for this asset.
       # for example if it has come from openbis or has extracted samples then it is not allowed
       def new_version_supported?
         versioned? &&
-            is_downloadable? &&
-            !(respond_to?(:extracted_samples) && extracted_samples.any?) &&
-            !(respond_to?(:openbis?) && openbis?) &&
-            !(supports_doi? && is_any_doi_minted?)
+          is_downloadable? &&
+          !(respond_to?(:extracted_samples) && extracted_samples.any?) &&
+          !(respond_to?(:openbis?) && openbis?) &&
+          !(supports_doi? && is_any_doi_minted?)
       end
-
     end
   end
 end

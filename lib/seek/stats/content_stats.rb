@@ -27,11 +27,10 @@ module Seek
           define_method "publicly_accessible_#{type_str}" do
             authorised_assets type, 'download', nil
           end
-
         end
 
         def registered_people
-          people.select { |person| person.user }
+          people.select(&:user)
         end
 
         private

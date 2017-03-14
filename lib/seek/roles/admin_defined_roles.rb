@@ -54,7 +54,7 @@ module Seek
       end
 
       def role_handlers
-        [Seek::Roles::StandAloneRoles,Seek::Roles::ProjectRelatedRoles,::Seek::Roles::ProgrammeRelatedRoles]
+        [Seek::Roles::StandAloneRoles, Seek::Roles::ProjectRelatedRoles, ::Seek::Roles::ProgrammeRelatedRoles]
       end
 
       def is_admin_or_project_administrator?
@@ -65,7 +65,7 @@ module Seek
         (roles_mask && roles_mask != 0) && (roles_mask & Seek::Roles::Roles.instance.mask_for_role(role_name) != 0)
       end
 
-      def check_for_role rolename,item
+      def check_for_role(rolename, item)
         has_role?(rolename) && check_role_for_item(rolename, item)
       end
 

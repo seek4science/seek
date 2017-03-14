@@ -1,12 +1,11 @@
 module Seek
   module Biosamples
     module PhenoTypesAndGenoTypes
-
       def self.included(base)
         base.has_many :phenotypes
         base.has_many :genotypes
-        base.accepts_nested_attributes_for :genotypes,:allow_destroy=>true
-        base.accepts_nested_attributes_for :phenotypes,:allow_destroy=>true
+        base.accepts_nested_attributes_for :genotypes, allow_destroy: true
+        base.accepts_nested_attributes_for :phenotypes, allow_destroy: true
         base.before_destroy :destroy_genotypes_phenotypes
       end
 
@@ -32,12 +31,9 @@ module Seek
         genotypes = self.genotypes
         phenotypes = self.phenotypes
         (genotypes | phenotypes).each do |type|
-          if (type.strain == self || type.strain.nil?)
-            type.destroy
-          end
+          type.destroy if type.strain == self || type.strain.nil?
         end
       end
-
     end
   end
 end
