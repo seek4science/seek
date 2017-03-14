@@ -49,9 +49,7 @@ class OpenbisEndpointsController < ApplicationController
     perm_id = params[:dataset_perm_id]
     fail 'No perm_id passed' unless perm_id
     @data_file = DataFile.build_from_openbis(@openbis_endpoint, params[:dataset_perm_id])
-    if @data_file.save
-      redirect_to @data_file
-    end
+    redirect_to @data_file if @data_file.save
   end
 
   def browse
@@ -155,6 +153,21 @@ class OpenbisEndpointsController < ApplicationController
       end
     else
       project_member?
+    end
+  end
+
+  # overides the after_filter callback from application_controller, as the behaviour needs to be
+  # slightly different
+  def log_event
+    action = action_name.downcase
+    if action == 'add_dataset' && @data_file
+      ActivityLog.create(action: 'create',
+                         culprit: current_user,
+                         controller_name: controller_name,
+                         activity_loggable: @data_file,
+                         data: @data_file.title,
+                         user_agent: request.env['HTTP_USER_AGENT'],
+                         referenced: @openbis_endpoint)
     end
   end
 end
