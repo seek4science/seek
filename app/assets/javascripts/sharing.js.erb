@@ -12,11 +12,11 @@ var Sharing = {
     }
 
     // This ensures that if a project permission is added, and that project is associated with the resource, it gains
-    //  the "mandatory" flag.
+    //  the "isMandatory" flag.
     if (permission.contributor_type === 'Project') {
       for (var j = 0; j < Sharing.projectsSelector.selected.length; j++) {
         if (Sharing.projectsSelector.selected[j].id === permission.contributor_id) {
-          permission.mandatory = true;
+          permission.isMandatory = true;
           break;
         }
       }
@@ -32,7 +32,7 @@ var Sharing = {
         contributor_id: project.id,
         title: project.title,
         access_type: Sharing.associatedProjectAccessType,
-        mandatory: true }, true);
+        isMandatory: true }, true);
   },
 
   removePermissionForProject: function (project) {
@@ -43,7 +43,7 @@ var Sharing = {
     if (confirm('Do you want to want to remove any permissions for ' + project.title + '?')) {
       Sharing.permissionsTable.permissions.splice(i, 1);
     } else {
-      Sharing.permissionsTable.permissions[i].mandatory = false;
+      Sharing.permissionsTable.permissions[i].isMandatory = false;
     }
   },
 
@@ -112,7 +112,7 @@ Vue.component('permissions-table', {
   computed: {
     sortedPermissions: function () {
       return this.permissions.sort(function (a, b) {
-        return (b.mandatory || false) - (a.mandatory || false);
+        return (b.isMandatory || false) - (a.isMandatory || false);
       });
     }
   },
@@ -126,14 +126,14 @@ Vue.component('permissions-table', {
 Vue.component('permission-row', {
   props: ['index', 'permission', 'accessTypes', 'publicAccessType', 'fieldPrefixOrig'],
   template:
-  '<tr class="permission-row" :class="{ mandatory: permission.mandatory, hidden: permission.contributor_type === \'FavouriteGroup\' }">' +
-  '<td class="name-cell"><span v-if="permission.contributor_type">({{ permission.contributor_type }}) </span>{{ permission.title }}' +
+  '<tr class="permission-row" :class="{ mandatory: permission.isMandatory, hidden: permission.contributor_type === \'FavouriteGroup\' }">' +
+  '<td class="name-cell" :title="permission.title"><span v-if="permission.contributor_type">({{ permission.contributor_type }}) </span>{{ permission.title }}' +
   '<input v-if="permission.contributor_type" type="hidden" :name="fieldPrefix+\'[contributor_type]\'" v-model="permission.contributor_type"/>' +
   '<input v-if="permission.contributor_id" type="hidden" :name="fieldPrefix+\'[contributor_id]\'" v-model="permission.contributor_id"/>' +
   '</td>' +
   '<td is="privilege-cell" v-for="accessType in accessTypes" :fieldPrefix="fieldPrefix" :permission="permission" :access-type="accessType" :public-access-type="publicAccessType"></td>' +
   '<td class="actions-cell">'+
-  '<a v-if="!permission.mandatory" @click="$emit(\'delete-permission\')" class="clickable remove-button" title="Remove this permission">' +
+  '<a v-if="!permission.isMandatory" @click="$emit(\'delete-permission\')" class="clickable remove-button" title="Remove this permission">' +
   '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
   '</a>' +
   '</td>' +
@@ -153,8 +153,8 @@ Vue.component('privilege-cell', {
   '</td>',
   computed: {
     disabled: function () {
-      //return (this.permission.public ? (this.accessType.value > Sharing.maxPublicAccessType) : (this.accessType.value < this.publicAccessType));
-      return (this.permission.public ? (this.accessType.value > Sharing.maxPublicAccessType) : false);
+      //return (this.permission.isPublic ? (this.accessType.value > Sharing.maxPublicAccessType) : (this.accessType.value < this.publicAccessType));
+      return (this.permission.isPublic ? (this.accessType.value > Sharing.maxPublicAccessType) : false);
     },
     enabled: function () {
       return this.permission.access_type === this.accessType.value ||
