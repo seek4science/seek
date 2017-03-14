@@ -1,3 +1,5 @@
+<% environment.context_class.instance_eval { include ImagesHelper } %>
+
 var Sharing = {
   addPermission: function (permission, preserveAccessType) {
     // Update if already existing, otherwise add a new row
@@ -127,7 +129,7 @@ Vue.component('permission-row', {
   props: ['index', 'permission', 'accessTypes', 'publicAccessType', 'fieldPrefixOrig'],
   template:
   '<tr class="permission-row" :class="{ mandatory: permission.isMandatory, hidden: permission.contributor_type === \'FavouriteGroup\' }">' +
-  '<td class="name-cell" :title="permission.title"><span v-if="permission.contributor_type">({{ permission.contributor_type }}) </span>{{ permission.title }}' +
+  '<td class="name-cell" :title="permission.title"><span class="type-icon-wrapper"><img :src="typeIcon" class="type-icon" :title="permission.contributor_type || \'All visitors\'"/></span> {{ permission.title }}' +
   '<input v-if="permission.contributor_type" type="hidden" :name="fieldPrefix+\'[contributor_type]\'" v-model="permission.contributor_type"/>' +
   '<input v-if="permission.contributor_id" type="hidden" :name="fieldPrefix+\'[contributor_id]\'" v-model="permission.contributor_id"/>' +
   '</td>' +
@@ -141,6 +143,20 @@ Vue.component('permission-row', {
   computed: {
     fieldPrefix: function () {
       return (this.fieldPrefixOrig ? this.fieldPrefixOrig : 'policy_attributes[permissions_attributes][' + this.index + ']');
+    },
+    typeIcon: function () {
+      switch(this.permission.contributor_type) {
+        case 'Person':
+          return '<%= asset_path(icon_filename_for_key('person')) %>';
+        case 'Project':
+          return '<%= asset_path(icon_filename_for_key('project')) %>';
+        case 'Institution':
+          return '<%= asset_path(icon_filename_for_key('institution')) %>';
+        case 'WorkGroup':
+          return '<%= asset_path(icon_filename_for_key('work_group')) %>';
+      }
+
+      return '<%= asset_path icon_filename_for_key('world') %>';
     }
   }
 });

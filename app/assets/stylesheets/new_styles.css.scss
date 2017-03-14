@@ -474,7 +474,17 @@ img.avatar-corner-icon {
 
   .name-column {
     border: none;
-    width: 30%;
+    width: 200px;
+
+    @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+      width: 250px;
+    }
+    @media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
+      width: 300px;
+    }
+    @media (min-width: $screen-lg-min) {
+      width: 400px;
+    }
   }
 
   tbody > tr > td {
@@ -500,6 +510,19 @@ img.avatar-corner-icon {
 
   .name-cell {
     border-left: 1px solid #ddd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    .type-icon-wrapper {
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+      text-align: center;
+    }
+    .type-icon {
+      max-width: 24px;
+      max-height: 24px;
+    }
   }
 
   .permission-row.mandatory {
