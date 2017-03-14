@@ -10,8 +10,8 @@ describe('Permissions form and projects selector', function() {
                 publicPermission: {
                     access_type: Sharing.accessTypes.accessible,
                     title: 'Public',
-                    public: true,
-                    mandatory: true },
+                    isPublic: true,
+                    isMandatory: true },
                 permissions: []
             }
         });
@@ -64,6 +64,19 @@ describe('Permissions form and projects selector', function() {
 
         Vue.nextTick(function () {
             expect(parseInt($j('#permissions-table tr.public-permission-row:last input[type=radio]:checked').val())).to.equal(Sharing.accessTypes.noAccess);
+            done();
+        });
+    });
+
+    it('decreases the public access type if the existing setting is clicked', function(done) {
+        expect(this.permissionsTable.publicPermission.access_type).to.equal(Sharing.accessTypes.accessible);
+
+        click($j('#permissions-table tr.public-permission-row td.privilege-cell.enabled')[0]);
+
+        expect(this.permissionsTable.publicPermission.access_type).to.equal(Sharing.accessTypes.visible);
+
+        Vue.nextTick(function () {
+            expect(parseInt($j('#permissions-table tr.public-permission-row:last input[type=radio]:checked').val())).to.equal(Sharing.accessTypes.visible);
             done();
         });
     });

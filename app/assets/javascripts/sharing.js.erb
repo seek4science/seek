@@ -164,7 +164,7 @@ Vue.component('permission-row', {
 Vue.component('privilege-cell', {
   props: ['fieldPrefix', 'permission', 'accessType', 'publicAccessType'],
   template:
-  '<td class="privilege-cell" :class="classes" @click="if (!disabled) permission.access_type = accessType.value">' +
+  '<td class="privilege-cell" :class="classes" @click="toggleValue">' +
   '<input v-if="!disabled" autocomplete="off" type="radio" :name="fieldPrefix+\'[access_type]\'" v-model="permission.access_type" :value="accessType.value"/>' +
   '</td>',
   computed: {
@@ -180,6 +180,19 @@ Vue.component('privilege-cell', {
       return { 'enabled': !this.disabled && this.enabled,
         'disabled': this.disabled,
         'no-access': this.accessType.value === Sharing.accessTypes.noAccess };
+    }
+  },
+  methods: {
+    toggleValue: function () {
+      if (!this.disabled) {
+        // If the existing setting is clicked, decrease the access type
+        if (this.permission.access_type === this.accessType.value &&
+            this.accessType.value !== Sharing.accessTypes.noAccess) {
+          this.permission.access_type = this.accessType.value - 1;
+        } else {
+          this.permission.access_type = this.accessType.value;
+        }
+      }
     }
   }
 });
