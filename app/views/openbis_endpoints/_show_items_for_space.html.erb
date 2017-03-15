@@ -14,7 +14,7 @@
     $j('#openbis-dataset-cards').on('click', '.view-files-link', OpenBis.showFiles);
     $j('#refresh-cache').on('click',OpenBis.refreshCache);
     $j('#toggle_registered').on('change',function() {
-      $j('.openbis-card + .registered').toggle();
+      $j('.openbis-card.registered').toggle();
     });
   });
 
