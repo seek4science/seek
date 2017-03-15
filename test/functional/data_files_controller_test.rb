@@ -2451,6 +2451,24 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div#openbis-details', count: 1
   end
 
+  test "associated assays don't cause 500 error if create fails" do
+    mock_http
+    data_file, blob = valid_data_file_with_http_url
+    data_file[:title] = ' ' # Will throw an error!
+    assay = Factory(:assay, contributor: users(:datafile_owner).person)
+
+    assert_no_difference('DataFile.count') do
+      assert_no_difference('ContentBlob.count') do
+        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing,
+             assay_ids: [assay.id]
+      end
+    end
+
+    assert assigns(:data_file).errors.any?
+    #assert_includes assigns(:data_file).assays, assay
+    assert_template :new
+  end
+
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)
