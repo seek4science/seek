@@ -160,8 +160,7 @@ SEEK::Application.configure do
 
   # Set default permissions
   Seek::Config.default :default_associated_projects_access_type, Policy::ACCESSIBLE
-  Seek::Config.default :default_consortium_access_type, Policy::VISIBLE
-  Seek::Config.default :default_all_visitors_access_type, Policy::ACCESSIBLE
+  Seek::Config.default :default_all_visitors_access_type, Policy::PRIVATE
 
   Seek::Config.default :permissions_popup, Seek::Config::PERMISSION_POPUP_ALWAYS
 
