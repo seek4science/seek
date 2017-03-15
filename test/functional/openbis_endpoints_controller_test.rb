@@ -155,6 +155,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     assert_equal endpoint, log.referenced
   end
 
+
   test 'add dataset permissions' do
     # already tests for project admin in test add dataset
 
