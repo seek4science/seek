@@ -131,19 +131,30 @@ module PolicyHelper
             contributor_id: permission.contributor_id,
             contributor_type: permission.contributor_type,
             index: permission.id }
-      if permission.contributor_type == "Project" && project_ids.include?(permission.contributor_id)
-        h[:mandatory] = true
+      # Mark associated project permissions as "mandatory"
+      if permission.contributor_type == 'Project' && project_ids.include?(permission.contributor_id)
+        project_ids.delete(permission.contributor_id)
+        h[:isMandatory] = true
       end
 
-      if permission.contributor_type == "Person"
-        h[:title] = (permission.contributor.first_name + " " + permission.contributor.last_name)
-      elsif permission.contributor_type == "WorkGroup"
-        h[:title] = permission.contributor.project.title + " @ " + permission.contributor.institution.title
+      if permission.contributor_type == 'Person'
+        h[:title] = "#{permission.contributor.first_name} #{permission.contributor.last_name}"
+      elsif permission.contributor_type == 'WorkGroup'
+        h[:title] = "#{permission.contributor.project.title} @ #{permission.contributor.institution.title}"
       else
         h[:title] = permission.contributor.title
       end
 
       h
+    end
+
+    # Add permissions for associated projects if they didn't already exist. Use "public" access type
+    associated_projects.select { |p| project_ids.include?(p.id) }.each do |project|
+      hash[:permissions] << { access_type: policy.access_type,
+                              contributor_id: project.id,
+                              contributor_type: 'Project',
+                              title: project.title,
+                              isMandatory: true }
     end
 
     hash.to_json.html_safe
