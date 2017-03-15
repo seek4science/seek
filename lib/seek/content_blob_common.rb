@@ -47,7 +47,7 @@ module Seek
       else
         dest_folder = File.join(Seek::Config.temporary_filestore_path, "#{asset.id}-dataset-#{dataset.perm_id}")
         zip_name = File.join(Seek::Config.temporary_filestore_path, "#{asset.id}-dataset-#{dataset.perm_id}.zip")
-        dataset.download(dest_folder, zip_name)
+        dataset.download(dest_folder, zip_name,asset.title.underscore)
         send_file zip_name, filename: "#{dataset.perm_id}.zip", type: 'application/octet-stream', disposition: 'attachment'
       end
     end
