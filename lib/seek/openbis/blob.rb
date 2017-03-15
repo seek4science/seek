@@ -41,10 +41,11 @@ module Seek
 
       def openbis_search_terms
         return [] unless openbis? && (dataset = openbis_dataset)
-        terms = [dataset.perm_id, dataset.dataset_type_code, dataset.dataset_type_description, dataset.experiment_id]
+        terms = [dataset.perm_id, dataset.dataset_type_code, dataset.dataset_type_description,
+                 dataset.experiment_id, dataset.registrator, dataset.modifier, dataset.code]
         terms | dataset.dataset_files_no_directories.collect do |file|
           [file.perm_id, file.path, file.filename]
-        end.flatten
+        end.flatten.uniq
       end
     end
   end

@@ -35,7 +35,8 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
     assert_includes terms, 'original/autumn.jpg'
     assert_includes terms, '20151216143716562-2'
     assert_includes terms, 'for api test'
+    assert_includes terms, 'autumn.jpg'
+    assert_includes terms, 'apiuser'
   end
 
-  private
 end
