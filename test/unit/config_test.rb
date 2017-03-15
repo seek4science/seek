@@ -145,11 +145,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 0, Seek::Config.default_associated_projects_access_type
   end
 
-  test 'changing default_consortium_access_type integer conversion' do
-    Seek::Config.default_consortium_access_type = '0'
-    assert_equal 0, Seek::Config.default_consortium_access_type
-  end
-
   test 'changing default_all_visitors_access_type integer conversion' do
     Seek::Config.default_all_visitors_access_type = '0'
     assert_equal 0, Seek::Config.default_all_visitors_access_type
@@ -337,20 +332,10 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, Seek::Config.default_associated_projects_access_type
   end
 
-  test 'default consortium access permission is visible' do
-    assert_equal Policy::VISIBLE, Seek::Config.default_consortium_access_type
-  end
-
   test 'default all visitors access permission is accessible' do
     with_config_value :default_all_visitors_access_type, Policy::ACCESSIBLE do
       assert_equal Policy::ACCESSIBLE, Seek::Config.default_all_visitors_access_type
     end
-  end
-
-  test 'changing default_consortium_access_type' do
-    Seek::Config.default_consortium_access_type = Policy::NO_ACCESS
-    assert_equal Policy::NO_ACCESS, Seek::Config.default_consortium_access_type
-    assert_equal Policy::NO_ACCESS.class, Seek::Config.default_consortium_access_type.class
   end
 
   test 'invalid setting accessor' do
