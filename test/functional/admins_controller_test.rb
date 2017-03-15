@@ -99,13 +99,6 @@ class AdminsControllerTest < ActionController::TestCase
     assert_equal 2, Seek::Config.default_associated_projects_access_type
   end
 
-  test 'update default consortium permissions' do
-    Seek::Config.default_consortium_access_type = 0
-    assert_equal 0, Seek::Config.default_consortium_access_type
-    post :update_others, default_consortium_access_type: '2'
-    assert_equal 2, Seek::Config.default_consortium_access_type
-  end
-
   test 'update default default_all_visitors_access_type permissions' do
     Seek::Config.default_all_visitors_access_type = 0
     assert_equal 0, Seek::Config.default_all_visitors_access_type

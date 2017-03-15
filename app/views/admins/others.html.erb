@@ -24,23 +24,17 @@
     <%= admin_text_setting(:sabiork_ws_base_url, Seek::Config.sabiork_ws_base_url,
                            'SabioRK WS base URL', 'This base URL for sabiork webservices REST API') %>
 
+    <%= access_type_options = [Policy::PRIVATE, Policy::VISIBLE, Policy::ACCESSIBLE]
+        # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
+        option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_all_visitors_access_type)
+        admin_dropdown_setting(:default_all_visitors_access_type, option_tags, 'Settings For Default Permissions',
+                               'Default permissions option for all visitors, including those without a login') %>
+
     <%= access_type_options = [Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING]
         # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
         option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_associated_projects_access_type)
-        admin_dropdown_setting(:default_associated_projects_access_type, option_tags, 'Settings For Default Permissions',
+        admin_dropdown_setting(:default_associated_projects_access_type, option_tags, nil,
                                'Default permissions option for members of associated projects') %>
-
-    <%= access_type_options = [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING]
-        # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
-        option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_consortium_access_type)
-        admin_dropdown_setting(:default_consortium_access_type, option_tags, nil,
-                               'Default permissions option for all registered users') %>
-
-    <%= access_type_options = [Policy::VISIBLE, Policy::ACCESSIBLE]
-        # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
-        option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_all_visitors_access_type)
-        admin_dropdown_setting(:default_all_visitors_access_type, option_tags, nil,
-                               'Default permissions option for all visitors') %>
 
     <%= admin_dropdown_setting(:permissions_popup,
            options_for_select([['Always show', Seek::Config::PERMISSION_POPUP_ALWAYS],

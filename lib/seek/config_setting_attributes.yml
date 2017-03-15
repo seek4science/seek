@@ -156,8 +156,6 @@ time_lock_doi_for:
   convert: :to_i
 default_associated_projects_access_type:
   convert: :to_i
-default_consortium_access_type:
-  convert: :to_i
 default_all_visitors_access_type:
   convert: :to_i
 default_project_members_access_type:

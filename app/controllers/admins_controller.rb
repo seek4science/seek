@@ -39,7 +39,7 @@ class AdminsController < ApplicationController
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
-    #Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
+    # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
@@ -210,7 +210,6 @@ class AdminsController < ApplicationController
     Seek::Config.recaptcha_private_key = params[:recaptcha_private_key]
     Seek::Config.recaptcha_public_key = params[:recaptcha_public_key]
     Seek::Config.default_associated_projects_access_type = params[:default_associated_projects_access_type]
-    Seek::Config.default_consortium_access_type = params[:default_consortium_access_type]
     Seek::Config.default_all_visitors_access_type = params[:default_all_visitors_access_type]
     Seek::Config.permissions_popup = params[:permissions_popup]
     Seek::Config.auth_lookup_update_batch_size = params[:auth_lookup_update_batch_size]
@@ -236,7 +235,7 @@ class AdminsController < ApplicationController
       begin
         Seek::Workers.restart
         wait_for_delayed_job_to_start
-      rescue  SystemExit => e
+      rescue SystemExit => e
         Rails.logger.info("Exit code #{e.status}")
       rescue => e
         error = e.message
@@ -320,26 +319,26 @@ class AdminsController < ApplicationController
     @page = params[:id]
     respond_to do |format|
       case @page
-        when 'content_stats'
-          format.html { render partial: 'admins/stats/content_stats', locals: { stats: Seek::Stats::ContentStats.generate } }
-        when 'activity_stats'
-          format.html { render partial: 'admins/stats/activity_stats', locals: { stats: Seek::Stats::ActivityStats.new } }
-        when 'search_stats'
-          format.html { render partial: 'admins/stats/search_stats', locals: { stats: Seek::Stats::SearchStats.new } }
-        when 'job_queue'
-          format.html { render partial: 'admins/stats/job_queue' }
-        when 'auth_consistency'
-          format.html { render partial: 'admins/stats/auth_consistency' }
-        when 'monthly_stats'
-          format.html { render partial: 'admins/stats/monthly_stats', locals: { stats: get_monthly_stats } }
-        when 'workflow_stats'
-          format.html { render partial: 'admins/stats/workflow_stats' }
-        when 'storage_usage_stats'
-          format.html { render partial: 'admins/stats/storage_usage_stats' }
-        when 'snapshot_and_doi_stats'
-          format.html { render partial: 'admins/stats/snapshot_and_doi_stats' }
-        when 'none'
-          format.html { render text: '' }
+      when 'content_stats'
+        format.html { render partial: 'admins/stats/content_stats', locals: { stats: Seek::Stats::ContentStats.generate } }
+      when 'activity_stats'
+        format.html { render partial: 'admins/stats/activity_stats', locals: { stats: Seek::Stats::ActivityStats.new } }
+      when 'search_stats'
+        format.html { render partial: 'admins/stats/search_stats', locals: { stats: Seek::Stats::SearchStats.new } }
+      when 'job_queue'
+        format.html { render partial: 'admins/stats/job_queue' }
+      when 'auth_consistency'
+        format.html { render partial: 'admins/stats/auth_consistency' }
+      when 'monthly_stats'
+        format.html { render partial: 'admins/stats/monthly_stats', locals: { stats: get_monthly_stats } }
+      when 'workflow_stats'
+        format.html { render partial: 'admins/stats/workflow_stats' }
+      when 'storage_usage_stats'
+        format.html { render partial: 'admins/stats/storage_usage_stats' }
+      when 'snapshot_and_doi_stats'
+        format.html { render partial: 'admins/stats/snapshot_and_doi_stats' }
+      when 'none'
+        format.html { render text: '' }
       end
     end
   end
@@ -352,36 +351,36 @@ class AdminsController < ApplicationController
     extra_options = {}
     @page = params[:id]
     case @page
-      when 'invalid_users_profiles'
-        partial = 'invalid_user_stats_list'
-        invalid_users = {}
-        pal_position = ProjectPosition.pal_position
-        invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal_of_any_project? != p.project_positions.include?(pal_position) }
-        invalid_users[:duplicates] = Person.duplicates
-        invalid_users[:no_person] = User.without_profile
-        collection = invalid_users
-      when 'users_requiring_activation'
-        partial = 'user_stats_list'
-        collection = User.not_activated
-        action = 'activate'
-        title = 'Users have not yet activated their account'
-      when 'non_project_members'
-        partial = 'user_stats_list'
-        collection = Person.without_group.registered
-        title = "Users are not in a #{Seek::Config.project_name} #{t('project')}"
-      when 'profiles_without_users'
-        partial = 'user_stats_list'
-        collection = Person.userless_people
-        title = 'Profiles that have no associated user'
-        extra_options = { action: 'delete', bulk_delete: false }
-      when 'pals'
-        partial = 'user_stats_list'
-        collection = Person.pals
-        title = 'List of PALs'
-      when 'administrators'
-        partial = 'admin_selection'
-      when 'none'
-        partial = 'none'
+    when 'invalid_users_profiles'
+      partial = 'invalid_user_stats_list'
+      invalid_users = {}
+      pal_position = ProjectPosition.pal_position
+      invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal_of_any_project? != p.project_positions.include?(pal_position) }
+      invalid_users[:duplicates] = Person.duplicates
+      invalid_users[:no_person] = User.without_profile
+      collection = invalid_users
+    when 'users_requiring_activation'
+      partial = 'user_stats_list'
+      collection = User.not_activated
+      action = 'activate'
+      title = 'Users have not yet activated their account'
+    when 'non_project_members'
+      partial = 'user_stats_list'
+      collection = Person.without_group.registered
+      title = "Users are not in a #{Seek::Config.project_name} #{t('project')}"
+    when 'profiles_without_users'
+      partial = 'user_stats_list'
+      collection = Person.userless_people
+      title = 'Profiles that have no associated user'
+      extra_options = { action: 'delete', bulk_delete: false }
+    when 'pals'
+      partial = 'user_stats_list'
+      collection = Person.pals
+      title = 'List of PALs'
+    when 'administrators'
+      partial = 'admin_selection'
+    when 'none'
+      partial = 'none'
     end
     respond_to do |format|
       if partial == 'none'
@@ -467,7 +466,7 @@ class AdminsController < ApplicationController
       x[day] += 1
     end
     sorted_keys = x.keys.sort
-    (sorted_keys.first..sorted_keys.last).map { |i| x[i].nil? ? 0 : x[i]  }
+    (sorted_keys.first..sorted_keys.last).map { |i| x[i].nil? ? 0 : x[i] }
   end
 
   def check_valid_email(email_address, field)
@@ -526,7 +525,7 @@ class AdminsController < ApplicationController
     rescue Cocaine::CommandNotFoundError => e
       return 'The command to restart the background tasks could not be found!'
     rescue => e
-      error =  e.message
+      error = e.message
       return error
     end
   end
