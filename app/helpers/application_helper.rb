@@ -1,34 +1,33 @@
 # Methods added to this helper will be available to all templates in the application.
-#require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','helpers','application_helper')
+# require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','helpers','application_helper')
 require 'savage_beast/application_helper'
 require 'app_version'
 
-module ApplicationHelper  
+module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
   include TavernaPlayer::RunsHelper
   include Recaptcha::ClientHelper
   include VersionHelper
 
-
   def no_items_to_list_text
-    content_tag :div,:id=>"no-index-items-text" do
+    content_tag :div, id: 'no-index-items-text' do
       "There are no #{resource_text_from_controller.pluralize} found that are visible to you."
     end
   end
 
   def required_span
-    content_tag :span,class:'required' do
-      "*"
+    content_tag :span, class: 'required' do
+      '*'
     end
   end
 
-  #e.g. SOP for sops_controller, taken from the locale based on the controller name
+  # e.g. SOP for sops_controller, taken from the locale based on the controller name
   def resource_text_from_controller
     internationalized_resource_name(controller_name.singularize.camelize, false)
   end
 
-  def index_title title=nil
+  def index_title(title = nil)
     content_tag(:h1) { title || resource_text_from_controller.pluralize }
   end
 
@@ -36,33 +35,33 @@ module ApplicationHelper
     current_page?(main_app.root_url)
   end
 
-  #turns the object name from a form builder, in the equivalent id
-  def sanitized_object_name object_name
-    object_name.gsub(/\]\[|[^-a-zA-Z0-9:.]/, "_").sub(/_$/, "")
+  # turns the object name from a form builder, in the equivalent id
+  def sanitized_object_name(object_name)
+    object_name.gsub(/\]\[|[^-a-zA-Z0-9:.]/, '_').sub(/_$/, '')
   end
 
-  def seek_stylesheet_tags main='application'
-    css = (Seek::Config.css_prepended || "").split(",").map {|c| "prepended/#{c}" }
+  def seek_stylesheet_tags(main = 'application')
+    css = (Seek::Config.css_prepended || '').split(',').map { |c| "prepended/#{c}" }
     css << main
-    css = css | (Seek::Config.css_appended || "").split(",").map {|c| "appended/#{c}" }
-    css.empty? ? "" : stylesheet_link_tag(*css)
+    css |= (Seek::Config.css_appended || '').split(',').map { |c| "appended/#{c}" }
+    css.empty? ? '' : stylesheet_link_tag(*css)
   end
 
-  def seek_javascript_tags main='application'
-    js = (Seek::Config.javascript_prepended || "").split(",").map {|c| "prepended/#{c}" }
+  def seek_javascript_tags(main = 'application')
+    js = (Seek::Config.javascript_prepended || '').split(',').map { |c| "prepended/#{c}" }
     js << main
-    js = js | (Seek::Config.javascript_appended || "").split(",").map {|c| "appended/#{c}" }
-    js.empty? ? "" : javascript_include_tag(*js)
+    js |= (Seek::Config.javascript_appended || '').split(',').map { |c| "appended/#{c}" }
+    js.empty? ? '' : javascript_include_tag(*js)
   end
 
-  def date_as_string date,show_time_of_day=false,year_only_1st_jan=false
-    #for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
-    if (year_only_1st_jan && !date.blank? && date.month==1 && date.day==1)
-      str=date.year.to_s
+  def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false)
+    # for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
+    if year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
+      str = date.year.to_s
     else
       date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
       if date.blank?
-        str="<span class='none_text'>No date defined</span>"
+        str = "<span class='none_text'>No date defined</span>"
       else
         str = date.localtime.strftime("#{date.day.ordinalize} %b %Y")
         str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
@@ -74,24 +73,24 @@ module ApplicationHelper
 
   # provide the block that shows the URL to the resource, including the version if it is a versioned resource
   # label is based on the application name, for example <label>FAIRDOMHUB ID: </label>
-  def persistent_resource_id resource
+  def persistent_resource_id(resource)
     url = polymorphic_url(resource)
     content_tag :p, class: :id do
       content_tag(:label) do
         "#{Seek::Config.application_name} ID: "
-      end + " " + link_to(url, url)
+      end + ' ' + link_to(url, url)
     end
   end
 
-  def show_title title
-    render :partial=>"general/page_title", :locals=>{:title=>title}
+  def show_title(title)
+    render partial: 'general/page_title', locals: { title: title }
   end
 
   def version_text
-    "(v.#{SEEK::Application::APP_VERSION.to_s})"
+    "(v.#{SEEK::Application::APP_VERSION})"
   end
 
-  def authorized_list all_items, attribute, sort=true, max_length=75, count_hidden_items=false
+  def authorized_list(all_items, attribute, sort = true, max_length = 75, count_hidden_items = false)
     items = all_items.select(&:can_view?)
     if Seek::Config.is_virtualliver
       title_only_items = (all_items - items).select(&:title_is_public?)
@@ -114,11 +113,11 @@ module ApplicationHelper
       items = items.sort_by { |i| get_object_title(i) } if sort
       title_only_items = title_only_items.sort_by { |i| get_object_title(i) } if sort
 
-      list = items.collect { |i| link_to truncate(i.title, :length => max_length), show_resource_path(i), :title => get_object_title(i) }
-      list = list + title_only_items.collect { |i| h(truncate(i.title, :length => max_length)) }
+      list = items.collect { |i| link_to truncate(i.title, length: max_length), show_resource_path(i), title: get_object_title(i) }
+      list += title_only_items.collect { |i| h(truncate(i.title, length: max_length)) }
       html << list.join(', ')
       if count_hidden_items && !hidden_items.empty?
-        text = items.size > 0 ? " and " : ""
+        text = items.size > 0 ? ' and ' : ''
         text << "#{hidden_items.size} hidden #{hidden_items.size > 1 ? 'items' : 'item'}"
         html << hidden_items_html(hidden_items, text)
       end
@@ -127,52 +126,50 @@ module ApplicationHelper
     html.html_safe
   end
 
-  def hidden_items_html hidden_items, text='hidden item'
+  def hidden_items_html(hidden_items, text = 'hidden item')
     html = "<span class='none_text'>#{text}</span>"
     contributor_links = hidden_item_contributor_links hidden_items
-    if !contributor_links.empty?
+    unless contributor_links.empty?
       html << "<span class='none_text'> - Please contact: #{contributor_links.join(', ')}</span>"
     end
     html.html_safe
   end
 
-  def hidden_item_contributor_links hidden_items
+  def hidden_item_contributor_links(hidden_items)
     contributor_links = []
     hidden_items = hidden_items.select { |hi| !hi.contributing_user.try(:person).nil? }
     hidden_items.sort! { |a, b| a.contributing_user.person.name <=> b.contributing_user.person.name }
     hidden_items.each do |hi|
       contributor_person = hi.contributing_user.person
-      if current_user.try(:person) && hi.can_see_hidden_item?(current_user.person) && contributor_person.can_view?
-        contributor_name = contributor_person.name
-        contributor_link = "<a href='#{person_path(contributor_person)}'>#{h(contributor_name)}</a>"
-        contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
-      end
+      next unless current_user.try(:person) && hi.can_see_hidden_item?(current_user.person) && contributor_person.can_view?
+      contributor_name = contributor_person.name
+      contributor_link = "<a href='#{person_path(contributor_person)}'>#{h(contributor_name)}</a>"
+      contributor_links << contributor_link if contributor_link && !contributor_links.include?(contributor_link)
     end
     contributor_links
   end
 
   def tabbar
-    Seek::Config.is_virtualliver ? render(:partial=>"general/tabnav_dropdown") : render(:partial=>"general/menutabs")
+    Seek::Config.is_virtualliver ? render(partial: 'general/tabnav_dropdown') : render(partial: 'general/menutabs')
   end
 
-  #joins the list with seperator and the last item with an 'and'
-  def join_with_and list, seperator=", "
-    return list.first if list.count==1
-    result = ""
+  # joins the list with seperator and the last item with an 'and'
+  def join_with_and(list, seperator = ', ')
+    return list.first if list.count == 1
+    result = ''
     list.each do |item|
       result << item
-      unless item==list.last
-        if item==list[-2]
-          result << " and "
-        else
-          result << seperator
-        end
-      end
+      next if item == list.last
+      if item == list[-2]
+        result << ' and '
+      else
+        result << seperator
+              end
     end
     result
   end
 
-  def tab_definition(options={})
+  def tab_definition(options = {})
     options[:gap_before] ||= false
     options[:title] ||= options[:controllers].first.capitalize
     options[:path] ||= eval "#{options[:controllers].first}_path"
@@ -180,57 +177,57 @@ module ApplicationHelper
     attributes = (options[:controllers].include?(controller.controller_name.to_s) ? ' id="selected_tabnav"' : '')
     attributes += " class='tab_gap_before'" if options[:gap_before]
 
-    link=link_to options[:title], options[:path]
+    link = link_to options[:title], options[:path]
     "<li #{attributes}>#{link}</li>".html_safe
   end
 
-  #Classifies each result item into a hash with the class name as the key.
+  # Classifies each result item into a hash with the class name as the key.
   #
-  #This is to enable the resources to be displayed in the asset tabbed listing by class, or defined by .tab. Items not originating within SEEK are identified by is_external
-  def classify_for_tabs result_collection
-    results={}
+  # This is to enable the resources to be displayed in the asset tabbed listing by class, or defined by .tab. Items not originating within SEEK are identified by is_external
+  def classify_for_tabs(result_collection)
+    results = {}
 
     result_collection.each do |res|
       tab = res.respond_to?(:tab) ? res.tab : res.class.name
-      results[tab] = {:items => [], :hidden_count => 0, :is_external=>(res.respond_to?(:is_external_search_result?) && res.is_external_search_result?)} unless results[tab]
+      results[tab] = { items: [], hidden_count: 0, is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) } unless results[tab]
       results[tab][:items] << res
     end
 
-    return results
+    results
   end
 
-  #selection of assets for new asset gadget
+  # selection of assets for new asset gadget
   def new_creatable_selection_list
-    Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, url_for({:controller => c.name.underscore.pluralize, :action => 'new'})] }
+    Seek::Util.user_creatable_types.collect { |c| [c.name.underscore.humanize, url_for(controller: c.name.underscore.pluralize, action: 'new')] }
   end
 
-  def is_nil_or_empty? thing
-    thing.nil? or thing.empty?
+  def is_nil_or_empty?(thing)
+    thing.nil? || thing.empty?
   end
-  
-  def empty_list_li_text list
+
+  def empty_list_li_text(list)
     return "<li><div class='none_text'> None specified</div></li>".html_safe if is_nil_or_empty?(list)
   end
-  
-  def text_or_not_specified text, options = {}
-    text=text.to_s
-    if text.nil? or text.chomp.empty?
-      not_specified_text||=options[:none_text]
-      not_specified_text||="No description specified" if options[:description]==true
-      not_specified_text||="Not specified"
+
+  def text_or_not_specified(text, options = {})
+    text = text.to_s
+    if text.nil? || text.chomp.empty?
+      not_specified_text ||= options[:none_text]
+      not_specified_text ||= 'No description specified' if options[:description] == true
+      not_specified_text ||= 'Not specified'
       res = content_tag(:span, not_specified_text, class: 'none_text')
-    else      
-      text.capitalize! if options[:capitalize]            
+    else
+      text.capitalize! if options[:capitalize]
       res = text.html_safe
       res = white_list(res)
-      res = truncate_without_splitting_words(res, options[:length])  if options[:length]
-      res = auto_link(res, :all, :rel => 'nofollow') if options[:auto_link]==true  
-      res = simple_format(res).html_safe if options[:description]==true || options[:address]==true
-      
-      res=mail_to(res) if options[:email]==true
-      res=link_to(res,res,:popup=>true) if options[:external_link]==true
-      res=res+"&nbsp;"+flag_icon(text) if options[:flag]==true
-      res = "&nbsp;" + flag_icon(text) + link_to(res,country_path(res)) if options[:link_as_country]==true 
+      res = truncate_without_splitting_words(res, options[:length]) if options[:length]
+      res = auto_link(res, :all, rel: 'nofollow') if options[:auto_link] == true
+      res = simple_format(res).html_safe if options[:description] == true || options[:address] == true
+
+      res = mail_to(res) if options[:email] == true
+      res = link_to(res, res, popup: true) if options[:external_link] == true
+      res = res + '&nbsp;' + flag_icon(text) if options[:flag] == true
+      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(res)) if options[:link_as_country] == true
     end
     res.html_safe
   end
@@ -238,37 +235,36 @@ module ApplicationHelper
   def tooltip(text)
     h(text)
   end
-      
+
   # text in "caption" will be used to display the item next to the image_tag_for_key;
   # if "caption" is nil, item.name will be used by default
-  def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip=nil, size=nil)
-    list_item = "<li>"
-    if icon_type.downcase == "flag"
+  def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip = nil, size = nil)
+    list_item = '<li>'
+    if icon_type.downcase == 'flag'
       list_item += flag_icon(item.country)
-    elsif icon_type == "data_file" || icon_type == "sop"
+    elsif icon_type == 'data_file' || icon_type == 'sop'
       list_item += file_type_icon(item)
     else
-      list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, "", false, size)
+      list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, '', false, size)
     end
-    item_caption = " " + (caption.blank? ? item.title : caption)
-    list_item += link_to truncate(item_caption, :length=>truncate_to), url_for(item), 'data-tooltip' => tooltip(custom_tooltip.blank? ? item_caption : custom_tooltip)
-    list_item += "</li>"
-    
-    return list_item.html_safe
+    item_caption = ' ' + (caption.blank? ? item.title : caption)
+    list_item += link_to truncate(item_caption, length: truncate_to), url_for(item), 'data-tooltip' => tooltip(custom_tooltip.blank? ? item_caption : custom_tooltip)
+    list_item += '</li>'
+
+    list_item.html_safe
   end
-  
-  
-  def contributor(contributor, avatar=false, size=100, you_text=false)
+
+  def contributor(contributor, avatar = false, size = 100, you_text = false)
     return jerm_harvester_name unless contributor
-    
-    if contributor.class.name == "User"
+
+    if contributor.class.name == 'User'
       # this string will output " (you) " for current user next to the display name, when invoked with 'you_text == true'
-      you_string = (you_text && logged_in? && user.id == current_user.id) ? "<small style='vertical-align: middle; color: #666666; margin-left: 0.5em;'>(you)</small>" : ""
+      you_string = (you_text && logged_in? && user.id == current_user.id) ? "<small style='vertical-align: middle; color: #666666; margin-left: 0.5em;'>(you)</small>" : ''
       contributor_person = contributor.person
       contributor_name = h(contributor_person.name)
       contributor_url = person_path(contributor_person.id)
       contributor_name_link = link_to(contributor_name, contributor_url)
-      
+
       if avatar
         result = avatar(contributor_person, size, false, contributor_url, contributor_name, false)
         result += "<p style='margin: 0; text-align: center;'>#{contributor_name_link}#{you_string}</p>"
@@ -280,17 +276,17 @@ module ApplicationHelper
       return nil
     end
   end
-  
+
   # this helper is to be extended to include many more types of objects that can belong to the
   # user - for example, SOPs and others
   def mine?(thing)
     return false if thing.nil?
     return false unless logged_in?
-    
+
     c_id = current_user.id.to_i
-    
+
     case thing.class.name
-    when "Person"
+    when 'Person'
       return (current_user.person.id == thing.id)
     else
       return false
@@ -301,166 +297,163 @@ module ApplicationHelper
     link_to(link_name, url, link_options)
   end
 
-  def page_title controller_name, action_name
-    name=PAGE_TITLES[controller_name]
-    name ||=""
-    name += " (Development)" if Rails.env.development?
-    return "The #{Seek::Config.application_name} "+name
+  def page_title(controller_name, _action_name)
+    name = PAGE_TITLES[controller_name]
+    name ||= ''
+    name += ' (Development)' if Rails.env.development?
+    "The #{Seek::Config.application_name} " + name
   end
 
+  def favourite_group_popup_link_action_new(resource_type = nil)
+    link_to_remote_redbox("Create new #{t('favourite_group')}",
+                          { url: main_app.new_favourite_group_url,
+                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
+                            with: "'resource_type=' + '#{resource_type}'" },
+                          #:style => options[:style],
+                          id: 'create_new_f_group_redbox',
+                          onclick: 'javascript: currentFavouriteGroupSettings = {};' # ,
+                         #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+                         #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+                         )
+  end
 
-  def favourite_group_popup_link_action_new resource_type=nil
-    return link_to_remote_redbox("Create new #{t('favourite_group')}",
-      { :url => main_app.new_favourite_group_url,
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-        :with => "'resource_type=' + '#{resource_type}'" },
-      { #:style => options[:style],
-        :id => "create_new_f_group_redbox",
-        :onclick => "javascript: currentFavouriteGroupSettings = {};" }#,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-    )
+  def favourite_group_popup_link_action_edit(resource_type = nil)
+    link_to_remote_redbox("Edit selected #{t('favourite_group')}",
+                          { url: main_app.edit_favourite_group_url,
+                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
+                            with: "'resource_type=' + '#{resource_type}' + '&id=' + selectedFavouriteGroup()" },
+                          #:style => options[:style],
+                          id: 'edit_existing_f_group_redbox',
+                          onclick: 'javascript: currentFavouriteGroupSettings = {};' # ,
+                         #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+                         #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+                         )
   end
-  
-  def favourite_group_popup_link_action_edit resource_type=nil
-    return link_to_remote_redbox("Edit selected #{t('favourite_group')}",
-      { :url => main_app.edit_favourite_group_url,
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-        :with => "'resource_type=' + '#{resource_type}' + '&id=' + selectedFavouriteGroup()" },
-      { #:style => options[:style],
-        :id => "edit_existing_f_group_redbox",
-        :onclick => "javascript: currentFavouriteGroupSettings = {};" } #,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-    )
+
+  def workgroup_member_review_popup_link(resource_type = nil)
+    link_to_remote_redbox('<b>Review members, set individual<br/>permissions and add afterwards</b>'.html_safe,
+                          { url: main_app.review_work_group_url('type', 'id', 'access_type'),
+                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
+                            with: "'resource_type=' + '#{resource_type}'" },
+                          #:style => options[:style],
+                          id: 'review_work_group_redbox' # ,
+                         #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+                         #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+                         )
   end
-  
-  def workgroup_member_review_popup_link resource_type=nil
-    return link_to_remote_redbox("<b>Review members, set individual<br/>permissions and add afterwards</b>".html_safe,
-      { :url => main_app.review_work_group_url("type", "id", "access_type"),
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();",
-        :with => "'resource_type=' + '#{resource_type}'" },
-      { #:style => options[:style],
-        :id => "review_work_group_redbox" } #,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-    )
-  end
-  
+
   # the parameter must be the *standard* name of the whitelist or blacklist (depending on the link that needs to be produced)
   # (standard names are defined in FavouriteGroup model)
   def whitelist_blacklist_edit_popup_link(f_group_name)
-    return link_to_remote_redbox("edit", 
-      { :url => edit_favourite_group_url,
-        :failure => "alert('Sorry, an error has occurred.'); RedBox.close();" },
-      { #:style => options[:style],
-        :id => "#{f_group_name}_edit_redbox",
-        :onclick => "javascript: currentFavouriteGroupSettings = {};" } #,
-      #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-      #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-    )
+    link_to_remote_redbox('edit',
+                          { url: edit_favourite_group_url,
+                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();" },
+                          #:style => options[:style],
+                          id: "#{f_group_name}_edit_redbox",
+                          onclick: 'javascript: currentFavouriteGroupSettings = {};' # ,
+                         #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
+                         #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
+                         )
   end
 
-  def preview_permission_popup_link resource
+  def preview_permission_popup_link(resource)
     locals = {}
     locals[:resource_name] = resource.class.name.underscore
     locals[:resource_id] = resource.id
     locals[:url] = preview_permissions_policies_path
     locals[:is_new_file] = resource.new_record?
     locals[:contributor_id] = resource.contributing_user.try(:id)
-    render :partial => 'assets/preview_permission_link', :locals => locals
+    render partial: 'assets/preview_permission_link', locals: locals
   end
 
-
   # Finn's truncate method. Doesn't split up words, tries to get as close to length as possible
-  def truncate_without_splitting_words(text, length=50)
-    truncated_result = ""
+  def truncate_without_splitting_words(text, length = 50)
+    truncated_result = ''
     remaining_length = length
     stop = false
     truncated = false
-    #lines
+    # lines
     text.split("\n").each do |l|
-      #words
-      l.split(" ").each do |w|
-        #If we're going to go over the length, and we've not already
+      # words
+      l.split(' ').each do |w|
+        # If we're going to go over the length, and we've not already
         if (remaining_length - w.length) <= 0 && !stop
           truncated = true
           stop = true
-          #Decide if adding or leaving out the last word puts us closer to the desired length
-          if (remaining_length-w.length).abs < remaining_length.abs
-            truncated_result += (w + " ")
+          # Decide if adding or leaving out the last word puts us closer to the desired length
+          if (remaining_length - w.length).abs < remaining_length.abs
+            truncated_result += (w + ' ')
           end
         elsif !stop
-          truncated_result += (w + " ")
+          truncated_result += (w + ' ')
           remaining_length -= (w.length + 1)
         end
       end
       truncated_result += "\n"
-    end    
-    #Need some kind of whitespace before elipses or auto-link breaks
-    html = truncated_result.strip + (truncated ? "\n..." : "")
+    end
+    # Need some kind of whitespace before elipses or auto-link breaks
+    html = truncated_result.strip + (truncated ? "\n..." : '')
     html.html_safe
-  end    
-  
+  end
+
   def get_object_title(item)
-    return h(item.title)
+    h(item.title)
   end
 
   def can_manage_announcements?
-    return admin_logged_in?
+    admin_logged_in?
   end
 
-  def show_or_hide_block visible=true
-    html = "display:" + (visible ? 'block' : 'none')
+  def show_or_hide_block(visible = true)
+    html = 'display:' + (visible ? 'block' : 'none')
     html.html_safe
   end
 
-  def toggle_appear_javascript block_id
+  def toggle_appear_javascript(block_id)
     "this.checked ? $j('##{block_id}').slideDown() : $j('##{block_id}').slideUp();".html_safe
   end
 
-  def folding_box id, title, options = nil
-    render :partial => 'assets/folding_box', :locals =>
-        {:fold_id => id,
-         :fold_title => title,
-         :contents => options[:contents],
-         :hidden => options[:hidden]}
+  def folding_box(id, title, options = nil)
+    render partial: 'assets/folding_box', locals:         { fold_id: id,
+                                                            fold_title: title,
+                                                            contents: options[:contents],
+                                                            hidden: options[:hidden] }
   end
 
-  def resource_tab_item_name resource_type,pluralize=true
+  def resource_tab_item_name(resource_type, pluralize = true)
     resource_type = resource_type.singularize
-    if resource_type == "Assay"
+    if resource_type == 'Assay'
       result = t('assays.assay')
     else
       translated_resource_type = translate_resource_type(resource_type)
-      result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
+      result = translated_resource_type.include?('translation missing') ? resource_type : translated_resource_type
     end
     pluralize ? result.pluralize : result
   end
 
-  def internationalized_resource_name resource_type,pluralize=true
+  def internationalized_resource_name(resource_type, pluralize = true)
     resource_type = resource_type.singularize
-    if resource_type == "Assay"
+    if resource_type == 'Assay'
       result = I18n.t('assays.assay')
-    elsif resource_type == "TavernaPlayer::Run"
-      result = "Run"
+    elsif resource_type == 'TavernaPlayer::Run'
+      result = 'Run'
     else
       translated_resource_type = translate_resource_type(resource_type)
-      result = translated_resource_type.include?("translation missing") ? resource_type : translated_resource_type
+      result = translated_resource_type.include?('translation missing') ? resource_type : translated_resource_type
     end
     pluralize ? result.pluralize : result
   end
 
-  def translate_resource_type resource_type
+  def translate_resource_type(resource_type)
     I18n.t("#{resource_type.underscore}")
   end
 
   def add_return_to_search
-    referer = request.headers["Referer"].try(:normalize_trailing_slash)
+    referer = request.headers['Referer'].try(:normalize_trailing_slash)
     search_path = main_app.search_url.normalize_trailing_slash
     root_path = main_app.root_url.normalize_trailing_slash
     request_uri = request.fullpath.try(:normalize_trailing_slash)
-    if !request_uri.include?(root_path)
+    unless request_uri.include?(root_path)
       request_uri = root_path.chop + request_uri
     end
 
@@ -475,7 +468,7 @@ module ApplicationHelper
           document.getElementById('return_to_search').appendChild(a);
         }
       "
-      #link_to_function 'Return to search', "window.history.back();"
+      # link_to_function 'Return to search', "window.history.back();"
     end
   end
 
@@ -484,60 +477,57 @@ module ApplicationHelper
   end
 
   def no_deletion_explanation_messages
-    {Assay=>"You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
-     Study=>"You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
-     Investigation=>"You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it." ,
-     Strain=>"You cannot delete this Strain. Samples associated with it or you are not authorized.",
-     Project=>"You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
-     Institution=>"You cannot delete this Institution. It may have people associated with it.",
-     SampleType=>"You cannot delete this Sample Type, it may have Samples associated with it or have another Sample Type linked to it",
-     SampleControlledVocab=>"You can delete this Controlled Vocabulary, it may be associated with a Sample Type"
+    { Assay => "You cannot delete this #{I18n.t('assays.assay')}. It might be published or it has items associated with it.",
+      Study => "You cannot delete this #{I18n.t('study')}. It might be published or it has #{I18n.t('assays.assay').pluralize} associated with it.",
+      Investigation => "You cannot delete this #{I18n.t('investigation')}. It might be published or it has #{I18n.t('study').pluralize} associated with it.",
+      Strain => 'You cannot delete this Strain. Samples associated with it or you are not authorized.',
+      Project => "You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
+      Institution => 'You cannot delete this Institution. It may have people associated with it.',
+      SampleType => 'You cannot delete this Sample Type, it may have Samples associated with it or have another Sample Type linked to it',
+      SampleControlledVocab => 'You can delete this Controlled Vocabulary, it may be associated with a Sample Type'
     }
   end
 
-
-  
-  def unable_to_delete_text model_item
+  def unable_to_delete_text(model_item)
     no_deletion_explanation_message(model_item.class).html_safe
   end
 
-
-  #returns a new instance of the string describing a resource type, or nil if it is not applicable
-  def instance_of_resource_type resource_type
+  # returns a new instance of the string describing a resource type, or nil if it is not applicable
+  def instance_of_resource_type(resource_type)
     resource = nil
     begin
       resource_class = resource_type.classify.constantize unless resource_type.nil?
       resource = resource_class.send(:new) if !resource_class.nil? && resource_class.respond_to?(:new)
-    rescue NameError=>e
+    rescue NameError => e
       logger.error("Unable to find constant for resource type #{resource_type}")
     end
     resource
   end
 
-  #returns the class associated with the controller, e.g. DataFile for data_files
+  # returns the class associated with the controller, e.g. DataFile for data_files
   #
-  def klass_from_controller controller_name=controller_name
+  def klass_from_controller(controller_name = controller_name)
     controller_name.singularize.camelize.constantize
   end
 
-  #returns the instance for the resource for the controller, e.g @data_file for data_files
-  def resource_for_controller controller_name=controller_name
+  # returns the instance for the resource for the controller, e.g @data_file for data_files
+  def resource_for_controller(controller_name = controller_name)
     eval "@#{controller_name.singularize}"
   end
 
-  #returns the count of the total visible items, and also the count of the all items, according to controller_name
+  # returns the count of the total visible items, and also the count of the all items, according to controller_name
   # primarily used for the metrics on the item index page
   def resource_count_stats
     klass = klass_from_controller(controller_name)
     full_total = klass.count
     if klass.authorization_supported?
-      visible_total = klass.all_authorized_for("view").count
-    elsif klass.kind_of?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
+      visible_total = klass.all_authorized_for('view').count
+    elsif klass.is_a?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
       visible_total = 0
     else
       visible_total = klass.count
     end
-    return visible_total,full_total
+    [visible_total, full_total]
   end
 
   def describe_visibility(model)
@@ -545,19 +535,19 @@ module ApplicationHelper
 
     if model.policy.access_type == Policy::NO_ACCESS
       css_class = 'private'
-      text << "Private "
-      text << "with some exceptions " unless model.policy.permissions.empty?
-      text << image('lock', :style => 'vertical-align: middle')
+      text << 'Private '
+      text << 'with some exceptions ' unless model.policy.permissions.empty?
+      text << image('lock', style: 'vertical-align: middle')
     else
       css_class = 'public'
-      text << "Public #{image('world', :style => 'vertical-align: middle')}"
+      text << "Public #{image('world', style: 'vertical-align: middle')}"
     end
 
     "<span class='visibility #{css_class}'>#{text}</span>".html_safe
   end
 
-  def cancel_button path,html_options={}
-    html_options[:class]||=''
+  def cancel_button(path, html_options = {})
+    html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
     text = html_options.delete(:button_text) || 'Cancel'
     link_to text, path, html_options
@@ -567,20 +557,21 @@ module ApplicationHelper
     Seek::Docker.using_docker?
   end
 
-  private  
-  PAGE_TITLES={"home"=>"Home", "projects"=>I18n.t('project').pluralize,"institutions"=>"Institutions", "people"=>"People", "sessions"=>"Login","users"=>"Signup","search"=>"Search",
-               "assays"=>I18n.t('assays.assay').pluralize.capitalize,"sops"=>I18n.t('sop').pluralize,"models"=>I18n.t('model').pluralize,"data_files"=>I18n.t('data_file').pluralize,
-               "publications"=>"Publications","investigations"=>I18n.t('investigation').pluralize,"studies"=>I18n.t('study').pluralize,
-               "samples"=>"Samples","strains"=>"Strains","organisms"=>"Organisms","biosamples"=>"Biosamples",
-               "presentations"=>I18n.t('presentation').pluralize,"programmes"=>I18n.t('programme').pluralize,"events"=>I18n.t('event').pluralize,"help_documents"=>"Help"}
+  private
+
+  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions', 'people' => 'People', 'sessions' => 'Login', 'users' => 'Signup', 'search' => 'Search',
+                  'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
+                  'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
+                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'biosamples' => 'Biosamples',
+                  'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }
 end
 
-class ApplicationFormBuilder< ActionView::Helpers::FormBuilder
-  def fancy_multiselect association, options = {}
+class ApplicationFormBuilder < ActionView::Helpers::FormBuilder
+  def fancy_multiselect(association, options = {})
     @template.fancy_multiselect object, association, options
   end
 
-  def subform_delete_link(link_text='remove', link_options = {}, hidden_field_options = {})
+  def subform_delete_link(link_text = 'remove', link_options = {}, hidden_field_options = {})
     hidden_field(:_destroy, hidden_field_options) + @template.link_to_function(link_text, "$(this).previous().value = '1';$(this).up().hide();", link_options)
   end
 end

@@ -89,23 +89,23 @@ module ApiHelper
 
   def xlink_title(item, item_type_name = nil)
     case item
-      when String
-        return item
-      else
-        if item_type_name.blank?
-          item_type_name = case item
-            when User
-              'User'
-            else
-              if item.class.name.include?('::Version')
-                item.parent.class.name
-              else
-                item.class.name
-              end
-          end
+    when String
+      return item
+    else
+      if item_type_name.blank?
+        item_type_name = case item
+                         when User
+                           'User'
+                         else
+                           if item.class.name.include?('::Version')
+                             item.parent.class.name
+                           else
+                             item.class.name
+                           end
         end
+      end
 
-        "#{display_name(item, false)}"
+      "#{display_name(item, false)}"
     end
   end
 
@@ -155,10 +155,10 @@ module ApiHelper
 
     if object.is_a?(Person) || object.is_a?(Project)
       unless hide_contact_details?(object)
-        builder.tag! 'email',object.email if object.respond_to?("email")
-        builder.tag! 'webpage',object.webpage if object.respond_to?("webpage")
-        builder.tag! 'internal_webpage',object.internal_webpage if object.respond_to?("internal_webpage")
-        builder.tag! 'phone',object.phone if object.respond_to?("phone")
+        builder.tag! 'email', object.email if object.respond_to?('email')
+        builder.tag! 'webpage', object.webpage if object.respond_to?('webpage')
+        builder.tag! 'internal_webpage', object.internal_webpage if object.respond_to?('internal_webpage')
+        builder.tag! 'phone', object.phone if object.respond_to?('phone')
       end
     end
 
@@ -300,7 +300,7 @@ module ApiHelper
   end
 
   def api_partial(builder, object, is_root = false)
-    parent_object =  object.class.name.include?('::Version') ? object.parent : object
+    parent_object = object.class.name.include?('::Version') ? object.parent : object
     path = api_partial_path_for_item(parent_object)
     classname = parent_object.class.name.underscore
     render partial: path, locals: { :parent_xml => builder, :is_root => is_root, classname.to_sym => object }

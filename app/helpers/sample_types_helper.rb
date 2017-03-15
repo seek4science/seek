@@ -4,7 +4,7 @@ module SampleTypesHelper
     if sample_type_attribute.seek_sample?
       type += ' - ' + link_to(sample_type_attribute.linked_sample_type.title, sample_type_attribute.linked_sample_type)
     end
-    unit = sample_type_attribute.unit ? "( #{ sample_type_attribute. unit.symbol } )" : ''
+    unit = sample_type_attribute.unit ? "( #{sample_type_attribute. unit.symbol} )" : ''
     req = sample_type_attribute.required? ? required_span : ''
     attribute_css = 'sample-attribute'
     attribute_css << ' sample-attribute-title' if sample_type_attribute.is_title?
@@ -42,11 +42,11 @@ module SampleTypesHelper
   end
 
   def sample_type_tags_list(sample_type)
-    list_item_tags_list(sample_type.annotations_with_attribute('sample_type_tags').collect(&:value),type:'sample_type_tags')
+    list_item_tags_list(sample_type.annotations_with_attribute('sample_type_tags').collect(&:value), type: 'sample_type_tags')
   end
 
   def all_sample_type_tags
-    tags = Annotation.with_attribute_name("sample_type_tags").collect(&:value)
+    tags = Annotation.with_attribute_name('sample_type_tags').collect(&:value)
     tags.uniq.sort_by(&:tag_count).reverse
   end
 end

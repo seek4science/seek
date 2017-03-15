@@ -44,7 +44,7 @@ module PeopleHelper
         text += ', ' unless disciplines.last == discipline
       end
     else
-      text = content_tag(:span,class:'none_text'){'Not specified'}
+      text = content_tag(:span, class: 'none_text') { 'Not specified' }
     end
     text.html_safe
   end
