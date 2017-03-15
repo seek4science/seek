@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class ProgrammeTest < ActiveSupport::TestCase
-
-
   test 'has_member?' do
     programme_administrator = Factory(:programme_administrator)
     programme1 = programme_administrator.programmes.first
@@ -42,7 +40,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert p2.valid?
     assert p2.valid?
 
-    #web_page url must be a valid web url if present
+    # web_page url must be a valid web url if present
     p.web_page = nil
     assert p.valid?
     p.web_page = ''
@@ -95,7 +93,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute_includes inst, person3.institutions.first
   end
 
-  test "can delete" do
+  test 'can delete' do
     admin = Factory(:admin)
     person = Factory(:person)
 
@@ -115,7 +113,6 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert programme.can_delete?(programme_administrator)
     refute programme.can_delete?(person)
     refute programme.can_delete?(nil)
-
   end
 
   test 'can be edited by' do
@@ -188,7 +185,7 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'can create' do
-    with_config_value :programme_user_creation_enabled,true do
+    with_config_value :programme_user_creation_enabled, true do
       User.current_user = nil
       refute Programme.can_create?
 
@@ -202,7 +199,7 @@ class ProgrammeTest < ActiveSupport::TestCase
       assert Programme.can_create?
     end
 
-    with_config_value :programme_user_creation_enabled,false do
+    with_config_value :programme_user_creation_enabled, false do
       User.current_user = nil
       refute Programme.can_create?
 
@@ -233,7 +230,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
   test 'programme activated automatically when created by an admin' do
     User.with_current_user Factory(:admin).user do
-      prog = Programme.create(:title=>"my prog")
+      prog = Programme.create(title: 'my prog')
       prog.save!
       assert prog.is_activated?
     end
@@ -241,7 +238,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
   test 'programme activated automatically when current_user is nil' do
     User.with_current_user nil do
-      prog = Programme.create(:title=>"my prog")
+      prog = Programme.create(title: 'my prog')
       prog.save!
       assert prog.is_activated?
     end
@@ -250,14 +247,14 @@ class ProgrammeTest < ActiveSupport::TestCase
   test 'programme not activated automatically when created by a normal user' do
     Factory(:admin) # to avoid 1st person being an admin
     User.with_current_user Factory(:person).user do
-      prog = Programme.create(:title=>"my prog")
+      prog = Programme.create(title: 'my prog')
       prog.save!
       refute prog.is_activated?
     end
   end
 
   test 'update programme administrators after destroy' do
-    User.current_user=Factory(:admin)
+    User.current_user = Factory(:admin)
     pa = Factory(:programme_administrator)
     prog = pa.programmes.first
 
@@ -275,12 +272,12 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute pa.is_programme_administrator_of_any_programme?
     refute pa.has_role?('programme_administrator')
 
-    #administrator of multiple programmes
+    # administrator of multiple programmes
     pa = Factory(:programme_administrator)
     prog = pa.programmes.first
     prog2 = Factory(:programme)
     disable_authorization_checks do
-      pa.is_programme_administrator=true, prog2
+      pa.is_programme_administrator = true, prog2
       pa.save!
     end
     pa.reload
@@ -299,7 +296,6 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert pa.is_programme_administrator?(prog2)
     assert pa.is_programme_administrator_of_any_programme?
     assert pa.has_role?('programme_administrator')
-
   end
 
   test "doesn't change activation flag on later save" do
@@ -307,92 +303,92 @@ class ProgrammeTest < ActiveSupport::TestCase
     prog = Factory(:programme)
     assert prog.is_activated?
     User.with_current_user Factory(:person).user do
-      prog.title="fish"
-      disable_authorization_checks{prog.save!}
+      prog.title = 'fish'
+      disable_authorization_checks { prog.save! }
       assert prog.is_activated?
     end
   end
 
-  test "activated scope" do
+  test 'activated scope' do
     activated_prog = Factory(:programme)
     not_activated_prog = Factory(:programme)
-    not_activated_prog.is_activated=false
-    disable_authorization_checks{not_activated_prog.save!}
+    not_activated_prog.is_activated = false
+    disable_authorization_checks { not_activated_prog.save! }
 
-    assert_includes Programme.activated,activated_prog
-    refute_includes Programme.activated,not_activated_prog
+    assert_includes Programme.activated, activated_prog
+    refute_includes Programme.activated, not_activated_prog
   end
 
-  test "activate" do
+  test 'activate' do
     prog = Factory(:programme)
-    prog.is_activated=false
-    disable_authorization_checks{prog.save!}
+    prog.is_activated = false
+    disable_authorization_checks { prog.save! }
 
-    #no current user
+    # no current user
     prog.activate
     refute prog.is_activated?
 
-    #normal user
-    User.current_user=Factory(:person).user
+    # normal user
+    User.current_user = Factory(:person).user
     prog.activate
     refute prog.is_activated?
 
-    #admin
-    User.current_user=Factory(:admin).user
+    # admin
+    User.current_user = Factory(:admin).user
     prog.activate
     assert prog.is_activated?
 
-    #reason is wiped
-    prog = Factory(:programme,activation_rejection_reason:'it is rubbish')
-    prog.is_activated=false
-    disable_authorization_checks{prog.save!}
+    # reason is wiped
+    prog = Factory(:programme, activation_rejection_reason: 'it is rubbish')
+    prog.is_activated = false
+    disable_authorization_checks { prog.save! }
     refute_nil prog.activation_rejection_reason
     prog.activate
     assert prog.is_activated?
     assert_nil prog.activation_rejection_reason
   end
 
-  test "rejected?" do
+  test 'rejected?' do
     prog = Factory(:programme)
-    prog.is_activated=false
-    disable_authorization_checks{prog.save!}
+    prog.is_activated = false
+    disable_authorization_checks { prog.save! }
 
     refute prog.rejected?
 
-    prog.activation_rejection_reason='xxx'
-    disable_authorization_checks{prog.save!}
+    prog.activation_rejection_reason = 'xxx'
+    disable_authorization_checks { prog.save! }
     assert prog.rejected?
 
-    prog.activation_rejection_reason=''
-    disable_authorization_checks{prog.save!}
+    prog.activation_rejection_reason = ''
+    disable_authorization_checks { prog.save! }
     assert prog.rejected?
 
-    prog.is_activated=true
-    disable_authorization_checks{prog.save!}
+    prog.is_activated = true
+    disable_authorization_checks { prog.save! }
     refute prog.rejected?
   end
 
-  test "rejected scope" do
+  test 'rejected scope' do
     Programme.destroy_all
     prog_no_1 = Factory(:programme)
-    prog_no_1.activation_rejection_reason=''
-    prog_no_1.is_activated=true
-    disable_authorization_checks{prog_no_1.save!}
+    prog_no_1.activation_rejection_reason = ''
+    prog_no_1.is_activated = true
+    disable_authorization_checks { prog_no_1.save! }
 
     prog_no_2 = Factory(:programme)
-    prog_no_2.activation_rejection_reason=nil
-    prog_no_2.is_activated=true
-    disable_authorization_checks{prog_no_2.save!}
+    prog_no_2.activation_rejection_reason = nil
+    prog_no_2.is_activated = true
+    disable_authorization_checks { prog_no_2.save! }
 
     prog_yes_1 = Factory(:programme)
-    prog_yes_1.activation_rejection_reason=''
-    prog_yes_1.is_activated=false
-    disable_authorization_checks{prog_yes_1.save!}
+    prog_yes_1.activation_rejection_reason = ''
+    prog_yes_1.is_activated = false
+    disable_authorization_checks { prog_yes_1.save! }
 
     prog_yes_2 = Factory(:programme)
-    prog_yes_2.activation_rejection_reason='xxx'
-    prog_yes_2.is_activated=false
-    disable_authorization_checks{prog_yes_2.save!}
+    prog_yes_2.activation_rejection_reason = 'xxx'
+    prog_yes_2.is_activated = false
+    disable_authorization_checks { prog_yes_2.save! }
 
     refute prog_no_1.rejected?
     refute prog_no_2.rejected?
@@ -401,8 +397,7 @@ class ProgrammeTest < ActiveSupport::TestCase
 
     result = Programme.rejected
     assert_instance_of ActiveRecord::Relation, result
-    assert_equal [prog_yes_1,prog_yes_2].sort,result.sort
-
+    assert_equal [prog_yes_1, prog_yes_2].sort, result.sort
   end
 
   test 'related items' do
@@ -435,5 +430,4 @@ class ProgrammeTest < ActiveSupport::TestCase
       assert_equal 3, programme.send(type).count
     end
   end
-
 end

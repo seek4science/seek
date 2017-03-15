@@ -3,31 +3,30 @@ require 'test_helper'
 class UserTest < ActiveSupport::TestCase
   # Be sure to include AuthenticatedTestHelper in test/test_helper.rb instead.
   # Then, you can remove it from this and the functional test.
-  
+
   include AuthenticatedTestHelper
-  fixtures :users,:sops,:data_files,:models,:assets
+  fixtures :users, :sops, :data_files, :models, :assets
 
-
-  test "validates email if set" do
+  test 'validates email if set' do
     u = Factory :user
     assert u.valid?
 
-    u.email="fish"
+    u.email = 'fish'
     refute u.valid?
 
-    u.email="http://fish.com"
+    u.email = 'http://fish.com'
     refute u.valid?
 
-    u.email="fish@example.com"
+    u.email = 'fish@example.com'
     assert u.valid?
   end
 
-  test "registration_compelete?" do
+  test 'registration_compelete?' do
     u = Factory :brand_new_user
     refute u.person
     refute u.registration_complete?
 
-    #its not complete until the association has been saved
+    # its not complete until the association has been saved
     u.person = Factory(:brand_new_person)
     assert u.person
     refute u.registration_complete?
@@ -35,52 +34,47 @@ class UserTest < ActiveSupport::TestCase
     u = Factory :user
     assert u.person
     assert u.registration_complete?
-
   end
 
-
-
-  test "check email present?" do
+  test 'check email present?' do
     u = Factory :user
     assert u.email.nil?
     assert u.valid?
 
-    u.check_email_present=true
+    u.check_email_present = true
     refute u.valid?
-    u.email=""
+    u.email = ''
     refute u.valid?
-    u.email="fish@example.com"
+    u.email = 'fish@example.com'
     assert u.valid?
   end
 
-  test "check email available" do
-    #email must not belong to another person, unless that person is unregistered
+  test 'check email available' do
+    # email must not belong to another person, unless that person is unregistered
     u = Factory :user
-    u.check_email_present=true
-    u.email="ghghgh@email.com"
+    u.check_email_present = true
+    u.email = 'ghghgh@email.com'
     assert u.valid?
-    Factory(:person,:email=>"ghghgh@email.com")
+    Factory(:person, email: 'ghghgh@email.com')
 
     refute u.valid?
 
-    Factory(:brand_new_person,:email=>"zzzzzz@email.com")
-    u.email="zzzzzz@email.com"
+    Factory(:brand_new_person, email: 'zzzzzz@email.com')
+    u.email = 'zzzzzz@email.com'
     assert u.valid?
-
   end
 
-  test "validation of login" do
+  test 'validation of login' do
     u = Factory :user
     assert u.valid?
-    u.login=nil
+    u.login = nil
     refute u.valid?
-    u.login=""
+    u.login = ''
     refute u.valid?
-    u.login="aa"
+    u.login = 'aa'
     refute u.valid?
-    u.login="zhsdfkhsdksdfh11"
+    u.login = 'zhsdfkhsdksdfh11'
     assert u.valid?
-
   end
 
   def test_without_profile
@@ -90,18 +84,17 @@ class UserTest < ActiveSupport::TestCase
     assert_nil user_without_profile.person
     refute_nil user_with_profile.person
 
-    without_profile=User.without_profile
+    without_profile = User.without_profile
     without_profile.each do |u|
       assert u.person.nil?
     end
     assert without_profile.include?(user_without_profile)
     assert !without_profile.include?(user_with_profile)
 
-
-    user_with_profile.person=nil
+    user_with_profile.person = nil
     user_with_profile.save!
 
-    without_profile=User.without_profile
+    without_profile = User.without_profile
     without_profile.each do |u|
       assert u.person.nil?
     end
@@ -109,9 +102,9 @@ class UserTest < ActiveSupport::TestCase
     assert without_profile.include? user_with_profile
   end
 
-  test "with magic_guest_enabled" do
-    user = Factory(:user, :login=>"guest")
-    with_config_value :magic_guest_enabled,true do
+  test 'with magic_guest_enabled' do
+    user = Factory(:user, login: 'guest')
+    with_config_value :magic_guest_enabled, true do
       User.with_current_user user do
         assert_equal user, User.guest
         assert user.guest?
@@ -120,9 +113,9 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "without auto magic_guest_enabled" do
-    user = Factory(:user, :login=>"guest")
-    with_config_value :magic_guest_enabled,false do
+  test 'without auto magic_guest_enabled' do
+    user = Factory(:user, login: 'guest')
+    with_config_value :magic_guest_enabled, false do
       User.with_current_user user do
         assert_nil User.guest
         assert !user.guest?
@@ -131,7 +124,7 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "logged in and registered" do
+  test 'logged in and registered' do
     user = Factory(:brand_new_user)
     User.with_current_user(user) do
       refute User.logged_in_and_registered?
@@ -146,7 +139,7 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "project administrator logged in?" do
+  test 'project administrator logged in?' do
     project_administrator = Factory :project_administrator
     normal = Factory :person
     User.with_current_user(project_administrator.user) do
@@ -158,7 +151,7 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "programme administrator logged in?" do
+  test 'programme administrator logged in?' do
     programme_administrator = Factory :programme_administrator
     normal = Factory :person
     User.with_current_user(programme_administrator.user) do
@@ -174,22 +167,22 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "activated_programme_administrator_logged_in? only if activated" do
+  test 'activated_programme_administrator_logged_in? only if activated' do
     refute User.activated_programme_administrator_logged_in?
     person = Factory(:programme_administrator)
     programme = person.administered_programmes.first
 
-    #check programme is activated an is the only administered programme
+    # check programme is activated an is the only administered programme
     assert person.administered_programmes.first.is_activated?
-    assert_equal [programme],person.administered_programmes
+    assert_equal [programme], person.administered_programmes
 
     User.with_current_user person.user do
       assert User.activated_programme_administrator_logged_in?
     end
 
-    #not true unless the programme is activated
-    programme.is_activated=false
-    disable_authorization_checks{programme.save!}
+    # not true unless the programme is activated
+    programme.is_activated = false
+    disable_authorization_checks { programme.save! }
     User.with_current_user person.user do
       refute User.activated_programme_administrator_logged_in?
     end
@@ -206,7 +199,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_not_activated
-    not_activated=User.not_activated
+    not_activated = User.not_activated
     not_activated.each do |u|
       assert !u.active?
     end
@@ -229,32 +222,32 @@ class UserTest < ActiveSupport::TestCase
 
   def test_should_require_login
     assert_no_difference 'User.count' do
-      u = create_user(:login => nil)
+      u = create_user(login: nil)
       assert u.errors.get(:login)
     end
   end
 
   def test_should_require_password
     assert_no_difference 'User.count' do
-      u = create_user(:password => nil)
+      u = create_user(password: nil)
       assert u.errors.get(:password)
     end
   end
 
   def test_should_require_password_confirmation
     assert_no_difference 'User.count' do
-      u = create_user(:password_confirmation => nil)
+      u = create_user(password_confirmation: nil)
       assert u.errors.get(:password_confirmation)
     end
   end
 
   def test_should_reset_password
-    users(:quentin).update_attributes(:password => 'new password', :password_confirmation => 'new password')
+    users(:quentin).update_attributes(password: 'new password', password_confirmation: 'new password')
     assert_equal users(:quentin), User.authenticate('quentin', 'new password')
   end
 
   def test_should_not_rehash_password
-    users(:quentin).update_attributes(:login => 'quentin2')
+    users(:quentin).update_attributes(login: 'quentin2')
     assert_equal users(:quentin), User.authenticate('quentin2', 'test')
   end
 
@@ -302,39 +295,38 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_get_assets
-    user=users(:owner_of_my_first_sop)
-    assert user.sops.size>0
+    user = users(:owner_of_my_first_sop)
+    assert user.sops.size > 0
     assert user.sops.include?(sops(:my_first_sop))
     assert !user.sops.include?(sops(:sop_with_fully_public_policy))
 
-    user=users(:model_owner)
-    assert user.models.size>0
+    user = users(:model_owner)
+    assert user.models.size > 0
     assert user.models.include?(models(:teusink))
     assert !user.models.include?(models(:model_with_different_owner))
 
-    user=users(:datafile_owner)
-    assert user.data_files.size>0
+    user = users(:datafile_owner)
+    assert user.data_files.size > 0
     assert user.data_files.include?(data_files(:picture))
     assert !user.data_files.include?(data_files(:sysmo_data_file))
-
   end
 
-  test "test uuid generated" do
+  test 'test uuid generated' do
     user = users(:aaron)
-    assert_nil user.attributes["uuid"]
+    assert_nil user.attributes['uuid']
     user.save
-    assert_not_nil user.attributes["uuid"]
+    assert_not_nil user.attributes['uuid']
   end
-  
+
   test "uuid doesn't change" do
     x = users(:aaron)
     x.save
-    uuid = x.attributes["uuid"]
+    uuid = x.attributes['uuid']
     x.save
     assert_equal x.uuid, uuid
   end
 
-  test "reset password" do
+  test 'reset password' do
     user = Factory(:user)
     assert_nil user.reset_password_code
     assert_nil user.reset_password_code_until
@@ -343,9 +335,10 @@ class UserTest < ActiveSupport::TestCase
     refute_nil user.reset_password_code_until
   end
 
-protected
+  protected
+
   def create_user(options = {})
-    record = User.new({ :login => 'quire', :password => 'quire', :password_confirmation => 'quire' }.merge(options))
+    record = User.new({ login: 'quire', password: 'quire', password_confirmation: 'quire' }.merge(options))
     record.save
     record
   end

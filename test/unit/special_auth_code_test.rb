@@ -1,8 +1,8 @@
 require 'test_helper'
 
 class SpecialAuthCodeTest < ActiveSupport::TestCase
-  test "only managers can add/remove auth codes" do
-    item = Factory(:data_file, :policy => Factory(:all_sysmo_viewable_policy))
+  test 'only managers can add/remove auth codes' do
+    item = Factory(:data_file, policy: Factory(:all_sysmo_viewable_policy))
     User.current_user = Factory(:user)
 
     assert_raise RuntimeError do
@@ -25,7 +25,7 @@ class SpecialAuthCodeTest < ActiveSupport::TestCase
     assert item.special_auth_codes.empty?
   end
 
-  test "only the manager of an item can edit its auth codes" do
+  test 'only the manager of an item can edit its auth codes' do
     code = Factory(:special_auth_code)
     User.current_user = Factory(:user)
 

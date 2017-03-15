@@ -1,8 +1,8 @@
 module SharingFormTestHelper
   def valid_sharing
     {
-        access_type: Policy::VISIBLE,
-        permissions_attributes: { }
+      access_type: Policy::VISIBLE,
+      permissions_attributes: {}
     }
   end
 
@@ -10,9 +10,9 @@ module SharingFormTestHelper
     {}.tap do |h|
       projects.each_with_index do |project, i|
         h["#{i}"] = {
-            contributor_type: 'Project',
-            contributor_id: project.is_a?(Project) ? project.id : project,
-            access_type: access_type
+          contributor_type: 'Project',
+          contributor_id: project.is_a?(Project) ? project.id : project,
+          access_type: access_type
         }
       end
     end
@@ -24,13 +24,12 @@ module SharingFormTestHelper
       h2 = {}
       projects.each_with_index do |project, i|
         h2["#{i}"] = {
-            contributor_type: 'Project',
-            contributor_id: project.is_a?(Project) ? project.id : project,
-            access_type: projects_access_type
+          contributor_type: 'Project',
+          contributor_id: project.is_a?(Project) ? project.id : project,
+          access_type: projects_access_type
         }
       end
       h[:permissions_attributes] = h2
     end
   end
-
 end

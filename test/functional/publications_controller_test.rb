@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class PublicationsControllerTest < ActionController::TestCase
-  
   fixtures :all
 
   include AuthenticatedTestHelper
@@ -17,106 +16,106 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object=publications(:taverna_paper_pubmed)
-    @object=publications(:taverna_paper_pubmed)
+    @object = publications(:taverna_paper_pubmed)
+    @object = publications(:taverna_paper_pubmed)
   end
-  
+
   def test_title
     get :index
-    assert_select "title",:text=>/The Sysmo SEEK Publications.*/, :count=>1
+    assert_select 'title', text: /The Sysmo SEEK Publications.*/, count: 1
   end
-  
-  test "should get index" do
+
+  test 'should get index' do
     get :index
     assert_response :success
     assert_not_nil assigns(:publications)
   end
 
-  test "should get new" do
+  test 'should get new' do
     get :new
     assert_response :success
   end
 
-  test "should not relate assays thay are not authorized for edit during create publication" do
-    mock_pubmed(:content_file=>"pubmed_1.txt")
-    assay=assays(:metabolomics_assay)
+  test 'should not relate assays thay are not authorized for edit during create publication' do
+    mock_pubmed(content_file: 'pubmed_1.txt')
+    assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 1,:project_ids=>[projects(:sysmo_project).id]},:assay_ids=>[assay.id.to_s]
+      post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id] }, assay_ids: [assay.id.to_s]
       p assigns(:publication).errors.full_messages
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
-    p=assigns(:publication)
-    assert_equal 0,p.assays.count
+    p = assigns(:publication)
+    assert_equal 0, p.assays.count
   end
 
-  test "should create publication" do
-    mock_pubmed(:content_file=>"pubmed_1.txt")
-    login_as(:model_owner) #can edit assay
-    assay=assays(:metabolomics_assay)
+  test 'should create publication' do
+    mock_pubmed(content_file: 'pubmed_1.txt')
+    login_as(:model_owner) # can edit assay
+    assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
-      post :create, :publication => {:pubmed_id => 1,:project_ids=>[projects(:sysmo_project).id] },:assay_ids=>[assay.id.to_s]
+      post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id] }, assay_ids: [assay.id.to_s]
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
-    p=assigns(:publication)
-    assert_equal 1,p.assays.count
+    p = assigns(:publication)
+    assert_equal 1, p.assays.count
     assert p.assays.include? assay
   end
-  
-  test "should create doi publication" do
-    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1371/journal.pone.0004803",:content_file=>"cross_ref3.xml")
+
+  test 'should create doi publication' do
+    mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1371/journal.pone.0004803", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
   end
 
-  test "should create doi publication with doi prefix" do
-    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1371/journal.pone.0004803",:content_file=>"cross_ref3.xml")
+  test 'should create doi publication with doi prefix' do
+    mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1371/journal.pone.0004803', content_file: 'cross_ref3.xml')
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "DOI: 10.1371/journal.pone.0004803", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, publication: { doi: 'DOI: 10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
     assert_redirected_to edit_publication_path(assigns(:publication))
     publication = assigns(:publication).destroy
 
-    #formatted slightly different
+    # formatted slightly different
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => " doi:10.1371/journal.pone.0004803", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, publication: { doi: ' doi:10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_not_nil assigns(:publication)
     assert_redirected_to edit_publication_path(assigns(:publication))
     publication = assigns(:publication).destroy
 
-    #also test with spaces around
+    # also test with spaces around
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "  10.1371/journal.pone.0004803  ", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, publication: { doi: '  10.1371/journal.pone.0004803  ', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
   end
 
-  test "should create publication from details" do
+  test 'should create publication from details' do
     publication = {
-      :doi => "10.1371/journal.pone.0004803",
-      :title => "Clickstream Data Yields High-Resolution Maps of Science",
-      :abstract => "Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.",
-      :publication_authors => ["Johan Bollen", "Herbert Van de Sompel", "Aric Hagberg", "Luis Bettencourt", "Ryan Chute", "Marko A. Rodriguez", "Lyudmila Balakireva"],
-      :journal => "Public Library of Science (PLoS)",
-      :published_date => Date.new(2011,3),
-      :project_ids=>[projects(:sysmo_project).id]
+      doi: '10.1371/journal.pone.0004803',
+      title: 'Clickstream Data Yields High-Resolution Maps of Science',
+      abstract: 'Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.',
+      publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
+      journal: 'Public Library of Science (PLoS)',
+      published_date: Date.new(2011, 3),
+      project_ids: [projects(:sysmo_project).id]
     }
 
     assert_difference('Publication.count') do
-      post :create, :subaction => "Create", :publication => publication
+      post :create, subaction: 'Create', publication: publication
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
-    p=assigns(:publication)
+    p = assigns(:publication)
 
     assert_nil p.pubmed_id
     assert_equal publication[:doi], p.doi
@@ -124,215 +123,215 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal publication[:abstract], p.abstract
     assert_equal publication[:journal], p.journal
     assert_equal publication[:published_date], p.published_date
-    assert_equal publication[:publication_authors], p.publication_authors.collect { |author| author.full_name }
-    assert_equal publication[:project_ids], p.projects.collect { |project| project.id }
+    assert_equal publication[:publication_authors], p.publication_authors.collect(&:full_name)
+    assert_equal publication[:project_ids], p.projects.collect(&:id)
   end
 
-  test "should import from bibtex file" do
+  test 'should import from bibtex file' do
     publication = {
-      :title        => "Taverna: a tool for building and running workflows of services.",
-      :journal      => "Nucleic Acids Res",
-      :authors      => [
-        PublicationAuthor.new({ :first_name => "D."   , :last_name => "Hull"        , :author_index => 0}),
-        PublicationAuthor.new({ :first_name => "K."   , :last_name => "Wolstencroft", :author_index => 1}),
-        PublicationAuthor.new({ :first_name => "R."   , :last_name => "Stevens"     , :author_index => 2}),
-        PublicationAuthor.new({ :first_name => "C."   , :last_name => "Goble"       , :author_index => 3}),
-        PublicationAuthor.new({ :first_name => "M. R.", :last_name => "Pocock"      , :author_index => 4}),
-        PublicationAuthor.new({ :first_name => "P."   , :last_name => "Li"          , :author_index => 5}),
-        PublicationAuthor.new({ :first_name => "T."   , :last_name => "Oinn"        , :author_index => 6})
+      title: 'Taverna: a tool for building and running workflows of services.',
+      journal: 'Nucleic Acids Res',
+      authors: [
+        PublicationAuthor.new(first_name: 'D.', last_name: 'Hull', author_index: 0),
+        PublicationAuthor.new(first_name: 'K.', last_name: 'Wolstencroft', author_index: 1),
+        PublicationAuthor.new(first_name: 'R.', last_name: 'Stevens', author_index: 2),
+        PublicationAuthor.new(first_name: 'C.', last_name: 'Goble', author_index: 3),
+        PublicationAuthor.new(first_name: 'M. R.', last_name: 'Pocock', author_index: 4),
+        PublicationAuthor.new(first_name: 'P.', last_name: 'Li', author_index: 5),
+        PublicationAuthor.new(first_name: 'T.', last_name: 'Oinn', author_index: 6)
       ],
-      :published_date => Date.new(2006)
+      published_date: Date.new(2006)
     }
-    post :create, :subaction => "Import", :publication => { :bibtex_file => fixture_file_upload('files/publication.bibtex') }
+    post :create, subaction: 'Import', publication: { bibtex_file: fixture_file_upload('files/publication.bibtex') }
     p = assigns(:publication)
     assert_equal publication[:title], p.title
     assert_equal publication[:journal], p.journal
     assert_equal publication[:authors].collect(&:full_name), p.publication_authors.collect(&:full_name)
     assert_equal publication[:published_date], p.published_date
   end
-  
-  test "should import multiple from bibtex file" do
-    publications = [{
-      :title        => "Taverna: a tool for building and running workflows of services.",
-      :journal      => "Nucleic Acids Res",
-      :authors      => [
-        PublicationAuthor.new({ :first_name => "D."   , :last_name => "Hull"        , :author_index => 0}),
-        PublicationAuthor.new({ :first_name => "K."   , :last_name => "Wolstencroft", :author_index => 1}),
-        PublicationAuthor.new({ :first_name => "R."   , :last_name => "Stevens"     , :author_index => 2}),
-        PublicationAuthor.new({ :first_name => "C."   , :last_name => "Goble"       , :author_index => 3}),
-        PublicationAuthor.new({ :first_name => "M. R.", :last_name => "Pocock"      , :author_index => 4}),
-        PublicationAuthor.new({ :first_name => "P."   , :last_name => "Li"          , :author_index => 5}),
-        PublicationAuthor.new({ :first_name => "T."   , :last_name => "Oinn"        , :author_index => 6})
-      ],
-      :published_date => Date.new(2006)
-    },
-    {
-      :authors        => [
-        PublicationAuthor.new({ :first_name => "J."   , :last_name => "Shmoe"     , :author_index => 0}),
-        PublicationAuthor.new({ :first_name => "M."   , :last_name => "Mustermann", :author_index => 1}),
-      ],
-      :title          => "Yet another tool for importing publications",
-      :journal        => "The second best journal",
-      :published_date =>  Date.new(2016)
-    }]
 
-    assert_difference('Publication.count',2) do
-      post :create, :subaction => "ImportMultiple", :publication => { :bibtex_file => fixture_file_upload('files/publications.bibtex'), :project_ids => [projects(:one).id] }
+  test 'should import multiple from bibtex file' do
+    publications = [{
+      title: 'Taverna: a tool for building and running workflows of services.',
+      journal: 'Nucleic Acids Res',
+      authors: [
+        PublicationAuthor.new(first_name: 'D.', last_name: 'Hull', author_index: 0),
+        PublicationAuthor.new(first_name: 'K.', last_name: 'Wolstencroft', author_index: 1),
+        PublicationAuthor.new(first_name: 'R.', last_name: 'Stevens', author_index: 2),
+        PublicationAuthor.new(first_name: 'C.', last_name: 'Goble', author_index: 3),
+        PublicationAuthor.new(first_name: 'M. R.', last_name: 'Pocock', author_index: 4),
+        PublicationAuthor.new(first_name: 'P.', last_name: 'Li', author_index: 5),
+        PublicationAuthor.new(first_name: 'T.', last_name: 'Oinn', author_index: 6)
+      ],
+      published_date: Date.new(2006)
+    },
+                    {
+                      authors: [
+                        PublicationAuthor.new(first_name: 'J.', last_name: 'Shmoe', author_index: 0),
+                        PublicationAuthor.new(first_name: 'M.', last_name: 'Mustermann', author_index: 1)
+                      ],
+                      title: 'Yet another tool for importing publications',
+                      journal: 'The second best journal',
+                      published_date: Date.new(2016)
+                    }]
+
+    assert_difference('Publication.count', 2) do
+      post :create, subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/publications.bibtex'), project_ids: [projects(:one).id] }
     end
 
-    publication0 = Publication.where( title: publications[0][:title]).first
+    publication0 = Publication.where(title: publications[0][:title]).first
     assert_not_nil publication0
     assert_equal publications[0][:journal], publication0.journal
     assert_equal publications[0][:authors].collect(&:full_name), publication0.publication_authors.collect(&:full_name)
     assert_equal publications[0][:published_date], publication0.published_date
 
-    publication1 = Publication.where( title: publications[1][:title]).first
+    publication1 = Publication.where(title: publications[1][:title]).first
     assert_not_nil publication1
     assert_equal publications[1][:journal], publication1.journal
     assert_equal publications[1][:authors].collect(&:full_name), publication1.publication_authors.collect(&:full_name)
     assert_equal publications[1][:published_date], publication1.published_date
   end
 
-  test "should only show the year for 1st Jan" do
-    publication = Factory(:publication,:published_date=>Date.new(2013,1,1))
-    get :show,:id=>publication
+  test 'should only show the year for 1st Jan' do
+    publication = Factory(:publication, published_date: Date.new(2013, 1, 1))
+    get :show, id: publication
     assert_response :success
-    assert_select("p") do
-      assert_select "strong", :text=>"Date Published:"
-      assert_select "span", :text=>/2013/, :count=>1
-      assert_select "span", :text=>/Jan.* 2013/, :count=>0
+    assert_select('p') do
+      assert_select 'strong', text: 'Date Published:'
+      assert_select 'span', text: /2013/, count: 1
+      assert_select 'span', text: /Jan.* 2013/, count: 0
     end
   end
 
-  test "should only show the year for 1st Jan in list view" do
-    publication = Factory(:publication,:published_date=>Date.new(2013,1,1),:title=>"blah blah blah science")
+  test 'should only show the year for 1st Jan in list view' do
+    publication = Factory(:publication, published_date: Date.new(2013, 1, 1), title: 'blah blah blah science')
     get :index
     assert_response :success
-    assert_select "div.list_item:first-of-type" do
-      assert_select "div.list_item_title a[href=?]",publication_path(publication),:text=>/#{publication.title}/
-      assert_select "p.list_item_attribute",:text=>/2013/,:count=>1
-      assert_select "p.list_item_attribute",:text=>/Jan.* 2013/,:count=>0
+    assert_select 'div.list_item:first-of-type' do
+      assert_select 'div.list_item_title a[href=?]', publication_path(publication), text: /#{publication.title}/
+      assert_select 'p.list_item_attribute', text: /2013/, count: 1
+      assert_select 'p.list_item_attribute', text: /Jan.* 2013/, count: 0
     end
   end
 
-  test "should show publication" do
-    get :show, :id => publications(:one)
+  test 'should show publication' do
+    get :show, id: publications(:one)
     assert_response :success
   end
 
-  test "should export publication as endnote" do
+  test 'should export publication as endnote' do
     publication_formatter_mock
-    get :show, :id => publications(:one), :format => "enw"
+    get :show, id: publications(:one), format: 'enw'
     assert_response :success
-    assert_match( /%0 Journal Article.*/, response.body)
-    assert_match( /.*%A Hendrickson, W\. A\..*/, response.body)
-    assert_match( /.*%A Ward, K\. B\..*/, response.body) 
-    assert_match( /.*%D 1975.*/, response.body) 
-    assert_match( /.*%T Atomic models for the polypeptide backbones of myohemerythrin and hemerythrin\..*/, response.body) 
-    assert_match( /.*%J Biochem Biophys Res Commun.*/, response.body) 
-    assert_match( /.*%V 66.*/, response.body) 
-    assert_match( /.*%N 4.*/, response.body) 
-    assert_match( /.*%P 1349-1356.*/, response.body) 
-    assert_match( /.*%M 5.*/, response.body) 
-    assert_match( /.*%U http:\/\/www.ncbi.nlm.nih.gov\/pubmed\/5.*/, response.body) 
-    assert_match( /.*%K Animals.*/, response.body) 
-    assert_match( /.*%K Cnidaria.*/, response.body) 
-    assert_match( /.*%K Computers.*/, response.body) 
-    assert_match( /.*%K \*Hemerythrin.*/, response.body) 
-    assert_match( /.*%K \*Metalloproteins.*/, response.body) 
-    assert_match( /.*%K Models, Molecular.*/, response.body) 
-    assert_match( /.*%K \*Muscle Proteins.*/, response.body) 
-    assert_match( /.*%K Protein Conformation.*/, response.body) 
-    assert_match( /.*%K Species Specificity.*/, response.body) 
+    assert_match(/%0 Journal Article.*/, response.body)
+    assert_match(/.*%A Hendrickson, W\. A\..*/, response.body)
+    assert_match(/.*%A Ward, K\. B\..*/, response.body)
+    assert_match(/.*%D 1975.*/, response.body)
+    assert_match(/.*%T Atomic models for the polypeptide backbones of myohemerythrin and hemerythrin\..*/, response.body)
+    assert_match(/.*%J Biochem Biophys Res Commun.*/, response.body)
+    assert_match(/.*%V 66.*/, response.body)
+    assert_match(/.*%N 4.*/, response.body)
+    assert_match(/.*%P 1349-1356.*/, response.body)
+    assert_match(/.*%M 5.*/, response.body)
+    assert_match(/.*%U http:\/\/www.ncbi.nlm.nih.gov\/pubmed\/5.*/, response.body)
+    assert_match(/.*%K Animals.*/, response.body)
+    assert_match(/.*%K Cnidaria.*/, response.body)
+    assert_match(/.*%K Computers.*/, response.body)
+    assert_match(/.*%K \*Hemerythrin.*/, response.body)
+    assert_match(/.*%K \*Metalloproteins.*/, response.body)
+    assert_match(/.*%K Models, Molecular.*/, response.body)
+    assert_match(/.*%K \*Muscle Proteins.*/, response.body)
+    assert_match(/.*%K Protein Conformation.*/, response.body)
+    assert_match(/.*%K Species Specificity.*/, response.body)
   end
 
-  test "should export publication as bibtex" do
+  test 'should export publication as bibtex' do
     publication_formatter_mock
-    get :show, :id => publications(:one), :format => "bibtex"
+    get :show, id: publications(:one), format: 'bibtex'
     assert_response :success
-    assert_match( /@article{PMID:5,.*/, response.body) 
-    assert_match( /.*author.*/, response.body)
-    assert_match( /.*title.*/, response.body)
-    assert_match( /.*journal.*/, response.body)
-    assert_match( /.*year.*/, response.body)
-    assert_match( /.*number.*/, response.body)
-    assert_match( /.*pages.*/, response.body)
-    assert_match( /.*url.*/, response.body)
+    assert_match(/@article{PMID:5,.*/, response.body)
+    assert_match(/.*author.*/, response.body)
+    assert_match(/.*title.*/, response.body)
+    assert_match(/.*journal.*/, response.body)
+    assert_match(/.*year.*/, response.body)
+    assert_match(/.*number.*/, response.body)
+    assert_match(/.*pages.*/, response.body)
+    assert_match(/.*url.*/, response.body)
   end
 
-  test "should export publication as embl" do
+  test 'should export publication as embl' do
     publication_formatter_mock
-    get :show, :id => publications(:one), :format => "embl"
+    get :show, id: publications(:one), format: 'embl'
     assert_response :success
-    assert_match( /RX   PUBMED; 5\..*/, response.body) 
-    assert_match( /.*RT   \"Atomic models for the polypeptide backbones of myohemerythrin and\nRT   hemerythrin.\";.*/, response.body)
-    assert_match( /.*RA   Hendrickson W\.A\., Ward K\.B\.;.*/, response.body)
-    assert_match( /.*RL   Biochem Biophys Res Commun 66\(4\):1349-1356\(1975\)\..*/, response.body)
-    assert_match( /.*XX.*/, response.body)
+    assert_match(/RX   PUBMED; 5\..*/, response.body)
+    assert_match(/.*RT   \"Atomic models for the polypeptide backbones of myohemerythrin and\nRT   hemerythrin.\";.*/, response.body)
+    assert_match(/.*RA   Hendrickson W\.A\., Ward K\.B\.;.*/, response.body)
+    assert_match(/.*RL   Biochem Biophys Res Commun 66\(4\):1349-1356\(1975\)\..*/, response.body)
+    assert_match(/.*XX.*/, response.body)
   end
 
-  test "should filter publications by projects_id for export" do
+  test 'should filter publications by projects_id for export' do
     # project without publications
-    get :export, :query => { :projects_id_in => [projects(:sysmo_project).id + 1] }
+    get :export, query: { projects_id_in: [projects(:sysmo_project).id + 1] }
     assert_response :success
     p = assigns(:publications)
     assert_equal 0, p.length
     # project with publications
-    get :export, :query => { :projects_id_in => [projects(:sysmo_project).id]}
+    get :export, query: { projects_id_in: [projects(:sysmo_project).id] }
     assert_response :success
     p = assigns(:publications)
     assert_equal 3, p.length
   end
 
-  test "should filter publications sort by published date for export" do
+  test 'should filter publications sort by published date for export' do
     # sort by published_date asc
-    get :export, :query => { :s => [{ :name => :published_date, :dir => :asc }] }
+    get :export, query: { s: [{ name: :published_date, dir: :asc }] }
     assert_response :success
     p = assigns(:publications)
     assert_operator p[0].published_date, :<=, p[1].published_date
     assert_operator p[1].published_date, :<=, p[2].published_date
 
     # sort by published_date desc
-    get :export, :query => { :s => [{ :name => :published_date, :dir => :desc }] }
+    get :export, query: { s: [{ name: :published_date, dir: :desc }] }
     assert_response :success
     p = assigns(:publications)
     assert_operator p[0].published_date, :>=, p[1].published_date
     assert_operator p[1].published_date, :>=, p[2].published_date
   end
 
-  test "should filter publications by title contains for export" do
+  test 'should filter publications by title contains for export' do
     # sort by published_date asc
-    get :export, :query => { :title_cont => "workflows" }
+    get :export, query: { title_cont: 'workflows' }
     assert_response :success
     p = assigns(:publications)
     assert_equal 1, p.count
   end
 
-  test "should filter publications by authour name contains for export" do
+  test 'should filter publications by authour name contains for export' do
     # sort by published_date asc
-    get :export, :query => { :publication_authors_last_name_cont => "Bau" }
+    get :export, query: { publication_authors_last_name_cont: 'Bau' }
     assert_response :success
     p = assigns(:publications)
     assert_equal 1, p.count
   end
 
-  test "should get edit" do
-    get :edit, :id => publications(:one)
+  test 'should get edit' do
+    get :edit, id: publications(:one)
     assert_response :success
   end
 
-  test "associates assay" do
-    login_as(:model_owner) #can edit assay
+  test 'associates assay' do
+    login_as(:model_owner) # can edit assay
     p = publications(:taverna_paper_pubmed)
     refute_nil p.contributor
     original_assay = assays(:assay_with_a_publication)
     assert p.assays.include?(original_assay)
     assert original_assay.publications.include?(p)
 
-    new_assay=assays(:metabolomics_assay)
+    new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
-    
-    put :update, :id => p,:author=>{},:assay_ids=>[new_assay.id.to_s]
+
+    put :update, id: p, author: {}, assay_ids: [new_assay.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -346,18 +345,17 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert p.assays.include?(new_assay)
     assert new_assay.publications.include?(p)
-
   end
 
-  test "associates data files" do
+  test 'associates data files' do
     p = Factory(:publication)
-    df = Factory(:data_file, :policy => Factory(:all_sysmo_viewable_policy))
+    df = Factory(:data_file, policy: Factory(:all_sysmo_viewable_policy))
     assert !p.data_files.include?(df)
     assert !df.publications.include?(p)
 
     login_as(p.contributor)
-    #add association
-    put :update, :id => p,:author=>{},:data_files=>[{ id: df.id.to_s }]
+    # add association
+    put :update, id: p, author: {}, data_files: [{ id: df.id.to_s }]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -368,8 +366,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert p.data_files.include?(df)
     assert df.publications.include?(p)
 
-    #remove association
-    put :update, :id => p,:author=>{},:data_file_ids=>[]
+    # remove association
+    put :update, id: p, author: {}, data_file_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -379,15 +377,15 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, df.publications.count
   end
 
-  test "associates models" do
+  test 'associates models' do
     p = Factory(:publication)
-    model = Factory(:model, :policy => Factory(:all_sysmo_viewable_policy))
+    model = Factory(:model, policy: Factory(:all_sysmo_viewable_policy))
     assert !p.models.include?(model)
     assert !model.publications.include?(p)
 
     login_as(p.contributor)
-    #add association
-    put :update, :id => p,:author=>{},:model_ids=>[model.id.to_s]
+    # add association
+    put :update, id: p, author: {}, model_ids: [model.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -399,8 +397,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert p.models.include?(model)
     assert model.publications.include?(p)
 
-    #remove association
-    put :update, :id => p,:author=>{},:model_ids=>[]
+    # remove association
+    put :update, id: p, author: {}, model_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -410,15 +408,15 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, model.publications.count
   end
 
-  test "associates investigations" do
+  test 'associates investigations' do
     p = Factory(:publication)
-    investigation = Factory(:investigation, :policy => Factory(:all_sysmo_viewable_policy))
+    investigation = Factory(:investigation, policy: Factory(:all_sysmo_viewable_policy))
     assert !p.investigations.include?(investigation)
     assert !investigation.publications.include?(p)
 
     login_as(p.contributor)
-    #add association
-    put :update, :id => p,:author=>{},:investigation_ids=>["#{investigation.id.to_s}"]
+    # add association
+    put :update, id: p, author: {}, investigation_ids: ["#{investigation.id}"]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -429,8 +427,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert p.investigations.include?(investigation)
     assert investigation.publications.include?(p)
 
-    #remove association
-    put :update, :id => p,:author=>{},:investigation_ids=>[]
+    # remove association
+    put :update, id: p, author: {}, investigation_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -440,15 +438,15 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, investigation.publications.count
   end
 
-  test "associates studies" do
+  test 'associates studies' do
     p = Factory(:publication)
-    study = Factory(:study, :policy => Factory(:all_sysmo_viewable_policy))
+    study = Factory(:study, policy: Factory(:all_sysmo_viewable_policy))
     assert !p.studies.include?(study)
     assert !study.publications.include?(p)
 
     login_as(p.contributor)
-    #add association
-    put :update, :id => p,:author=>{},:study_ids=>["#{study.id.to_s}"]
+    # add association
+    put :update, id: p, author: {}, study_ids: ["#{study.id}"]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -459,8 +457,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert p.studies.include?(study)
     assert study.publications.include?(p)
 
-    #remove association
-    put :update, :id => p,:author=>{},:study_ids=>[]
+    # remove association
+    put :update, id: p, author: {}, study_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -469,17 +467,17 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, p.studies.count
     assert_equal 0, study.publications.count
   end
-  
-  test "do not associate assays unauthorized for edit" do
+
+  test 'do not associate assays unauthorized for edit' do
     p = publications(:taverna_paper_pubmed)
     original_assay = assays(:assay_with_a_publication)
     assert p.assays.include?(original_assay)
     assert original_assay.publications.include?(p)
 
-    new_assay=assays(:metabolomics_assay)
+    new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
 
-    put :update, :id => p,:author=>{},:assay_ids=>[new_assay.id.to_s]
+    put :update, id: p, author: {}, assay_ids: [new_assay.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -493,14 +491,13 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert !p.assays.include?(new_assay)
     assert !new_assay.publications.include?(p)
-
   end
 
-  test "should keep model and data associations after update" do
+  test 'should keep model and data associations after update' do
     p = publications(:pubmed_2)
-    put :update, :id => p,:author=>{},:assay_ids=>[],
-        :data_files => p.data_files.map { |df| { id: df.id } },
-        :model_ids => p.models.collect{|m| m.id.to_s}
+    put :update, id: p, author: {}, assay_ids: [],
+                 data_files: p.data_files.map { |df| { id: df.id } },
+                 model_ids: p.models.collect { |m| m.id.to_s }
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -510,145 +507,140 @@ class PublicationsControllerTest < ActionController::TestCase
     assert p.data_files.include?(data_files(:picture))
   end
 
-
-  test "should associate authors" do
-    p = Factory(:publication, :publication_authors => [Factory.build(:publication_author), Factory.build(:publication_author)])
+  test 'should associate authors' do
+    p = Factory(:publication, publication_authors: [Factory.build(:publication_author), Factory.build(:publication_author)])
     assert_equal 2, p.publication_authors.size
     assert_equal 0, p.creators.size
-    
+
     seek_author1 = people(:modeller_person)
     seek_author2 = people(:quentin_person)
-    
-    #Associate a non-seek author to a seek person
+
+    # Associate a non-seek author to a seek person
     login_as p.contributor
     as_virtualliver do
       assert_difference('PublicationAuthor.count', 0) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, :id => p.id, :author => {p.publication_authors[1].id => seek_author2.id,p.publication_authors[0].id => seek_author1.id}
+          put :update, id: p.id, author: { p.publication_authors[1].id => seek_author2.id, p.publication_authors[0].id => seek_author1.id }
         end
       end
-
     end
     assert_redirected_to publication_path(p)
     p.reload
   end
-  
-  test "should disassociate authors" do
-    mock_pubmed(:content_file=>"pubmed_5.txt")
+
+  test 'should disassociate authors' do
+    mock_pubmed(content_file: 'pubmed_5.txt')
     p = publications(:one)
-    p.publication_authors << PublicationAuthor.new(:publication => p, :first_name => people(:quentin_person).first_name, :last_name => people(:quentin_person).last_name, :person => people(:quentin_person))
-    p.publication_authors << PublicationAuthor.new(:publication => p, :first_name => people(:aaron_person).first_name, :last_name => people(:aaron_person).last_name, :person => people(:aaron_person))
+    p.publication_authors << PublicationAuthor.new(publication: p, first_name: people(:quentin_person).first_name, last_name: people(:quentin_person).last_name, person: people(:quentin_person))
+    p.publication_authors << PublicationAuthor.new(publication: p, first_name: people(:aaron_person).first_name, last_name: people(:aaron_person).last_name, person: people(:aaron_person))
     p.creators << people(:quentin_person)
     p.creators << people(:aaron_person)
-    
+
     assert_equal 2, p.publication_authors.size
     assert_equal 2, p.creators.size
-    
+
     assert_difference('PublicationAuthor.count', 0) do
       # seek_authors (AssetsCreators) decrease by 2.
       assert_difference('AssetsCreator.count', -2) do
-        post :disassociate_authors, :id => p.id
-      end 
+        post :disassociate_authors, id: p.id
+      end
     end
-
   end
 
-  test "should update project" do
+  test 'should update project' do
     p = publications(:one)
     assert_equal projects(:sysmo_project), p.projects.first
-    put :update, :id => p.id, :author => {}, :publication => {:project_ids => [projects(:one).id]}
+    put :update, id: p.id, author: {}, publication: { project_ids: [projects(:one).id] }
     assert_redirected_to publication_path(p)
     p.reload
     assert_equal [projects(:one)], p.projects
   end
 
-  test "should destroy publication" do
+  test 'should destroy publication' do
     assert_difference('Publication.count', -1) do
-      delete :destroy, :id => publications(:one).to_param
+      delete :destroy, id: publications(:one).to_param
     end
 
     assert_redirected_to publications_path
   end
-  
-  test "shouldn't add paper with non-unique title within the same project" do
-    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1093/nar/gkl320",:content_file=>"cross_ref4.xml")
-    pub = Publication.find_by_doi("10.1093/nar/gkl320")
 
-    #PubMed version of publication already exists, so it shouldn't re-add
+  test "shouldn't add paper with non-unique title within the same project" do
+    mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1093/nar/gkl320', content_file: 'cross_ref4.xml')
+    pub = Publication.find_by_doi('10.1093/nar/gkl320')
+
+    # PubMed version of publication already exists, so it shouldn't re-add
     assert_no_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1093/nar/gkl320" ,:projects=>pub.projects.first} if pub
+      post :create, publication: { doi: '10.1093/nar/gkl320', projects: pub.projects.first } if pub
     end
   end
 
-  test "should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek profiles" do
-    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
+  test 'should retrieve the right author order after a publication is created and after some authors are associate/disassociated with seek profiles' do
+    mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1016/j.future.2011.08.004', content_file: 'cross_ref5.xml')
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :project_ids=>[projects(:sysmo_project).id]}
+      post :create, publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id] }
     end
     publication = assigns(:publication)
-    original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
-                        "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
+    original_authors = ['Sean Bechhofer', 'Iain Buchan', 'David De Roure', 'Paolo Missier', 'John Ainsworth', 'Jiten Bhagat', 'Philip Couch', 'Don Cruickshank',
+                        'Mark Delderfield', 'Ian Dunlop', 'Matthew Gamble', 'Danius Michaelides', 'Stuart Owen', 'David Newman', 'Shoaib Sufi', 'Carole Goble']
 
-    authors = publication.publication_authors.collect{|pa| pa.first_name + ' ' + pa.last_name} #publication_authors are ordered by author_index by default
+    authors = publication.publication_authors.collect { |pa| pa.first_name + ' ' + pa.last_name } # publication_authors are ordered by author_index by default
     assert_equal original_authors, authors
 
-    seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
-    seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
+    seek_author1 = Factory(:person, first_name: 'Stuart', last_name: 'Owen')
+    seek_author2 = Factory(:person, first_name: 'Carole', last_name: 'Goble')
 
-    #Associate a non-seek author to a seek person
+    # Associate a non-seek author to a seek person
     as_virtualliver do
       assert_difference('publication.non_seek_authors.count', -2) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id}
+          put :update, id: publication.id, author: { publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id }
         end
       end
     end
 
     publication.reload
-    authors = publication.publication_authors.map{|pa| pa.first_name + ' ' + pa.last_name}
+    authors = publication.publication_authors.map { |pa| pa.first_name + ' ' + pa.last_name }
     assert_equal original_authors, authors
 
-    #Disassociate seek-authors
+    # Disassociate seek-authors
     assert_difference('publication.non_seek_authors.count', 2) do
       assert_difference('AssetsCreator.count', -2) do
-        post :disassociate_authors, :id => publication.id
+        post :disassociate_authors, id: publication.id
       end
     end
 
     publication.reload
-    authors =  publication.publication_authors.map{|pa| pa.first_name + ' ' + pa.last_name}
+    authors = publication.publication_authors.map { |pa| pa.first_name + ' ' + pa.last_name }
     assert_equal original_authors, authors
   end
 
-  test "should display the right author order after some authors are associate with seek-profiles" do
+  test 'should display the right author order after some authors are associate with seek-profiles' do
     doi_citation_mock
-    mock_crossref(:email=>"sowen@cs.man.ac.uk",:doi=>"10.1016/j.future.2011.08.004",:content_file=>"cross_ref5.xml")
+    mock_crossref(email: 'sowen@cs.man.ac.uk', doi: '10.1016/j.future.2011.08.004', content_file: 'cross_ref5.xml')
     assert_difference('Publication.count') do
-      post :create, :publication => {:doi => "10.1016/j.future.2011.08.004", :project_ids=>[projects(:sysmo_project).id] } #10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
+      post :create, publication: { doi: '10.1016/j.future.2011.08.004', project_ids: [projects(:sysmo_project).id] } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
     assert assigns(:publication)
     publication = assigns(:publication)
-    original_authors = ["Sean Bechhofer","Iain Buchan","David De Roure","Paolo Missier","John Ainsworth","Jiten Bhagat","Philip Couch","Don Cruickshank",
-                        "Mark Delderfield","Ian Dunlop","Matthew Gamble","Danius Michaelides","Stuart Owen","David Newman","Shoaib Sufi","Carole Goble"]
+    original_authors = ['Sean Bechhofer', 'Iain Buchan', 'David De Roure', 'Paolo Missier', 'John Ainsworth', 'Jiten Bhagat', 'Philip Couch', 'Don Cruickshank',
+                        'Mark Delderfield', 'Ian Dunlop', 'Matthew Gamble', 'Danius Michaelides', 'Stuart Owen', 'David Newman', 'Shoaib Sufi', 'Carole Goble']
 
-
-
-    seek_author1 = Factory(:person, :first_name => 'Stuart', :last_name => 'Owen')
-    seek_author2 = Factory(:person, :first_name => 'Carole', :last_name => 'Goble')
+    seek_author1 = Factory(:person, first_name: 'Stuart', last_name: 'Owen')
+    seek_author2 = Factory(:person, first_name: 'Carole', last_name: 'Goble')
 
     # seek_authors are links
-    original_authors[12] = %!<a href="/people/#{seek_author1.id}">#{publication.non_seek_authors[12].first_name + " " + publication.non_seek_authors[12].last_name}</a>!
-    original_authors[15] = %!<a href="/people/#{seek_author2.id}">#{publication.non_seek_authors[15].first_name + " " + publication.non_seek_authors[15].last_name}</a>!
+    original_authors[12] = %(<a href="/people/#{seek_author1.id}">#{publication.non_seek_authors[12].first_name + ' ' + publication.non_seek_authors[12].last_name}</a>)
+    original_authors[15] = %(<a href="/people/#{seek_author2.id}">#{publication.non_seek_authors[15].first_name + ' ' + publication.non_seek_authors[15].last_name}</a>)
 
-    #Associate a non-seek author to a seek person
+    # Associate a non-seek author to a seek person
     assert_difference('publication.non_seek_authors.count', -2) do
       assert_difference('AssetsCreator.count', 2) do
-        put :update, :id => publication.id, :author => {publication.non_seek_authors[12].id => seek_author1.id,publication.non_seek_authors[15].id => seek_author2.id}
+        put :update, id: publication.id, author: { publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id }
       end
     end
     publication.reload
     joined_original_authors = original_authors.join(', ')
-    get :show, :id => publication.id
+    get :show, id: publication.id
     assert @response.body.include?(joined_original_authors)
   end
 
@@ -656,21 +648,21 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 'latest', Seek::Config.default_pages[:publications]
     get :index
     assert_response :success
-    assert_select ".pagination li.active" do
-      assert_select "a[href=?]", publications_path(:page => 'latest')
+    assert_select '.pagination li.active' do
+      assert_select 'a[href=?]', publications_path(page: 'latest')
     end
 
-    #change the setting
+    # change the setting
     Seek::Config.default_pages[:publications] = 'all'
     get :index
     assert_response :success
 
-    assert_select ".pagination li.active" do
-      assert_select "a[href=?]", publications_path(:page => 'all')
+    assert_select '.pagination li.active' do
+      assert_select 'a[href=?]', publications_path(page: 'all')
     end
   end
 
-  test "should avoid XSS in association forms" do
+  test 'should avoid XSS in association forms' do
     project = Factory(:project)
     c = Factory(:person, group_memberships: [Factory(:group_membership, work_group: Factory(:work_group, project: project))])
     Factory(:event, title: '<script>alert("xss")</script> &', projects: [project], contributor: c)
@@ -683,7 +675,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
 
-    get :edit, :id => p.id
+    get :edit, id: p.id
 
     assert_response :success
     assert_not_include response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
@@ -696,8 +688,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 10, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
   end
 
-  test "programme publications through nested routing" do
-    assert_routing 'programmes/2/publications', { controller: 'publications', action: 'index', programme_id: '2' }
+  test 'programme publications through nested routing' do
+    assert_routing 'programmes/2/publications', controller: 'publications', action: 'index', programme_id: '2'
     programme = Factory(:programme)
     publication = Factory(:publication, projects: programme.projects, policy: Factory(:public_policy))
     publication2 = Factory(:publication, policy: Factory(:public_policy))
@@ -705,62 +697,61 @@ class PublicationsControllerTest < ActionController::TestCase
     get :index, programme_id: programme.id
 
     assert_response :success
-    assert_select "div.list_item_title" do
-      assert_select "a[href=?]", publication_path(publication), text: publication.title
-      assert_select "a[href=?]", publication_path(publication2), text: publication2.title, count: 0
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', publication_path(publication), text: publication.title
+      assert_select 'a[href=?]', publication_path(publication2), text: publication2.title, count: 0
     end
   end
 
-  test "query single authors for typeahead" do
-    query = "Bloggs"
-    get :query_authors_typeahead, :format => :json, :full_name => query
+  test 'query single authors for typeahead' do
+    query = 'Bloggs'
+    get :query_authors_typeahead, format: :json, full_name: query
     assert_response :success
     authors = JSON.parse(@response.body)
     assert_equal 1, authors.length, authors
-    assert authors[0].key?('person_id'), "missing author person_id"
-    assert authors[0].key?('first_name'), "missing author first name"
-    assert authors[0].key?('last_name'), "missing author last name"
-    assert authors[0].key?('count'), "missing author publication count"
-    assert_equal "J", authors[0]['first_name']
-    assert_equal "Bloggs", authors[0]['last_name']
+    assert authors[0].key?('person_id'), 'missing author person_id'
+    assert authors[0].key?('first_name'), 'missing author first name'
+    assert authors[0].key?('last_name'), 'missing author last name'
+    assert authors[0].key?('count'), 'missing author publication count'
+    assert_equal 'J', authors[0]['first_name']
+    assert_equal 'Bloggs', authors[0]['last_name']
     assert_nil authors[0]['person_id']
     assert_equal 1, authors[0]['count']
   end
 
-  test "query single author for typeahead that is unknown" do
-    query = "Nobody knows this person"
-    get :query_authors_typeahead, :format => :json, :full_name => query
+  test 'query single author for typeahead that is unknown' do
+    query = 'Nobody knows this person'
+    get :query_authors_typeahead, format: :json, full_name: query
     assert_response :success
     authors = JSON.parse(@response.body)
     assert_equal 0, authors.length
   end
 
-  test "query authors for initilization" do
+  test 'query authors for initilization' do
     query_authors = {
-      "0" => { :full_name => "J Bloggs" },
-      "1" => { :full_name => "J Bauers" }
+      '0' => { full_name: 'J Bloggs' },
+      '1' => { full_name: 'J Bauers' }
     }
-    get :query_authors, :format => :json, :as => :json, :authors => query_authors
+    get :query_authors, format: :json, as: :json, authors: query_authors
     assert_response :success
     authors = JSON.parse(@response.body)
     assert_equal 2, authors.length, authors
-    assert authors[0].key?('person_id'), "missing author person_id"
-    assert authors[0].key?('first_name'), "missing author first name"
-    assert authors[0].key?('last_name'), "missing author last name"
-    assert authors[0].key?('count'), "missing author publication count"
-    assert_equal "J", authors[0]['first_name']
-    assert_equal "Bloggs", authors[0]['last_name']
+    assert authors[0].key?('person_id'), 'missing author person_id'
+    assert authors[0].key?('first_name'), 'missing author first name'
+    assert authors[0].key?('last_name'), 'missing author last name'
+    assert authors[0].key?('count'), 'missing author publication count'
+    assert_equal 'J', authors[0]['first_name']
+    assert_equal 'Bloggs', authors[0]['last_name']
     assert_nil authors[0]['person_id']
     assert_equal 1, authors[0]['count']
 
-    assert authors[1].key?('person_id'), "missing author person_id"
-    assert authors[1].key?('first_name'), "missing author first name"
-    assert authors[1].key?('last_name'), "missing author last name"
-    assert authors[1].key?('count'), "missing author publication count"
-    assert_equal "J", authors[1]['first_name']
-    assert_equal "Bauers", authors[1]['last_name']
+    assert authors[1].key?('person_id'), 'missing author person_id'
+    assert authors[1].key?('first_name'), 'missing author first name'
+    assert authors[1].key?('last_name'), 'missing author last name'
+    assert authors[1].key?('count'), 'missing author publication count'
+    assert_equal 'J', authors[1]['first_name']
+    assert_equal 'Bauers', authors[1]['last_name']
     assert_nil authors[1]['person_id']
     assert_equal 0, authors[1]['count']
   end
-
 end

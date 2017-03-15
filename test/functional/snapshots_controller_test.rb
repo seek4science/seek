@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SnapshotsControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
   include MockHelper
 
@@ -9,12 +8,12 @@ class SnapshotsControllerTest < ActionController::TestCase
     doi_citation_mock
   end
 
-  test "can get snapshot preview page" do
+  test 'can get snapshot preview page' do
     user = Factory(:user)
-    investigation = Factory(:investigation, :policy => Factory(:publicly_viewable_policy), :contributor => user.person)
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person)
     login_as(user)
 
-    get :new, :investigation_id => investigation
+    get :new, investigation_id: investigation
 
     assert investigation.can_manage?(user)
     assert_response :success
@@ -22,10 +21,10 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "can't get snapshot preview if no manage permissions" do
     user = Factory(:user)
-    investigation = Factory(:investigation, :policy => Factory(:publicly_viewable_policy))
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy))
     login_as(user)
 
-    get :new, :investigation_id => investigation
+    get :new, investigation_id: investigation
 
     assert !investigation.can_manage?(user)
     assert_redirected_to investigation_path(investigation)
@@ -34,49 +33,49 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "can't get snapshot preview if not publicly accessible" do
     user = Factory(:user)
-    investigation = Factory(:investigation, :policy => Factory(:private_policy), :contributor => user.person)
+    investigation = Factory(:investigation, policy: Factory(:private_policy), contributor: user.person)
     login_as(user)
 
-    get :new, :investigation_id => investigation
+    get :new, investigation_id: investigation
 
     assert investigation.can_manage?(user)
     assert_redirected_to investigation_path(investigation)
     assert flash[:error].include?('accessible')
   end
 
-  test "can create investigation snapshot" do
+  test 'can create investigation snapshot' do
     user = Factory(:user)
-    investigation = Factory(:investigation, :policy => Factory(:publicly_viewable_policy), :contributor => user.person)
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), contributor: user.person)
     login_as(user)
 
     assert_difference('Snapshot.count') do
-      post :create, :investigation_id => investigation
+      post :create, investigation_id: investigation
     end
 
     assert investigation.can_manage?(user)
     assert_redirected_to investigation_snapshot_path(investigation, assigns(:snapshot).snapshot_number)
   end
 
-  test "can create study snapshot" do
+  test 'can create study snapshot' do
     user = Factory(:user)
-    study = Factory(:study, :policy => Factory(:publicly_viewable_policy), :contributor => user.person)
+    study = Factory(:study, policy: Factory(:publicly_viewable_policy), contributor: user.person)
     login_as(user)
 
     assert_difference('Snapshot.count') do
-      post :create, :study_id => study
+      post :create, study_id: study
     end
 
     assert study.can_manage?(user)
     assert_redirected_to study_snapshot_path(study, assigns(:snapshot).snapshot_number)
   end
 
-  test "can create assay snapshot" do
+  test 'can create assay snapshot' do
     user = Factory(:user)
-    assay = Factory(:assay, :policy => Factory(:publicly_viewable_policy), :contributor => user.person)
+    assay = Factory(:assay, policy: Factory(:publicly_viewable_policy), contributor: user.person)
     login_as(user)
 
     assert_difference('Snapshot.count') do
-      post :create, :assay_id => assay
+      post :create, assay_id: assay
     end
 
     assert assay.can_manage?(user)
@@ -85,11 +84,11 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "can't create snapshot if no manage permissions" do
     user = Factory(:user)
-    investigation = Factory(:investigation, :policy => Factory(:publicly_viewable_policy))
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy))
     login_as(user)
 
     assert_no_difference('Snapshot.count') do
-      post :create, :investigation_id => investigation
+      post :create, investigation_id: investigation
     end
 
     assert !investigation.can_manage?(user)
@@ -99,11 +98,11 @@ class SnapshotsControllerTest < ActionController::TestCase
 
   test "can't create snapshot if not publicly accessible" do
     user = Factory(:user)
-    investigation = Factory(:investigation, :policy => Factory(:private_policy), :contributor => user.person)
+    investigation = Factory(:investigation, policy: Factory(:private_policy), contributor: user.person)
     login_as(user)
 
     assert_no_difference('Snapshot.count') do
-      post :create, :investigation_id => investigation
+      post :create, investigation_id: investigation
     end
 
     assert investigation.can_manage?(user)
@@ -111,48 +110,48 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert flash[:error].include?('accessible')
   end
 
-  test "can get snapshot show page" do
+  test 'can get snapshot show page' do
     create_investigation_snapshot
     login_as(@user)
 
-    get :show, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    get :show, investigation_id: @investigation, id: @snapshot.snapshot_number
 
     assert_response :success
   end
 
-  test "fails gracefully when missing snapshot" do
+  test 'fails gracefully when missing snapshot' do
     create_investigation_snapshot
     login_as(@user)
 
-    get :show, :investigation_id => @investigation, :id => 123
+    get :show, investigation_id: @investigation, id: 123
 
     assert_response :redirect
     assert flash[:error].include?('exist')
   end
 
-  test "can get confirmation when minting DOI for snapshot" do
+  test 'can get confirmation when minting DOI for snapshot' do
     datacite_mock
     create_investigation_snapshot
     login_as(@user)
 
-    get :mint_doi_confirm, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    get :mint_doi_confirm, investigation_id: @investigation, id: @snapshot.snapshot_number
 
     assert_response :success
     assert_nil assigns(:snapshot).doi
   end
 
-  test "can mint DOI for snapshot" do
+  test 'can mint DOI for snapshot' do
     datacite_mock
     create_investigation_snapshot
     login_as(@user)
 
-    post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    post :mint_doi, investigation_id: @investigation, id: @snapshot.snapshot_number
 
     assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     assert assigns(:snapshot).doi
   end
 
-  test "logs user when minting DOI for snapshot" do
+  test 'logs user when minting DOI for snapshot' do
     datacite_mock
     create_investigation_snapshot
     login_as(@user)
@@ -160,7 +159,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_equal 0, @snapshot.doi_logs.count
 
     assert_difference('AssetDoiLog.count', 1) do
-      post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+      post :mint_doi, investigation_id: @investigation, id: @snapshot.snapshot_number
     end
 
     assert_equal 1, @snapshot.doi_logs.count
@@ -174,7 +173,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     login_as(@user)
 
     with_config_value(:doi_minting_enabled, false) do
-      post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+      post :mint_doi, investigation_id: @investigation, id: @snapshot.snapshot_number
     end
 
     @snapshot = @snapshot.reload
@@ -190,7 +189,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     login_as(@user)
 
     with_config_value(:time_lock_doi_for, 100) do
-      post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+      post :mint_doi, investigation_id: @investigation, id: @snapshot.snapshot_number
     end
 
     @snapshot = @snapshot.reload
@@ -206,7 +205,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     other_user = Factory(:user)
     login_as(other_user)
 
-    post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    post :mint_doi, investigation_id: @investigation, id: @snapshot.snapshot_number
 
     @snapshot = @snapshot.reload
     assert !@investigation.can_manage?(other_user)
@@ -220,20 +219,20 @@ class SnapshotsControllerTest < ActionController::TestCase
     other_user = Factory(:user)
     login_as(other_user)
 
-    get :mint_doi_confirm, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    get :mint_doi_confirm, investigation_id: @investigation, id: @snapshot.snapshot_number
 
     assert !@investigation.can_manage?(other_user)
     assert_redirected_to investigation_path(@investigation)
   end
 
-  test "error message mentions DataCite when DataCite broken" do
+  test 'error message mentions DataCite when DataCite broken' do
     datacite_mock
     create_investigation_snapshot
     login_as(@user)
-    stub_request(:post, "http://test:test@idontexist.soup/metadata").to_return(status: 500)
+    stub_request(:post, 'http://test:test@idontexist.soup/metadata').to_return(status: 500)
 
     with_config_value(:datacite_url, 'http://idontexist.soup') do
-      post :mint_doi, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+      post :mint_doi, investigation_id: @investigation, id: @snapshot.snapshot_number
     end
 
     @snapshot = @snapshot.reload
@@ -243,82 +242,82 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert @snapshot.doi.nil?
   end
 
-  test "can retrieve Zenodo preivew page" do
+  test 'can retrieve Zenodo preivew page' do
     create_investigation_snapshot
     login_as(@user)
 
-    get :export_preview, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc'
+    get :export_preview, investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc'
 
     assert_response :success
   end
 
-  test "can export snapshot to Zenodo" do
+  test 'can export snapshot to Zenodo' do
     zenodo_mock
     zenodo_oauth_mock
     create_investigation_snapshot
-    Factory(:oauth_session, :user_id => @user.id)
+    Factory(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
     login_as(@user)
 
-    get :show, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+    get :show, investigation_id: @investigation, id: @snapshot.snapshot_number
     assert_response :success
-    assert_select "a.btn", :text => 'Export to Zenodo', :count => 1
+    assert_select 'a.btn', text: 'Export to Zenodo', count: 1
 
-    post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
-         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+    post :export_submit, investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc',
+                         metadata: { access_type: 'open', license: 'CC-BY-4.0' }
 
     assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
     assert !assigns(:snapshot).zenodo_deposition_id.nil?
     assert !assigns(:snapshot).zenodo_record_url.nil?
   end
 
-  test "can export study snapshot to Zenodo" do
+  test 'can export study snapshot to Zenodo' do
     zenodo_mock
     zenodo_oauth_mock
     create_study_snapshot
-    Factory(:oauth_session, :user_id => @user.id)
+    Factory(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
     login_as(@user)
 
-    get :show, :study_id => @study, :id => @snapshot.snapshot_number
+    get :show, study_id: @study, id: @snapshot.snapshot_number
     assert_response :success
-    assert_select "a.btn", :text => 'Export to Zenodo', :count => 1
+    assert_select 'a.btn', text: 'Export to Zenodo', count: 1
 
-    post :export_submit, :study_id => @study, :id => @snapshot.snapshot_number, :code => 'abc',
-         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+    post :export_submit, study_id: @study, id: @snapshot.snapshot_number, code: 'abc',
+                         metadata: { access_type: 'open', license: 'CC-BY-4.0' }
 
     assert_redirected_to study_snapshot_path(@study, @snapshot.snapshot_number)
     assert !assigns(:snapshot).zenodo_deposition_id.nil?
     assert !assigns(:snapshot).zenodo_record_url.nil?
   end
 
-  test "can export assay snapshot to Zenodo" do
+  test 'can export assay snapshot to Zenodo' do
     zenodo_mock
     zenodo_oauth_mock
     create_assay_snapshot
-    Factory(:oauth_session, :user_id => @user.id)
+    Factory(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
     login_as(@user)
 
-    get :show, :assay_id => @assay, :id => @snapshot.snapshot_number
+    get :show, assay_id: @assay, id: @snapshot.snapshot_number
     assert_response :success
-    assert_select "a.btn", :text => 'Export to Zenodo', :count => 1
+    assert_select 'a.btn', text: 'Export to Zenodo', count: 1
 
-    post :export_submit, :assay_id => @assay, :id => @snapshot.snapshot_number, :code => 'abc',
-         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+    post :export_submit, assay_id: @assay, id: @snapshot.snapshot_number, code: 'abc',
+                         metadata: { access_type: 'open', license: 'CC-BY-4.0' }
 
     assert_redirected_to assay_snapshot_path(@assay, @snapshot.snapshot_number)
     assert !assigns(:snapshot).zenodo_deposition_id.nil?
     assert !assigns(:snapshot).zenodo_record_url.nil?
   end
 
-  test "redirects to Zenodo auth page if no existing OAuth session" do
+  test 'redirects to Zenodo auth page if no existing OAuth session' do
     zenodo_mock
     zenodo_oauth_mock
     create_investigation_snapshot
@@ -327,10 +326,10 @@ class SnapshotsControllerTest < ActionController::TestCase
     @snapshot.save
     login_as(@user)
 
-    assert_empty @user.oauth_sessions.where(:provider => 'Zenodo')
+    assert_empty @user.oauth_sessions.where(provider: 'Zenodo')
 
-    post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
-         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+    post :export_submit, investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc',
+                         metadata: { access_type: 'open', license: 'CC-BY-4.0' }
 
     assert_redirected_to assigns(:zenodo_oauth_client).authorize_url(request.original_url)
   end
@@ -339,7 +338,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     zenodo_mock
     zenodo_oauth_mock
     create_investigation_snapshot
-    Factory(:oauth_session, :user_id => @user.id)
+    Factory(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
@@ -348,12 +347,12 @@ class SnapshotsControllerTest < ActionController::TestCase
     with_config_value(:zenodo_publishing_enabled, false) do
       refute @snapshot.can_export_to_zenodo?
 
-      get :show, :investigation_id => @investigation, :id => @snapshot.snapshot_number
+      get :show, investigation_id: @investigation, id: @snapshot.snapshot_number
       assert_response :success
-      assert_select "a.btn", :text => 'Export to Zenodo', :count => 0
+      assert_select 'a.btn', text: 'Export to Zenodo', count: 0
 
-      post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
-           :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+      post :export_submit, investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc',
+                           metadata: { access_type: 'open', license: 'CC-BY-4.0' }
 
       assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
       refute flash[:error].blank?
@@ -371,27 +370,27 @@ class SnapshotsControllerTest < ActionController::TestCase
     other_user = Factory(:user)
     login_as(other_user)
 
-    post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
-         :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+    post :export_submit, investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc',
+                         metadata: { access_type: 'open', license: 'CC-BY-4.0' }
 
     @snapshot = @snapshot.reload
     assert_redirected_to investigation_path(@investigation)
     assert @snapshot.zenodo_deposition_id.nil?
   end
 
-  test "error message mentions Zenodo when Zenodo broken" do
+  test 'error message mentions Zenodo when Zenodo broken' do
     zenodo_mock
     zenodo_oauth_mock
     create_investigation_snapshot
-    Factory(:oauth_session, :user_id => @user.id)
+    Factory(:oauth_session, user_id: @user.id)
 
     @snapshot.doi = '10.5072/123'
     @snapshot.save
     login_as(@user)
 
     with_config_value(:zenodo_api_url, 'http://idontexist.soup') do
-      post :export_submit, :investigation_id => @investigation, :id => @snapshot.snapshot_number, :code => 'abc',
-           :metadata => { :access_type => 'open', :license => 'CC-BY-4.0' }
+      post :export_submit, investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc',
+                           metadata: { access_type: 'open', license: 'CC-BY-4.0' }
     end
 
     @snapshot = @snapshot.reload
@@ -401,7 +400,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert @snapshot.zenodo_deposition_id.nil?
   end
 
-  test "can delete snapshot without doi" do
+  test 'can delete snapshot without doi' do
     create_investigation_snapshot
     login_as(@user)
 
@@ -438,7 +437,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert flash[:error].include?('authorized')
   end
 
-  test "can get citation for snapshot with DOI" do
+  test 'can get citation for snapshot with DOI' do
     create_investigation_snapshot
     login_as(@user)
     @snapshot.doi = '10.5072/test'
@@ -462,28 +461,26 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert_select '#snapshot-citation', text: /error occurred/
   end
 
-
   private
 
   def create_investigation_snapshot
     @user = Factory(:user)
-    @investigation = Factory(:investigation, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
+    @investigation = Factory(:investigation, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
     @snapshot = @investigation.create_snapshot
   end
 
   def create_study_snapshot
     @user = Factory(:user)
-    @investigation = Factory(:investigation, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
-    @study = Factory(:study, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
+    @investigation = Factory(:investigation, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
+    @study = Factory(:study, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
     @snapshot = @study.create_snapshot
   end
 
   def create_assay_snapshot
     @user = Factory(:user)
-    @investigation = Factory(:investigation, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
-    @study = Factory(:study, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
-    @assay = Factory(:assay, :description => 'not blank', :policy => Factory(:publicly_viewable_policy), :contributor => @user.person)
+    @investigation = Factory(:investigation, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
+    @study = Factory(:study, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
+    @assay = Factory(:assay, description: 'not blank', policy: Factory(:publicly_viewable_policy), contributor: @user.person)
     @snapshot = @assay.create_snapshot
   end
-
 end

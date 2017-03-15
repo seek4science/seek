@@ -1,28 +1,27 @@
 require 'test_helper'
 
 class SnapshotTest < ActiveSupport::TestCase
-
   include MockHelper
 
   fixtures :investigations
 
   setup do
-    @investigation = Factory(:investigation, :title => 'i1', :description => 'not blank',
-                             :policy => Factory(:downloadable_public_policy))
-    @study = Factory(:study, :title => 's1', :investigation => @investigation, :contributor => @investigation.contributor,
-                     :policy => Factory(:downloadable_public_policy))
-    @assay = Factory(:assay, :title => 'a1', :study => @study, :contributor => @investigation.contributor,
-                     :policy => Factory(:downloadable_public_policy))
-    @assay2 = Factory(:assay, :title => 'a2', :study => @study, :contributor => @investigation.contributor,
-                      :policy => Factory(:downloadable_public_policy))
-    @data_file = Factory(:data_file, :title => 'df1', :contributor => @investigation.contributor,
-                         :content_blob => Factory(:doc_content_blob, :original_filename=>"word.doc"),
-                         :policy => Factory(:downloadable_public_policy))
-    @publication = Factory(:publication, :title => 'p1', :contributor => @investigation.contributor,
-                           :policy => Factory(:downloadable_public_policy))
+    @investigation = Factory(:investigation, title: 'i1', description: 'not blank',
+                                             policy: Factory(:downloadable_public_policy))
+    @study = Factory(:study, title: 's1', investigation: @investigation, contributor: @investigation.contributor,
+                             policy: Factory(:downloadable_public_policy))
+    @assay = Factory(:assay, title: 'a1', study: @study, contributor: @investigation.contributor,
+                             policy: Factory(:downloadable_public_policy))
+    @assay2 = Factory(:assay, title: 'a2', study: @study, contributor: @investigation.contributor,
+                              policy: Factory(:downloadable_public_policy))
+    @data_file = Factory(:data_file, title: 'df1', contributor: @investigation.contributor,
+                                     content_blob: Factory(:doc_content_blob, original_filename: 'word.doc'),
+                                     policy: Factory(:downloadable_public_policy))
+    @publication = Factory(:publication, title: 'p1', contributor: @investigation.contributor,
+                                         policy: Factory(:downloadable_public_policy))
     @assay.associate(@data_file)
     @assay2.associate(@data_file)
-    Factory(:relationship, :subject => @assay, :predicate => Relationship::RELATED_TO_PUBLICATION, :other_object => @publication)
+    Factory(:relationship, subject: @assay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: @publication)
   end
 
   test 'snapshot number correctly set' do
@@ -37,10 +36,10 @@ class SnapshotTest < ActiveSupport::TestCase
     s1 = @investigation.create_snapshot
     refute_nil s1.md5sum
     refute_nil s1.sha1sum
-    assert_equal s1.content_blob.md5sum,s1.md5sum
-    assert_equal s1.content_blob.sha1sum,s1.sha1sum
+    assert_equal s1.content_blob.md5sum, s1.md5sum
+    assert_equal s1.content_blob.sha1sum, s1.sha1sum
 
-    assert_match(/\b([a-f0-9]{40})\b/,s1.sha1sum)
+    assert_match(/\b([a-f0-9]{40})\b/, s1.sha1sum)
   end
 
   test 'can access snapshot metadata' do
@@ -66,10 +65,10 @@ class SnapshotTest < ActiveSupport::TestCase
     old_description = @investigation.description
     snapshot = @investigation.create_snapshot
 
-    @investigation.update_attributes(title: "New title", description: "New description")
+    @investigation.update_attributes(title: 'New title', description: 'New description')
 
-    assert_equal "New title", @investigation.title
-    assert_equal "New description", @investigation.description
+    assert_equal 'New title', @investigation.title
+    assert_equal 'New description', @investigation.description
     assert_equal old_title, snapshot.title
     assert_equal old_description, snapshot.description
   end
@@ -128,7 +127,7 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_not_empty snapshot.errors
   end
 
-  test "exports to Zenodo" do
+  test 'exports to Zenodo' do
     zenodo_mock
 
     snapshot = @investigation.create_snapshot
@@ -144,7 +143,7 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_empty snapshot.errors
   end
 
-  test "publishes to Zenodo" do
+  test 'publishes to Zenodo' do
     zenodo_mock
 
     snapshot = @investigation.create_snapshot
@@ -186,7 +185,6 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_nil snapshot.zenodo_deposition_id
     assert_not_empty snapshot.errors
   end
-
 
   test "doesn't publish to Zenodo if not exported first" do
     zenodo_mock
@@ -237,7 +235,7 @@ class SnapshotTest < ActiveSupport::TestCase
   test 're-indexes parent model when DOI created' do
     snapshot = @assay.create_snapshot
 
-    assert_difference("ReindexingQueue.count", 1) do
+    assert_difference('ReindexingQueue.count', 1) do
       snapshot.doi = '10.5072/test'
       snapshot.save
     end
@@ -253,10 +251,8 @@ class SnapshotTest < ActiveSupport::TestCase
   def extract_keys(o, key)
     results = []
     if o.is_a?(Hash)
-      if o[key]
-        results << o[key]
-      end
-      results += o.map { |k,v| extract_keys(v, key) }
+      results << o[key] if o[key]
+      results += o.map { |_k, v| extract_keys(v, key) }
     elsif o.is_a?(Array)
       results += o.map { |v| extract_keys(v, key) }
     end

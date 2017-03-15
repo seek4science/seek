@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class ContentTypeDetectionTest < ActiveSupport::TestCase
-
   include Seek::ContentTypeDetection
 
   def test_is_xls
@@ -72,18 +71,17 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert !blob.is_sbml?
   end
 
-  test "is supported no longer relies on extension" do
+  test 'is supported no longer relies on extension' do
     blob = Factory :teusink_model_content_blob
-    blob.original_filename = "teusink.txt"
+    blob.original_filename = 'teusink.txt'
     blob.dump_data_to_file
     assert blob.is_sbml?
     assert !blob.is_jws_dat?
 
     blob = Factory :teusink_jws_model_content_blob
-    blob.original_filename = "jws.txt"
+    blob.original_filename = 'jws.txt'
     blob.dump_data_to_file
     assert !blob.is_sbml?
     assert blob.is_jws_dat?
   end
-  
 end

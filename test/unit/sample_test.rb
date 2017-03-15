@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
-
   test 'validation' do
     sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
@@ -16,7 +15,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'can_manage new record' do
-    sample=Sample.new(title:'can manage test')
+    sample = Sample.new(title: 'can manage test')
     assert sample.new_record?
     assert sample.can_manage?
 
@@ -341,7 +340,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'json metadata with awkward attributes' do
-    sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
+    sample_type = SampleType.new title: 'with awkward attributes', project_ids: [Factory(:project).id]
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title', is_title: true, sample_type: sample_type)
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
@@ -462,7 +461,7 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample with clashing attribute names' do
-    sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
+    sample_type = SampleType.new title: 'with awkward attributes', project_ids: [Factory(:project).id]
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'freeze', is_title: true, sample_type: sample_type)
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'updated_at', is_title: false, sample_type: sample_type)
     assert sample_type.valid?
@@ -483,10 +482,10 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample with clashing attribute names with private methods' do
-    sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
+    sample_type = SampleType.new title: 'with awkward attributes', project_ids: [Factory(:project).id]
     sample_type.sample_attributes << Factory.build(:any_string_sample_attribute, title: 'format', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
-    disable_authorization_checks{sample_type.save!}
+    disable_authorization_checks { sample_type.save! }
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
@@ -501,10 +500,10 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'sample with clashing attribute names with dynamic rails methods' do
-    sample_type = SampleType.new title: 'with awkward attributes',:project_ids=>[Factory(:project).id]
+    sample_type = SampleType.new title: 'with awkward attributes', project_ids: [Factory(:project).id]
     sample_type.sample_attributes << Factory(:any_string_sample_attribute, title: 'title_was', is_title: true, sample_type: sample_type)
     assert sample_type.valid?
-    disable_authorization_checks{sample_type.save!}
+    disable_authorization_checks { sample_type.save! }
     sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
     sample.sample_type = sample_type
 
@@ -535,11 +534,11 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'strain as title' do
     sample_type = Factory(:strain_sample_type)
-    sample_type.sample_attributes.first.is_title=false
-    sample_type.sample_attributes.last.is_title=true
+    sample_type.sample_attributes.first.is_title = false
+    sample_type.sample_attributes.last.is_title = true
     sample_type.save!
 
-    strain = Factory(:strain,title:'glow fish')
+    strain = Factory(:strain, title: 'glow fish')
     sample = Sample.new(sample_type: sample_type, project_ids: [Factory(:project).id])
     sample.set_attribute(:name, 'Strain sample')
     sample.set_attribute(:seekstrain, strain.id)
@@ -548,18 +547,17 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
     sample = Sample.find(sample.id)
 
-    assert_equal 'glow fish',sample.title
-
+    assert_equal 'glow fish', sample.title
   end
 
   test 'linked sample as title' do
-    #setup sample type, to be linked to patient sample type
+    # setup sample type, to be linked to patient sample type
     patient = Factory(:patient_sample)
-    assert_equal 'Fred Bloggs',patient.title
-    linked_sample_type = Factory(:linked_sample_type,project_ids:[Factory(:project).id])
+    assert_equal 'Fred Bloggs', patient.title
+    linked_sample_type = Factory(:linked_sample_type, project_ids: [Factory(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
-    linked_sample_type.sample_attributes.last.is_title=true
-    linked_sample_type.sample_attributes.first.is_title=false
+    linked_sample_type.sample_attributes.last.is_title = true
+    linked_sample_type.sample_attributes.first.is_title = false
 
     linked_sample_type.save!
 
@@ -567,7 +565,7 @@ class SampleTest < ActiveSupport::TestCase
     sample.set_attribute(:title, 'blah2')
     sample.set_attribute(:patient, patient.id)
     sample.save!
-    assert_equal 'Fred Bloggs',sample.title
+    assert_equal 'Fred Bloggs', sample.title
   end
 
   test 'strain type still stores missing strain info' do
@@ -633,9 +631,9 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'set linked sample by id' do
-    #setup sample type, to be linked to patient sample type
+    # setup sample type, to be linked to patient sample type
     patient = Factory(:patient_sample)
-    linked_sample_type = Factory(:linked_sample_type,project_ids:[Factory(:project).id])
+    linked_sample_type = Factory(:linked_sample_type, project_ids: [Factory(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
     linked_sample_type.save!
 
@@ -649,13 +647,12 @@ class SampleTest < ActiveSupport::TestCase
 
     assert_equal patient.id, sample.get_attribute(:patient)
     assert_equal [patient], sample.related_samples
-
   end
 
   test 'set linked sample by title' do
-    #setup sample type, to be linked to patient sample type
+    # setup sample type, to be linked to patient sample type
     patient = Factory(:patient_sample)
-    linked_sample_type = Factory(:linked_sample_type,project_ids:[Factory(:project).id])
+    linked_sample_type = Factory(:linked_sample_type, project_ids: [Factory(:project).id])
     linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
 
     linked_sample_type.save!
@@ -671,32 +668,30 @@ class SampleTest < ActiveSupport::TestCase
 
     assert_equal [patient], sample.related_samples
 
-
-    #invalid when title not recognised
+    # invalid when title not recognised
     sample = Sample.new(sample_type: linked_sample_type, project_ids: [Factory(:project).id])
     sample.set_attribute(:title, 'blah3')
     sample.set_attribute(:patient, 'a b c d e f 123')
     refute sample.valid?
-
   end
 
   test 'can create' do
     refute Sample.can_create?
     User.with_current_user Factory(:person).user do
       assert Sample.can_create?
-      with_config_value :samples_enabled,false do
+      with_config_value :samples_enabled, false do
         refute Sample.can_create?
       end
     end
   end
 
   test 'is favouritable?' do
-    sample=Factory(:sample)
+    sample = Factory(:sample)
     assert sample.is_favouritable?
   end
 
   test 'sample responds to correct methods' do
-    sample_type = SampleType.new(title: 'Custom',:project_ids=>[Factory(:project).id])
+    sample_type = SampleType.new(title: 'Custom', project_ids: [Factory(:project).id])
     attribute1 = Factory(:any_string_sample_attribute, title: 'banana_type',
                                                        is_title: true, sample_type: sample_type)
     attribute2 = Factory(:any_string_sample_attribute, title: 'license',
@@ -704,7 +699,7 @@ class SampleTest < ActiveSupport::TestCase
     sample_type.sample_attributes << attribute1
     sample_type.sample_attributes << attribute2
     assert sample_type.valid?
-    disable_authorization_checks{sample_type.save!}
+    disable_authorization_checks { sample_type.save! }
     sample = Sample.new(title: 'testing', project_ids: [Factory(:project).id])
     sample.sample_type = sample_type
     sample.set_attribute(:banana_type, 'yellow')
@@ -786,12 +781,12 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'extracted samples inherit projects from data file' do
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                        policy: Factory(:private_policy)
-    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
+                                    policy: Factory(:private_policy)
+    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
-    samples = data_file.extract_samples(sample_type,true)
+    samples = data_file.extract_samples(sample_type, true)
     sample = samples.first
 
     assert_equal sample.projects, data_file.projects
@@ -811,12 +806,12 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'extracted samples inherit creators from data file' do
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                        policy: Factory(:private_policy)
-    sample_type = SampleType.new title: 'from template',:project_ids=>[Factory(:project).id]
+                                    policy: Factory(:private_policy)
+    sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
-    samples = data_file.extract_samples(sample_type,true)
+    samples = data_file.extract_samples(sample_type, true)
     sample = samples.first
     creator = Factory(:person)
 
@@ -862,7 +857,6 @@ class SampleTest < ActiveSupport::TestCase
     assert_includes strain.samples, sample
   end
 
-
   test 'link to strain removed when no longer referenced' do
     sample_type = Factory(:optional_strain_sample_type)
     strain = Factory(:strain)
@@ -881,5 +875,4 @@ class SampleTest < ActiveSupport::TestCase
     assert_not_includes sample.strains, strain
     assert_not_includes strain.samples, sample
   end
-
 end

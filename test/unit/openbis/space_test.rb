@@ -4,7 +4,7 @@ require 'openbis_test_helper'
 class SpaceTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
-    @openbis_endpoint=Factory(:openbis_endpoint)
+    @openbis_endpoint = Factory(:openbis_endpoint)
   end
 
   test 'all' do
@@ -19,26 +19,26 @@ class SpaceTest < ActiveSupport::TestCase
   end
 
   test 'initialize with permid' do
-    space = Seek::Openbis::Space.new(@openbis_endpoint,'API-SPACE')
+    space = Seek::Openbis::Space.new(@openbis_endpoint, 'API-SPACE')
     assert_equal 'API-SPACE', space.perm_id
     assert_equal 'API-SPACE', space.code
     assert_equal 'use for testing openbis api integration ', space.description
 
     # not recognised
     assert_raise_with_message(Seek::Openbis::EntityNotFoundException, 'Unable to find Space with perm id NOT-API-SPACE') do
-      Seek::Openbis::Space.new(@openbis_endpoint,'NOT-API-SPACE')
+      Seek::Openbis::Space.new(@openbis_endpoint, 'NOT-API-SPACE')
     end
   end
 
   test 'dates' do
-    space = Seek::Openbis::Space.new(@openbis_endpoint,'API-SPACE')
+    space = Seek::Openbis::Space.new(@openbis_endpoint, 'API-SPACE')
     reg = space.registration_date
     assert reg.is_a?(DateTime)
-    assert_equal '16 12 2015 12:51:20',reg.strftime('%d %m %Y %H:%M:%S')
+    assert_equal '16 12 2015 12:51:20', reg.strftime('%d %m %Y %H:%M:%S')
 
     mod = space.modification_date
     assert mod.is_a?(DateTime)
-    assert_equal '16 12 2015 12:51:20',mod.strftime('%d %m %Y %H:%M:%S')
+    assert_equal '16 12 2015 12:51:20', mod.strftime('%d %m %Y %H:%M:%S')
   end
 
   test 'find by perm ids' do
@@ -47,19 +47,18 @@ class SpaceTest < ActiveSupport::TestCase
     assert_equal 2, spaces.count
     assert_equal ['API-SPACE', 'DEFAULT'], spaces.collect(&:code).sort
 
-    #should be empty when presenting no ids
+    # should be empty when presenting no ids
     spaces = Seek::Openbis::Space.new(@openbis_endpoint).find_by_perm_ids([])
     assert_empty spaces
-
   end
 
   test 'dataset count' do
-    space = Seek::Openbis::Space.new(@openbis_endpoint,'API-SPACE')
+    space = Seek::Openbis::Space.new(@openbis_endpoint, 'API-SPACE')
     assert_equal 8, space.dataset_count
   end
 
   test 'datasets' do
-    space = Seek::Openbis::Space.new(@openbis_endpoint,'API-SPACE')
+    space = Seek::Openbis::Space.new(@openbis_endpoint, 'API-SPACE')
     assert_equal 8, space.datasets.count
     assert_includes space.datasets.collect(&:perm_id), '20160210130454955-23'
   end

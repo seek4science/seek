@@ -4,17 +4,15 @@ require 'openbis_test_helper'
 class DataFileTest < ActiveSupport::TestCase
   fixtures :all
 
-  test "associations" do
+  test 'associations' do
     datafile_owner = Factory :user
-    datafile=Factory :data_file,:policy => Factory(:all_sysmo_viewable_policy),:contributor=> datafile_owner
-    assert_equal datafile_owner,datafile.contributor
-    unless datafile.content_blob.nil?
-      datafile.content_blob.destroy
-    end
+    datafile = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy), contributor: datafile_owner
+    assert_equal datafile_owner, datafile.contributor
+    datafile.content_blob.destroy unless datafile.content_blob.nil?
 
-    blob=Factory.create(:content_blob,:original_filename=>"df.ppt", :content_type=>"application/ppt",:asset => datafile,:asset_version=>datafile.version)#content_blobs(:picture_blob)
+    blob = Factory.create(:content_blob, original_filename: 'df.ppt', content_type: 'application/ppt', asset: datafile, asset_version: datafile.version) # content_blobs(:picture_blob)
     datafile.reload
-    assert_equal blob,datafile.content_blob
+    assert_equal blob, datafile.content_blob
   end
 
   test 'content blob search terms' do
@@ -103,7 +101,7 @@ class DataFileTest < ActiveSupport::TestCase
     with_config_value 'default_all_visitors_access_type', Policy::ACCESSIBLE do
       df_hash = Factory.attributes_for(:data_file)
       df_hash[:policy] = nil
-      df=DataFile.new(df_hash)
+      df = DataFile.new(df_hash)
       df.save!
       df.reload
       assert_not_nil df.policy
@@ -330,45 +328,44 @@ class DataFileTest < ActiveSupport::TestCase
 
   test 'spreadsheet annotation search fields' do
     df = Factory(:data_file)
-    cr = Factory(:cell_range,worksheet:Factory(:worksheet,content_blob:df.content_blob))
+    cr = Factory(:cell_range, worksheet: Factory(:worksheet, content_blob: df.content_blob))
 
-    Annotation.create(:source => Factory(:user),
-                  :annotatable => cr,
-                  :attribute_name => 'annotation',
-                  :value => 'fish')
+    Annotation.create(source: Factory(:user),
+                      annotatable: cr,
+                      attribute_name: 'annotation',
+                      value: 'fish')
 
     df.reload
     refute_empty df.content_blob.worksheets
     fields = df.spreadsheet_annotation_search_fields
-    assert_equal ['fish'],fields
+    assert_equal ['fish'], fields
   end
 
   test 'openbis?' do
     stub_request(:head, 'http://www.abc.com').to_return(
-        :headers => {:content_length => 500, :content_type => 'text/plain'}, :status => 200)
+      headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
 
     refute Factory(:data_file).openbis?
-    refute Factory(:data_file,content_blob:Factory(:url_content_blob)).openbis?
-    assert Factory(:data_file,content_blob:Factory(:url_content_blob,url:'openbis:1:dataset:2222')).openbis?
+    refute Factory(:data_file, content_blob: Factory(:url_content_blob)).openbis?
+    assert Factory(:data_file, content_blob: Factory(:url_content_blob, url: 'openbis:1:dataset:2222')).openbis?
   end
 
   test 'build from openbis' do
     mock_openbis_calls
     User.with_current_user(Factory(:person).user) do
       permission_project = Factory(:project)
-      endpoint=Factory(:openbis_endpoint,policy:Factory(:private_policy,permissions:[Factory(:permission, contributor:permission_project)]))
-      assert_equal 1,endpoint.policy.permissions.count
-      df = DataFile.build_from_openbis(endpoint,'20160210130454955-23')
+      endpoint = Factory(:openbis_endpoint, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: permission_project)]))
+      assert_equal 1, endpoint.policy.permissions.count
+      df = DataFile.build_from_openbis(endpoint, '20160210130454955-23')
       refute_nil df
       assert df.openbis?
       assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23", df.content_blob.url
       refute_equal df.policy, endpoint.policy
-      assert_equal endpoint.policy.access_type,df.policy.access_type
-      assert_equal 1,df.policy.permissions.length
-      permission=df.policy.permissions.first
-      assert_equal permission_project,permission.contributor
-      assert_equal Policy::NO_ACCESS,permission.access_type
+      assert_equal endpoint.policy.access_type, df.policy.access_type
+      assert_equal 1, df.policy.permissions.length
+      permission = df.policy.permissions.first
+      assert_equal permission_project, permission.contributor
+      assert_equal Policy::NO_ACCESS, permission.access_type
     end
   end
-
 end

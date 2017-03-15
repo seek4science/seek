@@ -1,8 +1,7 @@
 require 'test_helper'
 
 class PolicyHelperTest < ActionView::TestCase
-
-  test "policy selection options accessible removed if not downloadable" do
+  test 'policy selection options accessible removed if not downloadable' do
     policies = [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING]
     resource = nil # not downloadable
     selected_access_type = Policy::NO_ACCESS
@@ -15,7 +14,7 @@ class PolicyHelperTest < ActionView::TestCase
 
   #  handle access_type = ACCESSIBLE, and !resource.is_downloadable?
   #  Seek::Config.default :default_projects_access_type = @resource.is_asset? ? Policy::ACCESSIBLE : Policy::VISIBLE
-  test "policy selection options handles access type accessible selected but item not downloadable" do
+  test 'policy selection options handles access type accessible selected but item not downloadable' do
     policies = [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING]
     resource = nil # not downloadable
     selected_access_type = Policy::ACCESSIBLE
@@ -27,7 +26,7 @@ class PolicyHelperTest < ActionView::TestCase
 to visible if item is not downloadable and the accessible option is removed."
   end
 
-  test "policy selection options keeps access type accessible selected when item is downloadable" do
+  test 'policy selection options keeps access type accessible selected when item is downloadable' do
     policies = [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING]
     resource = DataFile.new # is downloadable
     selected_access_type = Policy::ACCESSIBLE
@@ -38,5 +37,4 @@ to visible if item is not downloadable and the accessible option is removed."
     assert_equal expected_options, actual_options, "default selected access type should change from accessible
 to visible if item is not downloadable and the accessible option is removed."
   end
-
 end

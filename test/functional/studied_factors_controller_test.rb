@@ -23,7 +23,6 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     df.save
     get :index, data_file_id: df.id, version: df.version
     assert_not_nil flash[:error]
-
   end
 
   test 'should create the factor studied with the concentration of the compound' do
@@ -43,18 +42,18 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs.measured_item, mi
     substance = fs.studied_factor_links.first.substance
     assert_equal substance.name, compound_annotation['recommended_name']
-    mappings = substance.mapping_links.map { |ml| ml.mapping }
+    mappings = substance.mapping_links.map(&:mapping)
     kegg_ids = []
     chebi_ids = []
     mappings.each do |m|
       assert_equal m.sabiork_id, compound_annotation['sabiork_id'].to_i
-      kegg_ids.push m.kegg_id if !kegg_ids.include?m.kegg_id and !m.kegg_id.blank?
-      chebi_ids.push m.chebi_id if !chebi_ids.include?m.chebi_id and !m.chebi_id.blank?
+      kegg_ids.push m.kegg_id if !kegg_ids.include?(m.kegg_id) && !m.kegg_id.blank?
+      chebi_ids.push m.chebi_id if !chebi_ids.include?(m.chebi_id) && !m.chebi_id.blank?
     end
     assert_equal kegg_ids.sort, compound_annotation['kegg_ids'].sort
     assert_equal chebi_ids.sort, compound_annotation['chebi_ids'].sort
 
-    synonyms = substance.synonyms.map { |s| s.name }
+    synonyms = substance.synonyms.map(&:name)
     assert_equal synonyms.sort, compound_annotation['synonyms'].sort
   end
 
@@ -132,7 +131,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
-    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => { measured_item_id: mi.id },  :substance_list => cp.name
+    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: { measured_item_id: mi.id }, substance_list: cp.name
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -162,7 +161,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs.studied_factor_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
-    put :update, :id => fs.id, :data_file_id => fs.data_file.id, :studied_factor => {}, :substance_list => cp.name
+    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: {}, substance_list: cp.name
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -248,7 +247,6 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     fs.studied_factor_links.each do |sfl|
       assert_nil StudiedFactorLink.find_by_id(sfl.id)
     end
-
   end
 
   test 'should create factor studied with growth medium item' do
@@ -304,8 +302,8 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     <name type='Recommended'>CTP</name>
   </Names>
 </Compound>)
-    stub_request(:get, 'http://sabiork.h-its.org/sabioRestWebServices/compounds?compoundName=CTP').
-        with(headers: { 'Accept' => '*/*; q=0.5, application/xml', 'Accept-Encoding' => 'gzip, deflate', 'User-Agent' => 'Ruby' }).
-        to_return(status: 200, body: body, headers: {})
+    stub_request(:get, 'http://sabiork.h-its.org/sabioRestWebServices/compounds?compoundName=CTP')
+      .with(headers: { 'Accept' => '*/*; q=0.5, application/xml', 'Accept-Encoding' => 'gzip, deflate', 'User-Agent' => 'Ruby' })
+      .to_return(status: 200, body: body, headers: {})
   end
 end

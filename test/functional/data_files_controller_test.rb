@@ -433,7 +433,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'missing sharing should default' do
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
-      data_file,blob = valid_data_file
+      data_file, blob = valid_data_file
       assert_difference('ActivityLog.count') do
         assert_difference('DataFile.count') do
           assert_difference('ContentBlob.count') do
@@ -448,7 +448,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_equal Policy::NO_ACCESS, df.policy.access_type
       assert df.policy.permissions.empty?
 
-      #check it doesn't create an error when retreiving the index
+      # check it doesn't create an error when retreiving the index
       get :index
       assert_response :success
     end
@@ -461,13 +461,13 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
 
-    assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/Filename:/
-      assert_select "p",:text=>/rightfield\.xls/
-      assert_select "p > b",:text=>/Format:/
-      assert_select "p",:text=>/Spreadsheet/
-      assert_select "p > b",:text=>/Size:/
-      assert_select "p",:text=>/9 KB/
+    assert_select 'div.box_about_actor' do
+      assert_select 'p > b', text: /Filename:/
+      assert_select 'p', text: /rightfield\.xls/
+      assert_select 'p > b', text: /Format:/
+      assert_select 'p', text: /Spreadsheet/
+      assert_select 'p > b', text: /Size:/
+      assert_select 'p', text: /9 KB/
     end
   end
 
@@ -550,13 +550,13 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show, id: df
     assert_response :success
 
-    assert_select "#buttons a.btn[href=?]","http://webpage.com",:text=>'External Link'
+    assert_select '#buttons a.btn[href=?]', 'http://webpage.com', text: 'External Link'
 
-    assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/Link:/
-      assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com"
-      assert_select "p > b",:text=>/Format:/,:count=>0
-      assert_select "p > b",:text=>/Size:/,:count=>0
+    assert_select 'div.box_about_actor' do
+      assert_select 'p > b', text: /Link:/
+      assert_select 'a[href=?][target=_blank]', 'http://webpage.com', text: 'http://webpage.com'
+      assert_select 'p > b', text: /Format:/, count: 0
+      assert_select 'p > b', text: /Size:/, count: 0
     end
   end
 
@@ -570,11 +570,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_select '#buttons a.btn[href=?]', 'spotify:track:3vX71b5ey9twzyCqJwBEvY', text: 'External Link'
 
-    assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/Link:/
-      assert_select "a[href=?][target=_blank]","spotify:track:3vX71b5ey9twzyCqJwBEvY",:text=>"spotify:track:3vX71b5ey9twzyCqJwBEvY"
-      assert_select "p > b",:text=>/Format:/,:count=>0
-      assert_select "p > b",:text=>/Size:/,:count=>0
+    assert_select 'div.box_about_actor' do
+      assert_select 'p > b', text: /Link:/
+      assert_select 'a[href=?][target=_blank]', 'spotify:track:3vX71b5ey9twzyCqJwBEvY', text: 'spotify:track:3vX71b5ey9twzyCqJwBEvY'
+      assert_select 'p > b', text: /Format:/, count: 0
+      assert_select 'p > b', text: /Size:/, count: 0
     end
   end
 
@@ -588,13 +588,13 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show, id: df
     assert_response :success
 
-    assert_select "div.box_about_actor" do
-      assert_select "p > b",:text=>/Link/,:count=>0
-      assert_select "a[href=?][target=_blank]","http://webpage.com",:text=>"http://webpage.com",:count=>0
+    assert_select 'div.box_about_actor' do
+      assert_select 'p > b', text: /Link/, count: 0
+      assert_select 'a[href=?][target=_blank]', 'http://webpage.com', text: 'http://webpage.com', count: 0
     end
 
-    assert_select "#buttons" do
-      assert_select "a",:text=>/Request/,:count=>1
+    assert_select '#buttons' do
+      assert_select 'a', text: /Request/, count: 1
     end
   end
 
@@ -612,7 +612,7 @@ class DataFilesControllerTest < ActionController::TestCase
     get :edit, id: data_files(:picture)
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('data_file')}/
-    assert_select "div.alert-info", text: /the #{I18n.t('data_file')}/i
+    assert_select 'div.alert-info', text: /the #{I18n.t('data_file')}/i
   end
 
   test 'publications included in form for datafile' do
@@ -1061,10 +1061,10 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
       put :update, id: df, data_file: { title: 'new title' },
-          policy_attributes: { access_type: Policy::NO_ACCESS,
-                               permissions_attributes: { contributor_type: 'Person',
-                                                         contributor_id: user.person.id,
-                                                         access_type: Policy::MANAGING } }
+                   policy_attributes: { access_type: Policy::NO_ACCESS,
+                                        permissions_attributes: { contributor_type: 'Person',
+                                                                  contributor_id: user.person.id,
+                                                                  access_type: Policy::MANAGING } }
     end
 
     assert_redirected_to data_file_path(df)
@@ -1186,7 +1186,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, data_file: data_file, content_blobs: [blob],
-               policy_attributes: projects_policy(Policy::VISIBLE, data_file[:project_ids], Policy::ACCESSIBLE)
+                        policy_attributes: projects_policy(Policy::VISIBLE, data_file[:project_ids], Policy::ACCESSIBLE)
         end
       end
     end
@@ -1216,7 +1216,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
     assert_difference('ActivityLog.count') do
       put :update, id: df, data_file: {},
-          policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
+                   policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
     end
     df.reload
 
@@ -1326,7 +1326,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory(:data_file,
                  policy: Factory(:public_policy),
                  content_blob: Factory(:small_test_spreadsheet_content_blob,
-                                         data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
+                                       data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
 
     get :explore, id: df, page_rows: 5
     assert_response :success
@@ -1340,7 +1340,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory(:data_file,
                  policy: Factory(:public_policy),
                  content_blob: Factory(:small_test_spreadsheet_content_blob,
-                                         data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
+                                       data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet_with_a_link.xls", 'rb').read))
 
     page_rows = Seek::Data::SpreadsheetExplorerRepresentation::MIN_ROWS / 2 + 1
     get :explore, id: df, page_rows: page_rows
@@ -2432,7 +2432,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('DataFile::Version.count') do
       post :new_version, id: data_file.id, data_file: {}, content_blobs: [{ data: file_for_upload }],
-           revision_comment: 'This is a new revision'
+                         revision_comment: 'This is a new revision'
     end
 
     assert_redirected_to data_file
@@ -2442,13 +2442,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'show openbis datafile' do
     mock_openbis_calls
     login_as(Factory(:person))
-    df=openbis_linked_data_file
+    df = openbis_linked_data_file
 
-    get :show,id:df.id
+    get :show, id: df.id
     assert_response :success
     assert assigns(:data_file)
-    assert_equal df,assigns(:data_file)
-    assert_select 'div#openbis-details',count:1
+    assert_equal df, assigns(:data_file)
+    assert_select 'div#openbis-details', count: 1
   end
 
   private

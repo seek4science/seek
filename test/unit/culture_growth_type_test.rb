@@ -1,8 +1,7 @@
 require 'test_helper'
 
 class CultureGrowthTypeTest < ActiveSupport::TestCase
-
-  test "to rdf" do
+  test 'to rdf' do
     object = Factory(:culture_growth_type)
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|

@@ -28,20 +28,20 @@ class PoliciesControllerTest < ActionController::TestCase
     user = Factory(:user)
     login_as(user)
 
-    person =  Factory(:person_in_project)
+    person = Factory(:person_in_project)
     favorite_group = Factory(:favourite_group, user: user)
     project = Factory(:project)
 
     post :preview_permissions, policy_attributes: {
-            permissions_attributes: {
-                # create a person and set access_type to Policy::MANAGING
-                '1' => { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::MANAGING },
-                # create a favourite group and members, set access_type to Policy::EDITING
-                '2' => { contributor_type: 'FavouriteGroup', contributor_id: favorite_group.id, access_type: Policy::DETERMINED_BY_GROUP },
-                # create a project and members and set access_type to Policy::ACCESSIBLE
-                '3' => { contributor_type: 'Project', contributor_id: project.id, access_type: Policy::ACCESSIBLE }
-            }
-        }, resource_name: 'data_file'
+      permissions_attributes: {
+        # create a person and set access_type to Policy::MANAGING
+        '1' => { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::MANAGING },
+        # create a favourite group and members, set access_type to Policy::EDITING
+        '2' => { contributor_type: 'FavouriteGroup', contributor_id: favorite_group.id, access_type: Policy::DETERMINED_BY_GROUP },
+        # create a project and members and set access_type to Policy::ACCESSIBLE
+        '3' => { contributor_type: 'Project', contributor_id: project.id, access_type: Policy::ACCESSIBLE }
+      }
+    }, resource_name: 'data_file'
 
     assert_response :success
     assert_select 'h3', text: 'Fine-grained sharing permissions:', count: 1
@@ -64,7 +64,7 @@ class PoliciesControllerTest < ActionController::TestCase
     sop = Factory(:sop, project_ids: gatekeeper.projects.map(&:id))
     login_as(sop.contributor)
     post :preview_permissions, policy_attributes: projects_policy(Policy::VISIBLE, [gatekeeper.projects.first], Policy::ACCESSIBLE),
-         is_new_file: 'false', resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s
+                               is_new_file: 'false', resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s
 
     assert_select 'p', text: "(An email will be sent to the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval)", count: 1
   end
@@ -161,7 +161,7 @@ class PoliciesControllerTest < ActionController::TestCase
       login_as(a_person.user)
       assert assay.can_manage?
 
-      #FIXME: can't test controller this way properly as it doesnt setup the @request and session properly
+      # FIXME: can't test controller this way properly as it doesnt setup the @request and session properly
       updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, assay.study.id.to_s)
       assert !updated_can_publish_immediately
     end
@@ -200,16 +200,16 @@ class PoliciesControllerTest < ActionController::TestCase
     # with additional text for permissions
     project = Factory(:project)
     post :preview_permissions, policy_attributes: projects_policy(Policy::VISIBLE, [project.id], Policy::ACCESSIBLE),
-         resource_name: 'data_file', project_ids: project.id
+                               resource_name: 'data_file', project_ids: project.id
 
     # with additional text for privileged people
     asset_manager = Factory(:asset_housekeeper)
     post :preview_permissions, policy_attributes: projects_policy(Policy::NO_ACCESS, [asset_manager.projects.first], Policy::ACCESSIBLE),
-         resource_name: 'data_file', project_ids: asset_manager.projects.first.id
+                               resource_name: 'data_file', project_ids: asset_manager.projects.first.id
 
     # with additional text for both permissions and privileged people
     asset_manager = Factory(:asset_housekeeper)
     post :preview_permissions, policy_attributes: projects_policy(Policy::VISIBLE, [asset_manager.projects.first], Policy::ACCESSIBLE),
-         resource_name: 'data_file',  project_ids: asset_manager.projects.first.id
+                               resource_name: 'data_file', project_ids: asset_manager.projects.first.id
   end
 end
