@@ -1,7 +1,7 @@
 SEEK::Application.routes.draw do
 
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
-  mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
+  #mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
   mount TavernaPlayer::Engine, :at => (SEEK::Application.config.relative_url_root || "/")
 
@@ -57,10 +57,10 @@ SEEK::Application.routes.draw do
     end
   end
 
-  match 'funding' => 'homes#funding', :as => :match
-  match 'index.html' => 'homes#index', :as => :match
-  match 'index' => 'homes#index', :as => :match
-  match 'my_biovel' => 'homes#my_biovel', :as => :my_biovel
+  get 'funding' => 'homes#funding', :as => :funding
+  get 'index.html' => 'homes#index'
+  get 'index' => 'homes#index'
+  get 'my_biovel' => 'homes#my_biovel', :as => :my_biovel
 
   resource :favourites do
     collection do
@@ -719,54 +719,54 @@ SEEK::Application.routes.draw do
 
 
   ### MISC MATCHES ###
-  match '/search/' => 'search#index', :as => :search
-  match '/search/save' => 'search#save', :as => :save_search
-  match '/search/delete' => 'search#delete', :as => :delete_search
-  match '/search/items_for_result' => 'search#items_for_result', :via => :post
-  match 'svg/:id.:format' => 'svg#show', :as => :svg
-  match '/tags/latest' => 'tags#latest', :as => :latest_tags
-  match '/tags/query' => 'tags#query', :as => :query_tags
-  match '/tags' => 'tags#index', :as => :all_tags
-  match '/tags/:id' => 'tags#show', :as => :show_tag
-  match '/tags' => 'tags#index', :as => :all_anns
-  match '/tags/:id' => 'tags#show', :as => :show_ann
-  match '/jerm/' => 'jerm#index', :as => :jerm
-  match '/jerm/fetch' => 'jerm#fetch', :as=>:jerm
-  match '/countries/:country_name' => 'countries#show', :as => :country
+  get '/search/' => 'search#index', :as => :search
+  get '/search/save' => 'search#save', :as => :save_search
+  get '/search/delete' => 'search#delete', :as => :delete_search
+  post '/search/items_for_result' => 'search#items_for_result'
+  get 'svg/:id.:format' => 'svg#show', :as => :svg
+  get '/tags/latest' => 'tags#latest', :as => :latest_tags
+  get '/tags/query' => 'tags#query', :as => :query_tags
+  get '/tags' => 'tags#index', :as => :all_tags
+  get '/tags/:id' => 'tags#show', :as => :show_tag
+  get '/tags' => 'tags#index', :as => :all_anns
+  get '/tags/:id' => 'tags#show', :as => :show_ann
+  get '/jerm/' => 'jerm#index', :as => :jerm
+  get '/jerm/fetch' => 'jerm#fetch', :as=> :jerm_fetch
+  get '/countries/:country_name' => 'countries#show', :as => :country
 
-  match '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
-  match '/favourite_groups/new' => 'favourite_groups#new', :as => :new_favourite_group, :via => :post
-  match '/favourite_groups/create' => 'favourite_groups#create', :as => :create_favourite_group, :via => :post
-  match '/favourite_groups/edit' => 'favourite_groups#edit', :as => :edit_favourite_group, :via => :post
-  match '/favourite_groups/update' => 'favourite_groups#update', :as => :update_favourite_group, :via => :post
-  match '/favourite_groups/:id' => 'favourite_groups#destroy', :as => :delete_favourite_group, :via => :delete
-  match 'studies/new_investigation_redbox' => 'studies#new_investigation_redbox', :as => :new_investigation_redbox, :via => :post
-  match 'experiments/create_investigation' => 'studies#create_investigation', :as => :create_investigation, :via => :post
-  match '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group, :via => :post
-  match ':controller/:id/approve_or_reject_publish' => ":controller#show"
+  get '/data_fuse/' => 'data_fuse#show', :as => :data_fuse
+  post '/favourite_groups/new' => 'favourite_groups#new', :as => :new_favourite_group
+  post '/favourite_groups/create' => 'favourite_groups#create', :as => :create_favourite_group
+  post '/favourite_groups/edit' => 'favourite_groups#edit', :as => :edit_favourite_group
+  post '/favourite_groups/update' => 'favourite_groups#update', :as => :update_favourite_group
+  delete '/favourite_groups/:id' => 'favourite_groups#destroy', :as => :delete_favourite_group
+  post 'studies/new_investigation_redbox' => 'studies#new_investigation_redbox', :as => :new_investigation_redbox
+  post 'experiments/create_investigation' => 'studies#create_investigation', :as => :create_investigation
+  post '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group
+  # get ':controller/:id/approve_or_reject_publish' => ":controller#show" # TODO: Rails4 - Delete me?
 
-  match '/signup' => 'users#new', :as => :signup
+  get '/signup' => 'users#new', :as => :signup
 
-  match '/logout' => 'sessions#destroy', :as => :logout
-  match '/login' => 'sessions#new', :as => :login
-  match '/auth/:provider/callback' => 'sessions#create'
-  match '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
-  match '/forgot_password' => 'users#forgot_password', :as => :forgot_password
-  match '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
-  match '/fail'=>'fail#index',:as=>:fail,:via=>:get
+  get '/logout' => 'sessions#destroy', :as => :logout
+  get '/login' => 'sessions#new', :as => :login
+  get '/auth/:provider/callback' => 'sessions#create'
+  get '/activate/:activation_code' => 'users#activate', :activation_code => nil, :as => :activate
+  get '/forgot_password' => 'users#forgot_password', :as => :forgot_password
+  get '/policies/request_settings' => 'policies#send_policy_data', :as => :request_policy_settings
+  get '/fail'=>'fail#index',:as=>:fail
 
   #feedback
-  match '/home/feedback' => 'homes#feedback', :as=> :feedback, :via=>:get
+  get '/home/feedback' => 'homes#feedback', :as=> :feedback
 
   #tabber lazy load
-  match 'application/resource_in_tab' => 'application#resource_in_tab'
+  get 'application/resource_in_tab' => 'application#resource_in_tab'
 
   #error rendering
-  match "/404" => "errors#error_404"
-  match "/422" => "errors#error_422"
-  match "/500" => "errors#error_500"
+  get "/404" => "errors#error_404"
+  get "/422" => "errors#error_422"
+  get "/500" => "errors#error_500"
 
-  match "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
+  get "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
 
   get "/citation/*doi(.:format)" => "citations#fetch", :as => :citation
 
