@@ -44,12 +44,6 @@ GIT
     gibberish (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/my_rails_settings.git
-  revision: e3f7fe9625ea27fea42b02c95e30cb4f1341655b
-  specs:
-    my_rails_settings (1.0.0)
-
-GIT
   remote: https://github.com/SysMO-DB/my_responds_to_parent.git
   revision: 5fadfd0cd85a0a70caaddd36f9617cb743047e0b
   specs:
@@ -854,7 +848,6 @@ DEPENDENCIES
   minitest-reporters
   modporter-plugin
   my_annotations!
-  my_rails_settings!
   my_responds_to_parent!
   my_savage_beast!
   mysql2
