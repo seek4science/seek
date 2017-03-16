@@ -12,7 +12,7 @@ The package is provided using Docker Compose, and became available with [SEEK ve
 
 # Installation and running
 
-First you should read the guide for [Docker](docker.html) and [Docker Compose](docker-compose.html)
+First you should read the guide for [Docker](docker.html) and [Docker Compose](docker/docker-compose.html)
 
 Running openSEEK is essentially the same, but you will need to use a different compose file and create an additional volume
 
