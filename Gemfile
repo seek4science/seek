@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.22'
+gem 'rails', '~> 4.0.0'
 gem 'rdoc'
 
 #database adaptors
@@ -85,7 +85,7 @@ gem 'my_annotations', git: 'https://github.com/myGrid/annotations.git'
 
 
 gem 'taverna-t2flow'
-gem 'taverna-player', git: 'https://github.com/myGrid/taverna-player.git', branch: 'list-inputs', ref: 'b36e19c85b7a58d08a73aa418c0f838442c6dfd3'
+gem 'taverna-player', git: 'https://github.com/myGrid/taverna-player.git', branch: 'rails400-list-inputs'
 gem 'jquery-rails', '~> 3'
 gem 'jquery-ui-rails', '~>3'
 gem 'recaptcha'
@@ -96,8 +96,8 @@ gem 'auto_strip_attributes'
 
 gem 'datacite_doi_ify', '~>1.1.0'
 
-gem 'bootstrap-sass', '3.1.1.0'
-gem 'sass-rails', '>= 3.2'
+gem 'bootstrap-sass'
+gem 'sass-rails'
 
 gem 'ro-bundle'
 gem 'handlebars_assets'
@@ -118,6 +118,8 @@ gem 'omniauth-ldap', '~> 1.0.5'
 
 gem 'ransack', '~> 1.8.2'
 
+gem 'uglifier'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
@@ -126,11 +128,6 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-typeahead.js', '~> 0.10.5'
   gem 'rails-assets-clipboard', '~> 1.5.12'
   gem 'rails-assets-vue', '~> 2.1.8'
-end
-
-group :assets do
-  gem 'turbo-sprockets-rails3'
-  gem 'uglifier'
 end
 
 group :production do
