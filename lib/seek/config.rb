@@ -81,17 +81,6 @@ module Seek
       exception_notification_enabled_propagate
     end
 
-    def piwik_analytics_enabled_propagate
-      if piwik_analytics_enabled
-        PiwikAnalytics.configuration.id_site = piwik_analytics_id_site
-        PiwikAnalytics.configuration.url = piwik_analytics_url
-        PiwikAnalytics.configuration.use_async = true
-        PiwikAnalytics.configuration.disabled = false
-      else
-        PiwikAnalytics.configuration.disabled = true
-      end
-    end
-
     def exception_notification_recipients_propagate
       configure_exception_notification
     end
