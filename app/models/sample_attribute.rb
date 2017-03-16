@@ -1,9 +1,9 @@
 class SampleAttribute < ActiveRecord::Base
   METHOD_PREFIX = '__sample_data_'
 
-  attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
-                  :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index, :sample_controlled_vocab,
-                  :sample_controlled_vocab_id, :linked_sample_type_id
+  # attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
+  #                :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index, :sample_controlled_vocab,
+  #                :sample_controlled_vocab_id, :linked_sample_type_id
 
   belongs_to :sample_attribute_type
   belongs_to :sample_type, inverse_of: :sample_attributes

@@ -12,7 +12,7 @@ class Post < ActiveRecord::Base
   after_destroy :update_cached_fields
 
   validates_presence_of :user_id, :body, :topic
-  attr_accessible :body	
+  # attr_accessible :body
 	
   def editable_by?(user)
     user && (user.id == user_id || user.admin? || user.moderator_of?(forum_id))

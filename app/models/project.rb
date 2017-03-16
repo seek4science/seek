@@ -40,8 +40,8 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
-  attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,
-                  :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids, :default_license
+  # attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,
+  #                :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids, :default_license
 
   # for handling the assignment for roles
   attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids

@@ -2,8 +2,8 @@ class Programme < ActiveRecord::Base
 
   include Seek::Taggable
 
-  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details,
-                  :administrator_ids, :activation_rejection_reason, :funding_codes
+  # attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details,
+  #                :administrator_ids, :activation_rejection_reason, :funding_codes
 
   attr_accessor :administrator_ids
 

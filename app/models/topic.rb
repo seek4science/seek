@@ -18,7 +18,7 @@ class Topic < ActiveRecord::Base
   has_many :voices, :through => :posts, :source => :user, :uniq => true
   belongs_to :replied_by_user, :foreign_key => "replied_by", :class_name => "User"
 
-  attr_accessible :title
+  # attr_accessible :title
   # to help with the create form
   attr_accessor :body
 	

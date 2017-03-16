@@ -5,7 +5,7 @@ module TavernaPlayer#
         extend ActiveSupport::Concern
 
         included do
-          attr_accessible :data_file_id
+          # attr_accessible :data_file_id
           before_save :assign_data_file_content
           belongs_to :data_file
         end

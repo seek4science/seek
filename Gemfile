@@ -121,7 +121,7 @@ gem 'uglifier'
 
 # Rails 4 upgrade
 gem 'activerecord-session_store'
-gem 'protected_attributes' # Delete me after refactoring
+# gem 'protected_attributes' # Delete me after refactoring
 gem 'rails-observers'
 
 # javascript assets from https://rails-assets.org

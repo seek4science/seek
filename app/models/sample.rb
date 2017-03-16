@@ -1,9 +1,9 @@
 require 'seek/samples/sample_data'
 
 class Sample < ActiveRecord::Base
-  attr_accessible :contributor_id, :contributor_type, :json_metadata,
-                  :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
-                  :other_creators, :data
+  # attr_accessible :contributor_id, :contributor_type, :json_metadata,
+  #                :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
+  #                :other_creators, :data
 
   searchable(auto_index: false) do
     text :attribute_values do

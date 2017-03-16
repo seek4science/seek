@@ -1,5 +1,5 @@
 class SampleAttributeType < ActiveRecord::Base
-  attr_accessible :base_type, :regexp, :title, :placeholder
+  # attr_accessible :base_type, :regexp, :title, :placeholder
 
   validates :title, :base_type, :regexp, presence: true
   validate :validate_allowed_type, :validate_regular_expression
