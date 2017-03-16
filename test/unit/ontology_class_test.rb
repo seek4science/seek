@@ -44,10 +44,10 @@ class OntologyClassTest < ActiveSupport::TestCase
 
     list = o4.flatten_hierarchy
     assert_equal 4, list.count
-    assert_iuncludes list, o1
-    assert_iuncludes list, o2
-    assert_iuncludes list, o3
-    assert_iuncludes list, o4
+    assert_includes list, o1
+    assert_includes list, o2
+    assert_includes list, o3
+    assert_includes list, o4
   end
 
   test 'hash_by_uri' do

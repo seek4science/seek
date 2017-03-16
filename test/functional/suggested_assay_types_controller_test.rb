@@ -103,7 +103,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     put :update, id: suggested_assay_type.id, suggested_assay_type: { parent_uri: "suggested_assay_type:#{suggested_parent2.id}" }
     assert_redirected_to action: :manage
     suggested_parent2.reload
-    assert_iuncludes suggested_parent2.children, suggested_assay_type
+    assert_includes suggested_parent2.children, suggested_assay_type
 
     # update to other parent from ontology
     put :update, id: suggested_assay_type.id, suggested_assay_type: { parent_uri: ontology_parent_uri }

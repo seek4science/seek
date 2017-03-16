@@ -200,11 +200,11 @@ class StrainsControllerTest < ActionController::TestCase
     refute_nil assay2
     refute_equal assay1, assay2
 
-    assert_iuncludes assay1.strains, strain1
-    assert_iuncludes assay2.strains, strain2
+    assert_includes assay1.strains, strain1
+    assert_includes assay2.strains, strain2
 
-    assert_iuncludes strain1.assays, assay1
-    assert_iuncludes strain2.assays, assay2
+    assert_includes strain1.assays, assay1
+    assert_includes strain2.assays, assay2
 
     assert strain1.can_view?
     assert strain2.can_view?

@@ -790,8 +790,8 @@ class PeopleControllerTest < ActionController::TestCase
     put :administer_update, id: person.id, person: { work_group_ids: [project_admin_wg.id, existing_wg.id] }
     assert_redirected_to person_path(assigns(:person))
     person.reload
-    assert_iuncludes person.work_groups, project_admin_wg
-    assert_iuncludes person.work_groups, existing_wg
+    assert_includes person.work_groups, project_admin_wg
+    assert_includes person.work_groups, existing_wg
   end
 
   test 'not allow project administrator assign people into their projects they do not administer' do

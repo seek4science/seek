@@ -86,7 +86,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     work_group = Factory(:work_group, institution: institution)
     a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
     institution.reload
-    assert_iuncludes institution.people, a_person
+    assert_includes institution.people, a_person
     get :show, id: institution
     assert_select 'span.disabled_icon', text: /Delete Institution/, count: 1
     assert_no_difference('Institution.count') do

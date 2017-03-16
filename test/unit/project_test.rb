@@ -719,7 +719,7 @@ class ProjectTest < ActiveSupport::TestCase
     disable_authorization_checks { project.save! }
     project.reload
 
-    assert_iuncludes project.organisms, organism
+    assert_includes project.organisms, organism
     assert_equal 'Project description', project.description
     assert_equal 'http://wikipage.com', project.wiki_page
     assert_equal 'http://webpage.com', project.web_page
@@ -739,10 +739,10 @@ class ProjectTest < ActiveSupport::TestCase
     }
     project.update_attributes(attr)
 
-    assert_iuncludes project.project_administrators, person
-    assert_iuncludes project.asset_gatekeepers, person
-    assert_iuncludes project.pals, person
-    assert_iuncludes project.asset_housekeepers, person
+    assert_includes project.project_administrators, person
+    assert_includes project.asset_gatekeepers, person
+    assert_includes project.pals, person
+    assert_includes project.asset_housekeepers, person
   end
 
   test 'project role removed when removed from project' do
