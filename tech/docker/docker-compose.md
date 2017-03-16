@@ -22,7 +22,7 @@ First you need to create 3 volumes
     
 and then to start up, with the docker-compose.yml in your currently directory run
     
-    docker-compose -d up
+    docker-compose up -d
     
 and go to [http://localhost:3000](http://localhost:3000)
 
@@ -35,7 +35,7 @@ You change the port, and image in the docker-compose.yml by editing
     seek:
         ..
         ..
-        image: fairdom/seek:1.2
+        image: fairdom/seek:1.3
         ..
         ..
         ports:
