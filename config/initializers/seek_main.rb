@@ -29,7 +29,6 @@ require 'acts_as_trashable'
 
 require 'country-select'
 require 'will_paginate'
-require 'piwik_analytics'
 require 'responds_to_parent'
 require 'pothoven-attachment_fu'
 
