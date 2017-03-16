@@ -17,7 +17,7 @@ This is the first release that supports openBIS integration. This version includ
   * Easily register an openBIS DataSet with SEEK as a DataFile
   * Browse and download individual DataSet files, or download as a whole zip file.
   * Search indexing of registered openBIS DataSets
-  * Automatic synchronisation with OpenBIS spaces and DataSets
+  * Automatic synchronisation with openBIS spaces and DataSets
   * An openSEEK bundle that provides both SEEK and openBIS through Docker and Docker Compose.
   * A new UI for setting sharing permissions
     * Now displays a matrix for easier setting and viewing of individual permissions, replacing the pre-canned options 
