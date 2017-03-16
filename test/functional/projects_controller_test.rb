@@ -237,7 +237,7 @@ class ProjectsControllerTest < ActionController::TestCase
     publication.save!
     project = person.projects.first
 
-    assert_include publication.projects, project
+    assert_iuncludes publication.projects, project
     login_as(person)
     get :asset_report, id: project.id
 
@@ -927,8 +927,8 @@ class ProjectsControllerTest < ActionController::TestCase
     refute_empty strain2.projects
     refute_equal project1, project2
 
-    assert_include project1.strains, strain1
-    assert_include project2.strains, strain2
+    assert_iuncludes project1.strains, strain1
+    assert_iuncludes project2.strains, strain2
 
     get :index, strain_id: strain1.id
     assert_response :success
