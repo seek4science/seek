@@ -13,15 +13,15 @@
        </span>
      </div>
      <div class='panel-body'>
-       <%= list_item_attribute('Code', dataset.code) %>
-       <%= list_item_attribute('Dataset Type', dataset.dataset_type['code']) %>
-       <%= list_item_attribute('Dataset Type Desc', dataset.dataset_type['description']) %>
+       <%= list_item_attribute('Code', text_or_not_specified(dataset.code)) %>
+       <%= list_item_attribute('Dataset Type Code', text_or_not_specified(dataset.dataset_type['code'])) %>
+       <%= list_item_attribute('Dataset Type', text_or_not_specified(dataset.dataset_type['description'])) %>
 
-       <%= list_item_attribute('Registrator', dataset.registrator) %>
-       <%= list_item_attribute('Modifier', dataset.modifier) %>
+       <%= list_item_attribute('Registrator', text_or_not_specified(dataset.registrator)) %>
+       <%= list_item_attribute('Modifier', text_or_not_specified(dataset.modifier)) %>
 
-       <%= list_item_attribute('Registered', date_as_string(dataset.registration_date, true)) %>
-       <%= list_item_attribute('Modified', date_as_string(dataset.modification_date, true)) %>
+       <%= list_item_attribute('Registered', text_or_not_specified(date_as_string(dataset.registration_date, true))) %>
+       <%= list_item_attribute('Modified', text_or_not_specified(date_as_string(dataset.modification_date, true))) %>
        <p class="list_item_attribute">
          <%= link_to(files_text, '#', class: 'view-files-link',
                      'data-toggle' => 'modal',
