@@ -20,7 +20,7 @@ class Workflow < ActiveRecord::Base
 
   validates_presence_of :title
 
-  validates :myexperiment_link, :format => { :with => /^http:\/\/(www\.)?myexperiment\.org\/workflows\/[0-9]+/,
+  validates :myexperiment_link, :format => { :with => /\Ahttp:\/\/(www\.)?myexperiment\.org\/workflows\/[0-9]+/,
                                              :message => "is invalid, please make sure the URL is in the format: http://www.myexperiment.org/workflows/...",
                                              :allow_blank => true }
 
