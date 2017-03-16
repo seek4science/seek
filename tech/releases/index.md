@@ -7,6 +7,26 @@ layout: page
 
 Latest version - {{ site.current_seek_version }}
 
+## Version 1.3.0
+
+Release date: _March 17th 2017_
+
+This is the first release that supports openBIS integration. This version includes
+
+  * Ability to link and browse an openBIS space and datastore, and browse DataSets
+  * Easily register an openBIS DataSet with SEEK as a DataFile
+  * Browse and download individual DataSet files, or download as a whole zip file.
+  * Search indexing of registered openBIS DataSets
+  * Automatic synchronisation with OpenBIS spaces and DataSets
+  * An openSEEK bundle that provides both SEEK and openBIS through Docker and Docker Compose.
+  * A new UI for setting sharing permissions
+    * Now displays a matrix for easier setting and viewing of individual permissions, replacing the pre-canned options 
+    that weren't always that intuitive or logical.
+    
+![new_sharing_matrix](/images/release-notes/sharing-1.3.0.png){:.screenshot}
+    
+A full list of changes included in this release can be found in the [SEEK v1.3.0 release notes](release-notes-1.3.0.html).    
+
 ## Version 1.2.2
 
 Release date: _March 3rd 2017_
