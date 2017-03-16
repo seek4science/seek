@@ -62,15 +62,6 @@ GIT
     my_savage_beast (2.3)
 
 GIT
-  remote: https://github.com/SysMO-DB/piwik-ruby-tracking.git
-  revision: 06fa67ba4b2bd66878d745e9de5d6d6c8015bc92
-  specs:
-    piwik_analytics (1.0.1)
-      actionpack
-      activesupport
-      rails (>= 3.0.0)
-
-GIT
   remote: https://github.com/SysMO-DB/redbox.git
   revision: 494451d01aeeb70b186783d08b6b9aefcb537e98
   specs:
@@ -885,7 +876,6 @@ DEPENDENCIES
   paperclip (~> 4.2.0)
   passenger
   pg
-  piwik_analytics!
   pothoven-attachment_fu
   prototype-rails
   pry
