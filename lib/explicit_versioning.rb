@@ -97,7 +97,12 @@ module Jits
 
         # Finds versions of this model.  Takes an options hash like <tt>find</tt>
         def find_versions(options = {})
-          versions.find(:all, options)
+          relation = versions
+          relation = relation.where(options[:conditions]) if options[:conditions]
+          relation = relation.joins(options[:joins]) if options[:joins]
+          relation = relation.limit(options[:limit]) if options[:limit]
+          relation = relation.order(options[:order]) if options[:order]
+          relation
         end
 
         # Saves the object as a new version and also saves the original object as the new version.

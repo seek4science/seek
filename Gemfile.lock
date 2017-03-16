@@ -75,9 +75,10 @@ GIT
 
 GIT
   remote: https://github.com/myGrid/annotations.git
-  revision: d33e78993ee957fa12d71cbe9f03100dd9b0ad15
+  revision: e524e4575f6a9af10286a713c1c155a6622cd542
+  branch: rails4
   specs:
-    my_annotations (0.6.0)
+    my_annotations (0.7.0)
 
 GIT
   remote: https://github.com/myGrid/search_biomodel.git
