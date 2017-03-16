@@ -49,6 +49,11 @@ module Seek
       (respond_to?(:content_blob) || respond_to?(:content_blobs))
     end
 
+    #a method that can be overridden for cases where an item is downloadable, but for some reason (e.g. size), is disabled
+    def download_disabled?
+      !is_downloadable?
+    end
+
     def versioned?
       respond_to? :versions
     end
