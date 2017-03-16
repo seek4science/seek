@@ -62,7 +62,7 @@ module Seek
       def self.decode(values)
         if values
           values.map do |value|
-            Sample.new.tap { |s| s.assign_attributes(value, without_protection: true) }
+            Sample.new.tap { |s| s.assign_attributes(value) }
           end
         end
       end
