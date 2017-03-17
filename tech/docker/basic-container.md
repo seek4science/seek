@@ -14,7 +14,7 @@ This is a good way to try out your own local installation of SEEK.
 
 Once Docker is installed it can be started simply with:
  
-    docker run -d -p 3000:3000 --name seek fairdom/seek:1.2
+    docker run -d -p 3000:3000 --name seek fairdom/seek:{{ site.current_docker_tag }}
     
 This will start the container, and will be then available at [http://localhost:3000](http://localhost:3000) 
 after a short few seconds wait for things to start up.
@@ -41,7 +41,7 @@ the data (see [Using volumes](#using-volumes) for how to avoid this)
 
 ### Image tags
    
-The above example used the image name _fairdom/seek:1.2_. The number following the : is the tag, and corresponds to the SEEK minor version _1.2_ . 
+The above example used the image name _fairdom/seek:{{ site.current_docker_tag }}_. The number following the : is the tag, and corresponds to the SEEK minor version _{{ site.current_docker_tag }}_ . 
 From SEEK 1.1 onwards tags are available for each stable version of SEEK. 
 Note that the patch version (i.e. the x in 1.1.x is omitted, the image is always up to date with the latest patch and fixes).
 
@@ -60,7 +60,7 @@ and lost once the container is deleted.
 You can avoid this by telling the container to use a couple of Docker volumes for the database and filestore.
   
   
-    docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.2
+    docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:{{ site.current_docker_tag }}
     
 this will create 2 volumes called _seek-filestore_ and _seek-db_, which you can see and manage with docker volumes, e.g
     
@@ -80,8 +80,8 @@ Switching to a newer build of the same version is as simple as:
 
     docker stop seek
     docker rm seek
-    docker pull fairdom/seek:1.2
-    docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:1.2
+    docker pull fairdom/seek:{{ site.current_docker_tag }}
+    docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:{{ site.current_docker_tag }}
     docker exec seek bundle exec rake seek:reindex_all #(to rebuild the search index)
     
 However, if moving between versions it is necessary to run some upgrade steps which can be achieved by usiung a temporary container.

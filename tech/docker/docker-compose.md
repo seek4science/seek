@@ -35,7 +35,7 @@ You change the port, and image in the docker-compose.yml by editing
     seek:
         ..
         ..
-        image: fairdom/seek:1.3
+        image: fairdom/seek:{{ site.current_docker_tag }}
         ..
         ..
         ports:
