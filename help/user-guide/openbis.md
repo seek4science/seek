@@ -5,6 +5,12 @@ layout: page
 
 # Using SEEK with openBIS
 
+## Enabling openBIS in SEEK
+
+By default, openBIS is disabled. To enable the functionality described below, first go to the Admin pages (available from the user menu in the top right). 
+Then select *Site Configuration* and the *Enable/disable features*. 
+There is a checkbox to enable openBIS towards the bottom of that page.
+
 ## Connecting your project to an openBIS space
 
 **Only a Project Administrator may configure connected spaces**
