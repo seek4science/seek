@@ -5,7 +5,7 @@ layout: page
 
 # SEEK Releases
 
-Latest version - {{ site.current_seek_version }}
+**Latest version - {{ site.current_seek_version }}**
 
 ## Version 1.3.0
 
@@ -13,7 +13,7 @@ Release date: _March 17th 2017_
 
 ![new_sharing_matrix](/images/release-notes/openbis.png)
 
-This is the first release that supports openBIS integration. This version includes
+This is the first public release that supports openBIS integration. This version includes
 
   * Ability to link and browse an openBIS space and datastore, and browse DataSets
   * Easily register an openBIS DataSet with SEEK as a DataFile

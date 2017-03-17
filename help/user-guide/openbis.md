@@ -49,7 +49,14 @@ Each card provides some details, along with the number of files - clicking the F
 A DataSet can be registered with SEEK simply by clicking the *Register with SEEK* link. When registered you will be redirected to the new DataFile in SEEK.
 This DataFile represents the whole openBIS DataSet including all its files. It can either be downloaded as a single zip file, or individual files can be downloaded via the files link.
 
-The latest synchronised metadata is shown for that DataFile in SEEK.
+The latest synchronised metadata is shown for that DataFile in SEEK. The metadata reflects the current state of the DataSet on openBIS, it is not a copy. 
+
+Currently, if the DataSet is deleted from openBIS the metadata will become unavailable, but the registered DataFile will SEEK will continue to exist.
+
+The DataSet is registered as a DataFile with the default permissions for the space, and the default license for the project.
+
+The DataFile behaves just like any other DataFile in SEEK, and its permissions, license, title, description etc can be changed by the owner or other users with the correct permissions. 
+It can also be linked to Assays, Publications and Events. 
 
 In a future version of SEEK we plan to allow registering multiple DataSets in one action.
 
