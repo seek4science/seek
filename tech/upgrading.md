@@ -45,7 +45,7 @@ It should only be necessary to run *bundle install* and the *db:migrate* rake
 task. Using *seek:upgrade* should still work, but could take a lot of
 unnecessary time. 
 
-## Steps to upgrade from 1.1.x to 1.2.x
+## Steps to upgrade from 1.2.x to 1.3.x
 
 
 ### Set RAILS_ENV
@@ -65,16 +65,16 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull https://github.com/seek4science/seek.git
-    git checkout v1.2.2
+    git checkout v1.3.0
 
 ### Updating using the tarball
 
-Starting with version 0.22, we've started making SEEK available as a download.
+
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.2.2.tar.gz> You can
+<https://bitbucket.org/seek4science/seek/downloads/seek-1.3.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.2.2.tar.gz
+    tar zxvf seek-1.3.0.tar.gz
 
 and then copy across your existing filestore and database configuration file
 from your previous installation and continue with the upgrade steps. The
@@ -101,5 +101,5 @@ content.
 
 ## Earlier upgrade notes
 
-For details of how to upgrade to 1.1.x and for earlier versions please visit
+For details of how to upgrade to 1.2.x and for earlier versions please visit
 [Upgrades between earlier versions](earlier-upgrades.html)
