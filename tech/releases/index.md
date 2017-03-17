@@ -26,6 +26,8 @@ This is the first public release that supports openBIS integration. This version
     that weren't always that intuitive or logical.
     
 ![new_sharing_matrix](/images/release-notes/sharing-1.3.0.png){:.screenshot}
+
+Details on how to use openBIS with SEEK is available in our [User Guide](/help/user-guide/openbis.html)
     
 A full list of changes included in this release can be found in the [SEEK v1.3.0 release notes](release-notes-1.3.0.html).    
 
