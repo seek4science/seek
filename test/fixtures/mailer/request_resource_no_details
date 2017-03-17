@@ -1,6 +1,6 @@
 Hi Datafile Owner, OwnerOf MyFirstSop,
 
-    The Sysmo SEEK user Aaron Spiggle, http://localhost:3000/people/2, has requested access to the file "Picture": http://localhost:3000/data_files/383471497.
+    The Sysmo SEEK user Aaron Spiggle, http://localhost:3000/people/-person_id-, has requested access to the file "Picture": http://localhost:3000/data_files/383471497.
 
     This file is currently not downloadable by Aaron according to the sharing permissions. You can modify permissions for individual people using the Custom Sharing Permissions when managing the file.
 

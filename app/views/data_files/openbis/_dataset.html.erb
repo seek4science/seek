@@ -1,0 +1,70 @@
+<%
+  openbis_endpoint = dataset.openbis_endpoint
+  file_count=dataset.dataset_file_count
+  files_text = "#{file_count} File".pluralize(file_count) + " : #{number_to_human_size(dataset.size)}"
+%>
+
+<%= modal_openbis_file_view('openbis-file-view') %>
+
+<div class="panel panel-default" id="openbis-details">
+  <div class="panel-body">
+    <p>
+      <%= image(:openbis, :width=>'75px') %>
+    </p>
+
+    <div class="row">
+      <div class="col-md-5">
+        <div>
+          <label>Dataset Perm ID: </label> <%= dataset.perm_id %>
+        </div>
+        <div>
+          <label>Dataset Type Code: </label> <%= text_or_not_specified(dataset.dataset_type_code) %>
+        </div>
+        <div>
+          <label>Dataset Type: </label> <%= text_or_not_specified(dataset.dataset_type_description) %>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div>
+          <label>Registration date: </label> <%= text_or_not_specified(date_as_string(dataset.registration_date, true)) %>
+        </div>
+        <div>
+          <label>Registered by: </label> <%= text_or_not_specified(dataset.registrator) %>
+        </div>
+        <% if dataset.registration_date != dataset.modification_date %>
+            <div>
+              <label>Modification date: </label> <%= text_or_not_specified(date_as_string(dataset.modification_date, true)) %>
+            </div>
+            <div>
+              <label>Modified by: </label> <%= text_or_not_specified(dataset.modifier) %>
+            </div>
+        <% end %>
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-5">
+        <label>Files: </label> <%=  %>
+        <%= link_to(files_text, '#', class: 'view-files-link',
+                    'data-toggle' => 'modal',
+                    'data-target' => "#openbis-file-view",
+                    'data-perm-id' => "#{dataset.perm_id}",
+                    'data-endpoint-id' => "#{openbis_endpoint.id}",
+                    'data-datafile-id' => "#{@data_file.id}",
+                    'data-project-id' => "#{@data_file.projects.first.id}")
+        %>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+
+
+  $j(document).ready(function () {
+    $j('#openbis-details').on('click', '.view-files-link', OpenBis.showFiles);
+  });
+
+</script>

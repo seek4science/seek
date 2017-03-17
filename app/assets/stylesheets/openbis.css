@@ -1,0 +1,47 @@
+.openbis-card .openbis-card-heading {
+    background-color: rgba(39, 106, 158, 0.27);
+    border-bottom: 1px solid #ccc;
+
+}
+
+
+
+.openbis-card-heading span {
+    padding-left:1em;
+}
+
+#openbis-dataset-cards  .openbis-card.registered  {
+    opacity: 0.65;
+    display:none;
+}
+
+#openbis-dataset-cards .openbis-card.registered .openbis-card-heading {
+    background-color: rgba(221, 12, 20, 0.26);
+    border-bottom: 1px solid #ccc;
+}
+
+#openbis-file-list {
+  max-height: 80vh;
+  overflow: scroll;
+}
+
+#openbis-file-list table {
+    width:98%;
+    margin:0.5em;
+}
+
+#openbis-file-list table tr {
+    border: 1px solid #ddd;
+}
+
+#openbis-file-list table td.filesize {
+    min-width: 3em;
+}
+
+#openbis-file-list table tr:hover {
+    background-color: #e8e8e8;
+}
+
+form#openbis-space-form select#openbis_endpoint_refresh_period_mins {
+    max-width: 5em;
+}

@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   include Seek::PreviewHandling
-  include Seek::DestroyHandling
+  include Seek::AssetsStandardControllerActions
 
   before_filter :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
 
@@ -56,10 +56,7 @@ class EventsController < ApplicationController
 
     @event.attributes = params[:event]
 
-    if params[:sharing]
-      @event.policy_or_default unless is_new
-      @event.policy.set_attributes_with_sharing params[:sharing], @event.projects
-    end
+    update_sharing_policies @event, params
 
     respond_to do | format |
       if @event.save

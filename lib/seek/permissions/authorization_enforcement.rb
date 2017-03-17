@@ -1,5 +1,5 @@
-#This file sets up enforcement for basic rules based on the 'can_edit?', 'can_view?', 'can_delete?', and 'can_manage?' methods
-#It also provides macro style class methods for AR classes to describe common variations on the basic rules.
+# This file sets up enforcement for basic rules based on the 'can_edit?', 'can_view?', 'can_delete?', and 'can_manage?' methods
+# It also provides macro style class methods for AR classes to describe common variations on the basic rules.
 
 # 1. An instance of an AR class may not be destroyed unless instance.can_delete? returns true.
 # 2. An instance of an AR class may not have its attributes/associations changed unless instance.can_edit? returns true.
@@ -18,12 +18,12 @@
 module Seek
   module Permissions
     module AuthorizationEnforcement
-      def self.included ar
+      def self.included(ar)
         ar.const_get(:Base).class_eval { include BaseExtensions }
       end
 
       module BaseExtensions
-        def self.included base
+        def self.included(base)
           base.extend ClassMethods
           base.before_save :changes_authorized?
           base.before_destroy :destroy_authorized?
@@ -35,9 +35,9 @@ module Seek
           result = true
           if authorization_checks_enabled
             result = authorized_changes_to_attributes? &&
-                authorized_to_edit? &&
-                authorized_associations_for_action? &&
-                authorized_required_access_for_owner?
+                     authorized_to_edit? &&
+                     authorized_associations_for_action? &&
+                     authorized_required_access_for_owner?
           end
           result
         end
@@ -92,7 +92,6 @@ module Seek
             end
           end
 
-
           result
         end
 
@@ -137,41 +136,39 @@ module Seek
           not_requiring_edit = self.class.respond_to?(:attributes_not_requiring_edit) ? self.class.attributes_not_requiring_edit : []
           can_edit? || (changed - not_requiring_edit).empty?
         end
-
       end
 
       module ClassMethods
-        def requires_can_manage *attrs
+        def requires_can_manage(*attrs)
           self.class_attribute :attributes_requiring_can_manage unless self.respond_to?(:attributes_requiring_can_manage)
           self.attributes_requiring_can_manage ||= []
           self.attributes_requiring_can_manage = self.attributes_requiring_can_manage | attrs.map(&:to_s)
         end
 
-        def does_not_require_can_edit *attrs
+        def does_not_require_can_edit(*attrs)
           self.class_attribute :attributes_not_requiring_edit unless self.respond_to?(:attributes_not_requiring_edit)
           self.attributes_not_requiring_edit ||= []
           self.attributes_not_requiring_edit = self.attributes_not_requiring_edit | attrs.map(&:to_s)
         end
 
-        def enforce_authorization_on_association association,action
+        def enforce_authorization_on_association(association,action)
           self.class_attribute :associations_and_actions_to_be_enforced unless self.respond_to?(:associations_and_actions_to_be_enforced)
           self.associations_and_actions_to_be_enforced ||= {}
           self.associations_and_actions_to_be_enforced[association.to_s]=action.to_s
         end
 
-        def enforce_required_access_for_owner association,action
+        def enforce_required_access_for_owner(association,action)
           self.class_attribute :associations_requiring_access_for_owner unless self.respond_to?(:associations_requiring_access_for_owner)
           self.associations_requiring_access_for_owner ||= {}
           self.associations_requiring_access_for_owner[association.to_s]=action.to_s
         end
       end
-
     end
   end
 end
 
 class Object
-  #Disables all authorization enforcement within the block passed to this method.
+  # Disables all authorization enforcement within the block passed to this method.
   def disable_authorization_checks
     saved = $authorization_checks_disabled
     $authorization_checks_disabled = true

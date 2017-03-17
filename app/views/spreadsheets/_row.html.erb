@@ -1,0 +1,161 @@
+
+ <style>
+
+   div.row_headings {
+       /*4 rows*/
+       height: 100px;
+   }
+
+   div.sheet_container{
+       height: 120px;
+   }
+   div.sheet {
+       height: 100px;
+   }
+
+ </style>
+ <%
+    default_per_page = 200
+    if sheet_array.length > 3
+      default_per_page = 100
+    end
+ %>
+ <% per_page = params[:page_rows].try(:to_i) || default_per_page %>
+
+ <%= render :partial => "spreadsheets/export" %>
+
+ <div  class="spreadsheet_container <%= object_id %>" onselectstart="return false;" >
+
+   <% sheet_array.each_with_index do |sheet_row_array, sheet_index| %>
+       <%  sheet = sheet_row_array[0] %>
+       <a index="<%= object_id %>_<%= sheet_index + 1 -%>" class="sheet_tab <%= object_id %> curved_top with_smaller_shadow <%= "selected_tab" if sheet_index == 0-%>"><%= h(sheet.name) -%></a>
+   <% end %>
+   <!--- Sheet --->
+    <% sheet_array.each_with_index do |sheet_and_rows_array, index| %>
+       <%
+          sheet_index = index + 1
+          sheet = sheet_and_rows_array[0]
+          rows = [1] | sheet_and_rows_array[1]
+          columns = sheet_and_rows_array[2]
+
+          is_header = rows ==[1] ? true : false
+
+
+
+          if is_header
+            rows_display = sheet.rows.compact
+            columns_display = sheet.columns.compact.select{|col| columns.include? col.index}
+          else
+            rows_display = sheet.rows.compact.select{|row| rows.include? row.index}
+            columns_display = sheet.columns.compact
+          end
+
+          per_page = rows_display.count
+          wp_rows = generate_paginate_rows(rows_display, sheet_index, per_page)
+       %>
+
+      <div  style="background-color: white;" class="sheet_container <%= object_id %> curved" id="<%= ("spreadsheet_#{object_id}_" + sheet_index.to_s) -%>">
+        <div class="corner_heading">&nbsp;</div>
+        <div class="col_headings <%= "odd_heading" if sheet.last_col % 2 == 0 -%>">
+          <div style="min-width:1000000px">
+            <div class="col_heading_spacer">&nbsp;</div>
+            <% columns_display.each_with_index do |col,c| -%>
+              <div style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil? -%>" class="col_heading <%= "odd_heading" if c % 2 == 0  -%>"><%= to_alpha(col.index) -%></div>
+            <% end -%>
+            <br style=" clear:both"/>
+          </div>
+        </div>
+
+        <div>
+
+          <div class="row_headings <%= "odd_heading" if sheet.last_row % 2 == 0 -%>" style="float:left">
+            <% wp_rows.each do |row| -%>
+                <% r = row.index  %>
+               <div <%= (sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%> class="row_heading <%= "odd_heading" if r % 2 == 1 -%>"><%= r -%></div>
+            <% end -%>
+                <div style="height: 20px">&nbsp;</div>
+          </div>
+          <div style="position: relative float: left" class="sheet <%= object_id %>" id="<%= ("spreadsheet_#{object_id}_" + sheet_index.to_s) -%>">
+            <table class="sheet <%= object_id %> tablesorter" cellspacing="0" cellpadding="0">
+              <!--- Columns --->
+              <colgroup>
+                <% columns_display.each do |col| -%>
+                  <col style="<%= (("width:" + (col.width.to_f/31).to_i.to_s) + "px") unless col.width.nil?  -%>">
+                <% end -%>
+              </colgroup>
+
+               <% head_row = []#wp_rows.select{|row| row.index == 1}
+
+                 #wp_rows.delete_if{|row| row.index  == 1}
+               %>
+              <!--- Rows --->
+                <!--- headers --->
+              <thead>
+              <% head_row.each do |row| -%>
+                  <% r = row.index %>
+                  <% height =(sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%>
+                  <tr <%= height -%>>
+                    <!--- Cells --->
+                    <% columns_display.each do |col| %>
+                        <% c = col.index %>
+                        <% if sheet[r] && sheet[r][c] -%>
+                            <% cell = sheet[r][c] -%>
+                            <th row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= ("=" + cell.formula unless cell.formula.nil?) || "" -%>" class="cell <%= cell.style || "" -%>"><%= auto_link(h(cell.value), :html => {:target => "_blank"}) -%></th>
+                        <% else -%>
+                            <th row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" class="cell">
+                            </td>
+                        <% end -%>
+                    <% end -%>
+                  </tr>
+              <% end %>
+              </thead>
+
+              <% wp_rows.each do |row| -%>
+                  <% r = row.index %>
+                <% height =(sheet[r].nil? || sheet[r].height.nil?) ? "" : "style =\"height:"+sheet[r].height+"\"" -%>
+                <tr <%= height -%>>
+                  <!--- Cells --->
+                  <% columns_display.each do |col| %>
+                      <% c = col.index %>
+                    <% if sheet[r] && sheet[r][c] -%>
+                      <% cell = sheet[r][c] -%>
+                         <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" title="<%= ("=" + cell.formula unless cell.formula.nil?) || "" -%>" class="cell <%= cell.style || ""-%>"><%= auto_link(h(cell.value),:html=>{:target=>"_blank"}) -%></td>
+                    <% else -%>
+                      <td row="<%= r -%>" col="<%= c -%>" id="cell_<%= to_alpha(c) + r.to_s -%>" class="cell"></td>
+                    <% end -%>
+                  <% end -%>
+                </tr>
+                 <% end %>
+            </table>
+          </div>
+          <br style="clear:both"/>
+        </div>
+      </div>
+       <%#= will_paginate(wp_rows,
+                            :id => "paginate_sheet_#{object_id}_#{sheet_index}",
+                            :params => {:sheet => sheet_index, :page_rows => per_page, :annotation_id => nil},
+                            :previous_label => "&#8593; Previous",
+                            :next_label => "Next &#8595;") %>
+
+
+      <%  end %>
+     <br/>
+      <div id="rows_per_page" style="display:none">
+        Display <%= text_field_tag :per_page, per_page, :size => 4, :onkeypress => 'return onlyNumbers(event);' %> rows per page
+        <input type='button' value='Update' onclick='changeRowsPerPage(<%= object_id %>)'/>
+      </div>
+
+<ul id="cell_menu" class='dynamic_menu with_smaller_shadow' style="display:none;margin-top: 0.5em; width:auto;">
+</ul>
+ </div>
+
+
+
+ <script type = "text/javascript">
+     var perPage = <%= default_per_page %>;
+       <% if params[:page_rows] %>
+           perPage = <%= params[:page_rows] %>;
+       <% end %>
+  </script>
+
+      

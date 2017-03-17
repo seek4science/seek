@@ -22,6 +22,8 @@ SEEK::Application.configure do
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
   Seek::Config.default :hide_details_enabled,false
+  Seek::Config.default :registration_disabled,false
+  Seek::Config.default :registration_disabled_description,'Registration is not available, please contact your administrator'
   Seek::Config.default :activation_required_enabled,false
   Seek::Config.default :google_analytics_enabled, false
   Seek::Config.default :google_analytics_tracker_id, '000-000'
@@ -155,11 +157,10 @@ SEEK::Application.configure do
 
   #MERGENOTE - remove this from config and replace with alternative partial
   Seek::Config.default :seek_video_link, "http://www.youtube.com/user/elinawetschHITS?feature=mhee#p/u"
-  
+
   # Set default permissions
   Seek::Config.default :default_associated_projects_access_type, Policy::ACCESSIBLE
-  Seek::Config.default :default_consortium_access_type, Policy::VISIBLE
-  Seek::Config.default :default_all_visitors_access_type, Policy::ACCESSIBLE
+  Seek::Config.default :default_all_visitors_access_type, Policy::PRIVATE
 
   Seek::Config.default :permissions_popup, Seek::Config::PERMISSION_POPUP_ALWAYS
 
@@ -186,5 +187,24 @@ SEEK::Application.configure do
   Seek::Config.default :recent_contributions_number_of_entries, 20
 
   Seek::Config.default :front_page_buttons_enabled, false
-end
 
+  # omniauth settings and behaviour
+  Seek::Config.default :omniauth_enabled, false
+  Seek::Config.default :omniauth_user_create, false
+  Seek::Config.default :omniauth_user_activate, false
+  Seek::Config.default :omniauth_providers, {
+    # # https://github.com/intridea/omniauth-ldap
+    # :ldap => {
+      # :title => "organization-ldap",
+      # :host => 'localhost',
+      # :port => 389,
+      # :method => :plain,
+      # :base => 'DC=example,DC=com',
+      # :uid => 'samaccountname',
+      # :password => '',
+      # :bind_dn => ''
+    # }
+  }
+  Seek::Config.default :openbis_enabled,false
+  Seek::Config.default :openbis_download_limit, 2.gigabytes
+end

@@ -1,0 +1,43 @@
+<%
+  openbis_space=space.space
+%>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <div class="list_item_title">
+      <%= space.title %>
+    </div>
+
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-md-4">
+      <%= list_item_attribute("Code",openbis_space.code) %>
+      <%= list_item_attribute("Perm ID",openbis_space.perm_id) %>
+      <%= list_item_attribute("Front page",space.web_endpoint) %>
+        </div>
+      <div class="col-md-6">
+        <%= list_item_attribute("AS Endpoint",space.as_endpoint) %>
+        <%= list_item_attribute("DSS Endpoint",space.dss_endpoint) %>
+      </div>
+      <div class="col-sm-2 text-right list_item_actions">
+        <% if space.can_edit? %>
+          <%= button_link_to 'Edit', 'edit', edit_project_openbis_endpoint_path(project, space), :class => 'btn-xs' %>
+        <% end %>
+        <% if space.can_delete? %>
+            <%= button_link_to 'Delete', 'destroy', project_openbis_endpoint_path(project, space), class:'btn-xs', disabled:!space.can_delete?,confirm:"Are you sure?",method: :delete -%>
+        <% end %>
+        <%= button_link_to 'Browse','openbis_square_small', browse_project_openbis_endpoints_path(project,id:space.id), {class:'btn-xs'} %>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-10">
+        <%= list_item_description(space.space.description) %>
+      </div>
+    </div>
+  </div>
+  <div class="panel-footer hidden-xs small">
+    <%= list_item_timestamp space %>
+  </div>
+
+</div>

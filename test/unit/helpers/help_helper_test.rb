@@ -16,7 +16,7 @@ class HelpHelperTest < ActionView::TestCase
   end
 
   test 'url only' do
-    link = help_link :investigation_checksum,url_only:true
+    link = help_link :investigation_checksum, url_only: true
     assert_equal 'http://docs.seek4science.org/tech/investigation-checksum.html', link
   end
 end

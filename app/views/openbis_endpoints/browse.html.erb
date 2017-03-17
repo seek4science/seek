@@ -1,0 +1,35 @@
+<%= render(partial: 'waiting_for_items_message') %>
+
+<%= render(partial: 'something_went_wrong_message') %>
+
+<p>
+  <%= image(:openbis, :width => '75px') %>
+</p>
+<%
+  options = options_for_select(@openbis_endpoints.map { |endpoint| [endpoint.title, endpoint.id, {'data-project-id' => endpoint.project.id}] },params[:id])
+%>
+Select Endpoint: <%= select_tag :selected_endpoints, options, id: 'select-endpoints', class: 'form-control' %>
+
+<div id="openbis-dataset-count">
+
+</div>
+<div id="openbis-datasets">
+  <div id="contents">
+
+  </div>
+</div>
+
+
+<script>
+
+  $j('#select-endpoints').change(function () {
+    OpenBis.browseEndpointChanged();
+  });
+
+  <% if @openbis_endpoints.any? %>
+  $j(document).ready(function () {
+    OpenBis.browseEndpointChanged();
+  });
+  <% end %>
+
+</script>

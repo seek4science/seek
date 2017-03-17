@@ -1,10 +1,8 @@
 require 'citeproc'
 require 'csl/styles'
 
-
 module Seek
   class CitationGenerator
-
     def initialize(doi)
       @doi = doi
     end
@@ -23,6 +21,5 @@ module Seek
         JSON.parse(resp)
       end
     end
-
   end
 end

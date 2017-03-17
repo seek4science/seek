@@ -9,6 +9,7 @@ class ContentBlob < ActiveRecord::Base
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
   include Seek::Data::Checksums
+  prepend Seek::Openbis::Blob
 
   belongs_to :asset, polymorphic: true
 
@@ -32,7 +33,7 @@ class ContentBlob < ActiveRecord::Base
   before_save :calculate_file_size
   after_create :create_retrieval_job
 
-  has_many :worksheets, dependent: :destroy
+  has_many :worksheets, inverse_of: :content_blob, dependent: :destroy
 
   validate :original_filename_or_url
 
@@ -91,10 +92,12 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def show_as_external_link?
+    return false if custom_integration? || url.blank?
+    return true if unhandled_url_scheme?
     no_local_copy =  !file_exists?
     html_content =  is_webpage? || content_type == 'text/html'
     show_as_link = Seek::Config.show_as_external_link_enabled ? no_local_copy : html_content
-    !url.blank? && (show_as_link || unhandled_url_scheme?)
+    show_as_link
   end
   # include all image types
 
@@ -146,20 +149,22 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
+
+
   def file
     @file ||= File.open(filepath)
   end
 
   def retrieve
     self.tmp_io_object = remote_content_handler.fetch
-    self.save
+    save
   end
 
   def cachable?
     Seek::Config.cache_remote_files &&
-        !is_webpage? &&
-        file_size &&
-        file_size < Seek::Config.max_cachable_size
+      !is_webpage? &&
+      file_size &&
+      file_size < Seek::Config.max_cachable_size
   end
 
   def caching_job(ignore_locked = true)
@@ -172,13 +177,7 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
-  def search_terms
-    if url
-      url_ignore_terms = ['http','https','www','com','co','org','uk','de']
-      url_search_terms = [url,url.split(/\W+/)].flatten - url_ignore_terms
-    else
-      url_search_terms = []
-    end
+  def search_terms    
     if is_text?
       if is_indexable_text?
         [original_filename, url, file_extension, text_contents_for_search] | url_search_terms
@@ -188,7 +187,21 @@ class ContentBlob < ActiveRecord::Base
     else
       [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
     end
+  end
 
+  def url_search_terms
+    if url
+      url_ignore_terms = %w(http https www com co org uk de)
+      url_search_terms = [url, url.split(/\W+/)].flatten - url_ignore_terms
+    else
+      url_search_terms = []
+    end
+    url_search_terms
+  end
+
+  #whether this content blob represents a custom integration, such as integrated with openBIS
+  def custom_integration?
+    openbis?
   end
 
   def is_downloadable?
@@ -252,7 +265,7 @@ class ContentBlob < ActiveRecord::Base
 
   def calculate_file_size
     if file_exists?
-      self.file_size = File.size(self.filepath)
+      self.file_size = File.size(filepath)
     elsif url
       self.file_size = remote_headers[:content_length]
     else
@@ -270,9 +283,9 @@ class ContentBlob < ActiveRecord::Base
     return nil unless valid_url?
     case URI(self.url).scheme
       when 'ftp'
-        Seek::DownloadHandling::FTPHandler.new(self.url)
+        Seek::DownloadHandling::FTPHandler.new(url)
       when 'http', 'https'
-        Seek::DownloadHandling::HTTPHandler.new(self.url)
+        Seek::DownloadHandling::HTTPHandler.new(url)
       else
         nil
     end

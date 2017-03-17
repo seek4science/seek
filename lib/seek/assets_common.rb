@@ -7,8 +7,6 @@ module Seek
     include Seek::PreviewHandling
     include Seek::AssetsStandardControllerActions
 
-
-
     def find_display_asset(asset = eval("@#{controller_name.singularize}"))
       requested_version = params[:version] || asset.latest_version.version
       found_version = asset.find_version(requested_version)

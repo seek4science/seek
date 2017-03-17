@@ -1,8 +1,7 @@
 module Seek
   module Ontologies
     class ModellingAnalysisTypeReader < OntologyReader
-
-      TERM_TYPE="modelling_analysis"
+      TERM_TYPE = 'modelling_analysis'
 
       def default_parent_class_uri
         RDF::URI.new(Seek::Config.modelling_analysis_type_base_uri)

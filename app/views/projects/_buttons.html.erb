@@ -1,10 +1,14 @@
 <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(item) -%>
     <%= button_link_to("Organize", 'organise', project_folders_path(item.id)) -%>
 <% end -%>
+<% if can_browse_openbis?(item) %>
+    <%= button_link_to("Browse openBIS", :openbis_square, browse_project_openbis_endpoints_path(item),{icon_options:{height:'18px'}}) %>
+<% end %>
 <% if item.try(:has_member?,current_user) || admin_logged_in? -%>
     <% tooltip_text="This will present you with a short report about the items that have been shared outside of your #{t('project')}" %>
     <%= button_link_to("Asset report", 'report', asset_report_project_path(item), 'data-tooltip' => tooltip(tooltip_text)) -%>
 <% end -%>
+
 
 <%= admin_dropdown do %>
     <% if mine?(item) || item.can_be_edited_by?(current_user) -%>
@@ -14,6 +18,9 @@
         <% if item.try(:can_be_administered_by?, current_user) -%>
             <li><%= image_tag_for_key "group_edit", admin_members_project_path(item), "Administer", nil, "Administer #{t('project')} members" -%></li>
             <li><%= image_tag_for_key "group_edit", admin_member_roles_project_path(item), "Administer", nil, "Administer #{t('project')} members roles" -%></li>
+            <% if OpenbisEndpoint.can_create? %>
+                <li><%= image_tag_for_key :openbis_square, project_openbis_endpoints_path(item), "Administer", {}, "Administer openBIS",false,16 -%></li>
+            <% end %>
         <% end -%>
         <% if admin_logged_in? -%>
             <%= delete_icon(item,current_user) %>

@@ -73,7 +73,7 @@ SEEK::Application.configure do
       ActionView::Renderer.clear_alternative({:controller=>:homes,:seek_template=>:index})
       ActionView::Renderer.clear_alternative({:seek_partial=>"people/resource_list_item"})
       ActionView::Renderer.clear_alternative({:seek_partial=>"projects/resource_list_item"})
-      ActionView::Renderer.clear_alternative({:seek_partial=>"assets/sharing_form"})
+      ActionView::Renderer.clear_alternative({:seek_partial=>"sharing/form"})
       ActionView::Renderer.clear_alternative({:controller=>:people,:seek_partial=>"general/items_related_to"})
 
 
@@ -100,6 +100,9 @@ SEEK::Application.configure do
 
       Settings.defaults[:orcid_required] = false
       Settings.defaults[:site_base_host] = "http://localhost:3000"
+
+      Settings.defaults[:default_all_visitors_access_type] = Policy::NO_ACCESS
+      Settings.defaults[:openbis_enabled] = true
     end
   end
 end

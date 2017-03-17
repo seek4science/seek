@@ -48,7 +48,7 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(nil)
     refute attribute.validate_value?('')
 
-    #contriversial, but after much argument decided to allow these values as integers
+    # contriversial, but after much argument decided to allow these values as integers
     assert attribute.validate_value?(1.0)
     assert attribute.validate_value?('1.0')
     assert attribute.validate_value?(1.00)
@@ -120,15 +120,14 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   test 'validate text with newlines' do
     attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::TEXT)
 
-
     assert attribute.validate_value?('fish\\n\\rsoup')
     assert attribute.validate_value?('fish\n\rsoup')
     assert attribute.validate_value?('fish\r\nsoup')
     assert attribute.validate_value?('   fish\n\rsoup ')
-    str= %!with
+    str = %(with
   a
   new
-  line%!
+  line%)
     assert attribute.validate_value?(str)
   end
 
@@ -167,7 +166,6 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     assert type.validate_value?('http://ontology.org#term')
     refute type.validate_value?('fish')
     refute type.validate_value?('fish;cow')
-
   end
 
   test 'boolean' do

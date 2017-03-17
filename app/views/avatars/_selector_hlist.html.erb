@@ -6,17 +6,17 @@
 	  <li><%= image_tag_for_key('avatar', new_avatar_link(avatar_for_instance), nil, nil, "Upload New Picture") -%></li>
 	</ul>
 		
-	<p class="box_standout" style="text-align: center; padding: 0.3em 0.5em; margin: 1.5em 0 1em 0;">
+	<p class="box_standout text-center" style="padding: 0.3em 0.5em; margin: 1.5em 0 1em 0;">
 		Choose your default display picture using a radio button below a picture and clicking 'Update' at the bottom of the page.
 	</p>
 	
 	<div id="hlist">
     <ul>
-	    <li style="text-align: center;">
+	    <li class="text-center">
 	      <%= default_avatar(avatar_for_instance.class.name, 60, "Anonymous", "$('#{object_type}_avatar_id_').checked = true;") %><br/><%= form_instance.radio_button :avatar_id, nil -%>
 	    </li>
 	    <% avatar_for_instance.avatars.each do |a| -%>
-	      <li style="text-align: center;">
+	      <li class="text-center">
 	      	<%= image_tag avatar_url(avatar_for_instance, a.id, 60), :alt => h(avatar_for_instance.title), :onclick => "$('#{object_type}_avatar_id_#{a.id}').checked = true;" -%>
 					<br/>
 					<%= form_instance.radio_button :avatar_id, a.id -%>

@@ -3,7 +3,7 @@ module Seek
     module AttributeTypeHandlers
       class AttributeHandlerException < Exception; end
       class BaseAttributeHandler
-        def initialize(additional_options={})
+        def initialize(additional_options = {})
           self.additional_options = additional_options
         end
 

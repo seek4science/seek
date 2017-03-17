@@ -59,7 +59,7 @@ module BootstrapHelper
     end
   end
 
-  def panel_title(title, options, heading_options )
+  def panel_title(title, options, heading_options)
     content_tag(:div, heading_options) do # The panel title
       title_html = ''
       if (help_text = options.delete(:help_text))
@@ -104,7 +104,7 @@ module BootstrapHelper
     end
 
     unless opts.blank?
-      dropdown_button(text, icon, menu_options: { class: 'pull-right' }) do
+      dropdown_button(text, icon, menu_options: { class: 'pull-right', id: 'item-admin-menu' }) do
         opts
       end
     end

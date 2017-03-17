@@ -1,0 +1,21 @@
+<% show_download = data_file && data_file.can_download? %>
+
+<h3>
+  <%= dataset.dataset_file_count %> Files - <%= number_to_human_size(dataset.size) %>
+</h3>
+
+<div id="openbis-file-list">
+  <table>
+    <% dataset.dataset_files_no_directories.each do |file| %>
+        <tr>
+          <td class='filename'><%= file.path %></td>
+          <td class='filesize'><%= number_to_human_size(file.size) %></td>
+          <% if show_download %>
+              <td>
+                <%= image_tag_for_key('download', polymorphic_path([data_file, data_file.content_blob], action: :download, code: params[:code], perm_id: file.file_perm_id), 'Download', {title: 'Download this file'}, '') %>
+              </td>
+          <% end %>
+        </tr>
+    <% end %>
+  </table>
+</div>

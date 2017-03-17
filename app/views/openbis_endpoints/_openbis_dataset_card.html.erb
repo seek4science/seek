@@ -1,0 +1,44 @@
+<%
+  dataset=openbis_dataset_card
+  openbis_endpoint = dataset.openbis_endpoint
+  file_count=dataset.dataset_file_count
+  files_text = "#{file_count} File".pluralize(file_count)
+%>
+
+<div class="col-md-3 openbis-card <%= 'registered' if dataset.registered? %>">
+   <div class='panel panel-default'>
+     <div class='openbis-card-heading'>
+       <span>
+        <%= dataset.perm_id %>
+       </span>
+     </div>
+     <div class='panel-body'>
+       <%= list_item_attribute('Code', text_or_not_specified(dataset.code)) %>
+       <%= list_item_attribute('Dataset Type Code', text_or_not_specified(dataset.dataset_type['code'])) %>
+       <%= list_item_attribute('Dataset Type', text_or_not_specified(dataset.dataset_type['description'])) %>
+
+       <%= list_item_attribute('Registrator', text_or_not_specified(dataset.registrator)) %>
+       <%= list_item_attribute('Modifier', text_or_not_specified(dataset.modifier)) %>
+
+       <%= list_item_attribute('Registered', text_or_not_specified(date_as_string(dataset.registration_date, true))) %>
+       <%= list_item_attribute('Modified', text_or_not_specified(date_as_string(dataset.modification_date, true))) %>
+       <p class="list_item_attribute">
+         <%= link_to(files_text, '#', class: 'view-files-link',
+                     'data-toggle' => 'modal',
+                     'data-target' => "#openbis-file-view",
+                     'data-perm-id' => "#{dataset.perm_id}",
+                     'data-project-id' => "#{@project.id}",
+                     'data-endpoint-id' => "#{openbis_endpoint.id}")
+         %>
+       </p>
+       <p class="list_item_attribute">
+         <% if dataset.registered? %>
+             Already registered
+         <% else %>
+             <%= link_to('Register with SEEK', add_dataset_project_openbis_endpoint_path(@project, openbis_endpoint, dataset_perm_id: dataset.perm_id), method: :post) %>
+         <% end %>
+       </p>
+     </div>
+   </div>
+
+</div>

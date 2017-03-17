@@ -39,7 +39,7 @@
 
       <fieldset style="margin-top: 2em;">
         <legend>&nbsp;Add Members&nbsp;</legend>
-        <p style="text-align: justify;">
+        <p class="text-justify">
           Please type names of people to add to this group into the box below - suggestions will be displayed as you type.
           Select access rights from drop-down menu; these will be applied to all chosen people.
           Clicking "Add" will add selected people as group members.
@@ -82,7 +82,7 @@
       </fieldset>
 
       <% if action_create -%>
-          <div style="text-align: left; margin-bottom: 1.3em;">
+          <div class="text-left" style="margin-bottom: 1.3em;">
             <%= check_box_tag "group_sharing_required", "1", true -%>
             <label for="group_sharing_required">Share with this group when it is created</label>
           </div>

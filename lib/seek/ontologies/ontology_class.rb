@@ -61,7 +61,7 @@ module Seek
       def validate_uri
         fail Exception.new('URI must be provided, as either as a string or RDF::URI type') if @uri.nil?
         @uri = RDF::URI.new(@uri) if @uri.is_a?(String)
-        fail Exception.new('URI must be provided, as either as a string or RDF::URI type') unless @uri.kind_of?(RDF::URI)
+        fail Exception.new('URI must be provided, as either as a string or RDF::URI type') unless @uri.is_a?(RDF::URI)
       end
 
       def extract_label_from_uri_fragment

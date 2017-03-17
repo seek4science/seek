@@ -103,12 +103,11 @@ module Seek
                    :institutions, :creators, :owners, :owner, :contributors, :contributor, :projects, :events, :presentations, :compounds, :organisms, :strains
                   ]
         methods.each do |method|
-          if self.respond_to?(method)
-            deps = Array(send(method))
-            # resolve User back to Person
-            deps = deps.collect { |dep| dep.is_a?(User) ? [dep, dep.person] : dep }.flatten.compact
-            items |= deps
-          end
+          next unless self.respond_to?(method)
+          deps = Array(send(method))
+          # resolve User back to Person
+          deps = deps.collect { |dep| dep.is_a?(User) ? [dep, dep.person] : dep }.flatten.compact
+          items |= deps
         end
 
         items.compact.uniq

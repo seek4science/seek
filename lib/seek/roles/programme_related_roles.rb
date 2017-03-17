@@ -1,6 +1,6 @@
 module Seek
   module Roles
-    PROGRAMME_ADMINISTRATOR='programme_administrator'
+    PROGRAMME_ADMINISTRATOR = 'programme_administrator'
     class ProgrammeRelatedRoles < RelatedRoles
       def self.role_names
         [Seek::Roles::PROGRAMME_ADMINISTRATOR]
@@ -55,7 +55,7 @@ module Seek
         end
 
         def is_programme_administrator?(programme)
-          check_for_role(Seek::Roles::PROGRAMME_ADMINISTRATOR,programme)
+          check_for_role(Seek::Roles::PROGRAMME_ADMINISTRATOR, programme)
         end
 
         def is_programme_administrator=(flag_and_items)

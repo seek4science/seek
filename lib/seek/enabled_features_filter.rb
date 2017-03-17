@@ -1,9 +1,9 @@
 module Seek
   module EnabledFeaturesFilter
-    FEATURES = [:models,:biosamples,:organisms,:events,:documentation, :workflows, :programmes, :assays, :publications, :samples]
+    FEATURES = [:models, :biosamples, :organisms, :events, :documentation, :workflows, :programmes, :assays, :publications, :samples, :openbis]
 
-    def feature_enabled? feature
-      feature=feature.to_s
+    def feature_enabled?(feature)
+      feature = feature.to_s
       if Seek::Config.send("#{feature}_enabled")
         true
       else
@@ -14,10 +14,9 @@ module Seek
     end
 
     FEATURES.each do |feature|
-      define_method("#{feature.to_s}_enabled?") do
+      define_method("#{feature}_enabled?") do
         feature_enabled? feature
       end
     end
-
   end
 end

@@ -27,7 +27,7 @@
 					<table>
 				  	<% group_members.each do |p| -%>
 						  <tr>
-						  	<td id="work_group_member_person_<%= p.id -%>" style="text-align: left;"><%= "#{p.first_name} #{p.last_name}" -%></td>
+						  	<td id="work_group_member_person_<%= p.id -%>" class="text-left"><%= "#{p.first_name} #{p.last_name}" -%></td>
 								<td>
 									<select id="work_group_access_rights_select_person_<%= p.id -%>" style="width: 220px; vertical-align: middle;">
 									  <%= policy_selection_options(nil, resource, @access_type)-%>
@@ -42,7 +42,7 @@
 			<% end -%>
 			
 			
-			<p style="text-align: center; margin-top: 1em;">
+			<p class="text-center" style="margin-top: 1em;">
 				<input type="button" value="Add" style="width: 150px;" onclick="javascript: addProjectInstitutionReviewed(); return(false);" />
 				<input type="button" value="Cancel" style="width: 150px;" onclick="javascript: RedBox.close(); return(false);" />
 			</p>

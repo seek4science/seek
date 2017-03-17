@@ -13,16 +13,16 @@ module Seek
 
       def suggested_children
         case term_type
-          when 'assay', 'modelling_analysis'
-            SuggestedAssayType.where(ontology_uri: uri.try(:to_s)).all
-          when 'technology'
-            SuggestedTechnologyType.where(ontology_uri: uri.try(:to_s)).all
-          else
-            []
+        when 'assay', 'modelling_analysis'
+          SuggestedAssayType.where(ontology_uri: uri.try(:to_s)).all
+        when 'technology'
+          SuggestedTechnologyType.where(ontology_uri: uri.try(:to_s)).all
+        else
+          []
         end
       end
 
-      def is_suggested_type?
+      def suggested_type?
         false
       end
 
@@ -37,12 +37,12 @@ module Seek
       def assays
         uris = hash_by_uri.keys
         case term_type
-          when 'assay', 'modelling_analysis'
-            Assay.where(:assay_type_uri => uris)
-          when 'technology'
-            Assay.where(:technology_type_uri => uris)
-          else
-            []
+        when 'assay', 'modelling_analysis'
+          Assay.where(assay_type_uri: uris)
+        when 'technology'
+          Assay.where(technology_type_uri: uris)
+        else
+          []
         end
       end
     end

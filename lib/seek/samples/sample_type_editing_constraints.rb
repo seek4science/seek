@@ -38,12 +38,12 @@ module Seek
         end
       end
 
-      #whether a new attribtue can be created
+      # whether a new attribtue can be created
       def allow_new_attribute?
         !samples?
       end
 
-      #whether the name of the attribute can be changed
+      # whether the name of the attribute can be changed
       def allow_name_change?(attr)
         attr = attr.accessor_name if attr.is_a?(SampleAttribute)
         if attr
@@ -53,7 +53,7 @@ module Seek
         end
       end
 
-      #whether the type for the attribute can be changed
+      # whether the type for the attribute can be changed
       def allow_type_change?(attr)
         attr = attr.accessor_name if attr.is_a?(SampleAttribute)
         if attr

@@ -58,11 +58,6 @@ class ScalesController < ApplicationController
 
   private
 
-  #Removes all results from the search results collection passed in that are not Authorised to show for the current_user
-  def select_authorised collection
-    collection.select {|el| el.can_view?}
-  end
-
   def everything_with_scale
         Scale.all.collect do |scale|
           scale.assets

@@ -20,7 +20,7 @@ module Seek
 
       def model_simulate_url_from_slug(slug)
         uri = URI.join(Seek::Config.jws_online_root, '/models/', slug + '/', 'simulate')
-        uri.query="embedded=1"
+        uri.query = 'embedded=1'
         uri.to_s
       end
 
@@ -32,7 +32,7 @@ module Seek
         token = determine_csrf_token
         { :cookies => { 'csrftoken' => token },
           'X-CSRFToken' => token,
-          referer:Seek::Config.jws_online_root
+          referer: Seek::Config.jws_online_root
         }
       end
 

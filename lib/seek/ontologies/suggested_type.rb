@@ -3,7 +3,6 @@ module Seek
     module SuggestedType
       extend ActiveSupport::Concern
       included do
-
         belongs_to :contributor, class_name: 'Person'
         belongs_to :parent, class_name: name
 
@@ -34,9 +33,7 @@ module Seek
       end
 
       def all_term_types
-        ontology_readers.map do |reader|
-          reader.ontology_term_type
-        end
+        ontology_readers.map(&:ontology_term_type)
       end
 
       # the first parent that comes from the ontology
@@ -90,12 +87,12 @@ module Seek
         super || ontology_parent
       end
 
-      #provides the direct child of this type. For all children in the hierarchy see all_children
+      # provides the direct child of this type. For all children in the hierarchy see all_children
       def children
         self.class.where('parent_id=? AND parent_id IS NOT NULL', id).all
       end
 
-      #provides all children of this type, traversing down the hierarchy
+      # provides all children of this type, traversing down the hierarchy
       def all_children
         children.collect do |child|
           [child] | child.all_children
@@ -103,7 +100,7 @@ module Seek
       end
 
       def assays
-        field="#{self.class.table_name.singularize}_id"
+        field = "#{self.class.table_name.singularize}_id"
         ids = all_children.collect(&:id) | [id]
         Assay.where(field => ids).all
       end
@@ -119,8 +116,8 @@ module Seek
       def get_child_assays(suggested_type = self)
         result = suggested_type.assays
         suggested_type.children.each do |child|
-          result = result | child.assays
-          result = result | get_child_assays(child) unless child.children.empty?
+          result |= child.assays
+          result |= get_child_assays(child) unless child.children.empty?
         end
         result
       end
@@ -157,7 +154,7 @@ module Seek
         end
       end
 
-      #triggered after a destroy, to link up the parent and children to retain the tree after self has been removed
+      # triggered after a destroy, to link up the parent and children to retain the tree after self has been removed
       def join_parents_and_children
         if parent && parent.instance_of?(self.class)
           children.each do |child|
@@ -167,7 +164,7 @@ module Seek
         end
       end
 
-      #when destroying a top level suggested type, updates the children to point to the new parent from the ontology
+      # when destroying a top level suggested type, updates the children to point to the new parent from the ontology
       def update_ontology_uri_for_children
         if parent && !parent.instance_of?(self.class) && self[:ontology_uri]
           children.each do |child|

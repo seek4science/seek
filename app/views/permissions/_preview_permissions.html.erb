@@ -39,11 +39,9 @@
         <h4 class="modal-title" id="preview_permissions_title">Preview of your sharing settings</h4>
       </div>
       <div class="modal-body">
-        <% if policy.sharing_scope == Policy::PRIVATE %>
+        <% if policy.access_type == Policy::NO_ACCESS %>
             <%= policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name) %>
-        <% elsif policy.sharing_scope == Policy::ALL_USERS %>
-            <%= policy_and_permissions_for_network_scope(policy, permissions, privileged_people, resource_name) %>
-        <% elsif policy.sharing_scope == Policy::EVERYONE  %>
+        <% else %>
             <%= policy_and_permissions_for_public_scope(policy, permissions, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval) %>
         <% end %>
 

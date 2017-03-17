@@ -2,9 +2,9 @@ require 'test_helper'
 
 class SampleExtractorTest < ActiveSupport::TestCase
   setup do
-    Factory(:admin) #to avoid first person automatically becoming admin
+    Factory(:admin) # to avoid first person automatically becoming admin
     @person = Factory(:project_administrator)
-    User.current_user=@person.user
+    User.current_user = @person.user
     Factory(:string_sample_attribute_type, title: 'String')
     @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                      policy: Factory(:private_policy), contributor: @person.user
@@ -13,7 +13,7 @@ class SampleExtractorTest < ActiveSupport::TestCase
     @sample_type.build_attributes_from_template
     @sample_type.save!
     @extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
-    User.current_user=nil
+    User.current_user = nil
   end
 
   test 'extracted samples are cached' do
@@ -43,7 +43,7 @@ class SampleExtractorTest < ActiveSupport::TestCase
 
   test 'blank rows are ignored from sample spreadsheets' do
     @data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_blank_rows_content_blob),
-                         policy: Factory(:private_policy), contributor: @person.user
+                                     policy: Factory(:private_policy), contributor: @person.user
     @extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
 
     accepted, rejected = @extractor.extract.partition(&:valid?)

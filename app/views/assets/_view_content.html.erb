@@ -2,7 +2,7 @@
 <% asset = content_blob.asset
    if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
     <%# those libs have been loaded for Model %>
-    <% unless asset.is_a?(Model) %>
+    <% unless asset.is_a?(Model) || asset.is_a?(DataFile) %>
         <%= javascript_include_tag "zoom/lightbox" %>
         <%= stylesheet_link_tag "lightbox" %>
     <% end %>

@@ -23,5 +23,5 @@ If the institution does not exist, you can create the new institution. To do thi
 
 After the institution has been created successfully, you need to assign it to the project following the steps described above.
 
-If you need to contact the person, their details can be found at: http://localhost:3000/people/2, and their email address is aaron@email.com .
+If you need to contact the person, their details can be found at: http://localhost:3000/people/-person_id-, and their email address is aaron@email.com .
 -- end --

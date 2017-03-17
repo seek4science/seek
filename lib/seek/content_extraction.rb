@@ -6,7 +6,7 @@ module Seek
       content = []
       if file_exists?
         if is_pdf?
-          #copy .dat to .pdf
+          # copy .dat to .pdf
           FileUtils.cp filepath, filepath('pdf')
         elsif is_pdf_convertable?
           convert_to_pdf
@@ -21,7 +21,7 @@ module Seek
     def text_contents_for_search
       content = []
       if file_exists?
-        text=File.open(filepath).read
+        text = File.open(filepath).read
         unless text.blank?
           content = filter_text_content text
           content = split_content(content)
@@ -30,26 +30,24 @@ module Seek
       content
     end
 
-    def convert_to_pdf dat_filepath=filepath, pdf_filepath=filepath('pdf')
-      begin
-        unless File.exists?(pdf_filepath)
-          #copy dat file to original file extension in order to convert to pdf on this file
-          file_extension = mime_extensions(content_type).first
-          tmp_file = Tempfile.new(['','.'+ file_extension])
-          copied_filepath = tmp_file.path
+    def convert_to_pdf(dat_filepath = filepath, pdf_filepath = filepath('pdf'))
+      unless File.exist?(pdf_filepath)
+        # copy dat file to original file extension in order to convert to pdf on this file
+        file_extension = mime_extensions(content_type).first
+        tmp_file = Tempfile.new(['', '.' + file_extension])
+        copied_filepath = tmp_file.path
 
-          FileUtils.cp dat_filepath, copied_filepath
+        FileUtils.cp dat_filepath, copied_filepath
 
-          ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath,pdf_filepath)
-          t = Time.now
-          while !File.exists?(pdf_filepath) && (Time.now - t) < MAXIMUM_PDF_CONVERT_TIME
-            sleep(1)
-          end
+        ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath, pdf_filepath)
+        t = Time.now
+        while !File.exist?(pdf_filepath) && (Time.now - t) < MAXIMUM_PDF_CONVERT_TIME
+          sleep(1)
         end
-      rescue Exception=> e
-        Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")
-        raise(e)
       end
+    rescue Exception => e
+      Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")
+      raise(e)
     end
 
     def extract_text_from_pdf
@@ -57,9 +55,9 @@ module Seek
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
 
-      if File.exists?(pdf_filepath)
+      if File.exist?(pdf_filepath)
         begin
-          Docsplit.extract_text(pdf_filepath, :output => output_directory) unless File.exists?(txt_filepath)
+          Docsplit.extract_text(pdf_filepath, output: output_directory) unless File.exist?(txt_filepath)
           content = File.open(txt_filepath).read
           unless content.blank?
             content = filter_text_content content
@@ -76,12 +74,12 @@ module Seek
 
     private
 
-    def split_content content,delimiter="\n"
-      content.split(delimiter).select{|str| !(str.blank? || str.length>50)}
+    def split_content(content, delimiter = "\n")
+      content.split(delimiter).select { |str| !(str.blank? || str.length > 50) }
     end
 
-    #filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
-    def filter_text_content content
+    # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
+    def filter_text_content(content)
       content.gsub(/[^-_0-9a-z \n]/i, '')
     end
   end

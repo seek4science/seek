@@ -4,7 +4,7 @@
     <div class="asset_form">
       <%= error_messages_for :presentation -%>
 
-      <%= render :partial=>"assets/upload_box" -%>
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@presentation} -%>
 
       <div class="form-group">
         <label>Title <span class="required">*</span></label>

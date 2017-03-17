@@ -37,7 +37,6 @@ class UploadHandingTest < ActiveSupport::TestCase
     params[:data_url] = 'sdfhksdlfsdkfh'
     default_to_http_if_missing(params)
     assert_equal('sdfhksdlfsdkfh', params[:data_url])
-
   end
 
   test 'asset params' do
@@ -67,11 +66,9 @@ class UploadHandingTest < ActiveSupport::TestCase
     stub_request(:head, 'http://moved2.com').to_return(status: 302, body: '', headers: { location: 'http://forbidden.com' })
     assert_equal 200, check_url_response_code('http://moved.com')
     assert_equal 403, check_url_response_code('http://moved2.com')
-
   end
 
   test 'fetch url headers' do
-
     stub_request(:head, 'http://bbc.co.uk/').to_return(status: 200,
                                                        body: '',
                                                        headers: { content_type: 'text/html', content_length: '555' })
@@ -96,7 +93,6 @@ class UploadHandingTest < ActiveSupport::TestCase
     headers = fetch_url_headers('http://moved.com')
     assert_equal 'text/html', headers[:content_type]
     assert_equal '555', headers[:content_length]
-
   end
 
   test 'content type from filename' do
@@ -162,7 +158,6 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'check for data or url' do
-
     refute check_for_data_or_url(data: '', data_url: '')
     assert check_for_data_or_url(data: 'hhhh')
     assert check_for_data_or_url(data_url: 'hhhh')
@@ -170,7 +165,6 @@ class UploadHandingTest < ActiveSupport::TestCase
     refute check_for_data_or_url(data: [], data_url: [])
     assert check_for_data_or_url(data: ['hhhh'])
     assert check_for_data_or_url(data_url: ['hhhh'])
-
   end
 
   test 'retained content blob ids' do
@@ -186,9 +180,9 @@ class UploadHandingTest < ActiveSupport::TestCase
 
   test 'model image present?' do
     file_with_content = ActionDispatch::Http::UploadedFile.new(
-        filename: 'file',
-        content_type: 'text/plain',
-        tempfile: StringIO.new('fish')
+      filename: 'file',
+      content_type: 'text/plain',
+      tempfile: StringIO.new('fish')
     )
     @params = { model_image: { image_file: file_with_content }, content_blob: {}, model: { title: 'fish' } }
     assert model_image_present?
@@ -200,15 +194,15 @@ class UploadHandingTest < ActiveSupport::TestCase
 
   test 'check for data if present' do
     file_with_content = ActionDispatch::Http::UploadedFile.new(
-                                                                   filename: 'file',
-                                                                   content_type: 'text/plain',
-                                                                   tempfile: StringIO.new('fish')
-                                                               )
+      filename: 'file',
+      content_type: 'text/plain',
+      tempfile: StringIO.new('fish')
+    )
     empty_content = ActionDispatch::Http::UploadedFile.new(
-                                                               filename: 'file',
-                                                               content_type: 'text/plain',
-                                                               tempfile: StringIO.new('')
-                                                           )
+      filename: 'file',
+      content_type: 'text/plain',
+      tempfile: StringIO.new('')
+    )
     assert check_for_empty_data_if_present(data: '', data_url: 'http://fish')
     assert check_for_empty_data_if_present(data: file_with_content, data_url: '')
     assert check_for_empty_data_if_present(data: file_with_content, data_url: [])
@@ -223,7 +217,6 @@ class UploadHandingTest < ActiveSupport::TestCase
     refute check_for_empty_data_if_present(data: [empty_content], data_url: [])
     refute check_for_empty_data_if_present(data: [empty_content])
     refute check_for_empty_data_if_present(data: [empty_content, file_with_content])
-
   end
 
   # allows some methods to be tested the rely on flash.now[:error]

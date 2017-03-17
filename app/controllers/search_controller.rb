@@ -14,9 +14,9 @@ class SearchController < ApplicationController
     end
 
     #strip out nils, which can occur if the index is out of sync
-    @results = @results.select{|r| !r.nil?}
-
-    @results = select_authorised @results
+    @results.compact!
+    #select only items, that can be viewed by the current_user
+    @results.select!(&:can_view?)
 
     @results_scaled = Scale.all.collect {|scale| [scale.key, @results.select {|item| !item.respond_to?(:scale_ids) or item.scale_ids.include? scale.id}]}
     @results_scaled << ['all', @results]
@@ -65,19 +65,23 @@ class SearchController < ApplicationController
       if type == "all"
           sources = Seek::Util.searchable_types
           sources.each do |source|
-            search_result = source.search do |query|
+            search = source.search do |query|
               query.keywords(downcase_query)
               query.paginate(:page => 1, :per_page => source.count ) if source.count > 30  # By default, Sunspot requests the first 30 results from Solr
-            end.results
+            end #.results
+            @search_hits = search.hits
+            search_result = search.results
             search_result = search_result.sort_by(&:published_date).reverse if source == Publication && Seek::Config.is_virtualliver
             @results |= search_result
           end
       else
            object = type.singularize.camelize.constantize
-           search_result = object.search do |query|
+           search = object.search do |query|
              query.keywords(downcase_query)
              query.paginate(:page => 1, :per_page => object.count ) if object.count > 30 # By default, Sunspot requests the first 30 results from Solr
-           end.results
+           end #.results
+           @search_hits = search.hits
+           search_result = search.results
            search_result = search_result.sort_by(&:published_date).reverse if object == Publication
            @results = search_result
       end
@@ -101,11 +105,6 @@ class SearchController < ApplicationController
 
   def include_external_search?
     Seek::Config.external_search_enabled && params[:include_external_search]
-  end
-
-  #Removes all results from the search results collection passed in that are not Authorised to show for the current user (if one is logged in)
-  def select_authorised collection
-    collection.select {|el| el.can_view?}
   end
 
 end

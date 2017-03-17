@@ -24,8 +24,8 @@ module ProgrammesHelper
     box.html_safe
   end
 
-  def programme_administrator_link_list programme
-    link_list_for_role("#{t('programme')} Administrator",programme.programme_administrators,'programme')
+  def programme_administrator_link_list(programme)
+    link_list_for_role("#{t('programme')} Administrator", programme.programme_administrators, 'programme')
   end
 
   def can_create_programmes?

@@ -17,7 +17,7 @@
 
 <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?%>
 
-<%= render :seek_partial=>"assets/sharing_form" if @investigation.can_manage? -%>
+<%= render :seek_partial=>"sharing/form" if @investigation.can_manage? -%>
 
 <%  existing_creators = @investigation.creators
     existing_creators =  [current_user.person] if existing_creators.blank?

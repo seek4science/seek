@@ -49,7 +49,7 @@ module Seek
             format.js { render template: 'suggested_types/create' }
 
             if saved
-              set_successful_flash_message("created")
+              set_successful_flash_message('created')
               format.html { redirect_to(action: 'manage') }
               format.xml { head :ok }
             else
@@ -66,7 +66,7 @@ module Seek
           respond_to do |format|
             format.js { render template: 'suggested_types/create' }
             if saved
-              set_successful_flash_message("updated")
+              set_successful_flash_message('updated')
               format.html { redirect_to(action: 'manage') }
               format.xml { head :ok }
             else
@@ -81,7 +81,7 @@ module Seek
           respond_to do |format|
             if @suggested_type.can_destroy?
               @suggested_type.destroy
-              set_successful_flash_message("destroyed")
+              set_successful_flash_message('destroyed')
               format.xml { head :ok }
             else
               flash[:error] = @suggested_type.destroy_errors.join('<br/>').html_safe
@@ -94,8 +94,6 @@ module Seek
         def set_successful_flash_message(action)
           flash[:notice] = "#{@suggested_type.humanize_term_type} type #{@suggested_type.label} was successfully #{action}."
         end
-
-
       end
     end
   end

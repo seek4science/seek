@@ -118,11 +118,11 @@ module Seek
     def configure_exception_notification
       if exception_notification_enabled && !Rails.application.config.consider_all_requests_local
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
-          email: {
-            sender_address: [noreply_sender],
-            email_prefix: "[ #{application_name} ERROR ] ",
-            exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(%r{[, ]})
-          }
+                                                email: {
+                                                  sender_address: [noreply_sender],
+                                                  email_prefix: "[ #{application_name} ERROR ] ",
+                                                  exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
+                                                }
       else
         SEEK::Application.config.middleware.delete ExceptionNotifier
       end
@@ -161,12 +161,30 @@ module Seek
       end
     end
 
+    def attr_encrypted_key_path
+      dir = append_filestore_path 'attr_encrypted'
+      File.join(dir, 'key')
+    end
+
+    def attr_encrypted_key
+      if File.exist?(attr_encrypted_key_path)
+        File.read(attr_encrypted_key_path)
+      else
+        write_attr_encrypted_key
+        attr_encrypted_key
+      end
+    end
+
     def rdf_filestore_path
       append_filestore_path 'rdf'
     end
 
     def temporary_filestore_path
       append_filestore_path 'tmp'
+    end
+
+    def clear_temporary_filestore
+      FileUtils.rm_r(temporary_filestore_path)
     end
 
     def converted_filestore_path
@@ -191,37 +209,27 @@ module Seek
 
     def append_filestore_path(inner_dir)
       path = filestore_path
-      unless path.start_with? '/'
-        path = File.join(Rails.root, path)
-      end
+      path = File.join(Rails.root, path) unless path.start_with? '/'
       check_path_exists(File.join(path, inner_dir))
     end
 
     def check_path_exists(path)
-      unless File.exist?(path)
-        FileUtils.mkdir_p path
-      end
+      FileUtils.mkdir_p path unless File.exist?(path)
       path
     end
 
     def smtp_settings(field)
       value = smtp[field.to_sym]
-      if field == :password || field == 'password'
-        value=decrypt_value(value)
-      end
+      value = decrypt_value(value) if field == :password || field == 'password'
       value
     end
 
     def set_smtp_settings(field, value)
       if [:password, :user_name, :authentication].include? field.to_sym
-        if value.blank?
-          value = nil
-        end
+        value = nil if value.blank?
       end
 
-      if field.to_sym == :authentication and value
-        value = value.to_sym
-      end
+      value = value.to_sym if field.to_sym == :authentication and value
       if field.to_sym == :password
         unless value.blank?
           value = encrypt(value, generate_key(GLOBAL_PASSPHRASE))
@@ -231,11 +239,13 @@ module Seek
       value
     end
 
+    # TODO: update to use attr_encrypted
     def datacite_password_decrypt
       datacite_password = Seek::Config.datacite_password
       decrypt_value(datacite_password)
     end
 
+    # TODO: update to use attr_encrypted
     def decrypt_value(value)
       unless value.blank?
         begin
@@ -247,6 +257,7 @@ module Seek
       end
     end
 
+    # TODO: update to use attr_encrypted
     def datacite_password_encrypt(password)
       unless password.blank?
         Seek::Config.datacite_password = encrypt(password, generate_key(GLOBAL_PASSPHRASE))
@@ -272,7 +283,7 @@ module Seek
       base_uri = URI(Seek::Config.site_base_host)
       host = base_uri.host
       unless (base_uri.port == 80 && base_uri.scheme == 'http') ||
-          (base_uri.port == 443 && base_uri.scheme == 'https')
+             (base_uri.port == 443 && base_uri.scheme == 'https')
         host << ":#{base_uri.port}"
       end
       host
@@ -282,6 +293,11 @@ module Seek
       URI(Seek::Config.site_base_host).scheme
     end
 
+    def write_attr_encrypted_key
+      File.open(attr_encrypted_key_path, 'w') do |f|
+        f << OpenSSL::Cipher::Cipher.new('AES-256-CBC').random_key.unpack('H*').first
+      end
+    end
   end
 
   # The inner wiring. Ideally this should be hidden away,
@@ -296,7 +312,7 @@ module Seek
       set_value setter, value
     end
 
-    def define_class_method(method , *args, &block)
+    def define_class_method(method, *args, &block)
       singleton_class.instance_eval { define_method method.to_sym, *args, &block }
     end
 

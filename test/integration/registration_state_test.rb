@@ -4,10 +4,9 @@ class RegistrationStateTest < ActionController::IntegrationTest
   include AuthenticatedTestHelper
   fixtures :all
 
-  test "partially registered user always redirects to select person" do
-
-    User.current_user = Factory(:user, :login => 'partial',:person=>nil)
-    post '/session', :login => 'partial', :password => 'blah'
+  test 'partially registered user always redirects to select person' do
+    User.current_user = Factory(:user, login: 'partial', person: nil)
+    post '/session', login: 'partial', password: 'blah'
     assert_redirected_to register_people_path
 
     assert_nil User.current_user.person
@@ -29,7 +28,5 @@ class RegistrationStateTest < ActionController::IntegrationTest
 
     get sop_path(Factory :sop)
     assert_redirected_to register_people_path
-
   end
-
 end

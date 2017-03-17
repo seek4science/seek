@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170124172923) do
+ActiveRecord::Schema.define(:version => 20170309145516) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -939,6 +939,21 @@ ActiveRecord::Schema.define(:version => 20170124172923) do
 
   add_index "oauth_sessions", ["user_id"], :name => "index_oauth_sessions_on_user_id"
 
+  create_table "openbis_endpoints", :force => true do |t|
+    t.string   "as_endpoint"
+    t.string   "space_perm_id"
+    t.string   "username"
+    t.integer  "project_id"
+    t.datetime "created_at",                             :null => false
+    t.datetime "updated_at",                             :null => false
+    t.string   "dss_endpoint"
+    t.string   "web_endpoint"
+    t.integer  "refresh_period_mins",   :default => 120
+    t.integer  "policy_id"
+    t.string   "encrypted_password"
+    t.string   "encrypted_password_iv"
+  end
+
   create_table "organisms", :force => true do |t|
     t.string   "title"
     t.datetime "created_at"
@@ -1218,13 +1233,6 @@ ActiveRecord::Schema.define(:version => 20170124172923) do
 
   add_index "publication_auth_lookup", ["user_id", "asset_id", "can_view"], :name => "index_pub_user_id_asset_id_can_view"
   add_index "publication_auth_lookup", ["user_id", "can_view"], :name => "index_publication_auth_lookup_on_user_id_and_can_view"
-
-  create_table "publication_author_orders", :force => true do |t|
-    t.integer "order"
-    t.integer "author_id"
-    t.string  "author_type"
-    t.integer "publication_id"
-  end
 
   create_table "publication_authors", :force => true do |t|
     t.string   "first_name"

@@ -36,6 +36,8 @@ class Project < ActiveRecord::Base
 
   has_many :admin_defined_role_projects
 
+  has_many :openbis_endpoints
+
   belongs_to :programme
 
   attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,

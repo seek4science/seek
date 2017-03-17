@@ -1,4 +1,3 @@
-
 require 'grouped_pagination'
 require 'title_trimmer'
 require 'libxml'
@@ -22,6 +21,7 @@ class Publication < ActiveRecord::Base
   acts_as_asset
 
   has_many :publication_authors, :dependent => :destroy, :autosave => true
+  has_many :persons, :through => :publication_authors
 
   has_many :backwards_relationships,
            :class_name => 'Relationship',
@@ -56,7 +56,7 @@ class Publication < ActiveRecord::Base
     # http://filext.com/file-extension/EMBL
     # ftp://ftp.embl.de/pub/databases/embl/doc/usrman.txt
     :embl        => { :format => "embl"   , :name => "EMBL"   , :mimetype => "chemical/x-embl-dl-nucleotide"}
-  )
+  ).freeze
 
   def update_creators_from_publication_authors
     self.creators = seek_authors.map(&:person)
@@ -88,7 +88,7 @@ class Publication < ActiveRecord::Base
   end
 
   def default_policy
-    policy = Policy.new(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+    policy = Policy.new(:name => "publication_policy", :access_type => Policy::VISIBLE)
     #add managers (authors + contributor)
     creators.each do |author|
       policy.permissions << Permissions.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
@@ -109,15 +109,13 @@ class Publication < ActiveRecord::Base
     publication_authors.find_all_by_person_id nil
   end
 
-
   def self.sort publications
-    publications.sort_by &:published_date
+    publications.sort_by(&:published_date)
   end
 
   def contributor_credited?
     false
   end
-
 
   def extract_metadata(reference)
     if reference.respond_to?(:pubmed)
@@ -127,8 +125,10 @@ class Publication < ActiveRecord::Base
     end
   end
 
+  # @param reference Bio::Reference
+  # @see https://github.com/bioruby/bioruby/blob/master/lib/bio/reference.rb
   def extract_pubmed_metadata(reference)
-    self.title = reference.title.chop #remove full stop
+    self.title = reference.title.chomp #remove full stop
     self.abstract = reference.abstract
     self.journal = reference.journal
     self.pubmed_id = reference.pubmed
@@ -136,6 +136,8 @@ class Publication < ActiveRecord::Base
     self.citation = reference.citation
   end
 
+  # @param doi_record DOI::Record
+  # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
     self.title = doi_record.title
     self.published_date = doi_record.date_published
@@ -143,6 +145,30 @@ class Publication < ActiveRecord::Base
     self.doi = doi_record.doi
     self.publication_type = doi_record.publication_type
     self.citation = doi_record.citation
+  end
+
+  # @param bibtex_record BibTeX entity from bibtex-ruby gem
+  def extract_bibtex_metadata(bibtex_record)
+    self.title           = bibtex_record.title.try(:to_s).try(:encode!)
+    self.abstract        = bibtex_record[:abstract].try(:to_s).try(:encode!) || ""
+    self.journal         = bibtex_record.journal.try(:to_s).try(:encode!)
+    self.published_date  = Date.new( bibtex_record.year.try(:to_i), bibtex_record.month_numeric || 1, bibtex_record[:day].try(:to_i) || 1 )
+    self.doi             = bibtex_record[:doi].try(:to_s).try(:encode!)
+    self.pubmed_id       = bibtex_record[:pubmed_id].try(:to_s).try(:encode!)
+    plain_authors = bibtex_record[:author].split(" and ") # by bibtex definition
+    plain_authors.each_with_index do |author, index| # multiselect
+      if author.empty?
+        next
+      end
+      last_name, first_name = author.split(", ") # by bibtex definition
+      pa = PublicationAuthor.new({
+        :publication  => self,
+        :first_name   => first_name.try(:encode),
+        :last_name    => last_name.try(:encode),
+        :author_index => index
+      })
+      self.publication_authors << pa
+    end
   end
 
   def data_files
@@ -255,7 +281,7 @@ class Publication < ActiveRecord::Base
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
         if !matching_projects.empty?
-          self.errors[:base] << "You cannot register the same DOI within the same project"
+          self.errors[:doi] << "You cannot register the same DOI within the same project"
           return false
         end
       end
@@ -265,7 +291,7 @@ class Publication < ActiveRecord::Base
       if !existing.empty?
         matching_projects = existing.collect(&:projects).flatten.uniq & projects
         if !matching_projects.empty?
-          self.errors[:base] << "You cannot register the same PubMed ID within the same project"
+          self.errors[:pubmed_id] << "You cannot register the same PubMed ID within the same project"
           return false
         end
       end
@@ -278,7 +304,7 @@ class Publication < ActiveRecord::Base
     if !existing.empty?
       matching_projects = existing.collect(&:projects).flatten.uniq & projects
       if !matching_projects.empty?
-        self.errors[:base] << "You cannot register the same Title within the same project"
+        self.errors[:title] << "You cannot register the same Title \"#{self.title}\" within the same project: \"#{matching_projects[0].title}\""
         return false
       end
     end

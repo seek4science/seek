@@ -1,8 +1,11 @@
-    function addSelectedToFancy(multiselect, value) {
+    function addSelectedToFancy(multiselect, value, selectElement, callback) {
         if (!$F(multiselect).include(value)) {
             $(multiselect).setValue($F(multiselect).concat(value));
             updateFancyMultiselect(multiselect);
             $j('#'+multiselect).trigger('change');
+            if (callback) {
+                callback(value, selectElement);
+            }
         } else {
             alert('Item already exists!');
         }

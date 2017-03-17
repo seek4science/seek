@@ -3,31 +3,29 @@ module ResultHelper
 
   # Override
   def deep_parse(types, output, zip, index = [])
-    content = "<ol>"
+    content = '<ol>'
     i = 0
     types.each do |type|
       if type.is_a?(Array)
-        content += "<li><strong>List #{i+1}</strong><br />" +
-            deep_parse(type, output, zip, index + [i]) + "</li>"
+        content += "<li><strong>List #{i + 1}</strong><br />" +
+                   deep_parse(type, output, zip, index + [i]) + '</li>'
       else
         # Text outputs are inlined here by us. Other types are linked and
         # inlined by the browser.
         content += "<li style='list-style-type:decimal; list-style-position:outside; display:list-item;'> <span class='mime_type'>(#{type})</span><p>"
-        if type.starts_with?("text")
-          path = (index + [i]).map { |j| j += 1 }.join("/")
+        if type.starts_with?('text')
+          path = (index + [i]).map { |j| j += 1 }.join('/')
           data = zip.read("#{output.name}/#{path}")
         else
-          path = (index + [i]).join("/")
+          path = (index + [i]).join('/')
           data = run_path(output.run_id) + "/output/#{output.name}/#{path}"
         end
         content += TavernaPlayer.output_renderer.render(data, type)
-        content += "</p></li>"
+        content += '</p></li>'
       end
       i += 1
     end
 
-    raw(content += "</ol>")
-
+    raw(content += '</ol>')
   end
 end
-

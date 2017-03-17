@@ -35,8 +35,8 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
 
     Delayed::Job.destroy_all
 
-    #check there is no existing job triggered from a sample.save
-    refute SampleTypeUpdateJob.new(type,false).exists?
+    # check there is no existing job triggered from a sample.save
+    refute SampleTypeUpdateJob.new(type, false).exists?
 
     job = SampleTypeUpdateJob.new(type)
     pretend_now_is(Time.now + 1.minute) do
@@ -47,8 +47,8 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     # timestamps shouldn't change
     assert_equal updated_at, sample.updated_at
 
-    #a new job shouldn't be created by the sample.save
-    refute SampleTypeUpdateJob.new(type,false).exists?
+    # a new job shouldn't be created by the sample.save
+    refute SampleTypeUpdateJob.new(type, false).exists?
   end
 
   test 'perform without refresh' do

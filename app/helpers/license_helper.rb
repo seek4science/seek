@@ -51,7 +51,6 @@ module LicenseHelper
   end
 
   def grouped_license_options(opts = {})
-
     grouped_licenses = sort_grouped_licenses(group_licenses(opts))
 
     grouped_licenses.each do |_, licenses|
@@ -64,12 +63,12 @@ module LicenseHelper
   def sort_grouped_licenses(licenses)
     licenses.sort_by do |pair|
       case pair[0]
-        when 'Recommended'
-          0
-        when 'Generic'
-          1
-        else
-          2
+      when 'Recommended'
+        0
+      when 'Generic'
+        1
+      else
+        2
       end
     end
   end

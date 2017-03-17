@@ -11,6 +11,17 @@
     display:inline-block;
 }
 
+.spinner {
+  background: url(<%= asset_path(icon_filename_for_key('spinner')) %>);
+  background-repeat: no-repeat;
+  width: 75px; /*or your image's width*/
+  height: 75px; /*or your image's height*/
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+  display:inline-block;
+}
+
 .warning_icon {
     background: url(<%= asset_path(icon_filename_for_key('warning')) %>);
     background-repeat: no-repeat;

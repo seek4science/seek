@@ -94,6 +94,7 @@ SEEK::Application.configure do
     if ActiveRecord::Base.connection.table_exists? 'delayed_jobs'
       SendPeriodicEmailsJob.create_initial_jobs
       NewsFeedRefreshJob.create_initial_job
+      OpenbisEndpointCacheRefreshJob.create_initial_jobs
     end
   rescue Exception=>e
     Rails.logger.error "Error creating default delayed jobs - #{e.message}"

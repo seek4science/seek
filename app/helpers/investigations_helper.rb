@@ -1,6 +1,5 @@
 module InvestigationsHelper
-  
-  def investigation_link investigation
+  def investigation_link(investigation)
     unless investigation.nil?
       if investigation.can_view?
         link_to investigation.title, investigation
@@ -12,8 +11,7 @@ module InvestigationsHelper
     end
   end
 
-  def authorised_investigations projects=nil
-    authorised_assets(Investigation,projects,'view')
+  def authorised_investigations(projects = nil)
+    authorised_assets(Investigation, projects, 'view')
   end
-
 end

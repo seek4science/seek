@@ -27,7 +27,7 @@
     %>
     <% if can_download_asset?(asset, params[:code]) -%>
         <%= download_or_link_button display_asset, path, display_asset.single_content_blob.try(:url), human_name,
-                                    :class => 'btn btn-default' %>
+                                    :class => 'btn btn-default',disabled:asset.download_disabled? %>
 
         <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
             <%= button_link_to('Explore', 'spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code => params[:code])) %>
@@ -45,13 +45,14 @@
 <%= admin_dropdown do %>
     <% edit_verb = 'edit' %>
     <% if asset.can_manage? -%>
-        <% if asset.is_downloadable? && !(asset.respond_to?(:extracted_samples) && asset.extracted_samples.any?) -%>
+        <% if asset.versioned? -%>
             <li>
-                <% if asset.supports_doi? && asset.is_any_doi_minted?  -%>
-                    <%= link_to_function image("new")+" Upload new version", "javascript:alert('After DOI is generated, uploading new version is not possible')", :class=>"disabled" -%>
-                <% else %>
-                    <%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") -%>
-                <% end %>
+              <% if asset.new_version_supported? %>
+                  <%= link_to_function image("new")+" Upload new version", visual_effect(:toggle_appear, "upload_new_version_form") %>
+                  <% else %>
+                  <%= link_to_function image("new")+" Upload new version", nil,disabled:true, class:'disabled' %>
+                  <% end %>
+
             </li>
         <% end -%>
 
@@ -67,10 +68,6 @@
     <% end -%>
 
     <%= delete_icon(asset, current_user)%>
-
-    <% if Seek::Config.is_virtualliver && (asset.can_delete? || current_user.try(:admin?)) && asset.respond_to?(:to_presentation) %>
-        <li><%= image_tag_for_key "arrow_right", convert_to_presentation_data_file_path(asset.id), nil, {:title => "click to move this #{t('data_file')} to #{t('presentation').pluralize}", :confirm => "Are you sure you wish to move this #{t('data_file')} to #{t('presentation').pluralize}? Doing so is irreversible!", :method => :post}, "Move to #{t('presentation').pluralize}" %></li>
-    <% end %>
 
     <% if asset.supports_doi? && asset.is_doiable?(display_asset.version) %>
         <li><%= image_tag_for_key('doi', polymorphic_path(asset, :action => 'mint_doi_confirm', :version => display_asset.version), nil,{},"Generate a DOI") -%></li>

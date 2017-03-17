@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
-
   def setup
     @val = Seek::Config.auth_lookup_enabled
     Seek::Config.auth_lookup_enabled = true
@@ -10,10 +9,10 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   end
 
   def teardown
-    Seek::Config.auth_lookup_enabled=@val
+    Seek::Config.auth_lookup_enabled = @val
   end
 
-  test 'Removes a user from the lookup tables when they are destroyed' do#
+  test 'Removes a user from the lookup tables when they are destroyed' do #
     disable_authorization_checks do
       Person.destroy_all
       User.destroy_all
@@ -46,6 +45,4 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_equal (User.count + 1), a.lookup_count
     assert_equal (User.count + 1), d.lookup_count
   end
-
-
 end

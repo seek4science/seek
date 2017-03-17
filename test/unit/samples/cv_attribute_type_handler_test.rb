@@ -1,11 +1,10 @@
 require 'test_helper'
 
-class CVAttributeTypeHandlerTest  < ActiveSupport::TestCase
-
+class CVAttributeTypeHandlerTest < ActiveSupport::TestCase
   test 'test value' do
     handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new
     vocab = Factory(:apples_sample_controlled_vocab)
-    handler.send('additional_options=',controlled_vocab:vocab)
+    handler.send('additional_options=', controlled_vocab: vocab)
     handler.test_value('Granny Smith')
     assert_raises(RuntimeError) do
       handler.test_value('Pear')
@@ -14,7 +13,7 @@ class CVAttributeTypeHandlerTest  < ActiveSupport::TestCase
 
   test 'validate value' do
     vocab = Factory(:apples_sample_controlled_vocab)
-    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new({:controlled_vocab=>vocab})
+    handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(controlled_vocab: vocab)
     assert handler.validate_value?('Granny Smith')
     refute handler.validate_value?('Pear')
   end
@@ -25,5 +24,4 @@ class CVAttributeTypeHandlerTest  < ActiveSupport::TestCase
       assert handler.validate_value?('Granny Smith')
     end
   end
-
 end

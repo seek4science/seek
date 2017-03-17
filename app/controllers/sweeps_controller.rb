@@ -1,5 +1,7 @@
 class SweepsController < ApplicationController
 
+  include Seek::AssetsStandardControllerActions
+
   before_filter :workflows_enabled?
 
   skip_before_filter :restrict_guest_user, :only => :new
@@ -28,10 +30,7 @@ class SweepsController < ApplicationController
   def update
     @sweep.attributes = params[:sweep]
 
-    if params[:sharing]
-      @sweep.policy_or_default
-      @sweep.policy.set_attributes_with_sharing params[:sharing], @sweep.projects
-    end
+    update_sharing_policies @sweep, params
 
     if @sweep.save
       respond_to do |format|
@@ -53,7 +52,7 @@ class SweepsController < ApplicationController
     raise if @workflow.nil?
     # Manually add projects of current user, as they aren't prompted for this information in the form
     @sweep.projects = current_person.projects
-    @sweep.policy.set_attributes_with_sharing params[:sharing], @sweep.projects
+    @sweep.policy.set_attributes_with_sharing(params[:policy_attributes])
     respond_to do |format|
       if @sweep.save
         format.html { redirect_to sweep_path(@sweep) }

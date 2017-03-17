@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class HttpHandlerTest < ActiveSupport::TestCase
-
   test 'is_slideshare_url' do
     assert Seek::DownloadHandling::HTTPHandler.new('http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794').send(:is_slideshare_url?)
     assert Seek::DownloadHandling::HTTPHandler.new('http://www.slideshare.net////mygrid//if-we-build-it-will-they-come-13652794').send(:is_slideshare_url?)
@@ -14,5 +13,4 @@ class HttpHandlerTest < ActiveSupport::TestCase
     refute Seek::DownloadHandling::HTTPHandler.new(nil).send(:is_slideshare_url?)
     refute Seek::DownloadHandling::HTTPHandler.new('ftp://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794').send(:is_slideshare_url?)
   end
-
 end

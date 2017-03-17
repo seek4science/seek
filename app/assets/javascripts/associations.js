@@ -29,7 +29,6 @@ function nestedOptionsFromJSONArray(array,prompt_option_text) {
     //build into optgroups, with options clustered according to parent
     for (parent_id in parents) {
         var parent=parents[parent_id];
-        console.log(parent);
         var group = $j('<optgroup/>').attr('label',parent.title);
         for(var i=0;i<parent.children.length;i++) {
             var child=parent.children[i];

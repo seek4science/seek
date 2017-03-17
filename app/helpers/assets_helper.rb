@@ -6,14 +6,14 @@ module AssetsHelper
     controller_name.downcase.singularize.underscore
   end
 
-  #will render a view of the asset, if available. For example, a slideshare based asset could give a embedded slideshare view
+  # will render a view of the asset, if available. For example, a slideshare based asset could give a embedded slideshare view
   def rendered_asset_view(asset)
     return '' unless asset.can_download?
     content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}") do
       Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob).render
     end
     unless content.blank?
-      content_tag(:div,class:'renderer') do
+      content_tag(:div, class: 'renderer') do
         content.html_safe
       end
     else
@@ -22,7 +22,7 @@ module AssetsHelper
   end
 
   def can_create_new_items?
-    #the state of being able to create assets is the same for all assets
+    # the state of being able to create assets is the same for all assets
     DataFile.can_create?
   end
 
@@ -119,7 +119,7 @@ module AssetsHelper
   # assets are sorted by title except if they are projects and scales (because of hierarchies)
   def authorised_assets(asset_class, projects = nil, action = 'view')
     assets = asset_class.all_authorized_for action, User.current_user, projects
-    assets = assets.sort_by &:title if !assets.blank? && !%w(Project Scale).include?(assets.first.class.name)
+    assets = assets.sort_by(&:title) if !assets.blank? && !%w(Project Scale).include?(assets.first.class.name)
     assets
   end
 
@@ -144,8 +144,8 @@ module AssetsHelper
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})
     download_button = icon_link_to('Download', 'download', download_path, opts)
     link_button_or_nil = link_url ? icon_link_to('External Link', 'external_link', link_url, opts.merge(target: 'blank')) : nil
-    return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob)
     return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ? download_button : link_button_or_nil if asset.respond_to?(:content_blobs)
+    return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob)
   end
 
   def view_content_button(asset)
@@ -168,6 +168,4 @@ module AssetsHelper
     end
     sharing_text.html_safe
   end
-
-
 end

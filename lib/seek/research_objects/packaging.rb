@@ -40,7 +40,7 @@ module Seek
         end
       end
 
-      #the filename for research object when downloaded. Takes the form [type]-[id].ro.zip
+      # the filename for research object when downloaded. Takes the form [type]-[id].ro.zip
       def research_object_filename(item = self)
         "#{item.class.name.underscore}-#{item.id}.ro.zip"
       end

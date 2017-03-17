@@ -62,18 +62,13 @@ class PoliciesController < ApplicationController
   end
 
   def preview_permissions
-      policy = sharing_params_to_policy
       contributor_person = (params['is_new_file'] == 'false') ?  User.find_by_id(params['contributor_id'].to_i).try(:person) : current_person
       creators = (params["creators"].blank? ? [] : ActiveSupport::JSON.decode(params["creators"])).uniq
       creators.collect!{|c| Person.find(c[1])}
 
       resource_class = params[:resource_name].camelize.constantize
       resource = resource_class.find_by_id(params[:resource_id]) || resource_class.new
-      cloned_resource = resource.dup
-      cloned_resource= resource_with_assigned_projects cloned_resource,params[:project_ids]
-      cloned_resource.policy = policy
-      cloned_resource.creators = creators if cloned_resource.respond_to?(:creators)
-      cloned_resource.contributor = contributor_person
+      policy = resource.policy.set_attributes_with_sharing(params[:policy_attributes])
 
       privileged_people = {}
       #exclude the current_person from the privileged people
@@ -96,7 +91,7 @@ class PoliciesController < ApplicationController
     cloned_resource = resource.dup
     cloned_resource.policy = resource.policy.deep_copy
     cloned_resource = resource_with_assigned_projects cloned_resource,project_ids
-    if !resource.new_record? && resource.policy.sharing_scope == Policy::EVERYONE
+    if !resource.new_record? && resource.is_published?
       updated_can_publish_immediately = true
       #FIXME: need to use User.current_user here because of the way the function tests in PolicyControllerTest work, without correctly creating the session and @request etc
     elsif cloned_resource.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(cloned_resource)
@@ -119,43 +114,6 @@ class PoliciesController < ApplicationController
        resource.projects = selected_projects
      end
      resource
-  end
-
-  def sharing_params_to_policy params=params
-      policy =Policy.new()
-      policy.sharing_scope = params["sharing_scope"].to_i unless params[:sharing_scope].blank?
-      policy.access_type = params[:access_type].blank? ? 0 : params["access_type"].to_i
-      policy.use_whitelist = params["use_whitelist"] == 'true' ? true : false
-      policy.use_blacklist = params["use_blacklist"] == 'true' ? true : false
-
-      #now process the params for permissions
-      contributor_types = params["contributor_types"].blank? ? [] : ActiveSupport::JSON.decode(params["contributor_types"])
-      new_permission_data = params["contributor_values"].blank? ? {} : ActiveSupport::JSON.decode(params["contributor_values"])
-
-      #if share with your project and with all_sysmo_user is chosen
-      if (policy.sharing_scope == Policy::ALL_USERS)
-          your_proj_access_type = params["project_access_type"].blank? ? nil : params["project_access_type"].to_i
-          selected_projects = get_selected_projects params[:project_ids], params[:resource_name]
-          selected_projects.each do |selected_project|
-            project_id = selected_project.id
-            #add Project to contributor_type
-            contributor_types << "Project" if !contributor_types.include? "Project"
-            #add one hash {project.id => {"access_type" => sharing[:your_proj_access_type].to_i}} to new_permission_data
-            if !new_permission_data.has_key?('Project')
-              new_permission_data["Project"] = {project_id => {"access_type" => your_proj_access_type}}
-            else
-              new_permission_data["Project"][project_id] = {"access_type" => your_proj_access_type}
-            end
-          end
-      end
-
-      #build permissions
-      contributor_types.each do |contributor_type|
-         new_permission_data[contributor_type].each do |key, value|
-           policy.permissions.build(:contributor_type => contributor_type, :contributor_id => key, :access_type => value.values.first)
-         end
-      end
-    policy
   end
 
   def get_selected_projects project_ids, resource_name

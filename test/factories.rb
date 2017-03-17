@@ -176,47 +176,38 @@ end
 # Policy
 Factory.define(:policy, class: Policy) do |f|
   f.name 'test policy'
-  f.sharing_scope Policy::PRIVATE
   f.access_type Policy::NO_ACCESS
 end
 
 Factory.define(:private_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::PRIVATE
   f.access_type Policy::NO_ACCESS
 end
 
 Factory.define(:public_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::EVERYONE
   f.access_type Policy::MANAGING
 end
 
 Factory.define(:all_sysmo_viewable_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::ALL_USERS
   f.access_type Policy::VISIBLE
 end
 
 Factory.define(:all_sysmo_downloadable_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::ALL_USERS
   f.access_type Policy::ACCESSIBLE
 end
 
 Factory.define(:publicly_viewable_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::EVERYONE
   f.access_type Policy::VISIBLE
 end
 
 Factory.define(:public_download_and_no_custom_sharing, parent: :policy) do |f|
-  f.sharing_scope Policy::ALL_USERS
   f.access_type Policy::ACCESSIBLE
 end
 
 Factory.define(:editing_public_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::EVERYONE
   f.access_type Policy::EDITING
 end
 
 Factory.define(:downloadable_public_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::EVERYONE
   f.access_type Policy::ACCESSIBLE
 end
 
@@ -565,9 +556,9 @@ end
 Factory.define(:data_file_version_with_blob, parent: :data_file_version) do |f|
   f.after_create do |data_file_version|
     if data_file_version.content_blob.blank?
-      data_file_version.content_blob = Factory.create(:pdf_content_blob,
-                                                      asset: data_file_version.data_file,
-                                                      asset_version: data_file_version.version)
+      Factory.create(:pdf_content_blob,
+                     asset: data_file_version.data_file,
+                     asset_version: data_file_version.version)
     else
       data_file_version.content_blob.asset = data_file_version.data_file
       data_file_version.content_blob.asset_version = data_file_version.version
@@ -1348,4 +1339,14 @@ Factory.define(:sample_from_file, parent: :sample) do |f|
     sample.set_attribute(:name, sample.title) if sample.data.key?(:name)
     sample.set_attribute(:seekstrain, '1234')
   end
+end
+
+Factory.define(:openbis_endpoint) do |f|
+  f.as_endpoint 'https://openbis-api.fair-dom.org/openbis/openbis'
+  f.dss_endpoint 'https://openbis-api.fair-dom.org/datastore_server'
+  f.web_endpoint 'https://openbis-api.fair-dom.org/openbis'
+  f.username 'apiuser'
+  f.password 'apiuser'
+  f.space_perm_id 'API-SPACE'
+  f.association :project, factory: :project
 end

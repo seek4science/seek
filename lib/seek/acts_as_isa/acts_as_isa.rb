@@ -38,7 +38,6 @@ module Seek
         include ProgrammeCompat
 
         extend Seek::ActsAsISA::SingletonMethods
-
       end
 
       def is_isa?
@@ -51,6 +50,7 @@ module Seek
       def user_creatable?
         true
       end
+
       def can_create?
         User.logged_in_and_member?
       end

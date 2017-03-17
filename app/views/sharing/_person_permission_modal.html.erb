@@ -1,0 +1,45 @@
+<%= button_link_to('Share with a person', 'add', '#', id: 'add-person-permission-button') %>
+
+<%= modal(id: 'add-person-permission-modal', size: 'm') do %>
+    <%= modal_header('Share with people') %>
+    <%= modal_body do %>
+        <div class="form-group">
+          <label>The following people...</label>
+          <%= objects_input('permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.email } } }, name: nil) -%>
+          <p class="help-block">Start typing a person's name and select from the list that appears. You can select multiple people.</p>
+        </div>
+        <div class="form-group">
+          <label>can...</label>
+          <%= select_tag('permission-people-access-type', policy_selection_options(nil, object, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
+        </div>
+    <% end %>
+    <%= modal_footer do %>
+        <%= link_to('Add', '#', id: 'permission-people-confirm', class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
+    <% end %>
+<% end %>
+
+<script>
+  // Display person modal
+  $j('#add-person-permission-button').click(function () {
+    $j('#add-person-permission-modal').modal('show');
+    $j('#permission-people-ids').tagsinput('focus');
+
+    return false;
+  });
+
+  // Add a person permission to the table
+  $j('#permission-people-confirm').click(function () {
+    var people = $j('#permission-people-ids').tagsinput('items');
+
+    people.forEach(function (person, index) {
+      Sharing.addPermission(
+          { contributor_type: 'Person',
+            contributor_id: parseInt(person.id),
+            title: person.name,
+            access_type: parseInt($j('#permission-people-access-type').val()) });
+    });
+
+    // Reset form
+    $j('#permission-people-ids').tagsinput('removeAll');
+  });
+</script>

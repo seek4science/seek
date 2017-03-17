@@ -1,26 +1,24 @@
-//= require 'upload_selection'
-
-describe("tab selection", function(){
-    fixture.set("<ul class='nav nav-tabs' role='tablist'>" +
-        "<li role='presentation' class='active'>" +
-        "<a href='#local-file' aria-controls='local-file' role='tab' data-toggle='tab'>Local file</a>" +
-        "</li>" +
-        "<li role='presentation'>" +
-        "<a href='#remote-url' aria-controls='remote-url' role='tab' data-toggle='tab'>Remote URL</a>" +
-        "</li>" +
-        "</ul>"
-    );
-
-
-    it("should select local file tab by default", function() {
-        var active_tab_text = jQuery('li.active a')[0].text;
-        expect(active_tab_text).to.equal('Local file');
+describe('tab selection', function(){
+    beforeEach(function() {
+        this.timeout(10000);
+        MagicLamp.load('sops/new');
     });
-    it("should select remote url tab when it is clicked", function() {
-        var remote_url_tab = jQuery('ul.nav-tabs li')[1];
-        expect(remote_url_tab.class).not.to.equal('active');
-        remote_url_tab.children[0].click();
-        var active_tab_text = jQuery('li.active a')[0].text;
-        expect(active_tab_text).to.equal('Remote URL');
+
+    it('should select local file tab by default', function() {
+        expect($j('#upload_type_selection ul.nav-tabs li.active a')).to.have.$text('Local file');
+        expect($j('#local-file')).to.have.$class('active');
+        expect($j('#remote-url')).to.not.have.$class('active');
+    });
+
+    it('should select remote url tab when it is clicked', function() {
+        var remoteUrlTabLink = $j("#upload_type_selection ul.nav-tabs li a[href='#remote-url']");
+        var remoteUrlTab = remoteUrlTabLink.parent();
+
+        expect(remoteUrlTab).to.not.have.$class('active');
+
+        remoteUrlTabLink.trigger('click');
+        expect(remoteUrlTab.find("a[href='#remote-url']")).to.have.$text('Remote URL');
+        expect($j('#local-file')).to.not.have.$class('active');
+        expect($j('#remote-url')).to.have.$class('active');
     });
 });

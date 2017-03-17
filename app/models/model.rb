@@ -31,8 +31,6 @@ class Model < ActiveRecord::Base
 
   before_save :check_for_sbml_format
 
-
-
   #FIXME: model_images seems to be to keep persistence of old images, wheras model_image is just the current_image
   has_many :model_images
   belongs_to :model_image

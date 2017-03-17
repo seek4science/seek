@@ -42,7 +42,8 @@ RUN mkdir sqlite3-db && \
     bundle exec rake db:setup
 
 
-RUN bundle exec rake assets:precompile
+RUN bundle exec rake assets:precompile && \
+    rm -rf tmp/cache/*
 
 #root access needed for next couple of steps
 USER root
@@ -59,6 +60,6 @@ USER www-data
 EXPOSE 3000
 
 # Shared
-VOLUME ["/seek/filestore", "/seek/sqlite3-db"]
+VOLUME ["/seek/filestore", "/seek/sqlite3-db", "/seek/tmp/cache]
 
 CMD ["docker/entrypoint.sh"]

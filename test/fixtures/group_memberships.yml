@@ -1,24 +1,24 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  person_id: 1
-  work_group_id: 1
+  person: quentin_person
+  work_group: one
 
 two:
-  person_id: 2
-  work_group_id: 2
+  person: aaron_person
+  work_group: two
 
 three:
-  person_id: 3
-  work_group_id: 1
+  person: three
+  work_group: one
 
 four:
-  person_id: 1
-  work_group_id: 3
+  person: fred
+  work_group: three
 
 five:
-  person_id: 2
-  work_group_id: 4
+  person: aaron_person
+  work_group: four
 
 
 # ******** Fixtures below this point used with new Rails association mechanism - hence, no IDs defined ********

@@ -74,7 +74,7 @@
         <%= render :partial => "scales/scales_selector",:locals=>{:object=>@assay} %>
     <% end %>
 
-    <%= render :seek_partial=>"assets/sharing_form" if @assay.can_manage? -%>
+    <%= render :seek_partial=>"sharing/form" if @assay.can_manage? -%>
 
     <% if @assay.is_taggable? %>
         <%= render :partial=>"assets/select_tags" %>

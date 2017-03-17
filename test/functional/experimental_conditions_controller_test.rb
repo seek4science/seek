@@ -19,7 +19,6 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop.save
     get :index, sop_id: sop.id, version: sop.version
     assert_not_nil flash[:error]
-
   end
 
   test 'should create the experimental condition with the concentration of the compound' do
@@ -39,18 +38,18 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal ec.measured_item, mi
     substance = ec.experimental_condition_links.first.substance
     assert_equal substance.name, compound_annotation['recommended_name']
-    mappings = substance.mapping_links.map { |ml| ml.mapping }
+    mappings = substance.mapping_links.map(&:mapping)
     kegg_ids = []
     chebi_ids = []
     mappings.each do |m|
       assert_equal m.sabiork_id, compound_annotation['sabiork_id'].to_i
-      kegg_ids.push m.kegg_id if !kegg_ids.include?m.kegg_id and !m.kegg_id.blank?
-      chebi_ids.push m.chebi_id if !chebi_ids.include?m.chebi_id and !m.chebi_id.blank?
+      kegg_ids.push m.kegg_id if !kegg_ids.include?(m.kegg_id) && !m.kegg_id.blank?
+      chebi_ids.push m.chebi_id if !chebi_ids.include?(m.chebi_id) && !m.chebi_id.blank?
     end
     assert_equal kegg_ids.sort, compound_annotation['kegg_ids'].sort
     assert_equal chebi_ids.sort, compound_annotation['chebi_ids'].sort
 
-    synonyms = substance.synonyms.map { |s| s.name }
+    synonyms = substance.synonyms.map(&:name)
     assert_equal synonyms.sort, compound_annotation['synonyms'].sort
   end
 
@@ -128,7 +127,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
 
     mi = measured_items(:concentration)
     cp = compounds(:compound_glucose)
-    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => { measured_item_id: mi.id },  :substance_list => cp.name
+    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: mi.id }, substance_list: cp.name
     ec_updated = assigns(:experimental_condition)
     assert_not_nil ec_updated
     assert ec_updated.valid?
@@ -158,7 +157,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal ec.experimental_condition_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
-    put :update, :id => ec.id, :sop_id => ec.sop.id, :experimental_condition => {}, :substance_list => cp.name
+    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: {}, substance_list: cp.name
     ec_updated = assigns(:experimental_condition)
     assert_not_nil ec_updated
     assert ec_updated.valid?
@@ -282,8 +281,8 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     <name type='Name'>Adenosine 5'-triphosphate</name>
   </Names>
 </Compound>)
-    stub_request(:get, 'http://sabiork.h-its.org/sabioRestWebServices/compounds?compoundName=ATP').
-        with(headers: { 'Accept' => '*/*; q=0.5, application/xml', 'Accept-Encoding' => 'gzip, deflate', 'User-Agent' => 'Ruby' }).
-        to_return(status: 200, body: body, headers: {})
+    stub_request(:get, 'http://sabiork.h-its.org/sabioRestWebServices/compounds?compoundName=ATP')
+      .with(headers: { 'Accept' => '*/*; q=0.5, application/xml', 'Accept-Encoding' => 'gzip, deflate', 'User-Agent' => 'Ruby' })
+      .to_return(status: 200, body: body, headers: {})
   end
 end

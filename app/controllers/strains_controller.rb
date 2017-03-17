@@ -32,7 +32,7 @@ class StrainsController < ApplicationController
 
   def create
     @strain = new_strain(params[:strain])
-    @strain.policy.set_attributes_with_sharing params[:sharing], @strain.projects
+    @strain.policy.set_attributes_with_sharing(params[:policy_attributes])
     update_annotations(params[:tag_list], @strain)
 
     if @strain.save
@@ -61,8 +61,8 @@ class StrainsController < ApplicationController
 
   def update
     update_annotations(params[:tag_list], @strain)
-    if params[:sharing]
-      @strain.policy.set_attributes_with_sharing params[:sharing], @strain.projects
+    if params[:policy_attributes]
+      @strain.policy.set_attributes_with_sharing(params[:policy_attributes])
     end
     @strain.attributes = params[:strain]
     if @strain.save

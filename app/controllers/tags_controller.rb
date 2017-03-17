@@ -49,8 +49,7 @@ class TagsController < ApplicationController
 
   def find_tagged_objects
     types = tag_types_for_selection
-    objects = @tag.annotations.with_attribute_name(types).collect(&:annotatable).uniq
-    @tagged_objects = select_authorised(objects)
+    @tagged_objects = @tag.annotations.with_attribute_name(types).collect(&:annotatable).uniq.select(&:can_view?)
   end
 
   def tag_types_for_selection
@@ -60,11 +59,6 @@ class TagsController < ApplicationController
       types = %w(expertise tool tag sample_type_tags)
     end
     types
-  end
-
-  # Removes all results from the search results collection passed in that are not Authorised to show for the current_user
-  def select_authorised(collection)
-    collection.select(&:can_view?)
   end
 
   def get_tags

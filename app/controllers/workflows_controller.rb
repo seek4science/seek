@@ -5,6 +5,8 @@ require 't2flow/dot'
 
 class WorkflowsController < ApplicationController
 
+  include Seek::AssetsStandardControllerActions
+
   include Seek::IndexPager
   include Seek::AssetsCommon
 
@@ -63,7 +65,7 @@ class WorkflowsController < ApplicationController
     if handle_upload_data
 
       @workflow = Workflow.new params[:workflow]
-      @workflow.policy.set_attributes_with_sharing params[:sharing], @workflow.projects
+      @workflow.policy.set_attributes_with_sharing(params[:policy_attributes])
       if @workflow.save
         update_annotations(params[:tag_list], @workflow)
 
@@ -105,10 +107,7 @@ class WorkflowsController < ApplicationController
 
     @workflow.attributes = workflow_params
 
-     if params[:sharing]
-       @workflow.policy_or_default
-       @workflow.policy.set_attributes_with_sharing params[:sharing], @workflow.projects
-     end
+    update_sharing_policies @workflow, params
 
     if @workflow.save && !params[:sharing_form]
       update_annotations(params[:tag_list], @workflow)

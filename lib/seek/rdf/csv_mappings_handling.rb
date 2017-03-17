@@ -33,7 +33,7 @@ module Seek
       def generate_triples_for_csv_row(subject, method, property, uri_or_literal, transformation, collection_transform, rdf_graph)
         resource = subject.rdf_resource
         items = subject.send(method)
-        #may be an array of items or a single item. Cant use Array(item) or [*item] here cos it screws up times and datetimes
+        # may be an array of items or a single item. Cant use Array(item) or [*item] here cos it screws up times and datetimes
         items = [items] unless items.is_a?(Array)
 
         transformation.strip! if transformation

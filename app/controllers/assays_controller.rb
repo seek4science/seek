@@ -75,7 +75,7 @@ class AssaysController < ApplicationController
 
     @assay.assay_class=AssayClass.for_type(@assay_class) unless @assay_class.nil?
 
-    investigations = Investigation.all.select &:can_view?
+    investigations = Investigation.all.select(&:can_view?)
     studies=[]
     investigations.each do |i|
       studies << i.studies.select(&:can_view?)

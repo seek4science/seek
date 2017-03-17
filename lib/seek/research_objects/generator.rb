@@ -44,14 +44,14 @@ module Seek
       # Gather child resources of the given resource
       def subentries(resource)
         s = case resource
-                       when Investigation
-                         resource.studies + resource.assets
-                       when Study
-                         resource.assays + resource.assets
-                       when Assay
-                         resource.assets
-                       else
-                         []
+            when Investigation
+              resource.studies + resource.assets
+            when Study
+              resource.assays + resource.assets
+            when Assay
+              resource.assets
+            else
+              []
                      end
         remove_duplicates(s)
       end
@@ -73,6 +73,7 @@ module Seek
       end
 
       private
+
       # the current metadata handlers - JSON and RDF
       def metadata_handlers
         [Seek::ResearchObjects::RdfMetadata.instance, Seek::ResearchObjects::JSONMetadata.instance]
@@ -87,7 +88,7 @@ module Seek
       # stores a reference to the `resource` in the RO manifest
       def store_reference(resource, parents = [])
         @bundle.manifest.aggregates << ROBundle::Aggregate.new(:uri => '/' + resource.research_object_package_path(parents),
-                                                              'pav:importedFrom' => item_uri(resource))
+                                                               'pav:importedFrom' => item_uri(resource))
       end
 
       # stores the actual physical files defined by the contentblobs for the asset, and adds the appropriate
@@ -108,14 +109,14 @@ module Seek
         @bundle.add(path, blob.filepath, aggregate: true)
       end
 
-      #resolves the entry path, to avoid duplicates. If an asset has multiple files
-      #with some the same name, a "c-" is prepended t the file name, where c starts at 1 and increments
+      # resolves the entry path, to avoid duplicates. If an asset has multiple files
+      # with some the same name, a "c-" is prepended t the file name, where c starts at 1 and increments
       def resolve_entry_path(asset, blob, parents = [])
         path = File.join(asset.research_object_package_path(parents), blob.original_filename)
-        while(@bundle.find_entry(path))
-          c||=1
+        while @bundle.find_entry(path)
+          c ||= 1
           path = File.join(asset.research_object_package_path(parents), "#{c}-#{blob.original_filename}")
-          c+=1
+          c += 1
         end
         path
       end
