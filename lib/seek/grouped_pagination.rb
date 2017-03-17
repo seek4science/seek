@@ -110,7 +110,7 @@ module Seek
           conditions = merge_optional_conditions(options[:conditions], p)
           query_options = [conditions: conditions]
           query_options[0].merge!(options.except(:conditions, :page, :default_page))
-          page_totals[p] = count(*query_options)
+          page_totals[p] = where(query_options[0][:conditions]).count
         end
 
         result = Collection.new(records, page, @pages, page_totals)
