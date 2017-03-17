@@ -59,6 +59,7 @@ layout: page
      - [Create a Sample](create-sample.html)
      - [Legacy Biosamples](legacy-biosamples.html)
 - [Executing a model on JWS Online](http://jws-docs.readthedocs.org/)
+- [Using SEEK with openBIS](openbis.html)
 - [Contributing to these SEEK Documents](/contributing.html)
 
 
