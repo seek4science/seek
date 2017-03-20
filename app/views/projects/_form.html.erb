@@ -44,6 +44,8 @@
 
 <% if @project.can_manage? %>
     <%= render :partial => 'assets/license_selector', :locals => { :resource => @project, :label=>"Default License",:accessor=>:default_license } %>
+
+    <%= render :partial => 'sharing/form', :locals => { :object => @project, :policy => @project.default_policy, :label => 'Default Sharing Policy' } %>
 <% end %>
 
 <%= f.submit(project ? "Update" : "Create",:disable_with=>(project ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>

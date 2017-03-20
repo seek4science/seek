@@ -81,6 +81,11 @@ var Sharing = {
     }
 
     return false;
+  },
+
+  applyPolicy: function (policy) {
+    Sharing.permissionsTable.permissions = policy.permissions;
+    Sharing.permissionsTable.publicPermission.access_type = policy.access_type;
   }
 };
 

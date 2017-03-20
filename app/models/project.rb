@@ -76,10 +76,7 @@ class Project < ActiveRecord::Base
   #  necessary, deep copies of it will be made to ensure that all settings get
   #  fully copied and assigned to belong to owners of assets, where identical policy
   #  is to be used)
-  belongs_to :default_policy,
-             class_name: 'Policy',
-             dependent: :destroy,
-             autosave: true
+  belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
   after_initialize :default_default_policy_if_new
 
