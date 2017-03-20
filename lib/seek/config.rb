@@ -244,15 +244,12 @@ module Seek
       value
     end
 
-<<<<<<< HEAD
     def set_ldap_settings(field, value)
       merge! :ldap, field => value
       value
     end
-      
-=======
+
     # TODO: update to use attr_encrypted
->>>>>>> master
     def datacite_password_decrypt
       datacite_password = Seek::Config.datacite_password
       decrypt_value(datacite_password)

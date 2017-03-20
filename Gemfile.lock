@@ -876,7 +876,7 @@ DEPENDENCIES
   my_rails_settings!
   my_responds_to_parent!
   my_savage_beast!
-  mysql2
+  mysql2 (~> 0.3.10)
   net-ldap
   nokogiri
   omniauth (~> 1.3.1)
