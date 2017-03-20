@@ -49,7 +49,7 @@ module Seek
           end
 
           if (person.roles_mask & mask).zero?
-            person.update_attribute(:roles_mask,person.roles_mask + mask)
+            person.update_attribute(:roles_mask, person.roles_mask + mask)
           end
         end
       end
@@ -64,7 +64,7 @@ module Seek
           related_items_association(person).where(role_mask: role_info.role_mask).where(clause).destroy_all
         end
         if (current_item_ids - item_ids).empty?
-          person.update_attribute(:roles_mask,person.roles_mask - role_info.role_mask)
+          person.update_attribute(:roles_mask, person.roles_mask - role_info.role_mask)
         end
       end
 

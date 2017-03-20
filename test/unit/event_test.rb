@@ -8,7 +8,7 @@ class EventTest < ActiveSupport::TestCase
     User.current_user = @event.contributor
   end
 
-  test "datafile association" do
+  test 'datafile association' do
     assert @event.data_files.empty?
     datafile = data_files(:picture)
     @event.data_files << datafile
@@ -17,7 +17,7 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 1, @event.data_files.count
   end
 
-   test "publication association" do
+  test 'publication association' do
     assert @event.publications.empty?
     publication = publications(:one)
     @event.publications << publication
@@ -26,11 +26,11 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 1, @event.publications.count
   end
 
-  test "sort by created_at" do
+  test 'sort by created_at' do
     assert_equal Event.all.sort_by { |e| e.start_date.to_i * -1 }, Event.all
   end
 
-  test "datafiles are unique" do
+  test 'datafiles are unique' do
     assert @event.data_files.empty?
     datafile = data_files(:picture)
     @event.data_files << datafile
@@ -42,39 +42,39 @@ class EventTest < ActiveSupport::TestCase
     end
   end
 
-  test "end date after start date" do
-    assert @event.start_date != nil
+  test 'end date after start date' do
+    assert !@event.start_date.nil?
     @event.end_date = Time.at 0
     assert !@event.valid?
     assert !@event.save
   end
 
-  test "end date and start date can match" do
+  test 'end date and start date can match' do
     @event.start_date = Time.now
     @event.end_date = @event.start_date
     assert @event.valid?
     assert @event.save
   end
 
-  test "end date optional" do
+  test 'end date optional' do
     @event.end_date = nil
     assert @event.valid?
     assert @event.save
   end
 
-  test "start date required" do
+  test 'start date required' do
     @event.start_date = nil
     assert !@event.valid?
     assert !@event.save
   end
 
-  test "presentations association" do
-      event = Factory :event
-      assert event.presentations.empty?
+  test 'presentations association' do
+    event = Factory :event
+    assert event.presentations.empty?
 
-      User.current_user = event.contributor
-      assert_difference "event.presentations.count" do
-         event.presentations << [Factory(:presentation, :policy => Factory(:public_policy))]
-      end
+    User.current_user = event.contributor
+    assert_difference 'event.presentations.count' do
+      event.presentations << [Factory(:presentation, policy: Factory(:public_policy))]
+    end
   end
 end

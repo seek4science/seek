@@ -1,6 +1,5 @@
 module Seek #:nodoc:
   module Permissions #:nodoc:
-
     AUTHORIZATION_ACTIONS = [:view, :edit, :download, :delete, :manage]
 
     module ActsAsAuthorized
@@ -11,11 +10,11 @@ module Seek #:nodoc:
       end
 
       module BaseExtensions
-        def self.included base
+        def self.included(base)
           base.extend ClassMethods
         end
 
-        #Sets up the basic interface for authorization hooks. All AR instances get these methods, and by default they return true.
+        # Sets up the basic interface for authorization hooks. All AR instances get these methods, and by default they return true.
         AUTHORIZATION_ACTIONS.each do |action|
           eval <<-END_EVAL
             def can_#{action}? user=User.current_user
@@ -23,7 +22,7 @@ module Seek #:nodoc:
             end
           END_EVAL
 
-          def can_perform? action, *args
+          def can_perform?(action, *args)
             send "can_#{action}?", *args
           end
         end
@@ -64,4 +63,3 @@ require 'seek/permissions/state_based_permissions'
 ActiveRecord.module_eval do
   include Seek::Permissions::ActsAsAuthorized
 end
-

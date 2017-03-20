@@ -1,4 +1,4 @@
-#reformat the authors
+# reformat the authors
 module Seek
   module BioExtension
     class Bio::MEDLINE
@@ -15,31 +15,29 @@ module Seek
       def citation
         @pubmed['SO']
       end
+
       def published_date
         published_date = nil
-        #first parse published date on PHST - Publication History Status Date
+        # first parse published date on PHST - Publication History Status Date
         history_status_date = @pubmed['PHST']
         unless history_status_date.blank?
-          #Publication History Status Date: 2012/07/19 [received] 2013/03/05 [accepted] 2013/03/16 [aheadofprint]
-          publish_status = ["epublish","ppublish","aheadofprint","entrez,","pubmed","medline"]
+          # Publication History Status Date: 2012/07/19 [received] 2013/03/05 [accepted] 2013/03/16 [aheadofprint]
+          publish_status = ['epublish', 'ppublish', 'aheadofprint', 'entrez,', 'pubmed', 'medline']
           publish_status.each do |status|
-            if history_status_date.include?(status)
-              published_date_index = history_status_date.index(status) - 12
-              published_date = history_status_date[published_date_index, 10]
-              break
-            end
+            next unless history_status_date.include?(status)
+            published_date_index = history_status_date.index(status) - 12
+            published_date = history_status_date[published_date_index, 10]
+            break
           end
         end
-        #if not found then parse on EDAT - Entrez Date, the date the citation was added to PubMed
-        if published_date.blank?
-          published_date = @pubmed['EDAT'][0,10]
-        end
+        # if not found then parse on EDAT - Entrez Date, the date the citation was added to PubMed
+        published_date = @pubmed['EDAT'][0, 10] if published_date.blank?
         published_date
       end
 
       def error
         if @pubmed['PMID'].blank?
-          "No publication could be found on PubMed with that ID"
+          'No publication could be found on PubMed with that ID'
         end
       end
     end
@@ -49,7 +47,7 @@ module Seek
         authors_array = authors_without_reformat
         reformat_authors = []
         authors_array.each do |author|
-          #Petzold, A.
+          # Petzold, A.
           last_name, first_name = author.split(',')
           last_name.strip!
           first_name.strip!
@@ -59,7 +57,7 @@ module Seek
       end
       alias_method_chain :authors, :reformat
 
-      attr_accessor :published_date, :citation,:error
+      attr_accessor :published_date, :citation, :error
     end
 
     class Author
@@ -71,15 +69,14 @@ module Seek
       end
 
       def name
-        return self.first_name + " " + self.last_name
+        first_name + ' ' + last_name
       end
 
       alias_method :full_name, :name
 
       def to_s
-        return self.last_name + ", " + self.first_name
+        last_name + ', ' + first_name
       end
     end
-
   end
 end

@@ -10,6 +10,7 @@
 //= require scriptaculous
 //= require controls
 //= require bootstrap
+//= require vue/vue
 //= require collapsible_panels
 //= require redbox
 //= require builder
@@ -62,5 +63,6 @@
 //= require samples
 //= require jstree
 //= require clipboard
+//= require upload_selection
 //= require openbis
 //= require_tree ./templates

@@ -65,7 +65,7 @@
   <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
 
   <% if (action == 'create') || (action == 'edit' && @strain.can_manage?) %>
-      <%= render :seek_partial => "assets/sharing_form", :locals => {:object => @strain} -%>
+      <%= render :seek_partial => "sharing/form", :locals => {:object => @strain} -%>
   <% end %>
 
   <%= f.hidden_field :id %>

@@ -24,10 +24,10 @@ module Seek
           content_length = response.headers[:content_length].try(:to_i)
           file_name = determine_filename_from_disposition(response.headers[:content_disposition])
           code = response.code
-      rescue RestClient::Exception => e
-        code = e.http_code
-      rescue SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
-        code = 404
+        rescue RestClient::Exception => e
+          code = e.http_code
+        rescue SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+          code = 404
         end
 
         file_name ||= determine_filename_from_url(@url)

@@ -27,27 +27,27 @@ module Seek
 
       def handle_bad_http_response(code)
         case code
-          when 401, 403
-            @unauthorized = true
-          when 405
-            @error = true
-            @error_msg = "We can't find out information about this URL - Method not allowed response."
-          when 404
-            @error = true
-            @error_msg = 'Nothing can be found at that URL. Please check the address and try again'
-          else
-            @error = true
-            @error_msg = "We can't find out information about this URL - unhandled response code: #{code}"
+        when 401, 403
+          @unauthorized = true
+        when 405
+          @error = true
+          @error_msg = "We can't find out information about this URL - Method not allowed response."
+        when 404
+          @error = true
+          @error_msg = 'Nothing can be found at that URL. Please check the address and try again'
+        else
+          @error = true
+          @error_msg = "We can't find out information about this URL - unhandled response code: #{code}"
         end
       end
 
       def handle_exception_response(exception)
         case exception
-          when URI::InvalidURIError
-            @error = true
-            @error_msg = 'The URL appears to be invalid'
-          else
-            fail exception
+        when URI::InvalidURIError
+          @error = true
+          @error_msg = 'The URL appears to be invalid'
+        else
+          fail exception
         end
       end
     end

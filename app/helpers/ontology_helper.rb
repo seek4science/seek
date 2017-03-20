@@ -49,8 +49,8 @@ module OntologyHelper
 
   def parameters_for_type(assay, type)
     {
-        label: assay.send("#{type}_label"),
-        uri: assay.send("suggested_#{type}").try(:uri) || assay.send("#{type}_uri")
+      label: assay.send("#{type}_label"),
+      uri: assay.send("suggested_#{type}").try(:uri) || assay.send("#{type}_uri")
     }
   end
 

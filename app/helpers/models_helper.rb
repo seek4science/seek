@@ -28,10 +28,10 @@ module ModelsHelper
 
   def allow_model_comparison(displayed_version_model, other_version_model, user = User.current_user)
     return false if (displayed_version_model.version == other_version_model.version) ||
-        !displayed_version_model.contains_sbml?
+                    !displayed_version_model.contains_sbml?
     parent = displayed_version_model.parent
     return false unless parent.is_a?(Model) && parent.can_download?(user) && other_version_model.contains_sbml?
-    return false unless parent.versions.select { |version| version.contains_sbml? }.count > 1
+    return false unless parent.versions.count(&:contains_sbml?) > 1
     true
   end
 

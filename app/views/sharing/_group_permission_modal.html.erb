@@ -1,0 +1,102 @@
+<%= button_link_to('Share with a project/institution', 'add', '#', id: 'add-project-permission-button') %>
+
+<%= modal(id: 'add-project-permission-modal', size: 'm') do %>
+    <%= modal_header('Share with a project and/or institution') %>
+    <%= modal_body do %>
+        <div class="form-group">
+          <label>Members of...</label>
+          <%= select_tag('permission-project-id', projects_grouped_by_programme, name: nil,
+                         prompt: 'any project', class: 'form-control', autocomplete: 'off') -%>
+        </div>
+        <div class="form-group">
+          <label>working at...</label>
+          <%= select_tag('permission-institution-id',
+                         options_for_select(Institution.all.sort_by(&:title).map { |i| [i.title, i.id] }), name: nil,
+                         prompt: 'any institution', class: 'form-control', autocomplete: 'off') -%>
+        </div>
+        <div class="form-group">
+          <label>can...</label>
+          <%= select_tag('permission-project-access-type', policy_selection_options(nil, object, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
+        </div>
+    <% end %>
+    <%= modal_footer do %>
+        <%= link_to('Add', '#', id: 'permission-project-confirm', class: 'btn btn-primary pull-right', 'data-dismiss' => 'modal') %>
+    <% end %>
+<% end %>
+
+<script>
+
+  // Display project/institution/workgroup modal
+  $j('#add-project-permission-button').click(function () {
+    $j('#add-project-permission-modal').modal('show');
+
+    return false;
+  });
+
+  // Add a project/institution/workgroup permission to the table
+  $j('#permission-project-confirm').click(function () {
+    var projectId = parseInt($j('#permission-project-id').val());
+    var institutionId = parseInt($j('#permission-institution-id').val());
+    var projectTitle = $j('#permission-project-id :selected').text();
+    var institutionTitle = $j('#permission-institution-id :selected').text();
+    var permission = {
+      access_type: parseInt($j('#permission-project-access-type').val())
+    };
+
+    if (projectId) {
+      if (institutionId) {
+        permission.contributor_type = 'WorkGroup';
+        permission.contributor_id = institutionId; // The "institution" select contains the work group ID in this case
+        permission.title = '' + projectTitle + ' @ ' + institutionTitle;
+      } else {
+        permission.contributor_type = 'Project';
+        permission.contributor_id = projectId;
+        permission.title = projectTitle;
+      }
+    } else {
+      if (institutionId) {
+        permission.contributor_type = 'Institution';
+        permission.contributor_id = institutionId;
+        permission.title = institutionTitle;
+      } else {
+        alert('Please select either a project or institution.');
+        return false;
+      }
+    }
+
+    Sharing.addPermission(permission);
+  });
+
+  // Update the institution list when a project is selected
+  $j('#permission-project-id').change(function () {
+    var institutionSelect = $j('#permission-institution-id');
+    var projectId = $j(this).val();
+    institutionSelect.attr('disabled', 'disabled').spinner('add');
+
+    var url;
+    var idIndex;
+    // 0: Name, 1: ID, 2: WorkGroupID
+    if (projectId) {
+      url = Sharing.requestInstitutionsUrl;
+      idIndex = 2;
+    } else {
+      url = Sharing.requestAllInstitutionsUrl;
+      idIndex = 1;
+    }
+
+    $j.ajax(url, {
+          data: { 'id': projectId },
+          success: function (data) {
+            institutionSelect.html('');
+            institutionSelect.html('<option value="">any institution</option>');
+            data.institution_list.forEach(function (i) {
+              institutionSelect.append('<option value="'+i[idIndex]+'">'+i[0]+'</option>');
+            });
+          },
+          complete: function () {
+            institutionSelect.removeAttr('disabled').spinner('remove');
+          }
+        }
+    );
+  });
+</script>

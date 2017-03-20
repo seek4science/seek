@@ -4,14 +4,14 @@ gem 'rails', '3.2.22'
 gem 'rdoc'
 
 #database adaptors
-gem 'mysql2'
+gem 'mysql2','~> 0.3.10'
 gem 'pg'
 gem 'sqlite3'
 
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
-gem 'libxml-ruby', '>=2.6.0', require: 'libxml'
+gem 'libxml-ruby', '~>2.8.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '4.2.9'
 gem 'simple-spreadsheet-extractor', '~>0.15.2'
@@ -31,6 +31,7 @@ gem 'daemons'
 gem 'cancan'
 gem 'in_place_editing'
 gem 'linkeddata'
+gem 'openseek-api'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
@@ -56,6 +57,7 @@ gem 'lograge'
 gem 'psych'
 gem 'transaction_isolation'
 gem 'validate_url'
+gem "attr_encrypted", "~> 3.0.0"
 
 # gem for BiVeS and BudHat
 gem 'bives'
@@ -76,13 +78,12 @@ gem 'bioportal', '>=2.3', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'acts_as_activity_logged', git: 'https://github.com/SysMO-DB/acts_as_activity_logged.git'
 gem 'acts_as_trashable', git: 'https://github.com/SysMO-DB/acts_as_trashable.git'
 gem 'app_version', git: 'https://github.com/SysMO-DB/app_version.git'
-gem 'doi_query_tool', git: 'https://github.com/SysMO-DB/doi_query_tool.git'
+gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'convert_office', git: 'https://github.com/SysMO-DB/convert_office.git', ref: '753f2567dbd625bc89071e1150404efbb562e130'
 gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'bb1182f2716a9bf1b5d85e186d8bb7eec436797b'
 gem 'search_biomodel', '2.2.1', git: 'https://github.com/myGrid/search_biomodel.git'
 gem 'my_annotations', git: 'https://github.com/myGrid/annotations.git'
 
-gem 'openseek-api-gem', :git=>"https://github.com/FAIRdom/openseek-api-gem.git"
 
 gem 'taverna-t2flow'
 gem 'taverna-player', git: 'https://github.com/myGrid/taverna-player.git', branch: 'list-inputs', ref: 'b36e19c85b7a58d08a73aa418c0f838442c6dfd3'
@@ -125,6 +126,7 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'
   gem 'rails-assets-typeahead.js', '~> 0.10.5'
   gem 'rails-assets-clipboard', '~> 1.5.12'
+  gem 'rails-assets-vue', '~> 2.1.8'
 end
 
 group :assets do
@@ -159,12 +161,11 @@ group :test do
   gem 'minitest-reporters'
   gem 'coveralls', require: false
   gem 'sunspot_matchers'
-  gem 'magic_lamp'
   gem 'database_cleaner'
 end
 
 group :test, :development do
-  gem 'selenium-webdriver'
+  gem 'magic_lamp'
   gem 'webmock'
   gem 'teaspoon'
   gem 'teaspoon-mocha'

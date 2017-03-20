@@ -9,8 +9,8 @@ module Seek
       end
 
       def contains_publishable_items?
-        items = [:studies,:study,:assays,:investigation,:assets].collect do |accessor|
-          self.send(accessor) if self.respond_to?(accessor)
+        items = [:studies, :study, :assays, :investigation, :assets].collect do |accessor|
+          send(accessor) if self.respond_to?(accessor)
         end.flatten
         items.uniq.compact.detect(&:can_publish?).present?
       end
@@ -30,15 +30,14 @@ module Seek
         end
       end
 
-      def publish!(comment = nil, force=false)
-        if (force || can_publish?)
+      def publish!(comment = nil, force = false)
+        if force || can_publish?
           if gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
             false
           else
             policy.access_type = Policy::ACCESSIBLE
-            policy.sharing_scope = Policy::EVERYONE
             policy.save
-            # FIXME:may need to add comment
+            # FIXME: may need to add comment
             resource_publish_logs.create(publish_state: ResourcePublishLog::PUBLISHED,
                                          user: User.current_user,
                                          comment: comment)
@@ -101,19 +100,19 @@ module Seek
         is_downloadable?
       end
 
-      #the last ResourcePublishingLog made
+      # the last ResourcePublishingLog made
       def last_publishing_log
-        ResourcePublishLog.last(conditions: ['resource_type=? and resource_id=?', self.class.name, self.id])
+        ResourcePublishLog.last(conditions: ['resource_type=? and resource_id=?', self.class.name, id])
       end
 
       # while item is waiting for publishing approval,set the policy of the item to:
-      # new item: sysmo_and_project_policy
+      # new item: projects_policy
       # updated item: keep the policy as before
       def temporary_policy_while_waiting_for_publishing_approval
         return true unless authorization_checks_enabled
-        if policy.sharing_scope == Policy::EVERYONE && !self.is_a?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
+        if policy.public? && !self.is_a?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
           if self.new_record?
-            self.policy = Policy.sysmo_and_projects_policy projects
+            self.policy = Policy.projects_policy(projects)
           else
             self.policy = Policy.find_by_id(policy.id)
           end

@@ -10,12 +10,12 @@
     padding-left:1em;
 }
 
-.openbis-card + .registered  {
+#openbis-dataset-cards  .openbis-card.registered  {
     opacity: 0.65;
     display:none;
 }
 
-.openbis-card + .registered .openbis-card-heading {
+#openbis-dataset-cards .openbis-card.registered .openbis-card-heading {
     background-color: rgba(221, 12, 20, 0.26);
     border-bottom: 1px solid #ccc;
 }

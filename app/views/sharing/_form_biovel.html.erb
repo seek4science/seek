@@ -1,0 +1,6 @@
+<%
+  object ||= resource_for_controller
+  policy ||= (object.policy || Policy.default)
+%>
+<% # TODO: Implement the biovel special sharing form settings %>
+<%= render partial: 'sharing/form', locals: { object: object, policy: policy } %>

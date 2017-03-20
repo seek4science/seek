@@ -69,20 +69,18 @@ module MenuHelper
     sections ||= []
     selected_section = current_second_level_section sections
     sections.collect do |section|
-      unless section[:hide]
+      next if section[:hide]
+      title = section[:title]
+      title ||= c.capitalize
 
-        title = section[:title]
-        title ||= c.capitalize
+      options = section[:options] || {}
+      options[:class] = 'curved'
+      link = link_to title, determine_path(section), options
+      classes = 'curved'
+      classes << ' selected_menu' if section == selected_section
+      attributes = "class='#{classes}'"
 
-        options = section[:options] || {}
-        options[:class] = 'curved'
-        link = link_to title, determine_path(section), options
-        classes = 'curved'
-        classes << ' selected_menu' if section == selected_section
-        attributes = "class='#{classes}'"
-
-        "<li #{attributes}>#{link}</li>"
-      end
+      "<li #{attributes}>#{link}</li>"
     end.join('').html_safe
   end
 

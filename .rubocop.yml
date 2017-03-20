@@ -1,2 +1,6 @@
+AllCops:
+  Exclude:
+    - test/unit/assay_test.rb
+
 Metrics/LineLength:
   Max: 120

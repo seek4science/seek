@@ -28,6 +28,13 @@ class Publication < ActiveRecord::Base
            :as => :other_object,
            :dependent => :destroy
 
+  VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
+  VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
+  # Note that the PubMed regex deliberately does not allow versions
+  
+  validates :doi, format: { with: VALID_DOI_REGEX , message: "is invalid"}, :allow_blank => true
+  validates :pubmed_id, :numericality => {:greater_than => 0, message: "is invalid"}, :allow_blank => true
+ 
   #validation differences between OpenSEEK and the VLN SEEK
   validates_uniqueness_of :pubmed_id , :allow_nil => true, :allow_blank => true, :if => "Seek::Config.is_virtualliver"
   validates_uniqueness_of :doi ,:allow_nil => true, :allow_blank => true, :if => "Seek::Config.is_virtualliver"
@@ -81,7 +88,7 @@ class Publication < ActiveRecord::Base
   end
 
   def default_policy
-    policy = Policy.new(:name => "publication_policy", :sharing_scope => Policy::EVERYONE, :access_type => Policy::VISIBLE)
+    policy = Policy.new(:name => "publication_policy", :access_type => Policy::VISIBLE)
     #add managers (authors + contributor)
     creators.each do |author|
       policy.permissions << Permissions.create(:contributor => author, :policy => policy, :access_type => Policy::MANAGING)
@@ -129,7 +136,7 @@ class Publication < ActiveRecord::Base
     self.citation = reference.citation
   end
 
-  # @param doi_record DoiRecord
+  # @param doi_record DOI::Record
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
     self.title = doi_record.title

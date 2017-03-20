@@ -176,47 +176,38 @@ end
 # Policy
 Factory.define(:policy, class: Policy) do |f|
   f.name 'test policy'
-  f.sharing_scope Policy::PRIVATE
   f.access_type Policy::NO_ACCESS
 end
 
 Factory.define(:private_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::PRIVATE
   f.access_type Policy::NO_ACCESS
 end
 
 Factory.define(:public_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::EVERYONE
   f.access_type Policy::MANAGING
 end
 
 Factory.define(:all_sysmo_viewable_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::ALL_USERS
   f.access_type Policy::VISIBLE
 end
 
 Factory.define(:all_sysmo_downloadable_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::ALL_USERS
   f.access_type Policy::ACCESSIBLE
 end
 
 Factory.define(:publicly_viewable_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::EVERYONE
   f.access_type Policy::VISIBLE
 end
 
 Factory.define(:public_download_and_no_custom_sharing, parent: :policy) do |f|
-  f.sharing_scope Policy::ALL_USERS
   f.access_type Policy::ACCESSIBLE
 end
 
 Factory.define(:editing_public_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::EVERYONE
   f.access_type Policy::EDITING
 end
 
 Factory.define(:downloadable_public_policy, parent: :policy) do |f|
-  f.sharing_scope Policy::EVERYONE
   f.access_type Policy::ACCESSIBLE
 end
 

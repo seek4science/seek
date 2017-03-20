@@ -1,20 +1,19 @@
-require "test_helper"
+require 'test_helper'
 
 class RenderersTest < ActiveSupport::TestCase
-
   test 'factory' do
     cb = Factory(:content_blob)
     cb.url = 'http://bbc.co.uk'
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
-    assert_equal Seek::Renderers::BlankRenderer,render.class
+    assert_equal Seek::Renderers::BlankRenderer, render.class
 
     cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
-    assert_equal Seek::Renderers::SlideshareRenderer,render.class
+    assert_equal Seek::Renderers::SlideshareRenderer, render.class
   end
 
   test 'blank renderer' do
-    assert_equal '',Seek::Renderers::BlankRenderer.new.render
+    assert_equal '', Seek::Renderers::BlankRenderer.new.render
   end
 
   test 'slideshare_renderer' do
@@ -51,13 +50,12 @@ class RenderersTest < ActiveSupport::TestCase
     cb.url = 'ftp://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
     refute Seek::Renderers::SlideshareRenderer.new(cb).can_render?
 
-
     cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
 
     slideshare_api_url = "http://www.slideshare.net/api/oembed/2?url=#{cb.url}&format=json"
     mock_remote_file("#{Rails.root}/test/fixtures/files/slideshare.json",
                      slideshare_api_url,
-                     {'Content-Type' => 'application/json'})
+                     'Content-Type' => 'application/json')
 
     renderer = Seek::Renderers::SlideshareRenderer.new(cb)
     assert renderer.can_render?
@@ -68,7 +66,7 @@ class RenderersTest < ActiveSupport::TestCase
     assert html =~ /iframe/
 
     renderer = Seek::Renderers::SlideshareRenderer.new(nil)
-    assert_equal '',renderer.render
+    assert_equal '', renderer.render
   end
 
   test 'youtube renderer' do
@@ -120,7 +118,7 @@ class RenderersTest < ActiveSupport::TestCase
       stub_request(:head, url).to_timeout
       cb = Factory(:content_blob, url: url)
       assert_equal "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/1234abcd\" frameborder=\"0\" allowfullscreen></iframe>",
-        Seek::Renderers::YoutubeRenderer.new(cb).render
+                   Seek::Renderers::YoutubeRenderer.new(cb).render
     end
 
     html = renderer.render
@@ -128,7 +126,6 @@ class RenderersTest < ActiveSupport::TestCase
     assert html =~ /iframe/
 
     renderer = Seek::Renderers::YoutubeRenderer.new(nil)
-    assert_equal '',renderer.render
+    assert_equal '', renderer.render
   end
-
 end

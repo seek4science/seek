@@ -4,7 +4,7 @@ module Seek
 
     included do
       # Validate orcid is present only on create, and only if config says so
-      validates :orcid, presence: true, on: :create, if: Proc.new { |person| person.needs_orcid? }
+      validates :orcid, presence: true, on: :create, if: proc { |person| person.needs_orcid? }
       # If the orcid is there, validate its format
       validates :orcid, orcid: true, allow_blank: true
       # Store in full "http://orcid.org/..." format

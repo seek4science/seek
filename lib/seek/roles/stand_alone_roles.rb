@@ -1,6 +1,6 @@
 module Seek
   module Roles
-    ADMIN='admin'
+    ADMIN = 'admin'
     # Roles that stand alone, and are not linked to anything, for example Project or Programme
     class StandAloneRoles < Seek::Roles::Roles
       class InvalidCheckException < Exception; end

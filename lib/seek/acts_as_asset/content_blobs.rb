@@ -4,14 +4,14 @@ module Seek
     module ContentBlobs
       module InstanceMethods
         def contains_downloadable_items?
-          all_content_blobs.compact.any? { |blob| blob.is_downloadable? }
+          all_content_blobs.compact.any?(&:is_downloadable?)
         end
 
         def all_content_blobs
           if self.respond_to?(:content_blobs)
-            self.content_blobs
+            content_blobs
           elsif self.respond_to?(:content_blob)
-            [self.content_blob]
+            [content_blob]
           else
             []
           end
@@ -23,9 +23,7 @@ module Seek
 
         # the search terms coming from the content-blob(s)
         def content_blob_search_terms
-          all_content_blobs.map do |blob|
-            blob.search_terms
-          end.flatten.compact.uniq
+          all_content_blobs.map(&:search_terms).flatten.compact.uniq
         end
 
         def cache_remote_content_blob
@@ -38,7 +36,7 @@ module Seek
                 resource_type         = self.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
                 data_hash             = downloader.get_remote_data blob.url, p.site_username, p.site_password, resource_type
                 blob.tmp_io_object = File.open data_hash[:data_tmp_path], 'r'
-                blob.content_type     = data_hash[:content_type]
+                blob.content_type = data_hash[:content_type]
                 blob.original_filename = data_hash[:filename]
                 blob.save!
               rescue => e

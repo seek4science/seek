@@ -1,6 +1,7 @@
 module TavernaPlayer
   class RunsController < TavernaPlayer::ApplicationController
     include TavernaPlayer::Concerns::Controllers::RunsController
+    include Seek::AssetsStandardControllerActions
 
     before_filter :workflows_enabled?
 
@@ -17,11 +18,7 @@ module TavernaPlayer
     def update
       @run.update_attributes(params[:run])
 
-      if params[:sharing]
-        @run.policy_or_default
-        @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
-        @run.save
-      end
+      update_sharing_policies @run, params
 
       respond_with(@run)
     end
@@ -35,7 +32,7 @@ module TavernaPlayer
       auth_workflow
       # Manually add projects of current user, as they aren't prompted for this information in the form
       @run.projects = @run.contributor.person.projects
-      @run.policy.set_attributes_with_sharing params[:sharing], @run.projects
+      @run.policy.set_attributes_with_sharing(params[:policy_attributes])
 
       if @run.save
         flash[:notice] = "Run was successfully created."

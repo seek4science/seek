@@ -11,10 +11,10 @@ module Seek
       end
 
       def simulate
-        wrap_service('JWS online', model_path(@model, :version => @display_model.version)) do
+        wrap_service('JWS online', model_path(@model, version: @display_model.version)) do
           slug = upload_model_blob(select_jws_content_blob)
           @simulate_url = model_simulate_url_from_slug(slug)
-          @no_sidebar=true
+          @no_sidebar = true
         end
       end
 

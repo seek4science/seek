@@ -1,34 +1,32 @@
 module Seek
   module Stats
     class ActivityStats
+      # the time periods to be tested
+      PERIODS = { 'daily' => 1.day.ago, 'weekly' => 1.week.ago, 'monthly' => 1.month.ago, 'six_monthly' => 6.month.ago, 'yearly' => 1.year.ago }
 
-      #the time periods to be tested
-      PERIODS={"daily"=>1.day.ago,"weekly"=>1.week.ago,"monthly"=>1.month.ago,"six_monthly"=>6.month.ago,"yearly"=>1.year.ago}
-
-      #the item types to include
-      INCLUDED_TYPES=["Sop","Model","Publication","DataFile","Assay","Study","Investigation","Presentation"]
+      # the item types to include
+      INCLUDED_TYPES = %w(Sop Model Publication DataFile Assay Study Investigation Presentation)
 
       def initialize
         create_attributes
 
-        logs = ActivityLog.where(["(action = ? or action = ?)","create","download"])
+        logs = ActivityLog.where(['(action = ? or action = ?)', 'create', 'download'])
         logs.each do |log|
           next unless INCLUDED_TYPES.include?(log.activity_loggable_type)
-          action=""
+          action = ''
           case log.action
-            when "create"
-              action="created"
-            when "download"
-              action="downloaded"
+          when 'create'
+            action = 'created'
+          when 'download'
+            action = 'downloaded'
           end
 
           PERIODS.keys.each do |period_key|
             if log.created_at > PERIODS[period_key]
-              attribute="@#{period_key}_#{log.activity_loggable_type.downcase.pluralize}_#{action}"
+              attribute = "@#{period_key}_#{log.activity_loggable_type.downcase.pluralize}_#{action}"
               eval("#{attribute} += 1")
             end
           end
-
         end
       end
 
@@ -59,10 +57,10 @@ module Seek
       private
 
       def create_attributes
-        ["created","downloaded"].each do |action|
+        %w(created downloaded).each do |action|
           PERIODS.keys.each do |period|
             INCLUDED_TYPES.each do |type|
-              attribute="#{period}_#{type.downcase.pluralize}_#{action}"
+              attribute = "#{period}_#{type.downcase.pluralize}_#{action}"
               self.class.class_eval { attr_accessor attribute.intern }
               instance_variable_set "@#{attribute}".intern, 0
             end
@@ -70,10 +68,9 @@ module Seek
         end
       end
 
-      def distinct_culprits_since time=500.years.ago
-        ActivityLog.where(["created_at > ?",time]).select("distinct culprit_id").count
+      def distinct_culprits_since(time = 500.years.ago)
+        ActivityLog.where(['created_at > ?', time]).select('distinct culprit_id').count
       end
-
     end
   end
 end

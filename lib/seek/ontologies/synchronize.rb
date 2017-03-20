@@ -118,7 +118,7 @@ module Seek
         end
 
         # remove_suggested
-        Hash[ hash.map do |key, value|
+        Hash[hash.map do |key, value|
           [key, value.uri.to_s]
         end]
       end

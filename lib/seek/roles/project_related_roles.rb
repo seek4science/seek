@@ -1,12 +1,12 @@
 module Seek
   module Roles
-    PAL='pal'
-    PROJECT_ADMINISTRATOR='project_administrator'
-    ASSET_HOUSEKEEPER='asset_housekeeper'
-    ASSET_GATEKEEPER='asset_gatekeeper'
+    PAL = 'pal'
+    PROJECT_ADMINISTRATOR = 'project_administrator'
+    ASSET_HOUSEKEEPER = 'asset_housekeeper'
+    ASSET_GATEKEEPER = 'asset_gatekeeper'
     class ProjectRelatedRoles < RelatedRoles
       def self.role_names
-        [Seek::Roles::PAL,Seek::Roles::PROJECT_ADMINISTRATOR,Seek::Roles::ASSET_HOUSEKEEPER,Seek::Roles::ASSET_GATEKEEPER]
+        [Seek::Roles::PAL, Seek::Roles::PROJECT_ADMINISTRATOR, Seek::Roles::ASSET_HOUSEKEEPER, Seek::Roles::ASSET_GATEKEEPER]
       end
 
       def projects_for_person_with_role(person, role)
@@ -81,19 +81,19 @@ module Seek
         end
 
         def is_pal?(project)
-          check_for_role Seek::Roles::PAL,project
+          check_for_role Seek::Roles::PAL, project
         end
 
         def is_project_administrator?(project)
-          check_for_role Seek::Roles::PROJECT_ADMINISTRATOR,project
+          check_for_role Seek::Roles::PROJECT_ADMINISTRATOR, project
         end
 
         def is_asset_housekeeper?(project)
-          check_for_role Seek::Roles::ASSET_HOUSEKEEPER,project
+          check_for_role Seek::Roles::ASSET_HOUSEKEEPER, project
         end
 
         def is_asset_gatekeeper?(project)
-          check_for_role Seek::Roles::ASSET_GATEKEEPER,project
+          check_for_role Seek::Roles::ASSET_GATEKEEPER, project
         end
 
         def is_pal=(flag_and_items)
@@ -140,7 +140,7 @@ module Seek
         # called as callback after save, to make sure the role project records are aligned with the current projects, deleting
         # any for projects that have been removed, and resolving the mask
         def resolve_admin_defined_role_projects
-          projects =  Seek::Config.project_hierarchy_enabled ? projects_and_descendants : self.projects
+          projects = Seek::Config.project_hierarchy_enabled ? projects_and_descendants : self.projects
 
           admin_defined_role_projects.each do |role|
             role.destroy unless projects.include?(role.project)

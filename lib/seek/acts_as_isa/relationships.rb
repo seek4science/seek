@@ -35,12 +35,12 @@ module Seek
         # the child elements depending on the current type, for example for Investigation is would be studies
         def child_isa
           case self
-            when Investigation
-              studies
-            when Study
-              assays
-            else
-              []
+          when Investigation
+            studies
+          when Study
+            assays
+          else
+            []
           end
         end
       end

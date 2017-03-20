@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20170215145129) do
+ActiveRecord::Schema.define(:version => 20170309145516) do
 
   create_table "activity_logs", :force => true do |t|
     t.string   "action"
@@ -943,13 +943,15 @@ ActiveRecord::Schema.define(:version => 20170215145129) do
     t.string   "as_endpoint"
     t.string   "space_perm_id"
     t.string   "username"
-    t.string   "password"
     t.integer  "project_id"
-    t.datetime "created_at",                           :null => false
-    t.datetime "updated_at",                           :null => false
+    t.datetime "created_at",                             :null => false
+    t.datetime "updated_at",                             :null => false
     t.string   "dss_endpoint"
     t.string   "web_endpoint"
-    t.integer  "refresh_period_mins", :default => 120
+    t.integer  "refresh_period_mins",   :default => 120
+    t.integer  "policy_id"
+    t.string   "encrypted_password"
+    t.string   "encrypted_password_iv"
   end
 
   create_table "organisms", :force => true do |t|

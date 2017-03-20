@@ -9,42 +9,59 @@
         end -%>";
 
     function previewPermissions() {
-      if(permissionPopupSetting === 'always' ||
-         permissionPopupSetting === 'on_change' && permissionsChanged) {
-        $j('#permissions_spinner').show();
-        $j.ajax({
-            type: "POST",
-            url: '<%= url -%>',
-            data: {
-                sharing_scope: selectedSharingScope(),
-                access_type: selectedAccessType(selectedSharingScope()),
-                project_ids: getProjectIds('<%= resource_name -%>'), // Controller expects this to be a string containing IDs separated by a comma
-                project_access_type: $j('#sharing_your_proj_access_type').val(),
-                contributor_types: $j('#sharing_permissions_contributor_types').val(),
-                contributor_values: $j('#sharing_permissions_values').val(),
-                creators: getCreators(),
+        if (permissionPopupSetting === 'always' ||
+            permissionPopupSetting === 'on_change' && Sharing.permissionsChanged()) {
+            var project_ids;
+            var resource_name = '<%= resource_name -%>';
+            //in case of study, return the id of investigation, then from the server side, the project_ids are retrieved
+            if (resource_name == 'study') {
+                project_ids = $F('study_investigation_id');
+            }
+            //in case of assay, return the id of study, then from the server side, the project_ids are retrieved
+            else if (resource_name == 'assay') {
+                project_ids = $F('assay_study_id');
+            }
+            else {
+                project_ids = Sharing.projectsSelector.selected.map(function (x) {
+                    return x.id
+                }).join(',');
+            }
+
+            $j('#permissions_spinner').show();
+
+            var data = {
+                project_ids: project_ids, // Controller expects this to be a string containing IDs separated by a comma
+                creators: $j('#creators').val(),
                 contributor_id: '<%= contributor_id -%>',
                 resource_name: '<%= resource_name -%>',
                 resource_id: '<%= resource_id -%>',
                 is_new_file: '<%= is_new_file -%>',
                 authenticity_token: $j('meta[name=csrf-token]').attr('content') // is this necessary?
-            },
-            success: function (result) {
-                $j('#permissions-preview-wrapper').html(result);
-                $j('#preview_permissions').modal('show');
-            },
-            error: function () {
-                alert('Sorry, an error has occurred.');
-            },
-            complete: function () {
-                $j('#permissions_spinner').hide();
-            }
-        });
-        return false;
-      } else {
-        createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')
-        return false;
-      }
+            };
+
+            // Take the fields from the permissions table and serialize them along with the above hash
+            data = $j('#permissions-table :input').serialize() + '&' + $j.param(data);
+
+            $j.ajax({
+                type: "POST",
+                url: '<%= url -%>',
+                data: data,
+                success: function (result) {
+                    $j('#permissions-preview-wrapper').html(result);
+                    $j('#preview_permissions').modal('show');
+                },
+                error: function () {
+                    alert('Sorry, an error has occurred.');
+                },
+                complete: function () {
+                    $j('#permissions_spinner').hide();
+                }
+            });
+            return false;
+        } else {
+            createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')
+            return false;
+        }
     }
 </script>
 

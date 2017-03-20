@@ -1,6 +1,5 @@
 module Seek
   class SampleGraphGenerator
-
     def initialize(sample)
       @sample = sample
     end
@@ -48,6 +47,5 @@ module Seek
 
       hash
     end
-
   end
 end

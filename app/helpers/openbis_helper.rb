@@ -15,4 +15,13 @@ module OpenbisHelper
         end
     end
   end
+
+  def openbis_datafile_dataset(data_file)
+    dataset = data_file.content_blob.openbis_dataset
+    if dataset.error_occurred?
+      render partial: 'data_files/openbis/dataset_error'
+    else
+      render partial: 'data_files/openbis/dataset', locals: { dataset: dataset, data_file: data_file }
+    end
+  end
 end

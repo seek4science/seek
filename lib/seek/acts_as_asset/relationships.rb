@@ -12,11 +12,11 @@ module Seek
         end
 
         def attributions_objects
-          attributions.map { |a| a.other_object }
+          attributions.map(&:other_object)
         end
 
         def publications
-          relationships.select { |a| a.other_object_type == 'Publication' }.map { |a| a.other_object }
+          relationships.select { |a| a.other_object_type == 'Publication' }.map(&:other_object)
         end
       end
 

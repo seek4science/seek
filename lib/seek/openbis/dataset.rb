@@ -47,7 +47,7 @@ module Seek
         'DataSet'
       end
 
-      def download(dest_folder, zip_path)
+      def download(dest_folder, zip_path, root_folder)
         Rails.logger.info("Downloading folders for #{perm_id} to #{dest_folder}")
         datastore_server_download_instance.download(downloadType: 'dataset', permID: perm_id, source: '', dest: dest_folder)
 
@@ -59,9 +59,9 @@ module Seek
         Rails.logger.info("Creating zip file #{zip_path}")
         Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
           Dir.glob("#{dest_folder}/**/*").reject { |f| File.directory?(f) }.each do |path|
-            file_path = Pathname(path).relative_path_from(Pathname(dest_folder)).to_s
-            Rails.logger.info("Adding #{path} as #{file_path} to zip file #{zip_path}")
-            zipfile.add(file_path, path)
+            file_path_in_zip = File.join(root_folder,Pathname(path).relative_path_from(Pathname(dest_folder)).to_s)
+            Rails.logger.info("Adding #{path} as #{file_path_in_zip} to zip file #{zip_path}")
+            zipfile.add(file_path_in_zip, path)
           end
         end
         Rails.logger.info("Zip file #{zip_path} created")

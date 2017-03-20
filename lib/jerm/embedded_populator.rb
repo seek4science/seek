@@ -91,7 +91,6 @@ module Jerm
     
     def sysmo_policy
       Policy.new(:name=>'auto',
-                :sharing_scope=>Policy::ALL_USERS,
                 :access_type=>Policy::ACCESSIBLE,
                 :use_whitelist=>false,
                 :use_blacklist=>false)      
@@ -99,7 +98,6 @@ module Jerm
     
     def project_policy project
       policy=Policy.new(:name=>'auto',
-                :sharing_scope=>Policy::ALL_USERS,
                 :access_type=>Policy::VISIBLE,
                 :use_whitelist=>false,
                 :use_blacklist=>false) 

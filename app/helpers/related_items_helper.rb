@@ -26,11 +26,10 @@ module RelatedItemsHelper
 
   def limit_items(resource_hash, limit)
     resource_hash.each_value do |res|
-      if limit && res[:items].size > limit
-        res[:extra_count] = res[:items].size - limit
-        res[:extra_items] = res[:items][limit...(res[:items].size)]
-        res[:items] = res[:items][0...limit]
-      end
+      next unless limit && res[:items].size > limit
+      res[:extra_count] = res[:items].size - limit
+      res[:extra_items] = res[:items][limit...(res[:items].size)]
+      res[:items] = res[:items][0...limit]
     end
   end
 
@@ -49,7 +48,7 @@ module RelatedItemsHelper
     resource_type[:visible_resource_type] = internationalized_resource_name(resource_type[:type], !resource_type[:is_external])
     resource_type[:tab_title] = resource_type_tab_title(resource_type)
 
-    resource_type[:tab_id] = resource_type[:type].downcase.pluralize.gsub(' ', '-').html_safe
+    resource_type[:tab_id] = resource_type[:type].downcase.pluralize.tr(' ', '-').html_safe
     resource_type[:title_class] = resource_type[:is_external] ? 'external_result' : ''
     resource_type[:total_visible] = resource_type_total_visible_count(resource_type)
   end
@@ -117,8 +116,8 @@ module RelatedItemsHelper
     elsif resource.respond_to? "related_#{method_name.singularize}"
       Array(resource.send("related_#{method_name.singularize}"))
     elsif resource.respond_to? method_name
-        resource.send method_name
-    elsif item_type!='Person' && resource.respond_to?(method_name.singularize) #check is to avoid Person.person
+      resource.send method_name
+    elsif item_type != 'Person' && resource.respond_to?(method_name.singularize) # check is to avoid Person.person
       Array(resource.send(method_name.singularize))
     else
       []
@@ -135,30 +134,29 @@ module RelatedItemsHelper
     related.each do |key, res|
       res[:items].uniq!
       res[:items].compact!
-      unless res[:items].empty?
-        total_count = res[:items].size
-        if key == 'Project' || key == 'Institution'
-          res[:hidden_count] = 0
-        elsif key == 'Person'
-          if Seek::Config.is_virtualliver && User.current_user.nil?
-            res[:items] = []
-            res[:hidden_count] = total_count
-          else
-            res[:hidden_count] = 0
-          end
+      next if res[:items].empty?
+      total_count = res[:items].size
+      if key == 'Project' || key == 'Institution'
+        res[:hidden_count] = 0
+      elsif key == 'Person'
+        if Seek::Config.is_virtualliver && User.current_user.nil?
+          res[:items] = []
+          res[:hidden_count] = total_count
         else
-          total = res[:items]
-          res[:items] = key.constantize.authorize_asset_collection res[:items], 'view', User.current_user
-          res[:hidden_count] = total_count - res[:items].size
-          res[:hidden_items] = total - res[:items]
+          res[:hidden_count] = 0
         end
+      else
+        total = res[:items]
+        res[:items] = key.constantize.authorize_asset_collection res[:items], 'view', User.current_user
+        res[:hidden_count] = total_count - res[:items].size
+        res[:hidden_items] = total - res[:items]
       end
     end
   end
 
   def collect_related_items(resource)
     related = relatable_types
-    related.delete('Person') if resource.class=='Person' #to avoid the same person showing up
+    related.delete('Person') if resource.class == 'Person' # to avoid the same person showing up
 
     related.each_key do |type|
       related[type][:items] = related_items_method(resource, type)

@@ -19,10 +19,10 @@ class ConfigTest < ActiveSupport::TestCase
     end
   end
 
-  test "read setting attributes" do
+  test 'read setting attributes' do
     attributes = Seek::Config.read_setting_attributes
     refute attributes.empty?
-    assert_include attributes,:events_enabled
+    assert_include attributes, :events_enabled
   end
 
   test 'project_hierarchy_enabled' do
@@ -67,7 +67,6 @@ class ConfigTest < ActiveSupport::TestCase
     with_config_value :external_search_enabled, false do
       assert !Seek::Config.external_search_enabled
     end
-
   end
 
   test 'blacklisted feeds' do
@@ -103,9 +102,7 @@ class ConfigTest < ActiveSupport::TestCase
       assert_equal '/tmp/fish/tmp', Seek::Config.temporary_filestore_path
       assert_equal '/tmp/fish/converted-assets', Seek::Config.converted_filestore_path
       assert_equal '/tmp/fish/rdf', Seek::Config.rdf_filestore_path
-
     end
-
   end
 
   test 'email_enabled' do
@@ -150,11 +147,6 @@ class ConfigTest < ActiveSupport::TestCase
   test 'changing default_associated_projects_access_type integer conversion' do
     Seek::Config.default_associated_projects_access_type = '0'
     assert_equal 0, Seek::Config.default_associated_projects_access_type
-  end
-
-  test 'changing default_consortium_access_type integer conversion' do
-    Seek::Config.default_consortium_access_type = '0'
-    assert_equal 0, Seek::Config.default_consortium_access_type
   end
 
   test 'changing default_all_visitors_access_type integer conversion' do
@@ -233,8 +225,8 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'Consortium', Seek::Config.project_type
   end
   test 'project_link' do
-  assert_equal 'http://www.sysmo.net', Seek::Config.project_link
-end
+    assert_equal 'http://www.sysmo.net', Seek::Config.project_link
+  end
   test 'project_long_name' do
     assert_equal 'Sysmo Consortium', Seek::Config.project_long_name
   end
@@ -344,18 +336,10 @@ end
     assert_equal Policy::ACCESSIBLE, Seek::Config.default_associated_projects_access_type
   end
 
-  test 'default consortium access permission is visible' do
-    assert_equal Policy::VISIBLE, Seek::Config.default_consortium_access_type
-  end
-
   test 'default all visitors access permission is accessible' do
-    assert_equal Policy::ACCESSIBLE, Seek::Config.default_all_visitors_access_type
-  end
-
-  test 'changing default_consortium_access_type' do
-    Seek::Config.default_consortium_access_type = Policy::NO_ACCESS
-    assert_equal Policy::NO_ACCESS, Seek::Config.default_consortium_access_type
-    assert_equal Policy::NO_ACCESS.class, Seek::Config.default_consortium_access_type.class
+    with_config_value :default_all_visitors_access_type, Policy::ACCESSIBLE do
+      assert_equal Policy::ACCESSIBLE, Seek::Config.default_all_visitors_access_type
+    end
   end
 
   test 'invalid setting accessor' do
@@ -375,20 +359,20 @@ end
   end
 
   test 'doi_prefix, doi_suffix' do
-    assert_equal "10.5072", Seek::Config.doi_prefix
-    assert_equal "Sysmo.SEEK", Seek::Config.doi_suffix
+    assert_equal '10.5072', Seek::Config.doi_prefix
+    assert_equal 'Sysmo.SEEK', Seek::Config.doi_suffix
   end
 
   test 'datacite_url' do
-    assert_equal "https://test.datacite.org/mds/", Seek::Config.datacite_url
+    assert_equal 'https://test.datacite.org/mds/', Seek::Config.datacite_url
   end
 
   test 'datacite_username' do
-    assert_equal "test", Seek::Config.datacite_username
+    assert_equal 'test', Seek::Config.datacite_username
   end
 
   test 'datacite_password' do
-    assert_equal "test", Seek::Config.datacite_password_decrypt
+    assert_equal 'test', Seek::Config.datacite_password_decrypt
   end
 
   test 'time_lock_doi_for' do
@@ -434,11 +418,11 @@ end
   end
 
   test 'zenodo_api_url' do
-    assert_equal "https://sandbox.zenodo.org/api", Seek::Config.zenodo_api_url
+    assert_equal 'https://sandbox.zenodo.org/api', Seek::Config.zenodo_api_url
   end
 
   test 'zenodo_oauth_url' do
-    assert_equal "https://sandbox.zenodo.org/oauth", Seek::Config.zenodo_oauth_url
+    assert_equal 'https://sandbox.zenodo.org/oauth', Seek::Config.zenodo_oauth_url
   end
 
   test 'default_value works for all settings' do
@@ -465,5 +449,16 @@ end
         assert_equal Fixnum, Seek::Config.hard_max_cachable_size.class
       end
     end
+  end
+
+  test 'attr encrypted key' do
+    assert_equal "#{Rails.root}/tmp/testing-filestore/attr_encrypted/key", Seek::Config.attr_encrypted_key_path
+    FileUtils.rm(Seek::Config.attr_encrypted_key_path) if File.exist?(Seek::Config.attr_encrypted_key_path)
+    refute_nil key = Seek::Config.attr_encrypted_key
+    assert File.exist?(Seek::Config.attr_encrypted_key_path)
+    FileUtils.rm(Seek::Config.attr_encrypted_key_path)
+
+    # check it regenerates it different each time
+    refute_equal key, Seek::Config.attr_encrypted_key
   end
 end

@@ -24,10 +24,10 @@ class AdminDefinedRolesExtensionTest < ActiveSupport::TestCase
       assert p.asset_gatekeepers.empty?
     end
 
-    person.is_asset_housekeeper=true,@proj
-    person.is_project_administrator=true,@proj
-    person.is_pal=true,@proj
-    person.is_asset_gatekeeper=true,@proj
+    person.is_asset_housekeeper = true, @proj
+    person.is_project_administrator = true, @proj
+    person.is_pal = true, @proj
+    person.is_asset_gatekeeper = true, @proj
 
     disable_authorization_checks do
       person.save!
@@ -53,9 +53,9 @@ class AdminDefinedRolesExtensionTest < ActiveSupport::TestCase
     end
     person.reload
     assert person.is_admin?
-    
-    person.is_admin=true
-    person.is_asset_housekeeper=true,@proj
+
+    person.is_admin = true
+    person.is_asset_housekeeper = true, @proj
     disable_authorization_checks do
       person.save!
     end

@@ -11,8 +11,8 @@ module Seek
         params[:page] ||= Seek::Config.default_page(controller)
 
         objects = model_class.paginate_after_fetch(objects, page: params[:page],
-                                                   latest_limit: Seek::Config.limit_latest
-        ) unless objects.respond_to?('page_totals')
+                                                            latest_limit: Seek::Config.limit_latest
+                                                  ) unless objects.respond_to?('page_totals')
         instance_variable_set("@#{controller}", objects)
       end
 
@@ -42,4 +42,3 @@ module Seek
     end
   end
 end
-

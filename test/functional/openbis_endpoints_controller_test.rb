@@ -1,6 +1,8 @@
 require 'test_helper'
 require 'openbis_test_helper'
 
+include SharingFormTestHelper
+
 class OpenbisEndpointsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
@@ -36,22 +38,123 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     # other scenerios are covered in the unit tests for can_delete?
   end
 
+  test 'create' do
+    login_as(@project_administrator)
+
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
+
+    assert_difference('OpenbisEndpoint.count') do
+      assert_difference('Delayed::Job.count') do
+        post :create, project_id: @project.id, openbis_endpoint:
+            {
+              as_endpoint: 'http://as.com',
+              dss_endpoint: 'http://dss.com',
+              web_endpoint: 'http://web.com',
+              username: 'fred',
+              password: 'secret',
+              refresh_period_mins: '123',
+              space_perm_id: 'space-id'
+            },
+                      policy_attributes: policy_attributes
+      end
+    end
+    assert assigns(:openbis_endpoint)
+    ep = assigns(:openbis_endpoint)
+    assert_equal 'http://as.com', ep.as_endpoint
+    assert_equal 'http://dss.com', ep.dss_endpoint
+    assert_equal 'http://web.com', ep.web_endpoint
+    assert_equal 'fred', ep.username
+    assert_equal 'secret', ep.password
+    assert_equal 123, ep.refresh_period_mins
+    assert_equal 'space-id', ep.space_perm_id
+
+    assert_equal Policy::ACCESSIBLE, ep.policy.access_type
+    assert_equal 1, ep.policy.permissions.count
+
+    ep.policy.permissions.each do |permission|
+      assert_equal permission.contributor_type, 'Project'
+      assert_equal @project.id, (permission.contributor_id)
+      assert_equal permission.policy_id, ep.policy_id
+      assert_equal permission.access_type, Policy::ACCESSIBLE
+    end
+  end
+
+  test 'update' do
+    login_as(@project_administrator)
+    ep = Factory(:openbis_endpoint, project: @project)
+    refute_equal Policy::ACCESSIBLE, ep.policy.access_type
+    assert_empty ep.policy.permissions
+
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
+
+    put :update, id: ep.id, project_id: @project.id, openbis_endpoint:
+        {
+          as_endpoint: 'http://as.com',
+          dss_endpoint: 'http://dss.com',
+          web_endpoint: 'http://web.com',
+          username: 'fred',
+          password: 'secret',
+          refresh_period_mins: '123',
+          space_perm_id: 'space-id'
+        },
+                 policy_attributes: policy_attributes
+
+    assert assigns(:openbis_endpoint)
+    ep = assigns(:openbis_endpoint)
+    assert_equal 'http://as.com', ep.as_endpoint
+    assert_equal 'http://dss.com', ep.dss_endpoint
+    assert_equal 'http://web.com', ep.web_endpoint
+    assert_equal 'fred', ep.username
+    assert_equal 'secret', ep.password
+    assert_equal 123, ep.refresh_period_mins
+    assert_equal 'space-id', ep.space_perm_id
+
+    assert_equal Policy::ACCESSIBLE, ep.policy.access_type
+    assert_equal 1, ep.policy.permissions.count
+
+    ep.policy.permissions.each do |permission|
+      assert_equal permission.contributor_type, 'Project'
+      assert_equal @project.id, (permission.contributor_id)
+      assert_equal permission.policy_id, ep.policy_id
+      assert_equal permission.access_type, Policy::ACCESSIBLE
+    end
+  end
+
   test 'add dataset' do
     disable_authorization_checks do
       @project.update_attributes(default_license: 'wibble')
     end
-    endpoint = Factory(:openbis_endpoint, project: @project)
+    endpoint = Factory(:openbis_endpoint, project: @project, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: @project)]))
     perm_id = '20160210130454955-23'
     login_as(@project_administrator)
     assert_difference('DataFile.count') do
-      post :add_dataset, id: endpoint.id, project_id: @project.id, dataset_perm_id: perm_id
-      assert_nil flash[:error]
+      assert_difference('ActivityLog.count') do
+        post :add_dataset, id: endpoint.id, project_id: @project.id, dataset_perm_id: perm_id
+        assert_nil flash[:error]
+      end
     end
     data_file = assigns(:data_file)
+    data_file = DataFile.find(data_file)
     assert_redirected_to data_file
     assert_equal '20160210130454955-23', data_file.content_blob.openbis_dataset.perm_id
     assert_equal 'wibble', data_file.license
+
+    refute_equal data_file.policy, endpoint.policy
+    assert_equal endpoint.policy.access_type, data_file.policy.access_type
+    assert_equal 1, data_file.policy.permissions.length
+    permission = data_file.policy.permissions.first
+    assert_equal @project, permission.contributor
+    assert_equal Policy::NO_ACCESS, permission.access_type
+
+    log = ActivityLog.last
+    assert_equal 'create', log.action
+    assert_equal data_file, log.activity_loggable
+    assert_equal @project_administrator.user, log.culprit
+    assert_equal endpoint, log.referenced
   end
+
 
   test 'add dataset permissions' do
     # already tests for project admin in test add dataset

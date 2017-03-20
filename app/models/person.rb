@@ -457,7 +457,6 @@ class Person < ActiveRecord::Base
         projects_in_common = projects & item.projects
         pis = projects_in_common.collect{|p| p.pis}.flatten.uniq
         pis.reject!{|pi| pi.id == id}
-        item.policy_or_default
         policy = item.policy
         unless pis.blank?
           pis.each do |pi|

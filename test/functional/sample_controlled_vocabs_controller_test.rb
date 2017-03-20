@@ -1,9 +1,7 @@
 require 'test_helper'
 
 class SampleControlledVocabsControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
-
 
   test 'show' do
     cv = Factory(:apples_sample_controlled_vocab)
@@ -183,25 +181,22 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     person = Factory(:person)
     cv = Factory(:apples_sample_controlled_vocab)
     login_as(person.user)
-    with_config_value :samples_enabled,false do
-
+    with_config_value :samples_enabled, false do
       get :show, id: cv.id
       assert_redirected_to :root
       refute_nil flash[:error]
 
-      flash[:error]=nil
+      flash[:error] = nil
 
       get :index
       assert_redirected_to :root
       refute_nil flash[:error]
 
-      flash[:error]=nil
+      flash[:error] = nil
 
       get :new
       assert_redirected_to :root
       refute_nil flash[:error]
-
     end
-
   end
 end

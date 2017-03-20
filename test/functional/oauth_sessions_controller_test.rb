@@ -1,10 +1,9 @@
 require 'test_helper'
 
 class OauthSessionsControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
 
-  test "should get empty OAuth sessions lists" do
+  test 'should get empty OAuth sessions lists' do
     user = Factory(:user)
     login_as(user)
 
@@ -24,7 +23,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
     assert_not_empty flash[:error]
   end
 
-  test "should list OAuth sessions" do
+  test 'should list OAuth sessions' do
     oauth_session = Factory(:oauth_session)
     login_as(oauth_session.user)
 
@@ -35,7 +34,7 @@ class OauthSessionsControllerTest < ActionController::TestCase
     assert_includes(assigns(:oauth_sessions), oauth_session)
   end
 
-  test "should delete OAuth session" do
+  test 'should delete OAuth session' do
     oauth_session = Factory(:oauth_session)
     user = oauth_session.user
     login_as(user)
@@ -59,5 +58,4 @@ class OauthSessionsControllerTest < ActionController::TestCase
     assert_redirected_to root_path
     assert_not_empty flash[:error]
   end
-
 end

@@ -10,7 +10,7 @@ function optionsFromArray(array) {
 function nestedOptionsFromJSONArray(array,prompt_option_text) {
     var options = [];
     options.push($j('<option/>').val(0).text(prompt_option_text));
-    
+
     //gather together by parent id
     var parents = {};
     for(var i = 0; i < array.length; i++) {
@@ -29,7 +29,6 @@ function nestedOptionsFromJSONArray(array,prompt_option_text) {
     //build into optgroups, with options clustered according to parent
     for (parent_id in parents) {
         var parent=parents[parent_id];
-        console.log(parent);
         var group = $j('<optgroup/>').attr('label',parent.title);
         for(var i=0;i<parent.children.length;i++) {
             var child=parent.children[i];
@@ -243,12 +242,16 @@ $j(document).ready(function () {
     });
 
     $j('[data-role="seek-association-filter"]').keypress(function (e) {
+        if(e.keyCode == 13) {
+            e.preventDefault();
+        }
+    });
+
+    $j('[data-role="seek-association-filter"]').keyup(function (e) {
         // If more than two characters were entered, or the input was cleared, or the ENTER key was pressed..
         var filterField = this;
         if($j(filterField).val().length == 0 || $j(filterField).val().length >= 2 || e.keyCode == 13) {
             Associations.filter(filterField);
-            if(e.keyCode == 13)
-                e.preventDefault();
         }
     });
 

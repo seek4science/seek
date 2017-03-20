@@ -71,7 +71,7 @@ class DataFile < ActiveRecord::Base
 
   def relationship_type(assay)
     # FIXME: don't like this hardwiring to assay within data file, needs abstracting
-    assay_assets.find_by_assay_id(assay.id).relationship_type
+    assay_assets.find_by_assay_id(assay.id).try(:relationship_type)
   end
 
   def use_mime_type_for_avatar?
@@ -166,12 +166,22 @@ class DataFile < ActiveRecord::Base
   #creates a new DataFile that registers an openBIS dataset
   def self.build_from_openbis(openbis_endpoint,dataset_perm_id)
     dataset = Seek::Openbis::Dataset.new(openbis_endpoint,dataset_perm_id)
-    dataset.create_seek_datafile
+    df=dataset.create_seek_datafile
+    df.policy=openbis_endpoint.policy.deep_copy
+    df
   end
 
   #indicates that this is an openBIS based DataFile
   def openbis?
     content_blob && content_blob.openbis?
+  end
+
+  def openbis_size_download_restricted?
+    openbis? && content_blob.openbis_dataset.size>Seek::Config.openbis_download_limit
+  end
+
+  def download_disabled?
+    super || openbis_size_download_restricted?
   end
 
 end

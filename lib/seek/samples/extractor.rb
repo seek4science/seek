@@ -50,9 +50,7 @@ module Seek
             f.write(Marshal.dump(v))
             v
           end
-        else
-          nil
-        end
+                end
       end
 
       def self.encode(values)

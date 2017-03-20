@@ -1,5 +1,4 @@
 <%
-  dataset = data_file.content_blob.openbis_dataset
   openbis_endpoint = dataset.openbis_endpoint
   file_count=dataset.dataset_file_count
   files_text = "#{file_count} File".pluralize(file_count) + " : #{number_to_human_size(dataset.size)}"
@@ -19,22 +18,25 @@
           <label>Dataset Perm ID: </label> <%= dataset.perm_id %>
         </div>
         <div>
-          <label>Dataset Type: </label> <%= dataset.dataset_type_description %>
+          <label>Dataset Type Code: </label> <%= text_or_not_specified(dataset.dataset_type_code) %>
+        </div>
+        <div>
+          <label>Dataset Type: </label> <%= text_or_not_specified(dataset.dataset_type_description) %>
         </div>
       </div>
       <div class="col-md-5">
         <div>
-          <label>Registration date: </label> <%= date_as_string(dataset.registration_date, true) %>
+          <label>Registration date: </label> <%= text_or_not_specified(date_as_string(dataset.registration_date, true)) %>
         </div>
         <div>
-          <label>Registered by: </label> <%= dataset.registrator %>
+          <label>Registered by: </label> <%= text_or_not_specified(dataset.registrator) %>
         </div>
         <% if dataset.registration_date != dataset.modification_date %>
             <div>
-              <label>Modification date: </label> <%= date_as_string(dataset.modification_date, true) %>
+              <label>Modification date: </label> <%= text_or_not_specified(date_as_string(dataset.modification_date, true)) %>
             </div>
             <div>
-              <label>Modified by: </label> <%= dataset.modifier %>
+              <label>Modified by: </label> <%= text_or_not_specified(dataset.modifier) %>
             </div>
         <% end %>
 

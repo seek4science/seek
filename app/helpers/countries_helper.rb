@@ -1,9 +1,8 @@
 module CountriesHelper
-
   def country_code(country)
-    if country.downcase == "great britain"
-      code = "gb"
-    elsif ["england", "wales", "scotland"].include?(country.downcase)
+    if country.downcase == 'great britain'
+      code = 'gb'
+    elsif %w(england wales scotland).include?(country.downcase)
       code = country
     elsif country.length > 2
       code = CountryCodes.code(country)
@@ -12,5 +11,4 @@ module CountriesHelper
     end
     code
   end
-
 end

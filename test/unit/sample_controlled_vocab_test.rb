@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class SampleControlledVocabTest < ActiveSupport::TestCase
-
-
   test 'association with terms' do
     User.with_current_user(Factory(:project_administrator).user) do
       vocab = SampleControlledVocab.new(title: 'test')
@@ -11,7 +9,6 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
       vocab = SampleControlledVocab.find(vocab.id)
       assert_equal ['fish'], vocab.sample_controlled_vocab_terms.collect(&:label)
     end
-
   end
 
   test 'labels' do
@@ -22,7 +19,6 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
       vocab.save!
       assert_equal %w(fish sprout), vocab.labels.sort
     end
-
   end
 
   test 'validation' do
@@ -62,7 +58,6 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
         end
       end
     end
-
   end
 
   test 'cannot destroy if linked to sample type' do
@@ -81,9 +76,9 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
   test 'can delete?' do
     cv = Factory(:apples_sample_controlled_vocab)
     cv_with_sample_type = Factory(:apples_controlled_vocab_sample_type).sample_attributes.first.sample_controlled_vocab
-    admin=Factory(:admin)
-    proj_admin=Factory(:project_administrator)
-    person=Factory(:person)
+    admin = Factory(:admin)
+    proj_admin = Factory(:project_administrator)
+    person = Factory(:person)
 
     with_config_value :project_admin_sample_type_restriction, false do
       assert cv.can_delete?(admin.user)
@@ -102,7 +97,6 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
       refute cv_with_sample_type.can_delete?(proj_admin.user)
       refute cv_with_sample_type.can_delete?(person.user)
     end
-
   end
 
   test 'can edit' do
@@ -111,7 +105,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     cv = Factory(:apples_sample_controlled_vocab, title: 'for can_edit test')
     with_config_value :project_admin_sample_type_restriction, false do
       assert_empty cv.samples
-      refute cv.can_edit? #nobody logged in
+      refute cv.can_edit? # nobody logged in
       User.with_current_user(person) do
         assert cv.can_edit?
 
@@ -134,7 +128,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
       end
     end
 
-    #need to be a project administrator if restriction configured
+    # need to be a project administrator if restriction configured
     with_config_value :project_admin_sample_type_restriction, true do
       project_admin = Factory(:project_administrator)
       assert_empty cv.samples
@@ -152,9 +146,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
       User.with_current_user(admin.user) do
         assert cv.can_edit?
       end
-
     end
-
   end
 
   test 'can create' do
@@ -165,7 +157,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     with_config_value :project_admin_sample_type_restriction, false do
       User.with_current_user none_admin.user do
         assert SampleControlledVocab.can_create?
-        with_config_value :samples_enabled,false do
+        with_config_value :samples_enabled, false do
           refute SampleControlledVocab.can_create?
         end
       end
@@ -177,18 +169,17 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
       end
       User.with_current_user proj_admin.user do
         assert SampleControlledVocab.can_create?
-        with_config_value :samples_enabled,false do
+        with_config_value :samples_enabled, false do
           refute SampleControlledVocab.can_create?
         end
       end
       User.with_current_user admin.user do
         assert SampleControlledVocab.can_create?
-        with_config_value :samples_enabled,false do
+        with_config_value :samples_enabled, false do
           refute SampleControlledVocab.can_create?
         end
       end
     end
-
   end
 
   test 'trigger regeneration of sample type templates when saved' do
@@ -196,18 +187,18 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     cv = type.sample_attributes.first.sample_controlled_vocab
     refute_nil cv
     refute cv.new_record?
-    assert_equal [type],cv.sample_types
+    assert_equal [type], cv.sample_types
 
     Delayed::Job.destroy_all
 
-    assert_difference("Delayed::Job.count",1) do
+    assert_difference('Delayed::Job.count', 1) do
       cv.sample_controlled_vocab_terms.create(label: 'fsdfsdsdfsdf')
     end
     assert SampleTemplateGeneratorJob.new(type).exists?
 
     Delayed::Job.destroy_all
 
-    assert_difference("Delayed::Job.count",1) do
+    assert_difference('Delayed::Job.count', 1) do
       term = cv.sample_controlled_vocab_terms.last
       cv.sample_controlled_vocab_terms.destroy(term)
     end
@@ -215,16 +206,12 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
 
     Delayed::Job.destroy_all
 
-    #changing the title has no effect
-    assert_no_difference("Delayed::Job.count") do
-      cv.title="new title"
+    # changing the title has no effect
+    assert_no_difference('Delayed::Job.count') do
+      cv.title = 'new title'
       cv.save
     end
 
     refute SampleTemplateGeneratorJob.new(type).exists?
-
-
-
   end
-
 end

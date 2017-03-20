@@ -1,7 +1,7 @@
 module Seek
   module Openbis
     class Entity
-      attr_reader :json, :modifier, :registration_date, :modification_date, :code, :perm_id, :registrator, :openbis_endpoint
+      attr_reader :json, :modifier, :registration_date, :modification_date, :code, :perm_id, :registrator, :openbis_endpoint, :exception
 
       def ==(other)
         perm_id == other.perm_id
@@ -11,11 +11,15 @@ module Seek
         @openbis_endpoint = openbis_endpoint
         fail 'OpenbisEndpoint expected and required' unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
         if perm_id
-          json = query_application_server_by_perm_id(perm_id)
-          unless json[json_key]
-            fail Seek::Openbis::EntityNotFoundException.new("Unable to find #{type_name} with perm id #{perm_id}")
+          begin
+            json = query_application_server_by_perm_id(perm_id)
+            unless json[json_key]
+              fail Seek::Openbis::EntityNotFoundException.new("Unable to find #{type_name} with perm id #{perm_id}")
+            end
+            populate_from_json(json[json_key].first)
+          rescue Fairdom::OpenbisApi::OpenbisQueryException => e
+            @exception = e
           end
-          populate_from_json(json[json_key].first)
         end
       end
 
@@ -74,6 +78,10 @@ module Seek
         dataset_ids.count
       end
 
+      def error_occurred?
+        !exception.nil?
+      end
+
       protected
 
       def json_key
@@ -90,7 +98,7 @@ module Seek
 
       def query_datastore_server_by_dataset_perm_id(perm_id = '')
         cached_query_by_perm_id(perm_id) do
-          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
+          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'DataSetPermID', attributeValue: perm_id)
         end
       end
 

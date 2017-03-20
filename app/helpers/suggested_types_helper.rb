@@ -23,7 +23,7 @@ module SuggestedTypesHelper
   end
 
   def cancel_link
-    if  is_ajax_request?
+    if is_ajax_request?
       link_to_function('Cancel', 'RedBox.close()', class: 'btn btn-default')
     else
       manage_path = eval "manage_#{controller_name}_path"
@@ -58,7 +58,7 @@ module SuggestedTypesHelper
 
   def ontology_class_list_item(clz)
     list_item = show_ontology_class_link(clz)
-    list_item += '* ' if  clz.suggested_type?
+    list_item += '* ' if clz.suggested_type?
     list_item += edit_ontology_class_link(clz) + delete_ontology_class_link(clz) + related_assays_text(clz)
     list_item.html_safe
   end
@@ -73,7 +73,7 @@ module SuggestedTypesHelper
     type = clz.term_type
     fail 'error' if type.nil?
     path = send("#{type}_types_path", uri: clz.uri.try(:to_s), label: label)
-    html_options = clz.suggested_type? ? {style: 'color:green;font-style:italic' } : {}
+    html_options = clz.suggested_type? ? { style: 'color:green;font-style:italic' } : {}
     link_to label, path, html_options
   end
 

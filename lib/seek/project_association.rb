@@ -10,8 +10,10 @@ module Seek
                                            before_add: :react_to_project_addition,
                                            before_remove: :react_to_project_removal
 
-        validates :projects, presence: true, unless: Proc.new { |object| Seek::Config.is_virtualliver ||
-            object.is_a?(Strain) }
+        validates :projects, presence: true, unless: proc { |object|
+          Seek::Config.is_virtualliver ||
+            object.is_a?(Strain)
+        }
 
         def react_to_project_addition(project)
           SetSubscriptionsForItemJob.new(self, [project]).queue_job if !self.new_record? && self.subscribable?

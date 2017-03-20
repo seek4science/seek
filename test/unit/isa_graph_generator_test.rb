@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class IsaGraphGeneratorTest < ActiveSupport::TestCase
-
   test 'investigation with studies and assays' do
     investigation = Factory(:investigation)
     study = Factory(:study, investigation: investigation)
@@ -155,7 +154,4 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
     assert_not_includes result[:nodes].map(&:object), study3
     assert_not_includes result[:nodes].map(&:object), study4
   end
-
-
-
 end

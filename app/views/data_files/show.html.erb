@@ -13,11 +13,11 @@
       <div class="col-md-10">
         <%= persistent_resource_id(@display_data_file) %>
         <% if @data_file.can_download? %>
-          <% if @data_file.openbis? %>
-            <%= render(partial:"data_files/openbis/dataset", locals:{data_file:@data_file}) %>
-          <% else %>
-                <%= render partial:'assets/fileinfo',object:@display_data_file.content_blob -%>
-          <% end %>
+            <% if @data_file.openbis? %>
+                <%= openbis_datafile_dataset(@data_file) %>
+            <% else %>
+                <%= render partial:'assets/fileinfo',object:@display_data_file.content_blob %>
+            <% end %>
         <% end %>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
