@@ -1,4 +1,5 @@
 require 'rest-client'
+require 'http_streamer'
 
 module Seek
   module DownloadHandling
@@ -24,6 +25,20 @@ module Seek
           content_length = response.headers[:content_length].try(:to_i)
           file_name = determine_filename_from_disposition(response.headers[:content_disposition])
           code = response.code
+        rescue RestClient::MethodNotAllowed # Try a GET if HEAD isn't allowed, but don't download anything
+          begin
+            uri = URI.parse(url)
+            Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+              http.request(Net::HTTP::Get.new(uri)) do |response|
+                content_type = response['content-type']
+                content_length = response['content-length'].try(:to_i)
+                file_name = determine_filename_from_disposition(response['content-disposition'])
+                code = response.code.try(:to_i)
+              end
+            end
+          rescue Seek::DownloadHandling::BadResponseCodeException => e
+            code = e.code
+          end
         rescue RestClient::Exception => e
           code = e.http_code
         rescue SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
