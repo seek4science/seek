@@ -1,6 +1,7 @@
 <%
   object ||= resource_for_controller
-  policy ||= (object.policy || Policy.default)
+  policy = object.policy unless defined? policy
+  policy ||= Policy.default
   label ||= 'Sharing'
   resource_type = text_for_resource(object)
   if object.respond_to?(:projects)
