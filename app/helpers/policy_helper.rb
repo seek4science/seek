@@ -162,7 +162,7 @@ module PolicyHelper
     hash = {}
 
     projects.each do |p|
-      hash[p.id] = policy_hash(p.default_policy, [p]) if p.default_policy
+      hash[p.id] = policy_hash(p.default_policy, [p]) if p.use_default_policy
     end
 
     hash.to_json.html_safe

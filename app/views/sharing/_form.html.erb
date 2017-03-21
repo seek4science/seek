@@ -1,19 +1,16 @@
 <%
+  resource_type = text_for_resource(object)
   object ||= resource_for_controller
   policy = object.policy unless defined? policy
   policy ||= Policy.default
-  label ||= 'Sharing'
-  resource_type = text_for_resource(object)
   if object.respond_to?(:projects)
     projects = object.projects
-  elsif object.is_a?(Project)
-    projects = [object]
   else
     projects = []
   end
 %>
 
-<%= folding_panel(label, false, id: 'sharing_form',
+<%= folding_panel('Sharing', false, id: 'sharing_form',
                   help_text: "Here you can specify who can view, access and manage this #{resource_type}.") do %>
     <div class="alert alert-info">
       <% if object.is_a?(Project) %>
@@ -24,31 +21,5 @@
       <% end %>
     </div>
 
-    <div class="table-responsive">
-      <permissions-table class="table table-bordered" id="permissions-table"
-                         :permissions="permissions" :public-permission="publicPermission">
-      </permissions-table>
-    </div>
-
-    <%= render partial: 'sharing/person_permission_modal', locals: { object: object } %>
-    <%= render partial: 'sharing/group_permission_modal', locals: { object: object } %>
+    <%= render partial: 'sharing/permissions_table', locals: { object: object, policy: policy, projects: projects } %>
 <% end %>
-
-<script>
-  var policy = <%= policy_json(policy, projects) -%>;
-
-  <%# A deep copy of the policy that is used in `Sharing.permissionsChanged` to check if it has been modified %>
-  var originalPolicy = $j.extend(true, {}, policy);
-
-  Sharing.permissionsTable = new Vue({
-    el: '#permissions-table',
-    data: {
-      publicPermission: {
-        access_type: policy.access_type, <%# Uses snake case because that's how rails returns the JSON %>
-        title: 'Public',
-        isPublic: true,
-        isMandatory: true },
-      permissions: policy.permissions
-    }
-  });
-</script>
