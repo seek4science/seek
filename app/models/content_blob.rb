@@ -226,7 +226,7 @@ class ContentBlob < ActiveRecord::Base
       @headers
     else
       begin
-        Seek::DownloadHandling::HTTPHandler.new(url).info
+        remote_content_handler.info
       rescue
         {}
       end
