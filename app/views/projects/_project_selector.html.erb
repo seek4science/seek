@@ -72,6 +72,20 @@
         this.possibilities.push(project);
         this.selected.splice(index, 1);
         Sharing.removePermissionForProject(project);
+      },
+      add: function (projectId, skipPrompt) {
+        for (var i = 0; i < this.possibilities.length; i++) {
+          var project = this.possibilities[i];
+          if (project.id == projectId) {
+            this.selected.push(project);
+            if (Sharing.defaultPolicies[project.id] && skipPrompt || confirm('' + project.title + ' has a default policy specified, do you want to apply it?')) {
+              Sharing.applyPolicy(Sharing.defaultPolicies[project.id]);
+            } else {
+              Sharing.addPermissionForProject(project);
+            }
+            this.possibilities.splice(i, 1);
+          }
+        }
       }
     }
   });
@@ -79,20 +93,14 @@
   Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
 
   $j(document).ready(function () {
+    // Auto select project if there is only one
+    if (Sharing.projectsSelector.possibilities.length === 1 &&
+        Sharing.projectsSelector.selected.length === 0) {
+      Sharing.projectsSelector.add(Sharing.projectsSelector.possibilities[0].id, true);
+    }
     $j('#projects-selector-select').change(function () {
       if ($j(this).val()) {
-        for (var i = 0; i < Sharing.projectsSelector.possibilities.length; i++) {
-          var project = Sharing.projectsSelector.possibilities[i];
-          if (project.id == $j(this).val()) {
-            Sharing.projectsSelector.selected.push(project);
-            if (Sharing.defaultPolicies[project.id] && confirm('' + project.title + ' has a default policy specified, do you want to apply it?')) {
-              Sharing.applyPolicy(Sharing.defaultPolicies[project.id]);
-            } else {
-              Sharing.addPermissionForProject(project);
-            }
-            Sharing.projectsSelector.possibilities.splice(i, 1);
-          }
-        }
+        Sharing.projectsSelector.add($j(this).val());
       }
     })
   });
