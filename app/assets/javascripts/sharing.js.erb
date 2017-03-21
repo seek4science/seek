@@ -84,7 +84,7 @@ var Sharing = {
   },
 
   applyPolicy: function (policy) {
-    Sharing.permissionsTable.permissions = policy.permissions;
+    Sharing.permissionsTable.permissions = policy.permissions.slice(); // Copy the permissions rather than just reference
     Sharing.permissionsTable.publicPermission.access_type = policy.access_type;
   }
 };
