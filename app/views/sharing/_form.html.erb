@@ -1,8 +1,8 @@
 <%
-  resource_type = text_for_resource(object)
   object ||= resource_for_controller
   policy = object.policy unless defined? policy
   policy ||= Policy.default
+  resource_type = text_for_resource(object)
   if object.respond_to?(:projects)
     projects = object.projects
   else
