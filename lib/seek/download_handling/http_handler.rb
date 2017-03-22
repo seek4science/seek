@@ -8,8 +8,9 @@ module Seek
 
       attr_reader :url
 
-      def initialize(url)
+      def initialize(url, fallback_to_get: true)
         @url = url
+        @fallback_to_get = fallback_to_get
       end
 
       def info
@@ -25,19 +26,23 @@ module Seek
           content_length = response.headers[:content_length]
           file_name = determine_filename_from_disposition(response.headers[:content_disposition])
           code = response.code
-        rescue RestClient::MethodNotAllowed # Try a GET if HEAD isn't allowed, but don't download anything
-          begin
-            uri = URI.parse(url)
-            Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
-              http.request(Net::HTTP::Get.new(uri)) do |response|
-                content_type = response['content-type']
-                content_length = response['content-length']
-                file_name = determine_filename_from_disposition(response['content-disposition'])
-                code = response.code.try(:to_i)
+        rescue RestClient::MethodNotAllowed => e # Try a GET if HEAD isn't allowed, but don't download anything
+          if @fallback_to_get
+            begin
+              uri = URI.parse(url)
+              Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
+                http.request(Net::HTTP::Get.new(uri)) do |response|
+                  content_type = response['content-type']
+                  content_length = response['content-length']
+                  file_name = determine_filename_from_disposition(response['content-disposition'])
+                  code = response.code.try(:to_i)
+                end
               end
+            rescue Seek::DownloadHandling::BadResponseCodeException => e2
+              code = e2.code
             end
-          rescue Seek::DownloadHandling::BadResponseCodeException => e
-            code = e.code
+          else
+            code = e.http_code
           end
         rescue RestClient::Exception => e
           code = e.http_code
