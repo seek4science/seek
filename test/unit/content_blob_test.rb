@@ -80,9 +80,6 @@ class ContentBlobTest < ActiveSupport::TestCase
       blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: nil
       assert_equal 'image/png', blob.content_type
 
-      blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: 'application/x-download'
-      assert_equal 'image/png', blob.content_type
-
       blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: 'application/pdf'
       assert_equal 'application/pdf', blob.content_type
     end
