@@ -61,15 +61,7 @@ class PublicationsController < ApplicationController
   # GET /publications/1/edit
   def edit
   end
-
-  def index
-    options = {:is_collection=>true, :jsonapi=>{version: "1.0"}, :meta=>{base_url: Seek::Config.site_base_host}
-    respond_to do |format|
-      format.html
-      format.xml
-      format.json {render json: JSONAPI::Serializer.serialize(@publications,options)}
-    end
-  end
+  
   # POST /publications
   # POST /publications.xml
   def create

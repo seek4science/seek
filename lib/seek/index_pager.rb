@@ -15,10 +15,11 @@ module Seek
                                                   ) unless objects.respond_to?('page_totals')
         instance_variable_set("@#{controller}", objects)
       end
-
+      options = {:is_collection=>true, :jsonapi=>{version: "1.0"}, :meta=>{base_url: Seek::Config.site_base_host}}
       respond_to do |format|
         format.html
         format.xml
+        format.json {render json: JSONAPI::Serializer.serialize(objects,options)}
       end
     end
 

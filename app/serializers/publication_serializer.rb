@@ -12,7 +12,7 @@ class PublicationSerializer < BaseSerializer
       ""
     end
   end
-  has_many :associated do
-    associated_resources(object) # ||  { "data": [] }
+  has_many :associated, include_data:true do
+    associated_resources(object)  ||  [] #{ "data": [] }
   end
 end
