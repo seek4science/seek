@@ -22,7 +22,7 @@ module Seek
           else
             content_type = response.headers[:content_type]
           end
-          content_length = response.headers[:content_length].try(:to_i)
+          content_length = response.headers[:content_length]
           file_name = determine_filename_from_disposition(response.headers[:content_disposition])
           code = response.code
         rescue RestClient::MethodNotAllowed # Try a GET if HEAD isn't allowed, but don't download anything
@@ -31,7 +31,7 @@ module Seek
             Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
               http.request(Net::HTTP::Get.new(uri)) do |response|
                 content_type = response['content-type']
-                content_length = response['content-length'].try(:to_i)
+                content_length = response['content-length']
                 file_name = determine_filename_from_disposition(response['content-disposition'])
                 code = response.code.try(:to_i)
               end
@@ -50,7 +50,7 @@ module Seek
 
         {
           code: code,
-          file_size: content_length,
+          file_size: content_length.present? ? content_length.try(:to_i) : nil,
           content_type: content_type,
           file_name: file_name
         }
