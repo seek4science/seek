@@ -312,7 +312,7 @@ class StrainsControllerTest < ActionController::TestCase
 
       assert_response :success
 
-      assert_select 'div.related-items a[href=?]', /#{samples_path}/, text: /Strain sample ./, count: 2
+      assert_select 'div.related-items a[href=?]', /#{samples_path}\/\d+/, text: /Strain sample \d/, count: 2
     end
   end
 end
