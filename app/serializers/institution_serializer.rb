@@ -1,9 +1,10 @@
-class InstitutionSerializer < BaseSerializer
+class InstitutionSerializer < AvatarObjSerializer
   attributes :id, :title,
              :country, :city, :address,
-             :web_page, :avatars
+             :web_page
 
-  has_many :associated do
+
+  has_many :associated, include_data:true do
     associated_resources(object) # ||  { "data": [] }
   end
 end

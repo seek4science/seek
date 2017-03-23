@@ -487,21 +487,21 @@ class Person < ActiveRecord::Base
     self.group_memberships << membership
   end
 
-  def json_api_attrs (options = {})
-    attrs = []
-    attrs += %w(title id first_name last_name description phone email skype_name web_page) # if %i(user admin).include?options[:access_level]
-#    attrs += %w(real_price in_stock) if options[:access_level] == :admin
-    attrs
-  end
-
-  def json_api_relations (options = {})
-     ## TO DO: Why don't data files and other asset types work here? a person can have data files...
-      %w(avatar assays institutions investigations presentations projects studies ) #get_related_resources(self))
-  end
-
-  def json_api_meta (options = {})
-    { uuid: self.uuid, created: self.created_at, modified: self.updated_at }
-  end
+#   def json_api_attrs (options = {})
+#     attrs = []
+#     attrs += %w(title id first_name last_name description phone email skype_name web_page) # if %i(user admin).include?options[:access_level]
+# #    attrs += %w(real_price in_stock) if options[:access_level] == :admin
+#     attrs
+#   end
+#
+#   def json_api_relations (options = {})
+#      ## TO DO: Why don't data files and other asset types work here? a person can have data files...
+#       %w(avatar assays institutions investigations presentations projects studies ) #get_related_resources(self))
+#   end
+#
+#   def json_api_meta (options = {})
+#     { uuid: self.uuid, created: self.created_at, modified: self.updated_at }
+#   end
 
   private
 

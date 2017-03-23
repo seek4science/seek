@@ -64,6 +64,12 @@ module ApiHelper
     xlink
   end
 
+  def avatar_href_link(object)
+    uri = nil
+    uri = "/#{object.class.name.pluralize.underscore}/#{object.id}/avatars/#{object.avatar.id}" unless object.avatar.nil?
+    uri
+  end
+
   # requires a slightly different handling to core_xlink because the route is nested
   def avatar_xlink(avatar)
     return { 'xsi:nil' => 'true' } if avatar.nil?

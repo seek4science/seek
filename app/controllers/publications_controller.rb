@@ -61,7 +61,7 @@ class PublicationsController < ApplicationController
   # GET /publications/1/edit
   def edit
   end
-  
+
   # POST /publications
   # POST /publications.xml
   def create
