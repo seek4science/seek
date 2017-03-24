@@ -291,4 +291,28 @@ class StrainsControllerTest < ActionController::TestCase
 
     assert_select 'input[id=?][value=?]', 'strain_title', authorized_parent_strain.title
   end
+
+  test 'shows related samples on show page' do
+    person = Factory(:person)
+    login_as(person.user)
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+
+    samples = 3.times.map do |i|
+      sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
+      sample.set_attribute(:name, "Strain sample #{i}")
+      sample.set_attribute(:seekstrain, strain.id)
+      sample.save!
+
+      sample
+    end
+
+    with_config_value(:related_items_limit, 2) do
+      get :show, id: strain
+
+      assert_response :success
+
+      assert_select 'div.related-items a[href=?]', /#{samples_path}\/\d+/, text: /Strain sample \d/, count: 2
+    end
+  end
 end
