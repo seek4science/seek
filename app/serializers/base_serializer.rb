@@ -26,9 +26,13 @@ class BaseSerializer
   end
 
   def meta
+    if object.respond_to?('created_at')
+      created = object.created_at
+      updated = object.updated_at
+    end
     {
-        created: object.created_at,
-        modified: object.updated_at,
+        created: created || "",
+        modified: updated || "",
         uuid: object.uuid,
         base_url: base_url
     }
