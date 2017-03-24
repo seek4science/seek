@@ -26,6 +26,7 @@ class BaseSerializer
   end
 
   def meta
+    #content-blob doesn't have timestamps
     if object.respond_to?('created_at')
       created = object.created_at
       updated = object.updated_at
