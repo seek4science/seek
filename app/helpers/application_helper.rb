@@ -506,13 +506,13 @@ module ApplicationHelper
 
   # returns the class associated with the controller, e.g. DataFile for data_files
   #
-  def klass_from_controller(controller_name = controller_name)
-    controller_name.singularize.camelize.constantize
+  def klass_from_controller(c = controller_name)
+    c.singularize.camelize.constantize
   end
 
   # returns the instance for the resource for the controller, e.g @data_file for data_files
-  def resource_for_controller(controller_name = controller_name)
-    eval "@#{controller_name.singularize}"
+  def resource_for_controller(c = controller_name)
+    eval "@#{c.singularize}"
   end
 
   # returns the count of the total visible items, and also the count of the all items, according to controller_name
