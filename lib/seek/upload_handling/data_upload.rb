@@ -120,6 +120,7 @@ module Seek
         blob_params[:original_filename] = info[:file_name] || ''
         blob_params[:content_type] = info[:content_type]
         blob_params[:file_size] = info[:file_size]
+        blob_params[:headers] = info
 
         true
       end

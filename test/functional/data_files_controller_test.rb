@@ -2004,6 +2004,39 @@ class DataFilesControllerTest < ActionController::TestCase
     assert blob.caching_job.exists?
   end
 
+  test "should create data file for remote URL that does not respond to HEAD" do
+    mock_http
+    params = { data_file: {
+        title: 'No Head File',
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: 'http://mockedlocation.com/nohead.txt',
+                                   make_local_copy: '1'
+                               }],
+               policy_attributes: valid_sharing
+    }
+
+    assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    refute_nil assigns(:data_file).content_blob
+    blob = assigns(:data_file).content_blob
+    refute blob.external_link?
+    assert !blob.cachable?
+    assert !blob.url.blank?
+    assert_equal 'nohead.txt', blob.original_filename
+    assert_equal 'text/plain', blob.content_type
+    assert_equal 5000, blob.file_size
+    assert blob.caching_job.exists?
+  end
+
   test 'should display null license text' do
     df = Factory :data_file, policy: Factory(:public_policy)
 
@@ -2517,6 +2550,9 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:get, 'http://mockedlocation.com').to_return(body: '<!doctype html><html><head></head><body>internet.</body></html>', status: 200,
                                                               headers: { content_type: 'text/html; charset=UTF-8', content_length: 63 })
     stub_request(:head, 'http://mockedlocation.com').to_return(status: 200, headers: { content_type: 'text/html; charset=UTF-8', content_length: 63 })
+
+    stub_request(:get, 'http://mockedlocation.com/nohead.txt').to_return(body: 'bananafish' * 500, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
+    stub_request(:head, 'http://mockedlocation.com/nohead.txt').to_return(status: 405)
   end
 
   def mock_https

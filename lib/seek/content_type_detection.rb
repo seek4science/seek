@@ -155,7 +155,10 @@ module Seek
     end
 
     def set_content_type_according_to_url
-      type = retrieve_content_type_from_url
+      type = content_type.blank? ? retrieve_content_type_from_url : content_type
+
+      # strip out the charset, e.g for content-type  "text/html; charset=utf-8"
+      type = type.gsub(/;.*/, '').strip
       if type == 'text/html'
         self.is_webpage = true
         self.content_type = type
@@ -163,7 +166,11 @@ module Seek
       self.content_type = type if unknown_file_type?
     rescue => exception
       self.is_webpage = false
-      Rails.logger.warn("There was a problem reading the headers for the URL of the content blob = #{url}")
+      Rails.logger.warn("There was a problem reading the headers for the URL of the content blob: #{url}\n#{exception.class.name}\n\t#{exception.backtrace.join("\n\t")}")
+    end
+
+    def retrieve_content_type_from_url
+      remote_headers[:content_type] || ''
     end
   end
 end
