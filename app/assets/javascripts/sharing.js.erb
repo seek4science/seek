@@ -2,6 +2,8 @@
 
 var Sharing = {
   addPermission: function (permission, preserveAccessType) {
+    if (!Sharing.permissionsTable)
+        return;
     // Update if already existing, otherwise add a new row
     for (var i = 0; i < Sharing.permissionsTable.permissions.length; i++) {
       var p = Sharing.permissionsTable.permissions[i];
@@ -15,7 +17,7 @@ var Sharing = {
 
     // This ensures that if a project permission is added, and that project is associated with the resource, it gains
     //  the "isMandatory" flag.
-    if (permission.contributor_type === 'Project') {
+    if (permission.contributor_type === 'Project' && Sharing.projectsSelector) {
       for (var j = 0; j < Sharing.projectsSelector.selected.length; j++) {
         if (Sharing.projectsSelector.selected[j].id === permission.contributor_id) {
           permission.isMandatory = true;
@@ -38,6 +40,8 @@ var Sharing = {
   },
 
   removePermissionForProject: function (project) {
+    if (!Sharing.permissionsTable)
+        return;
     for (var i = 0; i < Sharing.permissionsTable.permissions.length; i++) {
       if (Sharing.permissionsTable.permissions[i].contributor_id === project.id)
         break;
