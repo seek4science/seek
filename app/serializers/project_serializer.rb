@@ -1,8 +1,5 @@
-class ProjectSerializer < BaseSerializer
-  attributes :id, :title, :description,
-             :avatars, :organisms
+class ProjectSerializer < AvatarObjSerializer
+  attributes :id, :title, :description, :organisms,
+             :webpage, :internal_webpage
 
-  has_many :associated do
-    associated_resources(object)
-  end
 end

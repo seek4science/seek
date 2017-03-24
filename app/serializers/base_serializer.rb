@@ -4,6 +4,10 @@ class BaseSerializer
   include ApiHelper
   include RelatedItemsHelper
 
+  has_many :associated do #, include_data:true --> add this when everything is serialized.
+    associated_resources(object) # ||  { "data": [] }
+  end
+
   def self_link
     #{base_url}//#{type}/#{id}
     "/#{type}/#{id}"

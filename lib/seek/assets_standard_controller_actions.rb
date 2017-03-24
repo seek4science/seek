@@ -14,6 +14,7 @@ module Seek
       asset = determine_asset_from_controller
       # store timestamp of the previous last usage
       @last_used_before_now = asset.last_used_at
+      options = {:is_collection=>false, :include=>['associated']}
 
       # update timestamp in the current record
       # (this will also trigger timestamp update in the corresponding Asset)
@@ -23,7 +24,7 @@ module Seek
         format.html
         format.xml
         format.rdf { render template: 'rdf/show' }
-        format.json
+        format.json {render json: JSONAPI::Serializer.serialize(asset,options)}
       end
     end
 

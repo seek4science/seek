@@ -8,9 +8,5 @@ class PersonSerializer < AvatarObjSerializer
   # end
 
   has_many :work_groups
-  has_many :associated do
-    #object.institutions
-    associated_resources(object) # ||  { "data": [] }
-  end
 
 end
