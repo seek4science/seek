@@ -2248,9 +2248,12 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
     sample_type.content_blob = Factory(:strain_sample_data_content_blob)
     sample_type.build_attributes_from_template
-    attribute_type = sample_type.sample_attributes.last
+    attribute_type = sample_type.sample_attributes[-2]
     attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
     attribute_type.required = true
+    attribute_type = sample_type.sample_attributes[-1]
+    attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
+    attribute_type.required = false
     sample_type.save!
 
     assert_difference('Sample.count', 3) do
