@@ -6,7 +6,7 @@
 require 'jbuilder'
 require 'jbuilder/json_api/version'
 module ApiHelper
-  Jbuilder.include JsonAPI
+  #Jbuilder.include JsonAPI
   def xml_root_attributes
     { 'xmlns' => 'http://www.sysmo-db.org/2010/xml/rest',
       'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',

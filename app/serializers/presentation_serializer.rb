@@ -1,0 +1,3 @@
+class PresentationSerializer < ContributedResourceSerializer
+
+end
