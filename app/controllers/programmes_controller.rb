@@ -81,7 +81,11 @@ class ProgrammesController < ApplicationController
   end
 
   def show
-    respond_with(@programme)
+    options = {:is_collection=>false, :include=>['associated']}
+    respond_with do |format|
+      format.html
+      format.json {render json: JSONAPI::Serializer.serialize(@programme,options)}
+    end
   end
 
   def initiate_spawn_project
