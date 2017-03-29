@@ -359,9 +359,9 @@ GEM
     json (1.8.3)
     json-ld (1.1.8)
       rdf (~> 1.1, >= 1.1.7)
-    kgio (2.11.0)
     jsonapi-serializers (0.16.1)
       activesupport
+    kgio (2.11.0)
     latex-decode (0.2.2)
       unicode (~> 0.4)
     libxml-ruby (2.8.0)
@@ -868,12 +868,8 @@ DEPENDENCIES
   jbuilder-json_api
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
-<<<<<<< HEAD
-  libxml-ruby (~> 2.8.0)
-=======
   jsonapi-serializers
-  libxml-ruby (>= 2.6.0)
->>>>>>> 1540dac... a bunch of trials
+  libxml-ruby (~> 2.8.0)
   linkeddata
   lograge
   magic_lamp
