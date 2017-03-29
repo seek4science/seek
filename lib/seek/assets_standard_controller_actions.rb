@@ -14,7 +14,7 @@ module Seek
       asset = determine_asset_from_controller
       # store timestamp of the previous last usage
       @last_used_before_now = asset.last_used_at
-      options = {:is_collection=>false, :include=>['associated', 'content-blob']}
+      options = {:is_collection=>false, :include=>['associated', 'content-blob', 'tags']}
 
       # update timestamp in the current record
       # (this will also trigger timestamp update in the corresponding Asset)
