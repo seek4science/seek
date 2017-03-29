@@ -35,11 +35,14 @@ class InvestigationsController < ApplicationController
   def show
     @investigation=Investigation.find(params[:id])
     @investigation.create_from_asset = params[:create_from_asset]
+    options = {:is_collection=>false, :include=>['associated']}
 
     respond_to do |format|
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show' }
+      format.json {render json: JSONAPI::Serializer.serialize(@investigation,options)}
+
       format.ro do
         ro_for_download
       end
