@@ -1,3 +1,4 @@
+# to make "tags" inclusion possible for objects in the json output format
 class AnnotationSerializer
   include JSONAPI::Serializer
   attribute :name do
