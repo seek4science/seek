@@ -61,8 +61,12 @@ class InstitutionsController < ApplicationController
   # POST /institutions.xml
   def create
 
-    #if not params has attr ("title") do
-    #    params = process_jsonapi(params)
+    # convert params as recieved by json-api to (flat) rails json
+    if params.key?("data")
+      params_new = params[:data][:attributes]
+      params = {:institution => params_new}
+    end
+
     @institution = Institution.new(params[:institution])
 
     respond_to do |format|
