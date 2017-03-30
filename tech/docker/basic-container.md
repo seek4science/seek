@@ -8,9 +8,11 @@ layout: page
 ## Running a basic container
 
 A single container is available for SEEK that runs on the SQLite3 database, 
-which is fine for a small to medium number of concurrent users. For larger deployments see [Docker compose](docker-compose.html)
+which is fine for a small number of concurrent users. 
 
-This is a good way to try out your own local installation of SEEK. 
+This is a good way to try out your own local installation of SEEK, and for testing.
+ 
+For production deployments see [Docker compose](docker-compose.html)
 
 Once Docker is installed it can be started simply with:
  
