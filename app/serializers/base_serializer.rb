@@ -1,6 +1,4 @@
-class BaseSerializer
-  include JSONAPI::Serializer
-
+class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
   include RelatedItemsHelper
 
@@ -8,22 +6,22 @@ class BaseSerializer
     associated_resources(object) # ||  { "data": [] }
   end
 
-  def self_link
-    #{base_url}//#{type}/#{id}
-    "/#{type}/#{id}"
-  end
-
-  def base_url
-    Seek::Config.site_base_host
-  end
-
-  #remove link to object/associated --> "#{self_link}/#{format_name(attribute_name)}"
-  def relationship_self_link(attribute_name)
-  end
-
-  #remove link to object/related/associated
-  def relationship_related_link(attribute_name)
-  end
+  # def self_link
+  #   #{base_url}//#{type}/#{id}
+  #   "/#{type}/#{id}"
+  # end
+  #
+  # def base_url
+  #   Seek::Config.site_base_host
+  # end
+  #
+  # #remove link to object/associated --> "#{self_link}/#{format_name(attribute_name)}"
+  # def relationship_self_link(attribute_name)
+  # end
+  #
+  # #remove link to object/related/associated
+  # def relationship_related_link(attribute_name)
+  # end
 
   def meta
     #content-blob doesn't have timestamps
@@ -31,10 +29,13 @@ class BaseSerializer
       created = object.created_at
       updated = object.updated_at
     end
+    if object.respond_to?('uuid')
+      uuid = object.uuid
+    end
     {
         created: created || "",
         modified: updated || "",
-        uuid: object.uuid,
+        uuid: uuid || "",
         base_url: base_url
     }
   end
