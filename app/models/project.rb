@@ -41,7 +41,7 @@ class Project < ActiveRecord::Base
   belongs_to :programme
 
   attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,
-                  :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids, :default_license
+                  :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids, :default_license, :use_default_policy
 
   # for handling the assignment for roles
   attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids
@@ -76,20 +76,7 @@ class Project < ActiveRecord::Base
   #  necessary, deep copies of it will be made to ensure that all settings get
   #  fully copied and assigned to belong to owners of assets, where identical policy
   #  is to be used)
-  belongs_to :default_policy,
-             class_name: 'Policy',
-             dependent: :destroy,
-             autosave: true
-
-  after_initialize :default_default_policy_if_new
-
-  def default_default_policy_if_new
-    unless Seek::Config.is_virtualliver
-      self.default_policy = Policy.default if new_record?
-    else
-      self.default_policy = Policy.private_policy if new_record?
-    end
-  end
+  belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
   def group_memberships_empty?(institution)
     work_group = WorkGroup.where(['project_id=? AND institution_id=?', id, institution.id]).first

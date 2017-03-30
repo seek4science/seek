@@ -724,7 +724,9 @@ class ProjectsControllerTest < ActionController::TestCase
   test 'project administrator can not administer sharing policy' do
     project_administrator = Factory(:project_administrator)
     project = project_administrator.projects.first
-    policy = project.default_policy
+    disable_authorization_checks { project.default_policy = Policy.default; project.save }
+
+    policy = project.reload.default_policy
 
     assert_not_equal policy.access_type, Policy::VISIBLE
 

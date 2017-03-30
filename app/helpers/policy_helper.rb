@@ -115,7 +115,7 @@ module PolicyHelper
     end
   end
 
-  def policy_json(policy, associated_projects)
+  def policy_hash(policy, associated_projects)
     project_ids = associated_projects.map(&:id)
     hash = { access_type: policy.access_type }
 
@@ -149,6 +149,20 @@ module PolicyHelper
                               contributor_type: 'Project',
                               title: project.title,
                               isMandatory: true }
+    end
+
+    hash
+  end
+
+  def policy_json(policy, associated_projects)
+    policy_hash(policy, associated_projects).to_json.html_safe
+  end
+
+  def project_policies_json(projects)
+    hash = {}
+
+    projects.each do |p|
+      hash[p.id] = policy_hash(p.default_policy, [p]) if p.use_default_policy
     end
 
     hash.to_json.html_safe

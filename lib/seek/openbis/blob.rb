@@ -14,7 +14,7 @@ module Seek
       end
 
       def openbis?
-        url && URI.parse(url).scheme == 'openbis' && url.split(':').count == 4
+        url && valid_url? && URI.parse(url).scheme == 'openbis' && url.split(':').count == 4
       end
 
       def openbis_dataset

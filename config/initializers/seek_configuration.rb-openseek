@@ -207,6 +207,6 @@ SEEK::Application.configure do
       # :bind_dn => ''
     # }
   }
-  Seek::Config.default :openbis_enabled,true
+  Seek::Config.default :openbis_enabled,false
   Seek::Config.default :openbis_download_limit, 2.gigabytes
 end
