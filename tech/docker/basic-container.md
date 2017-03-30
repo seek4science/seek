@@ -7,7 +7,7 @@ layout: page
 
 ## Running a basic container
 
-A single container is available for SEEK that runs on the SQLite3 database, which is can only support a small number of concurrent users. 
+A single container is available for SEEK that runs on the SQLite3 database, which can only support a small number of concurrent users. 
 
 This can be a good way to try out your own local installation of SEEK, and for testing or trying out new features.
  
