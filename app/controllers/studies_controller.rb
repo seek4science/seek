@@ -107,6 +107,26 @@ class StudiesController < ApplicationController
   end
 
   def create
+
+    # convert params as recieved by json-api to (flat) rails json
+    if params.key?("data")
+      params_new = params[:data][:attributes]
+      investigation_title = params[:meta][:investigation_title]
+      person_email = params[:meta][:person_responsible]
+
+      params[:study] = params_new
+      params[:study][:investigation_id] = Investigation.where(title:  investigation_title).first[:id].to_s
+      params[:study][:person_responsible] = Person.where(email: person_email).first
+
+      #Creators
+      creators_arr = []
+      params[:study][:creators].each { |cr|
+        the_person = Person.where(email: cr).first
+        creators_arr << the_person
+      }
+      params[:study][:creators] = creators_arr
+    end
+
     @study = Study.new(params[:study])
 
     update_sharing_policies @study,params

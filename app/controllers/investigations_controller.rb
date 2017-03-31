@@ -66,7 +66,7 @@ class InvestigationsController < ApplicationController
       project_titles = params[:meta][:project_titles]
 
 
-      params = {:investigation => params_new}
+      params[:investigation] = params_new
 
       # Projects
       params[:investigation][:project_ids] = []
