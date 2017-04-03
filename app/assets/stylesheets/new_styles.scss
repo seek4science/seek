@@ -540,7 +540,7 @@ img.avatar-corner-icon {
 
     &.enabled {
       background-color: #c3e8b9;
-      background-image: url(asset-path("crystal_project/16x16/apps/clean.png", image));
+      background-image: url(asset-path("crystal_project/16x16/apps/clean.png"));
       background-position: center center;
       background-repeat: no-repeat;
 
@@ -568,7 +568,7 @@ img.avatar-corner-icon {
     &.no-access {
       &.enabled {
         background-color: #ffc2c4;
-        background-image: url(asset-path("famfamfam_silk/cross.png", image));
+        background-image: url(asset-path("famfamfam_silk/cross.png"));
 
         &:hover {
           opacity: 0.7;
