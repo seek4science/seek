@@ -11,9 +11,11 @@
     child_list = window.opener.document.getElementById('<%= child_list_id%>');
     child_list.appendChild(new Option(text, value));
     child_list.selectedIndex = child_list.options.length - 1;
-    if (typeof(child_list.onchange)=="function"){
-     child_list.onchange() ;
+    if (window.opener.projectsLookup) {
+      window.opener.projectsLookup[<%= child.id -%>] = <%= child.projects.map { |p| { id: p.id, title: p.title } }.to_json.html_safe -%>;
     }
+
+    child_list.dispatchEvent(new Event('change'));
 
     alert("New "+ "<%= text_for_resource(child)%>" +" was created! You can use it now.");
     window.close();
