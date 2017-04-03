@@ -23,7 +23,7 @@ class SampleAttribute < ActiveRecord::Base
   before_save :generate_accessor_name
   before_save :default_pos, :force_required_when_is_title
 
-  scope :title_attributes, where(is_title: true)
+  scope :title_attributes, proc { where(is_title: true) }
 
   delegate :controlled_vocab?, :seek_sample?, :seek_strain?, to: :sample_attribute_type, allow_nil: true
 
