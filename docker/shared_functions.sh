@@ -8,14 +8,22 @@ function wait_for_mysql {
 }
 
 function wait_for_database {
-    while ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h db -e "desc $MYSQL_DATABASE.users" > /dev/null
+    while ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null
     do
             echo "WAITING FOR DATABASE"
             sleep 2
     done
 }
 
+function set_default_mysql_host {
+    if [ -z $MYSQL_HOST ]
+    then
+        export MYSQL_HOST=db
+    fi
+}
+
 function use_mysql_db {
+    set_default_mysql_host
     cp docker/database.docker.mysql.yml config/database.yml
 }
 
@@ -28,7 +36,7 @@ function check_mysql {
 
         wait_for_mysql
 
-        if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h db -e "desc $MYSQL_DATABASE.users" > /dev/null
+        if ! mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -h $MYSQL_HOST -e "desc $MYSQL_DATABASE.users" > /dev/null
         then
             echo "SETTING UP MYSQL DB"
             bundle exec rake db:setup
