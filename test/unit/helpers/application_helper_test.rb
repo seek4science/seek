@@ -87,7 +87,6 @@ class ApplicationHelperTest < ActionView::TestCase
     with_config_value :javascript_appended, 'fish' do
       with_config_value :javascript_prepended, 'apple' do
         tags = seek_javascript_tags 'carrot'
-        puts tags.inspect
         assert_includes tags, "<script src=\"/javascripts/prepended/apple.js\"></script>"
         assert_includes tags, "<script src=\"/javascripts/carrot.js\"></script>"
         assert_includes tags, "<script src=\"/javascripts/appended/fish.js\"></script>"
