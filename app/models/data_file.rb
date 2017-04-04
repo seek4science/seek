@@ -25,7 +25,7 @@ class DataFile < ActiveRecord::Base
 
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
 
-  has_many :studied_factors, -> { where('studied_factors.data_file_version =?', version) }
+  has_many :studied_factors, -> (r) { where('studied_factors.data_file_version =?', r.version) }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
   scope :with_extracted_samples, -> { joins(:extracted_samples).uniq }
