@@ -144,7 +144,7 @@ class StrainsControllerTest < ActionController::TestCase
     new_gene = Gene.find_by_title(new_gene_title)
     new_modification = Modification.find_by_title(new_modification_title)
     new_genotype = Genotype.where(gene_id: new_gene.id, modification_id: new_modification.id).first
-    new_phenotype = Phenotype.find_all_by_description(new_phenotype_description).sort_by(&:created_at).last
+    new_phenotype = Phenotype.where(description: new_phenotype_description).sort_by(&:created_at).last
     updated_genotypes = [genotype2, new_genotype].sort_by(&:id)
     assert_equal updated_genotypes, updated_strain.genotypes.sort_by(&:id)
 

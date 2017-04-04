@@ -383,7 +383,7 @@ class PeopleController < ApplicationController
     if project_ids.blank?
       []
     else
-      Project.find_all_by_id(project_ids).collect do |project|
+      Project.where(id: project_ids).collect do |project|
         project.project_administrators
       end.flatten.uniq
     end

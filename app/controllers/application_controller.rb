@@ -112,7 +112,7 @@ class ApplicationController < ActionController::Base
     # params[:resource_ids] is passed as string, e.g. "id1, id2, ..."
     resource_ids = (params[:resource_ids] || '').split(',')
     clazz = resource_type.constantize
-    resources = clazz.find_all_by_id(resource_ids)
+    resources = clazz.where(id: resource_ids)
     if clazz.respond_to?(:authorized_partial_asset_collection)
       authorized_resources = clazz.authorized_partial_asset_collection(resources, 'view')
     elsif resource_type == 'Project' || resource_type == 'Institution'

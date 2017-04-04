@@ -263,7 +263,7 @@ class DataFilesController < ApplicationController
     @matching_model_items = @data_file.matching_models
     # filter authorization
     ids = @matching_model_items.collect(&:primary_key)
-    models = Model.find_all_by_id(ids)
+    models = Model.where(id: ids)
     authorised_ids = Model.authorize_asset_collection(models, 'view').collect(&:id)
     @matching_model_items = @matching_model_items.select { |mdf| authorised_ids.include?(mdf.primary_key.to_i) }
 

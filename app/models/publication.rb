@@ -105,7 +105,7 @@ class Publication < ActiveRecord::Base
   end
 
   def non_seek_authors
-    publication_authors.find_all_by_person_id nil
+    publication_authors.where(person_id: nil)
   end
 
   def contributor_credited?

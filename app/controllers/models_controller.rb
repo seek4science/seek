@@ -221,7 +221,7 @@ class ModelsController < ApplicationController
 
     #filter authorization
     ids = @matching_data_items.collect(&:primary_key)
-    data_files = DataFile.find_all_by_id(ids)
+    data_files = DataFile.where(id: ids)
     authorised_ids = DataFile.authorize_asset_collection(data_files, "view").collect(&:id)
     @matching_data_items = @matching_data_items.select { |mdf| authorised_ids.include?(mdf.primary_key.to_i) }
 

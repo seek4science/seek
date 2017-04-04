@@ -156,7 +156,7 @@ module Seek
             sql << " and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
             ids = ActiveRecord::Base.connection.select_all(sql).collect { |k| k['asset_id'] }
           end
-          default_order.find_all_by_id(ids)
+          default_order.where(id: ids)
         end
 
         # the highest asset id recorded in authorization lookup table for a given user_id or user. Used to determine if the table is complete
