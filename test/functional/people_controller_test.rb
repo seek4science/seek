@@ -426,14 +426,14 @@ class PeopleControllerTest < ActionController::TestCase
       Factory(:permission, contributor: person, access_type: rand(5))
       i += 1
     end
-    permissions = Permission.find(:all, conditions: ['contributor_type =? and contributor_id=?', 'Person', person.try(:id)])
+    permissions = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
     assert_equal 10, permissions.count
 
     assert_difference('Person.count', -1) do
       delete :destroy, id: person
     end
 
-    permissions = Permission.find(:all, conditions: ['contributor_type =? and contributor_id=?', 'Person', person.try(:id)])
+    permissions = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
     assert_equal 0, permissions.count
   end
 
@@ -457,7 +457,7 @@ class PeopleControllerTest < ActionController::TestCase
       delete :destroy, id: person
     end
 
-    permissions_on_person = Permission.find(:all, conditions: ['contributor_type =? and contributor_id=?', 'Person', person.try(:id)])
+    permissions_on_person = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
     assert_equal 0, permissions_on_person.count
 
     permissions = data_file.policy.permissions
@@ -489,7 +489,7 @@ class PeopleControllerTest < ActionController::TestCase
       delete :destroy, id: person
     end
 
-    permissions_on_person = Permission.find(:all, conditions: ['contributor_type =? and contributor_id=?', 'Person', person.try(:id)])
+    permissions_on_person = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
     assert_equal 0, permissions_on_person.count
 
     permissions = data_file.policy.permissions
