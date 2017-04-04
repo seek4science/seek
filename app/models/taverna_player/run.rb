@@ -22,7 +22,7 @@ module TavernaPlayer
 
     belongs_to :sweep
 
-    scope :default_order, order('created_at')
+    scope :default_order, -> { order('created_at') }
 
     def self.by_owner(uid)
       where(:contributor_id => uid, :contributor_type => "User")

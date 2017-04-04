@@ -25,7 +25,7 @@ class Model < ActiveRecord::Base
 
   include Seek::Dois::DoiGeneration
 
-  scope :default_order, order("title")
+  scope :default_order, -> { order("title") }
 
   include Seek::Models::ModelExtraction
 

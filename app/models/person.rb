@@ -11,7 +11,7 @@ class Person < ActiveRecord::Base
   alias_attribute :title, :name
 
   acts_as_yellow_pages
-  scope :default_order, order("last_name, first_name")
+  scope :default_order, -> { order("last_name, first_name") }
 
   before_save :first_person_admin_and_add_to_default_project
   before_destroy :clean_up_and_assign_permissions

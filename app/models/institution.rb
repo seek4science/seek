@@ -8,7 +8,7 @@ class Institution < ActiveRecord::Base
   title_trimmer
 
   validates :title, uniqueness: true
-  scope :default_order, order('title')
+  scope :default_order, -> { order('title') }
 
   validates :web_page, url: {allow_nil: true, allow_blank: true}
   validates :country, :presence => true

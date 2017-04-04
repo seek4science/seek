@@ -18,7 +18,7 @@ class DataFile < ActiveRecord::Base
 
   include Seek::Dois::DoiGeneration
 
-  scope :default_order, order('title')
+  scope :default_order, -> { order('title') }
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."

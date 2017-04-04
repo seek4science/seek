@@ -21,7 +21,7 @@ class Sample < ActiveRecord::Base
   has_many :sample_resource_links, dependent: :destroy
   has_many :strains, through: :sample_resource_links, source: :resource, source_type: 'Strain'
 
-  scope :default_order, order('title')
+  scope :default_order, -> { order('title') }
 
   validates :title, :sample_type, presence: true
   include ActiveModel::Validations

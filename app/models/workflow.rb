@@ -16,7 +16,7 @@ class Workflow < ActiveRecord::Base
 
   include Seek::Dois::DoiGeneration
 
-  scope :default_order, order('title')
+  scope :default_order, -> { order('title') }
 
   validates_presence_of :title
 

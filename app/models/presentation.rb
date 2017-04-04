@@ -10,7 +10,7 @@ class Presentation < ActiveRecord::Base
    #even though in Seek::ActsAsAsset::Search it is already set to false!
    acts_as_asset
 
-   scope :default_order, order("title")
+   scope :default_order, -> { order("title") }
 
    has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
 

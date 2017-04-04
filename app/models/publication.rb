@@ -98,7 +98,7 @@ class Publication < ActiveRecord::Base
     policy
   end
 
-  scope :default_order, order("published_date DESC")
+  scope :default_order, -> { order("published_date DESC") }
 
   def seek_authors
     publication_authors.select{|publication_author| publication_author.person}

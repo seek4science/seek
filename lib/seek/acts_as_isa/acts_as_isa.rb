@@ -22,7 +22,7 @@ module Seek
 
         attr_accessor :create_from_asset
 
-        scope :default_order, order('title')
+        scope :default_order, -> { order('title') }
         validates :title, presence: true
 
         grouped_pagination

@@ -11,7 +11,7 @@ class Event < ActiveRecord::Base
   include Seek::Search::CommonFields
   include Seek::Search::BackgroundReindexing
 
-  scope :default_order, order('start_date DESC')
+  scope :default_order, -> { order('start_date DESC') }
 
   searchable(ignore_attribute_changes_of: [:updated_at], auto_index: false) do
     text :address, :city, :country, :url
