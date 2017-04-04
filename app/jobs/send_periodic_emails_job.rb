@@ -125,7 +125,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
            else
              Time.now
     end
-    Time.local_time(time.year, time.month, time.day, 12, 00, 00)
+    Time.local(time.year, time.month, time.day, 12, 00, 00)
   end
 
   def self.default_priority
