@@ -28,6 +28,8 @@ class ApplicationController < ActionController::Base
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
+  before_filter :process_params, :only=>[:edit, :update, :destroy, :create, :new]
+
   helper :all
 
   layout Seek::Config.main_layout
@@ -542,5 +544,33 @@ class ApplicationController < ActionController::Base
 
   def redirect_to_sign_up_when_no_user
     redirect_to signup_path if User.count == 0
+  end
+
+  def process_params()
+
+    resource = controller_name.singularize
+
+    #check for JSONAPI
+    if params.key?("data")
+      params[resource] = params[:data][:attributes]
+
+      #initialize
+      params[:relationships].each do |r,info|
+        params[resource][r.to_s+"_ids"] = []
+      end
+      #fill up related resource ids in params[resource][related_ids]
+      params[:relationships].each do |r,info|
+        related_entity = r.capitalize.constantize.where(info[:meta]).first
+        params[resource][r.to_s+"_ids"] << related_entity.id if related_entity
+      end
+
+      #Creators
+      creators_arr = []
+      params[resource][:creators].each do |cr|
+        the_person = Person.where(email: cr).first
+        creators_arr << the_person if the_person
+      end
+      params[resource][:creators] = creators_arr
+    end
   end
 end

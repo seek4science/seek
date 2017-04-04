@@ -11,7 +11,6 @@ class InvestigationsController < ApplicationController
   #defined in the application controller
   before_filter :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
-
   include Seek::Publishing::PublishingCommon
 
   include Seek::AnnotationCommon
@@ -59,32 +58,6 @@ class InvestigationsController < ApplicationController
   end
 
   def create
-
-    # convert params as recieved by json-api to (flat) rails json
-    if params.key?("data")
-      params_new = params[:data][:attributes]
-      project_titles = params[:meta][:project_titles]
-
-
-      params[:investigation] = params_new
-
-      # Projects
-      params[:investigation][:project_ids] = []
-
-      project_titles.each { |pr_ti|
-        params[:investigation][:project_ids] << Project.where(title: pr_ti).first[:id].to_s
-      }
-
-      #Creators
-      creators_arr = []
-      params[:investigation][:creators].each { |cr|
-        the_person = Person.where(email: cr).first
-        creators_arr << the_person
-      }
-      params[:investigation][:creators] = creators_arr
-
-    end
-
     @investigation=Investigation.new(params[:investigation])
     update_sharing_policies @investigation,params
 

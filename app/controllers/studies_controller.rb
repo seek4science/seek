@@ -108,13 +108,20 @@ class StudiesController < ApplicationController
 
   def create
 
-    # convert params as recieved by json-api to (flat) rails json
+    # convert params as received by json-api to (flat) rails json
     if params.key?("data")
-      params_new = params[:data][:attributes]
+
+      params[:study] = params[:data][:attributes]
+
+      params[:study][:project_ids] = []
+      params[:relationships].each do |r,info|
+        params[:study][:project_ids] << r.capitalize.constantize.where(info[:meta]).first.id
+      end
+
+
       investigation_title = params[:meta][:investigation_title]
       person_email = params[:meta][:person_responsible]
 
-      params[:study] = params_new
       params[:study][:investigation_id] = Investigation.where(title:  investigation_title).first[:id].to_s
       params[:study][:person_responsible] = Person.where(email: person_email).first
 
