@@ -6,9 +6,9 @@ class Organism < ActiveRecord::Base
 
   linked_to_bioportal :apikey=>Seek::Config.bioportal_api_key
   
-  has_many :assay_organisms
+  has_many :assay_organisms, inverse_of: :organism
   has_many :models
-  has_many :assays,:through=>:assay_organisms  
+  has_many :assays, through: :assay_organisms, inverse_of: :organisms
   has_many :strains, :dependent=>:destroy
 
   has_and_belongs_to_many :projects

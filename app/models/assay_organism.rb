@@ -1,6 +1,6 @@
 class AssayOrganism < ActiveRecord::Base
-  belongs_to :assay
-  belongs_to :organism
+  belongs_to :assay, inverse_of: :assay_organisms
+  belongs_to :organism, inverse_of: :assay_organisms
   belongs_to :culture_growth_type
   belongs_to :strain
   belongs_to :tissue_and_cell_type
