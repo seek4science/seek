@@ -94,5 +94,10 @@ module SEEK
     #uncomment and set the value if running under a suburi
     #config.relative_url_root = '/seek'
 
+    # The default cache timestamp format is "nsec", however timestamps in AR aren't stored with that precision
+    # This can result in mis-matches of cache_keys depending on if the record is saved or not, for example:
+    # openbis_endpoints/26-20170404142724000000000...
+    # openbis_endpoints/26-20170404142724224014370...
+    config.active_record.cache_timestamp_format = :usec
   end
 end
