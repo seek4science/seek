@@ -76,10 +76,10 @@ class Person < ActiveRecord::Base
     end
   end if Seek::Config.solr_enabled
 
-  scope :with_group, -> { includes(:group_memberships).where('group_memberships.person_id IS NOT NULL') }
-  scope :without_group, -> { includes(:group_memberships).where('group_memberships.person_id IS NULL') }
-  scope :registered, -> { includes(:user).where('users.person_id != 0') }
-  scope :not_registered, -> { includes(:user).where('users.person_id IS NULL') }
+  scope :with_group, -> { includes(:group_memberships).where('group_memberships.person_id IS NOT NULL').references(:group_memberships) }
+  scope :without_group, -> { includes(:group_memberships).where('group_memberships.person_id IS NULL').references(:group_memberships) }
+  scope :registered, -> { includes(:user).where('users.person_id != 0').references(:users) }
+  scope :not_registered, -> { includes(:user).where('users.person_id IS NULL').references(:users) }
 
   alias_attribute :webpage,:web_page
 

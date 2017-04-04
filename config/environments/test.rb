@@ -40,4 +40,7 @@ SEEK::Application.configure do
 
   #omniauth enable testing
   OmniAuth.config.test_mode = true
+
+  # Uncomment this to help find source of  "DEPRECATION WARNING: It looks like you are eager loading table(s) ..."
+  # config.active_record.disable_implicit_join_references = true
 end
