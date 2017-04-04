@@ -24,7 +24,7 @@ class SampleType < ActiveRecord::Base
 
   has_many :samples, inverse_of: :sample_type
 
-  has_many :sample_attributes, order: :pos, inverse_of: :sample_type, dependent: :destroy, after_add: :detect_link_back_to_self
+  has_many :sample_attributes, -> { order(:pos) }, inverse_of: :sample_type, dependent: :destroy, after_add: :detect_link_back_to_self
 
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 

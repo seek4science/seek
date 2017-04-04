@@ -15,7 +15,7 @@ module Seek
         after_remove_for_work_groups << :unsubscribe_from_project_subscription
         after_remove_for_work_groups << :touch_project_for_membership
 
-        has_many :project_subscriptions, before_add: proc { |person, ps| ps.person = person }, uniq: true, dependent: :destroy
+        has_many :project_subscriptions, -> { uniq }, before_add: proc { |person, ps| ps.person = person }, dependent: :destroy
         accepts_nested_attributes_for :project_subscriptions, allow_destroy: true
 
         has_many :subscriptions, dependent: :destroy

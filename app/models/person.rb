@@ -31,17 +31,17 @@ class Person < ActiveRecord::Base
   has_many :group_memberships, :dependent => :destroy
   has_many :work_groups, :through=>:group_memberships
 
-  has_many :former_group_memberships, :class_name => 'GroupMembership',
-           :conditions => proc { ["time_left_at IS NOT NULL AND time_left_at <= ?", Time.now] }, :dependent => :destroy
+  has_many :former_group_memberships, -> { where("time_left_at IS NOT NULL AND time_left_at <= ?", Time.now) },
+           :class_name => 'GroupMembership', :dependent => :destroy
   has_many :former_work_groups, :class_name => 'WorkGroup', :through => :former_group_memberships,
            :source => :work_group
 
-  has_many :current_group_memberships, :class_name => 'GroupMembership',
-           :conditions =>  proc { ["time_left_at IS NULL OR time_left_at > ?", Time.now] }, :dependent => :destroy
+  has_many :current_group_memberships, -> { where("time_left_at IS NULL OR time_left_at > ?", Time.now) },
+           :class_name => 'GroupMembership', :dependent => :destroy
   has_many :current_work_groups, :class_name => 'WorkGroup', :through => :current_group_memberships,
            :source => :work_group
 
-  has_many :institutions,:through => :work_groups, :uniq => true
+  has_many :institutions, -> { uniq }, :through => :work_groups
 
   has_many :favourite_group_memberships, :dependent => :destroy
   has_many :favourite_groups, :through => :favourite_group_memberships

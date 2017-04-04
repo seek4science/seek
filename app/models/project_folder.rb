@@ -4,7 +4,7 @@ class ProjectFolder < ActiveRecord::Base
 
   belongs_to :project
   belongs_to :parent,:class_name=>"ProjectFolder",:foreign_key=>:parent_id
-  has_many :children,:class_name=>"ProjectFolder",:foreign_key=>:parent_id, :order=>:title, :after_add=>:update_child
+  has_many :children,-> { order(:title) }, :class_name=>"ProjectFolder",:foreign_key=>:parent_id, :after_add=>:update_child
   has_many :project_folder_assets, :dependent=>:destroy
 
 

@@ -34,7 +34,7 @@ class Workflow < ActiveRecord::Base
            :conditions => proc { "workflow_version = #{self.version}"},
            :dependent => :destroy
 
-  has_one :content_blob, :as => :asset, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =?", version] }
+  has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   accepts_nested_attributes_for :input_ports, :output_ports
 
@@ -47,7 +47,8 @@ class Workflow < ActiveRecord::Base
     acts_as_versioned_resource
     acts_as_favouritable
 
-    has_one :content_blob, :primary_key => :workflow_id, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =? AND content_blobs.asset_type =?", version, parent.class.name] }
+    has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
+            :primary_key => :workflow_id, :foreign_key => :asset_id
     has_many :input_ports, :class_name => 'WorkflowInputPort',
              :primary_key => "workflow_id",
              :foreign_key => "workflow_id",

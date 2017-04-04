@@ -15,9 +15,9 @@ class Institution < ActiveRecord::Base
 
   has_many :work_groups, dependent: :destroy
   has_many :projects, through: :work_groups
-  has_many :programmes, through: :projects, uniq: true
+  has_many :programmes, -> { uniq }, through: :projects
   has_many :group_memberships, through: :work_groups
-  has_many :people, through: :group_memberships, order: 'last_name ASC', uniq: true
+  has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships
 
   searchable(auto_index: false) do
     text :city, :address

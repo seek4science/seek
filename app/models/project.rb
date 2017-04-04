@@ -32,7 +32,7 @@ class Project < ActiveRecord::Base
   has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?
   has_many :group_memberships, through: :work_groups
   # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
-  has_many :people, through: :group_memberships, order: 'last_name ASC', uniq: true
+  has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships
 
   has_many :admin_defined_role_projects
 

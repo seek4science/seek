@@ -10,12 +10,12 @@ class Topic < ActiveRecord::Base
   belongs_to :user
   belongs_to :last_post, :class_name => "Post", :foreign_key => 'last_post_id'
   has_many :monitorships
-  has_many :monitors, :through => :monitorships, :conditions => ["#{Monitorship.table_name}.active = ?", true], :source => :user
+  has_many :monitors, -> { where("#{Monitorship.table_name}.active = ?", true) }, :through => :monitorships, :source => :user
 
-  has_many :posts,     :order => "#{Post.table_name}.created_at", :dependent => :destroy
-  has_one  :recent_post, :order => "#{Post.table_name}.created_at DESC", :class_name => 'Post'
+  has_many :posts,     -> { order("#{Post.table_name}.created_at DESC") }, :dependent => :destroy
+  has_one  :recent_post, -> { order("#{Post.table_name}.created_at DESC") }, :class_name => 'Post'
   
-  has_many :voices, :through => :posts, :source => :user, :uniq => true
+  has_many :voices, -> { uniq }, :through => :posts, :source => :user
   belongs_to :replied_by_user, :foreign_key => "replied_by", :class_name => "User"
 
   # attr_accessible :title

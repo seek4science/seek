@@ -35,7 +35,7 @@ class Model < ActiveRecord::Base
   has_many :model_images
   belongs_to :model_image
 
-  has_many :content_blobs, :as => :asset, :foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
+  has_many :content_blobs, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   belongs_to :organism
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
