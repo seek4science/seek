@@ -9,7 +9,8 @@ class SiteAnnouncement < ActiveRecord::Base
   belongs_to :site_announcement_category
   belongs_to :announcer,:polymorphic=>true
 
-  scope :headline_announcements,:conditions=>(["is_headline = ? and expires_at > ? ",true,Time.now]),:order=>"created_at DESC",:limit=>1
+  scope :headline_announcements,
+        -> { where(['is_headline = ? and expires_at > ? ', true, Time.now]).order('created_at DESC').limit(1) }
   
   validates_presence_of :title
 

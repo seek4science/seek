@@ -5,7 +5,7 @@ class ActivityLog  < ActiveRecord::Base
   enforce_authorization_on_association :activity_loggable,:view
   serialize :data
 
-  scope :no_spider,:conditions=>"(UPPER(user_agent) NOT LIKE '%SPIDER%' OR user_agent IS NULL)"
+  scope :no_spider, -> { where("'(UPPER(user_agent) NOT LIKE '%SPIDER%' OR user_agent IS NULL)'") }
 
   #returns items that have duplicates for a given action - NOTE that the result does not contain all the actual duplicates.
   scope :duplicates, lambda {|action|
