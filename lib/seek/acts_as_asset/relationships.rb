@@ -29,9 +29,9 @@ module Seek
                    dependent: :destroy
 
           has_many :attributions,
+                   -> { where(predicate: Relationship::ATTRIBUTED_TO) },
                    class_name: 'Relationship',
                    as: :subject,
-                   conditions: { predicate: Relationship::ATTRIBUTED_TO },
                    dependent: :destroy
 
           has_many :inverse_relationships,
