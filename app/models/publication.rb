@@ -108,10 +108,6 @@ class Publication < ActiveRecord::Base
     publication_authors.find_all_by_person_id nil
   end
 
-  def self.sort publications
-    publications.sort_by(&:published_date)
-  end
-
   def contributor_credited?
     false
   end
