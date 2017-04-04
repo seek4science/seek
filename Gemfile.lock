@@ -75,7 +75,7 @@ GIT
 
 GIT
   remote: https://github.com/myGrid/annotations.git
-  revision: 086c9ca685893d1c7de5c99a2b02b80c7263a16f
+  revision: 73db96659dd18cfb93db305eed89ee6329e898aa
   branch: rails4
   specs:
     my_annotations (0.7.0)
