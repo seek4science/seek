@@ -54,6 +54,6 @@ class ProjectSubscriptionJob < SeekJob
     sql = "select #{asset_id} from #{table}"
     sql << " where #{table}.project_id = #{project.id}"
     ids = ActiveRecord::Base.connection.select_all(sql).collect { |k| k["#{asset_id}"] }
-    klass.find_all_by_id(ids)
+    klass.where(id: ids)
   end
 end

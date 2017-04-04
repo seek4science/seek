@@ -40,8 +40,7 @@ class Publication < ActiveRecord::Base
   validates_uniqueness_of :doi ,:allow_nil => true, :allow_blank => true, :if => "Seek::Config.is_virtualliver"
   validates_uniqueness_of :title , :if => "Seek::Config.is_virtualliver"
 
-  validate :check_uniqueness_of_identifier_within_project, :unless => "Seek::Config.is_virtualliver"
-  validate :check_uniqueness_of_title_within_project, :unless => "Seek::Config.is_virtualliver"
+  validate :check_uniqueness_within_project, :unless => "Seek::Config.is_virtualliver"
 
   after_update :update_creators_from_publication_authors
 
@@ -275,37 +274,17 @@ class Publication < ActiveRecord::Base
     end
   end
 
-  def check_uniqueness_of_identifier_within_project
-    if !doi.blank?
-      existing = Publication.find_all_by_doi(doi) - [self]
-      if !existing.empty?
-        matching_projects = existing.collect(&:projects).flatten.uniq & projects
-        if !matching_projects.empty?
-          self.errors[:doi] << "You cannot register the same DOI within the same project"
-          return false
+  def check_uniqueness_within_project
+    { title: 'title', doi: 'DOI', pubmed_id: 'PubMed ID' }.each do |attr, name|
+      if send(attr).present?
+        existing = Publication.where(attr => send(attr)).to_a - [self]
+        if existing.any?
+          matching_projects = existing.collect(&:projects).flatten.uniq & projects
+          if matching_projects.any?
+            self.errors[attr] << "You cannot register the same #{name} within the same project."
+            return false
+          end
         end
-      end
-    end
-    if !pubmed_id.blank?
-      existing = Publication.find_all_by_pubmed_id(pubmed_id) - [self]
-      if !existing.empty?
-        matching_projects = existing.collect(&:projects).flatten.uniq & projects
-        if !matching_projects.empty?
-          self.errors[:pubmed_id] << "You cannot register the same PubMed ID within the same project"
-          return false
-        end
-      end
-    end
-    true
-  end
-
-  def check_uniqueness_of_title_within_project
-    existing = Publication.find_all_by_title(title) - [self]
-    if !existing.empty?
-      matching_projects = existing.collect(&:projects).flatten.uniq & projects
-      if !matching_projects.empty?
-        self.errors[:title] << "You cannot register the same Title \"#{self.title}\" within the same project: \"#{matching_projects[0].title}\""
-        return false
       end
     end
   end
