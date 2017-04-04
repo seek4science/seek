@@ -1,7 +1,7 @@
 #!/bin/sh
 
 function wait_for_mysql {
-    while ! mysqladmin ping -h db --silent; do
+    while ! mysqladmin ping -h $MYSQL_HOST --silent; do
             echo "WAITING FOR MYSQL"
             sleep 2
     done
