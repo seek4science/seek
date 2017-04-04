@@ -7,11 +7,7 @@ class Subscription < ActiveRecord::Base
   validates_presence_of :person
   validates_presence_of :subscribable
 
-  scope :for_subscribable, lambda {|item|
-    {
-        :conditions=>["subscribable_id=? and subscribable_type=?",item.id,item.class.name]
-    }
-  }
+  scope :for_subscribable, -> (item) { where('subscribable_id=? and subscribable_type=?', item.id, item.class.name) }
 
   #these should be ordered fastest to slowest
   FREQUENCIES = ['immediately', 'daily', 'weekly', 'monthly']

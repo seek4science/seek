@@ -8,13 +8,9 @@ class ActivityLog  < ActiveRecord::Base
   scope :no_spider, -> { where("'(UPPER(user_agent) NOT LIKE '%SPIDER%' OR user_agent IS NULL)'") }
 
   #returns items that have duplicates for a given action - NOTE that the result does not contain all the actual duplicates.
-  scope :duplicates, lambda {|action|
-    {
-    :select=>"activity_loggable_type,activity_loggable_id",
-    :conditions=>"action='#{action}' AND controller_name!='sessions'",
-    :group=>'activity_loggable_type,activity_loggable_id HAVING COUNT(*)>1'
-    }
-  }
+  scope :duplicates, -> (action) { select('activity_loggable_type, activity_loggable_id').
+                                   where("action = ? AND controller_name != 'sessions'", action).
+                                   group('activity_loggable_type, activity_loggable_id HAVING COUNT(*)>1') }
 
   def self.remove_duplicate_creates
     duplicates=ActivityLog.duplicates "create"
