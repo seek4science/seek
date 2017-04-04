@@ -8,7 +8,7 @@ class SpaceTest < ActiveSupport::TestCase
   end
 
   test 'all' do
-    all = Seek::Openbis::Space.new(@openbis_endpoint).all.sort_by(&:code)
+    all = Seek::Openbis::Space.new(@openbis_endpoint).to_a.sort_by(&:code)
     assert_equal 2, all.count
     assert_equal 'API-SPACE', all.first.code
     assert_equal 'API-SPACE', all.first.perm_id
