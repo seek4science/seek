@@ -24,9 +24,11 @@ class DatasetTest < ActiveSupport::TestCase
     assert_equal '20160210130454955-23', dataset.code
 
     # not recognised
-    assert_raise_with_message(Seek::Openbis::EntityNotFoundException, 'Unable to find DataSet with perm id NOT-A-PERM-ID') do
+    e = assert_raise(Seek::Openbis::EntityNotFoundException) do
       Seek::Openbis::Dataset.new(@openbis_endpoint, 'NOT-A-PERM-ID')
     end
+
+    assert_equal 'Unable to find DataSet with perm id NOT-A-PERM-ID', e.message
   end
 
   test 'dates' do
