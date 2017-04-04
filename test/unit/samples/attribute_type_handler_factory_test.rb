@@ -26,7 +26,7 @@ class AttributeTypeHandlerFactoryTest < ActiveSupport::TestCase
     end
     assert_equal "unrecognised attribute base type 'fish'", e.message
 
-    e assert_raise(Seek::Samples::AttributeTypeHandlers::UnrecognisedAttributeHandlerType) do
+    e = assert_raise(Seek::Samples::AttributeTypeHandlers::UnrecognisedAttributeHandlerType) do
       @factory.for_base_type('fish')
     end
     assert_equal "unrecognised attribute base type 'fish'", e.message
