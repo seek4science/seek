@@ -28,8 +28,8 @@ class Person < ActiveRecord::Base
 
   has_and_belongs_to_many :disciplines
 
-  has_many :group_memberships, :dependent => :destroy
-  has_many :work_groups, :through=>:group_memberships
+  has_many :group_memberships, dependent: :destroy, inverse_of: :person
+  has_many :work_groups, through: :group_memberships, inverse_of: :people
 
   has_many :former_group_memberships, -> { where("time_left_at IS NOT NULL AND time_left_at <= ?", Time.now) },
            :class_name => 'GroupMembership', :dependent => :destroy

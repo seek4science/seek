@@ -693,7 +693,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal [prog], project.programmes
   end
 
-  test 'mass assigment' do
+  test 'mass assignment' do
     # check it is possible to mass assign all the attributes
     programme = Factory(:programme)
     institution = Factory(:institution)

@@ -28,11 +28,11 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
 
-  has_many :work_groups, dependent: :destroy
-  has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?
-  has_many :group_memberships, through: :work_groups
+  has_many :work_groups, dependent: :destroy, inverse_of: :project
+  has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?, inverse_of: :projects
+  has_many :group_memberships, through: :work_groups, inverse_of: :project
   # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
-  has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships
+  has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships, inverse_of: :projects
 
   has_many :admin_defined_role_projects
 
