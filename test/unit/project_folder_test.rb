@@ -44,7 +44,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
     p.reload
     unsorted_folder.reload
     assert_equal 1, ProjectFolder.where(project_id: p.id).count
-    assert_equal unsorted_folder, ProjectFolder.where(project_id: p.id).count
+    assert_equal unsorted_folder, ProjectFolder.where(project_id: p.id).first
     assert_equal all_assets.count, unsorted_folder.assets.count
     assert_equal all_assets.sort_by(&:title), unsorted_folder.assets.sort_by(&:title)
   end
