@@ -114,7 +114,7 @@ module Seek
           # cannot rely purely on the count, since an item could have been deleted and a new one added
           c = lookup_count_for_user user_id
           last_stored_asset_id = last_asset_id_for_user user_id
-          last_asset_id = unscoped.last(order: :id).try(:id)
+          last_asset_id = unscoped.order(:id).last.try(:id)
 
           # trigger off a full update for that user if the count is zero and items should exist for that type
           if c == 0 && !last_asset_id.nil?

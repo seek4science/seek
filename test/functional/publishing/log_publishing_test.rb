@@ -201,9 +201,9 @@ class LogPublishingTest < ActionController::TestCase
     end
     assert_response :redirect
 
-    log_for_df = ResourcePublishLog.last(conditions: ['resource_type=? AND resource_id=?', 'DataFile', df.id])
+    log_for_df = ResourcePublishLog.where('resource_type=? AND resource_id=?', 'DataFile', df.id).last
     assert_equal ResourcePublishLog::PUBLISHED, log_for_df.publish_state
-    log_for_request_publishing_df = ResourcePublishLog.last(conditions: ['resource_type=? AND resource_id=?', 'DataFile', request_publishing_df.id])
+    log_for_request_publishing_df = ResourcePublishLog.where('resource_type=? AND resource_id=?', 'DataFile', request_publishing_df.id).last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, log_for_request_publishing_df.publish_state
   end
 

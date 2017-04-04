@@ -40,7 +40,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
 
-    al = ActivityLog.last(order: :id)
+    al = ActivityLog.order(:id).last
     assert_equal 'show', al.action
     assert_equal df, al.activity_loggable
 
@@ -49,7 +49,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
 
-    al = ActivityLog.last(order: :id)
+    al = ActivityLog.order(:id).last
     assert_equal 'download', al.action
     assert_equal df, al.activity_loggable
   end
