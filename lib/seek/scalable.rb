@@ -18,6 +18,7 @@ module Seek
 
         remove = self.scales - scales
         add = scales - self.scales
+
         add.each do |scale|
           annotation = Annotation.new(
             source: source,
@@ -27,8 +28,10 @@ module Seek
           )
           annotation.save
         end
+
+        scale_annotations = annotations_with_attribute('scale')
         remove.each do |scale|
-          annotation = Annotation.for_annotatable(self.class.name, id).with_attribute_name('scale').find { |an| an.value == scale }
+          annotation = scale_annotations.find { |an| an.value == scale }
           annotation.destroy unless annotation.nil?
           remove_additional_scale_info(scale.id)
         end
