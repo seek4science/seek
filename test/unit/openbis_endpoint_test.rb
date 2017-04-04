@@ -247,7 +247,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal 'openbis_endpoints/new-867be42425f47d36cc6b91926853a714251da75cea9c7517046e610d2f0201ca', endpoint.cache_key
 
     endpoint = Factory(:openbis_endpoint)
-    assert_equal "openbis_endpoints/#{endpoint.id}-#{endpoint.updated_at.utc.to_s(:number)}", endpoint.cache_key
+    assert_equal "openbis_endpoints/#{endpoint.id}-#{endpoint.updated_at.utc.to_s(:nsec)}", endpoint.cache_key
   end
 
   test 'destroy' do
