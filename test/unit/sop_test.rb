@@ -71,7 +71,7 @@ class SopTest < ActiveSupport::TestCase
       assert sop.valid?
       assert sop.policy.valid?
       assert_equal Policy::NO_ACCESS, sop.policy.access_type
-      assert_blank sop.policy.permissions
+      assert sop.policy.permissions.blank?
     end
   end
 

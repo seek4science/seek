@@ -1966,7 +1966,7 @@ class DataFilesControllerTest < ActionController::TestCase
     blob = assigns(:data_file).content_blob
     assert !blob.cachable?
     assert !blob.url.blank?
-    assert_blank blob.original_filename
+    assert blob.original_filename.blank?
     assert_equal 'text/html', blob.content_type
     assert !blob.caching_job.exists?
   end

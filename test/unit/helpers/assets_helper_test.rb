@@ -3,7 +3,7 @@ require 'test_helper'
 class AssetsHelperTest < ActionView::TestCase
   def setup
     User.destroy_all
-    assert_blank User.all
+    assert User.all.blank?
     @user = Factory :user
     @project = Factory :project
   end
@@ -110,8 +110,8 @@ class AssetsHelperTest < ActionView::TestCase
       Sop.delete_all
       DataFile.delete_all
     end
-    assert_blank Sop.all
-    assert_blank DataFile.all
+    assert Sop.all.blank?
+    assert DataFile.all.blank?
     assets = []
     assets << Factory(:sop, title: 'A', contributor: other_user, policy: Factory(:public_policy), projects: [@project])
     assets << Factory(:sop, title: 'B', contributor: @user, policy: Factory(:private_policy))

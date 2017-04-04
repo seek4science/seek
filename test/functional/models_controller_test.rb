@@ -319,7 +319,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert m.valid?
       assert m.policy.valid?
       assert_equal Policy::NO_ACCESS, m.policy.access_type
-      assert_blank m.policy.permissions
+      assert m.policy.permissions.blank?
     end
   end
 
