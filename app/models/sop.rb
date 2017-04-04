@@ -28,8 +28,8 @@ class Sop < ActiveRecord::Base
     acts_as_versioned_resource
     acts_as_favouritable
 
-    has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :primary_key => :sop_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version,parent.class.name]}
-    has_many :experimental_conditions,  -> (r) { where('experimental_conditions.sop_version =?', r.version) },
+    has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :primary_key => :sop_id,:foreign_key => :asset_id
+    has_many :experimental_conditions, -> (r) { where('experimental_conditions.sop_version =?', r.version) },
         :primary_key => "sop_id", :foreign_key => "sop_id"
     
   end
