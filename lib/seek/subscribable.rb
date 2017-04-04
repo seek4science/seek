@@ -49,7 +49,7 @@ module Seek
 
     def set_default_subscriptions(projects)
       unless projects.empty?
-        Person.scoped(include: :project_subscriptions).each do |person|
+        Person.includes(:project_subscriptions).each do |person|
           project_subscriptions = person.project_subscriptions
           project_subscriptions.each do |ps|
             next unless projects.include? ps.project
