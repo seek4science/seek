@@ -26,12 +26,12 @@ class Workflow < ActiveRecord::Base
 
 
   belongs_to :category, :class_name => 'WorkflowCategory'
-  has_many :input_ports, :class_name => 'WorkflowInputPort',
-           :conditions => proc { "workflow_version = #{self.version}" },
+  has_many :input_ports, -> (r) { where(workflow_version: r.version) },
+           :class_name => 'WorkflowInputPort',
            :dependent => :destroy
 
-  has_many :output_ports, :class_name => 'WorkflowOutputPort',
-           :conditions => proc { "workflow_version = #{self.version}"},
+  has_many :output_ports, -> (r) { where(workflow_version: r.version) },
+           :class_name => 'WorkflowOutputPort',
            :dependent => :destroy
 
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
@@ -49,16 +49,16 @@ class Workflow < ActiveRecord::Base
 
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :workflow_id, :foreign_key => :asset_id
-    has_many :input_ports, :class_name => 'WorkflowInputPort',
+    has_many :input_ports, -> (r) { where(workflow_version: r.version) },
+             :class_name => 'WorkflowInputPort',
              :primary_key => "workflow_id",
              :foreign_key => "workflow_id",
-             :conditions => proc { "workflow_version = #{self.version}"},
              :dependent => :destroy
 
-    has_many :output_ports, :class_name => 'WorkflowOutputPort',
+    has_many :output_ports, -> (r) { where(workflow_version: r.version) },
+             :class_name => 'WorkflowOutputPort',
              :primary_key => "workflow_id",
              :foreign_key => "workflow_id",
-             :conditions => proc { "workflow_version = #{self.version}"},
              :dependent => :destroy
 
     def content_blobs

@@ -37,7 +37,9 @@ module Jits
           self.sync_ignore_columns          = options[:sync_ignore_columns]  || []
 
           class_eval do
-            has_many :versions, version_association_options
+            order_opts = version_association_options.delete(:order) || ''
+            condition_ops = version_association_options.delete(:conditions) || ''
+            has_many :versions, -> { order(order_opts).where(condition_ops) }, version_association_options
 
             before_create :set_new_version
             after_create :save_version_on_create

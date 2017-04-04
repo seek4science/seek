@@ -1,8 +1,7 @@
 class Policy < ActiveRecord::Base
 
-  has_many :permissions,
+  has_many :permissions, -> { order('created_at ASC') },
            :dependent => :destroy,
-           :order => "created_at ASC",
            :autosave => true,
            :inverse_of => :policy
 

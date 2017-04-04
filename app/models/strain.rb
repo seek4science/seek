@@ -25,7 +25,6 @@ class Strain < ActiveRecord::Base
   has_many :samples, through: :sample_resource_links
 
   before_destroy :destroy_genotypes_phenotypes
-  scope :by_title
 
   scope :without_default, -> { where(is_dummy: false) }
 
