@@ -53,7 +53,7 @@ module AdminHelper
         admin_activate_user_button + ' ' + resend_activation_email_button
       end
     when 'delete'
-      button_link_to('Delete', 'destroy', user_or_person, method: :delete, confirm: "Are you sure you wish to delete this #{user_or_person.class.name}?")
+      button_link_to('Delete', 'destroy', user_or_person, method: :delete, data: { confirm: "Are you sure you wish to delete this #{user_or_person.class.name}?" })
     end
   end
 
