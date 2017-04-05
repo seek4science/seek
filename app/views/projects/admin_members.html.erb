@@ -64,9 +64,9 @@
             <h4 class="modal-title">Flag as inactive in the project</h4>
           </div>
           <div class="modal-body">
-            <div class="form-group date-select">
+            <div class="form-group">
               <label>Date became inactive at</label>
-              <%= calendar_date_select_tag :leaving_date, Date.today, :time => "mixed", :class => "form-control" -%>
+              <%= text_field_tag :leaving_date, Date.today, data: { calendar: 'mixed' }, :class => "calendar form-control" -%>
               <input id="leaving-person-id" type="hidden" value=""/>
               <input id="leaving-person-name" type="hidden" value=""/>
               <input id="leaving-person-institution-id" type="hidden" value=""/>

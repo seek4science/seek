@@ -108,12 +108,6 @@ GIT
       taverna-t2flow (~> 0.5.1)
 
 GIT
-  remote: https://github.com/paneq/calendar_date_select.git
-  revision: 977048211b94599fe0f08eb37a481f3d69df48f6
-  specs:
-    calendar_date_select (1.16.2)
-
-GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
   revision: a389b760db2a1d00cc79319ad0bd48fd86b9d960
   specs:
@@ -515,7 +509,11 @@ GEM
     rails-assets-bootstrap-tagsinput (0.8.0)
       rails-assets-jquery (~> 2.1.1)
     rails-assets-clipboard (1.5.12)
+    rails-assets-eonasdan-bootstrap-datetimepicker (4.17.47)
+      rails-assets-jquery (>= 1.8.3)
+      rails-assets-moment (>= 2.10.5)
     rails-assets-jquery (2.1.4)
+    rails-assets-moment (2.18.1)
     rails-assets-typeahead.js (0.10.5)
       rails-assets-jquery (>= 1.7)
     rails-assets-vue (2.1.8)
@@ -830,7 +828,6 @@ DEPENDENCIES
   bootstrap-sass
   breadcrumbs_on_rails
   bundler (>= 1.8.4)
-  calendar_date_select!
   cancan
   citeproc (~> 1.0.4)
   citeproc-ruby (~> 1.1.4)
@@ -895,6 +892,7 @@ DEPENDENCIES
   rails-assets-bootstrap-multiselect (~> 0.9.13)!
   rails-assets-bootstrap-tagsinput (~> 0.8.0)!
   rails-assets-clipboard (~> 1.5.12)!
+  rails-assets-eonasdan-bootstrap-datetimepicker (~> 4.17.42)!
   rails-assets-typeahead.js (~> 0.10.5)!
   rails-assets-vue (~> 2.1.8)!
   rails-observers

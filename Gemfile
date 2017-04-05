@@ -45,7 +45,6 @@ gem 'acts_as_tree'
 gem 'country_select'
 gem 'modporter-plugin'
 gem 'will_paginate', '~> 3.0.4'
-gem 'calendar_date_select', git: 'https://github.com/paneq/calendar_date_select.git'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
@@ -132,6 +131,7 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-typeahead.js', '~> 0.10.5'
   gem 'rails-assets-clipboard', '~> 1.5.12'
   gem 'rails-assets-vue', '~> 2.1.8'
+  gem 'rails-assets-eonasdan-bootstrap-datetimepicker', '~> 4.17.42'
 end
 
 group :production do

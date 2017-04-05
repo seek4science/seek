@@ -45,7 +45,6 @@
 //= require objects_input
 //= require handlebars.runtime
 //= require handlebars_helpers
-//= require calendar_date_select/calendar_date_select
 //= require zenodo_form
 //= require batch_upload
 //= require bootstrap_tab_memory
@@ -65,4 +64,5 @@
 //= require clipboard
 //= require upload_selection
 //= require openbis
+//= require calendar
 //= require_tree ./templates
