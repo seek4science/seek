@@ -76,7 +76,7 @@ class FoldersControllerTest < ActionController::TestCase
     assert_redirected_to :root
     unsorted_folder.reload
     project.reload
-    assert_equal [folder, child, unsorted_folder], ProjectFolder.where(project_id: @project.id).to_a.sort_by(&:id)
+    assert_equal [folder, child, unsorted_folder], ProjectFolder.where(project_id: project.id).to_a.sort_by(&:id)
     assert_equal [], unsorted_folder.assets
     assert_equal [sop], folder.assets
   end
