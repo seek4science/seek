@@ -173,7 +173,7 @@ class ProjectsController < ApplicationController
     end
     @project = Project.new(params[:project])
 
-    @project.default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
+    @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
     respond_to do |format|
       if @project.save
