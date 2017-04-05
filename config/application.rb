@@ -103,3 +103,5 @@ module SEEK
     config.action_controller.permit_all_parameters = true # TODO: REMOVE ME!!! - Temp measure for testing Rails 3.2 -> 4.0 upgrade
   end
 end
+
+require 'settings' # This is here rather than in seek_main.rb because it has to be loaded before seek_configuration.rb
