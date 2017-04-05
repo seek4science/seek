@@ -104,7 +104,7 @@ class Programme < ActiveRecord::Base
   end
 
   def total_asset_size
-    projects.sum(&:total_asset_size)
+    projects.to_a(&:total_asset_size)
   end
 
   def funding_codes= tags
