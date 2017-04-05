@@ -32,6 +32,6 @@
         <% end %>
     <% end %>
 
-    <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateWorkGroupIds()", :class => 'btn btn-primary   ') -%>
+    <%= f.submit("Update", data: { disable_with: 'Updating...' }, :onclick => "updateWorkGroupIds()", :class => 'btn btn-primary   ') -%>
     or <%= cancel_button(person_path(@person.id)) -%>
 <% end -%>

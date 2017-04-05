@@ -10,6 +10,6 @@
                                Or you can give the link to its content from external site. You can input basic html tags and formats.
                                Below is an example. You can see how it is under homes/imprint", :rows => 30) %>
 
-    <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
+    <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path %>
 <% end %>

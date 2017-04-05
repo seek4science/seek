@@ -63,7 +63,7 @@
                  :onclick => "javascript: previewPermissions();return(false);",
                  :class => 'btn btn-primary'-%>
 <% else %>
-    <%= f.submit button_text, :disable_with=>disabled_text, :id => "study_submit_btn",
+    <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "study_submit_btn",
                  :onclick => "javascript: $('study_submit_btn').form.submit();return(false);",
                  :class => 'btn btn-primary'-%>
 <% end %>

@@ -26,7 +26,7 @@
               <%= select_tag :other_file_id, options_for_select(@other_version.sbml_content_blobs.collect { |b| [b.original_filename, b.id] }, @blob2.id) %>
             </div>
             <div>
-              <%= submit_tag "Compare", :disable_with => "Comparing" %>
+              <%= submit_tag "Compare", data: { disable_with: 'Comparing' } %>
             </div>
 
           </div>

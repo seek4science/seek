@@ -5,7 +5,7 @@
       otherwise you need to restart manually.
 
       <%= button_to('Restart server', restart_server_admin_path, :class =>'btn btn-danger', :id => 'restart_server',
-                    :onclick => 'return confirm("Are you sure you want to restart the server?")', :disable_with => 'Restarting...') -%>
+                    :onclick => 'return confirm("Are you sure you want to restart the server?")', data: { disable_with: 'Restarting...' }) -%>
     </p>
 
     <p>
@@ -13,7 +13,7 @@
       When changing setting '<b>search enabled</b>' or changing code, you need to restart this process.
 
       <%= button_to('Restart background tasks', restart_delayed_job_admin_path, :class =>'btn btn-danger', :id => 'restart_delayed_job',
-                    :onclick => 'return confirm("Are you sure you want to restart the background tasks?")', :disable_with => 'Restarting...') -%>
+                    :onclick => 'return confirm("Are you sure you want to restart the background tasks?")',data: { disable_with: 'Restarting...' }) -%>
     </p>
 
     <hr/>

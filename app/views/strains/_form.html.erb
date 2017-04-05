@@ -80,7 +80,7 @@
                    :onclick => "previewPermissions();return(false);",
                    :class => 'btn btn-primary' -%>
   <% else %>
-      <%= f.submit button_text, :disable_with => disabled_text, :id => "strain_submit_btn",
+      <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "strain_submit_btn",
                    :class => 'btn btn-primary' -%>
   <% end %>
   or <%= cancel_button(@strain.id ? strain_path(@strain.id) : strains_path) %>

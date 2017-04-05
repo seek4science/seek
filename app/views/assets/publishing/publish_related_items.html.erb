@@ -32,7 +32,7 @@
 
       <% resource = (controller_name == 'people') ? current_user.person : @asset %>
 
-      <%= submit_tag "Next",:disable_with=>"Next", :class => 'btn btn-primary' -%>
+      <%= submit_tag "Next",data: { disable_with: 'Next' }, :class => 'btn btn-primary' -%>
       or
       <%= cancel_button(resource) %>
   <% end %>

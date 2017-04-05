@@ -46,5 +46,5 @@
     <%= render :partial => 'assets/license_selector', :locals => { :resource => @project, :label=>"Default License",:accessor=>:default_license } %>
 <% end %>
 
-<%= f.submit(project ? "Update" : "Create",:disable_with=>(project ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
+<%= f.submit(project ? "Update" : "Create",data: { disable_with: (project ? "Updating..." : "Creating...") }, :class => 'btn btn-primary') -%>
  or <%= cancel_button(project ? project_path(project.id) : projects_path) -%>
