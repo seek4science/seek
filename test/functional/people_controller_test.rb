@@ -133,7 +133,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div#errorExplanation' do
-      assert_select 'ul > li', text: 'Email can&#x27;t be blank'
+      assert_select 'ul > li', text: 'Email can&#39;t be blank'
     end
     assert_select 'form#new_person' do
       assert_select 'input#person_first_name[value=?]', 'test'
