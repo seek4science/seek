@@ -99,5 +99,7 @@ module SEEK
     # openbis_endpoints/26-20170404142724000000000...
     # openbis_endpoints/26-20170404142724224014370...
     config.active_record.cache_timestamp_format = :usec
+
+    config.action_controller.permit_all_parameters = true # TODO: REMOVE ME!!! - Temp measure for testing Rails 3.2 -> 4.0 upgrade
   end
 end
