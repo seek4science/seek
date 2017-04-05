@@ -50,7 +50,7 @@
         <% end %>
         <li role="presentation" class="divider"></li>
         <li><%= link_to 'Provide feedback', feedback_home_path -%></li>
-        <li><%= link_to 'Logout', logout_path, :confirm => 'Are you sure you wish to logout?' -%></li>
+        <li><%= link_to 'Logout', logout_path, data: { confirm: 'Are you sure you wish to logout?' } -%></li>
       </ul>
     </li>
 <% end %>

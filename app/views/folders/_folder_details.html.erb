@@ -38,7 +38,7 @@
         <div>
         <%= image_tag_for_key "destroy", project_folder_path(@project, @folder),
                               "Delete this folder",
-                              {:confirm => "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?",
+                              { data: { confirm: "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?" },
                                :method => :delete},
                               "Delete this folder"
         -%>

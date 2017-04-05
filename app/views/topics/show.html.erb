@@ -53,7 +53,8 @@
         <span style="display:none;" id="topic_mod">
           <% if @topic.editable_by?(current_user) -%>
             <%= link_to('edit'[], edit_forum_topic_path(@forum, @topic), :class => "utility") %> |
-            <%= link_to('delete'[], forum_topic_path(@forum, @topic), :class => "utility", :method => :delete, :confirm => 'Delete this topic forever?'[:delete_topic_conf]) %>
+            <%= link_to('delete'[], forum_topic_path(@forum, @topic), :class => "utility", :method => :delete,
+                        data: { confirm: 'Delete this topic forever?'[:delete_topic_conf] }) %>
           <% end -%>
         </span>
       <% end %>

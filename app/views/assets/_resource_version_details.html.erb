@@ -28,7 +28,8 @@
                 <% end %>
                 <% if Seek::Config.delete_asset_version_enabled && resource.can_edit?(User.current_user) && resource.versions.length > 1 %>
                     <% path = polymorphic_path(resource, :version => version.version, :action => :destroy_version) %>
-                    <%= button_link_to("Delete", 'destroy', path, {:confirm => "This deletes version #{version.to_s} of the #{text_for_resource resource}. Are you sure?", :method => :delete}) -%>
+                    <%= button_link_to("Delete", 'destroy', path,
+                                       { data: { confirm: "This deletes version #{version.to_s} of the #{text_for_resource resource}. Are you sure?" }, :method => :delete}) -%>
                 <% end -%>
               </div>
             </div>

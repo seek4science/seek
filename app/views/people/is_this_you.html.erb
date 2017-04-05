@@ -38,7 +38,7 @@ Below are some details about the profile, and the related <%= t('project').plura
         <%= f.submit "Yes", :class => 'btn btn-primary' %>
         <%= link_to "No",
                     register_people_path,
-                    :confirm => "You will now be asked to create a new profile, and you will need to provide a different email address",
+                    data: { confirm: 'You will now be asked to create a new profile, and you will need to provide a different email address' },
                     :class => 'btn btn-primary' %>
         <%= render :partial => "cancel_registration" %>
     </div>

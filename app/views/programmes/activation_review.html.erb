@@ -28,9 +28,9 @@
 </p>
 <% end %>
 <p>
-  <%= link_to 'Accept',accept_activation_programme_path(@programme),:class=>'btn btn-success',:method=>:put, :confirm=>"You are about to accept this #{t('programme')}. Are you sure?" %>
+  <%= link_to 'Accept',accept_activation_programme_path(@programme),:class=>'btn btn-success',:method=>:put, data: { confirm: "You are about to accept this #{t('programme')}. Are you sure?" } %>
   <% if @programme.rejected? %>
-      <%= link_to 'Delete',programme_path(@programme),:class=>'btn btn-danger',:method=>:delete, :confirm=>"You are about to permanently delete this #{t('programme')}. Are you sure?" %>
+      <%= link_to 'Delete',programme_path(@programme),:class=>'btn btn-danger',:method=>:delete, data: { confirm: "You are about to permanently delete this #{t('programme')}. Are you sure?" } %>
   <% else %>
   <%= link_to 'Reject',reject_activation_confirmation_programme_path(@programme),:class=>'btn btn-danger' %>
   <% end %>

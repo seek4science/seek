@@ -16,6 +16,7 @@
   <% end -%>
 
   <% if item.can_delete? -%>
-    <li><%= image_tag_for_key('destroy', publication_path(item), nil, { :confirm => 'This will unregister this publication with SEEK. Are you sure wish to do this?', :method => :delete }, 'Unregister') -%></li>
+    <li><%= image_tag_for_key('destroy', publication_path(item), nil,
+                              { data: { confirm: 'This will unregister this publication with SEEK. Are you sure wish to do this?' }, :method => :delete }, 'Unregister') -%></li>
   <% end -%>
 <% end -%>
