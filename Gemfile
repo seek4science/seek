@@ -123,6 +123,8 @@ gem 'activerecord-session_store'
 # gem 'protected_attributes' # Delete me after refactoring
 gem 'rails-observers'
 
+gem 'jbuilder', '~> 2.0'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do

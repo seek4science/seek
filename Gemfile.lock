@@ -857,6 +857,7 @@ DEPENDENCIES
   handlebars_assets
   hpricot (~> 0.8.2)
   in_place_editing
+  jbuilder (~> 2.0)
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
   libxml-ruby (~> 2.8.0)
