@@ -1,5 +1,5 @@
 <% @page_title = @topic.title %>
-<% @monitoring = logged_in? && !Monitorship.count(:id, :conditions => ['user_id = ? and topic_id = ? and active = ?', current_user.id, @topic.id, true]).zero? %>
+<% @monitoring = logged_in? && !Monitorship.where(user_id: current_user.id, topic_id: @topic.id, active: true).count.zero? %>
 
 <div class="forums">
   <% content_for :right do -%>

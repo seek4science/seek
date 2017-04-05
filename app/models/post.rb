@@ -27,7 +27,7 @@ class Post < ActiveRecord::Base
   protected
     # using count isn't ideal but it gives us correct caches each time
     def update_cached_fields
-      Forum.update_all ['posts_count = ?', Post.count(:id, :conditions => {:forum_id => forum_id})], ['id = ?', forum_id]
+      Forum.update_all ['posts_count = ?', Post.where(forum_id: forum_id).count], ['id = ?', forum_id]
       User.update_posts_count(user_id)
       topic.update_cached_post_fields(self)
     end
