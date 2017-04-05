@@ -44,8 +44,8 @@ class Topic < ActiveRecord::Base
     # these fields are not accessible to mass assignment
     remaining_post = post.frozen? ? recent_post : post
     if remaining_post
-      self.class.update_all(['replied_at = ?, replied_by = ?, last_post_id = ?, posts_count = ?', 
-        remaining_post.created_at, remaining_post.user_id, remaining_post.id, posts.count], ['id = ?', id])
+      self.class.where(id: id).update_all('replied_at = ?, replied_by = ?, last_post_id = ?, posts_count = ?',
+        remaining_post.created_at, remaining_post.user_id, remaining_post.id, posts.count)
     else
       self.destroy
     end
@@ -58,7 +58,7 @@ class Topic < ActiveRecord::Base
     end
 
     def set_post_forum_id
-      Post.update_all ['forum_id = ?', forum_id], ['topic_id = ?', id]
+      Post.where(topic_id: id).update_all('forum_id = ?', forum_id)
     end
 
     def check_for_changing_forums
@@ -73,9 +73,9 @@ class Topic < ActiveRecord::Base
       # if the topic moved forums
       if !frozen? && @old_forum_id && @old_forum_id != forum_id
         set_post_forum_id
-        Forum.update_all ['topics_count = ?, posts_count = ?', 
-          Topic.where(forum_id: @old_forum_id).count,
-          Post.where(forum_id: @old_forum_id).count], ['id = ?', @old_forum_id]
+        Forum.where(id: @old_forum_id).update_all('topics_count = ?, posts_count = ?',
+                                                  Topic.where(forum_id: @old_forum_id).count,
+                                                  Post.where(forum_id: @old_forum_id).count)
       end
       # if the topic moved forums or was deleted
       if frozen? || (@old_forum_id && @old_forum_id != forum_id)
@@ -84,7 +84,7 @@ class Topic < ActiveRecord::Base
       end
       # User doesn't have update_posts_count method in SB2, as reported by Ryan
 			#@voices.each &:update_posts_count if @voices
-      Forum.update_all forum_conditions, ['id = ?', forum_id]
+      Forum.where(id: forum_id).update_all(forum_conditions)
       @old_forum_id = @voices = nil
     end
     
