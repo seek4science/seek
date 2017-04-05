@@ -44,8 +44,10 @@ class Topic < ActiveRecord::Base
     # these fields are not accessible to mass assignment
     remaining_post = post.frozen? ? recent_post : post
     if remaining_post
-      self.class.where(id: id).update_all('replied_at = ?, replied_by = ?, last_post_id = ?, posts_count = ?',
-        remaining_post.created_at, remaining_post.user_id, remaining_post.id, posts.count)
+      self.class.where(id: id).update_all(replied_at: remaining_post.created_at,
+                                          replied_by: remaining_post.user_id,
+                                          last_post_id: remaining_post.id,
+                                          posts_count: posts.count)
     else
       self.destroy
     end
@@ -58,7 +60,7 @@ class Topic < ActiveRecord::Base
     end
 
     def set_post_forum_id
-      Post.where(topic_id: id).update_all('forum_id = ?', forum_id)
+      Post.where(topic_id: id).update_all(forum_id: forum_id)
     end
 
     def check_for_changing_forums
@@ -73,9 +75,8 @@ class Topic < ActiveRecord::Base
       # if the topic moved forums
       if !frozen? && @old_forum_id && @old_forum_id != forum_id
         set_post_forum_id
-        Forum.where(id: @old_forum_id).update_all('topics_count = ?, posts_count = ?',
-                                                  Topic.where(forum_id: @old_forum_id).count,
-                                                  Post.where(forum_id: @old_forum_id).count)
+        Forum.where(id: @old_forum_id).update_all(topics_count: Topic.where(forum_id: @old_forum_id).count,
+                                                  posts_count: Post.where(forum_id: @old_forum_id).count)
       end
       # if the topic moved forums or was deleted
       if frozen? || (@old_forum_id && @old_forum_id != forum_id)
