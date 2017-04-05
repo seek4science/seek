@@ -53,7 +53,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_should_update_institution
-    put :update, id: institutions(:one).id, institution: {}
+    put :update, id: institutions(:one).id, institution: { title: 'something' }
     assert_redirected_to institution_path(assigns(:institution))
   end
 
@@ -106,7 +106,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     get :edit, id: institution
     assert_response :success
 
-    put :update, id: institution.id, institution: {}
+    put :update, id: institution.id, institution: { title: 'something' }
     assert_redirected_to institution_path(assigns(:institution))
   end
 
@@ -128,7 +128,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     get :edit, id: institutions(:two)
     assert_response :success
 
-    put :update, id: institutions(:two).id, institution: {}
+    put :update, id: institutions(:two).id, institution: { title: 'something' }
     assert_redirected_to institution_path(assigns(:institution))
   end
 
