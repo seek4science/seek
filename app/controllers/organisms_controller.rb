@@ -26,7 +26,7 @@ class OrganismsController < ApplicationController
   end
 
   def index
-    @organisms = Organism.order('title ASC').all
+    @organisms = Organism.order('title ASC')
 
     if request.format.symbol == :html
       super

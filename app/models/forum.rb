@@ -21,6 +21,7 @@ class Forum < ActiveRecord::Base
   
   # retrieves forums ordered by position
   def self.find_ordered(options = {})
-    find :all, options.update(:order => 'position')
+    options = options.update(:order => 'position')
+    where(options[:conditions] || '').order(options[:order]).limit(options[:limit])
   end
 end
