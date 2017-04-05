@@ -1,6 +1,5 @@
-class AssaySerializer < BaseSerializer
+class AssaySerializer < PCSSerializer
   attributes :id, :title, :description,:assay_class
-
   attribute :assay_type do
     object.assay_type_label
   end
