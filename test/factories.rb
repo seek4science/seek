@@ -136,7 +136,7 @@ end
 # Institution
 Factory.define(:institution) do |f|
   f.sequence(:title) { |n| "An Institution: #{n}" }
-  f.country { ActionView::Helpers::FormOptionsHelper::COUNTRIES.sample }
+  f.country { ISO3166::Country.all.sample.name }
 end
 
 # Sop
