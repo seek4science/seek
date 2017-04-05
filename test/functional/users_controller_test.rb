@@ -1,22 +1,11 @@
 require 'test_helper'
 
-# Re-raise errors caught by the controller.
-class UsersController; def rescue_action(e)
-                         fail e
-                       end; end
-
 class UsersControllerTest < ActionController::TestCase
   # Be sure to include AuthenticatedTestHelper in test/test_helper.rb instead
   # Then, you can remove it from this and the units test.
   include AuthenticatedTestHelper
 
   fixtures :all
-
-  def setup
-    @controller = UsersController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
-  end
 
   def test_title
     get :new
