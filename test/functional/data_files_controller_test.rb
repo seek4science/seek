@@ -1156,7 +1156,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'correct response to unknown action' do
     df = data_files(:picture)
-    assert_raises ActionController::RoutingError do
+    assert_raises ActionController::UrlGenerationError do
       get :sdkfjshdfkhsdf, id: df
     end
   end

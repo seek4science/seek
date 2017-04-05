@@ -26,7 +26,7 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'correct response to unknown action' do
     login_as(:quentin)
-    assert_raises ActionController::RoutingError do
+    assert_raises ActionController::UrlGenerationError do
       get :sdjgsdfjg
     end
   end

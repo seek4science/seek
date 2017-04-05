@@ -5,10 +5,10 @@ module Seek
       ERROR_MAP = {
         Exception => 500,
         ActionController::RoutingError => 404,
+        ActionController::UrlGenerationError => 404,
         ::AbstractController::ActionNotFound => 404,
         ActionController::UnknownController => 406,
         ActiveRecord::RecordNotFound => 404
-
       }
 
       def self.included(base)
