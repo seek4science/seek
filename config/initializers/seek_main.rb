@@ -20,7 +20,6 @@ require 'uuid'
 
 require 'sunspot_rails'
 require 'cancan'
-require 'in_place_editing'
 require 'seek/breadcrumbs'
 require 'string_extension'
 require 'recaptcha'

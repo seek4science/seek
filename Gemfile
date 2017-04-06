@@ -29,7 +29,6 @@ gem 'prototype-rails'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'cancan'
-gem 'in_place_editing'
 gem 'linkeddata'
 gem 'openseek-api'
 
@@ -134,6 +133,7 @@ source 'https://rails-assets.org' do
   gem 'rails-assets-clipboard', '~> 1.5.12'
   gem 'rails-assets-vue', '~> 2.1.8'
   gem 'rails-assets-eonasdan-bootstrap-datetimepicker', '~> 4.17.42'
+  gem 'rails-assets-x-editable', '~> 1.5.1'
 end
 
 group :production do

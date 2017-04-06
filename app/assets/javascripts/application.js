@@ -65,4 +65,5 @@
 //= require upload_selection
 //= require openbis
 //= require calendar
+//= require inplace
 //= require_tree ./templates

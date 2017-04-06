@@ -334,7 +334,6 @@ GEM
     i18n (0.8.1)
     i18n_data (0.7.0)
     ice_nine (0.11.2)
-    in_place_editing (1.2.0)
     jbuilder (2.6.3)
       activesupport (>= 3.0.0, < 5.2)
       multi_json (~> 1.2)
@@ -517,6 +516,8 @@ GEM
     rails-assets-typeahead.js (0.10.5)
       rails-assets-jquery (>= 1.7)
     rails-assets-vue (2.1.8)
+    rails-assets-x-editable (1.5.1)
+      rails-assets-jquery (>= 1.6)
     rails-observers (0.1.2)
       activemodel (~> 4.0)
     rails_autolink (1.1.6)
@@ -856,7 +857,6 @@ DEPENDENCIES
   guard-rubycritic
   handlebars_assets
   hpricot (~> 0.8.2)
-  in_place_editing
   jbuilder (~> 2.0)
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
@@ -896,6 +896,7 @@ DEPENDENCIES
   rails-assets-eonasdan-bootstrap-datetimepicker (~> 4.17.42)!
   rails-assets-typeahead.js (~> 0.10.5)!
   rails-assets-vue (~> 2.1.8)!
+  rails-assets-x-editable (~> 1.5.1)!
   rails-observers
   rails_autolink
   rails_best_practices
