@@ -3,7 +3,7 @@ require 'savage_beast/user_init'
 
 class User < ActiveRecord::Base
   acts_as_annotation_source
-  include SavageBeast::UserInit
+#  include SavageBeast::UserInit
 
   acts_as_tagger
 
