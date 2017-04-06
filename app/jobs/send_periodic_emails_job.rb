@@ -58,7 +58,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
   def send_subscription_mails(logs)
     if Seek::Config.email_enabled
       # strip the logs down to those that are relevant
-      logs.select! do |log|
+      logs = logs.to_a.select do |log|
         log.activity_loggable.try(:subscribable?)
       end
 
