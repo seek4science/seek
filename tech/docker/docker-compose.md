@@ -14,11 +14,12 @@ See the [Installation Guide](https://docs.docker.com/compose/install/) for how t
 Once installed, all you need is the [docker-compose.yml](https://github.com/seek4science/seek/blob/master/docker-compose.yml), and the [docker/db.env](https://github.com/seek4science/seek/blob/master/docker/db.env),
 although you can simply check out the SEEK source from GitHub - see [Getting SEEK](../install.html#getting-seek).
 
-First you need to create 3 volumes
+First you need to create 4 volumes
 
     docker volume create --name=seek-filestore
     docker volume create --name=seek-mysql-db
     docker volume create --name=seek-solr-data
+    docker volume create --name=seek-cache
     
 and then to start up, with the docker-compose.yml in your currently directory run
     
