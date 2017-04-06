@@ -274,7 +274,7 @@ class AdminsController < ApplicationController
       @tag.annotations.each do |a|
         annotatable = a.annotatable
         source = a.source
-        attribute_name = a.attribute.name
+        attribute_name = a.annotation_attribute.name
         a.destroy unless replacement_tags.include?(@tag)
         replacement_tags.each do |tag|
           if annotatable.annotations_with_attribute_and_by_source(attribute_name, source).select { |an| an.value == tag }.blank?

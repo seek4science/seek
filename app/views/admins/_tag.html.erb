@@ -3,7 +3,7 @@
    associated_count=tag.annotations.count
 
 -%>
-<% contexts=tag.annotations.collect{|a| a.attribute.name}.uniq -%>
+<% contexts=tag.annotations.collect{|a| a.annotation_attribute.name}.uniq -%>
 <tr>
   <td><%= tag.id -%></td>
   <td class="<%= name_class -%>"><%= h(tag.text) -%></td>
