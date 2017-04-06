@@ -73,9 +73,9 @@ class ApplicationHelperTest < ActionView::TestCase
     with_config_value :css_appended, 'fish' do
       with_config_value :css_prepended, 'apple' do
         tags = seek_stylesheet_tags 'carrot'
-        assert_includes tags, "<link href=\"/stylesheets/prepended/apple.css\" media=\"screen\" rel=\"stylesheet\" />"
-        assert_includes tags, "<link href=\"/stylesheets/carrot.css\" media=\"screen\" rel=\"stylesheet\" />"
-        assert_includes tags, "<link href=\"/stylesheets/appended/fish.css\" media=\"screen\" rel=\"stylesheet\" />"
+        assert_includes tags, "<link rel=\"stylesheet\" media=\"screen\" href=\"/stylesheets/prepended/apple.css\" />"
+        assert_includes tags, "<link rel=\"stylesheet\" media=\"screen\" href=\"/stylesheets/carrot.css\" />"
+        assert_includes tags, "<link rel=\"stylesheet\" media=\"screen\" href=\"/stylesheets/appended/fish.css\" />"
         assert tags.index('fish.css') > tags.index('carrot.css')
         assert tags.index('carrot.css') > tags.index('apple.css')
         refute_equal 0, tags.index('apple.css')
