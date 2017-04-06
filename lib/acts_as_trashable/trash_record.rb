@@ -31,7 +31,7 @@ module ActsAsTrashable
     class << self
       # Find a trash entry by class and id.
       def find_trash (klass, id)
-        find(:all, :conditions => {:trashable_type => klass.base_class.name, :trashable_id => id}).last
+        where(:trashable_type => klass.base_class.name, :trashable_id => id).last
       end
 
       # Empty the trash by deleting records older than the specified maximum age. You can optionally specify

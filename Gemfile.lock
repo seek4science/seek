@@ -13,13 +13,6 @@ GIT
     acts_as_activity_logged (0.3.3)
 
 GIT
-  remote: https://github.com/SysMO-DB/acts_as_trashable.git
-  revision: ff5dcddece0d03014a8ffde526da59a151501cd7
-  specs:
-    acts_as_trashable (1.0.6)
-      activerecord (>= 2.2)
-
-GIT
   remote: https://github.com/SysMO-DB/app_version.git
   revision: 773b6ae72d9cba038fce1a3502feb5de2f2b75a3
   specs:
@@ -839,7 +832,6 @@ DEPENDENCIES
   acts-as-taggable-on (= 3.0.1)
   acts_as_activity_logged!
   acts_as_list
-  acts_as_trashable!
   acts_as_tree
   app_version!
   attr_encrypted (~> 3.0.0)
