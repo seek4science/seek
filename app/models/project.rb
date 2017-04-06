@@ -24,7 +24,6 @@ class Project < ActiveRecord::Base
                                                 join_table: 'projects_taverna_player_runs', association_foreign_key: 'run_id'
 
   has_and_belongs_to_many :strains
-  has_and_belongs_to_many :organisms
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
 
