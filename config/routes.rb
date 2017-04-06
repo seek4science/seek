@@ -255,8 +255,8 @@ SEEK::Application.routes.draw do
         get :mint_doi_confirm
         post :mint_doi
         get :download
-        get :export, to: :export_preview
-        post :export, to: :export_submit
+        get :export, action: :export_preview
+        post :export, action: :export_submit
       end
     end
     member do
@@ -282,8 +282,8 @@ SEEK::Application.routes.draw do
         get :mint_doi_confirm
         post :mint_doi
         get :download
-        get :export, to: :export_preview
-        post :export, to: :export_submit
+        get :export, action: :export_preview
+        post :export, action: :export_submit
       end
     end
     member do
@@ -311,8 +311,8 @@ SEEK::Application.routes.draw do
         get :mint_doi_confirm
         post :mint_doi
         get :download
-        get :export, to: :export_preview
-        post :export, to: :export_submit
+        get :export, action: :export_preview
+        post :export, action: :export_submit
       end
     end
     member do
