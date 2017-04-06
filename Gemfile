@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.0.0'
+gem 'rails', '~> 4.2.8'
 gem 'rdoc'
 
 #database adaptors
@@ -25,7 +25,7 @@ gem 'sunspot_rails', '~>2.2.0'
 gem 'sunspot_solr', '~>2.2.0'
 gem 'savon', '1.1.0'
 gem 'dynamic_form'
-gem 'prototype-rails'
+gem 'prototype-rails', github: 'rails/prototype-rails', branch: '4.2'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'cancan'
@@ -78,11 +78,11 @@ gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'convert_office', git: 'https://github.com/SysMO-DB/convert_office.git', ref: '753f2567dbd625bc89071e1150404efbb562e130'
 gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'bb1182f2716a9bf1b5d85e186d8bb7eec436797b'
 gem 'search_biomodel', '2.2.1', git: 'https://github.com/myGrid/search_biomodel.git'
-gem 'my_annotations', git: 'https://github.com/myGrid/annotations.git', branch: 'rails4'
+gem 'my_annotations', git: 'https://github.com/myGrid/annotations.git', branch: 'rails4.2'
 
 
 gem 'taverna-t2flow'
-gem 'taverna-player', git: 'https://github.com/myGrid/taverna-player.git', branch: 'rails400-list-inputs'
+gem 'taverna-player', git: 'https://github.com/myGrid/taverna-player.git', branch: 'rails4-list-inputs'
 gem 'jquery-rails', '~> 3'
 gem 'jquery-ui-rails', '~>3'
 gem 'recaptcha'
@@ -159,8 +159,7 @@ end
 group :test do
   gem 'test_after_commit'
   gem 'ruby-prof'
-  gem 'minitest', '~> 4.0'
-  gem 'minitest-reporters'
+  gem 'minitest'
   gem 'coveralls', require: false
   gem 'sunspot_matchers'
   gem 'database_cleaner'

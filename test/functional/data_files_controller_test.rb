@@ -1,7 +1,6 @@
 
 require 'test_helper'
 require 'libxml'
-require 'webmock/test_unit'
 require 'openbis_test_helper'
 
 class DataFilesControllerTest < ActionController::TestCase
