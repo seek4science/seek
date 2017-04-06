@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SpecialAuthCodesAccessTest < ActionController::IntegrationTest
+class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
   ASSETS_WITH_AUTH_CODES = %w(data_files events models sops presentations)
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|

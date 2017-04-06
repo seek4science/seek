@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RegistrationStateTest < ActionController::IntegrationTest
+class RegistrationStateTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
   fixtures :all
 

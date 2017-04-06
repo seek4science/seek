@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class FacetedBrowsingTest < ActionController::IntegrationTest
+class FacetedBrowsingTest < ActionDispatch::IntegrationTest
   ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
 
   def setup

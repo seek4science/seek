@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SessionStoreTest < ActionController::IntegrationTest
+class SessionStoreTest < ActionDispatch::IntegrationTest
   def setup
     login_as_test_user 'http://www.example.com'
   end

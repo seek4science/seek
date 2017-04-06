@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AssetButtonsTest < ActionController::IntegrationTest
+class AssetButtonsTest < ActionDispatch::IntegrationTest
   ASSETS = %w(investigations studies assays data_files models sops strains presentations events)
   def setup
     User.current_user = Factory(:user, login: 'test')

@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'project_hierarchy_test_helper'
 
-class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
+class SubscriptionWithHierarchyTest < ActionDispatch::IntegrationTest
   include ProjectHierarchyTestHelper
   def setup
     skip_hierarchy_tests?
