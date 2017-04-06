@@ -12,8 +12,8 @@ SEEK::Application.configure do
   # preloads Rails for running tests, you may have to set it to true.
   config.eager_load = false
 
-  # Configure static asset server for tests with Cache-Control for performance.
-  config.serve_static_assets = true
+  # Configure static file server for tests with Cache-Control for performance.
+  config.serve_static_files = true
   config.static_cache_control = "public, max-age=3600"
 
   # Show full error reports and disable caching.
@@ -43,4 +43,7 @@ SEEK::Application.configure do
 
   # Uncomment this to help find source of  "DEPRECATION WARNING: It looks like you are eager loading table(s) ..."
   # config.active_record.disable_implicit_join_references = true
+
+  # Raises error for missing translations
+  config.action_view.raise_on_missing_translations = true
 end

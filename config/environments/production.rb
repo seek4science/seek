@@ -21,8 +21,8 @@ SEEK::Application.configure do
     config.action_controller.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
     config.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
 
-    # Disable Rails's static asset server (Apache or nginx will already do this).
-    config.serve_static_assets = true
+    # Disable Rails's static file server (Apache or nginx will already do this).
+    config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
 
     # Compress JavaScripts and CSS.
     config.assets.js_compressor  = :uglifier
@@ -31,11 +31,13 @@ SEEK::Application.configure do
     # Whether to fallback to assets pipeline if a precompiled asset is missed.
     config.assets.compile = false
 
-    # Generate digests for assets URLs.
+    # Asset digests allow you to set far-future HTTP expiration dates on all assets,
+    # yet still be able to expire them through the digest params.
     config.assets.digest = true
 
     # Version of your assets, change this if you want to expire all your assets.
     config.assets.version = '1.0'
+    # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
 
     # Specifies the header that your server uses for sending files.
     # config.action_dispatch.x_sendfile_header = "X-Sendfile" # for apache
@@ -44,8 +46,9 @@ SEEK::Application.configure do
     # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
     # config.force_ssl = true
 
-    # Set to :debug to see everything in the log.
-    config.log_level = :info
+    # Use the lowest log level to ensure availability of diagnostic information
+    # when problems arise.
+    config.log_level = :debug
 
     # Prepend all log lines with the following tags.
     # config.log_tags = [ :subdomain, :uuid ]
@@ -59,24 +62,17 @@ SEEK::Application.configure do
     # Enable serving of images, stylesheets, and JavaScripts from an asset server.
     # config.action_controller.asset_host = "http://assets.example.com"
 
-    # Precompile additional assets.
-    # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-    # config.assets.precompile += %w( search.js )
-
     # Ignore bad email addresses and do not raise email delivery errors.
     # Set this to true and configure the email server for immediate delivery to raise delivery errors.
     # config.action_mailer.raise_delivery_errors = false
 
     # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
-    # the I18n.default_locale when a translation can not be found).
+    # the I18n.default_locale when a translation cannot be found).
     config.i18n.fallbacks = true
     I18n.enforce_available_locales = true
 
     # Send deprecation notices to registered listeners.
     config.active_support.deprecation = :notify
-
-    # Disable automatic flushing of the log to improve performance.
-    # config.autoflush_log = false
 
     # Use default logging formatter so that PID and timestamp are not suppressed.
     config.log_formatter = ::Logger::Formatter.new
@@ -87,4 +83,7 @@ SEEK::Application.configure do
     config.lograge.custom_options = lambda do |event|
       {:time => event.time, :user_agent => event.payload[:user_agent]}
     end
+
+    # Do not dump schema after migrations.
+    config.active_record.dump_schema_after_migration = false
 end
