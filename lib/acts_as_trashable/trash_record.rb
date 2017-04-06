@@ -145,8 +145,8 @@ module ActsAsTrashable
     def attributes_and_associations (klass, hash)
       attrs = {}
       association_attrs = {}
-    
-      hash.each_pair do |key, value|
+
+      hash.stringify_keys.each_pair do |key, value|
         if klass.reflections.include?(key)
           association_attrs[key] = value
         else
