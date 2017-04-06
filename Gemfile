@@ -159,6 +159,7 @@ end
 group :test do
   gem 'test_after_commit'
   gem 'ruby-prof'
+  gem 'rails-perftest'
   gem 'minitest'
   gem 'coveralls', require: false
   gem 'sunspot_matchers'
