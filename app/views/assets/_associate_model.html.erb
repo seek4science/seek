@@ -47,8 +47,8 @@
 
 <script type="text/javascript">
     var modelOptions = {
-        project: <%= ([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>,
-        all: <%= ([["Select #{t('model')} ...", 0]]|all_models.collect{|s| [truncate(s.title, :length=>select_truncate_length), s.id]}).to_json.html_safe %>
+        project: <%= ([["Select #{t('model')} ...", 0]]|project_models.collect{|s| [truncate(s.title.html_safe, :length=>select_truncate_length), s.id]}).to_json.html_safe %>,
+        all: <%= ([["Select #{t('model')} ...", 0]]|all_models.collect{|s| [truncate(s.title.html_safe, :length=>select_truncate_length), s.id]}).to_json.html_safe %>
     };
 
     function toggle_model_list() {

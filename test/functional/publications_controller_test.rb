@@ -8,8 +8,6 @@ class PublicationsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include MockHelper
-  include Test::Unit::Assertions
-  include MockHelper
 
   def setup
     login_as(:quentin)
@@ -678,7 +676,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :edit, id: p.id
 
     assert_response :success
-    assert_not_include response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
+    assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
     # This will be slow!
 
     # 3 for events 'fancy_multiselect'
