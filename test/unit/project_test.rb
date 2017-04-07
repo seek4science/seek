@@ -16,7 +16,7 @@ class ProjectTest < ActiveSupport::TestCase
       p.destroy
     end
 
-    assert_equal nil, WorkGroup.find_by_id(wg.id)
+    assert_nil WorkGroup.find_by_id(wg.id)
   end
 
   test 'to_rdf' do

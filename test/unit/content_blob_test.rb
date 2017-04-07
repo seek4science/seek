@@ -624,7 +624,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     blob = Factory(:url_content_blob)
     assert !blob.file_exists?
-    assert_equal nil, blob.file_size
+    assert_nil blob.file_size
 
     blob.retrieve
     assert blob.file_exists?
@@ -690,7 +690,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     blob = Factory(:url_content_blob)
     assert !blob.file_exists?
-    assert_equal nil, blob.file_size
+    assert_nil blob.file_size
 
     blob.retrieve
     assert blob.file_exists?
@@ -707,7 +707,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     blob = Factory(:url_content_blob)
     assert !blob.file_exists?
-    assert_equal nil, blob.file_size
+    assert_nil blob.file_size
 
     blob.retrieve
     assert blob.file_exists?
@@ -726,7 +726,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     blob = Factory(:url_content_blob)
     assert !blob.file_exists?
-    assert_equal nil, blob.file_size
+    assert_nil blob.file_size
 
     blob.retrieve
     assert blob.file_exists?

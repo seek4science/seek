@@ -268,7 +268,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'pubmed_api_email' do
-    assert_equal nil, Seek::Config.pubmed_api_email
+    assert_nil Seek::Config.pubmed_api_email
   end
 
   test 'crossref_api_email' do

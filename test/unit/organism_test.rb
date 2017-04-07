@@ -81,8 +81,8 @@ class OrganismTest < ActiveSupport::TestCase
 
   test 'assigning terms to organism with no concept by default' do
     o = organisms(:Saccharomyces_cerevisiae)
-    assert_equal nil, o.ontology_id
-    assert_equal nil, o.concept_uri
+    assert_nil o.ontology_id
+    assert_nil o.concept_uri
     o.ontology_id = 'NCBITAXON'
 
     o.concept_uri = 'abc'

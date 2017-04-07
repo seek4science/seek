@@ -42,9 +42,9 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal users(:owner_of_my_first_sop), model.contributor
     model.contributor = nil
     model.save!
-    assert_equal nil, model.contributor
+    assert_nil model.contributor
     model = Model.find(model.id)
-    assert_equal nil, model.contributor
+    assert_nil model.contributor
   end
 
   test 'latest version?' do
