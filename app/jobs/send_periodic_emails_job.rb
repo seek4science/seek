@@ -92,8 +92,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
   # limit to only the people subscribed to the items logged, and those that are set to receive notifications and are project members
   def subscribed_people(logs)
     people = people_subscribed_to_logged_items logs
-    people.reject! { |person| !person.receive_notifications? }
-    people
+    people.select(&:receive_notifications?)
   end
 
   # returns an enumaration of the people subscribed to the items in the logs
