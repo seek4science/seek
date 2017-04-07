@@ -24,7 +24,7 @@ class SiteAnnouncement < ActiveRecord::Base
   end
 
   def body_html
-    helper.simple_format(helper.auto_link(body,:sanitize=>true),{},:sanitize=>true).html_safe
+    helper.simple_format(helper.auto_link(body), {}, sanitize: false).html_safe
   end
 
   private
