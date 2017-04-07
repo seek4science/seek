@@ -53,7 +53,6 @@ gem 'cocaine'
 gem 'colorize', '0.7.4'
 gem 'lograge'
 gem 'psych'
-gem 'transaction_isolation'
 gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
 

@@ -769,8 +769,6 @@ GEM
     timers (4.0.1)
       hitimes
     tins (1.5.1)
-    transaction_isolation (1.0.3)
-      activerecord (>= 3.0.11)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
     ucf (2.0.0)
@@ -946,7 +944,6 @@ DEPENDENCIES
   teaspoon
   teaspoon-mocha
   test_after_commit
-  transaction_isolation
   uglifier
   unicorn-rails
   uuid (~> 2.3)
