@@ -197,7 +197,7 @@ namespace :seek do
     Seek::Util.authorized_types.each do |type|
       table_name = type.lookup_table_name
       ActiveRecord::Base.connection.execute("delete from #{table_name} where user_id = #{user_id}")
-      assets = type.all(:include=>:policy)
+      assets = type.includes(:policy)
       c=0
       total=assets.count
       ActiveRecord::Base.transaction do

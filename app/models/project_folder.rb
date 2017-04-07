@@ -101,7 +101,7 @@ class ProjectFolder < ActiveRecord::Base
 
   #temporary method to destroy folders for a project, useful whilst developing
   def self.nuke project
-    folders = ProjectFolder.all(:conditions=>{:project_id=>project.id})
+    folders = ProjectFolder.where(project_id: project.id)
     folder_assets = ProjectFolderAsset.all.select{|pfa| pfa.project_folder.nil? || pfa.project_folder.try(:project_id)==project.id}
     folder_assets.each {|a| a.destroy}
     folders.each {|f| f.deletable=true ; f.destroy}
