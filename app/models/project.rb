@@ -113,14 +113,14 @@ class Project < ActiveRecord::Base
   end
 
   def institutions=(new_institutions)
-    new_institutions.each_index do |i|
-      new_institutions[i] = Institution.find(new_institutions[i]) unless new_institutions.is_a?(Institution)
+    new_institutions = Array(new_institutions).map do |i|
+      i.is_a?(Institution) ? i : Institution.find(i)
     end
     work_groups.each do |wg|
       wg.destroy unless new_institutions.include?(wg.institution)
     end
-    for institution in new_institutions
-      institutions << institution unless institutions.include?(institution)
+    new_institutions.each do |i|
+      institutions << i unless institutions.include?(i)
     end
   end
 
