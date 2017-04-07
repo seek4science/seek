@@ -546,6 +546,7 @@ class ApplicationController < ActionController::Base
     redirect_to signup_path if User.count == 0
   end
 
+  #process JSONAPI params into params itself, so it can be used normally with create, update, etc.
   def process_params()
 
     resource = controller_name.singularize
@@ -558,11 +559,31 @@ class ApplicationController < ActionController::Base
       params[:relationships].each do |r,info|
         params[resource][r.to_s+"_ids"] = []
       end
-      #fill up related resource ids in params[resource][related_ids]
+
+      #fill up related resource ids in params[resource][related_ids] from the meta section in relationships
+      #This makes sense when a user creates his own file to upload, and does not know IDs of resources, plus
+      #creating associated branches within data in JSONAPI format is adding too much complexity and user-unfriendly standards.
       params[:relationships].each do |r,info|
         related_entity = r.capitalize.constantize.where(info[:meta]).first
         params[resource][r.to_s+"_ids"] << related_entity.id if related_entity
+        puts "related entity: ", related_entity
       end
+
+      # #2nd way: fill up from associated resources (e.g. from an exported json)
+      # # TO DO: decide if this is the final input/output format
+      # # problem : not everything should exist for every resource, e.g associated people are creators of an investigation, but not a project
+      # begin
+      #   params[:data][:relationships][:associated][:data].each do |assoc_data|
+      #     puts "associated ====> ", assoc_data
+      #     key = assoc_data[:type].singularize + "_ids"
+      #     params[resource][key] = [] if (params[resource][key] == nil)
+      #     params[resource][key] << assoc_data[:id].to_i
+      #   end
+      #
+      # rescue NoMethodError
+      #   puts "no associated stuff"
+      # end
+
 
       #Creators
       creators_arr = []
@@ -573,4 +594,5 @@ class ApplicationController < ActionController::Base
       params[resource][:creators] = creators_arr
     end
   end
+
 end
