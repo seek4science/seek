@@ -766,7 +766,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal Institution.count, project.institutions.count
   end
 
-  test 'project administrator can not administer sharing policy' do
+  test 'project administrator can administer sharing policy' do
     project_administrator = Factory(:project_administrator)
     project = project_administrator.projects.first
     disable_authorization_checks { project.default_policy = Policy.default; project.save }
@@ -779,7 +779,7 @@ class ProjectsControllerTest < ActionController::TestCase
     put :update, id: project.id, project: valid_project, policy_attributes: { access_type: Policy::VISIBLE }
     project.reload
     assert_redirected_to project
-    assert_not_equal project.default_policy.access_type, Policy::VISIBLE
+    assert_equal project.default_policy.access_type, Policy::VISIBLE
   end
 
   test 'project administrator can not administer jerm detail' do
