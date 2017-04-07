@@ -279,7 +279,7 @@ GEM
     exception_notification (4.1.0)
       actionmailer (>= 3.0.4)
       activesupport (>= 3.0.4)
-    execjs (2.5.2)
+    execjs (2.7.0)
     factory_girl (2.6.4)
       activesupport (>= 2.3.9)
     faraday (0.9.1)
@@ -768,7 +768,7 @@ GEM
       thread_safe (~> 0.1)
     ucf (2.0.0)
       zip-container (~> 3.0.1)
-    uglifier (3.0.0)
+    uglifier (3.1.13)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
