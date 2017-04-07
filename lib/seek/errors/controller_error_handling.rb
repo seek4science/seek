@@ -34,7 +34,7 @@ module Seek
       def exception_notification(status, exception)
         unless !Seek::Config.exception_notification_enabled || status == 404
           begin
-            ExceptionNotifier::Notifier.exception_notification(request.env, exception).deliver
+            ExceptionNotifier::Notifier.exception_notification(request.env, exception).deliver_now
           rescue
             logger.error "ERROR - #{exception.class.name} (#{exception.message})"
           end

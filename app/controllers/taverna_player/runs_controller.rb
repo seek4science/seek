@@ -65,7 +65,7 @@ module TavernaPlayer
         respond_with(@run, :status => 400)
       else
         if Seek::Config.email_enabled
-          Mailer.report_run_problem(current_person, @run).deliver
+          Mailer.report_run_problem(current_person, @run).deliver_now
           @run.reported = true
           @run.save
           flash[:notice] = "Your report has been submitted to the support team, thank you."
