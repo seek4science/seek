@@ -46,18 +46,24 @@
 
     <%= folding_panel('Default Sharing Policy', false, id: 'sharing_form',
                       help_text: "Here you can choose to configure a default sharing policy that is applied to new resources created as part of this project.") do %>
-        <div class="alert alert-info">
-            Here you can choose to configure a default sharing policy that is applied to new resources created as part of this project.
-        </div>
-        <div class="checkbox">
-          <label>
-            <%= f.check_box(:use_default_policy, autocomplete: 'off', onchange: toggle_appear_javascript('default-sharing-form')) %> <strong>Enable default policy</strong>
-          </label>
-        </div>
+        <% if @project.new_record? %>
+            <div class="alert alert-warning">
+              To configure a default sharing policy, please finish creating the project then visit the "Edit Project Details" page.
+            </div>
+        <% else %>
+            <div class="alert alert-info">
+              Here you can choose to configure a default sharing policy that is applied to new resources created as part of this project.
+            </div>
+            <div class="checkbox">
+              <label>
+                <%= f.check_box(:use_default_policy, autocomplete: 'off', onchange: toggle_appear_javascript('default-sharing-form')) %> <strong>Enable default policy</strong>
+              </label>
+            </div>
 
-        <div id="default-sharing-form" style="<%= show_or_hide_block(@project.use_default_policy) -%>;">
-          <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: @project.default_policy || Policy.default, projects: [@project] } %>
-        </div>
+            <div id="default-sharing-form" style="<%= show_or_hide_block(@project.use_default_policy) -%>;">
+              <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: @project.default_policy || Policy.default, projects: [@project] } %>
+            </div>
+        <% end %>
     <% end %>
 <% end %>
 

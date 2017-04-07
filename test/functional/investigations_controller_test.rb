@@ -123,11 +123,32 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert !assigns(:investigation).new_record?
   end
 
+  test 'should create with policy' do
+    user = Factory(:user)
+    project = user.person.projects.first
+    another_project = Factory(:project)
+    login_as(user)
+    assert_difference('Investigation.count') do
+      post :create, investigation: Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]),
+           policy_attributes: { access_type: Policy::ACCESSIBLE,
+                                permissions_attributes: project_permissions([project, another_project], Policy::EDITING) }
+    end
+
+    investigation = assigns(:investigation)
+    assert investigation
+    projects_with_permissions = investigation.policy.permissions.map(&:contributor)
+    assert_includes projects_with_permissions, project
+    assert_includes projects_with_permissions, another_project
+    assert_equal 2, investigation.policy.permissions.count
+    assert_equal Policy::EDITING, investigation.policy.permissions[0].access_type
+    assert_equal Policy::EDITING, investigation.policy.permissions[1].access_type
+  end
+
   test 'should fall back to form when no title validation fails' do
     login_as(Factory :user)
 
     assert_no_difference('Investigation.count') do
-      put :create, investigation: { project_ids: [User.current_user.person.projects.first.id] }
+      post :create, investigation: { project_ids: [User.current_user.person.projects.first.id] }
     end
     assert_template :new
 
@@ -140,7 +161,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(Factory :user)
 
     assert_no_difference('Investigation.count') do
-      put :create, investigation: { title: 'investigation with no projects' }
+      post :create, investigation: { title: 'investigation with no projects' }
     end
     assert_template :new
 
