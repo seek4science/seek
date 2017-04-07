@@ -2,6 +2,7 @@ language: ruby
 
 rvm:
   - 2.1.9
+  - 2.2.6
   
 jdk:
   - openjdk7
@@ -9,6 +10,8 @@ jdk:
 sudo: false
 
 cache: bundler
+
+bundler_args: --without development
 
 env:
   - SUITE="rake test:units" DB_TYPE=mysql

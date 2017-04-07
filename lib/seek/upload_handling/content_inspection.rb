@@ -68,7 +68,7 @@ module Seek
       def determine_filename_from_url(url)
         filename = nil
         if valid_uri?(url)
-          path = URI.parse(url).path
+          path = URI.parse(url.strip).path
           filename = path.split('/').last unless path.nil?
           filename = filename.strip unless filename.nil?
         end
