@@ -275,7 +275,7 @@ class User < ActiveRecord::Base
 
   #indicates whether the user has completed the registration process, and is associated with a profile and link has been saved
   def registration_complete?
-    person.present? && person.user.present?
+    person.try(:persisted?) && person.user.try(:persisted?)
   end
 
   def self.without_profile

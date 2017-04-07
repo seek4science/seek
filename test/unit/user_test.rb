@@ -27,7 +27,7 @@ class UserTest < ActiveSupport::TestCase
     refute u.registration_complete?
 
     # its not complete until the association has been saved
-    u.person = Factory(:brand_new_person)
+    u.person = Factory.build(:brand_new_person)
     assert u.person
     refute u.registration_complete?
 
