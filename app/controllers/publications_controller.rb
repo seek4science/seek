@@ -222,7 +222,6 @@ class PublicationsController < ApplicationController
       end
 
       authors_db = PublicationAuthor.where(params)
-                                    .select([:person_id, :first_name, :last_name])
                                     .group( :person_id, :first_name, :last_name, :author_index)
                                     .count
                                     .collect {
@@ -268,7 +267,6 @@ class PublicationsController < ApplicationController
     # all authors
     authors = PublicationAuthor.where("first_name LIKE :fnquery", :fnquery => "#{first_name}%")
                                .where("last_name LIKE :lnquery", :lnquery => "#{last_name}%")
-                               .select([:person_id, :first_name, :last_name])
                                .group( :person_id, :first_name, :last_name, :author_index)
                                .count
                                .collect { 
