@@ -1,8 +1,8 @@
 class << self
   def create_tag text, attribute
-    text_value = TextValue.find_or_create_by_text(text)
+    text_value = TextValue.find_or_create_by(text:text)
     unless text_value.has_attribute_name?(attribute)
-      aa = AnnotationAttribute.find_or_create_by_name(attribute)
+      aa = AnnotationAttribute.find_or_create_by(name: attribute)
       AnnotationValueSeed.where(value_type: 'TextValue', value_id: text_value.id, attribute_id: aa).first_or_create!
     end
   end
