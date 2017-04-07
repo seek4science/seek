@@ -28,7 +28,7 @@
 <%
    is_new_file = params[:is_new_file]
    resource_name = params[:resource_name]
-   permissions, privileged_people = uniq_people_permissions_and_privileged_people(policy.permissions, privileged_people)
+   permissions, privileged_people = uniq_people_permissions_and_privileged_people(policy.permissions.to_a, privileged_people)
 %>
 
 <div class="modal fade" id="preview_permissions" tabindex="-1" role="dialog" aria-labelledby="preview_permissions_title" aria-hidden="true">
