@@ -228,7 +228,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
         gm.save!
       end
 
-      assert_equal [person2, person], AuthLookupUpdateQueue.all(order: :id).collect(&:item)
+      assert_equal [person2, person], AuthLookupUpdateQueue.order(:id).to_a.collect(&:item)
     end
   end
 end
