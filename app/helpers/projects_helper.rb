@@ -113,7 +113,7 @@ module ProjectsHelper
 
   def projects_grouped_by_programme(selected = nil)
     if Seek::Config.programmes_enabled
-      array = Project.order(&:title).to_a.group_by { |p| p.programme.try(:title) || 'Independent projects' }.each_value do |projects|
+      array = Project.order(:title).to_a.group_by { |p| p.programme.try(:title) || 'Independent projects' }.each_value do |projects|
         projects.map! { |p| [p.title, p.id] }
       end.to_a
 
