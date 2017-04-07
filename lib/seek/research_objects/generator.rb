@@ -67,7 +67,7 @@ module Seek
       def gather_entries(show_all = false)
         # This will break when used for non-ISA things:
         entries = all_subentries(@resource).flatten
-        entries.select!(&:permitted_for_research_object?) unless show_all
+        entries = entries.select(&:permitted_for_research_object?) unless show_all
 
         entries
       end

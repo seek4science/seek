@@ -447,7 +447,7 @@ module Seek
         sql += " WHERE asset_id=#{id}"
 
         if user.respond_to?(:each)
-          user.compact!
+          user = user.compact
           return unless user.any?
           sql += " AND user_id IN (#{user.map(&:id).join(', ')})"
         elsif user.is_a?(User)
