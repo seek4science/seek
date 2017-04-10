@@ -654,7 +654,7 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
     end
   end
 

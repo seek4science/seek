@@ -240,7 +240,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'should_add_nofollow_to_links_in_show_page' do
     get :show, id: investigations(:investigation_with_links_in_description)
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
     end
   end
 
