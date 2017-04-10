@@ -116,6 +116,8 @@ gem 'ransack', '~> 1.8.2'
 
 gem 'uglifier'
 
+gem 'coffee-rails', '~> 4.1.0'
+
 # Rails 4 upgrade
 gem 'activerecord-session_store'
 # gem 'protected_attributes' # Delete me after refactoring
