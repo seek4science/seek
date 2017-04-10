@@ -43,4 +43,5 @@
 *= require jstree
 *= require openbis
 *= require eonasdan-bootstrap-datetimepicker
+*= require cytoscape_isa_graph
 */

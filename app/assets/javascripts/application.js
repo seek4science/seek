@@ -34,6 +34,7 @@
 //= require fancy_multiselect
 //= require parseuri
 //= require tabber-minimized
+//= require tab_lazy_load
 //= require detect_browser
 //= require easytabs
 //= require favourites
@@ -67,4 +68,9 @@
 //= require openbis
 //= require calendar
 //= require inplace
+//= require strain
+//= require publishing
+//= require cytoscape_isa_graph
+//= require bives
+//= require asset_report
 //= require_tree ./templates

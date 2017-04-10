@@ -1,4 +1,3 @@
-<%= javascript_include_tag 'strain' -%>
 <%
    @assay_text=@assay.is_modelling? ? "#{t('assays.modelling_analysis')}" : "#{t('assays.assay')}"
    @assay_type_text=@assay.is_modelling? ? "biological problem addressed" : "#{t('assays.assay').downcase} type"
