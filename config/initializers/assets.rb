@@ -34,6 +34,17 @@ Rails.application.config.assets.precompile += [
     'projects',
     'scales/scales',
     'scales/scales_selection',
+    'jquery.ui.effect.js',
+    'exhibit/exhibit-api.js',
+    'flot/index.js',
+    'project_folders',
+    'tablesorter/jquery-latest.js',
+    'tablesorter/jquery.tablesorter.js',
+
+
+    'savage_beast/feed-icon.png',
+
+
     "prepended/*.css",
     "cytoscape_isa_graph.css",
     "data_tables.css",
