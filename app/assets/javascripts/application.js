@@ -38,7 +38,8 @@
 //= require easytabs
 //= require favourites
 //= require jquery-ui
-//= require typeahead
+// This is not a mistake:
+//= require typeahead.js.js
 //= require bootstrap-tagsinput
 //= require bootstrap-multiselect
 //= require tags_input
