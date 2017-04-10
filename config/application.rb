@@ -16,34 +16,6 @@ module SEEK
     #also include lib/** files
     config.autoload_paths += Dir["#{Rails.root}/lib/**/"]
 
-    # Asset pipeline
-    # Enable the asset pipeline
-    config.assets.enabled = true
-    # Version of your assets, change this if you want to expire all your assets
-    #config.assets.version = '1.0'
-    # Change the path that assets are served from
-    # config.assets.prefix = "/assets"
-    config.assets.js_compressor = :uglifier
-    # config.assets.css_compressor = :yui
-
-    config.assets.precompile += ['*.js',
-                                 "prepended/*.css",
-                                 "cytoscape_isa_graph.css",
-                                 "data_tables.css",
-                                 "datacite_doi.css",
-                                 "exhibit/styles/exhibit-scripted-bundle.css",
-                                 "jquery-ui-1.8.14.custom.css",
-                                 "jquery.ui.resizable.css",
-                                 "lightbox.css",
-                                 "pdfjs/viewer.css",
-                                 "savage_beast/display.css",
-                                 "scales/scales.css",
-                                 "spreadsheet_explorer.css",
-                                 "tablesorter/blue/tablesorter_blue.css",
-                                 "yui/index.css",
-                                 "appended/*.css"
-    ]
-
     # Force all environments to use the same logger level
     # (by default production uses :info, the others :debug)
     # config.log_level = :info
