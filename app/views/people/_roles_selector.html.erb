@@ -17,9 +17,9 @@
 </style>
 <p>
 
-  This person is <strong><%= role_title -%></strong> for the following <%= t('Project').downcase.pluralize.html_safe -%>:
+  This person is <strong><%= role_title -%></strong> for the following <%= t('project').downcase.pluralize.html_safe -%>:
   <span id='projects_for_<%= role %>'>
-    <%= text_or_not_specified(project_list,:none_text=>"No #{t('Project').downcase.pluralize} assigned") -%>
+    <%= text_or_not_specified(project_list,:none_text=>"No #{t('project').downcase.pluralize} assigned") -%>
     &nbsp;
     <%= link_to_function "[edit]","Effect.Appear('#{hidden_block}');Effect.Fade('projects_for_#{role}');return(false);" %>
   </span>
