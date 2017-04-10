@@ -49,4 +49,8 @@ SEEK::Application.configure do
 
   # TODO: Change this to: `:random` when tests are all passing
   config.active_support.test_order = :sorted
+
+  # Asset digests allow you to set far-future HTTP expiration dates on all assets,
+  # yet still be able to expire them through the digest params.
+  config.assets.digest = false
 end
