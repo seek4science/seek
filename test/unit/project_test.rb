@@ -570,7 +570,8 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test 'spawn' do
-    p = Factory(:programme, projects: [Factory(:project, avatar: Factory(:avatar))]).projects.first
+    p = Factory(:programme,
+                projects: [Factory(:project, description: 'proj', avatar: Factory(:avatar))]).projects.first
     wg1 = Factory(:work_group, project: p)
     wg2 = Factory(:work_group, project: p)
     person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: wg1)])
