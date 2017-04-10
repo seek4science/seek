@@ -88,9 +88,9 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     assert_select '.btn-group', count: 3 do
       [df, model, sop].each do |asset|
-        assert_select 'input[type=radio][name=?][value=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", 1
-        assert_select 'input[type=radio][name=?][value=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", 0
-        assert_select 'input[type=radio][name=?][value=?][checked=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", -1, 'checked'
+        assert_select 'input[type=radio][name=?][value=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", '1'
+        assert_select 'input[type=radio][name=?][value=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", '0'
+        assert_select 'input[type=radio][name=?][value=?][checked=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", '-1', 'checked'
       end
     end
 
