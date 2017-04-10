@@ -87,7 +87,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
-      assert_select "option[selected='selected'][value=?]", inv.id
+      assert_select "option[selected='selected'][value='#{inv.id}']"
     end
   end
 
@@ -100,7 +100,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
-      assert_select "option[selected='selected'][value=?]", inv.id
+      assert_select "option[selected='selected'][value='#{inv.id}']"
     end
   end
 
@@ -115,7 +115,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
-      assert_select "option[selected='selected'][value=?]", 0
+      assert_select "option[selected='selected'][value='0']"
     end
 
     assert_not_nil flash.now[:error]
@@ -412,7 +412,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :new_object_based_on_existing_one, id: study.id
     assert_response :success
     assert_select '#study_title[value=?]', 'the study'
-    assert_select 'select#study_investigation_id option[selected][value=?]', study.investigation.id, count: 1
+    assert_select "select#study_investigation_id option[selected][value='#{study.investigation.id}']", count: 1
   end
 
   test 'object based on existing one when unauthorized to view' do
@@ -446,7 +446,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :new_object_based_on_existing_one, id: study.id
     assert_response :success
     assert_select '#study_title[value=?]', 'the private study'
-    assert_select 'select#study_investigation_id option[selected][value=?]', study.investigation.id, count: 0
+    assert_select "select#study_investigation_id option[selected][value='#{study.investigation.id}']", count: 0
     refute_nil flash.now[:notice]
   end
 
