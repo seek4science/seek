@@ -93,6 +93,7 @@ gem 'datacite_doi_ify', '~>1.1.0'
 
 gem 'bootstrap-sass'
 gem 'sass-rails'
+gem 'sprockets-rails', '~> 3.2'
 
 gem 'ro-bundle'
 gem 'handlebars_assets'
