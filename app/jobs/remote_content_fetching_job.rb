@@ -1,8 +1,8 @@
 class RemoteContentFetchingJob < SeekJob
-  attr_reader :content_blob
+  attr_reader :content_blob_id
 
   def initialize(content_blob)
-    @content_blob = content_blob
+    @content_blob_id = content_blob.id
   end
 
   def perform_job(job_item)
@@ -10,7 +10,7 @@ class RemoteContentFetchingJob < SeekJob
   end
 
   def gather_items
-    [content_blob]
+    [ContentBlob.find_by_id(content_blob_id)].compact
   end
 
   def queue_name
