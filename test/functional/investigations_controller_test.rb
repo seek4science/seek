@@ -69,8 +69,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigations = assigns(:investigations)
     first_investigations = investigations.first
     assert_not_nil first_investigations
-    assert_select 'a[data-favourite-url=?]', h(add_favourites_path(resource_id: first_investigations.id,
-                                                                   resource_type: first_investigations.class.name))
+    assert_select 'a[data-favourite-url=?]', add_favourites_path(resource_id: first_investigations.id,
+                                                                 resource_type: first_investigations.class.name)
   end
 
   test 'should show item' do

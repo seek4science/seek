@@ -54,8 +54,8 @@ class StudiesControllerTest < ActionController::TestCase
     studies = assigns(:studies)
     first_study = studies.first
     assert_not_nil first_study
-    assert_select 'a[data-favourite-url=?]', h(add_favourites_path(resource_id: first_study.id,
-                                                                   resource_type: first_study.class.name))
+    assert_select 'a[data-favourite-url=?]', add_favourites_path(resource_id: first_study.id,
+                                                                 resource_type: first_study.class.name)
   end
 
   def test_title
