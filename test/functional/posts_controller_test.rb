@@ -5,6 +5,10 @@ class PostsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
 
+  setup do
+    skip('Skipping forums tests for now')
+  end
+
   test 'get index' do
     create_test_posts
     get :index
