@@ -213,7 +213,7 @@ module ApplicationHelper
     text = text.to_s
     if text.nil? || text.chomp.empty?
       not_specified_text ||= options[:none_text]
-      not_specified_text ||= 'No description specified' if options[:description] == true
+      not_specified_text ||= 'No description specified' if options[:description]
       not_specified_text ||= 'Not specified'
       res = content_tag(:span, not_specified_text, class: 'none_text')
     else
@@ -221,13 +221,13 @@ module ApplicationHelper
       res = text.html_safe
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
-      res = auto_link(res, :all, rel: 'nofollow') if options[:auto_link] == true
-      res = simple_format(res).html_safe if options[:description] == true || options[:address] == true
+      res = auto_link(res, html: { rel: 'nofollow' }) if options[:auto_link]
+      res = simple_format(res, {}, sanitize: !options[:auto_link]).html_safe if options[:description] == true || options[:address] == true
 
-      res = mail_to(res) if options[:email] == true
-      res = link_to(res, res, popup: true) if options[:external_link] == true
-      res = res + '&nbsp;' + flag_icon(text) if options[:flag] == true
-      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(res)) if options[:link_as_country] == true
+      res = mail_to(res) if options[:email]
+      res = link_to(res, res, popup: true) if options[:external_link]
+      res = res + '&nbsp;' + flag_icon(text) if options[:flag]
+      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(res)) if options[:link_as_country]
     end
     res.html_safe
   end

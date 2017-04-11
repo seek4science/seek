@@ -658,6 +658,15 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should not allow XSS in descriptions' do
+    assay = Factory(:assay, description: 'hello <script>alert("HELLO")</script>')
+    get :show, id: assays(:assay_with_links_in_description)
+
+    assert_select 'div#description' do
+      assert_select 'script', count: 0
+    end
+  end
+
   # checks that for an assay that has 2 sops and 2 datafiles, of which 1 is public and 1 private - only links to the public sops & datafiles are show
   def test_authorization_of_sops_and_datafiles_links
     # sanity check the fixtures are correct
