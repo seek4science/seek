@@ -260,10 +260,10 @@ class StrainsControllerTest < ActionController::TestCase
 
     assert_select 'input[id=?][value=?]', 'strain_title', strain.title
     assert_select 'select[id=?]', 'strain_parent_id' do
-      assert_select 'option[value=?][selected=?]', strain.id, 'selected', text: strain.info
+      assert_select "option[value='#{strain.id}'][selected]", text: strain.info
     end
     assert_select 'select[id=?]', 'strain_organism_id' do
-      assert_select 'option[value=?][selected=?]', strain.organism.id, 'selected', text: strain.organism.title
+      assert_select "option[value='#{strain.organism.id}'][selected]", text: strain.organism.title
     end
     genotype = strain.genotypes.first
     phenotype = strain.phenotypes.first
