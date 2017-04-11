@@ -1348,22 +1348,22 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div#paginate_sheet_1' do
       assert_select 'span.previous_page.disabled', text: /Previous/, count: 1
       assert_select 'em.current', text: '1', count: 1
-      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=1", text: '2', count: 1
-      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=1", text: /Next/, count: 1
+      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=1", text: '2', count: 1
+      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=1", text: /Next/, count: 1
     end
 
     assert_select 'div#paginate_sheet_2' do
       assert_select 'span.previous_page.disabled', text: /Previous/, count: 1
       assert_select 'em.current', text: '1', count: 1
-      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=2", text: '2', count: 1
-      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=2", text: /Next/, count: 1
+      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=2", text: '2', count: 1
+      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=2", text: /Next/, count: 1
     end
 
     assert_select 'div#paginate_sheet_3' do
       assert_select 'span.previous_page.disabled', text: /Previous/, count: 1
       assert_select 'em.current', text: '1', count: 1
-      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=3", text: '2', count: 1
-      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=3", text: /Next/, count: 1
+      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=3", text: '2', count: 1
+      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=3", text: /Next/, count: 1
     end
   end
 
