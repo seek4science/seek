@@ -1092,7 +1092,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :new_object_based_on_existing_one, id: assay.id
     assert_response :success
     assert_select '#assay_title[value=?]', 'the assay'
-    assert_select 'select#assay_study_id option[selected][value=?]', assay.study.id, count: 1
+    assert_select "select#assay_study_id option[selected][value='#{assay.study.id}']",count: 1
   end
 
   test 'new object based on existing one when unauthorised to view' do
