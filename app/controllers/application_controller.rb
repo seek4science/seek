@@ -8,8 +8,6 @@ class ApplicationController < ActionController::Base
   include Seek::EnabledFeaturesFilter
   include Recaptcha::Verify
 
-  self.mod_porter_secret = PORTER_SECRET
-
   include CommonSweepers
 
   before_filter :log_extra_exception_data

@@ -429,7 +429,6 @@ GEM
     mimemagic (0.3.0)
     mini_portile2 (2.1.0)
     minitest (5.10.1)
-    modporter-plugin (0.1.0)
     money (6.8.2)
       i18n (>= 0.6.4, < 0.9)
       sixarm_ruby_unaccent (>= 1.1.1, < 2)
@@ -880,7 +879,6 @@ DEPENDENCIES
   metainspector
   mimemagic
   minitest
-  modporter-plugin
   my_annotations!
   my_responds_to_parent!
   my_savage_beast!
