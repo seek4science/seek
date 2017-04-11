@@ -181,15 +181,11 @@ class UsersControllerTest < ActionController::TestCase
   def test_should_not_activate_user_without_key
     get :activate
     assert_nil flash[:notice]
-  rescue ActionController::RoutingError
-    # in the event your routes deny this, we'll just bow out gracefully.
   end
 
   def test_should_not_activate_user_with_blank_key
     get :activate, activation_code: ''
     assert_nil flash[:notice]
-  rescue ActionController::RoutingError
-    # well played, sir
   end
 
   def test_can_edit_self
