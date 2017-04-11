@@ -61,7 +61,7 @@ class SopsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', person_path(p2) do
         assert_select 'img'
       end
-      assert_select ['a[href=?]', person_path(p1)], 0
+      assert_select 'a[href=?]', person_path(p1), count: 0
     end
   end
 
