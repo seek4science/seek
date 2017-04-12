@@ -19,7 +19,6 @@ module Seek
           @suggested_type.term_type = params[:term_type]
           respond_to do |format|
             format.html { render template: 'suggested_types/new' }
-            format.js { render template: 'suggested_types/new_popup', layout: false }
             format.xml { render xml: @suggested_type }
           end
         end
@@ -29,7 +28,6 @@ module Seek
           @suggested_type.term_type = params[:term_type]
           respond_to do |format|
             format.html { render template: 'suggested_types/edit' }
-            format.js { render template: 'suggested_types/edit' }
             format.xml { render xml: @suggested_type }
           end
         end
@@ -46,8 +44,6 @@ module Seek
           @suggested_type.contributor_id = User.current_user.try(:person_id)
           saved = @suggested_type.save
           respond_to do |format|
-            format.js { render template: 'suggested_types/create' }
-
             if saved
               set_successful_flash_message('created')
               format.html { redirect_to(action: 'manage') }
@@ -64,7 +60,6 @@ module Seek
           @suggested_type.update_attributes(params[controller_name.singularize.to_sym])
           saved = @suggested_type.save
           respond_to do |format|
-            format.js { render template: 'suggested_types/create' }
             if saved
               set_successful_flash_message('updated')
               format.html { redirect_to(action: 'manage') }

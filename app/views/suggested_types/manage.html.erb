@@ -1,5 +1,5 @@
 <h1>Manage <%= all_types_text %> types</h1>
-<%= button_link_to "New #{all_types_text("or")}  type", 'new', eval("new_#{controller_name.singularize}_path") %>
+<%= button_link_to "New #{all_types_text("or")}  type", 'new', url_for(controller: controller_name, action: 'new') %>
 <%= button_link_to "New assay", 'new', new_assay_path %>
 
 <div class="show_basic">
