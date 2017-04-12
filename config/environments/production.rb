@@ -18,8 +18,7 @@ SEEK::Application.configure do
     # Add `rack-cache` to your Gemfile before enabling this.
     # For large-scale production use, consider using a caching reverse proxy like nginx, varnish or squid.
     # config.action_dispatch.rack_cache = true
-    config.action_controller.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
-    config.cache_store = [:file_store, "#{Rails.root}/tmp/cache"]
+    config.cache_store = :file_store, "#{Rails.root}/tmp/cache"
 
     # Disable Rails's static file server (Apache or nginx will already do this).
     config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
