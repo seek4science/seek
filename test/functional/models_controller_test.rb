@@ -429,7 +429,10 @@ class ModelsControllerTest < ActionController::TestCase
     model_details[:imported_url] = 'http://biomodels/model.xml'
 
     assert_difference('Model.count') do
-      post :create, model: model_details, policy_attributes: valid_sharing, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+      post :create, model: model_details,
+           content_blobs: [{ data: file_for_upload }],
+           policy_attributes: valid_sharing,
+           model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
     end
     model = assigns(:model)
     assert_redirected_to model_path(model)
