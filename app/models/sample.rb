@@ -72,7 +72,8 @@ class Sample < ActiveRecord::Base
 
   def referenced_strains
     sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_STRAIN }.map do |sa|
-      Strain.find_by_id(get_attribute(sa.hash_key)['id'])
+      value = get_attribute(sa.hash_key)
+      Strain.find_by_id(value['id']) if value
     end.compact
   end
 

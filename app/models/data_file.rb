@@ -178,4 +178,12 @@ class DataFile < ActiveRecord::Base
     content_blob && content_blob.openbis?
   end
 
+  def openbis_size_download_restricted?
+    openbis? && content_blob.openbis_dataset.size>Seek::Config.openbis_download_limit
+  end
+
+  def download_disabled?
+    super || openbis_size_download_restricted?
+  end
+
 end

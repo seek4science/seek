@@ -11,21 +11,6 @@ module Seek
         !INVALID_SCHEMES.include?(scheme)
       end
 
-      def check_url_response_code(url)
-        RestClient.head(url).code
-      rescue RestClient::MethodNotAllowed
-        405
-      # FIXME: catching SocketError and Errno::ECONNREFUSED is a temporary hack, unable to resovle url and connect is not the same as a 404
-      rescue RestClient::ResourceNotFound, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
-        404
-      rescue RestClient::InternalServerError
-        500
-      rescue RestClient::Forbidden
-        403
-      rescue RestClient::Unauthorized
-        401
-      end
-
       def content_is_webpage?(content_type)
         extract_mime_content_type(content_type) == 'text/html'
       end
@@ -35,10 +20,6 @@ module Seek
         # remove charset, e.g. "text/html; charset=UTF-8"
         raw_type = content_type.split(';')[0] || ''
         raw_type.strip.downcase
-      end
-
-      def fetch_url_headers(url)
-        RestClient.head(url, accept: :html).headers
       end
 
       def summarize_webpage(url)

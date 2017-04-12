@@ -173,9 +173,7 @@ class ProjectsController < ApplicationController
     end
     @project = Project.new(params[:project])
 
-    @project.default_policy.set_attributes_with_sharing(params[:policy_attributes])
-
-
+    @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
     respond_to do |format|
       if @project.save
@@ -368,8 +366,7 @@ class ProjectsController < ApplicationController
   end
 
   def auth_params
-    restricted_params={:policy_attributes => User.admin_logged_in?,
-                       :site_root_uri => User.admin_logged_in?,
+    restricted_params={:site_root_uri => User.admin_logged_in?,
                        :site_username => User.admin_logged_in?,
                        :site_password => User.admin_logged_in?,
                        :institution_ids => (User.admin_logged_in? || @project.can_be_administered_by?(current_user))}

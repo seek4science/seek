@@ -1,9 +1,9 @@
 require 'system'
 # Change to match your CPU core count
-workers System::CPU.count
+workers (System::CPU.count * 2)
 
 # Min and Max threads per worker
-threads 1, 6
+threads 1, 1
 
 # Default to development
 rails_env = ENV['RAILS_ENV'] || "development"

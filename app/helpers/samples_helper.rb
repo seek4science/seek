@@ -85,10 +85,14 @@ module SamplesHelper
   end
 
   def seek_strain_attribute_display(value)
-    if value['title']
-      link_to(value['title'], strain_path(value['id']))
+    if value && value['id']
+      if value['title']
+        link_to(value['title'], strain_path(value['id']))
+      else
+        content_tag(:span, value['id'], class: 'none_text')
+      end
     else
-      content_tag(:span, value['id'], class: 'none_text')
+      content_tag(:span, 'Not specified', class: 'none_text')
     end
   end
 end

@@ -604,7 +604,7 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
-    resources :specimens,:assays,:people,:projects,:only=>[:index]
+    resources :specimens,:assays,:people,:projects,:samples,:only=>[:index]
   end
 
   resources :organisms do

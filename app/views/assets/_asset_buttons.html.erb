@@ -27,7 +27,7 @@
     %>
     <% if can_download_asset?(asset, params[:code]) -%>
         <%= download_or_link_button display_asset, path, display_asset.single_content_blob.try(:url), human_name,
-                                    :class => 'btn btn-default' %>
+                                    :class => 'btn btn-default',disabled:asset.download_disabled? %>
 
         <% if asset.is_a?(DataFile) && display_asset.contains_extractable_spreadsheet? %>
             <%= button_link_to('Explore', 'spreadsheet', polymorphic_path(asset, :version => version, :action => :explore, :code => params[:code])) %>
