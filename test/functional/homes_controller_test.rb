@@ -249,8 +249,8 @@ class HomesControllerTest < ActionController::TestCase
       # default scale for search filtering is Organism
       assert_select 'div#search_box' do
         assert_select 'select#scale option' do
-          assert_select '[value=?]', /all/ do
-            assert_select '[selected=?]', /selected/
+          assert_select '[value=?]', 'all' do
+            assert_select '[selected=?]', 'selected'
           end
         end
       end
