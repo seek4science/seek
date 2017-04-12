@@ -57,13 +57,15 @@ class AdminsController < ApplicationController
 
     Seek::Config.ldap_enabled = string_to_boolean params[:ldap_enabled]
     Seek::Config.set_ldap_settings 'ldap_address', params[:ldap_address]
-    Seek::Config.set_ldap_settings 'ldap_port', params[:ldap_port] 
-    Seek::Config.set_ldap_settings 'ldap_base_dn', params[:ldap_base_dn]  
-    Seek::Config.set_ldap_settings 'ldap_login', params[:ldap_login]  
+    Seek::Config.set_ldap_settings 'ldap_port', params[:ldap_port]
+    Seek::Config.set_ldap_settings 'ldap_base_dn', params[:ldap_base_dn]
+    Seek::Config.set_ldap_settings 'ldap_bind_dn', params[:ldap_bind_dn]
+    Seek::Config.set_ldap_settings 'ldap_bind_password', params[:ldap_bind_password]
+    Seek::Config.set_ldap_settings 'ldap_login', params[:ldap_login]
     Seek::Config.set_ldap_settings 'ldap_email', params[:ldap_email]
     Seek::Config.set_ldap_settings 'ldap_first_name', params[:ldap_first_name]
     Seek::Config.set_ldap_settings 'ldap_last_name', params[:ldap_last_name]
-  
+
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
     Seek::Config.omniauth_user_activate = string_to_boolean params[:omniauth_user_activate]
@@ -447,14 +449,19 @@ class AdminsController < ApplicationController
       ActionMailer::Base.raise_delivery_errors = raise_delivery_errors_setting
     end
   end
-  
+
   def test_ldap_connection
-          
+
     ldap = Net::LDAP.new :host => params[:ldap_address], :port => params[:ldap_port], :base => params[:ldap_base_dn]
+
+  #  if !params[:ldap_bind_dn].blank? && !params[:ldap_bind_password].blank?
+    ldap.auth params[:ldap_bind_dn], params[:ldap_bind_password]
+    #end
+
     treebase = params[:ldap_base_dn]
-    
-    filter = Net::LDAP::Filter.eq( params[:ldap_login], params[:testing_ldap])  
-    
+
+    filter = Net::LDAP::Filter.eq( params[:ldap_login], params[:testing_ldap])
+
     begin
       if ldap.search(:base => treebase, :filter => filter).blank?
         render :update do |page|
@@ -462,22 +469,22 @@ class AdminsController < ApplicationController
             page.alert("LDAP not found #{params[:testing_ldap]}")
           end
       else
-        ldap.search(:base => treebase, :filter => filter) do |result| 
+        ldap.search(:base => treebase, :filter => filter) do |result|
           render :update do |page|
               page.replace_html 'ajax_loader_position_ldap', "<div id='ajax_loader_position_ldap'></div>"
               page.alert("LDAP found #{params[:testing_ldap]}")
             end
-        end 
-      end   
+        end
+      end
     rescue => e
       render :update do |page|
         page.replace_html 'ajax_loader_position_ldap', "<div id='ajax_loader_position_ldap'></div>"
         page.alert("Connection to LDAP failed, #{e.message}")
-      end 
+      end
     end
   end
-    
-  
+
+
 
   def header_image_file
     if params[:header_image_file]
