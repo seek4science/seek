@@ -121,15 +121,12 @@ class ApplicationController < ActionController::Base
       authorized_resources = resources.select(&:can_view?)
     end
 
-    render :update do |page|
-      page.replace_html "#{scale_title}_#{resource_type}_#{view_type}",
-                        partial: 'assets/resource_in_tab',
-                        locals: { resources: resources,
-                                  scale_title: scale_title,
-                                  authorized_resources: authorized_resources,
-                                  view_type: view_type,
-                                  actions_partial_disable: actions_partial_disable }
-    end
+    render partial: 'assets/resource_in_tab',
+           locals: { resources: resources,
+                     scale_title: scale_title,
+                     authorized_resources: authorized_resources,
+                     view_type: view_type,
+                     actions_partial_disable: actions_partial_disable }
   end
 
   private
