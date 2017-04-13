@@ -540,7 +540,11 @@ class ApplicationController < ActionController::Base
   end
 
   def policy_params
-    params.slice(:policy_attributes).permit(:access_type, { permissions_attributes: [:access_type, :contributor_type, :contributor_id] })
+    params.slice(:policy_attributes).permit(
+        policy_attributes: [:access_type,
+                            { permissions_attributes: [:access_type,
+                                                       :contributor_type,
+                                                       :contributor_id] }])[:policy_attributes] || {}
   end
 
 end
