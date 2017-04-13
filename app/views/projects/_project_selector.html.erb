@@ -83,7 +83,7 @@
           if (project.id == projectId) {
             this.selected.push(project);
             // Ask if they want to use the default policy (if there is one)
-            if (Sharing.defaultPolicies[project.id] && skipPrompt || confirm('' + project.title + ' has a default policy specified, do you want to apply it?')) {
+            if (Sharing.defaultPolicies[project.id] && (skipPrompt || confirm('' + project.title + ' has a default policy specified, do you want to apply it?'))) {
               Sharing.applyPolicy(Sharing.defaultPolicies[project.id]);
             } else { // Otherwise just add a permission for the project
               Sharing.addPermissionForProject(project);
