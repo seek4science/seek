@@ -141,7 +141,7 @@ class SubscriptionWithHierarchyTest < ActionDispatch::IntegrationTest
     assert_equal 4, person.subscriptions.count
 
     # unassign all related projects
-    person.work_groups.delete_all
+    person.work_groups.destroy_all
     disable_authorization_checks do
       person.save
     end
