@@ -1375,7 +1375,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Policy::NO_ACCESS, data_file.policy.access_type
     login_as(uploader)
 
-    put :update, id: data_file, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE }
 
     assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
@@ -1391,7 +1391,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person.user)
     assert data_file.can_manage?
 
-    put :update, id: data_file, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE }
 
     assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
@@ -1406,7 +1406,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person.user)
     assert data_file.can_manage?
 
-    put :update, id: data_file, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE }
 
     assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
