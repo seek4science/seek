@@ -89,7 +89,7 @@ module Seek
     end
 
     def update_sharing_policies(item, params = nil)
-      item.policy.set_attributes_with_sharing(policy_params) if policy_params
+      item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
     end
 
     def create_asset
