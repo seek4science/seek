@@ -40,10 +40,14 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'asset params' do
-    @params = { content_blob: { fish: 1, soup: 2 }, data_file: { title: 'george' }, sop: { title: 'mary' } }
-    assert_equal({ title: 'george' }, asset_params)
+    @params = ActionController::Parameters.new({ content_blob: { fish: 1, soup: 2 },
+                                                 data_file: { title: 'george' },
+                                                 sop: { title: 'mary' } })
+    assert_equal 'george', asset_params[:title]
+    assert_equal 1, asset_params.keys.length
     @controller_name = 'sops'
-    assert_equal({ title: 'mary' }, asset_params)
+    assert_equal 'mary', asset_params[:title]
+    assert_equal 1, asset_params.keys.length
   end
 
   test 'check url response code' do
