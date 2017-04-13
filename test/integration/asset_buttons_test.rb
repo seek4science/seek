@@ -48,29 +48,29 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
       with_config_value :show_as_external_link_enabled, true do
         if Seek::Util.multi_files_asset_types.include? klass
           create_content_blobs item, [pdf_blob_with_local_copy_attrs]
-          assert_download_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
+          assert_download_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
 
           create_content_blobs item, [pdf_blob_without_local_copy_attrs]
-          assert_link_button "#{underscored_type_name.pluralize}/#{item.id}"
+          assert_link_button "/#{underscored_type_name.pluralize}/#{item.id}"
 
           create_content_blobs item, [pdf_blob_with_local_copy_attrs, pdf_blob_without_local_copy_attrs]
-          assert_download_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
+          assert_download_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
 
           create_content_blobs item, [html_blob_attrs, pdf_blob_without_local_copy_attrs]
 
-          assert_neither_download_nor_link_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
+          assert_neither_download_nor_link_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
 
         else
           item.create_content_blob pdf_blob_with_local_copy_attrs
-          assert_download_button "#{underscored_type_name.pluralize}/#{item.id}", human_name
+          assert_download_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
 
           item.content_blob.destroy
           item.create_content_blob html_blob_attrs
-          assert_link_button "#{underscored_type_name.pluralize}/#{item.id}"
+          assert_link_button "/#{underscored_type_name.pluralize}/#{item.id}"
 
           item.content_blob.destroy
           item.create_content_blob pdf_blob_without_local_copy_attrs
-          assert_link_button "#{underscored_type_name.pluralize}/#{item.id}"
+          assert_link_button "/#{underscored_type_name.pluralize}/#{item.id}"
         end
       end
     end
