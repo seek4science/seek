@@ -179,7 +179,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     refute_includes new_assay.data_files, d
     assert_difference('ActivityLog.count') do
-      put :update, id: d, data_file: {}, assay_ids: [new_assay.id.to_s]
+      put :update, id: d, data_file: { title: nil }, assay_ids: [new_assay.id.to_s]
     end
 
     assert_redirected_to data_file_path(d)
@@ -892,7 +892,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'should update data file' do
     assert_difference('ActivityLog.count') do
-      put :update, id: data_files(:picture).id, data_file: {}
+      put :update, id: data_files(:picture).id, data_file: { title: nil }
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -915,9 +915,9 @@ class DataFilesControllerTest < ActionController::TestCase
     # upload a data file
     df = Factory :data_file, contributor: User.current_user
     # upload new version 1 of the data file
-    post :new_version, id: df, data_file: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 1'
+    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 1'
     # upload new version 2 of the data file
-    post :new_version, id: df, data_file: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 2'
+    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 2'
 
     df.reload
     assert_equal 3, df.versions.length
@@ -940,7 +940,7 @@ class DataFilesControllerTest < ActionController::TestCase
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
-        post :new_version, id: d, data_file: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
+        post :new_version, id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
       end
     end
 
@@ -1214,7 +1214,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: {},
+      put :update, id: df, data_file: { title: nil },
                    policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
     end
     df.reload
@@ -1236,7 +1236,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as(df.contributor)
 
-    put :update, id: df, policy_attributes: projects_policy(Policy::NO_ACCESS, df.projects, Policy::ACCESSIBLE)
+    put :update, id: df, data_file: { title: nil }, policy_attributes: projects_policy(Policy::NO_ACCESS, df.projects, Policy::ACCESSIBLE)
 
     df.reload
     permissions = df.policy.permissions
@@ -2466,7 +2466,7 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:sample, originating_data_file: data_file)
 
     assert_no_difference('DataFile::Version.count') do
-      post :new_version, id: data_file.id, data_file: {}, content_blobs: [{ data: file_for_upload }],
+      post :new_version, id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }],
                          revision_comment: 'This is a new revision'
     end
 

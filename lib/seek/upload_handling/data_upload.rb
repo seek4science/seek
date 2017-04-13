@@ -130,14 +130,8 @@ module Seek
         !blob_params[:data].blank?
       end
 
-      def init_asset_for_render
-        clean_params
-        eval "@#{controller_name.singularize} = controller_name.classify.constantize.new(asset_params)"
-      end
-
       def handle_upload_data_failure
         if render_new?
-          init_asset_for_render
           respond_to do |format|
             format.html do
               render action: :new

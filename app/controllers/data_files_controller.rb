@@ -135,11 +135,10 @@ class DataFilesController < ApplicationController
   end
 
   def create
+    @data_file = DataFile.new(data_file_params)
+
     if handle_upload_data
-
-      @data_file = DataFile.new params[:data_file]
-
-      update_sharing_policies @data_file, params
+      update_sharing_policies(@data_file, params)
 
       if @data_file.save
         update_annotations(params[:tag_list], @data_file)
@@ -194,9 +193,6 @@ class DataFilesController < ApplicationController
   end
 
   def update
-    # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-    data_file_params = filter_protected_update_params(params[:data_file])
-
     update_annotations(params[:tag_list], @data_file)
     update_scales @data_file
 
@@ -403,6 +399,13 @@ class DataFilesController < ApplicationController
         format.html { redirect_to @data_file }
       end
     end
+  end
+
+  private
+
+  def data_file_params
+    params.require(:data_file).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
+                                      :parent_name, { event_ids: [] })
   end
 
 end

@@ -2,11 +2,11 @@ module Seek
   module UploadHandling
     module ParameterHandling
       def asset_params
-        params[controller_name.downcase.singularize.to_sym]
+        params.require(controller_name.downcase.singularize.to_sym)
       end
 
       def content_blob_params
-        params[:content_blobs]
+        params.require(:content_blobs => [])
       end
 
       def clean_params

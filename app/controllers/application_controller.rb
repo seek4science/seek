@@ -538,4 +538,9 @@ class ApplicationController < ActionController::Base
   def redirect_to_sign_up_when_no_user
     redirect_to signup_path if User.count == 0
   end
+
+  def policy_params
+    params.permit(policy_attributes: [:access_type, { permissions_attributes: [:access_type, :contributor_type, :contributor_id] }])[:policy_attributes]
+  end
+
 end
