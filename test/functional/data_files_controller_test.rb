@@ -1236,7 +1236,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as(df.contributor)
 
-    put :update, id: df, data_file: { title: nil }, policy_attributes: projects_policy(Policy::NO_ACCESS, df.projects, Policy::ACCESSIBLE)
+    put :update, id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::NO_ACCESS, df.projects, Policy::ACCESSIBLE)
+
+    assert_redirected_to df
 
     df.reload
     permissions = df.policy.permissions

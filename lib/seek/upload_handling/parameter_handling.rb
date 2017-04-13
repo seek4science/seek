@@ -6,7 +6,7 @@ module Seek
       end
 
       def content_blob_params
-        params.require(:content_blobs => [])
+        params.require(:content_blobs)
       end
 
       def clean_params

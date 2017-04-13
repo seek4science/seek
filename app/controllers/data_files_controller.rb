@@ -90,7 +90,7 @@ class DataFilesController < ApplicationController
   def upload_for_tool
     if handle_upload_data
       params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
-      @data_file = DataFile.new params[:data_file]
+      @data_file = DataFile.new(data_file_params)
 
       @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
@@ -113,7 +113,7 @@ class DataFilesController < ApplicationController
     if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
       User.with_current_user Person.find(params[:sender_id]).user do
         if handle_upload_data
-          @data_file = DataFile.new params[:data_file]
+          @data_file = DataFile.new(data_file_params)
 
           @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
 
@@ -193,16 +193,15 @@ class DataFilesController < ApplicationController
   end
 
   def update
+    @data_file.attributes = data_file_params
+
     update_annotations(params[:tag_list], @data_file)
     update_scales @data_file
 
     respond_to do |format|
-      @data_file.attributes = data_file_params
-
       update_sharing_policies @data_file, params
 
       if @data_file.save
-
         update_relationships(@data_file, params)
 
         # the assay_id param can also contain the relationship type
