@@ -179,7 +179,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     refute_includes new_assay.data_files, d
     assert_difference('ActivityLog.count') do
-      put :update, id: d, data_file: { title: nil }, assay_ids: [new_assay.id.to_s]
+      put :update, id: d, data_file: { title: d.title }, assay_ids: [new_assay.id.to_s]
     end
 
     assert_redirected_to data_file_path(d)
@@ -892,7 +892,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'should update data file' do
     assert_difference('ActivityLog.count') do
-      put :update, id: data_files(:picture).id, data_file: { title: nil }
+      put :update, id: data_files(:picture).id, data_file: { title: 'diff title' }
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -1214,7 +1214,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: { title: nil },
+      put :update, id: df, data_file: { title: df.title },
                    policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
     end
     df.reload
