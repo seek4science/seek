@@ -134,7 +134,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute person.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
       assert_difference('AdminDefinedRoleProgramme.count', 1) do
-        post :create, programme: { administrator_ids: [person.id], title: 'programme xxxyxxx2' }
+        post :create, programme: { administrator_ids: "#{person.id}", title: 'programme xxxyxxx2' }
       end
     end
 
@@ -152,7 +152,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute admin.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
       assert_difference('AdminDefinedRoleProgramme.count', 1) do
-        post :create, programme: { administrator_ids: [admin.id], title: 'programme xxxyxxx1' }
+        post :create, programme: { administrator_ids: "#{admin.id}", title: 'programme xxxyxxx1' }
       end
     end
 

@@ -20,11 +20,9 @@ class ProgrammesController < ApplicationController
   respond_to :html
 
   def create
-    handle_administrators if params[:programme][:administrator_ids]
-
     #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
     funding_codes = params[:programme].delete(:funding_codes)
-    @programme = Programme.new(params[:programme])
+    @programme = Programme.new(programme_params)
 
     if @programme.save
       flash[:notice] = "The #{t('programme').capitalize} was successfully created."
@@ -45,8 +43,7 @@ class ProgrammesController < ApplicationController
   end
 
   def update
-    handle_administrators if params[:programme][:administrator_ids]
-    flash[:notice] = "The #{t('programme').capitalize} was successfully updated." if @programme.update_attributes(params[:programme])
+    flash[:notice] = "The #{t('programme').capitalize} was successfully updated." if @programme.update_attributes(programme_params)
     respond_with(@programme)
   end
 
@@ -150,6 +147,16 @@ class ProgrammesController < ApplicationController
     else
       @programmes = Programme.activated
     end
+  end
+
+  private
+
+  def programme_params
+    handle_administrators if params[:programme][:administrator_ids]
+
+    params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
+                                      { project_ids: [] }, :funding_details, { administrator_ids: [] },
+                                      :activation_rejection_reason, :funding_codes)
   end
 
 end
