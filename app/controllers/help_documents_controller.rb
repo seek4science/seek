@@ -49,9 +49,6 @@ class HelpDocumentsController < ApplicationController
   end
   
   def update
-    #Stop identifier being changed
-    params[:help_document].delete(:identifier)
-    
     #Update changes when previewing, but don't save
     if params[:commit] == "Preview"
       @preview = true
@@ -59,7 +56,7 @@ class HelpDocumentsController < ApplicationController
       @help_document.title = params[:help_document][:title]
     end   
     respond_to do |format|
-      if !@preview && @help_document.update_attributes(params[:help_document])
+      if !@preview && @help_document.update_attributes(help_document_params)
         format.html { redirect_to(@help_document) }
         format.xml  { head :ok }
       elsif @preview
@@ -72,7 +69,7 @@ class HelpDocumentsController < ApplicationController
   end
   
   def create
-    @help_document = HelpDocument.new(params[:help_document]) 
+    @help_document = HelpDocument.new(help_document_params)
     if params[:commit] == "Preview"
       @preview = true
     end
@@ -90,7 +87,13 @@ class HelpDocumentsController < ApplicationController
   end
   
   private
-  
+
+  def help_document_params
+    permitted_params = [:title, :body]
+    permitted_params << :identifier if action_name == 'create'
+    params.require(:help_document).permit(permitted_params)
+  end
+
   def find_document
     @help_document = HelpDocument.find_by_identifier(params[:id]) || raise(ActiveRecord::RecordNotFound)
   end
