@@ -97,7 +97,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test 'should not create invalid event' do
     assert_difference('Event.count', 0) do
-      post :create, event: {}
+      post :create, event: { title: nil }
     end
   end
 

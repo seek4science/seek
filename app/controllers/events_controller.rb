@@ -31,7 +31,7 @@ class EventsController < ApplicationController
   end
 
   def create
-    @event = Event.new params[:event]
+    @event = Event.new(event_params)
     handle_update_or_create(true)
   end
 
@@ -54,7 +54,7 @@ class EventsController < ApplicationController
     publication_ids = params.delete(:related_publication_ids) || []
     @event.publications = Publication.find(publication_ids)
 
-    @event.attributes = params[:event]
+    @event.attributes = event_params
 
     update_sharing_policies @event, params
 
@@ -67,4 +67,12 @@ class EventsController < ApplicationController
       end
     end
   end
+
+  private
+
+  def event_params
+    params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country,
+                                  { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] })
+  end
+
 end
