@@ -12,7 +12,6 @@ class PeopleController < ApplicationController
   before_filter :is_during_registration,:only=>[:register]
   before_filter :is_user_admin_auth,:only=>[:destroy]
   before_filter :auth_to_create, :only=>[:new,:create]
-  before_filter :removed_params,:only=>[:update,:create]
   before_filter :administerable_by_user, :only => [:admin, :administer_update]
   before_filter :do_projects_belong_to_project_administrator_projects?,:only=>[:administer_update]
   before_filter :editable_by_user, :only => [:edit, :update]
@@ -153,8 +152,7 @@ class PeopleController < ApplicationController
   # POST /people
   # POST /people.xml
   def create
-
-    @person = Person.new(params[:person])
+    @person = Person.new(person_params)
 
     redirect_action="new"
 
@@ -214,7 +212,7 @@ class PeopleController < ApplicationController
 
     
     respond_to do |format|
-      if @person.update_attributes(params[:person]) && set_group_membership_project_position_ids(@person,params)
+      if @person.update_attributes(person_params) && set_group_membership_project_position_ids(@person,params)
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch #this makes sure any caches based on the cache key are invalided where the person would not normally be updated, such as changing disciplines or tags
         flash[:notice] = 'Person was successfully updated.'
@@ -232,17 +230,9 @@ class PeopleController < ApplicationController
   def administer_update
     had_no_projects = @person.work_groups.empty?
 
-    passed_params=    {:work_group_ids        => (User.admin_or_project_administrator_logged_in?)}
-    temp = params.clone
-    params[:person] = {}
-    passed_params.each do |param, allowed|
-      params[:person]["#{param}"] = temp[:person]["#{param}"] if temp[:person]["#{param}"] && allowed
-      params["#{param}"] = temp["#{param}"] if temp["#{param}"] && allowed
-    end
-
     respond_to do |format|
-      if @person.update_attributes(params[:person])
-        set_project_related_roles(@person, params)
+      if @person.update_attributes(administer_person_params)
+        set_project_related_roles(@person)
 
         @person.save #this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
@@ -323,6 +313,25 @@ class PeopleController < ApplicationController
   end
 
   private
+
+  def person_params
+    params.require(:person).permit(:first_name, :last_name, :orcid, :description, :email, :web_page, :phone,
+                                   :skype_name, { discipline_ids: [] },
+                                   { project_subscriptions_attributes: [:id, :project_id, :_destroy, :frequency ] })
+  end
+
+  def administer_person_params
+    if params[:person] && User.admin_or_project_administrator_logged_in?
+      params.require(:person).permit(work_group_ids: [])
+    else
+      {}
+    end
+  end
+
+  # Unused...
+  def role_params
+    params.require(:roles).permit({ pal: [] }, { project_administrator: [] }, { asset_housekeeper: [] }, { asset_gatekeeper: [] })
+  end
   
   def set_tools_and_expertise person,params
       exp_changed = person.tag_annotations(params[:expertise_list],"expertise")
@@ -335,7 +344,7 @@ class PeopleController < ApplicationController
       end
   end
 
-  def set_project_related_roles person, params
+  def set_project_related_roles person
     return unless params[:roles]
 
     administered_project_ids = Project.all_can_be_administered.collect{|p| p.id.to_s}
@@ -351,8 +360,6 @@ class PeopleController < ApplicationController
     end
   end
 
-
-
   def is_user_admin_or_personless
     unless User.admin_logged_in? || !current_user.registration_complete?
       error("You do not have permission to create new people","Is invalid (not admin)")
@@ -365,18 +372,6 @@ class PeopleController < ApplicationController
       redirect_to(:root)
     end
     !!current_user
-  end
-
-  #checks the params attributes and strips those that cannot be set by non-admins, or other policy
-  def removed_params
-    # make sure to update people/_form if this changes
-    #                   param                 => allowed access?
-    removed_params = [:roles, :roles_mask, :work_group_ids]
-
-    removed_params.each do |param|
-      params[:person].delete(param) if params[:person]
-      params.delete param if params
-    end
   end
 
   def project_administrators_of_selected_projects project_ids

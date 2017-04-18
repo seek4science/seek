@@ -358,7 +358,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_should_update_person
-    put :update, id: people(:quentin_person), person: {}
+    put :update, id: people(:quentin_person), person: { description: 'a' }
     assert_redirected_to person_path(assigns(:person))
   end
 
@@ -593,7 +593,7 @@ class PeopleControllerTest < ActionController::TestCase
     project = person.projects.first
     assert_not_nil project
 
-    put :administer_update, id: person.id, person: {}, roles: { project_administrator: [project.id] }
+    put :administer_update, id: person.id, person: { description: 'a' }, roles: { project_administrator: [project.id] }
 
     person = assigns(:person)
 
@@ -985,7 +985,7 @@ class PeopleControllerTest < ActionController::TestCase
   #   assert_response :success
   #
   #   assert !admin.is_asset_gatekeeper?(project)
-  #   put :administer_update, id: admin, person: {}, roles: { asset_gatekeeper: [project.id] }
+  #   put :administer_update, id: admin, person: { description: 'a' }, roles: { asset_gatekeeper: [project.id] }
   #   assert_redirected_to person_path(admin)
   #   assert assigns(:person).is_asset_gatekeeper?(project)
   #   assert assigns(:person).is_admin?
@@ -1001,7 +1001,7 @@ class PeopleControllerTest < ActionController::TestCase
     refute person.is_project_administrator?(project)
     refute person.is_asset_gatekeeper?(project)
 
-    put :administer_update, id: person, person: {}, roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
+    put :administer_update, id: person, person: { description: 'a' }, roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
     assert_redirected_to person_path(person)
     assert assigns(:person).is_asset_gatekeeper?(project)
     assert assigns(:person).is_project_administrator?(project)
@@ -1018,7 +1018,7 @@ class PeopleControllerTest < ActionController::TestCase
     refute person.is_project_administrator?(project)
     refute person.is_asset_gatekeeper?(project)
 
-    put :administer_update, id: person, person: {}, roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
+    put :administer_update, id: person, person: { description: 'a' }, roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
     assert_redirected_to person_path(person)
 
     refute assigns(:person).is_asset_gatekeeper?(project)
@@ -1042,7 +1042,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_project_administrator?(project)
     refute person.is_project_administrator?(managed_project)
 
-    put :administer_update, id: person, person: {}, roles: { project_administrator: [managed_project.id] }
+    put :administer_update, id: person, person: { description: 'a' }, roles: { project_administrator: [managed_project.id] }
     assert_redirected_to person_path(person)
 
     assert assigns(:person).is_admin?
@@ -1062,7 +1062,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_programme_administrator?(prog)
     refute person.is_project_administrator?(proj)
 
-    put :administer_update, id: person, person: {}, roles: { project_administrator: [proj.id] }
+    put :administer_update, id: person, person: { description: 'a' }, roles: { project_administrator: [proj.id] }
     assert_redirected_to person_path(person)
 
     assert assigns(:person).is_admin?
@@ -1079,7 +1079,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.save!
     refute person.is_admin?
 
-    put :administer_update, id: person, person: {}, roles: { admin: [] }
+    put :administer_update, id: person, person: { description: 'a' }, roles: { admin: [] }
     assert_redirected_to person_path(person)
     refute assigns(:person).is_admin?
   end
@@ -1123,7 +1123,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    get :administer_update, id: people(:fred), person: {}
+    get :administer_update, id: people(:fred), person: { description: 'a' }
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
