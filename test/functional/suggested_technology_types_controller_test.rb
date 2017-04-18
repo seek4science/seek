@@ -74,13 +74,13 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     assert_equal suggested_parent1.uri, suggested_technology_type.parent.uri.to_s
 
     # update to other parent suggested
-    put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_id: suggested_parent2.id }
+    put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_uri: "suggested_technology_type:#{suggested_parent2.id}" }
     assert_redirected_to action: :manage
     suggested_parent2.reload
     assert_includes suggested_parent2.children, suggested_technology_type
 
     # update to other parent from ontology
-    put :update, id: suggested_technology_type.id, suggested_technology_type: { ontology_uri: ontology_parent_uri }
+    put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_uri: ontology_parent_uri }
     assert_redirected_to action: :manage
   end
 
