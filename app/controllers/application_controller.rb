@@ -30,6 +30,8 @@ class ApplicationController < ActionController::Base
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
   before_filter :process_params, :only=>[:edit, :update, :destroy, :create, :new]
 
+  after_filter :unescape_response
+
   helper :all
 
   layout Seek::Config.main_layout
@@ -595,4 +597,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
+  # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
+  # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
+  # by steffen.brinkmann@h-its.org
+  # 2017-04-18
+  def unescape_response()
+    response_body[0].gsub!(/\\u([0-9a-z]{4})/) { |s|
+      [$1.to_i(16)].pack("U")
+    }
+  end
 end

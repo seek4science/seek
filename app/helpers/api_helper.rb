@@ -278,7 +278,7 @@ module ApiHelper
     associated_hash.delete_if { |k, _v| to_ignore.include?(k) }
     associated_hash.each_value do |value|
       if (value[:items] != [])
-        puts "a value: ", value[:items]
+        #puts "a value: ", value[:items]
         associated_arr += value[:items]
 #        builder.api_format! value[:items]   #if we used a jbuilder
 
