@@ -310,7 +310,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert investigation.creators.empty?
 
-    put :update, id: investigation.id, creators: [[creator.name, creator.id]].to_json
+    put :update, id: investigation.id, investigation: { title: investigation.title },
+        creators: [[creator.name, creator.id]].to_json
     assert_redirected_to investigation_path(investigation)
 
     assert investigation.creators.include?(creator)

@@ -56,7 +56,7 @@ class InvestigationsController < ApplicationController
   end
 
   def create
-    @investigation=Investigation.new(params[:investigation])
+    @investigation = Investigation.new(investigation_params)
     update_sharing_policies @investigation,params
 
     if @investigation.save
@@ -107,7 +107,7 @@ class InvestigationsController < ApplicationController
   def update
     @investigation=Investigation.find(params[:id])
 
-    @investigation.attributes = params[:investigation]
+    @investigation.attributes = investigation_params
 
     update_sharing_policies @investigation,params
 
@@ -128,5 +128,10 @@ class InvestigationsController < ApplicationController
   end
 
   private
+
+  def investigation_params
+    params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
+                                          :create_from_asset, :new_link_from_study,)
+  end
   
 end
