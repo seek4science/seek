@@ -88,7 +88,7 @@ class AssaysControllerTest < ActionController::TestCase
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert !assay.sops.include?(sop.latest_version)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay_sop_ids: [sop.id], assay: {}
+      put :update, id: assay, assay_sop_ids: [sop.id], assay: { title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -103,7 +103,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
 
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay_sop_ids: [sop.id], assay: {}
+      put :update, id: assay, assay_sop_ids: [sop.id], assay: { title: assay.title }
     end
 
     assay.reload
@@ -120,7 +120,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.sops.include?(sop.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay_sop_ids: [sop.id], assay: {}
+      put :update, id: assay, assay_sop_ids: [sop.id], assay: { title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -141,7 +141,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       put :update, id: assay,
                    data_files: [{ id: df.id, relationship_type: RelationshipType.find_by_title('Test data').id }],
-                   assay: {}
+                   assay: { title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -160,7 +160,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, model_ids: [model.id], assay: {}
+      put :update, id: assay, model_ids: [model.id], assay: { title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -917,7 +917,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.policy.permissions.empty?
 
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay: {},
+      put :update, id: assay, assay: { title: assay.title },
                    policy_attributes: { access_type: Policy::ACCESSIBLE,
                                         permissions_attributes: project_permissions(study.projects, Policy::EDITING) }
     end
@@ -1279,7 +1279,7 @@ class AssaysControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert assay.creators.empty?
 
-    put :update, id: assay.id, creators: [[creator.name, creator.id]].to_json
+    put :update, id: assay.id, assay: { title: assay.title }, creators: [[creator.name, creator.id]].to_json
     assert_redirected_to assay_path(assay)
 
     assert assay.creators.include?(creator)

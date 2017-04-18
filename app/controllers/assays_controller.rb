@@ -103,7 +103,7 @@ class AssaysController < ApplicationController
 
   def create
     params[:assay_class_id] ||= AssayClass.for_type("experimental").id
-    @assay = Assay.new(params[:assay])
+    @assay = Assay.new(assay_params)
 
     update_assay_organisms @assay, params
 
@@ -145,7 +145,7 @@ class AssaysController < ApplicationController
     update_annotations(params[:tag_list], @assay)
     update_scales @assay
 
-    @assay.update_attributes(params[:assay])
+    @assay.update_attributes(assay_params)
 
     update_sharing_policies @assay,params
 
@@ -219,6 +219,13 @@ class AssaysController < ApplicationController
     render :update do |page|
       page.replace_html "favourite_list", :partial=>"favourites/gadget_list"
     end
+  end
+
+  private
+
+  def assay_params
+    params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
+                                  :assay_type_uri, :technology_type_uri, :license, :other_creators)
   end
 
 end
