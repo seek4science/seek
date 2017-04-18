@@ -53,4 +53,7 @@ SEEK::Application.configure do
   # Asset digests allow you to set far-future HTTP expiration dates on all assets,
   # yet still be able to expire them through the digest params.
   config.assets.digest = false
+
+  # Uncomment this to raise exception on unpermitted params:
+  # config.action_controller.action_on_unpermitted_parameters = :raise
 end
