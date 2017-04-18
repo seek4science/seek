@@ -432,7 +432,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :edit, id: projects(:one)
     assert_response :success
 
-    put :update, id: projects(:three).id, project: {}
+    put :update, id: projects(:three).id, project: { title: 'asd' }
+
     assert_redirected_to project_path(assigns(:project))
   end
 
@@ -1452,6 +1453,6 @@ class ProjectsControllerTest < ActionController::TestCase
   private
 
   def valid_project
-    {}
+    { title: 'a title' }
   end
 end
