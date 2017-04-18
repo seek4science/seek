@@ -225,7 +225,7 @@ class AssaysController < ApplicationController
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
-                                  :assay_type_uri, :technology_type_uri, :license, :other_creators)
+                                  :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset)
   end
 
 end
