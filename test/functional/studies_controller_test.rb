@@ -159,7 +159,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_equal Policy::EVERYONE, s.policy.access_type
 
-    put :update, id: s, study: {}, policy_attributes: { access_type: Policy::NO_ACCESS }
+    put :update, id: s, study: { title: s.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
     s = assigns(:study)
     assert_response :redirect
     s.reload
@@ -173,7 +173,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_equal Policy::EVERYONE, s.policy.access_type
 
-    put :update, id: s, study: {}, policy_attributes: { access_type: Policy::NO_ACCESS }
+    put :update, id: s, study: { title: s.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
     s = assigns(:study)
     assert_response :success
     s.reload
@@ -471,7 +471,7 @@ class StudiesControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert study.creators.empty?
 
-    put :update, id: study.id, study: {}, creators: [[creator.name, creator.id]].to_json
+    put :update, id: study.id, study: { title: study.title }, creators: [[creator.name, creator.id]].to_json
     assert_redirected_to study_path(study)
 
     assert study.creators.include?(creator)

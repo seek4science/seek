@@ -68,11 +68,10 @@ class StudiesController < ApplicationController
     end
   end
 
-  
   def update
     @study=Study.find(params[:id])
 
-    @study.attributes = params[:study]
+    @study.attributes = study_params
 
     update_sharing_policies @study,params
 
@@ -99,35 +98,33 @@ class StudiesController < ApplicationController
       format.xml
       format.rdf { render :template=>'rdf/show'}
     end
-
   end
 
   def create
-    @study = Study.new(params[:study])
+    @study = Study.new(study_params)
 
     update_sharing_policies @study,params
 
+    if @study.save
+      update_scales @study
+      update_relationships(@study, params)
 
-  if @study.save
-    update_scales @study
-    update_relationships(@study, params)
-
-    if @study.new_link_from_assay=="true"
-      render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
-    else
-      respond_to do |format|
-        flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
-        if @study.create_from_asset=="true"
-          flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
-          format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
-        else
-        format.html { redirect_to study_path(@study) }
-        format.xml { render :xml => @study, :status => :created, :location => @study }
+      if @study.new_link_from_assay=="true"
+        render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@study,:parent=>"assay"}
+      else
+        respond_to do |format|
+          flash[:notice] = "The #{t('study')} was successfully created.<br/>".html_safe
+          if @study.create_from_asset=="true"
+            flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
+            format.html { redirect_to study_path(:id=>@study,:create_from_asset=>@study.create_from_asset) }
+          else
+            format.html { redirect_to study_path(@study) }
+            format.xml { render :xml => @study, :status => :created, :location => @study }
+          end
         end
       end
-    end
-  else
-    respond_to do |format|
+    else
+      respond_to do |format|
         format.html {render :action=>"new"}
         format.xml  { render :xml => @study.errors, :status => :unprocessable_entity }
       end
@@ -135,7 +132,6 @@ class StudiesController < ApplicationController
   end
 
   def investigation_selected_ajax
-
     if investigation_id = params[:investigation_id] and params[:investigation_id]!="0"
       investigation = Investigation.find(investigation_id)
       people=investigation.projects.collect(&:people).flatten
@@ -151,7 +147,7 @@ class StudiesController < ApplicationController
 
   def check_assays_are_not_already_associated_with_another_study
     assay_ids=params[:study][:assay_ids]
-    study_id=params[:id]    
+    study_id=params[:id]
     if (assay_ids)
       valid = !assay_ids.detect do |a_id|
         a=Assay.find(a_id)
@@ -165,4 +161,12 @@ class StudiesController < ApplicationController
       end
     end
   end
+
+  private
+
+  def study_params
+    params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
+                                  :other_creators, :create_from_asset, :new_link_from_assay)
+  end
+
 end
