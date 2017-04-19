@@ -18,7 +18,7 @@ class StudiedFactorsController < ApplicationController
   end
 
   def create
-    @studied_factor=StudiedFactor.new(params[:studied_factor])
+    @studied_factor=StudiedFactor.new(studied_factor_params)
     @studied_factor.data_file=@data_file
     @studied_factor.data_file_version = params[:version]
     substances = find_or_new_substances(params[:substance_list])
@@ -116,18 +116,24 @@ class StudiedFactorsController < ApplicationController
 
     update_annotations(params[:annotation][:value], @studied_factor, 'description') if try_block{!params[:annotation][:value].blank?}
 
-    render :update do |page|
-      if  @studied_factor.update_attributes(params[:studied_factor])
+    if  @studied_factor.update_attributes(studied_factor_params)
+      render :update do |page|
         page.visual_effect :fade,"edit_condition_or_factor_#{@studied_factor.id}_form"
         page.call "autocompleters['#{@studied_factor.id}_substance_autocompleter'].deleteAllTokens"
         page.replace "condition_or_factor_row_#{@studied_factor.id}", :partial => 'condition_or_factor_row', :object => @studied_factor, :locals=>{:asset => 'data_file', :show_delete=>true}
-      else
+      end
+    else
+      render :update do |page|
         page.alert(@studied_factor.errors.full_messages)
       end
     end
   end
 
   private
+
+  def studied_factor_params
+    params.require(:studied_factor).permit(:measured_item_id, :unit_id, :start_value, :end_value, :standard_deviation)
+  end
 
   def find_data_file_auth
     begin
