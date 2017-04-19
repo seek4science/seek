@@ -55,7 +55,7 @@ class SampleTypesController < ApplicationController
   def create
     # because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
     tags = params[:sample_type].delete(:tags)
-    @sample_type = SampleType.new(params[:sample_type])
+    @sample_type = SampleType.new(sample_type_params)
 
     # removes controlled vocabularies or linked seek samples where the type may differ
     @sample_type.resolve_inconsistencies
@@ -74,7 +74,7 @@ class SampleTypesController < ApplicationController
   # PUT /sample_types/1
   # PUT /sample_types/1.json
   def update
-    @sample_type.update_attributes(params[:sample_type])
+    @sample_type.update_attributes(sample_type_params)
     @sample_type.resolve_inconsistencies
     flash[:notice] = 'Sample type was successfully updated.' if @sample_type.save
     respond_with(@sample_type)
@@ -118,8 +118,17 @@ class SampleTypesController < ApplicationController
 
   private
 
+  def sample_type_params
+    params.require(:sample_type).permit(:title, :description, :tags,
+                                        {project_ids: [],
+                                         sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
+                                                                        :sample_attribute_type_id,
+                                                                        :linked_sample_type_id, :unit_id, :_destroy]})
+  end
+
+
   def build_sample_type_from_template
-    @sample_type = SampleType.new(params[:sample_type])
+    @sample_type = SampleType.new(sample_type_params)
     @sample_type.uploaded_template = true
 
     handle_upload_data

@@ -34,6 +34,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_difference('SampleType.count') do
       post :create, sample_type: { title: 'Hello!',
                                    project_ids: @project_ids,
+                                   description: 'The description!!',
                                    sample_attributes_attributes: {
                                      '0' => {
                                        pos: '1', title: 'a string', required: '1', is_title: '1',
@@ -48,14 +49,19 @@ class SampleTypesControllerTest < ActionController::TestCase
       }
     end
 
-    assert_redirected_to sample_type_path(assigns(:sample_type))
-    assert_equal 2, assigns(:sample_type).sample_attributes.size
-    assert_equal 'a string', assigns(:sample_type).sample_attributes.title_attributes.first.title
-    assert_equal [@project], assigns(:sample_type).projects
-    refute assigns(:sample_type).uploaded_template?
-    assert_equal %w(fish golf), assigns(:sample_type).tags.sort
-    assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
-    assert SampleTypeUpdateJob.new(assigns(:sample_type), true).exists?
+    refute_nil type=assigns(:sample_type)
+    assert_redirected_to sample_type_path(type)
+
+    assert_equal 'Hello!',type.title
+    assert_equal 'The description!!',type.description
+    assert_equal @project_ids.sort,type.project_ids.sort
+    assert_equal 2, type.sample_attributes.size
+    assert_equal 'a string', type.sample_attributes.title_attributes.first.title
+    assert_equal [@project], type.projects
+    refute type.uploaded_template?
+    assert_equal %w(fish golf), type.tags.sort
+    assert SampleTemplateGeneratorJob.new(type).exists?
+    assert SampleTypeUpdateJob.new(type, true).exists?
   end
 
   test 'should create with linked sample type' do
@@ -137,7 +143,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     sample_attributes_fields[1][:title] = 'hello'
     sample_attributes_fields[1][:is_title] = '1'
     sample_attributes_fields[2][:_destroy] = '1'
-    sample_attributes_fields = Hash[sample_attributes_fields.each_with_index.map { |f, i| [i, f] }]
+    sample_attributes_fields = Hash[sample_attributes_fields.each_with_index.map { |f, i| [i.to_s, f] }]
 
     assert_difference('SampleAttribute.count', -1) do
       put :update, id: sample_type, sample_type: { title: 'Hello!',
