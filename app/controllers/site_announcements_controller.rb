@@ -66,7 +66,7 @@ class SiteAnnouncementsController < ApplicationController
   end
   
   def create
-    @site_announcement=SiteAnnouncement.new(params[:site_announcement])
+    @site_announcement=SiteAnnouncement.new(site_announcement_params)
     @site_announcement.announcer = current_person
 
     respond_to do |format|
@@ -89,7 +89,7 @@ class SiteAnnouncementsController < ApplicationController
     @site_announcement=SiteAnnouncement.find(params[:id])
     
     respond_to do |format|
-      if @site_announcement.update_attributes(params[:site_announcement])
+      if @site_announcement.update_attributes(site_announcement_params)
         flash[:notice] = 'Announcement was successfully updated.'
         format.html { redirect_to(@site_announcement) }
         format.xml  { head :ok }
@@ -117,6 +117,14 @@ class SiteAnnouncementsController < ApplicationController
       flash[:error] = "Admin rights required"
       redirect_to root_url
     end
+  end
+
+  private
+
+  def site_announcement_params
+    params.require(:site_announcement).permit(:title, :body, :show_in_feed, :is_headline,
+                                              'expires_at(1i)', 'expires_at(2i)', 'expires_at(3i)',
+                                              'expires_at(4i)', 'expires_at(5i)', :email_notification)
   end
    
 end
