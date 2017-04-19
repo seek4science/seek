@@ -19,9 +19,9 @@ class UploadHandingTest < ActiveSupport::TestCase
   test 'content_blob_params' do
     @params = ActionController::Parameters.new({ content_blobs: [{ fish: 1, soup: 2 }],
                                                  data_file: { title: 'george' } })
-    assert_equal 1, content_blob_params.length
-    assert_equal 1, content_blob_params.first[:fish]
-    assert_equal 2, content_blob_params.first[:soup]
+    assert_equal 1, content_blobs_params.length
+    assert_equal 1, content_blobs_params.first[:fish]
+    assert_equal 2, content_blobs_params.first[:soup]
   end
 
   test 'default to http if missing' do

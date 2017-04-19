@@ -107,7 +107,7 @@ module Seek
       update_scales item
       update_relationships(item, params)
       update_assay_assets(item, params[:assay_ids])
-      build_model_image item, params[:model_image] if item.is_a?(Model)
+      build_model_image item, model_image_params if item.is_a?(Model) && model_image_present?
       item
     end
 

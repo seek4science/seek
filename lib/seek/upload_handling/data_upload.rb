@@ -5,7 +5,7 @@ module Seek
       include Seek::UploadHandling::ContentInspection
 
       def handle_upload_data
-        blob_params = content_blob_params
+        blob_params = params[:content_blobs]
         allow_empty_content_blob = model_image_present?
 
         unless allow_empty_content_blob || retained_content_blob_ids.present?
@@ -27,8 +27,6 @@ module Seek
           end
         end
 
-        params[:content_blob] = blob_params
-        clean_params
         true
       end
 
@@ -48,12 +46,14 @@ module Seek
         asset = eval "@#{controller_name.downcase.singularize}"
         version = asset.version
 
-        content_blob_params.each do |item_params|
-          attributes = build_attributes_hash_for_content_blob(item_params, version)
-          if asset.respond_to?(:content_blobs)
-            asset.content_blobs.create(attributes)
-          else
-            asset.create_content_blob(attributes)
+        unless model_image_present? && params[:content_blobs].blank?
+          content_blobs_params.each do |item_params|
+            attributes = build_attributes_hash_for_content_blob(item_params, version)
+            if asset.respond_to?(:content_blobs)
+              asset.content_blobs.create(attributes)
+            else
+              asset.create_content_blob(attributes)
+            end
           end
         end
         retain_previous_content_blobs(asset)

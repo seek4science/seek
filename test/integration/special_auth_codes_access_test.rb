@@ -155,7 +155,7 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
   private
 
   def test_failing_for(item, type_name, action, code = nil)
-    if Seek::Util.multi_files_asset_types.include?(item.class)
+    if Seek::Util.is_multi_file_asset_type?(item.class)
       # download multiple files
       get "/#{type_name}/#{item.id}/#{action}/?code=#{code}"
       assert_redirected_to item
@@ -176,7 +176,7 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
   end
 
   def test_passing_for(item, type_name, action, code = nil)
-    if Seek::Util.multi_files_asset_types.include?(item.class)
+    if Seek::Util.is_multi_file_asset_type?(item.class)
       # download multiple files
       get "/#{type_name}/#{item.id}/#{action}/?code=#{code}"
       assert_response :success, "failed for asset #{type_name}"

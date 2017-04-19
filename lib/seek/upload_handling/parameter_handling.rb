@@ -5,16 +5,8 @@ module Seek
         params.require(controller_name.downcase.singularize.to_sym)
       end
 
-      def content_blob_params
+      def content_blobs_params
         params.require(:content_blobs)
-      end
-
-      def clean_params
-        if asset_params
-          %w(data_url data make_local_copy).each do |key|
-            asset_params.delete(key)
-          end
-        end
       end
 
       def retained_content_blob_ids

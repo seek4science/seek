@@ -57,6 +57,9 @@ class UtilTest < ActiveSupport::TestCase
 
     # double check they are actual types
     assert_equal expected, types
+    expected.each do |type|
+      assert Seek::Util.is_multi_file_asset_type?(type)
+    end
   end
 
   test 'doiable asset types' do

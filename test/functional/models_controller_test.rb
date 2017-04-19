@@ -236,7 +236,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.models, m
 
-    put :update, id: m, model: {}, assay_ids: [new_assay.id.to_s]
+    put :update, id: m, model: { title: m.title }, assay_ids: [new_assay.id.to_s]
 
     assert_redirected_to model_path(m)
     m.reload
@@ -259,7 +259,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal [scale1, scale2], m.scales
     scale3 = Factory(:scale)
 
-    put :update, id: m.id, scale_ids: [scale3.id.to_s]
+    put :update, id: m.id, model: { title: m.title }, scale_ids: [scale3.id.to_s]
     m = assigns(:model)
     assert_equal [scale3], m.scales
   end
@@ -399,7 +399,10 @@ class ModelsControllerTest < ActionController::TestCase
     m = models(:model_with_format_and_type)
     assert_difference('Model::Version.count', 1) do
       assert_difference('ModelImage.count') do
-        post :new_version, id: m, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }], revision_comment: 'This is a new revision', model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+        post :new_version, id: m, model: { title: m.title },
+             content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
+             revision_comment: 'This is a new revision',
+             model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
       end
     end
 
@@ -582,7 +585,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should update model' do
-    put :update, id: models(:teusink).id, model: {}
+    put :update, id: models(:teusink).id, model: { title: 'a' }
     assert_redirected_to model_path(assigns(:model))
   end
 
@@ -636,7 +639,9 @@ class ModelsControllerTest < ActionController::TestCase
   def test_should_create_new_version
     m = models(:model_with_format_and_type)
     assert_difference('Model::Version.count', 1) do
-      post :new_version, id: m, model: {}, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }], revision_comment: 'This is a new revision'
+      post :new_version, id: m, model: { title: m.title},
+           content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
+           revision_comment: 'This is a new revision'
     end
 
     assert_redirected_to model_path(m)
@@ -955,7 +960,7 @@ class ModelsControllerTest < ActionController::TestCase
     retained_content_blob = m.content_blobs.first
     login_as(m.contributor)
     assert_difference('Model::Version.count', 1) do
-      post :new_version, id: m, model: {}, content_blobs: [{ data: file_for_upload }],
+      post :new_version, id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload }],
                          retained_content_blob_ids: [retained_content_blob.id]
     end
 

@@ -107,6 +107,10 @@ module Seek
       end
     end
 
+    def self.is_multi_file_asset_type?(klass)
+      multi_files_asset_types.any? { |c| c.name == klass.name }
+    end
+
     def self.doiable_asset_types
       @@doiable_types ||= begin
         persistent_classes.select(&:supports_doi?).sort_by(&:name)

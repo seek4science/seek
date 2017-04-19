@@ -46,7 +46,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
       human_name = klass.name.humanize
       item = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy))
       with_config_value :show_as_external_link_enabled, true do
-        if Seek::Util.multi_files_asset_types.include? klass
+        if Seek::Util.is_multi_file_asset_type? klass
           create_content_blobs item, [pdf_blob_with_local_copy_attrs]
           assert_download_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
 
