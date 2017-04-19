@@ -9,7 +9,7 @@ class UsersController < ApplicationController
   skip_before_filter :partially_registered?,:only=>[:update,:cancel_registration]
 
   include Seek::AdminBulkAction
-  
+
   # render new.rhtml
   def new
     @user = User.new
@@ -22,7 +22,7 @@ class UsersController < ApplicationController
     # uncomment at your own risk
     # reset_session
 
-    @user = User.new(params[:user])
+    @user = User.new(user_params)
     @user.check_email_present=true
     check_registration
 
@@ -75,13 +75,13 @@ class UsersController < ApplicationController
         flash[:error] = "Invalid password reset code"
         format.html { redirect_to(main_app.root_path) }
       end
-    end 
+    end
   end
 
-  def forgot_password    
+  def forgot_password
     if request.get?
       # forgot_password.rhtml
-    elsif request.post?      
+    elsif request.post?
       user = User.find_by_login(params[:login]) || Person.where(email: params[:login]).first.try(:user)
 
       respond_to do |format|
@@ -101,13 +101,12 @@ class UsersController < ApplicationController
     end
   end
 
-  
   def edit
     @user = User.find(params[:id])
     render :action=>:edit
   end
-  
-  def update    
+
+  def update
     @user = User.find(params[:id])
     if @user==current_user && !@user.registration_complete? && (params[:user][:person_id]) && (params[:user][:email])
       person_id = params[:user][:person_id]
@@ -119,13 +118,7 @@ class UsersController < ApplicationController
       do_auth_update = !person.nil?
     end
 
-    if params[:user]
-      [:id, :person_id,:email].each do |column_name|
-        params[:user].delete(column_name)
-      end
-    end
-    
-    @user.attributes=params[:user]    
+    @user.attributes = user_params
 
     respond_to do |format|
       if @user.save
@@ -138,9 +131,9 @@ class UsersController < ApplicationController
           format.html { redirect_to :action=>"activation_required" }
         else
           flash[:notice]="Your account details have been updated"
-          format.html { redirect_to person_path(@user.person) } 
-        end        
-      else        
+          format.html { redirect_to person_path(@user.person) }
+        end
+      else
         format.html { render :action => 'edit' }
       end
     end
@@ -168,41 +161,46 @@ class UsersController < ApplicationController
   end
 
   def activation_required
-    
+
   end
-  
+
   def impersonate
     user = User.find(params[:id])
     if user
       self.current_user = user
     end
-    
+
     redirect_to :controller => 'homes', :action => 'index'
   end
 
-  protected
-  
-  private 
-  
-  def check_registration       
+  private
+
+  def user_params
+    permitted_params = [:password, :password_confirmation]
+    permitted_params += [:login, :email] if action_name == 'create'
+
+    params.require(:user).permit(permitted_params)
+  end
+
+  def check_registration
     if @user.save
       successful_registration
     else
       failed_registration @user.errors.full_messages.to_sentence
     end
   end
-  
+
   def failed_registration(message)
     flash.now[:error] = message
     render :new
   end
-  
+
   def successful_registration
     @user.activate unless activation_required?
     self.current_user = @user
     redirect_to(register_people_path(:email=>@user.email))
   end
-  
+
   def activation_required?
     Seek::Config.activation_required_enabled && User.count>1
   end
