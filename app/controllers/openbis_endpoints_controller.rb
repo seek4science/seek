@@ -31,7 +31,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def update
-    @openbis_endpoint.update_attributes(params[:openbis_endpoint])
+    @openbis_endpoint.update_attributes(openbis_endpoint_params)
     save_and_respond 'The space was successfully updated.'
   end
 
@@ -57,7 +57,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def create
-    @openbis_endpoint = @project.openbis_endpoints.build(params[:openbis_endpoint])
+    @openbis_endpoint = @project.openbis_endpoints.build(openbis_endpoint_params)
     save_and_respond 'The space was successfully created.'
   end
 
@@ -81,7 +81,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def test_endpoint
-    endpoint = OpenbisEndpoint.new(params[:openbis_endpoint])
+    endpoint = OpenbisEndpoint.new(openbis_endpoint_params)
     result = endpoint.test_authentication
 
     respond_to do |format|
@@ -90,7 +90,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def fetch_spaces
-    endpoint = OpenbisEndpoint.new(params[:openbis_endpoint])
+    endpoint = OpenbisEndpoint.new(openbis_endpoint_params)
     respond_to do |format|
       format.html { render partial: 'available_spaces', locals: { endpoint: endpoint } }
     end
@@ -109,6 +109,11 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   private
+
+  def openbis_endpoint_params
+    params.require(:openbis_endpoint).permit(:project_id, :web_endpoint, :as_endpoint, :dss_endpoint,
+                                             :username, :password, :refresh_period_mins, :space_perm_id)
+  end
 
   ### Filters
 

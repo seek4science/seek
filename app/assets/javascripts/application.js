@@ -73,4 +73,5 @@
 //= require cytoscape_isa_graph
 //= require bives
 //= require asset_report
+//= require uri
 //= require_tree ./templates
