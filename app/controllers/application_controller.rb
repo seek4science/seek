@@ -196,17 +196,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def filter_protected_update_params(params)
-    if params
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
-        params.delete(column_name)
-      end
-
-      params[:last_used_at] = Time.now
-    end
-    params
-  end
-
   def error(notice, _message)
     flash[:error] = notice
 

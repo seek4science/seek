@@ -62,9 +62,9 @@ class WorkflowsController < ApplicationController
   end
 
   def create
-    if handle_upload_data
+    @workflow = Workflow.new(workflow_params)
 
-      @workflow = Workflow.new params[:workflow]
+    if handle_upload_data
       @workflow.policy.set_attributes_with_sharing(params[:policy_attributes])
       if @workflow.save
         update_annotations(params[:tag_list], @workflow)
@@ -103,8 +103,6 @@ class WorkflowsController < ApplicationController
   end
 
   def update
-    workflow_params=filter_protected_update_params(params[:workflow])
-
     @workflow.attributes = workflow_params
 
     update_sharing_policies @workflow
@@ -209,6 +207,13 @@ class WorkflowsController < ApplicationController
   end
 
   private
+
+  def workflow_params
+    params.require(:workflow).permit(
+        :title, :category_id, :myexperiment_link, :documentation_link, :sweepable, { project_ids: [] },
+         { input_ports_attributes: [:name, :description, :example_value, :port_type_id, :mime_type, :id] },
+         { output_ports_attributes: [:name, :description, :example_value, :port_type_id, :mime_type, :id] })
+  end
 
   # Checks if the uploaded file looks like a Taverna workflow
   def taverna_workflow?(file)
