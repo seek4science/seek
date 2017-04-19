@@ -31,7 +31,7 @@ class StrainsController < ApplicationController
   end
 
   def create
-    @strain = new_strain(params[:strain])
+    @strain = new_strain(strain_params)
     @strain.policy.set_attributes_with_sharing(params[:policy_attributes])
     update_annotations(params[:tag_list], @strain)
 
@@ -64,9 +64,8 @@ class StrainsController < ApplicationController
     if params[:policy_attributes]
       @strain.policy.set_attributes_with_sharing(params[:policy_attributes])
     end
-    @strain.attributes = params[:strain]
+    @strain.attributes = strain_params
     if @strain.save
-
       respond_to do |format|
         flash[:notice] = 'Strain was successfully updated.'
         format.html { redirect_to(@strain) }
@@ -147,4 +146,16 @@ class StrainsController < ApplicationController
       end
     end
   end
+
+  private
+
+  def strain_params
+    params.require(:strain).permit(:title, :provider_id, :provider_name, :synonym, :comment, :organism_id, :parent_id,
+                                   { project_ids: [] },
+                                   { genotypes_attributes: [:id, :_destroy,
+                                                            { gene_attributes: [:title] },
+                                                            { modification_attributes: [:title]}]},
+                                   { phenotypes_attributes: [:id, :_destroy, :description]})
+  end
+
 end

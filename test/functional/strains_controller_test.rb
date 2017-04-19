@@ -159,7 +159,7 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, id: strain.id, policy_attributes: { access_type: Policy::MANAGING }
+    put :update, id: strain.id, strain: { title: strain.title }, policy_attributes: { access_type: Policy::MANAGING }
     assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
@@ -173,7 +173,7 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, id: strain.id,
+    put :update, id: strain.id, strain: { title: strain.title },
                  policy_attributes: { permissions_attributes: {
                    '1' => { contributor_type: 'Person', contributor_id: user.person.id, access_type: Policy::MANAGING }
                  } }
