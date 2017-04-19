@@ -25,7 +25,7 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def create
-    @sample_controlled_vocab = SampleControlledVocab.new(params[:sample_controlled_vocab])
+    @sample_controlled_vocab = SampleControlledVocab.new(cv_params)
 
     flash[:notice] = 'The sample controlled vocabulary was successfully created.' if @sample_controlled_vocab.save
     respond_with(@sample_controlled_vocab) do |format|
@@ -34,9 +34,15 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def update
-    @sample_controlled_vocab.update_attributes(params[:sample_controlled_vocab])
+    @sample_controlled_vocab.update_attributes(cv_params)
     respond_with(@sample_controlled_vocab)
   end
 
   private
+
+  def cv_params
+    params.require(:sample_controlled_vocab).permit(:title, :description,
+                                                    { sample_controlled_vocab_terms_attributes: [:id, :_destroy, :label] })
+  end
+
 end
