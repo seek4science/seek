@@ -39,7 +39,6 @@ class PublicationsControllerTest < ActionController::TestCase
     assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
       post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id] }, assay_ids: [assay.id.to_s]
-      p assigns(:publication).errors.full_messages
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -329,7 +328,7 @@ class PublicationsControllerTest < ActionController::TestCase
     new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
 
-    put :update, id: p, author: {}, assay_ids: [new_assay.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, assay_ids: [new_assay.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -353,7 +352,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, author: {}, data_files: [{ id: df.id.to_s }]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: [{ id: df.id.to_s }]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -365,7 +364,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert df.publications.include?(p)
 
     # remove association
-    put :update, id: p, author: {}, data_file_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_file_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -383,7 +382,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, author: {}, model_ids: [model.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, model_ids: [model.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -396,7 +395,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert model.publications.include?(p)
 
     # remove association
-    put :update, id: p, author: {}, model_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, model_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -414,7 +413,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, author: {}, investigation_ids: ["#{investigation.id}"]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: ["#{investigation.id}"]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -426,7 +425,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert investigation.publications.include?(p)
 
     # remove association
-    put :update, id: p, author: {}, investigation_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -444,7 +443,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, author: {}, study_ids: ["#{study.id}"]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, study_ids: ["#{study.id}"]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -456,7 +455,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert study.publications.include?(p)
 
     # remove association
-    put :update, id: p, author: {}, study_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, study_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -475,7 +474,7 @@ class PublicationsControllerTest < ActionController::TestCase
     new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
 
-    put :update, id: p, author: {}, assay_ids: [new_assay.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, assay_ids: [new_assay.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -493,7 +492,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should keep model and data associations after update' do
     p = publications(:pubmed_2)
-    put :update, id: p, author: {}, assay_ids: [],
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, assay_ids: [],
                  data_files: p.data_files.map { |df| { id: df.id } },
                  model_ids: p.models.collect { |m| m.id.to_s }
 
@@ -518,7 +517,9 @@ class PublicationsControllerTest < ActionController::TestCase
     as_virtualliver do
       assert_difference('PublicationAuthor.count', 0) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, id: p.id, author: { p.publication_authors[1].id => seek_author2.id, p.publication_authors[0].id => seek_author1.id }
+          put :update, id: p.id, publication: { abstract: p.abstract },
+              author: { p.publication_authors[1].id => seek_author2.id,
+                        p.publication_authors[0].id => seek_author1.id }
         end
       end
     end
@@ -591,7 +592,9 @@ class PublicationsControllerTest < ActionController::TestCase
     as_virtualliver do
       assert_difference('publication.non_seek_authors.count', -2) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, id: publication.id, author: { publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id }
+          put :update, id: publication.id, publication: { abstract: publication.abstract },
+              author: { publication.non_seek_authors[12].id => seek_author1.id,
+                        publication.non_seek_authors[15].id => seek_author2.id }
         end
       end
     end
@@ -633,7 +636,9 @@ class PublicationsControllerTest < ActionController::TestCase
     # Associate a non-seek author to a seek person
     assert_difference('publication.non_seek_authors.count', -2) do
       assert_difference('AssetsCreator.count', 2) do
-        put :update, id: publication.id, author: { publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id }
+        put :update, id: publication.id, publication: { abstract: publication.abstract },
+            author: { publication.non_seek_authors[12].id => seek_author1.id,
+                      publication.non_seek_authors[15].id => seek_author2.id }
       end
     end
     publication.reload

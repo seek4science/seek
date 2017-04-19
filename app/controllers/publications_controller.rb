@@ -72,11 +72,6 @@ class PublicationsController < ApplicationController
       return import_publication_multiple
     end
 
-    publication_params = params[:publication].dup
-
-    # publication authors need to be added separately
-    publication_params.delete(:publication_authors)
-
     @publication = Publication.new(publication_params)
     @publication.pubmed_id=nil if @publication.pubmed_id.blank?
     @publication.doi=nil if @publication.doi.blank?
@@ -120,7 +115,6 @@ class PublicationsController < ApplicationController
     model_ids = params[:model_ids] || []
 
     respond_to do |format|
-      publication_params = params[:publication]||{}
       if valid && @publication.update_attributes(publication_params)
 
         # Update association
@@ -162,8 +156,7 @@ class PublicationsController < ApplicationController
   def fetch_preview
     #trim the PubMed or Doi Id
     params[:key] = params[:key].strip() unless params[:key].blank?
-    params[:publication][:project_ids].reject!(&:blank?).map! { |id| id.split(',') }.flatten!
-    @publication = Publication.new(params[:publication])
+    @publication = Publication.new(publication_params)
     key = params[:key]
     protocol = params[:protocol]
     pubmed_id = nil
@@ -373,6 +366,15 @@ class PublicationsController < ApplicationController
 
   private
 
+  def publication_projects_params
+    params.require(:publication).permit(project_ids: [])
+  end
+
+  def publication_params
+    params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
+                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] })
+  end
+
   # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
   def register_publication
     result = get_data(@publication, @publication.pubmed_id, @publication.doi)
@@ -450,13 +452,13 @@ class PublicationsController < ApplicationController
   # create a publication from a reference file, at the moment supports only bibtex
   # only sets the @publication and redirects to the create_publication with content from the bibtex file
   def import_publication
-    @publication = Publication.new(params[:publication].slice(:project_ids))
+    @publication = Publication.new(publication_projects_params)
 
     require 'bibtex'
     if !params.has_key?(:publication) || !params[:publication].has_key?(:bibtex_file)
       @publication.errors[:bibtex_file] = "Upload a file!"
     else
-      bibtex_file = params[:publication][:bibtex_file]
+      bibtex_file = params[:publication].delete(:bibtex_file)
       bibtex = BibTeX.parse( bibtex_file.read)
       if bibtex['@article'].length < 1
         @publication.errors[:bibtex_file] = "The bibtex file should contain at least one @article"
@@ -486,14 +488,13 @@ class PublicationsController < ApplicationController
 
   # create publications from a reference file, at the moment supports only bibtex
   def import_publication_multiple
-    publication_params = params[:publication].slice(:project_ids)
-    @publication = Publication.new(publication_params)
+    @publication = Publication.new(publication_projects_params)
 
     require 'bibtex'
     if !params.has_key?(:publication) || !params[:publication].has_key?(:bibtex_file)
       @publication.errors[:bibtex_file] = "Upload a file!"
     else
-      bibtex_file = params[:publication][:bibtex_file]
+      bibtex_file = params[:publication].delete(:bibtex_file)
       bibtex = BibTeX.parse( bibtex_file.read)
       if bibtex['@article'].length < 1
         @publication.errors[:bibtex_file] = "The bibtex file should contain at least one @article"
