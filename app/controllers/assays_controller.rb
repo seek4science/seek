@@ -109,7 +109,7 @@ class AssaysController < ApplicationController
 
     @assay.owner=current_person
 
-    update_sharing_policies @assay,params
+    update_sharing_policies @assay
 
     update_annotations(params[:tag_list], @assay) #this saves the assay
     update_scales @assay
@@ -147,7 +147,7 @@ class AssaysController < ApplicationController
 
     @assay.update_attributes(assay_params)
 
-    update_sharing_policies @assay,params
+    update_sharing_policies @assay
 
     respond_to do |format|
       if @assay.save

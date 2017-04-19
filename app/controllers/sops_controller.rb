@@ -54,7 +54,7 @@ class SopsController < ApplicationController
 
     @sop.attributes = sop_params
 
-    update_sharing_policies @sop, params
+    update_sharing_policies @sop
 
     respond_to do |format|
       if @sop.save
@@ -70,6 +70,6 @@ class SopsController < ApplicationController
       end
     end
   end
- 
+
 
 end

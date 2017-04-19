@@ -53,7 +53,7 @@ class PresentationsController < ApplicationController
 
     @presentation.attributes = params[:presentation]
 
-    update_sharing_policies @presentation,params
+    update_sharing_policies @presentation
 
     assay_ids = params[:assay_ids] || []
     respond_to do |format|

@@ -88,14 +88,14 @@ module Seek
       end
     end
 
-    def update_sharing_policies(item, params = nil)
+    def update_sharing_policies(item)
       item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
     end
 
     def create_asset
       item = class_for_controller_name.new(params[controller_name.singularize.to_sym])
       set_shared_item_variable(item)
-      update_sharing_policies item, params
+      update_sharing_policies item
       update_annotations(params[:tag_list], item)
       update_scales item
       update_relationships(item, params)

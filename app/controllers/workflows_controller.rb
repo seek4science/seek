@@ -107,7 +107,7 @@ class WorkflowsController < ApplicationController
 
     @workflow.attributes = workflow_params
 
-    update_sharing_policies @workflow, params
+    update_sharing_policies @workflow
 
     if @workflow.save && !params[:sharing_form]
       update_annotations(params[:tag_list], @workflow)

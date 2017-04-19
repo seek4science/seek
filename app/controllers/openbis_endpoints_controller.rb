@@ -36,7 +36,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def save_and_respond(flash_msg)
-    update_sharing_policies @openbis_endpoint, params
+    update_sharing_policies @openbis_endpoint
     respond_with(@project, @openbis_endpoint) do |format|
       if @openbis_endpoint.save
         flash[:notice] = flash_msg

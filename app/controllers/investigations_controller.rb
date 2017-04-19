@@ -57,7 +57,7 @@ class InvestigationsController < ApplicationController
 
   def create
     @investigation = Investigation.new(investigation_params)
-    update_sharing_policies @investigation,params
+    update_sharing_policies @investigation
 
     if @investigation.save
       update_scales(@investigation)
@@ -109,7 +109,7 @@ class InvestigationsController < ApplicationController
 
     @investigation.attributes = investigation_params
 
-    update_sharing_policies @investigation,params
+    update_sharing_policies @investigation
 
     respond_to do |format|
       if @investigation.save

@@ -73,7 +73,7 @@ class StudiesController < ApplicationController
 
     @study.attributes = study_params
 
-    update_sharing_policies @study,params
+    update_sharing_policies @study
 
     respond_to do |format|
       if @study.save
@@ -103,7 +103,7 @@ class StudiesController < ApplicationController
   def create
     @study = Study.new(study_params)
 
-    update_sharing_policies @study,params
+    update_sharing_policies @study
 
     if @study.save
       update_scales @study

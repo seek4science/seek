@@ -18,7 +18,7 @@ module TavernaPlayer
     def update
       @run.update_attributes(params[:run])
 
-      update_sharing_policies @run, params
+      update_sharing_policies @run
 
       respond_with(@run)
     end

@@ -56,7 +56,7 @@ class EventsController < ApplicationController
 
     @event.attributes = event_params
 
-    update_sharing_policies @event, params
+    update_sharing_policies @event
 
     respond_to do | format |
       if @event.save

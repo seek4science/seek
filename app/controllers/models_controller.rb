@@ -197,7 +197,7 @@ class ModelsController < ApplicationController
 
     @model.attributes = model_params
 
-    update_sharing_policies @model,params
+    update_sharing_policies @model
 
     respond_to do |format|
       if @model.save

@@ -138,7 +138,7 @@ class DataFilesController < ApplicationController
     @data_file = DataFile.new(data_file_params)
 
     if handle_upload_data
-      update_sharing_policies(@data_file, params)
+      update_sharing_policies(@data_file)
 
       if @data_file.save
         update_annotations(params[:tag_list], @data_file)
@@ -199,7 +199,7 @@ class DataFilesController < ApplicationController
     update_scales @data_file
 
     respond_to do |format|
-      update_sharing_policies @data_file, params
+      update_sharing_policies @data_file
 
       if @data_file.save
         update_relationships(@data_file, params)
