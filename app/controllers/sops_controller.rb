@@ -47,8 +47,6 @@ class SopsController < ApplicationController
 
   # PUT /sops/1
   def update
-    sop_params=filter_protected_update_params(params[:sop])
-
     update_annotations(params[:tag_list], @sop)
     update_scales @sop
 
@@ -71,5 +69,13 @@ class SopsController < ApplicationController
     end
   end
 
+  private
+
+  def sop_params
+    params.require(:sop).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
+                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+  end
+
+  alias_method :asset_params, :sop_params
 
 end
