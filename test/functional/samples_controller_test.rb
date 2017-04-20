@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include HtmlHelper
