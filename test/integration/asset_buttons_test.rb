@@ -89,13 +89,13 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
     get path
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a', text: /Download/i, count: 0
-      assert_select 'a', text: /Link/i, count: 0
+      assert_select 'a', text: 'Download', count: 0
+      assert_select 'a', text: 'External Link', count: 0
     end
   end
 
   def assert_link_button(path)
-    assert_action_button path, 'Link'
+    assert_action_button path, 'External Link'
   end
 
   def assert_download_button(path, _human_name)
@@ -106,7 +106,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
     get path
     assert_response :success
     assert_select '#buttons' do
-      assert_select 'a', text: /#{text}/i
+      assert_select 'a', text: text
     end
   end
 end
