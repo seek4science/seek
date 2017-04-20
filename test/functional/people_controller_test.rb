@@ -241,18 +241,18 @@ class PeopleControllerTest < ActionController::TestCase
     p = Factory(:person)
     assert p.notifiee_info.receive_notifications?, 'should receive notifications by default in fixtures'
 
-    put :update, id: p.id, person: { id: p.id }
+    put :update, id: p.id, person: { description: p.description }
     assert !Person.find(p.id).notifiee_info.receive_notifications?
 
-    put :update, id: p.id, person: { id: p.id }, receive_notifications: true
+    put :update, id: p.id, person: { description: p.description }, receive_notifications: true
     assert Person.find(p.id).notifiee_info.receive_notifications?
   end
 
-  test 'admin cannot set roles_mask' do
+  test 'non-admin cannot set roles_mask' do
     login_as(Factory(:admin))
     p = Factory(:person)
     assert !p.is_admin?
-    put :administer_update, id: p.id, person: { id: p.id, roles_mask: mask_for_admin }
+    put :administer_update, id: p.id, person: { work_group_ids: p.work_group_ids, roles_mask: mask_for_admin }
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     refute assigns(:person).is_admin?
@@ -264,7 +264,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person)
     person.add_to_project_and_institution(p.projects.first, p.institutions.first)
     refute person.is_admin?
-    put :administer_update, id: person.id, person: { id: person.id, roles_mask: mask_for_admin }
+    put :administer_update, id: person.id, person: { work_group_ids: p.work_group_ids, roles_mask: mask_for_admin }
     assert_redirected_to person_path(person)
     assert_nil flash[:error]
     refute assigns(:person).is_admin?
@@ -276,7 +276,7 @@ class PeopleControllerTest < ActionController::TestCase
     project2 = p.projects[1]
     project3 = p.projects[2]
     assert !p.is_pal_of_any_project?
-    put :administer_update, id: p.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [project.id, project2.id] }
+    put :administer_update, id: p.id, person: { work_group_ids: p.work_group_ids }, roles: { pal: [project.id, project2.id] }
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     p.reload
@@ -289,7 +289,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p = Factory(:person)
     assert !p.is_pal?(p.projects.first)
-    put :administer_update, id: p.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [p.projects.first.id] }
+    put :administer_update, id: p.id, person: { work_group_ids: p.work_group_ids }, roles: { pal: [p.projects.first.id] }
     p.reload
     assert !p.is_pal?(p.projects.first)
   end
@@ -299,7 +299,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(me)
 
     assert !me.is_pal?(me.projects.first)
-    put :administer_update, id: me.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [me.projects.first.id] }
+    put :administer_update, id: me.id, person: { work_group_ids: me.work_group_ids }, roles: { pal: [me.projects.first.id] }
     me.reload
     assert !me.is_pal?(me.projects.first)
   end
@@ -308,7 +308,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p = people(:aaron_person)
     assert !p.is_admin?
-    put :administer_update, id: p.id, person: { id: p.id, roles_mask: mask_for_admin, email: 'ssfdsd@sdfsdf.com' }
+    put :administer_update, id: p.id, person: { roles_mask: mask_for_admin, work_group_ids: p.work_group_ids }
     p.reload
     assert !p.is_admin?
   end
@@ -537,7 +537,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil person
     assert person.is_pal?(project)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: { project_administrator: [project.id] }
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids }, roles: { project_administrator: [project.id] }
 
     person = assigns(:person)
     person.reload
@@ -553,7 +553,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert !person.is_asset_housekeeper?(proj1)
     assert !person.is_project_administrator?(proj2)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: { project_administrator: [proj2.id], asset_housekeeper: [proj1.id] }
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids }, roles: { project_administrator: [proj2.id], asset_housekeeper: [proj1.id] }
 
     person = assigns(:person)
     assert person.is_asset_housekeeper?(proj1)
@@ -566,7 +566,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert person.is_asset_housekeeper?(project)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: {}
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids }, roles: {}
 
     person = assigns(:person)
     assert !person.is_asset_housekeeper?(project)
@@ -578,7 +578,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert !person.is_asset_housekeeper?(project)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: { asset_housekeeper: [project.id] }
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids }, roles: { asset_housekeeper: [project.id] }
 
     person = assigns(:person)
     assert !person.is_asset_housekeeper?(project)
@@ -593,7 +593,8 @@ class PeopleControllerTest < ActionController::TestCase
     project = person.projects.first
     assert_not_nil project
 
-    put :administer_update, id: person.id, person: { description: 'a' }, roles: { project_administrator: [project.id] }
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids },
+        roles: { project_administrator: [project.id] }
 
     person = assigns(:person)
 
@@ -1001,7 +1002,8 @@ class PeopleControllerTest < ActionController::TestCase
     refute person.is_project_administrator?(project)
     refute person.is_asset_gatekeeper?(project)
 
-    put :administer_update, id: person, person: { description: 'a' }, roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
+        roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
     assert_redirected_to person_path(person)
     assert assigns(:person).is_asset_gatekeeper?(project)
     assert assigns(:person).is_project_administrator?(project)
@@ -1018,7 +1020,8 @@ class PeopleControllerTest < ActionController::TestCase
     refute person.is_project_administrator?(project)
     refute person.is_asset_gatekeeper?(project)
 
-    put :administer_update, id: person, person: { description: 'a' }, roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
+        roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
     assert_redirected_to person_path(person)
 
     refute assigns(:person).is_asset_gatekeeper?(project)
@@ -1042,7 +1045,10 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_project_administrator?(project)
     refute person.is_project_administrator?(managed_project)
 
-    put :administer_update, id: person, person: { description: 'a' }, roles: { project_administrator: [managed_project.id] }
+    person.reload
+
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
+        roles: { project_administrator: [managed_project.id] }
     assert_redirected_to person_path(person)
 
     assert assigns(:person).is_admin?
@@ -1062,7 +1068,8 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_programme_administrator?(prog)
     refute person.is_project_administrator?(proj)
 
-    put :administer_update, id: person, person: { description: 'a' }, roles: { project_administrator: [proj.id] }
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
+        roles: { project_administrator: [proj.id] }
     assert_redirected_to person_path(person)
 
     assert assigns(:person).is_admin?
@@ -1079,7 +1086,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.save!
     refute person.is_admin?
 
-    put :administer_update, id: person, person: { description: 'a' }, roles: { admin: [] }
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids }, roles: { admin: [] }
     assert_redirected_to person_path(person)
     refute assigns(:person).is_admin?
   end
