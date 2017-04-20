@@ -1,5 +1,6 @@
 @import 'variables';
-@import "bootstrap";
+@import 'bootstrap-sprockets';
+@import 'bootstrap';
 
 /* Tweaks */
 .main_content_right_box .panel-heading {
