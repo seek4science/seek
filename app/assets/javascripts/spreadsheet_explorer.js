@@ -62,7 +62,6 @@ $j(document).ready(function ($) {
         })
         .mouseover(function (){
             this.style.cursor = 'pointer';
-            this.style.cursor = 'pointer';
         });
 
     //Cell selection
@@ -277,10 +276,10 @@ function adjust_container_dimensions() {
         selector.width("95%");
         spreadsheet_container_width = selector.width();
     }
-    var sheet_container_width = spreadsheet_container_width - 2;
-    var sheet_width = spreadsheet_container_width - 45;
-    $j(".sheet_container").width(sheet_container_width);
-    $j(".sheet").width(sheet_width);
+    //var sheet_container_width = spreadsheet_container_width - 2;
+    //var sheet_width = spreadsheet_container_width -45;
+    //$j(".sheet_container").width(sheet_container_width);
+    //$j(".sheet").width(sheet_width);
 }
 
 //Convert a numeric column index to an alphabetic one
@@ -651,7 +650,7 @@ function activateSheet(sheet, sheetTab, fileIndex) {
     //Set table active
     activeSheet.children("table.sheet").addClass('active_sheet');
 
-    deselect_cells();
+    //deselect_cells();
 
     //Record current sheet in annotation form
     $j('input#annotation_sheet_id').attr("value", sheetIndex -1);
