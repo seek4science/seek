@@ -94,7 +94,8 @@ class SamplesController < ApplicationController
 
   def sample_params(sample_type)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:hash_key).collect(&:to_sym) : []
-    params.require(:sample).permit(:sample_type_id,project_ids:[],data:sample_type_param_keys)
+    params.require(:sample).permit(:sample_type_id, { project_ids: [] }, { data: sample_type_param_keys },
+                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
   end
 
   def update_sample_with_params

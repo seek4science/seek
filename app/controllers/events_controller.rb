@@ -72,7 +72,8 @@ class EventsController < ApplicationController
 
   def event_params
     params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country,
-                                  { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] })
+                                  { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] },
+                                  { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
   end
 
 end

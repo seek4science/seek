@@ -211,8 +211,9 @@ class WorkflowsController < ApplicationController
   def workflow_params
     params.require(:workflow).permit(
         :title, :category_id, :myexperiment_link, :documentation_link, :sweepable, { project_ids: [] },
-         { input_ports_attributes: [:name, :description, :example_value, :port_type_id, :mime_type, :id] },
-         { output_ports_attributes: [:name, :description, :example_value, :port_type_id, :mime_type, :id] })
+        { input_ports_attributes: [:name, :description, :example_value, :port_type_id, :mime_type, :id] },
+        { output_ports_attributes: [:name, :description, :example_value, :port_type_id, :mime_type, :id] },
+        { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
   end
 
   # Checks if the uploaded file looks like a Taverna workflow
