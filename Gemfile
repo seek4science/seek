@@ -4,7 +4,7 @@ gem 'rails', '~> 4.2.8'
 gem 'rdoc'
 
 #database adaptors
-gem 'mysql2','~> 0.3.10'
+gem 'mysql2'
 gem 'pg'
 gem 'sqlite3'
 
