@@ -1,6 +1,9 @@
 require 'test_helper'
 
 class AssetButtonsTest < ActionDispatch::IntegrationTest
+
+  include HtmlHelper
+
   ASSETS = %w(investigations studies assays data_files models sops strains presentations events)
   def setup
     User.current_user = Factory(:user, login: 'test')
@@ -105,6 +108,9 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   def assert_action_button(path, text)
     get path
     assert_response :success
+    puts "--------------------\n\n"
+    puts select_node_contents('#buttons')
+    puts "--------------------\n\n"
     assert_select '#buttons' do
       assert_select 'a', text: text
     end
