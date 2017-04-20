@@ -257,9 +257,9 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
   private
 
   def mock_datacite_request
-    stub_request(:post, 'https://test:test@test.datacite.org/mds/metadata').to_return(body: 'OK (10.5072/my_test)', status: 201)
-    stub_request(:post, 'https://test:test@test.datacite.org/mds/doi').to_return(body: 'OK', status: 201)
-    stub_request(:post, 'https://invalid:test@test.datacite.org/mds/metadata').to_return(body: '401 Bad credentials', status: 401)
+    stub_request(:post, 'https://test.datacite.org/mds/metadata').with(basic_auth: ['test', 'test']).to_return(body: 'OK (10.5072/my_test)', status: 201)
+    stub_request(:post, 'https://test.datacite.org/mds/doi').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 201)
+    stub_request(:post, 'https://test.datacite.org/mds/metadata').with(basic_auth: ['invalid', 'test']).to_return(body: '401 Bad credentials', status: 401)
   end
 
   def asset_url(asset)

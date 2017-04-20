@@ -99,8 +99,8 @@ module Seek
 
     def configure_recaptcha_keys
       Recaptcha.configure do |config|
-        config.public_key  = recaptcha_public_key
-        config.private_key = recaptcha_private_key
+        config.site_key  = recaptcha_public_key
+        config.secret_key = recaptcha_private_key
       end
     end
 
