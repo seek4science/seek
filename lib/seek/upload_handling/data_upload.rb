@@ -143,7 +143,13 @@ module Seek
       # if the urls misses the schema, default to http
       def default_to_http_if_missing(blob_params)
         url = blob_params[:data_url]
-        blob_params[:data_url] = Addressable::URI.heuristic_parse(url).to_s unless url.blank?
+        unless url.blank?
+          begin
+            blob_params[:data_url] = Addressable::URI.heuristic_parse(url).to_s
+          rescue Addressable::URI::InvalidURIError
+            blob_params[:data_url] = url
+          end
+        end
       end
 
       def check_for_valid_scheme(blob_params)

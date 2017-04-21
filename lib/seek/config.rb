@@ -99,8 +99,8 @@ module Seek
 
     def configure_recaptcha_keys
       Recaptcha.configure do |config|
-        config.public_key  = recaptcha_public_key
-        config.private_key = recaptcha_private_key
+        config.site_key  = recaptcha_public_key
+        config.secret_key = recaptcha_private_key
       end
     end
 
@@ -285,6 +285,17 @@ module Seek
     def write_attr_encrypted_key
       File.open(attr_encrypted_key_path, 'w') do |f|
         f << OpenSSL::Cipher::Cipher.new('AES-256-CBC').random_key.unpack('H*').first
+      end
+    end
+
+    def soffice_available?
+      @@soffice_available ||= begin
+        port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
+        soc = TCPSocket.new('localhost', port)
+        soc.close
+        true
+      rescue
+        false
       end
     end
   end

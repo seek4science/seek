@@ -40,40 +40,44 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   end
 
   test 'configurable showing as external link when there is no local copy' do
-    pdf_blob_with_local_copy_attrs = { url: 'http://somewhere.com/piccy.pdf', uuid: UUID.generate, data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read }
-    pdf_blob_without_local_copy_attrs = { data: nil, url: 'http://somewhere.com/piccy_no_copy.pdf', uuid: UUID.generate }
-    html_blob_attrs = { data: nil, url: 'http://www.abc.com', uuid: UUID.generate }
+    pdf_blob_with_local_copy_attrs = Factory(:content_blob, url: 'http://somewhere.com/piccy.pdf', uuid: UUID.generate, data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
+    pdf_blob_without_local_copy_attrs = Factory(:content_blob, data: nil, url: 'http://somewhere.com/piccy_no_copy.pdf', uuid: UUID.generate)
+    html_blob_attrs = Factory(:content_blob, data: nil, url: 'http://www.abc.com', uuid: UUID.generate)
 
     Seek::Util.inline_viewable_content_types.each do |klass|
       underscored_type_name = klass.name.underscore
       human_name = klass.name.humanize
-      item = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy))
+
       with_config_value :show_as_external_link_enabled, true do
         if Seek::Util.is_multi_file_asset_type? klass
-          create_content_blobs item, [pdf_blob_with_local_copy_attrs]
+          item = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                         content_blobs: [pdf_blob_with_local_copy_attrs])
           assert_download_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
 
-          create_content_blobs item, [pdf_blob_without_local_copy_attrs]
-          assert_link_button "/#{underscored_type_name.pluralize}/#{item.id}"
+          item2 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                          content_blobs: [pdf_blob_without_local_copy_attrs])
+          assert_link_button "/#{underscored_type_name.pluralize}/#{item2.id}"
 
-          create_content_blobs item, [pdf_blob_with_local_copy_attrs, pdf_blob_without_local_copy_attrs]
-          assert_download_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
+          item3 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                          content_blobs: [pdf_blob_with_local_copy_attrs, pdf_blob_without_local_copy_attrs])
+          assert_download_button "/#{underscored_type_name.pluralize}/#{item3.id}", human_name
 
-          create_content_blobs item, [html_blob_attrs, pdf_blob_without_local_copy_attrs]
-
-          assert_neither_download_nor_link_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
+          item4 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                          content_blobs: [html_blob_attrs, pdf_blob_without_local_copy_attrs])
+          assert_neither_download_nor_link_button "/#{underscored_type_name.pluralize}/#{item4.id}", human_name
 
         else
-          item.create_content_blob pdf_blob_with_local_copy_attrs
+          item = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                         content_blob: pdf_blob_with_local_copy_attrs)
           assert_download_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
 
-          item.content_blob.destroy
-          item.create_content_blob html_blob_attrs
-          assert_link_button "/#{underscored_type_name.pluralize}/#{item.id}"
+          item2 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                          content_blob: html_blob_attrs)
+          assert_link_button "/#{underscored_type_name.pluralize}/#{item2.id}"
 
-          item.content_blob.destroy
-          item.create_content_blob pdf_blob_without_local_copy_attrs
-          assert_link_button "/#{underscored_type_name.pluralize}/#{item.id}"
+          item3 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                          content_blob: pdf_blob_without_local_copy_attrs)
+          assert_link_button "/#{underscored_type_name.pluralize}/#{item3.id}"
         end
       end
     end
@@ -112,7 +116,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
     puts select_node_contents('#buttons')
     puts "--------------------\n\n"
     assert_select '#buttons' do
-      assert_select 'a', text: text
+      assert_select 'a', { text: text }, "Couldn't find '#{text}' button at #{path}"
     end
   end
 end
