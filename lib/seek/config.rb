@@ -287,6 +287,17 @@ module Seek
         f << OpenSSL::Cipher::Cipher.new('AES-256-CBC').random_key.unpack('H*').first
       end
     end
+
+    def soffice_available?
+      @@soffice_available ||= begin
+        port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
+        soc = TCPSocket.new('localhost', port)
+        soc.close
+        true
+      rescue
+        false
+      end
+    end
   end
 
   # The inner wiring. Ideally this should be hidden away,

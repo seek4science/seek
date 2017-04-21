@@ -106,15 +106,7 @@ class ActiveSupport::TestCase
   end
 
   def check_for_soffice
-    port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
-    @@soffice_available ||= begin
-      soc = TCPSocket.new('localhost', port)
-      soc.close
-      true
-    rescue
-      false
-    end
-    skip("soffice is not available on port #{port}, skipping test") unless @@soffice_available
+    skip("soffice is not available on port #{port}, skipping test") unless Seek::Config.soffice_available?
   end
 
   def skip_rest_schema_check?
