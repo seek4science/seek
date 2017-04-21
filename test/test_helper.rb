@@ -106,7 +106,9 @@ class ActiveSupport::TestCase
   end
 
   def check_for_soffice
-    skip("soffice is not available on port #{port}, skipping test") unless Seek::Config.soffice_available?
+    unless Seek::Config.soffice_available?
+      skip("soffice is not available on port #{ConvertOffice::ConvertOfficeConfig.options[:soffice_port]}, skipping test")
+    end
   end
 
   def skip_rest_schema_check?
