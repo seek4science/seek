@@ -34,6 +34,9 @@ en:
   #Project
   project: "Project"
 
+  #Institution (#FIXME: not yet used in most places, but required for some generic pages)
+  institution: "Institution"
+
   #Programme
   programme: "Programme"
 
