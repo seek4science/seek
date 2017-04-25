@@ -60,6 +60,6 @@ USER www-data
 EXPOSE 3000
 
 # Shared
-VOLUME ["/seek/filestore", "/seek/sqlite3-db", "/seek/tmp/cache]
+VOLUME ["/seek/filestore", "/seek/sqlite3-db", "/seek/tmp/cache"]
 
 CMD ["docker/entrypoint.sh"]
