@@ -14,6 +14,14 @@ class SiteAnnouncement < ActiveRecord::Base
   
   validates_presence_of :title
 
+  after_create :send_announcement_emails
+
+  def send_announcement_emails
+    if email_notification?
+      SendAnnouncementEmailsJob.new(id).queue_job
+    end
+  end
+
   def self.headline_announcement
     self.headline_announcements.first
   end

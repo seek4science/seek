@@ -1,5 +1,4 @@
-require 'title_trimmer'
-require 'grouped_pagination'
+
 
 module Seek
   module ActsAsISA

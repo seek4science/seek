@@ -1,6 +1,3 @@
-require 'seek/research_objects/acts_as_snapshottable'
-require 'datacite/acts_as_doi_mintable'
-
 class Investigation < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration

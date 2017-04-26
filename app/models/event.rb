@@ -1,7 +1,3 @@
-
-require 'grouped_pagination'
-# require 'only_writes_unique'
-
 class Event < ActiveRecord::Base
   has_and_belongs_to_many :data_files, -> { uniq }
   has_and_belongs_to_many :publications, -> { uniq }

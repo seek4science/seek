@@ -1,7 +1,3 @@
-require 'grouped_pagination'
-require 'simple_crypt'
-require 'title_trimmer'
-
 class Project < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::Rdf::ReactToAssociatedChange

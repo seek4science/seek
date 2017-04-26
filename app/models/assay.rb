@@ -1,5 +1,3 @@
-require 'seek/research_objects/acts_as_snapshottable'
-
 class Assay < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration

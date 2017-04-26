@@ -1,5 +1,4 @@
 require 'rest-client'
-require 'http_streamer'
 
 module Seek
   module DownloadHandling

@@ -1,10 +1,6 @@
-require 'acts_as_versioned_resource'
-require 'explicit_versioning'
-require 'title_trimmer'
 require 't2flow/model'
 require 't2flow/parser'
 require 't2flow/dot'
-require 'datacite/acts_as_doi_mintable'
 
 class Workflow < ActiveRecord::Base
 

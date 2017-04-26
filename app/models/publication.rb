@@ -1,5 +1,3 @@
-require 'grouped_pagination'
-require 'title_trimmer'
 require 'libxml'
 
 class Publication < ActiveRecord::Base

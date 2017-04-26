@@ -1,8 +1,3 @@
-require 'explicit_versioning'
-require 'title_trimmer'
-require 'acts_as_versioned_resource'
-require 'datacite/acts_as_doi_mintable'
-
 class Sop < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration

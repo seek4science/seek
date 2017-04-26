@@ -1,4 +1,3 @@
-
 module Seek
   module Permissions
     module PolicyBasedAuthorization
@@ -32,7 +31,7 @@ module Seek
       # - state_allows_#{action} - to chekc that the state of the object allows that action to proceed
       #
       # by default state_allows_#{action} always returns true, but can be overridden in the particular model type to tune its behaviour
-      AUTHORIZATION_ACTIONS.each do |action|
+      Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
             def can_#{action}? user = User.current_user
               authorized_for_#{action}?(user) && state_allows_#{action}?(user)

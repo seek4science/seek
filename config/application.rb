@@ -11,10 +11,8 @@ end
 
 module SEEK
   class Application < Rails::Application
-    config.autoload_paths += %W(#{Rails.root}/app/sweepers #{Rails.root}/app/reindexers #{Rails.root}/app/jobs)
-
-    #also include lib/** files
-    config.autoload_paths += Dir["#{Rails.root}/lib/**/"]
+    config.autoload_paths += %W(#{Rails.root}/lib #{Rails.root}/app/sweepers
+                                #{Rails.root}/app/reindexers #{Rails.root}/app/jobs)
 
     # Force all environments to use the same logger level
     # (by default production uses :info, the others :debug)

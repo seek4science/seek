@@ -1,7 +1,4 @@
-require 'acts_as_versioned_resource'
-require 'explicit_versioning'
-require 'title_trimmer'
-require 'datacite/acts_as_doi_mintable'
+require_dependency 'seek/util'
 
 class DataFile < ActiveRecord::Base
   include Seek::Data::SpreadsheetExplorerRepresentation

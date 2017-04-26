@@ -1,6 +1,3 @@
-require 'grouped_pagination'
-require 'title_trimmer'
-
 class Institution < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
 

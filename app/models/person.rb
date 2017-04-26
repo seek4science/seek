@@ -1,5 +1,3 @@
-require 'grouped_pagination'
-
 class Person < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration

@@ -1,7 +1,3 @@
-
-require 'explicit_versioning'
-require 'acts_as_versioned_resource'
-
 class Presentation < ActiveRecord::Base
 
    attr_accessor :orig_data_file_id
