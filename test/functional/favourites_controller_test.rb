@@ -4,7 +4,7 @@ class FavouritesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include FavouritesHelper
 
-  fixtures :users, :favourites, :projects, :people, :institutions
+  fixtures :users, :favourites, :projects, :people, :institutions, :saved_searches
 
   def setup
     @person = Factory(:person)
