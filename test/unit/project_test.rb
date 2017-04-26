@@ -109,7 +109,7 @@ class ProjectTest < ActiveSupport::TestCase
     p = projects(:sysmo_project)
     p.site_password = '12345'
     p.site_username = 'fred'
-    p.save!
+    disable_authorization_checks { p.save! }
 
     p = Project.find(p.id)
     assert_nil p.site_username, 'site username should be nil until requested'

@@ -159,7 +159,7 @@ end
 
 group :test do
   gem 'test_after_commit'
-  gem 'ruby-prof'
+  gem 'ruby-prof', '~> 0.15.9'
   gem 'rails-perftest'
   gem 'minitest'
   gem 'coveralls', require: false
