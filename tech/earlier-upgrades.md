@@ -44,7 +44,7 @@ files with:
 
 Starting with version 0.22, we've started making SEEK available as a download.
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.2.2.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.2.2.tar.gz> You can
 unpack this file using:
 
     tar zxvf seek-1.2.2.tar.gz
@@ -116,7 +116,7 @@ files with:
 
 Starting with version 0.22, we've started making SEEK available as a download.
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.1.2.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.1.2.tar.gz> You can
 unpack this file using:
 
     tar zxvf seek-1.1.2.tar.gz
@@ -209,7 +209,7 @@ files with:
 
 Starting with version 0.22, we've started making SEEK available as a download.
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.0.3.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.0.3.tar.gz> You can
 unpack this file using:
 
     tar zxvf seek-1.0.3.tar.gz
@@ -292,7 +292,7 @@ files with:
 
 Starting with version 0.22, we've started making SEEK available as a download.
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-0.23.0.tgz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-0.23.0.tgz> You can
 unpack this file using:
 
     tar zxvf seek-0.23.0.tgz
@@ -348,7 +348,7 @@ files with:
 
 Starting with version 0.22, we've started making SEEK available as a download.
 You can download the file from
-https://bitbucket.org/seek4science/seek/downloads/seek-0.22.0.tgz You can
+https://bitbucket.org/fairdom/seek/downloads/seek-0.22.0.tgz You can
 unpack this file using:
 
     tar zxvf seek-0.22.0.tgz
@@ -388,7 +388,7 @@ and other necessary changes:
 
 #then:
 
-    hg pull https://bitbucket.org/seek4science/seek -r v0.21.0
+    hg pull https://bitbucket.org/fairdom/seek -r v0.21.0
     hg update # only if no other changes have been made to your local version, if you get an error ignore it and do merge
     hg merge # only required if you've made changes since installing. If you have, you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
@@ -418,7 +418,7 @@ Start the upgrade following the standard steps:
 
     ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop
-    hg pull https://bitbucket.org/seek4science/seek -r v0.20.0
+    hg pull https://bitbucket.org/fairdom/seek -r v0.20.0
     hg update # only if no other changes have been made to your local version, if you get an error ignore it and do merge
     hg merge # only required if you've made changes since installing. If you have, you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
@@ -482,7 +482,7 @@ Upgrading follows the standard steps:
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
-    hg pull https://bitbucket.org/seek4science/seek -r v0.19.1
+    hg pull https://bitbucket.org/fairdom/seek -r v0.19.1
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
@@ -512,7 +512,7 @@ Upgrading follows the standard steps:
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
-    hg pull https://bitbucket.org/seek4science/seek -r v0.17.1
+    hg pull https://bitbucket.org/fairdom/seek -r v0.17.1
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
@@ -534,7 +534,7 @@ unless otherwise stated. You can upgrade directly from one patch version to
 another, skipping the intermediate versions (so you can upgrade directly
 0.16.0 to 0.16.3 without first having to upgrade to 0.16.1)
 
-    hg pull https://bitbucket.org/seek4science/seek -r v0.16.3
+    hg pull https://bitbucket.org/fairdom/seek -r v0.16.3
     hg update
     hg merge # if necessary
     hg commit -m "merged" # if necessary
@@ -607,7 +607,7 @@ versions:
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
-    hg pull https://bitbucket.org/seek4science/seek -r v0.16.3
+    hg pull https://bitbucket.org/fairdom/seek -r v0.16.3
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
@@ -643,7 +643,7 @@ the upgrade is the typical:
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
-    hg pull https://bitbucket.org/seek4science/seek -r v0.15.4
+    hg pull https://bitbucket.org/fairdom/seek -r v0.15.4
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
@@ -665,7 +665,7 @@ subscriptions (for email notifications).
 
     RAILS_ENV=production ./script/delayed_job stop
     bundle exec rake sunspot:solr:stop RAILS_ENV=production
-    hg pull https://bitbucket.org/seek4science/seek -r v0.14.1
+    hg pull https://bitbucket.org/fairdom/seek -r v0.14.1
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
@@ -697,7 +697,7 @@ on Ubuntu 12.04 this will be:
 then the following steps will update the SEEK server:
 
     bundle exec rake solr:stop RAILS_ENV=production # this is specific to this upgrade, since the command to stop and start the search has changed.
-    hg pull https://bitbucket.org/seek4science/seek -r v0.13.3
+    hg pull https://bitbucket.org/fairdom/seek -r v0.13.3
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing

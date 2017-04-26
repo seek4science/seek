@@ -20,11 +20,6 @@ Guide](install.html) guide. It assumes it is a production server that is
 being updated, and that commands are run from the root directory of the SEEK
 application.
 
-If your current installation is not linked to to the SEEK BitBucket Mercurial
-repository, it can still easily be updated by taking the next stable tag,
-reconfiguring the database configuration to point at your existing database,
-and copying across the *filestore/* directory. The upgrade steps can then be
-followed, with the Mercurial (hg) steps omitted.
 
 ## Identifying your version
 
@@ -71,7 +66,7 @@ files with:
 
 
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.3.0.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.3.0.tar.gz> You can
 unpack this file using:
 
     tar zxvf seek-1.3.0.tar.gz

@@ -86,7 +86,7 @@ And finally
 You are now ready to fetch the SEEK code and start upgrading. Make sure your
 *RAILS_ENV* is still set to *production* if necessary.
 
-    hg pull https://bitbucket.org/seek4science/seek -r v0.18.3
+    hg pull https://bitbucket.org/fairdom/seek -r v0.18.3
     hg update
     hg merge # only required if you've made changes since installing. If you have you may need to deal with conflicts.
     hg commit -m "merged" # likewise - only required if you made changes since installing
