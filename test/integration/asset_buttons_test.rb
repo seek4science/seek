@@ -112,9 +112,6 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   def assert_action_button(path, text)
     get path
     assert_response :success
-    puts "--------------------\n\n"
-    puts select_node_contents('#buttons')
-    puts "--------------------\n\n"
     assert_select '#buttons' do
       assert_select 'a', { text: text }, "Couldn't find '#{text}' button at #{path}"
     end
