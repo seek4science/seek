@@ -7,6 +7,19 @@ layout: page
 
 **Latest version - {{ site.current_seek_version }}**
 
+## Version 1.3.1
+
+Release date: _April 27th 2017_
+
+Patch release that fixes a few small bugs, in particular:
+
+  * Fix to sharing form for Studies and Assays
+  * Fix searching error where a spreadsheet was incorrectly expected
+  * Fix selection of default license for a project
+  * Fixes related to strains and extracting sample strains 
+
+A full list of changes included in this release can be found in the [SEEK v1.3.1 release notes](release-notes-1.3.1.html).
+
 ## Version 1.3.0
 
 Release date: _March 17th 2017_
