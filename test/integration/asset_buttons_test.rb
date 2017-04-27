@@ -24,7 +24,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
         human_name = type_name.singularize.humanize
       end
       item = Factory(type_name.singularize.to_sym, contributor: contributor,
-                                                   policy: Factory(:all_sysmo_viewable_policy))
+                     policy: Factory(:all_sysmo_viewable_policy))
       assert item.can_delete?, 'This item is deletable for the test to pass'
 
       get "/#{type_name}/#{item.id}"
@@ -47,40 +47,35 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
 
     Seek::Util.inline_viewable_content_types.each do |klass|
       underscored_type_name = klass.name.underscore
-      human_name = klass.name.humanize
 
       with_config_value :show_as_external_link_enabled, true do
         if Seek::Util.is_multi_file_asset_type? klass
-          item = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                         content_blobs: [Factory(:content_blob, pdf_blob_with_local_copy_attrs)])
-          assert_download_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
-
-          item2 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                          content_blobs: [Factory(:content_blob, pdf_blob_without_local_copy_attrs)])
-          assert_link_button "/#{underscored_type_name.pluralize}/#{item2.id}"
-
-          item3 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+          remote_with_local = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                                      content_blobs: [Factory(:content_blob, pdf_blob_with_local_copy_attrs)])
+          remote_without_local = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                                         content_blobs: [Factory(:content_blob, pdf_blob_without_local_copy_attrs)])
+          mixed = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
                           content_blobs: [Factory(:content_blob, pdf_blob_with_local_copy_attrs),
                                           Factory(:content_blob, pdf_blob_without_local_copy_attrs)])
-          assert_download_button "/#{underscored_type_name.pluralize}/#{item3.id}", human_name
+          pdf_and_html_remote = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                                        content_blobs: [Factory(:content_blob, html_blob_attrs),
+                                                        Factory(:content_blob, pdf_blob_without_local_copy_attrs)])
 
-          item4 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                          content_blobs: [Factory(:content_blob, html_blob_attrs),
-                                          Factory(:content_blob, pdf_blob_without_local_copy_attrs)])
-          assert_neither_download_nor_link_button "/#{underscored_type_name.pluralize}/#{item4.id}", human_name
-
+          assert_download_button remote_with_local
+          assert_link_button remote_without_local
+          assert_download_button mixed
+          assert_neither_download_nor_link_button pdf_and_html_remote
         else
-          item = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                         content_blob: Factory(:content_blob, pdf_blob_with_local_copy_attrs))
-          assert_download_button "/#{underscored_type_name.pluralize}/#{item.id}", human_name
+          remote_with_local = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                                      content_blob: Factory(:content_blob, pdf_blob_with_local_copy_attrs))
+          html_remote = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                                content_blob: Factory(:content_blob, html_blob_attrs))
+          remote_without_local = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
+                                         content_blob: Factory(:content_blob, pdf_blob_without_local_copy_attrs))
 
-          item2 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                          content_blob: Factory(:content_blob, html_blob_attrs))
-          assert_link_button "/#{underscored_type_name.pluralize}/#{item2.id}"
-
-          item3 = Factory(underscored_type_name.to_sym, policy: Factory(:all_sysmo_downloadable_policy),
-                          content_blob: Factory(:content_blob, pdf_blob_without_local_copy_attrs))
-          assert_link_button "/#{underscored_type_name.pluralize}/#{item3.id}"
+          assert_download_button remote_with_local
+          assert_link_button html_remote
+          assert_link_button remote_without_local
         end
       end
     end
@@ -95,8 +90,8 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def assert_neither_download_nor_link_button(path, _human_name)
-    get path
+  def assert_neither_download_nor_link_button(item)
+    get "/#{item.class.name.underscore.pluralize}/#{item.id}"
     assert_response :success
     assert_select '#buttons' do
       assert_select 'a', text: 'Download', count: 0
@@ -104,17 +99,26 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def assert_link_button(path)
-    assert_action_button path, 'External Link'
+  def assert_link_button(item)
+    assert_action_button item, 'External Link'
   end
 
-  def assert_download_button(path, _human_name)
-    assert_action_button path, 'Download'
+  def assert_download_button(item)
+    assert_action_button item, 'Download'
   end
 
-  def assert_action_button(path, text)
-    get path
+  def assert_action_button(item, text)
+    get "/#{item.class.name.underscore.pluralize}/#{item.id}"
     assert_response :success
+
+    pp item
+    puts
+    pp (item.respond_to?(:content_blobs) ? item.content_blobs : item.content_blob)
+    puts
+    puts select_node_contents('#buttons')
+    puts '-'*10
+    puts
+
     assert_select '#buttons' do
       assert_select 'a', { text: text }, "Couldn't find '#{text}' button at #{path}"
     end
