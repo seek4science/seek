@@ -21,6 +21,10 @@
 
 
 <% if asset.is_downloadable? -%>
+    <% puts "\n========== START VIEW ==========" %>
+    <% pp display_asset %>
+    <% pp display_asset.single_content_blob %>
+    <% puts "=========== END VIEW ===========\n" %>
     <%# param code is used for temporary link -%>
     <%
        path = polymorphic_path(asset,:version=>version,:action=>:download,:code=>params[:code])

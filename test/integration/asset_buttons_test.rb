@@ -40,10 +40,10 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   end
 
   test 'configurable showing as external link when there is no local copy' do
-    pdf_blob_with_local_copy_attrs = { url: 'http://somewhere.com/piccy.pdf', uuid: UUID.generate,
+    pdf_blob_with_local_copy_attrs = { url: 'http://somewhere.com/piccy.pdf',
                                        data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read }
-    pdf_blob_without_local_copy_attrs = { data: nil, url: 'http://somewhere.com/piccy_no_copy.pdf', uuid: UUID.generate }
-    html_blob_attrs = { data: nil, url: 'http://www.abc.com', uuid: UUID.generate }
+    pdf_blob_without_local_copy_attrs = { data: nil, url: 'http://somewhere.com/piccy_no_copy.pdf' }
+    html_blob_attrs = { data: nil, url: 'http://www.abc.com' }
 
     Seek::Util.inline_viewable_content_types.each do |klass|
       underscored_type_name = klass.name.underscore
