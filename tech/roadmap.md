@@ -15,7 +15,8 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Full integration with openBIS | Winter 2017  |
+| Rails 4.2 upgrade | Summer 2017 |
+| Further integration with openBIS, with better metadata mappings | Winter 2017  |
 | Application Programming Interface (API) supporting writes | Summer 2017  |
 
 
@@ -29,6 +30,7 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 | Feature | SEEK version |
 | --- | --- | --- |
+| Integration with openBIS | 1.3 |
 | Improved Samples/Treatments/SOP handling | 1.2  |
 | Docker and Docker Compose support | 1.2 |
 | Licensing of Assets | 1.1 |
