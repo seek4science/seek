@@ -110,15 +110,6 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   def assert_action_button(item, text)
     get "/#{item.class.name.underscore.pluralize}/#{item.id}"
     assert_response :success
-
-    pp item
-    puts
-    pp (item.respond_to?(:content_blobs) ? item.content_blobs : item.content_blob)
-    puts
-    puts select_node_contents('#buttons')
-    puts '-'*10
-    puts
-
     assert_select '#buttons' do
       assert_select 'a', { text: text }, "Couldn't find '#{text}' button at #{path}"
     end
