@@ -1,6 +1,8 @@
 require 'system'
 # Change to match your CPU core count
-workers (System::CPU.count * 2)
+workers System::CPU.count
+
+worker_timeout 120
 
 # Min and Max threads per worker
 threads 1, 1
