@@ -16,7 +16,7 @@ They are expected to be added to SEEK in roughly the order they are presented he
 | Feature | Milestone date |
 | --- | --- |
 | Rails 4.2 upgrade | Summer 2017 |
-| Further integration with openBIS, with better metadata mappings | Winter 2017  |
+| Further integration with openBIS, with improved metadata mappings | Winter 2017  |
 | Application Programming Interface (API) supporting writes | Summer 2017  |
 
 
