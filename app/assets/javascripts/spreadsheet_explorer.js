@@ -44,7 +44,6 @@ $j(document).ready(function ($) {
         endRow,
         endCol;
 
-
     //To disable text-selection
     //http://stackoverflow.com/questions/2700000/how-to-disable-text-selection-using-jquery
     $.fn.disableSelect = function() {
@@ -249,6 +248,7 @@ $j(document).ready(function ($) {
         })
     ;
     adjust_container_dimensions();
+
 });
 
 function activate_sheet_from_resizable(div_obj) {
@@ -258,8 +258,8 @@ function activate_sheet_from_resizable(div_obj) {
 }
 function max_container_width() {
     var max_width = $j(".corner_heading").width();
-    $j(".col_heading:visible").each(function() {
-        max_width += $(this).offsetWidth;
+    $j(".col_heading").each(function() {
+        max_width += parseInt($(this).style.width); //$(this).offsetWidth does not worked when the element is in a hidden tab
     });
     return max_width;
 }
