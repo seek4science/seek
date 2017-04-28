@@ -79,7 +79,7 @@
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[unit_id]",
-                   options_for_select(Unit.all.map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
+                   options_for_select(Unit.all.sort_by(&:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
                                       unit_id),
                    include_blank: true,
                    class: 'form-control',
