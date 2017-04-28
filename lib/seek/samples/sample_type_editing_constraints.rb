@@ -87,13 +87,13 @@ module Seek
       end
 
       def do_analysis
-        Rails.cache.fetch(cache_key) do
+        #Rails.cache.fetch(cache_key) do
           analysis = {}
           attribute_keys.each do |attr|
             analysis[attr] = analyse_for_attribute(attr)
           end
           analysis
-        end
+        #end
       end
 
       def analyse_for_attribute(attr)
