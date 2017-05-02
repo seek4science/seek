@@ -4,7 +4,7 @@ class AssayClass < ActiveRecord::Base
   #if there is not a match nil is returned
   def self.for_type type
     keys={"experimental"=>"EXP","modelling"=>"MODEL"}
-    return AssayClass.find_by_key(keys[type])
+    return AssayClass.find_by(key: keys[type])
   end
 
   def is_modelling?
