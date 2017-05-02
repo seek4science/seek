@@ -22,5 +22,5 @@ $j('#controlled-vocab-errors .errorExplanation').remove();
     selectTag.val('<%= @sample_controlled_vocab.id %>');
 
     SampleTypeControlledVocab.resetModalControlledVocabForm();
-    SampleTypeControlledVocab.controlledVocabChanged();
+    SampleTypeControlledVocab.controlledVocabChanged.call(selectTag);
 <% end %>
