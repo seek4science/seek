@@ -204,7 +204,10 @@ Vue.component('privilege-cell', {
     }
   },
   methods: {
-    toggleValue: function () {
+    toggleValue: function (e) {
+      // Stop clicks on the radio button from triggering this function and un-setting the access type
+      if (e.target.nodeName.toLowerCase() === 'input')
+          return;
       if (!this.disabled) {
         // If the existing setting is clicked, decrease the access type
         if (this.permission.access_type === this.accessType.value &&
