@@ -128,4 +128,28 @@ class AvatarsControllerTest < ActionController::TestCase
     get :new, programme_id: programme
     assert_response :success
   end
+
+  test 'create avatar' do
+    person = Factory(:person)
+
+    login_as(person)
+    assert_difference("Avatar.count",1) do
+      post :create,person_id:person, owner_type:'Person', owner_id:person.id,avatar:avatar_payload, return_to:'http://localhost:3000/fish'
+    end
+    assert_nil flash[:error]
+    assert_redirected_to 'http://localhost:3000/fish?use_unsaved_session_data=true'
+  end
+
+  private
+
+  def avatar_payload
+    options = { filename: 'file_picture.png', content_type: 'image/png', tempfile_fixture: 'files/file_picture.png' }
+
+    file = ActionDispatch::Http::UploadedFile.new({
+                                               filename: options[:filename],
+                                               content_type: options[:content_type],
+                                               tempfile: fixture_file_upload(options[:tempfile_fixture])
+                                           })
+    {image_file:file}
+  end
 end
