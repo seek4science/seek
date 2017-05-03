@@ -75,13 +75,14 @@ class ProjectsControllerTest < ActionController::TestCase
     prog = person.programmes.first
 
     assert_difference('Project.count') do
-      post :create, project: { title: 'proj with policy', programme_id: prog.id }, policy_attributes: valid_sharing
+      post :create, project: { title: 'proj with policy', programme_id: prog.id,use_default_policy:'1' }, policy_attributes: valid_sharing
     end
 
     project = assigns(:project)
 
     assert_redirected_to project
     assert project.default_policy
+    assert project.use_default_policy
   end
 
   test 'create project with programme' do
@@ -1448,6 +1449,23 @@ class ProjectsControllerTest < ActionController::TestCase
   test 'search route' do
     assert_generates '/projects/1/search', controller: 'search', action: 'index', project_id: '1'
     assert_routing '/projects/1/search', controller: 'search', action: 'index', project_id: '1'
+  end
+
+  test 'update to use default sharing policy' do
+    person=Factory(:project_administrator)
+    project=person.projects.first
+    login_as(person)
+    assert project.can_manage?
+    refute project.use_default_policy
+    refute project.default_policy
+
+    put :update, id:project.id, project: { use_default_policy:'1' }, policy_attributes: valid_sharing
+
+    project=assigns(:project)
+    assert project.use_default_policy
+    assert project.default_policy
+
+
   end
 
   private
