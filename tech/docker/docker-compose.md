@@ -49,6 +49,7 @@ like the following:
     server {
         listen 80; 
         server_name www.my-seek.org;
+        client_max_body_size 2G;
         
         location / {
             proxy_set_header   X-Real-IP $remote_addr;
