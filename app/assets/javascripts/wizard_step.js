@@ -2,7 +2,7 @@ var Wizards = {};
 
 Wizards.Wizard = function (element) {
     this.steps = [];
-    this.currentStep = nil;
+    this.currentStep = null;
     this.element = element;
     this.complete = function () {};
 
