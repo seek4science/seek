@@ -248,6 +248,8 @@ var ISA = {
             success: function (data) {
                 var node = childCountNode.incomers().sources();
 
+                ISA.decodeHTMLForElements(data.cytoscape);
+
                 // Set the child node positions to be on top of the node
                 data.cytoscape.forEach(function (childNode) {
                     childNode.renderedPosition = node.renderedPosition();
