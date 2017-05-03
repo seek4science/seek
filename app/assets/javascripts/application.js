@@ -9,6 +9,7 @@
 //= require effects
 //= require scriptaculous
 //= require controls
+//= require jquery.ui.all
 //= require bootstrap
 //= require vue/vue
 //= require collapsible_panels
@@ -38,7 +39,6 @@
 //= require detect_browser
 //= require easytabs
 //= require favourites
-//= require jquery.ui.all
 // This is not a mistake:
 //= require typeahead.js.js
 //= require bootstrap-tagsinput
