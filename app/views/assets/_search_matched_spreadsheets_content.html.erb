@@ -1,6 +1,6 @@
 <% unless matched_items.empty? -%>
-    <%= stylesheet_link_tag('spreadsheet_explorer', 'jquery.ui.resizable', 'lightbox') %>
-    <%= javascript_include_tag 'jquery.ui.all', 'spreadsheet_explorer', 'zoom/lightbox' %>
+    <%= stylesheet_link_tag('spreadsheet_explorer', 'lightbox') %>
+    <%= javascript_include_tag 'spreadsheet_explorer', 'zoom/lightbox' %>
     <!--- multiple  sheets --->
     <% matched_items.each do |item| -%>
         <% if authorization_for_showing_already_done || item.can_download? -%>
