@@ -123,7 +123,9 @@ class SampleTypesController < ApplicationController
                                         {project_ids: [],
                                          sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
                                                                         :sample_attribute_type_id,
-                                                                        :linked_sample_type_id, :unit_id, :_destroy]})
+                                                                        :sample_controlled_vocab_id,
+                                                                        :linked_sample_type_id,
+                                                                        :unit_id, :_destroy]})
   end
 
 

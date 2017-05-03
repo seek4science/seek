@@ -13,6 +13,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     @sample_type = Factory(:simple_sample_type, project_ids: @project_ids)
     @string_type = Factory(:string_sample_attribute_type)
     @int_type = Factory(:integer_sample_attribute_type)
+    @controlled_vocab_type=Factory(:controlled_vocab_attribute_type)
   end
 
   test 'should get index' do
@@ -462,6 +463,32 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_response :success
     assert results = assigns(:sample_types)
     assert_empty results
+  end
+
+  test 'create sample type with a controlled vocab' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    assert_difference('SampleType.count') do
+      post :create, sample_type: { title: 'Hello!',
+                                   project_ids: @project_ids,
+                                   sample_attributes_attributes: {
+                                       '0' => {
+                                           pos: '1', title: 'a string', required: '1', is_title: '1',
+                                           sample_attribute_type_id: @string_type.id, _destroy: '0' },
+                                       '1' => {
+                                           pos: '2', title: 'cv', required: '1',
+                                           sample_attribute_type_id:@controlled_vocab_type.id,
+                                           sample_controlled_vocab_id:cv.id,
+                                           destroy: '0'
+                                       }
+                                   }
+      }
+    end
+    refute_nil type=assigns(:sample_type)
+    assert_redirected_to sample_type_path(type)
+    assert_equal 2,type.sample_attributes.count
+    attr=type.sample_attributes.last
+    assert attr.controlled_vocab?
+    assert_equal cv,attr.sample_controlled_vocab
   end
 
   private
