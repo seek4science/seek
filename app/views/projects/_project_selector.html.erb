@@ -111,6 +111,7 @@
     $j('#projects-selector-select').change(function () {
       if ($j(this).val()) {
         Sharing.projectsSelector.add($j(this).val());
+        $j(this).prop('selectedIndex', 0); // Reset the select
       }
     })
   });
