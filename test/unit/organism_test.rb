@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class OrganismTest < ActiveSupport::TestCase
-  fixtures :organisms, :assays, :models, :bioportal_concepts, :assay_organisms, :studies
+  fixtures :all
 
   test 'assay association' do
     o = organisms(:Saccharomyces_cerevisiae)
