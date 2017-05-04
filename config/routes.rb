@@ -686,6 +686,7 @@ SEEK::Application.routes.draw do
       post :update_annotations_ajax
       get :isa_children
     end
+    resources :people,:projects,:assays, :studies, :investigations, :data_files, :publications, only:[:index]
   end
 
   ### SAMPLE TYPES ###
@@ -705,6 +706,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
+    resources :projects,only:[:index]
   end
 
   ### SAMPLE CONTROLLED VOCABS ###
