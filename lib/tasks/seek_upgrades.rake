@@ -12,7 +12,6 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
       :environment,
-      :seed_sample_attribute_types,
       :ensure_maximum_public_access_type
   ]
 
@@ -56,11 +55,6 @@ namespace :seek do
         strain.destroy
       end
     end
-    puts "Done"
-  end
-
-  task(:seed_sample_attribute_types => :environment) do
-    Rake::Task["db:seed:sample_attribute_types"].invoke
     puts "Done"
   end
 
