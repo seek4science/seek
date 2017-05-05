@@ -155,12 +155,26 @@ module Seek
       File.join(dir, 'key')
     end
 
+    def secret_key_base_path
+      dir = append_filestore_path 'secret_key_base'
+      File.join(dir, 'key')
+    end
+
     def attr_encrypted_key
       if File.exist?(attr_encrypted_key_path)
         File.read(attr_encrypted_key_path)
       else
         write_attr_encrypted_key
         attr_encrypted_key
+      end
+    end
+
+    def secret_key_base
+      if File.exists?(secret_key_base_path)
+        File.read(secret_key_base_path)
+      else
+        write_secret_key_base
+        secret_key_base
       end
     end
 
@@ -284,7 +298,13 @@ module Seek
 
     def write_attr_encrypted_key
       File.open(attr_encrypted_key_path, 'w') do |f|
-        f << OpenSSL::Cipher::Cipher.new('AES-256-CBC').random_key.unpack('H*').first
+        f << SecureRandom.hex(32)
+      end
+    end
+
+    def write_secret_key_base
+      File.open(secret_key_base_path, 'w') do |f|
+        f << SecureRandom.hex(64)
       end
     end
 
