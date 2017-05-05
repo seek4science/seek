@@ -298,7 +298,7 @@ module Seek
 
     def write_attr_encrypted_key
       File.open(attr_encrypted_key_path, 'w') do |f|
-        f << OpenSSL::Cipher::Cipher.new('AES-256-CBC').random_key.unpack('H*').first
+        f << SecureRandom.hex(32)
       end
     end
 
