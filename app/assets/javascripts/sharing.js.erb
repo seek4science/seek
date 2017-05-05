@@ -105,6 +105,15 @@ var Sharing = {
   }
 };
 
+// To do: Make this a property of the permissions table, and remove "Accessible" for things that can't be downloaded
+Sharing.orderedAccessTypes = [
+  Sharing.accessTypes.noAccess,
+  Sharing.accessTypes.visible,
+  Sharing.accessTypes.accessible,
+  Sharing.accessTypes.editing,
+  Sharing.accessTypes.managing
+];
+
 Vue.component('permissions-table', {
   props: ['publicPermission', 'permissions'],
   template:
@@ -212,7 +221,10 @@ Vue.component('privilege-cell', {
         // If the existing setting is clicked, decrease the access type
         if (this.permission.access_type === this.accessType.value &&
             this.accessType.value !== Sharing.accessTypes.noAccess) {
-          this.permission.access_type = this.accessType.value - 1;
+          var index = Sharing.orderedAccessTypes.indexOf(this.accessType.value) - 1;
+          if (index >= 0) {
+            this.permission.access_type = Sharing.orderedAccessTypes[index];
+          }
         } else {
           this.permission.access_type = this.accessType.value;
         }
