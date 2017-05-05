@@ -457,4 +457,17 @@ class ConfigTest < ActiveSupport::TestCase
     # check it regenerates it different each time
     refute_equal key, Seek::Config.attr_encrypted_key
   end
+
+  test 'secret key base' do
+    path = "#{Rails.root}/tmp/testing-filestore/secret_key_base/key"
+    FileUtils.rm(path) if File.exist?(path)
+    key = Seek::Config.secret_key_base
+    refute_nil key
+    assert File.exist?(path)
+    assert_equal key,Seek::Config.secret_key_base
+    assert_equal key,File.read(path)
+    assert_equal 128,key.length
+    FileUtils.rm(path)
+    refute_equal key, Seek::Config.secret_key_base
+  end
 end
