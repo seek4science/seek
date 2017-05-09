@@ -14,6 +14,7 @@ bundler_args: --without development
 
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
+  - SUITE="rake test:units" DB_TYPE=sqlite3
   - SUITE="rake test:functionals" DB_TYPE=mysql
   - SUITE="rake test:functionals" DB_TYPE=sqlite3
   - SUITE="rake test:functionals" DB_TYPE=postgres
