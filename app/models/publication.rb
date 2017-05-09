@@ -245,7 +245,7 @@ class Publication < ActiveRecord::Base
     author_names
   end
 
-  #those displayed on the right. We don't want authors listed as creators here (OPSK-1247). Changing .creators breaks behaviour when editing
+  # those displayed on the right. We don't want authors listed as creators here (OPSK-1247). Changing .creators breaks behaviour when editing
   def displayed_creators
     [contributor].compact.map do |creator|
       creator.is_a?(User) ? creator.person : creator
