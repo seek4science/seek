@@ -50,13 +50,5 @@ creators.reject! { |c| c == contributor }
           <%= h(resource.other_creators) %>
         </div>
     <% end -%>
-    <% if resource.respond_to?(:publication_authors) %>
-        <p class="heading">
-          <%= help_icon("Non-SEEK authors of this publication.") -%>
-          Other Authors
-        </p>
-        <div style="border: 1px dashed #BBB; margin: 0.5em;padding: 3px;text-align:left">
-          <%= h(resource.publication_authors.select { |a| a.person_id.nil? }.map { |a| a.full_name }.join(', ')) %>
-        </div>
-    <% end %>
+
 <% end %>
