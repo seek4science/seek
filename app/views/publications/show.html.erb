@@ -25,6 +25,9 @@
           <strong><%= publication_type_text @publication.publication_type -%>:</strong>
           <%=h @publication.journal -%>
         </p>
+
+      </div>
+      <div class="col-md-6">
         <p>
           <strong><%= "Citation:" -%></strong>
           <%=h @publication.citation -%>
@@ -33,19 +36,22 @@
           <strong for="date_published">Date Published:</strong>
           <span><%= date_as_string(@publication.published_date,false,true) -%></span>
         </p>
-
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-sm-10">
         <p>
           <strong>Author<%= @publication.publication_authors.size > 1 ? "s" : "" -%>:</strong>
           <% if @publication.publication_authors.empty? %>
-            <span class='none_text'>Not specified</span>
+              <span class='none_text'>Not specified</span>
           <% else %>
-            <%= @publication.publication_authors.map do |author|
-              if author.person && author.person.can_view?
-                link_to get_object_title(author.person), show_resource_path(author.person)
-              else
-                author.full_name
-              end
-            end.join(', ').html_safe %>
+              <%= @publication.publication_authors.map do |author|
+                if author.person && author.person.can_view?
+                  link_to get_object_title(author.person), show_resource_path(author.person)
+                else
+                  author.full_name
+                end
+              end.join(', ').html_safe %>
           <% end %>
         </p>
       </div>
@@ -53,7 +59,7 @@
     <%= render :partial => "general/isa_graph", :locals => { :root_item => @publication, :deep => true, :include_parents => true } %>
   </div>
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @publication, :authors_title=>"Authors" } -%>
+    <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @publication, :authors_title=>"Creator",creators:@publication.displayed_creators } -%>
   </div>
 </div>
 
