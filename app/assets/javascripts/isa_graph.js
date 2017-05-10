@@ -300,7 +300,7 @@ var ISA = {
                 });
 
                 // Add the nodes to the JStree
-                ISA.eachTreeNodeElement(node.id(), function () {
+                ISA.eachTreeNodeElement(node.id(), function (index) {
                     var treeNode = tree.get_node(this.id);
 
                     treeNode.state.loaded = true;
@@ -313,6 +313,7 @@ var ISA = {
 
                         // Only add the node to the tree if its not already there
                         if (!$j('li[data-node-id=' + childNode.li_attr['data-node-id'] +']', this).length) {
+                            childNode.id = childNode.id + index; // To stop dupes!
                             tree.create_node(treeNode, childNode);
                         }
                     }
