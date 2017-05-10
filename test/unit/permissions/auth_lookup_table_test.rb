@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
+class AuthLookupTableTest < ActiveSupport::TestCase
   def setup
     @val = Seek::Config.auth_lookup_enabled
     Seek::Config.auth_lookup_enabled = true
@@ -36,8 +36,8 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
       end
     end
 
-    a_user_ids = ActiveRecord::Base.connection.select("select user_id from #{Assay.lookup_table_name}").map { |i| i['user_id'] }
-    d_user_ids = ActiveRecord::Base.connection.select("select user_id from #{DataFile.lookup_table_name}").map { |i| i['user_id'] }
+    a_user_ids = ActiveRecord::Base.connection.select_all("select user_id from #{Assay.lookup_table_name}").map { |i| i['user_id'] }
+    d_user_ids = ActiveRecord::Base.connection.select_all("select user_id from #{DataFile.lookup_table_name}").map { |i| i['user_id'] }
 
     assert_not_includes a_user_ids, u.id
     assert_not_includes d_user_ids, u.id
