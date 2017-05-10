@@ -159,10 +159,6 @@ module ISAHelper
 
     nodes = roots.map { |root| tree_node(hash, root.object) }.flatten
 
-    nodes += (hash[:edges].map do |edge|
-      tree_node(hash, edge[1], node_id(edge[0]))
-    end).flatten
-
     nodes.to_json
   end
 
@@ -174,11 +170,11 @@ module ISAHelper
     node = hash[:nodes].detect { |n| n.object == object }
 
     entry = {
-      id: node_id(object),
-      parent: parent_id,
-      data: { loadable: false }
+      id: unique_node_id(object),
+      data: { loadable: false },
+      li_attr: { 'data-node-id' => node_id(object) },
+      children: []
     }
-    entries = [entry]
 
     if node.can_view?
       entry[:text] = object.title
@@ -190,7 +186,7 @@ module ISAHelper
 
     if node.child_count > 0
       if node.child_count > child_edges.count
-        entries << {
+        entry[:children] << {
           id: child_count_id(object),
           parent: entry[:id],
           text: "Show #{node.child_count - child_edges.count} more",
@@ -204,7 +200,9 @@ module ISAHelper
       entry[:state] = { opened: false }
     end
 
-    entries
+    entry[:children] += child_edges.map { |c| tree_node(hash, c[1]) }
+
+    entry
   end
 
   def aggregate_hidden_nodes(elements)
@@ -236,6 +234,10 @@ module ISAHelper
 
   def node_id(object)
     "#{object.class.name}-#{object.id}"
+  end
+
+  def unique_node_id(object)
+    "#{object.class.name}-#{object.id}-#{rand(2**32).to_s(36)}"
   end
 
   def edge_id(source, target)

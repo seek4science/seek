@@ -175,7 +175,9 @@ var ISA = {
     selectNode: function (node) {
         var jsTree = $j('#jstree').jstree(true);
         jsTree.deselect_all();
-        jsTree.select_node(node.data('id'));
+        $j('li[data-node-id=' + node.data('id') +']').each(function () {
+            jsTree.select_node(this.id);
+        });
         ISA.animateNode(node, 0.8);
         ISA.displayNodeInfo(node);
     },
