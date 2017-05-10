@@ -7,6 +7,19 @@ layout: page
 
 **Latest version - {{ site.current_seek_version }}**
 
+## Version 1.3.2
+
+Release date: _May 10th 2017_
+
+Patch release that fixes some bugs, in particular:
+
+  * Fixes an issue to do with editing sample types after a validation error
+  * Fix to displaying samples or sample types linked to a large number of projects or other associated items
+  * Clarifies publication authors when the person that registers it is not an actual author
+  * Fix for when using older version of Sqlite3
+  
+A full list of changes included in this release can be found in the [SEEK v1.3.2 release notes](release-notes-1.3.2.html).  
+
 ## Version 1.3.1
 
 Release date: _April 27th 2017_
