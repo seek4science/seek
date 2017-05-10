@@ -7,6 +7,8 @@ layout: page
 
 **Latest version - {{ site.current_seek_version }}**
 
+Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
+
 ## Version 1.3.2
 
 Release date: _May 10th 2017_
