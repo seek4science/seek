@@ -190,10 +190,11 @@ module ISAHelper
     if node.child_count > 0
       if node.child_count > child_edges.count
         entry[:children] << {
-          id: child_count_id(object),
+          id: unique_child_count_id(object),
           parent: entry[:id],
           text: "Show #{node.child_count - child_edges.count} more",
           a_attr: { class: 'child-count-leaf' },
+          li_attr: { 'data-node-id' => child_count_id(object) },
           data: { child_count: true }
         }
       end
@@ -240,7 +241,7 @@ module ISAHelper
   end
 
   def unique_node_id(object)
-    "#{object.class.name}-#{object.id}-#{rand(2**32).to_s(36)}"
+    "#{node_id(object)}-#{rand(2**32).to_s(36)}"
   end
 
   def edge_id(source, target)
@@ -249,5 +250,9 @@ module ISAHelper
 
   def child_count_id(object)
     "#{node_id(object)}-child-count"
+  end
+
+  def unique_child_count_id(object)
+    "#{child_count_id(object)}-#{rand(2**32).to_s(36)}"
   end
 end

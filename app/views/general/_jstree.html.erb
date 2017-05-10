@@ -11,7 +11,7 @@
       'data' : <%= tree_json(hash).html_safe -%>
     }}).on('activate_node.jstree', function (e, data) {
       if (data.node.data && data.node.data.child_count) {
-        var childCountNode = ISA.getNode(data.node.id);
+        var childCountNode = ISA.getNode(data.node.li_attr['data-node-id']);
         if (childCountNode.length) {
           ISA.loadChildren(childCountNode);
         }
