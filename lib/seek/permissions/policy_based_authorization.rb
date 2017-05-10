@@ -255,11 +255,11 @@ module Seek
 
             f = ActiveRecord::Base.connection.quote(false)
 
-            # Insert in batches of 10
-            ([0] + User.pluck(:id)).each_slice(10) do |batch|
-              sql = %(INSERT INTO #{self.class.lookup_table_name}
-                        (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
-                        VALUES #{batch.map { |user_id| "(#{user_id}, #{id}, #{f}, #{f}, #{f}, #{f}, #{f})" }.join(', ')};)
+              # Insert in batches of 10
+              ([0] + User.pluck(:id)).each_slice(Seek::Util.bulk_insert_batch_size) do |batch|
+                sql = %(INSERT INTO #{self.class.lookup_table_name}
+                          (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
+                          VALUES #{batch.map { |user_id| "(#{user_id}, #{id}, #{f}, #{f}, #{f}, #{f}, #{f})" }.join(', ')};)
 
               ActiveRecord::Base.connection.execute(sql)
             end

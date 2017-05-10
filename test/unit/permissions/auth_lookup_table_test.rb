@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
+class AuthLookupTableTest < ActiveSupport::TestCase
   def setup
     @val = Seek::Config.auth_lookup_enabled
     Seek::Config.auth_lookup_enabled = true
