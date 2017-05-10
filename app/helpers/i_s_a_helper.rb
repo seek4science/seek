@@ -153,8 +153,11 @@ module ISAHelper
   end
 
   def tree_json(hash)
+    objects = hash[:nodes].map(&:object)
+    real_edges = hash[:edges].select { |e| objects.include?(e[0]) }
+
     roots = hash[:nodes].select do |n|
-      hash[:edges].none? { |_parent, child| child == n.object }
+      real_edges.none? { |_parent, child| child == n.object }
     end
 
     nodes = roots.map { |root| tree_node(hash, root.object) }.flatten
@@ -162,7 +165,7 @@ module ISAHelper
     nodes.to_json
   end
 
-  def tree_node(hash, object, parent_id = '#')
+  def tree_node(hash, object)
     child_edges = hash[:edges].select do |parent, _child|
       parent == object
     end
