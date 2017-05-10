@@ -121,7 +121,7 @@ module Seek
     # of 1
     def self.bulk_insert_batch_size
       cache('bulk_insert_batch_size') do
-        default_size=10
+        default_size=100
         if database_type =='sqlite3' && !sqlite3_supports_bulk_inserts
           Rails.logger.info("Sqlite3 version < 3.7.11 detected, so using single rather than bulk inserts")
           1
