@@ -4,4 +4,6 @@
   <% else %>
       <%= render :partial => "home_contents" -%>
   <% end %>
+  <%= render :partial => "nels/popup" -%>
+  <%= button_link_to('NeLS', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "#nels-modal") %>
 </div>
