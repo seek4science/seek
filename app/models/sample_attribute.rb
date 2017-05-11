@@ -8,7 +8,7 @@ class SampleAttribute < ActiveRecord::Base
   belongs_to :sample_attribute_type
   belongs_to :sample_type, inverse_of: :sample_attributes
   belongs_to :unit
-  belongs_to :sample_controlled_vocab
+  belongs_to :sample_controlled_vocab, inverse_of: :sample_attributes
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
   validates :title, :sample_attribute_type, presence: true

@@ -1303,8 +1303,10 @@ end
 
 Factory.define(:apples_controlled_vocab_attribute, parent: :sample_attribute) do |f|
   f.sequence(:title) { |n| "apples controlled vocab attribute #{n}" }
-  f.sample_controlled_vocab Factory.build(:apples_sample_controlled_vocab)
-  f.sample_attribute_type Factory(:controlled_vocab_attribute_type)
+  f.after_build do |type|
+    type.sample_controlled_vocab=Factory.build(:apples_sample_controlled_vocab)
+    type.sample_attribute_type=Factory(:controlled_vocab_attribute_type)
+  end
 end
 
 Factory.define(:apples_controlled_vocab_sample_type, parent: :sample_type) do |f|
