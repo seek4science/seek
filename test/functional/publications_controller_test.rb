@@ -15,7 +15,6 @@ class PublicationsControllerTest < ActionController::TestCase
 
   def rest_api_test_object
     @object = publications(:taverna_paper_pubmed)
-    @object = publications(:taverna_paper_pubmed)
   end
 
   def test_title
