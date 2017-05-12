@@ -138,8 +138,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def test_file_dump
-    pic = content_blobs(:picture_blob)
-    blob = ContentBlob.new(data: pic.data_io_object.read, original_filename: 'piccy.jpg')
+    blob = ContentBlob.new(data: data_for_test('file_picture.png'), original_filename: 'piccy.jpg')
     blob.save!
     assert_not_nil blob.filepath
     data = nil
@@ -152,9 +151,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   # checks that the data is assigned through the new method, stored to a file, and not written to the old data_old field
   def test_data_assignment
-    pic = content_blobs(:picture_blob)
-    pic.save! # to trigger callback to save to file
-    blob = ContentBlob.new(data: pic.data_io_object.read, original_filename: 'piccy.jpg')
+    blob = ContentBlob.new(data: data_for_test('file_picture.png'), original_filename: 'piccy.jpg')
     blob.save!
     blob = ContentBlob.find(blob.id)
     assert_equal data_for_test('file_picture.png'), blob.data_io_object.read
@@ -170,7 +167,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   # simply checks that get and set data returns the same thing
   def test_data_assignment2
-    pic = content_blobs(:picture_blob)
+    pic = Factory(:content_blob,data:data_for_test('file_picture.png'))
     pic.data = data_for_test('little_file.txt')
     pic.save!
     assert_equal data_for_test('little_file.txt'), pic.data_io_object.read
@@ -182,7 +179,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   #
   def test_will_overwrite_if_data_changes
-    pic = content_blobs(:picture_blob)
+    pic = Factory(:content_blob,data:data_for_test('file_picture.png'))
     pic.save!
     assert_equal data_for_test('file_picture.png'), File.open(pic.filepath, 'rb').read
     pic.data = data_for_test('little_file.txt')
