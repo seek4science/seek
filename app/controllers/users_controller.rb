@@ -1,12 +1,11 @@
 class UsersController < ApplicationController
-
-  before_filter :is_current_user_auth, :only=>[:edit, :update]
-  before_filter :is_user_admin_auth, :only => [:impersonate, :resend_activation_email, :destroy]
+  before_filter :is_current_user_auth, only: %i[edit update]
+  before_filter :is_user_admin_auth, only: %i[impersonate resend_activation_email destroy]
 
   skip_before_filter :restrict_guest_user
   skip_before_filter :project_membership_required
 
-  skip_before_filter :partially_registered?,:only=>[:update,:cancel_registration]
+  skip_before_filter :partially_registered?, only: %i[update cancel_registration]
 
   include Seek::AdminBulkAction
 
@@ -23,9 +22,8 @@ class UsersController < ApplicationController
     # reset_session
 
     @user = User.new(user_params)
-    @user.check_email_present=true
+    @user.check_email_present = true
     check_registration
-
   end
 
   def cancel_registration
@@ -42,7 +40,7 @@ class UsersController < ApplicationController
     if logged_in? && !current_user.active?
       current_user.activate
       Mailer.welcome(current_user).deliver_now
-      flash[:notice] = "Registration complete and successfully activated!"
+      flash[:notice] = 'Registration complete and successfully activated!'
       redirect_to current_person
     else
       redirect_back_or_default('/')
@@ -50,7 +48,7 @@ class UsersController < ApplicationController
   end
 
   def reset_password
-    user = User.find_by_reset_password_code(params[:reset_code] || "")
+    user = User.find_by_reset_password_code(params[:reset_code] || '')
 
     respond_to do |format|
       if user
@@ -60,19 +58,19 @@ class UsersController < ApplicationController
           if user.save
             self.current_user = user
             if logged_in?
-              flash[:notice] = "You can change your password here"
-              format.html { redirect_to(:action => "edit", :id => user.id) }
+              flash[:notice] = 'You can change your password here'
+              format.html { redirect_to(action: 'edit', id: user.id) }
             else
-              flash[:error] = "An unknown error has occurred. We are sorry for the inconvenience. You can request another password reset here."
-              format.html { render :action => "forgot_password" }
+              flash[:error] = 'An unknown error has occurred. We are sorry for the inconvenience. You can request another password reset here.'
+              format.html { render action: 'forgot_password' }
             end
           end
         else
-          flash[:error] = "Your password reset code has expired"
+          flash[:error] = 'Your password reset code has expired'
           format.html { redirect_to(main_app.root_path) }
         end
       else
-        flash[:error] = "Invalid password reset code"
+        flash[:error] = 'Invalid password reset code'
         format.html { redirect_to(main_app.root_path) }
       end
     end
@@ -91,11 +89,11 @@ class UsersController < ApplicationController
           user.save!
           Mailer.forgot_password(user).deliver_now if Seek::Config.email_enabled
           flash[:notice] = "Instructions on how to reset your password have been sent to #{user.person.email}"
-          format.html { render :action => "forgot_password" }
+          format.html { render action: 'forgot_password' }
         else
-          flash[:error] = "Invalid login name/email: #{params[:login]}" if !user
+          flash[:error] = "Invalid login name/email: #{params[:login]}" unless user
           flash[:error] = "Unable to send you an email, as this information isn't available for #{params[:login]}" if user && (!user.person || user.person.email.blank?)
-          format.html { render :action => "forgot_password" }
+          format.html { render action: 'forgot_password' }
         end
       end
     end
@@ -103,18 +101,18 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
-    render :action=>:edit
+    render action: :edit
   end
 
   def update
     @user = User.find(params[:id])
-    if @user==current_user && !@user.registration_complete? && (params[:user][:person_id]) && (params[:user][:email])
+    if @user == current_user && !@user.registration_complete? && (params[:user][:person_id]) && (params[:user][:email])
       person_id = params[:user][:person_id]
       email = params[:user][:email]
-      person=Person.not_registered.detect do |person|
+      person = Person.not_registered.detect do |person|
         person.id.to_s == person_id && person.email == email && person.user.nil?
       end
-      @user.person=person
+      @user.person = person
       do_auth_update = !person.nil?
     end
 
@@ -123,18 +121,18 @@ class UsersController < ApplicationController
     respond_to do |format|
       if @user.save
         AuthLookupUpdateJob.new.add_items_to_queue(@user) if do_auth_update
-        #user has associated himself with a person, so activation email can now be sent
+        # user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
           Mailer.signup(@user).deliver_now
-          flash[:notice]="An email has been sent to you to confirm your email address. You need to respond to this email before you can login"
+          flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
-          format.html { redirect_to :action=>"activation_required" }
+          format.html { redirect_to action: 'activation_required' }
         else
-          flash[:notice]="Your account details have been updated"
+          flash[:notice] = 'Your account details have been updated'
           format.html { redirect_to person_path(@user.person) }
         end
       else
-        format.html { render :action => 'edit' }
+        format.html { render action: 'edit' }
       end
     end
   end
@@ -152,32 +150,28 @@ class UsersController < ApplicationController
     user = User.find(params[:id])
     if user && user.person && !user.active?
       Mailer.signup(user).deliver_now
-      flash[:notice]="An email has been sent to user: #{user.person.name}"
+      flash[:notice] = "An email has been sent to user: #{user.person.name}"
     else
-      flash[:notice] = "No email sent. User was already activated."
+      flash[:notice] = 'No email sent. User was already activated.'
     end
 
     redirect_back
   end
 
-  def activation_required
-
-  end
+  def activation_required; end
 
   def impersonate
     user = User.find(params[:id])
-    if user
-      self.current_user = user
-    end
+    self.current_user = user if user
 
-    redirect_to :controller => 'homes', :action => 'index'
+    redirect_to controller: 'homes', action: 'index'
   end
 
   private
 
   def user_params
-    permitted_params = [:password, :password_confirmation]
-    permitted_params += [:login, :email] if action_name == 'create'
+    permitted_params = %i[password password_confirmation]
+    permitted_params += %i[login email] if action_name == 'create'
 
     params.require(:user).permit(permitted_params)
   end
@@ -198,11 +192,10 @@ class UsersController < ApplicationController
   def successful_registration
     @user.activate unless activation_required?
     self.current_user = @user
-    redirect_to(register_people_path(:email=>@user.email))
+    redirect_to(register_people_path(email: @user.email))
   end
 
   def activation_required?
-    Seek::Config.activation_required_enabled && User.count>1
+    Seek::Config.activation_required_enabled && User.count > 1
   end
-
 end
