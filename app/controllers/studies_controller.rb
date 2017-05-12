@@ -3,13 +3,13 @@ class StudiesController < ApplicationController
   include Seek::AssetsCommon
 
   before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy, :show, :new_object_based_on_existing_one]
+  before_filter :find_and_authorize_requested_item, only: %i[edit update destroy show new_object_based_on_existing_one]
 
   # project_membership_required_appended is an alias to project_membership_required, but is necesary to include the actions
   # defined in the application controller
   before_filter :project_membership_required_appended, only: [:new_object_based_on_existing_one]
 
-  before_filter :check_assays_are_not_already_associated_with_another_study, only: [:create, :update]
+  before_filter :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
   include Seek::Publishing::PublishingCommon
 
@@ -130,7 +130,7 @@ class StudiesController < ApplicationController
   end
 
   def investigation_selected_ajax
-    if (investigation_id = params[:investigation_id]) && params[:investigation_id] != (0")
+    if (investigation_id = params[:investigation_id] && params[:investigation_id] != '0')
       investigation = Investigation.find(investigation_id)
       people = investigation.projects.collect(&:people).flatten
     end
