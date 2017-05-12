@@ -20,7 +20,7 @@ require 'mock_helper'
 require 'html_helper'
 require 'minitest'
 
-#Minitest::Test.i_suck_and_my_tests_are_order_dependent!
+Minitest::Test.i_suck_and_my_tests_are_order_dependent!
 
 module ActionView
   class Renderer
