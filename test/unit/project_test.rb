@@ -653,7 +653,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 5, p2.people.count
     assert_equal 2, p2.work_groups.count
     refute_equal p.work_groups.sort, p2.work_groups.sort
-    assert_equal p.people, p2.people
+    assert_equal p.people.sort, p2.people.sort
   end
 
   test 'can create?' do
