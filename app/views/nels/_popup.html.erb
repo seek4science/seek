@@ -1,4 +1,4 @@
 <%= modal(id: 'nels-modal', size: 'xl') do %>
 <%= modal_header('NeLS') %>
-  <%= content_tag(:iframe, '', src: nels_url, width: 800, height: 600) %>
+  <%= content_tag(:iframe, '', src: nels_browser_path, width: '100%', height: 600) %>
 <% end %>

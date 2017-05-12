@@ -769,8 +769,8 @@ SEEK::Application.routes.draw do
   get "/500" => "errors#error_500"
 
   get "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
-  get "/seek_nels" => "nels#callback"
-  get "/nels" => "nels#nels_page"
+  get "/seek_nels" => "nels#callback", as: 'nels_oauth_callback'
+  get "/nels" => "nels#browser", as: 'nels_browser'
 
   get "/citation/*doi(.:format)" => "citations#fetch", :as => :citation
 
