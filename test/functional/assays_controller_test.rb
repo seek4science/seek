@@ -7,7 +7,7 @@ class AssaysControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
   include HtmlHelper
 
   def setup

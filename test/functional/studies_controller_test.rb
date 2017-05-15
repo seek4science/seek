@@ -7,7 +7,7 @@ class StudiesControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   def setup
     login_as Factory(:admin).user

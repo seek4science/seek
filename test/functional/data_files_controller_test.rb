@@ -10,7 +10,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include RestTestCases
   include RdfTestCases
   include SharingFormTestHelper
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
   include MockHelper
 
   def setup

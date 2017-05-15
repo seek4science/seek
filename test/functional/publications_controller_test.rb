@@ -507,7 +507,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should associate authors' do
-    p = Factory(:publication, publication_authors: [Factory.build(:publication_author), Factory.build(:publication_author)])
+    p = Factory(:publication, publication_authors: [Factory(:publication_author), Factory(:publication_author)])
     assert_equal 2, p.publication_authors.size
     assert_equal 0, p.creators.size
 
