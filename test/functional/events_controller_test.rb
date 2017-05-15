@@ -3,7 +3,7 @@ require 'test_helper'
 class EventsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
   include SharingFormTestHelper
 
   def setup

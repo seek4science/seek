@@ -1,7 +1,8 @@
-module FunctionalAuthorizationTests
+# module mixed in with functional tests to test some general authorization scenerios common to all assets
+
+module GeneralAuthorizationTestCases
   def test_private_item_not_accessible_publicly
     itemname = @controller.controller_name.singularize.underscore
-    another_user = Factory :user
 
     item = Factory itemname.to_sym, policy: Factory(:private_policy)
 
@@ -25,7 +26,6 @@ module FunctionalAuthorizationTests
 
   def test_private_item_accessible_by_owner
     itemname = @controller.controller_name.singularize.underscore
-    another_user = Factory :user
 
     item = Factory itemname.to_sym, policy: Factory(:private_policy)
 

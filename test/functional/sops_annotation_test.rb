@@ -3,7 +3,7 @@ require 'test_helper'
 class SopsAnnotationTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include SharingFormTestHelper
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   fixtures :all
 
