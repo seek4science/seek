@@ -253,22 +253,23 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   test 'destroy' do
     pa = Factory(:project_administrator)
     endpoint = Factory(:openbis_endpoint, project: pa.projects.first)
+    metadata_store = endpoint.metadata_store
     key = endpoint.space.cache_key(endpoint.space_perm_id)
-    assert Rails.cache.exist?(key)
+    assert metadata_store.exist?(key)
     assert_difference('OpenbisEndpoint.count', -1) do
       User.with_current_user(pa.user) do
         endpoint.destroy
       end
     end
-    refute Rails.cache.exist?(key)
+    refute metadata_store.exist?(key)
   end
 
   test 'clear cache' do
     endpoint = Factory(:openbis_endpoint)
     key = endpoint.space.cache_key(endpoint.space_perm_id)
-    assert Rails.cache.exist?(key)
+    assert endpoint.metadata_store.exist?(key)
     endpoint.clear_cache
-    refute Rails.cache.exist?(key)
+    refute endpoint.metadata_store.exist?(key)
   end
 
   test 'create_refresh_cache_job' do

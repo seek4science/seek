@@ -10,7 +10,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   validates :project, :as_endpoint, :dss_endpoint, :web_endpoint, :username,
             :password, :space_perm_id, :refresh_period_mins, :policy, presence: true
   validates :refresh_period_mins, numericality: { greater_than_or_equal_to: 60 }
-  validates :space_perm_id, uniqueness: { scope: [:dss_endpoint, :as_endpoint, :space_perm_id, :project_id],
+  validates :space_perm_id, uniqueness: { scope: %i[dss_endpoint as_endpoint space_perm_id project_id],
                                           message: 'the endpoints and the space must be unique for this project' }
 
   after_create :create_refresh_cache_job
@@ -55,11 +55,10 @@ class OpenbisEndpoint < ActiveRecord::Base
   def clear_cache
     if test_authentication
       Rails.logger.info("CLEARING CACHE FOR #{cache_key}.*")
+      metadata_store.delete_matched(/#{cache_key}.*/)
     else
       Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not deleting CACHE")
     end
-
-    Rails.cache.delete_matched(/#{cache_key}.*/)
   end
 
   def cache_key
@@ -94,5 +93,9 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def password_key
     Seek::Config.attr_encrypted_key
+  end
+
+  def metadata_store
+    @metadata_store ||= Seek::Openbis::OpenbisMetadataStore.new
   end
 end

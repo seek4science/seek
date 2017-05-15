@@ -9,12 +9,12 @@ module Seek
 
       def initialize(openbis_endpoint, perm_id = nil)
         @openbis_endpoint = openbis_endpoint
-        fail 'OpenbisEndpoint expected and required' unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
+        raise 'OpenbisEndpoint expected and required' unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
         if perm_id
           begin
             json = query_application_server_by_perm_id(perm_id)
             unless json[json_key]
-              fail Seek::Openbis::EntityNotFoundException.new("Unable to find #{type_name} with perm id #{perm_id}")
+              raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
             end
             populate_from_json(json[json_key].first)
           rescue Fairdom::OpenbisApi::OpenbisQueryException => e
@@ -103,10 +103,10 @@ module Seek
       end
 
       def cached_query_by_perm_id(perm_id)
-        fail 'Block required for doing query' unless block_given?
+        raise 'Block required for doing query' unless block_given?
         key = cache_key(perm_id)
         Rails.logger.info("CACHE KEY = #{key}")
-        Rails.cache.fetch(key) do
+        openbis_endpoint.metadata_store.fetch(key) do
           Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")
           yield
         end
