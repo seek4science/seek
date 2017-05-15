@@ -10,11 +10,11 @@ class PublicationsControllerTest < ActionController::TestCase
   include MockHelper
 
   def setup
-    login_as(:quentin)
+    login_as(Factory(:admin))
   end
 
   def rest_api_test_object
-    @object = publications(:taverna_paper_pubmed)
+    @object = Factory(:publication, published_date: Date.new(2013, 1, 1))
   end
 
   def test_title
@@ -200,9 +200,12 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should only show the year for 1st Jan in list view' do
+    disable_authorization_checks{Publication.destroy_all}
     publication = Factory(:publication, published_date: Date.new(2013, 1, 1), title: 'blah blah blah science')
+    assert_equal 1,Publication.count
     get :index
     assert_response :success
+
     assert_select 'div.list_item:first-of-type' do
       assert_select 'div.list_item_title a[href=?]', publication_path(publication), text: /#{publication.title}/
       assert_select 'p.list_item_attribute', text: /2013/, count: 1
@@ -508,8 +511,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 2, p.publication_authors.size
     assert_equal 0, p.creators.size
 
-    seek_author1 = people(:modeller_person)
-    seek_author2 = people(:quentin_person)
+    seek_author1 = Factory(:person)
+    seek_author2 = Factory(:person)
 
     # Associate a non-seek author to a seek person
     login_as p.contributor
@@ -555,8 +558,9 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy publication' do
+    publication = Factory(:publication, published_date: Date.new(2013, 6, 4))
     assert_difference('Publication.count', -1) do
-      delete :destroy, id: publications(:one).to_param
+      delete :destroy, id: publication.id
     end
 
     assert_redirected_to publications_path
