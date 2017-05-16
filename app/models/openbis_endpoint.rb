@@ -54,19 +54,10 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def clear_metadata_store
     if test_authentication
-      Rails.logger.info("CLEARING METADATA STORE FOR #{cache_key}.*")
-      metadata_store.delete_matched(/#{cache_key}.*/)
+      Rails.logger.info("CLEARING METADATA STORE FOR Openbis Space #{id}")
+      metadata_store.clear
     else
       Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not deleting METADATA STORE")
-    end
-  end
-
-  def cache_key
-    if new_record?
-      str = "#{space_perm_id}-#{as_endpoint}-#{dss_endpoint}-#{username}-#{password}"
-      "#{super}-#{Digest::SHA2.hexdigest(str)}"
-    else
-      super
     end
   end
 
@@ -96,6 +87,6 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def metadata_store
-    @metadata_store ||= Seek::Openbis::OpenbisMetadataStore.new
+    @metadata_store ||= Seek::Openbis::OpenbisMetadataStore.new(self)
   end
 end

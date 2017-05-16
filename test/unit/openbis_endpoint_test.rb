@@ -240,16 +240,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute_nil endpoint.session_token
   end
 
-  test 'cache key' do
-    endpoint = OpenbisEndpoint.new username: 'fred', password: '12345', as_endpoint: 'http://my-openbis.org/openbis', dss_endpoint: 'http://my-openbis.org/openbis', space_perm_id: 'aaa'
-    assert_equal 'openbis_endpoints/new-ddf17b57f57098ff63383825125f00089a1e1c1cc4de18b27e30e3b9642854a9', endpoint.cache_key
-    endpoint.space_perm_id = 'bbb'
-    assert_equal 'openbis_endpoints/new-867be42425f47d36cc6b91926853a714251da75cea9c7517046e610d2f0201ca', endpoint.cache_key
-
-    endpoint = Factory(:openbis_endpoint)
-    assert_equal "openbis_endpoints/#{endpoint.id}-#{endpoint.updated_at.utc.to_s(:usec)}", endpoint.cache_key
-  end
-
   test 'destroy' do
     pa = Factory(:project_administrator)
     endpoint = Factory(:openbis_endpoint, project: pa.projects.first)

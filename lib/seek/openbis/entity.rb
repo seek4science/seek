@@ -59,7 +59,7 @@ module Seek
       end
 
       def cache_key(perm_id)
-        "#{openbis_endpoint.cache_key}/#{type_name}/#{Digest::SHA2.hexdigest(perm_id)}"
+        "#{type_name}/#{Digest::SHA2.hexdigest(perm_id)}"
       end
 
       def samples

@@ -424,4 +424,12 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
   end
+
+  test 'refresh metadata store' do
+    login_as(@project_administrator)
+    endpoint = Factory(:openbis_endpoint, project: @project)
+    post :refresh_metadata_store, id:endpoint.id,project_id: @project.id
+    assert_response :success
+    assert assigns(:openbis_endpoint)
+  end
 end
