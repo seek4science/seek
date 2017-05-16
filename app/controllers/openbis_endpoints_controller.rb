@@ -61,8 +61,8 @@ class OpenbisEndpointsController < ApplicationController
     save_and_respond 'The space was successfully created.'
   end
 
-  def refresh_browse_cache
-    @openbis_endpoint.clear_cache if @openbis_endpoint.test_authentication
+  def refresh_metadata_store
+    @openbis_endpoint.clear_metadata_store if @openbis_endpoint.test_authentication
     show_items
   end
 

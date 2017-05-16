@@ -13,8 +13,8 @@ class OpenbisEndpoint < ActiveRecord::Base
   validates :space_perm_id, uniqueness: { scope: %i[dss_endpoint as_endpoint space_perm_id project_id],
                                           message: 'the endpoints and the space must be unique for this project' }
 
-  after_create :create_refresh_cache_job
-  after_destroy :clear_cache, :remove_refresh_cache_job
+  after_create :create_refresh_metadata_store_job
+  after_destroy :clear_metadata_store, :remove_refresh_metadata_store_job
   after_initialize :default_policy, autosave: true
 
   def self.can_create?
@@ -52,12 +52,12 @@ class OpenbisEndpoint < ActiveRecord::Base
     "#{web_endpoint} : #{space_perm_id}"
   end
 
-  def clear_cache
+  def clear_metadata_store
     if test_authentication
-      Rails.logger.info("CLEARING CACHE FOR #{cache_key}.*")
+      Rails.logger.info("CLEARING METADATA STORE FOR #{cache_key}.*")
       metadata_store.delete_matched(/#{cache_key}.*/)
     else
-      Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not deleting CACHE")
+      Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not deleting METADATA STORE")
     end
   end
 
@@ -70,11 +70,11 @@ class OpenbisEndpoint < ActiveRecord::Base
     end
   end
 
-  def create_refresh_cache_job
+  def create_refresh_metadata_store_job
     OpenbisEndpointCacheRefreshJob.new(self).queue_job
   end
 
-  def remove_refresh_cache_job
+  def remove_refresh_metadata_store_job
     OpenbisEndpointCacheRefreshJob.new(self).delete_jobs
   end
 

@@ -59,7 +59,7 @@ module Seek
         Rails.logger.info("Creating zip file #{zip_path}")
         Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
           Dir.glob("#{dest_folder}/**/*").reject { |f| File.directory?(f) }.each do |path|
-            file_path_in_zip = File.join(root_folder,Pathname(path).relative_path_from(Pathname(dest_folder)).to_s)
+            file_path_in_zip = File.join(root_folder, Pathname(path).relative_path_from(Pathname(dest_folder)).to_s)
             Rails.logger.info("Adding #{path} as #{file_path_in_zip} to zip file #{zip_path}")
             zipfile.add(file_path_in_zip, path)
           end
@@ -70,7 +70,7 @@ module Seek
       end
 
       def create_seek_datafile
-        fail 'Already registered' if registered?
+        raise 'Already registered' if registered?
         df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}", license: openbis_endpoint.project.default_license)
         if df.save
           df.content_blob = ContentBlob.create(url: content_blob_uri, make_local_copy: false, external_link: false, original_filename: "openbis-#{perm_id}")
