@@ -1,7 +1,9 @@
 module Seek
   module Openbis
+    # General behaviour for an entity in openBIS. Specific entities are defined as specialized subclasses
     class Entity
-      attr_reader :json, :modifier, :registration_date, :modification_date, :code, :perm_id, :registrator, :openbis_endpoint, :exception
+      attr_reader :json, :modifier, :registration_date, :modification_date, :code,
+                  :perm_id, :registrator, :openbis_endpoint, :exception
 
       def ==(other)
         perm_id == other.perm_id
@@ -9,7 +11,10 @@ module Seek
 
       def initialize(openbis_endpoint, perm_id = nil)
         @openbis_endpoint = openbis_endpoint
-        raise 'OpenbisEndpoint expected and required' unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
+        unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
+          raise 'OpenbisEndpoint expected and required'
+        end
+
         if perm_id
           begin
             json = query_application_server_by_perm_id(perm_id)
@@ -92,13 +97,15 @@ module Seek
 
       def query_application_server_by_perm_id(perm_id = '')
         cached_query_by_perm_id(perm_id) do
-          application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
+          application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
+                                                  attribute: 'PermID', attributeValue: perm_id)
         end
       end
 
       def query_datastore_server_by_dataset_perm_id(perm_id = '')
         cached_query_by_perm_id(perm_id) do
-          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'DataSetPermID', attributeValue: perm_id)
+          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
+                                                attribute: 'DataSetPermID', attributeValue: perm_id)
         end
       end
 

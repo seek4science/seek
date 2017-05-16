@@ -1,5 +1,6 @@
 module Seek
   module Openbis
+    # Represents an openBIS DataSet entity
     class Dataset < Entity
       attr_reader :dataset_type, :experiment_id, :sample_ids, :properties
 
@@ -34,7 +35,8 @@ module Seek
         dataset_files.reject(&:is_directory)
       end
 
-      # FIMXE: we can speed things up and get this directly from the first API call rather than fetching the datasets, only getting the datasets on demand
+      # FIMXE: we can speed things up and get this directly from the first API call rather than
+      #   fetching the datasets, only getting the datasets on demand
       def dataset_file_count
         dataset_files_no_directories.count
       end
@@ -49,7 +51,9 @@ module Seek
 
       def download(dest_folder, zip_path, root_folder)
         Rails.logger.info("Downloading folders for #{perm_id} to #{dest_folder}")
-        datastore_server_download_instance.download(downloadType: 'dataset', permID: perm_id, source: '', dest: dest_folder)
+        datastore_server_download_instance.download(downloadType: 'dataset',
+                                                    permID: perm_id,
+                                                    source: '', dest: dest_folder)
 
         if File.exist?(zip_path)
           Rails.logger.info("Deleting old zip file #{zip_path}")
@@ -71,9 +75,11 @@ module Seek
 
       def create_seek_datafile
         raise 'Already registered' if registered?
-        df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}", license: openbis_endpoint.project.default_license)
+        df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}",
+                          license: openbis_endpoint.project.default_license)
         if df.save
-          df.content_blob = ContentBlob.create(url: content_blob_uri, make_local_copy: false, external_link: false, original_filename: "openbis-#{perm_id}")
+          df.content_blob = ContentBlob.create(url: content_blob_uri, make_local_copy: false,
+                                               external_link: false, original_filename: "openbis-#{perm_id}")
         end
         df
       end
