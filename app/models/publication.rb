@@ -160,29 +160,12 @@ class Publication < ActiveRecord::Base
     end
   end
 
-  def data_files
-    backwards_relationships.select { |a| a.subject_type == 'DataFile' }.collect(&:subject)
-  end
-
-  def models
-    backwards_relationships.select { |a| a.subject_type == 'Model' }.collect(&:subject)
-  end
-
-  def assays
-    backwards_relationships.select { |a| a.subject_type == 'Assay' }.collect(&:subject)
-  end
-
-  def studies
-    backwards_relationships.select { |a| a.subject_type == 'Study' }.collect(&:subject)
-  end
-
-  def investigations
-    backwards_relationships.select { |a| a.subject_type == 'Investigation' }.collect(&:subject)
-  end
-
-  def presentations
-    backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
-  end
+  has_many :data_files, through: :backwards_relationships, source: :subject, source_type: 'DataFile'
+  has_many :models, through: :backwards_relationships, source: :subject, source_type: 'Model'
+  has_many :assays, through: :backwards_relationships, source: :subject, source_type: 'Assay'
+  has_many :studies, through: :backwards_relationships, source: :subject, source_type: 'Study'
+  has_many :investigations, through: :backwards_relationships, source: :subject, source_type: 'Investigation'
+  has_many :presentations, through: :backwards_relationships, source: :subject, source_type: 'Presentation'
 
   def associate(item)
     clause = { subject_type: item.class.name,
