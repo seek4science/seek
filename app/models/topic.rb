@@ -10,15 +10,15 @@ class Topic < ActiveRecord::Base
   belongs_to :user
   belongs_to :last_post, :class_name => "Post", :foreign_key => 'last_post_id'
   has_many :monitorships
-  has_many :monitors, :through => :monitorships, :conditions => ["#{Monitorship.table_name}.active = ?", true], :source => :user
+  has_many :monitors, -> { where("#{Monitorship.table_name}.active = ?", true) }, :through => :monitorships, :source => :user
 
-  has_many :posts,     :order => "#{Post.table_name}.created_at", :dependent => :destroy
-  has_one  :recent_post, :order => "#{Post.table_name}.created_at DESC", :class_name => 'Post'
+  has_many :posts,     -> { order("#{Post.table_name}.created_at DESC") }, :dependent => :destroy
+  has_one  :recent_post, -> { order("#{Post.table_name}.created_at DESC") }, :class_name => 'Post'
   
-  has_many :voices, :through => :posts, :source => :user, :uniq => true
+  has_many :voices, -> { uniq }, :through => :posts, :source => :user
   belongs_to :replied_by_user, :foreign_key => "replied_by", :class_name => "User"
 
-  attr_accessible :title
+  # attr_accessible :title
   # to help with the create form
   attr_accessor :body
 	
@@ -44,8 +44,10 @@ class Topic < ActiveRecord::Base
     # these fields are not accessible to mass assignment
     remaining_post = post.frozen? ? recent_post : post
     if remaining_post
-      self.class.update_all(['replied_at = ?, replied_by = ?, last_post_id = ?, posts_count = ?', 
-        remaining_post.created_at, remaining_post.user_id, remaining_post.id, posts.count], ['id = ?', id])
+      self.class.where(id: id).update_all(replied_at: remaining_post.created_at,
+                                          replied_by: remaining_post.user_id,
+                                          last_post_id: remaining_post.id,
+                                          posts_count: posts.count)
     else
       self.destroy
     end
@@ -58,7 +60,7 @@ class Topic < ActiveRecord::Base
     end
 
     def set_post_forum_id
-      Post.update_all ['forum_id = ?', forum_id], ['topic_id = ?', id]
+      Post.where(topic_id: id).update_all(forum_id: forum_id)
     end
 
     def check_for_changing_forums
@@ -69,22 +71,21 @@ class Topic < ActiveRecord::Base
     
     # using count isn't ideal but it gives us correct caches each time
     def update_forum_counter_cache
-      forum_conditions = ['topics_count = ?', Topic.count(:id, :conditions => {:forum_id => forum_id})]
+      forum_conditions = ['topics_count = ?', Topic.where(forum_id: forum_id).count]
       # if the topic moved forums
       if !frozen? && @old_forum_id && @old_forum_id != forum_id
         set_post_forum_id
-        Forum.update_all ['topics_count = ?, posts_count = ?', 
-          Topic.count(:id, :conditions => {:forum_id => @old_forum_id}),
-          Post.count(:id,  :conditions => {:forum_id => @old_forum_id})], ['id = ?', @old_forum_id]
+        Forum.where(id: @old_forum_id).update_all(topics_count: Topic.where(forum_id: @old_forum_id).count,
+                                                  posts_count: Post.where(forum_id: @old_forum_id).count)
       end
       # if the topic moved forums or was deleted
       if frozen? || (@old_forum_id && @old_forum_id != forum_id)
         forum_conditions.first << ", posts_count = ?"
-        forum_conditions       << Post.count(:id, :conditions => {:forum_id => forum_id})
+        forum_conditions       << Post.where(forum_id: forum_id).count
       end
       # User doesn't have update_posts_count method in SB2, as reported by Ryan
 			#@voices.each &:update_posts_count if @voices
-      Forum.update_all forum_conditions, ['id = ?', forum_id]
+      Forum.where(id: forum_id).update_all(forum_conditions)
       @old_forum_id = @voices = nil
     end
     

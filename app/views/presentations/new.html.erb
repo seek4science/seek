@@ -9,7 +9,7 @@
       <div class="form-group">
         <label>Title <span class="required">*</span></label>
         <% presentation_title_value = (params[:presentation].blank? || params[:presentation][:title].blank?) ? nil : params[:presentation][:title] -%>
-        <%= text_area_tag "presentation[title]", presentation_title_value, :class=>"form-control" -%>
+        <%= text_field_tag "presentation[title]", presentation_title_value, :class=>"form-control" -%>
       </div>
 
       <div class="form-group">

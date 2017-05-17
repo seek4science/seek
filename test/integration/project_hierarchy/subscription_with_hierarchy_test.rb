@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'project_hierarchy_test_helper'
 
-class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
+class SubscriptionWithHierarchyTest < ActionDispatch::IntegrationTest
   include ProjectHierarchyTestHelper
   def setup
     skip_hierarchy_tests?
@@ -141,7 +141,7 @@ class SubscriptionWithHierarchyTest < ActionController::IntegrationTest
     assert_equal 4, person.subscriptions.count
 
     # unassign all related projects
-    person.work_groups.delete_all
+    person.work_groups.destroy_all
     disable_authorization_checks do
       person.save
     end

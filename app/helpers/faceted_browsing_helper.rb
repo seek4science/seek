@@ -96,15 +96,15 @@ module FacetedBrowsingHelper
       from.split(':').each do |field|
         if facet_value.blank?
           break
-        elsif facet_value.is_a?(Array) && facet_value.first.respond_to?(field)
+        elsif facet_value.respond_to?(:each) && facet_value.first.respond_to?(field)
           facet_value = facet_value.collect(&:"#{field}")
-        elsif facet_value.respond_to? field
+        elsif facet_value.respond_to?(field)
           facet_value = facet_value.send(field)
         else
           facet_value = nil
         end
       end
-      facet_value = [facet_value] unless facet_value.is_a?(Array)
+      facet_value = [facet_value] unless facet_value.respond_to?(:each)
       facet_values |= facet_value.map { |v| v.is_a?(String) ? h(v) : v }
     end
     facet_values.compact!

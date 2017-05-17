@@ -3,7 +3,7 @@
 <% creators ||= nil %>
 <% authors_title||=nil %>
 
-<% if !creators.nil? || resource.respond_to?("creators") %>
+<% if creators || resource.respond_to?("creators") %>
     <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes,:creators=>creators,:title=>authors_title } -%>
 <% end -%>
 

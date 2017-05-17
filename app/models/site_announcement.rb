@@ -9,9 +9,18 @@ class SiteAnnouncement < ActiveRecord::Base
   belongs_to :site_announcement_category
   belongs_to :announcer,:polymorphic=>true
 
-  scope :headline_announcements,:conditions=>(["is_headline = ? and expires_at > ? ",true,Time.now]),:order=>"created_at DESC",:limit=>1
+  scope :headline_announcements,
+        -> { where('is_headline = ? and expires_at > ? ', true, Time.now).order('created_at DESC').limit(1) }
   
   validates_presence_of :title
+
+  after_create :send_announcement_emails
+
+  def send_announcement_emails
+    if email_notification?
+      SendAnnouncementEmailsJob.new(id).queue_job
+    end
+  end
 
   def self.headline_announcement
     self.headline_announcements.first
@@ -23,7 +32,7 @@ class SiteAnnouncement < ActiveRecord::Base
   end
 
   def body_html
-    helper.simple_format(helper.auto_link(body,:sanitize=>true),{},:sanitize=>true).html_safe
+    helper.simple_format(helper.auto_link(body), {}, sanitize: false).html_safe
   end
 
   private

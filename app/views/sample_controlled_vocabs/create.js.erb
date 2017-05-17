@@ -15,12 +15,12 @@ $j('#controlled-vocab-errors .errorExplanation').remove();
     $j('#cv-modal').modal('hide');
 
     //add the option to available dropdowns
-    var newOption = '<option value="<%= @sample_controlled_vocab.id %>"><%= @sample_controlled_vocab.title %></option>';
+    var newOption = '<option data-editable="true" value="<%= @sample_controlled_vocab.id %>"><%= @sample_controlled_vocab.title %></option>';
     $j('.controlled-vocab-selection').append(newOption);
     //select the new CV in the current dropdown
     var selectTag = SampleTypeControlledVocab.controlledVocabSelectionElement();
     selectTag.val('<%= @sample_controlled_vocab.id %>');
 
     SampleTypeControlledVocab.resetModalControlledVocabForm();
-
+    SampleTypeControlledVocab.controlledVocabChanged.call(selectTag);
 <% end %>

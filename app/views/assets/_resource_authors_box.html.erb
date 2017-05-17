@@ -6,9 +6,8 @@
 <%
 creators ||= nil
 title ||= "#{t('contributor').capitalize} and #{t('creator').capitalize.pluralize}"
-creators ||= resource.creators
 contributor = resource.contributor.try(:person)
-creators.reject! { |c| c == contributor }
+creators ||= resource.creators.reject { |c| c == contributor }
 %>
 
 <%= panel(title, :help_text => "These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its contributors.") do %>
@@ -50,13 +49,5 @@ creators.reject! { |c| c == contributor }
           <%= h(resource.other_creators) %>
         </div>
     <% end -%>
-    <% if resource.respond_to?(:publication_authors) %>
-        <p class="heading">
-          <%= help_icon("Non-SEEK authors of this publication.") -%>
-          Other Authors
-        </p>
-        <div style="border: 1px dashed #BBB; margin: 0.5em;padding: 3px;text-align:left">
-          <%= h(resource.publication_authors.select { |a| a.person_id.nil? }.map { |a| a.full_name }.join(', ')) %>
-        </div>
-    <% end %>
+
 <% end %>

@@ -1,9 +1,7 @@
-require 'seek/samples/sample_data'
-
 class Sample < ActiveRecord::Base
-  attr_accessible :contributor_id, :contributor_type, :json_metadata,
-                  :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
-                  :other_creators, :data
+  # attr_accessible :contributor_id, :contributor_type, :json_metadata,
+  #                :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
+  #                :other_creators, :data
 
   searchable(auto_index: false) do
     text :attribute_values do
@@ -21,7 +19,7 @@ class Sample < ActiveRecord::Base
   has_many :sample_resource_links, dependent: :destroy
   has_many :strains, through: :sample_resource_links, source: :resource, source_type: 'Strain'
 
-  scope :default_order, order('title')
+  scope :default_order, -> { order('title') }
 
   validates :title, :sample_type, presence: true
   include ActiveModel::Validations
@@ -72,7 +70,8 @@ class Sample < ActiveRecord::Base
 
   def referenced_strains
     sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_STRAIN }.map do |sa|
-      Strain.find_by_id(get_attribute(sa.hash_key)['id'])
+      value = get_attribute(sa.hash_key)
+      Strain.find_by_id(value['id']) if value
     end.compact
   end
 

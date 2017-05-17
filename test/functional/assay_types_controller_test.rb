@@ -14,7 +14,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     logout
     get :show, uri: assay.assay_type_uri
     assert_response :success
-    assert_select 'h1', text: /Assay type &#x27;Fluxomics&#x27;/
+    assert_select 'h1', text: /Assay type 'Fluxomics'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -27,7 +27,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     get :show, uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type'
     assert_response :success
 
-    assert_select 'h1', text: /Assay type &#x27;Experimental assay type&#x27;/
+    assert_select 'h1', text: /Assay type 'Experimental assay type'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay)
     end
@@ -38,7 +38,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, policy: Factory(:public_policy)
     get :show
     assert_response :success
-    assert_select 'h1', text: /Assay type &#x27;Experimental assay type&#x27;/
+    assert_select 'h1', text: /Assay type 'Experimental assay type'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -62,7 +62,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     assay = Factory :modelling_assay
     get :show, uri: assay.assay_type_uri
     assert_response :success
-    assert_select 'h1', text: /Biological problem addressed &#x27;Model analysis type&#x27;/
+    assert_select 'h1', text: /Biological problem addressed 'Model analysis type'/
   end
 
   test 'unmatched label passed render term suggestion page with ontology label' do
@@ -71,7 +71,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     get :show, uri: assay.assay_type_uri, label: 'frog'
     # undefined label with uri in ontology will go to suggestion page pointing to term with ontology label
     assert_not_nil flash[:notice]
-    assert_select 'h1', text: /Assay type &#x27;frog&#x27;/
+    assert_select 'h1', text: /Assay type 'frog'/
     assert_select 'div.list_items_container', count: 0
   end
 
@@ -81,7 +81,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, policy: Factory(:public_policy)
     # with correct label
     get :show, uri: assay.assay_type_uri, label: assay.assay_type_label
-    assert_select 'h1', text: /Assay type &#x27;#{assay.assay_type_label}&#x27;/
+    assert_select 'h1', text: /Assay type '#{assay.assay_type_label}'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -91,7 +91,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, policy: Factory(:public_policy)
     # without label
     get :show, uri: assay.assay_type_uri
-    assert_select 'h1', text: /Assay type &#x27;#{assay.assay_type_label}&#x27;/i
+    assert_select 'h1', text: /Assay type '#{assay.assay_type_label}'/i
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -104,7 +104,7 @@ class AssayTypesControllerTest < ActionController::TestCase
 
     # with correct label
     get :show, uri: suggested_assay_type.uri, label: 'this is an assay type'
-    assert_select 'h1', text: /Assay type &#x27;this is an assay type&#x27;/
+    assert_select 'h1', text: /Assay type 'this is an assay type'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -115,7 +115,7 @@ class AssayTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, suggested_assay_type: suggested_assay_type, policy: Factory(:public_policy)
     get :show, uri: assay.assay_type_uri, label: 'frog'
     assert_not_nil flash[:notice]
-    assert_select 'h1', text: /Assay type &#x27;frog&#x27;/
+    assert_select 'h1', text: /Assay type 'frog'/
     assert_select 'div.list_items_container', count: 0
   end
 end

@@ -1,14 +1,14 @@
 class SampleAttribute < ActiveRecord::Base
   METHOD_PREFIX = '__sample_data_'
 
-  attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
-                  :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index, :sample_controlled_vocab,
-                  :sample_controlled_vocab_id, :linked_sample_type_id
+  # attr_accessible :sample_attribute_type_id, :title, :required, :sample_attribute_type, :pos, :sample_type_id,
+  #                :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index, :sample_controlled_vocab,
+  #                :sample_controlled_vocab_id, :linked_sample_type_id
 
   belongs_to :sample_attribute_type
   belongs_to :sample_type, inverse_of: :sample_attributes
   belongs_to :unit
-  belongs_to :sample_controlled_vocab
+  belongs_to :sample_controlled_vocab, inverse_of: :sample_attributes
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
   validates :title, :sample_attribute_type, presence: true
@@ -23,7 +23,7 @@ class SampleAttribute < ActiveRecord::Base
   before_save :generate_accessor_name
   before_save :default_pos, :force_required_when_is_title
 
-  scope :title_attributes, where(is_title: true)
+  scope :title_attributes, -> { where(is_title: true) }
 
   delegate :controlled_vocab?, :seek_sample?, :seek_strain?, to: :sample_attribute_type, allow_nil: true
 

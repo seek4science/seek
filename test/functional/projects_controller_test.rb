@@ -6,6 +6,7 @@ class ProjectsControllerTest < ActionController::TestCase
   include RestTestCases
   include RdfTestCases
   include ActionView::Helpers::NumberHelper
+  include SharingFormTestHelper
 
   fixtures :all
 
@@ -66,6 +67,22 @@ class ProjectsControllerTest < ActionController::TestCase
 
     project = assigns(:project)
     assert_equal 'CC-BY-SA-4.0', project.default_license
+  end
+
+  test 'create project with default policy' do
+    person = Factory(:programme_administrator)
+    login_as(person)
+    prog = person.programmes.first
+
+    assert_difference('Project.count') do
+      post :create, project: { title: 'proj with policy', programme_id: prog.id,use_default_policy:'1' }, policy_attributes: valid_sharing
+    end
+
+    project = assigns(:project)
+
+    assert_redirected_to project
+    assert project.default_policy
+    assert project.use_default_policy
   end
 
   test 'create project with programme' do
@@ -170,6 +187,16 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'should get edit for project with no policy' do
+    p = Factory(:project, default_policy: nil)
+
+    assert_nil p.default_policy
+
+    get :edit, id: p
+
+    assert_response :success
+  end
+
   def test_should_update_project
     put :update, id: Factory(:project, description: 'ffffff'), project: { title: 'pppp', default_license: 'CC-BY-SA-4.0' }
     assert_redirected_to project_path(assigns(:project))
@@ -237,7 +264,7 @@ class ProjectsControllerTest < ActionController::TestCase
     publication.save!
     project = person.projects.first
 
-    assert_include publication.projects, project
+    assert_includes publication.projects, project
     login_as(person)
     get :asset_report, id: project.id
 
@@ -406,7 +433,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :edit, id: projects(:one)
     assert_response :success
 
-    put :update, id: projects(:three).id, project: {}
+    put :update, id: projects(:three).id, project: { title: 'asd' }
+
     assert_redirected_to project_path(assigns(:project))
   end
 
@@ -637,6 +665,25 @@ class ProjectsControllerTest < ActionController::TestCase
     assert Permission.find_by_policy_id(project.default_policy).contributor_id == person.id
   end
 
+  test 'changing default policy even if not site admin' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+
+    person = Factory(:person)
+    sharing = {}
+    sharing[:permissions_attributes] = {}
+    sharing[:permissions_attributes]['1'] = { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::NO_ACCESS }
+    sharing[:access_type] = Policy::VISIBLE
+
+    put :update, id: project.id, project: valid_project, policy_attributes: sharing
+
+    project = Project.find(project.id)
+    assert_redirected_to project
+    assert project.default_policy_id
+    assert Permission.find_by_policy_id(project.default_policy).contributor_id == person.id
+  end
+
   test 'project administrator can administer their projects' do
     project_administrator = Factory(:project_administrator)
     project = project_administrator.projects.first
@@ -721,10 +768,12 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal Institution.count, project.institutions.count
   end
 
-  test 'project administrator can not administer sharing policy' do
+  test 'project administrator can administer sharing policy' do
     project_administrator = Factory(:project_administrator)
     project = project_administrator.projects.first
-    policy = project.default_policy
+    disable_authorization_checks { project.default_policy = Policy.default; project.save }
+
+    policy = project.reload.default_policy
 
     assert_not_equal policy.access_type, Policy::VISIBLE
 
@@ -732,7 +781,7 @@ class ProjectsControllerTest < ActionController::TestCase
     put :update, id: project.id, project: valid_project, policy_attributes: { access_type: Policy::VISIBLE }
     project.reload
     assert_redirected_to project
-    assert_not_equal project.default_policy.access_type, Policy::VISIBLE
+    assert_equal project.default_policy.access_type, Policy::VISIBLE
   end
 
   test 'project administrator can not administer jerm detail' do
@@ -927,8 +976,8 @@ class ProjectsControllerTest < ActionController::TestCase
     refute_empty strain2.projects
     refute_equal project1, project2
 
-    assert_include project1.strains, strain1
-    assert_include project2.strains, strain2
+    assert_includes project1.strains, strain1
+    assert_includes project2.strains, strain2
 
     get :index, strain_id: strain1.id
     assert_response :success
@@ -1402,9 +1451,26 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_routing '/projects/1/search', controller: 'search', action: 'index', project_id: '1'
   end
 
+  test 'update to use default sharing policy' do
+    person=Factory(:project_administrator)
+    project=person.projects.first
+    login_as(person)
+    assert project.can_manage?
+    refute project.use_default_policy
+    refute project.default_policy
+
+    put :update, id:project.id, project: { use_default_policy:'1' }, policy_attributes: valid_sharing
+
+    project=assigns(:project)
+    assert project.use_default_policy
+    assert project.default_policy
+
+
+  end
+
   private
 
   def valid_project
-    {}
+    { title: 'a title' }
   end
 end

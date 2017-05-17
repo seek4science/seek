@@ -6,7 +6,6 @@
 
 class AnnotationsController < ApplicationController
   include Annotations
-  unloadable
   def show
       annotation = Annotation.find(params[:id])
       other_annotations = annotation.value.annotations

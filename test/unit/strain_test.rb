@@ -132,8 +132,8 @@ class StrainTest < ActiveSupport::TestCase
     phenotype = Factory(:phenotype, strain: nil)
     strain = Factory(:strain, genotypes: [genotype], phenotypes: [phenotype])
     disable_authorization_checks { strain.destroy }
-    assert_equal nil, Strain.find_by_id(strain.id)
-    assert_equal nil, Genotype.find_by_id(genotype.id)
-    assert_equal nil, Phenotype.find_by_id(phenotype.id)
+    assert_nil Strain.find_by_id(strain.id)
+    assert_nil Genotype.find_by_id(genotype.id)
+    assert_nil Phenotype.find_by_id(phenotype.id)
   end
 end

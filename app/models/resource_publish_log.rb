@@ -1,43 +1,43 @@
 class ResourcePublishLog < ActiveRecord::Base
-  belongs_to :resource, :polymorphic => true #, :required_access => false
-  belongs_to :user #, :required_access => false
+  belongs_to :resource, polymorphic: true # , :required_access => false
+  belongs_to :user # , :required_access => false
 
   NOT_YET_PUBLISH = 0
   WAITING_FOR_APPROVAL = 1
   PUBLISHED = 2
   UNPUBLISHED = 3
-  REJECTED=4
+  REJECTED = 4
 
   CONSIDERING_TIME = 3.months
 
-  def self.add_log publish_state, resource, comment="", user=User.current_user
+  def self.add_log(publish_state, resource, comment = '', user = User.current_user)
     ResourcePublishLog.create(
-        :user => user,
-        :resource=>resource,
-        :publish_state=>publish_state,
-        :comment=>comment)
+      user: user,
+      resource: resource,
+      publish_state: publish_state,
+      comment: comment
+    )
   end
 
-  def self.requested_approval_assets_for gatekeeper
-    #FIXME: write tests for this method.
-    requested_approval_logs = ResourcePublishLog.includes(:resource).where(["publish_state=? AND resource_type IN (?)",
-                                                                              WAITING_FOR_APPROVAL, publishable_resource_names])
+  def self.requested_approval_assets_for(gatekeeper)
+    # FIXME: write tests for this method.
+    requested_approval_logs = ResourcePublishLog.includes(:resource).where(['publish_state=? AND resource_type IN (?)',
+                                                                            WAITING_FOR_APPROVAL, publishable_resource_names])
     requested_approval_assets = requested_approval_logs.collect(&:resource).compact
-    requested_approval_assets.select!{|asset| !asset.is_published?}
-    requested_approval_assets.select!{|asset| gatekeeper.is_asset_gatekeeper_of? asset}
+    requested_approval_assets.reject!(&:is_published?)
+    requested_approval_assets.select! { |asset| gatekeeper.is_asset_gatekeeper_of? asset }
     requested_approval_assets.uniq
   end
 
-  def self.waiting_approval_assets_for user
-    waiting_approval_logs = ResourcePublishLog.includes(:resource).where(["publish_state=? AND resource_type IN (?) AND user_id=?",
-                                                                            WAITING_FOR_APPROVAL, publishable_resource_names, user.id])
+  def self.waiting_approval_assets_for(user)
+    waiting_approval_logs = ResourcePublishLog.includes(:resource).where(['publish_state=? AND resource_type IN (?) AND user_id=?',
+                                                                          WAITING_FOR_APPROVAL, publishable_resource_names, user.id])
     waiting_approval_assets = waiting_approval_logs.collect(&:resource).compact
-    waiting_approval_assets.select!{|asset| !asset.is_published?}
+    waiting_approval_assets.reject!(&:is_published?)
     waiting_approval_assets.uniq
   end
 
   def self.publishable_resource_names
-    Seek::Util.publishable_types.collect{|klass| klass.name}
+    Seek::Util.publishable_types.collect(&:name)
   end
-
 end

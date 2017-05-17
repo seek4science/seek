@@ -15,7 +15,7 @@
       </p>
       <br/>
 
-      <%= submit_tag "Upload", :disable_with => "Uploading..." %>
+      <%= submit_tag "Upload", data: { disable_with: 'Uploading...' } %>
       or <%= cancel_button(params[:return_to] ? params[:return_to] : eval("#{@image_for.downcase}_model_images_path(#{@image_for_id})")) -%>
     </div>
 <% end %>

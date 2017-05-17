@@ -85,7 +85,7 @@ class InstitutionsController < ApplicationController
   # PUT /institutions/1.xml
   def update
     respond_to do |format|
-      if @institution.update_attributes(params[:institution])
+      if @institution.update_attributes(institution_params)
         expire_resource_list_item_content
         flash[:notice] = 'Institution was successfully updated.'
         format.html { redirect_to(@institution) }
@@ -113,6 +113,10 @@ class InstitutionsController < ApplicationController
   end
 
   private
+
+  def institution_params
+    params.require(:institution).permit(:title, :web_page, :address, :city, :country)
+  end
 
   def editable_by_user
     @institution = Institution.find(params[:id])

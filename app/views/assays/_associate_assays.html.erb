@@ -104,8 +104,8 @@
 
 <script type="text/javascript">
     var assayOptions = {
-        project: <%= (project_assays.collect{|assay| {title:assay_selection_dropdown_text(assay),id:assay.id,parent_id:assay.study.id,parent_title:assay.study.title}}).to_json.html_safe %>,
-        all: <%= (all_assays.collect{|assay| {title:assay_selection_dropdown_text(assay),id:assay.id,parent_id:assay.study.id,parent_title:assay.study.title}}).to_json.html_safe %>
+        project: <%= (project_assays.collect{|assay| {title:assay_selection_dropdown_text(assay).html_safe,id:assay.id,parent_id:assay.study.id,parent_title:assay.study.title}}).to_json.html_safe %>,
+        all: <%= (all_assays.collect{|assay| {title:assay_selection_dropdown_text(assay).html_safe,id:assay.id,parent_id:assay.study.id,parent_title:assay.study.title}}).to_json.html_safe %>
     };
 
     function toggle_assay_list() {

@@ -1,4 +1,3 @@
-
 module Seek
   module Permissions
     module PolicyBasedAuthorization
@@ -32,7 +31,7 @@ module Seek
       # - state_allows_#{action} - to chekc that the state of the object allows that action to proceed
       #
       # by default state_allows_#{action} always returns true, but can be overridden in the particular model type to tune its behaviour
-      AUTHORIZATION_ACTIONS.each do |action|
+      Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.each do |action|
         eval <<-END_EVAL
             def can_#{action}? user = User.current_user
               authorized_for_#{action}?(user) && state_allows_#{action}?(user)
@@ -114,7 +113,7 @@ module Seek
           # cannot rely purely on the count, since an item could have been deleted and a new one added
           c = lookup_count_for_user user_id
           last_stored_asset_id = last_asset_id_for_user user_id
-          last_asset_id = unscoped.last(order: :id).try(:id)
+          last_asset_id = unscoped.order(:id).last.try(:id)
 
           # trigger off a full update for that user if the count is zero and items should exist for that type
           if c == 0 && !last_asset_id.nil?
@@ -156,7 +155,7 @@ module Seek
             sql << " and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
             ids = ActiveRecord::Base.connection.select_all(sql).collect { |k| k['asset_id'] }
           end
-          default_order.find_all_by_id(ids)
+          default_order.where(id: ids)
         end
 
         # the highest asset id recorded in authorization lookup table for a given user_id or user. Used to determine if the table is complete
@@ -222,106 +221,102 @@ module Seek
 
       # updates or creates the authorization lookup entries for this item and the provided user (nil indicating anonymous user)
       def update_lookup_table(user = nil)
-        self.class.isolation_level(:repeatable_read) do # ensure it allows it see another worker may have inserted a record already
-          self.class.transaction do
-            user_id = user.nil? ? 0 : user.id
+        self.class.transaction do
+          user_id = user.nil? ? 0 : user.id
 
-            can_view = ActiveRecord::Base.connection.quote authorized_for_action(user, 'view')
-            can_edit = ActiveRecord::Base.connection.quote authorized_for_action(user, 'edit')
-            can_download = ActiveRecord::Base.connection.quote authorized_for_action(user, 'download')
-            can_manage = ActiveRecord::Base.connection.quote authorized_for_action(user, 'manage')
-            can_delete = ActiveRecord::Base.connection.quote authorized_for_action(user, 'delete')
+          can_view = ActiveRecord::Base.connection.quote authorized_for_action(user, 'view')
+          can_edit = ActiveRecord::Base.connection.quote authorized_for_action(user, 'edit')
+          can_download = ActiveRecord::Base.connection.quote authorized_for_action(user, 'download')
+          can_manage = ActiveRecord::Base.connection.quote authorized_for_action(user, 'manage')
+          can_delete = ActiveRecord::Base.connection.quote authorized_for_action(user, 'delete')
 
-            # check to see if an insert of update is needed, action used is arbitary
-            lookup = self.class.lookup_for_asset('view', user_id, id)
-            insert = lookup.nil?
+          # check to see if an insert of update is needed, action used is arbitary
+          lookup = self.class.lookup_for_asset('view', user_id, id)
+          insert = lookup.nil?
 
-            if insert
-              sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
-            else
-              sql = "update #{self.class.lookup_table_name} set can_view=#{can_view}, can_edit=#{can_edit}, can_download=#{can_download},can_manage=#{can_manage},can_delete=#{can_delete} where user_id=#{user_id} and asset_id=#{id}"
-            end
-
-            ActiveRecord::Base.connection.execute(sql)
+          if insert
+            sql = "insert into #{self.class.lookup_table_name} (user_id,asset_id,can_view,can_edit,can_download,can_manage,can_delete) values (#{user_id},#{id},#{can_view},#{can_edit},#{can_download},#{can_manage},#{can_delete});"
+          else
+            sql = "update #{self.class.lookup_table_name} set can_view=#{can_view}, can_edit=#{can_edit}, can_download=#{can_download},can_manage=#{can_manage},can_delete=#{can_delete} where user_id=#{user_id} and asset_id=#{id}"
           end
+
+          ActiveRecord::Base.connection.execute(sql)
         end
       end
 
       def update_lookup_table_for_all_users
-        self.class.isolation_level(:repeatable_read) do # ensure it allows it see another worker may have inserted a record already
-          self.class.transaction do
-            # Blank-out permissions first
+        self.class.transaction do
+          # Blank-out permissions first
 
-            # 1 entry for each user + anonymous
-            if lookup_count != (User.count + 1)
-              sql = %(DELETE FROM #{self.class.lookup_table_name} WHERE asset_id=#{id})
-              ActiveRecord::Base.connection.execute(sql)
+          # 1 entry for each user + anonymous
+          if lookup_count != (User.count + 1)
+            sql = %(DELETE FROM #{self.class.lookup_table_name} WHERE asset_id=#{id})
+            ActiveRecord::Base.connection.execute(sql)
 
-              f = ActiveRecord::Base.connection.quote(false)
+            f = ActiveRecord::Base.connection.quote(false)
 
               # Insert in batches of 10
-              ([0] + User.pluck(:id)).each_slice(10) do |batch|
+              ([0] + User.pluck(:id)).each_slice(Seek::Util.bulk_insert_batch_size) do |batch|
                 sql = %(INSERT INTO #{self.class.lookup_table_name}
                           (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
                           VALUES #{batch.map { |user_id| "(#{user_id}, #{id}, #{f}, #{f}, #{f}, #{f}, #{f})" }.join(', ')};)
 
-                ActiveRecord::Base.connection.execute(sql)
-              end
-            else
-              update_lookup([false, false, false, false, false], nil)
+              ActiveRecord::Base.connection.execute(sql)
             end
-
-            # Specific permissions (Permission)
-
-            # Sort permissions according to precedence, then access type, so the most direct (People), permissive (Manage)
-            # permissions are applied last.
-            sorted_permissions = policy.permissions
-                                 .sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }
-                                 .reverse
-
-            # Extract the individual member permissions from each FavouriteGroup and ensure they are also sorted by access_type:
-            # 1. Record the index where the FavouriteGroup permissions start
-            fav_group_perm_index = sorted_permissions.index { |p| p.contributor_type == 'FavouriteGroup' }
-            if fav_group_perm_index
-              # 2. Split them out of the array.
-              group_permissions, sorted_permissions = sorted_permissions.partition { |p| p.contributor_type == 'FavouriteGroup' }
-
-              # 3. Gather the FavouriteGroupMemberships for each of the FavouriteGroups referenced by the permissions.
-              group_members_permissions = FavouriteGroupMembership.includes(person: :user)
-                                          .where(favourite_group_id: group_permissions.map(&:contributor_id))
-                                          .order('access_type ASC').to_a
-
-              # 4. Add them in to the array at the point where the FavouriteGroup permissions were removed
-              #    to preserve the order of precedence.
-              sorted_permissions.insert(fav_group_perm_index, *group_members_permissions)
-            end
-
-            # Update the lookup for each permission
-            sorted_permissions.each do |permission|
-              update_lookup(permission, permission.affected_people.map(&:user))
-            end
-
-            # Creator permissions
-            if respond_to?(:creators) && creators.any?
-              update_lookup([true, true, true, false, false], creators.includes(:user).map(&:user).compact, false)
-            end
-
-            # Contributor permissions
-            if (contributor_user = (contributor.is_a?(Person) ? contributor.user : contributor))
-              update_lookup([true, true, true, true, true], contributor_user)
-            end
-
-            # Role permissions (Role)
-            if asset_housekeeper_can_manage?
-              asset_housekeepers = projects.map(&:asset_housekeepers).flatten.map(&:user).compact
-              if asset_housekeepers.any?
-                update_lookup([true, true, true, true, true], asset_housekeepers)
-              end
-            end
-
-            # Global permissions (Policy)
-            update_lookup(policy, nil, false)
+          else
+            update_lookup([false, false, false, false, false], nil)
           end
+
+          # Specific permissions (Permission)
+
+          # Sort permissions according to precedence, then access type, so the most direct (People), permissive (Manage)
+          # permissions are applied last.
+          sorted_permissions = policy.permissions
+                               .sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }
+                               .reverse
+
+          # Extract the individual member permissions from each FavouriteGroup and ensure they are also sorted by access_type:
+          # 1. Record the index where the FavouriteGroup permissions start
+          fav_group_perm_index = sorted_permissions.index { |p| p.contributor_type == 'FavouriteGroup' }
+          if fav_group_perm_index
+            # 2. Split them out of the array.
+            group_permissions, sorted_permissions = sorted_permissions.partition { |p| p.contributor_type == 'FavouriteGroup' }
+
+            # 3. Gather the FavouriteGroupMemberships for each of the FavouriteGroups referenced by the permissions.
+            group_members_permissions = FavouriteGroupMembership.includes(person: :user)
+                                        .where(favourite_group_id: group_permissions.map(&:contributor_id))
+                                        .order('access_type ASC').to_a
+
+            # 4. Add them in to the array at the point where the FavouriteGroup permissions were removed
+            #    to preserve the order of precedence.
+            sorted_permissions.insert(fav_group_perm_index, *group_members_permissions)
+          end
+
+          # Update the lookup for each permission
+          sorted_permissions.each do |permission|
+            update_lookup(permission, permission.affected_people.map(&:user))
+          end
+
+          # Creator permissions
+          if respond_to?(:creators) && creators.any?
+            update_lookup([true, true, true, false, false], creators.includes(:user).map(&:user).compact, false)
+          end
+
+          # Contributor permissions
+          if (contributor_user = (contributor.is_a?(Person) ? contributor.user : contributor))
+            update_lookup([true, true, true, true, true], contributor_user)
+          end
+
+          # Role permissions (Role)
+          if asset_housekeeper_can_manage?
+            asset_housekeepers = projects.map(&:asset_housekeepers).flatten.map(&:user).compact
+            if asset_housekeepers.any?
+              update_lookup([true, true, true, true, true], asset_housekeepers)
+            end
+          end
+
+          # Global permissions (Policy)
+          update_lookup(policy, nil, false)
         end
       end
 
@@ -451,7 +446,7 @@ module Seek
         sql += " WHERE asset_id=#{id}"
 
         if user.respond_to?(:each)
-          user.compact!
+          user = user.compact
           return unless user.any?
           sql += " AND user_id IN (#{user.map(&:id).join(', ')})"
         elsif user.is_a?(User)

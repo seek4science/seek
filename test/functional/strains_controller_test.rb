@@ -6,7 +6,7 @@ class StrainsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   def setup
     login_as :owner_of_fully_public_policy
@@ -144,7 +144,7 @@ class StrainsControllerTest < ActionController::TestCase
     new_gene = Gene.find_by_title(new_gene_title)
     new_modification = Modification.find_by_title(new_modification_title)
     new_genotype = Genotype.where(gene_id: new_gene.id, modification_id: new_modification.id).first
-    new_phenotype = Phenotype.find_all_by_description(new_phenotype_description).sort_by(&:created_at).last
+    new_phenotype = Phenotype.where(description: new_phenotype_description).sort_by(&:created_at).last
     updated_genotypes = [genotype2, new_genotype].sort_by(&:id)
     assert_equal updated_genotypes, updated_strain.genotypes.sort_by(&:id)
 
@@ -159,7 +159,7 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, id: strain.id, policy_attributes: { access_type: Policy::MANAGING }
+    put :update, id: strain.id, strain: { title: strain.title }, policy_attributes: { access_type: Policy::MANAGING }
     assert_redirected_to strain_path(strain)
 
     updated_strain = Strain.find_by_id strain.id
@@ -173,7 +173,7 @@ class StrainsControllerTest < ActionController::TestCase
     assert !strain.can_manage?(user)
 
     login_as(user)
-    put :update, id: strain.id,
+    put :update, id: strain.id, strain: { title: strain.title },
                  policy_attributes: { permissions_attributes: {
                    '1' => { contributor_type: 'Person', contributor_id: user.person.id, access_type: Policy::MANAGING }
                  } }
@@ -200,11 +200,11 @@ class StrainsControllerTest < ActionController::TestCase
     refute_nil assay2
     refute_equal assay1, assay2
 
-    assert_include assay1.strains, strain1
-    assert_include assay2.strains, strain2
+    assert_includes assay1.strains, strain1
+    assert_includes assay2.strains, strain2
 
-    assert_include strain1.assays, assay1
-    assert_include strain2.assays, assay2
+    assert_includes strain1.assays, assay1
+    assert_includes strain2.assays, assay2
 
     assert strain1.can_view?
     assert strain2.can_view?
@@ -260,10 +260,10 @@ class StrainsControllerTest < ActionController::TestCase
 
     assert_select 'input[id=?][value=?]', 'strain_title', strain.title
     assert_select 'select[id=?]', 'strain_parent_id' do
-      assert_select 'option[value=?][selected=?]', strain.id, 'selected', text: strain.info
+      assert_select "option[value='#{strain.id}'][selected]", text: strain.info
     end
     assert_select 'select[id=?]', 'strain_organism_id' do
-      assert_select 'option[value=?][selected=?]', strain.organism.id, 'selected', text: strain.organism.title
+      assert_select "option[value='#{strain.organism.id}'][selected]", text: strain.organism.title
     end
     genotype = strain.genotypes.first
     phenotype = strain.phenotypes.first
@@ -290,5 +290,29 @@ class StrainsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'input[id=?][value=?]', 'strain_title', authorized_parent_strain.title
+  end
+
+  test 'shows related samples on show page' do
+    person = Factory(:person)
+    login_as(person.user)
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+
+    samples = 3.times.map do |i|
+      sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
+      sample.set_attribute(:name, "Strain sample #{i}")
+      sample.set_attribute(:seekstrain, strain.id)
+      sample.save!
+
+      sample
+    end
+
+    with_config_value(:related_items_limit, 2) do
+      get :show, id: strain
+
+      assert_response :success
+
+      assert_select 'div.related-items a[href*=?]', samples_path, text: /Strain sample \d/, count: 2
+    end
   end
 end

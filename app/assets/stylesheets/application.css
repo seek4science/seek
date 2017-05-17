@@ -31,16 +31,18 @@
 *= require settings
 *= require new_styles
 *= require jquery-ui-drag-drop
+*= require jquery.ui.resizable
+*= require jquery.ui.datepicker
 *= require bootstrap-typeahead
 *= require bootstrap-tagsinput
 *= require bootstrap-multiselect
-*= require calendar_date_select/default
 *= require organisms
-*= require tweaks
 *= require samples
 *= require DataTables-1.10.11/dataTables.bootstrap
 *= require DataTables-1.10.11/select.bootstrap
 *= require DataTables-1.10.11/buttons.bootstrap
 *= require jstree
 *= require openbis
+*= require eonasdan-bootstrap-datetimepicker
+*= require cytoscape_isa_graph
 */

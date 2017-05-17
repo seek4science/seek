@@ -1,5 +1,3 @@
-require 'seek/research_objects/acts_as_snapshottable'
-
 class Assay < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
@@ -31,8 +29,8 @@ class Assay < ActiveRecord::Base
   belongs_to :study
   belongs_to :owner, :class_name=>"Person"
   belongs_to :assay_class
-  has_many :assay_organisms, :dependent=>:destroy
-  has_many :organisms, :through=>:assay_organisms
+  has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
+  has_many :organisms, through: :assay_organisms, inverse_of: :assays
   has_many :strains, :through=>:assay_organisms
   has_many :tissue_and_cell_types,:through => :assay_organisms
 

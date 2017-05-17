@@ -175,7 +175,9 @@ var ISA = {
     selectNode: function (node) {
         var jsTree = $j('#jstree').jstree(true);
         jsTree.deselect_all();
-        jsTree.select_node(node.data('id'));
+        $j('li[data-node-id=' + node.data('id') +']').each(function () {
+            jsTree.select_node(this.id);
+        });
         ISA.animateNode(node, 0.8);
         ISA.displayNodeInfo(node);
     },
@@ -237,16 +239,40 @@ var ISA = {
         }
     },
 
-    loadChildren: function (childCountNode) {
+    eachTreeNodeElement: function (id, callback) {
+        $j('li[data-node-id=' + id +']').each(callback);
+    },
+
+    eachTreeNode: function (id, callback) {
+        ISA.eachTreeNodeElement(function () {
+            var treeNode = tree.get_node(this.id);
+            callback.apply(treeNode);
+        });
+    },
+
+    getTreeNodes: function (id) {
+        var nodes = [];
+        ISA.eachTreeNode(id, function () {
+            nodes.push(treeNode);
+        });
+
+        return nodes;
+    },
+
+    loadChildren: function (childCountNode) { // This argument is a cytoscape node!
         var tree = $j('#jstree').jstree(true);
 
-        // Show a spinner on the tree node
-        $j('#' + tree.get_node(childCountNode.id()).id).spinner('add');
+        // Show a spinner on the tree nodes
+        ISA.eachTreeNodeElement(childCountNode.id(), function () {
+            $j(this).spinner('add');
+        });
 
         $j.ajax({
             url: childCountNode.data('url'),
             success: function (data) {
                 var node = childCountNode.incomers().sources();
+
+                ISA.decodeHTMLForElements(data.cytoscape);
 
                 // Set the child node positions to be on top of the node
                 data.cytoscape.forEach(function (childNode) {
@@ -268,27 +294,34 @@ var ISA = {
                     }, ISA.defaults.layout)
                 );
 
-                // Add the nodes to the JStree
-                tree.get_node(node.id()).state.loaded = true;
-                tree.get_node(node.id()).state.opened = true;
-
-                // We iterate backwards because parent nodes seem to appear after child nodes in the list, which breaks
-                //  jstree
-                for (var i = data.jstree.length - 1; i >= 0; i--) {
-                    var childNode = data.jstree[i];
-
-                    // Only add the node to the tree if its not already there
-                    var actualNode = tree.get_node(childNode.id);
-                    if (!actualNode || actualNode.parent !== childNode.parent) {
-                        tree.create_node(childNode.parent, childNode, 'last');
-                    }
-                }
                 // Delete the "show x more" node
-                tree.delete_node(childCountNode.id());
+                ISA.eachTreeNodeElement(childCountNode.id(), function () {
+                    tree.delete_node(this.id);
+                });
 
-                // Need to do this due to a little hack we used when drawing the tree
-                //  (to show a node as "openable" despite having no children)
-                tree.redraw_node(node.id());
+                // Add the nodes to the JStree
+                ISA.eachTreeNodeElement(node.id(), function (index) {
+                    var treeNode = tree.get_node(this.id);
+
+                    treeNode.state.loaded = true;
+                    treeNode.state.opened = true;
+
+                    // We iterate backwards because parent nodes seem to appear after child nodes in the list, which breaks
+                    //  jstree
+                    for (var i = data.jstree.length - 1; i >= 0; i--) {
+                        var childNode = data.jstree[i];
+
+                        // Only add the node to the tree if its not already there
+                        if (!$j('li[data-node-id=' + childNode.li_attr['data-node-id'] +']', this).length) {
+                            childNode.id = childNode.id + index; // To stop dupes!
+                            tree.create_node(treeNode, childNode);
+                        }
+                    }
+
+                    // Need to do this due to a little hack we used when drawing the tree
+                    //  (to show a node as "openable" despite having no children)
+                    tree.redraw_node(this.id);
+                });
 
                 cy.resize();
             }

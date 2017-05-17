@@ -1,7 +1,7 @@
 module AssaysHelper
   # the text shown in the association dropdown box. Includes the study to avoid ambiguity between similar named assays
   def assay_selection_dropdown_text(assay, select_truncate_length = 120)
-    truncate("#{assay.title}", length: select_truncate_length)
+    truncate(assay.title.html_safe, length: select_truncate_length)
   end
 
   def assay_organism_list_item(assay_organism)

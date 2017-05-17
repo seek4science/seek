@@ -99,6 +99,18 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     end
   end
 
+  #tests a peculiar error that was occuring with sqlite3, where the controlled vocab was the same between factory created sample types
+  test 'controlled vocab sample type factory' do
+    type = Factory.create(:apples_controlled_vocab_sample_type, title: 'test1')
+    type2 = Factory.create(:apples_controlled_vocab_sample_type, title: 'test2')
+
+    refute_equal type.id, type2.id, 'sample type ids should be different'
+
+    refute_equal type.sample_attributes.first.id, type2.sample_attributes.first.id, 'sample attributes should be different'
+
+    refute_equal type.sample_attributes.first.sample_controlled_vocab.id, type2.sample_attributes.first.sample_controlled_vocab.id, 'controlled vocabs should be different'
+  end
+
   test 'can edit' do
     admin = Factory(:admin)
     person = Factory(:person)

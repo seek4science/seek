@@ -38,22 +38,12 @@ class PresentationsController < ApplicationController
  # PUT /presentations/1
   # PUT /presentations/1.xml
   def update
-    # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-    if params[:presentation]
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
-        params[:presentation].delete(column_name)
-      end
-
-      # update 'last_used_at' timestamp on the Presentation
-      params[:presentation][:last_used_at] = Time.now
-    end
-
     update_annotations(params[:tag_list], @presentation)
     update_scales @presentation
 
-    @presentation.attributes = params[:presentation]
+    @presentation.attributes = presentation_params
 
-    update_sharing_policies @presentation,params
+    update_sharing_policies @presentation
 
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
@@ -84,5 +74,14 @@ class PresentationsController < ApplicationController
     end
   end
 
+  private
+
+  def presentation_params
+    params.require(:presentation).permit(:title, :description, :other_creators, :license, :parent_name,
+                                         { event_ids: [] }, { project_ids: [] },
+                                         { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+  end
+
+  alias_method :asset_params, :presentation_params
 
 end

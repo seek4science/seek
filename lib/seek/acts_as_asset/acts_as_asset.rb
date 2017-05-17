@@ -8,7 +8,6 @@
 # * Copyright (c) 2007 University of Manchester and the University of Southampton.
 # * See license.txt for details.
 # ********************************************************************************
-require 'seek/permissions/acts_as_authorized'
 
 module Seek
   module ActsAsAsset

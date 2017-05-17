@@ -163,7 +163,7 @@ class FacetedBrowsingHelperTest < ActionView::TestCase
     df = Factory(:data_file)
     common_facet_config = YAML.load(File.read(common_faceted_search_config_path))
     exhibit_item = exhibit_item_for df, common_facet_config
-    assert_equal nil, exhibit_item['a_field']
+    assert_nil exhibit_item['a_field']
   end
 
   test 'exhibit_item_for_external_resource: biomodel' do

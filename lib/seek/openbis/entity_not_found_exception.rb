@@ -1,5 +1,5 @@
 module Seek
   module Openbis
-    class EntityNotFoundException < Exception; end
+    class EntityNotFoundException < RuntimeError; end
   end
 end

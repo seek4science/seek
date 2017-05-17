@@ -73,7 +73,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     person = Person.with_group.find { |p| p.notifiee_info.try :receive_notifications? }
     if person
       person.delete
-      assert_emails(NotifieeInfo.find(:all, conditions: ['receive_notifications=?', true]).count - 1) do
+      assert_emails(NotifieeInfo.where(receive_notifications: true).count - 1) do
         post :create, site_announcement: { title: 'fred', email_notification: true }
       end
     end

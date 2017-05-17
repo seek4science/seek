@@ -9,22 +9,19 @@
   <% content = capture do %>
         <%= f.fields_for :special_auth_codes, f.object.special_auth_codes + [SpecialAuthCode.new.tap(&:mark_for_destruction)] do |sub_form|%>
             <fieldset <%= sub_form.object.new_record? ? "id='new_temporary_link_form' style='display: none'".html_safe : ''%> >
-              <p>
+              <div class="form-group">
                 <% temporary_link = url_for :action => :show, :only_path => false, :code => sub_form.object.code %>
                 Visitors (with no login) can access this <%= f.object.class.name.underscore.humanize %> with:
-                <br/>
-                <%= text_field_tag 'temp_link', temporary_link, :size => 70 -%>
-                <br/>
-                <span class='none_text'>(If this is the first time you generate this link, the link is not valid until you update)</span>
+                <%= text_field_tag 'temp_link', temporary_link, class: 'form-control' -%>
+                <p class='help-block'>This link will not be active until you click 'Update'.</p>
                 <%= sub_form.hidden_field :code %>
-              </p>
+              </div>
 
-              <p>
+              <div class="form-group">
                 <%= sub_form.label :expiration_date %>
-                <%= sub_form.calendar_date_select :expiration_date %>
-                <br/>
-                <span class='none_text'>(After this date, the link is not accessible anymore)</span>
-              </p>
+                <%= sub_form.text_field :expiration_date, data: { calendar: true }, class: 'calendar form-control' %>
+                <p class='help-block'>After this date the link will not be accessible.</p>
+              </div>
               <%= sub_form.subform_delete_link 'Revoke', {:onclick => "$('add_a_temporary_link').show(); "}, :class => 'hidden_destroy_field' %>
             </fieldset>
         <% end %>

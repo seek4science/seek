@@ -67,7 +67,7 @@ class PersonalTagsTest < ActionController::TestCase
     two = expertise_annotations[2]
     three = expertise_annotations[1]
     four = p.tools.first
-    post :update, id: p.id, person: {}, expertise_list: [one.text, two.text, 'five'].join(','), tool_list: [four.text, 'three'].join(',')
+    post :update, id: p.id, person: { email: p.email }, expertise_list: [one.text, two.text, 'five'].join(','), tool_list: [four.text, 'three'].join(',')
     assert_redirected_to p
     p = Person.find(p.id)
 

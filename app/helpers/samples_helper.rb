@@ -9,9 +9,9 @@ module SamplesHelper
     when Seek::Samples::BaseType::TEXT
       text_area :sample, attribute_method_name, class: "form-control #{clz}"
     when Seek::Samples::BaseType::DATE_TIME
-      calendar_date_select :sample, attribute_method_name, time: :mixed, class: "form-control  #{clz}", placeholder: placeholder
+      text_field :sample, attribute_method_name, data: { calendar: 'mixed' }, class: "calendar form-control #{clz}", placeholder: placeholder
     when Seek::Samples::BaseType::DATE
-      calendar_date_select :sample, attribute_method_name, time: false, class: "form-control  #{clz}", placeholder: placeholder
+      text_field :sample, attribute_method_name, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
     when Seek::Samples::BaseType::BOOLEAN
       check_box :sample, attribute_method_name, class: "#{clz}"
     when Seek::Samples::BaseType::SEEK_STRAIN
@@ -85,10 +85,14 @@ module SamplesHelper
   end
 
   def seek_strain_attribute_display(value)
-    if value['title']
-      link_to(value['title'], strain_path(value['id']))
+    if value && value['id']
+      if value['title']
+        link_to(value['title'], strain_path(value['id']))
+      else
+        content_tag(:span, value['id'], class: 'none_text')
+      end
     else
-      content_tag(:span, value['id'], class: 'none_text')
+      content_tag(:span, 'Not specified', class: 'none_text')
     end
   end
 end

@@ -17,8 +17,8 @@ module PolicyHelper
   end
 
   def policy_and_permissions_for_private_scope(permissions, _privileged_people, resource_name)
-    html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
-    html << "<p class='private'>You keep this #{resource_name.humanize.downcase} private (only visible to you)</p>"
+    html = "<h3>You will share this #{t(resource_name)} with:</h3>"
+    html << "<p class='private'>You keep this #{t(resource_name)} private (only visible to you)</p>"
     html << process_permissions(permissions, resource_name)
     html.html_safe
   end
@@ -28,9 +28,9 @@ module PolicyHelper
     html << "<p class='public'>All visitors (including anonymous visitors with no login) can #{Policy.get_access_type_wording(policy.access_type, resource_name.camelize.constantize.new).downcase} </p>"
     unless updated_can_publish_immediately
       if send_request_publish_approval
-        html << "<p class='gatekeeper_notice'>(An email will be sent to the Gatekeepers of the #{t('project').pluralize} associated with this #{resource_name.humanize} to ask for publishing approval. This #{resource_name.humanize} will not be published until one of the Gatekeepers has granted approval)</p>"
+        html << "<p class='gatekeeper_notice'>(An email will be sent to the Gatekeepers of the #{t('project').pluralize} associated with this #{t(resource_name)} to ask for publishing approval. This #{t(resource_name)} will not be published until one of the Gatekeepers has granted approval)</p>"
       else
-        html << "<p class='gatekeeper_notice'>(You requested the publishing approval from the Gatekeepers of the #{t('project').pluralize} associated with this #{resource_name.humanize}, and it is waiting for the decision. This #{resource_name.humanize} will not be published until one of the Gatekeepers has granted approval)</p>"
+        html << "<p class='gatekeeper_notice'>(You requested the publishing approval from the Gatekeepers of the #{t('project').pluralize} associated with this #{t(resource_name)}, and it is waiting for the decision. This #{t(resource_name)} will not be published until one of the Gatekeepers has granted approval)</p>"
       end
     end
 
@@ -115,7 +115,7 @@ module PolicyHelper
     end
   end
 
-  def policy_json(policy, associated_projects)
+  def policy_hash(policy, associated_projects)
     project_ids = associated_projects.map(&:id)
     hash = { access_type: policy.access_type }
 
@@ -149,6 +149,20 @@ module PolicyHelper
                               contributor_type: 'Project',
                               title: project.title,
                               isMandatory: true }
+    end
+
+    hash
+  end
+
+  def policy_json(policy, associated_projects)
+    policy_hash(policy, associated_projects).to_json.html_safe
+  end
+
+  def project_policies_json(projects)
+    hash = {}
+
+    projects.each do |p|
+      hash[p.id] = policy_hash(p.default_policy, [p]) if p.use_default_policy
     end
 
     hash.to_json.html_safe

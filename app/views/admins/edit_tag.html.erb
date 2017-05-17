@@ -16,7 +16,7 @@
           <% unless a.nil? || a.annotatable.nil? %>
               <li>
                 <%= link_to "#{a.annotatable.title} ( #{a.annotatable_type} )", a.annotatable -%>
-                context = <%= a.attribute.name -%>
+                context = <%= a.annotation_attribute.name -%>
               </li>
           <% end %>
       <% end -%>

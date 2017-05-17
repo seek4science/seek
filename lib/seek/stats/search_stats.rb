@@ -34,7 +34,7 @@ module Seek
       end
 
       def searches_since(time = 500.years.ago)
-        ActivityLog.count(:all, conditions: ['controller_name = ? and created_at > ?', 'search', time])
+        ActivityLog.where('controller_name = ? and created_at > ?', 'search', time).count
       end
 
       # returns a 2 dimensional array each outer element containing the [term,score]

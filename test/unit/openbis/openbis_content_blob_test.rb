@@ -17,6 +17,11 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
     assert Factory(:url_content_blob, make_local_copy: false, url: 'openbis:1:dataset:2222').openbis?
   end
 
+  test 'openbis? handles bad url' do
+    blob = Factory(:url_content_blob,url:'http://url with spaces/another space.doc')
+    refute blob.openbis?
+  end
+
   test 'openbis dataset' do
     blob = openbis_linked_content_blob
     dataset = blob.openbis_dataset

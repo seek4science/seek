@@ -36,7 +36,7 @@
 			<% end -%>
 			<%= image_tag_for_key "show", model_image_url(@model_instance, model_image.id, "large"), nil, nil, "Enlarge" -%>
 			<% if image_can_be_edited_by_current_user -%>
-				<%= image_tag_for_key "destroy", image_link, nil, { :confirm => 'Are you sure?', :method => :delete }, "Delete" -%>
+				<%= image_tag_for_key "destroy", image_link, nil, { data: { confirm: 'Are you sure?' }, :method => :delete }, "Delete" -%>
 			<% end -%>
     </td>
   </tr>

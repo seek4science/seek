@@ -120,10 +120,10 @@
       <%= publication_form.text_field :citation, :class => 'form-control' %>
     </div>
   </div>
-  <div class="form-group date-select">
+  <div class="form-group">
   <%= label_tag :published_date, nil, :class => 'control-label col-sm-2' %>
   <div class="col-sm-10">
-      <%= publication_form.calendar_date_select :published_date, :class => 'form-control' %>
+      <%= publication_form.text_field :published_date, data: { calendar: true }, class: 'calendar form-control' %>
     </div>
   </div>
   <div class="form-group">

@@ -6,7 +6,7 @@
       <%= button_link_to 'Manage', 'manage', edit_organism_path(resource), :class => 'btn-xs' -%>
     <% end -%>
     <% if resource.can_delete? -%>
-        <%= button_link_to 'Delete', 'destroy', organism_path(resource), :confirm => 'Are you sure?',
+        <%= button_link_to 'Delete', 'destroy', organism_path(resource), data: { confirm: 'Are you sure?' },
                            :method => :delete, :class => 'btn-xs' -%>
     <% end -%>
 <% end -%>

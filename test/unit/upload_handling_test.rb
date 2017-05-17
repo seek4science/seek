@@ -17,8 +17,11 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'content_blob_params' do
-    @params = { content_blobs: [{ fish: 1, soup: 2 }], data_file: { title: 'george' } }
-    assert_equal([{ fish: 1, soup: 2 }], content_blob_params)
+    @params = ActionController::Parameters.new({ content_blobs: [{ fish: 1, soup: 2 }],
+                                                 data_file: { title: 'george' } })
+    assert_equal 1, content_blobs_params.length
+    assert_equal 1, content_blobs_params.first[:fish]
+    assert_equal 2, content_blobs_params.first[:soup]
   end
 
   test 'default to http if missing' do
@@ -40,10 +43,14 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'asset params' do
-    @params = { content_blob: { fish: 1, soup: 2 }, data_file: { title: 'george' }, sop: { title: 'mary' } }
-    assert_equal({ title: 'george' }, asset_params)
+    @params = ActionController::Parameters.new({ content_blob: { fish: 1, soup: 2 },
+                                                 data_file: { title: 'george' },
+                                                 sop: { title: 'mary' } })
+    assert_equal 'george', asset_params[:title]
+    assert_equal 1, asset_params.keys.length
     @controller_name = 'sops'
-    assert_equal({ title: 'mary' }, asset_params)
+    assert_equal 'mary', asset_params[:title]
+    assert_equal 1, asset_params.keys.length
   end
 
   test 'check url response code' do
@@ -74,25 +81,23 @@ class UploadHandingTest < ActiveSupport::TestCase
                                                        headers: { content_type: 'text/html', content_length: '555' })
     headers = fetch_url_headers('http://bbc.co.uk')
     assert_equal 'text/html', headers[:content_type]
-    assert_equal '555', headers[:content_length]
+    assert_equal 555, headers[:file_size]
 
     stub_request(:head, 'http://somewhere.org/excel.xls').to_return(status: 200,
                                                                     body: '',
                                                                     headers: { content_type: 'application/vnd.ms-excel', content_length: '1111' })
     headers = fetch_url_headers('http://somewhere.org/excel.xls')
     assert_equal 'application/vnd.ms-excel', headers[:content_type]
-    assert_equal '1111', headers[:content_length]
+    assert_equal 1111, headers[:file_size]
 
     stub_request(:head, 'http://not-there.com').to_return(status: 404, body: '', headers: {})
-    assert_raise RestClient::ResourceNotFound do
-      fetch_url_headers('http://not-there.com')
-    end
+    assert_equal 404, fetch_url_headers('http://not-there.com')[:code]
 
     # follows redirection
     stub_request(:head, 'http://moved.com').to_return(status: 301, body: '', headers: { location: 'http://bbc.co.uk' })
     headers = fetch_url_headers('http://moved.com')
     assert_equal 'text/html', headers[:content_type]
-    assert_equal '555', headers[:content_length]
+    assert_equal 555, headers[:file_size]
   end
 
   test 'content type from filename' do
@@ -230,5 +235,15 @@ class UploadHandingTest < ActiveSupport::TestCase
   # mocks out the controller name, defaults to data_files, but can be changed by setting @controller_name
   def controller_name
     @controller_name || 'data_files'
+  end
+
+  private
+
+  def fetch_url_headers(url)
+    Seek::DownloadHandling::HTTPHandler.new(url).info
+  end
+
+  def check_url_response_code(url)
+    Seek::DownloadHandling::HTTPHandler.new(url, fallback_to_get: false).info[:code]
   end
 end

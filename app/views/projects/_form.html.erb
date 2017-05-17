@@ -38,13 +38,34 @@
 <% end %>
 
 <% if Seek::Config.organisms_enabled %>
-        <%= render :partial=>"projects/organisms_selection", :locals=>{:f=>f} -%>
-
+    <%= render :partial=>"projects/organisms_selection", :locals=>{:f=>f} -%>
 <% end %>
 
 <% if @project.can_manage? %>
     <%= render :partial => 'assets/license_selector', :locals => { :resource => @project, :label=>"Default License",:accessor=>:default_license } %>
+
+    <%= folding_panel('Default Sharing Policy', false, id: 'sharing_form',
+                      help_text: "Here you can choose to configure a default sharing policy that is applied to new resources created as part of this project.") do %>
+        <% if @project.new_record? %>
+            <div class="alert alert-warning">
+              To configure a default sharing policy, please finish creating the project then visit the "Edit Project Details" page.
+            </div>
+        <% else %>
+            <div class="alert alert-info">
+              Here you can choose to configure a default sharing policy that is applied to new resources created as part of this project.
+            </div>
+            <div class="checkbox">
+              <label>
+                <%= f.check_box(:use_default_policy, autocomplete: 'off', onchange: toggle_appear_javascript('default-sharing-form')) %> <strong>Enable default policy</strong>
+              </label>
+            </div>
+
+            <div id="default-sharing-form" style="<%= show_or_hide_block(@project.use_default_policy) -%>;">
+              <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: @project.default_policy || Policy.default, projects: [@project] } %>
+            </div>
+        <% end %>
+    <% end %>
 <% end %>
 
-<%= f.submit(project ? "Update" : "Create",:disable_with=>(project ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
+<%= f.submit(project ? "Update" : "Create",data: { disable_with: (project ? "Updating..." : "Creating...") }, :class => 'btn btn-primary') -%>
  or <%= cancel_button(project ? project_path(project.id) : projects_path) -%>

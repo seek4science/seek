@@ -11,7 +11,7 @@
         <td valign="top">
   
           <%= link_to('delete post'[], post_path(:forum_id => @post.topic.forum, :topic_id => @post.topic, :id => @post, :page => params[:page]), 
-                :class => "utility", :method => :delete, :confirm => "Delete this post?  Are you sure?"[:delete_post_conf]) %>  
+                :class => "utility", :method => :delete, data: { confirm: "Delete this post?  Are you sure?"[:delete_post_conf] }) %>
   
       
           <h5><%= 'Formatting Help'[] %></h5>

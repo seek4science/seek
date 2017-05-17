@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include HtmlHelper
@@ -32,6 +33,33 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type, assigns(:sample).sample_type
   end
 
+  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
+  test 'create from form' do
+    person = Factory(:person)
+    creator = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id,
+                              __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL' ,
+                              project_ids: [person.projects.first.id], other_creators:'frank, mary' },
+           creators: [[creator.name, creator.id]].to_json
+    end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'Fred Smith', sample.title
+    assert_equal 'Fred Smith', sample.get_attribute(:full_name)
+    assert_equal '22', sample.get_attribute(:age)
+    assert_equal '22.1', sample.get_attribute(:weight)
+    assert_equal 'M13 9PL', sample.get_attribute(:postcode)
+    assert_equal person.user, sample.contributor
+    assert_equal [creator], sample.creators
+    assert_equal 'frank, mary',sample.other_creators
+
+    # job should have been triggered
+    assert SampleTypeUpdateJob.new(type, false).exists?
+  end
+
   test 'create' do
     person = Factory(:person)
     creator = Factory(:person)
@@ -39,14 +67,14 @@ class SamplesControllerTest < ActionController::TestCase
     type = Factory(:patient_sample_type)
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id,
-                              data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                              data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
                               project_ids: [person.projects.first.id] },
                     creators: [[creator.name, creator.id]].to_json
     end
     assert assigns(:sample)
     sample = assigns(:sample)
-    assert_equal 'George Osborne', sample.title
-    assert_equal 'George Osborne', sample.get_attribute(:full_name)
+    assert_equal 'Fred Smith', sample.title
+    assert_equal 'Fred Smith', sample.get_attribute(:full_name)
     assert_equal '22', sample.get_attribute(:age)
     assert_equal '22.1', sample.get_attribute(:weight)
     assert_equal 'M13 9PL', sample.get_attribute(:postcode)
@@ -55,6 +83,28 @@ class SamplesControllerTest < ActionController::TestCase
 
     # job should have been triggered
     assert SampleTypeUpdateJob.new(type, false).exists?
+  end
+
+  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
+  test 'create and update with boolean from form' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:simple_sample_type)
+    type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
+    type.save!
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, __sample_data_the_title: 'ttt', __sample_data_bool: '1' ,
+                              project_ids: [person.projects.first.id] }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal 'ttt', sample.get_attribute(:the_title)
+    assert sample.get_attribute(:bool)
+    assert_no_difference('Sample.count') do
+      put :update, id: sample.id, sample: { data: { the_title: 'ttt', bool: '0' } }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal 'ttt', sample.get_attribute(:the_title)
+    assert !sample.get_attribute(:bool)
   end
 
   test 'create and update with boolean' do
@@ -111,6 +161,35 @@ class SamplesControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
+  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
+  test 'update from form' do
+    login_as(Factory(:person))
+    creator = Factory(:person)
+    sample = populated_patient_sample
+    type_id = sample.sample_type.id
+
+    assert_empty sample.creators
+
+    assert_no_difference('Sample.count') do
+      put :update, id: sample.id, sample: { __sample_data_full_name: 'Jesus Jones', __sample_data_age: '47', __sample_data_postcode: 'M13 9QL' },
+          creators: [[creator.name, creator.id]].to_json
+      assert_equal [creator], sample.creators
+    end
+
+    assert assigns(:sample)
+    assert_redirected_to assigns(:sample)
+    updated_sample = assigns(:sample)
+    updated_sample = Sample.find(updated_sample.id)
+    assert_equal type_id, updated_sample.sample_type.id
+    assert_equal 'Jesus Jones', updated_sample.title
+    assert_equal 'Jesus Jones', updated_sample.get_attribute(:full_name)
+    assert_equal '47', updated_sample.get_attribute(:age)
+    assert_nil updated_sample.get_attribute(:weight)
+    assert_equal 'M13 9QL', updated_sample.get_attribute(:postcode)
+    # job should have been triggered
+    assert SampleTypeUpdateJob.new(sample.sample_type, false).exists?
+  end
+
   test 'update' do
     login_as(Factory(:person))
     creator = Factory(:person)
@@ -139,6 +218,22 @@ class SamplesControllerTest < ActionController::TestCase
     assert SampleTypeUpdateJob.new(sample.sample_type, false).exists?
   end
 
+  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
+  test 'associate with project on create from form' do
+    person = Factory(:person_in_multiple_projects)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert person.projects.count >= 3 # incase the factory changes
+    project_ids = person.projects[0..1].collect(&:id)
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample',
+                              __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL',
+                              project_ids: project_ids }
+    end
+    assert sample = assigns(:sample)
+    assert_equal person.projects[0..1].sort, sample.projects.sort
+  end
+
   test 'associate with project on create' do
     person = Factory(:person_in_multiple_projects)
     login_as(person)
@@ -147,9 +242,25 @@ class SamplesControllerTest < ActionController::TestCase
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id, title: 'My Sample',
-                              data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                              data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
                               project_ids: project_ids }
     end
+    assert sample = assigns(:sample)
+    assert_equal person.projects[0..1].sort, sample.projects.sort
+  end
+
+  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
+  test 'associate with project on update from form' do
+    person = Factory(:person_in_multiple_projects)
+    login_as(person)
+    sample = populated_patient_sample
+    assert person.projects.count >= 3 # incase the factory changes
+    project_ids = person.projects[0..1].collect(&:id)
+
+    put :update, id: sample.id, sample: { title: 'Updated Sample',
+                                          __sample_data_full_name: 'Jesus Jones', __sample_data_age: '47', __sample_data_postcode: 'M13 9QL' ,
+                                          project_ids: project_ids }
+
     assert sample = assigns(:sample)
     assert_equal person.projects[0..1].sort, sample.projects.sort
   end
@@ -220,6 +331,22 @@ class SamplesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
+  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
+  test 'create with sharing from form' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+
+    assert_difference('Sample.count') do
+      post :create, sample: { sample_type_id: type.id, title: 'My Sample',
+                              __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL' ,
+                              project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing
+    end
+    assert sample = assigns(:sample)
+    assert_equal person.user, sample.contributor
+    assert sample.can_view?(Factory(:person).user)
+  end
+
   test 'create with sharing' do
     person = Factory(:person)
     login_as(person)
@@ -227,12 +354,30 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_difference('Sample.count') do
       post :create, sample: { sample_type_id: type.id, title: 'My Sample',
-                              data: { full_name: 'George Osborne', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                              data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
                               project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing
     end
     assert sample = assigns(:sample)
     assert_equal person.user, sample.contributor
     assert sample.can_view?(Factory(:person).user)
+  end
+
+  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
+  test 'update with sharing from form' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    login_as(person)
+    sample = populated_patient_sample
+    sample.contributor = person
+    sample.policy = Factory(:private_policy)
+    sample.save!
+    sample.reload
+    refute sample.can_view?(other_person.user)
+
+    put :update, id: sample.id, sample: { title: 'Updated Sample', __sample_data_full_name: 'Jesus Jones', __sample_data_age: '47', __sample_data_postcode: 'M13 9QL', project_ids: [] }, policy_attributes: valid_sharing
+
+    assert sample = assigns(:sample)
+    assert sample.can_view?(other_person.user)
   end
 
   test 'update with sharing' do

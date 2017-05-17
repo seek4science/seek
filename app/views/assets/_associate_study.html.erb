@@ -41,8 +41,8 @@
 <% end %>
 <script type="text/javascript">
     var studyOptions = {
-        project: <%= ([["Select Study...",0]]|project_studies.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
-        all: <%= ([["Select Study...",0]]|all_studies.collect{|s| [truncate(s.title,:length=>select_truncate_length),s.id]}).to_json.html_safe %>
+        project: <%= ([["Select Study...",0]]|project_studies.collect{|s| [truncate(s.title.html_safe,:length=>select_truncate_length),s.id]}).to_json.html_safe %>,
+        all: <%= ([["Select Study...",0]]|all_studies.collect{|s| [truncate(s.title.html_safe,:length=>select_truncate_length),s.id]}).to_json.html_safe %>
     };
 
     function toggle_study_list() {

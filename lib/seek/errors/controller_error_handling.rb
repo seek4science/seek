@@ -5,11 +5,12 @@ module Seek
       ERROR_MAP = {
         Exception => 500,
         ActionController::RoutingError => 404,
+        ActionController::UrlGenerationError => 404,
         ::AbstractController::ActionNotFound => 404,
-        ActionController::UnknownController => 406,
+        ActionController::UnknownController => 404,
+        ActionController::UnknownFormat => 406,
         ActiveRecord::RecordNotFound => 404
-
-      }
+      }.freeze
 
       def self.included(base)
         unless Rails.application.config.consider_all_requests_local
@@ -32,9 +33,9 @@ module Seek
       end
 
       def exception_notification(status, exception)
-        unless !Seek::Config.exception_notification_enabled || status == 404
+        unless !Seek::Config.exception_notification_enabled || [404, 406].include?(status)
           begin
-            ExceptionNotifier::Notifier.exception_notification(request.env, exception).deliver
+            ExceptionNotifier::Notifier.notify_exception(exception, options.merge(env: env)).deliver_now
           rescue
             logger.error "ERROR - #{exception.class.name} (#{exception.message})"
           end

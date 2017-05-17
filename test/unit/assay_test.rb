@@ -325,8 +325,8 @@ class AssayTest < ActiveSupport::TestCase
     end
 
     assay.reload
-    assert_include assay.strains, strain
-    assert_include assay.organisms, organism
+    assert_includes assay.strains, strain
+    assert_includes assay.organisms, organism
 
     assert_no_difference('AssayOrganism.count') do
       assert_no_difference('Strain.count') do
@@ -345,8 +345,8 @@ class AssayTest < ActiveSupport::TestCase
     end
 
     assay.reload
-    assert_include assay.strains, strain
-    assert_include assay.organisms, organism
+    assert_includes assay.strains, strain
+    assert_includes assay.organisms, organism
     ao = assay.assay_organisms.find { |ao| ao.strain == strain }
     assert_equal culture_growth, ao.culture_growth_type
   end

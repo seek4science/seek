@@ -86,8 +86,8 @@
           confirm_string.concat("Are you sure you want to remove this compound#{synonyms.blank? ? ', ' : ', synonyms'}#{(confirm_string.blank? and confirm_string_synonyms.blank?) ? '' : ', links'}.This cannot be undone.")
        %>
        <%= link_to image("destroy",:alt=>"Delete",:title=>"Delete this compound"),
-         { :action => "destroy", :id => compound.id},
-         :confirm => "#{confirm_string}", :method=>:delete, :remote => true
+         { :action => "destroy", :id => compound.id}, data: { confirm:  "#{confirm_string}" },
+                   :method=>:delete, :remote => true
        -%>
     </li>
 

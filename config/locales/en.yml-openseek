@@ -3,44 +3,30 @@ en:
   search_label: ""
   search_prompt: "Search here..."
 
-  #Investigation
   investigation: "Investigation"
-
-  #Study
   study: "Study"
-
-  #Assay
+  assay: "Assay"
   assays:
     assay: "Assay"
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
 
-
-  #DataFile
   data_file: "Data file"
-
-  #Model
   model: "Model"
-
-  #Sop
   sop: "SOP"
-
-  #Presentation
+  publication: "Publication"
   presentation: "Presentation"
-
-  #Event
+  workflow: "Workflow"
   event: "Event"
 
-  #Project
-  project: "Project"
-
-  #Programme
-  programme: "Programme"
-
-  #Workflow
-  workflow: "Workflow"
-
+  sample: "Sample"
+  strain: "Strain"
   scale: "Scale"
+
+  person: "Person"
+  project: "Project"
+  institution: "Institution"
+  programme: "Programme"
 
   gadget:
     new_heading: "New or upload"

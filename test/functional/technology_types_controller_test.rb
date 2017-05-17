@@ -14,7 +14,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     logout
     get :show, uri: assay.technology_type_uri
     assert_response :success
-    assert_select 'h1', text: /Technology type &#x27;Imaging&#x27;/
+    assert_select 'h1', text: /Technology type 'Imaging'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -27,7 +27,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     logout
     get :show, uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type'
     assert_response :success
-    assert_select 'h1', text: /Technology type &#x27;Technology type&#x27;/
+    assert_select 'h1', text: /Technology type 'Technology type'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -38,7 +38,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, policy: Factory(:public_policy)
     get :show
     assert_response :success
-    assert_select 'h1', text: /Technology type &#x27;Technology type&#x27;/
+    assert_select 'h1', text: /Technology type 'Technology type'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -64,7 +64,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     get :show, uri: assay.technology_type_uri, label: 'frog'
     # undefined label with uri in ontology will go to suggestion page pointing to term with ontology label
     assert_not_nil flash[:notice]
-    assert_select 'h1', text: /Technology type &#x27;frog&#x27;/
+    assert_select 'h1', text: /Technology type 'frog'/
     assert_select 'div.list_items_container', count: 0
   end
 
@@ -73,7 +73,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, policy: Factory(:public_policy)
     # with correct label
     get :show, uri: assay.technology_type_uri, label: assay.technology_type_label
-    assert_select 'h1', text: /Technology type &#x27;#{assay.technology_type_label}&#x27;/
+    assert_select 'h1', text: /Technology type '#{assay.technology_type_label}'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -82,7 +82,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, policy: Factory(:public_policy)
     # without label
     get :show, uri: assay.technology_type_uri
-    assert_select 'h1', text: /Technology type &#x27;#{assay.technology_type_label}&#x27;/
+    assert_select 'h1', text: /Technology type '#{assay.technology_type_label}'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -95,7 +95,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
 
     # with correct label
     get :show, uri: suggested_technology_type.uri, label: 'this is a techno type'
-    assert_select 'h1', text: /Technology type &#x27;this is a techno type&#x27;/
+    assert_select 'h1', text: /Technology type 'this is a techno type'/
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(assay), text: /#{assay.title}/
     end
@@ -106,7 +106,7 @@ class TechnologyTypesControllerTest < ActionController::TestCase
     assay = Factory :experimental_assay, suggested_technology_type: suggested_technology_type, policy: Factory(:public_policy)
     get :show, uri: assay.technology_type_uri, label: 'frog'
     assert_not_nil flash[:notice]
-    assert_select 'h1', text: /Technology type &#x27;frog&#x27;/
+    assert_select 'h1', text: /Technology type 'frog'/
     assert_select 'div.list_items_container', count: 0
   end
 end

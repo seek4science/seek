@@ -21,12 +21,14 @@ class AttributeTypeHandlerFactoryTest < ActiveSupport::TestCase
   end
 
   test 'exception for invalid type' do
-    assert_raise_with_message(Seek::Samples::AttributeTypeHandlers::UnrecognisedAttributeHandlerType, "unrecognised attribute base type 'fish'") do
+    e = assert_raise(Seek::Samples::AttributeTypeHandlers::UnrecognisedAttributeHandlerType) do
       @factory.for_base_type('fish')
     end
+    assert_equal "unrecognised attribute base type 'fish'", e.message
 
-    assert_raise_with_message(Seek::Samples::AttributeTypeHandlers::UnrecognisedAttributeHandlerType, "unrecognised attribute base type 'fish'") do
+    e = assert_raise(Seek::Samples::AttributeTypeHandlers::UnrecognisedAttributeHandlerType) do
       @factory.for_base_type('fish')
     end
+    assert_equal "unrecognised attribute base type 'fish'", e.message
   end
 end

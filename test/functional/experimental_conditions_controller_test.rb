@@ -157,7 +157,8 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal ec.experimental_condition_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
-    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: {}, substance_list: cp.name
+    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: ec.measured_item_id },
+        substance_list: cp.name
     ec_updated = assigns(:experimental_condition)
     assert_not_nil ec_updated
     assert ec_updated.valid?
@@ -244,7 +245,7 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     sop = sops(:editable_sop)
     mi = measured_items(:growth_medium)
     ec = { measured_item_id: mi.id }
-    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, annotation: { attribute: 'description', value: 'test value' }
+    post :create, experimental_condition: ec, sop_id: sop.id, version: sop.version, annotation: { annotation_attribute: 'description', value: 'test value' }
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?
@@ -257,7 +258,8 @@ class ExperimentalConditionsControllerTest < ActionController::TestCase
     assert_equal measured_items(:growth_medium), ec.measured_item
     assert_equal 'one value', ec.annotations_with_attribute('description').first.value.text
 
-    put :update, id: ec.id, sop_id: ec.sop.id, annotation: { attribute: 'description', value: 'update value' }
+    put :update, id: ec.id, sop_id: ec.sop.id, experimental_condition: { measured_item_id: ec.measured_item_id },
+        annotation: { annotation_attribute: 'description', value: 'update value' }
     ec = assigns(:experimental_condition)
     assert_not_nil ec
     assert ec.valid?

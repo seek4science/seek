@@ -3,7 +3,7 @@
    associated_count=tag.annotations.count
 
 -%>
-<% contexts=tag.annotations.collect{|a| a.attribute.name}.uniq -%>
+<% contexts=tag.annotations.collect{|a| a.annotation_attribute.name}.uniq -%>
 <tr>
   <td><%= tag.id -%></td>
   <td class="<%= name_class -%>"><%= h(tag.text) -%></td>
@@ -12,7 +12,8 @@
   <td>
 
     <%= link_to image("edit",:title=>"Edit"),:action=>:edit_tag,:id=>tag.id unless associated_count==0 %>
-    <%= link_to image("destroy",:title=>"Delete"),{:action=>:delete_tag,:id=>tag.id},:confirm=>"Are you sure?",:method=>:post -%>
+    <%= link_to image("destroy",:title=>"Delete"),{:action=>:delete_tag,:id=>tag.id}, data: { confirm: 'Are you sure?' },
+                :method=>:post -%>
 
   </td>
 </tr>

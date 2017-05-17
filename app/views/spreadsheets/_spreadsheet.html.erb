@@ -104,7 +104,7 @@
     function displayAnnotation(){
         <% a = Annotation.find_by_id(params[:annotation_id]) %>
         <% if a %>
-        var ann = new annotation(<%= a.id -%>, '<%= a.attribute.name -%>', <%= a.annotatable.worksheet.sheet_number -%>, '<%= a.annotatable.cell_range -%>', '<%= h escape_javascript a.value.text -%>', '<%= time_ago_in_words(a.created_at) -%> ago')
+        var ann = new annotation(<%= a.id -%>, '<%= a.annotation_attribute.name -%>', <%= a.annotatable.worksheet.sheet_number -%>, '<%= a.annotatable.cell_range -%>', '<%= h escape_javascript a.value.text -%>', '<%= time_ago_in_words(a.created_at) -%> ago')
         jumpToAnnotation(ann.id, ann.sheetNumber+1, ann.cellRange);
         <% end %>
     }

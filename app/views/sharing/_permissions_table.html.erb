@@ -1,0 +1,27 @@
+<div class="table-responsive">
+  <permissions-table class="table table-bordered" id="permissions-table"
+                     :permissions="permissions" :public-permission="publicPermission">
+  </permissions-table>
+</div>
+
+<%= render partial: 'sharing/person_permission_modal', locals: { object: object } %>
+<%= render partial: 'sharing/group_permission_modal', locals: { object: object } %>
+
+<script>
+  var policy = <%= policy_json(policy, projects) -%>;
+
+  <%# A deep copy of the policy that is used in `Sharing.permissionsChanged` to check if it has been modified %>
+  var originalPolicy = $j.extend(true, {}, policy);
+
+  Sharing.permissionsTable = new Vue({
+    el: '#permissions-table',
+    data: {
+      publicPermission: {
+        access_type: policy.access_type, <%# Uses snake case because that's how rails returns the JSON %>
+        title: 'Public',
+        isPublic: true,
+        isMandatory: true },
+      permissions: policy.permissions
+    }
+  });
+</script>

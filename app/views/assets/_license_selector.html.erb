@@ -1,4 +1,4 @@
-<% default_license ||= 'CC-BY-4.0' %>
+<% default_license ||= Seek::Config.default_license %>
 <% accessor ||= :license %>
 <% selected_license = resource.send(accessor) %>
 <% selected_license = (resource.new_record? ? default_license : Seek::License::NULL_LICENSE) if selected_license.nil? %>
@@ -24,8 +24,4 @@
         $j('#license-select').change(zenodoExport.setLicenseUrl); // Set URL on user change
         zenodoExport.setLicenseUrl(); // Set URL on initial page load
     });
-
-    <% if enable_auto_project_license? %>
-        <%= render :partial=>'projects/select_license_when_project_changes', :formats=>[:js] %>
-    <% end %>
 </script>

@@ -7,7 +7,7 @@ class ModelsControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   def setup
     login_as(:model_owner)
@@ -236,7 +236,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.models, m
 
-    put :update, id: m, model: {}, assay_ids: [new_assay.id.to_s]
+    put :update, id: m, model: { title: m.title }, assay_ids: [new_assay.id.to_s]
 
     assert_redirected_to model_path(m)
     m.reload
@@ -259,7 +259,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal [scale1, scale2], m.scales
     scale3 = Factory(:scale)
 
-    put :update, id: m.id, scale_ids: [scale3.id.to_s]
+    put :update, id: m.id, model: { title: m.title }, scale_ids: [scale3.id.to_s]
     m = assigns(:model)
     assert_equal [scale3], m.scales
   end
@@ -319,7 +319,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert m.valid?
       assert m.policy.valid?
       assert_equal Policy::NO_ACCESS, m.policy.access_type
-      assert_blank m.policy.permissions
+      assert m.policy.permissions.blank?
     end
   end
 
@@ -399,7 +399,10 @@ class ModelsControllerTest < ActionController::TestCase
     m = models(:model_with_format_and_type)
     assert_difference('Model::Version.count', 1) do
       assert_difference('ModelImage.count') do
-        post :new_version, id: m, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }], revision_comment: 'This is a new revision', model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+        post :new_version, id: m, model: { title: m.title },
+             content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
+             revision_comment: 'This is a new revision',
+             model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
       end
     end
 
@@ -429,7 +432,10 @@ class ModelsControllerTest < ActionController::TestCase
     model_details[:imported_url] = 'http://biomodels/model.xml'
 
     assert_difference('Model.count') do
-      post :create, model: model_details, policy_attributes: valid_sharing, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+      post :create, model: model_details,
+           content_blobs: [{ data: file_for_upload }],
+           policy_attributes: valid_sharing,
+           model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
     end
     model = assigns(:model)
     assert_redirected_to model_path(model)
@@ -579,7 +585,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should update model' do
-    put :update, id: models(:teusink).id, model: {}
+    put :update, id: models(:teusink).id, model: { title: 'a' }
     assert_redirected_to model_path(assigns(:model))
   end
 
@@ -633,7 +639,9 @@ class ModelsControllerTest < ActionController::TestCase
   def test_should_create_new_version
     m = models(:model_with_format_and_type)
     assert_difference('Model::Version.count', 1) do
-      post :new_version, id: m, model: {}, content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }], revision_comment: 'This is a new revision'
+      post :new_version, id: m, model: { title: m.title},
+           content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
+           revision_comment: 'This is a new revision'
     end
 
     assert_redirected_to model_path(m)
@@ -655,7 +663,7 @@ class ModelsControllerTest < ActionController::TestCase
   def test_should_add_nofollow_to_links_in_show_page
     get :show, id: models(:model_with_links_in_description)
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
     end
   end
 
@@ -944,7 +952,7 @@ class ModelsControllerTest < ActionController::TestCase
     model.save
     get :show, id: model
 
-    assert_select 'div', text: /another creator/, count: 1
+    assert_select 'div', text: 'another creator', count: 1
   end
 
   test 'should create new model version based on content_blobs of previous version' do
@@ -952,7 +960,7 @@ class ModelsControllerTest < ActionController::TestCase
     retained_content_blob = m.content_blobs.first
     login_as(m.contributor)
     assert_difference('Model::Version.count', 1) do
-      post :new_version, id: m, model: {}, content_blobs: [{ data: file_for_upload }],
+      post :new_version, id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload }],
                          retained_content_blob_ids: [retained_content_blob.id]
     end
 

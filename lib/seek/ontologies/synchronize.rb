@@ -3,7 +3,7 @@ module Seek
   module Ontologies
     class Synchronize
       def initialize
-        puts 'clearing caches'
+        Rails.logger.debug 'clearing caches'
         Rails.cache.clear
       end
 
@@ -23,7 +23,7 @@ module Seek
         # check for label in ontology
         found_suggested_types = get_suggested_types_found_in_ontology(type)
 
-        puts "matching suggested #{type.pluralize} found in ontology: #{found_suggested_types.map(&:label).join(', ')}"
+        Rails.logger.debug "matching suggested #{type.pluralize} found in ontology: #{found_suggested_types.map(&:label).join(', ')}"
 
         replace_suggested_types_with_ontology(found_suggested_types, type)
 
@@ -41,7 +41,7 @@ module Seek
 
         # check all assay uri-s, for those that don't exist in ontology. This is unusual and uris shouldn't be removed
         # revert to top level uri - print warning
-        puts "#{assays_for_update.count} assays found where the #{type} no longer exists in the ontology".green
+        Rails.logger.debug "#{assays_for_update.count} assays found where the #{type} no longer exists in the ontology".green
         disable_authorization_checks do
           assays_for_update.each do |assay|
             assay.send("use_default_#{type}_uri!")
@@ -70,17 +70,17 @@ module Seek
 
       def update_suggested_type(suggested_type)
         suggested_type.label = suggested_type.label + '2'
-        puts "suggested label updated to #{suggested_type.label}"
+        Rails.logger.debug "suggested label updated to #{suggested_type.label}"
         suggested_type.save
       end
 
       def update_assays_and_remove_suggested_type(assays, suggested_type, type, new_ontology_uri)
         assays.each do |assay|
-          puts "updating assay: #{assay.id} with the new #{type} uri #{new_ontology_uri}".green
+          Rails.logger.debug "updating assay: #{assay.id} with the new #{type} uri #{new_ontology_uri}".green
           assay.send("#{type}_uri=", new_ontology_uri)
           assay.save
         end
-        puts "destroying suggested type #{suggested_type.id} with label #{suggested_type.label}".green
+        Rails.logger.debug "destroying suggested type #{suggested_type.id} with label #{suggested_type.label}".green
         suggested_type.destroy
       end
 

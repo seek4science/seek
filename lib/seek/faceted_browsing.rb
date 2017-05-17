@@ -53,7 +53,7 @@ module Seek
       item_ids.collect!(&:to_i)
       unless item_type.blank?
         clazz = item_type.constantize
-        items = clazz.find_all_by_id(item_ids)
+        items = clazz.where(id: item_ids)
         if clazz.respond_to?(:authorize_asset_collection)
           items = clazz.authorize_asset_collection(items, 'view')
         else

@@ -67,7 +67,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             options["columnDefs"].push({
                 "targets": strainColumns,
                 "render": function (data, type, row) {
-                    if(data.id) {
+                    if(data && data.id) {
                         if (data.title)
                             return '<a href="/strains/' + data.id + '">' + data.title + '</a>';
                         else
