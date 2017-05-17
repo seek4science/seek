@@ -114,8 +114,6 @@ module AdminHelper
     end
   end
 
-  private
-
   def admin_setting_block(title, description)
     content_tag(:div, class: 'form-group') do
       content_tag(:label, title) +
