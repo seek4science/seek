@@ -179,9 +179,9 @@ class AssaysController < ApplicationController
   end
 
   def update_assets_linked_to_assay assay,params
-    sop_ids               = params[:assay_sop_ids] || []
+    sop_ids               = params[:assay][:sop_ids] || []
+    model_ids             = params[:assay][:model_ids] || []
     data_files            = params[:data_files] || []
-    model_ids             = params[:model_ids] || []
     samples               = params[:samples] || []
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
@@ -191,11 +191,11 @@ class AssaysController < ApplicationController
                                               relationship: RelationshipType.find_by_id(data_file[:relationship_type])
       ) if d.can_view?
     end
-    Array(model_ids).each do |id|
+    Array(model_ids).reject(&:blank?).each do |id|
       m = Model.find(id)
       assay_assets_to_keep << assay.associate(m) if m.can_view?
     end
-    Array(sop_ids).each do |id|
+    Array(sop_ids).reject(&:blank?).each do |id|
       s = Sop.find(id)
       assay_assets_to_keep << assay.associate(s) if s.can_view?
     end
@@ -224,7 +224,7 @@ class AssaysController < ApplicationController
   private
 
   def assay_params
-    params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
+    params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, { sop_ids: [] },
                                   :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset)
   end
 

@@ -108,23 +108,20 @@ class PublicationsController < ApplicationController
 
     update_annotations(params[:tag_list], @publication)
 
-    investigation_ids = params[:investigation_ids] || []
-    study_ids = params[:study_ids] || []
-    assay_ids = params[:assay_ids] || []
-    data_files = params[:data_files] || []
-    model_ids = params[:model_ids] || []
-
     respond_to do |format|
       if valid && @publication.update_attributes(publication_params)
 
         # Update association
+        investigation_ids = params[:investigation_ids] || []
+        study_ids = params[:study_ids] || []
+        assay_ids = params[:assay_ids] || []
+        data_files = params[:data_files] || []
+        model_ids = params[:publication][:model_ids].reject(&:blank?) || []
+
         create_or_update_associations investigation_ids, 'Investigation', 'view'
         create_or_update_associations study_ids, 'Study', 'view'
         create_or_update_associations assay_ids, 'Assay', 'edit'
-
-        data_files = data_files.map { |df| df['id'] }
-        create_or_update_associations data_files, 'DataFile', 'view'
-
+        create_or_update_associations data_files.map { |df| df['id'] }, 'DataFile', 'view'
         create_or_update_associations model_ids, 'Model', 'view'
 
         # Create policy if not present (should be)

@@ -8,14 +8,6 @@ module FancyMultiselectHelper
     # - SetDefaultsWithReflection
     set_defaults_with_reflection(association, object, options)
 
-    # Disable preview if no controller or controller class does not define a preview method
-    controller = begin
-                   "#{association.to_s.classify.pluralize}Controller".constantize
-                 rescue
-                   nil
-                 end
-    options[:preview_disabled] = options[:preview_disabled] || controller.nil? || !controller.method_defined?(:preview)
-
     # Set onchange options for select
     options[:possibilities_options][:onchange] = select_onchange_options(association, options)
 
@@ -42,6 +34,8 @@ module FancyMultiselectHelper
     hidden = object.send(association).blank?
     object_type_text = options[:object_type_text] || t(object.class.name.underscore)
     association_text = t(association.to_s.singularize)
+    association_controller = "#{association.to_s.classify.pluralize}Controller".constantize rescue nil
+
     {
       intro: "The following #{association_text.pluralize} are associated with this #{object_type_text.downcase}:",
       default_choice_text: "Select #{association_text} ...",
@@ -59,7 +53,8 @@ module FancyMultiselectHelper
       possibilities_options: {},
       hidden: hidden,
       required: false,
-      title: nil
+      title: nil,
+      preview_disabled: association_controller.nil? || !association_controller.method_defined?(:preview)
     }
   end
 
