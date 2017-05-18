@@ -31,7 +31,7 @@ gem 'daemons'
 gem 'cancan'
 gem 'linkeddata'
 gem 'openseek-api'
-gem 'jbuilder'
+gem 'jbuilder', '~> 2.0'
 gem 'jbuilder-json_api'
 gem 'jsonapi-serializers'
 
@@ -124,8 +124,6 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'activerecord-session_store'
 # gem 'protected_attributes' # Delete me after refactoring
 gem 'rails-observers'
-
-gem 'jbuilder', '~> 2.0'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
