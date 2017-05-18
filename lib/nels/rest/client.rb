@@ -17,6 +17,10 @@ module Nels
         perform('user-info', :get)
       end
 
+      def projects
+        perform('sbi/projects', :get)
+      end
+
       private
 
       def perform(path, method, opts = {})
