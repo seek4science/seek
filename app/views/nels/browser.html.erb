@@ -1,0 +1,40 @@
+Logged in as <%# @rest_client.user_info['name'] %>
+
+<div id="nels-tree"></div>
+
+<script type="text/javascript">
+    $j(document).ready(function () {
+        $j('#nels-tree')
+            .bind('loaded.jstree', function() {})
+            .jstree({
+                'core': {
+                    'check_callback': true,
+                    'force_text': true,
+                    'data' : {
+                        'url': function (node) {
+                            console.log(node);
+                            if (node.id === '#') {
+                                return 'nels_projects';
+                            } else if (node.data.project_id) {
+                                return 'nels_data';
+                            } else {
+                                return 'nels_datasets';
+                            }
+                        },
+                        'data': function (node) {
+                            if (node.id === '#') {
+                                return {};
+                            }
+
+                            var d = { id: node.data.id };
+                            if (node.data.project_id) {
+                                d.project_id = node.data.project_id
+                            }
+                            return d;
+                        }
+                    }
+                }
+            });
+    });
+</script>
+

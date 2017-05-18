@@ -1,0 +1,33 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title><%= page_title controller.controller_name, controller.action_name %></title>
+
+  <%= favicon_link_tag('favicon.png', :type => 'image/png') %>
+  <%= csrf_meta_tag %>
+  <%= seek_stylesheet_tags %>
+  <%= seek_javascript_tags %>
+
+  <link href="#data" type="application/json" rel="exhibit-data" />
+</head>
+
+<body id="body">
+
+<%= render :partial=>"layouts/navbar/navbar" %>
+
+<div id="content">
+  <div class="container-fluid">
+    <%# main content part of every page -%>
+    <%= yield :layout %>
+  </div>
+</div>
+
+<%= render :partial=>"layouts/footer" %>
+
+<%= render partial: 'layouts/piwik' if Seek::Config.piwik_analytics_enabled %>
+<%= analytics_init if Seek::Config.google_analytics_enabled %>
+</body>
+</html>

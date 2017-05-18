@@ -771,6 +771,9 @@ SEEK::Application.routes.draw do
   get "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
   get "/seek_nels" => "nels#callback", as: 'nels_oauth_callback'
   get "/nels" => "nels#browser", as: 'nels_browser'
+  get "/nels_projects" => "nels#projects", as: 'nels_projects'
+  get "/nels_datasets" => "nels#datasets", as: 'nels_datasets'
+  get "/nels_data" => "nels#data", as: 'nels_data'
 
   get "/citation/*doi(.:format)" => "citations#fetch", :as => :citation
 
