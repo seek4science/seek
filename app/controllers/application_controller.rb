@@ -1,3 +1,4 @@
+# coding: utf-8
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
@@ -586,11 +587,11 @@ class ApplicationController < ActionController::Base
   # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
   # by steffen.brinkmann@h-its.org
   # 2017-04-18
-  def unescape_response()
-    response_body[0].gsub!(/\\u([0-9a-z]{4})/) { |s|
-      [$1.to_i(16)].pack("U")
-    }
-  end
+#  def unescape_response()
+#    response_body[0].gsub!(/\\u([0-9a-z]{4})/) { |s|
+#      [$1.to_i(16)].pack("U")
+#    }
+#  end
 
   def policy_params
     params.slice(:policy_attributes).permit(
