@@ -48,7 +48,7 @@ class ExperimentalConditionsController < ApplicationController
     new_experimental_conditions = []
     #retrieve the selected FSes
     params.each do |key, value|
-       if key.match('checkbox_')
+       if key =~ /checkbox_/
          experimental_condition_ids.push value.to_i
        end
     end
