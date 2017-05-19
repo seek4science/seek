@@ -1,14 +1,14 @@
 class NelsController < ApplicationController
 
   before_filter :oauth_client
- # before_filter :nels_oauth_session, only: :browser
- # before_filter :rest_client, only: [:browser, :datasets, :data]
+  before_filter :nels_oauth_session, except: :callback
+  before_filter :rest_client, except: :callback
 
   def callback
     hash = @oauth_client.get_token(params[:code])
 
     oauth_session = current_user.oauth_sessions.where(provider: 'NeLS').first_or_initialize
-    oauth_session.update_attributes(access_token: hash['access_token'], expires_in: 1.hour)
+    oauth_session.update_attributes(access_token: hash['access_token'], expires_in: 2.hours)
 
     redirect_to nels_browser_path
   end
@@ -20,30 +20,26 @@ class NelsController < ApplicationController
   end
 
   def projects
-    @data = [{"id"=>1123122, "name"=>"seek_pilot1"}, {"id"=>1123123, "name"=>"seek_pilot2"}]
-    tree_data = @data.map { |n| { id: "project#{n['id']}", text: n['name'], parent: '#', state: { loaded: false },
-                                  data: { id: n['id'] } } }
+    @projects = @rest_client.projects
+
     respond_to do |format|
-      format.json { render json: tree_data.to_json }
+      format.json
     end
   end
 
   def datasets
-    @data = [{ 'name' => 'test dataset', 'id' => rand(99999) }, { 'name' => 'test dataset2', 'id' => rand(99999) }] # @rest_client.datasets(params[:id])
-    tree_data = @data.map { |n| { id: "dataset#{n['id']}", text: n['name'], parent: "project#{params[:id]}",
-                                  state: { loaded: false },
-                                  data: { id: n['id'], project_id: params[:id] } } }
+    @datasets = @rest_client.datasets(params[:id].to_i)
+
     respond_to do |format|
-      format.json { render json: tree_data.to_json }
+      format.json
     end
   end
 
   def data
-    @data = [{ 'name' => 'test data', 'id' => rand(99999) }, { 'name' => 'test data2', 'id' => rand(99999) }] # @rest_client.data(params[:project_id], params[:id])
-    tree_data = @data.map { |n| { id: "data#{n['id']}", text: n['name'], parent: "dataset#{params[:id]}",
-                                  data: { id: n['id'], project_id: params[:project_id], dataset_id: params[:id] } } }
+    @data = @rest_client.data(params[:project_id].to_i, params[:id].to_i)
+
     respond_to do |format|
-      format.json { render json: tree_data.to_json }
+      format.json
     end
   end
 
