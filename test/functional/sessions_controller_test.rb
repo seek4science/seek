@@ -174,7 +174,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert !Seek::Config.omniauth_enabled
     get :new
     assert_response :success
-    assert_select 'title', text: /The.*SEEK Login/, count: 1
+    assert_select 'title', text: 'Login', count: 1
     assert_select '#login-panel form', 1
   end
 
