@@ -23,8 +23,6 @@ class Assay < ActiveRecord::Base
   acts_as_isa
   acts_as_snapshottable
 
-  acts_as_annotatable name_field: :title
-
   belongs_to :institution
 
   belongs_to :study

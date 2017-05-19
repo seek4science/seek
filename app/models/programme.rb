@@ -13,7 +13,6 @@ class Programme < ActiveRecord::Base
   end
 
   acts_as_yellow_pages
-  acts_as_annotatable name_field: :title
 
   # associations
   has_many :projects, dependent: :nullify

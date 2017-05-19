@@ -14,7 +14,7 @@ class Person < ActiveRecord::Base
   before_destroy :clean_up_and_assign_permissions
 
   acts_as_notifiee
-  acts_as_annotatable name_field: :name
+
 
   validates_presence_of :email
 
