@@ -59,7 +59,7 @@ class NelsController < ApplicationController
   end
 
   def rest_client
-    @rest_client = Nels::Rest::Client.new(@oauth_session.access_token)
+    @rest_client = Nels::Rest::DummyClient.new(@oauth_session.access_token)
   end
 
 end
