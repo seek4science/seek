@@ -19,7 +19,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK Publications.*/, count: 1
+    assert_select 'title', text: 'Publications', count: 1
   end
 
   test 'should get index' do

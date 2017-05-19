@@ -26,7 +26,13 @@ class DataFilesControllerTest < ActionController::TestCase
   def test_title
     get :index
     assert_response :success
-    assert_select 'title', text: /The Sysmo SEEK Data.*/, count: 1
+    assert_select 'title', text: 'Data files', count: 1
+
+    df = Factory(:data_file,contributor:User.current_user.person)
+    get :show, id:df
+    assert_response :success
+    assert_select 'title', text: df.title, count: 1
+
   end
 
   # because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent

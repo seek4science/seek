@@ -298,10 +298,15 @@ module ApplicationHelper
   end
 
   def page_title(controller_name, _action_name)
-    name = PAGE_TITLES[controller_name]
-    name ||= ''
-    name += ' (Development)' if Rails.env.development?
-    "The #{Seek::Config.application_name} " + name
+    resource=resource_for_controller
+    if resource && resource.respond_to?(:title) && resource.title
+      h(resource.title)
+    elsif PAGE_TITLES[controller_name]
+      PAGE_TITLES[controller_name]
+    else
+      "The #{Seek::Config.application_name}"
+    end
+
   end
 
   def favourite_group_popup_link_action_new(resource_type = nil)

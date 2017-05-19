@@ -63,7 +63,7 @@ class SessionsControllerTest < ActionController::TestCase
 
   def test_title
     get :new
-    assert_select 'title', text: /The Sysmo SEEK.*/, count: 1
+    assert_select 'title', text: 'Login', count: 1
   end
 
   def test_should_login_and_redirect

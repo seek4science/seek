@@ -18,7 +18,7 @@ class EventsControllerTest < ActionController::TestCase
   def test_title
     get :index
     assert_response :success
-    assert_select 'title', text: /The Sysmo SEEK.*/, count: 1
+    assert_select 'title', text: /Events/, count: 1
   end
 
   test 'should show index' do

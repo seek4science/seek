@@ -18,7 +18,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK People.*/, count: 1
+    assert_select 'title', text: 'People', count: 1
   end
 
   def test_xml_for_person_with_tools_and_expertise

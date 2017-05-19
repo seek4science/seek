@@ -20,7 +20,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK #{I18n.t('project').pluralize}.*/, count: 1
+    assert_select 'title', text: I18n.t('project').pluralize, count: 1
   end
 
   def test_should_get_index
