@@ -18,6 +18,7 @@ class Sample < ActiveRecord::Base
   belongs_to :originating_data_file, class_name: 'DataFile'
   has_many :sample_resource_links, dependent: :destroy
   has_many :strains, through: :sample_resource_links, source: :resource, source_type: 'Strain'
+  has_many :organisms, through: :strains
 
   scope :default_order, -> { order('title') }
 
