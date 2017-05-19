@@ -112,5 +112,33 @@ module Seek
         persistent_classes.select(&:supports_doi?).sort_by(&:name)
       end
     end
+
+    # determines the batch size for bulk inserts, as sqlite3 below version 3.7.11 doesn't handle it and requires a size
+    # of 1
+    def self.bulk_insert_batch_size
+      @@bulk_insert_batch_size ||= begin
+        default_size=10
+        if database_type =='sqlite3' && !sqlite3_supports_bulk_inserts
+          Rails.logger.info("Sqlite3 version < 3.7.11 detected, so using single rather than bulk inserts")
+          1
+        else
+          default_size
+        end
+      end
+    end
+
+    # whether the sqlite3 version can support bulk inserts, needs to be 3.7.11 or greater
+    def self.sqlite3_supports_bulk_inserts
+      Gem::Version.new(sqlite3_version) >= Gem::Version.new('3.7.11')
+    end
+
+    # the version of the current sqlite3 database
+    def self.sqlite3_version
+      @@sqlite3_version ||= ActiveRecord::Base.connection.select_one('SELECT SQLITE_VERSION()').values[0]
+    end
+
+    def self.database_type
+      ActiveRecord::Base.connection.instance_values['config'][:adapter]
+    end
   end
 end
