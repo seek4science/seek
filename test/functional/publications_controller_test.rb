@@ -200,9 +200,9 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should only show the year for 1st Jan in list view' do
-    disable_authorization_checks{Publication.destroy_all}
+    disable_authorization_checks { Publication.destroy_all }
     publication = Factory(:publication, published_date: Date.new(2013, 1, 1), title: 'blah blah blah science')
-    assert_equal 1,Publication.count
+    assert_equal 1, Publication.count
     get :index
     assert_response :success
 
@@ -220,7 +220,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should export publication as endnote' do
     publication_formatter_mock
-    get :show, id: publications(:one), format: 'enw'
+    get :show, id: publication_for_export_tests, format: 'enw'
     assert_response :success
     assert_match(/%0 Journal Article.*/, response.body)
     assert_match(/.*%A Hendrickson, W\. A\..*/, response.body)
@@ -246,7 +246,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should export publication as bibtex' do
     publication_formatter_mock
-    get :show, id: publications(:one), format: 'bibtex'
+    get :show, id: publication_for_export_tests, format: 'bibtex'
     assert_response :success
     assert_match(/@article{PMID:5,.*/, response.body)
     assert_match(/.*author.*/, response.body)
@@ -260,7 +260,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should export publication as embl' do
     publication_formatter_mock
-    get :show, id: publications(:one), format: 'embl'
+    get :show, id: publication_for_export_tests, format: 'embl'
     assert_response :success
     assert_match(/RX   PUBMED; 5\..*/, response.body)
     assert_match(/.*RT   \"Atomic models for the polypeptide backbones of myohemerythrin and\nRT   hemerythrin.\";.*/, response.body)
@@ -415,7 +415,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: ["#{investigation.id}"]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: [investigation.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -445,7 +445,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, study_ids: ["#{study.id}"]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, study_ids: [study.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -520,8 +520,8 @@ class PublicationsControllerTest < ActionController::TestCase
       assert_difference('PublicationAuthor.count', 0) do
         assert_difference('AssetsCreator.count', 2) do
           put :update, id: p.id, publication: { abstract: p.abstract },
-              author: { p.publication_authors[1].id => seek_author2.id,
-                        p.publication_authors[0].id => seek_author1.id }
+                       author: { p.publication_authors[1].id => seek_author2.id,
+                                 p.publication_authors[0].id => seek_author1.id }
         end
       end
     end
@@ -596,8 +596,8 @@ class PublicationsControllerTest < ActionController::TestCase
       assert_difference('publication.non_seek_authors.count', -2) do
         assert_difference('AssetsCreator.count', 2) do
           put :update, id: publication.id, publication: { abstract: publication.abstract },
-              author: { publication.non_seek_authors[12].id => seek_author1.id,
-                        publication.non_seek_authors[15].id => seek_author2.id }
+                       author: { publication.non_seek_authors[12].id => seek_author1.id,
+                                 publication.non_seek_authors[15].id => seek_author2.id }
         end
       end
     end
@@ -640,8 +640,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_difference('publication.non_seek_authors.count', -2) do
       assert_difference('AssetsCreator.count', 2) do
         put :update, id: publication.id, publication: { abstract: publication.abstract },
-            author: { publication.non_seek_authors[12].id => seek_author1.id,
-                      publication.non_seek_authors[15].id => seek_author2.id }
+                     author: { publication.non_seek_authors[12].id => seek_author1.id,
+                               publication.non_seek_authors[15].id => seek_author2.id }
       end
     end
     publication.reload
@@ -759,5 +759,14 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 'Bauers', authors[1]['last_name']
     assert_nil authors[1]['person_id']
     assert_equal 0, authors[1]['count']
+  end
+
+  private
+
+  def publication_for_export_tests
+    Factory(:publication, title: 'A paper on blabla',
+                          abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
+                          published_date: 5.days.ago.to_s(:db),
+                          pubmed_id: 5)
   end
 end
