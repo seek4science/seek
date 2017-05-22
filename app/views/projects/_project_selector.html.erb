@@ -24,7 +24,7 @@
 %>
 
 <%= folding_panel(title, false, id: "add_projects_form",
-                  help_text: "Here you can associate the #{object_type_text} with specific projects.") do %>
+                  help_text: "Here you can associate the #{object_type_text} with specific #{t('project').downcase.pluralize}.") do %>
     <p class="help-block">
       The following projects are associated with this <%= object_type_text -%>:
     </p>
