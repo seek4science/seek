@@ -12,7 +12,9 @@ namespace :seek do
   #these are the tasks required for this version upgrade
   task :upgrade_version_tasks => [
       :environment,
-      :ensure_maximum_public_access_type
+      :ensure_maximum_public_access_type,
+      :update_model_types
+
   ]
 
   #these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -40,30 +42,16 @@ namespace :seek do
     puts "Upgrade completed successfully"
   end
 
-  task(:consolidate_news_feeds=>:environment) do
-    Seek::Config.news_enabled = Seek::Config.community_news_enabled || Seek::Config.project_news_enabled
-    Seek::Config.news_feed_urls = [Seek::Config.community_news_feed_urls, Seek::Config.project_news_feed_urls].join(',')
-    Seek::Config.news_number_of_entries = Seek::Config.community_news_number_of_entries +
-        Seek::Config.project_news_number_of_entries
-  end
-
-  task(:delete_orphaned_strains=>:environment) do
-    puts "Checking for orphaned Strains..."
-    disable_authorization_checks do
-      Strain.where("organism_id is NOT NULL").select { |s| s.organism.nil? }.each do |strain|
-        puts "Deleting #{strain.title}"
-        strain.destroy
-      end
-    end
-    puts "Done"
-  end
-
   task(:ensure_maximum_public_access_type => :environment) do
     policies = Policy.where('access_type > ?', Policy.max_public_access_type)
     count = policies.count
     policies.each { |p| p.update_column(:access_type, Policy.max_public_access_type)}
 
     puts "#{count} policies updated"
+  end
+
+  task(:update_model_types => :environment) do
+    Rake::Task["db:seed:model_types"].invoke
   end
 
 end

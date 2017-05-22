@@ -27,3 +27,6 @@ stoichiometric:
 
 agent based modelling:
   title: Agent based modelling
+
+metabolic_network:
+  title: Metabolic network
