@@ -14,7 +14,7 @@
           <%= text_field_tag :search_term, @organism.title, :class => "form-control" %>
         </div>
 
-        <%= submit_tag "Search", :disable_with => "Searching ...", :class => 'btn btn-primary' %>
+        <%= submit_tag "Search", data: { disable_with: 'Searching ...' }, :class => 'btn btn-primary' %>
     <% end -%>
 
     <div id="search_results">

@@ -1,7 +1,4 @@
-require 'acts_as_versioned_resource'
-require 'explicit_versioning'
-require 'title_trimmer'
-require 'datacite/acts_as_doi_mintable'
+require_dependency 'seek/util'
 
 class DataFile < ActiveRecord::Base
   include Seek::Data::SpreadsheetExplorerRepresentation
@@ -18,14 +15,14 @@ class DataFile < ActiveRecord::Base
 
   include Seek::Dois::DoiGeneration
 
-  scope :default_order, order('title')
+  scope :default_order, -> { order('title') }
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-  has_one :content_blob, as: :asset, foreign_key: :asset_id, conditions: proc { ['content_blobs.asset_version =?', version] }
+  has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
 
-  has_many :studied_factors, conditions: proc { ['studied_factors.data_file_version =?', version] }
+  has_many :studied_factors, -> (r) { where('studied_factors.data_file_version =?', r.version) }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
   scope :with_extracted_samples, -> { joins(:extracted_samples).uniq }
@@ -36,9 +33,11 @@ class DataFile < ActiveRecord::Base
     acts_as_versioned_resource
     acts_as_favouritable
 
-    has_one :content_blob,:primary_key => :data_file_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version,parent.class.name]}
+    has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
+            :primary_key => :data_file_id,:foreign_key => :asset_id
 
-    has_many :studied_factors, primary_key: 'data_file_id', foreign_key: 'data_file_id', conditions: proc { ['studied_factors.data_file_version =?', version] }
+    has_many :studied_factors, -> (r) { where('studied_factors.data_file_version = ?', r.version) },
+             primary_key: 'data_file_id', foreign_key: 'data_file_id'
 
     def relationship_type(assay)
       parent.relationship_type(assay)

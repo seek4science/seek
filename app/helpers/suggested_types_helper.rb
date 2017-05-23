@@ -88,7 +88,7 @@ module SuggestedTypesHelper
 
   def delete_ontology_class_link(clz)
     link = if clz.can_destroy? && action_name == 'manage'
-             link_to image('destroy'), clz, confirm: "Are you sure you want to remove this #{clz.term_type} type?  This cannot be undone.",
+             link_to image('destroy'), clz, data: { confirm: "Are you sure you want to remove this #{clz.term_type} type?  This cannot be undone." },
                                             method: :delete,
                                             style: 'vertical-align:middle'
            else

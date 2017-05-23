@@ -25,9 +25,11 @@ class SpaceTest < ActiveSupport::TestCase
     assert_equal 'use for testing openbis api integration ', space.description
 
     # not recognised
-    assert_raise_with_message(Seek::Openbis::EntityNotFoundException, 'Unable to find Space with perm id NOT-API-SPACE') do
+    e = assert_raise(Seek::Openbis::EntityNotFoundException) do
       Seek::Openbis::Space.new(@openbis_endpoint, 'NOT-API-SPACE')
     end
+
+    assert_equal 'Unable to find Space with perm id NOT-API-SPACE', e.message
   end
 
   test 'dates' do

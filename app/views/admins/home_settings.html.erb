@@ -21,6 +21,6 @@
                                "Home page buttons enabled", "Display the three large buttons on the home page.") %>
 
 -->
-    <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
+    <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path -%>
 <% end %>

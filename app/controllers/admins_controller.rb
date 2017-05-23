@@ -219,6 +219,8 @@ class AdminsController < ApplicationController
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
 
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
+
+    Seek::Config.default_license = params[:default_license]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || (crossref_email_valid)) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
     update_redirect_to update_flag, 'others'
   end
@@ -274,7 +276,7 @@ class AdminsController < ApplicationController
       @tag.annotations.each do |a|
         annotatable = a.annotatable
         source = a.source
-        attribute_name = a.attribute.name
+        attribute_name = a.annotation_attribute.name
         a.destroy unless replacement_tags.include?(@tag)
         replacement_tags.each do |tag|
           if annotatable.annotations_with_attribute_and_by_source(attribute_name, source).select { |an| an.value == tag }.blank?
@@ -422,7 +424,7 @@ class AdminsController < ApplicationController
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
     ActionMailer::Base.raise_delivery_errors = true
     begin
-      Mailer.test_email(params[:testing_email]).deliver
+      Mailer.test_email(params[:testing_email]).deliver_now
       render :update do |page|
         page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
         page.alert("test email is sent successfully to #{params[:testing_email]}")

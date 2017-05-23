@@ -82,7 +82,7 @@ class TaggableTest < ActiveSupport::TestCase
     p.tag_with %w(coffee Coffee), attr
     p.reload
 
-    updated_expertises = Annotation.where(annotatable_type: p.class.name, annotatable_id: p.id).select { |a| a.attribute.name == attr }
+    updated_expertises = Annotation.where(annotatable_type: p.class.name, annotatable_id: p.id).select { |a| a.annotation_attribute.name == attr }
     assert_equal ['coffee'], updated_expertises.collect { |a| a.value.text }
   end
 end

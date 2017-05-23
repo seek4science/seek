@@ -30,7 +30,7 @@ class SweepsController < ApplicationController
   def update
     @sweep.attributes = params[:sweep]
 
-    update_sharing_policies @sweep, params
+    update_sharing_policies @sweep
 
     if @sweep.save
       respond_to do |format|

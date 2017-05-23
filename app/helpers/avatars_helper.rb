@@ -66,7 +66,7 @@ module AvatarsHelper
       if avatar_for_instance.avatars.include?(avatar)
         avatar.public_asset_url(size)
       else
-        fail 'Avatar does not belong to instance'
+        raise 'Avatar does not belong to instance'
       end
     else
       basic_url = eval("#{avatar_for_instance.class.name.downcase}_avatar_path(#{avatar_for_instance.id}, #{avatar_id})")

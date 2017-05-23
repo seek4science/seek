@@ -58,7 +58,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
   def send_subscription_mails(logs)
     if Seek::Config.email_enabled
       # strip the logs down to those that are relevant
-      logs.select! do |log|
+      logs = logs.to_a.select do |log|
         log.activity_loggable.try(:subscribable?)
       end
 
@@ -74,7 +74,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
 
   def collect_and_deliver(logs, person)
     activity_logs = collect_relevant_logs(logs, person)
-    SubMailer.send_digest_subscription(person, activity_logs, frequency).deliver if activity_logs.any?
+    SubMailer.send_digest_subscription(person, activity_logs, frequency).deliver_now if activity_logs.any?
   end
 
   def collect_relevant_logs(logs, person)
@@ -92,8 +92,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
   # limit to only the people subscribed to the items logged, and those that are set to receive notifications and are project members
   def subscribed_people(logs)
     people = people_subscribed_to_logged_items logs
-    people.reject! { |person| !person.receive_notifications? }
-    people
+    people.select(&:receive_notifications?)
   end
 
   # returns an enumaration of the people subscribed to the items in the logs
@@ -125,7 +124,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
            else
              Time.now
     end
-    Time.local_time(time.year, time.month, time.day, 12, 00, 00)
+    Time.local(time.year, time.month, time.day, 12, 00, 00)
   end
 
   def self.default_priority

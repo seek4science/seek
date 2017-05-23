@@ -1,4 +1,3 @@
-<%= javascript_include_tag 'bives' %>
 <%= javascript_include_tag 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' %>
 
 <div class="show_basic">
@@ -26,7 +25,7 @@
               <%= select_tag :other_file_id, options_for_select(@other_version.sbml_content_blobs.collect { |b| [b.original_filename, b.id] }, @blob2.id) %>
             </div>
             <div>
-              <%= submit_tag "Compare", :disable_with => "Comparing" %>
+              <%= submit_tag "Compare", data: { disable_with: 'Comparing' } %>
             </div>
 
           </div>

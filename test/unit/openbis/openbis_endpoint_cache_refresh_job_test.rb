@@ -47,9 +47,10 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
   test 'perform' do
     mock_openbis_calls
     key = @endpoint.space.cache_key(@endpoint.space_perm_id)
-    @endpoint.clear_cache
-    refute Rails.cache.exist?(key)
+    store = @endpoint.metadata_store
+    @endpoint.clear_metadata_store
+    refute store.exist?(key)
     @job.perform
-    assert Rails.cache.exist?(key)
+    assert store.exist?(key)
   end
 end

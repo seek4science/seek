@@ -44,7 +44,6 @@ $j(document).ready(function ($) {
         endRow,
         endCol;
 
-
     //To disable text-selection
     //http://stackoverflow.com/questions/2700000/how-to-disable-text-selection-using-jquery
     $.fn.disableSelect = function() {
@@ -58,9 +57,7 @@ $j(document).ready(function ($) {
     //Clickable worksheet tabs
     $("a.sheet_tab")
         .click(function () {
-            if ($('div#spreadsheet_outer_frame').length > 0) {
-                activateSheet(null, $(this));
-            }
+            activateSheet(null, $(this));
         })
         .mouseover(function (){
             this.style.cursor = 'pointer';
@@ -205,13 +202,12 @@ $j(document).ready(function ($) {
             minWidth: 20,
             handles: 'e',
             stop: function (){
-                var obj_id = $(this)[0].parentNode.parentNode.parentNode.id.split('_')[1];
-                //use table number in search preview mode, cause "active_sheet" is irrelevant.
-                if ($("table."+obj_id).length > 0) {
-                    $("table." + obj_id + " col:eq(" + ($(this).index() - 1) + ")").width($(this).width());
                 //when in spreadsheet "explore"
-                } else {
+                if ( (window.location.href).indexOf("explore") > -1 ) {
                     $("table.active_sheet col:eq(" + ($(this).index() - 1) + ")").width($(this).width());
+                } else {
+                    var obj_id = activate_sheet_from_resizable(this);
+                    $("table." + obj_id + ".active_sheet col:eq(" + ($(this).index() - 1) + ")").width($(this).width());
                 }
                 if ($j("div.spreadsheet_container").width()>max_container_width()) {
                     adjust_container_dimensions();
@@ -233,13 +229,12 @@ $j(document).ready(function ($) {
             handles: 's',
             stop: function (){
                 var height = $(this).height();
-                var obj_id = $(this)[0].parentNode.parentNode.parentNode.id.split('_')[1];
-                //use table number in search preview mode, cause "active_sheet" is irrelevant.
-                if ($("table."+obj_id).length > 0) {
-                    $("table."+ obj_id +" tr:eq(" + $(this).index() + ")").height(height).css('line-height', height - 2 + "px");
-                 //when in spreadsheet "explore"
+                //when in spreadsheet "explore"
+                if ( (window.location.href).indexOf("explore") > -1 ) {
+                     $("table.active_sheet tr:eq(" + $(this).index() + ")").height(height).css('line-height', height - 2 + "px");
                 } else {
-                    $("table.active_sheet tr:eq(" + $(this).index() + ")").height(height).css('line-height', height - 2 + "px");
+                    var obj_id = activate_sheet_from_resizable(this);
+                    $("table." + obj_id + ".active_sheet tr:eq(" + $(this).index() + ")").height(height).css('line-height', height - 2 + "px");
                 }
             }
         })
@@ -252,29 +247,39 @@ $j(document).ready(function ($) {
             }
         })
     ;
-
     adjust_container_dimensions();
+
 });
 
+function activate_sheet_from_resizable(div_obj) {
+    var obj_id_sheetN = div_obj.parentNode.parentNode.parentNode.id.split('_');
+    activateSheet(null, $j($j("a.sheet_tab."+ obj_id_sheetN[1] )[obj_id_sheetN[2]-1] ) );
+    return obj_id_sheetN[1];
+}
 function max_container_width() {
     var max_width = $j(".corner_heading").width();
-    $j(".col_heading:visible").each(function() {
-        max_width += $(this).offsetWidth;
+    $j(".col_heading").each(function() {
+        max_width += parseInt($(this).style.width); //$(this).offsetWidth does not worked when the element is in a hidden tab
     });
     return max_width;
 }
 
 function adjust_container_dimensions() {
+    var selector = $j("div.spreadsheet_container");
     var max_width = max_container_width();
-    var spreadsheet_container_width = $j("div.spreadsheet_container").width();
+    var spreadsheet_container_width = selector.width();
     if (spreadsheet_container_width>=max_width) {
-        $j(".spreadsheet_container").width(max_width);
-        spreadsheet_container_width=max_width;
+        selector.width(max_width);
+        spreadsheet_container_width = max_width;
     }
     else {
-        $j(".spreadsheet_container").width("95%");
-        spreadsheet_container_width = $j("div.spreadsheet_container").width();
+        selector.width("95%");
+        spreadsheet_container_width = selector.width();
     }
+    //var sheet_container_width = spreadsheet_container_width - 2;
+    //var sheet_width = spreadsheet_container_width -45;
+    //$j(".sheet_container").width(sheet_container_width);
+    //$j(".sheet").width(sheet_width);
 }
 
 //Convert a numeric column index to an alphabetic one
@@ -580,6 +585,8 @@ function select_cells(startCol, startRow, endCol, endRow, sheetNumber) {
     $j('.requires_selection').show();
 }
 
+/* search_matched_spreadsheets_content.html.erb calls with a third argument - fileIndex = item_id
+will have more than one spreadsheet_container div */
 function activateSheet(sheet, sheetTab, fileIndex) {
     var root_element = null;
     if (sheetTab == null) {
@@ -594,6 +601,8 @@ function activateSheet(sheet, sheetTab, fileIndex) {
             sheetTab = $j("a.sheet_tab." + fileIndex + ":eq(" + i + ")");
             root_element = sheetTab.closest("div.spreadsheet_container");
         }
+    } else {
+         root_element = sheetTab.closest("div.spreadsheet_container");
     }
 
     var sheetIndex = sheetTab.attr("index");
@@ -612,8 +621,10 @@ function activateSheet(sheet, sheetTab, fileIndex) {
 
     //Hide sheets
     if (root_element == null) {
+        //gets here on file explore
         $j('div.sheet_container').hide();
     } else {
+        //gets here from search results preview
         $j('div.sheet_container', root_element).hide();
     }
     //Hide paginates
@@ -639,7 +650,7 @@ function activateSheet(sheet, sheetTab, fileIndex) {
     //Set table active
     activeSheet.children("table.sheet").addClass('active_sheet');
 
-    deselect_cells();
+    //deselect_cells();
 
     //Record current sheet in annotation form
     $j('input#annotation_sheet_id').attr("value", sheetIndex -1);

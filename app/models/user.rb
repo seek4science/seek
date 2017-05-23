@@ -3,7 +3,7 @@ require 'savage_beast/user_init'
 
 class User < ActiveRecord::Base
   acts_as_annotation_source
-  include SavageBeast::UserInit
+#  include SavageBeast::UserInit
 
   acts_as_tagger
 
@@ -52,11 +52,11 @@ class User < ActiveRecord::Base
 
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :login, :password, :password_confirmation, :email
+  # attr_accessible :login, :password, :password_confirmation, :email
 
   has_many :favourite_groups, :dependent => :destroy
   
-  scope :not_activated,where('activation_code IS NOT NULL')
+  scope :not_activated, -> { where('activation_code IS NOT NULL') }
 
   acts_as_uniquely_identifiable
 
@@ -275,7 +275,7 @@ class User < ActiveRecord::Base
 
   #indicates whether the user has completed the registration process, and is associated with a profile and link has been saved
   def registration_complete?
-    person.present? && person.user.present?
+    person.try(:persisted?) && person.user.try(:persisted?)
   end
 
   def self.without_profile

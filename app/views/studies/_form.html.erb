@@ -63,8 +63,26 @@
                  :onclick => "javascript: previewPermissions();return(false);",
                  :class => 'btn btn-primary'-%>
 <% else %>
-    <%= f.submit button_text, :disable_with=>disabled_text, :id => "study_submit_btn",
+    <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "study_submit_btn",
                  :onclick => "javascript: $('study_submit_btn').form.submit();return(false);",
                  :class => 'btn btn-primary'-%>
 <% end %>
  or <%= cancel_button(@study.id ? study_path(@study.id) : studies_path) -%>
+
+<script>
+  var projectsLookup = <%= Hash[Investigation.all_authorized_for(:edit).map { |i| [i.id, i.projects.map { |p| { id: p.id, title: p.title } }] }].to_json.html_safe -%>;
+
+  $j(document).ready(function () {
+    $j('#study_investigation_id').change(function () {
+      Sharing.removeMandatoryProjectPermissions();
+      if ($j(this).val()) {
+        var projects = projectsLookup[parseInt($j(this).val())];
+        if (projects && projects.length) {
+          for (var i = 0; i < projects.length; i++) {
+            Sharing.addPermissionForProject(projects[i]);
+          }
+        }
+      }
+    });
+  });
+</script>

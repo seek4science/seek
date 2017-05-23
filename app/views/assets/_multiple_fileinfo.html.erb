@@ -30,7 +30,7 @@
             <%=h file.original_filename -%>
             <span class="subtle">(<%=h file.human_content_type -%> - <%= filesize_as_text(file) %>)</span>
             <% asset = file.asset
-               if Seek::Util.multi_files_asset_types.include?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
+               if Seek::Util.is_multi_file_asset_type?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
                 <%= render :partial => "assets/view_content", :locals => {:content_blob => file, :icon_view => true} -%>
                 <%= image_tag_for_key('download', polymorphic_path([asset, file], :action=>:download,:code=>params[:code]), "Download", {:title => 'Download this file'}, "") -%>
             <% end %>
@@ -42,7 +42,7 @@
             <%= link_to page.url, page.url, :target=>"_blank" -%>
             <span class="subtle">(Website)</span>
             <% asset = page.asset
-               if Seek::Util.multi_files_asset_types.include?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
+               if Seek::Util.is_multi_file_asset_type?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
                 <%= image_tag_for_key('arrow_right', page.url, "Link", {:title => 'Go to this Link',:target=>"_blank"}, "") -%>
             <% end %>
           </li>

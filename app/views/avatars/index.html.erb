@@ -34,7 +34,7 @@
             <% end -%>
 
             <% avatar_path = eval("#{@avatar_owner_instance.class.name.downcase}_avatar_path(@avatar_owner_instance,avatar)") %>
-            <br/><%= image_tag_for_key "destroy", avatar_path, nil, { :confirm => 'Are you sure?', :method => :delete }, "Delete" -%>
+            <br/><%= image_tag_for_key "destroy", avatar_path, nil, { data: { confirm: 'Are you sure?' }, :method => :delete }, "Delete" -%>
         <% end -%>
       </div>
   <% end -%>

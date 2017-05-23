@@ -116,7 +116,7 @@ class AttributionsTest < ActionController::TestCase
     deleted_attr_to_sop_one = Relationship.where(subject_id: attr_to_sop_one.subject_id, subject_type: attr_to_sop_one.subject_type,
                                                  predicate: attr_to_sop_one.predicate, other_object_id: attr_to_sop_one.other_object_id,
                                                  other_object_type: attr_to_sop_one.other_object_type).first
-    assert_equal nil, deleted_attr_to_sop_one
+    assert_nil deleted_attr_to_sop_one
 
     # attribution that was supposed to stay unchanged should preserve its ID -
     # this will then indicate that it was identified to be existing and was properly

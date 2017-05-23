@@ -1,13 +1,12 @@
 require 'test_helper'
 
 class PoliciesControllerTest < ActionController::TestCase
-  fixtures :users
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
 
   def setup
-    login_as(:datafile_owner)
+    login_as(Factory(:person).user)
   end
 
   test 'should show the preview permission when choosing public scope' do

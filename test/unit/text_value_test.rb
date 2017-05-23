@@ -30,7 +30,7 @@ class TextValueTest < ActiveSupport::TestCase
     u = Factory :user
     coffee = Factory :tag, annotatable: sop, source: u, value: 'coffee', attribute_name: 'tag'
     tv = TextValue.create text: 'frog'
-    AnnotationValueSeed.create value: tv, attribute: AnnotationAttribute.find_or_create_by_name('tag')
+    AnnotationValueSeed.create value: tv, annotation_attribute: AnnotationAttribute.find_or_create_by(name: 'tag')
 
     assert_equal 2, TextValue.all_tags.count
 
@@ -69,7 +69,7 @@ class TextValueTest < ActiveSupport::TestCase
     coffee = Factory :tag, annotatable: sop, source: u, value: 'coffee', attribute_name: 'tag'
     Factory :tag, annotatable: sop, source: u, value: coffee.value, attribute_name: 'title'
     tv = TextValue.create text: 'frog'
-    AnnotationValueSeed.create value: tv, attribute: AnnotationAttribute.find_or_create_by_name('tag')
+    AnnotationValueSeed.create value: tv, annotation_attribute: AnnotationAttribute.find_or_create_by(name: 'tag')
 
     assert tv.has_attribute_name?('tag')
     assert !tv.has_attribute_name?('title')

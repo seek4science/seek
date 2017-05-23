@@ -72,7 +72,7 @@ class SinglePublishingTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'a[href=?]', data_file_path(df), text: /#{df.title}/
-    assert_select 'div[style=display:none]' do
+    assert_select 'div[style="display:none"]' do
       assert_select "input[type='checkbox'][checked='checked'][id=?]", "publish_DataFile_#{df.id}"
     end
   end
@@ -159,7 +159,7 @@ class SinglePublishingTest < ActionController::TestCase
       assert_select 'a[href=?]', person_path(gatekeeper), text: /#{gatekeeper.name}/, count: 2
     end
 
-    assert_select 'div[style=display:none;]' do
+    assert_select 'div[style="display:none;"]' do
       assert_select "input[type='hidden'][value='1'][id=?]", "publish_DataFile_#{df.id}"
       assert_select "input[type='hidden'][value='1'][id=?]", "publish_Model_#{model.id}"
       assert_select "input[type='hidden'][value='1'][id=?]", "publish_Sop_#{sop.id}"

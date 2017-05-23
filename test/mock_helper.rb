@@ -5,8 +5,8 @@ module MockHelper
   ZENODO_FILE_ID = '789'
 
   def datacite_mock
-    stub_request(:post, 'https://test:test@test.datacite.org/mds/metadata').to_return(body: 'OK (10.5072/my_test)', status: 201)
-    stub_request(:post, 'https://test:test@test.datacite.org/mds/doi').to_return(body: 'OK', status: 201)
+    stub_request(:post, 'https://test.datacite.org/mds/metadata').with(basic_auth: ['test', 'test']).to_return(body: 'OK (10.5072/my_test)', status: 201)
+    stub_request(:post, 'https://test.datacite.org/mds/doi').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 201)
   end
 
   def zenodo_mock

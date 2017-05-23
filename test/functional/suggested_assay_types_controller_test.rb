@@ -24,20 +24,10 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'should new with ajax' do
-    xhr :get, 'new'
-    assert_response :success
-  end
-
   test 'should show edit own assay types' do
     get :edit, id: Factory(:suggested_assay_type, contributor_id: User.current_user.person.try(:id)).id
     assert_response :success
     assert_not_nil assigns(:suggested_assay_type)
-  end
-
-  test 'should edit with ajax' do
-    xhr :get, 'edit', id: Factory(:suggested_assay_type, contributor_id: User.current_user.person.try(:id)).id
-    assert_response :success
   end
 
   test 'should create with suggested parent' do
@@ -65,26 +55,13 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_select 'li a', text: /test assay type/
   end
 
-  test 'should create for ajax request' do
-    assert_difference('SuggestedAssayType.count') do
-      xhr :post, :create, suggested_assay_type: { label: 'test_assay_type', parent_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics' }
-    end
-    assert_select "select option[selected='selected']", text: /test_assay_type/
-  end
-
-  test 'should update for ajax request' do
-    suggested_assay_type = Factory(:suggested_assay_type, contributor_id: User.current_user.person.try(:id))
-    xhr :put, :update, id: suggested_assay_type.id, suggested_assay_type: { label: 'child_assay_type_a' }
-    assert_select "select option[value=?][selected='selected']", suggested_assay_type.uri, text: /child_assay_type_a/
-  end
-
   test 'should update label' do
     login_as Factory(:admin)
     suggested_assay_type = Factory(:suggested_assay_type, label: 'old label', contributor_id: User.current_user.person.try(:id))
     put :update, id: suggested_assay_type.id, suggested_assay_type: { label: 'new label' }
     assert_redirected_to action: :manage
     get :manage
-    assert_select 'li a[href=?]', http_escape(assay_types_path(uri: suggested_assay_type.uri, label: 'new label')), text: /new label/
+    assert_select 'li a[href=?]', assay_types_path(uri: suggested_assay_type.uri, label: 'new label'), text: 'new label'
   end
 
   test 'should update parent' do
@@ -103,7 +80,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     put :update, id: suggested_assay_type.id, suggested_assay_type: { parent_uri: "suggested_assay_type:#{suggested_parent2.id}" }
     assert_redirected_to action: :manage
     suggested_parent2.reload
-    assert_include suggested_parent2.children, suggested_assay_type
+    assert_includes suggested_parent2.children, suggested_assay_type
 
     # update to other parent from ontology
     put :update, id: suggested_assay_type.id, suggested_assay_type: { parent_uri: ontology_parent_uri }

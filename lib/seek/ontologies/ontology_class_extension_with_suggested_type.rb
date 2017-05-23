@@ -14,9 +14,9 @@ module Seek
       def suggested_children
         case term_type
         when 'assay', 'modelling_analysis'
-          SuggestedAssayType.where(ontology_uri: uri.try(:to_s)).all
+          SuggestedAssayType.where(ontology_uri: uri.try(:to_s)).to_a
         when 'technology'
-          SuggestedTechnologyType.where(ontology_uri: uri.try(:to_s)).all
+          SuggestedTechnologyType.where(ontology_uri: uri.try(:to_s)).to_a
         else
           []
         end

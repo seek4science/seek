@@ -7,7 +7,7 @@ class ProjectChangedEmailJob < SeekEmailJob
 
   def perform_job(job_item)
     if Seek::Config.email_enabled
-      Mailer.project_changed(job_item).deliver
+      Mailer.project_changed(job_item).deliver_now
     end
   end
 

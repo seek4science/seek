@@ -2,9 +2,6 @@ class Programme < ActiveRecord::Base
 
   include Seek::Taggable
 
-  attr_accessible :avatar_id, :description, :first_letter, :title, :uuid, :web_page, :project_ids, :funding_details,
-                  :administrator_ids, :activation_rejection_reason, :funding_codes
-
   attr_accessor :administrator_ids
 
   searchable(auto_index: false) do
@@ -21,8 +18,8 @@ class Programme < ActiveRecord::Base
   has_many :projects, dependent: :nullify
   has_many :work_groups, through: :projects
   has_many :group_memberships, through: :work_groups
-  has_many :people, through: :group_memberships, order: 'last_name ASC', uniq: true
-  has_many :institutions, through: :work_groups, uniq: true
+  has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships
+  has_many :institutions, -> { uniq }, through: :work_groups
   has_many :admin_defined_role_programmes, :dependent => :destroy
   accepts_nested_attributes_for :projects
 
@@ -34,10 +31,10 @@ class Programme < ActiveRecord::Base
   before_create :activate_on_create
 
   #scopes
-  scope :default_order, order('title')
-  scope :activated, where(is_activated: true)
-  scope :not_activated, where(is_activated: false)
-  scope :rejected, where("is_activated = ? AND activation_rejection_reason IS NOT NULL",false)
+  scope :default_order, -> { order('title') }
+  scope :activated, -> { where(is_activated: true) }
+  scope :not_activated, -> { where(is_activated: false) }
+  scope :rejected, -> { where("is_activated = ? AND activation_rejection_reason IS NOT NULL",false) }
 
   def investigations(include_clause = :investigations)
     projects.includes(include_clause).collect(&:investigations).flatten.uniq
@@ -104,7 +101,7 @@ class Programme < ActiveRecord::Base
   end
 
   def total_asset_size
-    projects.sum(&:total_asset_size)
+    projects.to_a.sum(&:total_asset_size)
   end
 
   def funding_codes= tags

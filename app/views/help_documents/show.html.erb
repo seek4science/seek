@@ -5,7 +5,7 @@
         <% end %>
 
         <%= button_link_to("Edit Page", 'edit', edit_help_document_path(@help_document)) -%>
-        <%= button_link_to('Remove', 'destroy', help_document_path(@help_document), { :confirm => 'Are you sure you wish to remove this page?', :method => :delete })  -%>
+        <%= button_link_to('Remove', 'destroy', help_document_path(@help_document), { data: { confirm: 'Are you sure you wish to remove this page?' }, :method => :delete })  -%>
     <% end -%>
 <% end -%>
 

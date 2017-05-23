@@ -73,9 +73,9 @@ class ApplicationHelperTest < ActionView::TestCase
     with_config_value :css_appended, 'fish' do
       with_config_value :css_prepended, 'apple' do
         tags = seek_stylesheet_tags 'carrot'
-        assert_include tags, "<link href=\"/stylesheets/prepended/apple.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />"
-        assert_include tags, "<link href=\"/stylesheets/carrot.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />"
-        assert_include tags, "<link href=\"/stylesheets/appended/fish.css\" media=\"screen\" rel=\"stylesheet\" type=\"text/css\" />"
+        assert_includes tags, "<link rel=\"stylesheet\" media=\"screen\" href=\"/stylesheets/prepended/apple.css\" />"
+        assert_includes tags, "<link rel=\"stylesheet\" media=\"screen\" href=\"/stylesheets/carrot.css\" />"
+        assert_includes tags, "<link rel=\"stylesheet\" media=\"screen\" href=\"/stylesheets/appended/fish.css\" />"
         assert tags.index('fish.css') > tags.index('carrot.css')
         assert tags.index('carrot.css') > tags.index('apple.css')
         refute_equal 0, tags.index('apple.css')
@@ -87,9 +87,9 @@ class ApplicationHelperTest < ActionView::TestCase
     with_config_value :javascript_appended, 'fish' do
       with_config_value :javascript_prepended, 'apple' do
         tags = seek_javascript_tags 'carrot'
-        assert_include tags, "<script src=\"/javascripts/prepended/apple.js\" type=\"text/javascript\"></script>"
-        assert_include tags, "<script src=\"/javascripts/carrot.js\" type=\"text/javascript\"></script>"
-        assert_include tags, "<script src=\"/javascripts/appended/fish.js\" type=\"text/javascript\"></script>"
+        assert_includes tags, "<script src=\"/javascripts/prepended/apple.js\"></script>"
+        assert_includes tags, "<script src=\"/javascripts/carrot.js\"></script>"
+        assert_includes tags, "<script src=\"/javascripts/appended/fish.js\"></script>"
         assert tags.index('fish.js') > tags.index('carrot.js')
         assert tags.index('carrot.js') > tags.index('apple.js')
         refute_equal 0, tags.index('apple.js')

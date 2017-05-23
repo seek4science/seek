@@ -26,7 +26,7 @@
       <% end -%>
       <% if admin_logged_in? -%>
           <li>
-            <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", {:confirm => 'Are you sure?', :method => :delete}, "Delete Person" -%>
+            <%= image_tag_for_key "destroy", person_path(@person), "Delete Person", { data: { confirm: 'Are you sure?' }, :method => :delete}, "Delete Person" -%>
           </li>
       <% end -%>
   <% end %>

@@ -18,7 +18,7 @@ module Seek
 
     def self.create_commands(number_of_taverna_workers, action)
       commands = []
-      queues = [Delayed::Worker.default_queue_name]
+      queues = [QueueNames::DEFAULT]
       queues << QueueNames::AUTH_LOOKUP if Seek::Config.auth_lookup_enabled
       queues << QueueNames::REMOTE_CONTENT if Seek::Config.cache_remote_files
       queues << QueueNames::SAMPLES if Seek::Config.samples_enabled

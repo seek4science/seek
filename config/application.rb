@@ -4,45 +4,15 @@ require 'rails/all'
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
-  Bundler.require(*Rails.groups(:assets => %w(development test)))
+  Bundler.require(*Rails.groups)
   # If you want your assets lazily compiled in production, use this line
   # Bundler.require(:default, :assets, Rails.env)
 end
 
 module SEEK
   class Application < Rails::Application
-    config.autoload_paths += %W(#{Rails.root}/app/sweepers #{Rails.root}/app/reindexers #{Rails.root}/app/jobs)
-
-    #also include lib/** files
-    config.autoload_paths += Dir["#{Rails.root}/lib/**/"]
-
-    # Asset pipeline
-    # Enable the asset pipeline
-    config.assets.enabled = true
-    # Version of your assets, change this if you want to expire all your assets
-    #config.assets.version = '1.0'
-    # Change the path that assets are served from
-    # config.assets.prefix = "/assets"
-    config.assets.js_compressor = :uglifier
-    # config.assets.css_compressor = :yui
-
-    config.assets.precompile += ['*.js',
-                                 "prepended/*.css",
-                                 "cytoscape_isa_graph.css",
-                                 "data_tables.css",
-                                 "datacite_doi.css",
-                                 "exhibit/styles/exhibit-scripted-bundle.css",
-                                 "jquery-ui-1.8.14.custom.css",
-                                 "jquery.ui.resizable.css",
-                                 "lightbox.css",
-                                 "pdfjs/viewer.css",
-                                 "savage_beast/display.css",
-                                 "scales/scales.css",
-                                 "spreadsheet_explorer.css",
-                                 "tablesorter/blue/tablesorter_blue.css",
-                                 "yui/index.css",
-                                 "appended/*.css"
-    ]
+    config.autoload_paths += %W(#{Rails.root}/lib #{Rails.root}/app/sweepers
+                                #{Rails.root}/app/reindexers #{Rails.root}/app/jobs)
 
     # Force all environments to use the same logger level
     # (by default production uses :info, the others :debug)
@@ -94,5 +64,15 @@ module SEEK
     #uncomment and set the value if running under a suburi
     #config.relative_url_root = '/seek'
 
+    # The default cache timestamp format is "nsec", however timestamps in AR aren't stored with that precision
+    # This can result in mis-matches of cache_keys depending on if the record is saved or not, for example:
+    # openbis_endpoints/26-20170404142724000000000...
+    # openbis_endpoints/26-20170404142724224014370...
+    config.active_record.cache_timestamp_format = :usec
+
+    # Do not swallow errors in after_commit/after_rollback callbacks.
+    config.active_record.raise_in_transactional_callbacks = true
   end
 end
+
+require 'settings' # This is here rather than in seek_main.rb because it has to be loaded before seek_configuration.rb

@@ -9,25 +9,23 @@
 <%#= f.hidden_field :term_type%>
 
 <div class="center-block" style="width: 60%;">
-  <p>
-    <%= f.label :label-%>*<br/>
-    <%= f.text_field :label,{:style=>"width: 100%"} -%>
-  </p>
+  <div class="form-group">
+    <%= f.label :label %>*<br/>
+    <%= f.text_field :label, class: 'form-control' %>
+  </div>
 
-  <p>
-    <%= f.label "Parent" -%><br/>
-    <span style="color: #666666;"> Select parent</span><br/>
+  <div class="form-group">
+    <%= f.label 'Parent' -%>
     <%= ontology_selection_list types, "#{@suggested_type.class.name.underscore}[parent_uri]",
                                 selected_uri,
                                 ([@suggested_type] + @suggested_type.all_children).map(&:uri),
-                                {:style => "width:100%"}
+                                { class: 'form-control'}
     %>
-
-  </p>
+    <p class="help-block">Select parent type.</p>
+  </div>
+  <div>
+    <%= f.submit(create_or_update_text, class: 'btn btn-primary') -%>
+    or <%= cancel_link %>
+  </div>
 </div>
-<div align="center" style="margin-top: 1.5em">
-  <%= f.submit(create_or_update_text) -%>
-  or <%= cancel_link %>
-</div>
-
 <% end -%>

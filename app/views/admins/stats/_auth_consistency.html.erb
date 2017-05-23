@@ -37,7 +37,7 @@
            <%  if !type.lookup_table_consistent?(user)
                 asset_count = type.count
                 lookup_count = type.lookup_count_for_user user
-                last_asset_id = type.last(:order=>:id).try(:id)
+                last_asset_id = type.order(:id).last.try(:id)
                 last_stored_asset_id = type.last_asset_id_for_user user
            %>
               <tr>

@@ -1,6 +1,6 @@
 <h1>Administer Person: <%= link_to @person.name, person_path(@person) -%></h1>
 
-<%= form_for @person, :url => {:action => 'administer_update', :id => @person.id} do |f| -%>
+<%= form_for @person, :url => {:action => 'administer_update', :id => @person.id}, method: :put do |f| -%>
     <% unless (project_administrator_logged_in? && @person.me?) %>
         <%= panel("#{t('project')} / Institution Memberships", :id => 'work_groups') do %>
             <%= render :partial => "work_groups", :locals => { :person => @person } -%>
@@ -13,12 +13,12 @@
                 <div class="alert alert-info">
                   <p>
                     These are the roles that can be assigned to a person by an administrator to allow this person to carry out specific tasks within that role.
-                    Each role is associated with, and only applies to, a particular <%= t('Project').downcase.html_safe %>.
+                    Each role is associated with, and only applies to, a particular <%= t('project').downcase.html_safe %>.
                   </p>
                   <p>
                     <strong>Note</strong> that if new projects are added to this person (above), they will
-                    need to be saved before the <%= t('Project').downcase.pluralize.html_safe %> you can associate with a role are available.
-                    If the person is removed from a <%= t('Project').downcase.html_safe %> then the role will also be automatically removed.
+                    need to be saved before the <%= t('project').downcase.pluralize.html_safe %> you can associate with a role are available.
+                    If the person is removed from a <%= t('project').downcase.html_safe %> then the role will also be automatically removed.
                   </p>
                 </div>
               </div>
@@ -32,6 +32,6 @@
         <% end %>
     <% end %>
 
-    <%= f.submit("Update", :disable_with=>"Updating...", :onclick => "updateWorkGroupIds()", :class => 'btn btn-primary   ') -%>
+    <%= f.submit("Update", data: { disable_with: 'Updating...' }, :onclick => "updateWorkGroupIds()", :class => 'btn btn-primary   ') -%>
     or <%= cancel_button(person_path(@person.id)) -%>
 <% end -%>

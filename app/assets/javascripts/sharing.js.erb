@@ -2,6 +2,8 @@
 
 var Sharing = {
   addPermission: function (permission, preserveAccessType) {
+    if (!Sharing.permissionsTable)
+        return;
     // Update if already existing, otherwise add a new row
     for (var i = 0; i < Sharing.permissionsTable.permissions.length; i++) {
       var p = Sharing.permissionsTable.permissions[i];
@@ -15,7 +17,7 @@ var Sharing = {
 
     // This ensures that if a project permission is added, and that project is associated with the resource, it gains
     //  the "isMandatory" flag.
-    if (permission.contributor_type === 'Project') {
+    if (permission.contributor_type === 'Project' && Sharing.projectsSelector) {
       for (var j = 0; j < Sharing.projectsSelector.selected.length; j++) {
         if (Sharing.projectsSelector.selected[j].id === permission.contributor_id) {
           permission.isMandatory = true;
@@ -37,7 +39,21 @@ var Sharing = {
         isMandatory: true }, true);
   },
 
+  removeMandatoryProjectPermissions: function () {
+    if (!Sharing.permissionsTable)
+      return;
+    var indices = [];
+    for (var i = Sharing.permissionsTable.permissions.length - 1; i >= 0; i--) {
+      if (Sharing.permissionsTable.permissions[i].contributor_type === 'Project' &&
+          Sharing.permissionsTable.permissions[i].isMandatory) {
+        Sharing.permissionsTable.permissions.splice(i, 1);
+      }
+    }
+  },
+
   removePermissionForProject: function (project) {
+    if (!Sharing.permissionsTable)
+        return;
     for (var i = 0; i < Sharing.permissionsTable.permissions.length; i++) {
       if (Sharing.permissionsTable.permissions[i].contributor_id === project.id)
         break;
@@ -81,8 +97,22 @@ var Sharing = {
     }
 
     return false;
+  },
+
+  applyPolicy: function (policy) {
+    Sharing.permissionsTable.permissions = policy.permissions.slice(); // Copy the permissions rather than just reference
+    Sharing.permissionsTable.publicPermission.access_type = policy.access_type;
   }
 };
+
+// To do: Make this a property of the permissions table, and remove "Accessible" for things that can't be downloaded
+Sharing.orderedAccessTypes = [
+  Sharing.accessTypes.noAccess,
+  Sharing.accessTypes.visible,
+  Sharing.accessTypes.accessible,
+  Sharing.accessTypes.editing,
+  Sharing.accessTypes.managing
+];
 
 Vue.component('permissions-table', {
   props: ['publicPermission', 'permissions'],
@@ -183,12 +213,18 @@ Vue.component('privilege-cell', {
     }
   },
   methods: {
-    toggleValue: function () {
+    toggleValue: function (e) {
+      // Stop clicks on the radio button from triggering this function and un-setting the access type
+      if (e.target.nodeName.toLowerCase() === 'input')
+          return;
       if (!this.disabled) {
         // If the existing setting is clicked, decrease the access type
         if (this.permission.access_type === this.accessType.value &&
             this.accessType.value !== Sharing.accessTypes.noAccess) {
-          this.permission.access_type = this.accessType.value - 1;
+          var index = Sharing.orderedAccessTypes.indexOf(this.accessType.value) - 1;
+          if (index >= 0) {
+            this.permission.access_type = Sharing.orderedAccessTypes[index];
+          }
         } else {
           this.permission.access_type = this.accessType.value;
         }

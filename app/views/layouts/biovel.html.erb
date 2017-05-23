@@ -59,7 +59,7 @@
 
 <%= render :partial=>"layouts/biovel_footer" %>
 
-<%= piwik_tracking_tag %>
+<%= render partial: 'layouts/piwik' if Seek::Config.piwik_analytics_enabled %>
 <%= analytics_init if Seek::Config.google_analytics_enabled %>
 </body>
 </html>

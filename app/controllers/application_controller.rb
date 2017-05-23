@@ -1,3 +1,4 @@
+# coding: utf-8
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
@@ -7,8 +8,6 @@ class ApplicationController < ActionController::Base
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
   include Recaptcha::Verify
-
-  self.mod_porter_secret = PORTER_SECRET
 
   include CommonSweepers
 
@@ -130,7 +129,7 @@ class ApplicationController < ActionController::Base
     # params[:resource_ids] is passed as string, e.g. "id1, id2, ..."
     resource_ids = (params[:resource_ids] || '').split(',')
     clazz = resource_type.constantize
-    resources = clazz.find_all_by_id(resource_ids)
+    resources = clazz.where(id: resource_ids)
     if clazz.respond_to?(:authorized_partial_asset_collection)
       authorized_resources = clazz.authorized_partial_asset_collection(resources, 'view')
     elsif resource_type == 'Project' || resource_type == 'Institution'
@@ -141,15 +140,12 @@ class ApplicationController < ActionController::Base
       authorized_resources = resources.select(&:can_view?)
     end
 
-    render :update do |page|
-      page.replace_html "#{scale_title}_#{resource_type}_#{view_type}",
-                        partial: 'assets/resource_in_tab',
-                        locals: { resources: resources,
-                                  scale_title: scale_title,
-                                  authorized_resources: authorized_resources,
-                                  view_type: view_type,
-                                  actions_partial_disable: actions_partial_disable }
-    end
+    render partial: 'assets/resource_in_tab',
+           locals: { resources: resources,
+                     scale_title: scale_title,
+                     authorized_resources: authorized_resources,
+                     view_type: view_type,
+                     actions_partial_disable: actions_partial_disable }
   end
 
   private
@@ -217,17 +213,6 @@ class ApplicationController < ActionController::Base
       error('You need to login first.', '...')
       return false
     end
-  end
-
-  def filter_protected_update_params(params)
-    if params
-      [:contributor_id, :contributor_type, :original_filename, :content_type, :content_blob_id, :created_at, :updated_at, :last_used_at].each do |column_name|
-        params.delete(column_name)
-      end
-
-      params[:last_used_at] = Time.now
-    end
-    params
   end
 
   def error(notice, _message)
@@ -616,9 +601,18 @@ class ApplicationController < ActionController::Base
   # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
   # by steffen.brinkmann@h-its.org
   # 2017-04-18
-  def unescape_response()
-    response_body[0].gsub!(/\\u([0-9a-z]{4})/) { |s|
-      [$1.to_i(16)].pack("U")
-    }
+#  def unescape_response()
+#    response_body[0].gsub!(/\\u([0-9a-z]{4})/) { |s|
+#      [$1.to_i(16)].pack("U")
+#    }
+#  end
+
+  def policy_params
+    params.slice(:policy_attributes).permit(
+        policy_attributes: [:access_type,
+                            { permissions_attributes: [:access_type,
+                                                       :contributor_type,
+                                                       :contributor_id] }])[:policy_attributes] || {}
   end
+
 end

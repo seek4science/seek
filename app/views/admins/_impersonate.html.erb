@@ -7,7 +7,7 @@
 
       <%= select_tag "id", options_for_select(users), :class => 'form-control' -%>
 
-      <%= submit_tag "Go", :confirm => "This action will log you out. Are you sure you wish to continue?",
+      <%= submit_tag "Go", data: { confirm: 'This action will log you out. Are you sure you wish to continue?' },
                      :class => 'btn btn-primary' %>
     </div>
 <% end %>

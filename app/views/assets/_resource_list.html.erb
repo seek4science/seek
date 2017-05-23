@@ -4,7 +4,10 @@
 <% view_type ||= 'view_some' %>
 <% matched_items = []
    sheet_array = []
-   matched_items, sheet_array = search_extractable_items collection, @search_query if collection.first.class.is_asset? && !@search_query.blank?
+  unless true || @search_query.blank?
+    first_type=collection.first.class
+    matched_items, sheet_array = search_extractable_items collection, @search_query if first_type.respond_to?(:is_asset?) && first_type.is_asset?
+  end
 %>
 <% unless collection.empty? -%>
   <div class="list_items_container" id="<%=collection.first.class.name%>_<%= view_type %>">

@@ -1,11 +1,11 @@
 group_for_model_owner_member:
-  group_membership_id: <%= ActiveRecord::Fixtures.identify(:group_for_model_owner) %>
-  project_position_id: <%= ActiveRecord::Fixtures.identify(:member) %>
+  group_membership_id: <%= ActiveRecord::FixtureSet.identify(:group_for_model_owner) %>
+  project_position_id: <%= ActiveRecord::FixtureSet.identify(:member) %>
 
 group_for_model_owner_postdoc:
-  group_membership_id: <%= ActiveRecord::Fixtures.identify(:group_for_model_owner) %>
-  project_position_id: <%= ActiveRecord::Fixtures.identify(:postdoc) %>
+  group_membership_id: <%= ActiveRecord::FixtureSet.identify(:group_for_model_owner) %>
+  project_position_id: <%= ActiveRecord::FixtureSet.identify(:postdoc) %>
   
 pal_association:
-  group_membership_id: <%= ActiveRecord::Fixtures.identify(:group_for_pal) %>
-  project_position_id: <%= ActiveRecord::Fixtures.identify(:pal) %>
+  group_membership_id: <%= ActiveRecord::FixtureSet.identify(:group_for_pal) %>
+  project_position_id: <%= ActiveRecord::FixtureSet.identify(:pal) %>

@@ -14,7 +14,6 @@ class ProjectsController < ApplicationController
   before_filter :is_user_admin_auth, :only => [:manage, :destroy]
   before_filter :editable_by_user, :only=>[:edit,:update]
   before_filter :administerable_by_user, :only =>[:admin,:admin_members,:admin_member_roles,:update_members,:storage_report]
-  before_filter :auth_params,:only=>[:update]
   before_filter :member_of_this_project, :only=>[:asset_report],:unless=>:admin?
 
   skip_before_filter :project_membership_required
@@ -166,17 +165,9 @@ class ProjectsController < ApplicationController
   # POST /projects
   # POST /projects.xml
   def create
-    #strip out programme_id if permissions do not allow
-    unless params[:project][:programme_id].blank?
-      unless Programme.find(params[:project][:programme_id]).can_manage?
-        params[:project].delete(:programme_id)
-      end
-    end
-    @project = Project.new(params[:project])
+    @project = Project.new(project_params)
 
-    @project.default_policy.set_attributes_with_sharing(params[:policy_attributes])
-
-
+    @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
     respond_to do |format|
       if @project.save
@@ -200,12 +191,11 @@ class ProjectsController < ApplicationController
   # PUT /projects/1
   # PUT /projects/1.xml
   def update
-
     @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
     begin
       respond_to do |format|
-        if @project.update_attributes(params[:project])
+        if @project.update_attributes(project_params)
           if (Seek::Config.email_enabled && !@project.can_be_administered_by?(current_user))
             ProjectChangedEmailJob.new(@project).queue_job
           end
@@ -285,11 +275,7 @@ class ProjectsController < ApplicationController
 
   def update_administrative_roles
     unless params[:project].blank?
-      #need convverting to an array from a comma separated string
-      params[:project].keys.each do |k|
-        params[:project][k] = params[:project][k].split(",")
-      end
-      @project.update_attributes(params[:project])
+      @project.update_attributes(project_role_params)
     end
   end
 
@@ -301,6 +287,40 @@ class ProjectsController < ApplicationController
   end
 
   private
+
+  def project_role_params
+    params[:project].keys.each do |k|
+      params[:project][k] = params[:project][k].split(",")
+    end
+
+    params.require(:project).permit({ project_administrator_ids: [] },
+                                    { asset_gatekeeper_ids: [] },
+                                    { asset_housekeeper_ids: [] },
+                                    { pal_ids: [] })
+  end
+
+  def project_params
+    permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] },
+                        { institution_ids: [] }, :default_license, :site_root_uri, :site_username, :site_password,
+                        :parent_id ,:use_default_policy]
+
+    if action_name == 'update'
+      restricted_params =
+          { site_root_uri: User.admin_logged_in?,
+            site_username: User.admin_logged_in?,
+            site_password: User.admin_logged_in?,
+            institution_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)) }
+      restricted_params.each do |param, allowed|
+        permitted_params.delete(param) if params[:project] && !allowed
+      end
+    end
+
+    if params[:project][:programme_id].present? && !Programme.find(params[:project][:programme_id]).can_manage?
+      permitted_params.delete(:programme_id)
+    end
+
+    params.require(:project).permit(permitted_params)
+  end
 
   def add_and_remove_members_and_institutions
     groups_to_remove = params[:group_memberships_to_remove] || []
@@ -367,18 +387,5 @@ class ProjectsController < ApplicationController
       return false
     end
   end
-
-  def auth_params
-    restricted_params={:policy_attributes => User.admin_logged_in?,
-                       :site_root_uri => User.admin_logged_in?,
-                       :site_username => User.admin_logged_in?,
-                       :site_password => User.admin_logged_in?,
-                       :institution_ids => (User.admin_logged_in? || @project.can_be_administered_by?(current_user))}
-    restricted_params.each do |param, allowed|
-      params[:project].delete(param) if params[:project] and not allowed
-      params.delete param if params and not allowed
-    end
-  end
-
 
 end

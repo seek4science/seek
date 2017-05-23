@@ -31,7 +31,7 @@ module Seek
     end
 
     def convert_to_pdf(dat_filepath = filepath, pdf_filepath = filepath('pdf'))
-      unless File.exist?(pdf_filepath)
+      unless File.exist?(pdf_filepath) || !Seek::Config.soffice_available?
         # copy dat file to original file extension in order to convert to pdf on this file
         file_extension = mime_extensions(content_type).first
         tmp_file = Tempfile.new(['', '.' + file_extension])

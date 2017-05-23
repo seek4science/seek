@@ -25,7 +25,7 @@ namespace :seek_stats do
       filename="#{Rails.root}/tmp/filesizes-and-versions-#{type.name}.csv"
       File.open(filename, "w") do |file|
         file << "type,id,created_at,filesize,content-type,version,project_id,project_name\n"
-        type.find(:all,:order=>:created_at).each do |asset|
+        type.order(:created_at).each do |asset|
           file << "#{type.name}"
           file << ","
           file << asset.id

@@ -1,7 +1,3 @@
-require 'grouped_pagination'
-require 'simple_crypt'
-require 'title_trimmer'
-
 class Project < ActiveRecord::Base
   include Seek::Rdf::RdfGeneration
   include Seek::Rdf::ReactToAssociatedChange
@@ -24,15 +20,14 @@ class Project < ActiveRecord::Base
                                                 join_table: 'projects_taverna_player_runs', association_foreign_key: 'run_id'
 
   has_and_belongs_to_many :strains
-  has_and_belongs_to_many :organisms
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
 
-  has_many :work_groups, dependent: :destroy
-  has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?
-  has_many :group_memberships, through: :work_groups
+  has_many :work_groups, dependent: :destroy, inverse_of: :project
+  has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?, inverse_of: :projects
+  has_many :group_memberships, through: :work_groups, inverse_of: :project
   # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
-  has_many :people, through: :group_memberships, order: 'last_name ASC', uniq: true
+  has_many :people, -> { order('last_name ASC').uniq }, through: :group_memberships
 
   has_many :admin_defined_role_projects
 
@@ -40,8 +35,8 @@ class Project < ActiveRecord::Base
 
   belongs_to :programme
 
-  attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,
-                  :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids, :default_license
+  # attr_accessible :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids, :title, :programme_id, :description,
+  #                 :web_page, :institution_ids, :parent_id, :wiki_page, :organism_ids, :default_license, :use_default_policy
 
   # for handling the assignment for roles
   attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids
@@ -62,8 +57,8 @@ class Project < ActiveRecord::Base
   belongs_to :lineage_ancestor, class_name: 'Project', foreign_key: :ancestor_id
   has_many :lineage_descendants, class_name: 'Project', foreign_key: :ancestor_id
 
-  scope :default_order, order('title')
-  scope :without_programme, conditions: 'programme_id IS NULL'
+  scope :default_order, -> { order('title') }
+  scope :without_programme, -> { where('programme_id IS NULL') }
 
   validates :web_page, url: {allow_nil: true, allow_blank: true}
   validates :wiki_page, url: {allow_nil: true, allow_blank: true}
@@ -76,20 +71,7 @@ class Project < ActiveRecord::Base
   #  necessary, deep copies of it will be made to ensure that all settings get
   #  fully copied and assigned to belong to owners of assets, where identical policy
   #  is to be used)
-  belongs_to :default_policy,
-             class_name: 'Policy',
-             dependent: :destroy,
-             autosave: true
-
-  after_initialize :default_default_policy_if_new
-
-  def default_default_policy_if_new
-    unless Seek::Config.is_virtualliver
-      self.default_policy = Policy.default if new_record?
-    else
-      self.default_policy = Policy.private_policy if new_record?
-    end
-  end
+  belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
   def group_memberships_empty?(institution)
     work_group = WorkGroup.where(['project_id=? AND institution_id=?', id, institution.id]).first
@@ -114,14 +96,14 @@ class Project < ActiveRecord::Base
   end
 
   def institutions=(new_institutions)
-    new_institutions.each_index do |i|
-      new_institutions[i] = Institution.find(new_institutions[i]) unless new_institutions.is_a?(Institution)
+    new_institutions = Array(new_institutions).map do |i|
+      i.is_a?(Institution) ? i : Institution.find(i)
     end
     work_groups.each do |wg|
       wg.destroy unless new_institutions.include?(wg.institution)
     end
-    for institution in new_institutions
-      institutions << institution unless institutions.include?(institution)
+    new_institutions.each do |i|
+      institutions << i unless institutions.include?(i)
     end
   end
 
@@ -295,7 +277,7 @@ class Project < ActiveRecord::Base
       if asset.respond_to?(:content_blob)
         asset.content_blob.file_size || 0
       elsif asset.respond_to?(:content_blobs)
-        asset.content_blobs.sum do |blob|
+        asset.content_blobs.to_a.sum do |blob|
           blob.file_size || 0
         end
       else

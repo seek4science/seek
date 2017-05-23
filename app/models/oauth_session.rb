@@ -1,7 +1,7 @@
 class OauthSession < ActiveRecord::Base
 
   belongs_to :user
-  attr_accessible :access_token, :expires_in, :refresh_token, :provider, :user_id
+  # attr_accessible :access_token, :expires_in, :refresh_token, :provider, :user_id
   validates_uniqueness_of :user_id, scope: :provider
 
   EXPIRATION_ERROR_MARGIN = 120

@@ -20,16 +20,16 @@ class AssaysHelperTest < ActionView::TestCase
     refute_equal a1.projects, a3.projects
 
     User.with_current_user(p1.user) do
-      assays = authorised_assays(nil, 'download')
+      assays = authorised_assays(nil, 'download').sort_by(&:id)
       assert_equal [a1, a2, a3, a4], assays
 
-      assays = authorised_assays
+      assays = authorised_assays.sort_by(&:id)
       assert_equal [a1, a3], assays
 
-      assays = authorised_assays(a1.projects, 'download')
+      assays = authorised_assays(a1.projects, 'download').sort_by(&:id)
       assert_equal [a1, a2], assays
 
-      assays = authorised_assays a1.projects, 'edit'
+      assays = authorised_assays(a1.projects, 'edit').sort_by(&:id)
       assert_equal [a1], assays
     end
   end

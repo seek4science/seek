@@ -4,8 +4,8 @@ module Seek
     module PersonExtension
       def self.included(klass)
         klass.class_eval do
-          after_add_for_work_groups << :subscribe_work_group_project_ancestors
-          after_remove_for_work_groups << :unsubscribe_work_group_project_ancestors
+          after_add_for_work_groups << proc { |c, person, wg| person.subscribe_work_group_project_ancestors(wg) }
+          after_remove_for_work_groups << proc { |c, person, wg| person.unsubscribe_work_group_project_ancestors(wg) }
 
           def subscribe_work_group_project_ancestors(wg)
             # subscribe parent projects

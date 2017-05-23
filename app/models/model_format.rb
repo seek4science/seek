@@ -4,7 +4,7 @@ class ModelFormat < ActiveRecord::Base
 
   has_many :models
 
-  scope :sbml,:conditions=>{:title=>"SBML"}
+  scope :sbml, -> { where(title: 'SBML') }
 
 
 end

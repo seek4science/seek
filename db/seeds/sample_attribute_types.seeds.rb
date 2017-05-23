@@ -1,48 +1,48 @@
 # Sample attribute types
 count = SampleAttributeType.count
-date_time_type = SampleAttributeType.find_or_initialize_by_title('Date time')
+date_time_type = SampleAttributeType.find_or_initialize_by(title:'Date time')
 date_time_type.update_attributes(base_type: Seek::Samples::BaseType::DATE_TIME, placeholder: 'January 1, 2015 11:30 AM')
 
-date_type = SampleAttributeType.find_or_initialize_by_title('Date')
+date_type = SampleAttributeType.find_or_initialize_by(title:'Date')
 date_type.update_attributes(base_type: Seek::Samples::BaseType::DATE, placeholder: 'January 1, 2015')
 
-float_type = SampleAttributeType.find_or_initialize_by_title('Float')
+float_type = SampleAttributeType.find_or_initialize_by(title:'Float')
 float_type.update_attributes(title: 'Real number') unless SampleAttributeType.where(title: 'Real number').first
 
-real_type = SampleAttributeType.find_or_initialize_by_title('Real number')
+real_type = SampleAttributeType.find_or_initialize_by(title:'Real number')
 real_type.update_attributes(base_type: Seek::Samples::BaseType::FLOAT, placeholder: '3.6')
 
-int_type = SampleAttributeType.find_or_initialize_by_title('Integer')
+int_type = SampleAttributeType.find_or_initialize_by(title:'Integer')
 int_type.update_attributes(base_type: Seek::Samples::BaseType::INTEGER, placeholder: '1')
 
-link_type = SampleAttributeType.find_or_initialize_by_title('Web link')
+link_type = SampleAttributeType.find_or_initialize_by(title:'Web link')
 link_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp(%w(http https)).to_s, placeholder: 'http://www.example.com')
 
-email_type = SampleAttributeType.find_or_initialize_by_title('Email address')
+email_type = SampleAttributeType.find_or_initialize_by(title:'Email address')
 email_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: RFC822::EMAIL.to_s, placeholder: 'someone@example.com')
 
-text_type = SampleAttributeType.find_or_initialize_by_title('Text')
+text_type = SampleAttributeType.find_or_initialize_by(title:'Text')
 text_type.update_attributes(base_type: Seek::Samples::BaseType::TEXT)
 
-string_type = SampleAttributeType.find_or_initialize_by_title('String')
+string_type = SampleAttributeType.find_or_initialize_by(title:'String')
 string_type.update_attributes(base_type: Seek::Samples::BaseType::STRING)
 
-chebi_type = SampleAttributeType.find_or_initialize_by_title('CHEBI ID')
+chebi_type = SampleAttributeType.find_or_initialize_by(title:'CHEBI ID')
 chebi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: 'CHEBI:[0-9]+', placeholder: 'CHEBI:1234')
 
-bool_type = SampleAttributeType.find_or_initialize_by_title('Boolean')
+bool_type = SampleAttributeType.find_or_initialize_by(title:'Boolean')
 bool_type.update_attributes(base_type: Seek::Samples::BaseType::BOOLEAN)
 
-strain_type = SampleAttributeType.find_or_initialize_by_title('SEEK Strain')
+strain_type = SampleAttributeType.find_or_initialize_by(title:'SEEK Strain')
 strain_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_STRAIN)
 
-seek_sample_type = SampleAttributeType.find_or_initialize_by_title('SEEK Sample')
+seek_sample_type = SampleAttributeType.find_or_initialize_by(title:'SEEK Sample')
 seek_sample_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_SAMPLE)
 
-cv_type = SampleAttributeType.find_or_initialize_by_title('Controlled Vocabulary')
+cv_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary')
 cv_type.update_attributes(base_type: Seek::Samples::BaseType::CV)
 
-uri_type = SampleAttributeType.find_or_initialize_by_title('URI')
+uri_type = SampleAttributeType.find_or_initialize_by(title:'URI')
 uri_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s, placeholder: 'http://www.example.com/123')
 
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types"

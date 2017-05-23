@@ -22,20 +22,10 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'should new with ajax' do
-    xhr :get, 'new'
-    assert_response :success
-  end
-
-  test 'should show edit own technology types' do
+  test 'should show edit on technology types' do
     get :edit, id: @suggested_technology_type
     assert_response :success
     assert_not_nil assigns(:suggested_technology_type)
-  end
-
-  test 'should edit with ajax' do
-    xhr :get, 'edit', id: Factory(:suggested_technology_type, contributor_id: User.current_user.person.try(:id)).id
-    assert_response :success
   end
 
   test 'should create with suggested parent' do
@@ -63,26 +53,13 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     assert_select 'li a', text: /test tech type/
   end
 
-  test 'should create for ajax request' do
-    assert_difference('SuggestedTechnologyType.count') do
-      xhr :post, :create, suggested_technology_type: { label: 'test_technology_type', parent_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography' }
-    end
-    assert_select "select option[selected='selected']", text: /test_technology_type/
-  end
-
-  test 'should update for ajax request' do
-    suggested_technology_type = Factory(:suggested_technology_type, contributor_id: User.current_user.person.try(:id))
-    xhr :put, :update, id: suggested_technology_type.id, suggested_technology_type: { label: 'child_technology_type_a' }
-    assert_select "select option[value=?][selected='selected']", suggested_technology_type.uri, text: /child_technology_type_a/
-  end
-
   test 'should update label' do
     login_as Factory(:admin)
     put :update, id: @suggested_technology_type, suggested_technology_type: { label: 'new label' }
     assert_redirected_to action: :manage
     get :manage
     suggested_technology_type = SuggestedTechnologyType.find @suggested_technology_type
-    assert_select 'li a[href=?]', ERB::Util.html_escape(technology_types_path(uri: suggested_technology_type.uri, label: 'new label')), text: /new label/
+    assert_select 'li a[href=?]', technology_types_path(uri: suggested_technology_type.uri, label: 'new label'), text: 'new label'
   end
 
   test 'should update parent' do
@@ -97,13 +74,13 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     assert_equal suggested_parent1.uri, suggested_technology_type.parent.uri.to_s
 
     # update to other parent suggested
-    put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_id: suggested_parent2.id }
+    put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_uri: "suggested_technology_type:#{suggested_parent2.id}" }
     assert_redirected_to action: :manage
     suggested_parent2.reload
     assert_includes suggested_parent2.children, suggested_technology_type
 
     # update to other parent from ontology
-    put :update, id: suggested_technology_type.id, suggested_technology_type: { ontology_uri: ontology_parent_uri }
+    put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_uri: ontology_parent_uri }
     assert_redirected_to action: :manage
   end
 

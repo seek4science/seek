@@ -26,7 +26,7 @@ class OrganismsController < ApplicationController
   end
 
   def index
-    @organisms = Organism.order('title ASC').all
+    @organisms = Organism.order('title ASC')
 
     if request.format.symbol == :html
       super
@@ -81,7 +81,7 @@ class OrganismsController < ApplicationController
   end
 
   def create
-    @organism = Organism.new(params[:organism])
+    @organism = Organism.new(organism_params)
     respond_to do |format|
       if @organism.save
         flash[:notice] = 'Organism was successfully created.'
@@ -97,7 +97,7 @@ class OrganismsController < ApplicationController
   def update
 
     respond_to do |format|
-      if @organism.update_attributes(params[:organism])
+      if @organism.update_attributes(organism_params)
         flash[:notice] = 'Organism was successfully updated.'
         format.html { redirect_to organism_path(@organism) }
         format.xml  { head :ok }
@@ -116,6 +116,10 @@ class OrganismsController < ApplicationController
   end
 
   private
+
+  def organism_params
+    params.require(:organism).permit(:title, :ontology_id, :concept_uri)
+  end
 
   def can_manage?
     unless @organism.can_manage?

@@ -1,6 +1,3 @@
-require 'grouped_pagination'
-require 'acts_as_cached_tree'
-
 class Strain < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
@@ -25,16 +22,15 @@ class Strain < ActiveRecord::Base
   has_many :samples, through: :sample_resource_links
 
   before_destroy :destroy_genotypes_phenotypes
-  scope :by_title
 
-  scope :without_default,where(:is_dummy=>false)
+  scope :without_default, -> { where(is_dummy: false) }
 
   delegate :ncbi_uri, :to=>:organism
 
   validates_presence_of :title, :organism
   validates_presence_of :projects, :unless => Proc.new{|strain| strain.is_dummy? || Seek::Config.is_virtualliver}
 
-  scope :default_order, order("title")
+  scope :default_order, -> { order("title") }
 
   alias_attribute :description, :comment
 

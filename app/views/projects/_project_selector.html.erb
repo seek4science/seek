@@ -58,8 +58,13 @@
 <% end %>
 <%= content_tag :script, possible_projects_json.html_safe, type: 'application/json', id: 'project-selector-possibilities-json' %>
 <%= content_tag :script, selected_projects_json.html_safe, type: 'application/json', id: 'project-selector-selected-json' %>
+<%= content_tag :script, project_policies_json(possible_projects | selected_projects), type: 'application/json', id: 'project-default-policies-json' %>
+<%= content_tag :script, enable_auto_project_license? ? project_licenses_json : '{}', type: 'application/json', id: 'project-default-licenses-json' %>
 
 <script>
+  Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
+  Sharing.defaultLicenses = JSON.parse($j('#project-default-licenses-json').text());
+
   Sharing.projectsSelector = new Vue({
     el: '#project-selector',
     data: {
@@ -71,20 +76,42 @@
         this.possibilities.push(project);
         this.selected.splice(index, 1);
         Sharing.removePermissionForProject(project);
+      },
+      add: function (projectId, skipPrompt) {
+        for (var i = 0; i < this.possibilities.length; i++) {
+          var project = this.possibilities[i];
+          if (project.id == projectId) {
+            this.selected.push(project);
+            // Ask if they want to use the default policy (if there is one)
+            if (Sharing.defaultPolicies[project.id] && (skipPrompt || confirm('' + project.title + ' has a default policy specified, do you want to apply it?'))) {
+              Sharing.applyPolicy(Sharing.defaultPolicies[project.id]);
+            } else { // Otherwise just add a permission for the project
+              Sharing.addPermissionForProject(project);
+            }
+
+            // Select the default license
+            if (this.selected.length === 1 && Sharing.defaultLicenses[project.id]) {
+              $j('#license-select').val(Sharing.defaultLicenses[project.id]);
+              zenodoExport.setLicenseUrl();
+            }
+            this.possibilities.splice(i, 1);
+          }
+        }
       }
     }
   });
 
+
   $j(document).ready(function () {
+    // Auto select project if there is only one
+    if (Sharing.projectsSelector.possibilities.length === 1 &&
+        Sharing.projectsSelector.selected.length === 0) {
+      Sharing.projectsSelector.add(Sharing.projectsSelector.possibilities[0].id, true);
+    }
     $j('#projects-selector-select').change(function () {
       if ($j(this).val()) {
-        for (var i = 0; i < Sharing.projectsSelector.possibilities.length; i++) {
-          if (Sharing.projectsSelector.possibilities[i].id == $j(this).val()) {
-            Sharing.projectsSelector.selected.push(Sharing.projectsSelector.possibilities[i]);
-            Sharing.addPermissionForProject(Sharing.projectsSelector.possibilities[i]);
-            Sharing.projectsSelector.possibilities.splice(i, 1);
-          }
-        }
+        Sharing.projectsSelector.add($j(this).val());
+        $j(this).prop('selectedIndex', 0); // Reset the select
       }
     })
   });

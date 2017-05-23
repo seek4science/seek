@@ -16,7 +16,7 @@ class ProjectTest < ActiveSupport::TestCase
       p.destroy
     end
 
-    assert_equal nil, WorkGroup.find_by_id(wg.id)
+    assert_nil WorkGroup.find_by_id(wg.id)
   end
 
   test 'to_rdf' do
@@ -109,7 +109,7 @@ class ProjectTest < ActiveSupport::TestCase
     p = projects(:sysmo_project)
     p.site_password = '12345'
     p.site_username = 'fred'
-    p.save!
+    disable_authorization_checks { p.save! }
 
     p = Project.find(p.id)
     assert_nil p.site_username, 'site username should be nil until requested'
@@ -570,7 +570,8 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test 'spawn' do
-    p = Factory(:programme, projects: [Factory(:project, avatar: Factory(:avatar))]).projects.first
+    p = Factory(:programme,
+                projects: [Factory(:project, description: 'proj', avatar: Factory(:avatar))]).projects.first
     wg1 = Factory(:work_group, project: p)
     wg2 = Factory(:work_group, project: p)
     person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: wg1)])
@@ -652,7 +653,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 5, p2.people.count
     assert_equal 2, p2.work_groups.count
     refute_equal p.work_groups.sort, p2.work_groups.sort
-    assert_equal p.people, p2.people
+    assert_equal p.people.sort, p2.people.sort
   end
 
   test 'can create?' do
@@ -693,7 +694,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal [prog], project.programmes
   end
 
-  test 'mass assigment' do
+  test 'mass assignment' do
     # check it is possible to mass assign all the attributes
     programme = Factory(:programme)
     institution = Factory(:institution)
@@ -719,7 +720,7 @@ class ProjectTest < ActiveSupport::TestCase
     disable_authorization_checks { project.save! }
     project.reload
 
-    assert_include project.organisms, organism
+    assert_includes project.organisms, organism
     assert_equal 'Project description', project.description
     assert_equal 'http://wikipage.com', project.wiki_page
     assert_equal 'http://webpage.com', project.web_page
@@ -739,10 +740,10 @@ class ProjectTest < ActiveSupport::TestCase
     }
     project.update_attributes(attr)
 
-    assert_include project.project_administrators, person
-    assert_include project.asset_gatekeepers, person
-    assert_include project.pals, person
-    assert_include project.asset_housekeepers, person
+    assert_includes project.project_administrators, person
+    assert_includes project.asset_gatekeepers, person
+    assert_includes project.pals, person
+    assert_includes project.asset_housekeepers, person
   end
 
   test 'project role removed when removed from project' do

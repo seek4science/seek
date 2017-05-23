@@ -90,7 +90,7 @@ class ModelsController < ApplicationController
       respond_to do |format|
         create_new_version comments
         create_content_blobs
-        create_model_image @model, params[:model_image]
+        create_model_image @model, model_image_params  if model_image_present?
         format.html { redirect_to @model }
       end
     else
@@ -189,15 +189,12 @@ class ModelsController < ApplicationController
   # PUT /models/1
   # PUT /models/1.xml
   def update
-    # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-    model_params=filter_protected_update_params(params[:model])
-
     update_annotations(params[:tag_list], @model)
     update_scales @model
 
     @model.attributes = model_params
 
-    update_sharing_policies @model,params
+    update_sharing_policies @model
 
     respond_to do |format|
       if @model.save
@@ -221,7 +218,7 @@ class ModelsController < ApplicationController
 
     #filter authorization
     ids = @matching_data_items.collect(&:primary_key)
-    data_files = DataFile.find_all_by_id(ids)
+    data_files = DataFile.where(id: ids)
     authorised_ids = DataFile.authorize_asset_collection(data_files, "view").collect(&:id)
     @matching_data_items = @matching_data_items.select { |mdf| authorised_ids.include?(mdf.primary_key.to_i) }
 
@@ -257,16 +254,12 @@ class ModelsController < ApplicationController
   end
 
   def build_model_image model_object, params_model_image
-    unless params_model_image.blank? || params_model_image[:image_file].blank?
-
-      # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
-      @model_image = ModelImage.new(params_model_image)
-      @model_image.model_id = model_object.id
-      @model_image.content_type = params_model_image[:image_file].content_type
-      @model_image.original_filename = params_model_image[:image_file].original_filename
-      model_object.model_image = @model_image
-    end
-
+    # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
+    @model_image = ModelImage.new(params_model_image)
+    @model_image.model_id = model_object.id
+    @model_image.content_type = params_model_image[:image_file].content_type
+    @model_image.original_filename = params_model_image[:image_file].original_filename
+    model_object.model_image = @model_image
   end
 
   def find_xgmml_doc model
@@ -277,10 +270,25 @@ class ModelsController < ApplicationController
   end
 
   def create_model_image model_object, params_model_image
-    build_model_image model_object, params_model_image
+    build_model_image model_object, params_model_image if model_image_present?
     model_object.save(:validate => false)
     latest_version = model_object.latest_version
     latest_version.model_image_id = model_object.model_image_id
     latest_version.save
+  end
+
+  private
+
+  def model_params
+    params.require(:model).permit(:imported_source, :imported_url, :title, :description, { project_ids: [] }, :license,
+                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id,
+                                  :other_creators,
+                                  { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+  end
+
+  alias_method :asset_params, :model_params
+
+  def model_image_params
+    params.require(:model_image).permit(:image_file)
   end
 end

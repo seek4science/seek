@@ -1,7 +1,6 @@
 
 require 'test_helper'
 require 'libxml'
-require 'webmock/test_unit'
 require 'openbis_test_helper'
 
 class DataFilesControllerTest < ActionController::TestCase
@@ -11,7 +10,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include RestTestCases
   include RdfTestCases
   include SharingFormTestHelper
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
   include MockHelper
 
   def setup
@@ -40,7 +39,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
 
-    al = ActivityLog.last(order: :id)
+    al = ActivityLog.order(:id).last
     assert_equal 'show', al.action
     assert_equal df, al.activity_loggable
 
@@ -49,7 +48,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     assert_response :success
 
-    al = ActivityLog.last(order: :id)
+    al = ActivityLog.order(:id).last
     assert_equal 'download', al.action
     assert_equal df, al.activity_loggable
   end
@@ -180,7 +179,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     refute_includes new_assay.data_files, d
     assert_difference('ActivityLog.count') do
-      put :update, id: d, data_file: {}, assay_ids: [new_assay.id.to_s]
+      put :update, id: d, data_file: { title: d.title }, assay_ids: [new_assay.id.to_s]
     end
 
     assert_redirected_to data_file_path(d)
@@ -893,7 +892,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'should update data file' do
     assert_difference('ActivityLog.count') do
-      put :update, id: data_files(:picture).id, data_file: {}
+      put :update, id: data_files(:picture).id, data_file: { title: 'diff title' }
     end
 
     assert_redirected_to data_file_path(assigns(:data_file))
@@ -916,9 +915,9 @@ class DataFilesControllerTest < ActionController::TestCase
     # upload a data file
     df = Factory :data_file, contributor: User.current_user
     # upload new version 1 of the data file
-    post :new_version, id: df, data_file: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 1'
+    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 1'
     # upload new version 2 of the data file
-    post :new_version, id: df, data_file: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 2'
+    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 2'
 
     df.reload
     assert_equal 3, df.versions.length
@@ -941,7 +940,7 @@ class DataFilesControllerTest < ActionController::TestCase
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
-        post :new_version, id: d, data_file: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
+        post :new_version, id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
       end
     end
 
@@ -964,7 +963,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
     end
   end
 
@@ -1156,7 +1155,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'correct response to unknown action' do
     df = data_files(:picture)
-    assert_raises ActionController::RoutingError do
+    assert_raises ActionController::UrlGenerationError do
       get :sdkfjshdfkhsdf, id: df
     end
   end
@@ -1215,7 +1214,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal permission.policy_id, df.policy_id
     assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
     assert_difference('ActivityLog.count') do
-      put :update, id: df, data_file: {},
+      put :update, id: df, data_file: { title: df.title },
                    policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
     end
     df.reload
@@ -1237,7 +1236,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
     login_as(df.contributor)
 
-    put :update, id: df, policy_attributes: projects_policy(Policy::NO_ACCESS, df.projects, Policy::ACCESSIBLE)
+    put :update, id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::NO_ACCESS, df.projects, Policy::ACCESSIBLE)
+
+    assert_redirected_to df
 
     df.reload
     permissions = df.policy.permissions
@@ -1349,22 +1350,22 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div#paginate_sheet_1' do
       assert_select 'span.previous_page.disabled', text: /Previous/, count: 1
       assert_select 'em.current', text: '1', count: 1
-      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=1", text: '2', count: 1
-      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=1", text: /Next/, count: 1
+      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=1", text: '2', count: 1
+      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=1", text: /Next/, count: 1
     end
 
     assert_select 'div#paginate_sheet_2' do
       assert_select 'span.previous_page.disabled', text: /Previous/, count: 1
       assert_select 'em.current', text: '1', count: 1
-      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=2", text: '2', count: 1
-      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=2", text: /Next/, count: 1
+      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=2", text: '2', count: 1
+      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=2", text: /Next/, count: 1
     end
 
     assert_select 'div#paginate_sheet_3' do
       assert_select 'span.previous_page.disabled', text: /Previous/, count: 1
       assert_select 'em.current', text: '1', count: 1
-      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=3", text: '2', count: 1
-      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&amp;page_rows=#{page_rows}&amp;sheet=3", text: /Next/, count: 1
+      assert_select 'a[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=3", text: '2', count: 1
+      assert_select 'a.next_page[href=?]', "/data_files/#{df.id}/explore?page=2&page_rows=#{page_rows}&sheet=3", text: /Next/, count: 1
     end
   end
 
@@ -1374,7 +1375,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Policy::NO_ACCESS, data_file.policy.access_type
     login_as(uploader)
 
-    put :update, id: data_file, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE }
 
     assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
@@ -1390,7 +1391,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person.user)
     assert data_file.can_manage?
 
-    put :update, id: data_file, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE }
 
     assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
@@ -1405,7 +1406,7 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(person.user)
     assert data_file.can_manage?
 
-    put :update, id: data_file, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: data_file, data_file: { title: data_file.title }, policy_attributes: { access_type: Policy::VISIBLE }
 
     assert_equal Policy::VISIBLE, assigns(:data_file).policy.access_type
     assert_nil flash[:error]
@@ -1546,13 +1547,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', text: /another creator/, count: 1
   end
 
-  test 'should show the other creators in  uploader and creators  box' do
+  test 'should show the other creators in uploader and creators box' do
     data_file = data_files(:picture)
     data_file.other_creators = 'another creator'
     data_file.save
     get :show, id: data_file
 
-    assert_select 'div', text: /another creator/, count: 1
+    assert_select 'div', text: 'another creator', count: 1
   end
 
   # TODO: Permission UI testing - Replace this with a Jasmine test
@@ -1966,7 +1967,7 @@ class DataFilesControllerTest < ActionController::TestCase
     blob = assigns(:data_file).content_blob
     assert !blob.cachable?
     assert !blob.url.blank?
-    assert_blank blob.original_filename
+    assert blob.original_filename.blank?
     assert_equal 'text/html', blob.content_type
     assert !blob.caching_job.exists?
   end
@@ -1999,6 +2000,39 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !blob.cachable?
     assert !blob.url.blank?
     assert_equal 'big.txt', blob.original_filename
+    assert_equal 'text/plain', blob.content_type
+    assert_equal 5000, blob.file_size
+    assert blob.caching_job.exists?
+  end
+
+  test "should create data file for remote URL that does not respond to HEAD" do
+    mock_http
+    params = { data_file: {
+        title: 'No Head File',
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: 'http://mockedlocation.com/nohead.txt',
+                                   make_local_copy: '1'
+                               }],
+               policy_attributes: valid_sharing
+    }
+
+    assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_difference('DataFile.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params
+        end
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    refute_nil assigns(:data_file).content_blob
+    blob = assigns(:data_file).content_blob
+    refute blob.external_link?
+    assert !blob.cachable?
+    assert !blob.url.blank?
+    assert_equal 'nohead.txt', blob.original_filename
     assert_equal 'text/plain', blob.content_type
     assert_equal 5000, blob.file_size
     assert blob.caching_job.exists?
@@ -2215,9 +2249,12 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id]
     sample_type.content_blob = Factory(:strain_sample_data_content_blob)
     sample_type.build_attributes_from_template
-    attribute_type = sample_type.sample_attributes.last
+    attribute_type = sample_type.sample_attributes[-2]
     attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
     attribute_type.required = true
+    attribute_type = sample_type.sample_attributes[-1]
+    attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
+    attribute_type.required = false
     sample_type.save!
 
     assert_difference('Sample.count', 3) do
@@ -2431,7 +2468,7 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:sample, originating_data_file: data_file)
 
     assert_no_difference('DataFile::Version.count') do
-      post :new_version, id: data_file.id, data_file: {}, content_blobs: [{ data: file_for_upload }],
+      post :new_version, id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }],
                          revision_comment: 'This is a new revision'
     end
 
@@ -2517,6 +2554,9 @@ class DataFilesControllerTest < ActionController::TestCase
     stub_request(:get, 'http://mockedlocation.com').to_return(body: '<!doctype html><html><head></head><body>internet.</body></html>', status: 200,
                                                               headers: { content_type: 'text/html; charset=UTF-8', content_length: 63 })
     stub_request(:head, 'http://mockedlocation.com').to_return(status: 200, headers: { content_type: 'text/html; charset=UTF-8', content_length: 63 })
+
+    stub_request(:get, 'http://mockedlocation.com/nohead.txt').to_return(body: 'bananafish' * 500, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
+    stub_request(:head, 'http://mockedlocation.com/nohead.txt').to_return(status: 405)
   end
 
   def mock_https

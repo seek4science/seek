@@ -11,18 +11,18 @@ module TavernaPlayer
     # Extend the Run model here.
     acts_as_asset
 
-    attr_accessible :workflow_version, :project_ids
+    # attr_accessible :workflow_version, :project_ids
 
     after_create :fix_run_input_ports_mime_types
     before_create :inherit_sweep_policy
 
     validates_presence_of :name
 
-    attr_accessible :project_ids
+    # attr_accessible :project_ids
 
     belongs_to :sweep
 
-    scope :default_order, order('created_at')
+    scope :default_order, -> { order('created_at') }
 
     def self.by_owner(uid)
       where(:contributor_id => uid, :contributor_type => "User")

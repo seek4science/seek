@@ -101,7 +101,7 @@ class SessionsControllerTest < ActionController::TestCase
     login_as :quentin
     @request.env['HTTP_REFERER'] = '/data_files'
     get :destroy
-    assert_equal @response.cookies['auth_token'], nil
+    assert_nil @response.cookies['auth_token']
   end
 
   def test_should_login_with_cookie

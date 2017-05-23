@@ -178,3 +178,6 @@ class Object
   end
 end
 
+ActiveRecord.module_eval do
+  include Seek::Permissions::AuthorizationEnforcement
+end

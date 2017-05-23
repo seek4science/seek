@@ -35,6 +35,9 @@ function tab_on_click(scale_title, resource_type, resource_ids, actions_partial_
                     onLoading: show_large_ajax_loader(tab_content_view_some_id),
                     onFailure: function(transport){
                         alert('Something went wrong, please try again...');
+                    },
+                    onSuccess: function (html) {
+                        Element.update('' + scale_title + '_' + resource_type + '_view_some', html);
                     }
                 });
         }

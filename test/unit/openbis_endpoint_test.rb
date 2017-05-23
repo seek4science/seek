@@ -240,46 +240,37 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute_nil endpoint.session_token
   end
 
-  test 'cache key' do
-    endpoint = OpenbisEndpoint.new username: 'fred', password: '12345', as_endpoint: 'http://my-openbis.org/openbis', dss_endpoint: 'http://my-openbis.org/openbis', space_perm_id: 'aaa'
-    assert_equal 'openbis_endpoints/new-ddf17b57f57098ff63383825125f00089a1e1c1cc4de18b27e30e3b9642854a9', endpoint.cache_key
-    endpoint.space_perm_id = 'bbb'
-    assert_equal 'openbis_endpoints/new-867be42425f47d36cc6b91926853a714251da75cea9c7517046e610d2f0201ca', endpoint.cache_key
-
-    endpoint = Factory(:openbis_endpoint)
-    assert_equal "openbis_endpoints/#{endpoint.id}-#{endpoint.updated_at.utc.to_s(:number)}", endpoint.cache_key
-  end
-
   test 'destroy' do
     pa = Factory(:project_administrator)
     endpoint = Factory(:openbis_endpoint, project: pa.projects.first)
+    metadata_store = endpoint.metadata_store
     key = endpoint.space.cache_key(endpoint.space_perm_id)
-    assert Rails.cache.exist?(key)
+    assert metadata_store.exist?(key)
     assert_difference('OpenbisEndpoint.count', -1) do
       User.with_current_user(pa.user) do
         endpoint.destroy
       end
     end
-    refute Rails.cache.exist?(key)
+    refute metadata_store.exist?(key)
   end
 
-  test 'clear cache' do
+  test 'clear metadata store' do
     endpoint = Factory(:openbis_endpoint)
     key = endpoint.space.cache_key(endpoint.space_perm_id)
-    assert Rails.cache.exist?(key)
-    endpoint.clear_cache
-    refute Rails.cache.exist?(key)
+    assert endpoint.metadata_store.exist?(key)
+    endpoint.clear_metadata_store
+    refute endpoint.metadata_store.exist?(key)
   end
 
-  test 'create_refresh_cache_job' do
+  test 'create_refresh_metadata_store_job' do
     endpoint = Factory(:openbis_endpoint)
     Delayed::Job.destroy_all
     refute OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
     assert_difference('Delayed::Job.count', 1) do
-      endpoint.create_refresh_cache_job
+      endpoint.create_refresh_metadata_store_job
     end
     assert_no_difference('Delayed::Job.count') do
-      endpoint.create_refresh_cache_job
+      endpoint.create_refresh_metadata_store_job
     end
     assert OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
   end
