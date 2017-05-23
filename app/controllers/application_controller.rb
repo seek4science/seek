@@ -69,6 +69,20 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
+  def api_version
+    @default = 1
+    version_re_arr = [/version=(?<v>.+?)/, /api.v(?<v>\d+?)\+json/]
+    version_re_arr.each do |re|
+      v_match = request.headers['Accept'].match(re)
+      if (v_match  != nil)
+        @version = v_match[:v]
+        break
+      end
+    end
+    @version ||= @default
+    puts "api version: ", @version
+  end
+
   def is_current_user_auth
     begin
       @user = User.where(['id = ?', current_user.try(:id)]).find(params[:id])

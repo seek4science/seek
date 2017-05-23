@@ -15,6 +15,9 @@ SEEK::Application.configure do
      text/x-json
      application/json
   )
+  #the space before 'version'  is important, if the user doesn't use space in his request header, it will not work unless we eliminate the space here
+  api_mime_types.append("application/vnd.api+json; version=1")
+  api_mime_types.append('application/vnd.api.v1+json')
   Mime::Type.unregister :json
   Mime::Type.register 'application/json', :json, api_mime_types
 
