@@ -2512,6 +2512,36 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_template :new
   end
 
+  test 'should download jerm thing' do
+    mock_http
+    data_file = Factory(:jerm_data_file,
+                        content_blob: Factory(:txt_content_blob, url: 'http://project.jerm/file.txt', data: 'jkl'),
+                        policy: Factory(:public_policy))
+    get :download, id: data_file
+    assert_equal 'abc', @response.body
+    assert_response :success
+  end
+
+  test 'should download jerm thing that throws 404 if a local copy is present' do
+    mock_http
+    data_file = Factory(:jerm_data_file,
+                        content_blob: Factory(:txt_content_blob, url: 'http://mocked404.com', data: 'xyz'),
+                        policy: Factory(:public_policy))
+    get :download, id: data_file
+    assert_equal 'xyz', @response.body
+    assert_response :success
+  end
+
+  test 'should not download jerm thing that has gone if a local copy is present' do
+    mock_http
+    data_file = Factory(:jerm_data_file,
+                        content_blob: Factory(:txt_content_blob, url: 'http://gone-project.jerm/file.txt', data: 'qwe'),
+                        policy: Factory(:public_policy))
+    get :download, id: data_file
+    assert_equal 'qwe', @response.body
+    assert_response :success
+  end
+
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)
@@ -2563,6 +2593,12 @@ class DataFilesControllerTest < ActionController::TestCase
 
     stub_request(:get, 'http://mockedlocation.com/nohead.txt').to_return(body: 'bananafish' * 500, status: 200, headers: { content_type: 'text/plain; charset=UTF-8', content_length: 5000 })
     stub_request(:head, 'http://mockedlocation.com/nohead.txt').to_return(status: 405)
+
+    stub_request(:get, 'http://project.jerm/file.txt').to_return(body: 'abc', status: 200, headers: { 'Content-Type' => 'text/plain; charset=UTF-8' })
+    stub_request(:head, 'http://project.jerm/file.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
+
+    stub_request(:get, 'http://gone-project.jerm/file.txt').to_raise(SocketError)
+    stub_request(:head, 'http://gone-project.jerm/file.txt').to_raise(SocketError)
   end
 
   def mock_https
