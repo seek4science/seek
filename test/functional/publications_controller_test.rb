@@ -767,6 +767,23 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, authors[1]['count']
   end
 
+  test 'automatically extracts DOI from full DOI url' do
+    project = Factory(:project)
+
+    assert_difference('Publication.count') do
+      post :create, publication: { project_ids: ['', project.id.to_s],
+                                   doi: 'http://dx.doi.org/10.5072/abcd',
+                                   title: 'Cool stuff',
+                                   publication_authors: ['', User.current_user.person.name],
+                                   abstract: 'We did stuff',
+                                   journal: 'Journal of Interesting Stuff',
+                                   published_date: '2017-05-23' }, subaction: 'Create'
+
+    end
+
+    assert_equal '10.5072/abcd', assigns(:publication).doi
+  end
+
   private
 
   def publication_for_export_tests

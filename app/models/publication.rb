@@ -84,6 +84,11 @@ class Publication < ActiveRecord::Base
     "https://dx.doi.org/#{doi}" if doi
   end
 
+  # Automatically extract the actual DOI if the user put in the full URL
+  def doi=(doi)
+    super(doi.gsub(/(https?:\/\/)?dx\.doi\.org\//,''))
+  end
+
   def default_policy
     policy = Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE)
     # add managers (authors + contributor)
