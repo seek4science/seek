@@ -1,0 +1,20 @@
+<p>
+  JWS Online needs information about whether the model you are attempting to simulate is Constraint based or not.
+</p>
+<p>
+  Please select the option below. If unsure, leave the value as it is.
+</p>
+
+<p>
+  <%= form_for @model, url:{action: :simulate},method: :post do |f| %>
+      <div>
+        <%= hidden_field_tag :version,@display_model.version %>
+        <%= hidden_field_tag :constraint_based,0 %>
+        <%= check_box_tag(:constraint_based) %>
+        <%= label_tag(:constraint_based, "Constraint based?") %>
+        </div>
+  <div>
+    <%= f.submit "Continue" %>
+    </div>
+  <% end %>
+</p>
