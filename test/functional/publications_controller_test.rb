@@ -220,7 +220,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should export publication as endnote' do
     publication_formatter_mock
-    get :show, id: publication_for_export_tests, format: 'enw'
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: publication_for_export_tests, format: 'enw'
+    end
     assert_response :success
     assert_match(/%0 Journal Article.*/, response.body)
     assert_match(/.*%A Hendrickson, W\. A\..*/, response.body)
@@ -246,7 +248,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should export publication as bibtex' do
     publication_formatter_mock
-    get :show, id: publication_for_export_tests, format: 'bibtex'
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: publication_for_export_tests, format: 'bibtex'
+    end
     assert_response :success
     assert_match(/@article{PMID:5,.*/, response.body)
     assert_match(/.*author.*/, response.body)
@@ -260,7 +264,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should export publication as embl' do
     publication_formatter_mock
-    get :show, id: publication_for_export_tests, format: 'embl'
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: publication_for_export_tests, format: 'embl'
+    end
     assert_response :success
     assert_match(/RX   PUBMED; 5\..*/, response.body)
     assert_match(/.*RT   \"Atomic models for the polypeptide backbones of myohemerythrin and\nRT   hemerythrin.\";.*/, response.body)
