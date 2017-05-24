@@ -811,6 +811,7 @@ GEM
     validate_url (1.0.2)
       activemodel (>= 3.0.0)
       addressable
+    vcr (2.9.3)
     version (1.0.0)
     virtus (1.0.5)
       axiom-types (~> 0.1)
@@ -961,6 +962,7 @@ DEPENDENCIES
   unicorn-rails
   uuid (~> 2.3)
   validate_url
+  vcr (~> 2.9)
   webmock
   white_list!
   white_list_formatted_content!

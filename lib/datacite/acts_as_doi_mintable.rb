@@ -43,7 +43,7 @@ module DataCite
         username = Seek::Config.datacite_username
         password = Seek::Config.datacite_password_decrypt
         url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
-        endpoint = Datacite.new(username, password, url)
+        endpoint = DataCite::Client.new(username, password, url)
 
         endpoint.upload_metadata(datacite_metadata.to_s)
         endpoint.mint(suggested_doi, doi_target_url)

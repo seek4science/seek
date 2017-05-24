@@ -166,6 +166,7 @@ group :test do
   gem 'coveralls', require: false
   gem 'sunspot_matchers'
   gem 'database_cleaner'
+  gem 'vcr', '~> 2.9'
 end
 
 group :test, :development do
