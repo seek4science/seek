@@ -506,16 +506,6 @@ img.avatar-corner-icon {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    .type-icon-wrapper {
-      width: 24px;
-      height: 24px;
-      display: inline-block;
-      text-align: center;
-    }
-    .type-icon {
-      max-width: 24px;
-      max-height: 24px;
-    }
   }
 
   .permission-row.mandatory {
@@ -583,4 +573,28 @@ a.remove-button {
   &:hover {
     text-decoration: none;
   }
+}
+
+#preview_permissions {
+  p.private {
+    color: $brand-danger;
+  }
+  p.public {
+    color: $brand-success;
+  }
+  ul {
+    list-style: none;
+    padding-left: 16px;
+  }
+}
+
+.type-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  text-align: center;
+}
+.type-icon {
+  max-width: 24px;
+  max-height: 24px;
 }
