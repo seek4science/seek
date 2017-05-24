@@ -1,25 +1,39 @@
-<p>
-  JWS Online needs information about whether the model you are simulating is constraint-based or not.<br/>
-  Select the following option to specify that the SBML model should be treated as a stoichiometric model
-  with flux constraints.
-</p>
-<p>
-  If unsure, leave the value as it is.
-</p>
 
-<p>
-  <form action="<%= simulate_model_path(@model) %>" method="get" id="constraint-form">
-      <div>
+<div class='row'>
+  <div class="col-md-2">
+    <%= jws_online_logo %>
+  </div>
+  <div class="col-md-10">
+
+    <p>
+      JWS Online needs information about whether the model you are simulating is constraint-based or not.
+      Select the following option to specify that the SBML model should be treated as a stoichiometric model
+      with flux constraints.
+    </p>
+    <p>
+      If unsure, leave the value as it is.
+    </p>
+
+    <form action="<%= simulate_model_path(@model) %>" method="get" id="constraint-form">
+      <div class="form-group">
         <%= hidden_field_tag :version,@display_model.version %>
         <%= hidden_field_tag :constraint_based,0 %>
-        <%= check_box_tag(:constraint_based) %>
-        <%= label_tag(:constraint_based, "Constraint-based model?") %>
+        <div class="checkbox">
+          <label>
+            <%= check_box_tag(:constraint_based,:class=>'form-control') %>
+            Constraint-based model?
+          </label>
         </div>
-  <div>
-    <%= submit_tag "Continue", name:nil, id:'submit' %>
-    </div>
-  </form>
-</p>
+      </div>
+      <div>
+        <%= submit_tag "Continue", name:nil, id:'submit',:class=>'btn btn-primary' %>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+
 
 <script>
   // this strange piece of javascript is to ensure that the URL of the resulting simulation contains the correct
