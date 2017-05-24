@@ -17,7 +17,7 @@ module BootstrapHelper
 
   # A collapsible panel
   def folding_panel(title = nil, collapsed = false, options = {})
-    title += ' <span class="caret"></span>'.html_safe
+    title += " <span class=\"#{collapsed ? 'caret' : 'caret-up'}\"></span>".html_safe
 
     options[:collapsible] = true
     options[:heading_options] = merge_options({ :class => 'clickable collapsible', 'data-toggle' => 'collapse-next' }, options[:heading_options])

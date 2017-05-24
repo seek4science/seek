@@ -274,3 +274,11 @@ function digValue(object, path) {
     }
   };
 }( jQuery ));
+
+$j(document).ready(function () {
+  $j('.collapse').on('show.bs.collapse', function () {
+    $j(this).parent().find('.panel-heading .caret').removeClass('caret').addClass('caret-up');
+  }).on('hide.bs.collapse', function () {
+    $j(this).parent().find('.panel-heading .caret-up').removeClass('caret-up').addClass('caret');
+  });
+});
