@@ -1,4 +1,5 @@
 require_relative 'metadata'
+require_relative 'client'
 require 'seek/util'
 
 module DataCite
