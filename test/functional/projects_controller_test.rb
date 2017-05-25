@@ -1152,14 +1152,16 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:person, group_memberships: [group_membership])
     former_group_membership = Factory(:group_membership, time_left_at: 10.days.ago, work_group: wg)
     former_person = Factory(:person, group_memberships: [former_group_membership])
-    assert_no_difference('GroupMembership.count') do
-      post :update_members,
-           id: project,
-           memberships_to_flag: { group_membership.id.to_s => { time_left_at: 1.day.ago },
-                                  former_group_membership.id.to_s => { time_left_at: '' } }
-      assert_redirected_to project_path(project)
-      assert_nil flash[:error]
-      refute_nil flash[:notice]
+    assert_difference("Delayed::Job.where(\"handler LIKE '%ProjectLeavingJob%'\").count", 2) do
+      assert_no_difference('GroupMembership.count') do
+        post :update_members,
+             id: project,
+             memberships_to_flag: { group_membership.id.to_s => { time_left_at: 1.day.ago },
+                                    former_group_membership.id.to_s => { time_left_at: '' } }
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
     end
 
     assert group_membership.reload.has_left
