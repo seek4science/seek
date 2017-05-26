@@ -490,6 +490,10 @@ img.avatar-corner-icon {
     border-right-width: 3px;
   }
 
+  .permission-column.hidden, .privilege-cell.hidden {
+    display: none;
+  }
+
   .permission-column {
     text-align: center;
     width: 7em;
