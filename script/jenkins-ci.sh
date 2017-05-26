@@ -14,4 +14,5 @@ bundle install
 
 bundle exec rake db:setup
 bundle exec rake db:test:prepare
-bundle exec rake test:units
+bundle exec rake test
+bundle exec rake assets:precompile
