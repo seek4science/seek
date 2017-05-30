@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 RUBY_VERSION=$(cat .ruby-version)
 GEMSET=$(cat .ruby-gemset)
 
