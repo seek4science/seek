@@ -55,7 +55,8 @@ module SEEK
     config.action_view.sanitized_allowed_tags = ["u"]
     WhiteListHelper.tags.merge %w(u)
 
-    config.middleware.use Rack::Deflater
+    config.middleware.use Rack::Deflater,
+                          include: %w(text/html application/xml application/json text/css application/javascript)
 
     config.exceptions_app = self.routes
 

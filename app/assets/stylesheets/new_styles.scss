@@ -490,6 +490,10 @@ img.avatar-corner-icon {
     border-right-width: 3px;
   }
 
+  .permission-column.hidden, .privilege-cell.hidden {
+    display: none;
+  }
+
   .permission-column {
     text-align: center;
     width: 7em;
@@ -506,16 +510,6 @@ img.avatar-corner-icon {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    .type-icon-wrapper {
-      width: 24px;
-      height: 24px;
-      display: inline-block;
-      text-align: center;
-    }
-    .type-icon {
-      max-width: 24px;
-      max-height: 24px;
-    }
   }
 
   .permission-row.mandatory {
@@ -582,5 +576,49 @@ a.remove-button {
   color: $brand-danger;
   &:hover {
     text-decoration: none;
+  }
+}
+
+#preview_permissions {
+  p.private {
+    color: $brand-danger;
+  }
+  p.public {
+    color: $brand-success;
+  }
+  ul {
+    list-style: none;
+    padding-left: 16px;
+  }
+}
+
+.type-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  text-align: center;
+}
+.type-icon {
+  max-width: 24px;
+  max-height: 24px;
+}
+
+div.popup-contributor {
+  width: 270px;
+  display: inline-block;
+  margin: 5px;
+  clear: both;
+
+  .favouritable {
+    float: left;
+    margin-right: 5px;
+    left: 0;
+    top: 0;
+  }
+
+  div.popup-contributor-name {
+    height: 3em;
+    display: table-cell;
+    vertical-align: middle;
   }
 }

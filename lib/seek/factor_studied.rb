@@ -82,7 +82,7 @@ module Seek
         check_string.concat(params[:experimental_condition][:start_value].to_s)
       end
 
-      if check_string.match(',')
+      if check_string =~ /,/
         render :update do |page|
           page.alert('Please use point instead of comma for decimal number')
         end

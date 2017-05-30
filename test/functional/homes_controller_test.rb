@@ -21,7 +21,7 @@ class HomesControllerTest < ActionController::TestCase
   test 'test title' do
     login_as(:quentin)
     get :index
-    assert_select 'title', text: /The Sysmo SEEK.*/, count: 1
+    assert_select 'title', text: 'The Sysmo SEEK', count: 1
   end
 
   test 'correct response to unknown action' do

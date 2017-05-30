@@ -20,18 +20,25 @@
               <% creators[0...2].each do |a|  -%>
                   <%=  favouritable_icon(a, 60) -%>
               <% end -%>
-              <div>
-                <a href="#" id="authorAvatarListLink<%= resource.object_id -%>" onclick="toggleAuthorAvatarList(<%= resource.object_id-%>); return false;">(Show All)</a>
-              </div>
-              <div id="authorAvatarList<%= resource.object_id -%>" class="avatar_list_popup" style="display:none;">
-                <% creators.each do |a|  -%>
-                    <%=  favouritable_icon(a, 60) -%>
-                <% end -%>
-                <br/>
-                <a href="#" onclick="toggleAuthorAvatarList(<%= resource.object_id-%>); return false;">(Close)</a>
-              </div>
+              <%= link_to('(Show All)', '#', 'data-toggle' => 'modal', 'data-target' => "#author-avatar-list#{resource.object_id}") %>
           <% end %>
         </div>
+        <%= modal(id: "author-avatar-list#{resource.object_id}", class: 'text-left', size: 'lg') do %>
+            <%= modal_header('All contributors') %>
+            <%= modal_body do %>
+                <% creators.each do |a|  -%>
+                    <div class="popup-contributor">
+                      <%= favouritable_icon(a, 40) -%>
+                      <div class="popup-contributor-name">
+                        <%= a.name %>
+                      </div>
+                    </div>
+                <% end -%>
+            <% end %>
+            <%= modal_footer do %>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <% end %>
+        <% end %>
     <% else %>
         <% if !resource.contributor -%>
             <div class="text-center">

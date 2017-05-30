@@ -1,4 +1,5 @@
 module AssociationsHelper
+
   def associations_list(id, template_name, existing, options = {})
     empty_text = options.delete(:empty_text) || 'No items'
     options.reverse_merge!(:id => id, 'data-role' => 'seek-associations-list', 'data-template-name' => template_name)
@@ -67,8 +68,8 @@ module AssociationsHelper
                direction: { value: aa.direction, text: direction_name(aa.direction) }
       }
       if aa.relationship_type
-        hash.merge!(relationship_type: { value: aa.relationship_type.id,
-                                         text: aa.relationship_type.title })
+        hash[:relationship_type] = { value: aa.relationship_type.id,
+                                         text: aa.relationship_type.title }
       end
 
       hash

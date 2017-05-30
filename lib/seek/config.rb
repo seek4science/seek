@@ -49,7 +49,7 @@ module Seek
       smtp_hash = smtp
 
       password =  smtp_settings 'password'
-      smtp_hash.merge! 'password' => password
+      smtp_hash['password'] = password
 
       new_hash = {}
       smtp_hash.keys.each do |key|

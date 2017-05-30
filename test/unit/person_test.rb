@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
+
   fixtures :users, :people
 
   # Replace this with your real tests.

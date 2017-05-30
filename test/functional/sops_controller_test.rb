@@ -100,7 +100,7 @@ class SopsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK #{I18n.t('sop').pluralize}.*/, count: 1
+    assert_select 'title', text: I18n.t('sop').pluralize, count: 1
   end
 
   test 'should get index' do

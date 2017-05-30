@@ -12,10 +12,6 @@ ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_d
 
 puts "Seeded culture growth types"
 
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "model_types")
-
-puts "Seeded model types"
-
 ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "model_formats")
 
 puts "Seeded model formats"

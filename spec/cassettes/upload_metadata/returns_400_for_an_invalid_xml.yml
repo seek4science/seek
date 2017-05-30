@@ -1,0 +1,78 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://test.datacite.org/mds/metadata
+    body:
+      encoding: UTF-8
+      string: |-
+        <resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+          <creators>
+            <creator>
+              <creatorName>First, Last</creatorName>
+            </creator>
+          </creators>
+          <titles>
+            <title>For testing</title>
+          </titles>
+          <publisher>ABC</publisher>
+          <publicationYear>2013</publicationYear>
+          <subjects>
+            <subject>Assessment</subject>
+            <subject>Information Literacy</subject>
+            <subject>Engineering</subject>
+          </subjects>
+          <language>eng</language>
+          <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
+          <version>1</version>
+          <descriptions>
+            <description descriptionType="Abstract">
+              A test
+            </description>
+          </descriptions>
+        </resource>
+    headers:
+      Accept:
+      - "*/*; q=0.5, application/xml"
+      Accept-Encoding:
+      - gzip, deflate
+      Content-Type:
+      - application/xml;charset=UTF-8
+      Content-Length:
+      - '828'
+      User-Agent:
+      - Ruby
+      Authorization:
+      - Basic dGVzdDp0ZXN0
+  response:
+    status:
+      code: 400
+      message: Bad Request
+    headers:
+      Date:
+      - Tue, 04 Nov 2014 15:23:14 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Cache-Control:
+      - no-cache
+      - no-store
+      Content-Length:
+      - '573'
+      Connection:
+      - close
+      Content-Type:
+      - text/plain
+    body:
+      encoding: UTF-8
+      string: '[xml] xml error: cvc-complex-type.2.4.b: The content of element ''resource''
+        is not complete. One of ''{"http://datacite.org/schema/kernel-3":identifier,
+        "http://datacite.org/schema/kernel-3":contributors, "http://datacite.org/schema/kernel-3":dates,
+        "http://datacite.org/schema/kernel-3":alternateIdentifiers, "http://datacite.org/schema/kernel-3":relatedIdentifiers,
+        "http://datacite.org/schema/kernel-3":sizes, "http://datacite.org/schema/kernel-3":formats,
+        "http://datacite.org/schema/kernel-3":rightsList, "http://datacite.org/schema/kernel-3":geoLocations}''
+        is expected.'
+    http_version:
+  recorded_at: Tue, 04 Nov 2014 15:23:16 GMT
+recorded_with: VCR 2.9.3

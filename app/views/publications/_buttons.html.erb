@@ -3,7 +3,9 @@
 <% elsif !item.doi.nil? %>
   <%= button_link_to('View Publication', 'visit_pubmed', item.doi_uri, :target => "_blank") -%>
 <% end -%>
+
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item } -%>
+
 <%= dropdown_button('Export', 'export', menu_options: { class: 'pull-right' }) do %>
   <% Publication::EXPORT_TYPES.each do |key,value| %>
     <li><%= image_tag_for_key(key.to_s, publication_path(item, :format => key), nil, nil, value[:name]) -%></li>

@@ -20,6 +20,7 @@ require 'acts_as_versioned_resource'
 require "attachment_fu_extension"
 require 'seek/taggable'
 require 'bio'
+require 'bio_extensions'
 require 'uuid'
 require 'sunspot_rails'
 require 'cancan'

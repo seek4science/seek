@@ -354,6 +354,11 @@ Factory.define(:strain_sample_data_file, parent: :data_file) do |f|
   f.association :content_blob, factory: :strain_sample_data_content_blob
 end
 
+Factory.define(:jerm_data_file, parent: :data_file) do |f|
+  f.contributor nil
+  f.association :content_blob, factory: :url_content_blob
+end
+
 # Model
 Factory.define(:model) do |f|
   f.sequence(:title) { |n| "A Model #{n}" }

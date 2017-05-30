@@ -26,7 +26,7 @@ class JwsOnlineTest < ActionController::TestCase
 
   test 'simulate' do
     model = Factory(:teusink_model, policy: Factory(:public_policy))
-    get :simulate, id: model.id, version: model.version
+    get :simulate, id: model.id, version: model.version, constraint_based:'1'
     assert_response :success
     assert assigns(:simulate_url)
 
@@ -34,5 +34,13 @@ class JwsOnlineTest < ActionController::TestCase
     refute_nil url
     assert url =~ URI.regexp, "simulate url (#{url}) should be a valid url"
     assert_select 'iframe[src=?]', url
+  end
+
+  test 'simulate no constraint defined' do
+    model = Factory(:teusink_model, policy: Factory(:public_policy))
+    get :simulate, id: model.id, version: model.version
+    assert_response :success
+    refute assigns(:simulate_url)
+    assert_select 'input[@type=checkbox]#constraint_based',count: 1
   end
 end
