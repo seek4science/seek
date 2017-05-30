@@ -29,26 +29,40 @@ module RestTestCases
     end
   end
 
-  def test_response_code_for_not_accessible_xml
+  def test_show_json(object = rest_api_test_object)
+    get :show, id: object, format: 'json'
+    perform_jsonapi_checks
+  end
+
+  def test_index_json
+    object = rest_api_test_object
+    get :index, format: 'json'
+    perform_jsonapi_checks
+  end
+
+  def test_response_code_for_not_accessible
     clz = @controller.controller_name.classify.constantize
     if clz.respond_to?(:authorization_supported?) && clz.authorization_supported?
       itemname = @controller.controller_name.singularize.underscore
       item = Factory itemname.to_sym, policy: Factory(:private_policy)
-
       logout
-      get :show, id: item.id, format: 'xml'
-      assert_response :forbidden
+      ['xml', 'json'].each do |format|
+        get :show, id: item.id, format: format
+        assert_response :forbidden
+      end
     end
   end
 
-  def test_response_code_for_not_available_xml
+  def test_response_code_for_not_available
     clz = @controller.controller_name.classify.constantize
     id = 9999
     id += 1 until clz.find_by_id(id).nil?
 
     logout
-    get :show, id: id, format: 'xml'
-    assert_response :not_found
+    ['xml', 'json'].each do |format|
+      get :show, id: id, format: format
+      assert_response :not_found
+    end
   end
 
   def perform_api_checks
@@ -56,6 +70,11 @@ module RestTestCases
     valid, message = check_xml
     assert valid, message
     validate_xml_against_schema(@response.body)
+  end
+
+  def perform_jsonapi_checks
+    assert_response :success
+    assert_equal 'application/json', @response.content_type
   end
 
   def check_xml
