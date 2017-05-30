@@ -602,3 +602,23 @@ a.remove-button {
   max-width: 24px;
   max-height: 24px;
 }
+
+div.popup-contributor {
+  width: 270px;
+  display: inline-block;
+  margin: 5px;
+  clear: both;
+
+  .favouritable {
+    float: left;
+    margin-right: 5px;
+    left: 0;
+    top: 0;
+  }
+
+  div.popup-contributor-name {
+    height: 3em;
+    display: table-cell;
+    vertical-align: middle;
+  }
+}
