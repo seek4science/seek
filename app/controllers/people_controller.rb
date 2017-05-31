@@ -300,12 +300,13 @@ class PeopleController < ApplicationController
   def typeahead
     # String concatenation varies across SQL implementations :(
     if Seek::Util.database_type == 'sqlite3'
-      concat_clause = '(first_name || " " || last_name)'
+      concat_clause = "LOWER(first_name || ' ' || last_name)"
     else
-      concat_clause = 'CONCAT(first_name, " ", last_name)'
+      concat_clause = "LOWER(CONCAT(first_name, ' ', last_name))"
     end
-    results = Person.where("#{concat_clause} LIKE :query OR first_name LIKE :query OR last_name LIKE :query",
-                           query: "#{params[:query]}%").limit(params[:limit] || 10)
+
+    results = Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
+                           query: "#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |person|
       projects = person.projects.collect { |p| p.title }.join(', ')
       { id: person.id, name: person.name, projects: projects, hint: projects }
