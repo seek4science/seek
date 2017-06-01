@@ -18,10 +18,12 @@ class OrganismsController < ApplicationController
   include Seek::BreadCrumbs
 
   def show
+    options = {:is_collection=>false, :jsonapi=>{version: "1.0"}, :include=>['associated']}
     respond_to do |format|
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
+      format.json {render json: JSONAPI::Serializer.serialize(@organism,options)}
     end
   end
 
