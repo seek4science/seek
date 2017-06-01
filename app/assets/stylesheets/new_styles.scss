@@ -622,3 +622,23 @@ div.popup-contributor {
     vertical-align: middle;
   }
 }
+
+.list_item {
+  .rli-head {
+    display: flex;
+  }
+
+  .list_item_title {
+    flex-grow: 1;
+    flex-shrink: 0;
+  }
+
+  .rli-project-list {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    flex-grow: 0;
+    margin-left: 3em;
+  }
+}
