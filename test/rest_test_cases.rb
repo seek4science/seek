@@ -2,9 +2,11 @@
 
 require 'libxml'
 require 'pp'
+require 'json-schema'
 
 module RestTestCases
-  SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
+  XML_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
+  JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'json', 'rest', 'jsonapi-schema-v1')
 
   def test_index_rest_api_xml
     # to make sure something in the database is created
@@ -75,6 +77,9 @@ module RestTestCases
   def perform_jsonapi_checks
     assert_response :success
     assert_equal 'application/json', @response.content_type
+    puts JSON::Validator.fully_validate(JSONAPI_SCHEMA_FILE_PATH, @response.body)
+    assert JSON::Validator.validate(JSONAPI_SCHEMA_FILE_PATH, @response.body)
+
   end
 
   def check_xml
@@ -85,7 +90,7 @@ module RestTestCases
     [true, '']
   end
 
-  def validate_xml_against_schema(xml, schema = SCHEMA_FILE_PATH)
+  def validate_xml_against_schema(xml, schema = XML_SCHEMA_FILE_PATH)
     skip('currently skipping REST API schema check') if skip_rest_schema_check?
     document = LibXML::XML::Document.string(xml)
     schema = LibXML::XML::Schema.new(schema)

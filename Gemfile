@@ -34,6 +34,7 @@ gem 'openseek-api'
 gem 'jbuilder', '~> 2.0'
 gem 'jbuilder-json_api'
 gem 'jsonapi-serializers'
+gem 'json-schema'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
