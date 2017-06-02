@@ -33,6 +33,17 @@ disable_authorization_checks do
       strain.update_column(:policy_id,policy.id)
     end
   end
+
+  # Fix first letters
+  Organism.find_each do |organism|
+    organism.update_first_letter
+    organism.update_column(:first_letter, organism.first_letter)
+  end
+
+  Strain.find_each do |strain|
+    strain.update_first_letter
+    strain.update_column(:first_letter, strain.first_letter)
+  end
 end
 
 puts "Seeded organisms"
