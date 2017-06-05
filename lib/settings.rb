@@ -24,25 +24,13 @@
 class Settings < ActiveRecord::Base
   class SettingNotFound < RuntimeError; end
 
+  belongs_to :target, polymorphic: true, required: false
+
   cattr_accessor :defaults
   @@defaults = {}.with_indifferent_access
   # Support old plugin
   if defined?(SettingsDefaults::DEFAULTS)
     @@defaults = SettingsDefaults::DEFAULTS.with_indifferent_access
-  end
-
-  #get or set a variable with the variable as the called method
-  def self.method_missing(method, *args)
-    method_name = method.to_s
-    super(method, *args)
-  rescue NoMethodError
-    if method_name.end_with?('=')
-      var_name = method_name.delete('=')
-      value = args.first
-      self[var_name] = value
-    else
-      self[method_name]
-    end
   end
 
   #destroy the specified settings record
@@ -57,7 +45,7 @@ class Settings < ActiveRecord::Base
   end
 
   def self.to_hash(starting_with=nil)
-    vars = target_scoped.select(:var, :values)
+    vars = select(:var, :values)
     vars = vars.where("var LIKE ?", "'#{starting_with}%'") if starting_with
 
     result = HashWithIndifferentAccess.new
@@ -79,7 +67,7 @@ class Settings < ActiveRecord::Base
   def self.[]=(var_name, value)
     var_name = var_name.to_s
 
-    record = target(var_name) || target_scoped.new(var: var_name)
+    record = target(var_name) || new(var: var_name)
     record.value = value
     record.save!
 
@@ -109,10 +97,14 @@ class Settings < ActiveRecord::Base
   end
 
   def self.target(var_name)
-    target_scoped.where(var: var_name.to_s).first
+    where(var: var_name.to_s).first
   end
 
-  def self.target_scoped
+  def self.global
     where(target_type: nil, target_id: nil)
+  end
+
+  def self.for(target)
+    where(target_type: target.class.name, target_id: target.id)
   end
 end
