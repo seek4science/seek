@@ -50,7 +50,7 @@ class StudiedFactorsController < ApplicationController
     # retrieve the selected FSes
 
     params.each do |key, value|
-      studied_factor_ids.push value.to_i if key.match('checkbox_')
+      studied_factor_ids.push value.to_i if (key =~ /checkbox/)
     end
     # create the new FSes based on the selected FSes
     studied_factor_ids.each do |id|

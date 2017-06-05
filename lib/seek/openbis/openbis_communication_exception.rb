@@ -1,5 +1,5 @@
 module Seek
   module Openbis
-    class APIInteractionException < Exception; end
+    class APIInteractionException < RuntimeError; end
   end
 end

@@ -17,7 +17,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK Institutions.*/, count: 1
+    assert_select 'title', text: 'Institutions', count: 1
   end
 
   def test_should_get_index

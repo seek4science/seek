@@ -11,7 +11,7 @@ module StudiesHelper
 
   def sorted_measured_items
     items = MeasuredItem.all
-    items.sort { |a, b| a.title <=> b.title }
+    items.sort_by(&:title)
   end
 
   def studies_link_list(studies, sorted = true)
@@ -19,7 +19,7 @@ module StudiesHelper
     return "<span class='none_text'>Not associated with any #{t('study').pluralize}</span>".html_safe if studies.empty?
 
     result = ''
-    studies = studies.sort { |a, b| a.title <=> b.title } if sorted
+    studies = studies.sort_by(&:title) if sorted
     studies.each do |study|
       if study.can_view?
         result += link_to study.title.capitalize, study

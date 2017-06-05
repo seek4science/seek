@@ -408,4 +408,27 @@ class PublicationTest < ActiveSupport::TestCase
       p.save!
     end
   end
+
+  test 'strips domain from DOI if an URL is given' do
+    project = Factory(:project)
+    pub = Publication.new(title: 'test1', projects: [project], doi: '10.5072/abc')
+    assert pub.valid?
+    assert_equal '10.5072/abc', pub.doi
+
+    pub.doi = 'http://dx.doi.org/10.5072/abc'
+    assert pub.valid?
+    assert_equal '10.5072/abc', pub.doi
+
+    pub.doi = 'https://dx.doi.org/10.5072/abc'
+    assert pub.valid?
+    assert_equal '10.5072/abc', pub.doi
+
+    pub.doi = 'dx.doi.org/10.5072/abc'
+    assert pub.valid?
+    assert_equal '10.5072/abc', pub.doi
+
+    pub.doi = 'www.example.com/10.5072/abc'
+    refute pub.valid?
+  end
+
 end

@@ -18,7 +18,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK People.*/, count: 1
+    assert_select 'title', text: 'People', count: 1
   end
 
   def test_xml_for_person_with_tools_and_expertise
@@ -1721,6 +1721,41 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#resource-count-stats', count: 0
   end
+
+  test 'autocomplete' do
+    Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Johnson')
+    Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Bohnson')
+    Factory(:brand_new_person, first_name: 'Charles', last_name: 'Bohnson')
+    Factory(:brand_new_person, first_name: 'Jon Bon', last_name: 'Jovi')
+    Factory(:brand_new_person, first_name: 'Jon', last_name: 'Bon Jovi')
+
+    get :typeahead, format: :json, query: 'xav'
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_equal 2, res.length
+    assert_includes res.map { |r| r['name'] }, 'Xavier Johnson'
+    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+
+    get :typeahead, format: :json, query: 'bohn'
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_equal 2, res.length
+    assert_includes res.map { |r| r['name'] }, 'Charles Bohnson'
+    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+
+    get :typeahead, format: :json, query: 'xavier bohn'
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_equal 1, res.length
+    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+
+    get :typeahead, format: :json, query: 'jon bon'
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_equal 2, res.length
+    assert_equal res.map { |r| r['name'] }.uniq, ['Jon Bon Jovi']
+  end
+
 
   def mask_for_admin
     Seek::Roles::Roles.instance.mask_for_role('admin')

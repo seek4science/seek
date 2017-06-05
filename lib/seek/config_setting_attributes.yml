@@ -177,5 +177,6 @@ omniauth_user_activate:
 omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
+default_license:
 nels_client_id:
 nels_client_secret:

@@ -7,7 +7,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   def setup
     login_as(:quentin)
@@ -19,7 +19,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK #{I18n.t('investigation').pluralize}.*/i, count: 1
+    assert_select 'title', text: I18n.t('investigation').pluralize, count: 1
   end
 
   test 'should show index' do

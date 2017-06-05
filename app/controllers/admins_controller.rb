@@ -4,7 +4,7 @@ class AdminsController < ApplicationController
   include CommonSweepers
 
   RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
-                 Please see the buttons and explanations below."
+                 Please see the buttons and explanations below.".freeze
 
   before_filter :login_required
   before_filter :is_user_admin_auth
@@ -219,7 +219,9 @@ class AdminsController < ApplicationController
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
 
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
-    update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || (crossref_email_valid)) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
+
+    Seek::Config.default_license = params[:default_license]
+    update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
     update_redirect_to update_flag, 'others'
   end
 
@@ -355,7 +357,7 @@ class AdminsController < ApplicationController
       partial = 'invalid_user_stats_list'
       invalid_users = {}
       pal_position = ProjectPosition.pal_position
-      invalid_users[:pal_mismatch] = Person.all.select { |p| p.is_pal_of_any_project? != p.project_positions.include?(pal_position) }
+      invalid_users[:pal_mismatch] = Person.all.reject { |p| p.is_pal_of_any_project? == p.project_positions.include?(pal_position) }
       invalid_users[:duplicates] = Person.duplicates
       invalid_users[:no_person] = User.without_profile
       collection = invalid_users

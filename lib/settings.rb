@@ -37,7 +37,7 @@ class Settings < ActiveRecord::Base
     super(method, *args)
   rescue NoMethodError
     if method_name.end_with?('=')
-      var_name = method_name.gsub('=', '')
+      var_name = method_name.delete('=')
       value = args.first
       self[var_name] = value
     else

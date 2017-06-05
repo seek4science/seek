@@ -1,6 +1,6 @@
 <div class="table-responsive">
   <permissions-table class="table table-bordered" id="permissions-table"
-                     :permissions="permissions" :public-permission="publicPermission">
+                     :permissions="permissions" :public-permission="publicPermission" :downloadable="<%= object.try(:is_downloadable?) || false-%>">
   </permissions-table>
 </div>
 

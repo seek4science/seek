@@ -26,7 +26,7 @@ gem 'sunspot_solr', '~>2.2.0'
 gem 'progress_bar'
 gem 'savon', '1.1.0'
 gem 'dynamic_form'
-gem 'prototype-rails', github: 'rails/prototype-rails', branch: '4.2'
+gem 'prototype-rails', git: 'https://github.com/rails/prototype-rails', branch: '4.2'
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'cancan'
@@ -162,9 +162,11 @@ group :test do
   gem 'ruby-prof', '~> 0.15.9'
   gem 'rails-perftest'
   gem 'minitest'
+  gem 'minitest-reporters'
   gem 'coveralls', require: false
   gem 'sunspot_matchers'
   gem 'database_cleaner'
+  gem 'vcr', '~> 2.9'
 end
 
 group :test, :development do

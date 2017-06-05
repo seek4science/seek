@@ -202,8 +202,8 @@ SEEK::Application.routes.draw do
         get :show_item_count
         get :show_items
         get :show_dataset_files
-        post :refresh_browse_cache
         get :browse
+        post :refresh_metadata_store
       end
     end
     resources :avatars do
@@ -612,7 +612,7 @@ SEEK::Application.routes.draw do
       post :search_ajax
       post :resource_in_tab
     end
-    resources :projects,:assays,:studies,:models,:strains,:specimens,:only=>[:index]
+    resources :projects,:assays,:studies,:models,:strains,:specimens,:samples,:only=>[:index]
     member do
       get :visualise
     end
