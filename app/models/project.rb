@@ -73,6 +73,8 @@ class Project < ActiveRecord::Base
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
+  has_many :settings, class_name: 'Settings', as: :target, dependent: :destroy
+
   def group_memberships_empty?(institution)
     work_group = WorkGroup.where(['project_id=? AND institution_id=?', id, institution.id]).first
     unless work_group.people.empty?
