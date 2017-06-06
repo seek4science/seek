@@ -3,10 +3,6 @@ class PersonSerializer < AvatarObjSerializer
              :first_name, :last_name,
              :email, :description
 
-  # attribute :myattr do
-  #   object.title.upcase
-  # end
-
-  has_many :work_groups
+  has_many :work_groups, include_data:true
 
 end

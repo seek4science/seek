@@ -6,6 +6,6 @@ class AssaySerializer < PCSSerializer
   attribute :technology_type do
     object.technology_type_label
   end
-  has_many :organisms
-  has_many :assay_organisms
+  has_many :organisms, include_data:true
+  has_many :assay_organisms, include_data:true
 end
