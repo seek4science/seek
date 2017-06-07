@@ -48,7 +48,7 @@ module Seek
 
       # extra steps that cannot be easily handled by the csv template
       def additional_triples(rdf_graph)
-        if self.is_a?(Model) && self.contains_sbml?
+        if is_a?(Model) && contains_sbml?
           rdf_graph << [rdf_resource, JERMVocab.hasFormat, JERMVocab.SBML_format]
         end
         rdf_graph
@@ -70,18 +70,18 @@ module Seek
           'dcterms' => RDF::DC.to_uri.to_s,
           'owl' => RDF::OWL.to_uri.to_s,
           'foaf' => RDF::FOAF.to_uri.to_s,
-          'sioc' => RDF::SIOC.to_uri.to_s,
+          'sioc' => RDF::SIOC.to_uri.to_s
         }
       end
 
       def create_rdf_generation_job(force = false, refresh_dependents = true)
-        unless !force && (changed - %w(updated_at last_used_at)).empty?
+        unless !force && (changed - %w[updated_at last_used_at]).empty?
           RdfGenerationJob.new(self, refresh_dependents).queue_job
         end
       end
 
       def remove_rdf
-        remove_rdf_from_repository if self.rdf_repository_configured?
+        remove_rdf_from_repository if rdf_repository_configured?
         delete_rdf_file
         refresh_dependents_rdf
       end
@@ -95,14 +95,13 @@ module Seek
       def dependent_items
         items = []
         # FIXME: this should go into a seperate mixin for active-record
-        methods = [:data_files, :sops, :models, :publications,
-                   :data_file_masters, :sop_masters, :model_masters,
-                   :assets,
-                   :assays, :studies, :investigations,
-                   :institutions, :creators, :owners, :owner, :contributors, :contributor, :projects, :events, :presentations, :compounds, :organisms, :strains
-                  ]
+        methods = %i[data_files sops models publications
+                     data_file_masters sop_masters model_masters
+                     assets
+                     assays studies investigations
+                     institutions creators owners owner contributors contributor projects events presentations compounds organisms strains]
         methods.each do |method|
-          next unless self.respond_to?(method)
+          next unless respond_to?(method)
           deps = Array(send(method))
           # resolve User back to Person
           deps = deps.collect { |dep| dep.is_a?(User) ? [dep, dep.person] : dep }.flatten.compact
@@ -111,7 +110,7 @@ module Seek
 
         items.compact.uniq
 
-        items |= related_items_from_sparql if self.rdf_repository_configured?
+        items |= related_items_from_sparql if rdf_repository_configured?
 
         items.compact.uniq
       end
