@@ -16,7 +16,11 @@ class SampleTypesController < ApplicationController
   # GET /sample_types/1
   # GET /sample_types/1.json
   def show
-    respond_with(@sample_type)
+    options = {:is_collection=>false, :jsonapi=>{version: "1.0"}, :include=>['associated']}
+    respond_to do |format|
+      format.html
+      format.json {render json: JSONAPI::Serializer.serialize(@sample_type,options)}
+    end
   end
 
   # GET /sample_types/new

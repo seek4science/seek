@@ -3,8 +3,13 @@ require 'test_helper'
 class SamplesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include RestTestCases
   include SharingFormTestHelper
   include HtmlHelper
+
+  def rest_api_test_object
+    @object = Factory(:sample, policy: Factory(:public_policy))
+  end
 
   test 'index' do
     Factory(:sample, policy: Factory(:public_policy))
