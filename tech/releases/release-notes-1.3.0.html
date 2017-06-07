@@ -1,0 +1,144 @@
+
+Release Notes - openSEEK - Version 1.3.0
+
+<h2>        New Feature
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-848'>OPSK-848</a>] -         Support Datafiles that contain multiple files
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1020'>OPSK-1020</a>] -         Configuration to turn openBIS on or off
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1021'>OPSK-1021</a>] -         Register an openBIS endpoint for a project
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1022'>OPSK-1022</a>] -         A simple view of Data sets from openBIS
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1024'>OPSK-1024</a>] -         Adding a data set from openBIS to SEEK
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1095'>OPSK-1095</a>] -         OpenBIS Icon
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1096'>OPSK-1096</a>] -         Show Browse Openbis Button if there are spaces defined
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1097'>OPSK-1097</a>] -         Improve view for list of openbis spaces
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1098'>OPSK-1098</a>] -         Browse Openbis should default to the first space
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1100'>OPSK-1100</a>] -         Card like list of openbis datasets
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1101'>OPSK-1101</a>] -         A button to refresh the cache when viewing a datafile, or openbis browse view
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1102'>OPSK-1102</a>] -         Default openbis space for Docker
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1104'>OPSK-1104</a>] -         Default sharing policy for openbis space
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1105'>OPSK-1105</a>] -         Restrict changes that can be made to an openbis datafile
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1106'>OPSK-1106</a>] -         Apply default project license when adding a dataset
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1107'>OPSK-1107</a>] -         Stop datasets being added twice
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1109'>OPSK-1109</a>] -         Handle destroy for OpenBisSpace
+    </li>
+</ul>
+
+<h2>        Improvement
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1026'>OPSK-1026</a>] -         Review and improve the openBIS gem and jar file
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1129'>OPSK-1129</a>] -         Highligh rows when hovering in file list view
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1130'>OPSK-1130</a>] -         Make cache refresh period configurable as part of the space
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1133'>OPSK-1133</a>] -         Delete openBIS job when deleting endpoint definition
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1139'>OPSK-1139</a>] -         Protect against first person being admin in tests
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1167'>OPSK-1167</a>] -         Encrypt the stored password for openbis
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1170'>OPSK-1170</a>] -         Use title for root of zip when downloading openbis datafile
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1173'>OPSK-1173</a>] -         Double check the search indexing of openbis metadata
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1175'>OPSK-1175</a>] -         Hide the openbis download button if total size is over a configurable value
+    </li>
+</ul>
+
+<h2>        Task
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1037'>OPSK-1037</a>] -         Remove the old treatments extraction
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1060'>OPSK-1060</a>] -         Use &quot;Real Number&quot; instead of &quot;Float&quot; for describing the attribute type
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1062'>OPSK-1062</a>] -         Fix how the openbis connection information and authentication is handled
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1067'>OPSK-1067</a>] -         DatasetFile querying and downloading using wrong permID
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1103'>OPSK-1103</a>] -         Show openbis metadata and files more cleaning in DataFile view
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1113'>OPSK-1113</a>] -         Background job to refresh openbis space cache
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1115'>OPSK-1115</a>] -         docker compose needs to share tmp/cache with workers
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1117'>OPSK-1117</a>] -         OpenSEEK docker compose
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1122'>OPSK-1122</a>] -         Extend functional tests to test ajax calls cannot be accessed without the correct permissions
+    </li>
+</ul>
+
+<h2>        Sub-task
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1074'>OPSK-1074</a>] -         Clicking disabled cells doesn&#39;t do anything
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1075'>OPSK-1075</a>] -         Adding a new project doesn&#39;t add a row to the permissions table
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1076'>OPSK-1076</a>] -         Download option is missing from access type dropdown in both modals
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1082'>OPSK-1082</a>] -         Avoid adding a duplicate space
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1087'>OPSK-1087</a>] -         When editing a resource, associated projects are not marked as &quot;mandatory&quot; in the permissions table
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1118'>OPSK-1118</a>] -         Decide what to do about missing project permissions
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1119'>OPSK-1119</a>] -         Need to support legacy policies with &quot;FavouriteGroup&quot; permissions
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1132'>OPSK-1132</a>] -         Test the Vue table using Jasmine or similar
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1135'>OPSK-1135</a>] -         Remove all references to defunct `sharing_scope`
+    </li>
+</ul>
+
+<h2>        Bug
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1049'>OPSK-1049</a>] -         Orphaned policies left behind when assets destroyed
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1053'>OPSK-1053</a>] -         ISA do not give the edit permission for creators
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1086'>OPSK-1086</a>] -         Disk cache not cleared out between test runs
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1112'>OPSK-1112</a>] -         openbis ruby API returns wrong dates
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1124'>OPSK-1124</a>] -         Project members should be able to browse and register datasets
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1126'>OPSK-1126</a>] -         Fix DataFile and revert to single content-blob
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1163'>OPSK-1163</a>] -         No option to set default system wide public policy to hidden
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1164'>OPSK-1164</a>] -         Tidy up and package openbis API gem
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1166'>OPSK-1166</a>] -         Default space sharing permissions not applied when adding from openbis
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1168'>OPSK-1168</a>] -         No activity log is created for DataFiles registered through openBIS
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1169'>OPSK-1169</a>] -         Sharing matrix actions seem to be misaligned
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1172'>OPSK-1172</a>] -         Error when DataFile upload validation fails when associating with an assay
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1176'>OPSK-1176</a>] -         DataSet type isn&#39;t shown correctly on the DataFile page
+    </li>
+</ul>
+
+
+

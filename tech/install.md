@@ -75,9 +75,9 @@ for Production](install-production.html)
 
 Now you are ready for installing SEEK. You can either download SEEK or install
 from GitHub. You can download SEEK from
-<https://bitbucket.org/seek4science/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz>
+<https://bitbucket.org/fairdom/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz>
 
-    wget https://bitbucket.org/seek4science/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz
+    wget https://bitbucket.org/fairdom/seek/downloads/seek-{{ site.current_seek_version }}.tar.gz
 
 then unpack the file with:
 

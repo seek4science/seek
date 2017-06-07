@@ -20,11 +20,6 @@ Guide](install.html) guide. It assumes it is a production server that is
 being updated, and that commands are run from the root directory of the SEEK
 application.
 
-If your current installation is not linked to to the SEEK BitBucket Mercurial
-repository, it can still easily be updated by taking the next stable tag,
-reconfiguring the database configuration to point at your existing database,
-and copying across the *filestore/* directory. The upgrade steps can then be
-followed, with the Mercurial (hg) steps omitted.
 
 ## Identifying your version
 
@@ -38,26 +33,14 @@ You can also tell which version you have installed by looking at the
     minor: 13
     patch: 2
 
-## General notes about versions and upgrading
 
+## Upgrading between patch versions (e.g. between 1.2.0 and 1.2.2) 
 
+It should only be necessary to run *bundle install* and the *db:migrate* rake
+task. Using *seek:upgrade* should still work, but could take a lot of
+unnecessary time. 
 
-**When upgrading between minor versions (i.e. from 0.11.x to 0.13.x)** it is
-necessary to run a seek:upgrade rake task to perform upgrade changes and
-import any new data. The upgrade task may require an internet connection, and
-sometimes can take some time to run, so please be patient. There are
-instructions for upgrading between each minor version listed below, but they
-will generally follow the same pattern. Upgrading to version 0.18 is an
-exception and involves some additional steps - due to the upgrade of the
-required versions of Rails and Ruby.
-
-**When upgrading between patch versions (i.e between 0.16.0 and 0.16.3)** it
-should only be necessary to run *bundle install* and the *db:migrate* rake
-task. Using seek:upgrade should still work, but could take a lot of
-unnecessary time. There is more details and an example towards the end of the
-this page.
-
-## Steps to upgrade from 1.1.x to 1.2.x
+## Steps to upgrade from 1.2.x to 1.3.x
 
 
 ### Set RAILS_ENV
@@ -77,16 +60,16 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull https://github.com/seek4science/seek.git
-    git checkout v1.2.0
+    git checkout v1.3.2
 
 ### Updating using the tarball
 
-Starting with version 0.22, we've started making SEEK available as a download.
+
 You can download the file from
-<https://bitbucket.org/seek4science/seek/downloads/seek-1.2.0.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.3.2.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.2.0.tar.gz
+    tar zxvf seek-1.3.2.tar.gz
 
 and then copy across your existing filestore and database configuration file
 from your previous installation and continue with the upgrade steps. The
@@ -113,5 +96,5 @@ content.
 
 ## Earlier upgrade notes
 
-For details of how to upgrade to 1.1.x and for earlier versions please visit
+For details of how to upgrade to 1.2.x and for earlier versions please visit
 [Upgrades between earlier versions](earlier-upgrades.html)

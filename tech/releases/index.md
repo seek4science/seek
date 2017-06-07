@@ -5,7 +5,82 @@ layout: page
 
 # SEEK Releases
 
-Latest version - {{ site.current_seek_version }}
+**Latest version - {{ site.current_seek_version }}**
+
+Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
+
+## Version 1.3.2
+
+Release date: _May 10th 2017_
+
+Patch release that fixes some bugs, in particular:
+
+  * Fixes an issue to do with editing sample types after a validation error
+  * Fix to displaying samples or sample types linked to a large number of projects or other associated items
+  * Clarifies publication authors when the person that registers it is not an actual author
+  * Fix for when using older version of Sqlite3
+  
+A full list of changes included in this release can be found in the [SEEK v1.3.2 release notes](release-notes-1.3.2.html).  
+
+## Version 1.3.1
+
+Release date: _April 27th 2017_
+
+Patch release that fixes a few small bugs, in particular:
+
+  * Fix to sharing form for Studies and Assays
+  * Fix searching error where a spreadsheet was incorrectly expected
+  * Fix selection of default license for a project
+  * Fixes related to strains and extracting sample strains 
+
+A full list of changes included in this release can be found in the [SEEK v1.3.1 release notes](release-notes-1.3.1.html).
+
+## Version 1.3.0
+
+Release date: _March 17th 2017_
+
+![new_sharing_matrix](/images/release-notes/openbis.png)
+
+This is the first public release that supports [openBIS](http://fairdom.eu/platform/openbis/) integration. This version includes
+
+  * Ability to link and browse an openBIS space and datastore, and browse DataSets
+  * Easily register an openBIS DataSet with SEEK as a DataFile
+  * Browse and download individual DataSet files, or download as a whole zip file.
+  * Search indexing of registered openBIS DataSets
+  * Automatic synchronisation with openBIS spaces and DataSets
+  * An [openSEEK bundle](/tech/openseek.html) that provides both SEEK and openBIS through Docker and Docker Compose.
+  * A new UI for setting sharing permissions
+    * Now displays a matrix for easier setting and viewing of individual permissions, replacing the pre-canned options 
+    that weren't always that intuitive or logical.
+    
+![new_sharing_matrix](/images/release-notes/sharing-1.3.0.png){:.screenshot}
+
+Details on how to use openBIS with SEEK is available in our [User Guide](/help/user-guide/openbis.html)
+    
+A full list of changes included in this release can be found in the [SEEK v1.3.0 release notes](release-notes-1.3.0.html).    
+
+## Version 1.2.2
+
+Release date: _March 3rd 2017_
+
+Fixes a couple of issues caused by some missing CSS (Stylesheet) elements related to Samples. Although minor this
+ affected some of the functional behaviour.
+  
+A full list of changes included in this release can be found in the [SEEK v1.2.2 release notes](release-notes-1.2.2.html).  
+
+## Version 1.2.1
+
+Release date: _February 21st 2017_
+
+Small bug fix release to fix:
+
+  * Crossref endpoint for DOI querying requires https://
+  * Better DOI and Pubmed validation
+  * Manual entry of publications currently disabled
+  * Further improvements to authorization caching update speed and fix a small inconsistency with incomplete user registrations
+  
+A full list of changes included in this release can be found in the [SEEK v1.2.1 release notes](release-notes-1.2.1.html).  
+    
 
 ## Version 1.2.0
 
@@ -47,8 +122,7 @@ Large update with many new features and improvements, in particular a new approa
   Handles upgrades and persistent data. Docker allows SEEK to be setup and run with a single command. This our expected 
   approach to simple packaging of SEEK with openBIS.
     * Documentation on using SEEK with Docker is available in our [Docker Guide](/tech/docker.html)
-  * A Project administrator to specify the default license for their project which is automatically selected when 
-  defining a new Asset, but can be changed by the user if necessary.
+  * A Project administrator may now specify the default license for their project which is automatically selected when creating a new item, but can be changed by the user if necessary.
   * Improved usability of adding new Publications from a DOI or PubmedID
   * Arbitrary URL schemes for remote files, that can be handled outside of SEEK. For example, and scp:// url could be 
   provided for and openSSH based resource

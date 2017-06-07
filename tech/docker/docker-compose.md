@@ -14,15 +14,16 @@ See the [Installation Guide](https://docs.docker.com/compose/install/) for how t
 Once installed, all you need is the [docker-compose.yml](https://github.com/seek4science/seek/blob/master/docker-compose.yml), and the [docker/db.env](https://github.com/seek4science/seek/blob/master/docker/db.env),
 although you can simply check out the SEEK source from GitHub - see [Getting SEEK](../install.html#getting-seek).
 
-First you need to create 3 volumes
+First you need to create 4 volumes
 
     docker volume create --name=seek-filestore
     docker volume create --name=seek-mysql-db
     docker volume create --name=seek-solr-data
+    docker volume create --name=seek-cache
     
 and then to start up, with the docker-compose.yml in your currently directory run
     
-    docker-compose -d up
+    docker-compose up -d
     
 and go to [http://localhost:3000](http://localhost:3000)
 
@@ -35,7 +36,7 @@ You change the port, and image in the docker-compose.yml by editing
     seek:
         ..
         ..
-        image: fairdom/seek:1.2
+        image: fairdom/seek:{{ site.current_docker_tag }}
         ..
         ..
         ports:
@@ -48,10 +49,12 @@ like the following:
     server {
         listen 80; 
         server_name www.my-seek.org;
+        client_max_body_size 2G;
         
         location / {
             proxy_set_header   X-Real-IP $remote_addr;
-            proxy_set_header   Host      $http_host;
+            proxy_set_header   Host      $host;
+            proxy_set_header   X-Forwarded-Proto $scheme;
             proxy_pass         http://127.0.0.1:3000;
         }
     }

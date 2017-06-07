@@ -1,7 +1,7 @@
 language: ruby
 
 rvm:
-  - 2.3.1
+  - 2.3.3
 
 sudo: false
 
@@ -10,7 +10,6 @@ cache: bundler
 branches:
   only:
     - gh-pages
-    - gh-pages-1.2
     - gh-pages-master
 
 script: bundle exec rake test
