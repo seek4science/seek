@@ -7,21 +7,21 @@ class PeopleController < ApplicationController
   include Seek::AdminBulkAction
 
   before_filter :find_and_authorize_requested_item, only: %i[show edit update destroy items]
-  before_filter :current_user_exists, only: [:register, :create, :new]
+  before_filter :current_user_exists, only: %i[register create new]
   before_filter :is_during_registration, only: [:register]
   before_filter :is_user_admin_auth, only: [:destroy]
-  before_filter :auth_to_create, only: [:new, :create]
+  before_filter :auth_to_create, only: %i[new create]
   before_filter :administerable_by_user, only: %i[admin administer_update]
   before_filter :do_projects_belong_to_project_administrator_projects?, only: [:administer_update]
   before_filter :editable_by_user, only: %i[edit update]
 
-  skip_before_filter :partially_registered?, only: [:register, :create]
+  skip_before_filter :partially_registered?, only: %i[register create]
   skip_before_filter :project_membership_required, only: %i[create new]
-  skip_after_filter :request_publish_approval, :log_publishing, only: [:create, :update]
+  skip_after_filter :request_publish_approval, :log_publishing, only: %i[create update]
 
   after_filter :reset_notifications, only: [:administer_update]
 
-  cache_sweeper :people_sweeper, only: [:update, :create, :destroy]
+  cache_sweeper :people_sweeper, only: %i[update create destroy]
   include Seek::BreadCrumbs
 
   def reset_notifications
@@ -50,23 +50,23 @@ class PeopleController < ApplicationController
       @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
     end
 
-    unless @people
+    if @people
+      @people = @people.select(&:can_view?).reject { |p| p.projects.empty? }
+    else
       @people = if params[:page].blank? || params[:page] == 'latest' || params[:page] == 'all'
-        Person.active
-      else
-        Person.all
+                  Person.active
+                else
+                  Person.all
                 end
       @people = @people.reject { |p| p.group_memberships.empty? }
       @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
 
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people = Person.paginate_after_fetch(@people,
-                                            page: (params[:page] || Seek::Config.default_page('people')),
-                                            reorder: false,
-                                            latest_limit: Seek::Config.limit_latest)
+                                              page: (params[:page] || Seek::Config.default_page('people')),
+                                              reorder: false,
+                                              latest_limit: Seek::Config.limit_latest)
       end
-    else
-      @people = @people.select(&:can_view?).reject { |p| p.projects.empty? }
     end
 
     respond_to do |format|
@@ -209,7 +209,6 @@ class PeopleController < ApplicationController
       @person.notifiee_info.save if @person.notifiee_info.changed?
     end
 
-
     respond_to do |format|
       if @person.update_attributes(person_params) && set_group_membership_project_position_ids(@person, params)
         @person.save # this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
@@ -299,16 +298,16 @@ class PeopleController < ApplicationController
   # For use in autocompleters
   def typeahead
     # String concatenation varies across SQL implementations :(
-    if Seek::Util.database_type == 'sqlite3'
-      concat_clause = "LOWER(first_name || ' ' || last_name)"
-    else
-      concat_clause = "LOWER(CONCAT(first_name, ' ', last_name))"
-    end
+    concat_clause = if Seek::Util.database_type == 'sqlite3'
+                      "LOWER(first_name || ' ' || last_name)"
+                    else
+                      "LOWER(CONCAT(first_name, ' ', last_name))"
+                    end
 
     results = Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
                            query: "#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |person|
-      projects = person.projects.collect { |p| p.title }.join(', ')
+      projects = person.projects.collect(&:title).join(', ')
       { id: person.id, name: person.name, projects: projects, hint: projects }
     end
 
@@ -340,13 +339,13 @@ class PeopleController < ApplicationController
 
   def set_tools_and_expertise(person, params)
     exp_changed = person.tag_annotations(params[:expertise_list], 'expertise')
-      tools_changed = person.tag_annotations(params[:tool_list], 'tool')
-      if immediately_clear_tag_cloud?
-        expire_annotation_fragments('expertise') if exp_changed
-        expire_annotation_fragments('tool') if tools_changed
-      else
-        RebuildTagCloudsJob.new.queue_job
-      end
+    tools_changed = person.tag_annotations(params[:tool_list], 'tool')
+    if immediately_clear_tag_cloud?
+      expire_annotation_fragments('expertise') if exp_changed
+      expire_annotation_fragments('tool') if tools_changed
+    else
+      RebuildTagCloudsJob.new.queue_job
+    end
   end
 
   def set_project_related_roles(person)
@@ -373,7 +372,7 @@ class PeopleController < ApplicationController
   end
 
   def current_user_exists
-    redirect_to(:root) if !current_user
+    redirect_to(:root) unless current_user
     !!current_user
   end
 
@@ -381,14 +380,12 @@ class PeopleController < ApplicationController
     if project_ids.blank?
       []
     else
-      Project.where(id: project_ids).collect do |project|
-        project.project_administrators
-      end.flatten.uniq
+      Project.where(id: project_ids).collect(&:project_administrators).flatten.uniq
     end
   end
 
   def do_projects_belong_to_project_administrator_projects?
-    if (params[:person] && params[:person][:work_group_ids])
+    if params[:person] && params[:person][:work_group_ids]
       if User.admin_or_project_administrator_logged_in?
         projects = []
         params[:person][:work_group_ids].each do |id|
@@ -398,12 +395,12 @@ class PeopleController < ApplicationController
         end
         flag = true
         projects.each do |project|
-        unless @person.projects.include?(project) || project.can_be_administered_by?(current_user)
-          flag = false
-        end
+          unless @person.projects.include?(project) || project.can_be_administered_by?(current_user)
+            flag = false
+          end
         end
         if flag == false
-        error("#{t('project')} manager can not assign person to the #{t('project').pluralize} that they are not in", 'Is invalid')
+          error("#{t('project')} manager can not assign person to the #{t('project').pluralize} that they are not in", 'Is invalid')
         end
         flag
       end

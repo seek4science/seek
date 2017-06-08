@@ -76,7 +76,7 @@ module ApplicationHelper
   def persistent_resource_id(resource)
     url = polymorphic_url(resource)
     content_tag :p, class: :id do
-      content_tag(:label) do
+      content_tag(:strong) do
         "#{Seek::Config.application_name} ID: "
       end + ' ' + link_to(url, url)
     end
