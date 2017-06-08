@@ -1,5 +1,5 @@
 class PublicationSerializer < BaseSerializer
-  attributes :id, :title, :publication_authors,
+  attributes :id, :title, #:publication_authors,
              :journal, :published_date,
              :doi, :pubmed_id,
              :abstract, :citation #, :persons --> creators?
@@ -12,7 +12,5 @@ class PublicationSerializer < BaseSerializer
       ""
     end
   end
-  # has_many :associated, include_data:true do
-  #   associated_resources(object)  ||  [] #{ "data": [] }
-  # end
+  has_many :publication_authors, include_data:true
 end
