@@ -42,7 +42,8 @@ class SamplesController < ApplicationController
   end
 
   def show
-    options = {:is_collection=>false, :jsonapi=>{version: "1.0"}, :include=>['associated']}
+    options = {:is_collection=>false, :jsonapi=>{version: "1.0"},
+               :include=>['associated','strains','organisms','sample-resource-links']}
     @sample = Sample.find(params[:id])
     respond_to do |format|
       format.html
