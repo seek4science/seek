@@ -133,9 +133,9 @@ module RelatedItemsHelper
   def authorize_related_items(related)
     related.each do |key, res|
       res[:items] = res[:items].uniq.compact
-      next if res[:items].empty?
+      next if res[:items].empty? || res[:items].nil?
       total_count = res[:items].size
-      if key == 'Project' || key == 'Institution'
+      if key == 'Project' || key == 'Institution' || key == 'Sample'
         res[:hidden_count] = 0
       elsif key == 'Person'
         if Seek::Config.is_virtualliver && User.current_user.nil?
