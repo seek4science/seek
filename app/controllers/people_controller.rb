@@ -79,7 +79,7 @@ class PeopleController < ApplicationController
   # GET /people/1
   # GET /people/1.xml
   def show
-    options = {:is_collection=>false, :jsonapi=>{version: "1.0"}, :include=>['associated']}
+    options = {:is_collection=>false, :jsonapi=>{version: "1.0"}, :include=>['associated','work-groups']}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }

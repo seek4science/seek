@@ -208,7 +208,7 @@ class AssaysController < ApplicationController
   end
 
   def show
-    options = {:is_collection=>false, :include=>['associated', 'organisms', 'assay-organisms']}
+    options = {:is_collection=>false, :include=>['associated', 'creators', 'organisms', 'assay-organisms']}
     respond_to do |format|
       format.html
       format.xml
