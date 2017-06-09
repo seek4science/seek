@@ -124,13 +124,20 @@ module Seek
         }
       when Publication
         {
-          parents: object.assays | object.studies | object.investigations | object.data_files | object.models
+          parents: (object.assays | object.studies | object.investigations | object.data_files | object.models | object.presentations),
+          related: object.events
         }
       when DataFile, Model, Sop, Sample, Presentation
         {
           parents: object.assays,
-          related: object.publications
+          related: object.publications | (object.respond_to?(:events) ? object.events : [])
         }
+      when Event
+        {
+          parents: (object.presentations | object.publications | object.data_files),
+        }
+      else
+        { }
       end.reverse_merge!(parents: [], children: [], related: [])
     end
   end
