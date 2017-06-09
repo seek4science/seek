@@ -9,6 +9,10 @@ module RestTestCases
   JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'json', 'rest', 'jsonapi-schema-v1')
 
   def test_index_rest_api_xml
+    clz = @controller.controller_name.classify.constantize.to_s
+    if (clz == 'SampleType' || clz == 'Sample')
+      skip('skipping XML tests for Sample and SampleType')
+    end
     # to make sure something in the database is created
     object = rest_api_test_object
 
@@ -17,6 +21,10 @@ module RestTestCases
   end
 
   def test_get_rest_api_xml(object = rest_api_test_object)
+    clz = @controller.controller_name.classify.constantize.to_s
+    if (clz == 'SampleType' || clz == 'Sample')
+      skip('skipping XML tests for Sample and SampleType')
+    end
     get :show, id: object, format: 'xml'
     perform_api_checks
 
