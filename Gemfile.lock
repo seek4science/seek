@@ -366,6 +366,8 @@ GEM
     json-ld (1.1.11.1)
       multi_json (~> 1.11)
       rdf (~> 1.1, >= 1.1.17, < 1.99)
+    json-schema (2.8.0)
+      addressable (>= 2.4)
     jsonapi-serializers (0.16.1)
       activesupport
     kgio (2.11.0)
@@ -890,6 +892,7 @@ DEPENDENCIES
   jbuilder-json_api
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
+  json-schema
   jsonapi-serializers
   libxml-ruby (~> 2.8.0)
   linkeddata
@@ -977,4 +980,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.14.6
+   1.15.0
