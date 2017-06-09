@@ -130,9 +130,7 @@ class StudiesController < ApplicationController
       params[:study][:creators] = creators_arr
     end
 
-    @study = Study.new(params[:study])
-
-    update_sharing_policies @study,params
+    @study = Study.new(study_params)
 
     update_sharing_policies @study
 

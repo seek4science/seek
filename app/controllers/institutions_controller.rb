@@ -33,7 +33,6 @@ class InstitutionsController < ApplicationController
   # GET /institutions/new.xml
   def new
     @institution = Institution.new
-
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render xml: @institution }
@@ -66,9 +65,7 @@ class InstitutionsController < ApplicationController
       params_new = params[:data][:attributes]
       params[:institution] = params_new
     end
-
-    @institution = Institution.new(params[:institution])
-
+    @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
         flash[:notice] = 'Institution was successfully created.'
