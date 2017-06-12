@@ -188,7 +188,7 @@ class ContentBlob < ActiveRecord::Base
         [original_filename, url, file_extension] | url_search_terms
       end
     else
-      [original_filename, url, file_extension, pdf_contents_for_search] | url_search_terms
+      [original_filename, url, file_extension, pdf_contents_for_search.first(350000)] | url_search_terms
     end
   end
 
