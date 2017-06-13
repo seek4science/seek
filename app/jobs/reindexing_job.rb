@@ -1,5 +1,5 @@
 class ReindexingJob < SeekJob
-  BATCHSIZE = 20
+  BATCHSIZE = 100
 
   def perform_job(item)
     if Seek::Config.solr_enabled
