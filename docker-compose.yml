@@ -58,6 +58,8 @@ services:
   solr:
     image: fairdom/seek-solr
     container_name: seek-solr
+    environment:
+      SOLR_JAVA_MEM: -Xms512m -Xmx1024m
     volumes:
       - seek-solr-data:/opt/solr/server/solr/seek/data
     restart: always
