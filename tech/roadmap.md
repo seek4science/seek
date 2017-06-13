@@ -15,9 +15,11 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Rails 4.2 upgrade | Summer 2017 |
+| JSON Read API | Summer 2017  |
+| Application Programming Interface (API) supporting writes | Autumn 2017  |
 | Further integration with openBIS, with improved metadata mappings | Winter 2017  |
-| Application Programming Interface (API) supporting writes | Summer 2017  |
+| Metadata search and querying | Winter 2017  |
+| Research Object import | Winter 2017  |
 
 
 
@@ -30,6 +32,7 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 | Feature | SEEK version |
 | --- | --- | --- |
+| Rails 4 upgrade | 1.4 |
 | Integration with openBIS | 1.3 |
 | Improved Samples/Treatments/SOP handling | 1.2  |
 | Docker and Docker Compose support | 1.2 |

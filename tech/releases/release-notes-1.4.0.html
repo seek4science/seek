@@ -1,0 +1,130 @@
+
+Release Notes - SEEK - Version 1.4.0
+
+<h2>        New Feature
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-906'>OPSK-906</a>] -         project-specific defaults (sharing, licensing)  set by project&#39;s admin
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1254'>OPSK-1254</a>] -         Allow site-wide default license to be specified
+    </li>
+</ul>
+
+<h2>        Improvement
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-255'>OPSK-255</a>] -         Upgrade to Rails 4
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-354'>OPSK-354</a>] -         better to switch the arrow direction after closing the box
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-743'>OPSK-743</a>] -         Use an better calendar for date &amp; time selection
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-972'>OPSK-972</a>] -         acts_as_annotatable and Seek::Tagging required
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1151'>OPSK-1151</a>] -         samples not shown on organism page
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1196'>OPSK-1196</a>] -         Improve person autocompleter thing
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1213'>OPSK-1213</a>] -         Include Events in the ISA graph
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1214'>OPSK-1214</a>] -         More descriptive tab titles
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1232'>OPSK-1232</a>] -         Shown as both a creator and contributor for an Assay
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1233'>OPSK-1233</a>] -         Cannot create a sample type with controlled vocab (Rails 4)
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1243'>OPSK-1243</a>] -         Store secret_key_base in filestore rather than using env variable
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1253'>OPSK-1253</a>] -         Long project lists are not displayd nicely in asset listing
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1258'>OPSK-1258</a>] -         Import datacite gem into main SEEK
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1259'>OPSK-1259</a>] -         JWS Online needs to know whether the model is constraint based or not
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1273'>OPSK-1273</a>] -         Rename owner_id to contributor_id for Assay
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1274'>OPSK-1274</a>] -         Show SEEK ID for Project and Person, and as a URI
+    </li>
+</ul>
+
+<h2>        Bug
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-573'>OPSK-573</a>] -         Stack level too deep when doing pubmed queries in development mode
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1041'>OPSK-1041</a>] -         URLs to the fairdomhub don&#39;t seem to be recognised as webpages
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1195'>OPSK-1195</a>] -         Sharing table should not show &quot;download&quot; column for non-downloadable (ISA) things
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1201'>OPSK-1201</a>] -         &quot;Upload new version&quot; button is hidden from non-managers
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1217'>OPSK-1217</a>] -         Unit order field needs renaming
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1220'>OPSK-1220</a>] -         Incorrect default permissions when selecting &quot;Add a Study&quot; for an investigation
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1221'>OPSK-1221</a>] -         No project permissions when creating an Assay
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1222'>OPSK-1222</a>] -         Clicking on the centre of the permissions matrix cells doesn&#39;t work.
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1223'>OPSK-1223</a>] -         New assay based on this one doesn&#39;t select the organism
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1224'>OPSK-1224</a>] -         Preview permissions doesn&#39;t make sense and is worded misleadingly
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1225'>OPSK-1225</a>] -         Preview of data file results breaks the drag and drop of favourite search
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1227'>OPSK-1227</a>] -         Error uploading avatars
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1229'>OPSK-1229</a>] -         Cannot set default sharing defaults for a project
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1230'>OPSK-1230</a>] -         Clicking &quot;show x more&quot; on the ISA graph doesn&#39;t work
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1236'>OPSK-1236</a>] -         Project selector doesn&#39;t revert to &#39;Select a project...&#39;
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1237'>OPSK-1237</a>] -         Presentation title box is large
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1238'>OPSK-1238</a>] -         Auth table consistency stats don&#39;t display
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1239'>OPSK-1239</a>] -         Error when attempting to do an external search
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1241'>OPSK-1241</a>] -         Problem with local solr search
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1246'>OPSK-1246</a>] -         Incorrect string value: &#39;\xE2\x97\x8F Wh...&#39; for column &#39;description&#39; when creating an event
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1248'>OPSK-1248</a>] -         Incorrectly sending error emails for ActionController::UnknownFormat
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1250'>OPSK-1250</a>] -         Store openbis metadata cache in filestore/, not tmp/
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1251'>OPSK-1251</a>] -         Problem with publications with the DOI registered as a full URL
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1263'>OPSK-1263</a>] -         organism page/ alphabetical order  - missing letters
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1268'>OPSK-1268</a>] -         (Show All) contributor pop-up displays avatars in a column
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1271'>OPSK-1271</a>] -         Pagination broken
+    </li>
+</ul>
+
+
+
+<h2>        Task
+</h2>
+<ul>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1242'>OPSK-1242</a>] -         FAIRDOMHUb model types are out of sync
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1245'>OPSK-1245</a>] -         Investigate error email about missing sprockets when running AuthLookupJob
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1255'>OPSK-1255</a>] -         Merge datacite gem into SEEK code
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1257'>OPSK-1257</a>] -         Test the asset housekeeper behaviour
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1260'>OPSK-1260</a>] -         Error when trying to download JERM things when the server has gone
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1261'>OPSK-1261</a>] -         Investigate loading of ontologies in OWL format without having to convert to RDFXML
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1265'>OPSK-1265</a>] -         fairdomhub does not set content-length under some circumstances
+    </li>
+    <li>[<a href='https://jira-bsse.ethz.ch/browse/OPSK-1266'>OPSK-1266</a>] -         Large file downloads take a while to start on fairdomhub
+    </li>
+</ul>
+
+

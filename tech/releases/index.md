@@ -9,6 +9,14 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+## Version 1.4.0
+
+Release date: _June xth 2017_
+
+  * Upgrade to Rails 4 platform
+  
+A full list of changes included in this release can be found in the [SEEK v1.4.0 release notes](release-notes-1.4.0.html).  
+
 ## Version 1.3.2
 
 Release date: _May 10th 2017_
