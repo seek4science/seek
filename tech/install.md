@@ -22,7 +22,7 @@ would be beneficial if it is new to you. Documentation and resources
 describing Ruby on Rails can be found at http://rubyonrails.org/documentation
 .
 
-SEEK is based on the 3.2 version of Rails, and requires Ruby 2.1.
+SEEK is based on the 4.2 version of Rails, and requires Ruby 2.2.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
 [Ubuntu (16.04 LTS)](http://releases.ubuntu.com/16.04/) system. However, running on other Linux distributions the
@@ -197,7 +197,7 @@ host that Solr runs on - which is important if running multiple SEEK
 installations on the same machine. If you wish to override the default ports
 then copy config/sunspot.default.yml to sunspot.yml and change the settings.
 
-The following task can also be at any time if there is need to force all
+The following task can also be run at any time if there is need to force all
 content to be reindexed (such as after a period of running SEEK with search
 turned off).
 
@@ -206,7 +206,7 @@ turned off).
 ### Starting and Stopping the Background Service
 
 SEEK uses [Delayed Job](https://github.com/collectiveidea/delayed_job) to
-process various jobs. It is important this service is running.
+process various asynchronous jobs. It is important this service is running.
 
 To start delayed job run:
 
