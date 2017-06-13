@@ -13,7 +13,7 @@ module Seek
         end
         content = extract_text_from_pdf
       else
-        Rails.logger.error("Unable to find file contents for content blob #{id}")
+        Rails.logger.info("No local file contents for content blob #{id}, so no pdf contents for search available")
       end
       content
     end
@@ -59,11 +59,11 @@ module Seek
         begin
           Docsplit.extract_text(pdf_filepath, output: output_directory) unless File.exist?(txt_filepath)
           content = File.open(txt_filepath).read
-          unless content.blank?
+          if content.blank?
+            []
+          else
             content = filter_text_content content
             split_content content
-          else
-            []
           end
         rescue Exception => e
           Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
@@ -75,7 +75,7 @@ module Seek
     private
 
     def split_content(content, delimiter = "\n")
-      content.split(delimiter).select { |str| !(str.blank? || str.length > 50) }.uniq
+      content.split(delimiter).reject { |str| (str.blank? || str.length > 50) }.uniq
     end
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
