@@ -114,7 +114,7 @@ if you already had RVM installed, bring it up to date with:
 
 now install the appropriate version of Ruby
 
-    rvm install `cat .ruby-version`
+    rvm install $(cat .ruby-version)
 
 you may be asked for your password so that some additional packages can be
 installed. You will then need to wait for Ruby to be downloaded and compiled.

@@ -86,7 +86,7 @@ If you have a modified _config/sunspot.yml_ you will also need to copy that acro
 ### Update RVM and Ruby
 
     rvm get stable
-    rvm install `cat .ruby-version` 
+    rvm install $(cat .ruby-version) 
 
 ### Doing the upgrade
 
@@ -95,6 +95,7 @@ and other necessary changes. Note that seek:upgrade may take longer than usual i
 content.
 
     cd .. && cd seek #this is to allow RVM to pick up the ruby and gemset changes
+    gem install bundler
     bundle install --deployment
     bundle exec rake seek:upgrade
     bundle exec rake assets:precompile # this task will take a while
@@ -109,8 +110,8 @@ Update your _sunspot.yml_ based on the new format in _[config/sunspot.default.ym
 
 ### Restarting services
 
-    bundle exec rake seek:workers:start
     bundle exec rake sunspot:solr:start
+    bundle exec rake seek:workers:start    
     touch tmp/restart.txt
     bundle exec rake tmp:clear
     
