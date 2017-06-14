@@ -1,0 +1,9 @@
+production:
+  uri: http://virtuoso:8890/sparql
+  update_uri: http://virtuoso:8899/sparql-auth
+
+  username: dba
+  password: wibble
+
+  private_graph: seek:private
+  public_graph: seek:public
