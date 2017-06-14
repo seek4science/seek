@@ -18,6 +18,62 @@ each released minor version in order incrementally (i.e. 0.13.x -> 0.14.x ->
 Each version has a tag in mercurial, which has the format of *v* prefix
 followed by the version - e.g. v0.11.1, v0.13.2, v0.17.1
 
+## Steps to upgrade from 1.2.x to 1.3.x
+
+
+### Set RAILS_ENV
+
+**If upgrading a production instance of SEEK, remember to set the RAILS_ENV first**
+
+    export RAILS_ENV=production
+
+### Stopping services before upgrading
+
+    bundle exec rake seek:workers:stop
+    bundle exec rake sunspot:solr:stop
+
+### Updating from GitHub
+
+If you have an existing installation linked to our GitHub, you can fetch the
+files with:
+
+    git pull https://github.com/seek4science/seek.git
+    git checkout v1.3.2
+
+### Updating using the tarball
+
+
+You can download the file from
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.3.2.tar.gz> You can
+unpack this file using:
+
+    tar zxvf seek-1.3.2.tar.gz
+
+and then copy across your existing filestore and database configuration file
+from your previous installation and continue with the upgrade steps. The
+database configuration file you would need to copy is *config/database.yml*,
+and the filestore is simply *filestore/*
+
+### Doing the upgrade
+
+After updating the files, the following steps will update the database, gems,
+and other necessary changes. Note that seek:upgrade may take longer than usual if you have data stored that points to remote
+content.
+
+    cd .. && cd seek #this is to allow RVM to pick up the ruby and gemset changes
+    bundle install --deployment
+    bundle exec rake seek:upgrade
+    bundle exec rake assets:precompile # this task will take a while
+
+### Restarting services
+
+    bundle exec rake seek:workers:start
+    bundle exec rake sunspot:solr:start
+    touch tmp/restart.txt
+    bundle exec rake tmp:clear
+
+---
+
 ## Steps to upgrade from 1.1.x to 1.2.x
 
 
@@ -72,6 +128,7 @@ content.
     touch tmp/restart.txt
     bundle exec rake tmp:clear
 
+---
 
 ## Steps to upgrade from 1.0.x to 1.1.x
 
@@ -161,6 +218,7 @@ If you have problems, you may need to upgrade and reinstall the Passenger Phusio
 
 Please read [Installing SEEK in a production environment](install-production.html) for more details about setting up Apache and installing the module.
 
+---
 
 ## Steps to upgrade from 0.23.x to 1.0.x
 
@@ -255,7 +313,7 @@ If you have problems, you may need to upgrade and reinstall the Passenger Phusio
 Please read [Installing SEEK in a production environment](install-production.html) for more details about setting up Apache and installing the module.
 
 
-
+---
 
 ## Steps to upgrade from 0.22.x to 0.23.x
 
@@ -316,6 +374,8 @@ and other necessary changes:
     touch tmp/restart.txt
     bundle exec rake tmp:clear
 
+---
+
 ## Steps to upgrade from 0.21.x to 0.22.x
 
 **If you need to upgrade from v0.21 based on Mercurial rather than Git or the
@@ -372,6 +432,10 @@ and other necessary changes:
     touch tmp/restart.txt
     bundle exec rake tmp:clear
 
+---
+    
+    
+
 # Upgrades to 0.21.x and earlier
 
 ## Steps to upgrade from 0.20.x to 0.21.x
@@ -404,6 +468,8 @@ seek:workers:<start|stop|restart|status>, e.g
 
 there is a new init.d script for this described at
 https://gist.github.com/e4219ec7cb161129f1c7
+
+---
 
 ## Steps to upgrade from 0.19.x to 0.20.x
 
@@ -475,6 +541,8 @@ You may also need to enable a couple of Apache modules, so run:
 You will then need to restart Apache
 
     sudo service apache2 restart
+    
+---    
 
 ## Steps to upgrade from 0.18.x to 0.19.x
 
@@ -495,6 +563,8 @@ Upgrading follows the standard steps:
     touch tmp/restart.txt
     bundle exec rake tmp:assets:clear RAILS_ENV=production
     bundle exec rake tmp:clear RAILS_ENV=production
+    
+---    
 
 ## Steps to upgrade from 0.17.x to 0.18.x
 
@@ -505,6 +575,8 @@ upgrade.
 
 Please visit [Upgrading to 0.18](upgrading-to-0.18.html) for details of
 how to do this upgrade.
+
+---
 
 ## Steps to upgrade from 0.16.x to 0.17.x
 
@@ -526,27 +598,7 @@ Upgrading follows the standard steps:
     bundle exec rake tmp:assets:clear RAILS_ENV=production
     bundle exec rake tmp:clear RAILS_ENV=production
 
-## Steps to upgrade between patches (e.g. between 0.16.0 to 0.16.3)
-
-This example shows upgrading from v0.16.0, v0.16.1, or v0.16.2 to v0.16.3 as
-an example, but the process is the same for upgrading between patch versions
-unless otherwise stated. You can upgrade directly from one patch version to
-another, skipping the intermediate versions (so you can upgrade directly
-0.16.0 to 0.16.3 without first having to upgrade to 0.16.1)
-
-    hg pull https://bitbucket.org/fairdom/seek -r v0.16.3
-    hg update
-    hg merge # if necessary
-    hg commit -m "merged" # if necessary
-    bundle install --deployment
-    bundle exec rake db:migrate RAILS_ENV=production
-
-    RAILS_ENV=production ./script/delayed_job stop
-    RAILS_ENV=production ./script/delayed_job start
-
-    touch tmp/restart.txt
-    bundle exec rake tmp:assets:clear RAILS_ENV=production
-    bundle exec rake tmp:clear RAILS_ENV=production
+---
 
 ## Steps to upgrade from 0.15.x to 0.16.x
 
@@ -619,6 +671,7 @@ versions:
     bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
     RAILS_ENV=production ./script/delayed_job start
     touch tmp/restart.txt
+---
 
 ## Steps to upgrade from 0.14.x to 0.15.x
 
@@ -656,6 +709,8 @@ the upgrade is the typical:
     RAILS_ENV=production ./script/delayed_job start
     touch tmp/restart.txt
 
+---
+
 ## Steps to upgrade from 0.13.x to 0.14.x
 
 These are the fairly standard steps when upgrading between minor versions.
@@ -677,6 +732,7 @@ subscriptions (for email notifications).
     bundle exec rake sunspot:solr:start RAILS_ENV=production # to restart the search server
     RAILS_ENV=production ./script/delayed_job start
     touch tmp/restart.txt
+---
 
 ## Steps to upgrade from 0.11.x to 0.13.x
 

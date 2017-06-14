@@ -85,10 +85,10 @@ This will compile a module for Apache, and at the end present you with some
 lines that need adding to /etc/apache2/http.conf. These will look something
 like the following, but the paths will most likely be different:
 
-    LoadModule passenger_module /home/www-data/.rvm/gems/ruby-2.1.7/gems/passenger-5.0.6/buildout/apache2/mod_passenger.so
+    LoadModule passenger_module /home/www-data/.rvm/gems/ruby-2.2.7/gems/passenger-5.1.2/buildout/apache2/mod_passenger.so
     <IfModule mod_passenger.c>
-      PassengerRoot /home/www-data/.rvm/gems/ruby-2.1.7/gems/passenger-5.0.6
-      PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.1.7/wrappers/ruby
+      PassengerRoot /home/www-data/.rvm/gems/ruby-2.2.7/gems/passenger-5.1.2
+      PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.2.7/wrappers/ruby
     </IfModule>
 
 You will need to be a user that has sudo permissions, and edit this file:

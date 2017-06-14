@@ -83,7 +83,7 @@ Switching to a newer build of the same version is as simple as:
     docker rm seek
     docker pull fairdom/seek:{{ site.current_docker_tag }}
     docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:{{ site.current_docker_tag }}
-    docker exec seek bundle exec rake seek:reindex_all #(to rebuild the search index)
+    
     
 However, if moving between versions it is necessary to run some upgrade steps which can be achieved by usiung a temporary container.
 
