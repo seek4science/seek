@@ -106,6 +106,7 @@ module HomesHelper
       end
       convert_logs_to_hash selected_activity_logs
     end
+    []
   end
 
   def recently_added_item_logs_hash(time = 1.month.ago, number_of_item = 10)
@@ -121,6 +122,7 @@ module HomesHelper
       end
       convert_logs_to_hash selected_activity_logs
     end
+    []
   end
 
   def convert_logs_to_hash(logs)
