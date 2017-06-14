@@ -111,15 +111,13 @@ Update your _sunspot.yml_ based on the new format in _[config/sunspot.default.ym
 ### Restarting services
 
     bundle exec rake sunspot:solr:start
-    bundle exec rake seek:workers:start    
-    touch tmp/restart.txt
-    bundle exec rake tmp:clear
-    
-### Note on Search results
-    
-Initially you won't get any search results, due to the upgrade of Sunspot/SOLR. The upgrade steps will have triggered a
-some jobs to rebuild the index. How long this takes depends upon the number of items in the database and the speed of your
-machine. You can track the progress by going to the Admin page of _SEEK_, and looking at _Job Queue_ under _Statistics_.
+    bundle exec rake seek:workers:start            
+
+If you are running a production SEEK behing Apache, then move onto the next part. Otherwise, or you want to do a quick test,
+ you can simply start SEEK again with:  
+  
+    bundle exec rails s    
+            
     
 ### Upgrading Passenger Phusion
     
@@ -127,6 +125,12 @@ If you are running SEEK with Passenger, it is likely you will need to upgrade Pa
  
 Please read [Serving SEEK through Apache](/tech/install-production.html#serving-seek-through-apache) for a reminder
 on how to install the new version, and update your virtual host configuration accordingly.
+
+### Note on Search results
+    
+Initially you won't get any search results, due to the upgrade of Sunspot/SOLR. The upgrade steps will have triggered
+some jobs to rebuild the search index. How long this takes depends upon the number of items in the database and the speed of your
+machine. You can track the progress by going to the Admin page of _SEEK_, and looking at _Job Queue_ under _Statistics_.
     
 ---
     
