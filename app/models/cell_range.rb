@@ -1,7 +1,5 @@
 class CellRange < ActiveRecord::Base
 
-  unloadable
-
   include Seek::Data::SpreadsheetExplorerRepresentation
 
   acts_as_annotatable :name_field=>:annotation

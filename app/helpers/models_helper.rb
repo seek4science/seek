@@ -38,4 +38,8 @@ module ModelsHelper
   def show_jws_simulate?
     Seek::Config.jws_enabled && @model.can_download? && @display_model.is_jws_supported?
   end
+
+  def jws_online_logo
+    image(:jws_online_logo, style: 'background-color:black;padding:1em;', class: 'img-responsive')
+  end
 end

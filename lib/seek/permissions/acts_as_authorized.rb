@@ -1,12 +1,11 @@
 module Seek #:nodoc:
   module Permissions #:nodoc:
-    AUTHORIZATION_ACTIONS = [:view, :edit, :download, :delete, :manage]
-
     module ActsAsAuthorized
+
+      AUTHORIZATION_ACTIONS = [:view, :edit, :download, :delete, :manage]
+
       def self.included(ar)
         ar.const_get(:Base).class_eval { include BaseExtensions }
-        ar.module_eval { include AuthorizationEnforcement }
-        ar.const_get(:Base).class_eval { does_not_require_can_edit :uuid, :first_letter }
       end
 
       module BaseExtensions
@@ -45,6 +44,8 @@ module Seek #:nodoc:
             include Seek::Permissions::CodeBasedAuthorization
             include Seek::Permissions::StateBasedPermissions
             include Seek::Permissions::PublishingPermissions
+
+            does_not_require_can_edit :uuid, :first_letter
           end
 
           def authorization_supported?
@@ -55,10 +56,6 @@ module Seek #:nodoc:
     end
   end
 end
-
-require 'seek/permissions/policy_based_authorization'
-require 'seek/permissions/code_based_authorization'
-require 'seek/permissions/state_based_permissions'
 
 ActiveRecord.module_eval do
   include Seek::Permissions::ActsAsAuthorized

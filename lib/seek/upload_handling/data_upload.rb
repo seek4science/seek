@@ -5,7 +5,7 @@ module Seek
       include Seek::UploadHandling::ContentInspection
 
       def handle_upload_data
-        blob_params = content_blob_params
+        blob_params = params[:content_blobs]
         allow_empty_content_blob = model_image_present?
 
         unless allow_empty_content_blob || retained_content_blob_ids.present?
@@ -27,8 +27,6 @@ module Seek
           end
         end
 
-        params[:content_blob] = blob_params
-        clean_params
         true
       end
 
@@ -48,12 +46,14 @@ module Seek
         asset = eval "@#{controller_name.downcase.singularize}"
         version = asset.version
 
-        content_blob_params.each do |item_params|
-          attributes = build_attributes_hash_for_content_blob(item_params, version)
-          if asset.respond_to?(:content_blobs)
-            asset.content_blobs.create(attributes)
-          else
-            asset.create_content_blob(attributes)
+        unless model_image_present? && params[:content_blobs].blank?
+          content_blobs_params.each do |item_params|
+            attributes = build_attributes_hash_for_content_blob(item_params, version)
+            if asset.respond_to?(:content_blobs)
+              asset.content_blobs.create(attributes)
+            else
+              asset.create_content_blob(attributes)
+            end
           end
         end
         retain_previous_content_blobs(asset)
@@ -120,6 +120,7 @@ module Seek
         blob_params[:original_filename] = info[:file_name] || ''
         blob_params[:content_type] = info[:content_type]
         blob_params[:file_size] = info[:file_size]
+        blob_params[:headers] = info
 
         true
       end
@@ -129,14 +130,8 @@ module Seek
         !blob_params[:data].blank?
       end
 
-      def init_asset_for_render
-        clean_params
-        eval "@#{controller_name.singularize} = controller_name.classify.constantize.new(asset_params)"
-      end
-
       def handle_upload_data_failure
         if render_new?
-          init_asset_for_render
           respond_to do |format|
             format.html do
               render action: :new
@@ -148,7 +143,13 @@ module Seek
       # if the urls misses the schema, default to http
       def default_to_http_if_missing(blob_params)
         url = blob_params[:data_url]
-        blob_params[:data_url] = Addressable::URI.heuristic_parse(url).to_s unless url.blank?
+        unless url.blank?
+          begin
+            blob_params[:data_url] = Addressable::URI.heuristic_parse(url).to_s
+          rescue Addressable::URI::InvalidURIError
+            blob_params[:data_url] = url
+          end
+        end
       end
 
       def check_for_valid_scheme(blob_params)

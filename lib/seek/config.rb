@@ -49,7 +49,7 @@ module Seek
       smtp_hash = smtp
 
       password =  smtp_settings 'password'
-      smtp_hash.merge! 'password' => password
+      smtp_hash['password'] = password
 
       new_hash = {}
       smtp_hash.keys.each do |key|
@@ -81,17 +81,6 @@ module Seek
       exception_notification_enabled_propagate
     end
 
-    def piwik_analytics_enabled_propagate
-      if piwik_analytics_enabled
-        PiwikAnalytics.configuration.id_site = piwik_analytics_id_site
-        PiwikAnalytics.configuration.url = piwik_analytics_url
-        PiwikAnalytics.configuration.use_async = true
-        PiwikAnalytics.configuration.disabled = false
-      else
-        PiwikAnalytics.configuration.disabled = true
-      end
-    end
-
     def exception_notification_recipients_propagate
       configure_exception_notification
     end
@@ -110,8 +99,8 @@ module Seek
 
     def configure_recaptcha_keys
       Recaptcha.configure do |config|
-        config.public_key  = recaptcha_public_key
-        config.private_key = recaptcha_private_key
+        config.site_key  = recaptcha_public_key
+        config.secret_key = recaptcha_private_key
       end
     end
 
@@ -166,12 +155,26 @@ module Seek
       File.join(dir, 'key')
     end
 
+    def secret_key_base_path
+      dir = append_filestore_path 'secret_key_base'
+      File.join(dir, 'key')
+    end
+
     def attr_encrypted_key
       if File.exist?(attr_encrypted_key_path)
         File.read(attr_encrypted_key_path)
       else
         write_attr_encrypted_key
         attr_encrypted_key
+      end
+    end
+
+    def secret_key_base
+      if File.exists?(secret_key_base_path)
+        File.read(secret_key_base_path)
+      else
+        write_secret_key_base
+        secret_key_base
       end
     end
 
@@ -295,7 +298,24 @@ module Seek
 
     def write_attr_encrypted_key
       File.open(attr_encrypted_key_path, 'w') do |f|
-        f << OpenSSL::Cipher::Cipher.new('AES-256-CBC').random_key.unpack('H*').first
+        f << SecureRandom.hex(32)
+      end
+    end
+
+    def write_secret_key_base
+      File.open(secret_key_base_path, 'w') do |f|
+        f << SecureRandom.hex(64)
+      end
+    end
+
+    def soffice_available?
+      @@soffice_available ||= begin
+        port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
+        soc = TCPSocket.new('localhost', port)
+        soc.close
+        true
+      rescue
+        false
       end
     end
   end

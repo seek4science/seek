@@ -229,7 +229,7 @@ class SnapshotsControllerTest < ActionController::TestCase
     datacite_mock
     create_investigation_snapshot
     login_as(@user)
-    stub_request(:post, 'http://test:test@idontexist.soup/metadata').to_return(status: 500)
+    stub_request(:post, 'http://idontexist.soup/metadata').with(basic_auth: ['test', 'test']).to_return(status: 500)
 
     with_config_value(:datacite_url, 'http://idontexist.soup') do
       post :mint_doi, investigation_id: @investigation, id: @snapshot.snapshot_number

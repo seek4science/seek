@@ -3,7 +3,7 @@
   <% matching_data_items.each do |matching_data_item| %>
       <%
          data_file = DataFile.find(matching_data_item.primary_key)
-         plots = data_file.latest_version.spreadsheet_annotations.select { |a| a.attribute.name=="plot_data" }
+         plots = data_file.latest_version.spreadsheet_annotations.select { |a| a.annotation_attribute.name=="plot_data" }
       %>
       <div class="matching_item">
 

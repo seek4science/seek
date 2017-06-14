@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
+
   fixtures :users, :people
 
   # Replace this with your real tests.
@@ -850,9 +851,9 @@ class PersonTest < ActiveSupport::TestCase
     end
     p1.reload
     assert_equal 1, p1.projects.count
-    assert_include p1.projects, proj1
+    assert_includes p1.projects, proj1
     assert_equal 1, p1.institutions.count
-    assert_include p1.institutions, inst1
+    assert_includes p1.institutions, inst1
 
     assert_no_difference('WorkGroup.count') do
       assert_difference('GroupMembership.count', 1) do
@@ -862,9 +863,9 @@ class PersonTest < ActiveSupport::TestCase
 
     p2.reload
     assert_equal 1, p2.projects.count
-    assert_include p2.projects, proj1
+    assert_includes p2.projects, proj1
     assert_equal 1, p2.institutions.count
-    assert_include p2.institutions, inst1
+    assert_includes p2.institutions, inst1
 
     assert_difference('WorkGroup.count', 1) do
       assert_difference('GroupMembership.count', 1) do
@@ -880,9 +881,9 @@ class PersonTest < ActiveSupport::TestCase
 
     p1.reload
     assert_equal 2, p1.projects.count
-    assert_include p1.projects, proj2
+    assert_includes p1.projects, proj2
     assert_equal 2, p1.institutions.count
-    assert_include p1.institutions, inst2
+    assert_includes p1.institutions, inst2
 
     assert_no_difference('WorkGroup.count') do
       assert_no_difference('GroupMembership.count') do

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class SessionStoreTest < ActionController::IntegrationTest
+class SessionStoreTest < ActionDispatch::IntegrationTest
   def setup
     login_as_test_user 'http://www.example.com'
   end
@@ -22,9 +22,9 @@ class SessionStoreTest < ActionController::IntegrationTest
   end
 
   test 'should go to last correctly visited page(except search) after login' do
-    get '/forums'
+    get '/sops'
     assert_response :success
-    logout 'http://www.example.com/forums'
+    logout 'http://www.example.com/sops'
 
     data_file = Factory :data_file, contributor: User.current_user, policy: Factory(:public_policy)
     get "/data_files/#{data_file.id}"

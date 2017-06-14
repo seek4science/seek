@@ -128,7 +128,7 @@
       </table>
     </div>
     <hr/>
-    <em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple projects.</em>
+    <em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple <%= t('project').pluralize %></em>
 
 <% else %>
 For authorised assets the numbers are split as <em>total</em> / <em>visible</em> / <em>accessible</em> / <em>publicly visible</em> / <em>publicly accessible</em>
@@ -172,7 +172,7 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
   <% end %>
   <tr style="background-color: #DEF">
     <td><b>Overall</b></td>
-    <td><%= Person.count -%> (<%= User.count(:all,:conditions=>"person_id IS NOT NULL") -%>)<em>*</em></td>
+    <td><%= Person.count -%> (<%= User.where('person_id IS NOT NULL').count -%>)<em>*</em></td>
     <% authorised_types.each do |type| %>
         <%  type_str = type.name.underscore.pluralize
             total=type.count

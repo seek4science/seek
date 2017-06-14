@@ -145,7 +145,7 @@ class JermController < ApplicationController
     resources.each_key do |author|
       begin
         unless author.nil? || author.user.nil?
-          Mailer.resources_harvested(resources[author], author.user).deliver if Seek::Config.email_enabled?
+          Mailer.resources_harvested(resources[author], author.user).deliver_now if Seek::Config.email_enabled?
         end
       rescue Exception=>e
         #FIXME: report exception back with the response

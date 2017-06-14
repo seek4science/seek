@@ -6,21 +6,24 @@ Coveralls.wear!('rails')
 require File.expand_path(File.dirname(__FILE__) + '/../config/environment')
 require 'rails/test_help'
 
-require 'minitest/reporters'
-MiniTest::Reporters.use! MiniTest::Reporters::DefaultReporter.new
-
 require 'rest_test_cases'
 require 'rdf_test_cases'
 require 'sharing_form_test_helper'
-require 'functional_authorization_tests'
+require 'general_authorization_test_cases'
 require 'ruby-prof'
 require 'factory_girl'
-require 'webmock/test_unit'
+require 'webmock/minitest'
 require 'action_view/test_case'
 require 'tmpdir'
 require 'authenticated_test_helper'
 require 'mock_helper'
 require 'html_helper'
+require 'minitest/reporters'
+require 'minitest'
+
+Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
+
+Minitest::Test.i_suck_and_my_tests_are_order_dependent!
 
 module ActionView
   class Renderer
@@ -109,15 +112,9 @@ class ActiveSupport::TestCase
   end
 
   def check_for_soffice
-    port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
-    @@soffice_available ||= begin
-      soc = TCPSocket.new('localhost', port)
-      soc.close
-      true
-    rescue
-      false
+    unless Seek::Config.soffice_available?
+      skip("soffice is not available on port #{ConvertOffice::ConvertOfficeConfig.options[:soffice_port]}, skipping test")
     end
-    skip("soffice is not available on port #{port}, skipping test") unless @@soffice_available
   end
 
   def skip_rest_schema_check?

@@ -1,11 +1,11 @@
 <%
-label||=""
-none_text||=nil
+  label ||= ""
+  none_text ||= nil
 -%>
 
 <% unless label.blank? %>
     <b><%= label -%>:</b>
 <% end %>
 <div id="description" class="well well-sm">
-  <%= text_or_not_specified(item_description, :description=>true,:auto_link=>true, :none_text=>none_text) %>
+  <%= text_or_not_specified(description, description: true, auto_link: true, none_text: none_text) %>
 </div>

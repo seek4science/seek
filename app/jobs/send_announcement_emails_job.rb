@@ -34,7 +34,7 @@ class SendAnnouncementEmailsJob < SeekEmailJob
       NotifieeInfo.where(['id IN (?) AND receive_notifications=?', (from_notifiee_id..(from_notifiee_id + BATCHSIZE)), true]).each do |notifiee_info|
         begin
           unless notifiee_info.notifiee.nil?
-            Mailer.announcement_notification(site_announcement, notifiee_info).deliver
+            Mailer.announcement_notification(site_announcement, notifiee_info).deliver_now
           end
         rescue Exception => e
           if defined? Rails.logger

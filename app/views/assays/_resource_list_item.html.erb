@@ -6,7 +6,7 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <%= list_item_authorized_attribute t('contributor').capitalize, resource.owner %>
+    <%= list_item_authorized_attribute t('contributor').capitalize, resource.contributor %>
 
     <%= "<p class=\"list_item_attribute\"><b>#{assay_type_text}</b>: #{link_to_assay_type(resource)}</p>".html_safe %>
     <% unless resource.is_modelling? -%>

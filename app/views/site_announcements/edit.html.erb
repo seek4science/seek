@@ -2,7 +2,7 @@
   <% content_for(:buttons) do %>
       <% confirmation_text = "Are you sure you wish to delete this announcement?" %>
       <% confirmation_text += "\n(This announcement included an email notification, so you may not want to delete)" if @site_announcement.email_notification? %>
-      <%= button_link_to "Destroy announcement", 'destroy', site_announcement_path(@site_announcement), :method=>:delete, :confirm=>confirmation_text-%>
+      <%= button_link_to "Destroy announcement", 'destroy', site_announcement_path(@site_announcement), :method=>:delete, data: { confirm: confirmation_text }-%>
   <% end -%>
 
   <%= render :partial=>"general/page_title", :locals=>{ :title => "Editing '#{h(@site_announcement.title)}'"} %>

@@ -4,7 +4,7 @@ class PresentationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include RestTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   def setup
     login_as Factory(:user)
@@ -209,7 +209,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     presentation = Factory(:presentation, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, id: presentation
-    assert_select 'div', text: /another creator/, count: 1
+    assert_select 'div', text: 'another creator', count: 1
   end
 
   test 'should be able to view ms/open office ppt content' do
@@ -230,7 +230,7 @@ class PresentationsControllerTest < ActionController::TestCase
     ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
     get :show, id: ms_ppt_presentation.id
     assert_response :success
-    assert_select 'img[src=?]', /\/assets\/file_icons\/small\/ppt\.png/
+    assert_select 'img[src=?]', '/assets/file_icons/small/ppt.png'
 
     # new version
     pdf_presentation = Factory(:presentation_version, presentation: ms_ppt_presentation)
@@ -241,7 +241,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
     get :show, id: ms_ppt_presentation.id, version: 2
     assert_response :success
-    assert_select 'img[src=?]', /\/assets\/file_icons\/small\/pdf\.png/
+    assert_select 'img[src=?]', '/assets/file_icons/small/pdf.png'
   end
 
   test 'filter by people, including creators, using nested routes' do

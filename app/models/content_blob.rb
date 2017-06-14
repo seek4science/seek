@@ -21,6 +21,9 @@ class ContentBlob < ActiveRecord::Base
   # if the file doesn't exist an error occurs
   attr_writer :tmp_io_object
 
+  # Store HTTP headers to stop SEEK performing multiple requests when getting info
+  attr_writer :headers
+
   # Flag to decide whether a remote file should be retrieved and stored in SEEK
   attr_accessor :make_local_copy
 
@@ -223,18 +226,11 @@ class ContentBlob < ActiveRecord::Base
       @headers
     else
       begin
-        RestClient.head(url).headers
+        remote_content_handler.info
       rescue
         {}
       end
     end
-  end
-
-  def retrieve_content_type_from_url
-    type = remote_headers[:content_type] || ''
-
-    # strip out the charset, e.g for content-type  "text/html; charset=utf-8"
-    type.gsub(/;.*/, '').strip
   end
 
   def dump_data_object_to_file
@@ -267,7 +263,7 @@ class ContentBlob < ActiveRecord::Base
     if file_exists?
       self.file_size = File.size(filepath)
     elsif url
-      self.file_size = remote_headers[:content_length]
+      self.file_size = remote_headers[:file_size]
     else
       self.file_size = nil
     end

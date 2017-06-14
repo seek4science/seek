@@ -1,7 +1,0 @@
-.calendar_date_select {
-    z-index: 100000;
-}
-
-.calendar_date_select select, .calendar_date_select input {
-    color: #333;
-}

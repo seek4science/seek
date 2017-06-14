@@ -7,7 +7,7 @@ parent_xml.statistics do
   parent_xml.total items.size + @hidden
   parent_xml.total_displayed items.size
   parent_xml.hidden @hidden
-  if items.respond_to?("pages")
+  if items.is_a?(Seek::GroupedPagination::Collection)
     pages = items.pages + ["latest","all"]
     parent_xml.pages pages.join(", ")
     parent_xml.page items.page  
@@ -26,7 +26,7 @@ parent_xml.items do
 end
 
 parent_xml.related do
-  if items.respond_to?("pages")
+  if items.is_a?(Seek::GroupedPagination::Collection)
     pages = items.pages + ["latest","all"]
     pages.each do |page|
       parent_xml.tag! "page", {"xlink:href"=>assays_url(:page=>page)}

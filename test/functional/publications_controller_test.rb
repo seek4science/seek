@@ -8,21 +8,18 @@ class PublicationsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include MockHelper
-  include Test::Unit::Assertions
-  include MockHelper
 
   def setup
-    login_as(:quentin)
+    login_as(Factory(:admin))
   end
 
   def rest_api_test_object
-    @object = publications(:taverna_paper_pubmed)
-    @object = publications(:taverna_paper_pubmed)
+    @object = Factory(:publication, published_date: Date.new(2013, 1, 1))
   end
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK Publications.*/, count: 1
+    assert_select 'title', text: 'Publications', count: 1
   end
 
   test 'should get index' do
@@ -41,7 +38,6 @@ class PublicationsControllerTest < ActionController::TestCase
     assay = assays(:metabolomics_assay)
     assert_difference('Publication.count') do
       post :create, publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id] }, assay_ids: [assay.id.to_s]
-      p assigns(:publication).errors.full_messages
     end
 
     assert_redirected_to edit_publication_path(assigns(:publication))
@@ -204,9 +200,12 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should only show the year for 1st Jan in list view' do
+    disable_authorization_checks { Publication.destroy_all }
     publication = Factory(:publication, published_date: Date.new(2013, 1, 1), title: 'blah blah blah science')
+    assert_equal 1, Publication.count
     get :index
     assert_response :success
+
     assert_select 'div.list_item:first-of-type' do
       assert_select 'div.list_item_title a[href=?]', publication_path(publication), text: /#{publication.title}/
       assert_select 'p.list_item_attribute', text: /2013/, count: 1
@@ -221,7 +220,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should export publication as endnote' do
     publication_formatter_mock
-    get :show, id: publications(:one), format: 'enw'
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: publication_for_export_tests, format: 'enw'
+    end
     assert_response :success
     assert_match(/%0 Journal Article.*/, response.body)
     assert_match(/.*%A Hendrickson, W\. A\..*/, response.body)
@@ -247,7 +248,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should export publication as bibtex' do
     publication_formatter_mock
-    get :show, id: publications(:one), format: 'bibtex'
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: publication_for_export_tests, format: 'bibtex'
+    end
     assert_response :success
     assert_match(/@article{PMID:5,.*/, response.body)
     assert_match(/.*author.*/, response.body)
@@ -261,7 +264,9 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should export publication as embl' do
     publication_formatter_mock
-    get :show, id: publications(:one), format: 'embl'
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: publication_for_export_tests, format: 'embl'
+    end
     assert_response :success
     assert_match(/RX   PUBMED; 5\..*/, response.body)
     assert_match(/.*RT   \"Atomic models for the polypeptide backbones of myohemerythrin and\nRT   hemerythrin.\";.*/, response.body)
@@ -331,7 +336,7 @@ class PublicationsControllerTest < ActionController::TestCase
     new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
 
-    put :update, id: p, author: {}, assay_ids: [new_assay.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, assay_ids: [new_assay.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -355,7 +360,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, author: {}, data_files: [{ id: df.id.to_s }]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: [{ id: df.id.to_s }]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -367,7 +372,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert df.publications.include?(p)
 
     # remove association
-    put :update, id: p, author: {}, data_file_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_file_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -385,7 +390,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, author: {}, model_ids: [model.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, model_ids: [model.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -398,7 +403,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert model.publications.include?(p)
 
     # remove association
-    put :update, id: p, author: {}, model_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, model_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -416,7 +421,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, author: {}, investigation_ids: ["#{investigation.id}"]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: [investigation.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -428,7 +433,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert investigation.publications.include?(p)
 
     # remove association
-    put :update, id: p, author: {}, investigation_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -446,7 +451,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, author: {}, study_ids: ["#{study.id}"]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, study_ids: [study.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -458,7 +463,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert study.publications.include?(p)
 
     # remove association
-    put :update, id: p, author: {}, study_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, study_ids: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -477,7 +482,7 @@ class PublicationsControllerTest < ActionController::TestCase
     new_assay = assays(:metabolomics_assay)
     assert new_assay.publications.empty?
 
-    put :update, id: p, author: {}, assay_ids: [new_assay.id.to_s]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, assay_ids: [new_assay.id.to_s]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -495,7 +500,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should keep model and data associations after update' do
     p = publications(:pubmed_2)
-    put :update, id: p, author: {}, assay_ids: [],
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, assay_ids: [],
                  data_files: p.data_files.map { |df| { id: df.id } },
                  model_ids: p.models.collect { |m| m.id.to_s }
 
@@ -508,19 +513,21 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should associate authors' do
-    p = Factory(:publication, publication_authors: [Factory.build(:publication_author), Factory.build(:publication_author)])
+    p = Factory(:publication, publication_authors: [Factory(:publication_author), Factory(:publication_author)])
     assert_equal 2, p.publication_authors.size
     assert_equal 0, p.creators.size
 
-    seek_author1 = people(:modeller_person)
-    seek_author2 = people(:quentin_person)
+    seek_author1 = Factory(:person)
+    seek_author2 = Factory(:person)
 
     # Associate a non-seek author to a seek person
     login_as p.contributor
     as_virtualliver do
       assert_difference('PublicationAuthor.count', 0) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, id: p.id, author: { p.publication_authors[1].id => seek_author2.id, p.publication_authors[0].id => seek_author1.id }
+          put :update, id: p.id, publication: { abstract: p.abstract },
+                       author: { p.publication_authors[1].id => seek_author2.id,
+                                 p.publication_authors[0].id => seek_author1.id }
         end
       end
     end
@@ -557,8 +564,9 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should destroy publication' do
+    publication = Factory(:publication, published_date: Date.new(2013, 6, 4))
     assert_difference('Publication.count', -1) do
-      delete :destroy, id: publications(:one).to_param
+      delete :destroy, id: publication.id
     end
 
     assert_redirected_to publications_path
@@ -593,7 +601,9 @@ class PublicationsControllerTest < ActionController::TestCase
     as_virtualliver do
       assert_difference('publication.non_seek_authors.count', -2) do
         assert_difference('AssetsCreator.count', 2) do
-          put :update, id: publication.id, author: { publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id }
+          put :update, id: publication.id, publication: { abstract: publication.abstract },
+                       author: { publication.non_seek_authors[12].id => seek_author1.id,
+                                 publication.non_seek_authors[15].id => seek_author2.id }
         end
       end
     end
@@ -635,7 +645,9 @@ class PublicationsControllerTest < ActionController::TestCase
     # Associate a non-seek author to a seek person
     assert_difference('publication.non_seek_authors.count', -2) do
       assert_difference('AssetsCreator.count', 2) do
-        put :update, id: publication.id, author: { publication.non_seek_authors[12].id => seek_author1.id, publication.non_seek_authors[15].id => seek_author2.id }
+        put :update, id: publication.id, publication: { abstract: publication.abstract },
+                     author: { publication.non_seek_authors[12].id => seek_author1.id,
+                               publication.non_seek_authors[15].id => seek_author2.id }
       end
     end
     publication.reload
@@ -678,14 +690,14 @@ class PublicationsControllerTest < ActionController::TestCase
     get :edit, id: p.id
 
     assert_response :success
-    assert_not_include response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
+    assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
     # This will be slow!
 
     # 3 for events 'fancy_multiselect'
     assert_equal 3, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
     # 8 = 2 each for investigations, studies, assays, models (using bespoke association forms) - datafiles loaded asynchronously
     # plus an extra 2 for the study optgroups in the assay association
-    assert_equal 10, response.body.scan('\u003Cscript\u003Ealert(\"xss\")\u003C/script\u003E \u0026').count
+    assert_equal 10, response.body.scan('\u003cscript\u003ealert(\"xss\")\u003c/script\u003e \u0026').count
   end
 
   test 'programme publications through nested routing' do
@@ -753,5 +765,31 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 'Bauers', authors[1]['last_name']
     assert_nil authors[1]['person_id']
     assert_equal 0, authors[1]['count']
+  end
+
+  test 'automatically extracts DOI from full DOI url' do
+    project = Factory(:project)
+
+    assert_difference('Publication.count') do
+      post :create, publication: { project_ids: ['', project.id.to_s],
+                                   doi: 'http://dx.doi.org/10.5072/abcd',
+                                   title: 'Cool stuff',
+                                   publication_authors: ['', User.current_user.person.name],
+                                   abstract: 'We did stuff',
+                                   journal: 'Journal of Interesting Stuff',
+                                   published_date: '2017-05-23' }, subaction: 'Create'
+
+    end
+
+    assert_equal '10.5072/abcd', assigns(:publication).doi
+  end
+
+  private
+
+  def publication_for_export_tests
+    Factory(:publication, title: 'A paper on blabla',
+                          abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
+                          published_date: 5.days.ago.to_s(:db),
+                          pubmed_id: 5)
   end
 end

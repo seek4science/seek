@@ -1,5 +1,5 @@
 class SampleControlledVocab < ActiveRecord::Base
-  attr_accessible :title, :description, :sample_controlled_vocab_terms_attributes
+  # attr_accessible :title, :description, :sample_controlled_vocab_terms_attributes
 
   has_many :sample_controlled_vocab_terms, inverse_of: :sample_controlled_vocab,
                                            after_add: :update_sample_type_templates,

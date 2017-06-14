@@ -4,18 +4,6 @@
 module ImagesHelper
   include Seek::MimeTypes
 
-  def info_icon_with_tooltip(info_text)
-    image('info',
-          'data-tooltip' => tooltip(info_text),
-          :style => 'vertical-align:middle;')
-  end
-
-  # mirrors image_tag but uses a key instead of a source
-  def simple_image_tag_for_key(key, options = {})
-    return nil unless (filename = icon_filename_for_key(key.downcase))
-    image_tag filename, options
-  end
-
   def image_tag_for_key(key, url = nil, alt = nil, html_options = {}, label = key.humanize, remote = false, size = nil)
     label = 'Delete' if label == 'Destroy'
 
@@ -29,13 +17,13 @@ module ImagesHelper
     inner = "#{img_tag} #{label}".html_safe unless label.blank?
 
     if url
-      if remote == :function
-        inner = link_to_function inner, url, html_options
-      elsif remote
-        inner = link_to(inner, url, html_options.merge(remote: true))
-      else
-        inner = link_to(inner, url, html_options)
-      end
+      inner = if remote == :function
+                link_to_function inner, url, html_options
+              elsif remote
+                link_to(inner, url, html_options.merge(remote: true))
+              else
+                link_to(inner, url, html_options)
+              end
     end
 
     inner.html_safe
@@ -98,7 +86,7 @@ module ImagesHelper
   def delete_icon(model_item, user)
     item_name = text_for_resource model_item
     if model_item.can_delete?(user)
-      html = content_tag(:li) { image_tag_for_key('destroy', url_for(model_item), "Delete #{item_name}", { confirm: 'Are you sure?', method: :delete }, "Delete #{item_name}") }
+      html = content_tag(:li) { image_tag_for_key('destroy', url_for(model_item), "Delete #{item_name}", { data: { confirm: 'Are you sure?' }, method: :delete }, "Delete #{item_name}") }
       return html.html_safe
     elsif model_item.can_manage?(user)
       explanation = unable_to_delete_text model_item
@@ -107,22 +95,9 @@ module ImagesHelper
     end
   end
 
-  def share_icon
-    icon = simple_image_tag_for_key('share').html_safe
-    html = link_to_remote_redbox(icon + 'Share workflow'.html_safe,
-                                 url: url_for(action: 'temp_link'),
-                                 failure: "alert('Sorry, an error has occurred.'); RedBox.close();"
-                                )
-    html.html_safe
-  end
-
   def file_type_icon(item)
     url = file_type_icon_url(item)
     image_tag url, class: 'icon'
-  end
-
-  def file_type_icon_key(item)
-    mime_icon_key item.content_blob.try :content_type
   end
 
   def file_type_icon_url(item)

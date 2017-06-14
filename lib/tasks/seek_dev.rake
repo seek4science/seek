@@ -306,7 +306,7 @@ namespace :seek_dev do
         bench = Benchmark.measure do
           users = User.all.take(user_count)
           table_name = DataFile.lookup_table_name
-          assets = DataFile.all(:include => :policy).take(data_file_count)
+          assets = DataFile.include(:policy).to_a.take(data_file_count)
           ActiveRecord::Base.transaction do
             users.each do |user|
               ActiveRecord::Base.connection.execute("delete from #{table_name} where user_id = #{user.id}")

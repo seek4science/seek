@@ -1,6 +1,4 @@
 require 'zip'
-require 'datacite/acts_as_doi_mintable'
-require 'zenodo/acts_as_zenodo_depositable'
 
 # Investigation "snapshot"
 class Snapshot < ActiveRecord::Base

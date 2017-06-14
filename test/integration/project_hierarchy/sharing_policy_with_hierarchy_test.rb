@@ -1,7 +1,7 @@
 require 'test_helper'
 require 'project_hierarchy_test_helper'
 
-class SharingPolicyWithHierarchyTest < ActionController::IntegrationTest
+class SharingPolicyWithHierarchyTest < ActionDispatch::IntegrationTest
   include ProjectHierarchyTestHelper
 
   test 'items shared in parent project are also shared with same policy in child projects' do

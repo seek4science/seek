@@ -38,7 +38,7 @@ class AssayTypeReaderTest < ActiveSupport::TestCase
     reader = Seek::Ontologies::AssayTypeReader.instance
     labels = reader.all_labels
     assert_equal 52, labels.size
-    assert_include labels, 'amplification'
+    assert_includes labels, 'amplification'
   end
 
   test 'class for uri' do

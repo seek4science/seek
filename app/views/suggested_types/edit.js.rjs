@@ -1,5 +1,0 @@
-
-page.select('div#RB_redbox div.head span').first.textContent = "Edit #{@suggested_type.humanize_term_type} type";
-page.replace_html :new_suggested_assay_type_form, :partial => "suggested_types/form", :locals=> {:action=> :edit_popup}
-page[:suggested_assay_type_label].focus
-

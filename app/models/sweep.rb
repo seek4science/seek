@@ -8,7 +8,7 @@ class Sweep < ActiveRecord::Base
 
   accepts_nested_attributes_for :runs
 
-  attr_accessible :contributor_id, :workflow_id, :name, :runs_attributes, :workflow_version
+  # attr_accessible :contributor_id, :workflow_id, :name, :runs_attributes, :workflow_version
 
   before_destroy :cancel
 
@@ -53,7 +53,7 @@ class Sweep < ActiveRecord::Base
   end
 
   def build_zip(output_list)
-    unique_id = output_list.map {|o| o.id}.hash.to_s(16).gsub('-','0')
+    unique_id = output_list.map {|o| o.id}.hash.to_s(16).tr('-','0')
     path = "#{Rails.root}/tmp/#{name.parameterize('_')}_results_#{unique_id}.zip"
 
     unless File.exists?(path)

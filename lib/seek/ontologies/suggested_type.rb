@@ -89,7 +89,7 @@ module Seek
 
       # provides the direct child of this type. For all children in the hierarchy see all_children
       def children
-        self.class.where('parent_id=? AND parent_id IS NOT NULL', id).all
+        self.class.where('parent_id=? AND parent_id IS NOT NULL', id)
       end
 
       # provides all children of this type, traversing down the hierarchy
@@ -102,7 +102,7 @@ module Seek
       def assays
         field = "#{self.class.table_name.singularize}_id"
         ids = all_children.collect(&:id) | [id]
-        Assay.where(field => ids).all
+        Assay.where(field => ids)
       end
 
       def can_edit?

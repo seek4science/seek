@@ -27,6 +27,6 @@
                            'Latest list length', "This is the maximum number of items that are listed when viewing 'latest'.",
                            :onkeypress => "javascript: return onlyNumbers(event);") %>
 
-    <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
+    <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path %>
 <% end -%>

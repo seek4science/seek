@@ -30,14 +30,13 @@ module AdminHelper
         Daemons::PidFile.new(directory, file)
       end
       pids.each do |pid|
-        if pid.running?
-          status << "Running [Process ID: #{pid.pid}]"
-        else
-          status << "<span class='error_text'>Not running</span>"
-        end
+        status << if pid.running?
+                    "Running [Process ID: #{pid.pid}]"
+                  else
+                    "<span class='error_text'>Not running</span>"
+                  end
         status << '&nbsp;:&nbsp;' unless pid == pids.last
       end
-
     rescue Exception => e
       status = "<span class='error_text'>Unable to determine current status - #{e.message}</span>"
     end
@@ -53,7 +52,7 @@ module AdminHelper
         admin_activate_user_button + ' ' + resend_activation_email_button
       end
     when 'delete'
-      button_link_to('Delete', 'destroy', user_or_person, method: :delete, confirm: "Are you sure you wish to delete this #{user_or_person.class.name}?")
+      button_link_to('Delete', 'destroy', user_or_person, method: :delete, data: { confirm: "Are you sure you wish to delete this #{user_or_person.class.name}?" })
     end
   end
 
@@ -95,8 +94,6 @@ module AdminHelper
 
   def admin_dropdown_setting(name, option_tags, title, description = nil, options = {})
     admin_setting_block(title, description) do
-      #   select_tag "people", "<option>David</option>".html_safe
-      #   # => <select id="people" name="people"><option>David</option></select>
       select_tag(name, option_tags, options.merge!(class: 'form-control'))
     end
   end
@@ -108,13 +105,10 @@ module AdminHelper
         branch =  `git rev-parse --abbrev-ref HEAD`
         link = link_to(version[0...7], "https://github.com/seek4science/seek/commit/#{version}", target: '_blank', title: version).html_safe
         "Git revision: #{link} (branch:#{branch})".html_safe
-
       rescue
       end
     end
   end
-
-  private
 
   def admin_setting_block(title, description)
     content_tag(:div, class: 'form-group') do

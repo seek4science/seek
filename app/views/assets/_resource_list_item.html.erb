@@ -30,10 +30,10 @@
 %>
 
 <div class="panel panel-default <%= access_based_css_class%>">
-  <div class="panel-heading">
+  <div class="panel-heading rli-head">
     <%= list_item_title resource, title_options %>
     <% if resource.respond_to?(:projects) && ![Event, Person, Project, Institution, Programme].include?(resource.class) %>
-        <div class="pull-right small">
+        <div class="rli-project-list">
           <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
         </div>
     <% end %>

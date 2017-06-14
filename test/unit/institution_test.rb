@@ -159,7 +159,7 @@ class InstitutionTest < ActiveSupport::TestCase
   test 'get all institution listing' do
     inst = Factory(:institution, title: 'Inst X')
     array = Institution.get_all_institutions_listing
-    assert_include array, ['Inst X', inst.id]
+    assert_includes array, ['Inst X', inst.id]
   end
 
   test 'can create?' do

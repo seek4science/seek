@@ -59,7 +59,7 @@ class LogPublishingTest < ActionController::TestCase
     assert sop.can_publish?
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, id: sop.id, policy_attributes: public_sharing
+      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: public_sharing
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
@@ -78,7 +78,7 @@ class LogPublishingTest < ActionController::TestCase
     assert sop.can_publish?
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::VISIBLE }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -95,7 +95,7 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
 
     assert_no_difference ('ResourcePublishLog.count') do
-      put :update, id: sop.id, policy_attributes: { access_type: Policy::NO_ACCESS }
+      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
     end
   end
 
@@ -111,7 +111,7 @@ class LogPublishingTest < ActionController::TestCase
     ResourcePublishLog.create(resource: sop, user: User.current_user, publish_state: ResourcePublishLog::PUBLISHED)
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, id: sop.id, policy_attributes: { access_type: Policy::NO_ACCESS }
+      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::UNPUBLISHED, publish_log.publish_state.to_i
@@ -124,7 +124,7 @@ class LogPublishingTest < ActionController::TestCase
     df = Factory(:data_file, project_ids: @gatekeeper.projects.collect(&:id))
 
     login_as(df.contributor)
-    put :update, id: df.id, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::VISIBLE }
 
     logout
 
@@ -150,7 +150,7 @@ class LogPublishingTest < ActionController::TestCase
     df = Factory(:data_file, project_ids: gatekeeper2.projects.collect(&:id))
 
     login_as(df.contributor)
-    put :update, id: df.id, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::VISIBLE }
 
     logout
 
@@ -201,9 +201,9 @@ class LogPublishingTest < ActionController::TestCase
     end
     assert_response :redirect
 
-    log_for_df = ResourcePublishLog.last(conditions: ['resource_type=? AND resource_id=?', 'DataFile', df.id])
+    log_for_df = ResourcePublishLog.where('resource_type=? AND resource_id=?', 'DataFile', df.id).last
     assert_equal ResourcePublishLog::PUBLISHED, log_for_df.publish_state
-    log_for_request_publishing_df = ResourcePublishLog.last(conditions: ['resource_type=? AND resource_id=?', 'DataFile', request_publishing_df.id])
+    log_for_request_publishing_df = ResourcePublishLog.where('resource_type=? AND resource_id=?', 'DataFile', request_publishing_df.id).last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, log_for_request_publishing_df.publish_state
   end
 

@@ -27,7 +27,7 @@
         <%= image 'show', :class => "icon" -%> Show Interaction
       <% end %>
     <% end %>
-    <%= link_to cancel_run_path(run.id), :method => :put, :data => { confirm: "Are you sure?" }, :class => 'button-link' do %>
+    <%= link_to cancel_run_path(run.id), :method => :put, data: { confirm: "Are you sure?" }, :class => 'button-link' do %>
       <%= image 'destroy', :class => "icon" -%> Cancel
     <% end %>
   <% end %>

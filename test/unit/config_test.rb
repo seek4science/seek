@@ -22,7 +22,7 @@ class ConfigTest < ActiveSupport::TestCase
   test 'read setting attributes' do
     attributes = Seek::Config.read_setting_attributes
     refute attributes.empty?
-    assert_include attributes, :events_enabled
+    assert_includes attributes, :events_enabled
   end
 
   test 'project_hierarchy_enabled' do
@@ -268,7 +268,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'pubmed_api_email' do
-    assert_equal nil, Seek::Config.pubmed_api_email
+    assert_nil Seek::Config.pubmed_api_email
   end
 
   test 'crossref_api_email' do
@@ -453,8 +453,22 @@ class ConfigTest < ActiveSupport::TestCase
     refute_nil key = Seek::Config.attr_encrypted_key
     assert File.exist?(Seek::Config.attr_encrypted_key_path)
     FileUtils.rm(Seek::Config.attr_encrypted_key_path)
+    assert_equal 64, key.length
 
     # check it regenerates it different each time
     refute_equal key, Seek::Config.attr_encrypted_key
+  end
+
+  test 'secret key base' do
+    path = "#{Rails.root}/tmp/testing-filestore/secret_key_base/key"
+    FileUtils.rm(path) if File.exist?(path)
+    key = Seek::Config.secret_key_base
+    refute_nil key
+    assert File.exist?(path)
+    assert_equal key,Seek::Config.secret_key_base
+    assert_equal key,File.read(path)
+    assert_equal 128,key.length
+    FileUtils.rm(path)
+    refute_equal key, Seek::Config.secret_key_base
   end
 end

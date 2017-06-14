@@ -578,7 +578,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     programme_admin.save!
 
     admins = Person.programme_administrators
-    assert_instance_of ActiveRecord::Relation, admins
+    assert_kind_of ActiveRecord::Relation, admins
     assert_includes admins, programme_admin
     refute_includes admins, normal
   end
@@ -650,18 +650,18 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert_equal programmes.sort, result.sort
 
     # needs to be an ActiveRecord::Relation so that it can be extended with scopes and other query clauses
-    assert_instance_of ActiveRecord::Relation, result
-    assert_instance_of ActiveRecord::Relation, person.administered_programmes
+    assert_kind_of ActiveRecord::Relation, result
+    assert_kind_of ActiveRecord::Relation, person.administered_programmes
 
     # no roles but should not just return an empty array
     person = Factory(:person)
     result = Seek::Roles::ProgrammeRelatedRoles.instance.items_for_person_and_role(person, 'programme_administrator')
-    assert_instance_of ActiveRecord::Relation, result
-    assert_instance_of ActiveRecord::Relation, person.administered_programmes
+    assert_kind_of ActiveRecord::Relation, result
+    assert_kind_of ActiveRecord::Relation, person.administered_programmes
 
     # also for admin
     person = Factory(:admin)
-    assert_instance_of ActiveRecord::Relation, person.administered_programmes
+    assert_kind_of ActiveRecord::Relation, person.administered_programmes
   end
 
   test "nil roles mask doesn't indicate administrator" do

@@ -37,7 +37,7 @@
             <%= text_area_tag "extra_comment", nil, :size => "50x8" -%>
           </div>
           <br/>
-          <%= submit_tag "Submit", :disable_with => "Submitting ..." -%>
+          <%= submit_tag "Submit", data: { disable_with: 'Submitting ...' } -%>
           Or
           <%= cancel_button url_for(:action => "index") -%>
       <% end %>

@@ -1,17 +1,13 @@
-
-require 'grouped_pagination'
-# require 'only_writes_unique'
-
 class Event < ActiveRecord::Base
-  has_and_belongs_to_many :data_files, uniq: true
-  has_and_belongs_to_many :publications, uniq: true
-  has_and_belongs_to_many :presentations, uniq: true
+  has_and_belongs_to_many :data_files, -> { uniq }
+  has_and_belongs_to_many :publications, -> { uniq }
+  has_and_belongs_to_many :presentations, -> { uniq }
 
   include Seek::Subscribable
   include Seek::Search::CommonFields
   include Seek::Search::BackgroundReindexing
 
-  scope :default_order, order('start_date DESC')
+  scope :default_order, -> { order('start_date DESC') }
 
   searchable(ignore_attribute_changes_of: [:updated_at], auto_index: false) do
     text :address, :city, :country, :url

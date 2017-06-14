@@ -45,15 +45,16 @@ tmp/testing-filestore
 tmp/testing-seek-cache
 tmp/rubycritic
 tmp/fleximage
+tmp/performance
 *.tmp*
 *~
 
-solr/production/
-solr/development/
-solr/test/
+solr/production/data
+solr/development/data
+solr/test/data
 solr/data/
 solr/pids/
-solr/default/
+solr/default/data
 
 public/help_images/*
 public/javascripts/*_cached.js

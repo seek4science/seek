@@ -8,19 +8,23 @@
 
         <p>
           <span id="title_label"><b>Title: </b></span>
-          <%= in_place_editor_field :folder, 'title', {}, {
-                  :external_control=>:title_label,
-                  :url=>url_for(:project_id=>@project.id, :action=>:set_project_folder_title, :id=>@folder.id)
-          } %>
+          <%= link_to @folder.title, '#',
+                      data: { inplace: true,
+                              type: 'text',
+                              pk: @folder.id,
+                              url: set_project_folder_title_project_folder_path(@project.id, @folder.id),
+                              title: 'Enter title'} %>
         </p>
 
         <p>
           <span id="description_label"><b>Description: </b></span>
-          <%= in_place_editor_field :folder, 'description', {}, {
-                  :rows=>1,
-                  :cols=>50,
-                  :external_control=>"description_label",
-                  :url=>url_for(:project_id=>@project.id, :action=>:set_project_folder_description, :id=>@folder.id)} -%>
+          <%= link_to @folder.description, '#',
+                      data: { inplace: true,
+                              type: 'textarea',
+                              pk: @folder.id,
+                              url: set_project_folder_description_project_folder_path(@project.id, @folder.id),
+                              value: @folder.description,
+                              title: 'Enter description'} %>
         </p>
     <% else -%>
         <p>
@@ -38,7 +42,7 @@
         <div>
         <%= image_tag_for_key "destroy", project_folder_path(@project, @folder),
                               "Delete this folder",
-                              {:confirm => "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?",
+                              { data: { confirm: "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?" },
                                :method => :delete},
                               "Delete this folder"
         -%>

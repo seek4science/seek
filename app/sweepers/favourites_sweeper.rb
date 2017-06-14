@@ -16,6 +16,6 @@ class FavouritesSweeper < ActionController::Caching::Sweeper
   private
 
   def expire_cache(fav)
-    expire_fragment("favourites/user/#{fav.user.try(:id)}")
+    ActionController::Base.new.expire_fragment("favourites/user/#{fav.user.try(:id)}")
   end
 end

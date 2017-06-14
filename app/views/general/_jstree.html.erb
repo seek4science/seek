@@ -7,15 +7,16 @@
     }).jstree({ 'core' : {
       'check_callback': true,
       'force_text': true,
+      'multiple': true,
       'data' : <%= tree_json(hash).html_safe -%>
     }}).on('activate_node.jstree', function (e, data) {
       if (data.node.data && data.node.data.child_count) {
-        var childCountNode = ISA.getNode(data.node.id);
+        var childCountNode = ISA.getNode(data.node.li_attr['data-node-id']);
         if (childCountNode.length) {
           ISA.loadChildren(childCountNode);
         }
       } else {
-        ISA.selectNode(ISA.getNode(data.node.id));
+        ISA.selectNode(ISA.getNode(data.node.li_attr['data-node-id']));
       }
     })
   });

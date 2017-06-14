@@ -62,9 +62,9 @@ class WorkflowsController < ApplicationController
   end
 
   def create
-    if handle_upload_data
+    @workflow = Workflow.new(workflow_params)
 
-      @workflow = Workflow.new params[:workflow]
+    if handle_upload_data
       @workflow.policy.set_attributes_with_sharing(params[:policy_attributes])
       if @workflow.save
         update_annotations(params[:tag_list], @workflow)
@@ -103,11 +103,9 @@ class WorkflowsController < ApplicationController
   end
 
   def update
-    workflow_params=filter_protected_update_params(params[:workflow])
-
     @workflow.attributes = workflow_params
 
-    update_sharing_policies @workflow, params
+    update_sharing_policies @workflow
 
     if @workflow.save && !params[:sharing_form]
       update_annotations(params[:tag_list], @workflow)
@@ -210,6 +208,14 @@ class WorkflowsController < ApplicationController
 
   private
 
+  def workflow_params
+    params.require(:workflow).permit(
+        :title, :category_id, :myexperiment_link, :documentation_link, :sweepable, { project_ids: [] },
+        { input_ports_attributes: [:name, :description, :example_value, :port_type_id, :mime_type, :id] },
+        { output_ports_attributes: [:name, :description, :example_value, :port_type_id, :mime_type, :id] },
+        { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+  end
+
   # Checks if the uploaded file looks like a Taverna workflow
   def taverna_workflow?(file)
     first_couple_of_bytes = IO.read(file, 512) # returns string
@@ -263,7 +269,7 @@ class WorkflowsController < ApplicationController
     search_included = (params[:commit] == 'Clear') ? false : true
 
     # Filter by uploader and category
-    filter_results = Workflow.scoped
+    filter_results = Workflow.all
     filter_results = filter_results.by_category(category.to_i) unless category.blank?
     filter_results = filter_results.by_visibility(visibility) unless visibility.blank?
     filter_results = filter_results.by_uploader(uploader.to_i) unless uploader.blank?

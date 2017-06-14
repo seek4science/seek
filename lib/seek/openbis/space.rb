@@ -1,5 +1,6 @@
 module Seek
   module Openbis
+    # Represents an openBIS Space entity
     class Space < Entity
       attr_accessor :description
 

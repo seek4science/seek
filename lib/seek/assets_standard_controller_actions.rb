@@ -51,8 +51,10 @@ module Seek
     end
 
     def create
+      item = initialize_asset
+
       if handle_upload_data
-        create_asset_and_respond
+        create_asset_and_respond(item)
       else
         handle_upload_data_failure
       end
@@ -69,8 +71,8 @@ module Seek
     end
 
     # the standard response block after created a new asset
-    def create_asset_and_respond
-      item = create_asset
+    def create_asset_and_respond(item)
+      item = create_asset(item)
       if item.save
         create_content_blobs
         unless return_to_fancy_parent(item)
@@ -88,21 +90,24 @@ module Seek
       end
     end
 
-    def update_sharing_policies(item, params)
-      if params[:policy_attributes]
-        item.policy.set_attributes_with_sharing(params[:policy_attributes])
-      end
+    def update_sharing_policies(item)
+      item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
     end
 
-    def create_asset
-      item = class_for_controller_name.new(params[controller_name.singularize.to_sym])
+    def initialize_asset
+      item = class_for_controller_name.new(asset_params)
       set_shared_item_variable(item)
-      update_sharing_policies item, params
+
+      item
+    end
+
+    def create_asset(item)
+      update_sharing_policies item
       update_annotations(params[:tag_list], item)
       update_scales item
       update_relationships(item, params)
       update_assay_assets(item, params[:assay_ids])
-      build_model_image item, params[:model_image] if item.is_a?(Model)
+      build_model_image item, model_image_params if item.is_a?(Model) && model_image_present?
       item
     end
 

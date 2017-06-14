@@ -7,7 +7,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   def setup
     login_as(:quentin)
@@ -19,7 +19,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK #{I18n.t('investigation').pluralize}.*/i, count: 1
+    assert_select 'title', text: I18n.t('investigation').pluralize, count: 1
   end
 
   test 'should show index' do
@@ -69,8 +69,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigations = assigns(:investigations)
     first_investigations = investigations.first
     assert_not_nil first_investigations
-    assert_select 'a[data-favourite-url=?]', h(add_favourites_path(resource_id: first_investigations.id,
-                                                                   resource_type: first_investigations.class.name))
+    assert_select 'a[data-favourite-url=?]', add_favourites_path(resource_id: first_investigations.id,
+                                                                 resource_type: first_investigations.class.name)
   end
 
   test 'should show item' do
@@ -123,11 +123,32 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert !assigns(:investigation).new_record?
   end
 
+  test 'should create with policy' do
+    user = Factory(:user)
+    project = user.person.projects.first
+    another_project = Factory(:project)
+    login_as(user)
+    assert_difference('Investigation.count') do
+      post :create, investigation: Factory.attributes_for(:investigation, project_ids: [User.current_user.person.projects.first.id]),
+           policy_attributes: { access_type: Policy::ACCESSIBLE,
+                                permissions_attributes: project_permissions([project, another_project], Policy::EDITING) }
+    end
+
+    investigation = assigns(:investigation)
+    assert investigation
+    projects_with_permissions = investigation.policy.permissions.map(&:contributor)
+    assert_includes projects_with_permissions, project
+    assert_includes projects_with_permissions, another_project
+    assert_equal 2, investigation.policy.permissions.count
+    assert_equal Policy::EDITING, investigation.policy.permissions[0].access_type
+    assert_equal Policy::EDITING, investigation.policy.permissions[1].access_type
+  end
+
   test 'should fall back to form when no title validation fails' do
     login_as(Factory :user)
 
     assert_no_difference('Investigation.count') do
-      put :create, investigation: { project_ids: [User.current_user.person.projects.first.id] }
+      post :create, investigation: { project_ids: [User.current_user.person.projects.first.id] }
     end
     assert_template :new
 
@@ -140,7 +161,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     login_as(Factory :user)
 
     assert_no_difference('Investigation.count') do
-      put :create, investigation: { title: 'investigation with no projects' }
+      post :create, investigation: { title: 'investigation with no projects' }
     end
     assert_template :new
 
@@ -240,7 +261,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'should_add_nofollow_to_links_in_show_page' do
     get :show, id: investigations(:investigation_with_links_in_description)
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
     end
   end
 
@@ -289,7 +310,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert investigation.creators.empty?
 
-    put :update, id: investigation.id, creators: [[creator.name, creator.id]].to_json
+    put :update, id: investigation.id, investigation: { title: investigation.title },
+        creators: [[creator.name, creator.id]].to_json
     assert_redirected_to investigation_path(investigation)
 
     assert investigation.creators.include?(creator)

@@ -26,22 +26,22 @@ module CommonSweepers
   end
 
   def expire_download_activity
-    ActionController::Base.new.expire_fragment(/download_activity.*/)
+    expire_fragment(/download_activity.*/)
   end
 
   def expire_create_activity
-    ActionController::Base.new.expire_fragment(/create_activity.*/)
+    expire_fragment(/create_activity.*/)
   end
 
   def expire_resource_list_item_action_partial
-    ActionController::Base.new.expire_fragment(/rli_actions.*/)
+    expire_fragment(/rli_actions.*/)
   end
 
   def expire_resource_list_item_content item=nil
     if item.nil?
-      ActionController::Base.new.expire_fragment(/rli_.*/)
+      expire_fragment(/rli_.*/)
     else
-      ActionController::Base.new.expire_fragment(/rli_#{item.cache_key}.*/)
+      expire_fragment(/rli_#{item.cache_key}.*/)
     end
   end
 
@@ -69,6 +69,10 @@ module CommonSweepers
   
   def expire_organism_gadget
     expire_fragment "organisms_gadget"
+  end
+  
+  def expire_fragment(frag)
+    ActionController::Base.new.expire_fragment(frag)
   end
     
 end

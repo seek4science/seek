@@ -102,7 +102,7 @@ module Seek
 
       # the last ResourcePublishingLog made
       def last_publishing_log
-        ResourcePublishLog.last(conditions: ['resource_type=? and resource_id=?', self.class.name, id])
+        ResourcePublishLog.where('resource_type=? and resource_id=?', self.class.name, id).last
       end
 
       # while item is waiting for publishing approval,set the policy of the item to:

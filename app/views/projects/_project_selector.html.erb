@@ -24,7 +24,7 @@
 %>
 
 <%= folding_panel(title, false, id: "add_projects_form",
-                  help_text: "Here you can associate the #{object_type_text} with specific projects.") do %>
+                  help_text: "Here you can associate the #{object_type_text} with specific #{t('project').downcase.pluralize}.") do %>
     <p class="help-block">
       The following projects are associated with this <%= object_type_text -%>:
     </p>
@@ -58,9 +58,11 @@
 <% end %>
 <%= content_tag :script, possible_projects_json.html_safe, type: 'application/json', id: 'project-selector-possibilities-json' %>
 <%= content_tag :script, selected_projects_json.html_safe, type: 'application/json', id: 'project-selector-selected-json' %>
+<%= content_tag :script, project_policies_json(possible_projects | selected_projects), type: 'application/json', id: 'project-default-policies-json' %>
 <%= content_tag :script, enable_auto_project_license? ? project_licenses_json : '{}', type: 'application/json', id: 'project-default-licenses-json' %>
 
 <script>
+  Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
   Sharing.defaultLicenses = JSON.parse($j('#project-default-licenses-json').text());
 
   Sharing.projectsSelector = new Vue({
@@ -80,7 +82,12 @@
           var project = this.possibilities[i];
           if (project.id == projectId) {
             this.selected.push(project);
-            Sharing.addPermissionForProject(project);
+            // Ask if they want to use the default policy (if there is one)
+            if (Sharing.defaultPolicies[project.id] && (skipPrompt || confirm('' + project.title + ' has a default policy specified, do you want to apply it?'))) {
+              Sharing.applyPolicy(Sharing.defaultPolicies[project.id]);
+            } else { // Otherwise just add a permission for the project
+              Sharing.addPermissionForProject(project);
+            }
 
             // Select the default license
             if (this.selected.length === 1 && Sharing.defaultLicenses[project.id]) {
@@ -94,6 +101,7 @@
     }
   });
 
+
   $j(document).ready(function () {
     // Auto select project if there is only one
     if (Sharing.projectsSelector.possibilities.length === 1 &&
@@ -103,6 +111,7 @@
     $j('#projects-selector-select').change(function () {
       if ($j(this).val()) {
         Sharing.projectsSelector.add($j(this).val());
+        $j(this).prop('selectedIndex', 0); // Reset the select
       }
     })
   });

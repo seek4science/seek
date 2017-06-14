@@ -1,5 +1,3 @@
-<%= javascript_include_tag 'publishing' %>
-
 <div class="show_basic">
   <%= show_title "Batch publishing of your items" %>
 
@@ -37,7 +35,7 @@
           <% end %>
           <br/>
 
-          <%= submit_tag "Next",:disable_with=>"Next", :class => 'btn btn-primary' -%>
+          <%= submit_tag "Next",data: { disable_with: 'Next' }, :class => 'btn btn-primary' -%>
           Or
           <%= cancel_button person_path(params[:id].to_i)-%>
       <% end -%>

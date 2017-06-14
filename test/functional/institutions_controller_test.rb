@@ -17,7 +17,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK Institutions.*/, count: 1
+    assert_select 'title', text: 'Institutions', count: 1
   end
 
   def test_should_get_index
@@ -53,7 +53,7 @@ class InstitutionsControllerTest < ActionController::TestCase
   end
 
   def test_should_update_institution
-    put :update, id: institutions(:one).id, institution: {}
+    put :update, id: institutions(:one).id, institution: { title: 'something' }
     assert_redirected_to institution_path(assigns(:institution))
   end
 
@@ -86,7 +86,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     work_group = Factory(:work_group, institution: institution)
     a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
     institution.reload
-    assert_include institution.people, a_person
+    assert_includes institution.people, a_person
     get :show, id: institution
     assert_select 'span.disabled_icon', text: /Delete Institution/, count: 1
     assert_no_difference('Institution.count') do
@@ -106,7 +106,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     get :edit, id: institution
     assert_response :success
 
-    put :update, id: institution.id, institution: {}
+    put :update, id: institution.id, institution: { title: 'something' }
     assert_redirected_to institution_path(assigns(:institution))
   end
 
@@ -128,7 +128,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     get :edit, id: institutions(:two)
     assert_response :success
 
-    put :update, id: institutions(:two).id, institution: {}
+    put :update, id: institutions(:two).id, institution: { title: 'something' }
     assert_redirected_to institution_path(assigns(:institution))
   end
 

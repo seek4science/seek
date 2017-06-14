@@ -13,6 +13,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     @sample_type = Factory(:simple_sample_type, project_ids: @project_ids)
     @string_type = Factory(:string_sample_attribute_type)
     @int_type = Factory(:integer_sample_attribute_type)
+    @controlled_vocab_type=Factory(:controlled_vocab_attribute_type)
   end
 
   test 'should get index' do
@@ -34,6 +35,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_difference('SampleType.count') do
       post :create, sample_type: { title: 'Hello!',
                                    project_ids: @project_ids,
+                                   description: 'The description!!',
                                    sample_attributes_attributes: {
                                      '0' => {
                                        pos: '1', title: 'a string', required: '1', is_title: '1',
@@ -48,14 +50,19 @@ class SampleTypesControllerTest < ActionController::TestCase
       }
     end
 
-    assert_redirected_to sample_type_path(assigns(:sample_type))
-    assert_equal 2, assigns(:sample_type).sample_attributes.size
-    assert_equal 'a string', assigns(:sample_type).sample_attributes.title_attributes.first.title
-    assert_equal [@project], assigns(:sample_type).projects
-    refute assigns(:sample_type).uploaded_template?
-    assert_equal %w(fish golf), assigns(:sample_type).tags.sort
-    assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
-    assert SampleTypeUpdateJob.new(assigns(:sample_type), true).exists?
+    refute_nil type=assigns(:sample_type)
+    assert_redirected_to sample_type_path(type)
+
+    assert_equal 'Hello!',type.title
+    assert_equal 'The description!!',type.description
+    assert_equal @project_ids.sort,type.project_ids.sort
+    assert_equal 2, type.sample_attributes.size
+    assert_equal 'a string', type.sample_attributes.title_attributes.first.title
+    assert_equal [@project], type.projects
+    refute type.uploaded_template?
+    assert_equal %w(fish golf), type.tags.sort
+    assert SampleTemplateGeneratorJob.new(type).exists?
+    assert SampleTypeUpdateJob.new(type, true).exists?
   end
 
   test 'should create with linked sample type' do
@@ -137,7 +144,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     sample_attributes_fields[1][:title] = 'hello'
     sample_attributes_fields[1][:is_title] = '1'
     sample_attributes_fields[2][:_destroy] = '1'
-    sample_attributes_fields = Hash[sample_attributes_fields.each_with_index.map { |f, i| [i, f] }]
+    sample_attributes_fields = Hash[sample_attributes_fields.each_with_index.map { |f, i| [i.to_s, f] }]
 
     assert_difference('SampleAttribute.count', -1) do
       put :update, id: sample_type, sample_type: { title: 'Hello!',
@@ -378,14 +385,14 @@ class SampleTypesControllerTest < ActionController::TestCase
     st3.save!
     st1.save!
 
-    get :filter_for_select, projects: [st1.projects.collect(&:id)], tags: ['monkey']
+    get :filter_for_select, projects: st1.projects.collect(&:id), tags: ['monkey']
     assert_response :success
     assert assigns(:sample_types)
     assert_includes assigns(:sample_types), st1
     refute_includes assigns(:sample_types), st2
     refute_includes assigns(:sample_types), st3
 
-    get :filter_for_select, projects: [st2.projects.collect(&:id)]
+    get :filter_for_select, projects: st2.projects.collect(&:id)
     assert_response :success
     assert assigns(:sample_types)
     assert_includes assigns(:sample_types), st2
@@ -397,14 +404,14 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert assigns(:sample_types)
     assert_empty assigns(:sample_types)
 
-    get :filter_for_select, projects: [(st1.projects + st3.projects).collect(&:id)], tags: %w(fred mary)
+    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred mary)
     assert_response :success
     assert assigns(:sample_types)
     assert_includes assigns(:sample_types), st3
     refute_includes assigns(:sample_types), st2
     refute_includes assigns(:sample_types), st1
 
-    get :filter_for_select, projects: [(st1.projects + st3.projects).collect(&:id)], tags: %w(fred mary monkey)
+    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred mary monkey)
 
     assert_includes assigns(:sample_types), st1
     assert_includes assigns(:sample_types), st3
@@ -422,40 +429,66 @@ class SampleTypesControllerTest < ActionController::TestCase
     st2.save!
     st3.save!
 
-    get :filter_for_select, projects: [(st1.projects + st3.projects).collect(&:id)], tags: %w(fred bob)
+    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob)
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st1, st2].sort, results
 
-    get :filter_for_select, projects: [(st1.projects + st3.projects).collect(&:id)], tags: %w(fred bob), exclusive_tags: '0'
+    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob), exclusive_tags: '0'
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st1, st2].sort, results
 
-    get :filter_for_select, projects: [(st1.projects + st3.projects).collect(&:id)], tags: %w(fred bob), exclusive_tags: '1'
+    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob), exclusive_tags: '1'
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st2], results
 
-    get :filter_for_select, projects: [(st1.projects + st3.projects).collect(&:id)], tags: %w(jane frank), exclusive_tags: '1'
+    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(jane frank), exclusive_tags: '1'
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st3], results
 
-    get :filter_for_select, projects: [(st1.projects + st3.projects).collect(&:id)], tags: %w(peter frank jane), exclusive_tags: '1'
+    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(peter frank jane), exclusive_tags: '1'
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st3], results
 
-    get :filter_for_select, projects: [(st1.projects + st3.projects).collect(&:id)], tags: %w(frank jane bob), exclusive_tags: '1'
+    get :filter_for_select, projects: (st1.projects + st3.projects).collect(&:id), tags: %w(frank jane bob), exclusive_tags: '1'
     assert_response :success
     assert results = assigns(:sample_types)
     assert_empty results
+  end
+
+  test 'create sample type with a controlled vocab' do
+    cv = Factory(:apples_sample_controlled_vocab)
+    assert_difference('SampleType.count') do
+      post :create, sample_type: { title: 'Hello!',
+                                   project_ids: @project_ids,
+                                   sample_attributes_attributes: {
+                                       '0' => {
+                                           pos: '1', title: 'a string', required: '1', is_title: '1',
+                                           sample_attribute_type_id: @string_type.id, _destroy: '0' },
+                                       '1' => {
+                                           pos: '2', title: 'cv', required: '1',
+                                           sample_attribute_type_id:@controlled_vocab_type.id,
+                                           sample_controlled_vocab_id:cv.id,
+                                           destroy: '0'
+                                       }
+                                   }
+      }
+    end
+    refute_nil type=assigns(:sample_type)
+    assert_redirected_to sample_type_path(type)
+    assert_equal 2,type.sample_attributes.count
+    attr=type.sample_attributes.last
+    assert attr.controlled_vocab?
+    assert_equal cv,attr.sample_controlled_vocab
   end
 
   private

@@ -16,28 +16,6 @@ module PolicyHelper
                        selected_access_type)
   end
 
-  def policy_and_permissions_for_private_scope(permissions, _privileged_people, resource_name)
-    html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
-    html << "<p class='private'>You keep this #{resource_name.humanize.downcase} private (only visible to you)</p>"
-    html << process_permissions(permissions, resource_name)
-    html.html_safe
-  end
-
-  def policy_and_permissions_for_public_scope(policy, permissions, _privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval)
-    html = "<h3>You will share this #{resource_name.humanize} with:</h3>"
-    html << "<p class='public'>All visitors (including anonymous visitors with no login) can #{Policy.get_access_type_wording(policy.access_type, resource_name.camelize.constantize.new).downcase} </p>"
-    unless updated_can_publish_immediately
-      if send_request_publish_approval
-        html << "<p class='gatekeeper_notice'>(An email will be sent to the Gatekeepers of the #{t('project').pluralize} associated with this #{resource_name.humanize} to ask for publishing approval. This #{resource_name.humanize} will not be published until one of the Gatekeepers has granted approval)</p>"
-      else
-        html << "<p class='gatekeeper_notice'>(You requested the publishing approval from the Gatekeepers of the #{t('project').pluralize} associated with this #{resource_name.humanize}, and it is waiting for the decision. This #{resource_name.humanize} will not be published until one of the Gatekeepers has granted approval)</p>"
-      end
-    end
-
-    html << process_permissions(permissions, resource_name)
-    html.html_safe
-  end
-
   # check if there are overlapped people in permissions and of privileged_people
   # if yes, compare the access type of them
   # and keep the one with higher access type
@@ -51,37 +29,35 @@ module PolicyHelper
         next unless people_from_permissions.include?(v)
         permission_index = permissions.index { |p| p.contributor == v }
         access_type_from_permission = permissions[permission_index].access_type
-        access_type_from_privileged_person = (key == 'creator') ? Policy::EDITING : Policy::MANAGING
+        access_type_from_privileged_person = (key == 'contributor') ? Policy::MANAGING : Policy::EDITING
         if (access_type_from_privileged_person >= access_type_from_permission)
           permissions.slice!(permission_index)
         else
-          privileged_people[key].value.delete(v)
-          privileged_people.delete(key) if privileged_people[key].value.empty?
+          privileged_people[key].delete(v)
+          privileged_people.delete(key) if privileged_people[key].empty?
         end
       end
     end
     [permissions, privileged_people]
   end
 
-  def process_permissions(permissions, resource_name, display_no_access = false)
-    # remove the permissions with access_type=NO_ACCESS
-    permissions.select! { |p| p.access_type != Policy::NO_ACCESS } unless display_no_access
-
-    html = ''
-    unless permissions.empty?
-      html = '<h3>Fine-grained sharing permissions:</h3>'
-      permissions.each do |p|
-        contributor = p.contributor
-        group_name = (p.contributor_type == 'WorkGroup') ? (h(contributor.project.title) + ' @ ' + h(contributor.institution.title)) : h(contributor.title)
-        prefix_text = (p.contributor_type == 'Person') ? '' : ('Members of ' + p.contributor_type.underscore.humanize + ' ')
-        html << "<p class='permission'>#{prefix_text + group_name}"
-        html << ((p.access_type == Policy::DETERMINED_BY_GROUP || p.access_type == Policy::NO_ACCESS) ? ' have ' : ' can ')
-        html << Policy.get_access_type_wording(p.access_type, resource_name.camelize.constantize.new.try(:is_downloadable?)).downcase
-        html << '</p>'
-      end
+  def group_by_access_type(permissions, privileged_people)
+    grouped_contributors = {}
+    permissions.group_by(&:access_type).each do |access, permissions|
+      grouped_contributors[access] = permissions.map(&:contributor)
     end
 
-    html.html_safe
+    (privileged_people['creators'] || []).each do |creator|
+      grouped_contributors[Policy::EDITING] ||= []
+      grouped_contributors[Policy::EDITING].unshift(creator)
+    end
+
+    (privileged_people['contributor'] || []).each do |contributor|
+      grouped_contributors[Policy::MANAGING] ||= []
+      grouped_contributors[Policy::MANAGING].unshift(contributor)
+    end
+
+    grouped_contributors
   end
 
   def process_privileged_people(privileged_people, resource_name)
@@ -115,7 +91,7 @@ module PolicyHelper
     end
   end
 
-  def policy_json(policy, associated_projects)
+  def policy_hash(policy, associated_projects)
     project_ids = associated_projects.map(&:id)
     hash = { access_type: policy.access_type }
 
@@ -131,13 +107,7 @@ module PolicyHelper
         h[:isMandatory] = true
       end
 
-      if permission.contributor_type == 'Person'
-        h[:title] = "#{permission.contributor.first_name} #{permission.contributor.last_name}"
-      elsif permission.contributor_type == 'WorkGroup'
-        h[:title] = "#{permission.contributor.project.title} @ #{permission.contributor.institution.title}"
-      else
-        h[:title] = permission.contributor.title
-      end
+      h[:title] = permission_title(permission)
 
       h
     end
@@ -151,6 +121,62 @@ module PolicyHelper
                               isMandatory: true }
     end
 
+    hash
+  end
+
+  def policy_json(policy, associated_projects)
+    policy_hash(policy, associated_projects).to_json.html_safe
+  end
+
+  def project_policies_json(projects)
+    hash = {}
+
+    projects.each do |p|
+      hash[p.id] = policy_hash(p.default_policy, [p]) if p.use_default_policy
+    end
+
     hash.to_json.html_safe
   end
+
+  def permission_title(permission, member_prefix: false, icon: false)
+    if permission.is_a?(Permission)
+      type = permission.contributor_type
+      contributor = permission.contributor
+    else
+      type = permission.class.name
+      contributor = permission
+    end
+
+    if type == 'Person'
+      text = "#{contributor.first_name} #{contributor.last_name}"
+    elsif type == 'WorkGroup'
+      text = "#{member_prefix ? 'Members of ' : ''}#{contributor.project.title} @ #{contributor.institution.title}"
+    else
+      text = "#{member_prefix ? 'Members of ' : ''}#{contributor.title}"
+    end
+
+    if icon
+      content_tag(:span, class: 'type-icon-wrapper') do
+        image_tag(asset_path(icon_filename_for_key(type.underscore)), class: 'type-icon')
+      end.html_safe + " #{text}"
+    else
+      text
+    end
+  end
+
+  def access_type_key(access_type)
+    case access_type
+      when Policy::MANAGING
+        'manage'
+      when Policy::EDITING
+        'edit'
+      when Policy::ACCESSIBLE
+        'download'
+      when Policy::VISIBLE
+        'view'
+      when Policy::NO_ACCES
+        'no_access'
+    end
+  end
+
 end

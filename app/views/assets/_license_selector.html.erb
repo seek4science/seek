@@ -1,4 +1,4 @@
-<% default_license ||= 'CC-BY-4.0' %>
+<% default_license ||= Seek::Config.default_license %>
 <% accessor ||= :license %>
 <% selected_license = resource.send(accessor) %>
 <% selected_license = (resource.new_record? ? default_license : Seek::License::NULL_LICENSE) if selected_license.nil? %>

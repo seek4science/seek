@@ -11,7 +11,7 @@
         <%= render :partial => 'project_and_institution_selection', :locals => {:f => f} %>
     <% end %>
 
-    <%= f.submit("Create",:disable_with=>"Creating...", :class => 'btn btn-primary') %>
+    <%= f.submit("Create",data: { disable_with: 'Creating...' }, :class => 'btn btn-primary') %>
     <%= render :partial=>"cancel_registration" %>
 
 <% end -%>

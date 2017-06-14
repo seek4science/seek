@@ -396,7 +396,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert prog_yes_2.rejected?
 
     result = Programme.rejected
-    assert_instance_of ActiveRecord::Relation, result
+    assert_kind_of ActiveRecord::Relation, result
     assert_equal [prog_yes_1, prog_yes_2].sort, result.sort
   end
 

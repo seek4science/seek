@@ -6,10 +6,11 @@ class Organism < ActiveRecord::Base
 
   linked_to_bioportal :apikey=>Seek::Config.bioportal_api_key
   
-  has_many :assay_organisms
+  has_many :assay_organisms, inverse_of: :organism
   has_many :models
-  has_many :assays,:through=>:assay_organisms  
-  has_many :strains, :dependent=>:destroy
+  has_many :assays, through: :assay_organisms, inverse_of: :organisms
+  has_many :strains, dependent: :destroy
+  has_many :samples, through: :strains
 
   has_and_belongs_to_many :projects
 
@@ -34,8 +35,8 @@ class Organism < ActiveRecord::Base
   def searchable_terms
     terms = [title]
     if concept
-      terms = terms | concept[:synonyms].collect{|s| s.gsub("\"","")} if concept[:synonyms]
-      terms = terms | concept[:definitions].collect{|s| s.gsub("\"","")} if concept[:definitions]
+      terms = terms | concept[:synonyms].collect{|s| s.delete('\""')} if concept[:synonyms]
+      terms = terms | concept[:definitions].collect{|s| s.delete('\""')} if concept[:definitions]
     end
     terms
   end

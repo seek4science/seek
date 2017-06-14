@@ -36,8 +36,8 @@ class AuthLookupTableTest < ActiveSupport::TestCase
       end
     end
 
-    a_user_ids = ActiveRecord::Base.connection.select_all("select user_id from #{Assay.lookup_table_name}").map { |i| i['user_id'] }
-    d_user_ids = ActiveRecord::Base.connection.select_all("select user_id from #{DataFile.lookup_table_name}").map { |i| i['user_id'] }
+    a_user_ids = ActiveRecord::Base.connection.select_values("select user_id from #{Assay.lookup_table_name}")
+    d_user_ids = ActiveRecord::Base.connection.select_values("select user_id from #{DataFile.lookup_table_name}")
 
     assert_not_includes a_user_ids, u.id
     assert_not_includes d_user_ids, u.id

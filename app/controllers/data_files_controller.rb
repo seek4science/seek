@@ -90,7 +90,7 @@ class DataFilesController < ApplicationController
   def upload_for_tool
     if handle_upload_data
       params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
-      @data_file = DataFile.new params[:data_file]
+      @data_file = DataFile.new(data_file_params)
 
       @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
 
@@ -98,7 +98,7 @@ class DataFilesController < ApplicationController
         @data_file.creators = [current_person]
         create_content_blobs
         # send email to the file uploader and receiver
-        Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver
+        Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_now
 
         flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         render text: flash.now[:notice]
@@ -113,7 +113,7 @@ class DataFilesController < ApplicationController
     if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
       User.with_current_user Person.find(params[:sender_id]).user do
         if handle_upload_data
-          @data_file = DataFile.new params[:data_file]
+          @data_file = DataFile.new(data_file_params)
 
           @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
 
@@ -135,11 +135,10 @@ class DataFilesController < ApplicationController
   end
 
   def create
+    @data_file = DataFile.new(data_file_params)
+
     if handle_upload_data
-
-      @data_file = DataFile.new params[:data_file]
-
-      update_sharing_policies @data_file, params
+      update_sharing_policies(@data_file)
 
       if @data_file.save
         update_annotations(params[:tag_list], @data_file)
@@ -194,19 +193,15 @@ class DataFilesController < ApplicationController
   end
 
   def update
-    # remove protected columns (including a "link" to content blob - actual data cannot be updated!)
-    data_file_params = filter_protected_update_params(params[:data_file])
+    @data_file.attributes = data_file_params
 
     update_annotations(params[:tag_list], @data_file)
     update_scales @data_file
 
     respond_to do |format|
-      @data_file.attributes = data_file_params
-
-      update_sharing_policies @data_file, params
+      update_sharing_policies @data_file
 
       if @data_file.save
-
         update_relationships(@data_file, params)
 
         # the assay_id param can also contain the relationship type
@@ -263,7 +258,7 @@ class DataFilesController < ApplicationController
     @matching_model_items = @data_file.matching_models
     # filter authorization
     ids = @matching_model_items.collect(&:primary_key)
-    models = Model.find_all_by_id(ids)
+    models = Model.where(id: ids)
     authorised_ids = Model.authorize_asset_collection(models, 'view').collect(&:id)
     @matching_model_items = @matching_model_items.select { |mdf| authorised_ids.include?(mdf.primary_key.to_i) }
 
@@ -403,6 +398,14 @@ class DataFilesController < ApplicationController
         format.html { redirect_to @data_file }
       end
     end
+  end
+
+  private
+
+  def data_file_params
+    params.require(:data_file).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
+                                      :parent_name, { event_ids: [] },
+                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
   end
 
 end

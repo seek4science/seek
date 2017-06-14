@@ -8,7 +8,7 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
 
   def perform_job(endpoint)
     if endpoint.test_authentication
-      endpoint.clear_cache
+      endpoint.clear_metadata_store
       space = endpoint.space
       if space
         space.datasets.each do |dataset|

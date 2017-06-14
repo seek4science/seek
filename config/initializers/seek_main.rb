@@ -2,53 +2,51 @@
 #TO MODIFY THE DEFAULT SETTINGS, COPY seek_local.rb.pre to seek_local.rb AND EDIT THAT FILE INSTEAD
 
 require 'object'
-require 'active_record_extensions'
+require 'seek/active_record_extensions'
 require 'acts_as_taggable_extensions'
 require 'seek/acts_as_isa/acts_as_isa'
-require 'acts_as_yellow_pages'
+require 'seek/acts_as_yellow_pages'
 require 'seek/acts_as_uniquely_identifiable'
 require 'seek/acts_as_fleximage_extension'
-require 'acts_as_favouritable'
+require 'seek/acts_as_favouritable'
 require 'seek/acts_as_asset/acts_as_asset'
-require 'send_subscriptions_when_activity_logged'
-require 'send_notification_emails_when_announcement_created'
-require 'modporter_extensions'
+require 'seek/acts_as_cached_tree'
+require 'seek/permissions/authorization_enforcement'
+require 'seek/permissions/acts_as_authorized'
+require 'datacite/acts_as_doi_mintable'
+require 'seek/research_objects/acts_as_snapshottable'
+require 'zenodo/acts_as_zenodo_depositable'
+require 'acts_as_versioned_resource'
 require "attachment_fu_extension"
 require 'seek/taggable'
 require 'bio'
+require 'bio_extensions'
 require 'uuid'
-
 require 'sunspot_rails'
 require 'cancan'
-require 'in_place_editing'
 require 'seek/breadcrumbs'
 require 'string_extension'
 require 'recaptcha'
 require 'acts_as_list'
 require 'acts_as_trashable'
-
-require 'country-select'
 require 'will_paginate'
-require 'piwik_analytics'
 require 'responds_to_parent'
 require 'pothoven-attachment_fu'
-
 require 'rightfield/rightfield'
 require 'seek/rdf/rdf_generation'
-require 'background_reindexing'
-require 'subscribable'
+require 'seek/search/background_reindexing'
+require 'seek/subscribable'
 require 'seek/permissions/publishing_permissions'
-
 require 'seek/scalable'
-
 require 'taverna_player_callbacks'
 require 'taverna_player_renderers'
-
 require 'seek/search/common_fields'
-
 require 'seek/project_hierarchies/project_extension'
 require 'mimemagic'
 require 'site_announcements'
+require 'seek/title_trimmer'
+require 'seek/grouped_pagination'
+require 'explicit_versioning'
 
 SEEK::Application.configure do
   GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE

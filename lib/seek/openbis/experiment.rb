@@ -1,5 +1,6 @@
 module Seek
   module Openbis
+    # Represents an openBIS Experiment entity
     class Experiment < Entity
       attr_reader :experiment_type, :experiment_id, :sample_ids, :identifier, :dataset_ids, :properties
 

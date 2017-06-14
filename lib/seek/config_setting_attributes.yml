@@ -177,3 +177,4 @@ omniauth_user_activate:
 omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
+default_license:

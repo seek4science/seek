@@ -61,7 +61,7 @@ class SopsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', person_path(p2) do
         assert_select 'img'
       end
-      assert_select ['a[href=?]', person_path(p1)], 0
+      assert_select 'a[href=?]', person_path(p1), count: 0
     end
   end
 
@@ -100,7 +100,7 @@ class SopsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK #{I18n.t('sop').pluralize}.*/, count: 1
+    assert_select 'title', text: I18n.t('sop').pluralize, count: 1
   end
 
   test 'should get index' do
@@ -178,7 +178,7 @@ class SopsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.sops, s
 
-    put :update, id: s.id, sop: {}, assay_ids: [new_assay.id.to_s]
+    put :update, id: s.id, sop: { title: s.title }, assay_ids: [new_assay.id.to_s]
 
     assert_redirected_to sop_path(s)
 
@@ -324,7 +324,7 @@ class SopsControllerTest < ActionController::TestCase
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
     # create new version
-    post :new_version, id: s, sop: {}, content_blobs: [{ data: file_for_upload(tempfile_fixture: 'files/little_file_v2.txt', content_type: 'text/plain', filename: 'little_file_v2.txt') }]
+    post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload(tempfile_fixture: 'files/little_file_v2.txt', content_type: 'text/plain', filename: 'little_file_v2.txt') }]
     assert_redirected_to sop_path(assigns(:sop))
 
     s = Sop.find(s.id)
@@ -365,7 +365,7 @@ class SopsControllerTest < ActionController::TestCase
     s = sops(:editable_sop)
 
     assert_difference('Sop::Version.count', 1) do
-      post :new_version, id: s, sop: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision'
+      post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision'
     end
 
     assert_redirected_to sop_path(s)
@@ -408,7 +408,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1, s.experimental_conditions.count
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, id: s, sop: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
+        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
       end
     end
 
@@ -423,7 +423,7 @@ class SopsControllerTest < ActionController::TestCase
                                               start_value: 1, sop_id: s.id, sop_version: s.version)
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, id: s, sop: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
+        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
       end
     end
 
@@ -443,7 +443,7 @@ class SopsControllerTest < ActionController::TestCase
   def test_should_add_nofollow_to_links_in_show_page
     get :show, id: sops(:sop_with_links_in_description)
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
     end
   end
 
@@ -584,7 +584,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_edit?
     get :edit, id: sop
     assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home #{I18n.t('sop').pluralize} Index #{sop.title} Edit/, count: 1 do
+    assert_select 'div.breadcrumbs', text: /Home SOPs Index #{sop.title} Edit/, count: 1 do
       assert_select 'a[href=?]', root_path, count: 1
       assert_select 'a[href=?]', sops_url, count: 1
       assert_select 'a[href=?]', sop_url(sop), count: 1
@@ -621,7 +621,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: policy)
     login_as(sop.contributor)
     assert sop.can_manage?
-    put :update, id: sop.id, sop: {}, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::VISIBLE }
     sop = assigns(:sop)
     assert_redirected_to(sop)
     updated_policy = sop.policy
@@ -681,7 +681,7 @@ class SopsControllerTest < ActionController::TestCase
     s = assigns(:sop)
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop::Version.count', 1) do
-        post :new_version, id: s, sop: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision'
+        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision'
       end
     end
     al2 = ActivityLog.last
@@ -694,7 +694,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not create duplication sop_versions_projects when uploading new version' do
     sop = Factory(:sop)
     login_as(sop.contributor)
-    post :new_version, id: sop, sop: {}, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision'
+    post :new_version, id: sop, sop: { title: sop.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision'
 
     sop.reload
     assert_equal 2, sop.versions.count
@@ -732,7 +732,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     assert sop.can_publish?
     assert_emails 1 do
-      put :update, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
   end
 
@@ -745,7 +745,7 @@ class SopsControllerTest < ActionController::TestCase
     assert !sop.is_published?
     assert sop.can_publish?
     assert_emails 0 do
-      put :update, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
   end
 
@@ -758,11 +758,11 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_publish?
     # send the first time
     assert_emails 1 do
-      put :update, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
     # dont send again
     assert_emails 0 do
-      put :update, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
   end
 
@@ -775,11 +775,12 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory :sop, contributor: User.current_user, policy: policy
     assert sop.can_manage?
 
-    put :update, id: sop.id, policy_attributes: { access_type: Policy::NO_ACCESS,
-                                                  permissions_attributes: { '1' => { contributor_type: 'Person',
-                                                                                     contributor_id: a_person.id,
-                                                                                     access_type: Policy::MANAGING } }
-    }
+    put :update, id: sop.id, sop: { title: sop.title },
+        policy_attributes: { access_type: Policy::NO_ACCESS,
+                             permissions_attributes: { '1' => { contributor_type: 'Person',
+                                                                contributor_id: a_person.id,
+                                                                access_type: Policy::MANAGING } }
+        }
 
     assert_redirected_to sop
     assert_equal 1, sop.reload.policy.permissions.count

@@ -39,7 +39,7 @@ module VlnProjectsTreeHelper
       end
       list << "<li style=\"#{margin_left} ; #{root.id == selected_id ? 'background-color: lightblue;' : "#{(selected_display_items && selected_display_items.include?(root)) ? 'font-weight: bold;' : ''}"}\">" + folder + (link_to root.title, root) + ' ' +
         (show_edit ? link_to(image('edit'), edit_polymorphic_path(root), style: 'vertical-align:middle') : '') + ' ' +
-        (show_delete ? link_to(image('destroy'), root, confirm:                                                      "Are you sure you want to remove this #{root.class.name}?  This cannot be undone.",
+        (show_delete ? link_to(image('destroy'), root, data: { confirm: "Are you sure you want to remove this #{root.class.name}?  This cannot be undone." },
                                                        method: :delete, style: 'vertical-align:middle') : '') + "<span style=\"color: #666666;\">(#{related_resource.size} #{related_resource_type.downcase.pluralize})</span>" \
           '</li>'
 
@@ -79,7 +79,7 @@ module VlnProjectsTreeHelper
         related_resource = eval "child.#{related_resource_type.downcase.pluralize}"
         result << "<li style=\"margin-left:#{12 * depth}px;#{child.id == selected_id ? 'background-color: lightblue;' : "#{(selected_display_items && selected_display_items.include?(child)) ? 'font-weight: bold;' : ''}"};\">" + folder + (link_to child.title, child) + ' ' +
           (show_edit ? link_to(image('edit'), edit_polymorphic_path(child), style: 'vertical-align:middle') : '') + ' ' +
-          (show_delete ? link_to(image('destroy'), child, confirm:                                                        "Are you sure you want to remove this #{child.class.name}?  This cannot be undone.",
+          (show_delete ? link_to(image('destroy'), child, data: { confirm: "Are you sure you want to remove this #{child.class.name}?  This cannot be undone." },
                                                           method: :delete, style: 'vertical-align:middle') : '') + "<span style=\"color: #666666;\">(#{related_resource.size} #{related_resource_type.downcase.pluralize})</span>" \
 
         '</li>'

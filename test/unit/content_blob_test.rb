@@ -69,7 +69,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'only overrides url content-type if not already known or url points to html' do
+  test 'only overrides url content-type if not already known' do
     as_not_virtualliver do
       mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
       mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://webpage.com/piccy.png', 'Content-Type' => 'image/png'
@@ -77,13 +77,7 @@ class ContentBlobTest < ActiveSupport::TestCase
       blob = ContentBlob.create url: 'http://webpage.com', original_filename: nil, content_type: nil, external_link: true
       assert_equal 'text/html', blob.content_type
 
-      blob = ContentBlob.create url: 'http://webpage.com', original_filename: nil, content_type: 'application/pdf', external_link: true
-      assert_equal 'text/html', blob.content_type
-
       blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: nil
-      assert_equal 'image/png', blob.content_type
-
-      blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: 'application/x-download'
       assert_equal 'image/png', blob.content_type
 
       blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: 'application/pdf'
@@ -144,8 +138,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def test_file_dump
-    pic = content_blobs(:picture_blob)
-    blob = ContentBlob.new(data: pic.data_io_object.read, original_filename: 'piccy.jpg')
+    blob = ContentBlob.new(data: data_for_test('file_picture.png'), original_filename: 'piccy.jpg')
     blob.save!
     assert_not_nil blob.filepath
     data = nil
@@ -158,9 +151,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   # checks that the data is assigned through the new method, stored to a file, and not written to the old data_old field
   def test_data_assignment
-    pic = content_blobs(:picture_blob)
-    pic.save! # to trigger callback to save to file
-    blob = ContentBlob.new(data: pic.data_io_object.read, original_filename: 'piccy.jpg')
+    blob = ContentBlob.new(data: data_for_test('file_picture.png'), original_filename: 'piccy.jpg')
     blob.save!
     blob = ContentBlob.find(blob.id)
     assert_equal data_for_test('file_picture.png'), blob.data_io_object.read
@@ -176,7 +167,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   # simply checks that get and set data returns the same thing
   def test_data_assignment2
-    pic = content_blobs(:picture_blob)
+    pic = Factory(:content_blob,data:data_for_test('file_picture.png'))
     pic.data = data_for_test('little_file.txt')
     pic.save!
     assert_equal data_for_test('little_file.txt'), pic.data_io_object.read
@@ -188,7 +179,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   #
   def test_will_overwrite_if_data_changes
-    pic = content_blobs(:picture_blob)
+    pic = Factory(:content_blob,data:data_for_test('file_picture.png'))
     pic.save!
     assert_equal data_for_test('file_picture.png'), File.open(pic.filepath, 'rb').read
     pic.data = data_for_test('little_file.txt')
@@ -624,7 +615,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     blob = Factory(:url_content_blob)
     assert !blob.file_exists?
-    assert_equal nil, blob.file_size
+    assert_nil blob.file_size
 
     blob.retrieve
     assert blob.file_exists?
@@ -690,7 +681,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     blob = Factory(:url_content_blob)
     assert !blob.file_exists?
-    assert_equal nil, blob.file_size
+    assert_nil blob.file_size
 
     blob.retrieve
     assert blob.file_exists?
@@ -707,7 +698,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     blob = Factory(:url_content_blob)
     assert !blob.file_exists?
-    assert_equal nil, blob.file_size
+    assert_nil blob.file_size
 
     blob.retrieve
     assert blob.file_exists?
@@ -726,7 +717,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     blob = Factory(:url_content_blob)
     assert !blob.file_exists?
-    assert_equal nil, blob.file_size
+    assert_nil blob.file_size
 
     blob.retrieve
     assert blob.file_exists?

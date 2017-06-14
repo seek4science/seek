@@ -4,7 +4,7 @@
       <label><%= t('model') %> type</label>
 
       <span id="model_type_selection">
-        <%= collection_select :model, :model_type_id, ModelType.all, :id, :title,
+        <%= collection_select :model, :model_type_id, ModelType.order(:title), :id, :title,
                               {:include_blank => "Not specified"},
                               {:class => 'form-control'} -%>
       </span>
@@ -15,14 +15,14 @@
       <label><%= t('model') %> format</label>
 
       <span id="model_format_selection">
-        <%= collection_select :model, :model_format_id, ModelFormat.all, :id, :title,
+        <%= collection_select :model, :model_format_id, ModelFormat.order(:title), :id, :title,
                               {:include_blank => "Not specified"},
                               {:class => 'form-control'}
         -%>
       </span>
     </div>
 
-    <% environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.all.collect { |e| [h(e.title), e.id] } %>
+    <% environment_options=[['Unknown', 0]]|RecommendedModelEnvironment.order(:title).collect { |e| [h(e.title), e.id] } %>
     <div class="form-group">
       <label>Preferred execution or visualisation environment</label>
       <%= select_tag 'model[recommended_environment_id]',

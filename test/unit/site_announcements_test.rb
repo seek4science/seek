@@ -4,7 +4,7 @@ class SiteAnnouncementsTest < ActiveSupport::TestCase
   fixtures :site_announcements
 
   test 'using fixtures' do
-    assert_not_nil SiteAnnouncement.find(:first)
+    assert_not_nil SiteAnnouncement.first
   end
 
   test 'headline' do

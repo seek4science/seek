@@ -161,7 +161,8 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal fs.studied_factor_links.first.substance, compounds(:compound_glucose)
 
     cp = compounds(:compound_glycine)
-    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: {}, substance_list: cp.name
+    put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: { start_value: fs.start_value },
+        substance_list: cp.name
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -253,7 +254,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     data_file = data_files(:editable_data_file)
     mi = measured_items(:growth_medium)
     fs = { measured_item_id: mi.id }
-    post :create, studied_factor: fs, data_file_id: data_file.id, version: data_file.version, annotation: { attribute: 'description', value: 'test value' }
+    post :create, studied_factor: fs, data_file_id: data_file.id, version: data_file.version, annotation: { annotation_attribute: 'description', value: 'test value' }
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?
@@ -266,7 +267,8 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal measured_items(:growth_medium), fs.measured_item
     assert_equal 'one value', fs.annotations_with_attribute('description').first.value.text
 
-    put :update, id: fs.id, data_file_id: fs.data_file.id, annotation: { attribute: 'description', value: 'update value' }
+    put :update, id: fs.id, data_file_id: fs.data_file.id,
+        annotation: { annotation_attribute: 'description', value: 'update value' }, studied_factor: { start_value: fs.start_value }
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?

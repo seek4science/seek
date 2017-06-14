@@ -7,7 +7,7 @@ class StudiesControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   def setup
     login_as Factory(:admin).user
@@ -54,13 +54,13 @@ class StudiesControllerTest < ActionController::TestCase
     studies = assigns(:studies)
     first_study = studies.first
     assert_not_nil first_study
-    assert_select 'a[data-favourite-url=?]', h(add_favourites_path(resource_id: first_study.id,
-                                                                   resource_type: first_study.class.name))
+    assert_select 'a[data-favourite-url=?]', add_favourites_path(resource_id: first_study.id,
+                                                                 resource_type: first_study.class.name)
   end
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK #{I18n.t('study').pluralize}.*/i, count: 1
+    assert_select 'title', text: I18n.t('study').pluralize, count: 1
   end
 
   test 'should get show' do
@@ -87,7 +87,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
-      assert_select "option[selected='selected'][value=?]", inv.id
+      assert_select "option[selected='selected'][value='#{inv.id}']"
     end
   end
 
@@ -100,7 +100,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
-      assert_select "option[selected='selected'][value=?]", inv.id
+      assert_select "option[selected='selected'][value='#{inv.id}']"
     end
   end
 
@@ -115,7 +115,7 @@ class StudiesControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
-      assert_select "option[selected='selected'][value=?]", 0
+      assert_select "option[selected='selected'][value='0']"
     end
 
     assert_not_nil flash.now[:error]
@@ -159,7 +159,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_equal Policy::EVERYONE, s.policy.access_type
 
-    put :update, id: s, study: {}, policy_attributes: { access_type: Policy::NO_ACCESS }
+    put :update, id: s, study: { title: s.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
     s = assigns(:study)
     assert_response :redirect
     s.reload
@@ -173,7 +173,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_equal Policy::EVERYONE, s.policy.access_type
 
-    put :update, id: s, study: {}, policy_attributes: { access_type: Policy::NO_ACCESS }
+    put :update, id: s, study: { title: s.title }, policy_attributes: { access_type: Policy::NO_ACCESS }
     s = assigns(:study)
     assert_response :success
     s.reload
@@ -262,7 +262,7 @@ class StudiesControllerTest < ActionController::TestCase
   def test_should_add_nofollow_to_links_in_show_page
     get :show, id: studies(:study_with_links_in_description)
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
     end
   end
 
@@ -412,7 +412,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :new_object_based_on_existing_one, id: study.id
     assert_response :success
     assert_select '#study_title[value=?]', 'the study'
-    assert_select 'select#study_investigation_id option[selected][value=?]', study.investigation.id, count: 1
+    assert_select "select#study_investigation_id option[selected][value='#{study.investigation.id}']", count: 1
   end
 
   test 'object based on existing one when unauthorized to view' do
@@ -446,7 +446,7 @@ class StudiesControllerTest < ActionController::TestCase
     get :new_object_based_on_existing_one, id: study.id
     assert_response :success
     assert_select '#study_title[value=?]', 'the private study'
-    assert_select 'select#study_investigation_id option[selected][value=?]', study.investigation.id, count: 0
+    assert_select "select#study_investigation_id option[selected][value='#{study.investigation.id}']", count: 0
     refute_nil flash.now[:notice]
   end
 
@@ -471,7 +471,7 @@ class StudiesControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert study.creators.empty?
 
-    put :update, id: study.id, study: {}, creators: [[creator.name, creator.id]].to_json
+    put :update, id: study.id, study: { title: study.title }, creators: [[creator.name, creator.id]].to_json
     assert_redirected_to study_path(study)
 
     assert study.creators.include?(creator)

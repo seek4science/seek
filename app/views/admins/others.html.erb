@@ -34,7 +34,12 @@
         # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
         option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_associated_projects_access_type)
         admin_dropdown_setting(:default_associated_projects_access_type, option_tags, nil,
-                               'Default permissions option for members of associated projects') %>
+                               "Default permissions option for members of associated #{t('project').pluralize}") %>
+
+    <%= admin_setting_block('Default License', "The default license to use when one is not specified by a #{t('project').pluralize}.") do
+      grouped_license_select(:default_license, Seek::Config.default_license, id: 'license-select',
+                             class: 'form-control', source: Seek::License::OPENDEFINITION[:data])
+    end %>
 
     <%= admin_dropdown_setting(:permissions_popup,
            options_for_select([['Always show', Seek::Config::PERMISSION_POPUP_ALWAYS],
@@ -80,6 +85,6 @@
     <%= admin_checkbox_setting(:orcid_required, 1, Seek::Config.orcid_required,
                                'ORCID required', "Require all profiles to specify an #{link_to 'ORCID', 'http://orcid.org/content/about-orcid', target: :_blank} identifier.".html_safe) %>
 
-    <%= submit_tag "Update", :disable_with=>"Updating...", :class => 'btn btn-primary' -%> or
+    <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path %>
 <% end -%>

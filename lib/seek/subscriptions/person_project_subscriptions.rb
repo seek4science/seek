@@ -5,17 +5,18 @@ module Seek
       extend ActiveSupport::Concern
 
       included do
-        after_add_for_group_memberships << :subscribe_to_project_subscription
-        after_add_for_group_memberships << :touch_project_for_membership
-        after_remove_for_group_memberships << :unsubscribe_from_project_subscription
-        after_remove_for_group_memberships << :touch_project_for_membership
+        # TODO: Replace this. I don't think it is very well supported. Can't find any docs...
+        after_add_for_group_memberships << proc { |c, person, gm| person.subscribe_to_project_subscription(gm) }
+        after_add_for_group_memberships << proc { |c, person, gm| person.touch_project_for_membership(gm) }
+        after_remove_for_group_memberships << proc { |c, person, gm| person.unsubscribe_from_project_subscription(gm) }
+        after_remove_for_group_memberships << proc { |c, person, gm| person.touch_project_for_membership(gm) }
 
-        after_add_for_work_groups << :subscribe_to_project_subscription
-        after_add_for_work_groups << :touch_project_for_membership
-        after_remove_for_work_groups << :unsubscribe_from_project_subscription
-        after_remove_for_work_groups << :touch_project_for_membership
+        after_add_for_work_groups << proc { |c, person, wg| person.subscribe_to_project_subscription(wg) }
+        after_add_for_work_groups << proc { |c, person, wg| person.touch_project_for_membership(wg) }
+        after_remove_for_work_groups << proc { |c, person, wg| person.unsubscribe_from_project_subscription(wg) }
+        after_remove_for_work_groups << proc { |c, person, wg| person.touch_project_for_membership(wg) }
 
-        has_many :project_subscriptions, before_add: proc { |person, ps| ps.person = person }, uniq: true, dependent: :destroy
+        has_many :project_subscriptions, before_add: proc { |person, ps| ps.person = person }, dependent: :destroy
         accepts_nested_attributes_for :project_subscriptions, allow_destroy: true
 
         has_many :subscriptions, dependent: :destroy

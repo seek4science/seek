@@ -86,7 +86,7 @@ namespace :seek do
     ].compact
 
     #root as parent
-    reg_projects = Project.find(:all, :conditions=>["name REGEXP?", "^[A-Z][:]"])
+    reg_projects = Project.where('name REGEXP?', '^[A-Z][:]')
     (irreg_projects + reg_projects).each do |proj|
       proj.parent = root
       puts "#{proj.name} |has parent|  #{root.name}"
@@ -94,7 +94,7 @@ namespace :seek do
     end
 
     #ctus
-    sub_ctus = Project.find(:all, :conditions=>["name REGEXP?", "^CTU[^s]"])
+    sub_ctus = Project.where('name REGEXP?', '^CTU[^s]')
     sub_ctus.each do |proj|
       if ctu
         proj.parent = ctu
@@ -130,13 +130,13 @@ namespace :seek do
     #set parents for children of A-G,e.g.A,A1,A1.1
     reg_projects.each do |proj|
       init_char = proj.name[0].chr
-      Project.find(:all, :conditions=>["name REGEXP?", "^#{init_char}[0-9][^.]"]).each do |sub_proj|
+      Project.where('name REGEXP?', "^#{init_char}[0-9][^.]").each do |sub_proj|
         if sub_proj
           sub_proj.parent = proj
           puts "#{sub_proj.name} |has parent| #{proj.name}"
           sub_proj.save!
           num = sub_proj.name[1].chr # get the second char of the name
-          Project.find(:all, :conditions=>["name REGEXP?", "^#{init_char}[#{num}][.]"]).each { |sub_sub_proj|
+          Project.where('name REGEXP?', "^#{init_char}[#{num}][.]").each { |sub_sub_proj|
             if sub_sub_proj
               sub_sub_proj.parent = sub_proj
               puts "#{sub_sub_proj.name} |has parent| #{sub_proj.name}"
@@ -197,7 +197,7 @@ namespace :seek do
     Seek::Util.authorized_types.each do |type|
       table_name = type.lookup_table_name
       ActiveRecord::Base.connection.execute("delete from #{table_name} where user_id = #{user_id}")
-      assets = type.all(:include=>:policy)
+      assets = type.includes(:policy)
       c=0
       total=assets.count
       ActiveRecord::Base.transaction do

@@ -55,7 +55,7 @@ class BatchPublishingTest < ActionController::TestCase
       gatekeeper_required_assets.each do |a|
         assert_select 'a[href=?]', eval("#{a.class.name.underscore}_path(#{a.id})"), text: /#{a.title}/
       end
-      assert_select '.type_and_title img[src*=?][title=?]', /lock.png/, /Private/, count: total_asset_count
+      assert_select '.type_and_title img[src*=?][title=?]', 'lock.png', 'Private', count: total_asset_count
     end
 
     assert_select '.checkbox', text: /Publish/, count: total_asset_count do
