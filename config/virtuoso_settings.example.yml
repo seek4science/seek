@@ -1,4 +1,4 @@
-#change settings where appropriate, and then save as virtuoso_settings.yml
+#change settings where appropriate, and then save as virtuoso_settings.docker.yml
 
 production:
   uri: http://localhost:8890/sparql

@@ -3,7 +3,9 @@ production:
   update_uri: http://virtuoso:8899/sparql-auth
 
   username: dba
-  password: wibble
+  password: <%= ENV["DBA_PASSWORD"] %>
 
   private_graph: seek:private
   public_graph: seek:public
+
+  disabled: <%= !ENV["VIRTUOSO"].present? %>
