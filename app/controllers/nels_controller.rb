@@ -21,6 +21,7 @@ class NelsController < ApplicationController
 
   def projects
     @projects = @rest_client.projects
+    puts @projects.inspect
 
     respond_to do |format|
       format.json
@@ -29,14 +30,15 @@ class NelsController < ApplicationController
 
   def datasets
     @datasets = @rest_client.datasets(params[:id].to_i)
+    puts @datasets.inspect
 
     respond_to do |format|
       format.json
     end
   end
 
-  def data
-    @data = @rest_client.data(params[:project_id].to_i, params[:id].to_i)
+  def subtypes
+    @dataset = @rest_client.dataset(params[:project_id].to_i, params[:id].to_i)
 
     respond_to do |format|
       format.json
@@ -59,7 +61,7 @@ class NelsController < ApplicationController
   end
 
   def rest_client
-    @rest_client = Nels::Rest::DummyClient.new(@oauth_session.access_token)
+    @rest_client = Nels::Rest::Client.new(@oauth_session.access_token)
   end
 
 end

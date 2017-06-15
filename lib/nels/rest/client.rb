@@ -22,10 +22,10 @@ module Nels
       end
 
       def datasets(project_id)
-        perform("sbi/projects/#{project_id}", :get)
+        perform("sbi/projects/#{project_id}/datasets", :get)
       end
 
-      def data(project_id, dataset_id)
+      def dataset(project_id, dataset_id)
         perform("sbi/projects/#{project_id}/datasets/#{dataset_id}", :get)
       end
 
@@ -37,7 +37,7 @@ module Nels
         body = opts.delete(:body)
         args = [method]
         if body
-          body = body.to_json if content_type == :json
+          body = body.to_json if opts[:content_type] == :json
           args << body
         end
         args << opts
