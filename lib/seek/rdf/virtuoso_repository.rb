@@ -56,7 +56,7 @@ module Seek
       end
 
       def config_filename
-        'virtuoso_settings.docker.yml'
+        'virtuoso_settings.yml'
       end
     end
   end
