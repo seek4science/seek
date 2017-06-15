@@ -37,7 +37,7 @@ module Seek
 
       # returns the path that rdf for this item will be stored, according to its visibility
       def rdf_storage_path(inner_dir = nil?)
-        inner_dir ||= self.can_view?(nil) ? 'public' : 'private'
+        inner_dir ||= can_view?(nil) ? 'public' : 'private'
         path = File.join(Seek::Config.rdf_filestore_path, inner_dir)
         FileUtils.mkdir_p(path) unless File.exist?(path)
 

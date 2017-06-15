@@ -28,17 +28,15 @@ module Seek
 
       def read_configuration
         if configured?
-          y = YAML.load_file(config_path)
           @config = Config.new
-          @config.username = y[Rails.env]['username']
-          @config.password = y[Rails.env]['password']
-          @config.uri = y[Rails.env]['uri']
-          @config.update_uri = y[Rails.env]['update_uri']
-          @config.private_graph = y[Rails.env]['private_graph']
-          @config.public_graph = y[Rails.env]['public_graph']
-
+          @config.username = yaml[Rails.env]['username']
+          @config.password = yaml[Rails.env]['password']
+          @config.uri = yaml[Rails.env]['uri']
+          @config.update_uri = yaml[Rails.env]['update_uri']
+          @config.private_graph = yaml[Rails.env]['private_graph']
+          @config.public_graph = yaml[Rails.env]['public_graph']
         else
-          fail Exception.new "No configuration file found at #{rdf_repository_config_path}"
+          raise Exception, "No configuration file found at #{config_path}"
         end
       end
 
@@ -51,12 +49,15 @@ module Seek
       end
 
       def enabled_for_environment?
-        y = YAML.load_file(config_path)
-        !y[Rails.env].nil? && !y[Rails.env]['disabled']
+        !yaml[Rails.env].nil? && !yaml[Rails.env]['disabled']
       end
 
       def config_filename
         'virtuoso_settings.yml'
+      end
+
+      def yaml
+        @yaml ||= YAML.safe_load(ERB.new(File.new(config_path).read).result)
       end
     end
   end
