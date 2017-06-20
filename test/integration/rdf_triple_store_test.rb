@@ -78,11 +78,11 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 8, result.count
+    assert_equal 11, result.count
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
-    assert_equal 8, result.count
+    assert_equal 11, result.count
 
     sop.policy.access_type = Policy::NO_ACCESS
     sop.policy.save!
@@ -110,7 +110,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 8, result.count
+    assert_equal 9, result.count
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
@@ -213,11 +213,11 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 8, result.count, 'there should be 8 statements in total'
+    assert_equal 9, result.count, 'there should be 9 statements in total'
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
-    assert_equal 8, result.count, 'there should be 8 statements in total'
+    assert_equal 9, result.count, 'there should be 9 statements in total'
 
     sop.policy.access_type = Policy::NO_ACCESS
     sop.policy.save!
@@ -228,7 +228,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 8, result.count, 'there should be 8 statements in total'
+    assert_equal 9, result.count, 'there should be 9 statements in total'
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
@@ -247,11 +247,11 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 8, result.count, 'there should be 8 statements in total'
+    assert_equal 9, result.count, 'there should be 9 statements in total'
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
-    assert_equal 8, result.count, 'there should be 8 statements in the public graph'
+    assert_equal 9, result.count, 'there should be 9 statements in the public graph'
 
     q = @repository.query.select.where([subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@public_graph)
     result = @repository.select(q)
