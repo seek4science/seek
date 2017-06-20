@@ -34,7 +34,7 @@ module Seek
         resource = subject.rdf_resource
         items = subject.send(method)
         # may be an array of items or a single item. Cant use Array(item) or [*item] here cos it screws up times and datetimes
-        items = [items] unless items.is_a?(Array)
+        items = [items] unless items.respond_to?(:each)
 
         transformation.strip! if transformation
         collection_transform.strip! if collection_transform
