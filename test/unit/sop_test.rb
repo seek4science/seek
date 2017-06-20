@@ -18,6 +18,10 @@ class SopTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/sops/#{object.id}"), reader.statements.first.subject
+
+      #check for OPSK-1281 - where the creators weren't appearing
+      assert_includes reader.statements.collect(&:predicate),"http://www.mygrid.org.uk/ontology/JERMOntology#hasCreator"
+      assert_includes reader.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
     end
   end
 
