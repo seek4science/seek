@@ -21,7 +21,7 @@ module Seek
     def text_contents_for_search
       content = []
       if file_exists?
-        text = File.open(filepath).read
+        text = File.read(filepath)
         unless text.blank?
           content = filter_text_content text
           content = split_content(content)
@@ -58,7 +58,7 @@ module Seek
       if File.exist?(pdf_filepath)
         begin
           Docsplit.extract_text(pdf_filepath, output: output_directory) unless File.exist?(txt_filepath)
-          content = File.open(txt_filepath).read
+          content = File.read(txt_filepath)
           if content.blank?
             []
           else
