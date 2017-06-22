@@ -1,7 +1,10 @@
 module Seek
   module UrlValidation
     def valid_url?(url)
-      URI.parse(url).absolute? rescue false
+      uri = URI.parse(url)
+      uri.absolute? && uri.scheme != 'urn'
+    rescue URI::InvalidURIError
+      false
     end
   end
 end

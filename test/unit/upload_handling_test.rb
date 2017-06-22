@@ -137,12 +137,17 @@ class UploadHandingTest < ActiveSupport::TestCase
   test 'valid url?' do
     assert valid_url?('http://fish.com')
     assert valid_url?('https://fish.com')
-    refute valid_url?('http://fish.com   ')
     assert valid_url?('http://fish.com/fish.txt')
-    refute valid_url?('http://fish.com/fish.txt    ')
     assert valid_url?('ftp://fish.com/fish.txt')
+    assert valid_url?('mailto:fish@fishmail.fish')
+    assert valid_url?('skype:fish.user')
+
+    refute valid_url?('urn:fish:fish.com/fish.txt')
+    refute valid_url?('http://fish.com   ')
+    refute valid_url?('http://fish.com/fish.txt    ')
     refute valid_url?('x dd s')
     refute valid_url?('sdfsdf')
+    refute valid_url?('/somewhere/fish.txt')
     refute valid_url?(nil)
   end
 
