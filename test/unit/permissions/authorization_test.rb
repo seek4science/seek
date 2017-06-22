@@ -88,7 +88,9 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert Seek::Permissions::Authorization.access_type_allows_action?('delete', Policy::MANAGING), "'delete' action should have been allowed with access_type set to 'Policy::MANAGING'"
     assert Seek::Permissions::Authorization.access_type_allows_action?('manage', Policy::MANAGING), "'manage' action should have been allowed with access_type set to 'Policy::MANAGING'"
   end
-
+  
+  
+  
   # ****************************************************************************
   # this section tests integration of individual helpers in Authorization module
   # ****************************************************************************
@@ -683,7 +685,20 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert !df.reload.can_delete?(User.current_user)
   end
 
-  private
+  test 'old all registered users sharing policy honoured' do
+    df = Factory(:data_file,policy:Factory(:policy,sharing_scope:Policy::ALL_USERS,access_type:Policy::ACCESSIBLE))
+    user = Factory(:person).user
+
+    refute Seek::Permissions::Authorization.is_authorized?("edit",df,user)
+    assert Seek::Permissions::Authorization.is_authorized?("download",df,user)
+    assert Seek::Permissions::Authorization.is_authorized?("view",df,user)
+
+    refute Seek::Permissions::Authorization.is_authorized?("edit",df,nil)
+    refute Seek::Permissions::Authorization.is_authorized?("download",df,nil)
+    refute Seek::Permissions::Authorization.is_authorized?("view",df,nil)
+  end
+
+  private 
 
   def actions
     [:view, :edit, :download, :delete, :manage]
@@ -691,8 +706,8 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   # To save me re-writing lots of tests. Code copied from authorization.rb
   # Mimics how authorized_by_policy method used to work, but with my changes.
-  def temp_authorized_by_policy?(_policy, thing, action, _user, _not_used_2)
-    Seek::Permissions::Authorization.send(:authorized_by_policy?, action, thing)
+  def temp_authorized_by_policy?(_policy, thing, action, user, _not_used_2)
+    Seek::Permissions::Authorization.send(:authorized_by_policy?, action, thing,user)
   end
 
   test 'all users scope overrides more restrictive permissions' do
@@ -769,7 +784,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     person = Factory(:person_not_in_project)
 
     User.with_current_user(nil) do
-      assert public_item.can_view?
+      refute public_item.can_view?
     end
 
     User.with_current_user(person.user) do

@@ -189,10 +189,12 @@ end
 
 Factory.define(:all_sysmo_viewable_policy, parent: :policy) do |f|
   f.access_type Policy::VISIBLE
+  f.sharing_scope Policy::ALL_USERS
 end
 
 Factory.define(:all_sysmo_downloadable_policy, parent: :policy) do |f|
   f.access_type Policy::ACCESSIBLE
+  f.sharing_scope Policy::ALL_USERS
 end
 
 Factory.define(:publicly_viewable_policy, parent: :policy) do |f|
