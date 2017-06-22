@@ -19,21 +19,21 @@ class AnonymousAuthorizationTest < ActiveSupport::TestCase
     assert !sop.can_manage?
   end
 
-  test "anonymous can access 'ALL_USERS' scoped sop" do
+  test "anonymous cannot access 'ALL_USERS' scoped sop" do
     sop=Factory :sop,:policy=>Factory(:all_sysmo_downloadable_policy)
 
     assert_equal Policy::ALL_USERS,sop.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE,sop.policy.access_type
 
-    assert Seek::Permissions::Authorization.is_authorized?("view",sop,nil)
-    assert !Seek::Permissions::Authorization.is_authorized?("edit",sop,nil)
-    assert Seek::Permissions::Authorization.is_authorized?("download",sop,nil)
-    assert !Seek::Permissions::Authorization.is_authorized?("manage",sop,nil)
+    refute Seek::Permissions::Authorization.is_authorized?("view",sop,nil)
+    refute Seek::Permissions::Authorization.is_authorized?("edit",sop,nil)
+    refute Seek::Permissions::Authorization.is_authorized?("download",sop,nil)
+    refute Seek::Permissions::Authorization.is_authorized?("manage",sop,nil)
 
-    assert sop.can_view?
-    assert !sop.can_edit?
-    assert sop.can_download?
-    assert !sop.can_manage?
+    refute sop.can_view?
+    refute sop.can_edit?
+    refute sop.can_download?
+    refute sop.can_manage?
   end
 
   test "anonymous can view but not edit or access publicly viewable sop" do
