@@ -2,6 +2,7 @@ module Seek
   module UploadHandling
     module ContentInspection
       include Seek::MimeTypes
+      include Seek::UrlValidation
 
       INVALID_SCHEMES = %w(file)
 
@@ -37,10 +38,6 @@ module Seek
         end
       end
 
-      def valid_uri?(uri)
-        uri.try(:strip) =~ /\A#{URI.regexp}\z/
-      end
-
       def determine_filename_from_disposition(disposition)
         disposition ||= ''
         Mechanize::HTTP::ContentDispositionParser.parse(disposition).try(:filename)
@@ -48,8 +45,10 @@ module Seek
 
       def determine_filename_from_url(url)
         filename = nil
-        if valid_uri?(url)
-          path = URI.parse(url.strip).path
+        return if url.nil?
+        stripped_url = url.strip
+        if valid_url?(stripped_url)
+          path = URI.parse(stripped_url).path
           filename = path.split('/').last unless path.nil?
           filename = filename.strip unless filename.nil?
         end
