@@ -8,6 +8,7 @@ require 'rest-client'
 class ContentBlob < ActiveRecord::Base
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
+  include Seek::UrlValidation
   include Seek::Data::Checksums
   prepend Seek::Openbis::Blob
 
@@ -59,8 +60,12 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def original_filename_or_url
-    if original_filename.blank? && url.blank?
-      errors.add(:base, 'Need to specify either original_filename or url')
+    if original_filename.blank?
+      if url.blank?
+        errors.add(:base, 'Need to specify either original_filename or url')
+      elsif !valid_url?(url)
+        errors.add(:url, 'is invalid')
+      end
     end
   end
 
@@ -152,8 +157,6 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
-
-
   def file
     @file ||= File.open(filepath)
   end
@@ -217,10 +220,6 @@ class ContentBlob < ActiveRecord::Base
 
   private
 
-  def valid_url?
-    self.url && self.url =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
-  end
-
   def remote_headers
     if @headers
       @headers
@@ -276,8 +275,8 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def remote_content_handler
-    return nil unless valid_url?
-    case URI(self.url).scheme
+    return nil unless valid_url?(url)
+    case URI(url).scheme
       when 'ftp'
         Seek::DownloadHandling::FTPHandler.new(url)
       when 'http', 'https'
