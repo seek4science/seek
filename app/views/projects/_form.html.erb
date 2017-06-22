@@ -61,7 +61,7 @@
             </div>
 
             <div id="default-sharing-form" style="<%= show_or_hide_block(@project.use_default_policy) -%>;">
-              <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: @project.default_policy || Policy.default, projects: [@project] } %>
+              <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: @project.default_policy || Policy.default, projects: [@project], downloadable: true } %>
             </div>
         <% end %>
     <% end %>

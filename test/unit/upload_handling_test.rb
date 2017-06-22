@@ -5,7 +5,8 @@ require 'seek/upload_handling/examine_url'
 
 class UploadHandingTest < ActiveSupport::TestCase
   include Seek::UploadHandling::DataUpload
-  include Seek::UploadHandling::ExamineUrl
+  include Seek::UploadHandling::DataUpload
+  include Seek::UrlValidation
 
   test 'valid scheme?' do
     assert_equal %w(file).sort, Seek::UploadHandling::ContentInspection::INVALID_SCHEMES.sort
@@ -133,14 +134,21 @@ class UploadHandingTest < ActiveSupport::TestCase
     refute content_is_webpage?(nil)
   end
 
-  test 'valid uri?' do
-    assert valid_uri?('http://fish.com')
-    assert valid_uri?('http://fish.com')
-    assert valid_uri?('http://fish.com   ')
-    assert valid_uri?('http://fish.com/fish.txt')
-    assert valid_uri?('http://fish.com/fish.txt    ')
-    refute valid_uri?('x dd s')
-    refute valid_uri?(nil)
+  test 'valid url?' do
+    assert valid_url?('http://fish.com')
+    assert valid_url?('https://fish.com')
+    assert valid_url?('http://fish.com/fish.txt')
+    assert valid_url?('ftp://fish.com/fish.txt')
+    assert valid_url?('mailto:fish@fishmail.fish')
+    assert valid_url?('skype:fish.user')
+
+    refute valid_url?('urn:fish:fish.com/fish.txt')
+    refute valid_url?('http://fish.com   ')
+    refute valid_url?('http://fish.com/fish.txt    ')
+    refute valid_url?('x dd s')
+    refute valid_url?('sdfsdf')
+    refute valid_url?('/somewhere/fish.txt')
+    refute valid_url?(nil)
   end
 
   test 'determine_filename_from_disposition' do
