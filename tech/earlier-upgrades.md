@@ -38,16 +38,16 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull https://github.com/seek4science/seek.git
-    git checkout v1.2.2
+    git checkout v1.2.3
 
 ### Updating using the tarball
 
 Starting with version 0.22, we've started making SEEK available as a download.
 You can download the file from
-<https://bitbucket.org/fairdom/seek/downloads/seek-1.2.2.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.2.3.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.2.2.tar.gz
+    tar zxvf seek-1.2.3.tar.gz
 
 and then copy across your existing filestore and database configuration file
 from your previous installation and continue with the upgrade steps. The

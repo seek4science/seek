@@ -9,6 +9,13 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+## Version 1.2.3, 1.3.3
+
+Release date: _June 23rd 2017_
+
+Patch release to fix an issue, where items shared with "all registered users" in older versions of SEEK may be shown publicly.
+
+
 ## Version 1.3.2
 
 Release date: _May 10th 2017_
