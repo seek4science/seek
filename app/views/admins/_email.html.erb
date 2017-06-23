@@ -27,8 +27,11 @@
                                'Exception notification recipients', 'A comma or space seperated list of email address for those that will receive exception notifications.') %>
       </div>
 
+      <%= admin_text_setting(:noreply_sender, Seek::Config.noreply_sender,
+                             'Sender Email Address', 'The sender email address that is used when automated emails are sent by SEEK.') %>
+
       <%= admin_text_setting(:support_email_address,  Seek::Config.support_email_address,
-                             'Support Email Address', 'The email address which to send support emails (such as run problem reports).') %>
+                             'Support Email Address', 'The email address to which users can send support emails.') %>
     </div>
     <div class="col-sm-5">
       <%= panel('Test email configuration') do %>

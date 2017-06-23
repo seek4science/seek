@@ -43,9 +43,6 @@
                              "Copyright addendum content", "Additional copyright information that is appended to the information in the footer") %>
     </div>
 
-    <%= admin_text_setting(:noreply_sender, Seek::Config.noreply_sender,
-                           "Noreply sender", "An email that is used to send notification from SEEK.") %>
-
     <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path %>
 <% end -%>

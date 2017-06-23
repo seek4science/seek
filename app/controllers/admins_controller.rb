@@ -53,6 +53,7 @@ class AdminsController < ApplicationController
     Seek::Config.set_smtp_settings 'enable_starttls_auto', params[:enable_starttls_auto] == '1'
 
     Seek::Config.support_email_address = params[:support_email_address]
+    Seek::Config.noreply_sender = params[:noreply_sender]
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
@@ -161,8 +162,6 @@ class AdminsController < ApplicationController
 
     Seek::Config.copyright_addendum_enabled = string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content = params[:copyright_addendum_content]
-
-    Seek::Config.noreply_sender = params[:noreply_sender]
 
     update_redirect_to true, 'rebrand'
   end
