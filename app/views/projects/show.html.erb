@@ -4,63 +4,75 @@
   <div class="col-md-9 col-sm-8 box_about_actor">
     <%= item_description @project.description -%>
 
-    <% if Seek::Config.programmes_enabled %>
+    <div class="row">
+      <div class="col-md-6">
+        <% if Seek::Config.programmes_enabled %>
+            <p>
+              <strong><%= t('programme') -%>:</strong>
+              <%= programme_link(@project) -%>
+            </p>
+        <% end %>
+
+        <%= persistent_resource_id(@project) %>
+
         <p>
-          <strong><%= t('programme') -%>:</strong>
-          <%= programme_link(@project) -%>
-        </p>
-    <% end %>
-
-    <p>
-      <strong>Public web page:</strong>
-      <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
-    </p>
-
-    <% unless hide_contact_details?(@project) %>
-        <p>
-          <strong>Internal web page:</strong>
-          <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
-        </p>
-    <% end %>
-
-    <% if Seek::Config.organisms_enabled %>
-        <p>
-          <strong>Organisms:</strong>
-          <%= organisms_link_list @project.organisms -%>
-        </p>
-    <% end %>
-
-    <p class="pals">
-      <strong><%= Seek::Config.dm_project_name %> <%= t('pal').pluralize %>:</strong>
-      <%= pals_link_list @project -%>
-    </p>
-
-    <% if @project.respond_to?(:project_coordinators) %>
-        <p class="project_coordinators">
-          <strong>Project Coordinators:</strong>
-          <%= project_coordinators_link_list @project %>
-        </p>
-    <% end%>
-
-    <% if logged_in_and_registered? %>
-        <p class="project_administrators">
-          <strong><%= t('project_administrator').pluralize %>:</strong>
-          <%= project_administrator_link_list @project %>
-        </p>
-    <% end %>
-
-
-    <% if admin_logged_in? || @project.has_member?(current_user) %>
-        <p class="asset_housekeepers">
-          <strong><%= t('asset_housekeeper').pluralize %>:</strong>
-          <%= asset_housekeepers_link_list @project %>
+          <strong>Public web page:</strong>
+          <%= text_or_not_specified(@project.web_page,:external_link=>true) %>
         </p>
 
-        <p class="asset_gatekeepers">
-          <strong><%= t('asset_gatekeeper').pluralize %>:</strong>
-          <%= gatekeepers_link_list @project %>
+        <% unless hide_contact_details?(@project) %>
+            <p>
+              <strong>Internal web page:</strong>
+              <%= text_or_not_specified(@project.wiki_page,:external_link=>true) %>
+            </p>
+        <% end %>
+
+        <% if Seek::Config.organisms_enabled %>
+            <p>
+              <strong>Organisms:</strong>
+              <%= organisms_link_list @project.organisms -%>
+            </p>
+        <% end %>
+      </div>
+
+      <div class="col-md-6">
+        <p class="pals">
+          <strong><%= Seek::Config.dm_project_name %> <%= t('pal').pluralize %>:</strong>
+          <%= pals_link_list @project -%>
         </p>
-    <% end %>
+
+        <% if @project.respond_to?(:project_coordinators) %>
+            <p class="project_coordinators">
+              <strong>Project Coordinators:</strong>
+              <%= project_coordinators_link_list @project %>
+            </p>
+        <% end%>
+
+        <% if logged_in_and_registered? %>
+            <p class="project_administrators">
+              <strong><%= t('project_administrator').pluralize %>:</strong>
+              <%= project_administrator_link_list @project %>
+            </p>
+        <% end %>
+
+
+        <% if admin_logged_in? || @project.has_member?(current_user) %>
+            <p class="asset_housekeepers">
+              <strong><%= t('asset_housekeeper').pluralize %>:</strong>
+              <%= asset_housekeepers_link_list @project %>
+            </p>
+
+            <p class="asset_gatekeepers">
+              <strong><%= t('asset_gatekeeper').pluralize %>:</strong>
+              <%= gatekeepers_link_list @project %>
+            </p>
+        <% end %>
+      </div>
+    </div>
+
+
+
+
   </div>
 
   <div class="col-md-3 col-sm-4">
