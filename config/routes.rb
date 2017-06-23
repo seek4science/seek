@@ -17,9 +17,9 @@ SEEK::Application.routes.draw do
 
   root :to => "homes#index"
 
-  resource :admin do
-    member do
-      get :show
+  resource :admin, controller: 'admin' do
+    collection do
+      get :index
       get :tags
       get :features_enabled
       get :rebrand

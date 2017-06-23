@@ -1,7 +1,8 @@
 require 'delayed/command'
 
-class AdminsController < ApplicationController
+class AdminController < ApplicationController
   include CommonSweepers
+  include Seek::BreadCrumbs
 
   RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
                  Please see the buttons and explanations below.".freeze
@@ -9,7 +10,7 @@ class AdminsController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth
 
-  def show
+  def index
     respond_to do |format|
       format.html
     end
@@ -321,23 +322,23 @@ class AdminsController < ApplicationController
     respond_to do |format|
       case @page
       when 'content_stats'
-        format.html { render partial: 'admins/stats/content_stats', locals: { stats: Seek::Stats::ContentStats.generate } }
+        format.html { render partial: 'admin/stats/content_stats', locals: { stats: Seek::Stats::ContentStats.generate } }
       when 'activity_stats'
-        format.html { render partial: 'admins/stats/activity_stats', locals: { stats: Seek::Stats::ActivityStats.new } }
+        format.html { render partial: 'admin/stats/activity_stats', locals: { stats: Seek::Stats::ActivityStats.new } }
       when 'search_stats'
-        format.html { render partial: 'admins/stats/search_stats', locals: { stats: Seek::Stats::SearchStats.new } }
+        format.html { render partial: 'admin/stats/search_stats', locals: { stats: Seek::Stats::SearchStats.new } }
       when 'job_queue'
-        format.html { render partial: 'admins/stats/job_queue' }
+        format.html { render partial: 'admin/stats/job_queue' }
       when 'auth_consistency'
-        format.html { render partial: 'admins/stats/auth_consistency' }
+        format.html { render partial: 'admin/stats/auth_consistency' }
       when 'monthly_stats'
-        format.html { render partial: 'admins/stats/monthly_stats', locals: { stats: get_monthly_stats } }
+        format.html { render partial: 'admin/stats/monthly_stats', locals: { stats: get_monthly_stats } }
       when 'workflow_stats'
-        format.html { render partial: 'admins/stats/workflow_stats' }
+        format.html { render partial: 'admin/stats/workflow_stats' }
       when 'storage_usage_stats'
-        format.html { render partial: 'admins/stats/storage_usage_stats' }
+        format.html { render partial: 'admin/stats/storage_usage_stats' }
       when 'snapshot_and_doi_stats'
-        format.html { render partial: 'admins/stats/snapshot_and_doi_stats' }
+        format.html { render partial: 'admin/stats/snapshot_and_doi_stats' }
       when 'none'
         format.html { render text: '' }
       end
