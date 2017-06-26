@@ -1,0 +1,40 @@
+<%# Selects a project implicitly when a study/investigation is selected from an assay/study.%>
+<%# Populates the sharing form, prompts to apply the default policy%>
+
+<%= content_tag :script, project_policies_json(parents.map(&:projects).flatten.uniq), type: 'application/json', id: 'project-default-policies-json' %>
+<%= content_tag :script, project_lookup_json(parents), type: 'application/json', id: 'project-lookup-json' %>
+<script>
+  var projectsLookup = JSON.parse($j('#project-lookup-json').text());
+  Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
+
+  function setImplicitProjects(lookupId, skipPrompt) {
+    Sharing.removeMandatoryProjectPermissions();
+    if (lookupId) {
+      var projects = projectsLookup[parseInt(lookupId)];
+      if (projects && projects.length) {
+        if (projects.length == 1) {
+          // Ask if they want to use the default policy (if there is one)
+          if (Sharing.defaultPolicies[projects[0].id] && (skipPrompt || confirm('' + projects[0].title + ' has a default policy specified, do you want to apply it?'))) {
+            Sharing.applyPolicy(Sharing.defaultPolicies[projects[0].id]);
+          } else { // Otherwise just add a permission for the project
+            Sharing.addPermissionForProject(projects[0]);
+          }
+        }
+        for (var i = 0; i < projects.length; i++) {
+          Sharing.addPermissionForProject(projects[i]);
+        }
+      }
+    }
+  }
+
+  $j(document).ready(function () {
+    $j('<%= select_id -%>').change(function () {
+      setImplicitProjects($j(this).val());
+    });
+
+    <% if action == :new %>
+      // Set on page load if it is a new resource
+      setImplicitProjects($j('<%= select_id -%>').val());
+    <% end %>
+  });
+</script>

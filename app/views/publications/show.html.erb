@@ -6,6 +6,7 @@
 
     <div class="row">
       <div class="col-md-6">
+        <%= persistent_resource_id(@publication) %>
         <% unless @publication.pubmed_id.nil? %>
           <p>
             <strong>PubMed ID:</strong>

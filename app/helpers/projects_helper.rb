@@ -122,4 +122,12 @@ module ProjectsHelper
       options_for_select(Project.all.sort_by(&:title).map { |p| [p.title, p.id] }, selected)
     end
   end
+
+  def project_lookup_json(resources)
+    mapping = resources.map do |r|
+      [r.id, r.projects.map { |p| { id: p.id, title: p.title } }]
+    end
+
+    Hash[mapping].to_json.html_safe
+  end
 end

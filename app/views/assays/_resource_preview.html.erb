@@ -19,7 +19,7 @@
   <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
 
 
-  <%= list_item_attribute t('contributor').capitalize, resource.owner.name, resource.owner %>
+  <%= list_item_attribute t('contributor').capitalize, resource.contributor.name, resource.contributor %>
 
   <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => resource, :list_item => true} %>
   <% if Seek::Config.organisms_enabled %>

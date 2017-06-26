@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170602091314) do
+ActiveRecord::Schema.define(version: 20170607095453) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -160,7 +160,7 @@ ActiveRecord::Schema.define(version: 20170602091314) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "study_id",                     limit: 4
-    t.integer  "owner_id",                     limit: 4
+    t.integer  "contributor_id",               limit: 4
     t.string   "first_letter",                 limit: 1
     t.integer  "assay_class_id",               limit: 4
     t.string   "uuid",                         limit: 255

@@ -146,7 +146,9 @@ module Seek
 
     def find_or_keep_type_with_mime_magic
       mime = MimeMagic.by_extension(file_extension)
-      mime ||= MimeMagic.by_magic(File.open filepath) if file_exists?
+      io = File.open(filepath)
+      mime ||= MimeMagic.by_magic(io) if file_exists?
+      io.close
       mime.try(:type) || content_type
     end
 

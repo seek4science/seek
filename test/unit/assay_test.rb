@@ -132,10 +132,10 @@ class AssayTest < ActiveSupport::TestCase
       assert assay.valid?
       refute_nil assay.technology_type_uri, 'uri should have been set to default in before_validation'
 
-      assay.owner = nil
+      assay.contributor = nil
       assert !assay.valid?
 
-      assay.owner = people(:person_for_model_owner)
+      assay.contributor = people(:person_for_model_owner)
 
       # an modelling assay can be valid without a technology type, or organism
       assay.assay_class = assay_classes(:modelling_assay_class)
@@ -371,7 +371,7 @@ class AssayTest < ActiveSupport::TestCase
               assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics',
               technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography',
               study: studies(:metabolomics_study),
-              owner: people(:person_for_model_owner),
+              contributor: people(:person_for_model_owner),
               assay_class: assay_classes(:experimental_assay_class),
               policy: Factory(:private_policy)
              )

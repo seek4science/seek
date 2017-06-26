@@ -391,15 +391,7 @@ module Seek
       end
 
       def contributing_user
-        unless self.is_a?(Assay)
-          if contributor.is_a? Person
-            contributor.try(:user)
-          elsif contributor.is_a? User
-            contributor
-                    end
-        else
-          owner.try(:user)
-        end
+        contributor.try(:user)
       end
 
       # members of project can see some information of hidden items of their project
