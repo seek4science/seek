@@ -773,7 +773,7 @@ SEEK::Application.routes.draw do
   get "/nels" => "nels#browser", as: 'nels_browser'
   get "/nels_projects" => "nels#projects", as: 'nels_projects'
   get "/nels_datasets" => "nels#datasets", as: 'nels_datasets'
-  get "/nels_data" => "nels#data", as: 'nels_data'
+  get "/nels_subtypes" => "nels#subtypes", as: 'nels_subtypes'
 
   get "/citation/*doi(.:format)" => "citations#fetch", :as => :citation
 
