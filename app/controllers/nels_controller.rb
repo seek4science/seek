@@ -21,7 +21,6 @@ class NelsController < ApplicationController
 
   def projects
     @projects = @rest_client.projects
-    puts @projects.inspect
 
     respond_to do |format|
       format.json
@@ -30,7 +29,6 @@ class NelsController < ApplicationController
 
   def datasets
     @datasets = @rest_client.datasets(params[:id].to_i)
-    puts @datasets.inspect
 
     respond_to do |format|
       format.json

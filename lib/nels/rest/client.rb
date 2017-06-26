@@ -44,6 +44,8 @@ module Nels
 
         response = base[path].send(*args)
 
+        puts response
+
         JSON.parse(response) unless response.empty?
       end
 
