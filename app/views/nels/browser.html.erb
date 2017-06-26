@@ -10,7 +10,11 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
     <div id="nels-content" style="display: none">
       <h2></h2>
       <em>Other metadata here</em><br/><br/>
-      <%= button_link_to('Register in SEEK', 'add', '#') %>
+      <%= form_tag(new_data_file_path(anchor: 'remote-url'), method: :get) do %>
+        <%= hidden_field_tag('data_file[title]','', id: 'title') %>
+        <%= hidden_field_tag('data_url','', id: 'url') %>
+        <%= submit_tag('Register in SEEK', class: 'btn btn-primary') %>
+      <% end %>
     </div>
   </div>
 </div>
@@ -48,14 +52,17 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
                     }
                 }
             }).on('activate_node.jstree', function (e, data) {
-          console.log(data);
-          var el = $j('#nels-content');
-          if (data.node.data.dataset_id) {
-            el.show();
-            $j('h2', el).html(data.node.text)
-          } else {
-            el.hide();
-          }
+              console.log(data);
+              var el = $j('#nels-content');
+              el.show();
+              $j('h2', el).html(data.node.text);
+              if (data.node.data.dataset_id) {
+                $j('#title').val(data.node.text);
+                $j('#url').val('http://example.com/persistent-url');
+                $j('input', el).show();
+              } else {
+                $j('input', el).hide();
+              }
         });
     });
 </script>

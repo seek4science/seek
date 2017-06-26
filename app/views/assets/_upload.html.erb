@@ -58,7 +58,7 @@ end
           <div class="col-sm-8">
 
             <div class="input-group">
-              <%= text_field_tag "content_blobs[][data_url]", "", :id => "data_url_field", :class => 'form-control' -%>
+              <%= text_field_tag "content_blobs[][data_url]", params[:data_url], :id => "data_url_field", :class => 'form-control' -%>
               <span class="input-group-btn">
                 <%= button_link_to 'Test', 'test', "#", :id => "examine_url" %>
               </span>
