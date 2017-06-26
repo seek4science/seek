@@ -18,18 +18,31 @@ module Nels
       end
 
       def projects
-        [{id: 1123122, name: 'seek_pilot1'},
-         {id: 1123123, name: 'seek_pilot2'}].map(&:with_indifferent_access)
+        JSON.parse '[{"id":1123122,"name":"seek_pilot1"},{"id":1123123,"name":"seek_pilot2"}]'
       end
 
       def datasets(project_id)
-        [{id: project_id * 10 + 1, name: "dataset-#{project_id}-1"},
-         {id: project_id * 10 + 2, name: "dataset-#{project_id}-2"}].map(&:with_indifferent_access)
+        if project_id == 1123122
+          JSON.parse '[{"id":1123528,"name":"Illumina-sequencing-dataset","type":"Illumina_seq_data"},{"id":1123527,"name":"proteomics-dataset","type":"Proteomics_data"}]'
+        else
+          JSON.parse '[{"id":1123530,"name":"ds3","type":"Microarray_Methylation_data"},{"id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data"}]'
+        end
       end
 
-      def data(project_id, dataset_id)
-        [{id: dataset_id * 10 + 1, name: "data-#{project_id}-#{dataset_id}-1"},
-         {id: dataset_id * 10 + 2, name: "data-#{project_id}-#{dataset_id}-2"}].map(&:with_indifferent_access)
+      def dataset(project_id, dataset_id)
+        if project_id == 1123122
+          if dataset_id == 1123528
+            JSON.parse '{"id":1123528,"name":"Illumina-sequencing-dataset","type":"Illumina_seq_data","subtypes":["analysis","reads"]}'
+          else
+            JSON.parse '{"id":1123527,"name":"proteomics-dataset","type":"Proteomics_data","subtypes":["Processed","Raw","Results"]}'
+          end
+        else
+          if dataset_id == 1123530
+            JSON.parse '{"id":1123530,"name":"ds3","type":"Microarray_Methylation_data","subtypes":["Analysis","Images","Intensities"]}'
+          else
+            JSON.parse '{"id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data","subtypes":["Analysis","Images","Intensities"]}'
+          end
+        end
       end
 
     end
