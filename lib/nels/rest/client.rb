@@ -29,6 +29,11 @@ module Nels
         perform("sbi/projects/#{project_id}/datasets/#{dataset_id}", :get)
       end
 
+      def persistent_url(project_id, dataset_id, subtype)
+        perform("sbi/projects/#{project_id}/datasets/#{dataset_id}/do", :post,
+                body: { method: 'get_nels_url', subtype: subtype })
+      end
+
       private
 
       def perform(path, method, opts = {})
