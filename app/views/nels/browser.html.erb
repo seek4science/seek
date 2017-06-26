@@ -1,6 +1,19 @@
-Logged in as <%= @rest_client.user_info['name'] %>
+<h1>NeLS Browser</h1>
 
-<div id="nels-tree"></div>
+Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
+
+<div class="row">
+  <div class="col-sm-3">
+    <div id="nels-tree" style="min-height: 300px; border-right: 1px solid #ddd"></div>
+  </div>
+  <div class="col-sm-9">
+    <div id="nels-content" style="display: none">
+      <h2></h2>
+      <em>Other metadata here</em><br/><br/>
+      <%= button_link_to('Register in SEEK', 'add', '#') %>
+    </div>
+  </div>
+</div>
 
 <script type="text/javascript">
     $j(document).ready(function () {
@@ -34,6 +47,15 @@ Logged in as <%= @rest_client.user_info['name'] %>
                         }
                     }
                 }
-            });
+            }).on('activate_node.jstree', function (e, data) {
+          console.log(data);
+          var el = $j('#nels-content');
+          if (data.node.data.dataset_id) {
+            el.show();
+            $j('h2', el).html(data.node.text)
+          } else {
+            el.hide();
+          }
+        });
     });
 </script>
