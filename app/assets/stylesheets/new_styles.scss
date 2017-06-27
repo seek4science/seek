@@ -642,3 +642,15 @@ div.popup-contributor {
     margin-left: 3em;
   }
 }
+
+#user-menu > .dropdown-menu {
+  @media (min-width: $screen-md-min) {
+    max-width: 24em;
+  }
+  li.project-item > a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+}
