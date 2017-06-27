@@ -37,6 +37,6 @@ module DefaultJobProperties
 
   # the name of the queue the job will be places on - so that multiple workers can watch different queues.
   def queue_name
-    nil
+    QueueNames::DEFAULT
   end
 end

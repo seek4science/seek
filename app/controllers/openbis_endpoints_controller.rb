@@ -13,7 +13,7 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :project_can_admin?, except: [:browse, :add_dataset, :show_dataset_files, :show_items, :show_item_count]
   before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
   before_filter :get_endpoints, only: [:index, :browse]
-  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_browse_cache, :destroy]
+  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_metadata_store, :destroy]
 
   def index
     respond_with(@project, @openbis_endpoints)
@@ -31,12 +31,12 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def update
-    @openbis_endpoint.update_attributes(params[:openbis_endpoint])
+    @openbis_endpoint.update_attributes(openbis_endpoint_params)
     save_and_respond 'The space was successfully updated.'
   end
 
   def save_and_respond(flash_msg)
-    update_sharing_policies @openbis_endpoint, params
+    update_sharing_policies @openbis_endpoint
     respond_with(@project, @openbis_endpoint) do |format|
       if @openbis_endpoint.save
         flash[:notice] = flash_msg
@@ -57,12 +57,12 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def create
-    @openbis_endpoint = @project.openbis_endpoints.build(params[:openbis_endpoint])
+    @openbis_endpoint = @project.openbis_endpoints.build(openbis_endpoint_params)
     save_and_respond 'The space was successfully created.'
   end
 
-  def refresh_browse_cache
-    @openbis_endpoint.clear_cache if @openbis_endpoint.test_authentication
+  def refresh_metadata_store
+    @openbis_endpoint.clear_metadata_store if @openbis_endpoint.test_authentication
     show_items
   end
 
@@ -81,7 +81,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def test_endpoint
-    endpoint = OpenbisEndpoint.new(params[:openbis_endpoint])
+    endpoint = OpenbisEndpoint.new(openbis_endpoint_params)
     result = endpoint.test_authentication
 
     respond_to do |format|
@@ -90,7 +90,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def fetch_spaces
-    endpoint = OpenbisEndpoint.new(params[:openbis_endpoint])
+    endpoint = OpenbisEndpoint.new(openbis_endpoint_params)
     respond_to do |format|
       format.html { render partial: 'available_spaces', locals: { endpoint: endpoint } }
     end
@@ -109,6 +109,11 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   private
+
+  def openbis_endpoint_params
+    params.require(:openbis_endpoint).permit(:project_id, :web_endpoint, :as_endpoint, :dss_endpoint,
+                                             :username, :password, :refresh_period_mins, :space_perm_id)
+  end
 
   ### Filters
 

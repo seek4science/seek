@@ -7,7 +7,7 @@ class AssaysControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
   include HtmlHelper
 
   def setup
@@ -56,7 +56,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /#{Seek::Config.application_name} #{I18n.t('assays.assay')}s.*/i, count: 1
+    assert_select 'title', text: I18n.t('assays.assay').pluralize, count: 1
   end
 
   test 'should show index' do
@@ -71,8 +71,8 @@ class AssaysControllerTest < ActionController::TestCase
     assays = assigns(:assays)
     first_assay = assays.first
     assert_not_nil first_assay
-    assert_select 'a[data-favourite-url=?]', h(add_favourites_path(resource_id: first_assay.id,
-                                                                   resource_type: first_assay.class.name))
+    assert_select 'a[data-favourite-url=?]', add_favourites_path(resource_id: first_assay.id,
+                                                                 resource_type: first_assay.class.name)
   end
 
   test 'should show index in xml' do
@@ -88,7 +88,7 @@ class AssaysControllerTest < ActionController::TestCase
     sop = sops(:sop_with_all_sysmo_users_policy)
     assert !assay.sops.include?(sop.latest_version)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay_sop_ids: [sop.id], assay: {}
+      put :update, id: assay, assay_sop_ids: [sop.id], assay: { title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -103,7 +103,7 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
 
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay_sop_ids: [sop.id], assay: {}
+      put :update, id: assay, assay_sop_ids: [sop.id], assay: { title: assay.title }
     end
 
     assay.reload
@@ -120,7 +120,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.sops.include?(sop.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay_sop_ids: [sop.id], assay: {}
+      put :update, id: assay, assay_sop_ids: [sop.id], assay: { title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -141,7 +141,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       put :update, id: assay,
                    data_files: [{ id: df.id, relationship_type: RelationshipType.find_by_title('Test data').id }],
-                   assay: {}
+                   assay: { title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -160,7 +160,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, model_ids: [model.id], assay: {}
+      put :update, id: assay, model_ids: [model.id], assay: { title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -267,8 +267,8 @@ class AssaysControllerTest < ActionController::TestCase
     end
     a = assigns(:assay)
     assert_equal 1, a.assay_organisms.count
-    assert_include a.organisms, organism
-    assert_include a.strains, strain
+    assert_includes a.organisms, organism
+    assert_includes a.strains, strain
     assert_redirected_to assay_path(a)
   end
 
@@ -654,7 +654,16 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
+    end
+  end
+
+  test 'should not allow XSS in descriptions' do
+    assay = Factory(:assay, description: 'hello <script>alert("HELLO")</script>')
+    get :show, id: assays(:assay_with_links_in_description)
+
+    assert_select 'div#description' do
+      assert_select 'script', count: 0
     end
   end
 
@@ -908,7 +917,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.policy.permissions.empty?
 
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay: {},
+      put :update, id: assay, assay: { title: assay.title },
                    policy_attributes: { access_type: Policy::ACCESSIBLE,
                                         permissions_attributes: project_permissions(study.projects, Policy::EDITING) }
     end
@@ -1092,7 +1101,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :new_object_based_on_existing_one, id: assay.id
     assert_response :success
     assert_select '#assay_title[value=?]', 'the assay'
-    assert_select 'select#assay_study_id option[selected][value=?]', assay.study.id, count: 1
+    assert_select "select#assay_study_id option[selected][value='#{assay.study.id}']",count: 1
   end
 
   test 'new object based on existing one when unauthorised to view' do
@@ -1213,11 +1222,11 @@ class AssaysControllerTest < ActionController::TestCase
     refute_nil assay2
     refute_equal assay1, assay2
 
-    assert_include assay1.strains, strain1
-    assert_include assay2.strains, strain2
+    assert_includes assay1.strains, strain1
+    assert_includes assay2.strains, strain2
 
-    assert_include strain1.assays, assay1
-    assert_include strain2.assays, assay2
+    assert_includes strain1.assays, assay1
+    assert_includes strain2.assays, assay2
 
     assert strain1.can_view?
     assert strain2.can_view?
@@ -1270,7 +1279,7 @@ class AssaysControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert assay.creators.empty?
 
-    put :update, id: assay.id, creators: [[creator.name, creator.id]].to_json
+    put :update, id: assay.id, assay: { title: assay.title }, creators: [[creator.name, creator.id]].to_json
     assert_redirected_to assay_path(assay)
 
     assert assay.creators.include?(creator)

@@ -8,7 +8,6 @@
 # * Copyright (c) 2007 University of Manchester and the University of Southampton.
 # * See license.txt for details.
 # ********************************************************************************
-require 'seek/permissions/acts_as_authorized'
 
 module Seek
   module ActsAsAsset
@@ -32,7 +31,6 @@ module Seek
         acts_as_scalable
         acts_as_authorized
         acts_as_uniquely_identifiable
-        acts_as_annotatable name_field: :title
         acts_as_favouritable
         acts_as_trashable
         grouped_pagination

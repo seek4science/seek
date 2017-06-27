@@ -4,15 +4,10 @@ class ProjectFolder < ActiveRecord::Base
 
   belongs_to :project
   belongs_to :parent,:class_name=>"ProjectFolder",:foreign_key=>:parent_id
-  has_many :children,:class_name=>"ProjectFolder",:foreign_key=>:parent_id, :order=>:title, :after_add=>:update_child
+  has_many :children,-> { order(:title) }, :class_name=>"ProjectFolder",:foreign_key=>:parent_id, :after_add=>:update_child
   has_many :project_folder_assets, :dependent=>:destroy
 
-
-
-  scope :root_folders, lambda { |project| {
-    :conditions=>{:project_id=>project.id,:parent_id=>nil},:order=>"LOWER(title)"
-    }
-  }
+  scope :root_folders, -> (project) { where(project_id: project.id, parent_id: nil).order('LOWER(title)') }
 
   validates_presence_of :project,:title
 
@@ -106,7 +101,7 @@ class ProjectFolder < ActiveRecord::Base
 
   #temporary method to destroy folders for a project, useful whilst developing
   def self.nuke project
-    folders = ProjectFolder.all(:conditions=>{:project_id=>project.id})
+    folders = ProjectFolder.where(project_id: project.id)
     folder_assets = ProjectFolderAsset.all.select{|pfa| pfa.project_folder.nil? || pfa.project_folder.try(:project_id)==project.id}
     folder_assets.each {|a| a.destroy}
     folders.each {|f| f.deletable=true ; f.destroy}

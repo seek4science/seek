@@ -44,7 +44,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory :workflow, contributor: @member, policy: Factory(:public_policy)
     get :show, id: workflow.id
     assert_response :success
-    assert_select 'span[class=visibility public]', text: /Public/
+    assert_select 'span[class="visibility public"]', text: /Public/
 
     policy = workflow.policy
     policy.access_type = Policy::NO_ACCESS
@@ -53,6 +53,6 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, id: workflow.id
     assert_response :success
-    assert_select 'span[class=visibility public]', text: /Public/, count: 0
+    assert_select 'span[class="visibility public"]', text: /Public/, count: 0
   end
 end

@@ -42,9 +42,9 @@ class AssetTest < ActiveSupport::TestCase
     assert_equal users(:owner_of_my_first_sop), model.contributor
     model.contributor = nil
     model.save!
-    assert_equal nil, model.contributor
+    assert_nil model.contributor
     model = Model.find(model.id)
-    assert_equal nil, model.contributor
+    assert_nil model.contributor
   end
 
   test 'latest version?' do
@@ -62,11 +62,11 @@ class AssetTest < ActiveSupport::TestCase
   test 'just used' do
     model = Factory :model
     t = 1.day.ago
-    assert_not_equal t.to_s, model.last_used_at.to_s
+    assert_not_equal t.to_i, model.last_used_at.to_i
     pretend_now_is(t) do
       model.just_used
     end
-    assert_equal t.to_s, model.last_used_at.to_s
+    assert_equal t.to_i, model.last_used_at.to_i
   end
 
   test 'assay type titles' do

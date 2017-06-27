@@ -1,0 +1,19 @@
+<!-- Piwik -->
+<script type="text/javascript">
+  var _paq = _paq || [];
+  (function(){
+    var u=(("https:" == document.location.protocol) ? "https://<%= Seek::Config.piwik_analytics_url %>/" : "http://<%= Seek::Config.piwik_analytics_url %>/");
+    _paq.push(['setSiteId', <%= Seek::Config.piwik_analytics_id_site %>]);
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['trackPageView']);
+    var d=document,
+        g=d.createElement('script'),
+        s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript';
+    g.defer=true;
+    g.async=true;
+    g.src=u+'piwik.js';
+    s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Piwik Tag -->

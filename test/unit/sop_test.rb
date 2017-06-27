@@ -18,6 +18,10 @@ class SopTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
       assert_equal RDF::URI.new("http://localhost:3000/sops/#{object.id}"), reader.statements.first.subject
+
+      #check for OPSK-1281 - where the creators weren't appearing
+      assert_includes reader.statements.collect(&:predicate),"http://www.mygrid.org.uk/ontology/JERMOntology#hasCreator"
+      assert_includes reader.statements.collect(&:predicate),"http://rdfs.org/sioc/ns#has_creator"
     end
   end
 
@@ -71,7 +75,7 @@ class SopTest < ActiveSupport::TestCase
       assert sop.valid?
       assert sop.policy.valid?
       assert_equal Policy::NO_ACCESS, sop.policy.access_type
-      assert_blank sop.policy.permissions
+      assert sop.policy.permissions.blank?
     end
   end
 
@@ -224,6 +228,6 @@ class SopTest < ActiveSupport::TestCase
     assert_equal sop.contributor.user, sop.contributing_user
     assert_equal sop.contributor.user, sop.latest_version.contributing_user
     sop_without_contributor = Factory :sop, contributor: nil
-    assert_equal nil, sop_without_contributor.contributing_user
+    assert_nil sop_without_contributor.contributing_user
   end
 end

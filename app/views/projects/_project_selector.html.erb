@@ -24,7 +24,7 @@
 %>
 
 <%= folding_panel(title, false, id: "add_projects_form",
-                  help_text: "Here you can associate the #{object_type_text} with specific projects.") do %>
+                  help_text: "Here you can associate the #{object_type_text} with specific #{t('project').downcase.pluralize}.") do %>
     <p class="help-block">
       The following projects are associated with this <%= object_type_text -%>:
     </p>
@@ -83,7 +83,7 @@
           if (project.id == projectId) {
             this.selected.push(project);
             // Ask if they want to use the default policy (if there is one)
-            if (Sharing.defaultPolicies[project.id] && skipPrompt || confirm('' + project.title + ' has a default policy specified, do you want to apply it?')) {
+            if (Sharing.defaultPolicies[project.id] && (skipPrompt || confirm('' + project.title + ' has a default policy specified, do you want to apply it?'))) {
               Sharing.applyPolicy(Sharing.defaultPolicies[project.id]);
             } else { // Otherwise just add a permission for the project
               Sharing.addPermissionForProject(project);
@@ -111,6 +111,7 @@
     $j('#projects-selector-select').change(function () {
       if ($j(this).val()) {
         Sharing.projectsSelector.add($j(this).val());
+        $j(this).prop('selectedIndex', 0); // Reset the select
       }
     })
   });

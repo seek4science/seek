@@ -114,21 +114,6 @@ function expandResourceListItemExpandableText(objectId){
     }
 }
 
-function toggleAuthorAvatarList(objectId){
-    div = $('authorAvatarList'+objectId)
-    link = $('authorAvatarListLink'+objectId)    
-    if (div.style.display == "none") { //EXPAND
-        link.innerHTML = "(Hide)";
-        div.style.display = "block";
-
-    }
-    else { //COLLAPSE
-      div.style.display = "none";
-      link.innerHTML = '(Show All)';
-    }
-}
-
-
 //http://snipplr.com/view.php?codeview&id=1384
 function insertAtCursor(myField, myValue) {
   myField = $(myField);
@@ -201,11 +186,23 @@ function clickLink(link) {
 }
 
 function decodeHTML(str) {
-    return String(str).replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&#x27;/g, "'");
+    return String(str)
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#0?39;/g, "'")
+        .replace(/&#x27;/g, "'");
 }
 
 function encodeHTML(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/'/g, '&#x27;');
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+        .replace(/'/g, '&#x27;');
 }
 
 // taken from stack overflow - http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
@@ -262,3 +259,11 @@ function digValue(object, path) {
     }
   };
 }( jQuery ));
+
+$j(document).ready(function () {
+  $j('.collapse').on('show.bs.collapse', function () {
+    $j(this).parent().find('.panel-heading .caret').removeClass('caret').addClass('caret-up');
+  }).on('hide.bs.collapse', function () {
+    $j(this).parent().find('.panel-heading .caret-up').removeClass('caret-up').addClass('caret');
+  });
+});

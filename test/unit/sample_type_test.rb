@@ -483,7 +483,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
         # some sanity checking
         assert_empty type.samples
-        assert_include type.projects, @project
+        assert_includes type.projects, @project
         assert type.can_edit?
         refute_equal linked_sample_type, type
         refute type.can_delete?

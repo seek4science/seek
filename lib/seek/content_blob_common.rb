@@ -164,12 +164,17 @@ module Seek
       resource_type = @asset_version.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
       begin
         data_hash = downloader.get_remote_data @content_blob.url, project.site_username, project.site_password, resource_type
-        send_file data_hash[:data_tmp_path], filename: data_hash[:filename] || @content_blob.original_filename, type: data_hash[:content_type] || @content_blob.content_type, disposition: 'attachment'
-      rescue Seek::DownloadException, Jerm::JermException => de
-
+        send_file data_hash[:data_tmp_path],
+                  filename: data_hash[:filename] || @content_blob.original_filename,
+                  type: data_hash[:content_type] || @content_blob.content_type,
+                  disposition: 'attachment'
+      rescue Seek::DownloadException, Jerm::JermException, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH => de
         puts "Unable to fetch from remote: #{de.message}"
         if @content_blob.file_exists?
-          send_file @content_blob.filepath, filename: @content_blob.original_filename, type: @content_blob.content_type, disposition: 'attachment'
+          send_file @content_blob.filepath,
+                    filename: @content_blob.original_filename,
+                    type: @content_blob.content_type,
+                    disposition: 'attachment'
         else
           raise de
         end

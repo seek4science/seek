@@ -6,7 +6,7 @@ var as;
   as = new annotation_source(<%= source.id -%>, '<%= source.class.name -%>', '<%= source.person.name -%>', '<%= polymorphic_path(source.person) -%>');
   annotation_sources.push(as);
   <% annotation_subset.each do |a| -%>
-    as.annotations.push(new annotation(<%= a.id -%>, '<%= a.attribute.name -%>', <%= a.annotatable.worksheet.sheet_number -%>, '<%= a.annotatable.cell_range -%>', '<%= h escape_javascript a.value.text -%>', '<%= time_ago_in_words(a.created_at) -%> ago'));
+    as.annotations.push(new annotation(<%= a.id -%>, '<%= a.annotation_attribute.name -%>', <%= a.annotatable.worksheet.sheet_number -%>, '<%= a.annotatable.cell_range -%>', '<%= h escape_javascript a.value.text -%>', '<%= time_ago_in_words(a.created_at) -%> ago'));
   <% end -%>
 <% end -%>
 

@@ -210,7 +210,7 @@ module ApiHelper
     if object.respond_to?(:annotations_as_text_array)
       builder.tag! 'tags' do
         object.annotations.each do |annotation|
-          builder.tag! 'tag', annotation.value.text, context: annotation.attribute.name
+          builder.tag! 'tag', annotation.value.text, context: annotation.annotation_attribute.name
         end
       end
     end

@@ -1,6 +1,16 @@
 require 'test_helper'
 
 class OntologySynchronizationTest < ActiveSupport::TestCase
+
+  def setup
+    unless AssayClass.for_type('modelling')
+      Factory(:modelling_assay_class)
+    end
+    unless AssayClass.for_type('experimental')
+      Factory(:experimental_assay_class)
+    end
+  end
+
   def teardown
     Rails.cache.clear
     Seek::Ontologies::TechnologyTypeReader.instance.reset

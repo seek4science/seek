@@ -1,10 +1,5 @@
 require 'test_helper'
 
-# Re-raise errors caught by the controller.
-class UsersController; def rescue_action(e)
-                         fail e
-                       end; end
-
 class UsersControllerTest < ActionController::TestCase
   # Be sure to include AuthenticatedTestHelper in test/test_helper.rb instead
   # Then, you can remove it from this and the units test.
@@ -12,15 +7,9 @@ class UsersControllerTest < ActionController::TestCase
 
   fixtures :all
 
-  def setup
-    @controller = UsersController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
-  end
-
   def test_title
     get :new
-    assert_select 'title', text: /The Sysmo SEEK.*/, count: 1
+    assert_select 'title', text: 'Signup', count: 1
   end
 
   test 'cancel registration' do
@@ -192,15 +181,11 @@ class UsersControllerTest < ActionController::TestCase
   def test_should_not_activate_user_without_key
     get :activate
     assert_nil flash[:notice]
-  rescue ActionController::RoutingError
-    # in the event your routes deny this, we'll just bow out gracefully.
   end
 
   def test_should_not_activate_user_with_blank_key
     get :activate, activation_code: ''
     assert_nil flash[:notice]
-  rescue ActionController::RoutingError
-    # well played, sir
   end
 
   def test_can_edit_self

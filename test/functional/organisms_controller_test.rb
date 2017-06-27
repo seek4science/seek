@@ -284,4 +284,23 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#resource-count-stats', count: 0
   end
+
+  test 'samples in related items' do
+    person = Factory(:person)
+    login_as(person.user)
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+    organism = strain.organism
+
+    sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+    sample.save!
+
+    get :show, id: organism
+
+    assert_response :success
+    assert_select 'div.related-items > ul > li > a', text: "Samples (1)"
+    assert_select 'div.related-items .tab-pane a[href=?]', sample_path(sample), text: /#{sample.title}/
+  end
 end

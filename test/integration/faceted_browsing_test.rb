@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class FacetedBrowsingTest < ActionController::IntegrationTest
+class FacetedBrowsingTest < ActionDispatch::IntegrationTest
   ASSETS_WITH_FACET = Seek::Config.facet_enable_for_pages.keys
 
   def setup
@@ -97,7 +97,7 @@ class FacetedBrowsingTest < ActionController::IntegrationTest
   end
 
   test 'no -advance filter- button when no invisible assets' do
-    post '/logout' # to avoid redirect to select the profile for current user, when no person in the system
+    get '/logout' # to avoid redirect to select the profile for current user, when no person in the system
     with_config_value :faceted_browsing_enabled, true do
       ASSETS_WITH_FACET.each do |type_name|
         with_config_value :facet_enable_for_pages, type_name => true do

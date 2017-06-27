@@ -8,9 +8,6 @@ class FoldersController < ApplicationController
   before_filter :get_folders,:only=>[:index,:move_asset_to,:create_folder]
   before_filter :get_asset, :only=>[:move_asset_to,:remove_asset]
 
-  in_place_edit_for :project_folder, :title
-  in_place_edit_for :project_folder, :description
-
   include Seek::BreadCrumbs
 
   def show
@@ -91,6 +88,18 @@ class FoldersController < ApplicationController
     render :update do |page|
       page.replace_html "folder_contents",:partial=>"contents",:locals=>{:folder=>@folder}
     end
+  end
+
+  def set_project_folder_title
+    @item = ProjectFolder.find(params[:id])
+    @item.update_attribute(:title, params[:value])
+    render text: @item.title
+  end
+
+  def set_project_folder_description
+    @item = ProjectFolder.find(params[:id])
+    @item.update_attribute(:description, params[:value])
+    render text: @item.description
   end
 
   private

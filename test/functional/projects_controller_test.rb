@@ -2,6 +2,7 @@ require 'test_helper'
 require 'libxml'
 
 class ProjectsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
@@ -20,7 +21,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK #{I18n.t('project').pluralize}.*/, count: 1
+    assert_select 'title', text: I18n.t('project').pluralize, count: 1
   end
 
   def test_should_get_index
@@ -75,13 +76,14 @@ class ProjectsControllerTest < ActionController::TestCase
     prog = person.programmes.first
 
     assert_difference('Project.count') do
-      post :create, project: { title: 'proj with policy', programme_id: prog.id }, policy_attributes: valid_sharing
+      post :create, project: { title: 'proj with policy', programme_id: prog.id,use_default_policy:'1' }, policy_attributes: valid_sharing
     end
 
     project = assigns(:project)
 
     assert_redirected_to project
     assert project.default_policy
+    assert project.use_default_policy
   end
 
   test 'create project with programme' do
@@ -263,7 +265,7 @@ class ProjectsControllerTest < ActionController::TestCase
     publication.save!
     project = person.projects.first
 
-    assert_include publication.projects, project
+    assert_includes publication.projects, project
     login_as(person)
     get :asset_report, id: project.id
 
@@ -432,7 +434,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :edit, id: projects(:one)
     assert_response :success
 
-    put :update, id: projects(:three).id, project: {}
+    put :update, id: projects(:three).id, project: { title: 'asd' }
+
     assert_redirected_to project_path(assigns(:project))
   end
 
@@ -974,8 +977,8 @@ class ProjectsControllerTest < ActionController::TestCase
     refute_empty strain2.projects
     refute_equal project1, project2
 
-    assert_include project1.strains, strain1
-    assert_include project2.strains, strain2
+    assert_includes project1.strains, strain1
+    assert_includes project2.strains, strain2
 
     get :index, strain_id: strain1.id
     assert_response :success
@@ -1149,14 +1152,16 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:person, group_memberships: [group_membership])
     former_group_membership = Factory(:group_membership, time_left_at: 10.days.ago, work_group: wg)
     former_person = Factory(:person, group_memberships: [former_group_membership])
-    assert_no_difference('GroupMembership.count') do
-      post :update_members,
-           id: project,
-           memberships_to_flag: { group_membership.id.to_s => { time_left_at: 1.day.ago },
-                                  former_group_membership.id.to_s => { time_left_at: '' } }
-      assert_redirected_to project_path(project)
-      assert_nil flash[:error]
-      refute_nil flash[:notice]
+    assert_difference("Delayed::Job.where(\"handler LIKE '%ProjectLeavingJob%'\").count", 2) do
+      assert_no_difference('GroupMembership.count') do
+        post :update_members,
+             id: project,
+             memberships_to_flag: { group_membership.id.to_s => { time_left_at: 1.day.ago },
+                                    former_group_membership.id.to_s => { time_left_at: '' } }
+        assert_redirected_to project_path(project)
+        assert_nil flash[:error]
+        refute_nil flash[:notice]
+      end
     end
 
     assert group_membership.reload.has_left
@@ -1449,9 +1454,26 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_routing '/projects/1/search', controller: 'search', action: 'index', project_id: '1'
   end
 
+  test 'update to use default sharing policy' do
+    person=Factory(:project_administrator)
+    project=person.projects.first
+    login_as(person)
+    assert project.can_manage?
+    refute project.use_default_policy
+    refute project.default_policy
+
+    put :update, id:project.id, project: { use_default_policy:'1' }, policy_attributes: valid_sharing
+
+    project=assigns(:project)
+    assert project.use_default_policy
+    assert project.default_policy
+
+
+  end
+
   private
 
   def valid_project
-    {}
+    { title: 'a title' }
   end
 end

@@ -132,8 +132,7 @@ module RelatedItemsHelper
 
   def authorize_related_items(related)
     related.each do |key, res|
-      res[:items].uniq!
-      res[:items].compact!
+      res[:items] = res[:items].uniq.compact
       next if res[:items].empty?
       total_count = res[:items].size
       if key == 'Project' || key == 'Institution'

@@ -78,7 +78,7 @@ class ScalesController < ApplicationController
       end
 
       resource_hash.each do |key, res|
-        res[:items].compact!
+        res[:items] = res[:items].compact
         unless res[:items].empty?
           total_count = res[:items].size
           all = res[:items]

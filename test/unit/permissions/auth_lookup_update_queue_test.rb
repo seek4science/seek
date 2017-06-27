@@ -41,7 +41,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_difference('AuthLookupUpdateQueue.count', 1) do
       sop = Factory :sop, contributor: user.person, policy: Factory(:private_policy)
     end
-    assert_equal sop, AuthLookupUpdateQueue.last(order: :id).item
+    assert_equal sop, AuthLookupUpdateQueue.order(:id).last.item
 
     AuthLookupUpdateQueue.destroy_all
     sop.policy.access_type = Policy::VISIBLE
@@ -49,7 +49,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_difference('AuthLookupUpdateQueue.count', 1) do
       sop.policy.save
     end
-    assert_equal sop, AuthLookupUpdateQueue.last(order: :id).item
+    assert_equal sop, AuthLookupUpdateQueue.order(:id).last.item
     AuthLookupUpdateQueue.destroy_all
     sop.title = Time.now.to_s
     assert_difference('AuthLookupUpdateQueue.count', 0) do
@@ -68,7 +68,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
         assay = Factory :assay, contributor: user.person, policy: Factory(:private_policy), study: assay.study
       end
     end
-    assert_equal assay, AuthLookupUpdateQueue.last(order: :id).item
+    assert_equal assay, AuthLookupUpdateQueue.order(:id).last.item
 
     AuthLookupUpdateQueue.destroy_all
     assay.policy.access_type = Policy::VISIBLE
@@ -76,7 +76,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_difference('AuthLookupUpdateQueue.count', 1) do
       assay.policy.save
     end
-    assert_equal assay, AuthLookupUpdateQueue.last(order: :id).item
+    assert_equal assay, AuthLookupUpdateQueue.order(:id).last.item
     AuthLookupUpdateQueue.destroy_all
     assay.title = Time.now.to_s
     assert_no_difference('AuthLookupUpdateQueue.count') do
@@ -93,7 +93,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_difference('AuthLookupUpdateQueue.count', 1) do
       study = Factory :study, contributor: user.person, policy: Factory(:private_policy), investigation: study.investigation
     end
-    assert_equal study, AuthLookupUpdateQueue.last(order: :id).item
+    assert_equal study, AuthLookupUpdateQueue.order(:id).last.item
 
     AuthLookupUpdateQueue.destroy_all
     study.policy.access_type = Policy::VISIBLE
@@ -101,7 +101,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_difference('AuthLookupUpdateQueue.count', 1) do
       study.policy.save
     end
-    assert_equal study, AuthLookupUpdateQueue.last(order: :id).item
+    assert_equal study, AuthLookupUpdateQueue.order(:id).last.item
     AuthLookupUpdateQueue.destroy_all
     study.title = Time.now.to_s
     assert_no_difference('AuthLookupUpdateQueue.count') do
@@ -118,7 +118,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_difference('AuthLookupUpdateQueue.count', 1) do
       sweep = Factory :sweep, contributor: user.person, policy: Factory(:private_policy), workflow: sweep.workflow
     end
-    assert_equal sweep, AuthLookupUpdateQueue.last(order: :id).item
+    assert_equal sweep, AuthLookupUpdateQueue.order(:id).last.item
 
     AuthLookupUpdateQueue.destroy_all
     sweep.policy.access_type = Policy::VISIBLE
@@ -126,7 +126,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     assert_difference('AuthLookupUpdateQueue.count', 1) do
       sweep.policy.save
     end
-    assert_equal sweep, AuthLookupUpdateQueue.last(order: :id).item
+    assert_equal sweep, AuthLookupUpdateQueue.order(:id).last.item
 
     AuthLookupUpdateQueue.destroy_all
     sweep.title = Time.now.to_s
@@ -145,14 +145,14 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
       assert_difference('AuthLookupUpdateQueue.count', 1, "unexpected count for created type #{type.name}") do
         entity = Factory type.name.underscore.to_sym, contributor: user.person, policy: Factory(:private_policy)
       end
-      assert_equal entity, AuthLookupUpdateQueue.last(order: :id).item
+      assert_equal entity, AuthLookupUpdateQueue.order(:id).last.item
       AuthLookupUpdateQueue.destroy_all
       entity.policy.access_type = Policy::VISIBLE
 
       assert_difference('AuthLookupUpdateQueue.count', 1) do
         entity.policy.save
       end
-      assert_equal entity, AuthLookupUpdateQueue.last(order: :id).item
+      assert_equal entity, AuthLookupUpdateQueue.order(:id).last.item
       AuthLookupUpdateQueue.destroy_all
       entity.title = Time.now.to_s
       assert_no_difference('AuthLookupUpdateQueue.count') do
@@ -166,7 +166,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
   test 'updates when a user registers' do
     assert_difference('AuthLookupUpdateQueue.count', 1) do
       user = Factory(:brand_new_user)
-      assert_equal user, AuthLookupUpdateQueue.last(order: :id).item
+      assert_equal user, AuthLookupUpdateQueue.order(:id).last.item
     end
   end
 
@@ -182,7 +182,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
         person.save!
       end
     end
-    assert_equal person, AuthLookupUpdateQueue.last(order: :id).item
+    assert_equal person, AuthLookupUpdateQueue.order(:id).last.item
   end
 
   test 'does not update when a user changes their password' do
@@ -219,7 +219,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
         gm = GroupMembership.create person: person, work_group: wg
         gm.save!
       end
-      assert_equal person, AuthLookupUpdateQueue.last(order: :id).item
+      assert_equal person, AuthLookupUpdateQueue.order(:id).last.item
 
       AuthLookupUpdateQueue.destroy_all
       assert_difference('AuthLookupUpdateQueue.count', 2) do
@@ -228,7 +228,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
         gm.save!
       end
 
-      assert_equal [person2, person], AuthLookupUpdateQueue.all(order: :id).collect(&:item)
+      assert_equal [person2, person], AuthLookupUpdateQueue.order(:id).to_a.collect(&:item)
     end
   end
 end

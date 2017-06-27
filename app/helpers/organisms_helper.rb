@@ -26,7 +26,7 @@ module OrganismsHelper
 
   def delete_organism_icon(organism)
     if organism.can_delete?
-      image_tag_for_key('destroy', organism_path(organism), 'Delete Organism', { confirm: 'Are you sure?', method: :delete }, 'Delete Organism')
+      image_tag_for_key('destroy', organism_path(organism), 'Delete Organism', { data: { confirm: 'Are you sure?' }, method: :delete }, 'Delete Organism')
     else
       explanation = 'Unable to delete an Organism that is associated with other items.'
       html = "<span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' data-tooltip='#{tooltip(explanation)}' >" + image('destroy', alt: 'Delete', class: 'disabled') + ' Delete Organism</span>'

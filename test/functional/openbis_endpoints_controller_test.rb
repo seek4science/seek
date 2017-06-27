@@ -136,7 +136,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       end
     end
     data_file = assigns(:data_file)
-    data_file = DataFile.find(data_file)
+    data_file = DataFile.find(data_file.id)
     assert_redirected_to data_file
     assert_equal '20160210130454955-23', data_file.content_blob.openbis_dataset.perm_id
     assert_equal 'wibble', data_file.license
@@ -273,11 +273,13 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
   test 'fetch spaces' do
     login_as(@project_administrator)
-    post :fetch_spaces, project_id: @project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble'
+    post :fetch_spaces, project_id: @project.id,
+         openbis_endpoint: {
+             as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+             dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+             web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+             username: 'wibble',
+             password: 'wobble' }
     assert_response :success
     assert @response.body.include?('API-SPACE')
 
@@ -310,12 +312,14 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
   test 'test endpoint' do
     login_as(@project_administrator)
-    get :test_endpoint, project_id: @project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble',
-                        format: :json
+    get :test_endpoint, project_id: @project.id,
+        openbis_endpoint: {
+            as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+            dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+            web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+            username: 'wibble',
+            password: 'wobble' },
+        format: :json
     assert_response :success
     assert @response.body.include?('true')
 
@@ -327,12 +331,14 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     login_as(person)
 
     project = person.projects.first
-    get :test_endpoint, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble',
-                        format: :json
+    get :test_endpoint, project_id: project.id,
+        openbis_endpoint: {
+            as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+            dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+            web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+            username: 'wibble',
+            password: 'wobble' },
+        format: :json
     assert_response :redirect
     refute @response.body.include?('true')
 
@@ -417,5 +423,13 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
     assert_response :success
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
+  end
+
+  test 'refresh metadata store' do
+    login_as(@project_administrator)
+    endpoint = Factory(:openbis_endpoint, project: @project)
+    post :refresh_metadata_store, id:endpoint.id,project_id: @project.id
+    assert_response :success
+    assert assigns(:openbis_endpoint)
   end
 end

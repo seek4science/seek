@@ -7,14 +7,14 @@
         <% if sweep.complete?  %>
             <% unless current_user.guest? %>
                 <li>
-                  <%= link_to sweep_path(sweep), :method => :delete, :data => { confirm: 'Are you sure?' } do %>
+                  <%= link_to sweep_path(sweep), :method => :delete, data: { confirm: 'Are you sure?' } do %>
                       <span class="icon"><%= image('destroy') -%>Delete sweep</span>
                   <% end %>
                 </li>
             <% end %>
         <% else %>
             <li>
-              <%= link_to cancel_sweep_path(sweep), :method => :put, :data => { confirm: 'Are you sure?' } do %>
+              <%= link_to cancel_sweep_path(sweep), :method => :put, data: { confirm: 'Are you sure?' } do %>
                   <span class="icon"><%= image('destroy') -%>Cancel sweep</span>
               <% end %>
             </li>

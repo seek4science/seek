@@ -1,1 +1,2 @@
-<%= link_to "cancel signing up",cancel_registration_users_path,:method => :post,:confirm=>"This will cancel the registration process. Are you sure?" %>
+<%= link_to "cancel signing up",cancel_registration_users_path,:method => :post,
+            data: { confirm: 'This will cancel the registration process. Are you sure?' }%>

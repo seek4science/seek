@@ -1,20 +1,14 @@
 module Seek
   module UploadHandling
     module ParameterHandling
+      include Seek::UrlValidation
+
       def asset_params
-        params[controller_name.downcase.singularize.to_sym]
+        params.require(controller_name.downcase.singularize.to_sym)
       end
 
-      def content_blob_params
-        params[:content_blobs]
-      end
-
-      def clean_params
-        if asset_params
-          %w(data_url data make_local_copy).each do |key|
-            asset_params.delete(key)
-          end
-        end
+      def content_blobs_params
+        params.require(:content_blobs)
       end
 
       def retained_content_blob_ids
@@ -39,8 +33,9 @@ module Seek
       end
 
       def check_for_valid_uri_if_present(blob_params)
+        blob_params[:data_url].strip!
         data_url_param = blob_params[:data_url]
-        if !data_url_param.blank? && !valid_uri?(data_url_param)
+        if !data_url_param.blank? && !valid_url?(data_url_param)
           flash.now[:error] = "The URL '#{data_url_param}' is not valid"
           false
         else

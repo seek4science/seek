@@ -18,7 +18,7 @@ class ExperimentalConditionsController < ApplicationController
   end
 
   def create
-    @experimental_condition=ExperimentalCondition.new(params[:experimental_condition])
+    @experimental_condition=ExperimentalCondition.new(experimental_condition_params)
     @experimental_condition.sop=@sop
     @experimental_condition.sop_version = params[:version]
     substances = find_or_new_substances(params[:substance_list])
@@ -48,7 +48,7 @@ class ExperimentalConditionsController < ApplicationController
     new_experimental_conditions = []
     #retrieve the selected FSes
     params.each do |key, value|
-       if key.match('checkbox_')
+       if key =~ /checkbox_/
          experimental_condition_ids.push value.to_i
        end
     end
@@ -113,19 +113,24 @@ class ExperimentalConditionsController < ApplicationController
 
       update_annotations(params[:annotation][:value], @experimental_condition, 'description') if try_block{!params[:annotation][:value].blank?}
 
-      render :update do |page|
-        if  @experimental_condition.update_attributes(params[:experimental_condition])
+      if @experimental_condition.update_attributes(experimental_condition_params)
+        render :update do |page|
           page.visual_effect :fade,"edit_condition_or_factor_#{@experimental_condition.id}_form"
           page.call "autocompleters['#{@experimental_condition.id}_substance_autocompleter'].deleteAllTokens"
           page.replace "condition_or_factor_row_#{@experimental_condition.id}", :partial => 'studied_factors/condition_or_factor_row', :object => @experimental_condition, :locals=>{:asset => 'sop', :show_delete=>true}
-        else
+        end
+      else
+        render :update do |page|
           page.alert(@experimental_condition.errors.full_messages)
         end
       end
   end
 
-
   private
+
+  def experimental_condition_params
+    params.require(:experimental_condition).permit(:measured_item_id, :unit_id, :start_value)
+  end
 
   def find_and_auth_sop
     begin

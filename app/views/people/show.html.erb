@@ -11,6 +11,7 @@
 
     <div class="row">
       <div class="col-md-6">
+        <%= persistent_resource_id(@person) %>
         <p>
           <% locations = @person.locations -%>
           <% unless locations.empty? -%>
@@ -41,10 +42,6 @@
               <span class='none_text'>Only shown to you and administrators</span>
             </p>
 
-            <p>
-              <b>Seek ID: </b>
-              <%= @person.id %>
-            </p>
             <% if !@person.user.nil? && @person.user.login %>
                 <p>
                   <b>Login name:</b>

@@ -5,8 +5,7 @@ module VlnRelatedItemsHelper
     resource_hash = {}
     all_related_items_hash = collect_related_items(resource)
     all_related_items_hash.each_key do |resource_type|
-      all_related_items_hash[resource_type][:items].uniq!
-      all_related_items_hash[resource_type][:items].compact!
+      all_related_items_hash[resource_type][:items] = all_related_items_hash[resource_type][:items].uniq.compact
       unless all_related_items_hash[resource_type][:items].empty?
         resource_hash[resource_type] = all_related_items_hash[resource_type][:items]
       end

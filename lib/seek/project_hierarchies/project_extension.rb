@@ -21,13 +21,14 @@ module Seek
           include ActsAsCachedTree
           after_update :touch_for_hierarchy_updates
           # add institution to ancestor projects
-          after_add_for_institutions << :create_ancestor_workgroups
-          after_add_for_ancestors << :add_project_subscriptions_for_subscriber
-          after_remove_for_ancestors << :remove_project_subscriptions_for_subscriber
+          after_add_for_institutions << proc { |c, project, institution| project.create_ancestor_workgroups(institution) }
+          after_add_for_ancestors << proc { |c, project, ancestor| project.add_project_subscriptions_for_subscriber(ancestor) }
+          after_remove_for_ancestors << proc { |c, project, ancestor| project.remove_project_subscriptions_for_subscriber(ancestor) }
 
           def touch_for_hierarchy_updates
             if changed_attributes.include? :parent_id
-              Permission.find_by_contributor_type('Project', conditions: { contributor_id: ([id] + ancestors.map(&:id) + descendants.map(&:id)) }).each(&:touch)
+              Permission.where(contributor_type: 'Project',
+                               contributor_id: ([id] + ancestors.map(&:id) + descendants.map(&:id))).each(&:touch)
               ancestors.each(&:touch)
               descendants.each(&:touch)
             end

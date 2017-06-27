@@ -68,6 +68,7 @@ class HelpDocumentsControllerTest < ActionController::TestCase
       end
 
       assert_redirected_to help_document_path(assigns(:help_document))
+      assert_equal 'test', assigns(:help_document).identifier
     end
   end
 
@@ -208,9 +209,12 @@ class HelpDocumentsControllerTest < ActionController::TestCase
 
   test "can't change identifier for internal help" do
     with_config_value :internal_help_enabled, true do
-      assert_no_difference('help_documents(:one).identifier.hash') do
-        put :update, id: help_documents(:one).to_param, help_document: { identifier: 'fish' }
-      end
+      doc = help_documents(:one)
+
+      put :update, id: doc.to_param, help_document: { title: 'hi', identifier: 'fish' }
+
+      assert_equal 'hi', assigns(:help_document).title
+      assert_not_equal 'fish', assigns(:help_document).identifier
     end
   end
 

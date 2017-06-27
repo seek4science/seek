@@ -28,7 +28,7 @@ class AvatarsController < ApplicationController
       file_specified = true
       
       # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
-      @avatar = Avatar.new(params[:avatar])
+      @avatar = Avatar.new(avatar_params)
       @avatar.owner_type = params[:owner_type]
       @avatar.owner_id = params[:owner_id]
       @avatar.original_filename = (params[:avatar][:image_file]).original_filename
@@ -166,6 +166,10 @@ class AvatarsController < ApplicationController
   
   
   private
+
+  def avatar_params
+    params.require(:avatar).permit(:image_file)
+  end
   
   def check_owner_specified
     @avatar_for, @avatar_for_id = determine_avatar_owner

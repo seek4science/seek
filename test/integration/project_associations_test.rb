@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ProjectAssociationsTest < ActionController::IntegrationTest
+class ProjectAssociationsTest < ActionDispatch::IntegrationTest
   ASSETS_WITH_MULTIPLE_PROJECTS = %w(data_files events investigations models publications sops presentations samples publications)
   def setup
     User.current_user = Factory(:user, login: 'test')

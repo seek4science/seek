@@ -1,5 +1,4 @@
 require 'rest-client'
-require 'http_streamer'
 
 module Seek
   module DownloadHandling
@@ -17,7 +16,7 @@ module Seek
         content_type = nil
         content_length = nil
         begin
-          response = RestClient.head(url)
+          response = RestClient.head(url, accept: '*/*')
           if is_slideshare_url?
             content_type = 'text/html'
           else

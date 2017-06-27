@@ -1,4 +1,4 @@
-FROM ruby:2.1
+FROM ruby:2.2
 
 MAINTAINER Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall
 
@@ -10,7 +10,7 @@ RUN apt-get update -qq && \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
 		libxslt1-dev mysql-client nginx nodejs openjdk-7-jdk poppler-utils \
-		postgresql-client ruby2.1-dev sqlite3 && \
+		postgresql-client sqlite3 links telnet && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -60,6 +60,6 @@ USER www-data
 EXPOSE 3000
 
 # Shared
-VOLUME ["/seek/filestore", "/seek/sqlite3-db", "/seek/tmp/cache]
+VOLUME ["/seek/filestore", "/seek/sqlite3-db", "/seek/tmp/cache"]
 
 CMD ["docker/entrypoint.sh"]

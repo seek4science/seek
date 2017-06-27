@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class RdfTripleStoreTest < ActionController::IntegrationTest
+class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   def setup
     @repository = Seek::Rdf::RdfRepository.instance
     @project = Factory(:project, title: 'Test for RDF storage')

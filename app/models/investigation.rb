@@ -1,8 +1,4 @@
-require 'seek/research_objects/acts_as_snapshottable'
-require 'datacite/acts_as_doi_mintable'
-
 class Investigation < ActiveRecord::Base
-
   include Seek::Rdf::RdfGeneration
 
   acts_as_isa
@@ -13,15 +9,15 @@ class Investigation < ActiveRecord::Base
 
   has_many :studies
 
-  has_many :assays,:through=>:studies
+  has_many :assays, through: :studies
 
-  validates :projects,:presence => true
+  validates :projects, presence: true
 
-  def state_allows_delete? *args
+  def state_allows_delete?(*args)
     studies.empty? && super
   end
 
-  ["data_file","sop","model","publication"].each do |type|
+  %w[data_file sop model publication].each do |type|
     eval <<-END_EVAL
       def related_#{type}s
         studies.collect{|study| study.send(:related_#{type}s)}.flatten.uniq
@@ -38,15 +34,14 @@ class Investigation < ActiveRecord::Base
   end
 
   def clone_with_associations
-    new_object= self.dup
-    new_object.policy = self.policy.deep_copy
-    new_object.project_ids= self.project_ids
-    return new_object
+    new_object = dup
+    new_object.policy = policy.deep_copy
+    new_object.project_ids = project_ids
+    new_object
   end
 
-  #includes publications directly related, plus those related to associated assays
+  # includes publications directly related, plus those related to associated assays
   def related_publications
-    studies.collect{|s| s.related_publications}.flatten.uniq | publications
+    studies.collect(&:related_publications).flatten.uniq | publications
   end
-
 end

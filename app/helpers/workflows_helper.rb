@@ -25,4 +25,13 @@ module WorkflowsHelper
 
     link_to name, workflows_path(merge_workflow_filters(params, key, value)), class: (is_active ? 'active' : '')
   end
+
+  def share_workflow_icon
+    icon = image_tag_for_key('share').html_safe
+    html = link_to_remote_redbox(icon + 'Share workflow'.html_safe,
+                                 url: url_for(action: 'temp_link'),
+                                 failure: "alert('Sorry, an error has occurred.'); RedBox.close();"
+    )
+    html.html_safe
+  end
 end

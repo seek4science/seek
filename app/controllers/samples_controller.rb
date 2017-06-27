@@ -92,9 +92,15 @@ class SamplesController < ApplicationController
 
   private
 
+  def sample_params(sample_type)
+    sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:hash_key).collect(&:to_sym) | sample_type.sample_attributes.map(&:method_name).collect(&:to_sym) : []
+    params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] }, { data: sample_type_param_keys },
+                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] }, sample_type_param_keys)
+  end
+
   def update_sample_with_params
-    @sample.update_attributes(params[:sample])
-    update_sharing_policies @sample, params
+    @sample.update_attributes(sample_params(@sample.sample_type))
+    update_sharing_policies @sample
     update_annotations(params[:tag_list], @sample)
     update_relationships(@sample, params)
   end
@@ -110,10 +116,10 @@ class SamplesController < ApplicationController
         end
       end
 
-      @samples = Sample.authorize_asset_collection(@data_file.extracted_samples.includes(sample_type: :sample_attributes).all, 'view')
+      @samples = Sample.authorize_asset_collection(@data_file.extracted_samples.includes(sample_type: :sample_attributes), 'view')
     elsif params[:sample_type_id]
       @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
-      @samples = Sample.authorize_asset_collection(@sample_type.samples.all, 'view')
+      @samples = Sample.authorize_asset_collection(@sample_type.samples, 'view')
     else
       find_assets
     end

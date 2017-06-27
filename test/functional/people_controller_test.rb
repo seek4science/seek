@@ -18,7 +18,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK People.*/, count: 1
+    assert_select 'title', text: 'People', count: 1
   end
 
   def test_xml_for_person_with_tools_and_expertise
@@ -133,7 +133,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div#errorExplanation' do
-      assert_select 'ul > li', text: 'Email can&#x27;t be blank'
+      assert_select 'ul > li', text: "Email can't be blank"
     end
     assert_select 'form#new_person' do
       assert_select 'input#person_first_name[value=?]', 'test'
@@ -241,18 +241,18 @@ class PeopleControllerTest < ActionController::TestCase
     p = Factory(:person)
     assert p.notifiee_info.receive_notifications?, 'should receive notifications by default in fixtures'
 
-    put :update, id: p.id, person: { id: p.id }
+    put :update, id: p.id, person: { description: p.description }
     assert !Person.find(p.id).notifiee_info.receive_notifications?
 
-    put :update, id: p.id, person: { id: p.id }, receive_notifications: true
+    put :update, id: p.id, person: { description: p.description }, receive_notifications: true
     assert Person.find(p.id).notifiee_info.receive_notifications?
   end
 
-  test 'admin cannot set roles_mask' do
+  test 'non-admin cannot set roles_mask' do
     login_as(Factory(:admin))
     p = Factory(:person)
     assert !p.is_admin?
-    put :administer_update, id: p.id, person: { id: p.id, roles_mask: mask_for_admin }
+    put :administer_update, id: p.id, person: { work_group_ids: p.work_group_ids, roles_mask: mask_for_admin }
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     refute assigns(:person).is_admin?
@@ -264,7 +264,7 @@ class PeopleControllerTest < ActionController::TestCase
     person = Factory(:person)
     person.add_to_project_and_institution(p.projects.first, p.institutions.first)
     refute person.is_admin?
-    put :administer_update, id: person.id, person: { id: person.id, roles_mask: mask_for_admin }
+    put :administer_update, id: person.id, person: { work_group_ids: p.work_group_ids, roles_mask: mask_for_admin }
     assert_redirected_to person_path(person)
     assert_nil flash[:error]
     refute assigns(:person).is_admin?
@@ -276,7 +276,7 @@ class PeopleControllerTest < ActionController::TestCase
     project2 = p.projects[1]
     project3 = p.projects[2]
     assert !p.is_pal_of_any_project?
-    put :administer_update, id: p.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [project.id, project2.id] }
+    put :administer_update, id: p.id, person: { work_group_ids: p.work_group_ids }, roles: { pal: [project.id, project2.id] }
     assert_redirected_to person_path(p)
     assert_nil flash[:error]
     p.reload
@@ -289,7 +289,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p = Factory(:person)
     assert !p.is_pal?(p.projects.first)
-    put :administer_update, id: p.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [p.projects.first.id] }
+    put :administer_update, id: p.id, person: { work_group_ids: p.work_group_ids }, roles: { pal: [p.projects.first.id] }
     p.reload
     assert !p.is_pal?(p.projects.first)
   end
@@ -299,7 +299,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(me)
 
     assert !me.is_pal?(me.projects.first)
-    put :administer_update, id: me.id, person: { email: 'ssfdsd@sdfsdf.com' }, roles: { pal: [me.projects.first.id] }
+    put :administer_update, id: me.id, person: { work_group_ids: me.work_group_ids }, roles: { pal: [me.projects.first.id] }
     me.reload
     assert !me.is_pal?(me.projects.first)
   end
@@ -308,7 +308,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     p = people(:aaron_person)
     assert !p.is_admin?
-    put :administer_update, id: p.id, person: { id: p.id, roles_mask: mask_for_admin, email: 'ssfdsd@sdfsdf.com' }
+    put :administer_update, id: p.id, person: { roles_mask: mask_for_admin, work_group_ids: p.work_group_ids }
     p.reload
     assert !p.is_admin?
   end
@@ -318,18 +318,6 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:fred)
     get :edit, id: people(:fred)
     assert_response :success
-  end
-
-  def test_current_user_shows_seek_id
-    login_as(:quentin)
-    get :show, id: people(:quentin_person)
-    assert_select '.box_about_actor p', text: /Seek ID: /m
-    assert_select '.box_about_actor p', text: /Seek ID: .*#{people(:quentin_person).id}/m, count: 1
-  end
-
-  def test_not_current_user_doesnt_show_seek_id
-    get :show, id: people(:aaron_person)
-    assert_select '.box_about_actor p', text: /Seek ID :/, count: 0
   end
 
   def test_current_user_shows_login_name
@@ -358,7 +346,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_should_update_person
-    put :update, id: people(:quentin_person), person: {}
+    put :update, id: people(:quentin_person), person: { description: 'a' }
     assert_redirected_to person_path(assigns(:person))
   end
 
@@ -382,7 +370,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_should_add_nofollow_to_links_in_show_page
     get :show, id: people(:person_with_links_in_description)
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
     end
   end
 
@@ -426,14 +414,14 @@ class PeopleControllerTest < ActionController::TestCase
       Factory(:permission, contributor: person, access_type: rand(5))
       i += 1
     end
-    permissions = Permission.find(:all, conditions: ['contributor_type =? and contributor_id=?', 'Person', person.try(:id)])
+    permissions = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
     assert_equal 10, permissions.count
 
     assert_difference('Person.count', -1) do
       delete :destroy, id: person
     end
 
-    permissions = Permission.find(:all, conditions: ['contributor_type =? and contributor_id=?', 'Person', person.try(:id)])
+    permissions = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
     assert_equal 0, permissions.count
   end
 
@@ -457,7 +445,7 @@ class PeopleControllerTest < ActionController::TestCase
       delete :destroy, id: person
     end
 
-    permissions_on_person = Permission.find(:all, conditions: ['contributor_type =? and contributor_id=?', 'Person', person.try(:id)])
+    permissions_on_person = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
     assert_equal 0, permissions_on_person.count
 
     permissions = data_file.policy.permissions
@@ -489,7 +477,7 @@ class PeopleControllerTest < ActionController::TestCase
       delete :destroy, id: person
     end
 
-    permissions_on_person = Permission.find(:all, conditions: ['contributor_type =? and contributor_id=?', 'Person', person.try(:id)])
+    permissions_on_person = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
     assert_equal 0, permissions_on_person.count
 
     permissions = data_file.policy.permissions
@@ -537,7 +525,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil person
     assert person.is_pal?(project)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: { project_administrator: [project.id] }
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids }, roles: { project_administrator: [project.id] }
 
     person = assigns(:person)
     person.reload
@@ -553,7 +541,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert !person.is_asset_housekeeper?(proj1)
     assert !person.is_project_administrator?(proj2)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: { project_administrator: [proj2.id], asset_housekeeper: [proj1.id] }
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids }, roles: { project_administrator: [proj2.id], asset_housekeeper: [proj1.id] }
 
     person = assigns(:person)
     assert person.is_asset_housekeeper?(proj1)
@@ -566,7 +554,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert person.is_asset_housekeeper?(project)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: {}
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids }, roles: {}
 
     person = assigns(:person)
     assert !person.is_asset_housekeeper?(project)
@@ -578,7 +566,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert !person.is_asset_housekeeper?(project)
 
-    put :administer_update, id: person.id, person: { id: person.id }, roles: { asset_housekeeper: [project.id] }
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids }, roles: { asset_housekeeper: [project.id] }
 
     person = assigns(:person)
     assert !person.is_asset_housekeeper?(project)
@@ -593,7 +581,8 @@ class PeopleControllerTest < ActionController::TestCase
     project = person.projects.first
     assert_not_nil project
 
-    put :administer_update, id: person.id, person: {}, roles: { project_administrator: [project.id] }
+    put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids },
+        roles: { project_administrator: [project.id] }
 
     person = assigns(:person)
 
@@ -698,7 +687,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have asset housekeeper icon on person show page' do
     asset_housekeeper = Factory(:asset_housekeeper)
     get :show, id: asset_housekeeper
-    assert_select 'img[src*=?]', /#{role_image(:asset_housekeeper)}/, count: 1
+    assert_select 'img[src*=?]', role_image(:asset_housekeeper), count: 1
   end
 
   test 'should have asset housekeeper icon on people index page' do
@@ -707,13 +696,13 @@ class PeopleControllerTest < ActionController::TestCase
     end
     get :index
     asset_housekeeper_number = assigns(:people).count(&:is_asset_housekeeper_of_any_project?)
-    assert_select 'img[src*=?]', /#{role_image(:asset_housekeeper)}/, count: asset_housekeeper_number
+    assert_select 'img[src*=?]', role_image(:asset_housekeeper), count: asset_housekeeper_number
   end
 
   test 'should have project administrator icon on person show page' do
     project_administrator = Factory(:project_administrator)
     get :show, id: project_administrator
-    assert_select 'img[src*=?]', /#{role_image(:project_administrator)}/, count: 1
+    assert_select 'img[src*=?]', role_image(:project_administrator), count: 1
   end
 
   test 'should have project administrator icon on people index page' do
@@ -724,7 +713,7 @@ class PeopleControllerTest < ActionController::TestCase
     get :index
 
     project_administrator_count = assigns(:people).count(&:is_project_administrator_of_any_project?)
-    assert_select 'img[src*=?]', /#{role_image(:project_administrator)}/, count: project_administrator_count
+    assert_select 'img[src*=?]', role_image(:project_administrator), count: project_administrator_count
   end
 
   test 'project administrator can only see projects he can manage to assign to person' do
@@ -790,8 +779,8 @@ class PeopleControllerTest < ActionController::TestCase
     put :administer_update, id: person.id, person: { work_group_ids: [project_admin_wg.id, existing_wg.id] }
     assert_redirected_to person_path(assigns(:person))
     person.reload
-    assert_include person.work_groups, project_admin_wg
-    assert_include person.work_groups, existing_wg
+    assert_includes person.work_groups, project_admin_wg
+    assert_includes person.work_groups, existing_wg
   end
 
   test 'not allow project administrator assign people into their projects they do not administer' do
@@ -985,7 +974,7 @@ class PeopleControllerTest < ActionController::TestCase
   #   assert_response :success
   #
   #   assert !admin.is_asset_gatekeeper?(project)
-  #   put :administer_update, id: admin, person: {}, roles: { asset_gatekeeper: [project.id] }
+  #   put :administer_update, id: admin, person: { description: 'a' }, roles: { asset_gatekeeper: [project.id] }
   #   assert_redirected_to person_path(admin)
   #   assert assigns(:person).is_asset_gatekeeper?(project)
   #   assert assigns(:person).is_admin?
@@ -1001,7 +990,8 @@ class PeopleControllerTest < ActionController::TestCase
     refute person.is_project_administrator?(project)
     refute person.is_asset_gatekeeper?(project)
 
-    put :administer_update, id: person, person: {}, roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
+        roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
     assert_redirected_to person_path(person)
     assert assigns(:person).is_asset_gatekeeper?(project)
     assert assigns(:person).is_project_administrator?(project)
@@ -1018,7 +1008,8 @@ class PeopleControllerTest < ActionController::TestCase
     refute person.is_project_administrator?(project)
     refute person.is_asset_gatekeeper?(project)
 
-    put :administer_update, id: person, person: {}, roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
+        roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
     assert_redirected_to person_path(person)
 
     refute assigns(:person).is_asset_gatekeeper?(project)
@@ -1042,7 +1033,10 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_project_administrator?(project)
     refute person.is_project_administrator?(managed_project)
 
-    put :administer_update, id: person, person: {}, roles: { project_administrator: [managed_project.id] }
+    person.reload
+
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
+        roles: { project_administrator: [managed_project.id] }
     assert_redirected_to person_path(person)
 
     assert assigns(:person).is_admin?
@@ -1062,7 +1056,8 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_programme_administrator?(prog)
     refute person.is_project_administrator?(proj)
 
-    put :administer_update, id: person, person: {}, roles: { project_administrator: [proj.id] }
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
+        roles: { project_administrator: [proj.id] }
     assert_redirected_to person_path(person)
 
     assert assigns(:person).is_admin?
@@ -1079,7 +1074,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.save!
     refute person.is_admin?
 
-    put :administer_update, id: person, person: {}, roles: { admin: [] }
+    put :administer_update, id: person, person: { work_group_ids: person.work_group_ids }, roles: { admin: [] }
     assert_redirected_to person_path(person)
     refute assigns(:person).is_admin?
   end
@@ -1123,7 +1118,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to :root
     assert_not_nil flash[:error]
 
-    get :administer_update, id: people(:fred), person: {}
+    get :administer_update, id: people(:fred), person: { description: 'a' }
     assert_redirected_to :root
     assert_not_nil flash[:error]
   end
@@ -1162,7 +1157,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have gatekeeper icon on person show page' do
     gatekeeper = Factory(:asset_gatekeeper)
     get :show, id: gatekeeper
-    assert_select 'img[src*=?]', /#{role_image(:asset_gatekeeper)}/, count: 1
+    assert_select 'img[src*=?]', role_image(:asset_gatekeeper), count: 1
   end
 
   test 'should have gatekeeper icon on people index page' do
@@ -1171,7 +1166,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
     get :index
     gatekeeper_number = assigns(:people).count(&:is_asset_gatekeeper_of_any_project?)
-    assert_select 'img[src*=?]', /#{role_image(:asset_gatekeeper)}/, count: gatekeeper_number
+    assert_select 'img[src*=?]', role_image(:asset_gatekeeper), count: gatekeeper_number
   end
 
   test 'unsubscribe to a project should unsubscribe all the items of that project' do
@@ -1714,6 +1709,41 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#resource-count-stats', count: 0
   end
+
+  test 'autocomplete' do
+    Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Johnson')
+    Factory(:brand_new_person, first_name: 'Xavier', last_name: 'Bohnson')
+    Factory(:brand_new_person, first_name: 'Charles', last_name: 'Bohnson')
+    Factory(:brand_new_person, first_name: 'Jon Bon', last_name: 'Jovi')
+    Factory(:brand_new_person, first_name: 'Jon', last_name: 'Bon Jovi')
+
+    get :typeahead, format: :json, query: 'xav'
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_equal 2, res.length
+    assert_includes res.map { |r| r['name'] }, 'Xavier Johnson'
+    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+
+    get :typeahead, format: :json, query: 'bohn'
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_equal 2, res.length
+    assert_includes res.map { |r| r['name'] }, 'Charles Bohnson'
+    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+
+    get :typeahead, format: :json, query: 'xavier bohn'
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_equal 1, res.length
+    assert_includes res.map { |r| r['name'] }, 'Xavier Bohnson'
+
+    get :typeahead, format: :json, query: 'jon bon'
+    assert_response :success
+    res = JSON.parse(response.body)
+    assert_equal 2, res.length
+    assert_equal res.map { |r| r['name'] }.uniq, ['Jon Bon Jovi']
+  end
+
 
   def mask_for_admin
     Seek::Roles::Roles.instance.mask_for_role('admin')

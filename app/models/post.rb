@@ -12,7 +12,7 @@ class Post < ActiveRecord::Base
   after_destroy :update_cached_fields
 
   validates_presence_of :user_id, :body, :topic
-  attr_accessible :body	
+  # attr_accessible :body
 	
   def editable_by?(user)
     user && (user.id == user_id || user.admin? || user.moderator_of?(forum_id))
@@ -27,7 +27,7 @@ class Post < ActiveRecord::Base
   protected
     # using count isn't ideal but it gives us correct caches each time
     def update_cached_fields
-      Forum.update_all ['posts_count = ?', Post.count(:id, :conditions => {:forum_id => forum_id})], ['id = ?', forum_id]
+      Forum.where(id: forum_id).update_all(posts_count: Post.where(forum_id: forum_id).count)
       User.update_posts_count(user_id)
       topic.update_cached_post_fields(self)
     end

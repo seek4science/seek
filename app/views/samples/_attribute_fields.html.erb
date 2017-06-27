@@ -1,5 +1,5 @@
 <% sample_type.sample_attributes.each do |attribute| %>
-    <div class="form-group <%= 'date-select' if ['Date','DateTime'].include?(attribute.sample_attribute_type.base_type) %>">
+    <div class="form-group">
       <label><%= sample_attribute_title_and_unit(attribute) %></label><%= required_span if attribute.required? %>
       <%= sample_form_field_for_attribute(attribute) %>
     </div>

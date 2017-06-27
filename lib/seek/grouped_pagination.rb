@@ -76,13 +76,6 @@ module Seek
     end
 
     module SingletonMethods
-      def merge_optional_conditions(optional_conditions, page)
-        conditions = []
-        conditions << ["#{@field} = ?", page]
-        conditions << optional_conditions if optional_conditions
-        conditions = merge_conditions(*conditions)
-        conditions
-      end
 
       def paginate(*args)
         options = args.pop unless args.nil?
@@ -99,18 +92,16 @@ module Seek
         elsif page == 'latest'
           records = unscoped.order('updated_at DESC').limit(@latest_limit)
         elsif @pages.include?(page)
-          conditions = merge_optional_conditions(options[:conditions], page)
-          query_options = { conditions: conditions }
+          query_options = { conditions: options[:conditions] }
           query_options.merge!(options.except(:conditions, :page, :default_page))
-          records = unscoped.where(query_options[:conditions]).order(query_options[:order])
+          records = unscoped.where("#{@field}" => page).where(query_options[:conditions]).order(query_options[:order])
         end
 
         page_totals = {}
         @pages.each do |p|
-          conditions = merge_optional_conditions(options[:conditions], p)
-          query_options = [conditions: conditions]
+          query_options = [conditions: options[:conditions]]
           query_options[0].merge!(options.except(:conditions, :page, :default_page))
-          page_totals[p] = count(*query_options)
+          page_totals[p] = where("#{@field}" => p).where(query_options[0][:conditions]).count
         end
 
         result = Collection.new(records, page, @pages, page_totals)
@@ -127,20 +118,6 @@ module Seek
         result
       end
 
-      private
-
-      def merge_conditions(*conditions)
-        segments = []
-
-        conditions.each do |condition|
-          unless condition.blank?
-            sql = sanitize_sql(condition)
-            segments << sql unless sql.blank?
-          end
-        end
-
-        "(#{segments.join(') AND (')})" unless segments.empty?
-      end
     end
 
     module InstanceMethods

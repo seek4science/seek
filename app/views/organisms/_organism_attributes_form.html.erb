@@ -14,7 +14,7 @@
           <%= f.text_field :concept_uri, :class => "form-control" -%>
         </div>
 
-        <%= f.submit @organism.id ? "Update" : "Create", :disable_with => @organism.id ? "Updating..." : "Creating...",
+        <%= f.submit @organism.id ? "Update" : "Create", data: { disable_with: @organism.id ? "Updating..." : "Creating..." },
                      :class => 'btn btn-primary' -%>
     <% end %>
 <% end %>

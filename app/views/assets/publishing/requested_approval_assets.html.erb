@@ -83,7 +83,7 @@
         <% end %>
 
         <p>
-          <%= submit_tag "Submit", :disable_with => "Submitting ...", :class => 'btn btn-primary' -%>
+          <%= submit_tag "Submit", data: { disable_with: 'Submitting ...' }, :class => 'btn btn-primary' -%>
           or
           <%= cancel_button(person_path(params[:id].to_i)) -%>
         </p>

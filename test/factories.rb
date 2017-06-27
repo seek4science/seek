@@ -136,7 +136,7 @@ end
 # Institution
 Factory.define(:institution) do |f|
   f.sequence(:title) { |n| "An Institution: #{n}" }
-  f.country { ActionView::Helpers::FormOptionsHelper::COUNTRIES.sample }
+  f.country { ISO3166::Country.all.sample.name }
 end
 
 # Sop
@@ -189,10 +189,12 @@ end
 
 Factory.define(:all_sysmo_viewable_policy, parent: :policy) do |f|
   f.access_type Policy::VISIBLE
+  f.sharing_scope Policy::ALL_USERS
 end
 
 Factory.define(:all_sysmo_downloadable_policy, parent: :policy) do |f|
   f.access_type Policy::ACCESSIBLE
+  f.sharing_scope Policy::ALL_USERS
 end
 
 Factory.define(:publicly_viewable_policy, parent: :policy) do |f|
@@ -352,6 +354,11 @@ end
 
 Factory.define(:strain_sample_data_file, parent: :data_file) do |f|
   f.association :content_blob, factory: :strain_sample_data_content_blob
+end
+
+Factory.define(:jerm_data_file, parent: :data_file) do |f|
+  f.contributor nil
+  f.association :content_blob, factory: :url_content_blob
 end
 
 # Model
@@ -1303,8 +1310,10 @@ end
 
 Factory.define(:apples_controlled_vocab_attribute, parent: :sample_attribute) do |f|
   f.sequence(:title) { |n| "apples controlled vocab attribute #{n}" }
-  f.sample_controlled_vocab Factory.build(:apples_sample_controlled_vocab)
-  f.sample_attribute_type Factory(:controlled_vocab_attribute_type)
+  f.after_build do |type|
+    type.sample_controlled_vocab=Factory.build(:apples_sample_controlled_vocab)
+    type.sample_attribute_type=Factory(:controlled_vocab_attribute_type)
+  end
 end
 
 Factory.define(:apples_controlled_vocab_sample_type, parent: :sample_type) do |f|

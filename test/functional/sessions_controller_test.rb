@@ -63,7 +63,7 @@ class SessionsControllerTest < ActionController::TestCase
 
   def test_title
     get :new
-    assert_select 'title', text: /The Sysmo SEEK.*/, count: 1
+    assert_select 'title', text: 'Login', count: 1
   end
 
   def test_should_login_and_redirect
@@ -101,7 +101,7 @@ class SessionsControllerTest < ActionController::TestCase
     login_as :quentin
     @request.env['HTTP_REFERER'] = '/data_files'
     get :destroy
-    assert_equal @response.cookies['auth_token'], nil
+    assert_nil @response.cookies['auth_token']
   end
 
   def test_should_login_with_cookie
@@ -174,7 +174,7 @@ class SessionsControllerTest < ActionController::TestCase
     assert !Seek::Config.omniauth_enabled
     get :new
     assert_response :success
-    assert_select 'title', text: /The.*SEEK Login/, count: 1
+    assert_select 'title', text: 'Login', count: 1
     assert_select '#login-panel form', 1
   end
 

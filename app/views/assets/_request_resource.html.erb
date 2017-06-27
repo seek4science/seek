@@ -21,7 +21,7 @@ resource_type = text_for_resource(resource)
             <p>
 
               <%=  text_area_tag :details,'',:cols=>80,:rows=>10 -%>
-              <%= submit_tag 'Send',:confirm=>"An email will be delivered with your request to #{join_with_and(resource.managers.collect{|m| h(m.name)})}. Are you sure?" -%>
+              <%= submit_tag 'Send', data: { confirm: "An email will be delivered with your request to #{join_with_and(resource.managers.collect{|m| h(m.name)})}. Are you sure?" } -%>
 
             </p>
             <% end -%>

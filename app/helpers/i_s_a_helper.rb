@@ -153,20 +153,19 @@ module ISAHelper
   end
 
   def tree_json(hash)
+    objects = hash[:nodes].map(&:object)
+    real_edges = hash[:edges].select { |e| objects.include?(e[0]) }
+
     roots = hash[:nodes].select do |n|
-      hash[:edges].none? { |_parent, child| child == n.object }
+      real_edges.none? { |_parent, child| child == n.object }
     end
 
     nodes = roots.map { |root| tree_node(hash, root.object) }.flatten
 
-    nodes += (hash[:edges].map do |edge|
-      tree_node(hash, edge[1], node_id(edge[0]))
-    end).flatten
-
     nodes.to_json
   end
 
-  def tree_node(hash, object, parent_id = '#')
+  def tree_node(hash, object)
     child_edges = hash[:edges].select do |parent, _child|
       parent == object
     end
@@ -174,11 +173,11 @@ module ISAHelper
     node = hash[:nodes].detect { |n| n.object == object }
 
     entry = {
-      id: node_id(object),
-      parent: parent_id,
-      data: { loadable: false }
+      id: unique_node_id(object),
+      data: { loadable: false },
+      li_attr: { 'data-node-id' => node_id(object) },
+      children: []
     }
-    entries = [entry]
 
     if node.can_view?
       entry[:text] = object.title
@@ -190,11 +189,12 @@ module ISAHelper
 
     if node.child_count > 0
       if node.child_count > child_edges.count
-        entries << {
-          id: child_count_id(object),
+        entry[:children] << {
+          id: unique_child_count_id(object),
           parent: entry[:id],
           text: "Show #{node.child_count - child_edges.count} more",
           a_attr: { class: 'child-count-leaf' },
+          li_attr: { 'data-node-id' => child_count_id(object) },
           data: { child_count: true }
         }
       end
@@ -204,7 +204,9 @@ module ISAHelper
       entry[:state] = { opened: false }
     end
 
-    entries
+    entry[:children] += child_edges.map { |c| tree_node(hash, c[1]) }
+
+    entry
   end
 
   def aggregate_hidden_nodes(elements)
@@ -238,11 +240,19 @@ module ISAHelper
     "#{object.class.name}-#{object.id}"
   end
 
+  def unique_node_id(object)
+    "#{node_id(object)}-#{rand(2**32).to_s(36)}"
+  end
+
   def edge_id(source, target)
     "#{node_id(source)}-#{node_id(target)}"
   end
 
   def child_count_id(object)
     "#{node_id(object)}-child-count"
+  end
+
+  def unique_child_count_id(object)
+    "#{child_count_id(object)}-#{rand(2**32).to_s(36)}"
   end
 end

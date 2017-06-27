@@ -3,7 +3,7 @@ require 'test_helper'
 class SopsAnnotationTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include SharingFormTestHelper
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   fixtures :all
 
@@ -81,7 +81,7 @@ class SopsAnnotationTest < ActionController::TestCase
     sop.reload
     assert_equal %w(apple fish), sop.annotations.collect { |a| a.value.text }.sort
 
-    put :update, id: sop, tag_list: "soup,#{golf.value.text}", sop: {}, sharing: valid_sharing
+    put :update, id: sop, tag_list: "soup,#{golf.value.text}", sop: { title: sop.title }, sharing: valid_sharing
     sop.reload
 
     assert_equal %w(golf soup), sop.annotations.collect { |a| a.value.text }.sort
@@ -110,7 +110,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal ['apple'], sop.annotations.select { |a| a.source == p3.user }.collect { |a| a.value.text }
     assert_equal %w(apple fish golf), sop.annotations.collect { |a| a.value.text }.uniq.sort
 
-    put :update, id: sop, tag_list: "soup,#{golf.value.text}", sop: {}, sharing: valid_sharing
+    put :update, id: sop, tag_list: "soup,#{golf.value.text}", sop: { title: sop.title }, sharing: valid_sharing
     sop.reload
 
     assert_equal ['soup'], sop.annotations.select { |a| a.source == p1.user }.collect { |a| a.value.text }
@@ -142,7 +142,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal %w(fish golf), sop.annotations.select { |a| a.source == p1.user }.collect { |a| a.value.text }.sort
     assert_equal %w(apple golf), sop.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    put :update, id: sop, tag_list: golf.value.text, sop: {}, sharing: valid_sharing
+    put :update, id: sop, tag_list: golf.value.text, sop: { title: sop.title }, sharing: valid_sharing
     sop.reload
 
     assert_equal ['golf'], sop.annotations.select { |a| a.source == p1.user }.collect { |a| a.value.text }.sort
@@ -172,7 +172,7 @@ class SopsAnnotationTest < ActionController::TestCase
     assert_equal %w(fish golf), sop.annotations.select { |a| a.source == p1.user }.collect { |a| a.value.text }.sort
     assert_equal %w(fish soup), sop.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
-    put :update, id: sop, tag_list: "fish,#{golf.value.text}", sop: {}, sharing: valid_sharing
+    put :update, id: sop, tag_list: "fish,#{golf.value.text}", sop: { title: sop.title }, sharing: valid_sharing
 
     sop.reload
 

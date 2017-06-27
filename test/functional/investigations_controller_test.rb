@@ -7,7 +7,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
 
   def setup
     login_as(:quentin)
@@ -19,7 +19,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK #{I18n.t('investigation').pluralize}.*/i, count: 1
+    assert_select 'title', text: I18n.t('investigation').pluralize, count: 1
   end
 
   test 'should show index' do
@@ -69,8 +69,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigations = assigns(:investigations)
     first_investigations = investigations.first
     assert_not_nil first_investigations
-    assert_select 'a[data-favourite-url=?]', h(add_favourites_path(resource_id: first_investigations.id,
-                                                                   resource_type: first_investigations.class.name))
+    assert_select 'a[data-favourite-url=?]', add_favourites_path(resource_id: first_investigations.id,
+                                                                 resource_type: first_investigations.class.name)
   end
 
   test 'should show item' do
@@ -261,7 +261,7 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'should_add_nofollow_to_links_in_show_page' do
     get :show, id: investigations(:investigation_with_links_in_description)
     assert_select 'div#description' do
-      assert_select 'a[rel=nofollow]'
+      assert_select 'a[rel="nofollow"]'
     end
   end
 
@@ -310,7 +310,8 @@ class InvestigationsControllerTest < ActionController::TestCase
     creator = Factory(:person)
     assert investigation.creators.empty?
 
-    put :update, id: investigation.id, creators: [[creator.name, creator.id]].to_json
+    put :update, id: investigation.id, investigation: { title: investigation.title },
+        creators: [[creator.name, creator.id]].to_json
     assert_redirected_to investigation_path(investigation)
 
     assert investigation.creators.include?(creator)

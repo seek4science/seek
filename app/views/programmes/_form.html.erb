@@ -44,5 +44,5 @@
 
 <% end %>
 
-<%= f.submit(programme ? "Update" : "Create",:disable_with=>(programme ? "Updating..." : "Creating..."), :class => 'btn btn-primary') -%>
+<%= f.submit(programme ? "Update" : "Create",data: { disable_with: (programme ? "Updating..." : "Creating...") }, :class => 'btn btn-primary') -%>
  or <%= cancel_button(programme ? programme_path(programme.id) : programmes_path) -%>

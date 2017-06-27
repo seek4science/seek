@@ -1,9 +1,7 @@
-require 'seek/samples/sample_data'
-
 class Sample < ActiveRecord::Base
-  attr_accessible :contributor_id, :contributor_type, :json_metadata,
-                  :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
-                  :other_creators, :data
+  # attr_accessible :contributor_id, :contributor_type, :json_metadata,
+  #                :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
+  #                :other_creators, :data
 
   searchable(auto_index: false) do
     text :attribute_values do
@@ -20,8 +18,9 @@ class Sample < ActiveRecord::Base
   belongs_to :originating_data_file, class_name: 'DataFile'
   has_many :sample_resource_links, dependent: :destroy
   has_many :strains, through: :sample_resource_links, source: :resource, source_type: 'Strain'
+  has_many :organisms, through: :strains
 
-  scope :default_order, order('title')
+  scope :default_order, -> { order('title') }
 
   validates :title, :sample_type, presence: true
   include ActiveModel::Validations

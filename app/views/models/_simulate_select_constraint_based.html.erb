@@ -1,0 +1,48 @@
+
+<div class='row'>
+  <div class="col-md-2">
+    <%= jws_online_logo %>
+  </div>
+  <div class="col-md-10">
+
+    <p>
+      JWS Online needs information about whether the model you are simulating is constraint-based or not.
+      Select the following option to specify that the SBML model should be treated as a stoichiometric model
+      with flux constraints.
+    </p>
+    <p>
+      If unsure, leave the value as it is.
+    </p>
+
+    <form action="<%= simulate_model_path(@model) %>" method="get" id="constraint-form">
+      <div class="form-group">
+        <%= hidden_field_tag :version,@display_model.version %>
+        <%= hidden_field_tag :constraint_based,0 %>
+        <div class="checkbox">
+          <label>
+            <%= check_box_tag(:constraint_based) %>
+            Constraint-based model?
+          </label>
+        </div>
+      </div>
+      <div>
+        <%= submit_tag "Continue", name:nil, id:'submit',:class=>'btn btn-primary' %>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+
+
+<script>
+  // this strange piece of javascript is to ensure that the URL of the resulting simulation contains the correct
+  // parameters to allow the URL to be copied and shared as a direct persistent link to the simulation (including
+  // constraint-based and the version). The javascript removes the hidden field if the value is checked, otherwise
+  // it appears twice, as both 1 and 0
+  $j(document).on('submit','form#constraint-form',function() {
+    if ($j('input[type=checkbox]#constraint_based').prop('checked')) {
+      $j('input[type=hidden]#constraint_based').remove();
+    }
+  })
+</script>

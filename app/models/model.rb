@@ -1,8 +1,3 @@
-require 'acts_as_versioned_resource'
-require 'explicit_versioning'
-require 'title_trimmer'
-require 'datacite/acts_as_doi_mintable'
-
 class Model < ActiveRecord::Base
 
   include Seek::Rdf::RdfGeneration
@@ -25,7 +20,7 @@ class Model < ActiveRecord::Base
 
   include Seek::Dois::DoiGeneration
 
-  scope :default_order, order("title")
+  scope :default_order, -> { order("title") }
 
   include Seek::Models::ModelExtraction
 
@@ -35,7 +30,7 @@ class Model < ActiveRecord::Base
   has_many :model_images
   belongs_to :model_image
 
-  has_many :content_blobs, :as => :asset, :foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
+  has_many :content_blobs, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   belongs_to :organism
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"

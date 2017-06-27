@@ -1,7 +1,7 @@
 <%
-   queue = AuthLookupUpdateQueue.all | ReindexingQueue.all
-   queue = queue.sort_by &:created_at
-   delayed_jobs = Delayed::Job.all(:order=>:created_at)
+   queue = AuthLookupUpdateQueue.all.to_a | ReindexingQueue.all.to_a
+   queue = queue.sort_by(&:created_at)
+   delayed_jobs = Delayed::Job.order(:created_at)
 %>
 
 <p>

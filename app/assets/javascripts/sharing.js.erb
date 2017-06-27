@@ -105,8 +105,17 @@ var Sharing = {
   }
 };
 
+// To do: Make this a property of the permissions table, and remove "Accessible" for things that can't be downloaded
+Sharing.orderedAccessTypes = [
+  Sharing.accessTypes.noAccess,
+  Sharing.accessTypes.visible,
+  Sharing.accessTypes.accessible,
+  Sharing.accessTypes.editing,
+  Sharing.accessTypes.managing
+];
+
 Vue.component('permissions-table', {
-  props: ['publicPermission', 'permissions'],
+  props: ['publicPermission', 'permissions', 'downloadable'],
   template:
   '<table class="permissions-table" id="permissions-table">' +
   '<thead>' +
@@ -126,7 +135,7 @@ Vue.component('permissions-table', {
       accessTypes: [
         { title: 'No Access', value: Sharing.accessTypes.noAccess, classes: 'no-access' },
         { title: 'View', value: Sharing.accessTypes.visible },
-        { title: 'Download', value: Sharing.accessTypes.accessible },
+        { title: 'Download', value: Sharing.accessTypes.accessible, classes: this.downloadable ? '' : 'hidden' },
         { title: 'Edit', value: Sharing.accessTypes.editing },
         { title: 'Manage', value: Sharing.accessTypes.managing }
       ]
@@ -200,16 +209,23 @@ Vue.component('privilege-cell', {
     classes: function () {
       return { 'enabled': !this.disabled && this.enabled,
         'disabled': this.disabled,
+        'hidden': this.accessType.classes === 'hidden',
         'no-access': this.accessType.value === Sharing.accessTypes.noAccess };
     }
   },
   methods: {
-    toggleValue: function () {
+    toggleValue: function (e) {
+      // Stop clicks on the radio button from triggering this function and un-setting the access type
+      if (e.target.nodeName.toLowerCase() === 'input')
+          return;
       if (!this.disabled) {
         // If the existing setting is clicked, decrease the access type
         if (this.permission.access_type === this.accessType.value &&
             this.accessType.value !== Sharing.accessTypes.noAccess) {
-          this.permission.access_type = this.accessType.value - 1;
+          var index = Sharing.orderedAccessTypes.indexOf(this.accessType.value) - 1;
+          if (index >= 0) {
+            this.permission.access_type = Sharing.orderedAccessTypes[index];
+          }
         } else {
           this.permission.access_type = this.accessType.value;
         }

@@ -20,9 +20,9 @@ module Seek
 
       def count_actions(actions = nil)
         if actions
-          ActivityLog.no_spider.count(conditions: { action: actions, activity_loggable_type: self.class.name, activity_loggable_id: id })
+          ActivityLog.no_spider.where(action: actions, activity_loggable_type: self.class.name, activity_loggable_id: id).count
         else
-          ActivityLog.count(conditions: { activity_loggable_type: self.class.name, activity_loggable_id: id })
+          ActivityLog.where(activity_loggable_type: self.class.name, activity_loggable_id: id).count
         end
       end
     end

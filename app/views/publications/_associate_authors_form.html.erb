@@ -37,7 +37,8 @@
                     <li><%= (link_to get_object_title(creator), show_resource_path(creator)) %></li>
                 <% end %>
               </ul>
-              <%= button_link_to("Disassociate All Authors", 'destroy', disassociate_authors_publication_url(publication), {:confirm => "This will reset the publication's links to people in SEEK, are you sure you wish to do this?", :method => :post}) -%>
+              <%= button_link_to("Disassociate All Authors", 'destroy', disassociate_authors_publication_url(publication),
+                                 { data: { confirm: "This will reset the publication's links to people in SEEK, are you sure you wish to do this?" }, :method => :post}) -%>
           <% else %>
               <span class="none_text">No associated authors</span>
           <% end %>

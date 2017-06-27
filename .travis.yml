@@ -1,7 +1,7 @@
 language: ruby
 
 rvm:
-  - 2.1.9
+  - 2.2.7
   
 jdk:
   - openjdk7
@@ -10,8 +10,11 @@ sudo: false
 
 cache: bundler
 
+bundler_args: --without development
+
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
+  - SUITE="rake test:units" DB_TYPE=sqlite3
   - SUITE="rake test:functionals" DB_TYPE=mysql
   - SUITE="rake test:functionals" DB_TYPE=sqlite3
   - SUITE="rake test:functionals" DB_TYPE=postgres

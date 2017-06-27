@@ -1,10 +1,6 @@
-require 'acts_as_versioned_resource'
-require 'explicit_versioning'
-require 'title_trimmer'
 require 't2flow/model'
 require 't2flow/parser'
 require 't2flow/dot'
-require 'datacite/acts_as_doi_mintable'
 
 class Workflow < ActiveRecord::Base
 
@@ -16,25 +12,25 @@ class Workflow < ActiveRecord::Base
 
   include Seek::Dois::DoiGeneration
 
-  scope :default_order, order('title')
+  scope :default_order, -> { order('title') }
 
   validates_presence_of :title
 
-  validates :myexperiment_link, :format => { :with => /^http:\/\/(www\.)?myexperiment\.org\/workflows\/[0-9]+/,
+  validates :myexperiment_link, :format => { :with => /\Ahttp:\/\/(www\.)?myexperiment\.org\/workflows\/[0-9]+/,
                                              :message => "is invalid, please make sure the URL is in the format: http://www.myexperiment.org/workflows/...",
                                              :allow_blank => true }
 
 
   belongs_to :category, :class_name => 'WorkflowCategory'
-  has_many :input_ports, :class_name => 'WorkflowInputPort',
-           :conditions => proc { "workflow_version = #{self.version}" },
+  has_many :input_ports, -> (r) { where(workflow_version: r.version) },
+           :class_name => 'WorkflowInputPort',
            :dependent => :destroy
 
-  has_many :output_ports, :class_name => 'WorkflowOutputPort',
-           :conditions => proc { "workflow_version = #{self.version}"},
+  has_many :output_ports, -> (r) { where(workflow_version: r.version) },
+           :class_name => 'WorkflowOutputPort',
            :dependent => :destroy
 
-  has_one :content_blob, :as => :asset, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =?", version] }
+  has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   accepts_nested_attributes_for :input_ports, :output_ports
 
@@ -47,17 +43,18 @@ class Workflow < ActiveRecord::Base
     acts_as_versioned_resource
     acts_as_favouritable
 
-    has_one :content_blob, :primary_key => :workflow_id, :foreign_key => :asset_id, :conditions => Proc.new { ["content_blobs.asset_version =? AND content_blobs.asset_type =?", version, parent.class.name] }
-    has_many :input_ports, :class_name => 'WorkflowInputPort',
+    has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
+            :primary_key => :workflow_id, :foreign_key => :asset_id
+    has_many :input_ports, -> (r) { where(workflow_version: r.version) },
+             :class_name => 'WorkflowInputPort',
              :primary_key => "workflow_id",
              :foreign_key => "workflow_id",
-             :conditions => proc { "workflow_version = #{self.version}"},
              :dependent => :destroy
 
-    has_many :output_ports, :class_name => 'WorkflowOutputPort',
+    has_many :output_ports, -> (r) { where(workflow_version: r.version) },
+             :class_name => 'WorkflowOutputPort',
              :primary_key => "workflow_id",
              :foreign_key => "workflow_id",
-             :conditions => proc { "workflow_version = #{self.version}"},
              :dependent => :destroy
 
     def content_blobs

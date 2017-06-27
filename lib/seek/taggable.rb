@@ -1,7 +1,10 @@
 module Seek
   module Taggable
-    def self.included(mod)
-      mod.extend(ClassMethods)
+    extend ActiveSupport::Concern
+
+    included do
+      extend ClassMethods
+      acts_as_annotatable name_field: :title
     end
 
     def is_taggable?
@@ -34,14 +37,18 @@ module Seek
       selected_key = "#{attr}_autocompleter_selected_ids".to_sym
       unrecognized_key = "#{attr}_autocompleter_unrecognized_items".to_sym
 
-      Array(params[selected_key]).each do |selected_id|
-        tag = TextValue.find(selected_id)
-        tags << tag.text
-      end unless params[selected_key].nil?
+      unless params[selected_key].nil?
+        Array(params[selected_key]).each do |selected_id|
+          tag = TextValue.find(selected_id)
+          tags << tag.text
+        end
+      end
 
-      Array(params[unrecognized_key]).each do |item|
-        tags << item
-      end unless params[unrecognized_key].nil?
+      unless params[unrecognized_key].nil?
+        Array(params[unrecognized_key]).each do |item|
+          tags << item
+        end
+      end
 
       tags << params[:annotation][:value] if params[:annotation] && params[:annotation][:value]
 
@@ -56,7 +63,7 @@ module Seek
     def tag_with(tags, attr = 'tag', owner = User.current_user, owned_tags_only = false)
       tags = Array(tags)
       # FIXME: yuck! - this is required so that self has an id and can be assigned to an Annotation.annotatable
-      return if self.new_record? && !save
+      return if new_record? && !save
 
       current = annotations_with_attribute(attr)
       original = current
@@ -73,9 +80,9 @@ module Seek
 
           # isn't already used as an annotation for this entity
           if owned_tags_only
-            matching = Annotation.for_annotatable(self.class.name, id).with_attribute_name(attr).by_source(owner.class.name, owner.id).select { |a| a.value.text.downcase == tag.downcase }
+            matching = Annotation.for_annotatable(self.class.name, id).with_attribute_name(attr).by_source(owner.class.name, owner.id).select { |a| a.value.text.casecmp(tag.downcase).zero? }
           else
-            matching = Annotation.for_annotatable(self.class.name, id).with_attribute_name(attr).select { |a| a.value.text.downcase == tag.downcase }
+            matching = Annotation.for_annotatable(self.class.name, id).with_attribute_name(attr).select { |a| a.value.text.casecmp(tag.downcase).zero? }
           end
 
           if matching.empty?

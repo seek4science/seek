@@ -1,7 +1,3 @@
-
-require 'explicit_versioning'
-require 'acts_as_versioned_resource'
-
 class Presentation < ActiveRecord::Base
 
    attr_accessor :orig_data_file_id
@@ -10,14 +6,15 @@ class Presentation < ActiveRecord::Base
    #even though in Seek::ActsAsAsset::Search it is already set to false!
    acts_as_asset
 
-   scope :default_order, order("title")
+   scope :default_order, -> { order("title") }
 
-   has_one :content_blob, :as => :asset, :foreign_key => :asset_id ,:conditions => Proc.new{["content_blobs.asset_version =?", version]}
+   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
    explicit_versioning(:version_column => "version") do
      acts_as_versioned_resource
      acts_as_favouritable
-     has_one :content_blob,:primary_key => :presentation_id,:foreign_key => :asset_id,:conditions => Proc.new{["content_blobs.asset_version =? AND content_blobs.asset_type =?", version, parent.class.name]}
+     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
+             :primary_key => :presentation_id,:foreign_key => :asset_id
   end
 
    if Seek::Config.events_enabled

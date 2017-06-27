@@ -56,7 +56,7 @@
             <%= f.password_field :password_confirmation, :class => 'form-control' %>
           </div>
 
-          <%= submit_tag 'Register', :disable_with=>"Registering...", :class => 'btn btn-primary' %>
+          <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary' %>
       <% end -%>
     </div>
   </div>

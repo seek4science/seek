@@ -6,19 +6,6 @@ module ProjectsHelper
     res
   end
 
-  def projects_link_list(projects, sorted = true)
-    projects.compact! # remove nil items
-    return "<span class='none_text'>Not defined</span>".html_safe if projects.empty?
-
-    result = ''
-    projects = projects.sort { |a, b| a.title <=> b.title } if sorted
-    projects.each do |proj|
-      result += link_to proj.title, proj
-      result += ' | ' unless projects.last == proj
-    end
-    result.html_safe
-  end
-
   def link_list_for_role(role_text, role_members, type = 'project')
     if role_members.empty?
       html = "<span class='none_text'>No #{role_text.pluralize} for this #{t(type)}</span>"
@@ -126,7 +113,7 @@ module ProjectsHelper
 
   def projects_grouped_by_programme(selected = nil)
     if Seek::Config.programmes_enabled
-      array = Project.all.sort_by(&:title).group_by { |p| p.programme.try(:title) || 'Independent projects' }.each_value do |projects|
+      array = Project.order(:title).to_a.group_by { |p| p.programme.try(:title) || 'Independent projects' }.each_value do |projects|
         projects.map! { |p| [p.title, p.id] }
       end.to_a
 
@@ -134,5 +121,13 @@ module ProjectsHelper
     else
       options_for_select(Project.all.sort_by(&:title).map { |p| [p.title, p.id] }, selected)
     end
+  end
+
+  def project_lookup_json(resources)
+    mapping = resources.map do |r|
+      [r.id, r.projects.map { |p| { id: p.id, title: p.title } }]
+    end
+
+    Hash[mapping].to_json.html_safe
   end
 end

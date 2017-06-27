@@ -3,7 +3,7 @@ require 'test_helper'
 class EventsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
-  include FunctionalAuthorizationTests
+  include GeneralAuthorizationTestCases
   include SharingFormTestHelper
 
   def setup
@@ -18,7 +18,7 @@ class EventsControllerTest < ActionController::TestCase
   def test_title
     get :index
     assert_response :success
-    assert_select 'title', text: /The Sysmo SEEK.*/, count: 1
+    assert_select 'title', text: /Events/, count: 1
   end
 
   test 'should show index' do
@@ -97,7 +97,7 @@ class EventsControllerTest < ActionController::TestCase
 
   test 'should not create invalid event' do
     assert_difference('Event.count', 0) do
-      post :create, event: {}
+      post :create, event: { title: nil }
     end
   end
 

@@ -23,7 +23,7 @@
           <%= f.password_field :password_confirmation, :class => 'form-control' %>
         </div>
 
-        <%= submit_tag 'Update', :disable_with => "Updating...", :class => 'btn btn-primary' %>
+        <%= submit_tag 'Update', data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
     <% end -%>
 <% end %>
 

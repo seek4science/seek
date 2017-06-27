@@ -5,7 +5,8 @@ require 'seek/upload_handling/examine_url'
 
 class UploadHandingTest < ActiveSupport::TestCase
   include Seek::UploadHandling::DataUpload
-  include Seek::UploadHandling::ExamineUrl
+  include Seek::UploadHandling::DataUpload
+  include Seek::UrlValidation
 
   test 'valid scheme?' do
     assert_equal %w(file).sort, Seek::UploadHandling::ContentInspection::INVALID_SCHEMES.sort
@@ -17,8 +18,11 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'content_blob_params' do
-    @params = { content_blobs: [{ fish: 1, soup: 2 }], data_file: { title: 'george' } }
-    assert_equal([{ fish: 1, soup: 2 }], content_blob_params)
+    @params = ActionController::Parameters.new({ content_blobs: [{ fish: 1, soup: 2 }],
+                                                 data_file: { title: 'george' } })
+    assert_equal 1, content_blobs_params.length
+    assert_equal 1, content_blobs_params.first[:fish]
+    assert_equal 2, content_blobs_params.first[:soup]
   end
 
   test 'default to http if missing' do
@@ -40,10 +44,14 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'asset params' do
-    @params = { content_blob: { fish: 1, soup: 2 }, data_file: { title: 'george' }, sop: { title: 'mary' } }
-    assert_equal({ title: 'george' }, asset_params)
+    @params = ActionController::Parameters.new({ content_blob: { fish: 1, soup: 2 },
+                                                 data_file: { title: 'george' },
+                                                 sop: { title: 'mary' } })
+    assert_equal 'george', asset_params[:title]
+    assert_equal 1, asset_params.keys.length
     @controller_name = 'sops'
-    assert_equal({ title: 'mary' }, asset_params)
+    assert_equal 'mary', asset_params[:title]
+    assert_equal 1, asset_params.keys.length
   end
 
   test 'check url response code' do
@@ -126,14 +134,21 @@ class UploadHandingTest < ActiveSupport::TestCase
     refute content_is_webpage?(nil)
   end
 
-  test 'valid uri?' do
-    assert valid_uri?('http://fish.com')
-    assert valid_uri?('http://fish.com')
-    assert valid_uri?('http://fish.com   ')
-    assert valid_uri?('http://fish.com/fish.txt')
-    assert valid_uri?('http://fish.com/fish.txt    ')
-    refute valid_uri?('x dd s')
-    refute valid_uri?(nil)
+  test 'valid url?' do
+    assert valid_url?('http://fish.com')
+    assert valid_url?('https://fish.com')
+    assert valid_url?('http://fish.com/fish.txt')
+    assert valid_url?('ftp://fish.com/fish.txt')
+    assert valid_url?('mailto:fish@fishmail.fish')
+    assert valid_url?('skype:fish.user')
+
+    refute valid_url?('urn:fish:fish.com/fish.txt')
+    refute valid_url?('http://fish.com   ')
+    refute valid_url?('http://fish.com/fish.txt    ')
+    refute valid_url?('x dd s')
+    refute valid_url?('sdfsdf')
+    refute valid_url?('/somewhere/fish.txt')
+    refute valid_url?(nil)
   end
 
   test 'determine_filename_from_disposition' do

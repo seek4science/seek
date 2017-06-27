@@ -30,11 +30,11 @@ var OpenBis = {
         );
     },
 
-    refreshCache: function () {
-        if (confirm('Are you sure you wish to refresh the cache?')) {
+    refreshMetadataStore: function () {
+        if (confirm('Are you sure you wish to refresh the metadata?')) {
             var endpointId = $j(this).data('endpoint-id');
             var projectId = $j(this).data('project-id');
-            var path = '/projects/' + projectId + '/openbis_endpoints/refresh_browse_cache'
+            var path = '/projects/' + projectId + '/openbis_endpoints/refresh_metadata_store'
             $j.ajax(path, {
                     method: 'POST',
                     data: {id: endpointId},
