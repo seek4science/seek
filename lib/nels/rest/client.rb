@@ -34,6 +34,10 @@ module Nels
                 body: { method: 'get_nels_url', subtype_name: subtype }, skip_parse: true)
       end
 
+      def sample_metadata(reference)
+        perform("sbi/sample-metadata?ref=#{reference}", :get)
+      end
+
       private
 
       def perform(path, method, opts = {})
