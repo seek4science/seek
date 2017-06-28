@@ -2044,6 +2044,52 @@ class DataFilesControllerTest < ActionController::TestCase
     assert blob.caching_job.exists?
   end
 
+  test "should create data file for remote URL with a space at the end" do
+    mock_http
+    params = { data_file: {
+        title: 'Remote File',
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: 'http://mockedlocation.com/txt_test.txt ',
+                                   make_local_copy: '1'
+                               }],
+               policy_attributes: valid_sharing
+    }
+
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal 'http://mockedlocation.com/txt_test.txt', assigns(:data_file).content_blob.url
+  end
+
+  test "should create data file for remote URL with no scheme" do
+    mock_http
+    params = { data_file: {
+        title: 'Remote File',
+        project_ids: [projects(:sysmo_project).id]
+    },
+               content_blobs: [{
+                                   data_url: 'mockedlocation.com/txt_test.txt',
+                                   make_local_copy: '1'
+                               }],
+               policy_attributes: valid_sharing
+    }
+
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, params
+      end
+    end
+
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert_equal 'http://mockedlocation.com/txt_test.txt', assigns(:data_file).content_blob.url
+  end
+
   test 'should display null license text' do
     df = Factory :data_file, policy: Factory(:public_policy)
 
