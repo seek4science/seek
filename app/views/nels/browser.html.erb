@@ -10,9 +10,10 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
     <div id="nels-content" style="display: none">
       <h2></h2>
       <em>Other metadata here</em><br/><br/>
-      <%= form_tag(new_data_file_path(anchor: 'remote-url'), method: :get) do %>
-        <%= hidden_field_tag('data_file[title]','', id: 'title') %>
-        <%= hidden_field_tag('data_url','', id: 'url') %>
+      <%= form_tag(nels_register_path, method: :post) do %>
+        <%= hidden_field_tag('project_id','', id: 'project_id') %>
+        <%= hidden_field_tag('dataset_id','', id: 'dataset_id') %>
+        <%= hidden_field_tag('subtype_name','', id: 'subtype_name') %>
         <%= submit_tag('Register in SEEK', class: 'btn btn-primary') %>
       <% end %>
     </div>
@@ -57,8 +58,9 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
               el.show();
               $j('h2', el).html(data.node.text);
               if (data.node.data.dataset_id) {
-                $j('#title').val(data.node.text);
-                $j('#url').val('http://example.com/persistent-url');
+                $j('#subtype_name').val(data.node.text);
+                $j('#project_id').val(data.node.data.project_id);
+                $j('#dataset_id').val(data.node.data.dataset_id);
                 $j('input', el).show();
               } else {
                 $j('input', el).hide();

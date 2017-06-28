@@ -43,6 +43,13 @@ class NelsController < ApplicationController
     end
   end
 
+  def register
+    dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
+    url = @rest_client.persistent_url(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name])
+
+    redirect_to new_data_file_path(anchor: 'remote-url', 'data_file[title]' => dataset['title'], data_url: url)
+  end
+
   private
 
   def oauth_client

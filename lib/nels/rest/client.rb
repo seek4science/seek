@@ -31,7 +31,7 @@ module Nels
 
       def persistent_url(project_id, dataset_id, subtype)
         perform("sbi/projects/#{project_id}/datasets/#{dataset_id}/do", :post,
-                body: { method: 'get_nels_url', subtype: subtype })
+                body: { method: 'get_nels_url', subtype_name: subtype }, skip_parse: true)
       end
 
       private
@@ -50,6 +50,8 @@ module Nels
         response = base[path].send(*args)
 
         puts response
+
+        return response if opts[:skip_parse]
 
         JSON.parse(response) unless response.empty?
       end
