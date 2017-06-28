@@ -43,6 +43,14 @@ class NelsController < ApplicationController
     end
   end
 
+  def dataset
+    @dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
+
+    respond_to do |format|
+      format.html { render partial: 'nels/dataset' }
+    end
+  end
+
   def register
     dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
     url = @rest_client.persistent_url(params[:project_id].to_i, params[:dataset_id].to_i, params[:subtype_name])

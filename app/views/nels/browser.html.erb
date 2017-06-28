@@ -7,64 +7,63 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
     <div id="nels-tree" style="min-height: 300px; border-right: 1px solid #ddd"></div>
   </div>
   <div class="col-sm-9">
+    <div id="nels-dataset" style="display: none"></div>
     <div id="nels-content" style="display: none">
       <h2></h2>
       <em>Other metadata here</em><br/><br/>
-      <%= form_tag(nels_register_path, method: :post) do %>
-        <%= hidden_field_tag('project_id','', id: 'project_id') %>
-        <%= hidden_field_tag('dataset_id','', id: 'dataset_id') %>
-        <%= hidden_field_tag('subtype_name','', id: 'subtype_name') %>
-        <%= submit_tag('Register in SEEK', class: 'btn btn-primary') %>
-      <% end %>
     </div>
   </div>
 </div>
 
 <script type="text/javascript">
-    $j(document).ready(function () {
-        $j('#nels-tree')
-            .bind('loaded.jstree', function() {})
-            .jstree({
-                'core': {
-                    'check_callback': true,
-                    'force_text': true,
-                    'data' : {
-                        'url': function (node) {
-                            console.log(node);
-                            if (node.id === '#') {
-                                return 'nels_projects';
-                            } else if (node.data.project_id) {
-                                return 'nels_subtypes';
-                            } else {
-                                return 'nels_datasets';
-                            }
-                        },
-                        'data': function (node) {
-                            if (node.id === '#') {
-                                return {};
-                            }
-
-                            var d = { id: node.data.id };
-                            if (node.data.project_id) {
-                                d.project_id = node.data.project_id
-                            }
-                            return d;
-                        }
-                    }
+  $j(document).ready(function () {
+    $j('#nels-tree')
+        .bind('loaded.jstree', function() {})
+        .jstree({
+          'core': {
+            'check_callback': true,
+            'force_text': true,
+            'data' : {
+              'url': function (node) {
+                console.log(node);
+                if (node.id === '#') {
+                  return 'nels_projects';
+                } else {
+                  return 'nels_datasets';
                 }
-            }).on('activate_node.jstree', function (e, data) {
-              console.log(data);
-              var el = $j('#nels-content');
-              el.show();
-              $j('h2', el).html(data.node.text);
-              if (data.node.data.dataset_id) {
-                $j('#subtype_name').val(data.node.text);
-                $j('#project_id').val(data.node.data.project_id);
-                $j('#dataset_id').val(data.node.data.dataset_id);
-                $j('input', el).show();
-              } else {
-                $j('input', el).hide();
+              },
+              'data': function (node) {
+                if (node.id === '#') {
+                  return {};
+                }
+
+                var d = { id: node.data.id };
+                if (node.data.project_id) {
+                  d.project_id = node.data.project_id
+                }
+                return d;
               }
+            }
+          }
+        }).on('activate_node.jstree', function (e, data) {
+      console.log(data);
+
+      if (data.node.data.project_id) {
+        $j('#nels-dataset').html('').spinner('add').show();
+        $j('#nels-content').hide();
+
+        $j.ajax({ url: '<%= nels_dataset_path -%>',
+          data: { project_id: data.node.data.project_id,
+            dataset_id: data.node.data.id },
+          success: function (data) {
+            $j('#nels-dataset').html(data).spinner('remove');
+          }
         });
+      } else {
+        $j('#nels-dataset').hide();
+        $j('#nels-content').show();
+        $j('#nels-content h2').html(data.node.text);
+      }
     });
+  });
 </script>
