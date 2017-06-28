@@ -31,7 +31,7 @@ module Nels
 
       def persistent_url(project_id, dataset_id, subtype)
         perform("sbi/projects/#{project_id}/datasets/#{dataset_id}/do", :post,
-                body: { method: 'get_nels_url', subtype_name: subtype }, skip_parse: true)
+                body: { method: 'get_nels_url', subtype_name: subtype })['url']
       end
 
       def sample_metadata(reference)
