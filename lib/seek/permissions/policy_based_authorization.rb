@@ -315,9 +315,13 @@ module Seek
             end
           end
 
-          # Global permissions (Policy)
-          update_lookup(policy, nil, false)
-        end
+            # Global permissions (Policy)
+            update_lookup(policy, nil, false)
+
+            #block from anonymous users if polidy is shared with ALL_USERS only
+            update_lookup([false,false,false,false,false],:anonymous) if policy.sharing_scope==Policy::ALL_USERS
+          end
+        
       end
 
       def contributor_credited?
@@ -411,7 +415,7 @@ module Seek
 
       private
 
-      # Note, nil user means ALL users, not guest user
+      # Note, nil user means ALL users, not anonymous user. Anon user is represented with ;anonymous
       def update_lookup(permission, user = nil, overwrite = true)
         if permission.is_a?(Array)
           can_view, can_edit, can_download, can_manage, can_delete = *permission
@@ -441,6 +445,8 @@ module Seek
           user = user.compact
           return unless user.any?
           sql += " AND user_id IN (#{user.map(&:id).join(', ')})"
+        elsif user==:anonymous
+          sql += " AND user_id=0"
         elsif user.is_a?(User)
           sql += " AND user_id=#{user.id}"
         elsif user.is_a?(Person)
