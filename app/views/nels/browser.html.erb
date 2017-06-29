@@ -8,10 +8,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
   </div>
   <div class="col-sm-9">
     <div id="nels-dataset" style="display: none"></div>
-    <div id="nels-content" style="display: none">
-      <h2></h2>
-      <em>Other metadata here</em><br/><br/>
-    </div>
+    <div id="nels-content" style="display: none"></div>
   </div>
 </div>
 
@@ -62,7 +59,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
       } else {
         $j('#nels-dataset').hide();
         $j('#nels-content').show();
-        $j('#nels-content h2').html(data.node.text);
+        $j('#nels-content').html(HandlebarsTemplates['nels/project'](data.node.data));
       }
     });
   });

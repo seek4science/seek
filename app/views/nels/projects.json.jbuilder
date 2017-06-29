@@ -7,5 +7,9 @@ json.array! @projects do |project|
   end
   json.data do
     json.id project['id']
+    json.contact_person project['contact_person']
+    json.name project['name']
+    json.description project['description']
+    json.created_at project['created_at']
   end
 end
