@@ -35,7 +35,7 @@ module Nels
       end
 
       def sample_metadata(reference)
-        perform("sbi/sample-metadata?ref=#{reference}", :get)
+        perform("sbi/sample-metadata?ref=#{reference}", :get, skip_parse: true)
       end
 
       private
