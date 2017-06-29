@@ -917,6 +917,3 @@ DEPENDENCIES
   will_paginate (~> 3.0.4)
   yaml_db
   zenodo-client!
-
-BUNDLED WITH
-   1.13.6
