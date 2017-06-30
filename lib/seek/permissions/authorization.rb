@@ -41,7 +41,7 @@ module Seek
       def self.authorized_by_policy?(action, thing,user)
         # Check the user is "in scope" and also is performing an action allowed under the given access type
         if thing.policy.sharing_scope==Policy::ALL_USERS
-          access_type_allows_action?(action, thing.policy.access_type) && user
+          access_type_allows_action?(action, thing.policy.access_type) && !user.nil?
         else
           access_type_allows_action?(action, thing.policy.access_type)
         end
