@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 20170607095453) do
     t.datetime "updated_at"
     t.string   "http_referer",           limit: 255
     t.string   "user_agent",             limit: 255
-    t.text     "data",                   limit: 16777215
+    t.text     "data",                   limit: 4294967295
     t.string   "controller_name",        limit: 255
   end
 
@@ -1706,19 +1706,20 @@ ActiveRecord::Schema.define(version: 20170607095453) do
   create_table "taggings", force: :cascade do |t|
     t.integer  "tag_id",        limit: 4
     t.integer  "taggable_id",   limit: 4
+    t.string   "taggable_type", limit: 255
     t.integer  "tagger_id",     limit: 4
     t.string   "tagger_type",   limit: 255
-    t.string   "taggable_type", limit: 255
-    t.string   "context",       limit: 255
+    t.string   "context",       limit: 128
     t.datetime "created_at"
   end
 
-  add_index "taggings", ["tag_id"], name: "index_taggings_on_tag_id", using: :btree
-  add_index "taggings", ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context", using: :btree
+  add_index "taggings", ["tag_id", "taggable_id", "taggable_type", "context", "tagger_id", "tagger_type"], name: "taggings_idx", unique: true, using: :btree
 
   create_table "tags", force: :cascade do |t|
     t.string "name", limit: 255
   end
+
+  add_index "tags", ["name"], name: "index_tags_on_name", unique: true, using: :btree
 
   create_table "taverna_player_interactions", force: :cascade do |t|
     t.boolean  "replied",                     default: false
@@ -1828,10 +1829,10 @@ ActiveRecord::Schema.define(version: 20170607095453) do
   end
 
   create_table "text_value_versions", force: :cascade do |t|
-    t.integer  "text_value_id",      limit: 4,        null: false
-    t.integer  "version",            limit: 4,        null: false
+    t.integer  "text_value_id",      limit: 4,          null: false
+    t.integer  "version",            limit: 4,          null: false
     t.integer  "version_creator_id", limit: 4
-    t.text     "text",               limit: 16777215, null: false
+    t.text     "text",               limit: 4294967295, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -1841,7 +1842,7 @@ ActiveRecord::Schema.define(version: 20170607095453) do
   create_table "text_values", force: :cascade do |t|
     t.integer  "version",            limit: 4
     t.integer  "version_creator_id", limit: 4
-    t.text     "text",               limit: 16777215, null: false
+    t.text     "text",               limit: 4294967295, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -9,8 +9,8 @@ module Seek
       end
 
       def contains_publishable_items?
-        items = [:studies, :study, :assays, :investigation, :assets].collect do |accessor|
-          send(accessor) if self.respond_to?(accessor)
+        items = %i[studies study assays investigation assets].collect do |accessor|
+          send(accessor) if respond_to?(accessor)
         end.flatten
         items.uniq.compact.detect(&:can_publish?).present?
       end
@@ -20,13 +20,13 @@ module Seek
       end
 
       def state_allows_publish?(user = User.current_user)
-        if self.new_record?
-          return true unless self.gatekeeper_required?
-          !self.is_waiting_approval?(user) && !self.is_rejected?
+        if new_record?
+          return true unless gatekeeper_required?
+          !is_waiting_approval?(user) && !is_rejected?
         else
-          return false if self.is_published?
-          return true unless self.gatekeeper_required?
-          !self.is_waiting_approval?(user) && !self.is_rejected?
+          return false if is_published?
+          return true unless gatekeeper_required?
+          !is_waiting_approval?(user) && !is_rejected?
         end
       end
 
@@ -56,7 +56,7 @@ module Seek
 
       def is_published?
         policy = self.policy
-        if self.is_downloadable?
+        if is_downloadable?
           policy.public? && policy.access_type >= Policy::ACCESSIBLE
         else
           policy.public?
@@ -110,12 +110,12 @@ module Seek
       # updated item: keep the policy as before
       def temporary_policy_while_waiting_for_publishing_approval
         return true unless authorization_checks_enabled
-        if policy.public? && !self.is_a?(Publication) && self.gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
-          if self.new_record?
-            self.policy = Policy.projects_policy(projects)
-          else
-            self.policy = Policy.find_by_id(policy.id)
-          end
+        if policy.public? && !is_a?(Publication) && gatekeeper_required? && !User.current_user.person.is_asset_gatekeeper_of?(self)
+          self.policy = if new_record?
+                          Policy.projects_policy(projects)
+                        else
+                          Policy.find_by_id(policy.id)
+                        end
         end
       end
     end
