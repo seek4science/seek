@@ -9,7 +9,7 @@ layout: page
 
 If necessary, you can run SEEK in Docker together with MySQL and SOLR running in its own containers. 
 To do this you use Docker Compose. 
-See the [Installation Guide](https://docs.docker.com/compose/install/) for how to install.
+See the [Docker Compose Installation Guide](https://docs.docker.com/compose/install/) for how to install.
  
 Once installed, all you need is the [docker-compose.yml](https://github.com/seek4science/seek/blob/master/docker-compose.yml), and the [docker/db.env](https://github.com/seek4science/seek/blob/master/docker/db.env),
 although you can simply check out the SEEK source from GitHub - see [Getting SEEK](../install.html#getting-seek).
@@ -25,7 +25,8 @@ and then to start up, with the docker-compose.yml in your currently directory ru
     
     docker-compose up -d
     
-and go to [http://localhost:3000](http://localhost:3000)
+and go to [http://localhost:3000](http://localhost:3000). There may be a short delay before you can connect, especially
+if this is the first time and various things are being initialized.
 
 to stop run
     
