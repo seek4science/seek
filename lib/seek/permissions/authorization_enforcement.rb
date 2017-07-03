@@ -69,7 +69,7 @@ module Seek
           result = true
           unless safe_to_edit?
             result = false
-            errors.add(:base,"You are not authorized to edit #{self.class.name.underscore.humanize}-#{id}")
+            errors.add(:base, "You are not authorized to edit #{self.class.name.underscore.humanize}-#{id}")
           end
           result
         end
@@ -78,16 +78,14 @@ module Seek
           result = true
           if self.class.respond_to?(:associations_and_actions_to_be_enforced)
             self.class.associations_and_actions_to_be_enforced.keys.each do |association|
-              if self.respond_to?(association)
-                action = self.class.associations_and_actions_to_be_enforced[association]
-                auth_method = "can_#{self.class.associations_and_actions_to_be_enforced[association]}?"
-                Array(self.send(association)).each do |item|
-                  if item.respond_to?(auth_method) && !item.send(auth_method)
-                    result = false
-                    errors.add(:base,"You do not have permission to #{action} #{item.class.name.underscore.humanize}-#{item.id}")
-                    break
-                  end
-                end
+              next unless respond_to?(association)
+              action = self.class.associations_and_actions_to_be_enforced[association]
+              auth_method = "can_#{self.class.associations_and_actions_to_be_enforced[association]}?"
+              Array(send(association)).each do |item|
+                next unless item.respond_to?(auth_method) && !item.send(auth_method)
+                result = false
+                errors.add(:base, "You do not have permission to #{action} #{item.class.name.underscore.humanize}-#{item.id}")
+                break
               end
             end
           end
@@ -105,18 +103,15 @@ module Seek
                 enforced_associations.include?(reflection.name.to_s)
               end
               autosave_associations.each do |reflection|
-                if associations = association_instance_get(reflection.name)
-                  associations = Array(associations)
-                  if associations.detect {|association| association.target.changed_for_autosave?}
-                    action = self.class.associations_requiring_access_for_owner[reflection.name.to_s]
-                    action_method = "can_#{action}?"
-                    if self.respond_to?(action_method) && !self.send(action_method)
-                      result = false
-                      errors.add(:base,"You are not permitted to change #{reflection.name} on #{self.class.name.underscore.humanize}-#{id} without #{action} rights")
-                      break
-                    end
-                  end
-                end
+                next unless associations = association_instance_get(reflection.name)
+                associations = Array(associations)
+                next unless associations.detect { |association| association.target.changed_for_autosave? }
+                action = self.class.associations_requiring_access_for_owner[reflection.name.to_s]
+                action_method = "can_#{action}?"
+                next unless respond_to?(action_method) && !send(action_method)
+                result = false
+                errors.add(:base, "You are not permitted to change #{reflection.name} on #{self.class.name.underscore.humanize}-#{id} without #{action} rights")
+                break
               end
             end
           end
@@ -127,7 +122,7 @@ module Seek
         def authorized_changes_requiring_manage?
           offending_attributes = changed & self.class.attributes_requiring_can_manage
           unless offending_attributes.empty?
-            errors.add(:base,"You are not permitted to change #{offending_attributes.join(",")} attributes on #{self.class.name.underscore.humanize}-#{id} without manage rights")
+            errors.add(:base, "You are not permitted to change #{offending_attributes.join(',')} attributes on #{self.class.name.underscore.humanize}-#{id} without manage rights")
           end
           offending_attributes.empty?
         end
@@ -140,27 +135,27 @@ module Seek
 
       module ClassMethods
         def requires_can_manage(*attrs)
-          self.class_attribute :attributes_requiring_can_manage unless self.respond_to?(:attributes_requiring_can_manage)
+          class_attribute :attributes_requiring_can_manage unless respond_to?(:attributes_requiring_can_manage)
           self.attributes_requiring_can_manage ||= []
           self.attributes_requiring_can_manage = self.attributes_requiring_can_manage | attrs.map(&:to_s)
         end
 
         def does_not_require_can_edit(*attrs)
-          self.class_attribute :attributes_not_requiring_edit unless self.respond_to?(:attributes_not_requiring_edit)
+          class_attribute :attributes_not_requiring_edit unless respond_to?(:attributes_not_requiring_edit)
           self.attributes_not_requiring_edit ||= []
           self.attributes_not_requiring_edit = self.attributes_not_requiring_edit | attrs.map(&:to_s)
         end
 
-        def enforce_authorization_on_association(association,action)
-          self.class_attribute :associations_and_actions_to_be_enforced unless self.respond_to?(:associations_and_actions_to_be_enforced)
+        def enforce_authorization_on_association(association, action)
+          class_attribute :associations_and_actions_to_be_enforced unless respond_to?(:associations_and_actions_to_be_enforced)
           self.associations_and_actions_to_be_enforced ||= {}
-          self.associations_and_actions_to_be_enforced[association.to_s]=action.to_s
+          self.associations_and_actions_to_be_enforced[association.to_s] = action.to_s
         end
 
-        def enforce_required_access_for_owner(association,action)
-          self.class_attribute :associations_requiring_access_for_owner unless self.respond_to?(:associations_requiring_access_for_owner)
+        def enforce_required_access_for_owner(association, action)
+          class_attribute :associations_requiring_access_for_owner unless respond_to?(:associations_requiring_access_for_owner)
           self.associations_requiring_access_for_owner ||= {}
-          self.associations_requiring_access_for_owner[association.to_s]=action.to_s
+          self.associations_requiring_access_for_owner[association.to_s] = action.to_s
         end
       end
     end
