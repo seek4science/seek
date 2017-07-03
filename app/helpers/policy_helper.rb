@@ -16,6 +16,13 @@ module PolicyHelper
                        selected_access_type)
   end
 
+  def project_policy_selection_options(access_types = nil, resource = nil, selected_access_type = nil)
+    access_types ||= [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING]
+
+    options_for_select(access_types.map { |t| [Policy.get_access_type_wording(t, true), t] },
+                       selected_access_type)
+  end
+
   # check if there are overlapped people in permissions and of privileged_people
   # if yes, compare the access type of them
   # and keep the one with higher access type
