@@ -67,6 +67,8 @@ module Seek
           end
 
           permission ? permission.allows_action?(action, person) : false
+        else
+          false
         end
       end
 
