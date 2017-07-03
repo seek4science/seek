@@ -11,7 +11,7 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 ## Version 1.4.0
 
-Release date: _June xth 2017_
+Release date: _July 4th 2017_
 
 The main change in this version is a complete upgrade of the underlying platform to the Rails 4.2, which supports Ruby 2.2.
 
@@ -19,8 +19,8 @@ Other major changes are included below:
 
   * Upgrade to Rails 4 platform
   * Project sharing permission defaults for when adding new items for a Project.
-  * Events are included in the ISA graph
-  * More descriptive tab titles
+  * Events are included in the ISA graph, and the text formatting has been improved
+  * More descriptive tab titles  
   
 There have also been many bug fixes (although many of the bugs listed in the release notes relate to problems 
 encountered during the Rails upgrade)        
