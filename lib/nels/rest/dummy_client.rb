@@ -18,31 +18,39 @@ module Nels
       end
 
       def projects
-        JSON.parse '[{"id":1123122,"name":"seek_pilot1"},{"id":1123123,"name":"seek_pilot2"}]'
+        JSON.parse '[{"id":1123122,"name":"seek_pilot1","description":"Seek pilot project 1","contact_person":"Kidane M. Tekle","creation_date":"2017-05-17T22:00:00Z"},{"id":1123123,"name":"seek_pilot2","description":"Second pilot project for seek","contact_person":"Kidane M. Tekle","creation_date":"2017-05-17T22:00:00Z"}]'
       end
 
       def datasets(project_id)
         if project_id == 1123122
-          JSON.parse '[{"id":1123528,"name":"Illumina-sequencing-dataset","type":"Illumina_seq_data"},{"id":1123527,"name":"proteomics-dataset","type":"Proteomics_data"}]'
+          JSON.parse '[{"creation_date":"2017-05-17T22:00:00Z","owner_name":"","description":"test","id":1123528,"name":"Illumina-sequencing-dataset","type":"Illumina_seq_data"},{"creation_date":"2017-05-17T22:00:00Z","owner_name":"","description":"test","id":1123527,"name":"proteomics-dataset","type":"Proteomics_data"}]'
         else
-          JSON.parse '[{"id":1123530,"name":"ds3","type":"Microarray_Methylation_data"},{"id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data"}]'
+          JSON.parse '[{"creation_date":"2017-05-17T22:00:00Z","owner_name":"","description":"test","id":1123530,"name":"ds3","type":"Microarray_Methylation_data"},{"creation_date":"2017-05-17T22:00:00Z","owner_name":"","description":"test","id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data"}]'
         end
       end
 
       def dataset(project_id, dataset_id)
         if project_id == 1123122
           if dataset_id == 1123528
-            JSON.parse '{"id":1123528,"name":"Illumina-sequencing-dataset","type":"Illumina_seq_data","subtypes":["analysis","reads"]}'
+            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123528,"name":"Illumina-sequencing-dataset","type":"Illumina_seq_data","owner_name":"","description":"test","subtypes":[{"name":"analysis","size":0},{"name":"reads","size":0}]}'
           else
-            JSON.parse '{"id":1123527,"name":"proteomics-dataset","type":"Proteomics_data","subtypes":["Processed","Raw","Results"]}'
+            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123527,"name":"proteomics-dataset","type":"Proteomics_data","owner_name":"","description":"test","subtypes":[{"name":"Processed","size":0},{"name":"Raw","size":94353},{"name":"Results","size":0}]}'
           end
         else
           if dataset_id == 1123530
-            JSON.parse '{"id":1123530,"name":"ds3","type":"Microarray_Methylation_data","subtypes":["Analysis","Images","Intensities"]}'
+            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123530,"name":"ds3","type":"Microarray_Methylation_data","owner_name":"","description":"test","subtypes":[{"name":"Analysis","size":0},{"name":"Images","size":0},{"name":"Intensities","size":0}]}'
           else
-            JSON.parse '{"id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data","subtypes":["Analysis","Images","Intensities"]}'
+            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data","owner_name":"","description":"test","subtypes":[{"name":"Analysis","size":0},{"name":"Images","size":0},{"name":"Intensities","size":0}]'
           end
         end
+      end
+
+      def persistent_url(project_id, dataset_id, subtype)
+        "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{Base64.encode64([project_id, dataset_id, subtype].join('')).chomp("=\n")}"
+      end
+
+      def sample_metadata(reference)
+        File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'sample-type-populated.xlsx'))
       end
 
     end
