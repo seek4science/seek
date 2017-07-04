@@ -4,6 +4,8 @@ class NelsController < ApplicationController
   before_filter :nels_oauth_session, except: :callback
   before_filter :rest_client, except: :callback
 
+  rescue_from RestClient::Unauthorized, :with => :unauthorized_response
+
   def callback
     hash = @oauth_client.get_token(params[:code])
 
@@ -70,13 +72,21 @@ class NelsController < ApplicationController
 
   def nels_oauth_session
     @oauth_session = current_user.oauth_sessions.where(provider: 'NeLS').first
-    if !@oauth_session || @oauth_session.expired?
-      redirect_to @oauth_client.authorize_url
-    end
+    unauthorized_response if !@oauth_session || @oauth_session.expired?
   end
 
   def rest_client
     @rest_client = Nels::Rest::Client.new(@oauth_session.access_token)
+  end
+
+  def unauthorized_response
+    if action_name == 'browser'
+      redirect_to @oauth_client.authorize_url
+    else
+      render json: { error: 'Unauthorized',
+                     message: 'Attempting to reauthenticate...',
+                     url: @oauth_client.authorize_url }, status: :unauthorized
+    end
   end
 
 end

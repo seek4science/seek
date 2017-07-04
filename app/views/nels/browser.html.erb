@@ -22,7 +22,6 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
             'force_text': true,
             'data' : {
               'url': function (node) {
-                console.log(node);
                 if (node.id === '#') {
                   return 'nels_projects';
                 } else {
@@ -39,28 +38,35 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
                   d.project_id = node.data.project_id
                 }
                 return d;
+              },
+              'error': function (error) {
+                $j('#nels-dataset').hide();
+                $j('#nels-content').show();
+                $j('#nels-content').html(HandlebarsTemplates['nels/error'](error));
+                if (error.responseJSON.url) {
+                  window.location.href = error.responseJSON.url;
+                }
               }
             }
           }
-        }).on('activate_node.jstree', function (e, data) {
-      console.log(data);
+        })
+      .on('activate_node.jstree', function (e, data) {
+        if (data.node.data.project_id) {
+          $j('#nels-dataset').html('').spinner('add').show();
+          $j('#nels-content').hide();
 
-      if (data.node.data.project_id) {
-        $j('#nels-dataset').html('').spinner('add').show();
-        $j('#nels-content').hide();
-
-        $j.ajax({ url: '<%= nels_dataset_path -%>',
-          data: { project_id: data.node.data.project_id,
-            dataset_id: data.node.data.id },
-          success: function (data) {
-            $j('#nels-dataset').html(data).spinner('remove');
-          }
-        });
-      } else {
-        $j('#nels-dataset').hide();
-        $j('#nels-content').show();
-        $j('#nels-content').html(HandlebarsTemplates['nels/project'](data.node.data));
-      }
+          $j.ajax({ url: '<%= nels_dataset_path -%>',
+            data: { project_id: data.node.data.project_id,
+              dataset_id: data.node.data.id },
+            success: function (data) {
+              $j('#nels-dataset').html(data).spinner('remove');
+            }
+          });
+        } else {
+          $j('#nels-dataset').hide();
+          $j('#nels-content').show();
+          $j('#nels-content').html(HandlebarsTemplates['nels/project'](data.node.data));
+        }
     });
   });
 </script>
