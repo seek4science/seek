@@ -17,7 +17,7 @@ module Seek
       #   If not, the auth table will not be accurate.
       def self.is_authorized?(action, thing, user = nil)
         authorized_as_creator?(action, thing, user) ||
-          authorized_by_policy?(action, thing) ||
+          authorized_by_policy?(action, thing, user) ||
           authorized_by_permission?(action, thing, user)
       end
 
@@ -38,9 +38,13 @@ module Seek
         false
       end
 
-      def self.authorized_by_policy?(action, thing)
+      def self.authorized_by_policy?(action, thing, user)
         # Check the user is "in scope" and also is performing an action allowed under the given access type
-        access_type_allows_action?(action, thing.policy.access_type)
+        if thing.policy.sharing_scope == Policy::ALL_USERS
+          access_type_allows_action?(action, thing.policy.access_type) && !user.nil?
+        else
+          access_type_allows_action?(action, thing.policy.access_type)
+        end
       end
 
       def self.authorized_by_permission?(action, thing, user = nil)
@@ -63,6 +67,8 @@ module Seek
           end
 
           permission ? permission.allows_action?(action, person) : false
+        else
+          false
         end
       end
 
@@ -70,15 +76,15 @@ module Seek
       def self.access_type_allows_action?(action, access_type)
         case action
         when 'view'
-          return access_type >= Policy::VISIBLE
+          access_type >= Policy::VISIBLE
         when 'download'
-          return access_type >= Policy::ACCESSIBLE
+          access_type >= Policy::ACCESSIBLE
         when 'edit'
-          return access_type >= Policy::EDITING
+          access_type >= Policy::EDITING
         when 'delete', 'manage'
           return access_type >= Policy::MANAGING
         else
-          return false
+          false
         end
       end
     end
