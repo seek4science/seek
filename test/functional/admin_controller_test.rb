@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AdminsControllerTest < ActionController::TestCase
+class AdminControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
@@ -65,14 +65,14 @@ class AdminsControllerTest < ActionController::TestCase
   end
 
   test 'visible to admin' do
-    get :show
+    get :index
     assert_response :success
     assert_nil flash[:error]
   end
 
   test 'invisible to non admin' do
     login_as(Factory(:user))
-    get :show
+    get :index
     assert_response :redirect
     assert_not_nil flash[:error]
   end
