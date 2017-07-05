@@ -1,11 +1,7 @@
 <h1>Administration <small><%= version_text -%></small></h1>
 
-<%= folding_panel('Common tasks', false) do %>
-    <%= render :partial => 'admin/tasks' %>
-<% end %>
-
-<%= folding_panel('Site configuration', true) do %>
-    <%= render :partial => 'admin/site_configuration' %>
+<%= folding_panel('General', false) do %>
+    <%= render :partial => 'admin/general' %>
 <% end %>
 
 <%= folding_panel('Statistics', true) do %>
