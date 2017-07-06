@@ -692,10 +692,12 @@ class AuthorizationTest < ActiveSupport::TestCase
     refute Seek::Permissions::Authorization.is_authorized?("edit",df,user)
     assert Seek::Permissions::Authorization.is_authorized?("download",df,user)
     assert Seek::Permissions::Authorization.is_authorized?("view",df,user)
+    assert_equal true, Seek::Permissions::Authorization.is_authorized?("view",df,user)
 
     refute Seek::Permissions::Authorization.is_authorized?("edit",df,nil)
     refute Seek::Permissions::Authorization.is_authorized?("download",df,nil)
     refute Seek::Permissions::Authorization.is_authorized?("view",df,nil)
+    assert_equal false, Seek::Permissions::Authorization.is_authorized?("view",df,nil)
   end
 
   private 

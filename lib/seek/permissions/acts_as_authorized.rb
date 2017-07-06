@@ -1,8 +1,7 @@
 module Seek #:nodoc:
   module Permissions #:nodoc:
     module ActsAsAuthorized
-
-      AUTHORIZATION_ACTIONS = [:view, :edit, :download, :delete, :manage]
+      AUTHORIZATION_ACTIONS = %i[view edit download delete manage].freeze
 
       def self.included(ar)
         ar.const_get(:Base).class_eval { include BaseExtensions }

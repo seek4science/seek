@@ -58,7 +58,7 @@ var Sharing = {
       if (Sharing.permissionsTable.permissions[i].contributor_id === project.id)
         break;
     }
-    if (confirm('Do you want to want to remove any permissions for ' + project.title + '?')) {
+    if (confirm('Do you want to remove any permissions for ' + project.title + '?')) {
       Sharing.permissionsTable.permissions.splice(i, 1);
     } else {
       Sharing.permissionsTable.permissions[i].isMandatory = false;
