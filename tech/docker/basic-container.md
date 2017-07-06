@@ -52,13 +52,16 @@ Note that there is also a _master_ tag. This is the latest development build of 
 It is useful for testing and trying out new cutting edge features, 
 but is not suitable for a production deployment of SEEK.    
 
-### Using volumes
+### Persistant Storage
 
-If you are using Docker for a SEEK deployment for real use, rather than just testing or trying out, 
-then you will want your data and files to be preserved. 
-Using the previous examples they would be inside the container
-and lost once the container is deleted. 
-You can avoid this by telling the container to use a couple of Docker volumes for the database and filestore.
+If running a container for other than basic testing, you will want the stored data to be preserved when updating images. 
+(However, if this is case you should be thinking about using [Docker compose](docker-compose.html)).
+
+It is possible to do so by mounting a directory on the host machine for the database and filestore. E.g. to use /data/seek-filestore and /data/seek-db:
+
+    docker run -d -p 3000:3000 -v /data/seek-filestore:/seek/filestore -v /data/seek-db:/seek/sqlite3-db --name seek fairdom/seek:{{ site.current_docker_tag }}
+
+Alternatively you can tell the Docker container to use named _data volumes_ for the database and filestore:
   
   
     docker run -d -p 3000:3000 -v seek-filestore:/seek/filestore -v seek-db:/seek/sqlite3-db --name seek fairdom/seek:{{ site.current_docker_tag }}
@@ -66,8 +69,7 @@ You can avoid this by telling the container to use a couple of Docker volumes fo
 this will create 2 volumes called _seek-filestore_ and _seek-db_, which you can see and manage with docker volumes, e.g
     
     docker volume ls
-    
-For backing up purposes, Docker volumes are stored at _/var/lib/docker/volumes_ (sudo required). 
+     
 By using volumes the container can be thrown away and recreated (say, for a newer image) without losing your data.
     
 For more detailed information about Volumes please read [Manage data in containers](https://docs.docker.com/engine/tutorials/dockervolumes/)    

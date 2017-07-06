@@ -7,11 +7,11 @@ layout: page
 
 ## Using docker compose
 
-If necessary, you can run SEEK in Docker together with MySQL and SOLR running in its own containers. 
+You can run SEEK in Docker together with MySQL and SOLR running in its own containers as micro-services. 
 To do this you use Docker Compose. 
 See the [Docker Compose Installation Guide](https://docs.docker.com/compose/install/) for how to install.
  
-Once installed, all you need is the [docker-compose.yml](https://github.com/seek4science/seek/blob/seek-{{ site.current_docker_tag }}/docker-compose.yml), and the [docker/db.env](https://github.com/seek4science/seek/blob/master/docker/db.env),
+Once installed, all that is needed is the [docker-compose.yml](https://github.com/seek4science/seek/blob/seek-{{ site.current_docker_tag }}/docker-compose.yml), and the [docker/db.env](https://github.com/seek4science/seek/blob/master/docker/db.env),
 although you can simply check out the SEEK source from GitHub - see [Getting SEEK](../install.html#getting-seek).
 
 First you need to create 4 volumes
@@ -43,7 +43,9 @@ You change the port, and image in the docker-compose.yml by editing
         ports:
               - "3000:3000"
               
-Alternatively to changing the port (particularly if running several instances on
+## Proxy through NGINX              
+              
+An alternative to changing the port (particularly if running several instances on
 same machine), you can proxy through Apache or Nginx. E.g. for Nginx you would configure a virtual host
 like the following:
 
@@ -59,3 +61,22 @@ like the following:
             proxy_pass         http://127.0.0.1:3000;
         }
     }
+    
+## Upgrading between versions    
+
+The process is very similar to [Upgrading a Basic Container](basic-container.html#upgrading).
+
+First update the [docker-compose.yml](https://github.com/seek4science/seek/blob/seek-{{ site.current_docker_tag }}/docker-compose.yml) for the new version.
+You will be able to tell the version from the image tag - e.g for {{ site.current_docker_tag }} 
+
+    image: fairdom/seek:{{ site.current_docker_tag }}
+    
+using the new docker-compose.yml do:
+    
+    docker-compose down
+    docker-compose pull
+    docker-compose up -d seek db solr            # avoiding the seek-workers, which will interfere    
+    docker exec -it seek docker/upgrade.sh
+    docker-compose down
+    docker-compose up -d
+ 
