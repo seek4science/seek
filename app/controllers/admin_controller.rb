@@ -133,12 +133,6 @@ class AdminController < ApplicationController
     update_redirect_to is_entries_integer, 'home_settings'
   end
 
-  def update_imprint_setting
-    Seek::Config.imprint_enabled = string_to_boolean params[:imprint_enabled]
-    Seek::Config.imprint_description = params[:imprint_description]
-    update_redirect_to true, 'imprint_setting'
-  end
-
   def rebrand
     respond_to do |format|
       format.html
@@ -163,6 +157,12 @@ class AdminController < ApplicationController
 
     Seek::Config.copyright_addendum_enabled = string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content = params[:copyright_addendum_content]
+
+    Seek::Config.imprint_enabled = string_to_boolean params[:imprint_enabled]
+    Seek::Config.imprint_description = params[:imprint_description]
+
+    Seek::Config.about_page_enabled = string_to_boolean params[:about_page_enabled]
+    Seek::Config.about_page = params[:about_page]
 
     update_redirect_to true, 'rebrand'
   end
