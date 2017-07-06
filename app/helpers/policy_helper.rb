@@ -48,9 +48,18 @@ module PolicyHelper
     [permissions, privileged_people]
   end
 
-  def group_by_access_type(permissions, privileged_people)
+  def group_by_access_type(permissions, privileged_people, downloadable = false)
     grouped_contributors = {}
-    permissions.group_by(&:access_type).each do |access, permissions|
+    # Group "download" permissions (i.e. from a default policy) in with "view" permissions if the resource is not downloadable
+    grouped_permissions = permissions.group_by do |p|
+      if !downloadable && p.access_type == Policy::ACCESSIBLE
+        Policy::VISIBLE
+      else
+        p.access_type
+      end
+    end
+
+    grouped_permissions.each do |access, permissions|
       grouped_contributors[access] = permissions.map(&:contributor)
     end
 
