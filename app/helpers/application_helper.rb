@@ -409,8 +409,8 @@ module ApplicationHelper
     html.html_safe
   end
 
-  def toggle_appear_javascript(block_id)
-    "this.checked ? $j('##{block_id}').slideDown() : $j('##{block_id}').slideUp();".html_safe
+  def toggle_appear_javascript(block_id, reverse: false)
+    "#{reverse ? '!' : ''}this.checked ? $j('##{block_id}').slideDown() : $j('##{block_id}').slideUp();".html_safe
   end
 
   def folding_box(id, title, options = nil)
