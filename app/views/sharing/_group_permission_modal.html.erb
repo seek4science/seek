@@ -16,7 +16,13 @@
         </div>
         <div class="form-group">
           <label>can...</label>
-          <%= select_tag('permission-project-access-type', policy_selection_options(nil, object, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
+          <% if object.kind_of?(Project)%>
+              <%= select_tag('permission-project-access-type', project_policy_selection_options(nil, object, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
+          <% else %>
+              <%= select_tag('permission-project-access-type', policy_selection_options(nil, object, Policy::ACCESSIBLE), name: nil, class: 'form-control') -%>
+          <% end %>
+
+
         </div>
     <% end %>
     <%= modal_footer do %>
