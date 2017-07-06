@@ -208,11 +208,7 @@ GEM
       i18n
     bibtex-ruby (4.4.2)
       latex-decode (~> 0.0)
-<<<<<<< HEAD
-    bio (1.5.0)
-=======
     bio (1.5.1)
->>>>>>> master
     bives (1.0)
       open4 (~> 1.3.0)
     bootstrap-sass (3.1.1.0)
@@ -361,11 +357,7 @@ GEM
     json (1.8.3)
     json-ld (1.1.8)
       rdf (~> 1.1, >= 1.1.7)
-<<<<<<< HEAD
-    kgio (2.9.3)
-=======
     kgio (2.11.0)
->>>>>>> master
     latex-decode (0.2.2)
       unicode (~> 0.4)
     libxml-ruby (2.8.0)
@@ -778,11 +770,7 @@ GEM
       unf_ext
     unf_ext (0.0.7.1)
     unicode (0.4.4.2)
-<<<<<<< HEAD
-    unicorn (4.9.0)
-=======
     unicorn (5.2.0)
->>>>>>> master
       kgio (~> 2.6)
       raindrops (~> 0.7)
     unicorn-rails (2.2.0)
@@ -836,11 +824,7 @@ DEPENDENCIES
   attr_encrypted (~> 3.0.0)
   auto_strip_attributes
   bibtex-ruby (~> 4.4.2)
-<<<<<<< HEAD
-  bio (~> 1.5.0)
-=======
   bio (~> 1.5.1)
->>>>>>> master
   bioportal (>= 2.3)!
   bives
   bootstrap-sass (= 3.1.1.0)
