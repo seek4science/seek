@@ -105,30 +105,30 @@ class StudiesController < ApplicationController
   def create
 
     # convert params as received by json-api to (flat) rails json
-    if params.key?("data")
-
-      params[:study] = params[:data][:attributes]
-
-      params[:study][:project_ids] = []
-      params[:relationships].each do |r,info|
-        params[:study][:project_ids] << r.capitalize.constantize.where(info[:meta]).first.id
-      end
-
-
-      investigation_title = params[:meta][:investigation_title]
-      person_email = params[:meta][:person_responsible]
-
-      params[:study][:investigation_id] = Investigation.where(title:  investigation_title).first[:id].to_s
-      params[:study][:person_responsible] = Person.where(email: person_email).first
-
-      #Creators
-      creators_arr = []
-      params[:study][:creators].each { |cr|
-        the_person = Person.where(email: cr).first
-        creators_arr << the_person
-      }
-      params[:study][:creators] = creators_arr
-    end
+    # if params.key?("data")
+    #
+    #   params[:study] = params[:data][:attributes]
+    #
+    #   params[:study][:project_ids] = []
+    #   params[:relationships].each do |r,info|
+    #     params[:study][:project_ids] << r.capitalize.constantize.where(info[:meta]).first.id
+    #   end
+    #
+    #
+    #   investigation_title = params[:meta][:investigation_title]
+    #   person_email = params[:meta][:person_responsible]
+    #
+    #   params[:study][:investigation_id] = Investigation.where(title:  investigation_title).first[:id].to_s
+    #   params[:study][:person_responsible] = Person.where(email: person_email).first
+    #
+    #   #Creators
+    #   creators_arr = []
+    #   params[:study][:creators].each { |cr|
+    #     the_person = Person.where(email: cr).first
+    #     creators_arr << the_person
+    #   }
+    #   params[:study][:creators] = creators_arr
+    # end
 
     @study = Study.new(study_params)
 

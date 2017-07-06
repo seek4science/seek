@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
-  before_filter :process_params, :only=>[:edit, :update, :destroy, :create, :new]
+  #before_filter :process_params, :only=>[:edit, :update, :destroy, :create, :new]
 
   # after_filter :unescape_response
 
