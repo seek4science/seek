@@ -43,8 +43,26 @@
                              "Copyright addendum content", "Additional copyright information that is appended to the information in the footer") %>
     </div>
 
-    <%= admin_text_setting(:noreply_sender, Seek::Config.noreply_sender,
-                           "Noreply sender", "An email that is used to send notification from SEEK.") %>
+    <%= admin_checkbox_setting(:imprint_enabled, 1,Seek::Config.imprint_enabled,
+                               "Imprint enabled","Whether you enabled imprint link at the bottom left of the page. This is obligatory for the SEEK instance running in Germany",
+                               :onchange => toggle_appear_javascript('imprint_details')) %>
+
+    <div class="additional_settings" id="imprint_details" style="<%= show_or_hide_block Seek::Config.imprint_enabled -%>">
+      <%= admin_textarea_setting(:imprint_description, Seek::Config.imprint_description,
+                               nil, "Here you give the text for your SEEK imprint, to comply with German/your country's law and your institution/university's rules.
+                               Or you can give the link to its content from external site. You can input basic html tags and formats.
+                               Below is an example. You can see how it is under homes/imprint", :rows => 30) %>
+    </div>
+
+    <%= admin_checkbox_setting(:about_page_enabled, 1,Seek::Config.about_page_enabled,
+                               '"About" page enabled', 'Add a custom "About" page link to the Help menu where users can find out more information about this SEEK instance.',
+                               :onchange => toggle_appear_javascript('about_page_details')) %>
+
+    <div class="additional_settings" id="about_page_details" style="<%= show_or_hide_block Seek::Config.about_page_enabled -%>">
+      <%= admin_textarea_setting(:about_page, Seek::Config.about_page,
+                               nil, "Here you can specify content for your instance's \"About\" page. You can input basic html tags and formats.
+                               Below is an example.", :rows => 30) %>
+    </div>
 
     <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path %>
