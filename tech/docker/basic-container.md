@@ -38,7 +38,7 @@ Once the container is finshed with, and after it has been stopped you can delete
     docker rm seek
     
 Note that in this simple form, deleting the container will also delete 
-the data (see [Using volumes](#using-volumes) for how to avoid this)    
+the data (see [Persistent Storage](#persistent-storage) for how to avoid this)    
 
 ### Image tags
    
@@ -52,7 +52,7 @@ Note that there is also a _master_ tag. This is the latest development build of 
 It is useful for testing and trying out new cutting edge features, 
 but is not suitable for a production deployment of SEEK.    
 
-### Persistant Storage
+### Persistent Storage
 
 If running a container for other than basic testing, you will want the stored data to be preserved when updating images. 
 (However, if this is case you should be thinking about using [Docker compose](docker-compose.html)).
@@ -76,7 +76,7 @@ For more detailed information about Volumes please read [Manage data in containe
 
 ### Upgrades
 
-Upgrades between SEEK container versions is only possible (and only makes sense) when [using Volumes](#using-volumes). 
+Upgrades between SEEK container versions is only possible (and only makes sense) when [using Volumes](#persistent-storage). 
 Also, upgrades are generally only necessary when switching between minor versions of SEEK. 
 
 Switching to a newer build of the same version is as simple as:

@@ -64,7 +64,7 @@ like the following:
     
 ## Upgrading between versions    
 
-The process is very similar to [Upgrading a Basic Container](basic-container.html#upgrading).
+The process is very similar to [Upgrading a Basic Container](basic-container.html#upgrades).
 
 First update the [docker-compose.yml](https://github.com/seek4science/seek/blob/seek-{{ site.current_docker_tag }}/docker-compose.yml) for the new version.
 You will be able to tell the version from the image tag - e.g for {{ site.current_docker_tag }} 
