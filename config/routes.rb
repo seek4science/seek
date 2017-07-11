@@ -17,9 +17,9 @@ SEEK::Application.routes.draw do
 
   root :to => "homes#index"
 
-  resource :admin do
-    member do
-      get :show
+  resource :admin, controller: 'admin' do
+    collection do
+      get :index
       get :tags
       get :features_enabled
       get :rebrand
@@ -29,7 +29,6 @@ SEEK::Application.routes.draw do
       get :get_stats
       get :registration_form
       get :edit_tag
-      get :imprint_setting
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -54,6 +53,7 @@ SEEK::Application.routes.draw do
       get :funding
       post :send_feedback
       get :imprint
+      get :about
     end
   end
 
