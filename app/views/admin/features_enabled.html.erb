@@ -21,12 +21,6 @@
     <%#= admin_checkbox_setting(:delete_asset_version_enabled, 1, Seek::Config.delete_asset_version_enabled,
                                "Delete asset version enabled", "Whether delete of one version of the versioned asset is enabled. It allows to delete previous (older) versions without deleting the complete asset") %>
 
-    <div id="registration_disabled_textarea" class="additional_settings" style="<%= show_or_hide_block Seek::Config.registration_disabled -%>">
-
-      <%= admin_textarea_setting(:registration_disabled_description, Seek::Config.registration_disabled_description,
-                                 "Registration disabled message", "Sets the description text on the registration page when registration is disabled") %>
-    </div>
-
     <%= admin_checkbox_setting(:jws_enabled, 1, Seek::Config.jws_enabled,
                                "JWS Online enabled", "Whether integration with JWS Online is enabled. Enabling this allows simulation of SBML models with JWS Online.",
                                :onchange=>toggle_appear_javascript('jws_online_details')) %>
