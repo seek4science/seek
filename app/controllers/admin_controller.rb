@@ -185,7 +185,7 @@ class AdminController < ApplicationController
     update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'), 'pagination'
   end
 
-  def update_others
+  def update_settings
     update_flag = true
     if Seek::Config.tag_threshold.to_s != params[:tag_threshold] || Seek::Config.max_visible_tags.to_s != params[:max_visible_tags]
       expire_annotation_fragments
@@ -222,7 +222,7 @@ class AdminController < ApplicationController
 
     Seek::Config.default_license = params[:default_license]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
-    update_redirect_to update_flag, 'others'
+    update_redirect_to update_flag, 'settings'
   end
 
   def restart_server

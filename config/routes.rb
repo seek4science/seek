@@ -25,7 +25,7 @@ SEEK::Application.routes.draw do
       get :rebrand
       get :home_settings
       get :pagination
-      get :others
+      get :settings
       get :get_stats
       get :registration_form
       get :edit_tag
@@ -37,7 +37,7 @@ SEEK::Application.routes.draw do
       post :update_admins
       post :update_rebrand
       post :test_email_configuration
-      post :update_others
+      post :update_settings
       post :update_features_enabled
       post :update_pagination
       post :delete_tag

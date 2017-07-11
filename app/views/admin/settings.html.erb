@@ -1,6 +1,6 @@
 <h1>Additional settings</h1>
 
-<%= form_tag :action=>"update_others" do -%>
+<%= form_tag :action=>"update_settings" do -%>
     <%= admin_text_setting(:pubmed_api_email, Seek::Config.pubmed_api_email,
                            'Pubmed API email', 'When adding a publication from PubMed, an email address is required to use the API. No registration is required.') %>
 
