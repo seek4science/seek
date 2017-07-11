@@ -1,6 +1,9 @@
 <h1>Homepage Settings</h1>
 
 <%= form_tag :action=>"update_home_settings" do -%>
+    <%= admin_checkbox_setting(:show_announcements, 1, Seek::Config.show_announcements,
+                               "Announcements enabled", "Whether the announcements panel is displayed. If you don't make many announcements you may want to hide it to avoid showing old announcements") %>
+
     <%= admin_checkbox_setting(:news_enabled, 1, Seek::Config.news_enabled,
                                "News enabled", "Display news in the homepage",
                                :onchange=>toggle_appear_javascript('news_block')) %>

@@ -15,9 +15,6 @@
     <%= admin_checkbox_setting(:samples_enabled, 1, Seek::Config.samples_enabled,
                                "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.") %>
 
-    <%= admin_checkbox_setting(:show_announcements, 1, Seek::Config.show_announcements,
-                               "Show announcements enabled", "Whether the announcements panel is displayed. If you don't make many announcements you may want to hide it to avoid showing old announcements") %>
-
     <%= admin_checkbox_setting(:pdf_conversion_enabled, 1, Seek::Config.pdf_conversion_enabled,
                                "Pdf conversion enabled", "Whether pdf conversion is enabled. It allows converting some document types to pdf format. If enabled, you need to ensure open office is running") %>
 

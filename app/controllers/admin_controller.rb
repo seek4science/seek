@@ -41,7 +41,6 @@ class AdminController < ApplicationController
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
     # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
-    Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
@@ -114,6 +113,7 @@ class AdminController < ApplicationController
   end
 
   def update_home_settings
+    Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
     Seek::Config.news_enabled = string_to_boolean params[:news_enabled]
     Seek::Config.news_feed_urls = params[:news_feed_urls]
 
