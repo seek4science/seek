@@ -69,13 +69,6 @@ class AdminController < ApplicationController
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
 
-    Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
-
-    Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
-    Seek::Config.registration_disabled_description = params[:registration_disabled_description]
-
-    Seek::Config.activation_required_enabled = string_to_boolean params[:activation_required_enabled]
-
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
     Seek::Config.google_analytics_enabled = string_to_boolean params[:google_analytics_enabled]
 
@@ -218,6 +211,10 @@ class AdminController < ApplicationController
     Seek::Config.max_cachable_size = params[:max_cachable_size]
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
 
+    Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
+    Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
+    Seek::Config.registration_disabled_description = params[:registration_disabled_description]
+    Seek::Config.activation_required_enabled = string_to_boolean params[:activation_required_enabled]
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
 
     Seek::Config.default_license = params[:default_license]

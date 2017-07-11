@@ -82,6 +82,16 @@
                              :onkeypress => "javascript: return onlyNumbers(event);") %>
     </div>
 
+    <%= admin_checkbox_setting(:hide_details_enabled, 1, Seek::Config.hide_details_enabled,
+                               "Hide contact details", "Hides email addresses, skype and internal web addresses.") %>
+
+    <%= admin_checkbox_setting(:activation_required_enabled, 1, Seek::Config.activation_required_enabled,
+                               "Activation required", "Whether activation is required when registering, as an additional check that the person is genuine and provided a correct email address. Since an activation email is sent, you need to make sure email is setup and working") %>
+
+    <%= admin_checkbox_setting(:registration_disabled, 1, Seek::Config.registration_disabled,
+                               "Registration disabled", "Whether new accounts creation is disabled. Can be useful in combinaison with external authentification (e.g. LDAP)",
+                               :onchange=>toggle_appear_javascript('registration_disabled_textarea')) %>
+
     <%= admin_checkbox_setting(:orcid_required, 1, Seek::Config.orcid_required,
                                'ORCID required', "Require all profiles to specify an #{link_to 'ORCID', 'http://orcid.org/content/about-orcid', target: :_blank} identifier.".html_safe) %>
 
