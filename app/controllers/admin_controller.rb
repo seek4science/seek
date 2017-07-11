@@ -123,7 +123,12 @@ class AdminController < ApplicationController
       logger.error "Error whilst attempting to clear feed cache #{e.message}"
     end
 
-    update_redirect_to is_entries_integer, 'home_settings'
+    max_visible_tags = params[:max_visible_tags]
+    tag_threshold = params[:tag_threshold]
+    Seek::Config.tag_threshold = tag_threshold if only_integer tag_threshold, 'tag threshold'
+    Seek::Config.max_visible_tags = max_visible_tags if only_positive_integer max_visible_tags, 'maximum visible tags'
+
+    update_redirect_to (is_entries_integer && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')), 'home_settings'
   end
 
   def rebrand
@@ -179,7 +184,6 @@ class AdminController < ApplicationController
   end
 
   def update_settings
-    update_flag = true
     if Seek::Config.tag_threshold.to_s != params[:tag_threshold] || Seek::Config.max_visible_tags.to_s != params[:max_visible_tags]
       expire_annotation_fragments
     end
@@ -192,12 +196,7 @@ class AdminController < ApplicationController
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 
-    max_visible_tags = params[:max_visible_tags]
-    tag_threshold = params[:tag_threshold]
-
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
-    Seek::Config.tag_threshold = tag_threshold if only_integer tag_threshold, 'tag threshold'
-    Seek::Config.max_visible_tags = max_visible_tags if only_positive_integer max_visible_tags, 'maximum visible tags'
     Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
     Seek::Config.recaptcha_enabled = string_to_boolean params[:recaptcha_enabled]
     Seek::Config.recaptcha_private_key = params[:recaptcha_private_key]
@@ -218,7 +217,7 @@ class AdminController < ApplicationController
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
 
     Seek::Config.default_license = params[:default_license]
-    update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
+    update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end
 

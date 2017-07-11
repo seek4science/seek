@@ -87,7 +87,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
     Seek::Config.tag_threshold = 2
-    post :update_settings, tag_threshold: '8', max_visible_tags: '9'
+    post :update_home_settings, tag_threshold: '8', max_visible_tags: '9'
     assert_equal 8, Seek::Config.tag_threshold
     assert_equal 9, Seek::Config.max_visible_tags
   end
@@ -114,17 +114,17 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'invalid email address' do
-    post :update_settings, pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com', tag_threshold: '1', max_visible_tags: '20'
+    post :update_settings, pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com'
     assert_not_nil flash[:error]
   end
 
   test 'should input integer' do
-    post :update_settings, pubmed_api_email: 'quentin@example.com', crossref_api_email: 'quentin@example.com', tag_threshold: '', max_visible_tags: '20'
+    post :update_home_settings, tag_threshold: '', max_visible_tags: '20'
     assert_not_nil flash[:error]
   end
 
   test 'should input positive integer' do
-    post :update_settings, pubmed_api_email: 'quentin@example.com', crossref_api_email: 'quentin@example.com', tag_threshold: '1', max_visible_tags: '0'
+    post :update_home_settings, tag_threshold: '1', max_visible_tags: '0'
     assert_not_nil flash[:error]
   end
 
@@ -233,11 +233,11 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update_redirect_to for update_home_setting' do
-    post :update_home_settings, news_number_of_entries: '10'
+    post :update_home_settings, news_number_of_entries: '10', tag_threshold: '1', max_visible_tags: '20'
     assert_redirected_to admin_path
     assert_nil flash[:error]
 
-    post :update_home_settings, news_number_of_entries: ''
+    post :update_home_settings, news_number_of_entries: '', tag_threshold: '1', max_visible_tags: '20'
     assert_redirected_to home_settings_admin_path
     assert_not_nil flash[:error]
   end

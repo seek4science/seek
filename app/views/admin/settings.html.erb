@@ -13,14 +13,6 @@
     <%= admin_text_setting(:site_base_host, Seek::Config.site_base_host,
                            'Site base URL', 'This base URL for this SEEK installation. This is required cases where the host cannot be determined from the request - particularly within the REST API and Subscription email notifications.') %>
 
-    <%= admin_text_setting(:tag_threshold, Seek::Config.tag_threshold,
-                           'Tag threshold', 'Tags must have a count above or equal to this value to appear in either expanded or collapsed left hand tag cloud.',
-                           :onkeypress => "javascript: return onlyNumbers(event);") %>
-
-    <%= admin_text_setting(:max_visible_tags, Seek::Config.max_visible_tags,
-                           'Maximum visible tags', 'The maximum number of tags that will appear in the left hand tag cloud in its collapsed state.',
-                           :onkeypress => "javascript: return onlyNumbers(event);") %>
-
     <%= admin_text_setting(:sabiork_ws_base_url, Seek::Config.sabiork_ws_base_url,
                            'SabioRK WS base URL', 'This base URL for sabiork webservices REST API') %>
 
@@ -89,7 +81,7 @@
                                "Activation required", "Whether activation is required when registering, as an additional check that the person is genuine and provided a correct email address. Since an activation email is sent, you need to make sure email is setup and working") %>
 
     <%= admin_checkbox_setting(:registration_disabled, 1, Seek::Config.registration_disabled,
-                               "Registration disabled", "Whether new accounts creation is disabled. Can be useful in combinaison with external authentification (e.g. LDAP)",
+                               "Registration disabled", "Whether new accounts creation is disabled. Can be useful in combination with external authentication (e.g. LDAP)",
                                :onchange=>toggle_appear_javascript('registration_disabled_textarea')) %>
 
     <div id="registration_disabled_textarea" class="additional_settings" style="<%= show_or_hide_block Seek::Config.registration_disabled -%>">
