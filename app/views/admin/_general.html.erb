@@ -37,6 +37,14 @@
         <% end %>
         <li><%= link_to 'Manage compounds', compounds_path %></li>
       </ul>
+      <ul>
+        <li>
+          <%= link_to 'Register your SEEK installation', registration_form_admin_path %><br/>
+          <span class="subtle">This short registration form is entirely optional, but helps ensure continued funding and development of SEEK.</span>
+        </li>
+      </ul>
+
+      <%= render partial: 'admin/impersonate' if Seek::Config.admin_impersonation_enabled %>
     </div>
   </div>
 </div>
