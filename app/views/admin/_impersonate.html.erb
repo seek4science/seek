@@ -8,7 +8,21 @@
       <%= select_tag :id, options_for_select(options), autocomplete: 'off', prompt: 'Select user...',
                      class: 'form-control' %>
 
-      <%= submit_tag 'Go', class: 'btn btn-default',
-                     data: { confirm: 'This action will log you out. Are you sure you wish to continue?' } %>
+      <%= link_to 'Go', '#', class: 'btn btn-default', id: 'impersonate-btn' %>
     </div>
 <% end %>
+
+<script>
+  $j('#impersonate-btn').click(function () {
+    var form = $j(this).parents('form');
+    if (!$j('#id').val() || $j('#id').val() === '') {
+      alert('Please select a user.');
+    } else {
+      if (confirm('This action will log you out. Are you sure you wish to continue?')) {
+        form.submit();
+      }
+    }
+
+    return false;
+  });
+</script>
