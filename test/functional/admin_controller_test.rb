@@ -252,4 +252,17 @@ class AdminControllerTest < ActionController::TestCase
       refute Seek::Config.openbis_enabled
     end
   end
+
+  test 'snapshot and doi stats' do
+    investigation = Factory(:investigation, title: 'i1', description: 'not blank',
+                            policy: Factory(:downloadable_public_policy))
+    snapshot = investigation.create_snapshot
+    snapshot.update_column(:doi, '10.5072/testytest')
+    AssetDoiLog.create(asset_type: 'investigation',
+                       asset_id: investigation.id,
+                       action: AssetDoiLog::MINT)
+
+    xml_http_request :get, :get_stats, page:  'snapshot_and_doi_stats'
+    assert_response :success
+  end
 end
