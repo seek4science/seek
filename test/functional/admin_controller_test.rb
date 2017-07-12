@@ -146,7 +146,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'get project content stats' do
-    xml_http_request :get, :get_stats, id: 'content_stats'
+    xml_http_request :get, :get_stats, page:  'content_stats'
     assert_response :success
   end
 
@@ -184,7 +184,7 @@ class AdminControllerTest < ActionController::TestCase
     dj.created_at = '2010 September 11'
     assert dj.save
 
-    xml_http_request :get, :get_stats, id: 'job_queue'
+    xml_http_request :get, :get_stats, page:  'job_queue'
     assert_response :success
 
     assert_select 'p', text: 'Total delayed jobs waiting = 1'
@@ -199,7 +199,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'storage usage stats' do
     Factory(:rightfield_datafile)
     Factory(:rightfield_annotated_datafile)
-    xml_http_request :get, :get_stats, id: 'storage_usage_stats'
+    xml_http_request :get, :get_stats, page:  'storage_usage_stats'
     assert_response :success
   end
 

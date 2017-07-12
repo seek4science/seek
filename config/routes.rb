@@ -32,8 +32,6 @@ SEEK::Application.routes.draw do
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
-      post :get_stats
-      post :get_user_stats
       post :update_admins
       post :update_rebrand
       post :test_email_configuration

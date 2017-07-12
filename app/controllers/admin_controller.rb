@@ -314,30 +314,30 @@ class AdminController < ApplicationController
   end
 
   def get_stats
-    @page = params[:id]
-    respond_to do |format|
+    @page = params[:page]
       case @page
       when 'content_stats'
-        format.html { render partial: 'admin/stats/content_stats', locals: { stats: Seek::Stats::ContentStats.generate } }
+        render partial: 'admin/stats/content_stats', locals: { stats: Seek::Stats::ContentStats.generate }
       when 'activity_stats'
-        format.html { render partial: 'admin/stats/activity_stats', locals: { stats: Seek::Stats::ActivityStats.new } }
+        render partial: 'admin/stats/activity_stats', locals: { stats: Seek::Stats::ActivityStats.new }
       when 'search_stats'
-        format.html { render partial: 'admin/stats/search_stats', locals: { stats: Seek::Stats::SearchStats.new } }
+        render partial: 'admin/stats/search_stats', locals: { stats: Seek::Stats::SearchStats.new }
       when 'job_queue'
-        format.html { render partial: 'admin/stats/job_queue' }
+        render partial: 'admin/stats/job_queue'
       when 'auth_consistency'
-        format.html { render partial: 'admin/stats/auth_consistency' }
+        render partial: 'admin/stats/auth_consistency'
       when 'monthly_stats'
-        format.html { render partial: 'admin/stats/monthly_stats', locals: { stats: get_monthly_stats } }
+        render partial: 'admin/stats/monthly_stats', locals: { stats: get_monthly_stats }
       when 'workflow_stats'
-        format.html { render partial: 'admin/stats/workflow_stats' }
+        render partial: 'admin/stats/workflow_stats'
       when 'storage_usage_stats'
-        format.html { render partial: 'admin/stats/storage_usage_stats' }
+        render partial: 'admin/stats/storage_usage_stats'
       when 'snapshot_and_doi_stats'
-        format.html { render partial: 'admin/stats/snapshot_and_doi_stats' }
+        render partial: 'admin/stats/snapshot_and_doi_stats'
       when 'none'
-        format.html { render text: '' }
-      end
+        render text: ''
+      else
+        get_user_stats
     end
   end
 
@@ -347,7 +347,6 @@ class AdminController < ApplicationController
     action = nil
     title = nil
     extra_options = {}
-    @page = params[:id]
     case @page
     when 'invalid_users_profiles'
       partial = 'invalid_user_stats_list'
