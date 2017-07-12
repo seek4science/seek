@@ -36,7 +36,7 @@ module SuggestedTypesHelper
     Array(types).each do |type|
       list += render_list(type, selected_uri)
     end
-    list.join("\n").html_safe + '<br/> <em>* Note that it is suggested term.</em>'.html_safe
+    list.join("\n").html_safe
   end
 
   def render_list(type, selected_uri = nil)
@@ -48,11 +48,14 @@ module SuggestedTypesHelper
   def render_ontology_class_tree(clz, selected_uri, depth = 0)
     list = []
     uri = clz.uri.try(:to_s)
-    clz_li = "<li style=\"margin-left:#{12 * depth}px;#{uri == selected_uri ? 'background-color: lightblue;' : ''}\">" + (depth > 0 ? '└ ' : ' ') + ontology_class_list_item(clz) + '</li>'
+    clz_li = "<li#{uri == selected_uri ? 'class="selected"' : ''}>#{ontology_class_list_item(clz)}"
     list << clz_li
+    list << '<ul>' if clz.children.any?
     clz.children.each do |ontology_class_or_suggested_type|
       list += render_ontology_class_tree(ontology_class_or_suggested_type, selected_uri, depth + 1)
     end
+    list << '</ul>' if clz.children.any?
+    list << '</li>'
     list
   end
 
