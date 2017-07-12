@@ -329,23 +329,9 @@ SEEK::Application.routes.draw do
 
    ### ASSAY AND TECHNOLOGY TYPES ###
 
-  resources :suggested_assay_types do
-      collection do
-        get :manage
-      end
-
-  end
-  resources :suggested_modelling_analysis_types, :path => :suggested_assay_types, :controller => :suggested_assay_types do
-     collection do
-        get :manage
-      end
-  end
-  resources :suggested_technology_types do
-    collection do
-      get :manage
-    end
-  end
-
+  resources :suggested_assay_types
+  resources :suggested_modelling_analysis_types, :path => :suggested_assay_types, :controller => :suggested_assay_types
+  resources :suggested_technology_types
 
   ### ASSETS ###
 

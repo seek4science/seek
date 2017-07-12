@@ -29,8 +29,8 @@
       <h4>Management</h4>
       <ul>
         <li><%= link_to 'Announcements', site_announcements_path -%></li>
-        <li><%= link_to 'Manage assay types', manage_suggested_assay_types_path %></li>
-        <li><%= link_to 'Manage technology types', manage_suggested_technology_types_path %></li>
+        <li><%= link_to 'Manage assay types', suggested_assay_types_path %></li>
+        <li><%= link_to 'Manage technology types', suggested_technology_types_path %></li>
         <li><%= link_to 'Manage tags', tags_admin_path %></li>
         <% if Seek::Config.project_hierarchy_enabled %>
             <li><%= link_to 'Manage projects', manage_projects_path %></li>

@@ -26,7 +26,7 @@ module SuggestedTypesHelper
     if is_ajax_request?
       link_to_function('Cancel', 'RedBox.close()', class: 'btn btn-default')
     else
-      manage_path = eval "manage_#{controller_name}_path"
+      manage_path = eval "#{controller_name}_path"
       cancel_button(manage_path)
     end
   end

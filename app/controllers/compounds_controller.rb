@@ -6,6 +6,7 @@ class CompoundsController < ApplicationController
   before_filter :find_all_compounds
 
   include Seek::FactorStudied
+  include Seek::BreadCrumbs
 
   def index
     respond_to do |format|
