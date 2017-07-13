@@ -160,6 +160,7 @@ module ApiHelper
         builder.tag! 'internal_webpage', object.internal_webpage if object.respond_to?('internal_webpage')
         builder.tag! 'phone', object.phone if object.respond_to?('phone')
       end
+      builder.tag! 'orcid', object.orcid_uri if object.respond_to?('orcid_uri')
     end
 
     builder.tag! 'bioportal_concepts' do

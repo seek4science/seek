@@ -7,8 +7,10 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <%= link_to '/',:class=>"logo_link" do %>
-          <%= header_logo_image %>
+      <% if Seek::Config.header_image_enabled %>
+        <%= link_to '/',:class=>"logo_link" do %>
+            <%= header_logo_image %>
+        <% end %>
       <% end %>
     </div>
 
