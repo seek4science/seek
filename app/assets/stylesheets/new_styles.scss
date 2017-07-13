@@ -673,7 +673,7 @@ div.popup-contributor {
     background-image: url('tree/node.png');
     background-repeat: no-repeat;
     &.selected {
-      background-color: lightblue;
+      background-color: lightblue !important;
     }
     &:last-child {
       background-image: url('tree/last_node.png');

@@ -48,7 +48,7 @@ module SuggestedTypesHelper
   def render_ontology_class_tree(clz, selected_uri, depth = 0)
     list = []
     uri = clz.uri.try(:to_s)
-    clz_li = "<li#{uri == selected_uri ? 'class="selected"' : ''}>#{ontology_class_list_item(clz)}"
+    clz_li = "<li#{uri == selected_uri ? ' class="selected"' : ''}>#{ontology_class_list_item(clz)}"
     list << clz_li
     list << '<ul>' if clz.children.any?
     clz.children.each do |ontology_class_or_suggested_type|
@@ -68,7 +68,7 @@ module SuggestedTypesHelper
 
   def related_assays_text(clz)
     count = clz.assays.size
-    count == 0 ? '' : "<span style='color: #666666;'>(#{pluralize(count, 'assay')})</span>".html_safe
+    count == 0 ? '' : " <span style='color: #666666;'>(#{pluralize(count, 'assay')})</span>".html_safe
   end
 
   def show_ontology_class_link(clz)
@@ -90,10 +90,9 @@ module SuggestedTypesHelper
   end
 
   def delete_ontology_class_link(clz)
-    link = if clz.can_destroy? && action_name == 'manage'
+    link = if clz.can_destroy?
              link_to image('destroy'), clz, data: { confirm: "Are you sure you want to remove this #{clz.term_type} type?  This cannot be undone." },
-                                            method: :delete,
-                                            style: 'vertical-align:middle'
+                                            method: :delete
            else
              ''
            end
@@ -101,7 +100,7 @@ module SuggestedTypesHelper
   end
 
   def normal_link_to_edit(clz)
-    link_to(image('edit'), send("edit_suggested_#{clz.term_type}_type_path", id: clz), style: 'vertical-align:middle')
+    link_to(image('edit'), send("edit_suggested_#{clz.term_type}_type_path", id: clz))
   end
 
   def popup_link_to_edit(clz)
