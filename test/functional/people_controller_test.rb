@@ -13,7 +13,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object = Factory(:person)
+    @object = Factory(:person,orcid:'http://orcid.org/0000-0003-2130-0865')
   end
 
   def test_title
