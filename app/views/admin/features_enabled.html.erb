@@ -50,7 +50,7 @@
 
     <%= admin_checkbox_setting(:internal_help_enabled, 1, Seek::Config.internal_help_enabled,
                                "Internal help enabled", "Whether internal help pages should be used. Disabling this allows the use of external help pages.",
-                               :onchange=>toggle_appear_javascript('external_help_details')) %>
+                               :onchange=>toggle_appear_javascript('external_help_details', reverse: true)) %>
     <div id="external_help_details" class="additional_settings" style="<%= show_or_hide_block !Seek::Config.internal_help_enabled -%>">
       <%= admin_text_setting(:external_help_url, Seek::Config.external_help_url,
                              'Help URL', "This is the URL for the external help e.g #{Seek::Config.default_external_help_url}.") %>
@@ -74,13 +74,13 @@
                              'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. #{Seek::Config.default_piwik_analytics_url} ") %>
     </div>
 
-    <%= render :partial => "admins/doi_settings" %>
+    <%= render :partial => "admin/doi_settings" %>
 
-    <%= render :partial => "admins/zenodo_settings" %>
+    <%= render :partial => "admin/zenodo_settings" %>
 
-    <%= render :partial => 'admins/email' %>
+    <%= render :partial => 'admin/email' %>
 
-    <%= render :partial => 'admins/omniauth' %>
+    <%= render :partial => 'admin/omniauth' %>
 
     <%= admin_checkbox_setting(:openbis_enabled, 1, Seek::Config.openbis_enabled,
                                "openBIS enabled", "Whether support for a #{t('project')} to connect to openBIS is enabled.") %>

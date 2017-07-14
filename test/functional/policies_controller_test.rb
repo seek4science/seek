@@ -211,4 +211,23 @@ class PoliciesControllerTest < ActionController::TestCase
     post :preview_permissions, policy_attributes: projects_policy(Policy::VISIBLE, [asset_manager.projects.first], Policy::ACCESSIBLE),
                                resource_name: 'data_file', project_ids: asset_manager.projects.first.id
   end
+
+  test 'should display download permissions as view for non-downloadable resource in permission preview' do
+    person = Factory(:person_in_project)
+    project = Factory(:project)
+
+    post :preview_permissions, policy_attributes: {
+        access_type: Policy::NO_ACCESS,
+        permissions_attributes: {
+            '1' => { contributor_type: 'Person', contributor_id: person.id, access_type: Policy::VISIBLE },
+            '2' => { contributor_type: 'Project', contributor_id: project.id, access_type: Policy::ACCESSIBLE }
+        }
+    }, resource_name: 'study', project_ids: project.id
+
+    assert_response :success
+
+    assert_select 'p.private', text: "This #{I18n.t('study')} is hidden from public view.", count: 1
+    assert_select 'div.access-type-view li', text: "Members of #{project.title}", count: 1
+    assert_select 'div.access-type-view li', text: person.name, count: 1
+  end
 end
