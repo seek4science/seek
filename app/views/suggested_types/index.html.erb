@@ -1,8 +1,5 @@
 <h1>Manage <%= all_types_text %> types</h1>
 <%= button_link_to "New #{all_types_text("or")}  type", 'new', url_for(controller: controller_name, action: 'new') %>
-<%= button_link_to "New assay", 'new', new_assay_path %>
+<%= button_link_to 'New assay', 'new', new_assay_path %>
 
-<div class="type-tree">
-  <ul><%= ontology_editor_display(controller_name.classify.constantize.all_term_types) %></ul>
-  <em>* indicates a suggested term (not from the ontology)</em>
-</div>
+<%= render partial: 'suggested_types/tree', locals: { types: controller_name.classify.constantize.all_term_types } %>
