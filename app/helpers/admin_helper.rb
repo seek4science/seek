@@ -21,26 +21,12 @@ module AdminHelper
     words.join(', ').html_safe
   end
 
-  def delayed_job_status
-    status = ''
-    begin
-      directory = "#{Rails.root}/tmp/pids"
-      pids = Daemons::PidFile.find_files(directory, 'delayed_job').collect do |path|
-        file = path.sub("#{directory}/", '').sub('.pid', '')
-        Daemons::PidFile.new(directory, file)
-      end
-      pids.each do |pid|
-        status << if pid.running?
-                    "Running [Process ID: #{pid.pid}]"
-                  else
-                    "<span class='error_text'>Not running</span>"
-                  end
-        status << '&nbsp;:&nbsp;' unless pid == pids.last
-      end
-    rescue Exception => e
-      status = "<span class='error_text'>Unable to determine current status - #{e.message}</span>"
+  def delayed_job_pids
+    directory = "#{Rails.root}/tmp/pids"
+    Daemons::PidFile.find_files(directory, 'delayed_job').collect do |path|
+      file = path.sub("#{directory}/", '').sub('.pid', '')
+      Daemons::PidFile.new(directory, file)
     end
-    status.html_safe
   end
 
   def action_buttons(user_or_person, action)
