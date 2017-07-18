@@ -77,6 +77,11 @@ module SamplesHelper
   end
 
   def default_attribute_display(attribute, options, sample, value)
+    t = attribute.sample_attribute_type
+    if t.resolution.present? && t.regexp.present?
+      resolution = value.gsub(Regexp.new(t.regexp), t.resolution)
+      value = "<a href=\"" + resolution + "\"/>" + value + "</a>"
+    end
     if options[:link] && attribute.is_title
       link_to(value, sample)
     else
