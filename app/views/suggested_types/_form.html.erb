@@ -1,12 +1,13 @@
 
-<% options = (action == :new_popup || action == :edit_popup) ? {:remote=> true} : {}
-  types ||= Array(@suggested_type.term_type)
-   selected_uri = @suggested_type.parent.try(:uri) || @suggested_type.ontology_uri
+<%
+  suggested_type ||= @suggested_type
+  options = (action == :new_popup || action == :edit_popup) ? {:remote=> true} : {}
+  types ||= Array(suggested_type.term_type)
+  selected_uri = suggested_type.parent.try(:uri) || suggested_type.ontology_uri
 %>
 
-<%= form_for @suggested_type, options do |f| %>
+<%= form_for suggested_type, options do |f| %>
 <%= f.error_messages %>
-<%#= f.hidden_field :term_type%>
 
 <div class="center-block" style="width: 60%;">
   <div class="form-group">
@@ -16,9 +17,9 @@
 
   <div class="form-group">
     <%= f.label 'Parent' -%>
-    <%= ontology_selection_list types, "#{@suggested_type.class.name.underscore}[parent_uri]",
+    <%= ontology_selection_list types, "#{suggested_type.class.name.underscore}[parent_uri]",
                                 selected_uri,
-                                ([@suggested_type] + @suggested_type.all_children).map(&:uri),
+                                ([suggested_type] + suggested_type.all_children).map(&:uri),
                                 { class: 'form-control'}
     %>
     <p class="help-block">Select parent type.</p>

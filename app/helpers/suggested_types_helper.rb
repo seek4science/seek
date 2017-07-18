@@ -2,14 +2,24 @@
 module SuggestedTypesHelper
   def create_suggested_type_popup_link(term_type)
     link_name = image('new') + ' ' + "New #{term_type.humanize.downcase} type"
-    url = eval "new_suggested_#{term_type}_type_path"
+    modal_id = "#{term_type.underscore.downcase}-new-term-modal"
+    suggested_type = if term_type=='technology'
+                       SuggestedTechnologyType.new
+                     else
+                       SuggestedAssayType.new
+                     end
+    suggested_type.term_type = term_type
 
-    link_to_remote_redbox(link_name,
-                          url: url,
-                          failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
-                          with: "'term_type=#{term_type}'",
-                          method: :get
-                         )
+    modal_options = {id: modal_id, size: 's', 'data-role' => 'create-new-suggested-type'}
+
+    modal_title = "New suggested #{term_type.humanize.downcase} type"
+
+    modal(modal_options) do
+      modal_header(modal_title) +
+          modal_body do
+            render partial: 'suggested_types/new_modal_type', locals: {suggested_type: suggested_type}
+          end
+    end + link_to(link_name, '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}")
   end
 
   def create_or_update_text
@@ -24,7 +34,7 @@ module SuggestedTypesHelper
 
   def cancel_link
     if is_ajax_request?
-      link_to_function('Cancel', 'RedBox.close()', class: 'btn btn-default')
+      link_to_function('Cancel', "$j('.modal:visible').modal('toggle');", class: 'btn btn-default')
     else
       manage_path = eval "manage_#{controller_name}_path"
       cancel_button(manage_path)
