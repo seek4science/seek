@@ -220,19 +220,35 @@ class UsersControllerTest < ActionController::TestCase
     assert User.authenticate('quentin', 'mmmmm')
   end
 
-  def admin_can_impersonate
+  test 'admin can impersonate' do
     login_as :quentin
-    assert current_user, users(:quentin)
+    assert User.current_user, users(:quentin)
+
     get :impersonate, id: users(:aaron)
-    assert current_user, users(:aaron)
+
+    assert_redirected_to root_path
+    assert User.current_user, users(:aaron)
   end
 
-  def non_admin_cannot_impersonate
-    login_as :aaron
-    assert current_user, users(:aaron)
-    get :impersonate, id: users(:quentin)
+  test 'admin redirected back impersonating non-existent user' do
+    login_as :quentin
+    assert User.current_user, users(:quentin)
+
+    get :impersonate, id: (User.last.id + 1)
+
+    assert_redirected_to admin_path
+    assert User.current_user, users(:quentin)
     assert flash[:error]
-    assert current_user, users(:aaron)
+  end
+
+  test 'non admin cannot impersonate' do
+    login_as :aaron
+    assert User.current_user, users(:aaron)
+
+    get :impersonate, id: users(:quentin)
+
+    assert flash[:error]
+    assert User.current_user, users(:aaron)
   end
 
   test 'should handle no current_user when edit user' do

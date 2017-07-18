@@ -8,12 +8,12 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should not show manage page for normal user, but show for admins' do
-    get :manage
+    get :index
     assert_redirected_to root_url
 
     logout
     login_as Factory(:user, person_id: Factory(:admin).id)
-    get :manage
+    get :index
     assert_response :success
   end
 
@@ -37,9 +37,9 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_difference('SuggestedAssayType.count') do
       post :create, suggested_assay_type: { label: 'test assay type', parent_uri: "suggested_assay_type:#{suggested.id}" }
     end
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
     assert suggested.children.count == 1
-    get :manage
+    get :index
     assert_select 'li a', text: /test assay type/
   end
 
@@ -49,9 +49,9 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     assert_difference('SuggestedAssayType.count') do
       post :create, suggested_assay_type: { label: 'test assay type', parent_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics' }
     end
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
     assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', SuggestedAssayType.last.parent.uri
-    get :manage
+    get :index
     assert_select 'li a', text: /test assay type/
   end
 
@@ -59,8 +59,8 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
     login_as Factory(:admin)
     suggested_assay_type = Factory(:suggested_assay_type, label: 'old label', contributor_id: User.current_user.person.try(:id))
     put :update, id: suggested_assay_type.id, suggested_assay_type: { label: 'new label' }
-    assert_redirected_to action: :manage
-    get :manage
+    assert_redirected_to action: :index
+    get :index
     assert_select 'li a[href=?]', assay_types_path(uri: suggested_assay_type.uri, label: 'new label'), text: 'new label'
   end
 
@@ -78,13 +78,13 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
 
     # update to other parent suggested
     put :update, id: suggested_assay_type.id, suggested_assay_type: { parent_uri: "suggested_assay_type:#{suggested_parent2.id}" }
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
     suggested_parent2.reload
     assert_includes suggested_parent2.children, suggested_assay_type
 
     # update to other parent from ontology
     put :update, id: suggested_assay_type.id, suggested_assay_type: { parent_uri: ontology_parent_uri }
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
 
     ontology_parent = Seek::Ontologies::AssayTypeReader.instance.class_for_uri('http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics')
     assert ontology_parent.children.include?(suggested_assay_type)
@@ -115,7 +115,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
       delete :destroy, id: suggested_assay_type.id
     end
     assert_nil flash[:error]
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
   end
 
   test 'should not delete assay_type with child' do
@@ -128,7 +128,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
       delete :destroy, id: parent.id
     end
     assert flash[:error]
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
   end
 
   test 'should not delete assay_type with assays' do
@@ -140,7 +140,7 @@ class SuggestedAssayTypesControllerTest < ActionController::TestCase
       delete :destroy, id: suggested_at.id
     end
     assert flash[:error]
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
   end
 
   private
