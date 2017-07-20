@@ -1,31 +1,24 @@
+<% types ||= Array(@suggested_type.term_type)
+   selected_uri = @suggested_type.parent.try(:uri) || @suggested_type.ontology_uri %>
 
-<% options = (action == :new_popup || action == :edit_popup) ? {:remote=> true} : {}
-  types ||= Array(@suggested_type.term_type)
-   selected_uri = @suggested_type.parent.try(:uri) || @suggested_type.ontology_uri
-%>
+<%= form_for @suggested_type do |f| %>
+    <%= f.error_messages %>
 
-<%= form_for @suggested_type, options do |f| %>
-<%= f.error_messages %>
-<%#= f.hidden_field :term_type%>
+    <div class="form-group">
+      <%= f.label :label %>*<br/>
+      <%= f.text_field :label, class: 'form-control' %>
+    </div>
 
-<div class="center-block" style="width: 60%;">
-  <div class="form-group">
-    <%= f.label :label %>*<br/>
-    <%= f.text_field :label, class: 'form-control' %>
-  </div>
-
-  <div class="form-group">
-    <%= f.label 'Parent' -%>
-    <%= ontology_selection_list types, "#{@suggested_type.class.name.underscore}[parent_uri]",
-                                selected_uri,
-                                ([@suggested_type] + @suggested_type.all_children).map(&:uri),
-                                { class: 'form-control'}
-    %>
-    <p class="help-block">Select parent type.</p>
-  </div>
-  <div>
-    <%= f.submit(create_or_update_text, class: 'btn btn-primary') -%>
-    or <%= cancel_link %>
-  </div>
-</div>
+    <div class="form-group">
+      <%= f.label 'Parent' -%>
+      <%= ontology_selection_list types, "#{@suggested_type.class.name.underscore}[parent_uri]",
+                                  selected_uri,
+                                  ([@suggested_type] + @suggested_type.all_children).map(&:uri),
+                                  { class: 'form-control'}
+      %>
+    </div>
+    <div>
+      <%= f.submit(create_or_update_text, class: 'btn btn-primary') -%>
+      or <%= cancel_link %>
+    </div>
 <% end -%>
