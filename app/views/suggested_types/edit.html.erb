@@ -1,11 +1,11 @@
 <h1>Editing suggested <%= @suggested_type.humanize_term_type %> type</h1>
-<div class="show_basic">
-  <div style="float:left;">
-    <ul><%= ontology_editor_display @suggested_type.class.all_term_types, (@suggested_type.uri.blank? ? @suggested_type.default_parent_uri : @suggested_type.uri)  %></ul>
-  </div>      
-  <div style="float:left;">
-    <%= form_for @suggested_type do |f| %>
-      <%= render :partial => "suggested_types/form", :locals => { :f => f, :action=>:edit, :types=>  @suggested_type.class.all_term_types} -%>
-    <% end -%>
+
+<div class="row">
+  <div class="col-md-6 col-md-push-6">
+    <%= render partial: 'suggested_types/form', locals: { types: @suggested_type.class.all_term_types } %>
+    <br/> <br/>
+  </div>
+  <div class="col-md-6 col-md-pull-6">
+    <%= render partial: 'suggested_types/tree', locals: { types: @suggested_type.class.all_term_types } %>
   </div>
 </div>

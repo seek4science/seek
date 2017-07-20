@@ -1,6 +1,13 @@
-<h1>Additional settings</h1>
+<h1>Settings</h1>
 
-<%= form_tag :action=>"update_others" do -%>
+<%= form_tag :action=>"update_settings" do -%>
+    <h2>General settings</h2>
+    <%= admin_text_setting(:site_base_host, Seek::Config.site_base_host,
+                           'Site base URL', 'This base URL for this SEEK installation. This is required cases where the host cannot be determined from the request - particularly within the REST API and Subscription email notifications.') %>
+
+    <%= admin_text_setting(:sabiork_ws_base_url, Seek::Config.sabiork_ws_base_url,
+                           'SabioRK WS base URL', 'This base URL for sabiork webservices REST API') %>
+
     <%= admin_text_setting(:pubmed_api_email, Seek::Config.pubmed_api_email,
                            'Pubmed API email', 'When adding a publication from PubMed, an email address is required to use the API. No registration is required.') %>
 
@@ -10,20 +17,22 @@
     <%= admin_text_setting(:bioportal_api_key, Seek::Config.bioportal_api_key,
                            'BioPortal API key', "Required to interact with BioPortal - for example when creating new Organisms through the NCBI Taxonomy. Please register with #{link_to 'http://bioportal.bioontology.org','http://bioportal.bioontology.org',:target=>:_blank} to get an API key.") %>
 
-    <%= admin_text_setting(:site_base_host, Seek::Config.site_base_host,
-                           'Site base URL', 'This base URL for this SEEK installation. This is required cases where the host cannot be determined from the request - particularly within the REST API and Subscription email notifications.') %>
+    <%= admin_checkbox_setting(:hide_details_enabled, 1, Seek::Config.hide_details_enabled,
+                               "Hide contact details", "Hides email addresses, skype and internal web addresses.") %>
 
-    <%= admin_text_setting(:tag_threshold, Seek::Config.tag_threshold,
-                           'Tag threshold', 'Tags must have a count above or equal to this value to appear in either expanded or collapsed left hand tag cloud.',
-                           :onkeypress => "javascript: return onlyNumbers(event);") %>
+    <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
+                               "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
+                               :onchange=>toggle_appear_javascript('cache_remote_block')) %>
+    <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
+      <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
+                             'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
+                             :onkeypress => "javascript: return onlyNumbers(event);") %>
+      <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
+                             'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
+                             :onkeypress => "javascript: return onlyNumbers(event);") %>
+    </div>
 
-    <%= admin_text_setting(:max_visible_tags, Seek::Config.max_visible_tags,
-                           'Maximum visible tags', 'The maximum number of tags that will appear in the left hand tag cloud in its collapsed state.',
-                           :onkeypress => "javascript: return onlyNumbers(event);") %>
-
-    <%= admin_text_setting(:sabiork_ws_base_url, Seek::Config.sabiork_ws_base_url,
-                           'SabioRK WS base URL', 'This base URL for sabiork webservices REST API') %>
-
+    <h2>Policy and license settings</h2>
     <%= access_type_options = [Policy::PRIVATE, Policy::VISIBLE, Policy::ACCESSIBLE]
         # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
         option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_all_visitors_access_type)
@@ -53,6 +62,22 @@
                            :onkeypress => "javascript: return onlyNumbers(event);") %>
 
 
+    <h2>Registration settings</h2>
+    <%= admin_checkbox_setting(:registration_disabled, 1, Seek::Config.registration_disabled,
+                               "Registration disabled", "Whether new accounts creation is disabled. Can be useful in combination with external authentication (e.g. LDAP)",
+                               :onchange=>toggle_appear_javascript('registration_disabled_textarea')) %>
+    <div id="registration_disabled_textarea" class="additional_settings" style="<%= show_or_hide_block Seek::Config.registration_disabled -%>">
+
+      <%= admin_textarea_setting(:registration_disabled_description, Seek::Config.registration_disabled_description,
+                                 "Registration disabled message", "Sets the description text on the registration page when registration is disabled") %>
+    </div>
+
+    <%= admin_checkbox_setting(:activation_required_enabled, 1, Seek::Config.activation_required_enabled,
+                               "Activation required", "Whether activation is required when registering, as an additional check that the person is genuine and provided a correct email address. Since an activation email is sent, you need to make sure email is setup and working") %>
+
+    <%= admin_checkbox_setting(:orcid_required, 1, Seek::Config.orcid_required,
+                               'ORCID required', "Require all profiles to specify an #{link_to 'ORCID', 'http://orcid.org/content/about-orcid', target: :_blank} identifier.".html_safe) %>
+
     <%= admin_checkbox_setting(:recaptcha_enabled, 1, Seek::Config.recaptcha_enabled,
                                'Captcha enabled', 'Enable to show a captcha on forms susceptible to spam',
                                :onchange=>toggle_appear_javascript('captcha_key_settings')) %>
@@ -69,21 +94,6 @@
       <%= admin_text_setting(:recaptcha_private_key, Seek::Config.recaptcha_private_key,
                              'Private recaptcha key') %>
     </div>
-
-    <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
-                               "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
-                               :onchange=>toggle_appear_javascript('cache_remote_block')) %>
-    <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
-      <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
-                             'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
-                             :onkeypress => "javascript: return onlyNumbers(event);") %>
-      <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
-                             'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
-                             :onkeypress => "javascript: return onlyNumbers(event);") %>
-    </div>
-
-    <%= admin_checkbox_setting(:orcid_required, 1, Seek::Config.orcid_required,
-                               'ORCID required', "Require all profiles to specify an #{link_to 'ORCID', 'http://orcid.org/content/about-orcid', target: :_blank} identifier.".html_safe) %>
 
     <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path %>
