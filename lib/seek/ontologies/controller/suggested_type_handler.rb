@@ -5,9 +5,11 @@ module Seek
         extend ActiveSupport::Concern
 
         included do
-          before_filter :check_allowed_to_manage_types, only: [:destroy, :manage]
-          before_filter :project_membership_required_appended, only: [:manage]
+          before_filter :check_allowed_to_manage_types, only: [:destroy, :index]
+          before_filter :project_membership_required_appended, only: [:index]
           before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy]
+
+          include Seek::BreadCrumbs
         end
 
         def model_class
@@ -17,17 +19,10 @@ module Seek
         def new
           @suggested_type = model_class.new
           @suggested_type.term_type = params[:term_type]
-          if request.xhr?
-            respond_to do |format|
-              format.html { render template: 'suggested_types/new_popup',layout:false }
-            end
-          else
-            respond_to do |format|
-              format.html { render template: 'suggested_types/new' }
-              format.xml { render xml: @suggested_type }
-            end
+          respond_to do |format|
+            format.html { render template: 'suggested_types/new' }
+            format.xml { render xml: @suggested_type }
           end
-
         end
 
         def edit
@@ -39,9 +34,9 @@ module Seek
           end
         end
 
-        def manage
+        def index
           respond_to do |format|
-            format.html { render template: 'suggested_types/manage' }
+            format.html { render template: 'suggested_types/index' }
           end
         end
 
@@ -49,21 +44,18 @@ module Seek
           @suggested_type = model_class.new(type_params)
           @suggested_type.contributor_id = User.current_user.try(:person_id)
           saved = @suggested_type.save
-
           respond_to do |format|
             if saved
               format.js   { render template: 'suggested_types/create' }
               set_successful_flash_message('created')
-              format.html { redirect_to(action: 'manage') }
-              format.xml  { head :ok }
+              format.html { redirect_to(action: 'index') }
+              format.xml { head :ok }
             else
               format.js   { render template: 'suggested_types/create', status: :unprocessable_entity  }
               format.html { render template: 'suggested_types/new' }
-              format.xml  { render xml: @suggested_type.errors, status: :unprocessable_entity }
+              format.xml { render xml: @suggested_type.errors, status: :unprocessable_entity }
             end
           end
-
-
         end
 
         def update
@@ -73,7 +65,7 @@ module Seek
           respond_to do |format|
             if saved
               set_successful_flash_message('updated')
-              format.html { redirect_to(action: 'manage') }
+              format.html { redirect_to(action: 'index') }
               format.xml { head :ok }
             else
               format.html { render action: :edit }
@@ -93,7 +85,7 @@ module Seek
               flash[:error] = @suggested_type.destroy_errors.join('<br/>').html_safe
               format.xml { render xml: @suggested_type.errors, status: :unprocessable_entity }
             end
-            format.html { redirect_to(action: 'manage') }
+            format.html { redirect_to(action: 'index') }
           end
         end
 

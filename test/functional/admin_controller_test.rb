@@ -59,8 +59,8 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'should show others' do
-    get :others
+  test 'should show settings' do
+    get :settings
     assert_response :success
   end
 
@@ -87,7 +87,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
     Seek::Config.tag_threshold = 2
-    post :update_others, tag_threshold: '8', max_visible_tags: '9'
+    post :update_home_settings, tag_threshold: '8', max_visible_tags: '9'
     assert_equal 8, Seek::Config.tag_threshold
     assert_equal 9, Seek::Config.max_visible_tags
   end
@@ -95,36 +95,36 @@ class AdminControllerTest < ActionController::TestCase
   test 'update default default_associated_projects_access_type permissions' do
     Seek::Config.default_associated_projects_access_type = 0
     assert_equal 0, Seek::Config.default_associated_projects_access_type
-    post :update_others, default_associated_projects_access_type: '2'
+    post :update_settings, default_associated_projects_access_type: '2'
     assert_equal 2, Seek::Config.default_associated_projects_access_type
   end
 
   test 'update default default_all_visitors_access_type permissions' do
     Seek::Config.default_all_visitors_access_type = 0
     assert_equal 0, Seek::Config.default_all_visitors_access_type
-    post :update_others, default_all_visitors_access_type: '2'
+    post :update_settings, default_all_visitors_access_type: '2'
     assert_equal 2, Seek::Config.default_all_visitors_access_type
   end
 
   test 'update permissions popup' do
     Seek::Config.permissions_popup = Seek::Config::PERMISSION_POPUP_ALWAYS
     assert_equal Seek::Config::PERMISSION_POPUP_ALWAYS, Seek::Config.permissions_popup
-    post :update_others, permissions_popup: "#{Seek::Config::PERMISSION_POPUP_NEVER}"
+    post :update_settings, permissions_popup: "#{Seek::Config::PERMISSION_POPUP_NEVER}"
     assert_equal Seek::Config::PERMISSION_POPUP_NEVER, Seek::Config.permissions_popup
   end
 
   test 'invalid email address' do
-    post :update_others, pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com', tag_threshold: '1', max_visible_tags: '20'
+    post :update_settings, pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com'
     assert_not_nil flash[:error]
   end
 
   test 'should input integer' do
-    post :update_others, pubmed_api_email: 'quentin@example.com', crossref_api_email: 'quentin@example.com', tag_threshold: '', max_visible_tags: '20'
+    post :update_home_settings, tag_threshold: '', max_visible_tags: '20'
     assert_not_nil flash[:error]
   end
 
   test 'should input positive integer' do
-    post :update_others, pubmed_api_email: 'quentin@example.com', crossref_api_email: 'quentin@example.com', tag_threshold: '1', max_visible_tags: '0'
+    post :update_home_settings, tag_threshold: '1', max_visible_tags: '0'
     assert_not_nil flash[:error]
   end
 
@@ -146,7 +146,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'get project content stats' do
-    xml_http_request :get, :get_stats, id: 'content_stats'
+    xml_http_request :get, :get_stats, page:  'content_stats'
     assert_response :success
   end
 
@@ -184,7 +184,7 @@ class AdminControllerTest < ActionController::TestCase
     dj.created_at = '2010 September 11'
     assert dj.save
 
-    xml_http_request :get, :get_stats, id: 'job_queue'
+    xml_http_request :get, :get_stats, page:  'job_queue'
     assert_response :success
 
     assert_select 'p', text: 'Total delayed jobs waiting = 1'
@@ -199,7 +199,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'storage usage stats' do
     Factory(:rightfield_datafile)
     Factory(:rightfield_annotated_datafile)
-    xml_http_request :get, :get_stats, id: 'storage_usage_stats'
+    xml_http_request :get, :get_stats, page:  'storage_usage_stats'
     assert_response :success
   end
 
@@ -233,11 +233,11 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update_redirect_to for update_home_setting' do
-    post :update_home_settings, news_number_of_entries: '10'
+    post :update_home_settings, news_number_of_entries: '10', tag_threshold: '1', max_visible_tags: '20'
     assert_redirected_to admin_path
     assert_nil flash[:error]
 
-    post :update_home_settings, news_number_of_entries: ''
+    post :update_home_settings, news_number_of_entries: '', tag_threshold: '1', max_visible_tags: '20'
     assert_redirected_to home_settings_admin_path
     assert_not_nil flash[:error]
   end
@@ -251,5 +251,18 @@ class AdminControllerTest < ActionController::TestCase
       post :update_features_enabled, openbis_enabled: '0'
       refute Seek::Config.openbis_enabled
     end
+  end
+
+  test 'snapshot and doi stats' do
+    investigation = Factory(:investigation, title: 'i1', description: 'not blank',
+                            policy: Factory(:downloadable_public_policy))
+    snapshot = investigation.create_snapshot
+    snapshot.update_column(:doi, '10.5072/testytest')
+    AssetDoiLog.create(asset_type: 'investigation',
+                       asset_id: investigation.id,
+                       action: AssetDoiLog::MINT)
+
+    xml_http_request :get, :get_stats, page:  'snapshot_and_doi_stats'
+    assert_response :success
   end
 end

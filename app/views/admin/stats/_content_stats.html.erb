@@ -1,22 +1,6 @@
 <%# #MERGENOTE - this needs a major sort out and splitting up, at least between the VLN and non-VLN bits -%>
-<%= javascript_include_tag "tablesorter/jquery-latest.js", "tablesorter/jquery.tablesorter.js"%>
+<%= javascript_include_tag "tablesorter/jquery.tablesorter.js"%>
 <%= stylesheet_link_tag "tablesorter/blue/tablesorter_blue.css" %>
-<script type="text/javascript">
-    jQuery.noConflict();
-    var $j = jQuery;
-    jQuery(document).ready(function(){
-            $j("#content_stats_table").tablesorter({
-                    //headers: {
-                        // assign the first column (we start counting zero)
-                  //      0: {
-                            // disable it by setting the property sorter to false
-                    //        sorter: false
-                      //  }
-                   // }
-                });
-
-    });
-</script>
 
 <%
   authorised_types=Seek::Stats::ContentStats::TYPES_FOR_STATS
@@ -193,3 +177,15 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
 <hr/>
 <em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple <%= t('project').pluralize %>.</em>
 <% end %>
+
+<script type="text/javascript">
+  $j("#content_stats_table").tablesorter({
+    //headers: {
+    // assign the first column (we start counting zero)
+    //      0: {
+    // disable it by setting the property sorter to false
+    //        sorter: false
+    //  }
+    // }
+  });
+</script>
