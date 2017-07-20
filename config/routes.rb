@@ -726,9 +726,7 @@ SEEK::Application.routes.draw do
   post '/favourite_groups/edit' => 'favourite_groups#edit', :as => :edit_favourite_group
   post '/favourite_groups/update' => 'favourite_groups#update', :as => :update_favourite_group
   delete '/favourite_groups/:id' => 'favourite_groups#destroy', :as => :delete_favourite_group
-  post 'studies/new_investigation_redbox' => 'studies#new_investigation_redbox', :as => :new_investigation_redbox
   post 'experiments/create_investigation' => 'studies#create_investigation', :as => :create_investigation
-  post '/work_groups/review/:type/:id/:access_type' => 'work_groups#review_popup', :as => :review_work_group
   # get ':controller/:id/approve_or_reject_publish' => ":controller#show" # TODO: Rails4 - Delete me?
 
   get '/signup' => 'users#new', :as => :signup
