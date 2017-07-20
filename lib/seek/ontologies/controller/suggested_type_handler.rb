@@ -5,9 +5,9 @@ module Seek
         extend ActiveSupport::Concern
 
         included do
-          before_filter :check_allowed_to_manage_types, only: [:destroy, :index]
+          before_filter :check_allowed_to_manage_types, only: %i[destroy index]
           before_filter :project_membership_required_appended, only: [:index]
-          before_filter :find_and_authorize_requested_item, only: [:edit, :update, :destroy]
+          before_filter :find_and_authorize_requested_item, only: %i[edit update destroy]
 
           include Seek::BreadCrumbs
         end
@@ -46,12 +46,12 @@ module Seek
           saved = @suggested_type.save
           respond_to do |format|
             if saved
-              format.js   { render template: 'suggested_types/create' }
+              format.js { render template: 'suggested_types/create' }
               set_successful_flash_message('created')
               format.html { redirect_to(action: 'index') }
               format.xml { head :ok }
             else
-              format.js   { render template: 'suggested_types/create', status: :unprocessable_entity  }
+              format.js   { render template: 'suggested_types/create', status: :unprocessable_entity }
               format.html { render template: 'suggested_types/new' }
               format.xml { render xml: @suggested_type.errors, status: :unprocessable_entity }
             end
