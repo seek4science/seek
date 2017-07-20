@@ -1,27 +1,13 @@
 <h1>Administration <small><%= version_text -%></small></h1>
 
 <%= folding_panel('General', false) do %>
-    <%= render :partial => 'admin/general' %>
+    <%= render partial: 'admin/general' %>
 <% end %>
 
-<%= folding_panel('Statistics', true) do %>
-    <%= render :partial => 'admin/stats' %>
+<%= folding_panel('Status and statistics', false) do %>
+    <%= render partial: 'admin/stats' %>
 <% end %>
 
-<%= folding_panel('Users and Administrators Management', true) do %>
-    <%= render :partial => 'admin/users_admin' %>
-<% end %>
-
-<% if Seek::Config.admin_impersonation_enabled %>
-    <%= folding_panel('Act As Another User', true) do %>
-        <%= render :partial => 'admin/impersonate' %>
-    <% end %>
-<% end %>
-
-<%= folding_panel('Register SEEK', true) do %>
-    <%= render :partial => 'admin/registration' %>
-<% end %>
-
-<%= render :partial => "admin/restart_buttons" unless using_docker? %>
+<%= render partial: 'admin/restart_buttons' unless using_docker? %>
 
 <small><%= git_link_tag %></small>

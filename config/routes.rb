@@ -25,19 +25,17 @@ SEEK::Application.routes.draw do
       get :rebrand
       get :home_settings
       get :pagination
-      get :others
+      get :settings
       get :get_stats
       get :registration_form
       get :edit_tag
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
-      post :get_stats
-      post :get_user_stats
       post :update_admins
       post :update_rebrand
       post :test_email_configuration
-      post :update_others
+      post :update_settings
       post :update_features_enabled
       post :update_pagination
       post :delete_tag
@@ -331,23 +329,9 @@ SEEK::Application.routes.draw do
 
    ### ASSAY AND TECHNOLOGY TYPES ###
 
-  resources :suggested_assay_types do
-      collection do
-        get :manage
-      end
-
-  end
-  resources :suggested_modelling_analysis_types, :path => :suggested_assay_types, :controller => :suggested_assay_types do
-     collection do
-        get :manage
-      end
-  end
-  resources :suggested_technology_types do
-    collection do
-      get :manage
-    end
-  end
-
+  resources :suggested_assay_types
+  resources :suggested_modelling_analysis_types, :path => :suggested_assay_types, :controller => :suggested_assay_types
+  resources :suggested_technology_types
 
   ### ASSETS ###
 
