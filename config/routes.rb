@@ -17,24 +17,21 @@ SEEK::Application.routes.draw do
 
   root :to => "homes#index"
 
-  resource :admin do
-    member do
-      get :show
+  resource :admin, controller: 'admin' do
+    collection do
+      get :index
       get :tags
       get :features_enabled
       get :rebrand
       get :home_settings
       get :pagination
-      get :others
+      get :settings
       get :get_stats
       get :registration_form
       get :edit_tag
-      get :imprint_setting
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
-      post :get_stats
-      post :get_user_stats
       post :update_admins
       post :update_rebrand
       post :test_email_configuration      
@@ -55,6 +52,7 @@ SEEK::Application.routes.draw do
       get :funding
       post :send_feedback
       get :imprint
+      get :about
     end
   end
 
@@ -332,23 +330,9 @@ SEEK::Application.routes.draw do
 
    ### ASSAY AND TECHNOLOGY TYPES ###
 
-  resources :suggested_assay_types do
-      collection do
-        get :manage
-      end
-
-  end
-  resources :suggested_modelling_analysis_types, :path => :suggested_assay_types, :controller => :suggested_assay_types do
-     collection do
-        get :manage
-      end
-  end
-  resources :suggested_technology_types do
-    collection do
-      get :manage
-    end
-  end
-
+  resources :suggested_assay_types
+  resources :suggested_modelling_analysis_types, :path => :suggested_assay_types, :controller => :suggested_assay_types
+  resources :suggested_technology_types
 
   ### ASSETS ###
 

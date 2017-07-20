@@ -1,9 +1,0 @@
-<h2><%= "#{@tags.size} tags" -%></h2>
-<style>
-  td.dubious_tag {color:red}
-  td.unlinked_tag {color:blue}        
-</style>
-<table>
-  <tr><th>ID</th></th><th>Tag</th><th>Associated items</th><th>Contexts</th><th></th></tr>
-    <%= render :partial=>"tag",:collection=>@tags %>
-</table>

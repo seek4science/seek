@@ -1,8 +1,9 @@
 require 'delayed/command'
 require 'net/ldap'
 
-class AdminsController < ApplicationController
+class AdminController < ApplicationController
   include CommonSweepers
+  include Seek::BreadCrumbs
 
   RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
                  Please see the buttons and explanations below.".freeze
@@ -10,7 +11,7 @@ class AdminsController < ApplicationController
   before_filter :login_required
   before_filter :is_user_admin_auth
 
-  def show
+  def index
     respond_to do |format|
       format.html
     end
@@ -41,7 +42,6 @@ class AdminsController < ApplicationController
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
     # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
-    Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
@@ -54,6 +54,7 @@ class AdminsController < ApplicationController
     Seek::Config.set_smtp_settings 'enable_starttls_auto', params[:enable_starttls_auto] == '1'
 
     Seek::Config.support_email_address = params[:support_email_address]
+    Seek::Config.noreply_sender = params[:noreply_sender]
 
     Seek::Config.ldap_enabled = string_to_boolean params[:ldap_enabled]
     Seek::Config.set_ldap_settings 'ldap_address', params[:ldap_address]
@@ -79,13 +80,6 @@ class AdminsController < ApplicationController
 
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
-
-    Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
-
-    Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
-    Seek::Config.registration_disabled_description = params[:registration_disabled_description]
-
-    Seek::Config.activation_required_enabled = string_to_boolean params[:activation_required_enabled]
 
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
     Seek::Config.google_analytics_enabled = string_to_boolean params[:google_analytics_enabled]
@@ -124,6 +118,7 @@ class AdminsController < ApplicationController
   end
 
   def update_home_settings
+    Seek::Config.show_announcements = string_to_boolean params[:show_announcements]
     Seek::Config.news_enabled = string_to_boolean params[:news_enabled]
     Seek::Config.news_feed_urls = params[:news_feed_urls]
 
@@ -140,13 +135,12 @@ class AdminsController < ApplicationController
       logger.error "Error whilst attempting to clear feed cache #{e.message}"
     end
 
-    update_redirect_to is_entries_integer, 'home_settings'
-  end
+    max_visible_tags = params[:max_visible_tags]
+    tag_threshold = params[:tag_threshold]
+    Seek::Config.tag_threshold = tag_threshold if only_integer tag_threshold, 'tag threshold'
+    Seek::Config.max_visible_tags = max_visible_tags if only_positive_integer max_visible_tags, 'maximum visible tags'
 
-  def update_imprint_setting
-    Seek::Config.imprint_enabled = string_to_boolean params[:imprint_enabled]
-    Seek::Config.imprint_description = params[:imprint_description]
-    update_redirect_to true, 'imprint_setting'
+    update_redirect_to (is_entries_integer && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')), 'home_settings'
   end
 
   def rebrand
@@ -174,7 +168,11 @@ class AdminsController < ApplicationController
     Seek::Config.copyright_addendum_enabled = string_to_boolean params[:copyright_addendum_enabled]
     Seek::Config.copyright_addendum_content = params[:copyright_addendum_content]
 
-    Seek::Config.noreply_sender = params[:noreply_sender]
+    Seek::Config.imprint_enabled = string_to_boolean params[:imprint_enabled]
+    Seek::Config.imprint_description = params[:imprint_description]
+
+    Seek::Config.about_page_enabled = string_to_boolean params[:about_page_enabled]
+    Seek::Config.about_page = params[:about_page]
 
     update_redirect_to true, 'rebrand'
   end
@@ -197,8 +195,7 @@ class AdminsController < ApplicationController
     update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'), 'pagination'
   end
 
-  def update_others
-    update_flag = true
+  def update_settings
     if Seek::Config.tag_threshold.to_s != params[:tag_threshold] || Seek::Config.max_visible_tags.to_s != params[:max_visible_tags]
       expire_annotation_fragments
     end
@@ -211,12 +208,7 @@ class AdminsController < ApplicationController
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 
-    max_visible_tags = params[:max_visible_tags]
-    tag_threshold = params[:tag_threshold]
-
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
-    Seek::Config.tag_threshold = tag_threshold if only_integer tag_threshold, 'tag threshold'
-    Seek::Config.max_visible_tags = max_visible_tags if only_positive_integer max_visible_tags, 'maximum visible tags'
     Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
     Seek::Config.recaptcha_enabled = string_to_boolean params[:recaptcha_enabled]
     Seek::Config.recaptcha_private_key = params[:recaptcha_private_key]
@@ -230,11 +222,15 @@ class AdminsController < ApplicationController
     Seek::Config.max_cachable_size = params[:max_cachable_size]
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]
 
+    Seek::Config.hide_details_enabled = string_to_boolean params[:hide_details_enabled]
+    Seek::Config.registration_disabled = string_to_boolean params[:registration_disabled]
+    Seek::Config.registration_disabled_description = params[:registration_disabled_description]
+    Seek::Config.activation_required_enabled = string_to_boolean params[:activation_required_enabled]
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
 
     Seek::Config.default_license = params[:default_license]
-    update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid) && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')
-    update_redirect_to update_flag, 'others'
+    update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
+    update_redirect_to update_flag, 'settings'
   end
 
   def restart_server
@@ -330,30 +326,30 @@ class AdminsController < ApplicationController
   end
 
   def get_stats
-    @page = params[:id]
-    respond_to do |format|
+    @page = params[:page]
       case @page
       when 'content_stats'
-        format.html { render partial: 'admins/stats/content_stats', locals: { stats: Seek::Stats::ContentStats.generate } }
+        render partial: 'admin/stats/content_stats', locals: { stats: Seek::Stats::ContentStats.generate }
       when 'activity_stats'
-        format.html { render partial: 'admins/stats/activity_stats', locals: { stats: Seek::Stats::ActivityStats.new } }
+        render partial: 'admin/stats/activity_stats', locals: { stats: Seek::Stats::ActivityStats.new }
       when 'search_stats'
-        format.html { render partial: 'admins/stats/search_stats', locals: { stats: Seek::Stats::SearchStats.new } }
+        render partial: 'admin/stats/search_stats', locals: { stats: Seek::Stats::SearchStats.new }
       when 'job_queue'
-        format.html { render partial: 'admins/stats/job_queue' }
+        render partial: 'admin/stats/job_queue'
       when 'auth_consistency'
-        format.html { render partial: 'admins/stats/auth_consistency' }
+        render partial: 'admin/stats/auth_consistency'
       when 'monthly_stats'
-        format.html { render partial: 'admins/stats/monthly_stats', locals: { stats: get_monthly_stats } }
+        render partial: 'admin/stats/monthly_stats', locals: { stats: get_monthly_stats }
       when 'workflow_stats'
-        format.html { render partial: 'admins/stats/workflow_stats' }
+        render partial: 'admin/stats/workflow_stats'
       when 'storage_usage_stats'
-        format.html { render partial: 'admins/stats/storage_usage_stats' }
+        render partial: 'admin/stats/storage_usage_stats'
       when 'snapshot_and_doi_stats'
-        format.html { render partial: 'admins/stats/snapshot_and_doi_stats' }
+        render partial: 'admin/stats/snapshot_and_doi_stats'
       when 'none'
-        format.html { render text: '' }
-      end
+        render text: ''
+      else
+        get_user_stats
     end
   end
 
@@ -363,7 +359,6 @@ class AdminsController < ApplicationController
     action = nil
     title = nil
     extra_options = {}
-    @page = params[:id]
     case @page
     when 'invalid_users_profiles'
       partial = 'invalid_user_stats_list'

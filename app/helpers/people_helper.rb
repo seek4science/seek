@@ -17,23 +17,26 @@ module PeopleHelper
   # tag for displaying an image if person that has no user associated - but is only displayed if the current user is an admin
   def no_user_for_admins_img(person)
     if !person.user && admin_logged_in?
-      return image_tag_for_key('no_user', nil, 'No associated user', nil, '')
+      image_tag_for_key('no_user', nil, 'No associated user', nil, '')
     end
   end
 
   def seek_role_icons(person, size = 32)
     icons = ''
     person.roles.each do |role|
-      icons << image("#{role}", :size => "#{size}x#{size}", :alt => "#{role}",
+      icons << image(role.to_s, :size => "#{size}x#{size}", :alt => role.to_s,
                                 'data-tooltip' => tooltip(role.humanize), :style => 'vertical-align: middle')
     end
     icons.html_safe
   end
 
   def orcid_identifier(person)
-    uri = person.orcid_uri
-    uri = link_to(uri, uri, target: '_blank').html_safe unless uri.blank?
-    uri.blank? ? text_or_not_specified(uri) : uri
+    if person.orcid_uri.blank?
+      text_or_not_specified(nil)
+    else
+      logo = image(:orcid_id)
+      link_to(logo + ' ' + person.orcid_display_format, person.orcid_https_uri, target: '_blank').html_safe
+    end
   end
 
   def discipline_list(disciplines)

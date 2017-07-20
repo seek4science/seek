@@ -1,0 +1,14 @@
+<% style = dubious_tag?(tag) ? 'danger' : ''
+   style = 'info' if style.empty? && tag.annotations.blank?
+   associated_count = tag.annotations.count %>
+<tr>
+  <td><%= tag.id -%></td>
+  <td class="<%= style -%>"><%= h(tag.text) -%></td>
+  <td><%= associated_count -%></td>
+  <td><%= tag.annotations.collect{|a| a.annotation_attribute.name}.uniq.join(', ') -%></td>
+  <td>
+    <%= link_to(image('edit', title: 'Edit'),action: :edit_tag, id: tag.id) if associated_count > 0 %>
+    <%= link_to image('destroy', title: 'Delete'),{action: :delete_tag,id: tag.id}, data: { confirm: 'Are you sure?' },
+                method: :post -%>
+  </td>
+</tr>

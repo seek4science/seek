@@ -16,6 +16,13 @@ module PolicyHelper
                        selected_access_type)
   end
 
+  def project_policy_selection_options(access_types = nil, resource = nil, selected_access_type = nil)
+    access_types ||= [Policy::NO_ACCESS, Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING]
+
+    options_for_select(access_types.map { |t| [Policy.get_access_type_wording(t, true), t] },
+                       selected_access_type)
+  end
+
   # check if there are overlapped people in permissions and of privileged_people
   # if yes, compare the access type of them
   # and keep the one with higher access type
@@ -41,9 +48,18 @@ module PolicyHelper
     [permissions, privileged_people]
   end
 
-  def group_by_access_type(permissions, privileged_people)
+  def group_by_access_type(permissions, privileged_people, downloadable = false)
     grouped_contributors = {}
-    permissions.group_by(&:access_type).each do |access, permissions|
+    # Group "download" permissions (i.e. from a default policy) in with "view" permissions if the resource is not downloadable
+    grouped_permissions = permissions.group_by do |p|
+      if !downloadable && p.access_type == Policy::ACCESSIBLE
+        Policy::VISIBLE
+      else
+        p.access_type
+      end
+    end
+
+    grouped_permissions.each do |access, permissions|
       grouped_contributors[access] = permissions.map(&:contributor)
     end
 

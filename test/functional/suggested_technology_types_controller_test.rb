@@ -9,11 +9,11 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
   end
 
   test 'should not show manage page for normal user, but show for admins' do
-    get :manage
+    get :index
     assert_redirected_to root_url
     logout
     login_as Factory(:user, person_id: Factory(:admin).id)
-    get :manage
+    get :index
     assert_response :success
   end
 
@@ -35,9 +35,9 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     assert_difference('SuggestedTechnologyType.count') do
       post :create, suggested_technology_type: { label: 'test tech type', parent_uri: "suggested_technology_type:#{suggested.id}" }
     end
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
     assert suggested.children.count == 1
-    get :manage
+    get :index
     assert_select 'li a', text: /test tech type/
   end
 
@@ -47,17 +47,17 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     assert_difference('SuggestedTechnologyType.count') do
       post :create, suggested_technology_type: { label: 'test tech type', parent_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography' }
     end
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
     assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography', SuggestedTechnologyType.last.parent.uri
-    get :manage
+    get :index
     assert_select 'li a', text: /test tech type/
   end
 
   test 'should update label' do
     login_as Factory(:admin)
     put :update, id: @suggested_technology_type, suggested_technology_type: { label: 'new label' }
-    assert_redirected_to action: :manage
-    get :manage
+    assert_redirected_to action: :index
+    get :index
     suggested_technology_type = SuggestedTechnologyType.find @suggested_technology_type
     assert_select 'li a[href=?]', technology_types_path(uri: suggested_technology_type.uri, label: 'new label'), text: 'new label'
   end
@@ -75,13 +75,13 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
 
     # update to other parent suggested
     put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_uri: "suggested_technology_type:#{suggested_parent2.id}" }
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
     suggested_parent2.reload
     assert_includes suggested_parent2.children, suggested_technology_type
 
     # update to other parent from ontology
     put :update, id: suggested_technology_type.id, suggested_technology_type: { parent_uri: ontology_parent_uri }
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
   end
 
   test 'should delete suggested technology type' do
@@ -108,7 +108,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
       delete :destroy, id: @suggested_technology_type
     end
     assert_nil flash[:error]
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
   end
 
   test 'should not delete technology type with child' do
@@ -121,7 +121,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
       delete :destroy, id: parent.id
     end
     assert flash[:error]
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
   end
 
   test 'should not delete technology type with assays' do
@@ -133,6 +133,6 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
       delete :destroy, id: suggested.id
     end
     assert flash[:error]
-    assert_redirected_to action: :manage
+    assert_redirected_to action: :index
   end
 end

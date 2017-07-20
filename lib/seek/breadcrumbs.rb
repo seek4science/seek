@@ -37,10 +37,25 @@ module Seek
           add_index_breadcrumb 'sample_types'
           add_show_breadcrumb @sample_type
         end
+      elsif %w(compounds suggested_assay_types suggested_technology_types site_announcements).include?(controller_name)
+        add_index_breadcrumb('admin', 'Administration')
       end
 
       # Index
-      controller_name == 'studied_factors' ? add_index_breadcrumb(controller_name, 'Factors studied Index') : add_index_breadcrumb(controller_name)
+      case controller_name
+        when 'studied_factors'
+          add_index_breadcrumb(controller_name, 'Factors studied Index')
+        when 'admin'
+          add_index_breadcrumb(controller_name, 'Administration')
+        when 'site_announcements'
+          add_index_breadcrumb(controller_name, 'Announcements')
+        when 'suggested_assay_types'
+          add_index_breadcrumb(controller_name, 'Assay types')
+        when 'suggested_technology_types'
+          add_index_breadcrumb(controller_name, 'Technology types')
+        else
+          add_index_breadcrumb(controller_name)
+      end
       resource = eval('@' + controller_name.singularize) || try_block { controller_name.singularize.camelize.constantize.find_by_id(params[:id]) }
 
       add_show_breadcrumb resource if resource && resource.respond_to?(:new_record?) && !resource.new_record?
