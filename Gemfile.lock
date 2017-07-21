@@ -49,12 +49,6 @@ GIT
     my_savage_beast (2.3)
 
 GIT
-  remote: https://github.com/SysMO-DB/redbox.git
-  revision: 494451d01aeeb70b186783d08b6b9aefcb537e98
-  specs:
-    redbox (1.0.4)
-
-GIT
   remote: https://github.com/SysMO-DB/white_list.git
   revision: 3f9798ec54f227e852b944bb14f6f90d05cde893
   specs:
@@ -930,7 +924,6 @@ DEPENDENCIES
   rdf-virtuoso (>= 0.1.6)
   rdoc
   recaptcha (~> 4.1.0)
-  redbox!
   request-log-analyzer
   rest-client
   rfc-822
@@ -969,3 +962,6 @@ DEPENDENCIES
   will_paginate (~> 3.0.4)
   yaml_db
   zenodo-client!
+
+BUNDLED WITH
+   1.14.6

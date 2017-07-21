@@ -7,37 +7,6 @@ var assays_array = new Array();
 var id_rel_array = new Array();
 
 
-function postInvestigationData() {
-    request = new Ajax.Request(CREATE_INVESTIGATION_LINK,
-    {
-        method: 'post',
-        parameters: {
-            id: $('study_investigation_id').value,  // empty ID will be submitted on "create" action, but it doesn't make a difference
-            title: $('title').value,
-            project_id: $('project_id').value
-        },
-        onSuccess: function(transport){
-            var data = transport.responseText.evalJSON(true);
-            
-            if (data.status==200){                
-                addNewInvestigation(data.new_investigation);
-                RedBox.close();
-            }
-            if (data.status==406) {
-                $('errorExplanation').innerHTML=data.error_messages;
-                $('errorExplanation').show();
-            }
-            
-            return (true);
-        },
-        onFailure: function(transport){            
-            alert('Something went wrong, please try again...');
-            return(false);
-        }
-    });
-
-}
-
 function addNewInvestigation(new_investigation) {
     selectObj=$('study_investigation_id');
     selectObj.options[select.options.length]=new Option(new_investigation[1],new_investigation[0],false,true);
