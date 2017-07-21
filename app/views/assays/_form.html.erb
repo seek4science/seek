@@ -39,7 +39,7 @@
   <div class="col-sm-<%= @assay.is_modelling? ? '12' : '6' -%>">
     <div class="form-group">
       <%= f.label "#{@assay_type_text.capitalize}" %>
-      <%#= create_suggested_type_popup_link @assay.assay_type_reader.ontology_term_type %>
+      <%= create_suggested_type_popup_link @assay.assay_type_reader.ontology_term_type %>
       <div id="assay_<%= @assay.assay_type_reader.ontology_term_type %>_types_list">
         <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay.assay_type_uri, {:class => "form-control"} %>
       </div>
@@ -49,7 +49,7 @@
       <div class="col-sm-6">
         <div class="form-group">
           <%= f.label "Technology type" %>
-          <%#= create_suggested_type_popup_link @assay.technology_type_reader.ontology_term_type %>
+          <%= create_suggested_type_popup_link @assay.technology_type_reader.ontology_term_type %>
           <div id="assay_<%= @assay.technology_type_reader.ontology_term_type %>_types_list">
             <%= technology_type_select_tag f, "technology_type_uri", @assay.technology_type_uri, {:class => "form-control"} %>
           </div>
