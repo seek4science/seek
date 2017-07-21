@@ -15,10 +15,9 @@ namespace :seek do
 
     update_ontology_settings_for_jerm
     update_assay_and_tech_types
+    resynchronise_ontology_types
 
   ]
-
-  # resynchronise_ontology_types
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
   task standard_upgrade_tasks: %i[
@@ -44,16 +43,25 @@ namespace :seek do
   task(update_ontology_settings_for_jerm: :environment) do
     if Seek::Config.assay_type_ontology_file=='JERM-RDFXML.owl'
       Seek::Config.assay_type_ontology_file='JERM.rdf'
+    end
+
+    if Seek::Config.assay_type_base_uri=="http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
       Seek::Config.assay_type_base_uri="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
     end
 
     if Seek::Config.technology_type_ontology_file=='JERM-RDFXML.owl'
       Seek::Config.technology_type_ontology_file='JERM.rdf'
+    end
+
+    if Seek::Config.technology_type_base_uri=="http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
       Seek::Config.technology_type_base_uri="http://jermontology.org/ontology/JERMOntology#Technology_type"
     end
 
     if Seek::Config.modelling_analysis_type_ontology_file=='JERM-RDFXML.owl'
       Seek::Config.modelling_analysis_type_ontology_file='JERM.rdf'
+    end
+
+    if Seek::Config.modelling_analysis_type_base_uri=="http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
       Seek::Config.modelling_analysis_type_base_uri="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
     end
   end
