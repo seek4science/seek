@@ -1,16 +1,20 @@
 # encoding: utf-8
 module SuggestedTypesHelper
-  def create_suggested_type_popup_link(term_type)
-    link_name = image('new') + ' ' + "New #{term_type.humanize.downcase} type"
+  def suggested_type_modal_boxes
+    boxes = suggested_type_modal_box(@assay.assay_type_reader.ontology_term_type)
+    boxes << suggested_type_modal_box(@assay.technology_type_reader.ontology_term_type) unless @assay.is_modelling?
+    boxes
+  end
+
+  def suggested_type_modal_box(term_type)
     modal_id = "#{term_type.underscore.downcase}-new-term-modal"
+    modal_options = {id: modal_id, size: 's', 'data-role' => 'create-new-suggested-type'}
     suggested_type = if term_type=='technology'
                        SuggestedTechnologyType.new
                      else
                        SuggestedAssayType.new
                      end
     suggested_type.term_type = term_type
-
-    modal_options = {id: modal_id, size: 's', 'data-role' => 'create-new-suggested-type'}
 
     modal_title = "New suggested #{term_type.humanize.downcase} type"
 
@@ -19,7 +23,14 @@ module SuggestedTypesHelper
           modal_body do
             render partial: 'suggested_types/new_modal_type', locals: {suggested_type: suggested_type}
           end
-    end + link_to(link_name, '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}")
+    end
+  end
+
+  def create_suggested_type_popup_link(term_type)
+    link_name = image('new') + ' ' + "New #{term_type.humanize.downcase} type"
+    modal_id = "#{term_type.underscore.downcase}-new-term-modal"
+
+    link_to(link_name, '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}")
   end
 
   def create_or_update_text
