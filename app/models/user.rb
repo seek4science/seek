@@ -148,7 +148,7 @@ class User < ActiveRecord::Base
     u = User.where(['login = ?', login]).first # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
-  
+
   # Encrypts some data with the salt.
   def self.encrypt(password, salt)
     Digest::SHA1.hexdigest("--#{salt}--#{password}--")

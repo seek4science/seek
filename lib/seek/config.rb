@@ -241,7 +241,7 @@ module Seek
       merge! :smtp, field => value
       value
     end
-    
+
     def ldap_settings(field)
       value = ldap[field.to_sym]
       value
