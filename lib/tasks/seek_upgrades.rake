@@ -12,16 +12,19 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    ensure_maximum_public_access_type
-    update_model_types
+
+    update_ontology_settings_for_jerm
+    update_assay_and_tech_types
+
   ]
+
+  # resynchronise_ontology_types
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
   task standard_upgrade_tasks: %i[
     environment
     clear_filestore_tmp
     repopulate_auth_lookup_tables
-    resynchronise_ontology_types
   ]
 
   desc('upgrades SEEK from the last released version to the latest released version')
@@ -38,15 +41,45 @@ namespace :seek do
     puts 'Upgrade completed successfully'
   end
 
-  task(ensure_maximum_public_access_type: :environment) do
-    policies = Policy.where('access_type > ?', Policy.max_public_access_type)
-    count = policies.count
-    policies.each { |p| p.update_column(:access_type, Policy.max_public_access_type) }
+  task(update_ontology_settings_for_jerm: :environment) do
+    if Seek::Config.assay_type_ontology_file=='JERM-RDFXML.owl'
+      Seek::Config.assay_type_ontology_file='JERM.rdf'
+      Seek::Config.assay_type_base_uri="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+    end
 
-    puts "#{count} policies updated"
+    if Seek::Config.technology_type_ontology_file=='JERM-RDFXML.owl'
+      Seek::Config.technology_type_ontology_file='JERM.rdf'
+      Seek::Config.technology_type_base_uri="http://jermontology.org/ontology/JERMOntology#Technology_type"
+    end
+
+    if Seek::Config.modelling_analysis_type_ontology_file=='JERM-RDFXML.owl'
+      Seek::Config.modelling_analysis_type_ontology_file='JERM.rdf'
+      Seek::Config.modelling_analysis_type_base_uri="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
+    end
   end
 
-  task(update_model_types: :environment) do
-    Rake::Task['db:seed:model_types'].invoke
+  task(update_assay_and_tech_types: :environment) do
+    disable_authorization_checks do
+      Assay.where("assay_type_uri LIKE ?",'%www.mygrid.org.uk%').each do |assay|
+        new_uri = assay.assay_type_uri.gsub('www.mygrid.org.uk','jermontology.org')
+        puts new_uri
+        assay.update_attribute(:assay_type_uri,new_uri)
+      end
+
+      Assay.where("technology_type_uri LIKE ?",'%www.mygrid.org.uk%').each do |assay|
+        new_uri = assay.technology_type_uri.gsub('www.mygrid.org.uk','jermontology.org')
+        assay.update_attribute(:technology_type_uri,new_uri)
+      end
+
+      SuggestedAssayType.where("ontology_uri LIKE ?",'%www.mygrid.org.uk%').each do |type|
+        new_uri = type.ontology_uri.gsub('www.mygrid.org.uk','jermontology.org')
+        type.update_attribute(:ontology_uri,new_uri)
+      end
+
+      SuggestedTechnologyType.where("ontology_uri LIKE ?",'%www.mygrid.org.uk%').each do |type|
+        new_uri = type.ontology_uri.gsub('www.mygrid.org.uk','jermontology.org')
+        type.update_attribute(:ontology_uri,new_uri)
+      end
+    end
   end
 end
