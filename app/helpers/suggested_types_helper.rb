@@ -1,17 +1,21 @@
 # encoding: utf-8
 
 module SuggestedTypesHelper
-  def create_suggested_type_popup_link(term_type)
-    link_name = image('new') + ' ' + "New #{term_type.humanize.downcase} type"
+  def suggested_type_modal_boxes
+    boxes = suggested_type_modal_box(@assay.assay_type_reader.ontology_term_type)
+    boxes << suggested_type_modal_box(@assay.technology_type_reader.ontology_term_type) unless @assay.is_modelling?
+    boxes
+  end
+
+  def suggested_type_modal_box(term_type)
     modal_id = "#{term_type.underscore.downcase}-new-term-modal"
+    modal_options = { id: modal_id, size: 's', 'data-role' => 'create-new-suggested-type' }
     suggested_type = if term_type == 'technology'
                        SuggestedTechnologyType.new
                      else
                        SuggestedAssayType.new
                      end
     suggested_type.term_type = term_type
-
-    modal_options = { id: modal_id, size: 's', 'data-role' => 'create-new-suggested-type' }
 
     modal_title = "New suggested #{term_type.humanize.downcase} type"
 
@@ -20,7 +24,14 @@ module SuggestedTypesHelper
         modal_body do
           render partial: 'suggested_types/new_modal_type', locals: { suggested_type: suggested_type }
         end
-    end + link_to(link_name, '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}")
+    end
+  end
+
+  def create_suggested_type_popup_link(term_type)
+    link_name = image('new') + ' ' + "New #{term_type.humanize.downcase} type"
+    modal_id = "#{term_type.underscore.downcase}-new-term-modal"
+
+    link_to(link_name, '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}")
   end
 
   def create_or_update_text
@@ -34,8 +45,12 @@ module SuggestedTypesHelper
   end
 
   def cancel_link
-    manage_path = eval "#{controller_name}_path"
-    cancel_button(manage_path)
+    if is_ajax_request?
+      link_to_function('Cancel', "$j('.modal:visible').modal('toggle');", class: 'btn btn-default')
+    else
+      manage_path = eval "#{controller_name}_path"
+      cancel_button(manage_path)
+    end
   end
 
   def ontology_editor_display(types, selected_uri = nil)
@@ -89,7 +104,7 @@ module SuggestedTypesHelper
 
   def edit_ontology_class_link(clz)
     link = if clz.can_edit?
-             normal_link_to_edit(clz)
+             new_popup_request? ? popup_link_to_edit(clz) : normal_link_to_edit(clz)
            else
              ''
            end
@@ -110,4 +125,20 @@ module SuggestedTypesHelper
     link_to(image('edit'), send("edit_suggested_#{clz.term_type}_type_path", id: clz))
   end
 
+  def popup_link_to_edit(clz)
+    type = clz.term_type
+    link_to_with_callbacks(image('edit'), html: { remote: true, method: :get },
+                                          url: send("edit_suggested_#{type}_type_path", id: clz, term_type: type),
+                                          method: :get,
+                                          loading: "$('RB_redbox').scrollTo();Element.show('edit_suggested_type_spinner'); Element.hide('new_suggested_#{type}_type_form')",
+                                          loaded: "Element.hide('edit_suggested_type_spinner'); Element.show('new_suggested_#{type}_type_form')")
+  end
+
+  def new_popup_request?
+    action_name == 'new' && is_ajax_request?
+  end
+
+  def is_ajax_request?
+    request.xhr?
+  end
 end
