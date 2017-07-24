@@ -5,13 +5,6 @@ GIT
     acts_as_activity_logged (0.3.3)
 
 GIT
-  remote: https://github.com/SysMO-DB/acts_as_trashable.git
-  revision: ff5dcddece0d03014a8ffde526da59a151501cd7
-  specs:
-    acts_as_trashable (1.0.6)
-      activerecord (>= 2.2)
-
-GIT
   remote: https://github.com/SysMO-DB/app_version.git
   revision: 773b6ae72d9cba038fce1a3502feb5de2f2b75a3
   specs:
@@ -44,12 +37,6 @@ GIT
     gibberish (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/my_rails_settings.git
-  revision: e3f7fe9625ea27fea42b02c95e30cb4f1341655b
-  specs:
-    my_rails_settings (1.0.0)
-
-GIT
   remote: https://github.com/SysMO-DB/my_responds_to_parent.git
   revision: 5fadfd0cd85a0a70caaddd36f9617cb743047e0b
   specs:
@@ -60,15 +47,6 @@ GIT
   revision: 4ff41d5e7d1f17440240fe0886a7c9827f8f53c6
   specs:
     my_savage_beast (2.3)
-
-GIT
-  remote: https://github.com/SysMO-DB/piwik-ruby-tracking.git
-  revision: 06fa67ba4b2bd66878d745e9de5d6d6c8015bc92
-  specs:
-    piwik_analytics (1.0.1)
-      actionpack
-      activesupport
-      rails (>= 3.0.0)
 
 GIT
   remote: https://github.com/SysMO-DB/redbox.git
@@ -376,6 +354,8 @@ GEM
     jbuilder (2.6.3)
       activesupport (>= 3.0.0, < 5.2)
       multi_json (~> 1.2)
+    jbuilder-json_api (1.0.0)
+      jbuilder (~> 2)
     jquery-rails (3.1.4)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
@@ -386,6 +366,10 @@ GEM
     json-ld (1.1.11.1)
       multi_json (~> 1.11)
       rdf (~> 1.1, >= 1.1.17, < 1.99)
+    json-schema (2.8.0)
+      addressable (>= 2.4)
+    jsonapi-serializers (0.16.1)
+      activesupport
     kgio (2.11.0)
     latex-decode (0.2.2)
       unicode (~> 0.4)
@@ -865,7 +849,6 @@ DEPENDENCIES
   acts-as-taggable-on (= 3.0.1)
   acts_as_activity_logged!
   acts_as_list
-  acts_as_trashable!
   acts_as_tree
   app_version!
   attr_encrypted (~> 3.0.0)
@@ -877,7 +860,6 @@ DEPENDENCIES
   bootstrap-sass
   breadcrumbs_on_rails
   bundler (>= 1.8.4)
-  calendar_date_select!
   cancan
   citeproc (~> 1.0.4)
   citeproc-ruby (~> 1.1.4)
@@ -907,8 +889,11 @@ DEPENDENCIES
   handlebars_assets
   hpricot (~> 0.8.2)
   jbuilder (~> 2.0)
+  jbuilder-json_api
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
+  json-schema
+  jsonapi-serializers
   libxml-ruby (~> 2.8.0)
   linkeddata
   lograge
@@ -993,3 +978,6 @@ DEPENDENCIES
   will_paginate (~> 3.0.4)
   yaml_db
   zenodo-client!
+
+BUNDLED WITH
+   1.15.0
