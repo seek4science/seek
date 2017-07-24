@@ -16,8 +16,7 @@ class SampleTypesController < ApplicationController
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json
   def show
-    options = {:is_collection=>false, :jsonapi=>{version: "1.0"},
-               :include=>['associated', 'tags','samples','sample-attributes','linked-sample-attributes']}
+    options = {:is_collection=>false}
     respond_to do |format|
       format.html
       format.json {render json: JSONAPI::Serializer.serialize(@sample_type,options)}

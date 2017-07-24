@@ -24,7 +24,7 @@ class WorkGroupsController < ApplicationController
   # GET /groups/1
   # GET /groups/1.xml
   def show
-    options = {:is_collection=>false, :include=>['associated']}
+    options = {:is_collection=>false}
     @group = WorkGroup.find(params[:id])
 
     respond_to do |format|

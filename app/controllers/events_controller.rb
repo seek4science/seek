@@ -15,7 +15,7 @@ class EventsController < ApplicationController
   include Seek::BreadCrumbs
 
   def show
-    options = {:is_collection=>false, :jsonapi=>{version: "1.0"}, :include=>['associated']}
+    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }

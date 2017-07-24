@@ -52,7 +52,7 @@ class StrainsController < ApplicationController
   end
 
   def show
-    options = {:is_collection=>false, :jsonapi=>{version: "1.0"}, :include=>['associated']}
+    options = {:is_collection=>false}
     respond_to do |format|
       format.rdf { render template: 'rdf/show' }
       format.xml

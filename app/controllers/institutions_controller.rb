@@ -18,7 +18,7 @@ class InstitutionsController < ApplicationController
   # GET /institutions/1
   # GET /institutions/1.xml
   def show
-    options = {:is_collection=>false, :include=>['associated']}
+    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }

@@ -27,4 +27,11 @@ class SimpleBaseSerializer
         modified: updated || ""
     }
   end
+
+  def jsonapi
+        {
+            "version": "1.0"
+        }
+  end
+
 end

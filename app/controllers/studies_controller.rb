@@ -91,7 +91,7 @@ class StudiesController < ApplicationController
   def show
     @study = Study.find(params[:id])
     @study.create_from_asset = params[:create_from_asset]
-    options = {:is_collection=>false, :include=>['associated', 'creators']}
+    options = {:is_collection=>false}
 
     respond_to do |format|
       format.html

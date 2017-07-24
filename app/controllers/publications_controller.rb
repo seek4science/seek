@@ -37,7 +37,7 @@ class PublicationsController < ApplicationController
   # GET /publications/1
   # GET /publications/1.xml
   def show
-    options = {:is_collection=>false, :include=>['associated','publication-authors']}
+    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.xml

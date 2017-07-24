@@ -78,7 +78,7 @@ class ProgrammesController < ApplicationController
   end
 
   def show
-    options = {:is_collection=>false, :include=>['associated']}
+    options = {:is_collection=>false}
     respond_with do |format|
       format.html
       format.json {render json: JSONAPI::Serializer.serialize(@programme,options)}
