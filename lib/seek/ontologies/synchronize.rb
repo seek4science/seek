@@ -23,7 +23,7 @@ module Seek
         # check for label in ontology
         found_suggested_types = get_suggested_types_found_in_ontology(type)
 
-        Rails.logger.debug "matching suggested #{type.pluralize} found in ontology: #{found_suggested_types.map(&:label).join(', ')}"
+        Rails.logger.info "matching suggested #{type.pluralize} found in ontology: #{found_suggested_types.map(&:label).join(', ')}"
 
         replace_suggested_types_with_ontology(found_suggested_types, type)
 
@@ -35,8 +35,8 @@ module Seek
       end
 
       def update_assay_with_obselete_uris(type)
-        assays_for_update = Assay.all.select do |assay|
-          !assay.send("valid_#{type}_uri?")
+        assays_for_update = Assay.all.reject do |assay|
+          assay.send("valid_#{type}_uri?")
         end
 
         # check all assay uri-s, for those that don't exist in ontology. This is unusual and uris shouldn't be removed
@@ -59,10 +59,10 @@ module Seek
             if type == 'assay_type'
               cannot_be_removed = assay_changes_class?(assays, new_ontology_uri)
             end
-            unless cannot_be_removed
-              update_assays_and_remove_suggested_type(assays, suggested_type, type, new_ontology_uri)
-            else
+            if cannot_be_removed
               update_suggested_type(suggested_type)
+            else
+              update_assays_and_remove_suggested_type(assays, suggested_type, type, new_ontology_uri)
             end
           end
         end
@@ -70,17 +70,17 @@ module Seek
 
       def update_suggested_type(suggested_type)
         suggested_type.label = suggested_type.label + '2'
-        Rails.logger.debug "suggested label updated to #{suggested_type.label}"
+        Rails.logger.info "suggested label updated to #{suggested_type.label}"
         suggested_type.save
       end
 
       def update_assays_and_remove_suggested_type(assays, suggested_type, type, new_ontology_uri)
         assays.each do |assay|
-          Rails.logger.debug "updating assay: #{assay.id} with the new #{type} uri #{new_ontology_uri}".green
+          Rails.logger.info "updating assay: #{assay.id} with the new #{type} uri #{new_ontology_uri}".green
           assay.send("#{type}_uri=", new_ontology_uri)
           assay.save
         end
-        Rails.logger.debug "destroying suggested type #{suggested_type.id} with label #{suggested_type.label}".green
+        Rails.logger.info "destroying suggested type #{suggested_type.id} with label #{suggested_type.label}".green
         suggested_type.destroy
       end
 
