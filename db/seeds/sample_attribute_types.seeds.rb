@@ -16,10 +16,10 @@ int_type = SampleAttributeType.find_or_initialize_by(title:'Integer')
 int_type.update_attributes(base_type: Seek::Samples::BaseType::INTEGER, placeholder: '1')
 
 link_type = SampleAttributeType.find_or_initialize_by(title:'Web link')
-link_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp(%w(http https)).to_s, placeholder: 'http://www.example.com')
+link_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp(%w(http https)).to_s, placeholder: 'http://www.example.com', resolution:'\\0')
 
 email_type = SampleAttributeType.find_or_initialize_by(title:'Email address')
-email_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: RFC822::EMAIL.to_s, placeholder: 'someone@example.com')
+email_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: RFC822::EMAIL.to_s, placeholder: 'someone@example.com', resolution:'mailto:\\0')
 
 text_type = SampleAttributeType.find_or_initialize_by(title:'Text')
 text_type.update_attributes(base_type: Seek::Samples::BaseType::TEXT)
@@ -43,7 +43,10 @@ cv_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary
 cv_type.update_attributes(base_type: Seek::Samples::BaseType::CV)
 
 uri_type = SampleAttributeType.find_or_initialize_by(title:'URI')
-uri_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s, placeholder: 'http://www.example.com/123')
+uri_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s, placeholder: 'http://www.example.com/123', resolution:'\\0')
+
+doi_type = SampleAttributeType.find_or_initialize_by(title:'DOI')
+doi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: '(DOI:)?(.*)', placeholder: 'DOI:10.1109/5.771073', resolution:'https://dx.doi.org/\\2')
 
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types"
 
