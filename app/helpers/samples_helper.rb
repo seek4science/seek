@@ -79,14 +79,21 @@ module SamplesHelper
   def default_attribute_display(attribute, options, sample, value)
     t = attribute.sample_attribute_type
     if t.resolution.present? && t.regexp.present?
-      resolution = value.gsub(Regexp.new(t.regexp), t.resolution)
-      value = "<a href=\"" + resolution + "\"/>" + value + "</a>"
-    end
-    if options[:link] && attribute.is_title
+      regexp = t.regexp
+      if ! regexp.start_with?('\A')
+        regexp = '\A' + regexp
+      end
+      if ! regexp.end_with?('\Z')
+        regexp = regexp + '\Z'
+      end
+      resolution = value.sub(Regexp.new(t.regexp), t.resolution)
+      link_to(value, resolution)
+  else if options[:link] && attribute.is_title
       link_to(value, sample)
     else
-      text_or_not_specified(value, auto_link: options[:link])
+      sample_form_field_for_attribute(value, auto_link: options[:link])
     end
+   end
   end
 
   def seek_strain_attribute_display(value)
