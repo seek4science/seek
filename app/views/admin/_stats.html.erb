@@ -1,0 +1,56 @@
+<%= javascript_include_tag 'link_adder' %>
+
+<div class="form-group form-inline" id="stats-controls">
+  <%
+    status_options = [["Job queue","job_queue"],
+                      ["Auth table consistency","auth_consistency"]]
+
+    statistics_options = [["Content Statistics","content_stats"],
+                          ["Activity Statistics","activity_stats"],
+                          ["Search Statistics","search_stats"],
+                          ["Storage usage","storage_usage_stats"],
+                          ["Snapshot & DOI Statistics","snapshot_and_doi_stats"]
+    ]
+
+    user_options = [["Invalid Users or Profiles","invalid_users_profiles"],
+                    ["Users Requiring Activation","users_requiring_activation"],
+                    ["Non-#{t('project')} Members","non_project_members"],
+                    ["PALs","pals"],
+                    ["Profiles without users","profiles_without_users"],
+                    ["Administrators","administrators"]]
+    statistics_options = statistics_options | [["Workflow Statistics", "workflow_stats"]] if Seek::Config.workflows_enabled
+
+    grouped_options = [['Status', status_options], ['Statistics', statistics_options], ['User Information', user_options]]
+  %>
+
+  <%= select_tag :stats_query,
+                 grouped_options_for_select(grouped_options, nil),
+                 { include_blank: 'Select query...', autocomplete: 'off', class: 'form-control', id: 'query-selector' } %>
+
+  <%= button_link_to "Refresh", 'refresh', '#', id: 'stats-refresh-btn' %>
+</div>
+
+<div id="stats-pane"></div>
+
+<script>
+  $j(document).ready(function () {
+    var getPage = function (page) {
+      $j('#stats-controls').spinner('add');
+      $j.ajax({ url: '<%= get_stats_admin_path -%>',
+        data: { page: page },
+        success: function (resp) {
+          $j('#stats-pane').html(resp);
+        },
+        error: function () {
+          $j('#stats-pane').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+        },
+        complete: function () {
+          $j('#stats-controls').spinner('remove');
+        }
+      })
+    };
+
+    $j('#query-selector').change(function () { getPage($j(this).val()) });
+    $j('#stats-refresh-btn').click(function () { getPage($j('#query-selector').val()); return false; });
+  });
+</script>

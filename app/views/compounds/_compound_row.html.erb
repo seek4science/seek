@@ -23,29 +23,14 @@
    end
 
 %>
-<li id="compound_row_<%= compound.id -%>" >
-  <ul class="compound_row">
-    <li id="compound_name">
-        <%= h compound.title %>
-    </li>
+<tr id="compound_row_<%= compound.id -%>" >
+    <td><%= h compound.title %></td>
+    <td><%= h synonym_names %></td>
+    <td><%= h sabiork_id %></td>
+    <td><%= h chebi_ids %></td>
+    <td><%= h kegg_ids %></td>
 
-    <li id="synonyms">
-      <%= h synonym_names %>
-    </li>
-
-    <li id="sabiork_id">
-       <%= h sabiork_id %>
-    </li>
-
-    <li id="chebi_ids">
-      <%= h chebi_ids %>
-    </li>
-
-    <li id="kegg_ids">
-      <%= h kegg_ids %>
-    </li>
-
-    <li id="delete_<%= compound.id -%>" class="destroy_compound">
+    <td id="delete_<%= compound.id -%>" class="destroy_compound">
        <%
           studied_factors = ''
           experimental_conditions = ''
@@ -57,10 +42,10 @@
           end
           confirm_string = ''
           unless studied_factors.blank?
-            confirm_string.concat("This compound are linked to factors studied: #{studied_factors}")
+            confirm_string.concat("This compound is linked to factors studied: #{studied_factors}")
           end
           unless experimental_conditions.blank?
-            confirm_string.concat("This compound are linked to experimental conditions: #{experimental_conditions}")
+            confirm_string.concat("This compound is linked to experimental conditions: #{experimental_conditions}")
           end
 
           synonyms = compound.synonyms
@@ -89,31 +74,11 @@
          { :action => "destroy", :id => compound.id}, data: { confirm:  "#{confirm_string}" },
                    :method=>:delete, :remote => true
        -%>
-    </li>
+    </td>
 
-    <li id="edit_on_<%= compound.id -%>" >
-      <%= link_to_function image(("edit"),:title=>"Start editing",:alt=>"Start editing") do |page|
-         page.visual_effect :appear, "edit_compound_#{compound.id}"
-         page["edit_on_#{compound.id}"].toggle
-         page["edit_off_#{compound.id}"].toggle
-
-        end
-      -%>
-    </li>
-
-    <li id="edit_off_<%= compound.id -%>" style="display:none">
-      <%= link_to_function image(("edit_off"),:title=>"Stop editing",:alt=>"Stop editing") do |page|
-         page.visual_effect :fade, "edit_compound_#{compound.id}"
-         page["edit_on_#{compound.id}"].toggle
-         page["edit_off_#{compound.id}"].toggle
-        end
-      -%>
-    </li>
-  </ul>
-</li>
-
-<%= render :partial => "edit_compound", :locals => { :compound => compound}-%>
-
-
-
-
+    <td>
+      <a href="#" data-toggle="modal" data-target="#edit_compound_<%= compound.id -%>">
+        <%= image(("edit"),:title=>"Start editing",:alt=>"Start editing") %>
+      </a>
+    </td>
+</tr>

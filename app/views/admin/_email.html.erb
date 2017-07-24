@@ -1,0 +1,51 @@
+<%= admin_checkbox_setting(:email_enabled, 1, Seek::Config.email_enabled,
+                           "Email enabled", "Enables email support for sending notifications, requesting feedback, and requesting access to other users files.",
+                           :onchange=>toggle_appear_javascript('email_settings')) %>
+<div id="email_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.email_enabled) -%>;">
+  <div class="row">
+    <div class="col-sm-7">
+      <%= admin_text_setting(:address, Seek::Config.smtp_settings('address'), 'SMTP server address') %>
+
+      <%= admin_text_setting(:port, Seek::Config.smtp_settings('port'), 'SMTP server port', nil, :onkeypress => "javascript: return onlyNumbers(event);") %>
+
+      <%= admin_text_setting(:domain, Seek::Config.smtp_settings('domain'), 'Domain') %>
+
+      <%= admin_text_setting(:authentication, Seek::Config.smtp_settings('authentication'), 'Authentication') %>
+
+      <%= admin_checkbox_setting(:enable_starttls_auto, 1, Seek::Config.smtp_settings('enable_starttls_auto'), 'Auto STARTTLS enabled') %>
+
+      <%= admin_text_setting(:smtp_user_name, Seek::Config.smtp_settings('user_name'), 'User name') %>
+
+      <%= admin_password_setting(:smtp_password, Seek::Config.smtp_settings('password'), 'Password', nil, :autocomplete => 'off') %>
+
+      <%= admin_checkbox_setting(:exception_notification_enabled, 1, Seek::Config.exception_notification_enabled,
+                                 "Exception notification enabled", "Allows notifications of certain exceptions, allowing unexpected errors to be picked up quickly and fixed.",
+                                 :onchange=>toggle_appear_javascript('exception_notification_block')) %>
+
+      <div id="exception_notification_block" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.exception_notification_enabled) -%>;">
+        <%= admin_text_setting(:exception_notification_recipients,  Seek::Config.exception_notification_recipients,
+                               'Exception notification recipients', 'A comma or space seperated list of email address for those that will receive exception notifications.') %>
+      </div>
+
+      <%= admin_text_setting(:noreply_sender, Seek::Config.noreply_sender,
+                             'Sender Email Address', 'The sender email address that is used when automated emails are sent by SEEK.') %>
+
+      <%= admin_text_setting(:support_email_address,  Seek::Config.support_email_address,
+                             'Support Email Address', 'The email address to which users can send support emails.') %>
+    </div>
+    <div class="col-sm-5">
+      <%= panel('Test email configuration') do %>
+          <p class="help-block">Here you can input an email address for a testing message to be sent to.</p>
+          <%= text_field_tag :testing_email, '', :class => 'form-control', :placeholder => 'email@example.com' %>
+          <%= link_to_with_callbacks image("test",:title=>"Send testing email",:alt=>"Test")+" Send test email",
+                                     {:url=>{:action=>'test_email_configuration'},
+                                      :method=>:post,
+                                      :with=>"'address=' + $F('address') + '&port=' + $F('port') + '&domain=' + $F('domain') + '&authentication=' + $F('authentication')
+                             + '&enable_starttls_auto='+$F('enable_starttls_auto') + '&user_name=' + $F('smtp_user_name') + '&password=' + $F('smtp_password') + '&testing_email=' + $F('testing_email')",
+                                      :before => "show_ajax_loader('ajax_loader_position');"},
+                                     {:remote=>true, :class => 'btn btn-default'}-%>
+          <div id='ajax_loader_position'></div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -5,7 +5,7 @@
   downloadable = resource_name.camelize.constantize.new.try(:is_downloadable?)
   effective_permissions = permissions.reject { |p| p.access_type <= policy.access_type }
   sorted_permissions = effective_permissions.sort_by { |p| Permission.precedence.index(p.contributor_type) }
-  grouped_contributors = group_by_access_type(sorted_permissions, privileged_people)
+  grouped_contributors = group_by_access_type(sorted_permissions, privileged_people, downloadable)
 %>
 
 <div class="modal fade" id="preview_permissions" tabindex="-1" role="dialog" aria-labelledby="preview_permissions_title" aria-hidden="true">

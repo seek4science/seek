@@ -64,23 +64,6 @@ function checkProjectExists(prefix) {
     return(true);
 }
 
-function flipSaveEnable(){
-    if ($('redbox_workflow_submit_btn').hidden == true) {
-        $('redbox_workflow_submit_btn').hidden = false;
-    }
-    else {
-        $('redbox_workflow_submit_btn').hidden = true;
-    }
-}
-
-function createOrUpdateResourceInRedBox(is_new_file, resource_name){
-    // filename and title set - can submit
-    $('redbox_workflow_submit_btn').disabled = true;
-    $('redbox_workflow_submit_btn').value = (is_new_file=='true' ? "Creating..." : "Updating...");
-    var form0 = $('redbox_workflow_submit_btn').form;
-    form0.submit();
-    RedBox.close();
-}
 
 function createOrUpdateResource(is_new_file, resource_name){
     // filename and title set - can submit
