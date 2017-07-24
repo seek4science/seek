@@ -201,7 +201,6 @@ GEM
       sass (>= 3.3.4)
     breadcrumbs_on_rails (3.0.1)
     builder (3.2.3)
-    cancan (1.6.10)
     citeproc (1.0.5)
       namae (~> 0.8)
     citeproc-ruby (1.1.6)
@@ -848,7 +847,6 @@ DEPENDENCIES
   bootstrap-sass
   breadcrumbs_on_rails
   bundler (>= 1.8.4)
-  cancan
   citeproc (~> 1.0.4)
   citeproc-ruby (~> 1.1.4)
   cocaine

@@ -531,7 +531,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile3 = Factory(:data_file, contributor: leaving_project_member.user,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
 
-    ability = Ability.new(asset_manager.user)
+    ability = Ability.new(asset_manager)
 
     assert ability.cannot? :manage, datafile1
     assert ability.cannot? :manage, datafile2
@@ -553,7 +553,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile2 = Factory(:data_file, contributor: former_project_member.user,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
 
-    ability = Ability.new(asset_manager.user)
+    ability = Ability.new(asset_manager)
 
     assert ability.can? :manage, datafile1
     assert ability.can? :manage, datafile2
@@ -569,7 +569,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile = Factory(:data_file)
     assert (asset_manager.projects & datafile.projects).empty?
 
-    ability = Ability.new(asset_manager.user)
+    ability = Ability.new(asset_manager)
 
     assert ability.cannot? :manage, datafile
 
@@ -586,7 +586,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile = Factory(:data_file, projects: [other_project])
     assert !(asset_manager.projects & datafile.projects).empty?
 
-    ability = Ability.new(asset_manager.user)
+    ability = Ability.new(asset_manager)
 
     assert ability.cannot? :manage, datafile
 
@@ -600,7 +600,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile1 = Factory(:data_file, contributor: nil,
                                     projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
 
-    ability = Ability.new(asset_manager.user)
+    ability = Ability.new(asset_manager)
 
     assert ability.can? :manage, datafile1
 
@@ -616,7 +616,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     User.with_current_user gatekeeper.user do
       assert !datafile.can_manage?
 
-      ability = Ability.new(gatekeeper.user)
+      ability = Ability.new(gatekeeper)
       assert gatekeeper.is_asset_gatekeeper?(gatekeeper.projects.first)
       assert ability.cannot? :publish, datafile
       assert ability.cannot? :manage, datafile
