@@ -28,10 +28,4 @@ class SimpleBaseSerializer
     }
   end
 
-  def jsonapi
-        {
-            "version": "1.0"
-        }
-  end
-
 end
