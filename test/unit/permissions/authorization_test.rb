@@ -533,9 +533,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     ability = Ability.new(asset_manager.user)
 
-    assert ability.cannot? :manage_asset, datafile1
-    assert ability.cannot? :manage_asset, datafile2
-    assert ability.cannot? :manage_asset, datafile3
+    assert ability.cannot? :manage, datafile1
     assert ability.cannot? :manage, datafile2
     assert ability.cannot? :manage, datafile3
 
@@ -557,9 +555,8 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     ability = Ability.new(asset_manager.user)
 
-    assert ability.can? :manage_asset, datafile1
-    assert ability.can? :manage_asset, datafile2
-    assert ability.cannot? :manage, datafile2
+    assert ability.can? :manage, datafile1
+    assert ability.can? :manage, datafile2
 
     User.with_current_user asset_manager.user do
       assert datafile1.can_manage?
@@ -574,7 +571,6 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     ability = Ability.new(asset_manager.user)
 
-    assert ability.cannot? :manage_asset, datafile
     assert ability.cannot? :manage, datafile
 
     User.with_current_user asset_manager.user do
@@ -592,7 +588,6 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     ability = Ability.new(asset_manager.user)
 
-    assert ability.cannot? :manage_asset, datafile
     assert ability.cannot? :manage, datafile
 
     User.with_current_user asset_manager.user do
@@ -607,7 +602,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
     ability = Ability.new(asset_manager.user)
 
-    assert ability.can? :manage_asset, datafile1
+    assert ability.can? :manage, datafile1
 
     User.with_current_user asset_manager.user do
       assert datafile1.can_manage?
@@ -624,7 +619,6 @@ class AuthorizationTest < ActiveSupport::TestCase
       ability = Ability.new(gatekeeper.user)
       assert gatekeeper.is_asset_gatekeeper?(gatekeeper.projects.first)
       assert ability.cannot? :publish, datafile
-      assert ability.cannot? :manage_asset, datafile
       assert ability.cannot? :manage, datafile
     end
   end
