@@ -368,7 +368,7 @@ GEM
       rdf (~> 1.1, >= 1.1.17, < 1.99)
     json-schema (2.8.0)
       addressable (>= 2.4)
-    jsonapi-serializers (0.16.1)
+    jsonapi-serializers (1.0.0)
       activesupport
     kgio (2.11.0)
     latex-decode (0.2.2)
@@ -980,4 +980,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.15.0
+   1.15.1
