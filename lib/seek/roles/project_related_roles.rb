@@ -64,6 +64,10 @@ module Seek
           after_save(:resolve_admin_defined_role_projects)
         end
 
+        def is_pal_of_any_project?
+          has_role?(Seek::Roles::PAL)
+        end
+
         def is_project_administrator_of_any_project?
           has_role?(Seek::Roles::PROJECT_ADMINISTRATOR)
         end
@@ -90,6 +94,10 @@ module Seek
 
         def is_asset_gatekeeper?(project)
           check_for_role Seek::Roles::ASSET_GATEKEEPER, project
+        end
+
+        def is_pal_of?(asset)
+          asset.projects.any? { |project| check_for_role(Seek::Roles::PAL, project) }
         end
 
         def is_project_administrator_of?(asset)
