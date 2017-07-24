@@ -230,33 +230,33 @@ class ApplicationController < ActionController::Base
   # handles finding and authorizing an asset for all controllers that require authorization, and handling if the item cannot be found
   def find_and_authorize_requested_item
     name = controller_name.singularize
-    action = Seek::Permissions::Translator.translate(action_name)
+    privilege = Seek::Permissions::Translator.translate(action_name)
 
-    return if action.nil?
+    return if privilege.nil?
 
     object = controller_name.classify.constantize.find(params[:id])
 
-    if is_auth?(object, action)
+    if is_auth?(object, privilege)
       eval "@#{name} = object"
       params.delete :policy_attributes unless object.can_manage?(current_user)
     else
       respond_to do |format|
         format.html do
-          case action
+          case privilege
           when :publish, :manage, :edit, :download, :delete
             if current_user.nil?
-              flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
+              flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}, you may need to login first."
             else
-              flash[:error] = "You are not authorized to #{action} this #{name.humanize}."
+              flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
             redirect_to(eval("#{controller_name.singularize}_path(#{object.id})"))
           else
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
         end
-        format.rdf { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
-        format.xml { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
-        format.json { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
+        format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.json { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
       end
       return false
     end
@@ -284,11 +284,11 @@ class ApplicationController < ActionController::Base
     false
   end
 
-  def is_auth?(object, action)
-    if object.can_perform? action
+  def is_auth?(object, privilege)
+    if object.can_perform?(privilege)
       true
-    elsif params[:code] && (action == 'view' || action == 'download')
-      object.auth_by_code? params[:code]
+    elsif params[:code] && [:view, :download].include?(privilege)
+      object.auth_by_code?(params[:code])
     else
       false
     end
