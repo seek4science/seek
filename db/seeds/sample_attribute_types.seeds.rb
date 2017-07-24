@@ -28,7 +28,7 @@ string_type = SampleAttributeType.find_or_initialize_by(title:'String')
 string_type.update_attributes(base_type: Seek::Samples::BaseType::STRING)
 
 chebi_type = SampleAttributeType.find_or_initialize_by(title:'CHEBI ID')
-chebi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: 'CHEBI:[0-9]+', placeholder: 'CHEBI:1234')
+chebi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: 'CHEBI:[0-9]+', placeholder: 'CHEBI:1234', resolution:'http://identifiers.org/chebi/\\0')
 
 bool_type = SampleAttributeType.find_or_initialize_by(title:'Boolean')
 bool_type.update_attributes(base_type: Seek::Samples::BaseType::BOOLEAN)
