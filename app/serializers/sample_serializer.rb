@@ -1,5 +1,5 @@
 class SampleSerializer < BaseSerializer
-  attributes :id, :title, :sample_type,
+  attributes :title, :sample_type,
              :sample_type_id, :originating_data_file_id,
              :json_metadata
 

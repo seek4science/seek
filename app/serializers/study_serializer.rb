@@ -1,3 +1,3 @@
 class StudySerializer < PCSSerializer
-  attributes :id, :title, :description
+  attributes :title, :description
 end

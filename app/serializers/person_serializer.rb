@@ -1,5 +1,5 @@
 class PersonSerializer < AvatarObjSerializer
-  attributes :id, :title,
+  attributes :title,
              :first_name, :last_name,
              :email, :description
 

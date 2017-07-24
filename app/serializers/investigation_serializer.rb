@@ -1,3 +1,3 @@
 class InvestigationSerializer < PCSSerializer
-  attributes :id, :title, :description
+  attributes :title, :description
 end

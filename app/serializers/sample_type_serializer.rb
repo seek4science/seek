@@ -1,5 +1,5 @@
 class SampleTypeSerializer < BaseSerializer
-  attributes :id, :title, :description, :uploaded_template
+  attributes :title, :description, :uploaded_template
 
   has_many :samples, include_data:true
   has_many :sample_attributes, include_data:true

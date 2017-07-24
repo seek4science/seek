@@ -1,5 +1,5 @@
 class ProgrammeSerializer < AvatarObjSerializer
-  attributes :id, :title, :description,
+  attributes :title, :description,
              :web_page, :funding_details
 
 end

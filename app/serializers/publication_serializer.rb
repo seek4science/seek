@@ -1,5 +1,5 @@
 class PublicationSerializer < BaseSerializer
-  attributes :id, :title, #:publication_authors,
+  attributes :title, #:publication_authors,
              :journal, :published_date,
              :doi, :pubmed_id,
              :abstract, :citation #, :persons --> creators?

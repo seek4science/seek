@@ -1,4 +1,4 @@
 class WorkGroupSerializer < BaseSerializer
-  attributes :id, :name, :institution, :project
+  attributes :name, :institution, :project
 
 end
