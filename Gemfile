@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.8'
+gem 'rails', '~> 4.2.9'
 gem 'rdoc'
 
 #database adaptors
@@ -67,7 +67,6 @@ gem 'gibberish', git: 'https://github.com/SysMO-DB/gibberish.git'
 gem 'white_list', git: 'https://github.com/SysMO-DB/white_list.git'
 gem 'white_list_formatted_content', git: 'https://github.com/SysMO-DB/white_list_formatted_content.git'
 gem 'my_savage_beast', git: 'https://github.com/SysMO-DB/my_savage_beast.git'
-gem 'redbox', git: 'https://github.com/SysMO-DB/redbox.git'
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
 gem 'bioportal', '>=2.3', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'acts_as_activity_logged', git: 'https://github.com/SysMO-DB/acts_as_activity_logged.git'

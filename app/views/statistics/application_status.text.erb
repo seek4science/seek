@@ -1,5 +1,5 @@
 <%
    search_enabled = Seek::Config.solr_enabled ? 'enabled' : 'disabled'
-   delayed_job_count = delayed_job_status.scan("Running [Process ID:").count
+   delayed_job_count = delayed_job_pids.count rescue 0
 %>
 <%= Seek::Config.application_name %> is running | search is <%= search_enabled %> | <%= delayed_job_count %> delayed jobs running

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170607095453) do
+ActiveRecord::Schema.define(version: 20170711121424) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255

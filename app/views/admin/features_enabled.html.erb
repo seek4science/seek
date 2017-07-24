@@ -1,0 +1,75 @@
+<h1>Enable or disable features</h1>
+
+<%= form_tag :action=>"update_features_enabled" do -%>
+    <h2>SEEK services</h2>
+    <%= admin_checkbox_setting(:solr_enabled, 1, Seek::Config.solr_enabled,
+                               "Search enabled", "Whether the search is enabled. If switched on you need to ensure SOLR is running and its index is up to date. You need to restart both the server, and the Background service, after changing this setting.") %>
+
+    <%= render :partial => 'admin/email' %>
+
+    <%= render :partial => 'admin/omniauth' %>
+
+    <%= admin_checkbox_setting(:pdf_conversion_enabled, 1, Seek::Config.pdf_conversion_enabled,
+                               "Pdf conversion enabled", "Whether pdf conversion is enabled. It allows converting some document types to pdf format. If enabled, you need to ensure open office is running") %>
+
+    <h2>SEEK features</h2>
+    <%= admin_checkbox_setting(:events_enabled, 1,Seek::Config.events_enabled,
+                               "#{t('event').pluralize} enabled","Whether the #{t('event').pluralize} are displayed and can be added.") %>
+
+    <%= admin_checkbox_setting(:programmes_enabled, 1, Seek::Config.programmes_enabled,
+                               "#{t('programme').pluralize} enabled", "Whether #{t('programme').pluralize} are enabled. #{t('programme').pluralize} allow a collection of #{t('project').pluralize} to be grouped together. This is useful if you have a large number of #{t('project').pluralize} from different initiatives.",:onchange=>toggle_appear_javascript('programme_details')) %>
+    <div id="programme_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.programmes_enabled -%>">
+      <%= admin_checkbox_setting(:programme_user_creation_enabled, 1, Seek::Config.programme_user_creation_enabled,
+                             "User creation of #{t('programme').pluralize} enabled", "Controls whether standard users can create their own #{t('programme').pluralize}. If disabled only full administrators will be able to create #{t('programme').pluralize}. If enabled a full administrator is still required to allow and activate the #{t('programme')}") %>
+    </div>
+    <%= admin_checkbox_setting(:samples_enabled, 1, Seek::Config.samples_enabled,
+                               "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.") %>
+
+    <%#= admin_checkbox_setting(:delete_asset_version_enabled, 1, Seek::Config.delete_asset_version_enabled,
+                               "Delete asset version enabled", "Whether delete of one version of the versioned asset is enabled. It allows to delete previous (older) versions without deleting the complete asset") %>
+
+    <%= admin_checkbox_setting(:internal_help_enabled, 1, Seek::Config.internal_help_enabled,
+                               "Internal help enabled", "Whether internal help pages should be used. Disabling this allows the use of external help pages.",
+                               :onchange=>toggle_appear_javascript('external_help_details', reverse: true)) %>
+    <div id="external_help_details" class="additional_settings" style="<%= show_or_hide_block !Seek::Config.internal_help_enabled -%>">
+      <%= admin_text_setting(:external_help_url, Seek::Config.external_help_url,
+                             'Help URL', "This is the URL for the external help e.g #{Seek::Config.default_external_help_url}.") %>
+    </div>
+
+    <h2>Integrations</h2>
+    <%= admin_checkbox_setting(:jws_enabled, 1, Seek::Config.jws_enabled,
+                               "JWS Online enabled", "Whether integration with JWS Online is enabled. Enabling this allows simulation of SBML models with JWS Online.",
+                               :onchange=>toggle_appear_javascript('jws_online_details')) %>
+    <div id="jws_online_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.jws_enabled -%>">
+      <%= admin_text_setting(:jws_online_root, Seek::Config.jws_online_root,
+                             'JWS Online Root URL', "This is the root URL for the JWS Online server SEEK communicates with, e.g. #{Seek::Config.default_jws_online_root} .") %>
+    </div>
+
+    <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,
+                               "Google analytics enabled", "Allows you to keep track of site traffic using Google Analytics. You need to register with Google Analytics and get a tracker ID.",
+                               :onchange=>toggle_appear_javascript('google_anaylitics_block')) %>
+    <div id="google_anaylitics_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.google_analytics_enabled -%>">
+      <%= admin_text_setting(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id,
+                             'Google analytics tracker id', "The tracker ID provided to you by Google.") %>
+    </div>
+
+    <%= admin_checkbox_setting(:piwik_analytics_enabled, 1, Seek::Config.piwik_analytics_enabled,
+                               "Piwik analytics enabled", "Allows you to keep track of site traffic using Piwik Analytics.",
+                               :onchange=>toggle_appear_javascript('piwik_anaylitics_block')) %>
+    <div id="piwik_anaylitics_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.piwik_analytics_enabled -%>">
+      <%= admin_text_setting(:piwik_analytics_id_site, Seek::Config.piwik_analytics_id_site,
+                             'Piwik analytics id site', "The ID of your website inside Piwik. It is the numeric value corresponding to the ID of the site created in Piwik.") %>
+      <%= admin_text_setting(:piwik_analytics_url, Seek::Config.piwik_analytics_url,
+                             'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. #{Seek::Config.default_piwik_analytics_url} ") %>
+    </div>
+
+    <%= render :partial => "admin/doi_settings" %>
+
+    <%= render :partial => "admin/zenodo_settings" %>
+
+    <%= admin_checkbox_setting(:openbis_enabled, 1, Seek::Config.openbis_enabled,
+                               "openBIS enabled", "Whether support for a #{t('project')} to connect to openBIS is enabled.") %>
+
+    <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
+    <%= cancel_button admin_path-%>
+<% end -%>

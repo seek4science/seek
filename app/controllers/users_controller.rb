@@ -161,10 +161,14 @@ class UsersController < ApplicationController
   def activation_required; end
 
   def impersonate
-    user = User.find(params[:id])
-    self.current_user = user if user
-
-    redirect_to controller: 'homes', action: 'index'
+    user = User.find_by_id(params[:id])
+    if user
+      self.current_user = user
+      redirect_to root_path
+    else
+      flash[:error] = "User not found"
+      redirect_to admin_path
+    end
   end
 
   private
