@@ -210,33 +210,6 @@ class ApplicationController < ActionController::Base
     User.admin_logged_in?
   end
 
-  def translate_action(action_name)
-    case action_name
-    when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
-          'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview', 'runs', 'new_object_based_on_existing_one',
-          'samples_table'
-      'view'
-
-    when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute', 'plot', 'explore', 'visualise',
-          'export_as_xgmml', 'download_log', 'download_results', 'input', 'output', 'download_output', 'download_input',
-          'view_result', 'compare_versions', 'simulate'
-      'download'
-
-    when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
-          'destroy_version', 'edit_version', 'update_version', 'new_item',
-          'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link', 'describe_ports'
-      'edit'
-
-    when 'destroy', 'destroy_item', 'cancel', 'destroy_samples_confirm'
-      'delete'
-
-    when 'manage', 'notification', 'read_interaction', 'write_interaction', 'report_problem', 'storage_report',
-          'select_sample_type', 'extraction_status', 'extract_samples', 'confirm_extraction', 'cancel_extraction'
-      'manage'
-    end
-  end
-
   # handles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
   def find_requested_item
     name = controller_name.singularize
@@ -257,7 +230,7 @@ class ApplicationController < ActionController::Base
   # handles finding and authorizing an asset for all controllers that require authorization, and handling if the item cannot be found
   def find_and_authorize_requested_item
     name = controller_name.singularize
-    action = translate_action(action_name)
+    action = Seek::Permissions::Translator.translate(action_name)
 
     return if action.nil?
 
@@ -270,7 +243,7 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         format.html do
           case action
-          when 'publish', 'manage', 'edit', 'download', 'delete'
+          when :publish, :manage, :edit, :download, :delete
             if current_user.nil?
               flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
             else
