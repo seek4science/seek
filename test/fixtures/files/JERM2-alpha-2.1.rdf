@@ -2281,7 +2281,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <!-- http://jermontology.org/ontology/JERMOntology#Progressive_curve_experiment -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Progressive_curve_experiment">
-        <rdfs:label>Prog Rock</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Enzymatic_activity_measurements"/>
         <dc:identifier>JERM:00118</dc:identifier>
     </owl:Class>
@@ -3633,7 +3632,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <!-- http://jermontology.org/ontology/JERMOntology#2-hybrid_system -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#2-hybrid_system">
-        <rdfs:label>fish</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Binding"/>
         <dc:description>Two-hybrid screening (also known as yeast two-hybrid system or Y2H) is a molecular biology technique used to discover protein-protein interactions and protein-DNA interactions by testing for physical interactions</dc:description>
         <dc:identifier>JERM:00106</dc:identifier>

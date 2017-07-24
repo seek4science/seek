@@ -14,15 +14,15 @@ class AssayTypeReaderTest < ActiveSupport::TestCase
 
     refute_nil hierarchy
     assert hierarchy.is_a?(Seek::Ontologies::OntologyClass)
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type', hierarchy.uri.to_s
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type', hierarchy.uri.to_s
 
     hierarchy = hierarchy.subclasses
 
     refute_empty hierarchy
-    genomics = hierarchy.select { |t| t.uri.to_s == 'http://www.mygrid.org.uk/ontology/JERMOntology#Genomics' }
+    genomics = hierarchy.select { |t| t.uri.to_s == 'http://jermontology.org/ontology/JERMOntology#Genomics' }
     assert_equal 1, genomics.count
     refute_empty genomics.first.subclasses
-    amp = genomics.first.subclasses.select { |t| t.uri.to_s == 'http://www.mygrid.org.uk/ontology/JERMOntology#Amplification' }
+    amp = genomics.first.subclasses.select { |t| t.uri.to_s == 'http://jermontology.org/ontology/JERMOntology#Amplification' }
     refute_empty amp
   end
 
@@ -37,27 +37,27 @@ class AssayTypeReaderTest < ActiveSupport::TestCase
   test 'all labels' do
     reader = Seek::Ontologies::AssayTypeReader.instance
     labels = reader.all_labels
-    assert_equal 52, labels.size
+    assert_equal 59, labels.size
     assert_includes labels, 'amplification'
   end
 
   test 'class for uri' do
     reader = Seek::Ontologies::AssayTypeReader.instance
-    c = reader.class_for_uri('http://www.mygrid.org.uk/ontology/JERMOntology#Amplification')
+    c = reader.class_for_uri('http://jermontology.org/ontology/JERMOntology#Amplification')
     refute_nil c
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Amplification', c.uri
-    assert_nil reader.class_for_uri('http://www.mygrid.org.uk/ontology/JERMOntology#sdfskdfhsdf')
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Amplification', c.uri
+    assert_nil reader.class_for_uri('http://jermontology.org/ontology/JERMOntology#sdfskdfhsdf')
   end
 
   test 'parents are set' do
-    amp = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri['http://www.mygrid.org.uk/ontology/JERMOntology#Amplification']
+    amp = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri['http://jermontology.org/ontology/JERMOntology#Amplification']
     refute_nil amp
     assert_equal 1, amp.parents.count
     genomics = amp.parents.first
     assert_equal 'Genomics', genomics.label
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Genomics', genomics.uri.to_s
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Genomics', genomics.uri.to_s
 
     assert_equal 1, genomics.parents.count
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type', genomics.parents.first.uri.to_s
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type', genomics.parents.first.uri.to_s
   end
 end

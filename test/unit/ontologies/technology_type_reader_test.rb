@@ -14,7 +14,7 @@ class TechnologyTypeReaderTest < ActiveSupport::TestCase
 
     refute_nil hierarchy
     assert hierarchy.is_a?(Seek::Ontologies::OntologyClass)
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type', hierarchy.uri.to_s
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Technology_type', hierarchy.uri.to_s
 
     hierarchy = hierarchy.subclasses
 
@@ -28,9 +28,9 @@ class TechnologyTypeReaderTest < ActiveSupport::TestCase
 
   test 'class for uri' do
     reader = Seek::Ontologies::TechnologyTypeReader.instance
-    c = reader.class_for_uri('http://www.mygrid.org.uk/ontology/JERMOntology#Sequencing')
+    c = reader.class_for_uri('http://jermontology.org/ontology/JERMOntology#Sequencing')
     refute_nil c
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Sequencing', c.uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Sequencing', c.uri
     assert_nil reader.class_for_uri('http://www.mygrid.org.uk/ontology/JERMOntology#sdfskdfhsdf')
   end
 
