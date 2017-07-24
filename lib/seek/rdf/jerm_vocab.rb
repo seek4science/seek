@@ -1,6 +1,6 @@
 module Seek
   module Rdf
-    class JERMVocab < RDF::Vocabulary('http://www.mygrid.org.uk/ontology/JERMOntology#')
+    class JERMVocab < RDF::Vocabulary('http://jermontology.org/ontology/JERMOntology#')
       @types = { DataFile => 'Data',
                  Model => 'Model',
                  Sop => 'SOP',

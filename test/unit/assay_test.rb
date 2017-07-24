@@ -120,7 +120,7 @@ class AssayTest < ActiveSupport::TestCase
       assert assay.valid?
       refute_nil assay.assay_type_uri, 'uri should have been set to default in before_validation'
 
-      assay.assay_type_uri = 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics'
+      assay.assay_type_uri = 'http://jermontology.org/ontology/JERMOntology#Metabolomics'
 
       assert assay.valid?
 
@@ -368,8 +368,8 @@ class AssayTest < ActiveSupport::TestCase
 
   def new_valid_assay
     Assay.new(title: 'test',
-              assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics',
-              technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography',
+              assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
+              technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
               study: studies(:metabolomics_study),
               contributor: people(:person_for_model_owner),
               assay_class: assay_classes(:experimental_assay_class),
@@ -384,10 +384,10 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'assay type label from ontology or suggested assay type' do
-    assay = Factory(:experimental_assay, assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response')
+    assay = Factory(:experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response')
     assert_equal 'Catabolic response', assay.assay_type_label
 
-    assay = Factory(:modelling_assay, assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Genome_scale')
+    assay = Factory(:modelling_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
     assert_equal 'Genome scale', assay.assay_type_label
 
     suggested_at = Factory(:suggested_assay_type, label: 'new fluxomics')
@@ -400,7 +400,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'technology type label from ontology or suggested technology type' do
-    assay = Factory(:experimental_assay, technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding')
+    assay = Factory(:experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding')
     assert_equal 'Binding', assay.technology_type_label
 
     suggested_tt = Factory(:suggested_technology_type, label: 'new technology type')

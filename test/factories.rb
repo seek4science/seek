@@ -224,18 +224,18 @@ end
 
 Factory.define(:suggested_technology_type) do |f|
   f.sequence(:label) { |n| "A TechnologyType#{n}" }
-  f.ontology_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type'
+  f.ontology_uri 'http://jermontology.org/ontology/JERMOntology#Technology_type'
 end
 
 Factory.define(:suggested_assay_type) do |f|
   f.sequence(:label) { |n| "An AssayType#{n}" }
-  f.ontology_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type'
+  f.ontology_uri 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type'
   f.after_build { |type| type.term_type = 'assay' }
 end
 
 Factory.define(:suggested_modelling_analysis_type, class: SuggestedAssayType) do |f|
   f.sequence(:label) { |n| "An Modelling Analysis Type#{n}" }
-  f.ontology_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type'
+  f.ontology_uri 'http://jermontology.org/ontology/JERMOntology#Model_analysis_type'
   f.after_build { |type| type.term_type = 'modelling_analysis' }
 end
 
@@ -266,8 +266,8 @@ Factory.define(:modelling_assay_with_organism, parent: :modelling_assay) do |f|
 end
 Factory.define(:experimental_assay, parent: :assay_base) do |f|
   f.association :assay_class, factory: :experimental_assay_class
-  f.assay_type_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type'
-  f.technology_type_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type'
+  f.assay_type_uri 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type'
+  f.technology_type_uri 'http://jermontology.org/ontology/JERMOntology#Technology_type'
 end
 
 Factory.define(:assay, parent: :modelling_assay) {}

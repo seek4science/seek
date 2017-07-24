@@ -31,7 +31,7 @@ class TechnologyTypeReaderTest < ActiveSupport::TestCase
     c = reader.class_for_uri('http://jermontology.org/ontology/JERMOntology#Sequencing')
     refute_nil c
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Sequencing', c.uri
-    assert_nil reader.class_for_uri('http://www.mygrid.org.uk/ontology/JERMOntology#sdfskdfhsdf')
+    assert_nil reader.class_for_uri('http://jermontology.org/ontology/JERMOntology#sdfskdfhsdf')
   end
 
   test 'label exists?' do
