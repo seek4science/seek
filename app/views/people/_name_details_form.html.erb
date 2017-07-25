@@ -14,7 +14,8 @@
 
   <div class="col-sm-6">
     <div class="form-group">
-      <label>ORCID Identifier</label><% if f.object.needs_orcid? %><span class="required">*</span><% end %>
+      <label>ORCID</label><% if f.object.needs_orcid? %><span class="required">*</span><% end %>
+      <%= image(:orcid_id) %>
       <%= help_icon('<b>ORCID</b> is an open, non-profit, community-based effort to provide a registry of unique researcher identifiers and a transparent method of linking research activities and outputs to these identifiers.<b>An ORCID identifier looks like http://orcid.org/XXXX-XXXX-XXXX-XXXX</b>To find out more and get your ORCID ID please visit http://orcid.org') -%>
 
       <%= f.text_field :orcid, :class => 'form-control' %>

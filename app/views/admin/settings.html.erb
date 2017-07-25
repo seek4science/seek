@@ -1,0 +1,100 @@
+<h1>Settings</h1>
+
+<%= form_tag :action=>"update_settings" do -%>
+    <h2>General settings</h2>
+    <%= admin_text_setting(:site_base_host, Seek::Config.site_base_host,
+                           'Site base URL', 'This base URL for this SEEK installation. This is required cases where the host cannot be determined from the request - particularly within the REST API and Subscription email notifications.') %>
+
+    <%= admin_text_setting(:sabiork_ws_base_url, Seek::Config.sabiork_ws_base_url,
+                           'SabioRK WS base URL', 'This base URL for sabiork webservices REST API') %>
+
+    <%= admin_text_setting(:pubmed_api_email, Seek::Config.pubmed_api_email,
+                           'Pubmed API email', 'When adding a publication from PubMed, an email address is required to use the API. No registration is required.') %>
+
+    <%= admin_text_setting(:crossref_api_email, Seek::Config.crossref_api_email,
+                           'CrossRef API email', "When adding a publication from a DOI, an email address is required to use the API. The email address needs registering at #{link_to 'http://www.crossref.org/', 'http://www.crossref.org/',:target=>:_blank}") %>
+
+    <%= admin_text_setting(:bioportal_api_key, Seek::Config.bioportal_api_key,
+                           'BioPortal API key', "Required to interact with BioPortal - for example when creating new Organisms through the NCBI Taxonomy. Please register with #{link_to 'http://bioportal.bioontology.org','http://bioportal.bioontology.org',:target=>:_blank} to get an API key.") %>
+
+    <%= admin_checkbox_setting(:hide_details_enabled, 1, Seek::Config.hide_details_enabled,
+                               "Hide contact details", "Hides email addresses, skype and internal web addresses.") %>
+
+    <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
+                               "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
+                               :onchange=>toggle_appear_javascript('cache_remote_block')) %>
+    <div id="cache_remote_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.cache_remote_files -%>">
+      <%= admin_text_setting(:max_cachable_size, Seek::Config.max_cachable_size,
+                             'Maximum file size', 'The size limit (in bytes) below which SEEK will automatically cache remote files. Remote files larger than this limit will be ignored unless the user explicitly requests.',
+                             :onkeypress => "javascript: return onlyNumbers(event);") %>
+      <%= admin_text_setting(:hard_max_cachable_size, Seek::Config.hard_max_cachable_size,
+                             'Hard maximum file size', 'The hard remote file size limit (in bytes). SEEK will not download files over this size regardless of user preference.',
+                             :onkeypress => "javascript: return onlyNumbers(event);") %>
+    </div>
+
+    <h2>Policy and license settings</h2>
+    <%= access_type_options = [Policy::PRIVATE, Policy::VISIBLE, Policy::ACCESSIBLE]
+        # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
+        option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_all_visitors_access_type)
+        admin_dropdown_setting(:default_all_visitors_access_type, option_tags, 'Settings For Default Permissions',
+                               'Default permissions option for all visitors, including those without a login') %>
+
+    <%= access_type_options = [Policy::VISIBLE, Policy::ACCESSIBLE, Policy::EDITING, Policy::MANAGING]
+        # Passing in a data file so that is_downloadable is true, and the ACCESSIBLE option will be kept.
+        option_tags = policy_selection_options(access_type_options, DataFile.new, Seek::Config.default_associated_projects_access_type)
+        admin_dropdown_setting(:default_associated_projects_access_type, option_tags, nil,
+                               "Default permissions option for members of associated #{t('project').pluralize}") %>
+
+    <%= admin_setting_block('Default License', "The default license to use when one is not specified by a #{t('project').pluralize}.") do
+      grouped_license_select(:default_license, Seek::Config.default_license, id: 'license-select',
+                             class: 'form-control', source: Seek::License::OPENDEFINITION[:data])
+    end %>
+
+    <%= admin_dropdown_setting(:permissions_popup,
+           options_for_select([['Always show', Seek::Config::PERMISSION_POPUP_ALWAYS],
+                               ['Show when permissions changed', Seek::Config::PERMISSION_POPUP_ON_CHANGE],
+                               ['Never show',Seek::Config::PERMISSION_POPUP_NEVER]], Seek::Config.permissions_popup),
+           'Permissions Summary Settings',
+           'Choose when/if to display the "Preview of your sharing settings" pop-up when creating or updating a resource') %>
+
+    <%= admin_text_setting(:auth_lookup_update_batch_size, Seek::Config.auth_lookup_update_batch_size,
+                           'Authorization update batch size', 'The number of authorization updates to process per cycle of the job. Setting this too high may cause transactions to timeout.',
+                           :onkeypress => "javascript: return onlyNumbers(event);") %>
+
+
+    <h2>Registration settings</h2>
+    <%= admin_checkbox_setting(:registration_disabled, 1, Seek::Config.registration_disabled,
+                               "Registration disabled", "Whether new accounts creation is disabled. Can be useful in combination with external authentication (e.g. LDAP)",
+                               :onchange=>toggle_appear_javascript('registration_disabled_textarea')) %>
+    <div id="registration_disabled_textarea" class="additional_settings" style="<%= show_or_hide_block Seek::Config.registration_disabled -%>">
+
+      <%= admin_textarea_setting(:registration_disabled_description, Seek::Config.registration_disabled_description,
+                                 "Registration disabled message", "Sets the description text on the registration page when registration is disabled") %>
+    </div>
+
+    <%= admin_checkbox_setting(:activation_required_enabled, 1, Seek::Config.activation_required_enabled,
+                               "Activation required", "Whether activation is required when registering, as an additional check that the person is genuine and provided a correct email address. Since an activation email is sent, you need to make sure email is setup and working") %>
+
+    <%= admin_checkbox_setting(:orcid_required, 1, Seek::Config.orcid_required,
+                               'ORCID required', "Require all profiles to specify an #{link_to 'ORCID', 'http://orcid.org/content/about-orcid', target: :_blank} identifier.".html_safe) %>
+
+    <%= admin_checkbox_setting(:recaptcha_enabled, 1, Seek::Config.recaptcha_enabled,
+                               'Captcha enabled', 'Enable to show a captcha on forms susceptible to spam',
+                               :onchange=>toggle_appear_javascript('captcha_key_settings')) %>
+
+    <div id="captcha_key_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.recaptcha_enabled) %>">
+      <p>
+        You can request a private and public key for Recaptcha by visiting
+        <%= link_to("https://www.google.com/recaptcha/admin","https://www.google.com/recaptcha/admin",:target=>:_blank)%> (a Google account is required).
+      </p>
+
+      <%= admin_text_setting(:recaptcha_public_key, Seek::Config.recaptcha_public_key,
+                             'Public recaptcha key') %>
+
+      <%= admin_text_setting(:recaptcha_private_key, Seek::Config.recaptcha_private_key,
+                             'Private recaptcha key') %>
+    </div>
+
+    <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
+    <%= cancel_button admin_path %>
+<% end -%>

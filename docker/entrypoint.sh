@@ -3,9 +3,6 @@
 # import some shared functions
 . docker/shared_functions.sh
 
-# Change secret token
-sed -i "s/secret_token = '.*'/key = '"`bundle exec rake secret`"'/" config/initializers/secret_token.rb
-
 # Set the search to be enabled by default
 enable_search
 

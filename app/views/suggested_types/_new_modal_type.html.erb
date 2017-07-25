@@ -1,0 +1,46 @@
+<%
+  suggested_type ||= @suggested_type
+  types ||= Array(suggested_type.term_type)
+  selected_uri = suggested_type.parent.try(:uri) || suggested_type.ontology_uri
+  submit_url="/suggested_#{suggested_type.term_type}_types"
+  button_id = "create-suggested-#{suggested_type.term_type.underscore}-type-button"
+%>
+<form></form>
+<%= form_for suggested_type do |f| %>
+    <%= f.error_messages %>
+
+    <div class="center-block" style="width: 60%;">
+      <div class="form-group">
+        <%= f.label :label %>*<br/>
+        <%= f.text_field :label, class: 'form-control' %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label 'Parent' -%>
+        <%= ontology_selection_list types, "#{suggested_type.class.name.underscore}[parent_uri]",
+                                    selected_uri,
+                                    ([suggested_type] + suggested_type.all_children).map(&:uri),
+                                    { class: 'form-control'}
+        %>
+        <p class="help-block">Select parent type.</p>
+      </div>
+      <div>
+        <%= content_tag(:button,type:'button',class:'btn btn-primary',id:button_id){"Create"} %>
+      </div>
+    </div>
+<% end -%>
+
+<script type="application/javascript">
+  var button_id="#<%= button_id %>";
+  $j(button_id).on('click', function() {
+      var form = $j(this).parents('form:first');
+
+      $j.ajax(form.prop('action'), {
+          data: form.serialize(),
+          method: 'POST',
+          success: function (html) {
+            $j('.modal:visible').modal('toggle');
+          }
+      });
+  });
+</script>

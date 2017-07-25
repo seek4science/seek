@@ -1,15 +1,37 @@
 # encoding: utf-8
+
 module SuggestedTypesHelper
+  def suggested_type_modal_boxes
+    boxes = suggested_type_modal_box(@assay.assay_type_reader.ontology_term_type)
+    boxes << suggested_type_modal_box(@assay.technology_type_reader.ontology_term_type) unless @assay.is_modelling?
+    boxes
+  end
+
+  def suggested_type_modal_box(term_type)
+    modal_id = "#{term_type.underscore.downcase}-new-term-modal"
+    modal_options = { id: modal_id, size: 's', 'data-role' => 'create-new-suggested-type' }
+    suggested_type = if term_type == 'technology'
+                       SuggestedTechnologyType.new
+                     else
+                       SuggestedAssayType.new
+                     end
+    suggested_type.term_type = term_type
+
+    modal_title = "New suggested #{term_type.humanize.downcase} type"
+
+    modal(modal_options) do
+      modal_header(modal_title) +
+        modal_body do
+          render partial: 'suggested_types/new_modal_type', locals: { suggested_type: suggested_type }
+        end
+    end
+  end
+
   def create_suggested_type_popup_link(term_type)
     link_name = image('new') + ' ' + "New #{term_type.humanize.downcase} type"
-    url = eval "new_suggested_#{term_type}_type_path"
+    modal_id = "#{term_type.underscore.downcase}-new-term-modal"
 
-    link_to_remote_redbox(link_name,
-                          url: url,
-                          failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
-                          with: "'term_type=#{term_type}'",
-                          method: :get
-                         )
+    link_to(link_name, '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}")
   end
 
   def create_or_update_text
@@ -24,9 +46,9 @@ module SuggestedTypesHelper
 
   def cancel_link
     if is_ajax_request?
-      link_to_function('Cancel', 'RedBox.close()', class: 'btn btn-default')
+      link_to_function('Cancel', "$j('.modal:visible').modal('toggle');", class: 'btn btn-default')
     else
-      manage_path = eval "manage_#{controller_name}_path"
+      manage_path = eval "#{controller_name}_path"
       cancel_button(manage_path)
     end
   end
@@ -36,7 +58,7 @@ module SuggestedTypesHelper
     Array(types).each do |type|
       list += render_list(type, selected_uri)
     end
-    list.join("\n").html_safe + '<br/> <em>* Note that it is suggested term.</em>'.html_safe
+    list.join("\n").html_safe
   end
 
   def render_list(type, selected_uri = nil)
@@ -48,11 +70,14 @@ module SuggestedTypesHelper
   def render_ontology_class_tree(clz, selected_uri, depth = 0)
     list = []
     uri = clz.uri.try(:to_s)
-    clz_li = "<li style=\"margin-left:#{12 * depth}px;#{uri == selected_uri ? 'background-color: lightblue;' : ''}\">" + (depth > 0 ? '└ ' : ' ') + ontology_class_list_item(clz) + '</li>'
+    clz_li = "<li#{uri == selected_uri ? ' class="selected"' : ''}>#{ontology_class_list_item(clz)}"
     list << clz_li
+    list << '<ul>' if clz.children.any?
     clz.children.each do |ontology_class_or_suggested_type|
       list += render_ontology_class_tree(ontology_class_or_suggested_type, selected_uri, depth + 1)
     end
+    list << '</ul>' if clz.children.any?
+    list << '</li>'
     list
   end
 
@@ -65,13 +90,13 @@ module SuggestedTypesHelper
 
   def related_assays_text(clz)
     count = clz.assays.size
-    count == 0 ? '' : "<span style='color: #666666;'>(#{pluralize(count, 'assay')})</span>".html_safe
+    count == 0 ? '' : " <span style='color: #666666;'>(#{pluralize(count, 'assay')})</span>".html_safe
   end
 
   def show_ontology_class_link(clz)
     label = clz.label
     type = clz.term_type
-    fail 'error' if type.nil?
+    raise 'error' if type.nil?
     path = send("#{type}_types_path", uri: clz.uri.try(:to_s), label: label)
     html_options = clz.suggested_type? ? { style: 'color:green;font-style:italic' } : {}
     link_to label, path, html_options
@@ -87,10 +112,9 @@ module SuggestedTypesHelper
   end
 
   def delete_ontology_class_link(clz)
-    link = if clz.can_destroy? && action_name == 'manage'
+    link = if clz.can_destroy?
              link_to image('destroy'), clz, data: { confirm: "Are you sure you want to remove this #{clz.term_type} type?  This cannot be undone." },
-                                            method: :delete,
-                                            style: 'vertical-align:middle'
+                                            method: :delete
            else
              ''
            end
@@ -98,7 +122,7 @@ module SuggestedTypesHelper
   end
 
   def normal_link_to_edit(clz)
-    link_to(image('edit'), send("edit_suggested_#{clz.term_type}_type_path", id: clz), style: 'vertical-align:middle')
+    link_to(image('edit'), send("edit_suggested_#{clz.term_type}_type_path", id: clz))
   end
 
   def popup_link_to_edit(clz)
@@ -107,8 +131,7 @@ module SuggestedTypesHelper
                                           url: send("edit_suggested_#{type}_type_path", id: clz, term_type: type),
                                           method: :get,
                                           loading: "$('RB_redbox').scrollTo();Element.show('edit_suggested_type_spinner'); Element.hide('new_suggested_#{type}_type_form')",
-                                          loaded: "Element.hide('edit_suggested_type_spinner'); Element.show('new_suggested_#{type}_type_form')"
-                          )
+                                          loaded: "Element.hide('edit_suggested_type_spinner'); Element.show('new_suggested_#{type}_type_form')")
   end
 
   def new_popup_request?

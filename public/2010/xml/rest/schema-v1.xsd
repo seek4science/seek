@@ -1049,6 +1049,8 @@
                        maxOccurs="1" minOccurs="0"></xsd:element>
           <xsd:element name="phone" type="xsd:string" maxOccurs="1"
                        minOccurs="0"></xsd:element>
+          <xsd:element name="orcid" type="xsd:string" maxOccurs="1"
+                       minOccurs="0"></xsd:element>
           <xsd:element name="avatars" type="Avatars" maxOccurs="1"
                        minOccurs="1"></xsd:element>
           <xsd:element name="tags" type="Tags" maxOccurs="1"
