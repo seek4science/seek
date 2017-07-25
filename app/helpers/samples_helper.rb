@@ -77,9 +77,8 @@ module SamplesHelper
   end
 
   def default_attribute_display(attribute, options, sample, value)
-    t = attribute.sample_attribute_type
-    if t.resolution.present? && t.regexp.present?
-      resolution = value.sub(Regexp.new(t.regexp), t.resolution)
+    resolution = attribute.resolve (value)
+    if (resolution != nil)
       link_to(value, resolution)
     else if options[:link] && attribute.is_title
         link_to(value, sample)
