@@ -5,15 +5,7 @@ class Ability
   end
 
   def can?(action, item)
-    return false if @person.nil?
-
-    if [:manage, :delete, :edit, :download, :view].include?(action)
-      @person.is_asset_housekeeper_of?(item) && item.asset_housekeeper_can_manage?
-    elsif action == :publish
-      @person.is_asset_gatekeeper_of?(item) && item.asset_gatekeeper_can_publish?
-    else
-      false
-    end
+    Seek::Permissions::Authorization.authorized_by_role?(action.to_s, item, @person.try(:user))
   end
 
   def cannot?(action, item)
