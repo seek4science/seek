@@ -1,7 +1,7 @@
 class PersonSerializer < AvatarObjSerializer
-  attributes :title,
+  attributes :title, :description,
              :first_name, :last_name,
-             :email, :description
+             :email, :webpage,  :orcid
 
   has_many :work_groups, include_data:true
 
