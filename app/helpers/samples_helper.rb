@@ -91,7 +91,8 @@ module SamplesHelper
   else if options[:link] && attribute.is_title
       link_to(value, sample)
     else
-      sample_form_field_for_attribute(value, auto_link: options[:link])
+      
+      text_or_not_specified(value, auto_link: options[:link])
     end
    end
   end
