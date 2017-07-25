@@ -531,11 +531,9 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile3 = Factory(:data_file, contributor: leaving_project_member.user,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
 
-    ability = Ability.new(asset_manager)
-
-    assert ability.cannot? :manage, datafile1
-    assert ability.cannot? :manage, datafile2
-    assert ability.cannot? :manage, datafile3
+    refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
+    refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile2, asset_manager)
+    refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile3, asset_manager)
 
     User.with_current_user asset_manager.user do
       assert !datafile1.can_manage?
@@ -553,10 +551,8 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile2 = Factory(:data_file, contributor: former_project_member.user,
                                     projects: asset_manager.projects, policy: Factory(:private_policy))
 
-    ability = Ability.new(asset_manager)
-
-    assert ability.can? :manage, datafile1
-    assert ability.can? :manage, datafile2
+    assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
+    assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile2, asset_manager)
 
     User.with_current_user asset_manager.user do
       assert datafile1.can_manage?
@@ -569,9 +565,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile = Factory(:data_file)
     assert (asset_manager.projects & datafile.projects).empty?
 
-    ability = Ability.new(asset_manager)
-
-    assert ability.cannot? :manage, datafile
+    refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile, asset_manager)
 
     User.with_current_user asset_manager.user do
       assert !datafile.can_manage?
@@ -586,9 +580,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile = Factory(:data_file, projects: [other_project])
     assert !(asset_manager.projects & datafile.projects).empty?
 
-    ability = Ability.new(asset_manager)
-
-    assert ability.cannot? :manage, datafile
+    refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile, asset_manager)
 
     User.with_current_user asset_manager.user do
       assert !datafile.can_manage?
@@ -600,9 +592,7 @@ class AuthorizationTest < ActiveSupport::TestCase
     datafile1 = Factory(:data_file, contributor: nil,
                                     projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
 
-    ability = Ability.new(asset_manager)
-
-    assert ability.can? :manage, datafile1
+    assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
 
     User.with_current_user asset_manager.user do
       assert datafile1.can_manage?
@@ -616,10 +606,9 @@ class AuthorizationTest < ActiveSupport::TestCase
     User.with_current_user gatekeeper.user do
       assert !datafile.can_manage?
 
-      ability = Ability.new(gatekeeper)
       assert gatekeeper.is_asset_gatekeeper?(gatekeeper.projects.first)
-      assert ability.cannot? :publish, datafile
-      assert ability.cannot? :manage, datafile
+      refute Seek::Permissions::Authorization.authorized_by_role?('publish', datafile, gatekeeper)
+      refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile, gatekeeper)
     end
   end
 

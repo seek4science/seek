@@ -21,7 +21,6 @@ module Seek
 
       def can_publish?(user = User.current_user)
         authorized_for_action(user, 'publish') && state_allows_publish?(user)
-        (Ability.new(user).can?(:publish, self) || can_manage?(user)) && state_allows_publish?(user)
       end
 
       def state_allows_publish?(user = User.current_user)
