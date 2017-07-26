@@ -11,8 +11,11 @@ class NelsController < ApplicationController
 
     oauth_session = current_user.oauth_sessions.where(provider: 'NeLS').first_or_initialize
     oauth_session.update_attributes(access_token: hash['access_token'], expires_in: 2.hours)
+    unless (match = params[:state].match(/assay_id:(\d+)/)).nil?
+      params[:assay_id] = match[1].to_i
+    end
 
-    redirect_to nels_browser_path
+    redirect_to nels_browser_path(assay_id: params[:assay_id])
   end
 
   def browser
@@ -59,7 +62,7 @@ class NelsController < ApplicationController
 
     title = [dataset['name'], params[:subtype_name]].reject(&:blank?).join(' - ')
 
-    redirect_to new_data_file_path(anchor: 'remote-url', 'data_file[title]' => title, data_url: url)
+    redirect_to new_data_file_path(anchor: 'remote-url', 'data_file[title]' => title, data_url: url, assay_ids: [params[:assay_id]])
   end
 
   private
@@ -67,7 +70,8 @@ class NelsController < ApplicationController
   def oauth_client
     @oauth_client = Nels::Oauth2::Client.new(Seek::Config.nels_client_id,
                                              Seek::Config.nels_client_secret,
-                                             nels_oauth_callback_url)
+                                             nels_oauth_callback_url,
+                                             "assay_id:#{params[:assay_id]}")
   end
 
   def nels_oauth_session

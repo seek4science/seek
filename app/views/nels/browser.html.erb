@@ -13,6 +13,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
 </div>
 
 <script type="text/javascript">
+  var assayId = <%= params[:assay_id] %>;
   $j(document).ready(function () {
     $j('#nels-tree')
         .bind('loaded.jstree', function() {})
@@ -30,10 +31,12 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
               },
               'data': function (node) {
                 if (node.id === '#') {
-                  return {};
+                  return { assay_id: assayId };
                 }
 
-                var d = { id: node.data.id };
+                var d = { id: node.data.id,
+                  assay_id: assayId };
+
                 if (node.data.project_id) {
                   d.project_id = node.data.project_id
                 }
@@ -56,8 +59,11 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           $j('#nels-content').hide();
 
           $j.ajax({ url: '<%= nels_dataset_path -%>',
-            data: { project_id: data.node.data.project_id,
-              dataset_id: data.node.data.id },
+            data: {
+              project_id: data.node.data.project_id,
+              dataset_id: data.node.data.id,
+              assay_id: assayId
+            },
             success: function (data) {
               $j('#nels-dataset').html(data).spinner('remove');
             }

@@ -3,6 +3,9 @@
 <% if logged_in_and_member? %>
     <%= button_link_to("New #{assay_word} based on this one", 'new',  new_object_based_on_existing_one_assay_path(item,:controller_name=>"assays")) %>
 <% end %>
+<% if show_nels_button?(item) %>
+    <%= button_link_to('Add data from NeLS', 'add', nels_browser_path(assay_id: item.id)) %>
+<% end -%>
 
 <%= admin_dropdown do %>
     <% if item.can_manage? -%>

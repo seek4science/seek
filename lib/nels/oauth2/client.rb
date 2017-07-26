@@ -6,10 +6,11 @@ module Nels
     class Client
       AUTH_ENDPOINT = 'https://test-fe.cbu.uib.no/oauth2/'
 
-      def initialize(client_id, client_secret, redirect_uri)
+      def initialize(client_id, client_secret, redirect_uri, state)
         @client_id = client_id
         @client_secret = client_secret
         @redirect_uri = redirect_uri
+        @state = state
       end
 
       def authorize_url
@@ -17,6 +18,7 @@ module Nels
 
         url.query = {
             scope: 'user',
+            state: @state,
             redirect_uri: @redirect_uri,
             response_type: 'code',
             client_id: @client_id
@@ -33,6 +35,7 @@ module Nels
             client_secret: @client_secret,
             grant_type: 'authorization_code',
             code: code,
+            state: @state,
             redirect_uri: @redirect_uri # Not sure why this is needed, but the request fails otherwise
         }
 
