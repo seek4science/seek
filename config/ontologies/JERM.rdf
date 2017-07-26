@@ -2031,7 +2031,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Micro-electrophoresis">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Electrophoresis"/>
         <dc:identifier>JERM:00213</dc:identifier>
-        <rdfs:label>Micro Electrophoresis</rdfs:label>
+        <rdfs:label>Micro-electrophoresis</rdfs:label>
     </owl:Class>
     
 
@@ -2569,7 +2569,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Protein_quantification">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00152</dc:identifier>
-        <rdfs:label>Protein Qualification</rdfs:label>
+        <rdfs:label>Protein Quantification</rdfs:label>
     </owl:Class>
     
 

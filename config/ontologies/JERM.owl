@@ -31,10 +31,10 @@
         <Class IRI="#Ion_optics"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Software"/>
+        <Class IRI="#Microarray_file_format"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Microarray_file_format"/>
+        <Class IRI="#Software"/>
     </Declaration>
     <Declaration>
         <Class IRI="#2D_gel_electrophoresis"/>
@@ -67,10 +67,10 @@
         <Class IRI="#developmentalStage"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#experimental_assay"/>
+        <Class IRI="#Spectrum_interpretation"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Spectrum_interpretation"/>
+        <Class IRI="#experimental_assay"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Organism_or_strain_characterisation"/>
@@ -187,13 +187,13 @@
         <Class IRI="#Quantitation"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Strain"/>
+        <Class IRI="#Ion_mobility_spectrometry_mass_spectrometry"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Metabolism"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Ion_mobility_spectrometry_mass_spectrometry"/>
+        <Class IRI="#Strain"/>
     </Declaration>
     <Declaration>
         <Class IRI="#qRT-PCR"/>
@@ -238,10 +238,10 @@
         <Class IRI="#Enzyme_activity"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#2-hybrid_system"/>
+        <Class IRI="#Tiling_path"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Tiling_path"/>
+        <Class IRI="#2-hybrid_system"/>
     </Declaration>
     <Declaration>
         <Class IRI="#cell_line"/>
@@ -259,16 +259,13 @@
         <Class IRI="#Post_source_component"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Gas_chromatography"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#SDS_PAGE"/>
     </Declaration>
     <Declaration>
-        <ObjectProperty IRI="#itemProducedBy"/>
+        <Class IRI="#Gas_chromatography"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Detectors"/>
+        <ObjectProperty IRI="#itemProducedBy"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Experimental_assay_type"/>
@@ -277,13 +274,16 @@
         <Class IRI="#Protein-protein_interaction"/>
     </Declaration>
     <Declaration>
+        <Class IRI="#Detectors"/>
+    </Declaration>
+    <Declaration>
         <DataProperty IRI="#donationDate"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Western_blot"/>
+        <Class IRI="#Dry_biomass"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Dry_biomass"/>
+        <Class IRI="#Western_blot"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Data_sample"/>
@@ -331,10 +331,10 @@
         <Class IRI="#Protein-protein_interaction_profiling"/>
     </Declaration>
     <Declaration>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <Class IRI="#Growth_rate/Dilution_rate"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Growth_rate/Dilution_rate"/>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Cell_cycle"/>
@@ -361,13 +361,13 @@
         <Class IRI="#Protein_structural_analysis"/>
     </Declaration>
     <Declaration>
-        <ObjectProperty IRI="#isContributorOf"/>
+        <Class IRI="#Model_analysis_type"/>
     </Declaration>
     <Declaration>
         <Class IRI="#turbidostat"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Model_analysis_type"/>
+        <ObjectProperty IRI="#isContributorOf"/>
     </Declaration>
     <Declaration>
         <Class IRI="#cell"/>
@@ -406,10 +406,10 @@
         <DataProperty IRI="#WebLink"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#miRNA_microarray"/>
+        <ObjectProperty IRI="#isDerivedFrom"/>
     </Declaration>
     <Declaration>
-        <ObjectProperty IRI="#isDerivedFrom"/>
+        <Class IRI="#miRNA_microarray"/>
     </Declaration>
     <Declaration>
         <Class IRI="#biofilm"/>
@@ -481,10 +481,10 @@
         <Class IRI="#Radioactive_labelling"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Flow_cytometry"/>
+        <Class IRI="#carbonSourcePhenotype"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#carbonSourcePhenotype"/>
+        <Class IRI="#Flow_cytometry"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Instrument"/>
@@ -502,10 +502,10 @@
         <Class IRI="#Quality_control_type"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Surface_plasmon_resonance"/>
+        <Class IRI="#Micro-electrophoresis"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Micro-electrophoresis"/>
+        <Class IRI="#Surface_plasmon_resonance"/>
     </Declaration>
     <Declaration>
         <Class IRI="#RNA-Seq"/>
@@ -607,10 +607,10 @@
         <Class IRI="#mutationType"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#information_entity"/>
+        <Class IRI="#Affinity_chromatography"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Affinity_chromatography"/>
+        <Class IRI="#information_entity"/>
     </Declaration>
     <Declaration>
         <Class IRI="#MALDI"/>
@@ -706,10 +706,10 @@
         <Class IRI="#Mathematical_model_type"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Post-translational_modification"/>
+        <Class IRI="#Physical_file_format"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Physical_file_format"/>
+        <Class IRI="#Post-translational_modification"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Single_Nucleotide_Polymorphism"/>
@@ -754,13 +754,13 @@
         <Class IRI="#autoCarbonSource"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Metabolite"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#Reactomics"/>
     </Declaration>
     <Declaration>
         <Class IRI="#process"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Metabolite"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Binding"/>
@@ -802,19 +802,19 @@
         <Class IRI="#Metagenomics"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Model"/>
+        <Class IRI="#anaerobic"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#anaerobic"/>
+        <Class IRI="#Model"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Expression"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#aerobic"/>
+        <Class IRI="#Bait_protein_tagging"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Bait_protein_tagging"/>
+        <Class IRI="#aerobic"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Normalization_method"/>
@@ -823,10 +823,10 @@
         <Class IRI="#chemoenergy"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Cell_growth_rate"/>
+        <Class IRI="#Genome_wide_association"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Genome_wide_association"/>
+        <Class IRI="#Cell_growth_rate"/>
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#isTypeOf"/>
@@ -958,16 +958,16 @@
         <DataProperty IRI="#reactionCatalyst"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Functional_Biological_entity"/>
+        <Class IRI="#Spectrum_generation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Amplification"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Compound"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Spectrum_generation"/>
-    </Declaration>
-    <Declaration>
-        <Class IRI="#Amplification"/>
+        <Class IRI="#Functional_Biological_entity"/>
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#technologyUsedIn"/>
@@ -985,22 +985,22 @@
         <Class IRI="#Transcriptional_analysis"/>
     </Declaration>
     <Declaration>
+        <Class IRI="#Exon_array"/>
+    </Declaration>
+    <Declaration>
         <Class IRI="#material_type"/>
     </Declaration>
     <Declaration>
         <Class IRI="#haploid"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Exon_array"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#tissue"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#tissue_type"/>
+        <Class IRI="#Capillary_electrophoresis"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Capillary_electrophoresis"/>
+        <Class IRI="#tissue_type"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#date_of_death"/>
@@ -1021,10 +1021,10 @@
         <Class IRI="#disease_state"/>
     </Declaration>
     <Declaration>
-        <ObjectProperty IRI="#is_investigated_by"/>
+        <Class IRI="#Community_standard_specification"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Community_standard_specification"/>
+        <ObjectProperty IRI="#is_investigated_by"/>
     </Declaration>
     <Declaration>
         <Class IRI="#SOP_file_format"/>
@@ -4575,7 +4575,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#Micro-electrophoresis</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Micro Electrophoresis</Literal>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Micro-electrophoresis</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
@@ -5045,7 +5045,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#Protein_quantification</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Protein Qualification</Literal>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Protein Quantification</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
