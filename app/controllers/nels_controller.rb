@@ -17,7 +17,7 @@ class NelsController < ApplicationController
 
   def browser
     respond_to do |format|
-      format.html { render layout: 'nels' }
+      format.html
     end
   end
 
