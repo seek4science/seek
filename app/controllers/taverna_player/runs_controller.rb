@@ -154,7 +154,7 @@ module TavernaPlayer
         end
       end
 
-      action = translate_action(action_name)
+      action = Seek::Permissions::Translator.translate(action_name)
       unless is_auth?(@run, action)
         if current_user.nil?
           flash[:error] = "You are not authorized to #{action} this Workflow Run, you may need to login first."
