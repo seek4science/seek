@@ -3,8 +3,7 @@ module Seek
   module Ontologies
     class Synchronize
       def initialize
-        Rails.logger.debug 'clearing caches'
-        Rails.cache.clear
+        clear_caches
       end
 
       def synchronize_technology_types
@@ -121,6 +120,13 @@ module Seek
         Hash[hash.map do |key, value|
           [key, value.uri.to_s]
         end]
+      end
+
+      def clear_caches
+        Rails.logger.debug 'clearing caches'
+        Seek::Ontologies::AssayTypeReader.instance.reset
+        Seek::Ontologies::TechnologyTypeReader.instance.reset
+        Seek::Ontologies::ModellingAnalysisTypeReader.instance.reset
       end
     end
   end
