@@ -6,6 +6,11 @@ module Seek
         clear_caches
       end
 
+      def synchronize
+        synchronize_technology_types
+        synchronize_assay_types
+      end
+
       def synchronize_technology_types
         synchronize_types 'technology_type'
       end
@@ -14,7 +19,7 @@ module Seek
         synchronize_types 'assay_type'
       end
 
-      # private
+      private
 
       def synchronize_types(type)
         Assay.record_timestamps = false
