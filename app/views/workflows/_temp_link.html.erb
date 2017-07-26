@@ -1,0 +1,19 @@
+<%#FIXME: redbox now removed, so this would need updating to use bootstrap modal %>
+<div class="redbox_contents" id="temp_link" style="width:600px;">
+  <div class="head">
+    <span style="float:center;">Share your workflow</span>
+  </div>
+
+  <div class="body">
+    <div align="center" style="margin-top: 1em">
+      <%= form_for(workflow, :html => { :multipart => true } ) do |f| -%>
+          <% if f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?) %>
+              <%= render :partial => 'assets/special_auth_code_form', :locals => {:f => f} %>
+          <% end %>
+          <%= submit_tag "Save Changes", :id => "redbox_workflow_submit_btn", :onclick => "javascript: createOrUpdateResourceInRedBox(false,'workflow'); return(false)", :hidden => true -%>
+          <%= submit_tag "Cancel", :onclick => "javascript: RedBox.close(); return(false);"-%>
+
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -11,6 +11,7 @@
 
     <div class="row">
       <div class="col-md-6">
+        <%= persistent_resource_id(@person) %>
         <p>
           <% locations = @person.locations -%>
           <% unless locations.empty? -%>
@@ -30,7 +31,7 @@
         </p>
         <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person} %>
         <p>
-          <b>ORCID Identifier:</b>
+          <b>ORCID:</b>
           <%= orcid_identifier(@person) -%>
         </p>
       </div>
@@ -41,10 +42,6 @@
               <span class='none_text'>Only shown to you and administrators</span>
             </p>
 
-            <p>
-              <b>Seek ID: </b>
-              <%= @person.id %>
-            </p>
             <% if !@person.user.nil? && @person.user.login %>
                 <p>
                   <b>Login name:</b>

@@ -49,7 +49,7 @@ puts 'Seeded 1 study.'
 
 exp_assay = Assay.new(title: 'Reconstituted system reference state',
                       description: 'The four purified enzymes were incubated in assay buffer and consumption of 3PG and production of F6P were measured in time, together with GAP and DHAP concentrations.')
-exp_assay.owner = guest_person
+exp_assay.contributor = guest_person
 exp_assay.policy = Policy.create(name: 'default policy', access_type: 1)
 exp_assay.study = study
 exp_assay.assay_class = AssayClass.first
@@ -58,7 +58,7 @@ puts 'Seeded 1 experimental assay.'
 
 model_assay = Assay.new(title: 'Model reconstituted system',
                         description: 'Mathematical model for the reconstituted system with PGK, GAPDH, TPI and FBPAase.')
-model_assay.owner = guest_person
+model_assay.contributor = guest_person
 model_assay.policy = Policy.create(name: 'default policy', access_type: 1)
 model_assay.study = study
 model_assay.assay_class = AssayClass.last

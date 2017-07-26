@@ -457,6 +457,26 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can get imprint page' do
+    with_config_value :imprint_enabled, true do
+      with_config_value :imprint_description, '<h1>Hello World</h1>' do
+        get :imprint
+        assert_response :success
+        assert_select 'h1', text: 'Hello World'
+      end
+    end
+  end
+
+  test 'can get about page' do
+    with_config_value :about_page_enabled, true do
+      with_config_value :about_page, '<h1>Stuff</h1>' do
+        get :about
+        assert_response :success
+        assert_select 'h1', text: 'Stuff'
+      end
+    end
+  end
+
   def uri_to_guardian_feed
     uri_to_feed 'guardian_atom.xml'
   end

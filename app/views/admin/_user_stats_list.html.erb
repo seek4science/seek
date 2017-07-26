@@ -1,0 +1,63 @@
+<% title ||= nil
+   action ||= nil
+   bulk_delete ||= false
+%>
+
+<h4><%= h(title) -%></h4>
+
+<% if collection.empty? %>
+    <span class="none_text">No users or profiles found matching the criteria.</span>
+<% else %>
+    <table class="table">
+      <thead>
+      <tr>
+        <th><%= collection.first.class.name %> ID</th>
+        <th>Username</th>
+        <th>Profile</th>
+        <th>Created at</th>
+        <th>Updated at</th>
+        <% if action %>
+            <th>Action</th>
+        <% end %>
+      </tr>
+      </thead>
+      <% collection.each do |el| -%>
+          <%
+             if el.instance_of?(Person)
+               user = el.user
+               person = el
+             else
+               user = el
+               person = el.person
+             end
+          %>
+          <tr>
+            <td> <%= user.try(:id) || person.try(:id) %></td>
+            <% if user.nil? %>
+                <td><span class="none_text">No associated user</span></td>
+            <% else %>
+                <td><%= user.login -%></td>
+            <% end %>
+            <% if person.nil? %>
+                <td><span class="none_text">No associated person</span></td>
+            <% else %>
+                <td><%= link_to person.name, person -%></td>
+            <% end %>
+            <td> <%= date_as_string(el.created_at, true) %></td>
+            <td> <%= date_as_string(el.updated_at, true) %></td>
+            <% if action %>
+                <td> <%= action_buttons el, action %></td>
+            <% end  %>
+
+          </tr>
+      <% end %>
+      <% if bulk_delete %>
+          <tr>
+            <td> <%= render :partial => "admin/bulk_delete_button", :locals => {:collection => collection} %></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+      <% end %>
+    </table>
+<% end %>

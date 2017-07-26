@@ -642,3 +642,42 @@ div.popup-contributor {
     margin-left: 3em;
   }
 }
+
+#user-menu > .dropdown-menu {
+  @media (min-width: $screen-md-min) {
+    max-width: 24em;
+  }
+  li.project-item > a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+}
+
+.admin_tasks ul {
+  padding-left: 0.5em;
+}
+
+.type-tree {
+  ul {
+    background-image: url('tree/line.png');
+    background-repeat: repeat-y;
+    padding: 0;
+    margin: 0;
+  }
+  li {
+    padding-left: 24px;
+    line-height: 24px;
+    list-style: none;
+    background-image: url('tree/node.png');
+    background-repeat: no-repeat;
+    &.selected {
+      background-color: lightblue !important;
+    }
+    &:last-child {
+      background-image: url('tree/last_node.png');
+      background-color: $body-bg; /* This stops the <ul>'s background overlapping */
+    }
+  }
+}

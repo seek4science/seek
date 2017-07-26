@@ -80,7 +80,7 @@ module Seek
           end
 
           if programatic_project_filter
-            assets.select { |a| !(a.projects & projects).empty? }
+            assets.reject { |a| (a.projects & projects).empty? }
           else
             assets
           end
@@ -92,7 +92,7 @@ module Seek
         def authorize_asset_collection(assets, action, user = User.current_user, filter_by_permissions = true)
           return assets if assets.empty?
           user_id = user.nil? ? 0 : user.id
-          if Seek::Config.auth_lookup_enabled && self.lookup_table_consistent?(user_id)
+          if Seek::Config.auth_lookup_enabled && lookup_table_consistent?(user_id)
             ids = assets.collect(&:id)
             clause = "asset_id IN (#{ids.join(',')})"
             sql =  "SELECT asset_id from #{lookup_table_name} WHERE user_id = #{user_id} AND (#{clause}) AND can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
@@ -145,7 +145,7 @@ module Seek
             sql = "select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
             ids = ActiveRecord::Base.connection.select_all(sql).collect { |k| k['asset_id'] }
           else
-            project_map_table = ["#{name.underscore.pluralize}", 'projects'].sort.join('_')
+            project_map_table = [name.underscore.pluralize.to_s, 'projects'].sort.join('_')
             project_map_asset_id = "#{name.underscore}_id"
             project_clause = projects.collect { |p| "#{project_map_table}.project_id = #{p.id}" }.join(' or ')
             sql = "select asset_id,#{project_map_asset_id} from #{lookup_table_name}"
@@ -193,28 +193,28 @@ module Seek
         if Seek::Config.auth_lookup_enabled && self.class.lookup_table_consistent?(user_id)
           sql = "SELECT can_view,can_edit,can_download,can_manage,can_delete FROM #{self.class.lookup_table_name} WHERE user_id=#{user_id} AND asset_id=#{id}"
           res = ActiveRecord::Base.connection.select_one(sql)
-          unless res.nil?
+          if res.nil?
+            raise 'Expected to find record in auth lookup table'
+          else
             permissions.can_view = res['can_view'].to_s == @@expected_true_value && state_allows_manage?(user)
             permissions.can_download = res['can_download'].to_s == @@expected_true_value && state_allows_manage?(user)
             permissions.can_edit = res['can_edit'].to_s == @@expected_true_value && state_allows_manage?(user)
             permissions.can_manage = res['can_manage'].to_s == @@expected_true_value && state_allows_manage?(user)
             permissions.can_delete = res['can_delete'].to_s == @@expected_true_value && state_allows_manage?(user)
-          else
-            fail 'Expected to find record in auth lookup table'
           end
         else
-          permissions.can_view = self.can_view?
-          permissions.can_download = self.can_download?
-          permissions.can_edit = self.can_edit?
-          permissions.can_manage = self.can_manage?
-          permissions.can_delete = self.can_delete?
+          permissions.can_view = can_view?
+          permissions.can_download = can_download?
+          permissions.can_edit = can_edit?
+          permissions.can_manage = can_manage?
+          permissions.can_delete = can_delete?
       end
         permissions
       end
 
       # triggers a background task to update or create the authorization lookup table records for this item
       def check_to_queue_update_auth_table
-        unless (previous_changes.keys & %w(contributor_id owner_id)).empty?
+        unless (previous_changes.keys & %w[contributor_id owner_id]).empty?
           AuthLookupUpdateJob.new.add_items_to_queue self
         end
       end
@@ -255,11 +255,11 @@ module Seek
 
             f = ActiveRecord::Base.connection.quote(false)
 
-              # Insert in batches of 10
-              ([0] + User.pluck(:id)).each_slice(Seek::Util.bulk_insert_batch_size) do |batch|
-                sql = %(INSERT INTO #{self.class.lookup_table_name}
-                          (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
-                          VALUES #{batch.map { |user_id| "(#{user_id}, #{id}, #{f}, #{f}, #{f}, #{f}, #{f})" }.join(', ')};)
+            # Insert in batches of 10
+            ([0] + User.pluck(:id)).each_slice(Seek::Util.bulk_insert_batch_size) do |batch|
+              sql = %(INSERT INTO #{self.class.lookup_table_name}
+                        (user_id, asset_id, can_view ,can_edit, can_download, can_manage, can_delete)
+                        VALUES #{batch.map { |user_id| "(#{user_id}, #{id}, #{f}, #{f}, #{f}, #{f}, #{f})" }.join(', ')};)
 
               ActiveRecord::Base.connection.execute(sql)
             end
@@ -272,8 +272,8 @@ module Seek
           # Sort permissions according to precedence, then access type, so the most direct (People), permissive (Manage)
           # permissions are applied last.
           sorted_permissions = policy.permissions
-                               .sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }
-                               .reverse
+                                     .sort_by { |p| Permission.precedence.index(p.contributor_type) * 100 - p.access_type }
+                                     .reverse
 
           # Extract the individual member permissions from each FavouriteGroup and ensure they are also sorted by access_type:
           # 1. Record the index where the FavouriteGroup permissions start
@@ -284,8 +284,8 @@ module Seek
 
             # 3. Gather the FavouriteGroupMemberships for each of the FavouriteGroups referenced by the permissions.
             group_members_permissions = FavouriteGroupMembership.includes(person: :user)
-                                        .where(favourite_group_id: group_permissions.map(&:contributor_id))
-                                        .order('access_type ASC').to_a
+                                                                .where(favourite_group_id: group_permissions.map(&:contributor_id))
+                                                                .order('access_type ASC').to_a
 
             # 4. Add them in to the array at the point where the FavouriteGroup permissions were removed
             #    to preserve the order of precedence.
@@ -317,6 +317,9 @@ module Seek
 
           # Global permissions (Policy)
           update_lookup(policy, nil, false)
+
+          # block from anonymous users if polidy is shared with ALL_USERS only
+          update_lookup([false, false, false, false, false], :anonymous) if policy.sharing_scope == Policy::ALL_USERS
         end
       end
 
@@ -337,7 +340,7 @@ module Seek
       end
 
       def policy_or_default_if_new
-        self.policy = default_policy if self.new_record? && !policy
+        self.policy = default_policy if new_record? && !policy
       end
 
       def default_contributor
@@ -350,7 +353,7 @@ module Seek
       end
 
       def contributor_or_default_if_new
-        if self.new_record? && contributor.nil?
+        if new_record? && contributor.nil?
           self.contributor = default_contributor
         end
       end
@@ -366,9 +369,7 @@ module Seek
       end
 
       def authorized_for_action(user, action)
-        (Authorization.is_authorized?(action, self, user)) ||
-          (Ability.new(user).can?(action.to_sym, self)) ||
-          (Ability.new(user).can?("#{action}_asset".to_sym, self))
+        Authorization.is_authorized?(action, self, user)
       end
 
       # returns a list of the people that can manage this file
@@ -383,23 +384,15 @@ module Seek
 
         policy.permissions.each do |perm|
           unless perm.contributor.nil? || perm.access_type != Policy::MANAGING
-            people << (perm.contributor) if perm.contributor.is_a?(Person)
-            people << (perm.contributor.person) if perm.contributor.is_a?(User)
+            people << perm.contributor if perm.contributor.is_a?(Person)
+            people << perm.contributor.person if perm.contributor.is_a?(User)
           end
         end
         people.uniq
       end
 
       def contributing_user
-        unless self.is_a?(Assay)
-          if contributor.is_a? Person
-            contributor.try(:user)
-          elsif contributor.is_a? User
-            contributor
-                    end
-        else
-          owner.try(:user)
-        end
+        contributor.try(:user)
       end
 
       # members of project can see some information of hidden items of their project
@@ -419,7 +412,7 @@ module Seek
 
       private
 
-      # Note, nil user means ALL users, not guest user
+      # Note, nil user means ALL users, not anonymous user. Anon user is represented with ;anonymous
       def update_lookup(permission, user = nil, overwrite = true)
         if permission.is_a?(Array)
           can_view, can_edit, can_download, can_manage, can_delete = *permission
@@ -432,7 +425,7 @@ module Seek
         end
 
         sql = %(UPDATE #{self.class.lookup_table_name} SET )
-        fields_to_set = [:can_view, :can_edit, :can_download, :can_manage, :can_delete].select do |privilege|
+        fields_to_set = %i[can_view can_edit can_download can_manage can_delete].select do |privilege|
           # Only set "true" values if not overwriting
           overwrite || binding.local_variable_get(privilege)
         end
@@ -449,6 +442,8 @@ module Seek
           user = user.compact
           return unless user.any?
           sql += " AND user_id IN (#{user.map(&:id).join(', ')})"
+        elsif user == :anonymous
+          sql += ' AND user_id=0'
         elsif user.is_a?(User)
           sql += " AND user_id=#{user.id}"
         elsif user.is_a?(Person)

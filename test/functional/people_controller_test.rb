@@ -13,7 +13,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object = Factory(:person)
+    @object = Factory(:person,orcid:'http://orcid.org/0000-0003-2130-0865')
   end
 
   def test_title
@@ -318,18 +318,6 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:fred)
     get :edit, id: people(:fred)
     assert_response :success
-  end
-
-  def test_current_user_shows_seek_id
-    login_as(:quentin)
-    get :show, id: people(:quentin_person)
-    assert_select '.box_about_actor p', text: /Seek ID: /m
-    assert_select '.box_about_actor p', text: /Seek ID: .*#{people(:quentin_person).id}/m, count: 1
-  end
-
-  def test_not_current_user_doesnt_show_seek_id
-    get :show, id: people(:aaron_person)
-    assert_select '.box_about_actor p', text: /Seek ID :/, count: 0
   end
 
   def test_current_user_shows_login_name

@@ -21,27 +21,12 @@ module AdminHelper
     words.join(', ').html_safe
   end
 
-  def delayed_job_status
-    status = ''
-    begin
-      directory = "#{Rails.root}/tmp/pids"
-      pids = Daemons::PidFile.find_files(directory, 'delayed_job').collect do |path|
-        file = path.sub("#{directory}/", '').sub('.pid', '')
-        Daemons::PidFile.new(directory, file)
-      end
-      pids.each do |pid|
-        if pid.running?
-          status << "Running [Process ID: #{pid.pid}]"
-        else
-          status << "<span class='error_text'>Not running</span>"
-        end
-        status << '&nbsp;:&nbsp;' unless pid == pids.last
-      end
-
-    rescue Exception => e
-      status = "<span class='error_text'>Unable to determine current status - #{e.message}</span>"
+  def delayed_job_pids
+    directory = "#{Rails.root}/tmp/pids"
+    Daemons::PidFile.find_files(directory, 'delayed_job').collect do |path|
+      file = path.sub("#{directory}/", '').sub('.pid', '')
+      Daemons::PidFile.new(directory, file)
     end
-    status.html_safe
   end
 
   def action_buttons(user_or_person, action)
@@ -95,8 +80,6 @@ module AdminHelper
 
   def admin_dropdown_setting(name, option_tags, title, description = nil, options = {})
     admin_setting_block(title, description) do
-      #   select_tag "people", "<option>David</option>".html_safe
-      #   # => <select id="people" name="people"><option>David</option></select>
       select_tag(name, option_tags, options.merge!(class: 'form-control'))
     end
   end
@@ -104,11 +87,10 @@ module AdminHelper
   def git_link_tag
     if File.exist?(File.join(Rails.root, '.git'))
       begin
-        version = `git rev-parse HEAD`
-        branch =  `git rev-parse --abbrev-ref HEAD`
+        version = `git rev-parse HEAD`.chomp
+        branch = `git rev-parse --abbrev-ref HEAD`.chomp
         link = link_to(version[0...7], "https://github.com/seek4science/seek/commit/#{version}", target: '_blank', title: version).html_safe
-        "Git revision: #{link} (branch:#{branch})".html_safe
-
+        "Git revision: #{link} (branch: #{branch})".html_safe
       rescue
       end
     end

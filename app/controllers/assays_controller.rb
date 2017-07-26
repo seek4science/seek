@@ -107,7 +107,7 @@ class AssaysController < ApplicationController
 
     update_assay_organisms @assay, params
 
-    @assay.owner=current_person
+    @assay.contributor=current_person
 
     update_sharing_policies @assay
 

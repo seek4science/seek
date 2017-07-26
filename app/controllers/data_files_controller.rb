@@ -349,12 +349,6 @@ class DataFilesController < ApplicationController
 
   protected
 
-  def translate_action(action)
-    action = 'download' if action == 'data'
-    action = 'view' if ['matching_models'].include?(action)
-    super action
-  end
-
   def xml_login_only
     unless session[:xml_login]
       flash[:error] = 'Only available when logged in via xml'

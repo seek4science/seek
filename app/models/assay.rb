@@ -26,7 +26,7 @@ class Assay < ActiveRecord::Base
   belongs_to :institution
 
   belongs_to :study
-  belongs_to :owner, class_name: 'Person'
+  belongs_to :contributor, class_name: 'Person'
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
   has_many :organisms, through: :assay_organisms, inverse_of: :assays
@@ -45,15 +45,13 @@ class Assay < ActiveRecord::Base
   validates_presence_of :assay_type_uri
   validates_presence_of :technology_type_uri, unless: :is_modelling?
   validates_presence_of :study, message: ' must be selected'
-  validates_presence_of :owner
+  validates_presence_of :contributor
   validates_presence_of :assay_class
 
   before_validation :default_assay_and_technology_type
 
   # a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
-
-  alias_attribute :contributor, :owner
 
   def project_ids
     projects.map(&:id)

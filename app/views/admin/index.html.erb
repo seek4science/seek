@@ -1,0 +1,13 @@
+<h1>Administration <small><%= version_text -%></small></h1>
+
+<%= folding_panel('General', false) do %>
+    <%= render partial: 'admin/general' %>
+<% end %>
+
+<%= folding_panel('Status and statistics', false) do %>
+    <%= render partial: 'admin/stats' %>
+<% end %>
+
+<%= render partial: 'admin/restart_buttons' unless using_docker? %>
+
+<small><%= git_link_tag %></small>

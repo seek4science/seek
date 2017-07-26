@@ -7,7 +7,7 @@ module Seek
       def upload_model_blob(blob, constraint_based)
         blob.with_temporary_copy do |temp_path|
           payload = upload_payload(temp_path)
-          payload[:is_constraint_model] == 'true' if constraint_based
+          payload[:is_constraint_model] = true if constraint_based
           url = get_endpoint[get_upload_path].post(payload, cookie_header_definition) do |response, request, result, &block|
             if response.code == 302
               response.headers[:location]

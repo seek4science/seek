@@ -13,7 +13,7 @@ module Seek
       end
 
       def openbis?
-        url && valid_url? && URI.parse(url).scheme == 'openbis' && url.split(':').count == 4
+        url && valid_url?(url) && URI.parse(url).scheme == 'openbis' && url.split(':').count == 4
       end
 
       def openbis_dataset
@@ -39,10 +39,10 @@ module Seek
       private
 
       def openbis_search_terms
-        return [] unless openbis? && (dataset = openbis_dataset)
-        terms = [dataset.perm_id, dataset.dataset_type_code, dataset.dataset_type_description,
-                 dataset.experiment_id, dataset.registrator, dataset.modifier, dataset.code]
-        terms | dataset.dataset_files_no_directories.collect do |file|
+        return [] unless openbis_dataset
+        terms = [openbis_dataset.perm_id, openbis_dataset.dataset_type_code, openbis_dataset.dataset_type_description,
+                 openbis_dataset.experiment_id, openbis_dataset.registrator, openbis_dataset.modifier, openbis_dataset.code]
+        terms | openbis_dataset.dataset_files_no_directories.collect do |file|
           [file.perm_id, file.path, file.filename]
         end.flatten.uniq
       end
