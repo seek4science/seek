@@ -7,7 +7,7 @@ module Seek
         rows = Rails.cache.fetch('rdf_definitions', expires_in: 1.hour) do
           CSV.read(MAPPINGS_FILE)
         end
-        rows.each do |row|
+        rows.select{|row| row.present? && row.size>0}.each do |row|
           unless row[0].casecmp('class').zero?
             rdf_graph = generate_for_csv_row(rdf_graph, row)
           end

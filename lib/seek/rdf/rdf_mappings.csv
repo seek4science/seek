@@ -52,4 +52,3 @@ Strain,provider_id,JERMVocab.External_supplier_ID,l,,
 Study,assays,JERMVocab.hasPart,u,,
 Study,investigation,JERMVocab.isPartOf,u,,
 Study,projects,JERMVocab.itemProducedBy,u,,
-
