@@ -23,6 +23,11 @@ class BaseSerializer < SimpleBaseSerializer
   # def relationship_related_link(attribute_name)
   # end
 
+  #avoid dash-erizing attribute names
+  def format_name(attribute_name)
+    attribute_name.to_s
+  end
+
   def meta
     #content-blob doesn't have timestamps
     if object.respond_to?('created_at')
