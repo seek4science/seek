@@ -1340,4 +1340,49 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', assay_path(assay2), text: assay2.title, count: 0
     end
   end
+
+  test 'should show NeLS button for NeLS-enabled project' do
+    person = Factory(:person)
+    login_as(person.user)
+    project = person.projects.first
+    project.settings['nels_enabled'] = true
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    assay = Factory(:assay, contributor: person, study: study)
+
+    get :show, id: assay
+
+    assert_response :success
+    assert_select 'a[href=?]', nels_browser_path(assay_id: assay.id), count: 1
+  end
+
+  test 'should not show NeLS button for non-NeLS' do
+    person = Factory(:person)
+    login_as(person.user)
+    project = person.projects.first
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    assay = Factory(:assay, contributor: person, study: study)
+
+    get :show, id: assay
+
+    assert_response :success
+    assert_select 'a[href=?]', nels_browser_path(assay_id: assay.id), count: 0
+  end
+
+  test 'should not show NeLS button for NeLS-enabled project to non-NeLS project member' do
+    nels_person = Factory(:person)
+    non_nels_person = Factory(:person)
+    login_as(non_nels_person.user)
+    nels_project = nels_person.projects.first
+    non_nels_project = non_nels_person.projects.first
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [non_nels_project.id, non_nels_project.id]))
+    assay = Factory(:assay, contributor: nels_person, study: study, policy: Factory(:policy, permissions: [
+        Factory(:permission, contributor: nels_project, access_type: Policy::MANAGING),
+        Factory(:permission, contributor: non_nels_project, access_type: Policy::MANAGING)]))
+
+    get :show, id: assay
+
+    assert_response :success
+    assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
+    assert_select 'a[href=?]', nels_browser_path(assay_id: assay.id), count: 0 # But not browse NeLS
+  end
 end
