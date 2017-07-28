@@ -53,8 +53,6 @@ module Nels
 
         response = base[path].send(*args)
 
-        puts response
-
         return response if opts[:skip_parse]
 
         JSON.parse(response) unless response.empty?
