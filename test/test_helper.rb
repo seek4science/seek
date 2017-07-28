@@ -243,4 +243,9 @@ end
 # Load seed data
 # load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
 
-WebMock.disable_net_connect!(allow_localhost: true)
+VCR.configure do |config|
+  config.cassette_library_dir = 'test/fixtures/vcr_cassettes'
+  config.hook_into :webmock
+end
+
+WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time

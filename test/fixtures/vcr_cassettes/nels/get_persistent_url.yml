@@ -1,0 +1,40 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://test-fe.cbu.uib.no/nels-api/sbi/projects/91123122/datasets/91123528/do
+    body:
+      encoding: UTF-8
+      string: '{"method":"get_nels_url","subtype_name":"reads"}'
+    headers:
+      Accept:
+      - "*/*; q=0.5, application/xml"
+      Accept-Encoding:
+      - gzip, deflate
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      Content-Length:
+      - '48'
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 28 Jul 2017 09:06:29 GMT
+      Content-Length:
+      - '94'
+      Connection:
+      - close
+      Content-Type:
+      - text/plain; charset=UTF-8
+    body:
+      encoding: UTF-8
+      string: '{"url":"https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=xMTEyMzEyMjoxMTIzNTI4OnJlYWRz"}'
+    http_version: 
+  recorded_at: Fri, 28 Jul 2017 09:06:30 GMT
+recorded_with: VCR 2.9.3
