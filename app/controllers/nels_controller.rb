@@ -40,14 +40,6 @@ class NelsController < ApplicationController
     end
   end
 
-  def subtypes
-    @dataset = @rest_client.dataset(params[:project_id].to_i, params[:id].to_i)
-
-    respond_to do |format|
-      format.json
-    end
-  end
-
   def dataset
     @dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
 
