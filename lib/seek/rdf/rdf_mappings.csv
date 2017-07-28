@@ -35,6 +35,12 @@ Person,name,RDF::SIOC.name,l,,
 Person,name,RDF::FOAF.name,l,,
 Person,projects,JERMVocab.isAssociatedWith,u,,
 Person,web_page,RDF::FOAF.homepage,u,,
+Programme,assays,JERMVocab.hasItem,u,,
+Programme,studies,JERMVocab.hasItem,u,,
+Programme,investigations,JERMVocab.hasItem,u,,
+Programme,organisms,JERMVocab.investigates,u,,
+Programme,assets,JERMVocab.hasItem,u,,select{|item| !item.is_a?(Presentation)}
+Programme,people,JERMVocab.isAssociatedWith,u,,
 Project,assays,JERMVocab.hasItem,u,,
 Project,assets,JERMVocab.hasItem,u,,select{|item| !item.is_a?(Presentation)}
 Project,investigations,JERMVocab.hasItem,u,,

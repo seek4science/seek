@@ -15,6 +15,7 @@ module RdfTestCases
     get :show, id: object, format: 'rdf'
     assert_response :success
     rdf = @response.body
+    puts rdf
 
     assert_equal object.to_rdf, rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|

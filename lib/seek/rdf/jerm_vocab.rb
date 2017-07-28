@@ -8,6 +8,7 @@ module Seek
                  Person => 'Person',
                  Organism => 'organism',
                  Project => 'Project',
+                 Programme => 'Programme',
                  Study => 'Study',
                  Investigation => 'Investigation',
                  Publication => 'Publication',

@@ -1,5 +1,6 @@
 class Programme < ActiveRecord::Base
   include Seek::Taggable
+  include Seek::Rdf::RdfGeneration
 
   attr_accessor :administrator_ids
 
@@ -52,6 +53,14 @@ class Programme < ActiveRecord::Base
     define_method(type) do
       projects.includes(type).collect(&type).flatten.uniq
     end
+  end
+
+  def organisms
+    projects.collect(&:organisms).flatten.uniq
+  end
+
+  def assets
+    (data_files+models+sops+presentations+events+publications).uniq.compact
   end
 
   def can_be_edited_by?(user)

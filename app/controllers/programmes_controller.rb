@@ -78,7 +78,10 @@ class ProgrammesController < ApplicationController
   end
 
   def show
-    respond_with(@programme)
+    respond_to do |format|
+      format.html # show.html.erb
+      format.rdf { render template: 'rdf/show' }
+    end
   end
 
   def initiate_spawn_project
