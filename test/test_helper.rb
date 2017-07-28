@@ -244,7 +244,7 @@ end
 # load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
 
 VCR.configure do |config|
-  config.cassette_library_dir = 'test/fixtures/vcr_cassettes'
+  config.cassette_library_dir = 'test/vcr_cassettes'
   config.hook_into :webmock
 end
 
