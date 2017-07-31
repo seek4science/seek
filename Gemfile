@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.8'
+gem 'rails', '~> 4.2.9'
 gem 'rdoc'
 
 #database adaptors
@@ -29,7 +29,6 @@ gem 'dynamic_form'
 gem 'prototype-rails', git: 'https://github.com/rails/prototype-rails', branch: '4.2'
 gem 'delayed_job_active_record'
 gem 'daemons'
-gem 'cancan'
 gem 'linkeddata'
 gem 'openseek-api'
 

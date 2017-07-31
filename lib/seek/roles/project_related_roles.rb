@@ -60,24 +60,24 @@ module Seek
         extend ActiveSupport::Concern
 
         included do
-          Seek::Roles::ProjectRelatedRoles.role_names.each do |role|
-            class_eval <<-END_EVAL
-            def is_#{role}_of_any_project?
-              has_role?('#{role}')
-            end
-
-            def is_#{role}_of?(asset)
-              match = asset.projects.find do |project|
-                is_#{role}?(project)
-              end
-              !match.nil?
-            end
-
-            END_EVAL
-          end
-
           has_many(:admin_defined_role_projects, dependent: :destroy)
           after_save(:resolve_admin_defined_role_projects)
+        end
+
+        def is_pal_of_any_project?
+          has_role?(Seek::Roles::PAL)
+        end
+
+        def is_project_administrator_of_any_project?
+          has_role?(Seek::Roles::PROJECT_ADMINISTRATOR)
+        end
+
+        def is_asset_housekeeper_of_any_project?
+          has_role?(Seek::Roles::ASSET_HOUSEKEEPER)
+        end
+
+        def is_asset_gatekeeper_of_any_project?
+          has_role?(Seek::Roles::ASSET_GATEKEEPER)
         end
 
         def is_pal?(project)
@@ -94,6 +94,22 @@ module Seek
 
         def is_asset_gatekeeper?(project)
           check_for_role Seek::Roles::ASSET_GATEKEEPER, project
+        end
+
+        def is_pal_of?(asset)
+          asset.projects.any? { |project| check_for_role(Seek::Roles::PAL, project) }
+        end
+
+        def is_project_administrator_of?(asset)
+          asset.projects.any? { |project| check_for_role(Seek::Roles::PROJECT_ADMINISTRATOR, project) }
+        end
+
+        def is_asset_housekeeper_of?(asset)
+          asset.projects.any? { |project| check_for_role(Seek::Roles::ASSET_HOUSEKEEPER, project) }
+        end
+
+        def is_asset_gatekeeper_of?(asset)
+          asset.projects.any? { |project| check_for_role(Seek::Roles::ASSET_GATEKEEPER, project) }
         end
 
         def is_pal=(flag_and_items)
