@@ -28,4 +28,13 @@ class SimpleBaseSerializer
     }
   end
 
+  def serialize_annotations(object, context=nil)
+    tags = []
+    object.annotations.each do |tag|
+      if (context.nil? || tag.annotation_attribute.name==context)
+        tags.append(tag.value.text)
+      end
+    end
+    tags
+  end
 end

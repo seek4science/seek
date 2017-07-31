@@ -4,7 +4,9 @@ class SampleTypeSerializer < BaseSerializer
   has_many :samples, include_data:true
   has_many :sample_attributes, include_data:true
   has_many :linked_sample_attributes, include_data:true
-  has_many :tags, include_data:true do
-    object.annotations
+
+  attribute :tags do
+    serialize_annotations(object)
   end
+
 end
