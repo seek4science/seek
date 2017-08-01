@@ -1,5 +1,4 @@
-class ModelSerializer < BaseSerializer
-  attributes :title, :description, :latest_version, :version, :versions
+class ModelSerializer < PCSSerializer
   attributes :model_type, :model_format
   attribute :environment do
     object.recommended_environment
@@ -8,4 +7,7 @@ class ModelSerializer < BaseSerializer
   has_many :content_blob, include_data:true do
     object.content_blobs
   end
+end
+
+class Model::VersionSerializer < VersionSerializer
 end
