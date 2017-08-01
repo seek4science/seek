@@ -1,5 +1,8 @@
 class SimpleBaseSerializer
   include JSONAPI::Serializer
+  def type
+    object.class.name.demodulize.tableize
+  end
   def self_link
     #{base_url}//#{type}/#{id}
     "/#{type}/#{id}"
