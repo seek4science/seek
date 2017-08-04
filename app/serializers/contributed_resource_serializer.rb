@@ -1,11 +1,12 @@
 class ContributedResourceSerializer < PCSSerializer
-  attributes :title, :description, :version
+  attributes :title, :description, :version, :license, :revision_comments
   attribute :latest_version do
     if object.latest_version.nil?
       latest = {}
     else
       latest = { title: object.latest_version.title,
                description: object.latest_version.description,
+               version: object.latest_version.version,
                revision_comments: object.latest_version.revision_comments,
                # template_id: object.latest_version.template_id         #  ==>  only in DataFile
                # template_name: object.latest_version.template_name,

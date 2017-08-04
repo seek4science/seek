@@ -16,13 +16,6 @@ class VersionSerializer < ContributedResourceSerializer
       object.class.name.demodulize.tableize
     end
   end
-
-  attribute :current_revision_comments do
-    object.revision_comments
-  end
-  attribute :current_license do
-    object.license
-  end
 end
 
 class DataFile::VersionSerializer < VersionSerializer
