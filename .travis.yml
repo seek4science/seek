@@ -24,8 +24,7 @@ env:
   - SUITE="rake teaspoon" RAILS_ENV=test DB_TYPE=mysql
 
 before_script:
-  - sh -e /etc/init.d/xvfb start
-  - sleep 25 # give time for xvfb to start
+  - sh -c "if [ '$SUITE' = 'rake teaspoon' ]; then sh -e /etc/init.d/xvfb start && sleep 60; fi"
   - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test;' -U postgres; fi"
   - cp test/database.travis.$DB_TYPE.yml config/database.yml
   - RAILS_ENV=test bundle exec rake db:create
