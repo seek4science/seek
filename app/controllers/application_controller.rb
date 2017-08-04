@@ -184,7 +184,7 @@ class ApplicationController < ActionController::Base
         end
         format.json {
           errors = [{"title": "Unauthorized", "status": "401", "detail": flash[:error].to_s}]
-          render json: JSONAPI::Serializer.serialize_errors(errors)
+          render json: JSONAPI::Serializer.serialize_errors(errors), status: 401
          # render json: { status: 401, error_message: flash[:error] }
         }
       end
@@ -271,7 +271,7 @@ class ApplicationController < ActionController::Base
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
         format.json {
           errors = [{"title": "Not found", "status": "404"}]
-          render json: JSONAPI::Serializer.serialize_errors(errors)
+          render json: JSONAPI::Serializer.serialize_errors(errors), status: :not_found
         }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
@@ -311,7 +311,7 @@ class ApplicationController < ActionController::Base
         format.xml { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
         format.json {
           errors = [{"title": "Forbidden", "status": "403", "detail": "You may not #{action} #{name}:#{params[:id]}"}]
-          render json: JSONAPI::Serializer.serialize_errors(errors)
+          render json: JSONAPI::Serializer.serialize_errors(errors), status: :forbidden
         }
       end
       return false
@@ -337,7 +337,7 @@ class ApplicationController < ActionController::Base
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
       format.json {
         errors = [{"title": "Not found", "status": "404"}]
-        render json: JSONAPI::Serializer.serialize_errors(errors)
+        render json: JSONAPI::Serializer.serialize_errors(errors), status: :not_found
       }
     end
     false
