@@ -182,7 +182,11 @@ class ApplicationController < ActionController::Base
             redirect_to path
           end
         end
-        format.json { render json: { status: 401, error_message: flash[:error] } }
+        format.json {
+          errors = [{"title": "Unauthorized", "status": "401", "detail": flash[:error].to_s}]
+          render json: JSONAPI::Serializer.serialize_errors(errors)
+         # render json: { status: 401, error_message: flash[:error] }
+        }
       end
     end
   end
@@ -265,7 +269,10 @@ class ApplicationController < ActionController::Base
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render text: 'Not found', status: :not_found }
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-        format.json { render text: 'Not found', status: :not_found }
+        format.json {
+          errors = [{"title": "Not found", "status": "404"}]
+          render json: JSONAPI::Serializer.serialize_errors(errors)
+        }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
     else
@@ -302,7 +309,10 @@ class ApplicationController < ActionController::Base
         end
         format.rdf { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
         format.xml { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
-        format.json { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
+        format.json {
+          errors = [{"title": "Forbidden", "status": "403", "detail": "You may not #{action} #{name}:#{params[:id]}"}]
+          render json: JSONAPI::Serializer.serialize_errors(errors)
+        }
       end
       return false
     end
@@ -325,7 +335,10 @@ class ApplicationController < ActionController::Base
 
       format.rdf { render text: 'Not found', status: :not_found }
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-      format.json { render text: 'Not found', status: :not_found }
+      format.json {
+        errors = [{"title": "Not found", "status": "404"}]
+        render json: JSONAPI::Serializer.serialize_errors(errors)
+      }
     end
     false
   end
