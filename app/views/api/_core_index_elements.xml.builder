@@ -1,7 +1,9 @@
 parent_xml.parameters do
   parent_xml.page params[:page]
 end
+
 @hidden ||= 0
+@total_count ||= (items.any? ? items.first.class.count : 0)
 
 parent_xml.statistics do
   parent_xml.total @total_count
