@@ -1,3 +1,3 @@
 class OrganismSerializer < BaseSerializer
-  attributes :title
+  attribute :title
 end
