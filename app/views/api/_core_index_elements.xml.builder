@@ -4,7 +4,7 @@ end
 @hidden ||= 0
 
 parent_xml.statistics do
-  parent_xml.total items.size + @hidden
+  parent_xml.total @total_count
   parent_xml.total_displayed items.size
   parent_xml.hidden @hidden
   if items.is_a?(Seek::GroupedPagination::Collection)
