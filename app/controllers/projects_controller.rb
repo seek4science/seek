@@ -168,13 +168,11 @@ class ProjectsController < ApplicationController
        format.json {
          @project = Project.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
        }
-       Rails.logger.info("after new in create")
     end
 
     if @project.present?
       @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end
-    Rails.logger.info("after policy in create")
     respond_to do |format|
       if @project.present? && @project.save
         Rails.logger.info("create succeeded to save")
@@ -193,7 +191,6 @@ class ProjectsController < ApplicationController
         format.json {render json: JSONAPI::Serializer.serialize(@project)}
       else
         Rails.logger.info("create failed to save")
-
         format.html { render action: 'new' }
         #format.xml  { render xml: @project.errors, status: :unprocessable_entity }
         format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
@@ -204,23 +201,37 @@ class ProjectsController < ApplicationController
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
-    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
+    update_params = {}
+    is_json = false
+    respond_to do |format|
+      format.html {update_params = project_params}
+      format.json {
+        is_json = true
+        update_params = ActiveModelSerializers::Deserialization.jsonapi_parse(params) }
+    end
+
+    if @project.present? && !is_json
+      @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
+    end
 
     begin
       respond_to do |format|
-        if @project.update_attributes(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
-          if Seek::Config.email_enabled && !@project.can_be_administered_by?(current_user)
-            ProjectChangedEmailJob.new(@project).queue_job
+        if @project.present?
+          if @project.update_attributes(update_params)
+            if Seek::Config.email_enabled && !@project.can_be_administered_by?(current_user)
+              ProjectChangedEmailJob.new(@project).queue_job
+            end
+            expire_resource_list_item_content
+            flash[:notice] = "#{t('project')} was successfully updated."
+            format.html { redirect_to(@project) }
+            format.xml  { head :ok }
+            format.json {render json: JSONAPI::Serializer.serialize(@project)}
+#            format.json {render json: @project, adapter: :json, status: 200 }
+          else
+            format.html { render action: 'edit' }
+            format.xml  { render xml: @project.errors, status: :unprocessable_entity }
+            format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
           end
-          expire_resource_list_item_content
-          flash[:notice] = "#{t('project')} was successfully updated."
-          format.html { redirect_to(@project) }
-          format.xml  { head :ok }
-          format.json {render json: @project, adapter: :json, status: 200 }
-        else
-          format.html { render action: 'edit' }
-          format.xml  { render xml: @project.errors, status: :unprocessable_entity }
-          format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
         end
       end
     rescue WorkGroupDeleteError => e
