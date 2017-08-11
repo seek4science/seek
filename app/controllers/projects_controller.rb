@@ -93,6 +93,7 @@ class ProjectsController < ApplicationController
       format.rdf { render template: 'rdf/show' }
       format.xml
       format.json {render json: JSONAPI::Serializer.serialize(@project,options)}
+      #format.json {render json: @project}
     end
   end
 
@@ -160,12 +161,23 @@ class ProjectsController < ApplicationController
   # POST /projects
   # POST /projects.xml
   def create
-    @project = Project.new(project_params)
-
-    @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
-
+    @project = nil
+    Rails.logger.info(params)
     respond_to do |format|
-      if @project.save
+       format.html { @project = Project.new(project_params) }
+       format.json {
+         @project = Project.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
+       }
+       Rails.logger.info("after new in create")
+    end
+
+    if @project.present?
+      @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
+    end
+    Rails.logger.info("after policy in create")
+    respond_to do |format|
+      if @project.present? && @project.save
+        Rails.logger.info("create succeeded to save")
         if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
           institution = Institution.find(params[:default_member][:institution_id])
           person = current_person
@@ -173,24 +185,30 @@ class ProjectsController < ApplicationController
           person.is_project_administrator = true, @project
           disable_authorization_checks { person.save }
         end
+        Rails.logger.info("create succeeded to save 2")
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
-        format.xml  { render xml: @project, status: :created, location: @project }
+        #format.xml  { render xml: @project, status: :created, location: @project }
+        #format.json {render json: @project, adapter: :json, status: 200 }
+        format.json {render json: JSONAPI::Serializer.serialize(@project)}
       else
+        Rails.logger.info("create failed to save")
+
         format.html { render action: 'new' }
-        format.xml  { render xml: @project.errors, status: :unprocessable_entity }
+        #format.xml  { render xml: @project.errors, status: :unprocessable_entity }
+        format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
       end
     end
   end
 
-  # PUT /projects/1
+  # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
     @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
     begin
       respond_to do |format|
-        if @project.update_attributes(project_params)
+        if @project.update_attributes(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
           if Seek::Config.email_enabled && !@project.can_be_administered_by?(current_user)
             ProjectChangedEmailJob.new(@project).queue_job
           end
@@ -198,9 +216,11 @@ class ProjectsController < ApplicationController
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
           format.xml  { head :ok }
+          format.json {render json: @project, adapter: :json, status: 200 }
         else
           format.html { render action: 'edit' }
           format.xml  { render xml: @project.errors, status: :unprocessable_entity }
+          format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
         end
       end
     rescue WorkGroupDeleteError => e

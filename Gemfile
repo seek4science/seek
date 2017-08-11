@@ -32,6 +32,7 @@ gem 'linkeddata'
 gem 'openseek-api'
 gem 'jbuilder', '~> 2.0'
 gem 'jbuilder-json_api'
+gem 'active_model_serializers', '~> 0.10.2'
 gem 'jsonapi-serializers'
 gem 'json-schema'
 
