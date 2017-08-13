@@ -1,6 +1,7 @@
 class ProgrammesController < ApplicationController
   include Seek::IndexPager
   include Seek::DestroyHandling
+  include ApiHelper
 
   before_filter :programmes_enabled?
   before_filter :login_required, except: [:show, :index, :isa_children]
@@ -20,34 +21,74 @@ class ProgrammesController < ApplicationController
   respond_to :html
 
   def create
-    #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
-    funding_codes = params[:programme].delete(:funding_codes)
-    @programme = Programme.new(programme_params)
+     @programme = nil
+     funding_codes = []
+    respond_to do |format|
+      format.html {
+        #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
+        funding_codes = params[:programme].delete(:funding_codes)
 
-    if @programme.save
-      flash[:notice] = "The #{t('programme').capitalize} was successfully created."
-
-      # current person becomes the programme administrator, unless they are logged in
-      # also activation email is sent
-      unless User.admin_logged_in?
-        current_person.is_programme_administrator = true, @programme
-        disable_authorization_checks { current_person.save! }
-        if Seek::Config.email_enabled
-          Mailer.delay.programme_activation_required(@programme,current_person)
-        end
-      end
-      @programme.update_attribute(:funding_codes,funding_codes)
+        @programme = Programme.new(programme_params)}
+      format.json {
+        hacked_params = flatten_relationships(params)
+        #What to do with funding codes?
+        @programme = Programme.new(ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params, except: ["tags"]))}
+        # @programme = Programme.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params, except: ["tags"]))}
     end
 
-    respond_with(@programme)
+    respond_to do |format|
+      if @programme.present? && @programme.save
+        flash[:notice] = "The #{t('programme').capitalize} was successfully created."
+
+        # current person becomes the programme administrator, unless they are logged in
+        # also activation email is sent
+        unless User.admin_logged_in?
+          current_person.is_programme_administrator = true, @programme
+          disable_authorization_checks { current_person.save! }
+          if Seek::Config.email_enabled
+            Mailer.delay.programme_activation_required(@programme,current_person)
+          end
+        end
+#        @programme.update_attribute(:funding_codes,funding_codes)
+        format.html {respond_with(@programme)}
+        format.json {render json: JSONAPI::Serializer.serialize(@programme)}
+      else
+        format.html { render action: 'new' }
+        format.json {render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+      end
+    end
   end
 
   def update
-    flash[:notice] = "The #{t('programme').capitalize} was successfully updated." if @programme.update_attributes(programme_params)
-    respond_with(@programme)
+    update_params = {}
+    is_json = false
+    respond_to do |format|
+      format.html {update_params = programme_params}
+      format.json {
+        is_json = true
+        hacked_params = flatten_relationships(params)
+        #What to do with funding codes?
+        update_params = ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params, except: ["tags"])
+      }
+    end
+
+    respond_to do |format|
+      if @programme.present?
+        if @programme.update_attributes(update_params)
+          flash[:notice] = "The #{t('programme').capitalize} was successfully updated"
+          format.html { redirect_to(@programme) }
+          format.xml  { head :ok }
+          format.json {render json: JSONAPI::Serializer.serialize(@programme)}
+        else
+          format.html { render action: 'edit' }
+          format.xml  { render xml: @programme.errors, status: :unprocessable_entity }
+          format.json { render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+        end
+      end
+    end
   end
 
-  def handle_administrators
+ def handle_administrators
     params[:programme][:administrator_ids] = params[:programme][:administrator_ids].split(',')
 
     prevent_removal_of_self_as_programme_administrator

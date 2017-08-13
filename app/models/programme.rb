@@ -36,7 +36,7 @@ class Programme < ActiveRecord::Base
   scope :not_activated, -> { where(is_activated: false) }
   scope :rejected, -> { where('is_activated = ? AND activation_rejection_reason IS NOT NULL', false) }
 
-  def investigations(include_clause = :investigations)
+   def investigations(include_clause = :investigations)
     projects.includes(include_clause).collect(&:investigations).flatten.uniq
   end
 
