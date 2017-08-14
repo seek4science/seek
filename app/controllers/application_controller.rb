@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   include Recaptcha::Verify
 
   include CommonSweepers
+  @@is_json = false
 
   before_filter :log_extra_exception_data
 
@@ -28,12 +29,13 @@ class ApplicationController < ActionController::Base
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
   #before_filter :process_params, :only=>[:edit, :update, :destroy, :create, :new]
-
+  before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
   # after_filter :unescape_response
 
   helper :all
 
   layout Seek::Config.main_layout
+
 
   def with_current_user
     User.with_current_user current_user do
@@ -66,6 +68,14 @@ class ApplicationController < ActionController::Base
 
   def base_host
     request.host_with_port
+  end
+
+  def set_is_json
+    respond_to do |format|
+      format.html { @@is_json = false }
+      format.xml  { @@is_json = false }
+      format.json { @@is_json = true }
+    end
   end
 
   def api_version

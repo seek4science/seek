@@ -162,12 +162,10 @@ class ProjectsController < ApplicationController
   # POST /projects.xml
   def create
     @project = nil
-    Rails.logger.info(params)
-    respond_to do |format|
-       format.html { @project = Project.new(project_params) }
-       format.json {
-         @project = Project.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
-       }
+    if @@is_json
+      @project = Project.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
+    else
+      @project = Project.new(project_params)
     end
 
     if @project.present?
@@ -186,13 +184,11 @@ class ProjectsController < ApplicationController
         Rails.logger.info("create succeeded to save 2")
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
-        #format.xml  { render xml: @project, status: :created, location: @project }
         #format.json {render json: @project, adapter: :json, status: 200 }
         format.json {render json: JSONAPI::Serializer.serialize(@project)}
       else
         Rails.logger.info("create failed to save")
         format.html { render action: 'new' }
-        #format.xml  { render xml: @project.errors, status: :unprocessable_entity }
         format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
       end
     end
@@ -202,15 +198,14 @@ class ProjectsController < ApplicationController
   # PUT /projects/1.xml
   def update
     update_params = {}
-    is_json = false
-    respond_to do |format|
-      format.html {update_params = project_params}
-      format.json {
-        is_json = true
-        update_params = ActiveModelSerializers::Deserialization.jsonapi_parse(params) }
+
+    if @@is_json
+      update_params = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    else
+      update_params = project_params
     end
 
-    if @project.present? && !is_json
+    if @project.present? && !@@is_json
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end
 
