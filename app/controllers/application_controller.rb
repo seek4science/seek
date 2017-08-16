@@ -72,9 +72,8 @@ class ApplicationController < ActionController::Base
 
   def set_is_json
     respond_to do |format|
-      format.html { @@is_json = false }
-      format.xml  { @@is_json = false }
       format.json { @@is_json = true }
+      format.all { @@is_json = false }
     end
   end
 
