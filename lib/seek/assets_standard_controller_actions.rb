@@ -92,7 +92,16 @@ module Seek
       end
     end
 
+    def organize_policies_from_json
+      if !(params[:data][:attributes][:policy_attributes].nil?)
+        params[:policy_attributes] = params[:data][:attributes][:policy_attributes]
+        params[:data][:attributes].delete :policy_attributes
+      end
+    end
+
     def update_sharing_policies(item)
+      Rails.logger.info("=====Policy=====")
+      Rails.logger.info(policy_params)
       item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
     end
 

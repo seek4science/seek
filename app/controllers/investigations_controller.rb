@@ -58,31 +58,41 @@ class InvestigationsController < ApplicationController
   end
 
   def create
-    @investigation = Investigation.new(investigation_params)
-    update_sharing_policies @investigation
+    @investigation = nil
+    if @@is_json
+      organize_policies_from_json
+      @investigation = Investigation.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
+    else
+      @investigation = Investigation.new(investigation_params)
+    end
 
-    if @investigation.save
-      update_scales(@investigation)
-      update_relationships(@investigation, params)
+    if @investigation.present?
+      update_sharing_policies @investigation
+    end
+
+    if @investigation.present? && @investigation.save
+       update_scales(@investigation)
+       update_relationships(@investigation, params)
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
         respond_to do |format|
           flash[:notice] = "The #{t('investigation')} was successfully created."
           if @investigation.create_from_asset=="true"
-             flash.now[:notice] << "<br/> Now you can create new #{t('study')} for your #{t('assays.assay')} by clicking -Add a #{t('study')}- button".html_safe
+            flash.now[:notice] << "<br/> Now you can create new #{t('study')} for your #{t('assays.assay')} by clicking -Add a #{t('study')}- button".html_safe
             format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
+            format.json {render json: JSONAPI::Serializer.serialize(@investigation)}
           else
             format.html { redirect_to investigation_path(@investigation) }
-            format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
+            format.json {render json: JSONAPI::Serializer.serialize(@investigation)}
           end
         end
        end
     else
       respond_to do |format|
-      format.html { render :action => "new" }
-      format.xml { render :xml => @investigation.errors, :status => :unprocessable_entity }
-    end
+        format.html { render :action => "new" }
+        format.json { render json: {error: @investigation.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+      end
     end
 
   end
@@ -107,24 +117,34 @@ class InvestigationsController < ApplicationController
   end
 
   def update
-    @investigation=Investigation.find(params[:id])
+    @investigation = nil
+    params_to_update = nil
+    if @@is_json
+      @investigation=Investigation.find(params["data"][:id])
+      organize_policies_from_json
+      params_to_update = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    else
+      @investigation=Investigation.find(params[:id])
+      params_to_update = investigation_params
+    end
+    Rails.logger.info(params_to_update)
 
-    @investigation.attributes = investigation_params
+    if @investigation.present?
+      @investigation.attributes = params_to_update
+      update_sharing_policies @investigation
 
-    update_sharing_policies @investigation
+      respond_to do |format|
+        if @investigation.save
+          update_scales(@investigation)
+          update_relationships(@investigation, params)
 
-    respond_to do |format|
-      if @investigation.save
-
-        update_scales(@investigation)
-        update_relationships(@investigation, params)
-
-        flash[:notice] = "#{t('investigation')} was successfully updated."
-        format.html { redirect_to(@investigation) }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @investigation.errors, :status => :unprocessable_entity }
+          flash[:notice] = "#{t('investigation')} was successfully updated."
+          format.html { redirect_to(@investigation) }
+          format.json {render json: JSONAPI::Serializer.serialize(@investigation)}
+        else
+          format.html { render :action => "edit" }
+          format.json { render json: {error: @investigation.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+        end
       end
     end
   end

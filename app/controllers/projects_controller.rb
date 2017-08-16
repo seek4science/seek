@@ -173,7 +173,6 @@ class ProjectsController < ApplicationController
     end
     respond_to do |format|
       if @project.present? && @project.save
-        Rails.logger.info("create succeeded to save")
         if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
           institution = Institution.find(params[:default_member][:institution_id])
           person = current_person
@@ -181,13 +180,11 @@ class ProjectsController < ApplicationController
           person.is_project_administrator = true, @project
           disable_authorization_checks { person.save }
         end
-        Rails.logger.info("create succeeded to save 2")
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         #format.json {render json: @project, adapter: :json, status: 200 }
         format.json {render json: JSONAPI::Serializer.serialize(@project)}
       else
-        Rails.logger.info("create failed to save")
         format.html { render action: 'new' }
         format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
       end
