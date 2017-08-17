@@ -7,7 +7,6 @@ module Seek
       unless view_context.index_with_facets?(controller) && params[:user_enable_facet] == 'true'
         model_class = controller_name.classify.constantize
         objects = eval("@#{controller}")
-        @hidden = 0
         params[:page] ||= Seek::Config.default_page(controller)
 
         objects = model_class.paginate_after_fetch(objects, page: params[:page],
@@ -33,11 +32,16 @@ module Seek
 
     def fetch_all_viewable_assets
       model_class = controller_name.classify.constantize
+
       if model_class.respond_to? :all_authorized_for
         found = model_class.all_authorized_for 'view', User.current_user
       else
         found = model_class.respond_to?(:default_order) ? model_class.default_order : model_class.all
       end
+
+      @total_count = model_class.count
+      @hidden = @total_count - found.count
+
       found
     end
   end
