@@ -20,11 +20,13 @@ module Seek
       end
 
       def check_for_data_or_url(blob_param)
-        if blob_param[:data].blank? && blob_param[:data_url].blank?
+        if blob_param[:data].blank? && blob_param[:data_url].blank?  && blob_param[:base64_data].blank?
           if blob_param.include?(:data_url)
             flash.now[:error] = 'Please select a file to upload or provide a URL to the data.'
-          else
+          elsif blob_param.include?(:data_url)
             flash.now[:error] = 'Please select a file to upload.'
+          else
+            # What to do?
           end
           false
         else
@@ -41,6 +43,14 @@ module Seek
         else
           true
         end
+      end
+
+      def check_for_base64_data(blob_params)
+        base64_data = blob_params[:base64_data]
+        if base64_data.blank?
+          return false
+        end
+        return true
       end
 
       def check_for_empty_data_if_present(blob_params)
