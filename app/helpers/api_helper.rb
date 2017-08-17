@@ -406,7 +406,7 @@ module ApiHelper
         replacements[the_type][:data].push({:type => the_type, :id => the_id})
       end
       rels.delete(:associated)
-      original_params[:data][:relationships] = ActionController::Parameters.new(replacements)
+      original_params[:data][:relationships].merge!(ActionController::Parameters.new(replacements))
     rescue Exception
     end
     original_params
