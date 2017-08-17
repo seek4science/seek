@@ -24,7 +24,7 @@ class Study < ActiveRecord::Base
   has_many :assays
   belongs_to :person_responsible, :class_name => "Person"
 
-  validates :investigation, :presence => true
+  validates :investigation, :presence => { message: "Investigation is blank or invalid" }
 
   ["data_file","sop","model"].each do |type|
     eval <<-END_EVAL

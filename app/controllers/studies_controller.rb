@@ -67,23 +67,38 @@ class StudiesController < ApplicationController
   end
 
   def update
-    @study = Study.find(params[:id])
+    @study = nil
+    params_to_update = nil
+    if @is_json
+      @study=Study.find(params["data"][:id])
+      organize_policies_from_json
+      params_to_update = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+      if (!params_to_update[:person_responsible_id].nil?) && (!Person.exists?(params_to_update[:person_responsible_id]))
+           render json: {error: "person_responsible_id not found", status: :unprocessable_entity}, status: :unprocessable_entity
+           return
+      end
+    else
+      @study = Study.find(params[:id])
+      params_to_update = study_params
+    end
+    Rails.logger.info(params_to_update)
 
-    @study.attributes = study_params
+    if @study.present?
+      @study.attributes = params_to_update
+      update_sharing_policies @study
 
-    update_sharing_policies @study
+      respond_to do |format|
+        if @study.save
+          update_scales @study
+          update_relationships(@study, params)
 
-    respond_to do |format|
-      if @study.save
-        update_scales @study
-        update_relationships(@study, params)
-
-        flash[:notice] = "#{t('study')} was successfully updated."
-        format.html { redirect_to(@study) }
-        format.xml  { head :ok }
-      else
-        format.html { render action: 'edit' }
-        format.xml  { render xml: @study.errors, status: :unprocessable_entity }
+          flash[:notice] = "#{t('study')} was successfully updated."
+          format.html { redirect_to(@study) }
+          format.json {render json: JSONAPI::Serializer.serialize(@study)}
+        else
+          format.html { render action: 'edit' }
+          format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+        end
       end
     end
   end
@@ -103,32 +118,6 @@ class StudiesController < ApplicationController
   end
 
   def create
-
-    # convert params as received by json-api to (flat) rails json
-    # if params.key?("data")
-    #
-    #   params[:study] = params[:data][:attributes]
-    #
-    #   params[:study][:project_ids] = []
-    #   params[:relationships].each do |r,info|
-    #     params[:study][:project_ids] << r.capitalize.constantize.where(info[:meta]).first.id
-    #   end
-    #
-    #
-    #   investigation_title = params[:meta][:investigation_title]
-    #   person_email = params[:meta][:person_responsible]
-    #
-    #   params[:study][:investigation_id] = Investigation.where(title:  investigation_title).first[:id].to_s
-    #   params[:study][:person_responsible] = Person.where(email: person_email).first
-    #
-    #   #Creators
-    #   creators_arr = []
-    #   params[:study][:creators].each { |cr|
-    #     the_person = Person.where(email: cr).first
-    #     creators_arr << the_person
-    #   }
-    #   params[:study][:creators] = creators_arr
-    # end
 
     @study = Study.new(study_params)
 
