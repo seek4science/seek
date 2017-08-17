@@ -73,10 +73,7 @@ class StudiesController < ApplicationController
       @study=Study.find(params["data"][:id])
       organize_policies_from_json
       params_to_update = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-      if (!params_to_update[:person_responsible_id].nil?) && (!Person.exists?(params_to_update[:person_responsible_id]))
-           render json: {error: "person_responsible_id not found", status: :unprocessable_entity}, status: :unprocessable_entity
-           return
-      end
+      return if !validate_person_responsible(params_to_update)
     else
       @study = Study.find(params[:id])
       params_to_update = study_params
@@ -118,12 +115,19 @@ class StudiesController < ApplicationController
   end
 
   def create
+    @study = nil
+    if @is_json
+      organize_policies_from_json
+      return if !validate_person_responsible(params["data"]["attributes"])
+      @study = Study.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
+    else
+      @study = Study.new(study_params)
+    end
+    if @study.present?
+      update_sharing_policies @study
+    end
 
-    @study = Study.new(study_params)
-
-    update_sharing_policies @study
-
-    if @study.save
+    if @study.present? && @study.save
       update_scales @study
       update_relationships(@study, params)
 
@@ -135,9 +139,11 @@ class StudiesController < ApplicationController
           if @study.create_from_asset == 'true'
             flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
             format.html { redirect_to study_path(id: @study, create_from_asset: @study.create_from_asset) }
+            format.json {render json: JSONAPI::Serializer.serialize(@study)}
           else
             format.html { redirect_to study_path(@study) }
             format.xml { render xml: @study, status: :created, location: @study }
+            format.json {render json: JSONAPI::Serializer.serialize(@study)}
           end
         end
       end
@@ -145,6 +151,7 @@ class StudiesController < ApplicationController
       respond_to do |format|
         format.html { render action: 'new' }
         format.xml  { render xml: @study.errors, status: :unprocessable_entity }
+        format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
       end
     end
   end
@@ -180,6 +187,13 @@ class StudiesController < ApplicationController
   end
 
   private
+  def validate_person_responsible(p)
+    if (!p[:person_responsible_id].nil?) && (!Person.exists?(p[:person_responsible_id]))
+      render json: {error: "Person responsible does not exist", status: :unprocessable_entity}, status: :unprocessable_entity
+      return false
+    end
+    true
+  end
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
