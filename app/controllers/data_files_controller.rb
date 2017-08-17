@@ -6,6 +6,7 @@ class DataFilesController < ApplicationController
   include Seek::IndexPager
   include SysMODB::SpreadsheetExtractor
   include MimeTypesHelper
+  include ApiHelper
 
   include Seek::AssetsCommon
 
@@ -135,7 +136,20 @@ class DataFilesController < ApplicationController
   end
 
   def create
-    @data_file = DataFile.new(data_file_params)
+    @data_file = nil
+    Rails.logger.info(params)
+    respond_to do |format|
+      format.html { @data_file = DataFile.new(data_file_params) }
+      format.json {
+        flattened_relationships = flatten_relationships(params)
+        datafile_json_params = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+
+        if datafile_json_params.key?(:content)
+          params[:content_blobs] = datafile_json_params[:content]["data"] #Why a string?
+        end
+        @data_file = DataFile.new(datafile_json_params.except!(:content))
+      }
+    end
 
     if handle_upload_data
       update_sharing_policies(@data_file)
@@ -166,6 +180,7 @@ class DataFilesController < ApplicationController
             assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
             update_assay_assets(@data_file, assay_ids, relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
+            format.json { render json: JSONAPI::Serializer.serialize(@data_file)}
           end
       end
       else
@@ -173,6 +188,7 @@ class DataFilesController < ApplicationController
           format.html do
             render action: 'new'
           end
+          format.json {render json: "{}" } #fix
         end
 
       end
@@ -193,6 +209,8 @@ class DataFilesController < ApplicationController
   end
 
   def update
+    @data_file.attributes = nil
+
     @data_file.attributes = data_file_params
 
     update_annotations(params[:tag_list], @data_file)
