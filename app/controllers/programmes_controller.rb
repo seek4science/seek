@@ -49,7 +49,10 @@ class ProgrammesController < ApplicationController
             Mailer.delay.programme_activation_required(@programme,current_person)
           end
         end
-#        @programme.update_attribute(:funding_codes,funding_codes)
+        begin
+        @programme.update_attribute(:funding_codes,funding_codes)
+        rescue
+        end
         format.html {respond_with(@programme)}
         format.json {render json: JSONAPI::Serializer.serialize(@programme)}
       else
