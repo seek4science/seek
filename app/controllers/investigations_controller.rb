@@ -59,7 +59,7 @@ class InvestigationsController < ApplicationController
 
   def create
     @investigation = nil
-    if @@is_json
+    if @is_json
       organize_policies_from_json
       @investigation = Investigation.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
     else
@@ -119,7 +119,7 @@ class InvestigationsController < ApplicationController
   def update
     @investigation = nil
     params_to_update = nil
-    if @@is_json
+    if @is_json
       @investigation=Investigation.find(params["data"][:id])
       organize_policies_from_json
       params_to_update = ActiveModelSerializers::Deserialization.jsonapi_parse(params)

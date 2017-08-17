@@ -10,7 +10,7 @@ class ApplicationController < ActionController::Base
   include Recaptcha::Verify
 
   include CommonSweepers
-  @@is_json = false
+  @is_json = false
 
   before_filter :log_extra_exception_data
 
@@ -71,10 +71,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_is_json
-    respond_to do |format|
-      format.json { @@is_json = true }
-      format.all { @@is_json = false }
-    end
+    @is_json = (request.format == 'json')
   end
 
   def api_version

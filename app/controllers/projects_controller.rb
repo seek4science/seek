@@ -162,7 +162,7 @@ class ProjectsController < ApplicationController
   # POST /projects.xml
   def create
     @project = nil
-    if @@is_json
+    if @is_json
       @project = Project.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
     else
       @project = Project.new(project_params)
@@ -196,13 +196,13 @@ class ProjectsController < ApplicationController
   def update
     update_params = {}
 
-    if @@is_json
+    if @is_json
       update_params = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
     else
       update_params = project_params
     end
 
-    if @project.present? && !@@is_json
+    if @project.present? && !@is_json
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end
 
