@@ -142,7 +142,6 @@ class StudiesController < ApplicationController
             format.json {render json: JSONAPI::Serializer.serialize(@study)}
           else
             format.html { redirect_to study_path(@study) }
-            format.xml { render xml: @study, status: :created, location: @study }
             format.json {render json: JSONAPI::Serializer.serialize(@study)}
           end
         end
@@ -150,7 +149,6 @@ class StudiesController < ApplicationController
     else
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @study.errors, status: :unprocessable_entity }
         format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
       end
     end
