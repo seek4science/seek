@@ -44,7 +44,7 @@ class Assay < ActiveRecord::Base
 
   validates_presence_of :assay_type_uri
   validates_presence_of :technology_type_uri, unless: :is_modelling?
-  validates_presence_of :study, message: ' must be selected'
+  validates_presence_of :study, message: ' must be selected and valid'
   validates_presence_of :contributor
   validates_presence_of :assay_class
 

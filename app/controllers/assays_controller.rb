@@ -102,22 +102,30 @@ class AssaysController < ApplicationController
   end
 
   def create
-    params[:assay_class_id] ||= AssayClass.for_type("experimental").id
-    @assay = Assay.new(assay_params)
+    @assay = nil
+    if @is_json
+      params[:data][:attributes][:assay_class_id] ||= AssayClass.for_type("experimental").id
+      organize_policies_from_json
+      organize_tags_from_json
+      set_assay_organisms_from_json
+      @assay = Assay.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
 
-    update_assay_organisms @assay, params
+    else
+      params[:assay_class_id] ||= AssayClass.for_type("experimental").id
+      @assay = Assay.new(assay_params)
+    end
 
-    @assay.contributor=current_person
+    if @assay.present?
+      @assay.contributor=current_person
+      update_sharing_policies @assay
+      update_annotations(params[:tag_list], @assay) #this saves the assay
+      update_scales @assay
+      update_assay_organisms @assay, params
+    end
 
-    update_sharing_policies @assay
 
-    update_annotations(params[:tag_list], @assay) #this saves the assay
-    update_scales @assay
-
-
-    if @assay.save
+    if @assay.present? && @assay.save
       update_assets_linked_to_assay @assay, params
-
       update_relationships(@assay, params)
 
       #required to trigger the after_save callback after the assets have been associated
@@ -128,48 +136,64 @@ class AssaysController < ApplicationController
         respond_to do |format|
           flash[:notice] = "#{t('assays.assay')} was successfully created."
           format.html { redirect_to(@assay) }
-          format.xml { render :xml => @assay, :status => :created, :location => @assay }
+          format.json {render json: JSONAPI::Serializer.serialize(@assay)}
         end
       end
     else
       respond_to do |format|
         format.html { render :action => "new" }
-        format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }
+        format.json { render json: {error: @assay.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+
       end
     end
   end
 
   def update
-    update_assay_organisms @assay, params
+    @assay = nil
+    params_to_update = nil
+    if @is_json
+      @assay=Assay.find(params["data"][:id])
+      organize_policies_from_json
+      organize_tags_from_json
+      set_assay_organisms_from_json
+      params_to_update = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    else
+      @assay=Assay.find(params[:id])
+      params_to_update = assay_params
+    end
+    Rails.logger.info("params to update:")
+    Rails.logger.info(params_to_update)
 
-    update_annotations(params[:tag_list], @assay)
-    update_scales @assay
-
-    @assay.update_attributes(assay_params)
-
-    update_sharing_policies @assay
+    if @assay.present?
+      update_annotations(params[:tag_list], @assay)
+      update_scales @assay
+      @assay.update_attributes(params_to_update)
+      update_sharing_policies @assay
+      update_assay_organisms @assay, params
+    end
 
     respond_to do |format|
       if @assay.save
-        update_assets_linked_to_assay @assay, params
-
-        update_relationships(@assay, params)
+        update_assets_linked_to_assay @assay, params_to_update
+        update_relationships(@assay, params_to_update)
 
         @assay.save!
 
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
-        format.xml { head :ok }
+        format.json {render json: JSONAPI::Serializer.serialize(@assay)}
       else
         format.html { render :action => "edit" }
-        format.xml { render :xml => @assay.errors, :status => :unprocessable_entity }
+        format.json { render json: {error: @assay.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
       end
     end
   end
 
   def update_assay_organisms assay,params
     organisms             = params[:assay_organism_ids] || []
-
+    Rails.logger.info("update organisms")
+    Rails.logger.info(params[:assay_organism_ids])
+    Rails.logger.info(organisms)
     assay.assay_organisms = []
     Array(organisms).each do |text|
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
@@ -225,6 +249,13 @@ class AssaysController < ApplicationController
   end
 
   private
+
+  def set_assay_organisms_from_json
+    if !(params[:data][:attributes][:assay_organism_ids].nil?)
+      params[:assay_organism_ids] = params[:data][:attributes][:assay_organism_ids]
+      params[:data][:attributes].delete :assay_organism_ids
+    end
+  end
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
