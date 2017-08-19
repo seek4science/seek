@@ -108,6 +108,7 @@ class AssaysController < ApplicationController
       organize_policies_from_json
       organize_tags_from_json
       set_assay_organisms_from_json
+      set_creators
       @assay = Assay.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
 
     else
@@ -173,9 +174,9 @@ class AssaysController < ApplicationController
     end
 
     respond_to do |format|
-      if @assay.save
-        update_assets_linked_to_assay @assay, params_to_update
-        update_relationships(@assay, params_to_update)
+      if @assay.save           #should use params (e.g. for creators to be updated)
+        update_assets_linked_to_assay @assay, params
+        update_relationships(@assay, params)
 
         @assay.save!
 
@@ -254,6 +255,13 @@ class AssaysController < ApplicationController
     if !(params[:data][:attributes][:assay_organism_ids].nil?)
       params[:assay_organism_ids] = params[:data][:attributes][:assay_organism_ids]
       params[:data][:attributes].delete :assay_organism_ids
+    end
+  end
+
+  def set_creators
+    if !(params[:data][:attributes][:creators].nil?)
+      params[:creators] = params[:data][:attributes][:creators]
+      params[:data][:attributes].delete :creators
     end
   end
 
