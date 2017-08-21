@@ -138,17 +138,16 @@ class DataFilesController < ApplicationController
   def create
     @data_file = nil
     Rails.logger.info(params)
-    respond_to do |format|
-      format.html { @data_file = DataFile.new(data_file_params) }
-      format.json {
-        flattened_relationships = flatten_relationships(params)
-        datafile_json_params = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    if is_json
+      flattened_relationships = flatten_relationships(params)
+      datafile_json_params = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
 
-        if datafile_json_params.key?(:content)
-          params[:content_blobs] = datafile_json_params[:content]["data"] #Why a string?
-        end
-        @data_file = DataFile.new(datafile_json_params.except!(:content))
-      }
+      if datafile_json_params.key?(:content)
+        params[:content_blobs] = datafile_json_params[:content]["data"] #Why a string?
+      end
+      @data_file = DataFile.new(datafile_json_params.except!(:content))
+    else
+      @data_file = DataFile.new(data_file_params)
     end
 
     if handle_upload_data
@@ -209,9 +208,13 @@ class DataFilesController < ApplicationController
   end
 
   def update
-    @data_file.attributes = nil
 
-    @data_file.attributes = data_file_params
+    if is_json
+      flattened_relationships = flatten_relationships(params)
+      params = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    end
+
+    @data_file.attributes = params
 
     update_annotations(params[:tag_list], @data_file)
     update_scales @data_file
