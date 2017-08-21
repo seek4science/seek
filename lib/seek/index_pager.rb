@@ -8,9 +8,6 @@ module Seek
         model_class = controller_name.classify.constantize
         objects = eval("@#{controller}")
         @hidden = 0
-        Rails.logger.info("**** params page **** ")
-        Rails.logger.info(params[:page])
-        Rails.logger.info(params[:page].nil?)
         if (request.format == 'json' && params[:page].nil?)
           params[:page] = 'all'
         else
