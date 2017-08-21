@@ -18,22 +18,26 @@ class ProgrammesController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
-  respond_to :html
+  respond_to :html, :json
 
   def create
-     @programme = nil
-     funding_codes = []
-    respond_to do |format|
-      format.html {
-        #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
-        funding_codes = params[:programme].delete(:funding_codes)
+    @programme = nil
+    funding_codes = []
+    case
+      when @is_json
+        begin
+          hacked_params = flatten_relationships(params)
+          #What to do with funding codes?
+          @programme = Programme.new(ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params, except: ["tags"]))
+          # @programme = Programme.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params, except: ["tags"]))}
+        end
+      else
+        begin
+          #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
+          funding_codes = params[:programme].delete(:funding_codes)
 
-        @programme = Programme.new(programme_params)}
-      format.json {
-        hacked_params = flatten_relationships(params)
-        #What to do with funding codes?
-        @programme = Programme.new(ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params, except: ["tags"]))}
-        # @programme = Programme.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params, except: ["tags"]))}
+          @programme = Programme.new(programme_params)
+        end
     end
 
     respond_to do |format|
@@ -64,15 +68,17 @@ class ProgrammesController < ApplicationController
 
   def update
     update_params = {}
-    is_json = false
-    respond_to do |format|
-      format.html {update_params = programme_params}
-      format.json {
-        is_json = true
-        hacked_params = flatten_relationships(params)
-        #What to do with funding codes?
-        update_params = ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params, except: ["tags"])
-      }
+    case
+      when @is_json
+        begin
+          hacked_params = flatten_relationships(params)
+          #What to do with funding codes?
+          update_params = ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params, except: ["tags"])
+        end
+      else
+        begin
+          update_params = programme_params
+        end
     end
 
     respond_to do |format|
