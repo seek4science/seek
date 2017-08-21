@@ -71,7 +71,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_is_json
-    @is_json = (request.format == 'json')
+    @is_json = (request.format.json?)
   end
 
   def api_version
