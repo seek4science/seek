@@ -84,7 +84,7 @@ module RestTestCases
 
   def perform_jsonapi_checks
     assert_response :success
-    assert_equal 'application/json', @response.content_type
+    assert_equal 'application/vnd.api+json', @response.content_type
     #puts JSON::Validator.fully_validate(JSONAPI_SCHEMA_FILE_PATH, @response.body)
     assert JSON::Validator.validate(JSONAPI_SCHEMA_FILE_PATH, @response.body)
 

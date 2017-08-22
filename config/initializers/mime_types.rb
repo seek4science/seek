@@ -19,7 +19,7 @@ SEEK::Application.configure do
   api_mime_types.append("application/vnd.api+json; version=1")
   api_mime_types.append('application/vnd.api.v1+json')
   Mime::Type.unregister :json
-  Mime::Type.register 'application/json', :json, api_mime_types
+  Mime::Type.register 'application/vnd.api+json', :json, api_mime_types
 
   # for publication export
   # http://filext.com/file-extension/ENW
