@@ -40,7 +40,7 @@ class InvestigationsController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show' }
-      format.json {render json: JSONAPI::Serializer.serialize(@investigation,options)}
+      format.json {render json: @investigation}
 
       format.ro do
         ro_for_download
@@ -81,10 +81,10 @@ class InvestigationsController < ApplicationController
           if @investigation.create_from_asset=="true"
             flash.now[:notice] << "<br/> Now you can create new #{t('study')} for your #{t('assays.assay')} by clicking -Add a #{t('study')}- button".html_safe
             format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
-            format.json {render json: JSONAPI::Serializer.serialize(@investigation)}
+            format.json {render json: @investigation}
           else
             format.html { redirect_to investigation_path(@investigation) }
-            format.json {render json: JSONAPI::Serializer.serialize(@investigation)}
+            format.json {render json: @investigation}
           end
         end
        end
@@ -140,7 +140,7 @@ class InvestigationsController < ApplicationController
 
           flash[:notice] = "#{t('investigation')} was successfully updated."
           format.html { redirect_to(@investigation) }
-          format.json {render json: JSONAPI::Serializer.serialize(@investigation)}
+          format.json {render json: @investigation}
         else
           format.html { render :action => "edit" }
           format.json { render json: {error: @investigation.errors, status: :unprocessable_entity}, status: :unprocessable_entity }

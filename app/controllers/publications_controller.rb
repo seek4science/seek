@@ -42,7 +42,7 @@ class PublicationsController < ApplicationController
       format.html # show.html.erb
       format.xml
       format.rdf { render template: 'rdf/show' }
-      format.json {render json: JSONAPI::Serializer.serialize(@publication,options)}
+      format.json {render json: @publication}
       format.any( *Publication::EXPORT_TYPES.keys ) { send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}" }
     end
   end

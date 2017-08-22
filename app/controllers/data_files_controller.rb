@@ -136,19 +136,10 @@ class DataFilesController < ApplicationController
   end
 
   def create
-    @data_file = nil
-    Rails.logger.info(params)
-    if is_json
-      flattened_relationships = flatten_relationships(params)
-      datafile_json_params = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-
-      if datafile_json_params.key?(:content)
-        params[:content_blobs] = datafile_json_params[:content]["data"] #Why a string?
-      end
-      @data_file = DataFile.new(datafile_json_params.except!(:content))
-    else
-      @data_file = DataFile.new(data_file_params)
-    end
+     if params.key?(:content)
+        params[:content_blobs] = params[:content]["data"] #Why a string?
+     end
+      @data_file = DataFile.new(data_file_params.except!(:content))
 
     if handle_upload_data
       update_sharing_policies(@data_file)
@@ -179,7 +170,7 @@ class DataFilesController < ApplicationController
             assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
             update_assay_assets(@data_file, assay_ids, relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
-            format.json { render json: JSONAPI::Serializer.serialize(@data_file)}
+            format.json { render json: @data_file}
           end
       end
       else
@@ -209,11 +200,6 @@ class DataFilesController < ApplicationController
 
   def update
 
-    if is_json
-      flattened_relationships = flatten_relationships(params)
-      params = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-    end
-
     @data_file.attributes = params
 
     update_annotations(params[:tag_list], @data_file)
@@ -231,11 +217,12 @@ class DataFilesController < ApplicationController
 
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
-
+        format.json {@data_file}
       else
         format.html do
           render action: 'edit'
         end
+        format.json {} #to be decided
       end
     end
   end

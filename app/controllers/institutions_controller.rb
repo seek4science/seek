@@ -25,7 +25,7 @@ class InstitutionsController < ApplicationController
       format.xml
       # format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
       #format.json { render json: @institution } #normal json
-      format.json {render json: JSONAPI::Serializer.serialize(@institution,options)}
+      format.json {render json: @institution}
     end
   end
 
@@ -103,7 +103,7 @@ class InstitutionsController < ApplicationController
     institution_list = Institution.get_all_institutions_listing
     respond_to do |format|
        format.json do
-         render json: JSONAPI::Serializer.serialize(institution_list, options)
+         render json: institution_list
          #render json: { status: 200, institution_list: institution_list }
        end
     end

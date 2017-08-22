@@ -23,7 +23,7 @@ class OrganismsController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.json {render json: JSONAPI::Serializer.serialize(@organism,options)}
+      format.json {render json: @organism}
     end
   end
 
@@ -36,7 +36,7 @@ class OrganismsController < ApplicationController
       options = {:is_collection=>true}
       respond_to do |format|
         format.xml
-        format.json {render json: JSONAPI::Serializer.serialize(@organisms, options)}
+        format.json {render json: @organisms}
       end
     end
   end

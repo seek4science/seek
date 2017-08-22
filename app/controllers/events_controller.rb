@@ -20,7 +20,7 @@ class EventsController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json {render json: JSONAPI::Serializer.serialize(@event,options)}
+      format.json {render json: @event}
     end
   end
 

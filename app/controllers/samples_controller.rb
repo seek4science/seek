@@ -17,7 +17,7 @@ class SamplesController < ApplicationController
     if @data_file || @sample_type
       respond_to do |format|
         format.html
-        format.json {render json: JSONAPI::Serializer.serialize(@samples,options)}
+        format.json {render json: @samples}
       end
       #respond_with(@samples)
     else
@@ -46,7 +46,7 @@ class SamplesController < ApplicationController
     @sample = Sample.find(params[:id])
     respond_to do |format|
       format.html
-      format.json {render json: JSONAPI::Serializer.serialize(@sample,options)}
+      format.json {render json: @sample}
     end
   end
 

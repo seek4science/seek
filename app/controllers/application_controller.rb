@@ -556,7 +556,7 @@ class ApplicationController < ActionController::Base
 
   def check_illegal_id
     begin
-      if @is_json && !(params[:data][:id].nil?)
+      if !params[:id].nil?
         raise ArgumentError.new('A POST request is not allowed to specify an id')
       end
     rescue ArgumentError => e
@@ -642,5 +642,26 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def flatten_relationships(original_params)
+    replacements = {}
+    begin
+      rels = original_params[:data][:relationships]
+      assoc = rels[:associated]
+      assoc_relationships = assoc[:data]
+      assoc_relationships.each do |assoc_rel|
+        the_type = assoc_rel["type"]
+        the_id = assoc_rel["id"]
+        if !replacements.key?(the_type)
+          replacements[the_type] = {}
+          replacements[the_type][:data] = []
+        end
+        replacements[the_type][:data].push({:type => the_type, :id => the_id})
+      end
+      rels.delete(:associated)
+      original_params[:data][:relationships].merge!(ActionController::Parameters.new(replacements))
+    rescue Exception
+    end
+    original_params
+  end
 
 end

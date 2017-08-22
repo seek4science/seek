@@ -12,7 +12,7 @@ class WorkGroupsController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @groups }
-      format.json {render json: JSONAPI::Serializer.serialize(@groups,options)}
+      format.json {render json: @groups}
 
     end
   end
@@ -26,7 +26,7 @@ class WorkGroupsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @group }
-      format.json {render json: JSONAPI::Serializer.serialize(@group,options)}
+      format.json {render json: @group}
 
     end
   end

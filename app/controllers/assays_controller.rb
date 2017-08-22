@@ -137,7 +137,7 @@ class AssaysController < ApplicationController
         respond_to do |format|
           flash[:notice] = "#{t('assays.assay')} was successfully created."
           format.html { redirect_to(@assay) }
-          format.json {render json: JSONAPI::Serializer.serialize(@assay)}
+          format.json {render json: @assay}
         end
       end
     else
@@ -182,7 +182,7 @@ class AssaysController < ApplicationController
 
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
-        format.json {render json: JSONAPI::Serializer.serialize(@assay)}
+        format.json {render json: @assay}
       else
         format.html { render :action => "edit" }
         format.json { render json: {error: @assay.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
@@ -238,7 +238,7 @@ class AssaysController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.json {render json: JSONAPI::Serializer.serialize(@assay,options)}
+      format.json {render json: @assay}
 
     end
   end

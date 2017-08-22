@@ -91,7 +91,7 @@ class StudiesController < ApplicationController
 
           flash[:notice] = "#{t('study')} was successfully updated."
           format.html { redirect_to(@study) }
-          format.json {render json: JSONAPI::Serializer.serialize(@study)}
+          format.json {render json: @study}
         else
           format.html { render action: 'edit' }
           format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
@@ -109,7 +109,7 @@ class StudiesController < ApplicationController
       format.html
       format.xml
       format.rdf { render template: 'rdf/show' }
-      format.json {render json: JSONAPI::Serializer.serialize(@study,options)}
+      format.json {render json: @study}
 
     end
   end
@@ -139,10 +139,10 @@ class StudiesController < ApplicationController
           if @study.create_from_asset == 'true'
             flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
             format.html { redirect_to study_path(id: @study, create_from_asset: @study.create_from_asset) }
-            format.json {render json: JSONAPI::Serializer.serialize(@study)}
+            format.json {render json: @study}
           else
             format.html { redirect_to study_path(@study) }
-            format.json {render json: JSONAPI::Serializer.serialize(@study)}
+            format.json {render json: @study}
           end
         end
       end

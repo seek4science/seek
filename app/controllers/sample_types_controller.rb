@@ -19,7 +19,7 @@ class SampleTypesController < ApplicationController
     options = {:is_collection=>false}
     respond_to do |format|
       format.html
-      format.json {render json: JSONAPI::Serializer.serialize(@sample_type,options)}
+      format.json {render json: @sample_type}
     end
   end
 

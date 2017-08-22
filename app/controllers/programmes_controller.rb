@@ -12,6 +12,7 @@ class ProgrammesController < ApplicationController
   before_filter :can_activate?, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
   before_filter :inactive_view_allowed?, only: [:show]
 
+
   skip_before_filter :project_membership_required
 
   include Seek::BreadCrumbs
@@ -21,24 +22,10 @@ class ProgrammesController < ApplicationController
   respond_to :html, :json
 
   def create
-    @programme = nil
-    funding_codes = []
-    case
-      when @is_json
-        begin
-          hacked_params = flatten_relationships(params)
-          #What to do with funding codes?
-          @programme = Programme.new(ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params, except: ["tags"]))
-          # @programme = Programme.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params, except: ["tags"]))}
-        end
-      else
-        begin
-          #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
-          funding_codes = params[:programme].delete(:funding_codes)
+    #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
+    funding_codes = params[:programme].delete(:funding_codes)
 
-          @programme = Programme.new(programme_params)
-        end
-    end
+    @programme = Programme.new(programme_params)
 
     respond_to do |format|
       if @programme.present? && @programme.save
@@ -58,7 +45,7 @@ class ProgrammesController < ApplicationController
         rescue
         end
         format.html {respond_with(@programme)}
-        format.json {render json: JSONAPI::Serializer.serialize(@programme)}
+        format.json {render json: @programme}
       else
         format.html { render action: 'new' }
         format.json {render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
@@ -67,37 +54,24 @@ class ProgrammesController < ApplicationController
   end
 
   def update
-    update_params = {}
-    case
-      when @is_json
-        begin
-          hacked_params = flatten_relationships(params)
-          #What to do with funding codes?
-          update_params = ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params, except: ["tags"])
-        end
-      else
-        begin
-          update_params = programme_params
-        end
-    end
-
-    respond_to do |format|
+    update_params = programme_params
+   respond_to do |format|
       if @programme.present?
         if @programme.update_attributes(update_params)
           flash[:notice] = "The #{t('programme').capitalize} was successfully updated"
           format.html { redirect_to(@programme) }
-          format.xml  { head :ok }
-          format.json {render json: JSONAPI::Serializer.serialize(@programme)}
+          format.xml { head :ok }
+          format.json { render json: @programme }
         else
           format.html { render action: 'edit' }
-          format.xml  { render xml: @programme.errors, status: :unprocessable_entity }
-          format.json { render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+          format.xml { render xml: @programme.errors, status: :unprocessable_entity }
+          format.json { render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
         end
       end
     end
   end
 
- def handle_administrators
+  def handle_administrators
     params[:programme][:administrator_ids] = params[:programme][:administrator_ids].split(',')
 
     prevent_removal_of_self_as_programme_administrator
@@ -131,7 +105,7 @@ class ProgrammesController < ApplicationController
     options = {:is_collection=>false}
     respond_with do |format|
       format.html
-      format.json {render json: JSONAPI::Serializer.serialize(@programme,options)}
+      format.json {render json: @programme}
     end
   end
 

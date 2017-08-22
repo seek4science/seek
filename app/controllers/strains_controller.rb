@@ -57,7 +57,7 @@ class StrainsController < ApplicationController
       format.rdf { render template: 'rdf/show' }
       format.xml
       format.html
-      format.json {render json: JSONAPI::Serializer.serialize(@strain,options)}
+      format.json {render json: @strain}
 
     end
   end
