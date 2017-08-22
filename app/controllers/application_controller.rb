@@ -24,6 +24,7 @@ class ApplicationController < ActionController::Base
   around_filter :with_current_user
 
   rescue_from 'ActiveRecord::RecordNotFound', with: :render_not_found_error
+  rescue_from 'ActiveRecord::UnknownAttributeError', with: :render_unknown_attribute_error
 
   before_filter :project_membership_required, only: [:create, :new]
 
@@ -321,6 +322,17 @@ class ApplicationController < ActionController::Base
       }
     end
     false
+  end
+
+  def render_unknown_attribute_error(e)
+    respond_to do |format|
+      format.json {
+        render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
+      }
+      format.all {
+        render text: e.message, status: :unprocessable_entity
+      }
+    end
   end
 
   def is_auth?(object, privilege)
