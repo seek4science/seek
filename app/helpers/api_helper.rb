@@ -285,10 +285,10 @@ module ApiHelper
     associated_hash = get_related_resources(object)
     to_ignore = ignore_associated_types.collect(&:name)
     associated_hash.delete_if { |k, _v| to_ignore.include?(k) }
-    associated_hash.each_value do |value|
+    associated_hash.each do |k, value|
       if (value[:items] != [])
         #puts "a value: ", value[:items]
-        associated_arr += value[:items]
+         associated_arr += value[:items]
 #        builder.api_format! value[:items]   #if we used a jbuilder
 
       end
@@ -390,27 +390,6 @@ module ApiHelper
     end
   end
 
-  def flatten_relationships(original_params)
-    replacements = {}
-    begin
-      rels = original_params[:data][:relationships]
-      assoc = rels[:associated]
-      assoc_relationships = assoc[:data]
-      assoc_relationships.each do |assoc_rel|
-        the_type = assoc_rel["type"]
-        the_id = assoc_rel["id"]
-        if !replacements.key?(the_type)
-          replacements[the_type] = {}
-          replacements[the_type][:data] = []
-        end
-        replacements[the_type][:data].push({:type => the_type, :id => the_id})
-      end
-      rels.delete(:associated)
-      original_params[:data][:relationships].merge!(ActionController::Parameters.new(replacements))
-    rescue Exception
-    end
-    original_params
-  end
 
 
 end

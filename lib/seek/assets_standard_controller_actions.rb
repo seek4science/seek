@@ -25,7 +25,7 @@ module Seek
         format.xml
         format.rdf { render template: 'rdf/show' }
 
-        format.json {render json: JSONAPI::Serializer.serialize(asset_version,options)}
+        format.json {render json: asset_version}
       end
     end
 

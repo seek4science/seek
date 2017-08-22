@@ -2,7 +2,9 @@ class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
   include RelatedItemsHelper
 
-  has_many :associated, include_data:true do  #--> add this when everything is serialized.
+  has_many :associated
+
+  def associated
     associated_resources(object) # ||  { "data": [] }
   end
 

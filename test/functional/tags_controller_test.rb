@@ -121,7 +121,7 @@ class TagsControllerTest < ActionController::TestCase
 
     get :latest, format: 'json'
     assert_response :success
-    assert_equal '[]', @response.body
+    assert_equal "{\"data\":[]}", @response.body
   end
 
   test 'latest' do
