@@ -34,6 +34,8 @@ class ApplicationController < ActionController::Base
   before_filter :check_illegal_id, :only=>[:create]
   # after_filter :unescape_response
 
+  before_filter :convert_json_params
+
   helper :all
 
   layout Seek::Config.main_layout
@@ -192,7 +194,7 @@ class ApplicationController < ActionController::Base
         end
         format.json {
           errors = [{"title": "Unauthorized", "status": "401", "detail": flash[:error].to_s}]
-          render json: JSONAPI::Serializer.serialize_errors(errors), status: 401
+          render json: errors, status: 401
          # render json: { status: 401, error_message: flash[:error] }
         }
       end
@@ -252,7 +254,7 @@ class ApplicationController < ActionController::Base
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
         format.json {
           errors = [{"title": "Not found", "status": "404"}]
-          render json: JSONAPI::Serializer.serialize_errors(errors), status: :not_found
+          render json: errors, status: :not_found
         }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
@@ -318,7 +320,7 @@ class ApplicationController < ActionController::Base
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
       format.json {
         errors = [{"title": "Not found", "status": "404"}]
-        render json: JSONAPI::Serializer.serialize_errors(errors), status: :not_found
+        render json: errors, status: :not_found
       }
     end
     false
@@ -611,6 +613,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+=======
+>>>>>>> a762580... Added before filter to process JSON
   # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
   # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
   # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
@@ -629,5 +633,14 @@ class ApplicationController < ActionController::Base
                                                        :contributor_type,
                                                        :contributor_id] }])[:policy_attributes] || {}
   end
+
+  def convert_json_params
+    if @is_json
+      hacked_params = flatten_relationships(params)
+      params[controller_name.classify.downcase.to_sym] =
+          ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
+    end
+  end
+
 
 end
