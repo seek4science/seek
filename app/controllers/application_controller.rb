@@ -30,6 +30,7 @@ class ApplicationController < ActionController::Base
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
   #before_filter :process_params, :only=>[:edit, :update, :destroy, :create, :new]
   before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
+  before_filter :check_illegal_id, :only=>[:create]
   # after_filter :unescape_response
 
   helper :all
@@ -537,6 +538,16 @@ class ApplicationController < ActionController::Base
 
   def redirect_to_sign_up_when_no_user
     redirect_to signup_path if User.count == 0
+  end
+
+  def check_illegal_id
+    begin
+      if @is_json && !(params[:data][:id].nil?)
+        raise ArgumentError.new('A POST request is not allowed to specify an id')
+      end
+    rescue ArgumentError => e
+      render json: {error: e.message, status: :forbidden}, status: :forbidden
+    end
   end
 
   #process JSONAPI params into params itself, so it can be used normally with create, update, etc.

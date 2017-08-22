@@ -162,32 +162,36 @@ class ProjectsController < ApplicationController
   # POST /projects.xml
   def create
     @project = nil
-    if @is_json
-      @project = Project.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
-    else
-      @project = Project.new(project_params)
-    end
+    begin
+      if @is_json
+        @project = Project.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
+      else
+        @project = Project.new(project_params)
+      end
 
-    if @project.present?
-      @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
-    end
-    respond_to do |format|
-      if @project.present? && @project.save
-        if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
+      if @project.present?
+       @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
+      end
+      respond_to do |format|
+       if @project.present? && @project.save
+         if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
           institution = Institution.find(params[:default_member][:institution_id])
           person = current_person
           person.add_to_project_and_institution(@project, institution)
           person.is_project_administrator = true, @project
           disable_authorization_checks { person.save }
-        end
-        flash[:notice] = "#{t('project')} was successfully created."
-        format.html { redirect_to(@project) }
-        #format.json {render json: @project, adapter: :json, status: 200 }
-        format.json {render json: JSONAPI::Serializer.serialize(@project)}
-      else
-        format.html { render action: 'new' }
-        format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+         end
+         flash[:notice] = "#{t('project')} was successfully created."
+         format.html { redirect_to(@project) }
+         #format.json {render json: @project, adapter: :json, status: 200 }
+         format.json {render json: JSONAPI::Serializer.serialize(@project)}
+       else
+         format.html { render action: 'new' }
+         format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+       end
       end
+    rescue ActiveRecord::UnknownAttributeError  => e
+      render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
     end
   end
 
