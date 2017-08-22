@@ -93,7 +93,7 @@ class ProjectsController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json {render json: JSONAPI::Serializer.serialize(@project)}
+      format.json {render json: @project}
     end
   end
 
@@ -161,12 +161,7 @@ class ProjectsController < ApplicationController
   # POST /projects
   # POST /projects.xml
   def create
-    @project = nil
-    if @is_json
-      @project = Project.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
-    else
       @project = Project.new(project_params)
-    end
 
     if @project.present?
       @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
@@ -180,14 +175,14 @@ class ProjectsController < ApplicationController
           person.is_project_administrator = true, @project
           disable_authorization_checks { person.save }
         end
-         flash[:notice] = "#{t('project')} was successfully created."
-         format.html { redirect_to(@project) }
-         #format.json {render json: @project, adapter: :json, status: 200 }
-         format.json {render json: JSONAPI::Serializer.serialize(@project)}
-       else
-         format.html { render action: 'new' }
-         format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
-       end
+        flash[:notice] = "#{t('project')} was successfully created."
+        format.html { redirect_to(@project) }
+        #format.json {render json: @project, adapter: :json, status: 200 }
+        format.json {render json: @project}
+      else
+        format.html { render action: 'new' }
+        format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+      end
     end
   end
 
@@ -195,13 +190,7 @@ class ProjectsController < ApplicationController
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
-    update_params = {}
-
-    if @is_json
-      update_params = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-    else
       update_params = project_params
-    end
 
     if @project.present? && !@is_json
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
@@ -218,7 +207,7 @@ class ProjectsController < ApplicationController
             flash[:notice] = "#{t('project')} was successfully updated."
             format.html { redirect_to(@project) }
             format.xml  { head :ok }
-            format.json {render json: JSONAPI::Serializer.serialize(@project)}
+            format.json {render json: @project}
 #            format.json {render json: @project, adapter: :json, status: 200 }
           else
             format.html { render action: 'edit' }
