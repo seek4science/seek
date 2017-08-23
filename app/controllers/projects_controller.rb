@@ -23,7 +23,7 @@ class ProjectsController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
-  respond_to :html
+  respond_to :html, :json
 
   def asset_report
     @no_sidebar = true

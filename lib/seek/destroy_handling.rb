@@ -19,7 +19,7 @@ module Seek
         flash.now[:error] = "Unable to delete the #{controller_name.singularize}"
         format.html { render action: 'show' }
         format.xml { render xml: asset.errors, status: :unprocessable_entity }
-        format.json {render json: {status: :unprocessable_entity}, status: :unprocessable_entity}
+        format.json {render json: {"title": asset.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
       end
     end
 
