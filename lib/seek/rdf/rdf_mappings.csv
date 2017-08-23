@@ -59,7 +59,7 @@ Publication,assays,JERMVocab.isPartOf,u,,
 Sop,assays,JERMVocab.isPartOf,u,,
 Sop,projects,JERMVocab.itemProducedBy,u,,
 Strain,assays,JERMVocab.is_investigated_by,u,,
-Strain,ncbi_uri,JERMVocab.NCBI_ID,u,,compact
+Strain,ncbi_uri,JERMVocab.NCBI_ID,l,URI.parse(item),compact
 Strain,provider_id,JERMVocab.External_supplier_ID,l,,
 Study,assays,JERMVocab.hasPart,u,,
 Study,investigation,JERMVocab.isPartOf,u,,

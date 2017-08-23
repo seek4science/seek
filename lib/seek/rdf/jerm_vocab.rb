@@ -18,6 +18,8 @@ module Seek
       property :Data
       property :hasPart
       property :isPartOf
+      property :External_supplier_ID
+      property :NCBI_ID
 
       # returns the correct Class IRI accrording to the class, or instance, passed in - or nil if its not recognised
       def self.for_type(type)
