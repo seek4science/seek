@@ -200,7 +200,7 @@ class DataFilesController < ApplicationController
 
   def update
 
-    @data_file.attributes = params
+    @data_file.attributes = data_file_params.except!(:content)
 
     update_annotations(params[:tag_list], @data_file)
     update_scales @data_file
