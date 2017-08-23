@@ -18,6 +18,7 @@ Assay,study,JERMVocab.isPartOf,u,,
 Assay,assay_type_uri,JERMVocab.hasType,u,,
 Assay,technology_type_uri,JERMVocab.hasType,u,,
 Assay,assets,JERMVocab.hasPart,u,,select{|item| !item.is_a?(Presentation)}
+Assay,sops,JERMVocab.isAssociatedWith,u,,
 Compound,chebi_ids,RDF::OWL.sameAs,u,'http://identifiers.org/obo.chebi/CHEBI:'+item,
 Compound,chebi_ids,RDF::OWL.sameAs,u,'urn:miriam:obo.chebi:'+item,
 DataFile,assays,JERMVocab.isPartOf,u,,
