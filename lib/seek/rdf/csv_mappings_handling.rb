@@ -57,11 +57,11 @@ module Seek
       def handle_literal_for_item(item)
         return '' if item.nil?
         if item.is_a?(URI)
-          RDF::Literal.new(item,datatype:RDF::XSD.anyURI)
+          return nil unless item.to_s =~ URI.regexp # rejects invalid URI's
+          RDF::Literal.new(item, datatype: RDF::XSD.anyURI)
         else
           RDF::Literal.new(item)
         end
-
       end
 
       def handle_uri_for_item(item)

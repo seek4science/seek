@@ -37,7 +37,7 @@ Person,last_name,RDF::FOAF.familyName,l,,
 Person,name,RDF::SIOC.name,l,,
 Person,name,RDF::FOAF.name,l,,
 Person,projects,JERMVocab.isAssociatedWith,u,,
-Person,web_page,RDF::FOAF.homepage,l,URI.parse(item),
+Person,web_page,RDF::FOAF.homepage,l,URI.parse(item),compact
 Programme,assays,JERMVocab.hasItem,u,,
 Programme,studies,JERMVocab.hasItem,u,,
 Programme,investigations,JERMVocab.hasItem,u,,
@@ -50,10 +50,10 @@ Project,assets,JERMVocab.hasItem,u,,select{|item| !item.is_a?(Presentation)}
 Project,investigations,JERMVocab.hasItem,u,,
 Project,organisms,JERMVocab.investigates,u,,
 Project,studies,JERMVocab.hasItem,u,,
-Project,web_page,RDF::FOAF.homepage,l,URI.parse(item),
+Project,web_page,RDF::FOAF.homepage,l,URI.parse(item),compact
 Project,people,JERMVocab.isAssociatedWith,u,,
 Project,programme,JERMVocab.isPartOf,u,,
-Project,web_page,JERMVocab.WebLink,l,URI.parse(item),
+Project,web_page,JERMVocab.WebLink,l,URI.parse(item),compact
 Publication,projects,JERMVocab.itemProducedBy,u,,
 Publication,assays,JERMVocab.isPartOf,u,,
 Sop,assays,JERMVocab.isPartOf,u,,
