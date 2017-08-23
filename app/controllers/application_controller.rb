@@ -192,11 +192,7 @@ class ApplicationController < ActionController::Base
             redirect_to path
           end
         end
-        format.json {
-          errors = [{"title": "Unauthorized", "status": "401", "detail": flash[:error].to_s}]
-          render json: errors, status: 401
-         # render json: { status: 401, error_message: flash[:error] }
-        }
+        format.json { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized, status: :unauthorized}
       end
     end
   end
@@ -252,10 +248,7 @@ class ApplicationController < ActionController::Base
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render text: 'Not found', status: :not_found }
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-        format.json {
-          errors = [{"title": "Not found", "status": "404"}]
-          render json: errors, status: :not_found
-        }
+        format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
     else
@@ -318,10 +311,7 @@ class ApplicationController < ActionController::Base
 
       format.rdf { render text: 'Not found', status: :not_found }
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-      format.json {
-        errors = [{"title": "Not found", "status": "404"}]
-        render json: errors, status: :not_found
-      }
+      format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
     end
     false
   end
@@ -556,6 +546,7 @@ class ApplicationController < ActionController::Base
 
   def check_illegal_id
     begin
+      Rails.logger.info("checking illegal ID")
       if !params[:id].nil?
         raise ArgumentError.new('A POST request is not allowed to specify an id')
       end
