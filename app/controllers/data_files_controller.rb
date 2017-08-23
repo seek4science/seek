@@ -136,6 +136,10 @@ class DataFilesController < ApplicationController
   end
 
   def create
+    if params[:data_file].empty? && !params[:datafile].empty?
+      params[:data_file] = params[:datafile]
+    end
+
      if params.key?(:content)
         params[:content_blobs] = params[:content]["data"] #Why a string?
      end
@@ -200,6 +204,9 @@ class DataFilesController < ApplicationController
 
   def update
 
+    if params[:data_file].empty? && !params[:datafile].empty?
+      params[:data_file] = params[:datafile]
+    end
     @data_file.attributes = data_file_params.except!(:content)
 
     update_annotations(params[:tag_list], @data_file)
@@ -217,7 +224,7 @@ class DataFilesController < ApplicationController
 
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
-        format.json {@data_file}
+        format.json {render json: @data_file}
       else
         format.html do
           render action: 'edit'
