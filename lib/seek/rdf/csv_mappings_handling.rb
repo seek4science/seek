@@ -55,7 +55,13 @@ module Seek
       end
 
       def handle_literal_for_item(item)
-        item.nil? ? '' : item
+        return '' if item.nil?
+        if item.is_a?(URI)
+          RDF::Literal.new(item,datatype:RDF::XSD.anyURI)
+        else
+          RDF::Literal.new(item)
+        end
+
       end
 
       def handle_uri_for_item(item)
