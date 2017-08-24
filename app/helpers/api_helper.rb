@@ -314,18 +314,6 @@ module ApiHelper
     end
   end
 
-  #TO DO: there is still redundancy with the parallel xml method with deleting ignored associated resources
-  def associated_resources_json(builder, object)
-    associated = get_related_resources(object)
-    to_ignore = ignore_associated_types.collect(&:name)
-    associated.delete_if { |k, _v| to_ignore.include?(k) }
-    associated.each_value do |value|
-      if (value[:items] != [])
-        builder.api_format! value[:items]
-      end
-    end
-  end
-
   # types that should be ignored from the related resources. It may be desirable to add items in this list to the schema
   def ignore_associated_types
     [Strain, TavernaPlayer::Run, Workflow, Sweep]
