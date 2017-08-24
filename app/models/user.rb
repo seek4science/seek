@@ -281,7 +281,7 @@ class User < ActiveRecord::Base
     User.includes(:person).select { |u| u.person.nil? }
   end
 
-  #set the code and the until time to nil. object needs to be saved to take effect
+  # set the code and the until time to nil. object needs to be saved to take effect
   def clear_reset_password_code
     self.reset_password_code = nil
     self.reset_password_code_until = nil
@@ -321,6 +321,4 @@ class User < ActiveRecord::Base
       ActiveRecord::Base.connection.execute("delete from #{type.lookup_table_name} where user_id=#{id}")
     end
   end
-
-
 end

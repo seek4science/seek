@@ -113,9 +113,7 @@ class UsersController < ApplicationController
 
     @user.attributes = user_params
 
-    if @user.reset_password_code
-      @user.clear_reset_password_code
-    end
+    @user.clear_reset_password_code if @user.reset_password_code
 
     respond_to do |format|
       if @user.save
@@ -165,7 +163,7 @@ class UsersController < ApplicationController
       self.current_user = user
       redirect_to root_path
     else
-      flash[:error] = "User not found"
+      flash[:error] = 'User not found'
       redirect_to admin_path
     end
   end
