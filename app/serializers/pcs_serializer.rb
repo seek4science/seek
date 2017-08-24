@@ -3,7 +3,6 @@ class PCSSerializer < BaseSerializer
   has_one :submitter, include_data:true do
     determine_submitter object
   end
-  has_one :policy, include_data:true
   attribute :tags do
     serialize_annotations(object)
   end
