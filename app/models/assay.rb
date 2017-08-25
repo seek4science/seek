@@ -113,6 +113,14 @@ class Assay < ActiveRecord::Base
     data_files + models + sops + publications + samples
   end
 
+  def incoming
+    assay_assets.incoming.collect(&:asset)
+  end
+
+  def outgoing
+    assay_assets.outgoing.collect(&:asset)
+  end
+
   def avatar_key
     type = is_modelling? ? 'modelling' : 'experimental'
     "assay_#{type}_avatar"

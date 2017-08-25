@@ -508,4 +508,38 @@ class AssayTest < ActiveSupport::TestCase
     refute_includes assay.samples, sample3
     refute_includes assay.assets, sample3
   end
+
+  test 'incoming and outgoing' do
+    assay = Factory(:assay)
+    df_in1 = Factory(:data_file,title:'in1')
+    df_in2 = Factory(:data_file,title:'in2')
+    sample_in1 = Factory(:sample,title:'sample_in1')
+
+    df_out1 = Factory(:data_file,title:'out1')
+    df_out2 = Factory(:data_file,title: 'out2')
+    sample_out1 = Factory(:sample, title: 'sample_out1')
+
+    df_nodir1 = Factory(:data_file)
+    sample_nodir1 = Factory(:sample)
+
+    df = Factory(:data_file)
+    AssayAsset.create assay: assay, asset: df_in1, direction: AssayAsset::Direction::INCOMING
+    AssayAsset.create assay: assay, asset: df_in2, direction: AssayAsset::Direction::INCOMING
+    AssayAsset.create assay: assay, asset: sample_in1, direction: AssayAsset::Direction::INCOMING
+
+    AssayAsset.create assay: assay, asset: df_out1, direction: AssayAsset::Direction::OUTGOING
+    AssayAsset.create assay: assay, asset: df_out2, direction: AssayAsset::Direction::OUTGOING
+    AssayAsset.create assay: assay, asset: sample_out1, direction: AssayAsset::Direction::OUTGOING
+
+    AssayAsset.create assay: assay, asset: df_nodir1, direction: AssayAsset::Direction::NODIRECTION
+    AssayAsset.create assay: assay, asset: sample_nodir1, direction: AssayAsset::Direction::NODIRECTION
+
+    #sanity check
+    assert_equal 5,assay.data_files.count
+    assert_equal 3,assay.samples.count
+
+    assert_equal [df_in1,df_in2,sample_in1],assay.incoming.sort_by(&:title)
+    assert_equal [df_out1,df_out2,sample_out1],assay.outgoing.sort_by(&:title)
+
+  end
 end

@@ -9,6 +9,9 @@ class AssayAsset < ActiveRecord::Base
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :assay
 
+  scope :incoming, -> {where(direction:Direction::INCOMING)}
+  scope :outgoing, -> {where(direction:Direction::OUTGOING)}
+
   def check_version
     return unless asset.respond_to?(:latest_version)
     if version.nil? && !asset.nil? && (asset.class.name.end_with?('::Version') || (!asset.latest_version.nil? && asset.latest_version.class.name.end_with?('::Version')))
