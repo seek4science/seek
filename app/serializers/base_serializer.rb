@@ -2,8 +2,44 @@ class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
   include RelatedItemsHelper
 
-  has_many :associated, include_data:true do  #--> add this when everything is serialized.
-    associated_resources(object) # ||  { "data": [] }
+  has_many :assays, include_data:true do
+    @associated["Assay"][:items]
+  end
+  has_many :data_files, include_data:true do
+    @associated["DataFile"][:items]
+  end
+  has_many :events, include_data:true do
+    @associated["Event"][:items]
+  end
+  has_many :investigations, include_data:true do
+    @associated["Investigation"][:items]
+  end
+  has_many :institutions, include_data:true do
+    @associated["Institution"][:items]
+  end
+  has_many :models, include_data:true do
+    @associated["Model"][:items]
+  end
+  has_many :people, include_data:true  do
+    @associated["Person"][:items]
+  end
+  has_many :presentations, include_data:true do
+    @associated["Presentation"][:items]
+  end
+  has_many :projects, include_data:true do
+    @associated["Project"][:items]
+  end
+  has_many :publications, include_data:true do
+    @associated["Publication"][:items]
+  end
+  has_many :samples, include_data:true do
+    @associated["Sample"][:items]
+  end
+  has_many :sops, include_data:true do
+    @associated["Sop"][:items]
+  end
+  has_many :studies, include_data:true do
+    @associated["Study"][:items]
   end
 
   # def self_link
@@ -43,5 +79,10 @@ class BaseSerializer < SimpleBaseSerializer
         uuid: uuid || "",
         base_url: base_url
     }
+  end
+
+  def initialize(object, options = {})
+    super
+    @associated = associated_resources(object)
   end
 end
