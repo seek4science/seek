@@ -512,7 +512,11 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end
 
-  resources :content_blobs, :except => [:show, :index, :update, :create, :destroy] do
+  resources :content_blobs, :except => [:show,  :index, :update, :create, :destroy] do
+    member do
+      get :show, action: :download
+      #get :download
+    end
     collection do
       post :examine_url
     end

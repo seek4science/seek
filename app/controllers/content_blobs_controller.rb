@@ -89,6 +89,7 @@ class ContentBlobsController < ApplicationController
       respond_to do |format|
         format.html { handle_download(disposition, image_size) }
         format.pdf { get_pdf }
+        format.json { handle_download(disposition, image_size) }
       end
     end
   end
@@ -165,6 +166,8 @@ class ContentBlobsController < ApplicationController
           Presentation.find(params[:presentation_id])
         when params[:sample_type_id] then
           SampleType.find(params[:sample_type_id])
+        else
+          ContentBlob.find(params[:id]).asset
       end
     rescue ActiveRecord::RecordNotFound
       error("Unable to find the asset", "is invalid")
