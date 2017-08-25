@@ -17,11 +17,11 @@ class JermVocabularyTest < ActiveSupport::TestCase
   end
 
   test 'for type' do
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Seek::Rdf::JERMVocab.for_type(DataFile)
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Seek::Rdf::JERMVocab.for_type(Factory :data_file)
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Seek::Rdf::JERMVocab.for_type(Model)
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), Seek::Rdf::JERMVocab.for_type(Sop)
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Assay'), Seek::Rdf::JERMVocab.for_type(Assay)
-    assert_nil Seek::Rdf::JERMVocab.for_type ActionView
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Seek::Rdf::JERMVocab.for_type(Factory :model)
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), Seek::Rdf::JERMVocab.for_type(Factory :sop)
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Assay'), Seek::Rdf::JERMVocab.for_type(Factory :assay)
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#organism'), Seek::Rdf::JERMVocab.for_type(Factory :organism)
+    assert_nil Seek::Rdf::JERMVocab.for_type(Factory :presentation)
   end
 end

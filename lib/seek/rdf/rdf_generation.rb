@@ -56,6 +56,7 @@ module Seek
 
       def describe_type(rdf_graph)
         it_is = JERMVocab.for_type self
+        it_is = JERMVocab.Fish
         unless it_is.nil?
           resource = rdf_resource
           rdf_graph << [resource, RDF.type, it_is]
