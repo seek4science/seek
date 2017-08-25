@@ -49,21 +49,16 @@ class UsersController < ApplicationController
 
   def reset_password
     user = User.find_by_reset_password_code(params[:reset_code] || '')
-
     respond_to do |format|
       if user
         if user.reset_password_code_until && Time.now < user.reset_password_code_until
-          user.reset_password_code = nil
-          user.reset_password_code_until = nil
-          if user.save
-            self.current_user = user
-            if logged_in?
-              flash[:notice] = 'You can change your password here'
-              format.html { redirect_to(action: 'edit', id: user.id) }
-            else
-              flash[:error] = 'An unknown error has occurred. We are sorry for the inconvenience. You can request another password reset here.'
-              format.html { render action: 'forgot_password' }
-            end
+          self.current_user = user
+          if logged_in?
+            flash[:notice] = 'You can change your password here'
+            format.html { redirect_to(action: 'edit', id: user.id) }
+          else
+            flash[:error] = 'An unknown error has occurred. We are sorry for the inconvenience. You can request another password reset here.'
+            format.html { render action: 'forgot_password' }
           end
         else
           flash[:error] = 'Your password reset code has expired'
@@ -118,6 +113,8 @@ class UsersController < ApplicationController
 
     @user.attributes = user_params
 
+    @user.clear_reset_password_code if @user.reset_password_code
+
     respond_to do |format|
       if @user.save
         AuthLookupUpdateJob.new.add_items_to_queue(@user) if do_auth_update
@@ -166,7 +163,7 @@ class UsersController < ApplicationController
       self.current_user = user
       redirect_to root_path
     else
-      flash[:error] = "User not found"
+      flash[:error] = 'User not found'
       redirect_to admin_path
     end
   end
