@@ -13,15 +13,16 @@ class JermVocabularyTest < ActiveSupport::TestCase
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Seek::Rdf::JERMVocab.Data
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Seek::Rdf::JERMVocab.Model
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), Seek::Rdf::JERMVocab.SOP
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Assay'), Seek::Rdf::JERMVocab.Assay
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#experimental_assay'), Seek::Rdf::JERMVocab.experimental_assay
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#modelling_analysis'), Seek::Rdf::JERMVocab.modelling_analysis
   end
 
-  test 'for type' do
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Seek::Rdf::JERMVocab.for_type(Factory :data_file)
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Seek::Rdf::JERMVocab.for_type(Factory :model)
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), Seek::Rdf::JERMVocab.for_type(Factory :sop)
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Assay'), Seek::Rdf::JERMVocab.for_type(Factory :assay)
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#organism'), Seek::Rdf::JERMVocab.for_type(Factory :organism)
-    assert_nil Seek::Rdf::JERMVocab.for_type(Factory :presentation)
+  test 'rdf type uri' do
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Factory(:data_file).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Factory(:model).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), Factory(:sop).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#experimental_assay'), Factory(:experimental_assay).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#modelling_analysis'), Factory(:modelling_assay).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#organism'), Factory(:organism).rdf_type_uri
   end
 end

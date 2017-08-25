@@ -1,25 +1,23 @@
 module Seek
   module Rdf
     class JERMVocab < RDF::Vocabulary('http://jermontology.org/ontology/JERMOntology#')
-      property :Data
-      property :hasPart
-      property :isPartOf
+      # these are explicitly defined, to prevent the undercores being changed to camelCase
       property :External_supplier_ID
       property :NCBI_ID
+      property :experimental_assay
+      property :modelling_analysis
 
       # returns the correct Class IRI according to the instance 'type' - or nil if its not recognised
       def self.for_type(type)
-        defined_type = defined_types[type.class]
-        return nil unless defined_type
-        send(defined_type)
+        return nil unless type.respond_to?(:rdf_class_entity)
+        send(type.rdf_class_entity)
       end
 
-      # private - predefined list of types and their JERM ontology class
+      # predefined list of types and their JERM ontology class
       def self.defined_types
         { DataFile => :Data,
           Model => :Model,
           Sop => :SOP,
-          Assay => :Assay,
           Person => :Person,
           Organism => :organism,
           Project => :Project,
@@ -30,8 +28,6 @@ module Seek
           Strain => :strain,
           Compound => :compound }
       end
-
-      private_class_method :defined_types
     end
   end
 end

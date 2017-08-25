@@ -162,4 +162,9 @@ class Assay < ActiveRecord::Base
     end
     assay_organism.tissue_and_cell_type = tissue_and_cell_type
   end
+
+  # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay
+  def rdf_type_entity_fragment
+    { 'EXP' => 'experimental_assay', 'MODEL' => 'modelling_analysis' }[assay_class.key]
+  end
 end
