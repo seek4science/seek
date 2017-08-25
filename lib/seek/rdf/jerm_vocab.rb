@@ -6,6 +6,7 @@ module Seek
       property :NCBI_ID
       property :experimental_assay
       property :modelling_analysis
+      property :SEEK_ID
 
       # returns the correct Class IRI according to the instance 'type' - or nil if its not recognised
       def self.for_type(type)

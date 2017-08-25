@@ -62,6 +62,12 @@ module Seek
         rdf_graph
       end
 
+      # this is what is needed for the SEEK_ID term from JERM. It is essentially the same as the resource, but this method
+      # make the mappings clearer
+      def rdf_seek_id
+        rdf_resource.to_s
+      end
+
       # the URI for the type of this object, for example http://jermontology.org/ontology/JERMOntology#Study for a Study
       def rdf_type_uri
         JERMVocab[rdf_type_entity_fragment]

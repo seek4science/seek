@@ -11,6 +11,7 @@ class,method,property,uri or literal,transformation,collection transformation
 *,managers,RDF::SIOC.has_owner,u,,
 *,updated_at,RDF::DC.modified,l,item.to_datetime,
 *,latest_version,RDF::DC.hasVersion,u,,
+*,rdf_seek_id,JERMVocab.SEEK_ID,l,URI.parse(item),
 Assay,organisms,JERMVocab.investigates,u,,
 Assay,projects,JERMVocab.itemProducedBy,u,,
 Assay,strains,JERMVocab.investigates,u,,
