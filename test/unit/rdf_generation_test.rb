@@ -159,4 +159,14 @@ class RDFGenerationTest < ActiveSupport::TestCase
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
     end
   end
+
+  test 'rdf type uri' do
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Factory(:data_file).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Factory(:model).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), Factory(:sop).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#experimental_assay'), Factory(:experimental_assay).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#modelling_analysis'), Factory(:modelling_assay).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#organism'), Factory(:organism).rdf_type_uri
+  end
+  
 end
