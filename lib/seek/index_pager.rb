@@ -21,7 +21,7 @@ module Seek
       respond_to do |format|
         format.html
         format.xml
-        format.json {render json: objects}
+        format.json {render json: objects, each_serializer: ActiveModel::Serializer}
       end
     end
 
