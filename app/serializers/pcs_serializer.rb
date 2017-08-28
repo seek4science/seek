@@ -6,4 +6,5 @@ class PCSSerializer < BaseSerializer
   attribute :tags do
     serialize_annotations(object)
   end
+
 end

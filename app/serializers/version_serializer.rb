@@ -23,15 +23,19 @@ class VersionSerializer < ContributedResourceSerializer
 end
 
 class DataFile::VersionSerializer < VersionSerializer
+  BaseSerializer.rels(DataFile::Version, DataFile::VersionSerializer)
 end
 
 class Sop::VersionSerializer < VersionSerializer
+  BaseSerializer.rels(Sop::Version, Sop::VersionSerializer)
 end
 
 class Presentation::VersionSerializer < VersionSerializer
+  BaseSerializer.rels(Presentation::Version, Presentation::VersionSerializer)
 end
 
 class Model::VersionSerializer < VersionSerializer
+  BaseSerializer.rels(Model::Version, Model::VersionSerializer)
 end
 
 # class VersionSerializer < BaseSerializer

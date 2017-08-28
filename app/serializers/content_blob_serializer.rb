@@ -4,4 +4,5 @@ class ContentBlobSerializer < BaseSerializer
     object.file_exists?
   end
 
+   BaseSerializer.rels(ContentBlob,ContentBlobSerializer)
 end

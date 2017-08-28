@@ -3,4 +3,5 @@ class EventSerializer < BaseSerializer
              :address, :city, :country,
              :start_date, :end_date
 
+  BaseSerializer.rels(Event, EventSerializer)
 end

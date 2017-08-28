@@ -5,4 +5,5 @@ class SampleAttributeSerializer < BaseSerializer
              :sample_controlled_vocab, :sample_controlled_vocab_id, :linked_sample_type_id,
              :required, :is_title, :template_column_index
 
+  BaseSerializer.rels(SampleAttribute, SampleAttributeSerializer)
 end

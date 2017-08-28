@@ -4,4 +4,6 @@ class ProgrammeSerializer < AvatarObjSerializer
   attribute :tags do
     serialize_annotations(object, context='funding_code')
   end
+
+  BaseSerializer.rels(Programme, ProgrammeSerializer)
 end

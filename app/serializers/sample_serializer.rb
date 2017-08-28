@@ -6,4 +6,5 @@ class SampleSerializer < BaseSerializer
   has_many :sample_resource_links, include_data:true
   has_many :strains, include_data:true
   has_many :organisms, include_data:true
+  BaseSerializer.rels(Sample, SampleSerializer)
 end
