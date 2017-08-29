@@ -542,4 +542,12 @@ class AssayTest < ActiveSupport::TestCase
     assert_equal [df_out1,df_out2,sample_out1],assay.outgoing.sort_by(&:title)
 
   end
+
+  test 'validation data files' do
+    assay = Factory(:assay)
+    df_1 = Factory(:data_file,title:'validation')
+    df_2 = Factory(:data_file,title:'not validation')
+    AssayAsset.create assay: assay, asset: df_1, relationship: nil
+    AssayAsset.create assay: assay, asset: df_2
+  end
 end

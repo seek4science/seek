@@ -16,6 +16,7 @@ namespace :seek do
     update_ontology_settings_for_jerm
     update_assay_and_tech_types
     resynchronise_ontology_types
+    update_relationship_types
 
   ]
 
@@ -90,4 +91,7 @@ namespace :seek do
       end
     end
   end
+
+  task(update_relationship_types: [:environment, 'db:seed:relationship_types']) do; end
+
 end
