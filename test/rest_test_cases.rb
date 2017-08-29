@@ -20,6 +20,28 @@ module RestTestCases
     perform_api_checks
   end
 
+  def test_displays_correct_counts_in_index
+    # to make sure something in the database is created
+    object = rest_api_test_object
+
+    get :index, format: 'xml'
+
+    xml = @response.body
+    doc = LibXML::XML::Document.string(xml)
+
+    total = doc.find('//seek:statistics/seek:total', ['seek:http://www.sysmo-db.org/2010/xml/rest']).first.content.to_i
+    assert_equal object.class.count, total
+
+    if object.class.respond_to?(:all_authorized_for)
+      actual_hidden = object.class.count - object.class.all_authorized_for('view', User.current_user).count
+    else
+      actual_hidden = object.class.count - (object.class.respond_to?(:default_order) ? object.class.default_order : object.class.all).count
+    end
+
+    hidden = doc.find('//seek:statistics/seek:hidden', ['seek:http://www.sysmo-db.org/2010/xml/rest']).first.content.to_i
+    assert_equal actual_hidden, hidden
+  end
+
   def test_get_rest_api_xml(object = rest_api_test_object)
     clz = @controller.controller_name.classify.constantize.to_s
     if (clz == 'SampleType' || clz == 'Sample')

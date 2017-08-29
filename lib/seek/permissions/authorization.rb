@@ -18,10 +18,9 @@ module Seek
       def self.is_authorized?(action, thing, user = nil)
         authorized_as_creator?(action, thing, user) ||
           authorized_by_policy?(action, thing, user) ||
-          authorized_by_permission?(action, thing, user)
+          authorized_by_permission?(action, thing, user) ||
+          authorized_by_role?(action, thing, user)
       end
-
-      private
 
       def self.authorized_as_creator?(action, thing, user = nil)
         if user
@@ -72,17 +71,33 @@ module Seek
         end
       end
 
+      def self.authorized_by_role?(action, thing, user = nil)
+        return false if user.nil? || user.person.nil?
+
+        if user.person.is_asset_housekeeper_of?(thing) && thing.asset_housekeeper_can_manage?
+          access_type = Policy::MANAGING
+        elsif user.person.is_asset_gatekeeper_of?(thing) && thing.asset_gatekeeper_can_publish?
+          access_type = Policy::PUBLISHING
+        else
+          return false
+        end
+
+        access_type_allows_action?(action, access_type)
+      end
+
       # checks if the "access_type" permits an action of a certain type (based on cascading permissions)
       def self.access_type_allows_action?(action, access_type)
         case action
         when 'view'
-          access_type >= Policy::VISIBLE
+          access_type >= Policy::VISIBLE && access_type <= Policy::MANAGING
         when 'download'
-          access_type >= Policy::ACCESSIBLE
+          access_type >= Policy::ACCESSIBLE && access_type <= Policy::MANAGING
         when 'edit'
-          access_type >= Policy::EDITING
+          access_type >= Policy::EDITING && access_type <= Policy::MANAGING
         when 'delete', 'manage'
-          return access_type >= Policy::MANAGING
+          access_type == Policy::MANAGING
+        when 'publish'
+          access_type == Policy::PUBLISHING || access_type == Policy::MANAGING
         else
           false
         end
