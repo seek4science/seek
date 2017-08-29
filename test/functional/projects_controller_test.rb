@@ -1029,8 +1029,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, id: proj, format: 'json'
     assert_response :success
     json = JSON.parse(@response.body)
-    assert_equal 'fishing project', json['title']
-    assert_equal 'investigating fishing', json['description']
+    assert_equal 'fishing project', json['data']['attributes']['title']
+    assert_equal 'investigating fishing', json['data']['attributes']['description']
   end
 
   test 'admin members available to admin' do

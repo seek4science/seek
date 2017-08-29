@@ -1,3 +1,4 @@
+# coding: utf-8
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
@@ -26,6 +27,10 @@ class ApplicationController < ActionController::Base
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
+  #before_filter :process_params, :only=>[:edit, :update, :destroy, :create, :new]
+
+  # after_filter :unescape_response
+
   helper :all
 
   layout Seek::Config.main_layout
@@ -61,6 +66,20 @@ class ApplicationController < ActionController::Base
 
   def base_host
     request.host_with_port
+  end
+
+  def api_version
+    @default = 1
+    version_re_arr = [/version=(?<v>.+?)/, /api.v(?<v>\d+?)\+json/]
+    version_re_arr.each do |re|
+      v_match = request.headers['Accept'].match(re)
+      if (v_match  != nil)
+        @version = v_match[:v]
+        break
+      end
+    end
+    @version ||= @default
+    puts "api version: ", @version
   end
 
   def is_current_user_auth
@@ -163,7 +182,11 @@ class ApplicationController < ActionController::Base
             redirect_to path
           end
         end
-        format.json { render json: { status: 401, error_message: flash[:error] } }
+        format.json {
+          errors = [{"title": "Unauthorized", "status": "401", "detail": flash[:error].to_s}]
+          render json: JSONAPI::Serializer.serialize_errors(errors), status: 401
+         # render json: { status: 401, error_message: flash[:error] }
+        }
       end
     end
   end
@@ -219,7 +242,10 @@ class ApplicationController < ActionController::Base
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render text: 'Not found', status: :not_found }
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-        format.json { render text: 'Not found', status: :not_found }
+        format.json {
+          errors = [{"title": "Not found", "status": "404"}]
+          render json: JSONAPI::Serializer.serialize_errors(errors), status: :not_found
+        }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
     else
@@ -256,7 +282,10 @@ class ApplicationController < ActionController::Base
         end
         format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
-        format.json { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.json {
+          errors = [{"title": "Forbidden", "status": "403", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}]
+          render json: JSONAPI::Serializer.serialize_errors(errors), status: :forbidden
+        }
       end
       return false
     end
@@ -279,7 +308,10 @@ class ApplicationController < ActionController::Base
 
       format.rdf { render text: 'Not found', status: :not_found }
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-      format.json { render text: 'Not found', status: :not_found }
+      format.json {
+        errors = [{"title": "Not found", "status": "404"}]
+        render json: JSONAPI::Serializer.serialize_errors(errors), status: :not_found
+      }
     end
     false
   end
@@ -500,6 +532,66 @@ class ApplicationController < ActionController::Base
   def redirect_to_sign_up_when_no_user
     redirect_to signup_path if User.count == 0
   end
+
+  #process JSONAPI params into params itself, so it can be used normally with create, update, etc.
+  def process_params()
+
+    resource = controller_name.singularize
+
+    #check for JSONAPI
+    if params.key?("data")
+      params[resource] = params[:data][:attributes]
+
+      #initialize
+      params[:relationships].each do |r,info|
+        params[resource][r.to_s+"_ids"] = []
+      end
+
+      #fill up related resource ids in params[resource][related_ids] from the meta section in relationships
+      #This makes sense when a user creates his own file to upload, and does not know IDs of resources, plus
+      #creating associated branches within data in JSONAPI format is adding too much complexity and user-unfriendly standards.
+      params[:relationships].each do |r,info|
+        related_entity = r.capitalize.constantize.where(info[:meta]).first
+        params[resource][r.to_s+"_ids"] << related_entity.id if related_entity
+        puts "related entity: ", related_entity
+      end
+
+      # #2nd way: fill up from associated resources (e.g. from an exported json)
+      # # TO DO: decide if this is the final input/output format
+      # # problem : not everything should exist for every resource, e.g associated people are creators of an investigation, but not a project
+      # begin
+      #   params[:data][:relationships][:associated][:data].each do |assoc_data|
+      #     puts "associated ====> ", assoc_data
+      #     key = assoc_data[:type].singularize + "_ids"
+      #     params[resource][key] = [] if (params[resource][key] == nil)
+      #     params[resource][key] << assoc_data[:id].to_i
+      #   end
+      #
+      # rescue NoMethodError
+      #   puts "no associated stuff"
+      # end
+
+
+      #Creators
+      creators_arr = []
+      params[resource][:creators].each do |cr|
+        the_person = Person.where(email: cr).first
+        creators_arr << the_person if the_person
+      end
+      params[resource][:creators] = creators_arr
+    end
+  end
+
+  # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
+  # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
+  # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
+  # by steffen.brinkmann@h-its.org
+  # 2017-04-18
+#  def unescape_response()
+#    response_body[0].gsub!(/\\u([0-9a-z]{4})/) { |s|
+#      [$1.to_i(16)].pack("U")
+#    }
+#  end
 
   def policy_params
     params.slice(:policy_attributes).permit(

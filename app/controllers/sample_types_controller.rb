@@ -13,10 +13,14 @@ class SampleTypesController < ApplicationController
   # these checks are mostly coverered by the #check_no_created_samples filter, but will give an additional check based on can_xxx? methods
   before_filter :find_and_authorize_requested_item, except: [:index, :new, :create]
 
-  # GET /sample_types/1
+  # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json
   def show
-    respond_with(@sample_type)
+    options = {:is_collection=>false}
+    respond_to do |format|
+      format.html
+      format.json {render json: JSONAPI::Serializer.serialize(@sample_type,options)}
+    end
   end
 
   # GET /sample_types/new

@@ -68,20 +68,24 @@ class PeopleController < ApplicationController
                                               latest_limit: Seek::Config.limit_latest)
       end
     end
-
+    options = {:is_collection=>true}
     respond_to do |format|
       format.html # index.html.erb
       format.xml
+      format.json  { render json: JSONAPI::Serializer.serialize(@people, options) }
     end
   end
 
   # GET /people/1
   # GET /people/1.xml
   def show
+    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
+      format.json {render json: JSONAPI::Serializer.serialize(@person,options)}
+      #format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@person).target!) }
     end
   end
 

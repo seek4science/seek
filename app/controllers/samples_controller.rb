@@ -13,8 +13,13 @@ class SamplesController < ApplicationController
   include Seek::IsaGraphExtensions
 
   def index
+    options = {:is_collection=>true}
     if @data_file || @sample_type
-      respond_with(@samples)
+      respond_to do |format|
+        format.html
+        format.json {render json: JSONAPI::Serializer.serialize(@samples,options)}
+      end
+      #respond_with(@samples)
     else
       super
     end
@@ -37,8 +42,12 @@ class SamplesController < ApplicationController
   end
 
   def show
+    options = {:is_collection=>false}
     @sample = Sample.find(params[:id])
-    respond_with(@sample)
+    respond_to do |format|
+      format.html
+      format.json {render json: JSONAPI::Serializer.serialize(@sample,options)}
+    end
   end
 
   def edit
