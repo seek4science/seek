@@ -46,4 +46,9 @@ SEEK::Application.configure do
 
   # Raises error for missing translations
   config.action_view.raise_on_missing_translations = true
+
+  #config.log_level = :warn
+  #disable SQL logs from active record
+  ActiveRecord::Base.logger = Logger.new(STDOUT)
+  ActiveRecord::Base.logger.level = 1
 end
