@@ -1359,3 +1359,21 @@ Factory.define(:openbis_endpoint) do |f|
   f.space_perm_id 'API-SPACE'
   f.association :project, factory: :project
 end
+
+Factory.define(:validation_data_relationship_type, class:RelationshipType) do |f|
+  f.title 'Validation data'
+  f.key 'VALIDATION'
+  f.description 'Data used for validating a model'
+end
+
+Factory.define(:simulation_data_relationship_type, class:RelationshipType) do |f|
+  f.title 'Simulation results'
+  f.key 'SIMULATION'
+  f.description 'Data resulting from running a model simulation'
+end
+
+Factory.define(:construction_data_relationship_type, class:RelationshipType) do |f|
+  f.title 'Construction data'
+  f.key 'CONSTRUCTION'
+  f.description 'Data used for model testing'
+end

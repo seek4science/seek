@@ -121,6 +121,18 @@ class Assay < ActiveRecord::Base
     assay_assets.outgoing.collect(&:asset)
   end
 
+  def validation_assets
+    assay_assets.validation.collect(&:asset)
+  end
+
+  def construction_assets
+    assay_assets.construction.collect(&:asset)
+  end
+
+  def simulation_assets
+    assay_assets.simulation.collect(&:asset)
+  end
+
   def avatar_key
     type = is_modelling? ? 'modelling' : 'experimental'
     "assay_#{type}_avatar"

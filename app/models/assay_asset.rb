@@ -12,6 +12,10 @@ class AssayAsset < ActiveRecord::Base
   scope :incoming, -> {where(direction:Direction::INCOMING)}
   scope :outgoing, -> {where(direction:Direction::OUTGOING)}
 
+  scope :validation, ->{joins(:relationship_type).where('relationship_types.key = ?','VALIDATION')}
+  scope :simulation, ->{joins(:relationship_type).where('relationship_types.key = ?','SIMULATION')}
+  scope :construction, ->{joins(:relationship_type).where('relationship_types.key = ?','CONSTRUCTION')}
+
   def check_version
     return unless asset.respond_to?(:latest_version)
     if version.nil? && !asset.nil? && (asset.class.name.end_with?('::Version') || (!asset.latest_version.nil? && asset.latest_version.class.name.end_with?('::Version')))

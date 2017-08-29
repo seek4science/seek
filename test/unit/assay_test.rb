@@ -543,11 +543,42 @@ class AssayTest < ActiveSupport::TestCase
 
   end
 
-  test 'validation data files' do
+  test 'validation assets' do
     assay = Factory(:assay)
     df_1 = Factory(:data_file,title:'validation')
     df_2 = Factory(:data_file,title:'not validation')
-    AssayAsset.create assay: assay, asset: df_1, relationship: nil
+
+    validation_type= RelationshipType.where(key:'VALIDATION').first || Factory(:validation_data_relationship_type)
+    AssayAsset.create assay: assay, asset: df_1, relationship_type: validation_type
     AssayAsset.create assay: assay, asset: df_2
+
+    assert_equal 2,assay.data_files.count
+    assert_equal [df_1],assay.validation_assets
+  end
+
+  test 'simulation assets' do
+    assay = Factory(:assay)
+    df_1 = Factory(:data_file,title:'simulation')
+    df_2 = Factory(:data_file,title:'not simulation')
+
+    validation_type= RelationshipType.where(key:'SIMULATION').first || Factory(:simulation_data_relationship_type)
+    AssayAsset.create assay: assay, asset: df_1, relationship_type: validation_type
+    AssayAsset.create assay: assay, asset: df_2
+
+    assert_equal 2,assay.data_files.count
+    assert_equal [df_1],assay.simulation_assets
+  end
+
+  test 'construction assets' do
+    assay = Factory(:assay)
+    df_1 = Factory(:data_file,title:'construction')
+    df_2 = Factory(:data_file,title:'not construction')
+
+    validation_type= RelationshipType.where(key:'CONSTRUCTION').first || Factory(:construction_data_relationship_type)
+    AssayAsset.create assay: assay, asset: df_1, relationship_type: validation_type
+    AssayAsset.create assay: assay, asset: df_2
+
+    assert_equal 2,assay.data_files.count
+    assert_equal [df_1],assay.construction_assets
   end
 end
