@@ -15,15 +15,17 @@ module Seek
       # store timestamp of the previous last usage
       @last_used_before_now = asset.last_used_at
 
+      options = {:is_collection=>false}
       # update timestamp in the current record
       # (this will also trigger timestamp update in the corresponding Asset)
       asset.just_used
-
+      asset_version = find_display_asset asset
       respond_to do |format|
         format.html
         format.xml
         format.rdf { render template: 'rdf/show' }
-        format.json
+
+        format.json {render json: JSONAPI::Serializer.serialize(asset_version,options)}
       end
     end
 

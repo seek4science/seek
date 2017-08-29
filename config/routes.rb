@@ -513,6 +513,9 @@ SEEK::Application.routes.draw do
   end
 
   resources :content_blobs, :except => [:show, :index, :update, :create, :destroy] do
+    member do
+      get :show, action: :download
+    end
     collection do
       post :examine_url
     end

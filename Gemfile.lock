@@ -347,6 +347,8 @@ GEM
     jbuilder (2.6.3)
       activesupport (>= 3.0.0, < 5.2)
       multi_json (~> 1.2)
+    jbuilder-json_api (1.0.0)
+      jbuilder (~> 2)
     jquery-rails (3.1.4)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
@@ -357,6 +359,10 @@ GEM
     json-ld (1.1.11.1)
       multi_json (~> 1.11)
       rdf (~> 1.1, >= 1.1.17, < 1.99)
+    json-schema (2.8.0)
+      addressable (>= 2.4)
+    jsonapi-serializers (1.0.0)
+      activesupport
     kgio (2.11.0)
     latex-decode (0.2.2)
       unicode (~> 0.4)
@@ -875,8 +881,11 @@ DEPENDENCIES
   handlebars_assets
   hpricot (~> 0.8.2)
   jbuilder (~> 2.0)
+  jbuilder-json_api
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
+  json-schema
+  jsonapi-serializers
   libxml-ruby (~> 2.8.0)
   linkeddata
   lograge

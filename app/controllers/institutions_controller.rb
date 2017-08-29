@@ -18,10 +18,14 @@ class InstitutionsController < ApplicationController
   # GET /institutions/1
   # GET /institutions/1.xml
   def show
+    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
+      # format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
+      #format.json { render json: @institution } #normal json
+      format.json {render json: JSONAPI::Serializer.serialize(@institution,options)}
     end
   end
 
@@ -29,7 +33,6 @@ class InstitutionsController < ApplicationController
   # GET /institutions/new.xml
   def new
     @institution = Institution.new
-
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render xml: @institution }
@@ -56,8 +59,13 @@ class InstitutionsController < ApplicationController
   # POST /institutions
   # POST /institutions.xml
   def create
-    @institution = Institution.new(institution_params)
 
+    # convert params as recieved by json-api to (flat) rails json
+    # if params.key?("data")
+    #   params_new = params[:data][:attributes]
+    #   params[:institution] = params_new
+    # end
+    @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
         flash[:notice] = 'Institution was successfully created.'
@@ -90,14 +98,14 @@ class InstitutionsController < ApplicationController
   def request_all
     # listing all institutions is public data, but still
     # we require login to protect from unwanted requests
-
+    options = {:is_collection=>true}
     institution_id = white_list(params[:id])
     institution_list = Institution.get_all_institutions_listing
-
     respond_to do |format|
-      format.json do
-        render json: { status: 200, institution_list: institution_list }
-      end
+       format.json do
+         render json: JSONAPI::Serializer.serialize(institution_list, options)
+         #render json: { status: 200, institution_list: institution_list }
+       end
     end
   end
 

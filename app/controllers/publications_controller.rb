@@ -37,11 +37,13 @@ class PublicationsController < ApplicationController
   # GET /publications/1
   # GET /publications/1.xml
   def show
+    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.xml
       format.rdf { render template: 'rdf/show' }
-      format.any(*Publication::EXPORT_TYPES.keys) { send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}" }
+      format.json {render json: JSONAPI::Serializer.serialize(@publication,options)}
+      format.any( *Publication::EXPORT_TYPES.keys ) { send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}" }
     end
   end
 

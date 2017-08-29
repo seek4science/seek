@@ -52,10 +52,13 @@ class StrainsController < ApplicationController
   end
 
   def show
+    options = {:is_collection=>false}
     respond_to do |format|
       format.rdf { render template: 'rdf/show' }
       format.xml
       format.html
+      format.json {render json: JSONAPI::Serializer.serialize(@strain,options)}
+
     end
   end
 

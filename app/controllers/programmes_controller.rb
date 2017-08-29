@@ -78,9 +78,10 @@ class ProgrammesController < ApplicationController
   end
 
   def show
-    respond_to do |format|
-      format.html # show.html.erb
-      format.rdf { render template: 'rdf/show' }
+    respond_with do |format|
+      format.html
+      format.json {render json: JSONAPI::Serializer.serialize(@programme,{:is_collection=>false})}
+      format.rdf { render template: 'rdf/show' }	
     end
   end
 

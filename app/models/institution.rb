@@ -46,4 +46,20 @@ class Institution < ActiveRecord::Base
     User.admin_or_project_administrator_logged_in? ||
       User.activated_programme_administrator_logged_in?
   end
+
+  def json_api_attrs (options = {})
+    attrs = []
+    attrs += %w(title id country city address web_page) # if %i(user admin).include?options[:access_level]
+#    attrs += %w(real_price in_stock) if options[:access_level] == :admin
+    attrs
+  end
+
+  # TO DO: is it redundant to have people and projects here?
+  #def json_api_relations (options = {})
+  #  %w(projects people avatar programmes)
+  #end
+
+  def json_api_meta (options = {})
+    { uuid: self.uuid, created: self.created_at, modified: self.updated_at }
+  end
 end

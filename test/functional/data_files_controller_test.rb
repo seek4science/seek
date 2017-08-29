@@ -1745,10 +1745,10 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show, id: df, format: 'json'
     assert_response :success
     json = JSON.parse(response.body)
-    assert_equal df.id, json['id']
-    assert_equal 'fish flop', json['title']
-    assert_equal 'testing json description', json['description']
-    assert_equal df.version, json['version']
+    assert_equal df.id, json['data']['id'].to_i
+    assert_equal 'fish flop', json['data']['attributes']['title']
+    assert_equal 'testing json description', json['data']['attributes']['description']
+    assert_equal df.version, json['data']['attributes']['version']
   end
 
   test 'landing page for hidden item' do

@@ -3,8 +3,10 @@
 # Copyright (c) 2008-2009, University of Manchester, The European Bioinformatics
 # Institute (EMBL-EBI) and the University of Southampton.
 # See license.txt for details.
-
+require 'jbuilder'
+require 'jbuilder/json_api/version'
 module ApiHelper
+  #Jbuilder.include JsonAPI
   def xml_root_attributes
     { 'xmlns' => 'http://www.sysmo-db.org/2010/xml/rest',
       'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
@@ -60,6 +62,12 @@ module ApiHelper
     xlink['uuid'] = object.uuid if object.respond_to?('uuid')
     xlink['resourceType'] = object.class.name.include?('::Version') ? object.parent.class.name : object.class.name
     xlink
+  end
+
+  def avatar_href_link(object)
+    uri = nil
+    uri = "/#{object.class.name.pluralize.underscore}/#{object.id}/avatars/#{object.avatar.id}" unless object.avatar.nil?
+    uri
   end
 
   # requires a slightly different handling to core_xlink because the route is nested
@@ -270,6 +278,22 @@ module ApiHelper
         asset_xml builder, asset, include_core, include_resource
       end
     end
+  end
+
+  def associated_resources(object)
+    associated_arr = []
+    associated_hash = get_related_resources(object)
+    to_ignore = ignore_associated_types.collect(&:name)
+    associated_hash.delete_if { |k, _v| to_ignore.include?(k) }
+    associated_hash.each_value do |value|
+      if (value[:items] != [])
+        #puts "a value: ", value[:items]
+        associated_arr += value[:items]
+#        builder.api_format! value[:items]   #if we used a jbuilder
+
+      end
+    end
+    associated_arr
   end
 
   def associated_resources_xml(builder, object)
