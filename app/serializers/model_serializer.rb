@@ -3,7 +3,5 @@ class ModelSerializer < ContributedResourceSerializer
   attribute :environment do
     object.recommended_environment
   end
-
-  BaseSerializer.rels(Model, ModelSerializer)
 end
 

@@ -281,10 +281,19 @@ module ApiHelper
   end
 
   def associated_resources(object)
+    associated_arr = []
     associated_hash = get_related_resources(object)
     to_ignore = ignore_associated_types.collect(&:name)
     associated_hash.delete_if { |k, _v| to_ignore.include?(k) }
-    associated_hash
+    associated_hash.each_value do |value|
+      if (value[:items] != [])
+        #puts "a value: ", value[:items]
+        associated_arr += value[:items]
+#        builder.api_format! value[:items]   #if we used a jbuilder
+
+      end
+    end
+    associated_arr
   end
 
   def associated_resources_xml(builder, object)

@@ -14,5 +14,4 @@ class PersonSerializer < AvatarObjSerializer
   end
   has_many :work_groups, include_data:true
 
-  BaseSerializer.rels(Person, PersonSerializer)
 end

@@ -18,6 +18,4 @@ class AssaySerializer < PCSSerializer
 
   has_many :organisms, include_data:true
   has_many :assay_organisms, include_data:true
-
-  BaseSerializer.rels(Assay, AssaySerializer)
 end

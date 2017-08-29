@@ -13,5 +13,4 @@ class PublicationSerializer < BaseSerializer
     end
   end
   has_many :publication_authors, include_data:true
-  BaseSerializer.rels(Publication, PublicationSerializer)
 end
