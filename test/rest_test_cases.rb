@@ -21,6 +21,11 @@ module RestTestCases
   end
 
   def test_displays_correct_counts_in_index
+    clz = @controller.controller_name.classify.constantize.to_s
+    if (clz == 'SampleType' || clz == 'Sample')
+      skip('skipping XML tests for Sample and SampleType')
+    end
+
     # to make sure something in the database is created
     object = rest_api_test_object
 
