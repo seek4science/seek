@@ -1362,18 +1362,18 @@ end
 
 Factory.define(:validation_data_relationship_type, class:RelationshipType) do |f|
   f.title 'Validation data'
-  f.key 'VALIDATION'
+  f.key RelationshipType::VALIDATION
   f.description 'Data used for validating a model'
 end
 
 Factory.define(:simulation_data_relationship_type, class:RelationshipType) do |f|
   f.title 'Simulation results'
-  f.key 'SIMULATION'
+  f.key RelationshipType::SIMULATION
   f.description 'Data resulting from running a model simulation'
 end
 
 Factory.define(:construction_data_relationship_type, class:RelationshipType) do |f|
   f.title 'Construction data'
-  f.key 'CONSTRUCTION'
+  f.key RelationshipType::CONSTRUCTION
   f.description 'Data used for model testing'
 end

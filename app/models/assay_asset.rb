@@ -9,12 +9,12 @@ class AssayAsset < ActiveRecord::Base
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :assay
 
-  scope :incoming, -> {where(direction:Direction::INCOMING)}
-  scope :outgoing, -> {where(direction:Direction::OUTGOING)}
+  scope :incoming, -> { where(direction: Direction::INCOMING) }
+  scope :outgoing, -> { where(direction: Direction::OUTGOING) }
 
-  scope :validation, ->{joins(:relationship_type).where('relationship_types.key = ?','VALIDATION')}
-  scope :simulation, ->{joins(:relationship_type).where('relationship_types.key = ?','SIMULATION')}
-  scope :construction, ->{joins(:relationship_type).where('relationship_types.key = ?','CONSTRUCTION')}
+  scope :validation, -> { joins(:relationship_type).where('relationship_types.key = ?', RelationshipType::VALIDATION) }
+  scope :simulation, -> { joins(:relationship_type).where('relationship_types.key = ?', RelationshipType::SIMULATION) }
+  scope :construction, -> { joins(:relationship_type).where('relationship_types.key = ?', RelationshipType::CONSTRUCTION) }
 
   def check_version
     return unless asset.respond_to?(:latest_version)
