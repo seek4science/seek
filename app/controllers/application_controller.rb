@@ -192,7 +192,7 @@ class ApplicationController < ActionController::Base
             redirect_to path
           end
         end
-        format.json { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized, status: :unauthorized}
+        format.json { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
       end
     end
   end
@@ -286,8 +286,7 @@ class ApplicationController < ActionController::Base
         format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.json {
-          errors = [{"title": "Forbidden", "status": "403", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}]
-          render json: JSONAPI::Serializer.serialize_errors(errors), status: :forbidden
+          render json: {"title": "Forbidden", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}, status: :forbidden
         }
       end
       return false
@@ -604,8 +603,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-=======
->>>>>>> a762580... Added before filter to process JSON
   # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
   # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
   # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
