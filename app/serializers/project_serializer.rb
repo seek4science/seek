@@ -1,6 +1,6 @@
 class ProjectSerializer < AvatarObjSerializer
 #class ProjectSerializer < ActiveModel::Serializer
   attributes :title, :description,
-             :webpage, :internal_webpage
+             :web_page, :wiki_page
   has_many :organisms,  include_data:true
 end
