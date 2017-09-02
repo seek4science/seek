@@ -72,7 +72,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml
-      format.json  { render json: @people }
+      format.json  { render json: @people, each_serializer: ActiveModel::Serializer }
     end
   end
 
@@ -85,7 +85,6 @@ class PeopleController < ApplicationController
       format.rdf { render template: 'rdf/show' }
       format.xml
       format.json {render json: @person}
-      #format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@person).target!) }
     end
   end
 
@@ -178,15 +177,18 @@ class PeopleController < ApplicationController
             format.html { redirect_to(@person) }
           end
           format.xml { render xml: @person, status: :created, location: @person }
+          format.json {render json: @person, status: :created, location: @person }
         else
           Mailer.signup(current_user).deliver_now
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
+          format.json { render json: @person, status: :created} # There must be more to be done
         end
       else
         format.html { render redirect_action }
         format.xml { render xml: @person.errors, status: :unprocessable_entity }
+        format.json { render json: @person.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -220,9 +222,11 @@ class PeopleController < ApplicationController
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
+        format.json {render json: @person}
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @person.errors, status: :unprocessable_entity }
+        format.json { render json: @person.errors, status: :unprocessable_entity }
       end
     end
   end
