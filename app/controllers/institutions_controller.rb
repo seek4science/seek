@@ -71,9 +71,11 @@ class InstitutionsController < ApplicationController
         flash[:notice] = 'Institution was successfully created.'
         format.html { redirect_to(@institution) }
         format.xml  { render xml: @institution, status: :created, location: @institution }
+        format.json {render json: @institution, status: :created, location: @institution}
       else
         format.html { render action: 'new' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
+        format.json  { render json: @institution.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -87,9 +89,11 @@ class InstitutionsController < ApplicationController
         flash[:notice] = 'Institution was successfully updated.'
         format.html { redirect_to(@institution) }
         format.xml  { head :ok }
+        format.json {render json: @institution}
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
+        format.json { render json: @institution.errors, status: :unprocessable_entity}
       end
     end
   end
