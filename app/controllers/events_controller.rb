@@ -69,8 +69,15 @@ class EventsController < ApplicationController
       if @event.save
         flash.now[:notice] = "#{t('event')} was updated successfully." if flash.now[:notice].nil?
         format.html { redirect_to @event }
+        format.json { if @new
+                        render json: @event, status: :created, location: @event
+                      else
+                        render json: @event
+                      end
+        }
       else
         format.html { render 'events/form' }
+        format.json { render json: @event.errors, status: :unprocessable_entity}
       end
     end
   end
