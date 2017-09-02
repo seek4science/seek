@@ -625,7 +625,7 @@ class ApplicationController < ActionController::Base
   def convert_json_params
     if @is_json
       hacked_params = flatten_relationships(params)
-      params[controller_name.classify.downcase.to_sym] =
+      params[controller_name.classify.underscore.to_sym] =
           ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
     end
   end
