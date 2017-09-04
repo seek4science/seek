@@ -34,7 +34,7 @@ You can also tell which version you have installed by looking at the
     patch: 2
 
 
-## Upgrading between patch versions (e.g. between 1.2.0 and 1.2.2) 
+## Upgrading between patch versions (e.g. between 1.4.0 and 1.4.1) 
 
 It should only be necessary to run *bundle install* and the *db:migrate* rake
 task. Using *seek:upgrade* should still work, but could take a lot of
@@ -62,16 +62,16 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.4.0
+    git checkout v1.4.1
 
 ### Updating using the tarball
 
 
 You can download the file from
-<https://bitbucket.org/fairdom/seek/downloads/seek-1.4.0.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.4.1.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.4.0.tar.gz
+    tar zxvf seek-1.4.1.tar.gz
     mv seek seek-previous
     mv seek-{{ site.current_seek_version }} seek
     cd seek/
