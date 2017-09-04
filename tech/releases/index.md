@@ -9,6 +9,17 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+## Version 1.4.1
+
+Release date: _September 4th 2017_
+
+Contains bug fixes and minor improvements, and also in particular a reorganisation and update of the Administration
+areas of SEEK.
+
+A full list of changes included in this release can be found in the [SEEK v1.4.1 release notes](release-notes-1.4.1.html).
+
+
+
 ## Version 1.4.0
 
 Release date: _July 4th 2017_
