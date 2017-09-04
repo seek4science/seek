@@ -9,7 +9,7 @@ redirect_from: "/backups.html"
 ## Backing up the database
 
 You can backup the database using
-[mysqldump](http://linuxcommand.org/man_pages/mysqldump1.html) using the
+[mysqldump](https://dev.mysql.com/doc/en/mysqldump.html) using the
 following syntax. The database name, username and password follows that which
 was used in the install guide - however the username and password should be
 different for you if you'd changed them as suggested.
