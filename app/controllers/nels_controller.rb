@@ -54,7 +54,11 @@ class NelsController < ApplicationController
 
     title = [dataset['name'], params[:subtype_name]].reject(&:blank?).join(' - ')
 
-    redirect_to new_data_file_path(anchor: 'remote-url', 'data_file[title]' => title, data_url: url, assay_ids: [params[:assay_id]])
+    redirect_to new_data_file_path(anchor: 'remote-url',
+                                   'data_file[title]' => title,
+                                   data_url: url,
+                                   assay_ids: [params[:assay_id]],
+                                   project_ids: Assay.find(params[:assay_id]).project_ids)
   end
 
   private
