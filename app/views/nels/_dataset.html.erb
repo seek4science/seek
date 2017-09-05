@@ -15,8 +15,8 @@
             <%= hidden_field_tag('project_id', params[:project_id]) %>
             <%= hidden_field_tag('dataset_id', params[:dataset_id]) %>
             <%= hidden_field_tag('assay_id', params[:assay_id]) %>
-            <%= hidden_field_tag('subtype_name', subtype['name']) %>
-            <%= subtype['name'] %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
+            <%= hidden_field_tag('subtype_name', subtype['type']) %>
+            <%= subtype['type'] %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
             <%= submit_tag('Register', class: 'btn btn-primary btn-xs pull-right') %>
         <% end %>
       </li>
