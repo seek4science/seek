@@ -18,6 +18,10 @@ class AuthLookupUpdateJob < SeekJob
     QueueNames::AUTH_LOOKUP
   end
 
+  def timelimit
+    1.hour
+  end
+
   private
 
   def perform_job(item)
