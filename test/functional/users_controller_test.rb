@@ -220,6 +220,17 @@ class UsersControllerTest < ActionController::TestCase
     assert User.authenticate('quentin', 'mmmmm')
   end
 
+  test 'reset code cleared after updating password' do
+    user = Factory(:user)
+    user.reset_password
+    user.save!
+    login_as(user)
+    post :update, id: user.id, user: { id: user.id, password: 'mmmmm', password_confirmation: 'mmmmm' }
+    user.reload
+    assert_nil user.reset_password_code
+    assert_nil user.reset_password_code_until
+  end
+
   test 'admin can impersonate' do
     login_as :quentin
     assert User.current_user, users(:quentin)
