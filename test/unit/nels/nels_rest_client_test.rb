@@ -46,7 +46,7 @@ class NelsRestClientTest < ActiveSupport::TestCase
 
       assert_equal @dataset_id, res['id']
       assert_equal 2, res['subtypes'].count
-      subtype = res['subtypes'].detect { |s| s['type'] == @subtype }
+      subtype = res['subtypes'].detect { |s| s['name'] == @subtype }
       assert_equal 0, subtype['size']
     end
   end
