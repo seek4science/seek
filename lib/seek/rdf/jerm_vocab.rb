@@ -27,7 +27,8 @@ module Seek
           Investigation => :Investigation,
           Publication => :Publication,
           Strain => :strain,
-          Compound => :compound }
+          Compound => :compound,
+          StudiedFactor => :factor_studied}
       end
     end
   end

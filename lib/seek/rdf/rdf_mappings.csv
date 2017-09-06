@@ -28,6 +28,7 @@ Compound,chebi_ids,RDF::OWL.sameAs,u,'http://identifiers.org/obo.chebi/CHEBI:'+i
 Compound,chebi_ids,RDF::OWL.sameAs,u,'urn:miriam:obo.chebi:'+item,
 DataFile,assays,JERMVocab.isPartOf,u,,
 DataFile,projects,JERMVocab.itemProducedBy,u,,
+DataFile,studied_factors,JERMVocab.hasPart,u,,
 Investigation,projects,JERMVocab.itemProducedBy,u,,
 Investigation,studies,JERMVocab.hasPart,u,,
 Model,assays,JERMVocab.isPartOf,u,,
