@@ -7,6 +7,7 @@ module Seek
       property :experimental_assay
       property :modelling_analysis
       property :SEEK_ID
+      property :Factors_studied
 
       # returns the correct Class IRI according to the instance 'type' - or nil if its not recognised
       def self.for_type(type)
@@ -28,7 +29,7 @@ module Seek
           Publication => :Publication,
           Strain => :strain,
           Compound => :compound,
-          StudiedFactor => :factor_studied}
+          StudiedFactor => :Factors_studied}
       end
     end
   end
