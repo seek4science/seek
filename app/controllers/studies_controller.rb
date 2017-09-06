@@ -91,19 +91,17 @@ class StudiesController < ApplicationController
   def show
     @study = Study.find(params[:id])
     @study.create_from_asset = params[:create_from_asset]
-    options = {:is_collection=>false}
+    options = { is_collection: false }
 
     respond_to do |format|
       format.html
       format.xml
       format.rdf { render template: 'rdf/show' }
-      format.json {render json: JSONAPI::Serializer.serialize(@study,options)}
-
+      format.json { render json: JSONAPI::Serializer.serialize(@study, options) }
     end
   end
 
   def create
-
     # convert params as received by json-api to (flat) rails json
     # if params.key?("data")
     #
