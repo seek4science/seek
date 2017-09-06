@@ -4,8 +4,8 @@ class StudiedFactorsController < ApplicationController
   include Seek::AssetsCommon
 
   before_filter :login_required, except: [:show]
-  before_filter :find_data_file_edit_auth,except: [:show]
-  before_filter :find_data_file_view_auth,only: [:show]
+  before_filter :find_data_file_edit_auth, except: [:show]
+  before_filter :find_data_file_view_auth, only: [:show]
   before_filter :create_new_studied_factor, only: [:index]
   before_filter :no_comma_for_decimal, only: %i[create update]
 
@@ -51,7 +51,7 @@ class StudiedFactorsController < ApplicationController
     # retrieve the selected FSes
 
     params.each do |key, value|
-      studied_factor_ids.push value.to_i if (key =~ /checkbox/)
+      studied_factor_ids.push value.to_i if key =~ /checkbox/
     end
     # create the new FSes based on the selected FSes
     studied_factor_ids.each do |id|
@@ -148,6 +148,7 @@ class StudiedFactorsController < ApplicationController
       respond_to do |format|
         flash[:error] = 'You are not authorized to perform this action'
         format.html { redirect_to data_files_path }
+        format.rdf { render text: 'You are not authorized to perform this action', status: :forbidden }
       end
       return false
     end
@@ -155,6 +156,7 @@ class StudiedFactorsController < ApplicationController
     respond_to do |format|
       flash[:error] = "Couldn't find the Data file"
       format.html { redirect_to data_files_path }
+      format.rdf { render text: 'Not found', status: :not_found }
     end
     return false
   end
