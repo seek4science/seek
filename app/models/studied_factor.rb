@@ -19,4 +19,9 @@ class StudiedFactor < ActiveRecord::Base
     uri = URI.join(Seek::Config.site_base_host, "data_files/#{data_file.id}/#{self.class.name.tableize}/#{id}").to_s
     RDF::Resource.new(uri)
   end
+
+  # overides that from Seek::RDF::RdfGeneration, as the class dependes upon the measured_item
+  def rdf_type_entity_fragment
+    measured_item.rdf_type_entity_fragment || 'Factors_studied'
+  end
 end
