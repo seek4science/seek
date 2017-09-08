@@ -26,7 +26,6 @@ class BaseSerializer < SimpleBaseSerializer
 
   def initialize(object, options = {})
     super
-    Rails.logger.info(object.class.to_s)
 
     #access related resources with proper authorization & ignore version subclass
     if (object.class.to_s.include?("::Version"))
@@ -35,11 +34,7 @@ class BaseSerializer < SimpleBaseSerializer
       @associated = associated_resources(object)
     end
     @associated.each do |k,v|
-      # Rails.logger.info(object.class)
-      # Rails.logger.info(k.to_s + v.to_s)
       unless (v[:items].blank?)
-        Rails.logger.info(object.class)
-        Rails.logger.info(k.to_s + v.to_s)
         begin
           self.class.has_many k.pluralize.downcase, include_data:true do
             v[:items]
