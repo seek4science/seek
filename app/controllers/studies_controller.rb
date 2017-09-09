@@ -67,35 +67,21 @@ class StudiesController < ApplicationController
   end
 
   def update
-    @study = nil
-    params_to_update = nil
-    if @is_json
-      @study=Study.find(params["data"][:id])
-      organize_policies_from_json
-      params_to_update = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-      return if !validate_person_responsible(params_to_update)
-    else
-      @study = Study.find(params[:id])
-      params_to_update = study_params
-    end
-    Rails.logger.info(params_to_update)
+    @study = Study.find(params[:id])
+    @study.attributes = study_params
+    update_sharing_policies @study
 
-    if @study.present?
-      @study.attributes = params_to_update
-      update_sharing_policies @study
+    respond_to do |format|
+      if @study.save
+        update_scales @study
+        update_relationships(@study, params)
 
-      respond_to do |format|
-        if @study.save
-          update_scales @study
-          update_relationships(@study, params)
-
-          flash[:notice] = "#{t('study')} was successfully updated."
-          format.html { redirect_to(@study) }
-          format.json {render json: @study}
-        else
-          format.html { render action: 'edit' }
-          format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
-        end
+        flash[:notice] = "#{t('study')} was successfully updated."
+        format.html { redirect_to(@study) }
+        format.json {render json: @study}
+      else
+        format.html { render action: 'edit' }
+        format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
       end
     end
   end
@@ -115,18 +101,9 @@ class StudiesController < ApplicationController
   end
 
   def create
-    @study = nil
-    if @is_json
-      organize_policies_from_json
-      return if !validate_person_responsible(params["data"]["attributes"])
-      @study = Study.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
-    else
-      @study = Study.new(study_params)
-    end
-    if @study.present?
-      update_sharing_policies @study
-    end
-
+    @study = Study.new(study_params)
+    update_sharing_policies @study
+    ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.present? && @study.save
       update_scales @study
       update_relationships(@study, params)
