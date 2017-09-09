@@ -33,7 +33,7 @@ class ApplicationController < ActionController::Base
   before_filter :check_illegal_id, :only=>[:create]
   # after_filter :unescape_response
 
-  before_filter :convert_json_params
+  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new]
 
   helper :all
 
