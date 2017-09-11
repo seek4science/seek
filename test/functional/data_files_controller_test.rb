@@ -2588,6 +2588,19 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'should unset policy sharing scope when updated' do
+    login_as(:datafile_owner)
+    df = data_files(:editable_data_file)
+    df.policy.update_column(:sharing_scope, Policy::ALL_USERS)
+
+    assert_equal df.reload.policy.sharing_scope, Policy::ALL_USERS
+
+    put :update, id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
+
+    assert_redirected_to data_file_path(df)
+    assert_nil df.reload.policy.sharing_scope
+  end
+
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)

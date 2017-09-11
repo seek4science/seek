@@ -108,6 +108,9 @@ class Policy < ActiveRecord::Base
       if policy_params
         # Set attributes on the policy
         policy.access_type = policy_params[:access_type]
+        if policy.access_type > Policy::NO_ACCESS
+          policy.sharing_scope = nil # This field should not be used anymore
+        end
 
         # Set attributes on the policy's permissions
         if policy_params[:permissions_attributes]
