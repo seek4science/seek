@@ -277,8 +277,10 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if request.env['HTTP_REFERER'].try(:include?, '/admin')
         format.html { redirect_to(admin_url) }
+        format.json {render json: {status: :ok}, status: :ok}
       else
         format.html { redirect_to(people_url) }
+        format.json {render json: {status: :ok}, status: :ok}
       end
       format.xml { head :ok }
     end
