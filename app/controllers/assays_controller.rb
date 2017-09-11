@@ -102,28 +102,14 @@ class AssaysController < ApplicationController
   end
 
   def create
-    @assay = nil
-    if @is_json
-      params[:data][:attributes][:assay_class_id] ||= AssayClass.for_type("experimental").id
-      organize_policies_from_json
-      organize_tags_from_json
-      set_assay_organisms_from_json
-      set_creators
-      @assay = Assay.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
+    params[:assay_class_id] ||= AssayClass.for_type("experimental").id
+    @assay = Assay.new(assay_params)
 
-    else
-      params[:assay_class_id] ||= AssayClass.for_type("experimental").id
-      @assay = Assay.new(assay_params)
-    end
-
-    if @assay.present?
-      @assay.contributor=current_person
-      update_sharing_policies @assay
-      update_annotations(params[:tag_list], @assay) #this saves the assay
-      update_scales @assay
-      update_assay_organisms @assay, params
-    end
-
+    update_assay_organisms @assay, params
+    @assay.contributor=current_person
+    update_sharing_policies @assay
+    update_annotations(params[:tag_list], @assay) #this saves the assay
+    update_scales @assay
 
     if @assay.present? && @assay.save
       update_assets_linked_to_assay @assay, params
@@ -150,28 +136,14 @@ class AssaysController < ApplicationController
   end
 
   def update
-    @assay = nil
-    params_to_update = nil
-    if @is_json
-      @assay=Assay.find(params["data"][:id])
-      organize_policies_from_json
-      organize_tags_from_json
-      set_assay_organisms_from_json
-      params_to_update = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-    else
-      @assay=Assay.find(params[:id])
-      params_to_update = assay_params
-    end
-    Rails.logger.info("params to update:")
-    Rails.logger.info(params_to_update)
 
-    if @assay.present?
-      update_annotations(params[:tag_list], @assay)
-      update_scales @assay
-      @assay.update_attributes(params_to_update)
-      update_sharing_policies @assay
-      update_assay_organisms @assay, params
-    end
+    set_assay_organisms_from_json if @is_json
+
+    update_assay_organisms @assay, params
+    update_annotations(params[:tag_list], @assay)
+    update_scales @assay
+    @assay.update_attributes(assay_params)
+    update_sharing_policies @assay
 
     respond_to do |format|
       if @assay.save           #should use params (e.g. for creators to be updated)
@@ -192,9 +164,6 @@ class AssaysController < ApplicationController
 
   def update_assay_organisms assay,params
     organisms             = params[:assay_organism_ids] || []
-    Rails.logger.info("update organisms")
-    Rails.logger.info(params[:assay_organism_ids])
-    Rails.logger.info(organisms)
     assay.assay_organisms = []
     Array(organisms).each do |text|
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
@@ -252,9 +221,9 @@ class AssaysController < ApplicationController
   private
 
   def set_assay_organisms_from_json
-    if !(params[:data][:attributes][:assay_organism_ids].nil?)
-      params[:assay_organism_ids] = params[:data][:attributes][:assay_organism_ids]
-      params[:data][:attributes].delete :assay_organism_ids
+    if !(params[:assay][:assay_organism_ids].nil?)
+      params[:assay_organism_ids] = params[:assay][:assay_organism_ids]
+      params[:assay].delete :assay_organism_ids
     end
   end
 

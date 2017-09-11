@@ -575,6 +575,7 @@ class ApplicationController < ActionController::Base
   def convert_json_params
     if @is_json
       organize_policies_from_json
+      organize_tags_from_json
       hacked_params = flatten_relationships(params)
       # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
       params[controller_name.classify.downcase.to_sym] =
@@ -592,7 +593,8 @@ class ApplicationController < ActionController::Base
   end
 
   def organize_tags_from_json
-    if (params[:data] && !params[:data][:attributes][:tag_list].nil?)
+    if (params[:data] && params[:data][:attributes] &&
+        params[:data][:attributes][:tag_list])
       params[:tag_list] = params[:data][:attributes][:tag_list]
       params[:data][:attributes].delete :tag_list
     end
