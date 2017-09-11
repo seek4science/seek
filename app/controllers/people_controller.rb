@@ -68,7 +68,7 @@ class PeopleController < ApplicationController
                                               latest_limit: Seek::Config.limit_latest)
       end
     end
-    options = {:is_collection=>true}
+
     respond_to do |format|
       format.html # index.html.erb
       format.xml
@@ -163,7 +163,7 @@ class PeopleController < ApplicationController
       redirect_action = 'register'
       during_registration = true
     end
-
+    set_tools_and_expertise(@person, params)
     respond_to do |format|
       if @person.save && current_user.save
         if Seek::Config.email_enabled && during_registration
