@@ -89,9 +89,11 @@ class OrganismsController < ApplicationController
         flash[:notice] = 'Organism was successfully created.'
         format.html { redirect_to organism_path(@organism) }
         format.xml  { head :ok }
+        format.json {render json: @organism, status: :created, location: @organism}
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
+        format.json  { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -103,9 +105,11 @@ class OrganismsController < ApplicationController
         flash[:notice] = 'Organism was successfully updated.'
         format.html { redirect_to organism_path(@organism) }
         format.xml  { head :ok }
+        format.json {render json: @organism}
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
+        format.json  { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
   end
