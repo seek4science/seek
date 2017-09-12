@@ -60,11 +60,6 @@ class InstitutionsController < ApplicationController
   # POST /institutions.xml
   def create
 
-    # convert params as recieved by json-api to (flat) rails json
-    # if params.key?("data")
-    #   params_new = params[:data][:attributes]
-    #   params[:institution] = params_new
-    # end
     @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
