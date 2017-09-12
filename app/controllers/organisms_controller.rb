@@ -18,7 +18,6 @@ class OrganismsController < ApplicationController
   include Seek::BreadCrumbs
 
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html
       format.xml
@@ -33,7 +32,6 @@ class OrganismsController < ApplicationController
     if request.format.symbol == :html
       super
     else
-      options = {:is_collection=>true}
       respond_to do |format|
         format.xml
         format.json {render json: @organisms}

@@ -202,7 +202,6 @@ class AssaysController < ApplicationController
   end
 
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html
       format.xml

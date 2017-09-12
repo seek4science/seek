@@ -34,7 +34,6 @@ class InvestigationsController < ApplicationController
   def show
     @investigation=Investigation.find(params[:id])
     @investigation.create_from_asset = params[:create_from_asset]
-    options = {:is_collection=>false}
 
     respond_to do |format|
       format.html

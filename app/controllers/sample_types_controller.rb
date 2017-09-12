@@ -16,7 +16,6 @@ class SampleTypesController < ApplicationController
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html
       format.json {render json: @sample_type}

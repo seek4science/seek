@@ -52,7 +52,6 @@ class StrainsController < ApplicationController
   end
 
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.rdf { render template: 'rdf/show' }
       format.xml
