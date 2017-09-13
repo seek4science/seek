@@ -108,26 +108,4 @@ class StudiedFactorTest < ActiveSupport::TestCase
     end
   end
 
-  test 'rdf class based on measured item' do
-    # acidity
-    sf = Factory(:studied_factor, measured_item: Factory(:measured_item, title: 'acidity/PH'))
-    rdf = sf.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert_equal 'http://jermontology.org/ontology/JERMOntology#pH', reader.statements.first.object
-    end
-
-    # optical density 600
-    sf = Factory(:studied_factor, measured_item: Factory(:measured_item, title: 'optical density 600 nm'))
-    rdf = sf.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert_equal 'http://jermontology.org/ontology/JERMOntology#Optical_density_600', reader.statements.first.object
-    end
-
-    # undefined
-    sf = Factory(:studied_factor, measured_item: Factory(:measured_item, title: 'I am unknown in the ontology'))
-    rdf = sf.to_rdf
-    RDF::Reader.for(:rdfxml).new(rdf) do |reader|
-      assert_equal 'http://jermontology.org/ontology/JERMOntology#Factors_studied', reader.statements.first.object
-    end
-  end
 end

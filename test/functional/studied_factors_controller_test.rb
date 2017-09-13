@@ -3,7 +3,7 @@ require 'test_helper'
 class StudiedFactorsControllerTest < ActionController::TestCase
   fixtures :all
 
-  include RdfTestCases
+  #include RdfTestCases
   include AuthenticatedTestHelper
   include ActionDispatch::Routing::PolymorphicRoutes
 

@@ -28,7 +28,6 @@ Compound,chebi_ids,RDF::OWL.sameAs,u,'http://identifiers.org/obo.chebi/CHEBI:'+i
 Compound,chebi_ids,RDF::OWL.sameAs,u,'urn:miriam:obo.chebi:'+item,
 DataFile,assays,JERMVocab.isPartOf,u,,
 DataFile,projects,JERMVocab.itemProducedBy,u,,
-DataFile,studied_factors,JERMVocab.hasPart,u,,
 Investigation,projects,JERMVocab.itemProducedBy,u,,
 Investigation,studies,JERMVocab.hasPart,u,,
 Model,assays,JERMVocab.isPartOf,u,,
@@ -67,8 +66,6 @@ Sop,projects,JERMVocab.itemProducedBy,u,,
 Strain,assays,JERMVocab.is_investigated_by,u,,
 Strain,ncbi_uri,JERMVocab.NCBI_ID,l,URI.parse(item),compact
 Strain,provider_id,JERMVocab.External_supplier_ID,l,,
-StudiedFactor,data_file,JERMVocab.isPartOf,u,,
-StudiedFactor,unit,JERMVocab.units,l,item.try(:symbol)
 Study,assays,JERMVocab.hasPart,u,,
 Study,investigation,JERMVocab.isPartOf,u,,
 Study,projects,JERMVocab.itemProducedBy,u,,

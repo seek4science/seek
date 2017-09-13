@@ -129,7 +129,7 @@ class StudiedFactorsController < ApplicationController
   def show
     @studied_factor = StudiedFactor.find(params[:id])
     respond_to do |format|
-      format.rdf { render template: 'rdf/show' }
+      format.rdf { render text: 'not yet available',status: :forbidden }
     end
   end
 
