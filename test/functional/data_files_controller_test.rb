@@ -2540,6 +2540,37 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div#openbis-details', count: 1
   end
 
+  test 'show openbis datafile with rich metadata' do
+    mock_openbis_calls
+    login_as(Factory(:person))
+    df = openbis_linked_data_file
+
+    get :show, id: df.id
+    assert_response :success
+    assert assigns(:data_file)
+    assert_equal df, assigns(:data_file)
+    assert_select 'div#openbis-details-properties', count: 1
+    assert_select 'div#openbis-details-properties label', text: 'SEEK_DATAFILE_ID:', count: 1
+  end
+
+  test 'get data_file as json gives openbis details' do
+    mock_openbis_calls
+    login_as(Factory(:person))
+    df = openbis_linked_data_file
+    get :show, id: df, format: 'json'
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal df.id, json['id']
+    assert_equal 'OpenBIS 20160210130454955-23', json['title']
+    #assert_equal nil, json['description']
+    assert_equal df.version, json['version']
+    bis = json['openbis_dataset']
+    assert_not_nil bis
+    assert_equal 'DataFile_3', bis['properties']['SEEK_DATAFILE_ID']
+    assert_equal '20151216143716562-2', bis['experiment']
+
+  end
+
   test "associated assays don't cause 500 error if create fails" do
     mock_http
     data_file, blob = valid_data_file_with_http_url
