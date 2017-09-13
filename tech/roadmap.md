@@ -15,11 +15,12 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| JSON Read API (Application Programming Interface) | Summer 2017  |
-| Write API | Autumn 2017  |
-| Further integration with openBIS, with improved metadata mappings | Winter 2017  |
+| JSON Read API (Application Programming Interface) | Autumn 2017  |
+| JERM 2 Ontology and RDF updates | Autumn 2017 |
+| Write API | Winter 2017  |
 | Metadata search and querying | Winter 2017  |
-| Research Object import | Winter 2017  |
+| Further integration with openBIS, with improved metadata mappings | Winter 2017  |
+
 
 
 
