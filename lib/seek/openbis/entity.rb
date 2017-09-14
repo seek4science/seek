@@ -29,7 +29,7 @@ module Seek
       end
 
       def populate_from_json(json)
-        puts 'Populates from json'
+        puts "Populates #{self.class} from json"
         puts json
         puts '-----\n'
         @json = json
