@@ -11,6 +11,7 @@ class ContentBlob < ActiveRecord::Base
   include Seek::UrlValidation
   include Seek::Data::Checksums
   prepend Seek::Openbis::Blob
+  prepend Nels::Blob
 
   belongs_to :asset, polymorphic: true
 
@@ -207,7 +208,7 @@ class ContentBlob < ActiveRecord::Base
 
   #whether this content blob represents a custom integration, such as integrated with openBIS
   def custom_integration?
-    openbis?
+    openbis? || nels?
   end
 
   def is_downloadable?
