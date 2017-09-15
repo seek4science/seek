@@ -178,7 +178,7 @@ module Seek
             flash[:error] = "Bad NeLS URL"
             return false
           end
-          rest_client = Nels::Rest::Client.new(oauth_session.access_token)
+          rest_client = Nels::Rest::DummyClient.new(oauth_session.access_token)
           begin
             data = rest_client.sample_metadata(ref)
           rescue RestClient::Unauthorized
