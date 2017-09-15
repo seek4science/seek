@@ -32,15 +32,15 @@ module Nels
       def dataset(project_id, dataset_id)
         if project_id == 1123122
           if dataset_id == 1123528
-            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123528,"name":"Illumina-sequencing-dataset","type":"Illumina_seq_data","owner_name":"","description":"test","subtypes":[{"name":"analysis","size":0},{"name":"reads","size":0}]}'
+            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123528,"name":"Illumina-sequencing-dataset","type":"Illumina_seq_data","owner_name":"","description":"test","subtypes":[{"type":"analysis","size":0},{"type":"reads","size":0}]}'
           else
-            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123527,"name":"proteomics-dataset","type":"Proteomics_data","owner_name":"","description":"test","subtypes":[{"name":"Processed","size":0},{"name":"Raw","size":94353},{"name":"Results","size":0}]}'
+            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123527,"name":"proteomics-dataset","type":"Proteomics_data","owner_name":"","description":"test","subtypes":[{"type":"Processed","size":0},{"type":"Raw","size":94353},{"type":"Results","size":0}]}'
           end
         else
           if dataset_id == 1123530
-            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123530,"name":"ds3","type":"Microarray_Methylation_data","owner_name":"","description":"test","subtypes":[{"name":"Analysis","size":0},{"name":"Images","size":0},{"name":"Intensities","size":0}]}'
+            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123530,"name":"ds3","type":"Microarray_Methylation_data","owner_name":"","description":"test","subtypes":[{"type":"Analysis","size":0},{"type":"Images","size":0},{"type":"Intensities","size":0}]}'
           else
-            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data","owner_name":"","description":"test","subtypes":[{"name":"Analysis","size":0},{"name":"Images","size":0},{"name":"Intensities","size":0}]'
+            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data","owner_name":"","description":"test","subtypes":[{"type":"Analysis","size":0},{"type":"Images","size":0},{"type":"Intensities","size":0}]'
           end
         end
       end
@@ -50,7 +50,7 @@ module Nels
       end
 
       def sample_metadata(reference)
-        File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'sample-type-populated.xlsx'))
+        File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'FASTQPaired.xlsx'))
       end
 
     end
