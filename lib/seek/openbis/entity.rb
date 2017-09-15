@@ -29,9 +29,10 @@ module Seek
       end
 
       def populate_from_json(json)
-        puts "Populates #{self.class} from json"
-        puts json
-        puts '-----'
+        # for debug by TZ
+        # puts "Populates #{self.class} from json"
+        # puts json
+        # puts '-----'
         @json = json
         @modifier = json['modifier']
         @code = json['code']
