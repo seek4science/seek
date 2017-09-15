@@ -61,7 +61,6 @@ class OpenbisEndpoint < ActiveRecord::Base
     else
       Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not refreshing METADATA")
     end
-
   end
 
   def reindex_entities
@@ -73,7 +72,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   def registered_datafiles
     # ugly will scan all content blobs from data files
     url = "openbis:#{id}"
-    DataFile.all.select{|df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url)}
+    DataFile.all.select { |df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url)}
   end
 
   def clear_metadata_store

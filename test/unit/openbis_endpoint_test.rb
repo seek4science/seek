@@ -316,11 +316,11 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'registered_datafiles finds only own datafiles' do
     endpoint1 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
-                                   web_endpoint: 'http://my-openbis.org/doesnotmatter',
-                                   as_endpoint: 'http://my-openbis.org/doesnotmatter',
-                                   dss_endpoint: 'http://my-openbis.org/doesnotmatter',
-                                   space_perm_id: 'space1',
-                                   refresh_period_mins: 60
+                                    web_endpoint: 'http://my-openbis.org/doesnotmatter',
+                                    as_endpoint: 'http://my-openbis.org/doesnotmatter',
+                                    dss_endpoint: 'http://my-openbis.org/doesnotmatter',
+                                    space_perm_id: 'space1',
+                                    refresh_period_mins: 60
 
     endpoint2 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
                                     web_endpoint: 'http://my-openbis.org/doesnotmatter',
@@ -348,7 +348,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     df = endpoint2.registered_datafiles
     assert_equal [datafile3], df
-
   end
 
   test 'reindex_entities queues new indexing job' do

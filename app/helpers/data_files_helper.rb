@@ -4,17 +4,16 @@ module DataFilesHelper
   end
 
   def split_into_two(ahash = {})
-
-    return [{},{}] if ahash.nil?
-    return [ahash,{}] if ahash.length < 2
+    return [{}, {}] if ahash.nil?
+    return [ahash, {}] if ahash.length < 2
 
     keys = ahash.keys
-    half = keys.length % 2 == 0 ? keys.length/2-1 : keys.length/2
+    half = keys.length.even? ? keys.length / 2 - 1 : keys.length / 2
     left = {}
-    keys[0..half].each {|key| left[key]=ahash[key] }
+    keys[0..half].each {|key| left[key] = ahash[key]}
     right = {}
-    keys[(half+1)..-1].each {|key| right[key]=ahash[key] }
+    keys[(half + 1)..-1].each {|key| right[key] = ahash[key]}
 
-    return [left,right]
+    [left, right]
   end
 end

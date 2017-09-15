@@ -170,7 +170,6 @@ class DataFile < ActiveRecord::Base
     df
   end
 
-
   #indicates that this is an openBIS based DataFile
   def openbis?
     content_blob && content_blob.openbis?
@@ -186,6 +185,6 @@ class DataFile < ActiveRecord::Base
 
   def openbis_dataset_json_details
     return content_blob.openbis_dataset.json if openbis?
-    return nil
+    nil
   end
 end

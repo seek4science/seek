@@ -48,9 +48,8 @@ module Seek
                  dataset.experiment_id, dataset.registrator, dataset.modifier, dataset.code]
 
         if dataset.properties
-          terms = terms | dataset.properties.map{|key,value| [value,"#{key}:#{value}"]}.flatten
+          terms |= dataset.properties.map { |key, value| [value, "#{key}:#{value}"]}.flatten
         end
-
 
         terms | dataset.dataset_files_no_directories.collect do |file|
           [file.perm_id, file.path, file.filename]
