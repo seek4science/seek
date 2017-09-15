@@ -76,7 +76,8 @@ class NelsController < ApplicationController
   end
 
   def rest_client
-    @rest_client = Nels::Rest::DummyClient.new(@oauth_session.access_token)
+    client_class = Rails.env.test? ? Nels::Rest::Client : Nels::Rest::DummyClient
+    @rest_client = client_class.new(@oauth_session.access_token)
   end
 
   def unauthorized_response

@@ -40,7 +40,7 @@ module Nels
           if dataset_id == 1123530
             JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123530,"name":"ds3","type":"Microarray_Methylation_data","owner_name":"","description":"test","subtypes":[{"type":"Analysis","size":0},{"type":"Images","size":0},{"type":"Intensities","size":0}]}'
           else
-            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data","owner_name":"","description":"test","subtypes":[{"type":"Analysis","size":0},{"type":"Images","size":0},{"type":"Intensities","size":0}]'
+            JSON.parse '{"creation_date":"2017-05-17T22:00:00Z","id":1123529,"name":"microarray-methylation","type":"Microarray_Methylation_data","owner_name":"","description":"test","subtypes":[{"type":"Analysis","size":0},{"type":"Images","size":0},{"type":"Intensities","size":0}]}'
           end
         end
       end
