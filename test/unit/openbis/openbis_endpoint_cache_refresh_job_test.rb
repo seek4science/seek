@@ -45,7 +45,6 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
   end
 
   test 'perform_job calls refresh on endpoint' do
-
     endpoint = MockEndpoint.new
     @job = OpenbisEndpointCacheRefreshJob.new(endpoint)
     @job.perform_job(endpoint)
@@ -85,7 +84,6 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
   end
 
   class MockEndpoint
-
     attr_accessor :refreshed, :id
 
     def initialize
@@ -94,7 +92,7 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
     end
 
     def refresh_metadata
-      @refreshed +=1
+      @refreshed += 1
     end
   end
 end

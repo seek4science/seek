@@ -36,7 +36,6 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
     assert_empty blob.url_search_terms, 'url search terms should be empty'
     terms = blob.search_terms
 
-
     assert_includes terms, 'TEST_DATASET_TYPE'
     assert_includes terms, 'original/autumn.jpg'
     assert_includes terms, '20151216143716562-2'
@@ -49,5 +48,4 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
     assert_includes terms, 'SEEK_DATAFILE_ID:DataFile_3'
 
   end
-
 end

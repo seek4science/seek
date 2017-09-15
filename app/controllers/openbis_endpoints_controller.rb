@@ -62,7 +62,6 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def refresh_metadata_store
-
     @openbis_endpoint.refresh_metadata
     show_items
   end
