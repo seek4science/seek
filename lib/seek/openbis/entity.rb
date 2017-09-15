@@ -31,7 +31,7 @@ module Seek
       def populate_from_json(json)
         puts "Populates #{self.class} from json"
         puts json
-        puts '-----\n'
+        puts '-----'
         @json = json
         @modifier = json['modifier']
         @code = json['code']
