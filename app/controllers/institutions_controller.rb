@@ -18,7 +18,6 @@ class InstitutionsController < ApplicationController
   # GET /institutions/1
   # GET /institutions/1.xml
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
@@ -60,11 +59,6 @@ class InstitutionsController < ApplicationController
   # POST /institutions.xml
   def create
 
-    # convert params as recieved by json-api to (flat) rails json
-    # if params.key?("data")
-    #   params_new = params[:data][:attributes]
-    #   params[:institution] = params_new
-    # end
     @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
@@ -102,7 +96,6 @@ class InstitutionsController < ApplicationController
   def request_all
     # listing all institutions is public data, but still
     # we require login to protect from unwanted requests
-    options = {:is_collection=>true}
     institution_id = white_list(params[:id])
     institution_list = Institution.get_all_institutions_listing
     respond_to do |format|

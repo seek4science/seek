@@ -18,7 +18,6 @@ class OrganismsController < ApplicationController
   include Seek::BreadCrumbs
 
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html
       format.xml
@@ -33,7 +32,6 @@ class OrganismsController < ApplicationController
     if request.format.symbol == :html
       super
     else
-      options = {:is_collection=>true}
       respond_to do |format|
         format.xml
         format.json {render json: @organisms}
@@ -91,9 +89,11 @@ class OrganismsController < ApplicationController
         flash[:notice] = 'Organism was successfully created.'
         format.html { redirect_to organism_path(@organism) }
         format.xml  { head :ok }
+        format.json {render json: @organism, status: :created, location: @organism}
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
+        format.json  { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -105,9 +105,11 @@ class OrganismsController < ApplicationController
         flash[:notice] = 'Organism was successfully updated.'
         format.html { redirect_to organism_path(@organism) }
         format.xml  { head :ok }
+        format.json {render json: @organism}
       else
         format.html { render :action => "edit" }
         format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
+        format.json  { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
   end

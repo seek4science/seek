@@ -13,7 +13,6 @@ class SamplesController < ApplicationController
   include Seek::IsaGraphExtensions
 
   def index
-    options = {:is_collection=>true}
     if @data_file || @sample_type
       respond_to do |format|
         format.html
@@ -42,7 +41,6 @@ class SamplesController < ApplicationController
   end
 
   def show
-    options = {:is_collection=>false}
     @sample = Sample.find(params[:id])
     respond_to do |format|
       format.html

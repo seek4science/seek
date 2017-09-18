@@ -15,7 +15,6 @@ class EventsController < ApplicationController
   include Seek::BreadCrumbs
 
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }

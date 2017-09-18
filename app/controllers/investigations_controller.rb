@@ -34,7 +34,6 @@ class InvestigationsController < ApplicationController
   def show
     @investigation=Investigation.find(params[:id])
     @investigation.create_from_asset = params[:create_from_asset]
-    options = {:is_collection=>false}
 
     respond_to do |format|
       format.html
@@ -58,17 +57,8 @@ class InvestigationsController < ApplicationController
   end
 
   def create
-    @investigation = nil
-    if @is_json
-      organize_policies_from_json
-      @investigation = Investigation.new(ActiveModelSerializers::Deserialization.jsonapi_parse(params))
-    else
-      @investigation = Investigation.new(investigation_params)
-    end
-
-    if @investigation.present?
-      update_sharing_policies @investigation
-    end
+    @investigation = Investigation.new(investigation_params)
+    update_sharing_policies @investigation
 
     if @investigation.present? && @investigation.save
        update_scales(@investigation)
@@ -117,21 +107,9 @@ class InvestigationsController < ApplicationController
   end
 
   def update
-    @investigation = nil
-    params_to_update = nil
-    if @is_json
-      @investigation=Investigation.find(params["data"][:id])
-      organize_policies_from_json
-      params_to_update = ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-    else
-      @investigation=Investigation.find(params[:id])
-      params_to_update = investigation_params
-    end
-    Rails.logger.info(params_to_update)
-
-    if @investigation.present?
-      @investigation.attributes = params_to_update
-      update_sharing_policies @investigation
+    @investigation=Investigation.find(params[:id])
+    @investigation.attributes = investigation_params
+    update_sharing_policies @investigation
 
       respond_to do |format|
         if @investigation.save
@@ -146,7 +124,6 @@ class InvestigationsController < ApplicationController
           format.json { render json: {error: @investigation.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
         end
       end
-    end
   end
 
   private

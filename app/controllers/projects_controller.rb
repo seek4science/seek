@@ -88,7 +88,6 @@ class ProjectsController < ApplicationController
   # GET /projects/1
   # GET /projects/1.xml
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }

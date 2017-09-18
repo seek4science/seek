@@ -68,7 +68,7 @@ class PeopleController < ApplicationController
                                               latest_limit: Seek::Config.limit_latest)
       end
     end
-    options = {:is_collection=>true}
+
     respond_to do |format|
       format.html # index.html.erb
       format.xml
@@ -79,7 +79,6 @@ class PeopleController < ApplicationController
   # GET /people/1
   # GET /people/1.xml
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
@@ -163,7 +162,7 @@ class PeopleController < ApplicationController
       redirect_action = 'register'
       during_registration = true
     end
-
+    set_tools_and_expertise(@person, params)
     respond_to do |format|
       if @person.save && current_user.save
         if Seek::Config.email_enabled && during_registration
@@ -277,8 +276,10 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if request.env['HTTP_REFERER'].try(:include?, '/admin')
         format.html { redirect_to(admin_url) }
+        format.json {render json: {status: :ok}, status: :ok}
       else
         format.html { redirect_to(people_url) }
+        format.json {render json: {status: :ok}, status: :ok}
       end
       format.xml { head :ok }
     end

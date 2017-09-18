@@ -15,7 +15,6 @@ module Seek
       # store timestamp of the previous last usage
       @last_used_before_now = asset.last_used_at
 
-      options = {:is_collection=>false}
       # update timestamp in the current record
       # (this will also trigger timestamp update in the corresponding Asset)
       asset.just_used
@@ -89,20 +88,6 @@ module Seek
             render action: 'new'
           end
         end
-      end
-    end
-
-    def organize_policies_from_json
-      if !(params[:data][:attributes][:policy_attributes].nil?)
-        params[:policy_attributes] = params[:data][:attributes][:policy_attributes]
-        params[:data][:attributes].delete :policy_attributes
-      end
-    end
-
-    def organize_tags_from_json
-      if (!params[:data][:attributes][:tag_list].nil?)
-        params[:tag_list] = params[:data][:attributes][:tag_list]
-        params[:data][:attributes].delete :tag_list
       end
     end
 

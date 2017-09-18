@@ -29,12 +29,11 @@ class ApplicationController < ActionController::Base
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
-  #before_filter :process_params, :only=>[:edit, :update, :destroy, :create, :new]
   before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
   before_filter :check_illegal_id, :only=>[:create]
   # after_filter :unescape_response
 
-  before_filter :convert_json_params
+  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new]
 
   helper :all
 
@@ -554,55 +553,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  #process JSONAPI params into params itself, so it can be used normally with create, update, etc.
-  def process_params()
-
-    resource = controller_name.singularize
-
-    #check for JSONAPI
-    if params.key?("data")
-      params[resource] = params[:data][:attributes]
-
-      #initialize
-      params[:relationships].each do |r,info|
-        params[resource][r.to_s+"_ids"] = []
-      end
-
-      #fill up related resource ids in params[resource][related_ids] from the meta section in relationships
-      #This makes sense when a user creates his own file to upload, and does not know IDs of resources, plus
-      #creating associated branches within data in JSONAPI format is adding too much complexity and user-unfriendly standards.
-      params[:relationships].each do |r,info|
-        related_entity = r.capitalize.constantize.where(info[:meta]).first
-        params[resource][r.to_s+"_ids"] << related_entity.id if related_entity
-        puts "related entity: ", related_entity
-      end
-
-      # #2nd way: fill up from associated resources (e.g. from an exported json)
-      # # TO DO: decide if this is the final input/output format
-      # # problem : not everything should exist for every resource, e.g associated people are creators of an investigation, but not a project
-      # begin
-      #   params[:data][:relationships][:associated][:data].each do |assoc_data|
-      #     puts "associated ====> ", assoc_data
-      #     key = assoc_data[:type].singularize + "_ids"
-      #     params[resource][key] = [] if (params[resource][key] == nil)
-      #     params[resource][key] << assoc_data[:id].to_i
-      #   end
-      #
-      # rescue NoMethodError
-      #   puts "no associated stuff"
-      # end
-
-
-      #Creators
-      creators_arr = []
-      params[resource][:creators].each do |cr|
-        the_person = Person.where(email: cr).first
-        creators_arr << the_person if the_person
-      end
-      params[resource][:creators] = creators_arr
-    end
-  end
-
   # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
   # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
   # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
@@ -624,9 +574,24 @@ class ApplicationController < ActionController::Base
 
   def convert_json_params
     if @is_json
+      organize_external_attributes_from_json
       hacked_params = flatten_relationships(params)
-      params[controller_name.classify.underscore.to_sym] =
+      # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
+      params[controller_name.classify.downcase.to_sym] =
           ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
+
+    end
+  end
+
+  # take out policies, annotations, etc(?) outside of the given object attributes
+  def organize_external_attributes_from_json
+    if (params[:data] && params[:data][:attributes])
+      [:tag_list, :expertise_list, :tool_list, :policy_attributes].each do |item|
+        if params[:data][:attributes][item]
+          params[item] = params[:data][:attributes][item]
+          params[:data][:attributes].delete item
+        end
+      end
     end
   end
 
