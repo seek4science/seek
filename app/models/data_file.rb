@@ -183,4 +183,8 @@ class DataFile < ActiveRecord::Base
     super || openbis_size_download_restricted?
   end
 
+  def nels?
+    content_blob && content_blob.nels?
+  end
+
 end
