@@ -15,7 +15,7 @@
     <div class="row">
       <div class="col-md-5">
         <div>
-          <label>Dataset Perm ID: </label> <%= dataset.perm_id %>
+          <label>Dataset Perm ID: </label>  <%= dataset.perm_id %>
         </div>
         <div>
           <label>Dataset Type Code: </label> <%= text_or_not_specified(dataset.dataset_type_code) %>
@@ -41,7 +41,30 @@
         <% end %>
 
       </div>
+
     </div>
+    <%
+      parts = split_into_two(dataset.properties)
+      if !parts[0].empty?
+    %>
+        <div class="row" id="openbis-details-properties">
+          <div class="col-md-5">
+            <% parts[0].each  do |key, value| %>
+                <div>
+                  <label><%= "#{key}" %>: </label> <%= "#{value}" %>
+                </div>
+            <% end %>
+          </div>
+          <div class="col-md-5">
+            <% parts[1].each  do |key, value| %>
+                <div>
+                  <label><%= "#{key}" %>: </label> <%= "#{value}" %>
+                </div>
+            <% end %>
+          </div>
+        </div>
+    <% end %>
+
     <div class="row">
       <div class="col-md-5">
         <label>Files: </label> <%=  %>

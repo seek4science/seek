@@ -62,7 +62,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def refresh_metadata_store
-    @openbis_endpoint.clear_metadata_store if @openbis_endpoint.test_authentication
+    @openbis_endpoint.refresh_metadata
     show_items
   end
 
