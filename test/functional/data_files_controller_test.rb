@@ -12,6 +12,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
   include MockHelper
+  include NelsTestHelper
 
   def setup
     login_as(:datafile_owner)
@@ -2586,6 +2587,25 @@ class DataFilesControllerTest < ActionController::TestCase
     get :download, id: data_file
     assert_equal 'qwe', @response.body
     assert_response :success
+  end
+
+  test 'should fetch sample metadata from nels immediately after creating a nels datafile' do
+    setup_nels
+    mock_http
+    data_file, blob = valid_data_file_with_http_url
+    blob[:data_url] = "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"
+
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        VCR.use_cassette('nels/get_sample_metadata') do
+          post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing,
+               assay_ids: [@assay.id]
+        end
+      end
+    end
+
+    assert assigns(:data_file).content_blob.is_excel?
+    assert assigns(:data_file).content_blob.file_size > 0
   end
 
   private
