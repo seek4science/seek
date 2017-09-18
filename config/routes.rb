@@ -203,6 +203,8 @@ SEEK::Application.routes.draw do
         get :browse
         post :refresh_metadata_store
       end
+      resources :openbis_zamples do
+      end
     end
     resources :avatars do
       member do

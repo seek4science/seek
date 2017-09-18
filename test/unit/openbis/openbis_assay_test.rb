@@ -47,12 +47,12 @@ class OpenbisAssayTest < ActiveSupport::TestCase
 
   def new_valid_openbis_assay
     OpenbisAssay.new(title: 'test',
-              assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics',
-              technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography',
-              study: studies(:metabolomics_study),
-              contributor: people(:person_for_model_owner),
-              assay_class: assay_classes(:experimental_assay_class),
-              policy: Factory(:private_policy)
+                     assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics',
+                     technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography',
+                     study: studies(:metabolomics_study),
+                     contributor: people(:person_for_model_owner),
+                     assay_class: assay_classes(:experimental_assay_class),
+                     policy: Factory(:private_policy)
     )
   end
 
