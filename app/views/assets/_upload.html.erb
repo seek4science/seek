@@ -56,7 +56,7 @@ end
 
         <div class="row">
           <div class="col-sm-8">
-            <% if params[:data_url].start_with?(Nels::Blob::NELS_BASE) %>
+            <% if params[:data_url] && params[:data_url].start_with?(Nels::Blob::NELS_BASE) %>
                 <div class="form-group">
                   <%= text_field_tag 'content_blobs[][data_url]', params[:data_url], id: 'data_url_field', class: 'form-control', readonly: :readonly -%>
                 </div>
