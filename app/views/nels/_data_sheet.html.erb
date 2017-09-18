@@ -2,7 +2,7 @@
     <% spreadsheet = Rails.cache.fetch(@display_data_file.content_blob.cache_key) { @display_data_file.spreadsheet } %>
     <% if spreadsheet %>
         <% sheet = spreadsheet.sheets.detect { |s| s.name.downcase == 'data' } %>
-        <% if sheet && sheet.rows[2] # Needs at least 2 rows %>
+        <% if sheet && sheet.rows[2] # Needs at least 2 rows: the column headings + at least 1 data row %>
             <%= folding_panel('NeLS location info', true) do %>
                 <div class="table-responsive">
                   <table class="table table-condensed">
