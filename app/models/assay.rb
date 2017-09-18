@@ -4,6 +4,9 @@ class Assay < ActiveRecord::Base
   include Seek::Taggable
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
+  # for single table inheritance
+  self.inheritance_column = 'class_type'
+
   # needs to be declared before acts_as_isa, else ProjectAssociation module gets pulled in
   def projects
     study.try(:projects) || []

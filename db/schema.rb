@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170711121424) do
+ActiveRecord::Schema.define(version: 20170918133541) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -171,7 +171,10 @@ ActiveRecord::Schema.define(version: 20170711121424) do
     t.integer  "suggested_assay_type_id",      limit: 4
     t.integer  "suggested_technology_type_id", limit: 4
     t.text     "other_creators",               limit: 65535
+    t.string   "class_type",                   limit: 255
   end
+
+  add_index "assays", ["class_type", "id"], name: "assay_by_class_type_and_PK", using: :btree
 
   create_table "assays_deprecated_samples", id: false, force: :cascade do |t|
     t.integer "assay_id",             limit: 4
