@@ -131,7 +131,7 @@ class StudiesController < ApplicationController
   end
 
   def investigation_selected_ajax
-    if (investigation_id = params[:investigation_id] && params[:investigation_id] != '0')
+    if (investigation_id = params[:investigation_id]).present? && params[:investigation_id] != '0'
       investigation = Investigation.find(investigation_id)
       people = investigation.projects.collect(&:people).flatten
     end

@@ -2,29 +2,6 @@ class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
   include RelatedItemsHelper
 
-  has_many :associated
-
-  def associated
-    associated_resources(object) # ||  { "data": [] }
-  end
-
-  # def self_link
-  #   #{base_url}//#{type}/#{id}
-  #   "/#{type}/#{id}"
-  # end
-  #
-  # def base_url
-  #   Seek::Config.site_base_host
-  # end
-  #
-  # #remove link to object/associated --> "#{self_link}/#{format_name(attribute_name)}"
-  # def relationship_self_link(attribute_name)
-  # end
-  #
-  # #remove link to object/related/associated
-  # def relationship_related_link(attribute_name)
-  # end
-
   #avoid dash-erizing attribute names
   def format_name(attribute_name)
     attribute_name.to_s
@@ -46,4 +23,25 @@ class BaseSerializer < SimpleBaseSerializer
         base_url: base_url
     }
   end
+
+  def initialize(object, options = {})
+    super
+
+    #access related resources with proper authorization & ignore version subclass
+    if (object.class.to_s.include?("::Version"))
+      @associated = associated_resources(object.parent)
+    else
+      @associated = associated_resources(object)
+    end
+    @associated.each do |k,v|
+      unless (v[:items].blank?)
+        begin
+          self.class.has_many k.pluralize.downcase, include_data:true do
+            v[:items]
+          end
+        end
+      end
+    end
+  end
+
 end
