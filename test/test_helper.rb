@@ -18,6 +18,7 @@ require 'tmpdir'
 require 'authenticated_test_helper'
 require 'mock_helper'
 require 'html_helper'
+require 'nels_test_helper'
 require 'minitest/reporters'
 require 'minitest'
 
