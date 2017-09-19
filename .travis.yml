@@ -10,7 +10,7 @@ sudo: false
 
 cache: bundler
 
-bundler_args: --without development
+bundler_args: --deployment --without development
 
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
