@@ -108,8 +108,9 @@ module HomesHelper
         end
         break if selected_activity_logs.length >= number_of_item
       end
-      convert_logs_to_hash selected_activity_logs
+      return convert_logs_to_hash selected_activity_logs
     end
+    convert_logs_to_hash []
   end
 
   def recently_added_item_logs_hash(time = 1.month.ago, number_of_item = 10)
@@ -123,8 +124,9 @@ module HomesHelper
         end
         break if selected_activity_logs.length >= number_of_item
       end
-      convert_logs_to_hash selected_activity_logs
+      return convert_logs_to_hash selected_activity_logs
     end
+    convert_logs_to_hash []
   end
 
   def convert_logs_to_hash(logs)

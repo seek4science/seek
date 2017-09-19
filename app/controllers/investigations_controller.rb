@@ -11,7 +11,6 @@ class InvestigationsController < ApplicationController
   #defined in the application controller
   before_filter :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
-
   include Seek::Publishing::PublishingCommon
 
   include Seek::AnnotationCommon
@@ -35,11 +34,14 @@ class InvestigationsController < ApplicationController
   def show
     @investigation=Investigation.find(params[:id])
     @investigation.create_from_asset = params[:create_from_asset]
+    options = {:is_collection=>false}
 
     respond_to do |format|
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show' }
+      format.json {render json: JSONAPI::Serializer.serialize(@investigation,options)}
+
       format.ro do
         ro_for_download
       end
@@ -133,5 +135,5 @@ class InvestigationsController < ApplicationController
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
                                           :create_from_asset, :new_link_from_study,)
   end
-  
+
 end

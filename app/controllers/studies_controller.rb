@@ -91,14 +91,45 @@ class StudiesController < ApplicationController
   def show
     @study = Study.find(params[:id])
     @study.create_from_asset = params[:create_from_asset]
+    options = {:is_collection=>false}
+
     respond_to do |format|
       format.html
       format.xml
       format.rdf { render template: 'rdf/show' }
+      format.json {render json: JSONAPI::Serializer.serialize(@study,options)}
+
     end
   end
 
   def create
+
+    # convert params as received by json-api to (flat) rails json
+    # if params.key?("data")
+    #
+    #   params[:study] = params[:data][:attributes]
+    #
+    #   params[:study][:project_ids] = []
+    #   params[:relationships].each do |r,info|
+    #     params[:study][:project_ids] << r.capitalize.constantize.where(info[:meta]).first.id
+    #   end
+    #
+    #
+    #   investigation_title = params[:meta][:investigation_title]
+    #   person_email = params[:meta][:person_responsible]
+    #
+    #   params[:study][:investigation_id] = Investigation.where(title:  investigation_title).first[:id].to_s
+    #   params[:study][:person_responsible] = Person.where(email: person_email).first
+    #
+    #   #Creators
+    #   creators_arr = []
+    #   params[:study][:creators].each { |cr|
+    #     the_person = Person.where(email: cr).first
+    #     creators_arr << the_person
+    #   }
+    #   params[:study][:creators] = creators_arr
+    # end
+
     @study = Study.new(study_params)
 
     update_sharing_policies @study
@@ -130,7 +161,7 @@ class StudiesController < ApplicationController
   end
 
   def investigation_selected_ajax
-    if (investigation_id = params[:investigation_id] && params[:investigation_id] != '0')
+    if (investigation_id = params[:investigation_id]).present? && params[:investigation_id] != '0'
       investigation = Investigation.find(investigation_id)
       people = investigation.projects.collect(&:people).flatten
     end

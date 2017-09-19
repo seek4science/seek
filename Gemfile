@@ -7,7 +7,6 @@ gem 'rdoc'
 gem 'mysql2'
 gem 'pg'
 gem 'sqlite3'
-
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
@@ -31,6 +30,10 @@ gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
 gem 'openseek-api'
+gem 'jbuilder', '~> 2.0'
+gem 'jbuilder-json_api'
+gem 'jsonapi-serializers'
+gem 'json-schema'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
@@ -120,8 +123,6 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'activerecord-session_store'
 # gem 'protected_attributes' # Delete me after refactoring
 gem 'rails-observers'
-
-gem 'jbuilder', '~> 2.0'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'

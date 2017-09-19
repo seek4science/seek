@@ -183,4 +183,8 @@ class DataFile < ActiveRecord::Base
     super || openbis_size_download_restricted?
   end
 
+  def openbis_dataset_json_details
+    return content_blob.openbis_dataset.json if openbis?
+    nil
+  end
 end

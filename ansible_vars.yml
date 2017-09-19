@@ -1,0 +1,60 @@
+---
+java_product: jdk # jdk vs jre required due to rjb gem
+java_version: 8
+java_shell_profile: true
+
+eclipse_distro: mars 
+eclipse_package: php
+eclipse_plugins_install:
+  - egit
+  - aptana_studio
+#  - redmine_mylyn
+
+package_list_eclipse:
+  - name: firefox
+  - name: chromium-browser
+
+rvm1_rubies:
+  - ruby-2.1.9
+
+mysql_databases:
+  - name:  seek_vagrant
+    state: present
+  - name:  seek_development
+    state: present
+  - name:  seek_test
+    state: present
+  - name:  seek_production
+    state: present
+
+mysql_users:
+  - name:     "mysqluser"
+    password: "mysqlpassword"
+    priv:     "seek%.*:ALL"
+    host:     "localhost"
+    state:    present
+
+# seek specific variables
+seek_initd:
+  - delayed_job-seek
+  - soffice
+  - solr-seek
+www_user: vagrant
+seek_project_root: /project
+rails_env: production
+
+# nginx setup
+nginx_remove_default_vhost: true
+passenger_ruby: /home/vagrant/sw/rvm/gems/{{ rvm1_rubies[0] }}@seek-1-3/wrappers/ruby
+
+nginx_vhosts:
+  - listen: "80 default_server"
+    server_name: "seek.local"
+    root: "{{ seek_project_root }}/public"
+    error_log:   /var/log/nginx/seek_error.log
+    access_log:  /var/log/nginx/seek_access.log
+    passenger_user: vagrant
+    passenger_enabled: "on"
+    passenger_app_env: "{{ rails_env }}"
+    # https://www.phusionpassenger.com/library/indepth/ruby/spawn_methods/#smart-spawning-caveats
+    extra_parameters: "passenger_spawn_method direct;"

@@ -15,6 +15,13 @@ class EventsController < ApplicationController
   include Seek::BreadCrumbs
 
   def show
+    options = {:is_collection=>false}
+    respond_to do |format|
+      format.html # show.html.erb
+      format.rdf { render template: 'rdf/show' }
+      format.xml
+      format.json {render json: JSONAPI::Serializer.serialize(@event,options)}
+    end
   end
 
   def new
