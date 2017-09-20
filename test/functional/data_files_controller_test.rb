@@ -371,8 +371,26 @@ class DataFilesControllerTest < ActionController::TestCase
     assert assigns(:data_file).content_blob.url.blank?
     assert_equal 1, assigns(:data_file).version
     assert_not_nil assigns(:data_file).latest_version
+    refute assigns(:data_file).simulation_data?
     assay.reload
     assert_includes assay.data_files, assigns(:data_file)
+  end
+
+  test 'should create data file as simulation data' do
+    login_as(:datafile_owner) # can edit assay
+    data_file, blob = valid_data_file
+    data_file.merge!({simulation_data: '1'})
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('DataFile::Version.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
+          end
+        end
+      end
+    end
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert assigns(:data_file).simulation_data?
   end
 
   test 'upload_for_tool inacessible with normal login' do
@@ -2712,7 +2730,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def valid_data_file
-    [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data: file_for_upload }]
+    [{ title: 'Test',simulation_data:'0', project_ids: [projects(:sysmo_project).id] }, { data: file_for_upload }]
   end
 
   def valid_data_file_with_http_url
