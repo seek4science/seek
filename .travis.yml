@@ -2,8 +2,7 @@ language: ruby
 
 cache: bundler
 
-jdk:
-  - openjdk7
+jdk: openjdk7
 
 sudo: false
 
