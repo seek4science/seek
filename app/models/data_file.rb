@@ -27,6 +27,8 @@ class DataFile < ActiveRecord::Base
 
   scope :with_extracted_samples, -> { joins(:extracted_samples).uniq }
 
+  scope :simulation_data, -> {where(simulation_data:true)}
+
   explicit_versioning(version_column: 'version') do
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent)

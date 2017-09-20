@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170829125634) do
+ActiveRecord::Schema.define(version: 20170920094317) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -319,6 +319,7 @@ ActiveRecord::Schema.define(version: 20170829125634) do
     t.string   "template_name",     limit: 255,   default: "none"
     t.string   "doi",               limit: 255
     t.string   "license",           limit: 255
+    t.boolean  "simulation_data",                 default: false
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], name: "index_data_file_versions_contributor", using: :btree
@@ -347,6 +348,7 @@ ActiveRecord::Schema.define(version: 20170829125634) do
     t.string   "template_name",    limit: 255,   default: "none"
     t.string   "doi",              limit: 255
     t.string   "license",          limit: 255
+    t.boolean  "simulation_data",                default: false
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], name: "index_data_files_on_contributor_id_and_contributor_type", using: :btree

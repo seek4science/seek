@@ -384,4 +384,16 @@ class DataFileTest < ActiveSupport::TestCase
       refute df.download_disabled?
     end
   end
+
+  test 'simulation data?' do
+    df = Factory(:data_file,simulation_data:true)
+    df2 = Factory(:data_file)
+
+    assert df.simulation_data?
+    refute df2.simulation_data?
+
+    assert_includes DataFile.simulation_data,df
+    refute_includes DataFile.simulation_data,df2
+
+  end
 end
