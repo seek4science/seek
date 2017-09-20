@@ -2,11 +2,10 @@ module Seek
   module Rdf
     class JERMVocab < RDF::Vocabulary('http://jermontology.org/ontology/JERMOntology#')
       # these are explicitly defined, to prevent the undercores being changed to camelCase
-      property :External_supplier_ID
       property :NCBI_ID
-      property :experimental_assay
-      property :modelling_analysis
-      property :SEEK_ID
+      property :Experimental_assay_type
+      property :Model_analysis_type
+      property :seekID
       property :Factors_studied
       property :Gas_flow
       property :Specific_concentration
@@ -27,14 +26,14 @@ module Seek
           Model => :Model,
           Sop => :SOP,
           Person => :Person,
-          Organism => :organism,
+          Organism => :Organism,
           Project => :Project,
           Programme => :Programme,
           Study => :Study,
           Investigation => :Investigation,
           Publication => :Publication,
-          Strain => :strain,
-          Compound => :compound,
+          Strain => :Strain,
+          Compound => :Compound,
           StudiedFactor => :Factors_studied }
       end
 

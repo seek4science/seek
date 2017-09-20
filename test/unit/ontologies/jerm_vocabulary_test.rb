@@ -13,8 +13,8 @@ class JermVocabularyTest < ActiveSupport::TestCase
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Seek::Rdf::JERMVocab.Data
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Seek::Rdf::JERMVocab.Model
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), Seek::Rdf::JERMVocab.SOP
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#experimental_assay'), Seek::Rdf::JERMVocab.experimental_assay
-    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#modelling_analysis'), Seek::Rdf::JERMVocab.modelling_analysis
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Experimental_assay_type'), Seek::Rdf::JERMVocab.Experimental_assay_type
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model_analysis_type'), Seek::Rdf::JERMVocab.Model_analysis_type
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Simulation_data'), Seek::Rdf::JERMVocab.Simulation_data
   end
 
