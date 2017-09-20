@@ -1318,6 +1318,8 @@ ActiveRecord::Schema.define(version: 20170829125634) do
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
     t.string   "placeholder", limit: 255
+    t.text     "description", limit: 65535
+    t.string   "resolution",  limit: 255
   end
 
   create_table "sample_attributes", force: :cascade do |t|
