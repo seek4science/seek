@@ -17,6 +17,7 @@ namespace :seek do
     update_assay_and_tech_types
     resynchronise_ontology_types
     update_relationship_types
+    flag_simulation_data
 
   ]
 
@@ -93,5 +94,13 @@ namespace :seek do
   end
 
   task(update_relationship_types: [:environment, 'db:seed:relationship_types']) do; end
+
+  task(flag_simulation_data: :environment) do
+    disable_authorization_checks do
+      AssayAsset.simulation.where(asset_type: 'DataFile').collect(&:asset).uniq.each do |data_file|
+        data_file.update_attributes(simulation_data: true)
+      end
+    end
+  end
 
 end
