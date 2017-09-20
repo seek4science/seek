@@ -13,6 +13,7 @@ module Seek
       property :Time_series
       property :Growth_medium_composition
       property :Optical_density_600
+      property :Simulation_data
 
       # returns the correct Class IRI according to the instance 'type' - or nil if its not recognised
       def self.for_type(type)

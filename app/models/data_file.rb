@@ -189,4 +189,13 @@ class DataFile < ActiveRecord::Base
     return content_blob.openbis_dataset.json if openbis?
     nil
   end
+
+  # overides that from Seek::RDF::RdfGeneration, as simulation data needs to be #Simulation_data
+  def rdf_type_entity_fragment
+    if simulation_data
+      'Simulation_data'
+    else
+      super
+    end
+  end
 end

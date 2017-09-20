@@ -167,6 +167,10 @@ class RDFGenerationTest < ActiveSupport::TestCase
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#experimental_assay'), Factory(:experimental_assay).rdf_type_uri
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#modelling_analysis'), Factory(:modelling_assay).rdf_type_uri
     assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#organism'), Factory(:organism).rdf_type_uri
+
+
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Simulation_data'), Factory(:data_file,simulation_data:true).rdf_type_uri
+
   end
 
   test 'rdf_seek_id' do
