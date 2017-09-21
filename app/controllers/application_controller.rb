@@ -25,6 +25,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from 'ActiveRecord::RecordNotFound', with: :render_not_found_error
   rescue_from 'ActiveRecord::UnknownAttributeError', with: :render_unknown_attribute_error
+  rescue_from NotImplementedError, with: :render_not_implemented_error
 
   before_filter :project_membership_required, only: [:create, :new]
 
@@ -33,6 +34,7 @@ class ApplicationController < ActionController::Base
   before_filter :check_illegal_id, :only=>[:create]
   # after_filter :unescape_response
 
+  before_filter :write_api_enabled, :only=>[:edit, :update, :destroy, :create, :new]
   before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new]
 
   helper :all
@@ -325,6 +327,18 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def render_not_implemented_error(e)
+    respond_to do |format|
+      format.json {
+        render json: {error: e.message, status: :not_implemented}, status: :not_implemented
+      }
+      format.all {
+        render text: e.message, status: :not_implemented
+      }
+    end
+  end
+
+
   def is_auth?(object, privilege)
     if object.can_perform?(privilege)
       true
@@ -572,8 +586,14 @@ class ApplicationController < ActionController::Base
                                                        :contributor_id] }])[:policy_attributes] || {}
   end
 
+  def write_api_enabled
+    if @is_json and not Seek::Config.write_api_enabled
+      raise NotImplementedError
+    end
+  end
+
   def convert_json_params
-    if @is_json
+   if @is_json
       organize_external_attributes_from_json
       hacked_params = flatten_relationships(params)
       # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
