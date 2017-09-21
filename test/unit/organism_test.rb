@@ -199,4 +199,22 @@ class OrganismTest < ActiveSupport::TestCase
     refute org2.errors.none?
     assert org2.errors[:concept_uri].any?
   end
+
+  test 'convert ncbi id' do
+    org = Factory.build(:organism, concept_uri: '1234')
+    org.convert_ncbi_id
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/1234',org.concept_uri
+
+    org = Factory.build(:organism, concept_uri: nil)
+    org.convert_ncbi_id
+    assert_nil org.convert_ncbi_id
+
+    org = Factory.build(:organism, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/562')
+    org.convert_ncbi_id
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/562',org.concept_uri
+
+    org = Factory.build(:organism, concept_uri: 'wibble')
+    org.convert_ncbi_id
+    assert_equal 'wibble',org.concept_uri
+  end
 end

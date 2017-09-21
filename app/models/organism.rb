@@ -14,8 +14,9 @@ class Organism < ActiveRecord::Base
 
   has_and_belongs_to_many :projects
 
-  validates_presence_of :title
+  before_validation :convert_ncbi_id
 
+  validates_presence_of :title
   validates :concept_uri, url: { allow_nil: true, allow_blank: true }
   validates :concept_uri, ncbi_concept_uri: true, allow_blank: true
 
@@ -46,5 +47,13 @@ class Organism < ActiveRecord::Base
 
   def self.can_create?
     User.admin_or_project_administrator_logged_in? || User.activated_programme_administrator_logged_in?
+  end
+
+  # if present, and just a number, then converts to the http://purl.bioontology.org/ontology/NCBITAXON/[:id] form,
+  # otherwise does nothing
+  def convert_ncbi_id
+    if concept_uri && /\A\d+\Z/.match(concept_uri)
+      self.concept_uri = "http://purl.bioontology.org/ontology/NCBITAXON/#{concept_uri}"
+    end
   end
 end
