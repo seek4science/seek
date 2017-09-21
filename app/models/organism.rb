@@ -4,8 +4,8 @@ class Organism < ActiveRecord::Base
   acts_as_favouritable
   grouped_pagination
 
-  linked_to_bioportal :apikey=>Seek::Config.bioportal_api_key
-  
+  linked_to_bioportal apikey: Seek::Config.bioportal_api_key
+
   has_many :assay_organisms, inverse_of: :organism
   has_many :models
   has_many :assays, through: :assay_organisms, inverse_of: :organisms
@@ -16,6 +16,9 @@ class Organism < ActiveRecord::Base
 
   validates_presence_of :title
 
+  validates :concept_uri, url: { allow_nil: true, allow_blank: true }
+  validates :concept_uri, ncbi_concept_uri: true, allow_blank: true
+
   validate do |organism|
     unless organism.bioportal_concept.nil? || organism.bioportal_concept.valid?
       organism.bioportal_concept.errors.each do |attr, msg|
@@ -24,7 +27,7 @@ class Organism < ActiveRecord::Base
     end
   end
 
-  def can_delete? user=User.current_user
+  def can_delete?(user = User.current_user)
     !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
   end
 
@@ -35,8 +38,8 @@ class Organism < ActiveRecord::Base
   def searchable_terms
     terms = [title]
     if concept
-      terms = terms | concept[:synonyms].collect{|s| s.delete('\""')} if concept[:synonyms]
-      terms = terms | concept[:definitions].collect{|s| s.delete('\""')} if concept[:definitions]
+      terms |= concept[:synonyms].collect { |s| s.delete('\""') } if concept[:synonyms]
+      terms |= concept[:definitions].collect { |s| s.delete('\""') } if concept[:definitions]
     end
     terms
   end
@@ -44,5 +47,4 @@ class Organism < ActiveRecord::Base
   def self.can_create?
     User.admin_or_project_administrator_logged_in? || User.activated_programme_administrator_logged_in?
   end
-
 end

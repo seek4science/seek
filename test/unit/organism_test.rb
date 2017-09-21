@@ -20,9 +20,74 @@ class OrganismTest < ActiveSupport::TestCase
   end
 
   test 'ncbi_id' do
-    org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
+    org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://purl.obolibrary.org/obo/NCBITaxon_2287'))
     assert_equal 'http://purl.obolibrary.org/obo/NCBITaxon_2287', org.ncbi_uri
     assert_equal 2287, org.ncbi_id
+
+    org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://purl.obolibrary.org/obo/NCBITaxon_1111'))
+    assert_equal 1111, org.ncbi_id
+
+    org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/2104'))
+    assert_equal 2104, org.ncbi_id
+
+    org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://identifiers.org/taxonomy/9606'))
+    assert_equal 9606, org.ncbi_id
+
+    org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://identifiers.org/taxonomy/9606'))
+    assert_equal 9606, org.ncbi_id
+
+    org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: nil))
+    assert_equal nil, org.ncbi_id
+  end
+
+  test 'validate concept uri' do
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://purl.obolibrary.org/obo/NCBITaxon_2287'))
+    assert org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://purl.obolibrary.org/obo/NCBITaxon_2287'))
+    assert org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://identifiers.org/taxonomy/9606'))
+    assert org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://identifiers.org/taxonomy/9606'))
+    assert org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/2104'))
+    assert org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://purl.bioontology.org/ontology/NCBITAXON/2104'))
+    assert org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: nil))
+    assert org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: '2104'))
+    refute org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'wibble'))
+    refute org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://somewhere/123'))
+    refute org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'purl.bioontology.org/ontology/NCBITAXON/2104'))
+    refute org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://purl.bioontology.org/ontology/NCBITAXON/wibble'))
+    refute org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://purl.bioontology.org/ontology/NCBITAXON/a123'))
+    refute org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://purl.bioontology.org/ontology/NCBITAXON/123a'))
+    refute org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://purl.obolibrary.org/obo/NCBITaxon_wibble'))
+    refute org.valid?
+
+    org = Factory.build(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://purl.obolibrary.org/obo/NCBITaxon_123a'))
+    refute org.valid?
   end
 
   test 'to_rdf' do
@@ -85,11 +150,11 @@ class OrganismTest < ActiveSupport::TestCase
     assert_nil o.concept_uri
     o.ontology_id = 'NCBITAXON'
 
-    o.concept_uri = 'abc'
+    o.concept_uri = 'http://purl.obolibrary.org/obo/NCBITaxon_2287'
     o.save!
     o = Organism.find(o.id)
     assert_equal 'NCBITAXON', o.ontology_id
-    assert_equal 'abc', o.concept_uri
+    assert_equal 'http://purl.obolibrary.org/obo/NCBITaxon_2287', o.concept_uri
   end
 
   test 'dependent destroyed' do
