@@ -178,7 +178,7 @@ module Seek
             flash[:error] = "Bad NeLS URL"
             return false
           end
-          client_class = Rails.env.test? ? Nels::Rest::Client : Nels::Rest::DummyClient
+          client_class = Nels::Rest::Client
           rest_client = client_class.new(oauth_session.access_token)
           begin
             data = rest_client.sample_metadata(ref)
