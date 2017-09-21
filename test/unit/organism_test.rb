@@ -12,16 +12,24 @@ class OrganismTest < ActiveSupport::TestCase
 
   test 'ncbi_uri' do
     org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
-    assert_equal 'http://purl.obolibrary.org/obo/NCBITaxon_2287', org.ncbi_uri
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2287', org.ncbi_uri
+
+    org = Factory(:organism, concept_uri:'http://purl.bioontology.org/ontology/NCBITAXON/2104')
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2104', org.ncbi_uri
+
+    org = Factory(:organism, concept_uri:'http://identifiers.org/taxonomy/2104')
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2104', org.ncbi_uri
+
+    org = Factory(:organism, concept_uri:'http://purl.obolibrary.org/obo/NCBITaxon_2387')
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2387', org.ncbi_uri
 
     org = Factory(:organism)
-
     assert_nil org.ncbi_uri
   end
 
   test 'ncbi_id' do
     org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://purl.obolibrary.org/obo/NCBITaxon_2287'))
-    assert_equal 'http://purl.obolibrary.org/obo/NCBITaxon_2287', org.ncbi_uri
+    assert_equal 'http://purl.obolibrary.org/obo/NCBITaxon_2287', org.concept_uri
     assert_equal 2287, org.ncbi_id
 
     org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://purl.obolibrary.org/obo/NCBITaxon_1111'))
@@ -37,7 +45,7 @@ class OrganismTest < ActiveSupport::TestCase
     assert_equal 9606, org.ncbi_id
 
     org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: nil))
-    assert_equal nil, org.ncbi_id
+    assert_nil org.ncbi_id
   end
 
   test 'validate concept uri' do
@@ -99,7 +107,7 @@ class OrganismTest < ActiveSupport::TestCase
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count >= 1
       assert_equal RDF::URI.new("http://localhost:3000/organisms/#{object.id}"), reader.statements.first.subject
-      assert reader.has_triple? ["http://localhost:3000/organisms/#{object.id}", Seek::Rdf::JERMVocab.NCBI_ID, 'http://purl.obolibrary.org/obo/NCBITaxon_2287']
+      assert reader.has_triple? ["http://localhost:3000/organisms/#{object.id}", Seek::Rdf::JERMVocab.NCBI_ID, "http://purl.bioontology.org/ontology/NCBITAXON/2287"]
     end
   end
 

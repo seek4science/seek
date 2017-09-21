@@ -12,9 +12,9 @@ GIT
 
 GIT
   remote: https://github.com/SysMO-DB/bioportal.git
-  revision: 27253aec409f64bc7a1cb812b20119a982026422
+  revision: 870180c646f5cce18a5b63782a26d954c92169aa
   specs:
-    bioportal (2.3)
+    bioportal (3.0)
 
 GIT
   remote: https://github.com/SysMO-DB/convert_office.git
@@ -848,7 +848,7 @@ DEPENDENCIES
   auto_strip_attributes
   bibtex-ruby (~> 4.4.2)
   bio (~> 1.5.1)
-  bioportal (>= 2.3)!
+  bioportal (>= 3.0)!
   bives
   bootstrap-sass
   breadcrumbs_on_rails
@@ -971,4 +971,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.15.1
+   1.15.3

@@ -49,6 +49,12 @@ class Organism < ActiveRecord::Base
     User.admin_or_project_administrator_logged_in? || User.activated_programme_administrator_logged_in?
   end
 
+  #overides that from the bioportal gem, to always make sure it is based on http://purl.bioontology.org/ontology/NCBITAXON/
+  def ncbi_uri
+    return nil if ncbi_id.nil?
+    "http://purl.bioontology.org/ontology/NCBITAXON/#{ncbi_id}"
+  end
+
   # if present, and just a number, then converts to the http://purl.bioontology.org/ontology/NCBITAXON/[:id] form,
   # otherwise does nothing
   def convert_ncbi_id
