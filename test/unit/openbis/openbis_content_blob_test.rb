@@ -42,6 +42,10 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
     assert_includes terms, 'for api test'
     assert_includes terms, 'autumn.jpg'
     assert_includes terms, 'apiuser'
-  end
 
+    # values form openbis parametes as welss as key:value pairs
+    assert_includes terms, 'DataFile_3'
+    assert_includes terms, 'SEEK_DATAFILE_ID:DataFile_3'
+
+  end
 end

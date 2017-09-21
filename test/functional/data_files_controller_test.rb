@@ -2540,6 +2540,38 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div#openbis-details', count: 1
   end
 
+  test 'show openbis datafile with rich metadata' do
+    mock_openbis_calls
+    login_as(Factory(:person))
+    df = openbis_linked_data_file
+
+    get :show, id: df.id
+    assert_response :success
+    assert assigns(:data_file)
+    assert_equal df, assigns(:data_file)
+    assert_select 'div#openbis-details-properties', count: 1
+    assert_select 'div#openbis-details-properties label', text: 'SEEK_DATAFILE_ID:', count: 1
+  end
+
+  test 'get data_file as json gives openbis details' do
+    skip('json endpoint underdeveloppment, has changed since my edit')
+    mock_openbis_calls
+    login_as(Factory(:person))
+    df = openbis_linked_data_file
+    get :show, id: df, format: 'json'
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal df.id, json['id']
+    assert_equal 'OpenBIS 20160210130454955-23', json['title']
+    #assert_equal nil, json['description']
+    assert_equal df.version, json['version']
+    bis = json['openbis_dataset']
+    assert_not_nil bis
+    assert_equal 'DataFile_3', bis['properties']['SEEK_DATAFILE_ID']
+    assert_equal '20151216143716562-2', bis['experiment']
+
+  end
+
   test "associated assays don't cause 500 error if create fails" do
     mock_http
     data_file, blob = valid_data_file_with_http_url
@@ -2586,6 +2618,19 @@ class DataFilesControllerTest < ActionController::TestCase
     get :download, id: data_file
     assert_equal 'qwe', @response.body
     assert_response :success
+  end
+
+  test 'should unset policy sharing scope when updated' do
+    login_as(:datafile_owner)
+    df = data_files(:editable_data_file)
+    df.policy.update_column(:sharing_scope, Policy::ALL_USERS)
+
+    assert_equal df.reload.policy.sharing_scope, Policy::ALL_USERS
+
+    put :update, id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
+
+    assert_redirected_to data_file_path(df)
+    assert_nil df.reload.policy.sharing_scope
   end
 
   private
