@@ -180,3 +180,4 @@ openbis_download_limit:
 default_license:
 about_page_enabled:
 about_page:
+write_api_enabled:
