@@ -25,6 +25,9 @@
         <Class IRI="#organism_part"/>
     </Declaration>
     <Declaration>
+        <DataProperty IRI="#labInternalID"/>
+    </Declaration>
+    <Declaration>
         <Class IRI="#Metabolic_redesign"/>
     </Declaration>
     <Declaration>
@@ -71,6 +74,9 @@
     </Declaration>
     <Declaration>
         <Class IRI="#experimental_assay"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#sabioRKID"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Organism_or_strain_characterisation"/>
@@ -127,10 +133,13 @@
         <Class IRI="#Publication"/>
     </Declaration>
     <Declaration>
+        <DataProperty IRI="#webLink"/>
+    </Declaration>
+    <Declaration>
         <Class IRI="#SBML_format"/>
     </Declaration>
     <Declaration>
-        <DataProperty IRI="#age_of_specimen/culture"/>
+        <Class IRI="#Functional_biological_entity"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Project"/>
@@ -145,13 +154,16 @@
         <Class IRI="#Ion_trap"/>
     </Declaration>
     <Declaration>
+        <DataProperty IRI="#externalSupplierID"/>
+    </Declaration>
+    <Declaration>
         <Class IRI="#MicroRNA_profiling"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Optical_density_600"/>
+        <Class IRI="#Tiling_array"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Tiling_array"/>
+        <Class IRI="#Optical_density_600"/>
     </Declaration>
     <Declaration>
         <Class IRI="#respiration"/>
@@ -164,9 +176,6 @@
     </Declaration>
     <Declaration>
         <Class IRI="#Cell_size"/>
-    </Declaration>
-    <Declaration>
-        <DataProperty IRI="#Sabio-RK_ID"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Ionization_source"/>
@@ -244,13 +253,13 @@
         <Class IRI="#2-hybrid_system"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#cell_line"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#Accelerator_mass_spectrometry"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Time_series"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#termsOfDistribution"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Custom_Array"/>
@@ -263,6 +272,9 @@
     </Declaration>
     <Declaration>
         <Class IRI="#Gas_chromatography"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Dilution_rate"/>
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#itemProducedBy"/>
@@ -289,6 +301,12 @@
         <Class IRI="#Data_sample"/>
     </Declaration>
     <Declaration>
+        <ObjectProperty IRI="#isInvestigatedBy"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#DOI"/>
+    </Declaration>
+    <Declaration>
         <ObjectProperty IRI="#usesTechnology"/>
     </Declaration>
     <Declaration>
@@ -310,9 +328,6 @@
         <Class IRI="#Linear_equation"/>
     </Declaration>
     <Declaration>
-        <DataProperty IRI="#SEEKID"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#Enzymatic_assay"/>
     </Declaration>
     <Declaration>
@@ -331,9 +346,6 @@
         <Class IRI="#Protein-protein_interaction_profiling"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Growth_rate/Dilution_rate"/>
-    </Declaration>
-    <Declaration>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
     </Declaration>
     <Declaration>
@@ -344,9 +356,6 @@
     </Declaration>
     <Declaration>
         <Class IRI="#Translational_profiling"/>
-    </Declaration>
-    <Declaration>
-        <DataProperty IRI="#sequence_accession"/>
     </Declaration>
     <Declaration>
         <Class IRI="#deletion"/>
@@ -388,6 +397,9 @@
         <Class IRI="#Tandem_mass_spectrometry"/>
     </Declaration>
     <Declaration>
+        <Class IRI="#Characteristics_for_assay"/>
+    </Declaration>
+    <Declaration>
         <Class IRI="#Electrophoresis"/>
     </Declaration>
     <Declaration>
@@ -401,9 +413,6 @@
     </Declaration>
     <Declaration>
         <Class IRI="#Liquid_chromatography_mass_spectrometry"/>
-    </Declaration>
-    <Declaration>
-        <DataProperty IRI="#WebLink"/>
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#isDerivedFrom"/>
@@ -421,7 +430,16 @@
         <Class IRI="#Optical_density"/>
     </Declaration>
     <Declaration>
+        <DataProperty IRI="#ageOfSpecimen"/>
+    </Declaration>
+    <Declaration>
         <Class IRI="#Volume"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Information_entity"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#dateOfDeath"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#title"/>
@@ -538,6 +556,9 @@
         <Class IRI="#Translation"/>
     </Declaration>
     <Declaration>
+        <Class IRI="#Growth_rate"/>
+    </Declaration>
+    <Declaration>
         <Class IRI="#informatics_analysis_type"/>
     </Declaration>
     <Declaration>
@@ -559,22 +580,16 @@
         <Class IRI="#Flux_balance_analysis"/>
     </Declaration>
     <Declaration>
-        <DataProperty IRI="#External_supplier_ID"/>
-    </Declaration>
-    <Declaration>
         <DataProperty IRI="#identifier"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#characteristics_for_assay"/>
+        <DataProperty IRI="#instrumentModel"/>
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#isValidatedBy"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Microscopy"/>
-    </Declaration>
-    <Declaration>
-        <DataProperty IRI="#Lab_internal_ID"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Protein_purification"/>
@@ -610,13 +625,13 @@
         <Class IRI="#Affinity_chromatography"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#information_entity"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#MALDI"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Model_format"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Material_entity"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Organism_colony"/>
@@ -640,6 +655,12 @@
         <Class IRI="#Equipment"/>
     </Declaration>
     <Declaration>
+        <Class IRI="#Simulation_data"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#seekID"/>
+    </Declaration>
+    <Declaration>
         <Class IRI="#Continuous_enzymatic"/>
     </Declaration>
     <Declaration>
@@ -656,9 +677,6 @@
     </Declaration>
     <Declaration>
         <Class IRI="#Replicate_type"/>
-    </Declaration>
-    <Declaration>
-        <Class IRI="#material_entity"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Activity"/>
@@ -686,6 +704,9 @@
     </Declaration>
     <Declaration>
         <Class IRI="#Pathway"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Cell_line"/>
     </Declaration>
     <Declaration>
         <Class IRI="#PCR"/>
@@ -772,6 +793,9 @@
         <ObjectProperty IRI="#hasFormat"/>
     </Declaration>
     <Declaration>
+        <DataProperty IRI="#pubmedID"/>
+    </Declaration>
+    <Declaration>
         <Class IRI="#RNAi"/>
     </Declaration>
     <Declaration>
@@ -799,10 +823,10 @@
         <Class IRI="#Specific_concentration"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Metagenomics"/>
+        <Class IRI="#anaerobic"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#anaerobic"/>
+        <Class IRI="#Metagenomics"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Model"/>
@@ -874,9 +898,6 @@
         <Class IRI="#Cell_growth_optimisation"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#simulationData"/>
-    </Declaration>
-    <Declaration>
         <AnnotationProperty abbreviatedIRI="dc:description"/>
     </Declaration>
     <Declaration>
@@ -913,7 +934,7 @@
         <Class IRI="#Intracellular_concentration"/>
     </Declaration>
     <Declaration>
-        <DataProperty IRI="#termsofDistribution"/>
+        <DataProperty IRI="#sequenceAccession"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Protein"/>
@@ -929,9 +950,6 @@
     </Declaration>
     <Declaration>
         <Class IRI="#Gas_chromatography_mass_spectrometry"/>
-    </Declaration>
-    <Declaration>
-        <ObjectProperty IRI="#isconstructedFrom"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Peptide"/>
@@ -952,9 +970,6 @@
         <Class IRI="#Immunostaining"/>
     </Declaration>
     <Declaration>
-        <DataProperty IRI="#instrument_model"/>
-    </Declaration>
-    <Declaration>
         <DataProperty IRI="#reactionCatalyst"/>
     </Declaration>
     <Declaration>
@@ -965,9 +980,6 @@
     </Declaration>
     <Declaration>
         <Class IRI="#Compound"/>
-    </Declaration>
-    <Declaration>
-        <Class IRI="#Functional_Biological_entity"/>
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#technologyUsedIn"/>
@@ -1003,9 +1015,6 @@
         <Class IRI="#tissue_type"/>
     </Declaration>
     <Declaration>
-        <DataProperty IRI="#date_of_death"/>
-    </Declaration>
-    <Declaration>
         <ObjectProperty IRI="#hasType"/>
     </Declaration>
     <Declaration>
@@ -1024,13 +1033,13 @@
         <Class IRI="#Community_standard_specification"/>
     </Declaration>
     <Declaration>
-        <ObjectProperty IRI="#is_investigated_by"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#SOP_file_format"/>
     </Declaration>
     <Declaration>
         <Class IRI="#ELISA"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#isConstructedFrom"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Algebraic_equation"/>
@@ -1131,13 +1140,6 @@
     <SubClassOf>
         <Class IRI="#Assay"/>
         <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#isAssociatedWith"/>
-            <Class IRI="#Protocol"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Assay"/>
-        <ObjectSomeValuesFrom>
             <ObjectProperty IRI="#isPartOf"/>
             <Class IRI="#Study"/>
         </ObjectSomeValuesFrom>
@@ -1148,7 +1150,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Asset"/>
-        <Class IRI="#information_entity"/>
+        <Class IRI="#Information_entity"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Asset"/>
@@ -1174,15 +1176,15 @@
     <SubClassOf>
         <Class IRI="#Asset"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#SEEKID"/>
-            <Datatype abbreviatedIRI="xsd:anyURI"/>
+            <DataProperty IRI="#description"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
         </DataSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Asset"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#description"/>
-            <Datatype abbreviatedIRI="xsd:string"/>
+            <DataProperty IRI="#seekID"/>
+            <Datatype abbreviatedIRI="xsd:anyURI"/>
         </DataSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
@@ -1210,7 +1212,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Biological_entity"/>
-        <Class IRI="#material_entity"/>
+        <Class IRI="#Material_entity"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Buffer"/>
@@ -1249,12 +1251,20 @@
         <Class IRI="#Organism_or_strain_characterisation"/>
     </SubClassOf>
     <SubClassOf>
+        <Class IRI="#Cell_line"/>
+        <Class IRI="#Biological_entity"/>
+    </SubClassOf>
+    <SubClassOf>
         <Class IRI="#Cell_size"/>
         <Class IRI="#Organism_or_strain_characterisation"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#ChIP-on-chip"/>
         <Class IRI="#Microarray"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Characteristics_for_assay"/>
+        <Class IRI="#Experimental_factors"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Characteristics_for_sample"/>
@@ -1380,6 +1390,10 @@
         <Class IRI="#Post_source_component"/>
     </SubClassOf>
     <SubClassOf>
+        <Class IRI="#Dilution_rate"/>
+        <Class IRI="#Factors_studied"/>
+    </SubClassOf>
+    <SubClassOf>
         <Class IRI="#Discontinuous_enzymatic"/>
         <Class IRI="#Enzymatic_assay"/>
     </SubClassOf>
@@ -1425,7 +1439,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Equipment"/>
-        <Class IRI="#material_entity"/>
+        <Class IRI="#Material_entity"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Exon_array"/>
@@ -1445,7 +1459,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Experimental_factors"/>
-        <Class IRI="#information_entity"/>
+        <Class IRI="#Information_entity"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Expression"/>
@@ -1481,16 +1495,10 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Factors_studied"/>
-        <ObjectUnionOf>
-            <ObjectSomeValuesFrom>
-                <ObjectProperty IRI="#isPartOf"/>
-                <Class IRI="#Data"/>
-            </ObjectSomeValuesFrom>
-            <ObjectSomeValuesFrom>
-                <ObjectProperty IRI="#isPartOf"/>
-                <Class IRI="#SOP"/>
-            </ObjectSomeValuesFrom>
-        </ObjectUnionOf>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#isPartOf"/>
+            <Class IRI="#Assay"/>
+        </ObjectSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Factors_studied"/>
@@ -1524,10 +1532,10 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Format"/>
-        <Class IRI="#information_entity"/>
+        <Class IRI="#Information_entity"/>
     </SubClassOf>
     <SubClassOf>
-        <Class IRI="#Functional_Biological_entity"/>
+        <Class IRI="#Functional_biological_entity"/>
         <Class IRI="#Biological_entity"/>
     </SubClassOf>
     <SubClassOf>
@@ -1599,6 +1607,10 @@
         <Class IRI="#Factors_studied"/>
     </SubClassOf>
     <SubClassOf>
+        <Class IRI="#Growth_rate"/>
+        <Class IRI="#Factors_studied"/>
+    </SubClassOf>
+    <SubClassOf>
         <Class IRI="#HPLC"/>
         <Class IRI="#Chromatography"/>
     </SubClassOf>
@@ -1645,7 +1657,7 @@
     <SubClassOf>
         <Class IRI="#Instrument"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#instrument_model"/>
+            <DataProperty IRI="#instrumentModel"/>
             <Datatype abbreviatedIRI="xsd:string"/>
         </DataSomeValuesFrom>
     </SubClassOf>
@@ -1809,7 +1821,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Microarray_factors"/>
-        <Class IRI="#characteristics_for_assay"/>
+        <Class IRI="#Characteristics_for_assay"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Microarray_file_format"/>
@@ -1840,7 +1852,7 @@
     <SubClassOf>
         <Class IRI="#Model"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#termsofDistribution"/>
+            <DataProperty IRI="#termsOfDistribution"/>
             <Datatype abbreviatedIRI="xsd:string"/>
         </DataSomeValuesFrom>
     </SubClassOf>
@@ -1910,7 +1922,7 @@
     <SubClassOf>
         <Class IRI="#Organism"/>
         <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#is_investigated_by"/>
+            <ObjectProperty IRI="#isInvestigatedBy"/>
             <Class IRI="#Assay"/>
         </ObjectSomeValuesFrom>
     </SubClassOf>
@@ -1918,7 +1930,7 @@
         <Class IRI="#Organism"/>
         <DataSomeValuesFrom>
             <DataProperty IRI="#NCBI_ID"/>
-            <Datatype abbreviatedIRI="xsd:string"/>
+            <Datatype abbreviatedIRI="xsd:anyURI"/>
         </DataSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
@@ -1939,7 +1951,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Pathway"/>
-        <Class IRI="#Functional_Biological_entity"/>
+        <Class IRI="#Functional_biological_entity"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Peptide"/>
@@ -1947,7 +1959,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Person"/>
-        <Class IRI="#material_entity"/>
+        <Class IRI="#Material_entity"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Person"/>
@@ -1966,7 +1978,7 @@
     <SubClassOf>
         <Class IRI="#Person"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#SEEKID"/>
+            <DataProperty IRI="#seekID"/>
             <Datatype abbreviatedIRI="xsd:anyURI"/>
         </DataSomeValuesFrom>
     </SubClassOf>
@@ -1996,7 +2008,31 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Programme"/>
-        <Class IRI="#Project"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasPart"/>
+            <Class IRI="#Project"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Programme"/>
+        <DataSomeValuesFrom>
+            <DataProperty IRI="#description"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Programme"/>
+        <DataSomeValuesFrom>
+            <DataProperty IRI="#seekID"/>
+            <Datatype abbreviatedIRI="xsd:anyURI"/>
+        </DataSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Programme"/>
+        <DataSomeValuesFrom>
+            <DataProperty IRI="#title"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Progressive_curve_experiment"/>
@@ -2004,7 +2040,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Project"/>
-        <Class IRI="#information_entity"/>
+        <Class IRI="#Information_entity"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Project"/>
@@ -2036,8 +2072,36 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Project"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#isPartOf"/>
+            <Class IRI="#Programme"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Project"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#WebLink"/>
+            <DataProperty IRI="#description"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Project"/>
+        <DataSomeValuesFrom>
+            <DataProperty IRI="#seekID"/>
+            <Datatype abbreviatedIRI="xsd:anyURI"/>
+        </DataSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Project"/>
+        <DataSomeValuesFrom>
+            <DataProperty IRI="#title"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
+        </DataSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Project"/>
+        <DataSomeValuesFrom>
+            <DataProperty IRI="#webLink"/>
             <Datatype abbreviatedIRI="xsd:anyURI"/>
         </DataSomeValuesFrom>
     </SubClassOf>
@@ -2086,7 +2150,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Proteomics_factors"/>
-        <Class IRI="#characteristics_for_assay"/>
+        <Class IRI="#Characteristics_for_assay"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Proteomics_file_format"/>
@@ -2099,6 +2163,20 @@
     <SubClassOf>
         <Class IRI="#Publication"/>
         <Class IRI="#Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Publication"/>
+        <DataSomeValuesFrom>
+            <DataProperty IRI="#DOI"/>
+            <Datatype abbreviatedIRI="xsd:anyURI"/>
+        </DataSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Publication"/>
+        <DataSomeValuesFrom>
+            <DataProperty IRI="#pubmedID"/>
+            <Datatype abbreviatedIRI="xsd:anyURI"/>
+        </DataSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Quality_control_type"/>
@@ -2187,7 +2265,7 @@
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Sample"/>
-        <Class IRI="#material_entity"/>
+        <Class IRI="#Material_entity"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Sample"/>
@@ -2223,13 +2301,6 @@
     <SubClassOf>
         <Class IRI="#Sample"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#SEEKID"/>
-            <Datatype abbreviatedIRI="xsd:anyURI"/>
-        </DataSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Sample"/>
-        <DataSomeValuesFrom>
             <DataProperty IRI="#description"/>
             <Datatype abbreviatedIRI="xsd:string"/>
         </DataSomeValuesFrom>
@@ -2239,6 +2310,13 @@
         <DataSomeValuesFrom>
             <DataProperty IRI="#samplingDate"/>
             <Datatype abbreviatedIRI="xsd:dateTime"/>
+        </DataSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Sample"/>
+        <DataSomeValuesFrom>
+            <DataProperty IRI="#seekID"/>
+            <Datatype abbreviatedIRI="xsd:anyURI"/>
         </DataSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
@@ -2259,6 +2337,17 @@
     <SubClassOf>
         <Class IRI="#Signal_transduction"/>
         <Class IRI="#Model_analysis_type"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Simulation_data"/>
+        <Class IRI="#Asset"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Simulation_data"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#isPartOf"/>
+            <Class IRI="#modelling_analysis"/>
+        </ObjectSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Single_Nucleotide_Polymorphism"/>
@@ -2313,14 +2402,7 @@
     <SubClassOf>
         <Class IRI="#Strain"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#External_supplier_ID"/>
-            <Datatype abbreviatedIRI="xsd:string"/>
-        </DataSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Strain"/>
-        <DataSomeValuesFrom>
-            <DataProperty IRI="#Lab_internal_ID"/>
+            <DataProperty IRI="#externalSupplierID"/>
             <Datatype abbreviatedIRI="xsd:string"/>
         </DataSomeValuesFrom>
     </SubClassOf>
@@ -2443,16 +2525,8 @@
         <Class IRI="#Biological_entity"/>
     </SubClassOf>
     <SubClassOf>
-        <Class IRI="#cell_line"/>
-        <Class IRI="#Biological_entity"/>
-    </SubClassOf>
-    <SubClassOf>
         <Class IRI="#cell_type"/>
         <Class IRI="#Characteristics_for_sample"/>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#characteristics_for_assay"/>
-        <Class IRI="#Experimental_factors"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#chemoenergy"/>
@@ -2562,6 +2636,13 @@
     <SubClassOf>
         <Class IRI="#modelling_analysis"/>
         <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasOutput"/>
+            <Class IRI="#Simulation_data"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#modelling_analysis"/>
+        <ObjectSomeValuesFrom>
             <ObjectProperty IRI="#hasPart"/>
             <Class IRI="#Model"/>
         </ObjectSomeValuesFrom>
@@ -2576,8 +2657,15 @@
     <SubClassOf>
         <Class IRI="#modelling_analysis"/>
         <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#hasPart"/>
-            <Class IRI="#simulationData"/>
+            <ObjectProperty IRI="#isConstructedFrom"/>
+            <Class IRI="#Data"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#modelling_analysis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#isConstructedFrom"/>
+            <Class IRI="#Publication"/>
         </ObjectSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
@@ -2585,20 +2673,6 @@
         <ObjectSomeValuesFrom>
             <ObjectProperty IRI="#isValidatedBy"/>
             <Class IRI="#Data"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#modelling_analysis"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#isconstructedFrom"/>
-            <Class IRI="#Data"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#modelling_analysis"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#isconstructedFrom"/>
-            <Class IRI="#Publication"/>
         </ObjectSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
@@ -2640,6 +2714,13 @@
     <SubClassOf>
         <Class IRI="#process"/>
         <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasContributor"/>
+            <Class IRI="#Person"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#process"/>
+        <ObjectSomeValuesFrom>
             <ObjectProperty IRI="#hasInput"/>
             <ObjectUnionOf>
                 <Class IRI="#Asset"/>
@@ -2667,15 +2748,15 @@
     <SubClassOf>
         <Class IRI="#process"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#SEEKID"/>
-            <Datatype abbreviatedIRI="xsd:anyURI"/>
+            <DataProperty IRI="#description"/>
+            <Datatype abbreviatedIRI="xsd:string"/>
         </DataSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#process"/>
         <DataSomeValuesFrom>
-            <DataProperty IRI="#description"/>
-            <Datatype abbreviatedIRI="xsd:string"/>
+            <DataProperty IRI="#seekID"/>
+            <Datatype abbreviatedIRI="xsd:anyURI"/>
         </DataSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
@@ -2700,10 +2781,6 @@
     <SubClassOf>
         <Class IRI="#semi-aerobic"/>
         <Class IRI="#respiration"/>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#simulationData"/>
-        <Class IRI="#Asset"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#tissue"/>
@@ -2757,10 +2834,6 @@
     <SubClassOf>
         <Class IRI="#2-hybrid_system"/>
         <Class IRI="#Binding"/>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Growth_rate/Dilution_rate"/>
-        <Class IRI="#Factors_studied"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Sex/Gender"/>
@@ -2867,7 +2940,7 @@
     </InverseObjectProperties>
     <InverseObjectProperties>
         <ObjectProperty IRI="#investigates"/>
-        <ObjectProperty IRI="#is_investigated_by"/>
+        <ObjectProperty IRI="#isInvestigatedBy"/>
     </InverseObjectProperties>
     <InverseObjectProperties>
         <ObjectProperty IRI="#technologyUsedIn"/>
@@ -2898,6 +2971,10 @@
         <Class IRI="#Assay"/>
     </ObjectPropertyDomain>
     <ObjectPropertyDomain>
+        <ObjectProperty IRI="#isConstructedFrom"/>
+        <Class IRI="#Model"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
         <ObjectProperty IRI="#isContributorOf"/>
         <Class IRI="#Person"/>
     </ObjectPropertyDomain>
@@ -2910,12 +2987,8 @@
         <Class IRI="#Format"/>
     </ObjectPropertyDomain>
     <ObjectPropertyDomain>
-        <ObjectProperty IRI="#is_investigated_by"/>
+        <ObjectProperty IRI="#isInvestigatedBy"/>
         <Class IRI="#Organism"/>
-    </ObjectPropertyDomain>
-    <ObjectPropertyDomain>
-        <ObjectProperty IRI="#isconstructedFrom"/>
-        <Class IRI="#Model"/>
     </ObjectPropertyDomain>
     <ObjectPropertyDomain>
         <ObjectProperty IRI="#technologyUsedIn"/>
@@ -2966,15 +3039,11 @@
         <Class IRI="#Technology_type"/>
     </ObjectPropertyRange>
     <SubDataPropertyOf>
+        <DataProperty IRI="#DOI"/>
+        <DataProperty IRI="#identifier"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
         <DataProperty IRI="#ECNumber"/>
-        <DataProperty IRI="#identifier"/>
-    </SubDataPropertyOf>
-    <SubDataPropertyOf>
-        <DataProperty IRI="#External_supplier_ID"/>
-        <DataProperty IRI="#identifier"/>
-    </SubDataPropertyOf>
-    <SubDataPropertyOf>
-        <DataProperty IRI="#Lab_internal_ID"/>
         <DataProperty IRI="#identifier"/>
     </SubDataPropertyOf>
     <SubDataPropertyOf>
@@ -2982,24 +3051,36 @@
         <DataProperty IRI="#identifier"/>
     </SubDataPropertyOf>
     <SubDataPropertyOf>
-        <DataProperty IRI="#SEEKID"/>
-        <DataProperty IRI="#identifier"/>
-    </SubDataPropertyOf>
-    <SubDataPropertyOf>
-        <DataProperty IRI="#Sabio-RK_ID"/>
-        <DataProperty IRI="#identifier"/>
-    </SubDataPropertyOf>
-    <SubDataPropertyOf>
-        <DataProperty IRI="#WebLink"/>
-        <DataProperty IRI="#identifier"/>
-    </SubDataPropertyOf>
-    <SubDataPropertyOf>
-        <DataProperty IRI="#sequence_accession"/>
-        <DataProperty IRI="#identifier"/>
-    </SubDataPropertyOf>
-    <SubDataPropertyOf>
-        <DataProperty IRI="#age_of_specimen/culture"/>
+        <DataProperty IRI="#ageOfSpecimen"/>
         <DataProperty abbreviatedIRI="owl:topDataProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#externalSupplierID"/>
+        <DataProperty IRI="#identifier"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#labInternalID"/>
+        <DataProperty IRI="#identifier"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#pubmedID"/>
+        <DataProperty IRI="#identifier"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#sabioRKID"/>
+        <DataProperty IRI="#identifier"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#seekID"/>
+        <DataProperty IRI="#identifier"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#sequenceAccession"/>
+        <DataProperty IRI="#identifier"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
+        <DataProperty IRI="#webLink"/>
+        <DataProperty IRI="#identifier"/>
     </SubDataPropertyOf>
     <DataPropertyDomain>
         <DataProperty IRI="#manufacturer"/>
@@ -3273,6 +3354,16 @@
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <IRI>#Cell_line</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00201</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Cell_line</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Cell Line</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
         <IRI>#Cell_size</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:006</Literal>
     </AnnotationAssertion>
@@ -3295,6 +3386,16 @@
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#ChIP-on-chip</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">ChIP-on-chip</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <IRI>#Characteristics_for_assay</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00155</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Characteristics_for_assay</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Characteristics for Assay</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
@@ -3540,6 +3641,11 @@
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#Detectors</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Detectors</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Dilution_rate</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Dilution Rate</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
@@ -3878,12 +3984,12 @@
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#Functional_Biological_entity</IRI>
+        <IRI>#Functional_biological_entity</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:40014</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#Functional_Biological_entity</IRI>
+        <IRI>#Functional_biological_entity</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Functional Biological Entity</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
@@ -4082,6 +4188,16 @@
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Growth Medium Composition</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <IRI>#Growth_rate</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00181</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Growth_rate</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Growth Rate</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:description"/>
         <IRI>#HPLC</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">High Performance Liquid Chromatography. 
@@ -4171,6 +4287,16 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#Inductively_coupled_plasma_mass_spectrometry</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Inductively Coupled Plasma Mass Spectrometry</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <IRI>#Information_entity</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00143</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Information_entity</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Information Entity</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
@@ -4431,6 +4557,16 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#Mass_spectrometry</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Mass Spectrometry</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <IRI>#Material_entity</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00198</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Material_entity</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Material Entity</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
@@ -5354,6 +5490,16 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <IRI>#Simulation_data</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00217</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#Simulation_data</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Simulation Data</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
         <IRI>#Single_Nucleotide_Polymorphism</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00166</Literal>
     </AnnotationAssertion>
@@ -5745,16 +5891,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#cell_line</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00201</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#cell_line</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Cell Line</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
         <IRI>#cell_type</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00157</Literal>
     </AnnotationAssertion>
@@ -5762,16 +5898,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#cell_type</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Cell Type</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#characteristics_for_assay</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00155</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#characteristics_for_assay</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Characteristics for Assay</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
@@ -5925,16 +6051,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#information_entity</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00143</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#information_entity</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Information Entity</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
         <IRI>#insertion</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00165</Literal>
     </AnnotationAssertion>
@@ -5945,8 +6061,8 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#instrument_model</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">instrument_model</Literal>
+        <IRI>#instrumentModel</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">instrumentModel</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
@@ -5957,16 +6073,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#manufacturer</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">manufacturer</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#material_entity</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00198</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#material_entity</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Material Entity</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
@@ -6166,22 +6272,12 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#sequence_accession</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">sequence_accession</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#simulationData</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00217</Literal>
+        <IRI>#sequenceAccession</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">sequenceAccession</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#simulationData</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Simulation Data</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#termsofDistribution</IRI>
+        <IRI>#termsOfDistribution</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">termsofDistribution</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
@@ -6283,16 +6379,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#2-hybrid_system</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">2-hybrid System</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#Growth_rate/Dilution_rate</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00181</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#Growth_rate/Dilution_rate</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Growth Rate / Dilution Rate</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
