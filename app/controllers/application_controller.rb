@@ -591,7 +591,7 @@ class ApplicationController < ActionController::Base
     if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
       return
     end
-    if @is_json and !Rails.env.development?
+    if @is_json && !Rails.env.development?
       raise NotImplementedError
     end
   end
