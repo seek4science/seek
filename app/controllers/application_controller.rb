@@ -587,7 +587,11 @@ class ApplicationController < ActionController::Base
   end
 
   def write_api_enabled
-    if @is_json and Rails.env.production?
+    controller_class = self.controller_name.classify
+    if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
+      return
+    end
+    if @is_json and !Rails.env.development?
       raise NotImplementedError
     end
   end
