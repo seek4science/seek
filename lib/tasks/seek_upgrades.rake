@@ -18,6 +18,7 @@ namespace :seek do
     resynchronise_ontology_types
     update_relationship_types
     flag_simulation_data
+    rebuild_rdf
 
   ]
 
@@ -101,6 +102,15 @@ namespace :seek do
         data_file.update_attributes(simulation_data: true)
       end
     end
+  end
+
+  #cleans old the old rdf, and triggers a task to create jobs to build new rdf
+  task(rebuild_rdf: :environment) do
+    dir = Seek::Config.rdf_filestore_path
+    if Dir.exist?(dir)
+      FileUtils.rm_r(dir,force:true)
+    end
+    Rake::Task['seek_rdf:generate'].invoke
   end
 
 end
