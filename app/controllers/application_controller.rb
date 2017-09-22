@@ -587,7 +587,7 @@ class ApplicationController < ActionController::Base
   end
 
   def write_api_enabled
-    if @is_json and not Seek::Config.write_api_enabled
+    if @is_json and Rails.env.production?
       raise NotImplementedError
     end
   end
