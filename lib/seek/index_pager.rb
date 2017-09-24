@@ -20,7 +20,9 @@ module Seek
       respond_to do |format|
         format.html
         format.xml
-        format.json {render json: objects, each_serializer: ActiveModel::Serializer}
+        format.json {render json: objects,
+                            each_serializer: ActiveModel::Serializer,
+                            meta: {:count => objects.length}}
       end
     end
 

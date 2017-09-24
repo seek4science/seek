@@ -7,7 +7,7 @@ class BaseSerializer < SimpleBaseSerializer
     attribute_name.to_s
   end
 
-  def meta
+  def _meta
     #content-blob doesn't have timestamps
     if object.respond_to?('created_at')
       created = object.created_at

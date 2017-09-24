@@ -19,7 +19,7 @@ class SimpleBaseSerializer < ActiveModel::Serializer
   def relationship_related_link(attribute_name)
   end
 
-  def meta
+  def _meta
     if object.respond_to?('created_at')
       created = object.created_at
       updated = object.updated_at
@@ -38,5 +38,9 @@ class SimpleBaseSerializer < ActiveModel::Serializer
       end
     end
     tags
+  end
+
+  def to_json(options = {})
+    super
   end
 end
