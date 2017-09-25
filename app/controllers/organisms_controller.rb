@@ -34,7 +34,10 @@ class OrganismsController < ApplicationController
     else
       respond_to do |format|
         format.xml
-        format.json {render json: @organisms}
+        format.json {render json: @organisms,
+                            each_serializer: ActiveModel::Serializer,
+                            meta: {:base_url =>   Seek::Config.site_base_host
+        }}
       end
     end
   end

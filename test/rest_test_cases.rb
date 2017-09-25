@@ -78,6 +78,7 @@ module RestTestCases
 
   def test_index_json
     get :index, format: 'json'
+    fred = @response.body
     perform_jsonapi_checks
     assert JSON::Validator.validate(index_schema_file_path, @response.body)
   end
