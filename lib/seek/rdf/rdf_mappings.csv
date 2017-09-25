@@ -32,12 +32,12 @@ Investigation,projects,JERMVocab.itemProducedBy,u,,
 Investigation,studies,JERMVocab.hasPart,u,,
 Investigation,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
 Model,assays,JERMVocab.isPartOf,u,,
-Model,organism,JERMVocab.investigates,u,,
 Model,projects,JERMVocab.itemProducedBy,u,,
 Model,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
 Organism,assays,JERMVocab.isInvestigatedBy,u,,
 Organism,ncbi_uri,JERMVocab.NCBI_ID,u,,
-Person,assets,JERMVocab.isCreatorOf,u,,select{|item| !item.is_a?(Presentation)}
+Person,created_items,JERMVocab.isCreatorOf,u,,select{|item| !(item.is_a?(Presentation) || item.is_a?(Event) || item.is_a?(Sample))}
+Person,contributed_items,JERMVocab.isContributorOf,u,,select{|item| !(item.is_a?(Presentation) || item.is_a?(Event) || item.is_a?(Sample))}
 Person,email_uri,RDF::FOAF.mbox_sha1sum,l,Digest::SHA1.hexdigest(item),
 Person,first_name,RDF::FOAF.firstName,l,,
 Person,last_name,RDF::FOAF.familyName,l,,

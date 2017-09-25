@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
-
   fixtures :users, :people
 
   # Replace this with your real tests.
@@ -136,6 +135,34 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'contributed items' do
+    person = Factory(:person)
+    refute_nil person.user
+    df = Factory(:data_file, contributor: person)
+    as = Factory(:assay, contributor: person)
+    study = Factory(:study, contributor: person.user)
+
+    items = person.contributed_items
+
+    assert_equal 3, items.count
+    assert_includes items, df
+    assert_includes items, as
+    assert_includes items, study
+
+    person = Factory(:brand_new_person)
+    assert_nil person.user
+    df = Factory(:data_file, contributor: person)
+    as = Factory(:assay, contributor: person)
+    inv = Factory(:investigation, contributor: person)
+
+    items = person.contributed_items
+
+    assert_equal 3, items.count
+    assert_includes items, df
+    assert_includes items, as
+    assert_includes items, inv
+  end
+
   test 'orcid id validation' do
     p = Factory :person
     p.orcid = nil
@@ -189,16 +216,16 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'orcid https uri' do
-    p = Factory :person,orcid: 'http://orcid.org/0000-0003-2130-0865'
-    assert_equal 'https://orcid.org/0000-0003-2130-0865',p.orcid_https_uri
+    p = Factory :person, orcid: 'http://orcid.org/0000-0003-2130-0865'
+    assert_equal 'https://orcid.org/0000-0003-2130-0865', p.orcid_https_uri
 
     p = Factory :person
     assert_nil p.orcid_https_uri
   end
 
   test 'orcid display format' do
-    p = Factory :person,orcid: 'http://orcid.org/0000-0003-2130-0865'
-    assert_equal 'orcid.org/0000-0003-2130-0865',p.orcid_display_format
+    p = Factory :person, orcid: 'http://orcid.org/0000-0003-2130-0865'
+    assert_equal 'orcid.org/0000-0003-2130-0865', p.orcid_display_format
 
     p = Factory :person
     assert_nil p.orcid_display_format
@@ -394,7 +421,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal 0, p.expertise.size
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
-          p.expertise = %w(golf fishing)
+          p.expertise = %w[golf fishing]
         end
       end
 
@@ -426,7 +453,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal 0, p.tools.size
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
-          p.tools = %w(golf fishing)
+          p.tools = %w[golf fishing]
         end
       end
 
@@ -455,14 +482,14 @@ class PersonTest < ActiveSupport::TestCase
   def test_removes_previously_assigned
     p = Factory :person
     User.with_current_user p.user do
-      p.tools = %w(one two)
+      p.tools = %w[one two]
       assert_equal 2, p.tools.size
       p.tools = ['three']
       assert_equal 1, p.tools.size
       assert_equal 'three', p.tools[0].text
 
       p = Factory :person
-      p.expertise = %w(aaa bbb)
+      p.expertise = %w[aaa bbb]
       assert_equal 2, p.expertise.size
       p.expertise = ['ccc']
       assert_equal 1, p.expertise.size
@@ -475,13 +502,13 @@ class PersonTest < ActiveSupport::TestCase
     User.with_current_user p.user do
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
-          p.tools = %w(golf fishing)
+          p.tools = %w[golf fishing]
         end
       end
 
       assert_difference('Annotation.count', 2) do
         assert_no_difference('TextValue.count') do
-          p.expertise = %w(golf fishing)
+          p.expertise = %w[golf fishing]
         end
       end
     end
@@ -506,7 +533,7 @@ class PersonTest < ActiveSupport::TestCase
   test 'not registered' do
     peeps = Person.not_registered
     assert_not_nil peeps
-    assert peeps.size > 0, 'There should be some userless people'
+    assert !peeps.empty?, 'There should be some userless people'
     assert_nil(peeps.find { |p| !p.user.nil? }, 'There should be no people with a non nil user')
 
     p = people(:three)
@@ -809,7 +836,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'add to project and institution subscribes to project' do
-    person = Factory (:brand_new_person)
+    person = Factory :brand_new_person
     inst = Factory(:institution)
     proj = Factory(:project)
 
@@ -1041,7 +1068,7 @@ class PersonTest < ActiveSupport::TestCase
                                             orcid: 'http://orcid.org/0000-0002-0048-3300'
 
     https_orcid = Factory :brand_new_person, email: 'FISH-sOup3@email.com',
-                         orcid: 'https://orcid.org/0000-0002-0048-3300'
+                                             orcid: 'https://orcid.org/0000-0002-0048-3300'
 
     assert_equal 'http://orcid.org/0000-0002-0048-3300', semi_orcid.orcid
     assert_equal 'http://orcid.org/0000-0002-0048-3300', full_orcid.orcid
