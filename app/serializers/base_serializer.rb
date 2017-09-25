@@ -2,6 +2,15 @@ class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
   include RelatedItemsHelper
 
+  def self_link
+    #{base_url}//#{type}/#{id}
+    "/#{type}/#{object.id}"
+  end
+
+  def _links
+      {self: self_link}
+      end
+
   #avoid dash-erizing attribute names
   def format_name(attribute_name)
     attribute_name.to_s

@@ -2,10 +2,11 @@ class SimpleBaseSerializer < ActiveModel::Serializer
   def type
     object.class.name.demodulize.tableize
   end
-  def self_link
-    #{base_url}//#{type}/#{id}
-    "/#{type}/#{id}"
-  end
+
+  # def self_link
+  #   #{base_url}//#{type}/#{id}
+  #   "/#{type}/#{id}"
+  # end
 
   def base_url
     Seek::Config.site_base_host

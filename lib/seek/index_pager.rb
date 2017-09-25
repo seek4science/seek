@@ -22,7 +22,8 @@ module Seek
         format.xml
         format.json {render json: objects,
                             each_serializer: ActiveModel::Serializer,
-                            meta: {:count => objects.length}}
+                            meta: {:base_url =>   Seek::Config.site_base_host
+                            }}
       end
     end
 
