@@ -35,7 +35,7 @@ Model,assays,JERMVocab.isPartOf,u,,
 Model,projects,JERMVocab.itemProducedBy,u,,
 Model,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
 Organism,assays,JERMVocab.isInvestigatedBy,u,,
-Organism,ncbi_uri,JERMVocab.NCBI_ID,u,,
+Organism,ncbi_uri,JERMVocab.NCBI_ID,l,URI.parse(item),compact
 Person,created_items,JERMVocab.isCreatorOf,u,,select{|item| !(item.is_a?(Presentation) || item.is_a?(Event) || item.is_a?(Sample))}
 Person,contributed_items,JERMVocab.isContributorOf,u,,select{|item| !(item.is_a?(Presentation) || item.is_a?(Event) || item.is_a?(Sample))}
 Person,email_uri,RDF::FOAF.mbox_sha1sum,l,Digest::SHA1.hexdigest(item),
