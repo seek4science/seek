@@ -13,7 +13,7 @@
           }, 
           "type": {
             "enum": [
-              "datafiles"
+              "data_files"
             ], 
             "type": "string"
           }
