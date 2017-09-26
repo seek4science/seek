@@ -72,7 +72,10 @@ class PeopleController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml
-      format.json  { render json: @people, each_serializer: ActiveModel::Serializer }
+      format.json  { render json: @people,
+                            each_serializer: ActiveModel::Serializer,
+                            meta: {:base_url =>   Seek::Config.site_base_host
+                            } }
     end
   end
 
