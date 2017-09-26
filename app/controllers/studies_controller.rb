@@ -95,7 +95,6 @@ class StudiesController < ApplicationController
       format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @study}
-
     end
   end
 

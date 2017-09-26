@@ -1638,9 +1638,9 @@ class PeopleControllerTest < ActionController::TestCase
     model = Factory(:model, contributor: me, creators: [me])
     other_data_file = Factory(:data_file, contributor: someone_else, creators: [someone_else])
 
-    assert_includes me.assets, data_file
-    assert_includes me.assets, model
-    refute_includes me.assets, other_data_file
+    assert_includes me.contributed_items, data_file
+    assert_includes me.contributed_items, model
+    refute_includes me.contributed_items, other_data_file
 
     get :items, id: me.id
     assert_response :success

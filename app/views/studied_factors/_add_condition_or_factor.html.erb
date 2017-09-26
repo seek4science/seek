@@ -1,114 +1,116 @@
 <%
-   entity=controller_name.singularize
-   object=eval("@"+entity)
-   display_asset = nil
-   path_to_object = nil
-   path_to_create_from_existing = nil
-   if asset == "data_file"
-      asset_object = @data_file
-      display_asset = @display_data_file
-      path_to_object = data_file_path(@data_file).concat("/#{controller_name}")
-      path_to_create_from_existing = create_from_existing_data_file_studied_factors_url
-   elsif asset == "sop"
-     asset_object = @sop
-     display_asset = @display_sop
-     path_to_object = sop_path(@sop).concat("/#{controller_name}")
-     path_to_create_from_existing = create_from_existing_sop_experimental_conditions_url
-   end
+  entity=controller_name.singularize
+  object=eval("@"+entity)
+  display_asset = nil
+  path_to_object = nil
+  path_to_create_from_existing = nil
+  if asset == "data_file"
+    asset_object = @data_file
+    display_asset = @display_data_file
+    path_to_object = data_file_path(@data_file).concat("/#{controller_name}")
+    path_to_create_from_existing = create_from_existing_data_file_studied_factors_url
+  elsif asset == "sop"
+    asset_object = @sop
+    display_asset = @display_sop
+    path_to_object = sop_path(@sop).concat("/#{controller_name}")
+    path_to_create_from_existing = create_from_existing_sop_experimental_conditions_url
+  end
 %>
 
+
 <%= form_for_with_callbacks object,
-  :url=> path_to_object,
-  :before=>"$('#{entity}_submit').disabled=true;",
-  :loaded=>"$('#{entity}_submit').disabled=false;",
-  :html=>{:method=>:post, :id => "add_condition_or_factor_form", :remote => true } do |f| -%>
+                            :url => path_to_object,
+                            :before => "$('#{entity}_submit').disabled=true;",
+                            :loaded => "$('#{entity}_submit').disabled=false;",
+                            :html => {:method => :post, :id => "add_condition_or_factor_form", :remote => true} do |f| -%>
 
 
-  <div class="conditions_or_factors" >
-  <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Add new entry manually </h4>
-  <table class='conditions_or_factor_table' >
-    <tr>
-      <th>Item</th>
-      <th>Unit</th>
-      <% if entity == "studied_factor" %>
-         <th>Start value</th>
-         <th>End value</th>
-         <th>SD</th>
-      <% elsif entity == 'experimental_condition' %>
-        <th>Value</th> 
-      <% end %>
-    </tr>
+    <div class="conditions_or_factors">
+      <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Add new entry manually </h4>
+      <table class='conditions_or_factor_table'>
+        <tr>
+          <th>Item</th>
+          <th>Unit</th>
+          <% if entity == "studied_factor" %>
+              <th>Start value</th>
+              <th>End value</th>
+              <th>SD</th>
+          <% elsif entity == 'experimental_condition' %>
+              <th>Value</th>
+          <% end %>
+        </tr>
+        <div class="form-group">
+          <tr>
+            <% if entity == "studied_factor" %>
+                <td><%= f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort { |a, b| a.title <=> b.title }, :id, :title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')",:class=>"form-control"} %></td>
+                <td><%= f.collection_select :unit_id, Unit.factors_studied_units.sort { |a, b| a.order <=> b.order }, :id, :symbol,{},:class=>"form-control" %></td>
+            <% elsif entity == 'experimental_condition' %>
+                <td><%= f.collection_select :measured_item_id, MeasuredItem.all.sort { |a, b| a.title <=> b.title }, :id, :title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')",:class=>"form-control"} %></td>
+                <td><%= f.collection_select :unit_id, Unit.all.sort { |a, b| a.order <=> b.order }, :id, :symbol,{},:class=>"form-control" %></td>
+            <% end %>
 
-    <tr>
-      <% if entity == "studied_factor" %>
-        <td><%=  f.collection_select :measured_item_id, MeasuredItem.factors_studied_items.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
-        <td><%=  f.collection_select :unit_id, Unit.factors_studied_units.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
-      <% elsif entity == 'experimental_condition' %>
-        <td><%= f.collection_select :measured_item_id, MeasuredItem.all.sort{|a,b| a.title <=> b.title},:id,:title, {}, {:onchange => "additionalFieldForItem('add_condition_or_factor_form', '')"} %></td>
-        <td><%=  f.collection_select :unit_id, Unit.all.sort{|a,b| a.order <=> b.order},:id,:symbol %></td>
-      <% end %>
+            <td><%= f.text_field :start_value, :size => 4,:class=>"form-control" %></td>
 
-      <td><%= f.text_field :start_value,:size=>4 %></td>
+            <% if entity == "studied_factor" %>
+                <td><%= f.text_field :end_value, :size => 4,:class=>"form-control" %></td>
+                <td><%= f.text_field :standard_deviation, :size => 4,:class=>"form-control" %></td>
+            <% end %>
 
-      <% if entity == "studied_factor" %>
-        <td><%= f.text_field :end_value,:size=>4 %></td>
-        <td><%= f.text_field :standard_deviation,:size=>4 %></td>
-      <% end %>
+            <%= hidden_field_tag "version", display_asset.version -%>
+          </tr>
+        </div>
+      </table>
 
-      <%= hidden_field_tag "version", display_asset.version -%>
-    </tr>
-  </table>
+      <div id='substance_condition_factor' class="substance_condition_factor" style="display: none">
+        <%= render :partial => "layouts/substances_autocomplete", :locals => {:name => "substance"} -%>
+      </div>
+      <div id='growth_medium_or_buffer_description' class="growth_medium_or_buffer_description" style="display: none">
+        <%= hidden_field_tag "annotation[attribute_name]", "description" -%>
+        Please enter the description:<br/>
+        <%= text_area_tag "annotation[value]", nil, :cols => 45,:class=>"form-control" -%>
+      </div>
 
-  <div id='substance_condition_factor' class="substance_condition_factor" style="display: none">
-     <%= render :partial=>"layouts/substances_autocomplete", :locals => {:name => "substance"}-%>
-  </div>
-  <div id='growth_medium_or_buffer_description' class="growth_medium_or_buffer_description" style="display: none">
-      <%= hidden_field_tag "annotation[attribute_name]", "description" -%>
-      Please enter the description:<br/>
-      <%= text_area_tag "annotation[value]", nil, :cols => 45 -%>
-  </div>
-
-  <div class='border_top'>
-    <%= f.submit "Add", :id => "#{entity}_submit", :style => "width:50px;font-weight:bold;" -%>
-  </div>
- </div>
+      <div class='border_top'>
+        <%= f.submit "Add", :id => "#{entity}_submit", :class => 'btn btn-primary' -%>
+      </div>
+    </div>
 <% end -%>
 
 <%= form_tag(path_to_create_from_existing, {:remote => true}) do -%>
-   <% fses_or_ecs = fses_or_ecs_of_project asset_object, controller_name
-      unless fses_or_ecs.blank? %>
-         <div class="conditions_or_factors" >
-            <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Or select from:</h4>
-            <% grouped_fses_or_ecs = fses_or_ecs.group_by{|fs_or_ec| fs_or_ec.measured_item.title}
-               grouped_fses_or_ecs = Hash[grouped_fses_or_ecs.sort]
-               grouped_fses_or_ecs.each do |measured_item, fses_or_ecs|
-                link_table_name = entity + '_links'
-                #remove the fs_or_ecs which have the concentration of no substance
-                if measured_item == 'concentration'
-                   fses_or_ecs = fses_or_ecs.reject{|fs_or_ec| fs_or_ec.send(link_table_name).blank?}
-                end
-                fses_or_ecs = uniq_fs_or_ec fses_or_ecs
+    <% fses_or_ecs = fses_or_ecs_of_project asset_object, controller_name
+       unless fses_or_ecs.blank? %>
+        <div class="conditions_or_factors">
+          <h4 style="border-bottom: 1px solid #DDD; width: 20em;"> Or select from:</h4>
+          <% grouped_fses_or_ecs = fses_or_ecs.group_by { |fs_or_ec| fs_or_ec.measured_item.title }
+             grouped_fses_or_ecs = Hash[grouped_fses_or_ecs.sort]
+             grouped_fses_or_ecs.each do |measured_item, fses_or_ecs|
+               link_table_name = entity + '_links'
+               #remove the fs_or_ecs which have the concentration of no substance
+               if measured_item == 'concentration'
+                 fses_or_ecs = fses_or_ecs.reject { |fs_or_ec| fs_or_ec.send(link_table_name).blank? }
+               end
+               fses_or_ecs = uniq_fs_or_ec fses_or_ecs
 
-                fses_or_ecs = fses_or_ecs.sort{|a,b| (try_block{a.send(link_table_name).first.substance.name.downcase}.to_s + a.measured_item.title) <=> (try_block{b.send(link_table_name).first.substance.name.downcase}.to_s + b.measured_item.title)} %>
-                <ul class="measured_items">
-                  <li>
-                     <input type=checkbox id='checkbox_<%= measured_item-%>' onclick="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear', { duration: 0.5 })">
-                  </li>
-                  <li><%= measured_item -%></li>
-                </ul>
-                <ul id = 'conditions_or_factors_of_item_<%= measured_item -%>' class='existing_conditions_or_factors' style="display: none;">
-                  <%= render :partial=>"studied_factors/condition_or_factor_row_headings", :locals=>{:asset => asset, :show_delete=>false, :show_checkbox => true} %>
-                  <%= render :partial=>"studied_factors/condition_or_factor_row",:collection=>fses_or_ecs, :locals=>{:asset => asset, :show_delete=>false, :show_checkbox => true} %>
-                </ul>
-            <% end -%>
-            <%= hidden_field_tag "#{asset}_id", asset_object.id -%>
-            <%= hidden_field_tag "version", display_asset.version  -%>
+               fses_or_ecs = fses_or_ecs.sort { |a, b| (try_block { a.send(link_table_name).first.substance.name.downcase }.to_s + a.measured_item.title) <=> (try_block { b.send(link_table_name).first.substance.name.downcase }.to_s + b.measured_item.title) } %>
+              <ul class="measured_items">
+                <li>
+                  <input type=checkbox id='checkbox_<%= measured_item -%>' onclick="Effect.toggle('conditions_or_factors_of_item_<%= measured_item-%>', 'appear', { duration: 0.5 })">
+                </li>
+                <li><%= measured_item -%></li>
+              </ul>
+              <ul id='conditions_or_factors_of_item_<%= measured_item -%>' class='existing_conditions_or_factors' style="display: none;">
+                <%= render :partial => "studied_factors/condition_or_factor_row_headings", :locals => {:asset => asset, :show_delete => false, :show_checkbox => true} %>
+                <%= render :partial => "studied_factors/condition_or_factor_row", :collection => fses_or_ecs, :locals => {:asset => asset, :show_delete => false, :show_checkbox => true} %>
+              </ul>
+          <% end -%>
+          <%= hidden_field_tag "#{asset}_id", asset_object.id -%>
+          <%= hidden_field_tag "version", display_asset.version -%>
 
-            <div class='border_top' style="float:right;margin-right: 13em; clear: both">
-               <%= submit_tag "Add", :style => "width:50px;font-weight:bold", :id => 'add_from_existing' %>
-            </div>
-         </div>
-      <% end -%>
+          <div class='border_top' style="float:right;margin-right: 13em; clear: both">
+            <%= submit_tag "Add", :style => "width:50px;font-weight:bold", :id => 'add_from_existing' %>
+          </div>
+        </div>
+    <% end -%>
 <% end -%>
 
 

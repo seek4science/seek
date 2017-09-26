@@ -3,8 +3,9 @@ class StudiedFactorsController < ApplicationController
   include Seek::AnnotationCommon
   include Seek::AssetsCommon
 
-  before_filter :login_required
-  before_filter :find_data_file_auth
+  before_filter :login_required, except: [:show]
+  before_filter :find_data_file_edit_auth, except: [:show]
+  before_filter :find_data_file_view_auth, only: [:show]
   before_filter :create_new_studied_factor, only: [:index]
   before_filter :no_comma_for_decimal, only: %i[create update]
 
@@ -50,7 +51,7 @@ class StudiedFactorsController < ApplicationController
     # retrieve the selected FSes
 
     params.each do |key, value|
-      studied_factor_ids.push value.to_i if (key =~ /checkbox/)
+      studied_factor_ids.push value.to_i if key =~ /checkbox/
     end
     # create the new FSes based on the selected FSes
     studied_factor_ids.each do |id|
@@ -125,13 +126,42 @@ class StudiedFactorsController < ApplicationController
     end
   end
 
+  def show
+    @studied_factor = StudiedFactor.find(params[:id])
+    respond_to do |format|
+      format.rdf { render text: 'not yet available',status: :forbidden }
+    end
+  end
+
   private
 
   def studied_factor_params
     params.require(:studied_factor).permit(:measured_item_id, :unit_id, :start_value, :end_value, :standard_deviation)
   end
 
-  def find_data_file_auth
+  def find_data_file_view_auth
+    data_file = DataFile.find(params[:data_file_id])
+    if data_file.can_view? current_user
+      @data_file = data_file
+      find_display_asset @data_file
+    else
+      respond_to do |format|
+        flash[:error] = 'You are not authorized to perform this action'
+        format.html { redirect_to data_files_path }
+        format.rdf { render text: 'You are not authorized to perform this action', status: :forbidden }
+      end
+      return false
+    end
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      flash[:error] = "Couldn't find the Data file"
+      format.html { redirect_to data_files_path }
+      format.rdf { render text: 'Not found', status: :not_found }
+    end
+    return false
+  end
+
+  def find_data_file_edit_auth
     data_file = DataFile.find(params[:data_file_id])
     if data_file.can_edit? current_user
       @data_file = data_file

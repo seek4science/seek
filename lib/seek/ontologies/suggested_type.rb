@@ -68,9 +68,11 @@ module Seek
         error_messages = []
         type_name = humanize_term_type
         error_messages << "Unable to delete #{type_name} types with children." unless children.empty?
-        error_messages << "Unable to delete #{type_name} type " \
-                                          "due to reliance from #{assays.count} " \
-                                          "existing #{type_name}." unless assays.empty?
+        unless assays.empty?
+          error_messages << "Unable to delete #{type_name} type " \
+                                            "due to reliance from #{assays.count} " \
+                                            "existing #{type_name}."
+        end
         error_messages
       end
 

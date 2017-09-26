@@ -105,6 +105,7 @@ class ProgrammesController < ApplicationController
     respond_with do |format|
       format.html
       format.json {render json: @programme}
+      format.rdf { render template: 'rdf/show' }	
     end
   end
 

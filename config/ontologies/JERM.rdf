@@ -129,7 +129,7 @@
     <!-- http://jermontology.org/ontology/JERMOntology#investigates -->
 
     <owl:ObjectProperty rdf:about="http://jermontology.org/ontology/JERMOntology#investigates">
-        <owl:inverseOf rdf:resource="http://jermontology.org/ontology/JERMOntology#is_investigated_by"/>
+        <owl:inverseOf rdf:resource="http://jermontology.org/ontology/JERMOntology#isInvestigatedBy"/>
         <rdfs:range rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism"/>
     </owl:ObjectProperty>
     
@@ -139,6 +139,14 @@
 
     <owl:ObjectProperty rdf:about="http://jermontology.org/ontology/JERMOntology#isAssociatedWith">
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#SymmetricProperty"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#isConstructedFrom -->
+
+    <owl:ObjectProperty rdf:about="http://jermontology.org/ontology/JERMOntology#isConstructedFrom">
+        <rdfs:domain rdf:resource="http://jermontology.org/ontology/JERMOntology#Model"/>
     </owl:ObjectProperty>
     
 
@@ -175,6 +183,14 @@
     
 
 
+    <!-- http://jermontology.org/ontology/JERMOntology#isInvestigatedBy -->
+
+    <owl:ObjectProperty rdf:about="http://jermontology.org/ontology/JERMOntology#isInvestigatedBy">
+        <rdfs:domain rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism"/>
+    </owl:ObjectProperty>
+    
+
+
     <!-- http://jermontology.org/ontology/JERMOntology#isPartOf -->
 
     <owl:ObjectProperty rdf:about="http://jermontology.org/ontology/JERMOntology#isPartOf">
@@ -194,22 +210,6 @@
     <!-- http://jermontology.org/ontology/JERMOntology#isValidatedBy -->
 
     <owl:ObjectProperty rdf:about="http://jermontology.org/ontology/JERMOntology#isValidatedBy"/>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#is_investigated_by -->
-
-    <owl:ObjectProperty rdf:about="http://jermontology.org/ontology/JERMOntology#is_investigated_by">
-        <rdfs:domain rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism"/>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#isconstructedFrom -->
-
-    <owl:ObjectProperty rdf:about="http://jermontology.org/ontology/JERMOntology#isconstructedFrom">
-        <rdfs:domain rdf:resource="http://jermontology.org/ontology/JERMOntology#Model"/>
-    </owl:ObjectProperty>
     
 
 
@@ -251,25 +251,17 @@
     
 
 
+    <!-- http://jermontology.org/ontology/JERMOntology#DOI -->
+
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#DOI">
+        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://jermontology.org/ontology/JERMOntology#ECNumber -->
 
     <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#ECNumber">
-        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#External_supplier_ID -->
-
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#External_supplier_ID">
-        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#Lab_internal_ID -->
-
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#Lab_internal_ID">
         <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
     </owl:DatatypeProperty>
     
@@ -283,33 +275,17 @@
     
 
 
-    <!-- http://jermontology.org/ontology/JERMOntology#SEEKID -->
+    <!-- http://jermontology.org/ontology/JERMOntology#ageOfSpecimen -->
 
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#SEEKID">
-        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#ageOfSpecimen">
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://jermontology.org/ontology/JERMOntology#Sabio-RK_ID -->
+    <!-- http://jermontology.org/ontology/JERMOntology#dateOfDeath -->
 
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#Sabio-RK_ID">
-        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#WebLink -->
-
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#WebLink">
-        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#date_of_death -->
-
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#date_of_death"/>
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#dateOfDeath"/>
     
 
 
@@ -325,16 +301,32 @@
     
 
 
+    <!-- http://jermontology.org/ontology/JERMOntology#externalSupplierID -->
+
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#externalSupplierID">
+        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://jermontology.org/ontology/JERMOntology#identifier -->
 
     <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#identifier"/>
     
 
 
-    <!-- http://jermontology.org/ontology/JERMOntology#instrument_model -->
+    <!-- http://jermontology.org/ontology/JERMOntology#instrumentModel -->
 
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#instrument_model">
-        <rdfs:label>instrument_model</rdfs:label>
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#instrumentModel">
+        <rdfs:label>instrumentModel</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#labInternalID -->
+
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#labInternalID">
+        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
     </owl:DatatypeProperty>
     
 
@@ -348,9 +340,25 @@
     
 
 
+    <!-- http://jermontology.org/ontology/JERMOntology#pubmedID -->
+
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#pubmedID">
+        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
+    </owl:DatatypeProperty>
+    
+
+
     <!-- http://jermontology.org/ontology/JERMOntology#reactionCatalyst -->
 
     <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#reactionCatalyst"/>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#sabioRKID -->
+
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#sabioRKID">
+        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
+    </owl:DatatypeProperty>
     
 
 
@@ -360,18 +368,26 @@
     
 
 
-    <!-- http://jermontology.org/ontology/JERMOntology#sequence_accession -->
+    <!-- http://jermontology.org/ontology/JERMOntology#seekID -->
 
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#sequence_accession">
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#seekID">
         <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
-        <rdfs:label>sequence_accession</rdfs:label>
     </owl:DatatypeProperty>
     
 
 
-    <!-- http://jermontology.org/ontology/JERMOntology#termsofDistribution -->
+    <!-- http://jermontology.org/ontology/JERMOntology#sequenceAccession -->
 
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#termsofDistribution">
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#sequenceAccession">
+        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
+        <rdfs:label>sequenceAccession</rdfs:label>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#termsOfDistribution -->
+
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#termsOfDistribution">
         <rdfs:label>termsofDistribution</rdfs:label>
     </owl:DatatypeProperty>
     
@@ -407,10 +423,10 @@
     
 
 
-    <!-- http://jermontology.org/ontology/JERMOntology#age_of_specimen/culture -->
+    <!-- http://jermontology.org/ontology/JERMOntology#webLink -->
 
-    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#age_of_specimen/culture">
-        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topDataProperty"/>
+    <owl:DatatypeProperty rdf:about="http://jermontology.org/ontology/JERMOntology#webLink">
+        <rdfs:subPropertyOf rdf:resource="http://jermontology.org/ontology/JERMOntology#identifier"/>
     </owl:DatatypeProperty>
     
 
@@ -431,6 +447,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Accelerator_mass_spectrometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00120</dc:identifier>
+        <rdfs:label>Accelerator Mass Spectrometry</rdfs:label>
     </owl:Class>
     
 
@@ -440,6 +457,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Activity">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:110001</dc:identifier>
+        <rdfs:label>Activity</rdfs:label>
     </owl:Class>
     
 
@@ -452,6 +470,7 @@
  It is often used in biochemistry in the purification of proteins bound to tags. These fusion proteins are labeled with compounds such as His-tags, biotin or antigens, which bind to the stationary phase specifically.</dc:description>
         <dc:identifier>JERM:00110</dc:identifier>
         <rdfs:comment>affinity_purification</rdfs:comment>
+        <rdfs:label>Affinity Chromatography</rdfs:label>
     </owl:Class>
     
 
@@ -461,6 +480,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Algebraic_equation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mathematical_model_type"/>
         <dc:identifier>JERM:00139</dc:identifier>
+        <rdfs:label>Algebraic Equation</rdfs:label>
     </owl:Class>
     
 
@@ -468,10 +488,10 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Amplification -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Amplification">
-        <rdfs:label>child1_at</rdfs:label>  <!-- added for synchronisation test -->
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:description>e.g. RT_PCR to amplify DNA from RNA</dc:description>
         <dc:identifier>JERM:000007</dc:identifier>
+        <rdfs:label>Amplification</rdfs:label>
     </owl:Class>
     
 
@@ -533,12 +553,6 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isAssociatedWith"/>
-                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Protocol"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isPartOf"/>
                 <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Study"/>
             </owl:Restriction>
@@ -547,6 +561,7 @@
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#Study"/>
         <dc:description>An assay is a combination of a process (experiment) and a protocol.</dc:description>
         <dc:identifier>JERM:00021</dc:identifier>
+        <rdfs:label>Assay</rdfs:label>
     </owl:Class>
     
 
@@ -558,7 +573,8 @@
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:description>An assay type describes the type of experiment being performed</dc:description>
         <dc:identifier>JERM:00024</dc:identifier>
-        <rdfs:comment>The assay_type hierarchy allows scientists to categorise their experimental assays, informatics analyses and computational models within SysMO</rdfs:comment>
+        <rdfs:comment>The assay_type hierarchy allows scientists to categorise their experimental assays, informatics analyses and computational models</rdfs:comment>
+        <rdfs:label>Assay Type</rdfs:label>
     </owl:Class>
     
 
@@ -566,7 +582,7 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Asset -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Asset">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#information_entity"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Information_entity"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasContributor"/>
@@ -587,14 +603,14 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#SEEKID"/>
-                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#description"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#description"/>
-                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#seekID"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -605,6 +621,7 @@
         </rdfs:subClassOf>
         <dc:description>all shareable entities in the SEEK are kinds of Assets</dc:description>
         <dc:identifier>JERM:00010</dc:identifier>
+        <rdfs:label>Asset</rdfs:label>
     </owl:Class>
     
 
@@ -614,6 +631,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Bait_protein_tagging">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Molecule_labelling"/>
         <dc:identifier>JERM:00135</dc:identifier>
+        <rdfs:label>Bait Protein Tagging</rdfs:label>
     </owl:Class>
     
 
@@ -625,6 +643,7 @@
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#Chemostat"/>
         <dc:description>A large-scale closed system culture in which cells are grown in a fixed volume of nutrient culture medium under specific environmental conditions</dc:description>
         <dc:identifier>JERM:021</dc:identifier>
+        <rdfs:label>Batch</rdfs:label>
     </owl:Class>
     
 
@@ -635,6 +654,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:description>laboratory techniques which involve separation by binding the molecules of interest</dc:description>
         <dc:identifier>JERM:00094</dc:identifier>
+        <rdfs:label>Binding</rdfs:label>
     </owl:Class>
     
 
@@ -645,6 +665,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#informatics_analysis_type"/>
         <dc:description>a bioinformatics analysis is an &quot;assay&quot; performed in silico, employing bioinformatics techniques to analyse biological data</dc:description>
         <dc:identifier>JERM:00046</dc:identifier>
+        <rdfs:label>Bioinformatics Analysis</rdfs:label>
     </owl:Class>
     
 
@@ -652,8 +673,9 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Biological_entity -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Biological_entity">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#material_entity"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Material_entity"/>
         <dc:identifier>JERM:40012</dc:identifier>
+        <rdfs:label>Biological Entity</rdfs:label>
     </owl:Class>
     
 
@@ -663,6 +685,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Buffer">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:011</dc:identifier>
+        <rdfs:label>Buffer</rdfs:label>
     </owl:Class>
     
 
@@ -672,6 +695,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#By-product_formation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism_or_strain_characterisation"/>
         <dc:identifier>JERM:004</dc:identifier>
+        <rdfs:label>By-product Formation</rdfs:label>
     </owl:Class>
     
 
@@ -681,6 +705,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Capillary_electrophoresis">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Electrophoresis"/>
         <dc:identifier>JERM:00113</dc:identifier>
+        <rdfs:label>Capillary Electrophoresis</rdfs:label>
     </owl:Class>
     
 
@@ -690,6 +715,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Catabolic_response">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Metabolite_profiling"/>
         <dc:identifier>JERM:00068</dc:identifier>
+        <rdfs:label>Catabolic Response</rdfs:label>
     </owl:Class>
     
 
@@ -699,6 +725,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#CellML">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_format"/>
         <dc:identifier>JERM:40020</dc:identifier>
+        <rdfs:label>CellML</rdfs:label>
     </owl:Class>
     
 
@@ -707,6 +734,7 @@
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Cell_count">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Transcriptomics"/>
+        <rdfs:label>Cell Count</rdfs:label>
     </owl:Class>
     
 
@@ -716,6 +744,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Cell_cycle">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00048</dc:identifier>
+        <rdfs:label>Cell Cycle</rdfs:label>
     </owl:Class>
     
 
@@ -725,6 +754,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Cell_growth_optimisation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Cell_growth_rate"/>
         <dc:identifier>JERM:00066</dc:identifier>
+        <rdfs:label>Cell Growth Optimisation</rdfs:label>
     </owl:Class>
     
 
@@ -734,12 +764,28 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Cell_growth_rate">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism_or_strain_characterisation"/>
         <dc:identifier>JERM:00151</dc:identifier>
+        <rdfs:label>Cell Growth Rate</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#Cell_line -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Cell_line">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
+        <dc:identifier>JERM:00201</dc:identifier>
+        <rdfs:label>Cell Line</rdfs:label>
     </owl:Class>
     
 
 
     <!-- http://jermontology.org/ontology/JERMOntology#Cell_size -->
-    <!-- removed for test -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Cell_size">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism_or_strain_characterisation"/>
+        <dc:identifier>JERM:006</dc:identifier>
+        <rdfs:label>Cell Size</rdfs:label>
+    </owl:Class>
     
 
 
@@ -749,6 +795,17 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray"/>
         <dc:identifier>JERM:00130</dc:identifier>
         <rdfs:comment>Chromatin Immunoprecipitation on Chip</rdfs:comment>
+        <rdfs:label>ChIP-on-chip</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#Characteristics_for_assay -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Characteristics_for_assay">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_factors"/>
+        <dc:identifier>JERM:00155</dc:identifier>
+        <rdfs:label>Characteristics for Assay</rdfs:label>
     </owl:Class>
     
 
@@ -758,6 +815,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_factors"/>
         <dc:identifier>JERM:00156</dc:identifier>
+        <rdfs:label>Characteristics for Sample</rdfs:label>
     </owl:Class>
     
 
@@ -768,6 +826,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#informatics_analysis_type"/>
         <dc:description>a cheminformatics analysis is an &quot;assay&quot; performed in silico, employing cheminformatics techniques to analyse biological data</dc:description>
         <dc:identifier>JERM:00047</dc:identifier>
+        <rdfs:label>Cheminformatics Analysis</rdfs:label>
     </owl:Class>
     
 
@@ -778,6 +837,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#CultureGrowthType"/>
         <dc:description>a bioreactor to which fresh medium is continuously added, while culture liquid is continuously removed to keep the culture volume constant.</dc:description>
         <dc:identifier>JERM:022</dc:identifier>
+        <rdfs:label>Chemostat</rdfs:label>
     </owl:Class>
     
 
@@ -787,6 +847,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Chemostat_measurements">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:identifier>JERM:00184</dc:identifier>
+        <rdfs:label>Chemostat Measurement</rdfs:label>
     </owl:Class>
     
 
@@ -806,6 +867,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:description>Chromatography is the collective term for a set of laboratory techniques for the separation of mixtures. It involves passing a mixture dissolved in a &quot;mobile phase&quot; through a stationary phase, which separates the analyte to be measured from other molecules in the mixture based on differential partitioning between the mobile and stationary phases.</dc:description>
         <dc:identifier>JERM:00095</dc:identifier>
+        <rdfs:label>Chromatography</rdfs:label>
     </owl:Class>
     
 
@@ -815,6 +877,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Collision_cell">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Post_source_component"/>
         <dc:identifier>JERM:50003</dc:identifier>
+        <rdfs:label>Collision Cell</rdfs:label>
     </owl:Class>
     
 
@@ -824,6 +887,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Community_standard_specification">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Data_file_format"/>
         <dc:identifier>JERM:00192</dc:identifier>
+        <rdfs:label>Community Standard Specification</rdfs:label>
     </owl:Class>
     
 
@@ -833,6 +897,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Comparative_genomic_hybridization">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Transcriptomics"/>
         <dc:identifier>JERM:00086</dc:identifier>
+        <rdfs:label>Comparative Genomic Hybridization</rdfs:label>
     </owl:Class>
     
 
@@ -842,6 +907,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Comparative_genomics">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:identifier>JERM:00060</dc:identifier>
+        <rdfs:label>Comparative Genomics</rdfs:label>
     </owl:Class>
     
 
@@ -851,6 +917,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Compound">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
         <dc:identifier>JERM:015</dc:identifier>
+        <rdfs:label>Compound</rdfs:label>
     </owl:Class>
     
 
@@ -860,6 +927,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Concentration">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:00031</dc:identifier>
+        <rdfs:label>Concentration</rdfs:label>
     </owl:Class>
     
 
@@ -869,6 +937,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Continuous_enzymatic">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Enzymatic_assay"/>
         <dc:identifier>JERM:008</dc:identifier>
+        <rdfs:label>Continuous Enzymatic</rdfs:label>
     </owl:Class>
     
 
@@ -878,6 +947,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Cultivation_experiment">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism_or_strain_characterisation"/>
         <dc:identifier>JERM:00216</dc:identifier>
+        <rdfs:label>Cultivation Experiment</rdfs:label>
     </owl:Class>
     
 
@@ -886,8 +956,9 @@
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#CultureGrowthType">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
-        <dc:description>SysMO studies microorganisms. Each experiment is performed on cell cultures, so it is essential to record the type of culture in use each time</dc:description>
+        <dc:description>Experiments can be performed on cell cultures, so it is essential to record the type of culture in use each time</dc:description>
         <dc:identifier>JERM:00026</dc:identifier>
+        <rdfs:label>Culture Growth Type</rdfs:label>
     </owl:Class>
     
 
@@ -897,6 +968,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Custom_Array">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray"/>
         <dc:identifier>JERM:00132</dc:identifier>
+        <rdfs:label>Custom Array</rdfs:label>
     </owl:Class>
     
 
@@ -906,6 +978,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#DNA_Methylation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray"/>
         <dc:identifier>JERM:00131</dc:identifier>
+        <rdfs:label>DNA Methylation</rdfs:label>
     </owl:Class>
     
 
@@ -915,6 +988,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#DNA_sequencing">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:identifier>JERM:00058</dc:identifier>
+        <rdfs:label>DNA Sequencing</rdfs:label>
     </owl:Class>
     
 
@@ -949,6 +1023,7 @@
         </rdfs:subClassOf>
         <dc:description>SEEK data files</dc:description>
         <dc:identifier>JERM:00011</dc:identifier>
+        <rdfs:label>Data</rdfs:label>
     </owl:Class>
     
 
@@ -961,6 +1036,7 @@
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_format"/>
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#SOP_file_format"/>
         <dc:identifier>JERM:00038</dc:identifier>
+        <rdfs:label>Data File Format</rdfs:label>
     </owl:Class>
     
 
@@ -977,6 +1053,7 @@
         </rdfs:subClassOf>
         <dc:description>An electronic description of a sample that can be used to derive a physical sample, for example a DNA sequence</dc:description>
         <dc:identifier>JERM:00144</dc:identifier>
+        <rdfs:label>Data Sample</rdfs:label>
     </owl:Class>
     
 
@@ -986,6 +1063,16 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Detectors">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Post_source_component"/>
         <dc:identifier>JERM:50004</dc:identifier>
+        <rdfs:label>Detectors</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#Dilution_rate -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Dilution_rate">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
+        <rdfs:label>Dilution Rate</rdfs:label>
     </owl:Class>
     
 
@@ -995,6 +1082,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Discontinuous_enzymatic">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Enzymatic_assay"/>
         <dc:identifier>JERM:009</dc:identifier>
+        <rdfs:label>Discontinuous Enzymatic</rdfs:label>
     </owl:Class>
     
 
@@ -1004,6 +1092,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Dry_biomass">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass"/>
         <dc:identifier>JERM:00037</dc:identifier>
+        <rdfs:label>Dry Biomass</rdfs:label>
     </owl:Class>
     
 
@@ -1013,6 +1102,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#ELISA">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Immunostaining"/>
         <dc:identifier>JERM:00188</dc:identifier>
+        <rdfs:label>ELISA</rdfs:label>
     </owl:Class>
     
 
@@ -1032,6 +1122,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:description>Electrophoresis is the motion of dispersed particles relative to a fluid under the influence of a spatially uniform electric field</dc:description>
         <dc:identifier>JERM:00096</dc:identifier>
+        <rdfs:label>Electrophoresis</rdfs:label>
     </owl:Class>
     
 
@@ -1041,6 +1132,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#ElectrosprayIonisation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Ionization_source"/>
         <dc:identifier>JERM:50000</dc:identifier>
+        <rdfs:label>Electrospray Ionisation</rdfs:label>
     </owl:Class>
     
 
@@ -1050,6 +1142,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Enzymatic_activity_measurements">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:identifier>JERM:00097</dc:identifier>
+        <rdfs:label>Enzymatic Activity Measurements</rdfs:label>
     </owl:Class>
     
 
@@ -1059,6 +1152,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Enzymatic_assay">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Reactomics"/>
         <dc:identifier>JERM:00083</dc:identifier>
+        <rdfs:label>Enzymatic Assay</rdfs:label>
     </owl:Class>
     
 
@@ -1068,6 +1162,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Enzyme">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Protein"/>
         <dc:identifier>JERM:501000</dc:identifier>
+        <rdfs:label>Enzyme</rdfs:label>
     </owl:Class>
     
 
@@ -1077,6 +1172,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Enzyme_activity">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Activity"/>
         <dc:identifier>JERM:012</dc:identifier>
+        <rdfs:label>Enzyme Activity</rdfs:label>
     </owl:Class>
     
 
@@ -1086,6 +1182,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Enzymology">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00049</dc:identifier>
+        <rdfs:label>Enzymology</rdfs:label>
     </owl:Class>
     
 
@@ -1093,9 +1190,10 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Equipment -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Equipment">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#material_entity"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Material_entity"/>
         <dc:description>tools or machines used in the laboratory, or computer hardware or software used for data analysis</dc:description>
         <dc:identifier>JERM:90004</dc:identifier>
+        <rdfs:label>Equipment</rdfs:label>
     </owl:Class>
     
 
@@ -1105,6 +1203,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Exon_array">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray"/>
         <dc:identifier>JERM:50015</dc:identifier>
+        <rdfs:label>Exon Array</rdfs:label>
     </owl:Class>
     
 
@@ -1115,6 +1214,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Assay_type"/>
         <dc:identifier>JERM:00043</dc:identifier>
         <rdfs:isDefinedBy>An experimental assay is an assay carried out in a laboratory</rdfs:isDefinedBy>
+        <rdfs:label>Experimental Assay Type</rdfs:label>
     </owl:Class>
     
 
@@ -1124,6 +1224,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Experimental_design_type">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray_factors"/>
         <dc:identifier>JERM:58493</dc:identifier>
+        <rdfs:label>Experimental Design Type</rdfs:label>
     </owl:Class>
     
 
@@ -1133,6 +1234,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Experimental_factor_type">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray_factors"/>
         <dc:identifier>JERM:26754</dc:identifier>
+        <rdfs:label>Experimental Factory Type</rdfs:label>
     </owl:Class>
     
 
@@ -1140,9 +1242,10 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Experimental_factors -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Experimental_factors">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#information_entity"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Information_entity"/>
         <dc:description>ExperimentalFactors are descriptors of the properties of the experiment. How the culture was prepared, what organism they are from, and what type of experiment was run</dc:description>
         <dc:identifier>JERM:00017</dc:identifier>
+        <rdfs:label>Experimental Factors</rdfs:label>
     </owl:Class>
     
 
@@ -1152,6 +1255,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Expression">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:00033</dc:identifier>
+        <rdfs:label>Expression</rdfs:label>
     </owl:Class>
     
 
@@ -1161,6 +1265,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Expression_value_measurement_type">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray_factors"/>
         <dc:identifier>JERM:20946</dc:identifier>
+        <rdfs:label>Expression Value Measurement</rdfs:label>
     </owl:Class>
     
 
@@ -1170,6 +1275,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Extracellular_concentration">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Concentration"/>
         <dc:identifier>JERM:000001</dc:identifier>
+        <rdfs:label>Extracellular Concentration</rdfs:label>
     </owl:Class>
     
 
@@ -1179,6 +1285,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Extracellular_metabolite_concentration">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Metabolite_concentration"/>
         <dc:identifier>JERM:00149</dc:identifier>
+        <rdfs:label>Extracellular Metabolite Concentration</rdfs:label>
     </owl:Class>
     
 
@@ -1186,10 +1293,10 @@
     <!-- http://jermontology.org/ontology/JERMOntology#FACS -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#FACS">
-        <rdfs:label>child1_tech</rdfs:label> <!-- added for synchronisation test -->
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Flow_cytometry"/>
         <dc:description>Fluorescence Activated Cell Sorting</dc:description>
         <dc:identifier>JERM:90002</dc:identifier>
+        <rdfs:label>FACS</rdfs:label>
     </owl:Class>
     
 
@@ -1200,6 +1307,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Imaging"/>
         <dc:identifier>JERM:00119</dc:identifier>
         <rdfs:comment>fluorescence recovery after photobleaching</rdfs:comment>
+        <rdfs:label>FRAP</rdfs:label>
     </owl:Class>
     
 
@@ -1209,6 +1317,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#FT-ICR">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Post_source_component"/>
         <dc:identifier>JERM:50005</dc:identifier>
+        <rdfs:label>FT-ICR</rdfs:label>
     </owl:Class>
     
 
@@ -1218,18 +1327,10 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Factors_studied">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_factors"/>
         <rdfs:subClassOf>
-            <owl:Class>
-                <owl:unionOf rdf:parseType="Collection">
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isPartOf"/>
-                        <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Data"/>
-                    </owl:Restriction>
-                    <owl:Restriction>
-                        <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isPartOf"/>
-                        <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#SOP"/>
-                    </owl:Restriction>
-                </owl:unionOf>
-            </owl:Class>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isPartOf"/>
+                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Assay"/>
+            </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
@@ -1246,6 +1347,7 @@
         <dc:description>factors studied describe what types of measurements were taken (i.e. what factors were expected to change during the experiment)</dc:description>
         <dc:identifier>JERM:00027</dc:identifier>
         <rdfs:comment>also known as ExperimentalConditions when used to set up initial conditions for an experiment/assay</rdfs:comment>
+        <rdfs:label>Factors Studied</rdfs:label>
     </owl:Class>
     
 
@@ -1255,6 +1357,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Flow_cytometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:identifier>JERM:90003</dc:identifier>
+        <rdfs:label>Flow Cytometry</rdfs:label>
     </owl:Class>
     
 
@@ -1266,6 +1369,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Metabolite_profiling"/>
         <dc:description>a method for analysing the flow of metabolites through metabolic networks </dc:description>
         <dc:identifier>JERM:00069</dc:identifier>
+        <rdfs:label>Flux Balance Analysis</rdfs:label>
     </owl:Class>
     
 
@@ -1276,6 +1380,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:description>the dynamic changes of molecules within a cell over time</dc:description>
         <dc:identifier>JERM:00056</dc:identifier>
+        <rdfs:label>Fluxomics</rdfs:label>
     </owl:Class>
     
 
@@ -1283,17 +1388,19 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Format -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Format">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#information_entity"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Information_entity"/>
         <dc:identifier>JERM:00018</dc:identifier>
+        <rdfs:label>Format</rdfs:label>
     </owl:Class>
     
 
 
-    <!-- http://jermontology.org/ontology/JERMOntology#Functional_Biological_entity -->
+    <!-- http://jermontology.org/ontology/JERMOntology#Functional_biological_entity -->
 
-    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Functional_Biological_entity">
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Functional_biological_entity">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
         <dc:identifier>JERM:40014</dc:identifier>
+        <rdfs:label>Functional Biological Entity</rdfs:label>
     </owl:Class>
     
 
@@ -1304,6 +1411,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Chromatography"/>
         <dc:description>Gas chromatography (GC) is a separation technique in which the mobile phase is a gas</dc:description>
         <dc:identifier>JERM:00111</dc:identifier>
+        <rdfs:label>Gas Chromatography</rdfs:label>
     </owl:Class>
     
 
@@ -1313,6 +1421,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Gas_chromatography_mass_spectrometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00121</dc:identifier>
+        <rdfs:label>Gas Chromatography Mass Spectrometry</rdfs:label>
     </owl:Class>
     
 
@@ -1322,6 +1431,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Gas_flow">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:110002</dc:identifier>
+        <rdfs:label>Gas Flow</rdfs:label>
     </owl:Class>
     
 
@@ -1331,6 +1441,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Gel_electrophoresis">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Electrophoresis"/>
         <dc:identifier>JERM:00114</dc:identifier>
+        <rdfs:label>Gel Electrophoresis</rdfs:label>
     </owl:Class>
     
 
@@ -1342,6 +1453,7 @@
         <dc:description>Size exclusion chromatography (SEC), also known as gel permeation chromatography or gel filtration chromatography, separates particles on the basis of size. It is generally a low resolution chromatography and thus it is often reserved for the final, &quot;polishing&quot; step of a purification. It is also useful for determining the tertiary structure and quaternary structure of purified proteins.</dc:description>
         <dc:identifier>JERM:00112</dc:identifier>
         <rdfs:comment>size_exclusion_chromatography</rdfs:comment>
+        <rdfs:label>Gel Filtration</rdfs:label>
     </owl:Class>
     
 
@@ -1353,6 +1465,7 @@
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism"/>
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#Protein"/>
         <dc:identifier>JERM:40015</dc:identifier>
+        <rdfs:label>Gene</rdfs:label>
     </owl:Class>
     
 
@@ -1362,6 +1475,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Gene_expression">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00050</dc:identifier>
+        <rdfs:label>Gene Expression</rdfs:label>
     </owl:Class>
     
 
@@ -1372,6 +1486,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Transcriptomics"/>
         <dc:description>analysing the gene expression across an organism in particular environmental conditions</dc:description>
         <dc:identifier>JERM:00088</dc:identifier>
+        <rdfs:label>Gene Expression Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -1381,6 +1496,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Gene_regulatory_network">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00051</dc:identifier>
+        <rdfs:label>Gene Regulatory Network</rdfs:label>
     </owl:Class>
     
 
@@ -1390,6 +1506,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Genome">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
         <dc:identifier>JERM:00202</dc:identifier>
+        <rdfs:label>Genome</rdfs:label>
     </owl:Class>
     
 
@@ -1399,6 +1516,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Genome-scale_enzyme_activity_profiling">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Reactomics"/>
         <dc:identifier>JERM:00081</dc:identifier>
+        <rdfs:label>Genome-scale Enzyme Activity Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -1406,9 +1524,9 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Genome_scale -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Genome_scale">
-        <rdfs:label>experimental_to_modelling</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:010</dc:identifier>
+        <rdfs:label>Genome Scale</rdfs:label>
     </owl:Class>
     
 
@@ -1418,6 +1536,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Genome_wide_association">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:identifier>JERM:00209</dc:identifier>
+        <rdfs:label>Genome Wide Association</rdfs:label>
     </owl:Class>
     
 
@@ -1428,6 +1547,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:description>the study of the genome of an organism</dc:description>
         <dc:identifier>JERM:00057</dc:identifier>
+        <rdfs:label>Genomics</rdfs:label>
     </owl:Class>
     
 
@@ -1437,6 +1557,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Genotyping">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:identifier>JERM:00061</dc:identifier>
+        <rdfs:label>Genotyping</rdfs:label>
     </owl:Class>
     
 
@@ -1446,6 +1567,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Glucose_pulse">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Metabolite_profiling"/>
         <dc:identifier>JERM:00070</dc:identifier>
+        <rdfs:label>Glucose Pulse</rdfs:label>
     </owl:Class>
     
 
@@ -1455,12 +1577,31 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Growth_medium_composition">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:013</dc:identifier>
+        <rdfs:label>Growth Medium Composition</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#Growth_rate -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Growth_rate">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
+        <dc:identifier>JERM:00181</dc:identifier>
+        <rdfs:label>Growth Rate</rdfs:label>
     </owl:Class>
     
 
 
     <!-- http://jermontology.org/ontology/JERMOntology#HPLC -->
-    <!-- removed for test -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#HPLC">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Chromatography"/>
+        <dc:description>High Performance Liquid Chromatography. 
+Liquid chromatography (LC) is a separation technique in which the mobile phase is a liquid</dc:description>
+        <dc:identifier>JERM:00108</dc:identifier>
+        <rdfs:comment>High Performance Liquid Chromatography</rdfs:comment>
+        <rdfs:label>HPLC</rdfs:label>
+    </owl:Class>
     
 
 
@@ -1469,6 +1610,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Hybridization">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray_factors"/>
         <dc:identifier>JERM:44538</dc:identifier>
+        <rdfs:label>Hybridization</rdfs:label>
     </owl:Class>
     
 
@@ -1478,6 +1620,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Imaging">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:identifier>JERM:00098</dc:identifier>
+        <rdfs:label>Imaging</rdfs:label>
     </owl:Class>
     
 
@@ -1485,9 +1628,9 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Immune_precipitation -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Immune_precipitation">
-        <rdfs:label>modelling_to_experimental</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00073</dc:identifier>
+        <rdfs:label>Immune Precipitation</rdfs:label>
     </owl:Class>
     
 
@@ -1497,6 +1640,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Immuno_electron_microscopy">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Immunostaining"/>
         <dc:identifier>JERM:00189</dc:identifier>
+        <rdfs:label>Immuno Electron Microscopy</rdfs:label>
     </owl:Class>
     
 
@@ -1506,6 +1650,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Immunoassay">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:identifier>JERM:00147</dc:identifier>
+        <rdfs:label>Immunoassay</rdfs:label>
     </owl:Class>
     
 
@@ -1515,6 +1660,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Immunostaining">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:identifier>JERM:00187</dc:identifier>
+        <rdfs:label>Immunostaining</rdfs:label>
     </owl:Class>
     
 
@@ -1524,6 +1670,16 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Inductively_coupled_plasma_mass_spectrometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00122</dc:identifier>
+        <rdfs:label>Inductively Coupled Plasma Mass Spectrometry</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#Information_entity -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Information_entity">
+        <dc:identifier>JERM:00143</dc:identifier>
+        <rdfs:label>Information Entity</rdfs:label>
     </owl:Class>
     
 
@@ -1533,6 +1689,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Initial_rate_experiment">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Enzymatic_activity_measurements"/>
         <dc:identifier>JERM:00117</dc:identifier>
+        <rdfs:label>Initial Rate Experiment</rdfs:label>
     </owl:Class>
     
 
@@ -1542,6 +1699,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Inoculation_density">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:00182</dc:identifier>
+        <rdfs:label>Inoculation Density</rdfs:label>
     </owl:Class>
     
 
@@ -1552,7 +1710,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Equipment"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#instrument_model"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#instrumentModel"/>
                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
@@ -1564,6 +1722,7 @@
         </rdfs:subClassOf>
         <dc:description>machines or tools used in laboratory experiments</dc:description>
         <dc:identifier>JERM:40004</dc:identifier>
+        <rdfs:label>Instrument</rdfs:label>
     </owl:Class>
     
 
@@ -1574,6 +1733,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:description>the study of the network of interactions between proteins, metabolites and other biological objects in the cell, and the consequences of those interactions</dc:description>
         <dc:identifier>JERM:00063</dc:identifier>
+        <rdfs:label>Interactomics</rdfs:label>
     </owl:Class>
     
 
@@ -1583,6 +1743,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Intracellular_concentration">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Concentration"/>
         <dc:identifier>JERM:000002</dc:identifier>
+        <rdfs:label>Intracellular Concentration</rdfs:label>
     </owl:Class>
     
 
@@ -1592,6 +1753,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Intracellular_metabolite_Concentration">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Metabolite_concentration"/>
         <dc:identifier>JERM:00150</dc:identifier>
+        <rdfs:label>Intracellular Metabolite Concentration</rdfs:label>
     </owl:Class>
     
 
@@ -1609,6 +1771,7 @@
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#Study"/>
         <dc:description>A high level description of the experimental work undertaken</dc:description>
         <dc:identifier>JERM:00022</dc:identifier>
+        <rdfs:label>Investigation</rdfs:label>
     </owl:Class>
     
 
@@ -1618,6 +1781,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Ion_mobility_spectrometry_mass_spectrometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00123</dc:identifier>
+        <rdfs:label>Ion Mobility Spectrometry Mass Spectrometry</rdfs:label>
     </owl:Class>
     
 
@@ -1627,6 +1791,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Ion_optics">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Post_source_component"/>
         <dc:identifier>JERM:50006</dc:identifier>
+        <rdfs:label>Ion Optics</rdfs:label>
     </owl:Class>
     
 
@@ -1636,6 +1801,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Ion_trap">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Post_source_component"/>
         <dc:identifier>JERM:50007</dc:identifier>
+        <rdfs:label>Ion Trap</rdfs:label>
     </owl:Class>
     
 
@@ -1645,6 +1811,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Ionization_source">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics_factors"/>
         <dc:identifier>JERM:40009</dc:identifier>
+        <rdfs:label>Ionization Source</rdfs:label>
     </owl:Class>
     
 
@@ -1654,6 +1821,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Isotope_ratio_mass_spectrometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00124</dc:identifier>
+        <rdfs:label>Isotope Ratio Mass Spectrometry</rdfs:label>
     </owl:Class>
     
 
@@ -1663,6 +1831,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Label">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray_factors"/>
         <dc:identifier>JERM:24776</dc:identifier>
+        <rdfs:label>Label</rdfs:label>
     </owl:Class>
     
 
@@ -1672,6 +1841,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Limited_media_growth">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism_or_strain_characterisation"/>
         <dc:identifier>JERM:007</dc:identifier>
+        <rdfs:label>Limited Media Growth</rdfs:label>
     </owl:Class>
     
 
@@ -1681,6 +1851,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Linear_equation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mathematical_model_type"/>
         <dc:identifier>JERM:00140</dc:identifier>
+        <rdfs:label>Linear Equation</rdfs:label>
     </owl:Class>
     
 
@@ -1690,6 +1861,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Liquid_chromatography-tandem_mass_spectrometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00129</dc:identifier>
+        <rdfs:label>Liquid Chromatography-tandom Mass Spectrometry</rdfs:label>
     </owl:Class>
     
 
@@ -1699,6 +1871,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Liquid_chromatography_mass_spectrometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00125</dc:identifier>
+        <rdfs:label>Liquid Chromatography Mass Spectrometry</rdfs:label>
     </owl:Class>
     
 
@@ -1708,6 +1881,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#MAGE-TAB">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray_file_format"/>
         <dc:identifier>JERM:91021</dc:identifier>
+        <rdfs:label>MAGE-TAB</rdfs:label>
     </owl:Class>
     
 
@@ -1717,6 +1891,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#MAGEML">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray_file_format"/>
         <dc:identifier>JERM:30184</dc:identifier>
+        <rdfs:label>MAGEML</rdfs:label>
     </owl:Class>
     
 
@@ -1726,6 +1901,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#MALDI">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Ionization_source"/>
         <dc:identifier>JERM:50001</dc:identifier>
+        <rdfs:label>MALDI</rdfs:label>
     </owl:Class>
     
 
@@ -1735,6 +1911,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#MALDI_TOF">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00126</dc:identifier>
+        <rdfs:label>MALDI-TOF</rdfs:label>
     </owl:Class>
     
 
@@ -1744,6 +1921,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Mass">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:00030</dc:identifier>
+        <rdfs:label>Mass</rdfs:label>
     </owl:Class>
     
 
@@ -1753,6 +1931,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Mass_spec_file_format">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics_file_format"/>
         <dc:identifier>JERM:40018</dc:identifier>
+        <rdfs:label>Mass Spectrometry File Format</rdfs:label>
     </owl:Class>
     
 
@@ -1763,6 +1942,16 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:description>Mass spectrometry (MS) is an analytical technique for the determination of the elemental composition of a sample or molecule. It is used for elucidating the chemical structures of peptides and sometimes other chemical compounds</dc:description>
         <dc:identifier>JERM:00099</dc:identifier>
+        <rdfs:label>Mass Spectrometry</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#Material_entity -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Material_entity">
+        <dc:identifier>JERM:00198</dc:identifier>
+        <rdfs:label>Material Entity</rdfs:label>
     </owl:Class>
     
 
@@ -1772,6 +1961,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Mathematical_model_type">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:identifier>JERM:00103</dc:identifier>
+        <rdfs:label>Mathematical Model Type</rdfs:label>
     </owl:Class>
     
 
@@ -1782,6 +1972,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_factors"/>
         <dc:description>the entity under investigation (e.g. glucose)</dc:description>
         <dc:identifier>JERM:00028</dc:identifier>
+        <rdfs:label>Measured Item</rdfs:label>
     </owl:Class>
     
 
@@ -1791,6 +1982,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Metabolic_network">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00052</dc:identifier>
+        <rdfs:label>Metabolic Network</rdfs:label>
     </owl:Class>
     
 
@@ -1800,6 +1992,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Metabolic_redesign">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00153</dc:identifier>
+        <rdfs:label>Metabolic Redesign</rdfs:label>
     </owl:Class>
     
 
@@ -1809,6 +2002,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Metabolism">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00054</dc:identifier>
+        <rdfs:label>Metabolism</rdfs:label>
     </owl:Class>
     
 
@@ -1818,6 +2012,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Metabolite">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Compound"/>
         <dc:identifier>JERM:016</dc:identifier>
+        <rdfs:label>Metabolite</rdfs:label>
     </owl:Class>
     
 
@@ -1827,6 +2022,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Metabolite_concentration">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Metabolite_profiling"/>
         <dc:identifier>JERM:00148</dc:identifier>
+        <rdfs:label>Metabolite Concentration</rdfs:label>
     </owl:Class>
     
 
@@ -1836,6 +2032,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Metabolite_profiling">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Metabolomics"/>
         <dc:identifier>JERM:00067</dc:identifier>
+        <rdfs:label>Metabolite Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -1846,6 +2043,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:description>the analysis of metabolism and the dynamic changes in concentration of small molecules and metabolites in different conditions</dc:description>
         <dc:identifier>JERM:00065</dc:identifier>
+        <rdfs:label>Metabolomics</rdfs:label>
     </owl:Class>
     
 
@@ -1856,6 +2054,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Metabolomics"/>
         <dc:identifier>JERM:00071</dc:identifier>
         <rdfs:comment>quantitative metabolomics</rdfs:comment>
+        <rdfs:label>Metabonomics</rdfs:label>
     </owl:Class>
     
 
@@ -1865,6 +2064,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Metagenomics">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:identifier>JERM:00208</dc:identifier>
+        <rdfs:label>Metagenomics</rdfs:label>
     </owl:Class>
     
 
@@ -1880,6 +2080,7 @@
         </owl:equivalentClass>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Transcriptomics"/>
         <dc:identifier>JERM:00091</dc:identifier>
+        <rdfs:label>Methylation Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -1889,6 +2090,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Micro-electrophoresis">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Electrophoresis"/>
         <dc:identifier>JERM:00213</dc:identifier>
+        <rdfs:label>Micro-electrophoresis</rdfs:label>
     </owl:Class>
     
 
@@ -1904,6 +2106,7 @@
         </owl:equivalentClass>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Transcriptomics"/>
         <dc:identifier>JERM:00092</dc:identifier>
+        <rdfs:label>MicroRNA Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -1913,6 +2116,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Microarray">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:identifier>JERM:00100</dc:identifier>
+        <rdfs:label>Microarray</rdfs:label>
     </owl:Class>
     
 
@@ -1920,8 +2124,9 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Microarray_factors -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Microarray_factors">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#characteristics_for_assay"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_assay"/>
         <dc:identifier>JERM:38539</dc:identifier>
+        <rdfs:label>Micorarray Factors</rdfs:label>
     </owl:Class>
     
 
@@ -1931,6 +2136,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Microarray_file_format">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Community_standard_specification"/>
         <dc:identifier>JERM:37735</dc:identifier>
+        <rdfs:label>Microarray File Format</rdfs:label>
     </owl:Class>
     
 
@@ -1940,6 +2146,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Microscopy">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Imaging"/>
         <dc:identifier>JERM:00185</dc:identifier>
+        <rdfs:label>Microscopy</rdfs:label>
     </owl:Class>
     
 
@@ -1962,12 +2169,13 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#termsofDistribution"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#termsOfDistribution"/>
                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <dc:description>computational models developed by SEEK consortium members</dc:description>
         <dc:identifier>JERM:00012</dc:identifier>
+        <rdfs:label>Model</rdfs:label>
     </owl:Class>
     
 
@@ -1978,6 +2186,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Assay_type"/>
         <dc:description>a model analysis type is a model &quot;assay&quot; type to classify the information contained within the model. The categories correspond to the existing categories in JWS Onnline, a tool for model simmulation</dc:description>
         <dc:identifier>JERM:00044</dc:identifier>
+        <rdfs:label>Model Analysis Type</rdfs:label>
     </owl:Class>
     
 
@@ -1989,6 +2198,7 @@
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_format"/>
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#SOP_file_format"/>
         <dc:identifier>JERM:00039</dc:identifier>
+        <rdfs:label>Model Execution Environment</rdfs:label>
     </owl:Class>
     
 
@@ -1999,6 +2209,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Format"/>
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#SOP_file_format"/>
         <dc:identifier>JERM:00040</dc:identifier>
+        <rdfs:label>Model Format</rdfs:label>
     </owl:Class>
     
 
@@ -2009,6 +2220,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:description>techniques for labelling molecules to allow them to be detected in laboratory analyses</dc:description>
         <dc:identifier>JERM:00101</dc:identifier>
+        <rdfs:label>Molecule Labelling</rdfs:label>
     </owl:Class>
     
 
@@ -2024,6 +2236,7 @@
             </owl:Restriction>
         </rdfs:subClassOf>
         <dc:identifier>JERM:00138</dc:identifier>
+        <rdfs:label>NMR</rdfs:label>
     </owl:Class>
     
 
@@ -2033,6 +2246,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Nature_protocols">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#SOP_file_format"/>
         <dc:identifier>JERM:00042</dc:identifier>
+        <rdfs:label>Nature Protocols</rdfs:label>
     </owl:Class>
     
 
@@ -2051,6 +2265,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Next_generation_sequencing_analysis">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:identifier>JERM:002</dc:identifier>
+        <rdfs:label>Next Generation Sequencing Analysis</rdfs:label>
     </owl:Class>
     
 
@@ -2060,6 +2275,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Normalization_method">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics_factors"/>
         <dc:identifier>JERM:62033</dc:identifier>
+        <rdfs:label>Normalization Method</rdfs:label>
     </owl:Class>
     
 
@@ -2070,6 +2286,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:description>absorption</dc:description>
         <dc:identifier>JERM:00034</dc:identifier>
+        <rdfs:label>Optical Density</rdfs:label>
     </owl:Class>
     
 
@@ -2079,6 +2296,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Optical_density_600">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Optical_density"/>
         <dc:identifier>JERM:014</dc:identifier>
+        <rdfs:label>Optical Density 600</rdfs:label>
     </owl:Class>
     
 
@@ -2088,6 +2306,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Orbitrap_velos">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00214</dc:identifier>
+        <rdfs:label>Orbitrap Velos</rdfs:label>
     </owl:Class>
     
 
@@ -2097,6 +2316,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Ordinary_differential_equation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mathematical_model_type"/>
         <dc:identifier>JERM:00141</dc:identifier>
+        <rdfs:label>Ordinary Differential Equation</rdfs:label>
     </owl:Class>
     
 
@@ -2107,18 +2327,19 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#is_investigated_by"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isInvestigatedBy"/>
                 <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Assay"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#NCBI_ID"/>
-                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <owl:disjointWith rdf:resource="http://jermontology.org/ontology/JERMOntology#Protein"/>
         <dc:identifier>JERM:00029</dc:identifier>
+        <rdfs:label>Organism</rdfs:label>
     </owl:Class>
     
 
@@ -2128,6 +2349,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Organism_colony">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
         <dc:identifier>JERM:00205</dc:identifier>
+        <rdfs:label>Organism Colony</rdfs:label>
     </owl:Class>
     
 
@@ -2138,6 +2360,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:description>experiments to differentiate between different species or strains by their functional properties or genetic profiles</dc:description>
         <dc:identifier>JERM:003</dc:identifier>
+        <rdfs:label>Organism or Strain Characteristics</rdfs:label>
     </owl:Class>
     
 
@@ -2148,6 +2371,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:description>the polymerase chain reaction (PCR) is a technique to amplify a single or few copies of a piece of DNA across several orders of magnitude, generating thousands to millions of copies of a particular DNA sequence.</dc:description>
         <dc:identifier>JERM:00093</dc:identifier>
+        <rdfs:label>PCR</rdfs:label>
     </owl:Class>
     
 
@@ -2157,6 +2381,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Partial_differential_equation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mathematical_model_type"/>
         <dc:identifier>JERM:00142</dc:identifier>
+        <rdfs:label>Partial Differential Equation</rdfs:label>
     </owl:Class>
     
 
@@ -2164,8 +2389,9 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Pathway -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Pathway">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Functional_Biological_entity"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Functional_biological_entity"/>
         <dc:identifier>JERM:40016</dc:identifier>
+        <rdfs:label>Pathway</rdfs:label>
     </owl:Class>
     
 
@@ -2175,6 +2401,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Peptide">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Protein"/>
         <dc:identifier>JERM:50020</dc:identifier>
+        <rdfs:label>Peptide</rdfs:label>
     </owl:Class>
     
 
@@ -2182,7 +2409,7 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Person -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Person">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#material_entity"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Material_entity"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isAssociatedWith"/>
@@ -2197,12 +2424,13 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#SEEKID"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#seekID"/>
                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <dc:description>a SEEK consortium member</dc:description>
         <dc:identifier>JERM:00019</dc:identifier>
+        <rdfs:label>Person</rdfs:label>
     </owl:Class>
     
 
@@ -2212,6 +2440,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Physical_file_format">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Data_file_format"/>
         <dc:identifier>JERM:00193</dc:identifier>
+        <rdfs:label>Physical File Format</rdfs:label>
     </owl:Class>
     
 
@@ -2221,6 +2450,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Post-translational_modification">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00074</dc:identifier>
+        <rdfs:label>Post-translational Modification</rdfs:label>
     </owl:Class>
     
 
@@ -2230,6 +2460,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Post_source_component">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics_factors"/>
         <dc:identifier>JERM:50002</dc:identifier>
+        <rdfs:label>Post Source Component</rdfs:label>
     </owl:Class>
     
 
@@ -2239,6 +2470,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Post_translational_modification">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00212</dc:identifier>
+        <rdfs:label>Post Translational Modification</rdfs:label>
     </owl:Class>
     
 
@@ -2248,6 +2480,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Pressure">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:90001</dc:identifier>
+        <rdfs:label>Pressure</rdfs:label>
         <rdfs:label>pressure</rdfs:label>
     </owl:Class>
     
@@ -2258,6 +2491,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Primer_design">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:identifier>JERM:00062</dc:identifier>
+        <rdfs:label>Primer Design</rdfs:label>
     </owl:Class>
     
 
@@ -2265,8 +2499,32 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Programme -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Programme">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Project"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasPart"/>
+                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Project"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#description"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#seekID"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#title"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <dc:description>Multiple scientific investigations from the same funding initiative</dc:description>
+        <rdfs:label>Programme</rdfs:label>
     </owl:Class>
     
 
@@ -2274,9 +2532,9 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Progressive_curve_experiment -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Progressive_curve_experiment">
-        <rdfs:label>Prog Rock</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Enzymatic_activity_measurements"/>
         <dc:identifier>JERM:00118</dc:identifier>
+        <rdfs:label>Progressive Curve Experiment</rdfs:label>
     </owl:Class>
     
 
@@ -2284,7 +2542,7 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Project -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Project">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#information_entity"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Information_entity"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasItem"/>
@@ -2311,12 +2569,37 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#WebLink"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isPartOf"/>
+                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Programme"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#description"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#seekID"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#title"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#webLink"/>
                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <dc:description>Scientific investigations into a particular biological or computational research question, involving one or more research groups</dc:description>
         <dc:identifier>JERM:00020</dc:identifier>
+        <rdfs:label>Project</rdfs:label>
     </owl:Class>
     
 
@@ -2326,6 +2609,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Protein">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
         <dc:identifier>JERM:40017</dc:identifier>
+        <rdfs:label>Protein</rdfs:label>
     </owl:Class>
     
 
@@ -2335,6 +2619,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Protein-protein_interaction">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00075</dc:identifier>
+        <rdfs:label>Protein-protein Interaction</rdfs:label>
     </owl:Class>
     
 
@@ -2344,6 +2629,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Protein-protein_interaction_profiling">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Interactomics"/>
         <dc:identifier>JERM:00064</dc:identifier>
+        <rdfs:label>Protein-Protein Interaction Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -2353,6 +2639,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Protein_expression_profiling">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00076</dc:identifier>
+        <rdfs:label>Protein Expression Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -2362,6 +2649,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Protein_identification">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00077</dc:identifier>
+        <rdfs:label>Protein Identification</rdfs:label>
     </owl:Class>
     
 
@@ -2377,6 +2665,7 @@
             </owl:Restriction>
         </rdfs:subClassOf>
         <dc:identifier>JERM:00078</dc:identifier>
+        <rdfs:label>Protein Purification</rdfs:label>
     </owl:Class>
     
 
@@ -2386,6 +2675,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Protein_quantification">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00152</dc:identifier>
+        <rdfs:label>Protein Quantification</rdfs:label>
     </owl:Class>
     
 
@@ -2395,6 +2685,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Protein_structural_analysis">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00079</dc:identifier>
+        <rdfs:label>Protein Structural Analysis</rdfs:label>
     </owl:Class>
     
 
@@ -2405,6 +2696,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:description>Proteomics is the study of the function and structure of proteins in an organism, predominantly using high-throughput techniques</dc:description>
         <dc:identifier>JERM:00072</dc:identifier>
+        <rdfs:label>Proteomics</rdfs:label>
     </owl:Class>
     
 
@@ -2412,8 +2704,9 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Proteomics_factors -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Proteomics_factors">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#characteristics_for_assay"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_assay"/>
         <dc:identifier>JERM:40008</dc:identifier>
+        <rdfs:label>Proteomics Factors</rdfs:label>
     </owl:Class>
     
 
@@ -2423,6 +2716,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Proteomics_file_format">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Community_standard_specification"/>
         <dc:identifier>JERM:40017</dc:identifier>
+        <rdfs:label>Proteomics File Format</rdfs:label>
     </owl:Class>
     
 
@@ -2433,6 +2727,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Asset"/>
         <dc:description>The specification of a laboratory or computational procedure that contains enough detail to enable scientists to rerun that procedure or at least understand and evaluate the method</dc:description>
         <dc:identifier>JERM:00145</dc:identifier>
+        <rdfs:label>Protocol</rdfs:label>
     </owl:Class>
     
 
@@ -2441,8 +2736,21 @@
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Publication">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Asset"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#DOI"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#pubmedID"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <dc:description>publication abstracts relating to other SEEK assets</dc:description>
         <dc:identifier>JERM:00014</dc:identifier>
+        <rdfs:label>Publication</rdfs:label>
     </owl:Class>
     
 
@@ -2452,6 +2760,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Quality_control_type">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray_factors"/>
         <dc:identifier>JERM:87160</dc:identifier>
+        <rdfs:label>Quality Control Type</rdfs:label>
     </owl:Class>
     
 
@@ -2461,6 +2770,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Quantitation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics_factors"/>
         <dc:identifier>JERM:50009</dc:identifier>
+        <rdfs:label>Quantitation</rdfs:label>
     </owl:Class>
     
 
@@ -2480,6 +2790,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Transcriptomics"/>
         <dc:description>RNA-SEQ, or Whole Transcriptome Shotgun Sequencing, allows the sequencing of cDNA in order to deterimine RNA content. RNA-Seq_analysis are experiments that make use of such data.</dc:description>
         <dc:identifier>JERM:001</dc:identifier>
+        <rdfs:label>RNA-seq Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -2490,6 +2801,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Transcriptomics"/>
         <dc:description>experiments involving RNA Interference</dc:description>
         <dc:identifier>JERM:00087</dc:identifier>
+        <rdfs:label>RNAi</rdfs:label>
     </owl:Class>
     
 
@@ -2499,6 +2811,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Radioactive_labelling">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Molecule_labelling"/>
         <dc:identifier>JERM:00136</dc:identifier>
+        <rdfs:label>Radioactive Labelling</rdfs:label>
     </owl:Class>
     
 
@@ -2509,6 +2822,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:description>the study of biochemical reactions in the cell</dc:description>
         <dc:identifier>JERM:00080</dc:identifier>
+        <rdfs:label>Reactomics</rdfs:label>
     </owl:Class>
     
 
@@ -2518,6 +2832,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Replicate_type">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray_factors"/>
         <dc:identifier>JERM:50925</dc:identifier>
+        <rdfs:label>Replicate Type</rdfs:label>
     </owl:Class>
     
 
@@ -2527,6 +2842,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#SBML_format">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_format"/>
         <dc:identifier>JERM:40021</dc:identifier>
+        <rdfs:label>SBML</rdfs:label>
     </owl:Class>
     
 
@@ -2547,6 +2863,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Gel_electrophoresis"/>
         <dc:identifier>JERM:00116</dc:identifier>
         <rdfs:comment>sodium dodecyl sulfate polyacrylamide gel electrophoresis</rdfs:comment>
+        <rdfs:label>SDS-PAGE</rdfs:label>
     </owl:Class>
     
 
@@ -2556,6 +2873,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#SELDI_TOF">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00127</dc:identifier>
+        <rdfs:label>SELDI-TOF</rdfs:label>
     </owl:Class>
     
 
@@ -2565,6 +2883,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#SNP_array">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray"/>
         <dc:identifier>JERM:50017</dc:identifier>
+        <rdfs:label>SNP Array</rdfs:label>
     </owl:Class>
     
 
@@ -2574,6 +2893,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#SNP_detection">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:identifier>JERM:00059</dc:identifier>
+        <rdfs:label>SNP Detection</rdfs:label>
     </owl:Class>
     
 
@@ -2602,6 +2922,7 @@
         </rdfs:subClassOf>
         <dc:description>Standard operating procedures and protocols - experimental methods that have been agreed and standardised across a project or organisation</dc:description>
         <dc:identifier>JERM:00015</dc:identifier>
+        <rdfs:label>SOP</rdfs:label>
     </owl:Class>
     
 
@@ -2611,6 +2932,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#SOP_file_format">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Format"/>
         <dc:identifier>JERM:00041</dc:identifier>
+        <rdfs:label>SOP File Format</rdfs:label>
     </owl:Class>
     
 
@@ -2618,7 +2940,7 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Sample -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Sample">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#material_entity"/>
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Material_entity"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasCharacteristics"/>
@@ -2652,12 +2974,6 @@
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#SEEKID"/>
-                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#description"/>
                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
             </owl:Restriction>
@@ -2668,7 +2984,14 @@
                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
             </owl:Restriction>
         </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#seekID"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <dc:identifier>JERM:69863</dc:identifier>
+        <rdfs:label>Sample</rdfs:label>
     </owl:Class>
     
 
@@ -2685,6 +3008,7 @@
         </rdfs:subClassOf>
         <dc:description>describes the treatments and conditions applied at the time of sampling</dc:description>
         <dc:identifier>JERM:00146</dc:identifier>
+        <rdfs:label>Sample Preperation Protocol</rdfs:label>
     </owl:Class>
     
 
@@ -2695,6 +3019,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:description>techniques for determining the DNA or protein sequence</dc:description>
         <dc:identifier>JERM:017</dc:identifier>
+        <rdfs:label>Sequencing</rdfs:label>
     </owl:Class>
     
 
@@ -2704,6 +3029,23 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Signal_transduction">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00053</dc:identifier>
+        <rdfs:label>Signal Induction</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://jermontology.org/ontology/JERMOntology#Simulation_data -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Simulation_data">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Asset"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isPartOf"/>
+                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#modelling_analysis"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <dc:identifier>JERM:00217</dc:identifier>
+        <rdfs:label>Simulation Data</rdfs:label>
     </owl:Class>
     
 
@@ -2713,6 +3055,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Single_Nucleotide_Polymorphism">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#mutationType"/>
         <dc:identifier>JERM:00166</dc:identifier>
+        <rdfs:label>Single Nucleotide Polymorphism</rdfs:label>
     </owl:Class>
     
 
@@ -2723,6 +3066,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:description>analysing the response of single cells to stimuli and perturbations by fluorescence and imaging</dc:description>
         <dc:identifier>JERM:00084</dc:identifier>
+        <rdfs:label>Single Cell</rdfs:label>
     </owl:Class>
     
 
@@ -2732,6 +3076,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Small_molecule_microarray">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray"/>
         <dc:identifier>JERM:00134</dc:identifier>
+        <rdfs:label>Small Molecule Microarray</rdfs:label>
     </owl:Class>
     
 
@@ -2754,6 +3099,7 @@
         </rdfs:subClassOf>
         <dc:description>computer programs used for data analysis or curation</dc:description>
         <dc:identifier>JERM:40005</dc:identifier>
+        <rdfs:label>Software</rdfs:label>
     </owl:Class>
     
 
@@ -2763,6 +3109,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Specific_concentration">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Concentration"/>
         <dc:identifier>JERM:00032</dc:identifier>
+        <rdfs:label>Specific Concentration</rdfs:label>
     </owl:Class>
     
 
@@ -2772,6 +3119,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Spectrophotometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:identifier>JERM:00191</dc:identifier>
+        <rdfs:label>Spectrophotometry</rdfs:label>
     </owl:Class>
     
 
@@ -2781,6 +3129,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Spectrum_generation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics_factors"/>
         <dc:identifier>JERM:40010</dc:identifier>
+        <rdfs:label>Spectrum Generation</rdfs:label>
     </owl:Class>
     
 
@@ -2790,6 +3139,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Spectrum_interpretation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics_factors"/>
         <dc:identifier>JERM:40011</dc:identifier>
+        <rdfs:label>Spectrum Interpretation</rdfs:label>
     </owl:Class>
     
 
@@ -2800,17 +3150,12 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism"/>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#External_supplier_ID"/>
-                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#Lab_internal_ID"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#externalSupplierID"/>
                 <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <dc:identifier>JERM:00204</dc:identifier>
+        <rdfs:label>Strain</rdfs:label>
     </owl:Class>
     
 
@@ -2821,6 +3166,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:description>Stress_response or adaptation</dc:description>
         <dc:identifier>JERM:00154</dc:identifier>
+        <rdfs:label>Stress Response</rdfs:label>
     </owl:Class>
     
 
@@ -2830,6 +3176,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Structural_methods">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Technology_type"/>
         <dc:identifier>JERM:00102</dc:identifier>
+        <rdfs:label>Structural Methods</rdfs:label>
     </owl:Class>
     
 
@@ -2852,6 +3199,7 @@
         </rdfs:subClassOf>
         <dc:description>a collection of experiments designed to answer a particular biological question</dc:description>
         <dc:identifier>JERM:00023</dc:identifier>
+        <rdfs:label>Study</rdfs:label>
     </owl:Class>
     
 
@@ -2861,6 +3209,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Substrate_utilization">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism_or_strain_characterisation"/>
         <dc:identifier>JERM:005</dc:identifier>
+        <rdfs:label>Substrate Utilization</rdfs:label>
     </owl:Class>
     
 
@@ -2870,6 +3219,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Surface_plasmon_resonance">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Binding"/>
         <dc:identifier>JERM:00107</dc:identifier>
+        <rdfs:label>Surface Plasmon Resonance</rdfs:label>
     </owl:Class>
     
 
@@ -2879,6 +3229,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Tandem_mass_spectrometry">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Mass_spectrometry"/>
         <dc:identifier>JERM:00128</dc:identifier>
+        <rdfs:label>Tandem Mass Spectrometry</rdfs:label>
     </owl:Class>
     
 
@@ -2889,6 +3240,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_factors"/>
         <dc:description>describes the technologies and/or techniques used in performing experiments</dc:description>
         <dc:identifier>JERM:00025</dc:identifier>
+        <rdfs:label>Technology Type</rdfs:label>
     </owl:Class>
     
 
@@ -2898,6 +3250,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Temperature">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:00036</dc:identifier>
+        <rdfs:label>Temperature</rdfs:label>
     </owl:Class>
     
 
@@ -2907,6 +3260,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Tiling_array">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray"/>
         <dc:identifier>JERM:50016</dc:identifier>
+        <rdfs:label>Tiling Array</rdfs:label>
     </owl:Class>
     
 
@@ -2916,6 +3270,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Tiling_path">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Transcriptomics"/>
         <dc:identifier>JERM:00092</dc:identifier>
+        <rdfs:label>Tiling Path</rdfs:label>
     </owl:Class>
     
 
@@ -2925,6 +3280,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Time_of_flight_drift_tube">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Post_source_component"/>
         <dc:identifier>JERM:50008</dc:identifier>
+        <rdfs:label>Time of Flight Drift Tube</rdfs:label>
     </owl:Class>
     
 
@@ -2934,6 +3290,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Time_series">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:00183</dc:identifier>
+        <rdfs:label>Time Series</rdfs:label>
     </owl:Class>
     
 
@@ -2943,6 +3300,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Transcriptional_analysis">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Transcriptomics"/>
         <dc:identifier>JERM:00211</dc:identifier>
+        <rdfs:label>Transcriptional Analysis</rdfs:label>
     </owl:Class>
     
 
@@ -2953,6 +3311,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Gene_expression_profiling"/>
         <dc:description>also called cDNA Microarray</dc:description>
         <dc:identifier>JERM:00089</dc:identifier>
+        <rdfs:label>Transcriptional Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -2963,6 +3322,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"/>
         <dc:description>The study of the transcriptome, the complete set of RNA transcripts produced by the genome at any one time</dc:description>
         <dc:identifier>JERM:00085</dc:identifier>
+        <rdfs:label>Transcriptomics</rdfs:label>
     </owl:Class>
     
 
@@ -2972,6 +3332,7 @@
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Translation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:00055</dc:identifier>
+        <rdfs:label>Translation</rdfs:label>
     </owl:Class>
     
 
@@ -2982,6 +3343,7 @@
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Gene_expression_profiling"/>
         <dc:description>The genome-wide measure of the nascent proteome</dc:description>
         <dc:identifier>JERM:00090</dc:identifier>
+        <rdfs:label>Translational Profiling</rdfs:label>
     </owl:Class>
     
 
@@ -2994,6 +3356,7 @@
 Liquid chromatography (LC) is a separation technique in which the mobile phase is a liquid</dc:description>
         <dc:identifier>JERM:00109</dc:identifier>
         <rdfs:comment>Ultra Performance Liquid Chromatography</rdfs:comment>
+        <rdfs:label>UPLC</rdfs:label>
     </owl:Class>
     
 
@@ -3003,6 +3366,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Volume">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:110000</dc:identifier>
+        <rdfs:label>Volume</rdfs:label>
     </owl:Class>
     
 
@@ -3012,6 +3376,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Western_blot">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Immunostaining"/>
         <dc:identifier>JERM:00190</dc:identifier>
+        <rdfs:label>Western Blot</rdfs:label>
     </owl:Class>
     
 
@@ -3021,6 +3386,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#aerobic">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#respiration"/>
         <dc:identifier>JERM:00175</dc:identifier>
+        <rdfs:label>Aerobic</rdfs:label>
     </owl:Class>
     
 
@@ -3030,6 +3396,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#anaerobic">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#respiration"/>
         <dc:identifier>JERM:00176</dc:identifier>
+        <rdfs:label>Anaerobic</rdfs:label>
     </owl:Class>
     
 
@@ -3038,6 +3405,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#autoCarbonSource">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#carbonSourcePhenotype"/>
+        <rdfs:label>Auto Carbon Response</rdfs:label>
     </owl:Class>
     
 
@@ -3047,6 +3415,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#biofilm">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism_colony"/>
         <dc:identifier>JERM:00206</dc:identifier>
+        <rdfs:label>Biofilm</rdfs:label>
     </owl:Class>
     
 
@@ -3055,6 +3424,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#carbonSourcePhenotype">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#phenotype"/>
+        <rdfs:label>Carbon Source Phenotype</rdfs:label>
     </owl:Class>
     
 
@@ -3064,15 +3434,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#cell">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
         <dc:identifier>JERM:00199</dc:identifier>
-    </owl:Class>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#cell_line -->
-
-    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#cell_line">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
-        <dc:identifier>JERM:00201</dc:identifier>
+        <rdfs:label>Cell</rdfs:label>
     </owl:Class>
     
 
@@ -3082,15 +3444,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#cell_type">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00157</dc:identifier>
-    </owl:Class>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#characteristics_for_assay -->
-
-    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#characteristics_for_assay">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Experimental_factors"/>
-        <dc:identifier>JERM:00155</dc:identifier>
+        <rdfs:label>Cell Type</rdfs:label>
     </owl:Class>
     
 
@@ -3099,6 +3453,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#chemoenergy">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#energySourcePhenotype"/>
+        <rdfs:label>Chemo Energy</rdfs:label>
     </owl:Class>
     
 
@@ -3108,6 +3463,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#deletion">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#mutationType"/>
         <dc:identifier>JERM:00164</dc:identifier>
+        <rdfs:label>Deletion</rdfs:label>
     </owl:Class>
     
 
@@ -3117,6 +3473,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#developmentalStage">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00158</dc:identifier>
+        <rdfs:label>Developmental Stage</rdfs:label>
     </owl:Class>
     
 
@@ -3126,6 +3483,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#diploid">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#ploidy"/>
         <dc:identifier>JERM:00171</dc:identifier>
+        <rdfs:label>Diploid</rdfs:label>
     </owl:Class>
     
 
@@ -3135,6 +3493,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#disease_state">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00159</dc:identifier>
+        <rdfs:label>Disease State</rdfs:label>
     </owl:Class>
     
 
@@ -3143,6 +3502,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#electronDonorPhenotype">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#phenotype"/>
+        <rdfs:label>Electron Donor Phenotype</rdfs:label>
     </owl:Class>
     
 
@@ -3151,6 +3511,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#energySourcePhenotype">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#phenotype"/>
+        <rdfs:label>Energy Source Phenotype</rdfs:label>
     </owl:Class>
     
 
@@ -3172,6 +3533,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
             </owl:Restriction>
         </rdfs:subClassOf>
         <dc:identifier>JERM:00194</dc:identifier>
+        <rdfs:label>Experimental Assay</rdfs:label>
     </owl:Class>
     
 
@@ -3181,6 +3543,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#explantation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00160</dc:identifier>
+        <rdfs:label>Explanation</rdfs:label>
     </owl:Class>
     
 
@@ -3190,6 +3553,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#fermentation">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#respiration"/>
         <dc:identifier>JERM:00177</dc:identifier>
+        <rdfs:label>Fermentation</rdfs:label>
     </owl:Class>
     
 
@@ -3200,6 +3564,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:description>A genotype is a variant genome, complete or incomplete - definition from the Sequence Ontology</dc:description>
         <dc:identifier>JERM:00161</dc:identifier>
+        <rdfs:label>Genotype</rdfs:label>
     </owl:Class>
     
 
@@ -3209,6 +3574,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#haploid">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#ploidy"/>
         <dc:identifier>JERM:00172</dc:identifier>
+        <rdfs:label>Haploid</rdfs:label>
     </owl:Class>
     
 
@@ -3217,6 +3583,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#heteroCarbonSource">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#carbonSourcePhenotype"/>
+        <rdfs:label>Hetero Carbon Source</rdfs:label>
     </owl:Class>
     
 
@@ -3226,6 +3593,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#hexaploid">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#ploidy"/>
         <dc:identifier>JERM:00173</dc:identifier>
+        <rdfs:label>Hexaploid</rdfs:label>
     </owl:Class>
     
 
@@ -3241,6 +3609,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
             </owl:Restriction>
         </rdfs:subClassOf>
         <dc:identifier>JERM:00195</dc:identifier>
+        <rdfs:label>Informatics Analysis</rdfs:label>
     </owl:Class>
     
 
@@ -3251,14 +3620,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Assay_type"/>
         <dc:description>an informatics analysis is an &quot;assay&quot; performed in silico, employing informatics techniques to analyse data</dc:description>
         <dc:identifier>JERM:00045</dc:identifier>
-    </owl:Class>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#information_entity -->
-
-    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#information_entity">
-        <dc:identifier>JERM:00143</dc:identifier>
+        <rdfs:label>Informatics Assay Type</rdfs:label>
     </owl:Class>
     
 
@@ -3268,6 +3630,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#insertion">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#mutationType"/>
         <dc:identifier>JERM:00165</dc:identifier>
+        <rdfs:label>Insertion</rdfs:label>
     </owl:Class>
     
 
@@ -3276,14 +3639,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#lithoElectronDonor">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#electronDonorPhenotype"/>
-    </owl:Class>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#material_entity -->
-
-    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#material_entity">
-        <dc:identifier>JERM:00198</dc:identifier>
+        <rdfs:label>Litho Electron Donor</rdfs:label>
     </owl:Class>
     
 
@@ -3295,6 +3651,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <dc:identifier>JERM:00162</dc:identifier>
         <rdfs:comment>links to CV in MGED and others
 </rdfs:comment>
+        <rdfs:label>Material Type</rdfs:label>
     </owl:Class>
     
 
@@ -3304,6 +3661,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#miRNA_microarray">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Microarray"/>
         <dc:identifier>JERM:00133</dc:identifier>
+        <rdfs:label>miRNA Microarray</rdfs:label>
     </owl:Class>
     
 
@@ -3312,6 +3670,12 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#modelling_analysis">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Assay"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasOutput"/>
+                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Simulation_data"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasPart"/>
@@ -3326,8 +3690,14 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasPart"/>
-                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#simulationData"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isConstructedFrom"/>
+                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Data"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isConstructedFrom"/>
+                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Publication"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -3336,19 +3706,8 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
                 <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Data"/>
             </owl:Restriction>
         </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isconstructedFrom"/>
-                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Data"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#isconstructedFrom"/>
-                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Publication"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
         <dc:identifier>JERM:00196</dc:identifier>
+        <rdfs:label>Modelling Analysis</rdfs:label>
     </owl:Class>
     
 
@@ -3358,6 +3717,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#mutationType">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00163</dc:identifier>
+        <rdfs:label>Mutation Type</rdfs:label>
     </owl:Class>
     
 
@@ -3367,6 +3727,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#organ">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
         <dc:identifier>JERM:00203</dc:identifier>
+        <rdfs:label>Organ</rdfs:label>
     </owl:Class>
     
 
@@ -3376,6 +3737,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#organ_type">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00167</dc:identifier>
+        <rdfs:label>Organ Type</rdfs:label>
     </owl:Class>
     
 
@@ -3386,6 +3748,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00168</dc:identifier>
         <rdfs:comment>links to CV in MGED and others</rdfs:comment>
+        <rdfs:label>Organism Part</rdfs:label>
     </owl:Class>
     
 
@@ -3394,6 +3757,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#organoElectronDonor">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#electronDonorPhenotype"/>
+        <rdfs:label>Organo Electron Donor</rdfs:label>
     </owl:Class>
     
 
@@ -3403,6 +3767,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#pH">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
         <dc:identifier>JERM:00035</dc:identifier>
+        <rdfs:label>pH</rdfs:label>
     </owl:Class>
     
 
@@ -3412,6 +3777,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#phenotype">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00169</dc:identifier>
+        <rdfs:label>Phenotype</rdfs:label>
     </owl:Class>
     
 
@@ -3420,6 +3786,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#photoEnergy">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#energySourcePhenotype"/>
+        <rdfs:label>Photo Energy</rdfs:label>
     </owl:Class>
     
 
@@ -3429,6 +3796,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#ploidy">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00170</dc:identifier>
+        <rdfs:label>Ploidy</rdfs:label>
     </owl:Class>
     
 
@@ -3436,6 +3804,12 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <!-- http://jermontology.org/ontology/JERMOntology#process -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#process">
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasContributor"/>
+                <owl:someValuesFrom rdf:resource="http://jermontology.org/ontology/JERMOntology#Person"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasInput"/>
@@ -3470,14 +3844,14 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#SEEKID"/>
-                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#description"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#description"/>
-                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+                <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#seekID"/>
+                <owl:someValuesFrom rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
             </owl:Restriction>
         </rdfs:subClassOf>
         <rdfs:subClassOf>
@@ -3488,6 +3862,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         </rdfs:subClassOf>
         <dc:description>experimental procedures</dc:description>
         <dc:identifier>JERM:00016</dc:identifier>
+        <rdfs:label>Process</rdfs:label>
     </owl:Class>
     
 
@@ -3499,6 +3874,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <dc:description>quantitative real time polymerase chain reaction (Q-PCR/qPCR) or kinetic polymerase chain reaction, is  based on PCR and is used to amplify and simultaneously quantify a targeted DNA molecule</dc:description>
         <dc:identifier>JERM:00104</dc:identifier>
         <rdfs:comment>also known as real-time PCR or quantative PCR</rdfs:comment>
+        <rdfs:label>qPCR</rdfs:label>
     </owl:Class>
     
 
@@ -3510,6 +3886,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <dc:description>Reverse transcription polymerase chain reaction (RT-PCR) is a variant of polymerase chain reaction (PCR). In RT-PCR an RNA strand is first reverse transcribed into its DNA complement (complementary DNA, or cDNA) using the enzyme reverse transcriptase, and the resulting cDNA is amplified using traditional or real-time PCR.</dc:description>
         <dc:identifier>JERM:00105</dc:identifier>
         <rdfs:comment>Real-time reverse-transcription PCR, qRT-PCR</rdfs:comment>
+        <rdfs:label>qRT-PCR</rdfs:label>
     </owl:Class>
     
 
@@ -3519,6 +3896,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#respiration">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00174</dc:identifier>
+        <rdfs:label>Respiration</rdfs:label>
     </owl:Class>
     
 
@@ -3528,15 +3906,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#semi-aerobic">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#respiration"/>
         <dc:identifier>JERM:00178</dc:identifier>
-    </owl:Class>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#simulationData -->
-
-    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#simulationData">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Asset"/>
-        <dc:identifier>JERM:00217</dc:identifier>
+        <rdfs:label>Semi-aerobic</rdfs:label>
     </owl:Class>
     
 
@@ -3546,6 +3916,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#tissue">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Biological_entity"/>
         <dc:identifier>JERM:00207</dc:identifier>
+        <rdfs:label>Tissue</rdfs:label>
     </owl:Class>
     
 
@@ -3555,6 +3926,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#tissue_type">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00180</dc:identifier>
+        <rdfs:label>Tissue Type</rdfs:label>
     </owl:Class>
     
 
@@ -3582,6 +3954,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
             </owl:Restriction>
         </rdfs:subClassOf>
         <dc:identifier>JERM:00197</dc:identifier>
+        <rdfs:label>Treatment</rdfs:label>
     </owl:Class>
     
 
@@ -3592,6 +3965,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#CultureGrowthType"/>
         <dc:description>a continuous culture device that has feedback between the turbidity of the culture vessel and the dilution rate</dc:description>
         <dc:identifier>JERM:023</dc:identifier>
+        <rdfs:label>Turboidostat</rdfs:label>
     </owl:Class>
     
 
@@ -3619,6 +3993,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#2D_gel_electrophoresis">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Gel_electrophoresis"/>
         <dc:identifier>JERM:00115</dc:identifier>
+        <rdfs:label>2D Gel Electrophoresis</rdfs:label>
     </owl:Class>
     
 
@@ -3626,20 +4001,11 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <!-- http://jermontology.org/ontology/JERMOntology#2-hybrid_system -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#2-hybrid_system">
-        <rdfs:label>fish</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Binding"/>
         <dc:description>Two-hybrid screening (also known as yeast two-hybrid system or Y2H) is a molecular biology technique used to discover protein-protein interactions and protein-DNA interactions by testing for physical interactions</dc:description>
         <dc:identifier>JERM:00106</dc:identifier>
         <rdfs:comment>yeast 2 hybrid</rdfs:comment>
-    </owl:Class>
-    
-
-
-    <!-- http://jermontology.org/ontology/JERMOntology#Growth_rate/Dilution_rate -->
-
-    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Growth_rate/Dilution_rate">
-        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Factors_studied"/>
-        <dc:identifier>JERM:00181</dc:identifier>
+        <rdfs:label>2-hybrid System</rdfs:label>
     </owl:Class>
     
 
@@ -3649,6 +4015,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Sex/Gender">
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Characteristics_for_sample"/>
         <dc:identifier>JERM:00179</dc:identifier>
+        <rdfs:label>Sex / Gender</rdfs:label>
     </owl:Class>
     
 

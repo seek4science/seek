@@ -61,12 +61,12 @@ SEEK::Application.configure do
   Seek::Config.default :publications_enabled,true
   Seek::Config.default :authorization_checks_enabled, true
   Seek::Config.default :documentation_enabled,true
-  Seek::Config.default :assay_type_ontology_file, "JERM-RDFXML.owl"
-  Seek::Config.default :technology_type_ontology_file, "JERM-RDFXML.owl"
-  Seek::Config.default :modelling_analysis_type_ontology_file, "JERM-RDFXML.owl"
-  Seek::Config.default :assay_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
-  Seek::Config.default :technology_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
-  Seek::Config.default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
+  Seek::Config.default :assay_type_ontology_file, "JERM.rdf"
+  Seek::Config.default :technology_type_ontology_file, "JERM.rdf"
+  Seek::Config.default :modelling_analysis_type_ontology_file, "JERM.rdf"
+  Seek::Config.default :assay_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+  Seek::Config.default :technology_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Technology_type"
+  Seek::Config.default :modelling_analysis_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
   Seek::Config.default :profile_select_by_default,true
   Seek::Config.default :programmes_enabled, false
   Seek::Config.default :project_hierarchy_enabled, false

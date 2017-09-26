@@ -5,12 +5,15 @@ class ProgrammesControllerTest < ActionController::TestCase
   include RestTestCases
   include ActionView::Helpers::NumberHelper
 
-  fixtures :all
+  include RdfTestCases
 
   def rest_api_test_object
-    @object = Factory(:programme)
+    Factory(:programme)
   end
 
+  test 'test rdf dummy' do
+    test_get_rdf
+  end
 
   # for now just admins can create programmes, later we will change this
   test 'new page accessible admin' do

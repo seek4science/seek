@@ -468,7 +468,6 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Amplification -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Amplification">
-        <rdfs:label>child1_at</rdfs:label>  <!-- added for synchronisation test -->
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Genomics"/>
         <dc:description>e.g. RT_PCR to amplify DNA from RNA</dc:description>
         <dc:identifier>JERM:000007</dc:identifier>
@@ -739,7 +738,11 @@
 
 
     <!-- http://jermontology.org/ontology/JERMOntology#Cell_size -->
-    <!-- removed for test -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Cell_size">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Organism_or_strain_characterisation"/>
+        <dc:identifier>JERM:006</dc:identifier>
+    </owl:Class>
     
 
 
@@ -1186,7 +1189,6 @@
     <!-- http://jermontology.org/ontology/JERMOntology#FACS -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#FACS">
-        <rdfs:label>child1_tech</rdfs:label> <!-- added for synchronisation test -->
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Flow_cytometry"/>
         <dc:description>Fluorescence Activated Cell Sorting</dc:description>
         <dc:identifier>JERM:90002</dc:identifier>
@@ -1406,7 +1408,6 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Genome_scale -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Genome_scale">
-        <rdfs:label>experimental_to_modelling</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Model_analysis_type"/>
         <dc:identifier>JERM:010</dc:identifier>
     </owl:Class>
@@ -1460,7 +1461,14 @@
 
 
     <!-- http://jermontology.org/ontology/JERMOntology#HPLC -->
-    <!-- removed for test -->
+
+    <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#HPLC">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Chromatography"/>
+        <dc:description>High Performance Liquid Chromatography. 
+Liquid chromatography (LC) is a separation technique in which the mobile phase is a liquid</dc:description>
+        <dc:identifier>JERM:00108</dc:identifier>
+        <rdfs:comment>High Performance Liquid Chromatography</rdfs:comment>
+    </owl:Class>
     
 
 
@@ -1485,7 +1493,6 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Immune_precipitation -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Immune_precipitation">
-        <rdfs:label>modelling_to_experimental</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Proteomics"/>
         <dc:identifier>JERM:00073</dc:identifier>
     </owl:Class>
@@ -2274,7 +2281,6 @@
     <!-- http://jermontology.org/ontology/JERMOntology#Progressive_curve_experiment -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Progressive_curve_experiment">
-        <rdfs:label>Prog Rock</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Enzymatic_activity_measurements"/>
         <dc:identifier>JERM:00118</dc:identifier>
     </owl:Class>
@@ -3626,7 +3632,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <!-- http://jermontology.org/ontology/JERMOntology#2-hybrid_system -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#2-hybrid_system">
-        <rdfs:label>fish</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Binding"/>
         <dc:description>Two-hybrid screening (also known as yeast two-hybrid system or Y2H) is a molecular biology technique used to discover protein-protein interactions and protein-DNA interactions by testing for physical interactions</dc:description>
         <dc:identifier>JERM:00106</dc:identifier>
