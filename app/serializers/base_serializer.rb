@@ -17,60 +17,68 @@ class BaseSerializer < SimpleBaseSerializer
   has_many :strains
   has_many :samples
 
-  def people
-    @associated['Person'][:items]
+  def associated(name)
+    unless @associated[name].blank?
+      @associated[name][:items]
+    else
+      []
+    end
   end
 
+  def people
+    associated('Person')
+   end
+
   def projects
-    @associated['Project'][:items]
+    associated('Project')
   end
 
   def institutions
-    @associated['Institution'][:items]
+    associated('Institution')
   end
 
   def investigations
-    @associated['Investigation'][:items]
+    associated('Investigation')
   end
 
   def studies
-    @associated['Study'][:items]
-  end
+    associated('Study')
+   end
 
   def assays
-    @associated['Assay'][:items]
+    associated('Assay')
   end
 
   def data_files
-    @associated['DataFile'][:items]
+    associated('DataFile')
   end
 
   def models
-    @associated['Model'][:items]
+    associated('Model')
   end
 
   def sops
-    @associated['Sop'][:items]
+    associated('Sop')
   end
 
   def publications
-    @associated['Publication'][:items]
+    associated('Publication')
   end
 
   def presentations
-    @associated['Presentation'][:items]
+    associated('Presentation')
   end
 
   def events
-    @associated['Event'][:items]
+    associated('Event')
   end
 
   def strains
-    @associated['Strain'][:items]
+    associated('Strain')
   end
 
   def samples
-    @associated['Sample'][:items]
+    associated('Sample')
   end
 
 
