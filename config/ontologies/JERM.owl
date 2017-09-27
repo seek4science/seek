@@ -22,10 +22,10 @@
         <Class IRI="#Metabolomics"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#organism_part"/>
+        <DataProperty IRI="#labInternalID"/>
     </Declaration>
     <Declaration>
-        <DataProperty IRI="#labInternalID"/>
+        <Class IRI="#organism_part"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Metabolic_redesign"/>
@@ -160,10 +160,10 @@
         <Class IRI="#MicroRNA_profiling"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Tiling_array"/>
+        <Class IRI="#Optical_density_600"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Optical_density_600"/>
+        <Class IRI="#Tiling_array"/>
     </Declaration>
     <Declaration>
         <Class IRI="#respiration"/>
@@ -370,13 +370,13 @@
         <Class IRI="#Protein_structural_analysis"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Model_analysis_type"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#turbidostat"/>
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#isContributorOf"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#Model_analysis_type"/>
     </Declaration>
     <Declaration>
         <Class IRI="#cell"/>
@@ -433,10 +433,10 @@
         <DataProperty IRI="#ageOfSpecimen"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Volume"/>
+        <Class IRI="#Information_entity"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Information_entity"/>
+        <Class IRI="#Volume"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#dateOfDeath"/>
@@ -520,10 +520,10 @@
         <Class IRI="#Quality_control_type"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Micro-electrophoresis"/>
+        <Class IRI="#Surface_plasmon_resonance"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Surface_plasmon_resonance"/>
+        <Class IRI="#Micro-electrophoresis"/>
     </Declaration>
     <Declaration>
         <Class IRI="#RNA-Seq"/>
@@ -670,10 +670,10 @@
         <Class IRI="#pH"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#cell_type"/>
+        <Class IRI="#Imaging"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Imaging"/>
+        <Class IRI="#cell_type"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Replicate_type"/>
@@ -706,10 +706,10 @@
         <Class IRI="#Pathway"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Cell_line"/>
+        <Class IRI="#PCR"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#PCR"/>
+        <Class IRI="#Cell_line"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Chemostat"/>
@@ -823,10 +823,10 @@
         <Class IRI="#Specific_concentration"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#anaerobic"/>
+        <Class IRI="#Metagenomics"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Metagenomics"/>
+        <Class IRI="#anaerobic"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Model"/>
@@ -1009,10 +1009,10 @@
         <Class IRI="#tissue"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Capillary_electrophoresis"/>
+        <Class IRI="#tissue_type"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#tissue_type"/>
+        <Class IRI="#Capillary_electrophoresis"/>
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#hasType"/>
@@ -2005,6 +2005,10 @@
     <SubClassOf>
         <Class IRI="#Primer_design"/>
         <Class IRI="#Genomics"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#Programme"/>
+        <Class IRI="#Information_entity"/>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Programme"/>

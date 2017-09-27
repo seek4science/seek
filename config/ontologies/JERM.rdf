@@ -2499,6 +2499,7 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     <!-- http://jermontology.org/ontology/JERMOntology#Programme -->
 
     <owl:Class rdf:about="http://jermontology.org/ontology/JERMOntology#Programme">
+        <rdfs:subClassOf rdf:resource="http://jermontology.org/ontology/JERMOntology#Information_entity"/>
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://jermontology.org/ontology/JERMOntology#hasPart"/>
