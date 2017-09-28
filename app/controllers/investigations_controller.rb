@@ -34,13 +34,12 @@ class InvestigationsController < ApplicationController
   def show
     @investigation=Investigation.find(params[:id])
     @investigation.create_from_asset = params[:create_from_asset]
-    options = {:is_collection=>false}
 
     respond_to do |format|
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show' }
-      format.json {render json: JSONAPI::Serializer.serialize(@investigation,options)}
+      format.json {render json: @investigation}
 
       format.ro do
         ro_for_download
@@ -61,28 +60,29 @@ class InvestigationsController < ApplicationController
     @investigation = Investigation.new(investigation_params)
     update_sharing_policies @investigation
 
-    if @investigation.save
-      update_scales(@investigation)
-      update_relationships(@investigation, params)
+    if @investigation.present? && @investigation.save
+       update_scales(@investigation)
+       update_relationships(@investigation, params)
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
         respond_to do |format|
           flash[:notice] = "The #{t('investigation')} was successfully created."
           if @investigation.create_from_asset=="true"
-             flash.now[:notice] << "<br/> Now you can create new #{t('study')} for your #{t('assays.assay')} by clicking -Add a #{t('study')}- button".html_safe
+            flash.now[:notice] << "<br/> Now you can create new #{t('study')} for your #{t('assays.assay')} by clicking -Add a #{t('study')}- button".html_safe
             format.html { redirect_to investigation_path(:id=>@investigation,:create_from_asset=>@investigation.create_from_asset) }
+            format.json {render json: @investigation}
           else
             format.html { redirect_to investigation_path(@investigation) }
-            format.xml { render :xml => @investigation, :status => :created, :location => @investigation }
+            format.json {render json: @investigation}
           end
         end
        end
     else
       respond_to do |format|
-      format.html { render :action => "new" }
-      format.xml { render :xml => @investigation.errors, :status => :unprocessable_entity }
-    end
+        format.html { render :action => "new" }
+        format.json { render json: {error: @investigation.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+      end
     end
 
   end
@@ -108,25 +108,22 @@ class InvestigationsController < ApplicationController
 
   def update
     @investigation=Investigation.find(params[:id])
-
     @investigation.attributes = investigation_params
-
     update_sharing_policies @investigation
 
-    respond_to do |format|
-      if @investigation.save
+      respond_to do |format|
+        if @investigation.save
+          update_scales(@investigation)
+          update_relationships(@investigation, params)
 
-        update_scales(@investigation)
-        update_relationships(@investigation, params)
-
-        flash[:notice] = "#{t('investigation')} was successfully updated."
-        format.html { redirect_to(@investigation) }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @investigation.errors, :status => :unprocessable_entity }
+          flash[:notice] = "#{t('investigation')} was successfully updated."
+          format.html { redirect_to(@investigation) }
+          format.json {render json: @investigation}
+        else
+          format.html { render :action => "edit" }
+          format.json { render json: {error: @investigation.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+        end
       end
-    end
   end
 
   private

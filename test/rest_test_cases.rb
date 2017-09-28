@@ -8,10 +8,15 @@ module RestTestCases
   XML_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
   JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'json', 'rest', 'jsonapi-schema-v1')
 
+  def index_schema_file_path
+    File.join(Rails.root, 'public', '2010', 'json', 'rest',
+              "index_#{@controller.controller_name}_200_response.json")
+  end
+
   def test_index_rest_api_xml
     clz = @controller.controller_name.classify.constantize.to_s
-    if (clz == 'SampleType' || clz == 'Sample')
-      skip('skipping XML tests for Sample and SampleType')
+    if (clz == 'SampleType' || clz == 'Sample' || clz == 'Programme')
+      skip('skipping XML tests for Sample, SampleType and Programme')
     end
     # to make sure something in the database is created
     object = rest_api_test_object
@@ -22,8 +27,8 @@ module RestTestCases
 
   def test_displays_correct_counts_in_index
     clz = @controller.controller_name.classify.constantize.to_s
-    if (clz == 'SampleType' || clz == 'Sample')
-      skip('skipping XML tests for Sample and SampleType')
+    if (clz == 'SampleType' || clz == 'Sample' || clz == 'Programme')
+      skip('skipping XML tests for Sample, SampleType and Programme')
     end
 
     # to make sure something in the database is created
@@ -49,8 +54,8 @@ module RestTestCases
 
   def test_get_rest_api_xml(object = rest_api_test_object)
     clz = @controller.controller_name.classify.constantize.to_s
-    if (clz == 'SampleType' || clz == 'Sample')
-      skip('skipping XML tests for Sample and SampleType')
+    if (clz == 'SampleType' || clz == 'Sample' || clz == 'Programme')
+      skip('skipping XML tests for Sample, SampleType and Programme')
     end
     get :show, id: object, format: 'xml'
     perform_api_checks
@@ -72,9 +77,10 @@ module RestTestCases
   end
 
   def test_index_json
-    object = rest_api_test_object
     get :index, format: 'json'
+    fred = @response.body
     perform_jsonapi_checks
+    assert JSON::Validator.validate(index_schema_file_path, @response.body)
   end
 
   def test_response_code_for_not_accessible

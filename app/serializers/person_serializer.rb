@@ -2,7 +2,7 @@ require 'digest/sha1'
 class PersonSerializer < AvatarObjSerializer
   attributes :title, :description,
              :first_name, :last_name,
-             :webpage,  :orcid
+             :web_page,  :orcid
   attribute :email do
     Digest::SHA1.hexdigest(object.email)
   end

@@ -14,10 +14,12 @@ module Seek
       if can_delete && asset.destroy
         format.html { redirect_to(redirect_location_on_success) }
         format.xml { head :ok }
+        format.json {render json: {status: :ok}, status: :ok}
       else
         flash.now[:error] = "Unable to delete the #{controller_name.singularize}"
         format.html { render action: 'show' }
         format.xml { render xml: asset.errors, status: :unprocessable_entity }
+        format.json {render json: {"title": asset.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
       end
     end
 

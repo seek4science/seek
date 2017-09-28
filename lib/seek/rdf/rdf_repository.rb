@@ -100,8 +100,8 @@ module Seek
           end
 
           # cannot simply do new_statements - old_statements, because although eql? works, the same statements have different hashes
-          to_add = new_statements.select { |s| !old_statements.include?(s) }
-          to_remove = old_statements.select { |s| !new_statements.include?(s) }
+          to_add = new_statements.reject { |s| old_statements.include?(s) }
+          to_remove = old_statements.reject { |s| new_statements.include?(s) }
 
           graphs.each do |graph|
             to_remove.each do |statement|
@@ -146,15 +146,15 @@ module Seek
       # Abstract methods
 
       def get_configuration
-        fail 'Not implemented: subclass should provide a configuration class'
+        raise 'Not implemented: subclass should provide a configuration class'
       end
 
       def get_query_object
-        fail 'Not implemented: subclass should provide a suitable RDF::Query class'
+        raise 'Not implemented: subclass should provide a suitable RDF::Query class'
       end
 
       def get_repository_object
-        fail 'Not implemented: subclass should provide a suitable instance of RDF::Repository'
+        raise 'Not implemented: subclass should provide a suitable instance of RDF::Repository'
       end
 
       private
@@ -162,11 +162,11 @@ module Seek
       # Private abstract methods
 
       def config_filename
-        fail 'Not implemented: subclass should provide the name (not path) of the configuration filename'
+        raise 'Not implemented: subclass should provide the name (not path) of the configuration filename'
       end
 
       def enabled_for_environment?
-        fail 'Not implemented: subclass should determine whether a configuration has been set for the current Rails.env'
+        raise 'Not implemented: subclass should determine whether a configuration has been set for the current Rails.env'
       end
 
       def last_rdf_file_path(item)
@@ -199,19 +199,19 @@ module Seek
         end.compact
       end
 
-      def with_statements(item, &block)
+      def with_statements(item)
         RDF::Reader.for(:rdfxml).new(item.to_rdf) do |reader|
           reader.each_statement do |statement|
-            block.call(statement)
+            yield(statement)
           end
         end
       end
 
-      def with_statements_from_file(path, &block)
+      def with_statements_from_file(path)
         RDF::Reader.for(:rdfxml).open(path) do |reader|
           reader.each_statement do |statement|
             Rails.logger.debug "Statement from #{path}- #{statement}"
-            block.call(statement)
+            yield(statement)
           end
         end
       end

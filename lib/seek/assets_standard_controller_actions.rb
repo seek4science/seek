@@ -15,7 +15,6 @@ module Seek
       # store timestamp of the previous last usage
       @last_used_before_now = asset.last_used_at
 
-      options = {:is_collection=>false}
       # update timestamp in the current record
       # (this will also trigger timestamp update in the corresponding Asset)
       asset.just_used
@@ -25,7 +24,7 @@ module Seek
         format.xml
         format.rdf { render template: 'rdf/show' }
 
-        format.json {render json: JSONAPI::Serializer.serialize(asset_version,options)}
+        format.json {render json: asset_version, serializer: (asset.class.name + "::VersionSerializer").constantize}
       end
     end
 
@@ -93,6 +92,8 @@ module Seek
     end
 
     def update_sharing_policies(item)
+      Rails.logger.info("=====Policy=====")
+      Rails.logger.info(policy_params)
       item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
     end
 

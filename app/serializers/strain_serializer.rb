@@ -1,5 +1,11 @@
 class StrainSerializer < BaseSerializer
-  attributes :title, :organism, :description,
-             :synonym, :genotype_info, :phenotype_info,
-             :provider_name, :provider_id
+  attributes :title, :provider_name, :provider_id, :project_ids, :comment,
+             :synonym, :genotype_info, :phenotype_info
+
+  attribute :organism do
+    {
+        organism_id: object.organism.id.to_s,
+        title: object.organism.title
+    }
+  end
 end

@@ -8,11 +8,10 @@ class WorkGroupsController < ApplicationController
   # GET /groups.xml
   def index
     @groups = WorkGroup.all
-    options = {:is_collection=>true}
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @groups }
-      format.json {render json: JSONAPI::Serializer.serialize(@groups,options)}
+      format.json {render json: @groups}
 
     end
   end
@@ -20,13 +19,12 @@ class WorkGroupsController < ApplicationController
   # GET /groups/1
   # GET /groups/1.xml
   def show
-    options = {:is_collection=>false}
     @group = WorkGroup.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @group }
-      format.json {render json: JSONAPI::Serializer.serialize(@group,options)}
+      format.json {render json: @group}
 
     end
   end

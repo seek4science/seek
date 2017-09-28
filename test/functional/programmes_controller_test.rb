@@ -2,7 +2,18 @@ require 'test_helper'
 
 class ProgrammesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
+  include RestTestCases
   include ActionView::Helpers::NumberHelper
+
+  include RdfTestCases
+
+  def rest_api_test_object
+    Factory(:programme)
+  end
+
+  test 'test rdf dummy' do
+    test_get_rdf
+  end
 
   # for now just admins can create programmes, later we will change this
   test 'new page accessible admin' do

@@ -18,14 +18,13 @@ class InstitutionsController < ApplicationController
   # GET /institutions/1
   # GET /institutions/1.xml
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
       # format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
       #format.json { render json: @institution } #normal json
-      format.json {render json: JSONAPI::Serializer.serialize(@institution,options)}
+      format.json {render json: @institution}
     end
   end
 
@@ -60,20 +59,17 @@ class InstitutionsController < ApplicationController
   # POST /institutions.xml
   def create
 
-    # convert params as recieved by json-api to (flat) rails json
-    # if params.key?("data")
-    #   params_new = params[:data][:attributes]
-    #   params[:institution] = params_new
-    # end
     @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
         flash[:notice] = 'Institution was successfully created.'
         format.html { redirect_to(@institution) }
         format.xml  { render xml: @institution, status: :created, location: @institution }
+        format.json {render json: @institution, status: :created, location: @institution}
       else
         format.html { render action: 'new' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
+        format.json  { render json: @institution.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -87,9 +83,11 @@ class InstitutionsController < ApplicationController
         flash[:notice] = 'Institution was successfully updated.'
         format.html { redirect_to(@institution) }
         format.xml  { head :ok }
+        format.json {render json: @institution}
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
+        format.json { render json: @institution.errors, status: :unprocessable_entity}
       end
     end
   end
@@ -98,12 +96,11 @@ class InstitutionsController < ApplicationController
   def request_all
     # listing all institutions is public data, but still
     # we require login to protect from unwanted requests
-    options = {:is_collection=>true}
     institution_id = white_list(params[:id])
     institution_list = Institution.get_all_institutions_listing
     respond_to do |format|
        format.json do
-         render json: JSONAPI::Serializer.serialize(institution_list, options)
+         render json: institution_list
          #render json: { status: 200, institution_list: institution_list }
        end
     end

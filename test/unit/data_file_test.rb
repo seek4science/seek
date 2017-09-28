@@ -220,7 +220,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'to rdf' do
-    df = Factory :data_file, assay_ids: [Factory(:assay, technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type').id, Factory(:assay).id]
+    df = Factory :data_file, assay_ids: [Factory(:assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Technology_type').id, Factory(:assay).id]
     pub = Factory :publication
     Factory :relationship, subject: df, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
     df.reload
@@ -383,5 +383,17 @@ class DataFileTest < ActiveSupport::TestCase
       refute df.openbis_size_download_restricted?
       refute df.download_disabled?
     end
+  end
+
+  test 'simulation data?' do
+    df = Factory(:data_file,simulation_data:true)
+    df2 = Factory(:data_file)
+
+    assert df.simulation_data?
+    refute df2.simulation_data?
+
+    assert_includes DataFile.simulation_data,df
+    refute_includes DataFile.simulation_data,df2
+
   end
 end

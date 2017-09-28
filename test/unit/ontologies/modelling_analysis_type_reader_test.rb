@@ -14,7 +14,7 @@ class ModellingAnalysisTypeReaderTest < ActiveSupport::TestCase
 
     refute_nil hierarchy
     assert hierarchy.is_a?(Seek::Ontologies::OntologyClass)
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type', hierarchy.uri.to_s
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Model_analysis_type', hierarchy.uri.to_s
 
     hierarchy = hierarchy.subclasses
 

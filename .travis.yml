@@ -1,16 +1,10 @@
 language: ruby
 
-rvm:
-  - 2.2.7
-  
-jdk:
-  - openjdk7
-
-sudo: false
-
 cache: bundler
 
-bundler_args: --without development
+jdk: openjdk7
+
+sudo: false
 
 env:
   - SUITE="rake test:units" DB_TYPE=mysql

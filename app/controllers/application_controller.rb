@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   include Recaptcha::Verify
 
   include CommonSweepers
+  @is_json = false
 
   before_filter :log_extra_exception_data
 
@@ -23,17 +24,23 @@ class ApplicationController < ActionController::Base
   around_filter :with_current_user
 
   rescue_from 'ActiveRecord::RecordNotFound', with: :render_not_found_error
+  rescue_from 'ActiveRecord::UnknownAttributeError', with: :render_unknown_attribute_error
+  rescue_from NotImplementedError, with: :render_not_implemented_error
 
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
-  #before_filter :process_params, :only=>[:edit, :update, :destroy, :create, :new]
-
+  before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
+  before_filter :check_illegal_id, :only=>[:create]
   # after_filter :unescape_response
+
+  before_filter :write_api_enabled, :only=>[:edit, :update, :destroy, :create, :new]
+  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new]
 
   helper :all
 
   layout Seek::Config.main_layout
+
 
   def with_current_user
     User.with_current_user current_user do
@@ -66,6 +73,10 @@ class ApplicationController < ActionController::Base
 
   def base_host
     request.host_with_port
+  end
+
+  def set_is_json
+    @is_json = (request.format.json?)
   end
 
   def api_version
@@ -182,11 +193,7 @@ class ApplicationController < ActionController::Base
             redirect_to path
           end
         end
-        format.json {
-          errors = [{"title": "Unauthorized", "status": "401", "detail": flash[:error].to_s}]
-          render json: JSONAPI::Serializer.serialize_errors(errors), status: 401
-         # render json: { status: 401, error_message: flash[:error] }
-        }
+        format.json { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
       end
     end
   end
@@ -242,10 +249,7 @@ class ApplicationController < ActionController::Base
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render text: 'Not found', status: :not_found }
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-        format.json {
-          errors = [{"title": "Not found", "status": "404"}]
-          render json: JSONAPI::Serializer.serialize_errors(errors), status: :not_found
-        }
+        format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
     else
@@ -283,8 +287,7 @@ class ApplicationController < ActionController::Base
         format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.json {
-          errors = [{"title": "Forbidden", "status": "403", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}]
-          render json: JSONAPI::Serializer.serialize_errors(errors), status: :forbidden
+          render json: {"title": "Forbidden", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}, status: :forbidden
         }
       end
       return false
@@ -308,13 +311,33 @@ class ApplicationController < ActionController::Base
 
       format.rdf { render text: 'Not found', status: :not_found }
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-      format.json {
-        errors = [{"title": "Not found", "status": "404"}]
-        render json: JSONAPI::Serializer.serialize_errors(errors), status: :not_found
-      }
+      format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
     end
     false
   end
+
+  def render_unknown_attribute_error(e)
+    respond_to do |format|
+      format.json {
+        render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
+      }
+      format.all {
+        render text: e.message, status: :unprocessable_entity
+      }
+    end
+  end
+
+  def render_not_implemented_error(e)
+    respond_to do |format|
+      format.json {
+        render json: {error: e.message, status: :not_implemented}, status: :not_implemented
+      }
+      format.all {
+        render text: e.message, status: :not_implemented
+      }
+    end
+  end
+
 
   def is_auth?(object, privilege)
     if object.can_perform?(privilege)
@@ -533,52 +556,14 @@ class ApplicationController < ActionController::Base
     redirect_to signup_path if User.count == 0
   end
 
-  #process JSONAPI params into params itself, so it can be used normally with create, update, etc.
-  def process_params()
-
-    resource = controller_name.singularize
-
-    #check for JSONAPI
-    if params.key?("data")
-      params[resource] = params[:data][:attributes]
-
-      #initialize
-      params[:relationships].each do |r,info|
-        params[resource][r.to_s+"_ids"] = []
+  def check_illegal_id
+    begin
+      Rails.logger.info("checking illegal ID")
+      if !params[:id].nil?
+        raise ArgumentError.new('A POST request is not allowed to specify an id')
       end
-
-      #fill up related resource ids in params[resource][related_ids] from the meta section in relationships
-      #This makes sense when a user creates his own file to upload, and does not know IDs of resources, plus
-      #creating associated branches within data in JSONAPI format is adding too much complexity and user-unfriendly standards.
-      params[:relationships].each do |r,info|
-        related_entity = r.capitalize.constantize.where(info[:meta]).first
-        params[resource][r.to_s+"_ids"] << related_entity.id if related_entity
-        puts "related entity: ", related_entity
-      end
-
-      # #2nd way: fill up from associated resources (e.g. from an exported json)
-      # # TO DO: decide if this is the final input/output format
-      # # problem : not everything should exist for every resource, e.g associated people are creators of an investigation, but not a project
-      # begin
-      #   params[:data][:relationships][:associated][:data].each do |assoc_data|
-      #     puts "associated ====> ", assoc_data
-      #     key = assoc_data[:type].singularize + "_ids"
-      #     params[resource][key] = [] if (params[resource][key] == nil)
-      #     params[resource][key] << assoc_data[:id].to_i
-      #   end
-      #
-      # rescue NoMethodError
-      #   puts "no associated stuff"
-      # end
-
-
-      #Creators
-      creators_arr = []
-      params[resource][:creators].each do |cr|
-        the_person = Person.where(email: cr).first
-        creators_arr << the_person if the_person
-      end
-      params[resource][:creators] = creators_arr
+    rescue ArgumentError => e
+      render json: {error: e.message, status: :forbidden}, status: :forbidden
     end
   end
 
@@ -599,6 +584,61 @@ class ApplicationController < ActionController::Base
                             { permissions_attributes: [:access_type,
                                                        :contributor_type,
                                                        :contributor_id] }])[:policy_attributes] || {}
+  end
+
+  def write_api_enabled
+    controller_class = self.controller_name.classify
+    if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
+      return
+    end
+    if @is_json && !Rails.env.development?
+      raise NotImplementedError
+    end
+  end
+
+  def convert_json_params
+   if @is_json
+      organize_external_attributes_from_json
+      hacked_params = flatten_relationships(params)
+      # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
+      params[controller_name.classify.downcase.to_sym] =
+          ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
+
+    end
+  end
+
+  # take out policies, annotations, etc(?) outside of the given object attributes
+  def organize_external_attributes_from_json
+    if (params[:data] && params[:data][:attributes])
+      [:tag_list, :expertise_list, :tool_list, :policy_attributes].each do |item|
+        if params[:data][:attributes][item]
+          params[item] = params[:data][:attributes][item]
+          params[:data][:attributes].delete item
+        end
+      end
+    end
+  end
+
+  def flatten_relationships(original_params)
+    replacements = {}
+    begin
+      rels = original_params[:data][:relationships]
+      assoc = rels[:associated]
+      assoc_relationships = assoc[:data]
+      assoc_relationships.each do |assoc_rel|
+        the_type = assoc_rel["type"]
+        the_id = assoc_rel["id"]
+        if !replacements.key?(the_type)
+          replacements[the_type] = {}
+          replacements[the_type][:data] = []
+        end
+        replacements[the_type][:data].push({:type => the_type, :id => the_id})
+      end
+      rels.delete(:associated)
+      original_params[:data][:relationships].merge!(ActionController::Parameters.new(replacements))
+    rescue Exception
+    end
+    original_params
   end
 
 end

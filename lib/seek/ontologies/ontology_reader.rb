@@ -58,11 +58,11 @@ module Seek
       private
 
       def default_parent_class_uri
-        fail NotImplementedError, 'Subclasses must implement a default_parent_class_uri method'
+        raise NotImplementedError, 'Subclasses must implement a default_parent_class_uri method'
       end
 
       def ontology_file
-        fail NotImplementedError, 'Subclasses must implement a ontology_file method'
+        raise NotImplementedError, 'Subclasses must implement a ontology_file method'
       end
 
       def ontology_term_type
@@ -126,7 +126,7 @@ module Seek
 
       # the schems for a uri that can be used to treat it as a URI, otherwise a filename is assumed
       def valid_uri_schemes
-        %w(http https file)
+        %w[http https file]
       end
     end
   end

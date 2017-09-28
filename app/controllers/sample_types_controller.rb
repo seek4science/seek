@@ -1,5 +1,5 @@
 class SampleTypesController < ApplicationController
-  respond_to :html
+  respond_to :html, :json
   include Seek::UploadHandling::DataUpload
   include Seek::IndexPager
 
@@ -16,10 +16,9 @@ class SampleTypesController < ApplicationController
   # GET /sample_types/1  ,'sample_attributes','linked_sample_attributes'
   # GET /sample_types/1.json
   def show
-    options = {:is_collection=>false}
     respond_to do |format|
       format.html
-      format.json {render json: JSONAPI::Serializer.serialize(@sample_type,options)}
+      format.json {render json: @sample_type}
     end
   end
 
@@ -69,8 +68,10 @@ class SampleTypesController < ApplicationController
       if @sample_type.save
         @sample_type.update_attribute(:tags, tags)
         format.html { redirect_to @sample_type, notice: 'Sample type was successfully created.' }
+        format.json { render json: @sample_type, status: :created, location: @sample_type}
       else
         format.html { render action: 'new' }
+        format.json { render json: @sample_type.errors, status: :unprocessable_entity}
       end
     end
   end
@@ -81,7 +82,11 @@ class SampleTypesController < ApplicationController
     @sample_type.update_attributes(sample_type_params)
     @sample_type.resolve_inconsistencies
     flash[:notice] = 'Sample type was successfully updated.' if @sample_type.save
-    respond_with(@sample_type)
+    respond_to do |format|
+      format.html { respond_with(@sample_type) }
+      format.json {render json: @sample_type}
+    end
+
   end
 
   # DELETE /sample_types/1
