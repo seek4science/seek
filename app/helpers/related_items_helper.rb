@@ -120,7 +120,7 @@ module RelatedItemsHelper
     elsif item_type != 'Person' && resource.respond_to?(method_name.singularize) # check is to avoid Person.person
       Array(resource.send(method_name.singularize))
     else
-      nil
+      []
     end
   end
 
