@@ -120,7 +120,7 @@ module RelatedItemsHelper
     elsif item_type != 'Person' && resource.respond_to?(method_name.singularize) # check is to avoid Person.person
       Array(resource.send(method_name.singularize))
     else
-      []
+      nil
     end
   end
 
@@ -157,6 +157,9 @@ module RelatedItemsHelper
 
   def authorize_related_items(related)
     related.each do |key, res|
+      if res[:items].nil?
+        res[:items] = []
+      end
       res[:items] = res[:items].uniq.compact
       next if res[:items].empty? || res[:items].nil?
       total_count = res[:items].size
@@ -182,11 +185,13 @@ module RelatedItemsHelper
       related = relatable_types
       related.delete('Person') if resource.class == 'Person' # to avoid the same person showing up
 
+      answerable = {}
       related.each_key do |type|
         related[type][:items] = related_items_method(resource, type)
         related[type][:hidden_items] = []
         related[type][:hidden_count] = 0
         related[type][:extra_count] = 0
+        answerable[type] = !related[type][:items].nil?
       end
 
       related
