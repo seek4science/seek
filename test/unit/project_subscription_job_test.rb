@@ -50,7 +50,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     assert assets.empty?
 
     # create items for project
-    ps.subscribable_types.collect(&:name).reject { |t| t == 'Assay' || t == 'Study' }.each do |type|
+    ps.subscribable_types.collect(&:name).reject { |t| t == 'Assay' || t == 'Study' || t == 'OpenbisAssay'}.each do |type|
       Factory("#{type.underscore.tr('/', '_')}", projects: [project])
     end
     project.reload
@@ -59,8 +59,11 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     # assay
     Factory(:assay, study: study)
 
+    # OpenbisAssay is not created
+
     assets = ProjectSubscriptionJob.new(1).all_in_project project
-    assert_equal ps.subscribable_types.count, assets.count
+    # cause without openbis
+    assert_equal ps.subscribable_types.count-1, assets.count
   end
 
   test 'perform' do
