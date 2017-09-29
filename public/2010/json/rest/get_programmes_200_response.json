@@ -10,18 +10,18 @@
           "additionalProperties": false, 
           "properties": {
             "avatar": {
-              "type": "string",
+              "type": ["string", "null"],
               "format": "uri"
             }, 
             "description": {
-              "type": "string"
+              "type": ["string", "null"]
             }, 
             "funding_details": {
-              "type": "string"
+              "type": ["string", "null"]
             }, 
             "tags": {
               "items": {
-                "type": "string"
+                "type": ["string", "null"]
               }, 
               "type": "array"
             }, 
@@ -29,7 +29,7 @@
               "type": "string"
             }, 
             "web_page": {
-              "type": "string",
+              "type": ["string", "null"],
               "format": "uri"
             }
           }, 
