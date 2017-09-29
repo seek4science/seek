@@ -1,0 +1,514 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#", 
+  "additionalProperties": false, 
+  "definitions": {}, 
+  "properties": {
+    "data": {
+      "additionalProperties": false, 
+      "properties": {
+        "attributes": {
+          "additionalProperties": false, 
+          "properties": {
+            "avatar": {
+              "type": "string",
+              "format": "uri"
+            }, 
+            "description": {
+              "type": "string"
+            }, 
+            "funding_details": {
+              "type": "string"
+            }, 
+            "tags": {
+              "items": {
+                "type": "string"
+              }, 
+              "type": "array"
+            }, 
+            "title": {
+              "type": "string"
+            }, 
+            "web_page": {
+              "type": "string",
+              "format": "uri"
+            }
+          }, 
+          "required": [
+            "title"
+          ], 
+          "type": "object"
+        }, 
+        "id": {
+          "type": "string"
+        }, 
+        "links": {
+          "additionalProperties": false, 
+          "properties": {
+            "self": {
+              "type": "string",
+              "format": "uri"
+            }
+          }, 
+          "required": [
+            "self"
+          ], 
+          "type": "object"
+        }, 
+        "meta": {
+          "additionalProperties": false, 
+          "properties": {
+            "base_url": {
+              "type": "string",
+              "format": "uri"
+            }, 
+            "created": {
+              "type": "string",
+              "format": "date-time"
+            }, 
+            "modified": {
+              "type": "string",
+              "format": "date-time"
+            }, 
+            "uuid": {
+              "type": "string"
+            }
+          }, 
+          "required": [
+            "created", 
+            "modified", 
+            "uuid", 
+            "base_url"
+          ], 
+          "type": "object"
+        }, 
+        "relationships": {
+          "additionalProperties": false, 
+          "properties": {
+            "assays": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "assays"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "data_files": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "data_files"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "events": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "events"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "institutions": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "institutions"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "investigations": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "investigations"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "models": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "models"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "people": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "people"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "presentations": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "presentations"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "projects": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "projects"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "publications": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "publications"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "sops": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "sops"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }, 
+            "studies": {
+              "additionalProperties": false, 
+              "properties": {
+                "data": {
+                  "items": {
+                    "additionalProperties": false, 
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      }, 
+                      "type": {
+                        "enum": [
+                          "studies"
+                        ], 
+                        "type": "string"
+                      }
+                    }, 
+                    "required": [
+                      "id", 
+                      "type"
+                    ], 
+                    "type": "object"
+                  }, 
+                  "type": "array"
+                }
+              }, 
+              "required": [
+                "data"
+              ], 
+              "type": "object"
+            }
+          }, 
+          "required": [
+            "projects", 
+            "institutions", 
+            "studies", 
+            "data_files", 
+            "assays", 
+            "publications", 
+            "events", 
+            "presentations", 
+            "people", 
+            "models", 
+            "investigations", 
+            "sops"
+          ], 
+          "type": "object"
+        }, 
+        "type": {
+          "enum": [
+            "programmes"
+          ], 
+          "type": "string"
+        }
+      }, 
+      "required": [
+        "id", 
+        "type", 
+        "attributes", 
+        "meta", 
+        "links", 
+        "relationships"
+      ], 
+      "type": "object"
+    }, 
+    "jsonapi": {
+      "additionalProperties": false, 
+      "properties": {
+        "version": {
+          "enum": [
+            "1.0"
+          ], 
+          "type": "string"
+        }
+      }, 
+      "required": [
+        "version"
+      ], 
+      "type": "object"
+    }
+  }, 
+  "required": [
+    "jsonapi", 
+    "data"
+  ], 
+  "type": "object"
+}
