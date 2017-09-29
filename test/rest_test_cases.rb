@@ -13,6 +13,11 @@ module RestTestCases
               "index_#{@controller.controller_name}_200_response.json")
   end
 
+  def get_schema_file_path
+    File.join(Rails.root, 'public', '2010', 'json', 'rest',
+              "get_#{@controller.controller_name}_200_response.json")
+  end
+
   def test_index_rest_api_xml
     clz = @controller.controller_name.classify.constantize.to_s
     if (clz == 'SampleType' || clz == 'Sample' || clz == 'Programme')
@@ -74,13 +79,17 @@ module RestTestCases
   def test_show_json(object = rest_api_test_object)
     get :show, id: object, format: 'json'
     perform_jsonapi_checks
+    if File.readable?(get_schema_file_path)
+      assert JSON::Validator.validate(get_schema_file_path, @response.body)
+    end
   end
 
   def test_index_json
     get :index, format: 'json'
-    fred = @response.body
     perform_jsonapi_checks
-    assert JSON::Validator.validate(index_schema_file_path, @response.body)
+    if File.readable?(index_schema_file_path)
+      assert JSON::Validator.validate(index_schema_file_path, @response.body)
+    end
   end
 
   def test_response_code_for_not_accessible
