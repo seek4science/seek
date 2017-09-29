@@ -1,4 +1,4 @@
-class ContentBlobsController < ApplicationController
+  class ContentBlobsController < ApplicationController
 
   before_filter :find_and_authorize_associated_asset, :only=>[:get_pdf, :view_content,:view_pdf_content, :download]
   before_filter :find_and_authorize_content_blob, :only=>[:get_pdf, :view_content,:view_pdf_content, :download]
@@ -17,7 +17,7 @@ class ContentBlobsController < ApplicationController
   end
 
   def view_text_content
-    render file: @content_blob.filepath, layout: false, content_type: 'text/plain'
+    render text: File.read(@content_blob.filepath,:encoding => 'iso-8859-1'), layout: false, content_type: 'text/plain'
   end
 
   def view_pdf_content
