@@ -47,7 +47,8 @@
       "additionalProperties": false, 
       "properties": {
         "base_url": {
-          "type": "string"
+          "type": "string",
+          "format" : "uri"
         }
       }, 
       "required": [
