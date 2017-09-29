@@ -14,4 +14,18 @@ class PersonSerializer < AvatarObjSerializer
   end
   has_many :work_groups, include_data:true
 
+  has_many :projects
+  has_many :institutions
+  has_many :investigations
+  has_many :studies
+  has_many :assays
+  has_many :data_files
+  has_many :models
+  has_many :sops
+  has_many :publications
+  has_many :presentations
+  has_many :events
+  has_many :samples
+
+
 end

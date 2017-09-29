@@ -2,6 +2,86 @@ class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
   include RelatedItemsHelper
 
+  # has_many :people
+  # has_many :projects
+  # has_many :institutions
+  # has_many :investigations
+  # has_many :studies
+  # has_many :assays
+  # has_many :data_files
+  # has_many :models
+  # has_many :sops
+  # has_many :publications
+  # has_many :presentations
+  # has_many :events
+  # has_many :strains
+  # has_many :samples
+
+  def associated(name)
+    unless @associated[name].blank?
+      @associated[name][:items]
+    else
+      nil
+    end
+  end
+
+  def people
+    associated('Person')
+   end
+
+  def projects
+    associated('Project')
+  end
+
+  def institutions
+    associated('Institution')
+  end
+
+  def investigations
+    associated('Investigation')
+  end
+
+  def studies
+    associated('Study')
+   end
+
+  def assays
+    associated('Assay')
+  end
+
+  def data_files
+    associated('DataFile')
+  end
+
+  def models
+    associated('Model')
+  end
+
+  def sops
+    associated('Sop')
+  end
+
+  def publications
+    associated('Publication')
+  end
+
+  def presentations
+    associated('Presentation')
+  end
+
+  def events
+    associated('Event')
+  end
+
+  def strains
+    associated('Strain')
+  end
+
+  def samples
+    associated('Sample')
+  end
+
+
   def self_link
     #{base_url}//#{type}/#{id}
     "/#{type}/#{object.id}"
@@ -41,15 +121,6 @@ class BaseSerializer < SimpleBaseSerializer
       @associated = associated_resources(object.parent)
     else
       @associated = associated_resources(object)
-    end
-    @associated.each do |k,v|
-      unless (v[:items].blank?)
-        begin
-          self.class.has_many k.pluralize.downcase, include_data:true do
-            v[:items]
-          end
-        end
-      end
     end
   end
 

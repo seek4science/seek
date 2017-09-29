@@ -13,4 +13,15 @@ class PublicationSerializer < BaseSerializer
     end
   end
   has_many :publication_authors, include_data:true
+
+  has_many :people
+  has_many :projects
+  has_many :investigations
+  has_many :studies
+  has_many :assays
+  has_many :data_files
+  has_many :models
+  has_many :publications
+  has_many :presentations
+  has_many :events
 end
