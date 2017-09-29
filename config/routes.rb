@@ -328,7 +328,8 @@ SEEK::Application.routes.draw do
     resources :people,:projects,:investigations,:samples, :studies,:models,:sops,:data_files,:publications,:strains,:only=>[:index]
   end
 
-  resources :openbis_assays, controller: 'assays', type: 'OpenbisAssay'
+  # to be removed as STI does not work in too many places
+  # resources :openbis_assays, controller: 'assays', type: 'OpenbisAssay'
 
    ### ASSAY AND TECHNOLOGY TYPES ###
 

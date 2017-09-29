@@ -139,7 +139,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
   test 'updates for remaining authorized assets' do
     user = Factory :user
-    types = Seek::Util.authorized_types - [Sop, Assay, OpenbisAssay, Study, Sweep, TavernaPlayer::Run]
+    types = Seek::Util.authorized_types - [Sop, Assay, Study, Sweep, TavernaPlayer::Run]
     types.each do |type|
       entity = nil
       assert_difference('AuthLookupUpdateQueue.count', 1, "unexpected count for created type #{type.name}") do
