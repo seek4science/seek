@@ -16,7 +16,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     @endpoint = Factory(:openbis_endpoint, project: Factory(:project))
   end
 
-  test 'setup works' do
+  test 'test setup works' do
     assert @user
     assert @project_administrator
     assert @project
@@ -30,4 +30,15 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     assert_response :success
   end
+
+  test 'index renders parents details' do
+    login_as(@user)
+    get :index, project_id: @project.id, openbis_endpoint_id: @endpoint.id
+
+    assert_response :success
+    assert_select "div", "Project: #{@project.title}"
+    assert_select "div", "Endpoint: #{@endpoint.id}"
+    assert_select "div", "Samples: 2"
+  end
+
 end

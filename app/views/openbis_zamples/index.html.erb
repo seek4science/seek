@@ -5,5 +5,12 @@
 
 Zamples
 
-<%= @project.title %>
-<%= @openbis_endpoint.id %>
+<div>Project: <%= @project.title %></div>
+<div>Endpoint: <%= @openbis_endpoint.id %></div>
+<div>Samples: <%= @zamples.length %></div>
+
+<div class='row' id="openbis-zamples-cards">
+  <%= render partial:'openbis_zample_card', collection:@zamples %>
+</div>
+
+
