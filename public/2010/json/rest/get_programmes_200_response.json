@@ -21,9 +21,9 @@
             }, 
             "tags": {
               "items": {
-                "type": ["string", "null"]
+                "type": ["string"]
               }, 
-              "type": "array"
+              "type": ["array", "null"]
             }, 
             "title": {
               "type": "string"
