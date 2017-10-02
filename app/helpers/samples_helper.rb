@@ -79,7 +79,7 @@ module SamplesHelper
   def default_attribute_display(attribute, options, sample, value)
     resolution = attribute.resolve (value)
     if (resolution != nil)
-      link_to(value, resolution)
+      link_to(value, resolution, target: :_blank)
     else if options[:link] && attribute.is_title
         link_to(value, sample)
       else

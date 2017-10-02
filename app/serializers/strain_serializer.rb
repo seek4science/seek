@@ -8,4 +8,9 @@ class StrainSerializer < BaseSerializer
         title: object.organism.title
     }
   end
+
+  has_many :projects
+  has_many :assays
+  has_many :samples
+
 end
