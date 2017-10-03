@@ -14,14 +14,20 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
   def teardown
     unless @subject.nil?
-      q = @repository.query.delete([:s, :p, :o]).graph(@graph).where([:s, :p, :o])
+      q = @repository.query.delete(%i[s p o]).graph(@graph).where(%i[s p o])
       @repository.delete(q)
 
-      q = @repository.query.delete([:s, :p, :o]).graph(@public_graph).where([:s, :p, :o])
+      q = @repository.query.delete(%i[s p o]).graph(@public_graph).where(%i[s p o])
       @repository.delete(q)
 
       @project.delete_rdf_file
     end
+  end
+
+  # a sanity check that the helper method, that the other tests rely on, is working correctly
+  test 'triple count' do
+    count = triple_count(@project)
+    assert count > 0
   end
 
   test 'singleton repository' do
@@ -50,13 +56,15 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     @repository.send_rdf(@project)
     @project.save_rdf_file
 
+    count = triple_count(@project)
+
     q = @repository.query.select.where([@subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 5, result.count
+    assert_equal count, result.count
 
     q = @repository.query.select.where([@subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
-    assert_equal 5, result.count
+    assert_equal count, result.count
 
     @repository.remove_rdf(@project)
     q = @repository.query.select.where([@subject, :p, :o]).from(@graph)
@@ -69,25 +77,27 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
   end
 
   test 'remove from store after privacy change' do
-    sop = Factory(:sop, policy: Factory(:public_policy),creators:[Factory(:person)])
+    sop = Factory(:sop, policy: Factory(:public_policy), creators: [Factory(:person)])
     assert sop.can_view?(nil)
     refute_empty sop.creators
 
     @repository.send_rdf(sop)
     subject = sop.rdf_resource
 
+    count = triple_count(sop)
+
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 11, result.count
+    assert_equal count, result.count
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
-    assert_equal 11, result.count
+    assert_equal count, result.count
 
     sop.policy.access_type = Policy::NO_ACCESS
     sop.policy.save!
     sop = Sop.find(sop.id)
-    assert !sop.can_view?(nil)
+    refute sop.can_view?(nil)
 
     @repository.remove_rdf(sop)
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
@@ -103,14 +113,16 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
   test 'remove private from store' do
     sop = Factory(:sop, policy: Factory(:private_policy))
-    assert !sop.can_view?(nil)
+    refute sop.can_view?(nil)
 
     @repository.send_rdf(sop)
     subject = sop.rdf_resource
 
+    count = triple_count(sop)
+
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 9, result.count
+    assert_equal count, result.count
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
@@ -174,9 +186,11 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     title = @project.title
 
+    triple_count = triple_count(@project)
+
     q = @repository.query.select.where([@subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 5, result.count, 'there should be 5 statements in total'
+    assert_equal triple_count, result.count, 'there should be 5 statements in total'
 
     q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@graph)
     result = @repository.select(q)
@@ -190,7 +204,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     q = @repository.query.select.where([@subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 5, result.count, 'there should be 5 statements in total'
+    assert_equal triple_count, result.count, "there should be #{triple_count} statements in total"
 
     q = @repository.query.select.where([@subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@graph)
     result = @repository.select(q)
@@ -206,6 +220,8 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     sop = Factory(:sop, policy: Factory(:public_policy))
     assert sop.can_view?(nil)
 
+    count = triple_count(sop)
+
     @repository.send_rdf(sop)
     @repository.update_rdf(sop)
 
@@ -213,22 +229,22 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
 
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 9, result.count, 'there should be 9 statements in total'
+    assert_equal count, result.count, "there should be #{count} statements in total"
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
-    assert_equal 9, result.count, 'there should be 9 statements in total'
+    assert_equal count, result.count, "there should be #{count} statements in total"
 
     sop.policy.access_type = Policy::NO_ACCESS
     sop.policy.save!
     sop = Sop.find(sop.id)
-    assert !sop.can_view?(nil), 'the sop should now be hidden'
+    refute sop.can_view?(nil), 'the sop should now be hidden'
 
     @repository.update_rdf(sop)
 
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 9, result.count, 'there should be 9 statements in total'
+    assert_equal count, result.count, "there should be #{count} statements in total"
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
@@ -243,15 +259,17 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     sop = Sop.find(sop.id)
     assert sop.can_view?(nil), 'The sop should now be visible'
 
+    count = triple_count(sop)
+
     @repository.update_rdf(sop)
 
     q = @repository.query.select.where([subject, :p, :o]).from(@graph)
     result = @repository.select(q)
-    assert_equal 9, result.count, 'there should be 9 statements in total'
+    assert_equal count, result.count, "there should be #{count} statements in total"
 
     q = @repository.query.select.where([subject, :p, :o]).from(@public_graph)
     result = @repository.select(q)
-    assert_equal 9, result.count, 'there should be 9 statements in the public graph'
+    assert_equal count, result.count, "there should be #{count} statements in the public graph"
 
     q = @repository.query.select.where([subject, RDF::URI.new('http://purl.org/dc/terms/title'), :o]).from(@public_graph)
     result = @repository.select(q)
@@ -259,5 +277,14 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     assert_equal 'Updated Title', result[0][:o].value
 
     sop.delete_rdf_file
+  end
+
+  private
+
+  # gets the count of the triples for a resource. This can change as the rdf is updated, so avoids having hard-coded
+  # variables making the tests fragile
+  def triple_count(object)
+    rdf = object.to_rdf
+    RDF::Reader.for(:rdfxml).new(rdf).statements.count
   end
 end
