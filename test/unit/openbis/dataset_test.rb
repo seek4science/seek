@@ -18,6 +18,14 @@ class DatasetTest < ActiveSupport::TestCase
     assert_empty sets
   end
 
+  test 'find by perm ids of sample only sets' do
+    ids = ["20171002172401546-38", "20171002190934144-40"]
+    sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_perm_ids(ids)
+    assert_equal 2, sets.count
+    assert_equal ["20171002172401546-38","20171002190934144-40"], sets.collect(&:perm_id).sort
+
+  end
+
   test 'initialize' do
     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
     assert_equal '20160210130454955-23', dataset.perm_id

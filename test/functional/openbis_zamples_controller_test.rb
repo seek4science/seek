@@ -41,4 +41,11 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_select "div", "Samples: 2"
   end
 
+  test 'edit gives edit view' do
+    login_as(@user)
+    get :edit, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37'
+
+    assert_response :success
+  end
+
 end

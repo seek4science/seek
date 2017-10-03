@@ -31,6 +31,18 @@ module Seek
       def type_name
         'Sample'
       end
+
+      def type_code
+        sample_type_code
+      end
+
+      def type_description
+        sample_type_description
+      end
+
+      def type_text
+        sample_type_text
+      end
     end
   end
 end
