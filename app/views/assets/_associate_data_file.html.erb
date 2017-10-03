@@ -76,11 +76,7 @@
             </div>
           </div>
 
-          <%= association_select_results do %>
-              <%= render partial: 'data_files/association_preview', collection: DataFile.limit(0),
-                         locals: { existing: resource.data_files }
-              %>
-          <% end %>
+          <%= association_select_results %>
         </div>
 
         <hr/>

@@ -46,7 +46,7 @@ module AssociationsHelper
     content_tag(:div, class: 'list-group association-candidate-list',
                 data: { role: 'seek-association-candidate-list',
                         multiple: options.delete(:multiple) || 'false' }) do
-      yield
+      yield if block_given?
     end
   end
 
