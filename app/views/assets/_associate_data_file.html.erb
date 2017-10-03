@@ -53,11 +53,34 @@
 
     <%= association_selector('data_file_to_list', 'Associate data', 'Associate data', size: 'md') do %>
         <label>Select data file</label>
-        <%= filterable_association_select(filter_data_files_path(:assay_id => resource.id)) do %>
-            <%= render :partial => 'data_files/association_preview', :collection => DataFile.limit(0),
-                       :locals => { :existing => resource.data_files }
-            %>
-        <% end %>
+        <div class="form-group" data-role="seek-association-filter-group" data-filter-url="<%= filter_data_files_path(assay_id: resource.id) -%>">
+          <%= association_select_filter %>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="checkbox">
+                <label>
+                  <%= check_box_tag(:all_projects, '1', false, 'data-role' => 'seek-association-filter-field') %>
+                  <strong>Show data from all projects?</strong>
+                </label>
+              </div>
+            </div>
+
+            <div class="col-sm-6">
+              <div class="checkbox">
+                <label>
+                  <%= check_box_tag(:simulation_data, '1', false, 'data-role' => 'seek-association-filter-field') %>
+                  <strong>Show only simulation data?</strong>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <%= association_select_results do %>
+              <%= render partial: 'data_files/association_preview', collection: DataFile.limit(0),
+                         locals: { existing: resource.data_files }
+              %>
+          <% end %>
+        </div>
 
         <hr/>
         <% if has_relationships -%>
