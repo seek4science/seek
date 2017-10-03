@@ -16,8 +16,7 @@ module Seek
         Seek::Rdf::RdfRepository.instance.remove_rdf(self)
       end
 
-      # updates the repository with the changes for self, consolidating the differences between now and when the last rdf
-      # was created, and only replacing those that have changed.
+      # updates the repository with the changes for self
       # It will also update the saved file containing the rdf
       def update_repository_rdf
         Seek::Rdf::RdfRepository.instance.update_rdf(self)

@@ -281,6 +281,49 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     sop.delete_rdf_file
   end
 
+  #checks the the rdf resource type is updated, and there is not a duplicate. This is in particular for when data changes
+  # to simulation data
+  test 'update rdf after resource type change' do
+    data_file = Factory(:data_file)
+    refute data_file.simulation_data?
+
+    @repository.send_rdf(data_file)
+
+    count = triple_count(data_file)
+    rdf_resource = data_file.rdf_resource
+
+    puts rdf_resource
+
+    # check the count, and the type
+    q = @repository.query.select.where([data_file.rdf_resource, :p, :o]).from(@private_graph)
+    result = @repository.select(q)
+    assert_equal count, result.count
+    q = @repository.query.select.where([data_file.rdf_resource, RDF.type, :o]).from(@private_graph)
+    result = @repository.select(q)
+    assert_equal 1, result.count
+    assert_equal Seek::Rdf::JERMVocab.Data, result[0][:o].value
+
+    disable_authorization_checks do
+      data_file.simulation_data=true
+      data_file.save!
+      data_file.reload
+    end
+
+    @repository.update_rdf(data_file)
+
+    # now check the count is the same, and the type has been updated
+    assert_equal count,triple_count(data_file)
+    assert_equal rdf_resource,data_file.rdf_resource
+    q = @repository.query.select.where([data_file.rdf_resource, :p, :o]).from(@private_graph)
+    result = @repository.select(q)
+    assert_equal count, result.count
+    q = @repository.query.select.where([data_file.rdf_resource, RDF.type, :o]).from(@private_graph)
+    result = @repository.select(q)
+    assert_equal 1, result.count
+    assert_equal Seek::Rdf::JERMVocab.Simulation_data, result[0][:o].value
+
+  end
+
   private
 
   # gets the count of the triples for a resource. This can change as the rdf is updated, so avoids having hard-coded
