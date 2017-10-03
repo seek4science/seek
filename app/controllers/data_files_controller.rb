@@ -287,7 +287,7 @@ class DataFilesController < ApplicationController
     scope = DataFile
     scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
     scope = scope.where(simulation_data: true) if (params[:simulation_data] == 'true')
-    scope = scope.with_extracted_samples if params[:with_samples]
+    scope = scope.with_extracted_samples if (params[:with_samples] == 'true')
 
     @data_files = DataFile.authorize_asset_collection(
       scope.where('data_files.title LIKE ?', "#{params[:filter]}%"), 'view'

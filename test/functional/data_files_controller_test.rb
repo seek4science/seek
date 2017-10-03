@@ -2207,28 +2207,68 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'filtering for sample association form' do
     person = Factory(:person)
-    d1 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: 'fish')
-    d2 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: 'frog')
-    d3 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
-    d4 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: 'no samples')
+    d1 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'fish')
+    d2 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'frog')
+    d3 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
+    d4 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'no samples')
     [d1, d2, d3].each do |data_file|
       Factory(:sample, originating_data_file_id: data_file.id)
     end
     login_as(person.user)
 
-    get :filter, filter: '', with_samples: true
+    get :filter, filter: 'no'
+    assert_select 'a', text: /no samples/, count: 1
+    assert_response :success
+
+    get :filter, filter: '', with_samples: 'true'
     assert_select 'a', count: 3
     assert_select 'a', text: /no samples/, count: 0
     assert_response :success
 
-    get :filter, filter: 'f', with_samples: true
+    get :filter, filter: 'f', with_samples: 'true'
     assert_select 'a', count: 2
     assert_select 'a', text: /fish/
     assert_select 'a', text: /frog/
 
-    get :filter, filter: 'fi', with_samples: true
+    get :filter, filter: 'fi', with_samples: 'true'
     assert_select 'a', count: 1
     assert_select 'a', text: /fish/
+  end
+
+
+  test 'filtering using other fields in association form' do
+    person = Factory(:person)
+    project1 = person.projects.first
+
+    person2 = Factory(:person)
+    project2 = person2.projects.first
+
+    d1 = Factory(:data_file, projects: [project1], contributor: person.user, policy: Factory(:public_policy), title: 'datax1a')
+    d2 = Factory(:data_file, projects: [project1], contributor: person.user, policy: Factory(:public_policy), title: 'datax1b')
+    d3 = Factory(:data_file, projects: [project2], contributor: person2.user, policy: Factory(:public_policy), title: 'datax2a')
+    d4 = Factory(:data_file, projects: [project2], contributor: person2.user, policy: Factory(:public_policy), title: 'datax2b', simulation_data: true)
+
+    login_as(person.user)
+
+    get :filter, filter: 'datax'
+    assert_select 'a', count: 2
+    assert_select 'a', text: /datax1./, count: 2
+    assert_select 'a', text: /datax2./, count: 0
+    assert_response :success
+
+    get :filter, filter: 'datax', all_projects: 'true'
+    assert_select 'a', count: 4
+    assert_select 'a', text: /datax./, count: 4
+    assert_response :success
+
+    get :filter, filter: 'datax', all_projects: 'true', simulation_data: 'true'
+    assert_select 'a', count: 1
+    assert_select 'a', text: /datax2b/, count: 1
+    assert_response :success
+
+    get :filter, filter: 'datax', simulation_data: 'true'
+    assert response.body.blank?
+    assert_response :success
   end
 
   test 'programme data files through nested routing' do
