@@ -195,6 +195,7 @@ Associations.FilterGroup.prototype.filter = function () {
 Associations.FilterGroup.prototype.reset = function () {
     $j(':input[data-role="seek-association-filter-field"]:not(:checkbox)', this.element).val('');
     $j(':input[data-role="seek-association-filter-field"]:checkbox', this.element).removeAttr('checked');
+    this.filter();
 };
 
 $j(document).ready(function () {
