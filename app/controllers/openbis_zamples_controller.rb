@@ -2,7 +2,7 @@ class OpenbisZamplesController < ApplicationController
 
   before_filter :get_project
   before_filter :get_endpoint
-  before_filter :get_zample, only: [:show, :edit]
+  before_filter :get_zample, only: [:show, :edit, :update]
 
 
   def index
@@ -13,6 +13,16 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def edit
+    #puts params
+    #puts "ID: #{params[:id]}"
+    @linked_to_assay = ['20171002172401546-38']
+  end
+
+  def update
+    puts "update called"
+    puts params
+    flash[:notice] = "Updated: #{params}"
+    redirect_to edit_project_openbis_endpoint_openbis_zample_path
   end
 
   def get_zample
@@ -22,10 +32,13 @@ class OpenbisZamplesController < ApplicationController
         '
 {"identifier":"\/API-SPACE\/TZ3","modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser",
 "code":"TZ3","modifier":"apiuser","permId":"20171002172111346-37",
-"registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40"],"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
+"registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40","20171004182824553-41"]
+,"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
 '
     )
-    @zample = sample.populate_from_json(json)
+    # @zample = sample.populate_from_json(json)
+
+    @zample = Seek::Openbis::Zample.new(@openbis_endpoint, params[:id])
   end
 
   def get_zamples
@@ -48,6 +61,8 @@ class OpenbisZamplesController < ApplicationController
     )
     sample = sample.populate_from_json(json)
     @zamples << sample
+
+    @zamples = Seek::Openbis::Zample.new(@openbis_endpoint).all
 
   end
 

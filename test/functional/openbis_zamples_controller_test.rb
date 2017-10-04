@@ -36,9 +36,12 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     get :index, project_id: @project.id, openbis_endpoint_id: @endpoint.id
 
     assert_response :success
-    assert_select "div", "Project: #{@project.title}"
-    assert_select "div", "Endpoint: #{@endpoint.id}"
-    assert_select "div", "Samples: 2"
+    assert_select "div label", "Project:"
+    assert_select "div.form-group", /#{@project.title}/
+    assert_select "div label", "Endpoint:"
+    assert_select "div.form-group", /#{@endpoint.title}/
+    # assert_select "div", "Endpoint: #{@endpoint.id}"
+    # assert_select "div", "Samples: 2"
   end
 
   test 'edit gives edit view' do

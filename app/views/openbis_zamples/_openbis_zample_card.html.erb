@@ -30,7 +30,7 @@
       <% if zample.dataset_ids %>
           <%= list_item_attribute('Datasets', text_or_not_specified(zample.dataset_ids.join(', '), none_text: 'None')) %>
       <% end %>
-      <%= link_to('Show', project_openbis_endpoint_openbis_zample_path(@project, @openbis_endpoint, id: zample.perm_id)) %>
+      <%= link_to('Show/Register', edit_project_openbis_endpoint_openbis_zample_path(@project, @openbis_endpoint, id: zample.perm_id)) %>
     </div>
   </div>
 

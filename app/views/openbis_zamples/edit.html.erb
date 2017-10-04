@@ -1,12 +1,68 @@
 
 <%= render :partial => 'openbis_zample_panel', :object => @zample %>
 
+<% datasets = @zample.datasets %>
 
-<%= form_tag({controller: "openbis_zamples", action: "update", id: @zample.perm_id}, {}) do |f| %>
-    X
+<%= form_tag({controller: "openbis_zamples", action: "update", id: @zample.perm_id}, {method: 'put'}) do |f| %>
+
+    <div class="form-group">
+      <%= check_box_tag(:link_datasets, 1, true) %>
+      <%= label_tag(:link_datasets, 'Automatically register all dependent datasets') %>
+      <div class="help-block">Any new dependent OpenBIS datasets will be registered and linked with this assay</div>
+    </div>
+
+    <div class="form-group">
+      <%= submit_tag("Register", class: 'btn btn-primary') %>
+    </div>
+
+    <div id="linked_entities">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <%= is_nil_or_empty?(datasets) ? 'No dependent Datasets' : 'Dependent Datasets' %>
+        </div>
+        <div class="panel-body">
+          <div class='row' id="openbis-dataset-cards">
+            <%= render partial:'openbis_dataset_card', collection: datasets %>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
 <% end %>
 
-Edit <%= @zample.perm_id %>
-Datasets_id <%= @zample.dataset_ids %>
-Sets <%= @zample.datasets %>
+<% if false %>
+ Edit <%= @zample.perm_id %>
+ Datasets_id <%= @zample.dataset_ids %>
+ Sets <% @zample.datasets.each do | s| %>
+    <%= s.perm_id %>
+    <br>
+ <% end %>
+<% end %>
 
+<script>
+
+    function disableLinkedInput(value) {
+        if (value) {
+            $j('#linked_entities input').prop("disabled", true);
+        } else {
+            $j('#linked_entities input.unlinked').prop("disabled", false);
+        }
+    }
+
+    $j('#link_datasets').change(function () {
+        // console.log("Check changed: "+this.checked);
+        /*if (this.checked) {
+            $j('#linked_entities input').prop("disabled", true);
+        } else {
+            $j('#linked_entities input.unlinked').prop("disabled", false);
+        }*/
+        disableLinkedInput(this.checked);
+    });
+
+    $j(document).ready(function () {
+        disableLinkedInput($j('#link_datasets').prop("checked"));
+    });
+
+</script>
