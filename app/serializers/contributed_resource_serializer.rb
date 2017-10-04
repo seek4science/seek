@@ -5,9 +5,9 @@ class ContributedResourceSerializer < PCSSerializer
       latest = {}
     else
       latest = { title: object.latest_version.title,
-               description: object.latest_version.description,
+               description: object.latest_version.description.presence,
                version: object.latest_version.version,
-               revision_comments: object.latest_version.revision_comments,
+               revision_comments: object.latest_version.revision_comments.presence,
                # template_id: object.latest_version.template_id         #  ==>  only in DataFile
                # template_name: object.latest_version.template_name,
                # is_with_sample: object.latest_version.is_with_sample,

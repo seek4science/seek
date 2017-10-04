@@ -9,14 +9,6 @@ class VersionSerializer < ContributedResourceSerializer
     end
   end
 
-  def type
-    if defined?(object.parent)
-      object.parent.class.name.demodulize.tableize
-    else
-      object.class.name.demodulize.tableize
-    end
-  end
-
   attribute :current_revision_comments do
     object.revision_comments
   end
