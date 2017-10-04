@@ -2608,6 +2608,26 @@ class DataFilesControllerTest < ActionController::TestCase
     assert assigns(:data_file).content_blob.file_size > 0
   end
 
+  test 'should gracefully handle case when sample metadata is unavailable when creating a nels datafile' do
+    setup_nels
+    mock_http
+    data_file, blob = valid_data_file_with_http_url
+    blob[:data_url] = 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404'
+
+    assert_difference('DataFile.count') do
+      assert_difference('ContentBlob.count') do
+        VCR.use_cassette('nels/missing_sample_metadata') do
+          VCR.use_cassette('nels/head_nels_page') do
+            post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing,
+                 assay_ids: [@assay.id]
+          end
+        end
+      end
+    end
+
+    refute assigns(:data_file).content_blob.is_excel?
+  end
+
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)

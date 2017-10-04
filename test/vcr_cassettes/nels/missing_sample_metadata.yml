@@ -1,0 +1,40 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://test-fe.cbu.uib.no/nels-api/sbi/sample-metadata?ref=404
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*; q=0.5, application/xml"
+      Accept-Encoding:
+      - gzip, deflate
+      Skip-Parse:
+      - 'true'
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Date:
+      - Wed, 04 Oct 2017 14:03:42 GMT
+      Content-Length:
+      - '0'
+      Connection:
+      - close
+      Content-Type:
+      - text/plain; charset=UTF-8
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 04 Oct 2017 14:03:42 GMT
+recorded_with: VCR 2.9.3

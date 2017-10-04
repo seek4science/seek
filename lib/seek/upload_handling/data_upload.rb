@@ -185,6 +185,8 @@ module Seek
           rescue RestClient::Unauthorized
             flash[:error] = "Could not authenticate with NeLS"
             return false
+          rescue RestClient::ResourceNotFound
+            return process_from_url(blob_params)
           rescue RestClient::Exception => e
             flash[:error] = "Could not retrieve metadata from NeLS"
             puts "\n#{e.http_code}: #{e.http_body}\n"
