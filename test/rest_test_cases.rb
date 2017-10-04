@@ -80,7 +80,7 @@ module RestTestCases
     get :show, id: object, format: 'json'
     perform_jsonapi_checks
     if File.readable?(get_schema_file_path)
-      assert JSON::Validator.validate(get_schema_file_path, @response.body)
+      assert JSON::Validator.fully_validate_json(get_schema_file_path, @response.body)
     end
   end
 
@@ -88,7 +88,7 @@ module RestTestCases
     get :index, format: 'json'
     perform_jsonapi_checks
     if File.readable?(index_schema_file_path)
-      assert JSON::Validator.validate(index_schema_file_path, @response.body)
+      assert JSON::Validator.fully_validate_json(index_schema_file_path, @response.body)
     end
   end
 
