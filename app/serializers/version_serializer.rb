@@ -23,6 +23,8 @@ class VersionSerializer < ContributedResourceSerializer
 end
 
 class DataFile::VersionSerializer < VersionSerializer
+  type :data_files
+
   has_many :people
   has_many :projects
   has_many :investigations
@@ -34,6 +36,7 @@ class DataFile::VersionSerializer < VersionSerializer
 end
 
 class Sop::VersionSerializer < VersionSerializer
+  type :sops
 
   has_many :people
   has_many :projects
@@ -45,6 +48,7 @@ class Sop::VersionSerializer < VersionSerializer
 end
 
 class Presentation::VersionSerializer < VersionSerializer
+  type :presentations
 
   has_many :people
   has_many :projects
@@ -57,6 +61,7 @@ class Presentation::VersionSerializer < VersionSerializer
 end
 
 class Model::VersionSerializer < VersionSerializer
+  type :models
 
   has_many :people
   has_many :projects
