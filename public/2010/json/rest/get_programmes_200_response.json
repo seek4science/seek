@@ -1,514 +1,98 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#", 
-  "additionalProperties": false, 
-  "definitions": {}, 
-  "properties": {
-    "data": {
-      "additionalProperties": false, 
-      "properties": {
-        "attributes": {
-          "additionalProperties": false, 
-          "properties": {
-            "avatar": {
-              "type": ["string", "null"],
-              "format": "uri"
-            }, 
-            "description": {
-              "type": ["string", "null"]
-            }, 
-            "funding_details": {
-              "type": ["string", "null"]
-            }, 
-            "tags": {
-              "items": {
-                "type": ["string"]
-              }, 
-              "type": ["array", "null"]
-            }, 
-            "title": {
-              "type": "string"
-            }, 
-            "web_page": {
-              "type": ["string", "null"],
-              "format": "uri"
-            }
-          }, 
-          "required": [
-            "title"
-          ], 
-          "type": "object"
-        }, 
-        "id": {
-          "type": "string"
-        }, 
-        "links": {
-          "additionalProperties": false, 
-          "properties": {
-            "self": {
-              "type": "string",
-              "format": "uri"
-            }
-          }, 
-          "required": [
-            "self"
-          ], 
-          "type": "object"
-        }, 
-        "meta": {
-          "additionalProperties": false, 
-          "properties": {
-            "base_url": {
-              "type": "string",
-              "format": "uri"
-            }, 
-            "created": {
-              "type": "string",
-              "format": "date-time"
-            }, 
-            "modified": {
-              "type": "string",
-              "format": "date-time"
-            }, 
-            "uuid": {
-              "type": "string"
-            }
-          }, 
-          "required": [
-            "created", 
-            "modified", 
-            "uuid", 
-            "base_url"
-          ], 
-          "type": "object"
-        }, 
-        "relationships": {
-          "additionalProperties": false, 
-          "properties": {
-            "assays": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "assays"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "data_files": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "data_files"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "events": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "events"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "institutions": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "institutions"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "investigations": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "investigations"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "models": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "models"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "people": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "people"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "presentations": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "presentations"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "projects": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "projects"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "publications": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "publications"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "sops": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "sops"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }, 
-            "studies": {
-              "additionalProperties": false, 
-              "properties": {
-                "data": {
-                  "items": {
-                    "additionalProperties": false, 
-                    "properties": {
-                      "id": {
-                        "type": "string"
-                      }, 
-                      "type": {
-                        "enum": [
-                          "studies"
-                        ], 
-                        "type": "string"
-                      }
-                    }, 
-                    "required": [
-                      "id", 
-                      "type"
-                    ], 
-                    "type": "object"
-                  }, 
-                  "type": "array"
-                }
-              }, 
-              "required": [
-                "data"
-              ], 
-              "type": "object"
-            }
-          }, 
-          "required": [
-            "projects", 
-            "institutions", 
-            "studies", 
-            "data_files", 
-            "assays", 
-            "publications", 
-            "events", 
-            "presentations", 
-            "people", 
-            "models", 
-            "investigations", 
-            "sops"
-          ], 
-          "type": "object"
-        }, 
-        "type": {
-          "enum": [
-            "programmes"
-          ], 
-          "type": "string"
-        }
-      }, 
-      "required": [
-        "id", 
-        "type", 
-        "attributes", 
-        "meta", 
-        "links", 
-        "relationships"
-      ], 
-      "type": "object"
-    }, 
-    "jsonapi": {
-      "additionalProperties": false, 
-      "properties": {
-        "version": {
-          "enum": [
-            "1.0"
-          ], 
-          "type": "string"
-        }
-      }, 
-      "required": [
-        "version"
-      ], 
-      "type": "object"
-    }
-  }, 
-  "required": [
-    "jsonapi", 
-    "data"
-  ], 
-  "type": "object"
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"properties": {
+		"data": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"$ref": "definitions.json#/definitions/nonEmptyString"
+				},
+				"type": {
+					"$ref": "definitions.json#/definitions/programmesType"
+				},
+				"attributes": {
+					"$ref": "definitions.json#/definitions/programmeDataType"
+				},
+				"relationships": {
+					"type": "object",
+					"properties": {
+						"people": {
+							"$ref": "definitions.json#/definitions/peopleReferenceList"
+						},
+						"projects": {
+							"$ref": "definitions.json#/definitions/projectsReferenceList"
+						},
+						"institutions": {
+							"$ref": "definitions.json#/definitions/institutionsReferenceList"
+						},
+						"investigations": {
+							"$ref": "definitions.json#/definitions/investigationsReferenceList"
+						},
+						"studies": {
+							"$ref": "definitions.json#/definitions/studiesReferenceList"
+						},
+						"assays": {
+							"$ref": "definitions.json#/definitions/assaysReferenceList"
+						},
+						"data_files": {
+							"$ref": "definitions.json#/definitions/dataFilesReferenceList"
+						},
+						"models": {
+							"$ref": "definitions.json#/definitions/modelsReferenceList"
+						},
+						"sops": {
+							"$ref": "definitions.json#/definitions/sopsReferenceList"
+						},
+						"publications": {
+							"$ref": "definitions.json#/definitions/publicationsReferenceList"
+						},
+						"presentations": {
+							"$ref": "definitions.json#/definitions/presentationsReferenceList"
+						},
+						"events": {
+							"$ref": "definitions.json#/definitions/eventsReferenceList"
+						}
+					},
+					"required": [
+						"people",
+						"projects",
+						"institutions",
+						"investigations",
+						"studies",
+						"assays",
+						"data_files",
+						"models",
+						"sops",
+						"publications",
+						"presentations",
+						"events"
+					]
+				},
+				"links": {
+					"$ref": "definitions.json#/definitions/linksType"
+				},
+				"meta": {
+					"$ref": "definitions.json#/definitions/metaType"
+				}
+			},
+			"required": [
+				"id",
+				"type",
+				"attributes",
+				"relationships",
+				"links",
+				"meta"
+			]
+		},
+		"jsonapi": {
+			"$ref": "definitions.json#/definitions/JsonApiVersion"
+		}
+	},
+	"required": [
+		"data",
+		"jsonapi"
+	],
+	"definitions": {
+	}
 }
