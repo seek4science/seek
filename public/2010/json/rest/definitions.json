@@ -611,6 +611,33 @@
 				"programmes"
 			]
 		},
+		 "programmesReferenceList": {
+			 "type": "object",
+			 "properties": {
+				 "data": {
+					 "type": "array",
+					 "minItems": 0,
+					 "uniqueItems": true,
+					 "items": {
+						 "properties": {
+							 "id": {
+								 "$ref": "#/definitions/nonEmptyString"
+							},
+							 "type": {
+								 "$ref": "#/definitions/programmesType"
+							}
+						},
+						 "required": [
+							"id",
+							"type"
+						]
+					}
+				}
+			},
+			 "required": [
+				"data"
+			]
+		},
 		 "programmeDataType": {
 			 "type": "object",
 			 "properties": {
@@ -768,6 +795,43 @@
 					 "uniqueItems": true,
 					 "items": {
 						 "$ref": "#/definitions/samplesReference"
+					}
+				}
+			},
+			 "required": [
+				"data"
+			]
+		},
+		 "sampleTypesType": {
+			 "type": "string",
+			 "minLength": 1,
+			 "enum": [
+				"sampleTypes"
+			]
+		},
+		 "sampleTypesReference": {
+			 "properties": {
+				 "id": {
+					 "$ref": "#/definitions/nonEmptyString"
+				},
+				 "type": {
+					 "$ref": "#/definitions/sampleTypesType"
+				}
+			},
+			 "required": [
+				"id",
+				"type"
+			]
+		},
+		 "sampleTypesReferenceList": {
+			 "type": "object",
+			 "properties": {
+				 "data": {
+					 "type": "array",
+					 "minItems": 0,
+					 "uniqueItems": true,
+					 "items": {
+						 "$ref": "#/definitions/sampleTypesReference"
 					}
 				}
 			},
