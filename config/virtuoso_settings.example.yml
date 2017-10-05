@@ -2,7 +2,7 @@
 
 production:
   uri: http://localhost:8890/sparql
-  update_uri: http://localhost:8899/sparql-auth
+  update_uri: http://localhost:8890/sparql-auth
 
   username: username
   password: password
@@ -15,7 +15,7 @@ development:
   disabled: false
 
   uri: http://localhost:8890/sparql
-  update_uri: http://localhost:8899/sparql-auth
+  update_uri: http://localhost:8890/sparql-auth
 
   username: username
   password: password
@@ -28,7 +28,7 @@ test:
   disabled: true
 
   uri: http://localhost:8890/sparql
-  update_uri: http://localhost:8899/sparql-auth
+  update_uri: http://localhost:8890/sparql-auth
 
   username: username
   password: password
