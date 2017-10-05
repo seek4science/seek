@@ -369,6 +369,26 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
+  test 'build from openbis_dataset' do
+    mock_openbis_calls
+    User.with_current_user(Factory(:person).user) do
+      permission_project = Factory(:project)
+      endpoint = Factory(:openbis_endpoint, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: permission_project)]))
+      assert_equal 1, endpoint.policy.permissions.count
+      dataset = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
+      df = DataFile.build_from_openbis_dataset(dataset)
+      refute_nil df
+      assert df.openbis?
+      assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23", df.content_blob.url
+      refute_equal df.policy, endpoint.policy
+      assert_equal endpoint.policy.access_type, df.policy.access_type
+      assert_equal 1, df.policy.permissions.length
+      permission = df.policy.permissions.first
+      assert_equal permission_project, permission.contributor
+      assert_equal Policy::NO_ACCESS, permission.access_type
+    end
+  end
+
   test 'openbis download restricted' do
     df = openbis_linked_data_file
     assert df.content_blob.openbis_dataset.size < 600.kilobytes

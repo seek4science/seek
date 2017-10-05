@@ -88,6 +88,11 @@ module Seek
         ContentBlob.where(url: content_blob_uri).any?
       end
 
+      def registered_as
+        blob = ContentBlob.where(url: content_blob_uri)
+        blob.any? ? blob.first.asset : nil
+      end
+
       private
 
       def content_blob_uri

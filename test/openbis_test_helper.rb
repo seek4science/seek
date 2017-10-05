@@ -41,6 +41,7 @@ module Fairdom
 
       def mock_file_path(options)
         name = Digest::SHA2.hexdigest(options.inspect) + '.json'
+        puts "Mock query, File: #{name} #{options}"
         dir = File.join(Rails.root, 'test', 'fixtures', 'files', 'mocking', 'openbis')
         File.join(dir, name)
       end

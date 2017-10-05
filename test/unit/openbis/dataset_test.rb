@@ -100,4 +100,15 @@ class DatasetTest < ActiveSupport::TestCase
     assert dataset.registered?
     refute dataset2.registered?
   end
+
+  test 'registered_as' do
+
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
+    dataset2 = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160215111736723-31')
+
+    datafile = DataFile.build_from_openbis(@openbis_endpoint, dataset.perm_id)
+    assert_equal datafile, dataset.registered_as
+    assert_nil dataset2.registered_as
+
+  end
 end
