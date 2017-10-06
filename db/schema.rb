@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170920094317) do
+ActiveRecord::Schema.define(version: 20171006143805) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -598,6 +598,23 @@ ActiveRecord::Schema.define(version: 20170920094317) do
   end
 
   add_index "experimental_conditions", ["sop_id"], name: "index_experimental_conditions_on_sop_id", using: :btree
+
+  create_table "external_assets", force: :cascade do |t|
+    t.string   "external_service",   limit: 255,             null: false
+    t.string   "external_id",        limit: 255,             null: false
+    t.string   "external_mod_stamp", limit: 255
+    t.datetime "synchronized_at"
+    t.integer  "sync_state",         limit: 1,   default: 0, null: false
+    t.integer  "seek_entity_id",     limit: 4
+    t.string   "seek_entity_type",   limit: 255
+    t.integer  "version",            limit: 4,   default: 0, null: false
+    t.string   "class_type",         limit: 255
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+  end
+
+  add_index "external_assets", ["external_id", "external_service"], name: "external_assets_by_external_id", unique: true, using: :btree
+  add_index "external_assets", ["seek_entity_type", "seek_entity_id"], name: "index_external_assets_on_seek_entity_type_and_seek_entity_id", using: :btree
 
   create_table "favourite_group_memberships", force: :cascade do |t|
     t.integer  "person_id",          limit: 4
