@@ -1,5 +1,4 @@
 class Institution < ActiveRecord::Base
-  include Seek::Rdf::RdfGeneration
 
   acts_as_yellow_pages
   title_trimmer
