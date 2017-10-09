@@ -11,10 +11,6 @@ class ProgrammesControllerTest < ActionController::TestCase
     Factory(:programme)
   end
 
-  test 'test rdf dummy' do
-    test_get_rdf
-  end
-
   # for now just admins can create programmes, later we will change this
   test 'new page accessible admin' do
     login_as(Factory(:admin))
