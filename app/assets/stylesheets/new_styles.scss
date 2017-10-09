@@ -681,3 +681,8 @@ div.popup-contributor {
     }
   }
 }
+
+[data-role="seek-associations-list"] ul {
+  max-height: 250px;
+  overflow-y: auto;
+}
