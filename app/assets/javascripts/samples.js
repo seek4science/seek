@@ -12,6 +12,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
 
     var options = $j.extend({}, opts, {
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
+        "pageLength": 10,
         dom: 'lr<"samples-table-container"t>ip', // Needed to place the buttons
         "columnDefs": [{
             "targets": [ 0, 1 ],
