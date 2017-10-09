@@ -1,6 +1,6 @@
 class ContentBlobsController < ApplicationController
-  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download]
-  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download]
+  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show]
+  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show]
   before_filter :set_asset_version, only: %i[get_pdf download]
 
   include Seek::AssetsCommon
@@ -23,6 +23,15 @@ class ContentBlobsController < ApplicationController
     @pdf_url = pdf_url
     respond_to do |format|
       format.html { render layout: false }
+    end
+  end
+
+  def show
+    respond_to do |format|
+      format.json { render json: @content_blob }
+      format.html { render text: 'Format not supported', status: :not_acceptable }
+      format.xml { render text: 'Format not supported', status: :not_acceptable }
+      format.rdf { render text: 'Format not supported', status: :not_acceptable }
     end
   end
 
@@ -146,6 +155,11 @@ class ContentBlobsController < ApplicationController
         respond_to do |format|
           flash[:error] = 'You are not authorized to perform this action'
           format.html { redirect_to asset }
+          format.json do
+            render json: { "title": 'Forbidden',
+                           "detail": "You are not authorized to download the asset linked to content_blob:#{params[:id]}" },
+                   status: :forbidden
+          end
         end
         return false
       end
