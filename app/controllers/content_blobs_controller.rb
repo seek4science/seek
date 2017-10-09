@@ -163,6 +163,15 @@ class ContentBlobsController < ApplicationController
         end
         return false
       end
+    else
+      flash[:error]='The asset could not be found'
+      respond_to do |format|
+        format.json do
+          render json: { "title": 'Not found',
+                         "detail": 'The asset could not be found' }, status: :not_found
+        end
+        format.html { redirect_to root_url }
+      end
     end
   end
 
@@ -181,16 +190,22 @@ class ContentBlobsController < ApplicationController
       ContentBlob.find(params[:id]).asset
     end
   rescue ActiveRecord::RecordNotFound
-    error('Unable to find the asset', 'is invalid')
-    return false
+    nil
   end
 
   def find_and_authorize_content_blob
     content_blob = content_blob_object
-    if content_blob.asset.id == @asset.id
+    if content_blob && content_blob.asset.id == @asset.id
       @content_blob = content_blob
     else
-      error('You are not authorized to see this content blob', 'is invalid')
+      flash[:error]='The blob was not found, or is not associated with this asset'
+      respond_to do |format|
+        format.json do
+          render json: { "title": 'Not found',
+                         "detail": 'The content blob was not found, or not related to the asset' }, status: :not_found
+        end
+        format.html { redirect_to root_url }
+      end
       return false
     end
   end
@@ -198,8 +213,7 @@ class ContentBlobsController < ApplicationController
   def content_blob_object
     ContentBlob.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    error('Unable to find content blob', 'is invalid')
-    return false
+    nil
   end
 
   def set_asset_version
