@@ -3,8 +3,10 @@ title: SEEK User Guide - Making an Investigation citable
 layout: page
 ---
 
-# Making an Investigation citable
-SEEK allows you to publish investigations, replete with studies and assets that comprise it. You can then assign a DOI to the investigation, which provides a persistent link with which you and others can cite the investigation with. Publishing an investigation involves the following steps:
+# Making an Investigation, Study or Assay citable
+SEEK allows you to publish investigations, studies and assays, replete with the structure and assets that comprise it. You can then assign a DOI to the investigation, which provides a persistent link with which you and others can use to cite them with. 
+
+The following describes the steps to publish an investigation, but also applies to Studies and Assays.
 
 * [Making public](#making-public)
 * [Snapshotting](#snapshotting)
