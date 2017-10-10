@@ -76,20 +76,30 @@ module RestTestCases
     end
   end
 
-  def test_show_json(object = rest_api_test_object)
-    get :show, id: object, format: 'json'
-    perform_jsonapi_checks
-    if File.readable?(get_schema_file_path)
-      assert JSON::Validator.fully_validate_json(get_schema_file_path, @response.body)
+  def validate_json (path)
+    if File.readable?(path)
+      errors = JSON::Validator.fully_validate_json(path, @response.body)
+      unless errors.empty?
+        msg = ""
+        errors.each do |e|
+          msg += e + "\n"
+        end
+        raise Minitest::Assertion, msg
+      end
     end
   end
 
-  def test_index_json
+
+  def test_show_json(object = rest_api_test_object)
+    get :show, id: object, format: 'json'
+    perform_jsonapi_checks
+    validate_json (get_schema_file_path)
+   end
+
+  def test_aaa_index_json
     get :index, format: 'json'
     perform_jsonapi_checks
-    if File.readable?(index_schema_file_path)
-      assert JSON::Validator.fully_validate_json(index_schema_file_path, @response.body)
-    end
+    validate_json (index_schema_file_path)
   end
 
   def test_response_code_for_not_accessible
