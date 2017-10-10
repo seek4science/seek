@@ -1,29 +1,21 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"type": "object",
-	"allOf": [
-		{
-			"$ref": "definitions.json#/definitions/dataFilesReferenceList",
-			"required": [
-				"data"
-			]
+	"properties": {
+		"data": {
+			"$ref": "definitions.json#/definitions/dataFilesReferences"
 		},
-		{
-			"properties": {
-				"jsonapi": {
-					"$ref": "definitions.json#/definitions/JsonApiVersion"
-				},
-				"meta": {
-					"$ref": "definitions.json#/definitions/baseMetaType"
-				}
-			},
-			"required": [
-				"jsonapi",
-				"meta"
-			]
+		"jsonapi": {
+			"$ref": "definitions.json#/definitions/JsonApiVersion"
+		},
+		"meta": {
+			"$ref": "definitions.json#/definitions/baseMetaType"
 		}
-	],
-	"additionalProperties": false,
-	"definitions": {
-	}
+
+	},
+	"required": [
+		"data",
+		"jsonapi",
+		"meta"
+	]
 }

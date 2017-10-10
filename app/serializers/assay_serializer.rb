@@ -1,4 +1,5 @@
 class AssaySerializer < PCSSerializer
+
   attributes :title, :description
   attribute :assay_class do
     { title: object.assay_class.title,

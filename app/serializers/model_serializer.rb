@@ -1,4 +1,4 @@
-class ModelSerializer < BaseSerializer
+class ModelSerializer < ContributedResourceSerializer
   attributes :model_type, :model_format
   attribute :environment do
     object.recommended_environment
@@ -10,39 +10,6 @@ class ModelSerializer < BaseSerializer
   has_many :studies
   has_many :assays
   has_many :publications
-
-  attributes :title, :description, :license
-
-  attribute :version, key: :latest_version
-
-  attribute :requested_version do
-    v = @scope[:requested_version]
-    if v.nil?
-      v = object.version
-    end
-
-    requested_version = object.find_version(v)
-
-    requested = {version: requested_version.version,
-                 revision_comments: requested_version.revision_comments.presence,
-                 created_at: requested_version.created_at,
-                 updated_at: requested_version.updated_at
-    }
-
-
-    requested
-  end
-
-  has_many :content_blobs do
-    v = @scope[:requested_version]
-    if v.nil?
-      v = object.version
-    end
-
-    requested_version = object.find_version(v)
-
-    requested_version.content_blobs
-  end
 
 end
 
