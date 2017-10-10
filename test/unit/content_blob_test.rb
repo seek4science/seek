@@ -735,5 +735,4 @@ class ContentBlobTest < ActiveSupport::TestCase
     refute Factory(:binary_content_blob).is_text?
   end
 
-
 end

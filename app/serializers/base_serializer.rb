@@ -102,20 +102,12 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   def _meta
-    #content-blob doesn't have timestamps
-    if object.respond_to?('created_at')
-      created = object.created_at
-      updated = object.updated_at
-    end
+    meta = super
     if object.respond_to?('uuid')
-      uuid = object.uuid
+      meta[:uuid] = object.uuid
     end
-    {
-        created: created || "",
-        modified: updated || "",
-        uuid: uuid || "",
-        base_url: base_url
-    }
+    meta[:base_url]=base_url
+    meta
   end
 
   def initialize(object, options = {})
