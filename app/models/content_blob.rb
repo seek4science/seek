@@ -102,8 +102,8 @@ class ContentBlob < ActiveRecord::Base
   def show_as_external_link?
     return false if custom_integration? || url.blank?
     return true if unhandled_url_scheme?
-    no_local_copy =  !file_exists?
-    html_content =  is_webpage? || content_type == 'text/html'
+    no_local_copy = !file_exists?
+    html_content = is_webpage? || content_type == 'text/html'
     show_as_link = Seek::Config.show_as_external_link_enabled ? no_local_copy : html_content
     show_as_link
   end
@@ -148,12 +148,12 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def dump_data_to_file
-    fail Exception.new('You cannot define both :data content and a :tmp_io_object') unless @data.nil? || @tmp_io_object.nil?
+    raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
     check_uuid
-    unless @tmp_io_object.nil?
-      dump_tmp_io_object_to_file
-    else
+    if @tmp_io_object.nil?
       dump_data_object_to_file
+    else
+      dump_tmp_io_object_to_file
     end
   end
 
@@ -183,7 +183,7 @@ class ContentBlob < ActiveRecord::Base
     end
   end
 
-  def search_terms    
+  def search_terms
     if is_text?
       if is_indexable_text?
         [original_filename, url, file_extension, text_contents_for_search] | url_search_terms
@@ -197,7 +197,7 @@ class ContentBlob < ActiveRecord::Base
 
   def url_search_terms
     if url
-      url_ignore_terms = %w(http https www com co org uk de)
+      url_ignore_terms = %w[http https www com co org uk de]
       url_search_terms = [url, url.split(/\W+/)].flatten - url_ignore_terms
     else
       url_search_terms = []
@@ -205,7 +205,7 @@ class ContentBlob < ActiveRecord::Base
     url_search_terms
   end
 
-  #whether this content blob represents a custom integration, such as integrated with openBIS
+  # whether this content blob represents a custom integration, such as integrated with openBIS
   def custom_integration?
     openbis?
   end
@@ -243,7 +243,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def dump_tmp_io_object_to_file
-    fail Exception.new('You cannot define both :data content and a :tmp_io_object') unless @data.nil? || @tmp_io_object.nil?
+    raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
     return unless @tmp_io_object
 
     if @tmp_io_object.is_a?(StringIO)
@@ -259,13 +259,11 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def calculate_file_size
-    if file_exists?
-      self.file_size = File.size(filepath)
-    elsif url
-      self.file_size = remote_headers[:file_size]
-    else
-      self.file_size = nil
-    end
+    self.file_size = if file_exists?
+                       File.size(filepath)
+                     elsif url
+                       remote_headers[:file_size]
+                     end
   end
 
   def create_retrieval_job
@@ -277,12 +275,10 @@ class ContentBlob < ActiveRecord::Base
   def remote_content_handler
     return nil unless valid_url?(url)
     case URI(url).scheme
-      when 'ftp'
-        Seek::DownloadHandling::FTPHandler.new(url)
-      when 'http', 'https'
-        Seek::DownloadHandling::HTTPHandler.new(url)
-      else
-        nil
-    end
+    when 'ftp'
+      Seek::DownloadHandling::FTPHandler.new(url)
+    when 'http', 'https'
+      Seek::DownloadHandling::HTTPHandler.new(url)
+      end
   end
 end

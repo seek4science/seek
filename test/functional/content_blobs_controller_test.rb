@@ -531,9 +531,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'should not download private data if url manipulated' do
     id = [Sop.last.id, DataFile.last.id].max + 1
     sop = Factory(:sop, id: id, policy: Factory(:public_policy),
-                  content_blob: Factory(:txt_content_blob, data: 'public'))
+                        content_blob: Factory(:txt_content_blob, data: 'public'))
     data_file = Factory(:data_file, id: id, policy: Factory(:private_policy),
-                        content_blob: Factory(:txt_content_blob, data: 'secret'))
+                                    content_blob: Factory(:txt_content_blob, data: 'secret'))
 
     assert_equal sop.id, data_file.id
     assert sop.can_download?
@@ -543,9 +543,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_equal 'secret', response.body.force_encoding(Encoding::UTF_8)
     assert_response :redirect
 
-    get :download, sop_id: sop.id, id: data_file.content_blob.id, format:'json'
+    get :download, sop_id: sop.id, id: data_file.content_blob.id, format: 'json'
     assert_response :not_found
-
   end
 
   private

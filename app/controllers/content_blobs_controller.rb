@@ -164,7 +164,7 @@ class ContentBlobsController < ApplicationController
         return false
       end
     else
-      flash[:error]='The asset could not be found'
+      flash[:error] = 'The asset could not be found'
       respond_to do |format|
         format.json do
           render json: { "title": 'Not found',
@@ -196,7 +196,7 @@ class ContentBlobsController < ApplicationController
     if content_blob && content_blob.asset == @asset
       @content_blob = content_blob
     else
-      flash[:error]='The blob was not found, or is not associated with this asset'
+      flash[:error] = 'The blob was not found, or is not associated with this asset'
       respond_to do |format|
         format.json do
           render json: { "title": 'Not found',
