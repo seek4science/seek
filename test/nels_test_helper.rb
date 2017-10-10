@@ -19,7 +19,7 @@ module NelsTestHelper
   end
 
   def setup_nels
-    setup_nels_basic
+    setup_nels_for_units
 
     login_as(@user)
   end
