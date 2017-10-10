@@ -63,6 +63,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
   def test_show_json(object = rest_api_test_object)
     get :show, id: object.content_blob, sop_id: object, format: 'json'
     perform_jsonapi_checks
+
+    #check meta doesn't include created_at and updated_at
+    json = JSON.parse(response.body)
+    refute_nil json['data']
+    refute_nil json['data']['meta']
+    assert_equal ['base_url','uuid'], json['data']['meta'].keys.sort
   end
 
   def test_response_code_for_not_available
