@@ -186,8 +186,6 @@ class ContentBlobsController < ApplicationController
       Presentation.find(params[:presentation_id])
     elsif params[:sample_type_id]
       SampleType.find(params[:sample_type_id])
-    else
-      ContentBlob.find(params[:id]).asset
     end
   rescue ActiveRecord::RecordNotFound
     nil
