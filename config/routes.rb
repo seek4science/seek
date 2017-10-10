@@ -372,6 +372,8 @@ SEEK::Application.routes.draw do
       delete :cancel_extraction
       get :isa_children
       get :destroy_samples_confirm
+      post :retrieve_nels_sample_metadata
+      get :retrieve_nels_sample_metadata
     end
     resources :studied_factors do
       collection do

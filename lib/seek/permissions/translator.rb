@@ -18,7 +18,7 @@ module Seek
           edit: Set.new([
              :edit, :new, :create, :update, :new_version, :create_version, :destroy_version, :edit_version,
              :update_version, :new_item , :create_item, :edit_item, :update_item, :quick_add, :resolve_link,
-             :describe_ports
+             :describe_ports, :retrieve_nels_sample_metadata
           ]).freeze,
 
           delete: Set.new([

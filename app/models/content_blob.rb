@@ -37,6 +37,7 @@ class ContentBlob < ActiveRecord::Base
   before_save :check_version
   before_save :calculate_file_size
   after_create :create_retrieval_job
+  before_save :clear_sample_type_matches
 
   has_many :worksheets, inverse_of: :content_blob, dependent: :destroy
 
@@ -285,5 +286,9 @@ class ContentBlob < ActiveRecord::Base
       else
         nil
     end
+  end
+
+  def clear_sample_type_matches
+    Rails.cache.delete_matched("st-match-#{self.id}*") if md5sum_changed? || sha1sum_changed?
   end
 end

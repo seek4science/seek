@@ -11,11 +11,14 @@ class NelsController < ApplicationController
 
     oauth_session = current_user.oauth_sessions.where(provider: 'NeLS').first_or_initialize
     oauth_session.update_attributes(access_token: hash['access_token'], expires_in: 2.hours)
-    unless (match = params[:state].match(/assay_id:(\d+)/)).nil?
+    if (match = params[:state].match(/assay_id:(\d+)/))
       params[:assay_id] = match[1].to_i
+      redirect_to nels_browser_path(assay_id: params[:assay_id])
+    elsif (match = params[:state].match(/data_file_id:(\d+)/))
+      redirect_to retrieve_nels_sample_metadata_data_file_path(match[1].to_i)
+    else
+      redirect_to nels_browser_path
     end
-
-    redirect_to nels_browser_path(assay_id: params[:assay_id])
   end
 
   def browser

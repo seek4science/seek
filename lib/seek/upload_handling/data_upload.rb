@@ -22,8 +22,6 @@ module Seek
 
           if add_from_upload?(item_params)
             return false unless add_data_for_upload(item_params)
-          elsif item_params[:data_url].strip.start_with?(Nels::Blob::NELS_BASE)
-            return false unless add_data_from_nels(item_params)
           else
             return false unless add_data_for_url(item_params)
           end
@@ -165,40 +163,6 @@ module Seek
 
       def render_new?
         action_name == 'create'
-      end
-
-      def add_data_from_nels(blob_params)
-        oauth_session = current_user.oauth_sessions.where(provider: 'NeLS').first
-        if !oauth_session || oauth_session.expired?
-          flash[:error] = "NeLS session has expired"
-          false
-        else
-          ref = blob_params[:data_url].scan(/ref=([^&]+)/).try(:first).try(:first)
-          unless ref
-            flash[:error] = "Bad NeLS URL"
-            return false
-          end
-          client_class = Nels::Rest::Client
-          rest_client = client_class.new(oauth_session.access_token)
-          begin
-            data = rest_client.sample_metadata(ref)
-          rescue RestClient::Unauthorized
-            flash[:error] = "Could not authenticate with NeLS"
-            return false
-          rescue RestClient::ResourceNotFound
-            return process_from_url(blob_params)
-          rescue RestClient::Exception => e
-            flash[:error] = "Could not retrieve metadata from NeLS"
-            puts "\n#{e.http_code}: #{e.http_body}\n"
-            return false
-          end
-
-          blob_params[:tmp_io_object] = StringIO.new(data)
-          blob_params[:original_filename] = 'sample_metadata.xlsx'
-          blob_params[:content_type] = content_type_from_filename(blob_params[:original_filename])
-
-          true
-        end
       end
     end
   end
