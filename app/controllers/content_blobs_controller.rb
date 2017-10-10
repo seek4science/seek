@@ -195,7 +195,7 @@ class ContentBlobsController < ApplicationController
 
   def find_and_authorize_content_blob
     content_blob = content_blob_object
-    if content_blob && content_blob.asset.id == @asset.id
+    if content_blob && content_blob.asset == @asset
       @content_blob = content_blob
     else
       flash[:error]='The blob was not found, or is not associated with this asset'

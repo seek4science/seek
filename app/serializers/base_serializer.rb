@@ -1,6 +1,7 @@
 class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
   include RelatedItemsHelper
+  include Rails.application.routes.url_helpers
 
   # has_many :people
   # has_many :projects
@@ -83,8 +84,12 @@ class BaseSerializer < SimpleBaseSerializer
 
 
   def self_link
-    #{base_url}//#{type}/#{id}
-    "/#{type}/#{object.id}"
+    if object.class.name.end_with?("::Version")
+      polymorphic_path(object.parent,version:object.version)
+    else
+      polymorphic_path(object)
+    end
+
   end
 
   def _links

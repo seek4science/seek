@@ -4,4 +4,8 @@ class ContentBlobSerializer < BaseSerializer
     object.file_exists?
   end
 
+   def self_link
+     polymorphic_path([object.asset,object])
+   end
+
 end
