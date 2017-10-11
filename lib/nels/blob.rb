@@ -17,9 +17,9 @@ module Nels
       rest_client = client_class.new(access_token)
       ref = url.scan(/ref=([^&]+)/).try(:first).try(:first)
 
+      self.tmp_io_object = StringIO.new(rest_client.sample_metadata(ref))
       self.original_filename = 'sample_metadata.xlsx'
       self.content_type = mime_types_for_extension('xlsx').sort.first
-      self.tmp_io_object = StringIO.new(rest_client.sample_metadata(ref))
 
       save
     end

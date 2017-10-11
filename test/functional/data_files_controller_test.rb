@@ -2589,17 +2589,21 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'should fetch sample metadata from nels immediately after creating a nels datafile' do
+  test 'should allow fetching of sample metadata for nels data' do
     setup_nels
     mock_http
-    data_file, blob = valid_data_file_with_http_url
-    blob[:data_url] = "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
+                 content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"))
 
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
+    refute data_file.content_blob.is_excel?
+    refute data_file.content_blob.file_size
+
+    assert_no_difference('Sample.count') do
+      assert_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count", 1) do
         VCR.use_cassette('nels/get_sample_metadata') do
-          post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing,
-               assay_ids: [@assay.id]
+          post :retrieve_nels_sample_metadata, id: data_file
+
+          assert_redirected_to data_file
         end
       end
     end
@@ -2608,19 +2612,22 @@ class DataFilesControllerTest < ActionController::TestCase
     assert assigns(:data_file).content_blob.file_size > 0
   end
 
-  test 'should gracefully handle case when sample metadata is unavailable when creating a nels datafile' do
+  test 'should gracefully handle case when sample metadata is unavailable when attempting to fetch' do
     setup_nels
     mock_http
-    data_file, blob = valid_data_file_with_http_url
-    blob[:data_url] = 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404'
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
+                        content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404"))
 
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
+    refute data_file.content_blob.is_excel?
+    refute data_file.content_blob.file_size
+
+    assert_no_difference('Sample.count') do
+      assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
         VCR.use_cassette('nels/missing_sample_metadata') do
-          VCR.use_cassette('nels/head_nels_page') do
-            post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing,
-                 assay_ids: [@assay.id]
-          end
+          post :retrieve_nels_sample_metadata, id: data_file
+
+          assert_redirected_to data_file
+          assert flash[:error].include?('No sample metadata')
         end
       end
     end
@@ -2628,6 +2635,30 @@ class DataFilesControllerTest < ActionController::TestCase
     refute assigns(:data_file).content_blob.is_excel?
   end
 
+  test 'should re-authenticate with nels if oauth token expired when trying to fetch sample metadata' do
+    setup_nels
+    mock_http
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
+                        content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"))
+
+    @user.oauth_sessions.where(provider: 'NeLS').first.update_column(:expires_at, 1.day.ago)
+
+    oauth_client = Nels::Oauth2::Client.new(Seek::Config.nels_client_id,
+                                            Seek::Config.nels_client_secret,
+                                            nels_oauth_callback_url,
+                                            "data_file_id:#{data_file.id}")
+
+    assert_no_difference('Sample.count') do
+      assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
+        VCR.use_cassette('nels/get_sample_metadata') do
+          post :retrieve_nels_sample_metadata, id: data_file
+
+          assert_redirected_to oauth_client.authorize_url
+        end
+      end
+    end
+  end
+  
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)

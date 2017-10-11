@@ -352,20 +352,28 @@ class DataFilesController < ApplicationController
   end
 
   def retrieve_nels_sample_metadata
-    if @data_file.content_blob.retrieve_from_nels(@oauth_session.access_token)
-      @sample_type = @data_file.reload.possible_sample_types.last
+    begin
+      if @data_file.content_blob.retrieve_from_nels(@oauth_session.access_token)
+        @sample_type = @data_file.reload.possible_sample_types.last
 
-      if @sample_type
-        extract_samples
+        if @sample_type
+          extract_samples
+        else
+          flash[:notice] = 'Successfully downloaded sample metadata from NeLS, but could not find a matching sample type.'
+
+          respond_to do |format|
+            format.html { redirect_to @data_file }
+          end
+        end
       else
-        flash[:notice] = 'Successfully downloaded sample metadata from NeLS, but could not find a matching sample type.'
+        flash[:error] = 'Could not download sample metadata from NeLS.'
 
         respond_to do |format|
           format.html { redirect_to @data_file }
         end
       end
-    else
-      flash[:error] = 'Could not download sample metadata from NeLS'
+    rescue RestClient::ResourceNotFound
+      flash[:error] = 'No sample metadata available.'
 
       respond_to do |format|
         format.html { redirect_to @data_file }
