@@ -13,12 +13,8 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   attribute :requested_version do
-    v = @scope[:requested_version]
-    if v.nil?
-      v = object.version
-    end
 
-    requested_version = object.find_version(v)
+    requested_version = object.find_version(@scope[:requested_version])
 
     requested = {version: requested_version.version,
                  revision_comments: requested_version.revision_comments.presence,
@@ -32,12 +28,7 @@ class ContributedResourceSerializer < PCSSerializer
 
  has_many :content_blobs do
 
-   v = @scope[:requested_version]
-   if v.nil?
-     v = object.version
-   end
-
-   requested_version = object.find_version(v)
+   requested_version = object.find_version(@scope[:requested_version])
 
    blobs = []
     if defined?(requested_version.content_blobs)

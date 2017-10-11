@@ -84,12 +84,11 @@ class BaseSerializer < SimpleBaseSerializer
 
 
   def self_link
-    if object.class.name.end_with?("::Version")
-      polymorphic_path(object.parent,version:object.version)
+    if @scope[:requested_version]
+      polymorphic_path(object,version:@scope[:requested_version])
     else
-      polymorphic_path(object)
+       polymorphic_path(object)
     end
-
   end
 
   def _links
@@ -112,6 +111,10 @@ class BaseSerializer < SimpleBaseSerializer
 
   def initialize(object, options = {})
     super
+
+    if object.is_asset? && object.versioned?
+      @scope[:requested_version] ||= object.version
+    end
 
     #access related resources with proper authorization & ignore version subclass
     if (object.class.to_s.include?("::Version"))
