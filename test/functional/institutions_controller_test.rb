@@ -5,7 +5,6 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
   include RestTestCases
-  include RdfTestCases
 
   def setup
     login_as(:quentin)

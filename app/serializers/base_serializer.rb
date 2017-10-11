@@ -1,6 +1,7 @@
 class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
   include RelatedItemsHelper
+  include Rails.application.routes.url_helpers
 
   # has_many :people
   # has_many :projects
@@ -83,8 +84,12 @@ class BaseSerializer < SimpleBaseSerializer
 
 
   def self_link
-    #{base_url}//#{type}/#{id}
-    "/#{type}/#{object.id}"
+    if object.class.name.end_with?("::Version")
+      polymorphic_path(object.parent,version:object.version)
+    else
+      polymorphic_path(object)
+    end
+
   end
 
   def _links
@@ -97,20 +102,12 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   def _meta
-    #content-blob doesn't have timestamps
-    if object.respond_to?('created_at')
-      created = object.created_at
-      updated = object.updated_at
-    end
+    meta = super
     if object.respond_to?('uuid')
-      uuid = object.uuid
+      meta[:uuid] = object.uuid
     end
-    {
-        created: created || "",
-        modified: updated || "",
-        uuid: uuid || "",
-        base_url: base_url
-    }
+    meta[:base_url]=base_url
+    meta
   end
 
   def initialize(object, options = {})

@@ -21,14 +21,16 @@ class SimpleBaseSerializer < ActiveModel::Serializer
   end
 
   def _meta
-    if object.respond_to?('created_at')
+    if object.respond_to?(:created_at)
       created = object.created_at
       updated = object.updated_at
+      {
+          created: created || "",
+          modified: updated || ""
+      }
+    else
+      {}
     end
-    {
-        created: created || "",
-        modified: updated || ""
-    }
   end
 
   def serialize_annotations(object, context=nil)

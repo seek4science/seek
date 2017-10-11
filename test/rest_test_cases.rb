@@ -19,10 +19,8 @@ module RestTestCases
   end
 
   def test_index_rest_api_xml
-    clz = @controller.controller_name.classify.constantize.to_s
-    if (clz == 'SampleType' || clz == 'Sample' || clz == 'Programme')
-      skip('skipping XML tests for Sample, SampleType and Programme')
-    end
+    check_for_xml_type_skip # some types do not support XML, only JSON
+
     # to make sure something in the database is created
     object = rest_api_test_object
 
@@ -31,10 +29,8 @@ module RestTestCases
   end
 
   def test_displays_correct_counts_in_index
-    clz = @controller.controller_name.classify.constantize.to_s
-    if (clz == 'SampleType' || clz == 'Sample' || clz == 'Programme')
-      skip('skipping XML tests for Sample, SampleType and Programme')
-    end
+    check_for_xml_type_skip # some types do not support XML, only JSON
+
 
     # to make sure something in the database is created
     object = rest_api_test_object
@@ -58,10 +54,8 @@ module RestTestCases
   end
 
   def test_get_rest_api_xml(object = rest_api_test_object)
-    clz = @controller.controller_name.classify.constantize.to_s
-    if (clz == 'SampleType' || clz == 'Sample' || clz == 'Programme')
-      skip('skipping XML tests for Sample, SampleType and Programme')
-    end
+    check_for_xml_type_skip # some types do not support XML, only JSON
+
     get :show, id: object, format: 'xml'
     perform_api_checks
 
@@ -170,6 +164,14 @@ module RestTestCases
     xml.split("\n").each do |line|
       puts "#{x} #{line}"
       x += 1
+    end
+  end
+
+  #skip if this current controller type doesn't support XML format
+  def check_for_xml_type_skip
+    clz = @controller.controller_name.classify.constantize.to_s
+    if %w[Programme Sample SampleType ContentBlob].include?(clz)
+      skip("skipping XML tests for #{clz}")
     end
   end
 end

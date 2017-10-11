@@ -21,7 +21,7 @@ module Seek
     def text_contents_for_search
       content = []
       if file_exists?
-        text = File.read(filepath)
+        text = File.read(filepath,:encoding => 'iso-8859-1')
         unless text.blank?
           content = filter_text_content text
           content = split_content(content)
@@ -75,7 +75,7 @@ module Seek
     private
 
     def split_content(content, delimiter = "\n")
-      content.split(delimiter).reject { |str| (str.blank? || str.length > 50) }.uniq
+      content.split(delimiter).reject { |str| (str.blank? || str.length > 50) }.collect(&:strip).uniq
     end
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
