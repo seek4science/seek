@@ -7,8 +7,8 @@ module Seek
         rows = Rails.cache.fetch('rdf_definitions', expires_in: 1.hour) do
           CSV.read(MAPPINGS_FILE)
         end
-        rows.each do |row|
-          unless row[0].downcase == 'class'
+        rows.select { |row| row.present? && !row.empty? }.each do |row|
+          unless row[0].casecmp('class').zero?
             rdf_graph = generate_for_csv_row(rdf_graph, row)
           end
         end
@@ -22,7 +22,7 @@ module Seek
         uri_or_literal = row[3].downcase
         transform = row[4]
         collection_transform = row[5]
-        if (klass == '*' || self.class.name == klass) && self.respond_to?(method)
+        if (klass == '*' || self.class.name == klass) && respond_to?(method)
           rdf_graph = generate_triples_for_csv_row(self, method, property, uri_or_literal, transform, collection_transform, rdf_graph)
         elsif self.class.name == klass # matched the class but the method isnt found
           Rails.logger.warn "Expected to find method #{method} for class #{klass}"
@@ -44,7 +44,7 @@ module Seek
         items.each do |item|
           property_uri = eval(property)
           item = eval(transformation) unless transformation.blank?
-          o = if uri_or_literal.downcase == 'u'
+          o = if uri_or_literal.casecmp('u').zero?
                 handle_uri_for_item(item)
               else
                 handle_literal_for_item(item)
@@ -55,7 +55,13 @@ module Seek
       end
 
       def handle_literal_for_item(item)
-        item.nil? ? '' : item
+        return '' if item.nil?
+        if item.is_a?(URI)
+          return nil unless item.to_s =~ URI.regexp # rejects invalid URI's
+          RDF::Literal.new(item, datatype: RDF::XSD.anyURI)
+        else
+          RDF::Literal.new(item)
+        end
       end
 
       def handle_uri_for_item(item)

@@ -170,7 +170,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   # simply checks that get and set data returns the same thing
   def test_data_assignment2
-    pic = Factory(:content_blob,data:data_for_test('file_picture.png'))
+    pic = Factory(:content_blob, data: data_for_test('file_picture.png'))
     pic.data = data_for_test('little_file.txt')
     pic.save!
     assert_equal data_for_test('little_file.txt'), pic.data_io_object.read
@@ -182,7 +182,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   #
   def test_will_overwrite_if_data_changes
-    pic = Factory(:content_blob,data:data_for_test('file_picture.png'))
+    pic = Factory(:content_blob, data: data_for_test('file_picture.png'))
     pic.save!
     assert_equal data_for_test('file_picture.png'), File.open(pic.filepath, 'rb').read
     pic.data = data_for_test('little_file.txt')
@@ -508,7 +508,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'is_content_viewable?' do
-    viewable_formats = %w(application/pdf)
+    viewable_formats = %w[application/pdf]
     viewable_formats << 'application/msword'
     viewable_formats << 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     viewable_formats << 'application/vnd.ms-powerpoint'
@@ -533,7 +533,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'content needing conversion should not be viewable when pdf_conversion is disabled' do
     with_config_value :pdf_conversion_enabled, false do
-      viewable_formats = %w(application/msword)
+      viewable_formats = %w[application/msword]
       viewable_formats << 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       viewable_formats << 'application/vnd.ms-powerpoint'
       viewable_formats << 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
@@ -553,7 +553,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     pdf_content_blob = Factory(:content_blob, content_type: 'application/pdf', asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
 
     with_config_value :pdf_conversion_enabled, false do
-      viewable_formats = %w(text/plain text/csv text/tsv)
+      viewable_formats = %w[text/plain text/csv text/tsv]
 
       viewable_formats.each do |viewable_format|
         cb_with_content_viewable_format = Factory(:content_blob, content_type: viewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
@@ -612,7 +612,8 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'can retrieve remote content' do
     stub_request(:head, 'http://www.abc.com').to_return(
-      headers: { content_length: nil, content_type: 'text/plain' }, status: 200)
+      headers: { content_length: nil, content_type: 'text/plain' }, status: 200
+    )
     stub_request(:get, 'http://www.abc.com').to_return(body: 'abcdefghij' * 500,
                                                        headers: { content_type: 'text/plain' }, status: 200)
 
@@ -628,7 +629,8 @@ class ContentBlobTest < ActiveSupport::TestCase
   test "won't retrieve remote content over hard limit" do
     # Web server lies about content length:
     stub_request(:head, 'http://www.abc.com').to_return(
-      headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
+      headers: { content_length: 500, content_type: 'text/plain' }, status: 200
+    )
     # Size is actually 6kb:
     stub_request(:get, 'http://www.abc.com').to_return(body: 'abcdefghij' * 600,
                                                        headers: { content_type: 'text/plain' }, status: 200)
@@ -645,7 +647,8 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test "won't endlessly follow redirects when downloading remote content" do
     stub_request(:head, 'http://www.abc.com').to_return(
-      headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
+      headers: { content_length: 500, content_type: 'text/plain' }, status: 200
+    )
     # Infinitely redirects
     stub_request(:get, 'http://www.abc.com').to_return(headers: { location: 'http://www.abc.com' }, status: 302)
 
@@ -661,7 +664,8 @@ class ContentBlobTest < ActiveSupport::TestCase
 
   test 'raises exception on bad response code when downloading remote content' do
     stub_request(:head, 'http://www.abc.com').to_return(
-      headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
+      headers: { content_length: 500, content_type: 'text/plain' }, status: 200
+    )
     stub_request(:get, 'http://www.abc.com').to_return(status: 404)
 
     blob = Factory(:url_content_blob)
@@ -678,7 +682,8 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:head, 'http://www.abc.com').to_return(headers: { location: '/xyz' }, status: 302)
     stub_request(:get, 'http://www.abc.com').to_return(headers: { location: '/xyz' }, status: 302)
     stub_request(:head, 'http://www.abc.com/xyz').to_return(
-      headers: { content_length: nil, content_type: 'text/plain' }, status: 200)
+      headers: { content_length: nil, content_type: 'text/plain' }, status: 200
+    )
     stub_request(:get, 'http://www.abc.com/xyz').to_return(body: 'abcdefghij' * 500,
                                                            headers: { content_type: 'text/plain' }, status: 200)
 
@@ -695,7 +700,8 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:head, 'http://www.abc.com').to_return(headers: { location: 'http://www.abc.com/xyz' }, status: 302)
     stub_request(:get, 'http://www.abc.com').to_return(headers: { location: 'http://www.abc.com/xyz' }, status: 302)
     stub_request(:head, 'http://www.abc.com/xyz').to_return(
-      headers: { content_length: nil, content_type: 'text/plain' }, status: 200)
+      headers: { content_length: nil, content_type: 'text/plain' }, status: 200
+    )
     stub_request(:get, 'http://www.abc.com/xyz').to_return(body: 'abcdefghij' * 500,
                                                            headers: { content_type: 'text/plain' }, status: 200)
 
@@ -714,7 +720,8 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:head, 'http://www.xyz.com').to_return(headers: { location: '/xyz' }, status: 302)
     stub_request(:get, 'http://www.xyz.com').to_return(headers: { location: '/xyz' }, status: 302)
     stub_request(:head, 'http://www.xyz.com/xyz').to_return(
-      headers: { content_length: nil, content_type: 'text/plain' }, status: 200)
+      headers: { content_length: nil, content_type: 'text/plain' }, status: 200
+    )
     stub_request(:get, 'http://www.xyz.com/xyz').to_return(body: 'abcdefghij' * 500,
                                                            headers: { content_type: 'text/plain' }, status: 200)
 

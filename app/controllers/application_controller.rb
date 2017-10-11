@@ -1,3 +1,4 @@
+# coding: utf-8
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
@@ -9,6 +10,7 @@ class ApplicationController < ActionController::Base
   include Recaptcha::Verify
 
   include CommonSweepers
+  @is_json = false
 
   before_filter :log_extra_exception_data
 
@@ -22,13 +24,23 @@ class ApplicationController < ActionController::Base
   around_filter :with_current_user
 
   rescue_from 'ActiveRecord::RecordNotFound', with: :render_not_found_error
+  rescue_from 'ActiveRecord::UnknownAttributeError', with: :render_unknown_attribute_error
+  rescue_from NotImplementedError, with: :render_not_implemented_error
 
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
+  before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
+  before_filter :check_illegal_id, :only=>[:create]
+  # after_filter :unescape_response
+
+  before_filter :write_api_enabled, :only=>[:edit, :update, :destroy, :create, :new]
+  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new]
+
   helper :all
 
   layout Seek::Config.main_layout
+
 
   def with_current_user
     User.with_current_user current_user do
@@ -61,6 +73,24 @@ class ApplicationController < ActionController::Base
 
   def base_host
     request.host_with_port
+  end
+
+  def set_is_json
+    @is_json = (request.format.json?)
+  end
+
+  def api_version
+    @default = 1
+    version_re_arr = [/version=(?<v>.+?)/, /api.v(?<v>\d+?)\+json/]
+    version_re_arr.each do |re|
+      v_match = request.headers['Accept'].match(re)
+      if (v_match  != nil)
+        @version = v_match[:v]
+        break
+      end
+    end
+    @version ||= @default
+    puts "api version: ", @version
   end
 
   def is_current_user_auth
@@ -163,7 +193,7 @@ class ApplicationController < ActionController::Base
             redirect_to path
           end
         end
-        format.json { render json: { status: 401, error_message: flash[:error] } }
+        format.json { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
       end
     end
   end
@@ -219,7 +249,7 @@ class ApplicationController < ActionController::Base
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render text: 'Not found', status: :not_found }
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-        format.json { render text: 'Not found', status: :not_found }
+        format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
     else
@@ -256,7 +286,9 @@ class ApplicationController < ActionController::Base
         end
         format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
-        format.json { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.json {
+          render json: {"title": "Forbidden", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}, status: :forbidden
+        }
       end
       return false
     end
@@ -279,10 +311,33 @@ class ApplicationController < ActionController::Base
 
       format.rdf { render text: 'Not found', status: :not_found }
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-      format.json { render text: 'Not found', status: :not_found }
+      format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
     end
     false
   end
+
+  def render_unknown_attribute_error(e)
+    respond_to do |format|
+      format.json {
+        render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
+      }
+      format.all {
+        render text: e.message, status: :unprocessable_entity
+      }
+    end
+  end
+
+  def render_not_implemented_error(e)
+    respond_to do |format|
+      format.json {
+        render json: {error: e.message, status: :not_implemented}, status: :not_implemented
+      }
+      format.all {
+        render text: e.message, status: :not_implemented
+      }
+    end
+  end
+
 
   def is_auth?(object, privilege)
     if object.can_perform?(privilege)
@@ -501,12 +556,89 @@ class ApplicationController < ActionController::Base
     redirect_to signup_path if User.count == 0
   end
 
+  def check_illegal_id
+    begin
+      Rails.logger.info("checking illegal ID")
+      if !params[:id].nil?
+        raise ArgumentError.new('A POST request is not allowed to specify an id')
+      end
+    rescue ArgumentError => e
+      render json: {error: e.message, status: :forbidden}, status: :forbidden
+    end
+  end
+
+  # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
+  # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
+  # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
+  # by steffen.brinkmann@h-its.org
+  # 2017-04-18
+#  def unescape_response()
+#    response_body[0].gsub!(/\\u([0-9a-z]{4})/) { |s|
+#      [$1.to_i(16)].pack("U")
+#    }
+#  end
+
   def policy_params
     params.slice(:policy_attributes).permit(
         policy_attributes: [:access_type,
                             { permissions_attributes: [:access_type,
                                                        :contributor_type,
                                                        :contributor_id] }])[:policy_attributes] || {}
+  end
+
+  def write_api_enabled
+    controller_class = self.controller_name.classify
+    if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
+      return
+    end
+    if @is_json && !Rails.env.development?
+      raise NotImplementedError
+    end
+  end
+
+  def convert_json_params
+   if @is_json
+      organize_external_attributes_from_json
+      hacked_params = flatten_relationships(params)
+      # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
+      params[controller_name.classify.downcase.to_sym] =
+          ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
+
+    end
+  end
+
+  # take out policies, annotations, etc(?) outside of the given object attributes
+  def organize_external_attributes_from_json
+    if (params[:data] && params[:data][:attributes])
+      [:tag_list, :expertise_list, :tool_list, :policy_attributes].each do |item|
+        if params[:data][:attributes][item]
+          params[item] = params[:data][:attributes][item]
+          params[:data][:attributes].delete item
+        end
+      end
+    end
+  end
+
+  def flatten_relationships(original_params)
+    replacements = {}
+    begin
+      rels = original_params[:data][:relationships]
+      assoc = rels[:associated]
+      assoc_relationships = assoc[:data]
+      assoc_relationships.each do |assoc_rel|
+        the_type = assoc_rel["type"]
+        the_id = assoc_rel["id"]
+        if !replacements.key?(the_type)
+          replacements[the_type] = {}
+          replacements[the_type][:data] = []
+        end
+        replacements[the_type][:data].push({:type => the_type, :id => the_id})
+      end
+      rels.delete(:associated)
+      original_params[:data][:relationships].merge!(ActionController::Parameters.new(replacements))
+    rescue Exception
+    end
+    original_params
   end
 
 end

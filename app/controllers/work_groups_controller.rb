@@ -8,10 +8,11 @@ class WorkGroupsController < ApplicationController
   # GET /groups.xml
   def index
     @groups = WorkGroup.all
-
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @groups }
+      format.json {render json: @groups}
+
     end
   end
 
@@ -23,6 +24,8 @@ class WorkGroupsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @group }
+      format.json {render json: @group}
+
     end
   end
 

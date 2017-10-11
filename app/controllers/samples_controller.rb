@@ -14,7 +14,11 @@ class SamplesController < ApplicationController
 
   def index
     if @data_file || @sample_type
-      respond_with(@samples)
+      respond_to do |format|
+        format.html
+        format.json {render json: @samples}
+      end
+      #respond_with(@samples)
     else
       super
     end
@@ -38,7 +42,10 @@ class SamplesController < ApplicationController
 
   def show
     @sample = Sample.find(params[:id])
-    respond_with(@sample)
+    respond_to do |format|
+      format.html
+      format.json {render json: @sample}
+    end
   end
 
   def edit

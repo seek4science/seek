@@ -72,6 +72,10 @@ class PeopleController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml
+      format.json  { render json: @people,
+                            each_serializer: ActiveModel::Serializer,
+                            meta: {:base_url =>   Seek::Config.site_base_host
+                            } }
     end
   end
 
@@ -82,6 +86,7 @@ class PeopleController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
+      format.json {render json: @person}
     end
   end
 
@@ -160,7 +165,7 @@ class PeopleController < ApplicationController
       redirect_action = 'register'
       during_registration = true
     end
-
+    set_tools_and_expertise(@person, params)
     respond_to do |format|
       if @person.save && current_user.save
         if Seek::Config.email_enabled && during_registration
@@ -174,15 +179,18 @@ class PeopleController < ApplicationController
             format.html { redirect_to(@person) }
           end
           format.xml { render xml: @person, status: :created, location: @person }
+          format.json {render json: @person, status: :created, location: @person }
         else
           Mailer.signup(current_user).deliver_now
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
+          format.json { render json: @person, status: :created} # There must be more to be done
         end
       else
         format.html { render redirect_action }
         format.xml { render xml: @person.errors, status: :unprocessable_entity }
+        format.json { render json: @person.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -216,9 +224,11 @@ class PeopleController < ApplicationController
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
+        format.json {render json: @person}
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @person.errors, status: :unprocessable_entity }
+        format.json { render json: @person.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -269,8 +279,10 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if request.env['HTTP_REFERER'].try(:include?, '/admin')
         format.html { redirect_to(admin_url) }
+        format.json {render json: {status: :ok}, status: :ok}
       else
         format.html { redirect_to(people_url) }
+        format.json {render json: {status: :ok}, status: :ok}
       end
       format.xml { head :ok }
     end

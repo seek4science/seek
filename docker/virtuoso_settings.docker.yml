@@ -1,0 +1,11 @@
+production:
+  uri: http://virtuoso:8890/sparql
+  update_uri: http://virtuoso:8890/sparql-auth
+
+  username: dba
+  password: <%= ENV["DBA_PASSWORD"] %>
+
+  private_graph: seek:private
+  public_graph: seek:public
+
+  disabled: <%= !ENV["VIRTUOSO"].present? %>

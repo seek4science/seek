@@ -18,12 +18,13 @@ module Seek
       # update timestamp in the current record
       # (this will also trigger timestamp update in the corresponding Asset)
       asset.just_used
-
+      asset_version = find_display_asset asset
       respond_to do |format|
         format.html
         format.xml
         format.rdf { render template: 'rdf/show' }
-        format.json
+
+        format.json {render json: asset_version, serializer: (asset.class.name + "::VersionSerializer").constantize}
       end
     end
 
@@ -91,6 +92,8 @@ module Seek
     end
 
     def update_sharing_policies(item)
+      Rails.logger.info("=====Policy=====")
+      Rails.logger.info(policy_params)
       item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
     end
 

@@ -6,4 +6,13 @@ test_data:
   
 validation_data:
   title: Validation Data
-  description: The data is used for validation  
+  description: The data is used for validation
+  key: VALIDATION
+
+construction_data:
+  title: Construction Data
+  key: CONSTRUCTION
+
+simulation_data:
+  title: Simulation Data
+  key: SIMULATION

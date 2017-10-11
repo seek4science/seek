@@ -42,7 +42,7 @@ class ProjectTest < ActiveSupport::TestCase
     end
   end
 
-  test 'rdf with empty URI resource' do
+  test 'rdf for web_page - existing or blank or nil' do
     object = Factory :project, web_page: 'http://google.com'
 
     homepage_predicate = RDF::URI.new 'http://xmlns.com/foaf/0.1/homepage'
@@ -52,7 +52,7 @@ class ProjectTest < ActiveSupport::TestCase
         next unless statement.predicate == homepage_predicate
         found = true
         assert statement.valid?, 'statement is not valid'
-        assert_equal RDF::URI.new('http://google.com'), statement.object
+        assert_equal RDF::Literal::AnyURI.new('http://google.com/'), statement.object
       end
     end
     assert found, "Didn't find homepage predicate"
@@ -60,14 +60,20 @@ class ProjectTest < ActiveSupport::TestCase
     object.web_page = ''
     found = false
     RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
-      reader.each_statement do |statement|
-        next unless statement.predicate == homepage_predicate
-        found = true
-
-        assert statement.valid?, 'statement is not valid'
-      end
+      found = reader.statements.select do |statement|
+        statement.predicate == homepage_predicate
+      end.any?
     end
-    assert !found, 'The homepage statement should have been skipped'
+    refute found, 'The homepage statement should have been skipped'
+
+    object.web_page = nil
+    found = false
+    RDF::Reader.for(:rdfxml).new(object.to_rdf) do |reader|
+      found = reader.statements.select do |statement|
+        statement.predicate == homepage_predicate
+      end.any?
+    end
+    refute found, 'The homepage statement should have been skipped'
   end
 
   def test_avatar_key

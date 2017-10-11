@@ -36,6 +36,24 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'rdf generation job created after policy change' do
+    item = Factory(:sop, policy: Factory(:public_policy))
+    Delayed::Job.delete_all
+
+    handlers = Delayed::Job.all.collect(&:handler).join(',')
+    refute_includes(handlers, 'RdfGenerationJob')
+
+    item.policy.access_type = Policy::NO_ACCESS
+    disable_authorization_checks do
+      assert_difference('Delayed::Job.count', 1) do
+        item.policy.save!
+      end
+    end
+
+    handlers = Delayed::Job.all.collect(&:handler).join(',')
+    assert_includes(handlers, 'RdfGenerationJob')
+  end
+
   test 'create job' do
     item = Factory(:assay)
 

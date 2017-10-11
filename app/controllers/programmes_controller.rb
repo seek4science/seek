@@ -1,6 +1,7 @@
 class ProgrammesController < ApplicationController
   include Seek::IndexPager
   include Seek::DestroyHandling
+  include ApiHelper
 
   before_filter :programmes_enabled?
   before_filter :login_required, except: [:show, :index, :isa_children]
@@ -11,40 +12,63 @@ class ProgrammesController < ApplicationController
   before_filter :can_activate?, only: [:activation_review, :accept_activation,:reject_activation,:reject_activation_confirmation]
   before_filter :inactive_view_allowed?, only: [:show]
 
+
   skip_before_filter :project_membership_required
 
   include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
 
-  respond_to :html
+  respond_to :html, :json
 
   def create
     #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
     funding_codes = params[:programme].delete(:funding_codes)
+
     @programme = Programme.new(programme_params)
 
-    if @programme.save
-      flash[:notice] = "The #{t('programme').capitalize} was successfully created."
+    respond_to do |format|
+      if @programme.present? && @programme.save
+        flash[:notice] = "The #{t('programme').capitalize} was successfully created."
 
-      # current person becomes the programme administrator, unless they are logged in
-      # also activation email is sent
-      unless User.admin_logged_in?
-        current_person.is_programme_administrator = true, @programme
-        disable_authorization_checks { current_person.save! }
-        if Seek::Config.email_enabled
-          Mailer.delay.programme_activation_required(@programme,current_person)
+        # current person becomes the programme administrator, unless they are logged in
+        # also activation email is sent
+        unless User.admin_logged_in?
+          current_person.is_programme_administrator = true, @programme
+          disable_authorization_checks { current_person.save! }
+          if Seek::Config.email_enabled
+            Mailer.delay.programme_activation_required(@programme,current_person)
+          end
         end
+        begin
+        @programme.update_attribute(:funding_codes,funding_codes)
+        rescue
+        end
+        format.html {respond_with(@programme)}
+        format.json {render json: @programme}
+      else
+        format.html { render action: 'new' }
+        format.json {render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
       end
-      @programme.update_attribute(:funding_codes,funding_codes)
     end
-
-    respond_with(@programme)
   end
 
   def update
-    flash[:notice] = "The #{t('programme').capitalize} was successfully updated." if @programme.update_attributes(programme_params)
-    respond_with(@programme)
+    update_params = programme_params
+   respond_to do |format|
+      if @programme.present?
+        if @programme.update_attributes(update_params)
+          flash[:notice] = "The #{t('programme').capitalize} was successfully updated"
+          format.html { redirect_to(@programme) }
+          format.xml { head :ok }
+          format.json { render json: @programme }
+        else
+          format.html { render action: 'edit' }
+          format.xml { render xml: @programme.errors, status: :unprocessable_entity }
+          format.json { render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+        end
+      end
+    end
   end
 
   def handle_administrators
@@ -78,7 +102,11 @@ class ProgrammesController < ApplicationController
   end
 
   def show
-    respond_with(@programme)
+    respond_with do |format|
+      format.html
+      format.json {render json: @programme}
+      format.rdf { render template: 'rdf/show' }	
+    end
   end
 
   def initiate_spawn_project

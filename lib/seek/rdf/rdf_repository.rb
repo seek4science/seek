@@ -61,67 +61,22 @@ module Seek
       def remove_rdf(item, graphs = [get_configuration.public_graph, get_configuration.private_graph].compact, delete_file = true)
         if configured?
           connect_to_repository
-          rdf_file_path = last_rdf_file_path(item)
-          unless rdf_file_path.nil?
-            with_statements_from_file rdf_file_path do |statement|
-              if statement.valid?
-                graphs.each do |graph|
-                  remove_statement_from_repository statement, graph
-                end
-              end
-            end
+          graphs.each do |graph|
+            q = query.delete([item.rdf_resource, :p, :o]).where([item.rdf_resource, :p, :o]).graph(RDF::URI(graph))
+            Rails.logger.debug("remove all SPARQL query #{q}")
+            result = delete(q)
+            Rails.logger.debug(result)
           end
           item.delete_rdf_file if delete_file
         end
       end
 
-      # updates the rdf in the repository and updates the rdf file. This is more efficient that calling remove_rdf and send_rdf, since
-      # it consolidates the triples that have changed since the last send (according to the rdf file), and only updates, add or removes those triples.
+      # updates the rdf in the repository and updates the rdf file.
       def update_rdf(item)
         if configured?
           connect_to_repository
-          graphs = rdf_graph_uris(item)
-          rdf_file_path = last_rdf_file_path(item)
-          if !graphs.include?(get_configuration.public_graph) && !rdf_file_path.nil?
-            remove_rdf(item, [get_configuration.public_graph], false)
-          end
-          if graphs.include?(get_configuration.public_graph) && rdf_file_path == item.private_rdf_storage_path
-            send_rdf(item, [get_configuration.public_graph], false)
-          end
-          old_statements = []
-          unless rdf_file_path.nil?
-            with_statements_from_file rdf_file_path do |statement|
-              old_statements << statement
-            end
-          end
-          new_statements = []
-          with_statements(item) do |statement|
-            new_statements << statement
-          end
-
-          # cannot simply do new_statements - old_statements, because although eql? works, the same statements have different hashes
-          to_add = new_statements.select { |s| !old_statements.include?(s) }
-          to_remove = old_statements.select { |s| !new_statements.include?(s) }
-
-          graphs.each do |graph|
-            to_remove.each do |statement|
-              if statement.valid?
-                remove_statement_from_repository(statement, graph)
-              else
-                Rails.logger.error("Invalid statement - '#{statement}'")
-              end
-            end
-
-            to_add.each do |statement|
-              if statement.valid?
-                send_statement_to_repository(statement, graph)
-              else
-                Rails.logger.error("Invalid statement - '#{statement}'")
-              end
-            end
-          end
-          item.delete_rdf_file
-          item.save_rdf_file
+          remove_rdf(item)
+          send_rdf(item)
         end
       end
 
@@ -146,15 +101,15 @@ module Seek
       # Abstract methods
 
       def get_configuration
-        fail 'Not implemented: subclass should provide a configuration class'
+        raise 'Not implemented: subclass should provide a configuration class'
       end
 
       def get_query_object
-        fail 'Not implemented: subclass should provide a suitable RDF::Query class'
+        raise 'Not implemented: subclass should provide a suitable RDF::Query class'
       end
 
       def get_repository_object
-        fail 'Not implemented: subclass should provide a suitable instance of RDF::Repository'
+        raise 'Not implemented: subclass should provide a suitable instance of RDF::Repository'
       end
 
       private
@@ -162,11 +117,11 @@ module Seek
       # Private abstract methods
 
       def config_filename
-        fail 'Not implemented: subclass should provide the name (not path) of the configuration filename'
+        raise 'Not implemented: subclass should provide the name (not path) of the configuration filename'
       end
 
       def enabled_for_environment?
-        fail 'Not implemented: subclass should determine whether a configuration has been set for the current Rails.env'
+        raise 'Not implemented: subclass should determine whether a configuration has been set for the current Rails.env'
       end
 
       def last_rdf_file_path(item)
@@ -199,19 +154,19 @@ module Seek
         end.compact
       end
 
-      def with_statements(item, &block)
+      def with_statements(item)
         RDF::Reader.for(:rdfxml).new(item.to_rdf) do |reader|
           reader.each_statement do |statement|
-            block.call(statement)
+            yield(statement)
           end
         end
       end
 
-      def with_statements_from_file(path, &block)
+      def with_statements_from_file(path)
         RDF::Reader.for(:rdfxml).open(path) do |reader|
           reader.each_statement do |statement|
             Rails.logger.debug "Statement from #{path}- #{statement}"
-            block.call(statement)
+            yield(statement)
           end
         end
       end

@@ -41,12 +41,16 @@ class StrainsController < ApplicationController
         flash[:notice] = 'Strain was successfully created.'
         format.html { redirect_to(@strain) }
         format.xml { render xml: @strain, status: :created, location: @strain }
+        format.json {render json: @strain, status: :created, location: @strain}
+
       end
 
     else
       respond_to do |format|
         format.html { render action: 'new' }
         format.xml { render xml: @strain.errors, status: :unprocessable_entity }
+        format.json  { render json: @strain.errors, status: :unprocessable_entity }
+
       end
     end
   end
@@ -56,6 +60,8 @@ class StrainsController < ApplicationController
       format.rdf { render template: 'rdf/show' }
       format.xml
       format.html
+      format.json {render json: @strain}
+
     end
   end
 
@@ -70,12 +76,14 @@ class StrainsController < ApplicationController
         flash[:notice] = 'Strain was successfully updated.'
         format.html { redirect_to(@strain) }
         format.xml { render xml: @strain, status: :created, location: @strain }
+        format.json {render json: @strain}
       end
 
     else
       respond_to do |format|
         format.html { render action: 'edit' }
         format.xml { render xml: @strain.errors, status: :unprocessable_entity }
+        format.json  { render json: @strain.errors, status: :unprocessable_entity }
       end
     end
   end
