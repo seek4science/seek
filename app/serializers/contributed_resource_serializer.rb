@@ -12,52 +12,37 @@ class ContributedResourceSerializer < PCSSerializer
     versions_data
   end
 
+  def get_version
+  v = @scope[:requested_version]
+  if v.nil?
+    v = object.version
+  end
+
+  object.find_version(v)
+  end
+
    attribute :version do
-     v = @scope[:requested_version]
-     if v.nil?
-       v = object.version
-     end
-
-     requested_version = object.find_version(v)
-
-     requested_version.version
+     get_version.version
   end
 
   attribute :revision_comments do
-    v = @scope[:requested_version]
-    if v.nil?
-      v = object.version
-    end
-
-    requested_version = object.find_version(v)
-
-    requested_version.revision_comments.presence
+    get_version.revision_comments.presence
   end
 
   attribute :created_at do
-    v = @scope[:requested_version]
-    if v.nil?
-      v = object.version
-    end
-
-    requested_version = object.find_version(v)
-
-    requested_version.created_at
+    get_version.created_at
     end
   attribute :updated_at do
-    v = @scope[:requested_version]
-    if v.nil?
-      v = object.version
-    end
-
-    requested_version = object.find_version(v)
-
-    requested_version.updated_at
+    get_version.updated_at
   end
 
  has_many :content_blobs do
+   v = @scope[:requested_version]
+   if v.nil?
+     v = object.version
+   end
 
-   requested_version = object.find_version(@scope[:requested_version])
+   requested_version = object.find_version(v)
 
    blobs = []
     if defined?(requested_version.content_blobs)
