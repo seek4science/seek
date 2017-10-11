@@ -102,7 +102,9 @@
 							"type": "null"
 						},
 						{
-					"$ref": "definitions.json#/definitions/nonEmptyString"}]
+							"$ref": "definitions.json#/definitions/nonEmptyString"
+						}
+					]
 				},
 				"license": {
 					"oneOf": [
@@ -110,7 +112,9 @@
 							"type": "null"
 						},
 						{
-					"$ref": "definitions.json#/definitions/nonEmptyString"}]
+							"$ref": "definitions.json#/definitions/nonEmptyString"
+						}
+					]
 				},
 				"latest_version": {
 					"type": "number"
@@ -125,12 +129,14 @@
 								"type": "number"
 							},
 							"revision_comments": {
-													"oneOf": [
-						{
-							"type": "null"
-						},
-						{
-"$ref": "definitions.json#/definitions/nonEmptyString"}]
+								"oneOf": [
+									{
+										"type": "null"
+									},
+									{
+										"$ref": "definitions.json#/definitions/nonEmptyString"
+									}
+								]
 							}
 						},
 						"required": [
@@ -138,32 +144,26 @@
 						]
 					}
 				},
-				"requested_version": {
-					"type": "object",
-					"properties": {
-						"version": {
-							"type": "number"
-						},
-						"revision_comments": {
+				"version": {
+					"type": "number"
+				},
+				"revision_comments": {
 					"oneOf": [
 						{
 							"type": "null"
 						},
 						{
-							"$ref": "definitions.json#/definitions/nonEmptyString"}]
-						},
-						"created_at": {
-							"$ref": "definitions.json#/definitions/dateTimeString"
-						},
-						"updated_at": {
-							"$ref": "definitions.json#/definitions/dateTimeString"
+							"$ref": "definitions.json#/definitions/nonEmptyString"
 						}
-					},
-					"required": [
-						"version",
-						"created_at",
-						"updated_at"
 					]
+				},
+				"created_at": {
+					"type": "string",
+					"minLength": 1
+				},
+				"updated_at": {
+					"type": "string",
+					"minLength": 1
 				}
 			},
 			"required": [
@@ -171,7 +171,9 @@
 				"license",
 				"latest_version",
 				"versions",
-				"requested_version"
+				"version",
+				"created_at",
+				"updated_at"
 			]
 		},
 		"assaysType": {
