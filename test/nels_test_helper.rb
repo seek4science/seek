@@ -16,6 +16,13 @@ module NelsTestHelper
     @dataset_id = 91123528
     @subtype = 'reads'
     @reference = 'xMTEyMzEyMjoxMTIzNTI4OnJlYWRz'
+
+    disable_authorization_checks do
+      @nels_sample_type = SampleType.new(title: 'NeLS FASTQ Paired', uploaded_template: true, project_ids: [@project.id])
+      @nels_sample_type.content_blob = Factory(:nels_fastq_paired_template_content_blob)
+      @nels_sample_type.build_attributes_from_template
+      @nels_sample_type.save
+    end
   end
 
   def setup_nels

@@ -866,6 +866,13 @@ Factory.define(:strain_sample_data_content_blob, parent: :content_blob) do |f|
   f.data File.new("#{Rails.root}/test/fixtures/files/strain-sample-data.xlsx", 'rb').read
 end
 
+Factory.define(:nels_fastq_paired_template_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'FASTQPaired.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data File.new("#{Rails.root}/test/fixtures/files/FASTQPaired.xlsx", 'rb').read
+end
+
+
 Factory.define(:activity_log) do |f|
   f.action 'create'
   f.association :activity_loggable, factory: :data_file
