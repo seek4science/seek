@@ -4,7 +4,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  # include RestTestCases
+  include RestTestCases
 
   def setup
     login_as(:quentin)
@@ -21,6 +21,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     get :show, id: blob.id, sop_id: sop.id, format: 'json'
     assert_response :success
+    perform_jsonapi_checks
   end
 
   test 'html and xml not acceptable' do
@@ -63,6 +64,8 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   def test_show_json(object = rest_api_test_object)
     get :show, id: object.content_blob, sop_id: object, format: 'json'
+
+    perform_jsonapi_checks
 
     #check meta doesn't include created_at and updated_at
     json = JSON.parse(response.body)
