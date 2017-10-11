@@ -35,6 +35,16 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'json link includes version' do
+    df = Factory(:data_file,policy:Factory(:public_policy))
+    test_show_json(df)
+    json = JSON.parse(response.body)
+    refute_nil json['data']
+    refute_nil json['data']['links']
+    refute_nil json['data']['links']['self']
+    assert json['data']['links']['self'].ends_with?("?version=#{df.version}")
+  end
+
   # because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent
   # the log being saved, unless it is public, since it has passed out of the around filter and User.current_user is nil
   test 'download and view activity logging for private items' do
