@@ -118,7 +118,7 @@ namespace :seek do
     Organism.all.each do |org|
       org.check_uuid
       org.record_timestamps = false
-      org.save!
+      org.save(validate:false)
     end
   end
 
