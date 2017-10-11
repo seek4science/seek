@@ -84,7 +84,7 @@ class BaseSerializer < SimpleBaseSerializer
 
 
   def self_link
-    if @scope[:requested_version]
+    if @scope && @scope.is_a?(Hash) && @scope[:requested_version]
       polymorphic_path(object,version:@scope[:requested_version])
     else
        polymorphic_path(object)
@@ -112,7 +112,7 @@ class BaseSerializer < SimpleBaseSerializer
   def initialize(object, options = {})
     super
 
-    if object.is_asset? && object.versioned?
+    if object.is_asset? && object.versioned? && @scope && @scope.is_a?(Hash)
       @scope[:requested_version] ||= object.version
     end
 
