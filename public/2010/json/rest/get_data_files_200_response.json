@@ -12,149 +12,7 @@
 					"$ref": "definitions.json#/definitions/dataFilesType"
 				},
 				"attributes": {
-					"type": "object",
-					"properties": {
-						"tags": {
-							"$ref": "definitions.json#/definitions/tagsType"
-						},
-						"title": {
-							"$ref": "definitions.json#/definitions/nonEmptyString"
-						},
-						"description": {
-							"oneOf": [
-								{
-									"type": "null"
-								},
-								{
-									"$ref": "definitions.json#/definitions/nonEmptyString"
-								}
-							]
-						},
-						"version": {
-							"type": "number"
-						},
-						"license": {
-							"$ref": "definitions.json#/definitions/nonEmptyString"
-						},
-						"latest_version": {
-							"type": "object",
-							"properties": {
-								"title": {
-									"$ref": "definitions.json#/definitions/nonEmptyString"
-								},
-								"description": {
-									"oneOf": [
-										{
-											"type": "null"
-										},
-										{
-											"$ref": "definitions.json#/definitions/nonEmptyString"
-										}
-									]
-								},
-								"version": {
-									"type": "number"
-								},
-								"revision_comments": {
-									"oneOf": [
-										{
-											"type": "null"
-										},
-										{
-											"$ref": "definitions.json#/definitions/nonEmptyString"
-										}
-									]
-								},
-								"license": {
-									"$ref": "definitions.json#/definitions/nonEmptyString"
-								},
-								"uuid": {
-									"$ref": "definitions.json#/definitions/nonEmptyString"
-								},
-								"created_at": {
-									"$ref": "definitions.json#/definitions/dateTimeString"
-								},
-								"updated_at": {
-									"$ref": "definitions.json#/definitions/dateTimeString"
-								}
-							},
-							"required": [
-								"title",
-								"description",
-								"version",
-								"license",
-								"uuid",
-								"created_at",
-								"updated_at"
-							]
-						},
-						"content_blobs": {
-							"type": "array",
-							"minItems": 1,
-							"uniqueItems": true,
-							"items": {
-								"properties": {
-									"content_blob_id": {
-										"$ref": "definitions.json#/definitions/nonEmptyString"
-									},
-									"original_filename": {
-										"$ref": "definitions.json#/definitions/nonEmptyString"
-									},
-									"content_type": {
-										"$ref": "definitions.json#/definitions/nonEmptyString"
-									},
-									"is_webpage": {
-										"type": "boolean"
-									},
-									"external_link": {
-										"type": "boolean"
-									},
-									"file_size": {
-										"type": "number"
-									},
-									"url": {
-										"oneOf": [
-											{
-												"type": "null"
-											},
-											{
-												"$ref": "definitions.json#/definitions/uriString"
-											}
-										]
-									},
-									"uuid": {
-										"$ref": "definitions.json#/definitions/nonEmptyString"
-									}
-								},
-								"required": [
-									"content_blob_id",
-									"original_filename",
-									"content_type",
-									"is_webpage",
-									"external_link",
-									"file_size",
-									"uuid"
-								]
-							}
-						},
-						"current_revision_comments": {
-							"oneOf": [
-								{
-									"type": "null"
-								},
-								{
-									"$ref": "definitions.json#/definitions/nonEmptyString"
-								}
-							]
-						}
-					},
-					"required": [
-						"title",
-						"version",
-						"license",
-						"latest_version",
-						"content_blobs"
-					]
+					"$ref": "definitions.json#/definitions/contributedTypeAttributes"
 				},
 				"relationships": {
 					"type": "object",
@@ -164,6 +22,35 @@
 						},
 						"submitter": {
 							"$ref": "definitions.json#/definitions/peopleReference"
+						},
+						"content_blobs": {
+							"type": "object",
+							"properties": {
+								"data": {
+									"type": "array",
+									"minItems": 1,
+									"uniqueItems": true,
+									"items": {
+										"properties": {
+											"id": {
+												"type": "string",
+												"minLength": 1
+											},
+											"type": {
+												"type": "string",
+												"minLength": 1
+											}
+										},
+										"required": [
+											"id",
+											"type"
+										]
+									}
+								}
+							},
+							"required": [
+								"data"
+							]
 						},
 						"people": {
 							"$ref": "definitions.json#/definitions/peopleReferenceList"
@@ -193,6 +80,7 @@
 					"required": [
 						"creators",
 						"submitter",
+						"content_blobs",
 						"people",
 						"projects",
 						"investigations",

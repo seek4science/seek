@@ -91,10 +91,10 @@
 			"type": "object",
 			"properties": {
 				"tags": {
-					"$ref": "#/definitions/tagsType"
+					"$ref": "definitions.json#/definitions/tagsType"
 				},
 				"title": {
-					"$ref": "#/definitions/nonEmptyString"
+					"$ref": "definitions.json#/definitions/nonEmptyString"
 				},
 				"description": {
 					"oneOf": [
@@ -102,134 +102,76 @@
 							"type": "null"
 						},
 						{
-							"$ref": "#/definitions/nonEmptyString"
-						}
-					]
-				},
-				"version": {
-					"type": "number"
+					"$ref": "definitions.json#/definitions/nonEmptyString"}]
 				},
 				"license": {
-					"$ref": "#/definitions/nonEmptyString"
-				},
-				"latest_version": {
-					"type": "object",
-					"properties": {
-						"title": {
-							"$ref": "#/definitions/nonEmptyString"
-						},
-						"description": {
-							"oneOf": [
-								{
-									"type": "null"
-								},
-								{
-									"$ref": "#/definitions/nonEmptyString"
-								}
-							]
-						},
-						"version": {
-							"type": "number"
-						},
-						"revision_comments": {
-							"oneOf": [
-								{
-									"type": "null"
-								},
-								{
-									"$ref": "#/definitions/nonEmptyString"
-								}
-							]
-						},
-						"license": {
-							"$ref": "#/definitions/nonEmptyString"
-						},
-						"uuid": {
-							"$ref": "#/definitions/nonEmptyString"
-						},
-						"created_at": {
-							"$ref": "#/definitions/dateTimeString"
-						},
-						"updated_at": {
-							"$ref": "#/definitions/dateTimeString"
-						}
-					},
-					"required": [
-						"title",
-						"description",
-						"version",
-						"license",
-						"uuid",
-						"created_at",
-						"updated_at"
-					]
-				},
-				"content_blobs": {
-					"type": "array",
-					"minItems": 1,
-					"uniqueItems": true,
-					"items": {
-						"properties": {
-							"content_blob_id": {
-								"$ref": "#/definitions/nonEmptyString"
-							},
-							"original_filename": {
-								"$ref": "#/definitions/nonEmptyString"
-							},
-							"content_type": {
-								"$ref": "#/definitions/nonEmptyString"
-							},
-							"is_webpage": {
-								"type": "boolean"
-							},
-							"external_link": {
-								"type": "boolean"
-							},
-							"file_size": {
-								"type": "number"
-							},
-							"url": {
-								"oneOf": [
-									{
-										"type": "null"
-									},
-									{
-										"$ref": "#/definitions/uriString"
-									}
-								]
-							},
-							"uuid": {
-								"$ref": "#/definitions/nonEmptyString"
-							}
-						},
-						"required": [
-							"content_blob_id",
-							"original_filename",
-							"content_type",
-							"is_webpage",
-							"external_link",
-							"file_size",
-							"uuid"
-						]
-					}
-				},
-				"current_revision_comments": {
 					"oneOf": [
 						{
 							"type": "null"
 						},
 						{
-							"$ref": "#/definitions/nonEmptyString"
+					"$ref": "definitions.json#/definitions/nonEmptyString"}]
+				},
+				"latest_version": {
+					"type": "number"
+				},
+				"versions": {
+					"type": "array",
+					"minItems": 1,
+					"uniqueItems": true,
+					"items": {
+						"properties": {
+							"version": {
+								"type": "number"
+							},
+							"revision_comments": {
+													"oneOf": [
+						{
+							"type": "null"
+						},
+						{
+"$ref": "definitions.json#/definitions/nonEmptyString"}]
+							}
+						},
+						"required": [
+							"version"
+						]
+					}
+				},
+				"requested_version": {
+					"type": "object",
+					"properties": {
+						"version": {
+							"type": "number"
+						},
+						"revision_comments": {
+					"oneOf": [
+						{
+							"type": "null"
+						},
+						{
+							"$ref": "definitions.json#/definitions/nonEmptyString"}]
+						},
+						"created_at": {
+							"$ref": "definitions.json#/definitions/dateTimeString"
+						},
+						"updated_at": {
+							"$ref": "definitions.json#/definitions/dateTimeString"
 						}
+					},
+					"required": [
+						"version",
+						"created_at",
+						"updated_at"
 					]
 				}
 			},
 			"required": [
 				"title",
-				"version",
 				"license",
 				"latest_version",
-				"content_blobs"
+				"versions",
+				"requested_version"
 			]
 		},
 		"assaysType": {
@@ -647,7 +589,7 @@
 			"type": "string",
 			"minLength": 1,
 			"enum": [
-				"sample_types"
+				"sampleTypes"
 			]
 		},
 		"sampleTypesReference": {
