@@ -3,6 +3,7 @@ class Organism < ActiveRecord::Base
 
   acts_as_favouritable
   grouped_pagination
+  acts_as_uniquely_identifiable
 
   linked_to_bioportal apikey: Seek::Config.bioportal_api_key
 

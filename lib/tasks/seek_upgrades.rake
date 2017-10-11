@@ -19,6 +19,7 @@ namespace :seek do
     update_relationship_types
     flag_simulation_data
     rebuild_rdf
+    generate_organism_uuids
 
   ]
 
@@ -111,6 +112,14 @@ namespace :seek do
       FileUtils.rm_r(dir,force:true)
     end
     Rake::Task['seek_rdf:generate'].invoke
+  end
+
+  task(generate_organism_uuids: :environment) do
+    Organism.all.each do |org|
+      org.check_uuid
+      org.record_timestamps = false
+      org.save!
+    end
   end
 
 end
