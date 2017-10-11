@@ -589,7 +589,7 @@
 			"type": "string",
 			"minLength": 1,
 			"enum": [
-				"sampleTypes"
+				"sample_types"
 			]
 		},
 		"sampleTypesReference": {

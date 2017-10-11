@@ -4,6 +4,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+  include RestTestCases
 
   def setup
     login_as(:quentin)

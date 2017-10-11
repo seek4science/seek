@@ -9,7 +9,7 @@
 					"$ref": "definitions.json#/definitions/nonEmptyString"
 				},
 				"type": {
-					"$ref": "definitions.json#/definitions/dataFilesType"
+					"$ref": "definitions.json#/definitions/presentationsType"
 				},
 				"attributes": {
 					"$ref": "definitions.json#/definitions/contributedTypeAttributes"
