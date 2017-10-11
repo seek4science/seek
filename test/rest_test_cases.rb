@@ -90,7 +90,7 @@ module RestTestCases
   end
 
 
-  def test_show_json(object = rest_api_test_object)
+  def test_aab_show_json(object = rest_api_test_object)
     get :show, id: object, format: 'json'
     perform_jsonapi_checks
     validate_json (get_schema_file_path)

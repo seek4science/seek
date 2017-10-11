@@ -12,7 +12,70 @@
 					"$ref": "definitions.json#/definitions/publicationsType"
 				},
 				"attributes": {
-					"$ref": "definitions.json#/definitions/contributedTypeAttributes"
+					"type": "object",
+					"properties": {
+						"title": {
+							"$ref": "definitions.json#/definitions/nonEmptyString"
+						},
+						"journal": {
+							"oneOf": [
+								{
+									"type": "null"
+								},
+								{
+							"$ref": "definitions.json#/definitions/nonEmptyString"
+}
+]
+						},
+						"published_date": {
+							"$ref": "definitions.json#/definitions/nonEmptyString"
+						},
+						"doi": {
+							"oneOf": [
+								{
+									"type": "null"
+								},
+								{
+							"$ref": "definitions.json#/definitions/uriString"
+}
+]
+						},
+						"pubmed_id": {
+							"type": "number"
+						},
+						"abstract": {
+							"oneOf": [
+								{
+									"type": "null"
+								},
+								{
+							"$ref": "definitions.json#/definitions/nonEmptyString"}]
+						},
+						"citation": {
+							"oneOf": [
+								{
+									"type": "null"
+								},
+								{
+							"$ref": "definitions.json#/definitions/nonEmptyString"}]
+						},
+						"link_to_pub": {							"oneOf": [
+								{
+									"type": "null"
+								},
+								{
+
+							"$ref": "definitions.json#/definitions/uriString"}]
+						}
+					},
+					"required": [
+						"title",
+						"journal",
+						"published_date",
+						"pubmed_id",
+						"citation",
+						"link_to_pub"
+					]
 				},
 				"relationships": {
 					"type": "object",
@@ -22,7 +85,7 @@
 							"properties": {
 								"data": {
 									"type": "array",
-									"minItems": 1,
+									"minItems": 0,
 									"uniqueItems": true,
 									"items": {
 										"properties": {
