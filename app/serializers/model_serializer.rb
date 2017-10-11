@@ -1,7 +1,15 @@
 class ModelSerializer < ContributedResourceSerializer
-  attributes :model_type, :model_format
+
+  attribute :model_type do
+    object.model_type.try(:title)
+  end
+
+  attribute :model_format do
+    object.model_format.try(:title)
+  end
+
   attribute :environment do
-    object.recommended_environment
+    object.recommended_environment.try(:title)
   end
 
   has_many :people
