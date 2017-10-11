@@ -4,12 +4,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
 
   def setup
     login_as(:quentin)
   end
 
+  # Is this still needed?
   def rest_api_test_object
     Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
   end
