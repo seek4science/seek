@@ -12,7 +12,6 @@ class PersonSerializer < AvatarObjSerializer
   attribute :tools do
     serialize_annotations(object, context="tool")
   end
-  has_many :work_groups, include_data:true
 
   has_many :projects
   has_many :institutions
