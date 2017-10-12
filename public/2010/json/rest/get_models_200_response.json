@@ -21,12 +21,7 @@
 							"$ref": "definitions.json#/definitions/peopleReferenceList"
 						},
 						"submitter": {
-							"type": "object",
-							"properties": {
-								"data": {
-									"$ref": "definitions.json#/definitions/peopleReference"
-								}
-							}
+							"$ref": "definitions.json#/definitions/peopleReferenceList"
 						},
 						"people": {
 							"$ref": "definitions.json#/definitions/peopleReferenceList"
