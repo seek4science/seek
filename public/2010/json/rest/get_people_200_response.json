@@ -118,35 +118,6 @@
 				"relationships": {
 					"type": "object",
 					"properties": {
-						"work_groups": {
-							"type": "object",
-							"properties": {
-								"data": {
-									"type": "array",
-									"minItems": 1,
-									"uniqueItems": true,
-									"items": {
-										"properties": {
-											"id": {
-												"type": "string",
-												"minLength": 1
-											},
-											"type": {
-												"type": "string",
-												"minLength": 1
-											}
-										},
-										"required": [
-											"id",
-											"type"
-										]
-									}
-								}
-							},
-							"required": [
-								"data"
-							]
-						},
 						"projects": {
 							"$ref": "definitions.json#/definitions/projectsReferenceList"
 						},
