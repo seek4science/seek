@@ -156,7 +156,6 @@
 						}
 					},
 					"required": [
-						"work_groups",
 						"projects",
 						"institutions",
 						"investigations",
