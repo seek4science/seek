@@ -84,16 +84,12 @@ class BaseSerializer < SimpleBaseSerializer
 
 
   def self_link
-    if @scope && @scope.is_a?(Hash) && @scope[:requested_version]
-      polymorphic_path(object,version:@scope[:requested_version])
-    else
-       polymorphic_path(object)
-    end
+    polymorphic_path(object)
   end
 
   def _links
       {self: self_link}
-      end
+  end
 
   #avoid dash-erizing attribute names
   def format_name(attribute_name)
@@ -111,10 +107,6 @@ class BaseSerializer < SimpleBaseSerializer
 
   def initialize(object, options = {})
     super
-
-    if object.is_asset? && object.versioned? && @scope && @scope.is_a?(Hash)
-      @scope[:requested_version] ||= object.version
-    end
 
     #access related resources with proper authorization & ignore version subclass
     if (object.class.to_s.include?("::Version"))

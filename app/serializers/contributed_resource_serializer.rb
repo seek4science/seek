@@ -12,17 +12,8 @@ class ContributedResourceSerializer < PCSSerializer
     versions_data
   end
 
-  def get_version
-  v = @scope[:requested_version]
-  if v.nil?
-    v = object.version
-  end
-
-  object.find_version(v)
-  end
-
-   attribute :version do
-     get_version.version
+  attribute :version do
+    version_number
   end
 
   attribute :revision_comments do
@@ -31,20 +22,20 @@ class ContributedResourceSerializer < PCSSerializer
 
   attribute :created_at do
     get_version.created_at
-    end
+  end
   attribute :updated_at do
     get_version.updated_at
   end
 
- has_many :content_blobs do
-   v = @scope[:requested_version]
-   if v.nil?
-     v = object.version
-   end
+  has_many :content_blobs do
+    v = @scope[:requested_version]
+    if v.nil?
+      v = object.version
+    end
 
-   requested_version = object.find_version(v)
+    requested_version = object.find_version(v)
 
-   blobs = []
+    blobs = []
     if defined?(requested_version.content_blobs)
       requested_version.content_blobs.each do |cb|
         blobs.append(cb)
@@ -53,6 +44,24 @@ class ContributedResourceSerializer < PCSSerializer
       blobs.append(requested_version.content_blob)
     end
     blobs
- end
+  end
+
+  def self_link
+    if version_number
+      polymorphic_path(object,version:version_number)
+    else
+      polymorphic_path(object)
+    end
+  end
+
+  private
+
+  def version_number
+    @scope[:requested_version] || object.try(:version)
+  end
+
+  def get_version
+    object.find_version(version_number)
+  end
 
 end
