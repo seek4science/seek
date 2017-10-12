@@ -66,6 +66,13 @@
 								{
 
 							"$ref": "definitions.json#/definitions/uriString"}]
+						},
+						"authors": {							"oneOf": [
+							{
+								"type": "null"
+							},
+							{
+							"$ref": "definitions.json#/definitions/nonEmptyStringList"}]
 						}
 					},
 					"required": [
@@ -80,35 +87,6 @@
 				"relationships": {
 					"type": "object",
 					"properties": {
-						"publication_authors": {
-							"type": "object",
-							"properties": {
-								"data": {
-									"type": "array",
-									"minItems": 0,
-									"uniqueItems": true,
-									"items": {
-										"properties": {
-											"id": {
-												"type": "string",
-												"minLength": 1
-											},
-											"type": {
-												"type": "string",
-												"minLength": 1
-											}
-										},
-										"required": [
-											"id",
-											"type"
-										]
-									}
-								}
-							},
-							"required": [
-								"data"
-							]
-						},
 						"people": {
 							"$ref": "definitions.json#/definitions/peopleReferenceList"
 						},
@@ -141,7 +119,6 @@
 						}
 					},
 					"required": [
-						"publication_authors",
 						"people",
 						"projects",
 						"investigations",

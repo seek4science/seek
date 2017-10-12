@@ -12,7 +12,14 @@ class PublicationSerializer < BaseSerializer
       ""
     end
   end
-  has_many :publication_authors, include_data:true
+
+  attribute :authors do
+    if object.publication_author_names.blank?
+      []
+    else
+     object.publication_author_names
+      end
+  end
 
   has_many :people
   has_many :projects
