@@ -1776,7 +1776,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df.id, json['data']['id'].to_i
     assert_equal 'fish flop', json['data']['attributes']['title']
     assert_equal 'testing json description', json['data']['attributes']['description']
-    assert_equal df.version, json['data']['attributes']['requested_version']['version']
+    assert_equal df.version, json['data']['attributes']['version']
   end
 
   test 'landing page for hidden item' do
