@@ -24,7 +24,8 @@ module Seek
         format.xml
         format.rdf { render template: 'rdf/show' }
 
-        format.json {render json: asset, scope: {requested_version: params[:version]}}
+        format.json {render json: asset,
+                            scope: {requested_version: params[:version]}}
       end
     end
 

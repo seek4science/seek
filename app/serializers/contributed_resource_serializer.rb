@@ -6,8 +6,10 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :versions do
     versions_data = []
     object.versions.each do |v|
+      path = polymorphic_path(object,version:v.version)
       versions_data.append({version: v.version,
-                            revision_comments: v.revision_comments.presence})
+                            revision_comments: v.revision_comments.presence,
+                           url: "#{base_url}#{path}"})
     end
     versions_data
   end
@@ -27,19 +29,32 @@ class ContributedResourceSerializer < PCSSerializer
     get_version.updated_at
   end
 
-  has_many :content_blobs do |serializer|
+  attribute :content_blobs do
 
-    requested_version = serializer.get_version
+    requested_version = get_version
 
     blobs = []
     if defined?(requested_version.content_blobs)
       requested_version.content_blobs.each do |cb|
-        blobs.append(cb)
+        blobs.append(convert_content_blob_to_json(cb))
       end
     elsif defined?(requested_version.content_blob)
-      blobs.append(requested_version.content_blob)
+      blobs.append(convert_content_blob_to_json(requested_version.content_blob))
     end
     blobs
+  end
+
+  def convert_content_blob_to_json(cb)
+    path = polymorphic_path([cb.asset, cb])
+    {
+        original_filename: cb.original_filename,
+        url: cb.url,
+        md5sum: cb.md5sum,
+        sha1sum: cb.sha1sum,
+        content_type: cb.content_type,
+        link: "#{base_url}#{path}",
+        size: cb.file_size
+    }
   end
 
   def self_link
