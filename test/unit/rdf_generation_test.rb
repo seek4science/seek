@@ -178,4 +178,14 @@ class RDFGenerationTest < ActiveSupport::TestCase
     assert_equal "http://localhost:3000/data_files/#{df.id}",df.rdf_seek_id
   end
 
+  test 'rdf_supported?' do
+    assert Factory(:person).rdf_supported?
+    assert Factory(:assay).rdf_supported?
+    assert Factory(:data_file).rdf_supported?
+
+
+    refute Factory(:event).rdf_supported?
+    refute Factory(:institution).rdf_supported?
+  end
+
 end
