@@ -20,7 +20,7 @@ class RdfGenerationJob < SeekJob
   end
 
   def gather_items
-    [item].compact
+    [item].compact.select(&:rdf_supported?)
   end
 
   def item

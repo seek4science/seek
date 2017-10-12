@@ -27,13 +27,9 @@ class ContributedResourceSerializer < PCSSerializer
     get_version.updated_at
   end
 
-  has_many :content_blobs do
-    v = @scope[:requested_version]
-    if v.nil?
-      v = object.version
-    end
+  has_many :content_blobs do |serializer|
 
-    requested_version = object.find_version(v)
+    requested_version = serializer.get_version
 
     blobs = []
     if defined?(requested_version.content_blobs)
@@ -54,14 +50,15 @@ class ContributedResourceSerializer < PCSSerializer
     end
   end
 
+  def get_version
+    object.find_version(version_number)
+  end
+
   private
 
   def version_number
     @scope[:requested_version] || object.try(:version)
   end
 
-  def get_version
-    object.find_version(version_number)
-  end
 
 end
