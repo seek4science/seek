@@ -285,6 +285,6 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def clear_sample_type_matches
-    Rails.cache.delete_matched("st-match-#{self.id}*") if md5sum_changed? || sha1sum_changed?
+    Rails.cache.delete_matched("st-match-#{self.id}*") if self.changed?
   end
 end
