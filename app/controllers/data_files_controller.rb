@@ -386,6 +386,8 @@ class DataFilesController < ApplicationController
           format.html { redirect_to @data_file }
         end
       end
+    rescue RestClient::Unauthorized
+      redirect_to @oauth_client.authorize_url
     rescue RestClient::ResourceNotFound
       flash[:error] = 'No sample metadata available.'
 
