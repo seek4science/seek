@@ -12,6 +12,9 @@ layout: page
 - [Editing your profile](editing-profile.html)
 - [Managing your account](managing-account.html)
 - [Adding assets (data, models, SOPs, publications) to SEEK](adding-assets.html)
+- [Creating new asset versions](uploading-new-versions.html)
+- [Comparing two versions of a Model](model-comparison.html)
+- [Executing a model on JWS Online](simulate-on-jws-online.html)
 - [Licenses](licenses.html)
 - [Generating the ISA structure](generating-the-isa-structure.html)
      - [Creating an Investigation](generating-the-isa-structure.html#creating-an-investigation)
@@ -59,7 +62,6 @@ layout: page
      - [Create a Sample Type](create-sample-type.html)
      - [Create a Sample](create-sample.html)
      - [Legacy Biosamples](legacy-biosamples.html)
-- [Executing a model on JWS Online](simulate-on-jws-online.html)
 - [Using SEEK with openBIS](openbis.html)
 - [Contributing to these SEEK Documents](/contributing.html)
 
