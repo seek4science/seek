@@ -34,6 +34,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
 gem 'json-schema'
+gem 'json-diff'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'

@@ -1,0 +1,34 @@
+{
+  "data": {
+    "id": "545947389",
+    "type": "institutions",
+    "attributes": {
+      "avatar": null,
+      "title": "A Minimal Institution",
+      "country": "Germany",
+      "city": null,
+      "address": null,
+      "web_page": null
+    },
+    "relationships": {
+      "people": {
+        "data": []
+      },
+      "projects": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/institutions/545947389"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

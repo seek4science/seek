@@ -9,6 +9,11 @@ end
 Factory.define(:admin_defined_role_programme, class: AdminDefinedRoleProgramme) do |_f|
 end
 
+Factory.define(:min_person, class: Person) do |f|
+  f.email "minimal_person@email.com"
+  f.last_name "Minimal"
+end
+
 Factory.define(:brand_new_person, class: Person) do |f|
   f.sequence(:email) { |n| "test#{n}@test.com" }
   f.sequence(:first_name) { |n| "Person#{n}" }
@@ -128,15 +133,28 @@ Factory.define(:programme) do |f|
   end
 end
 
+Factory.define(:min_programme, class: Programme) do |f|
+  f.title "A Minimal Programme"
+end
+
 # Project
 Factory.define(:project) do |f|
   f.sequence(:title) { |n| "A Project: -#{n}" }
+end
+
+Factory.define(:min_project, class: Project) do |f|
+  f.title "A Minimal Project"
 end
 
 # Institution
 Factory.define(:institution) do |f|
   f.sequence(:title) { |n| "An Institution: #{n}" }
   f.country { ISO3166::Country.all.sample.name }
+end
+
+Factory.define(:min_institution, class: Institution) do |f|
+  f.title "A Minimal Institution"
+  f.country "Germany"
 end
 
 # Sop

@@ -3,6 +3,7 @@
 require 'libxml'
 require 'pp'
 require 'json-schema'
+require 'json-diff'
 
 module RestTestCases
   XML_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
@@ -118,6 +119,31 @@ module RestTestCases
       get :show, id: id, format: format
       assert_response :not_found
     end
+  end
+
+  def test_min_content
+    object = min_test_object
+    json_file = File.join(Rails.root, 'public', '2010', 'json', 'content_compare',
+                          "min_#{@controller.controller_name.classify.downcase}.json")
+    #parse such that backspace is eliminated + null turns to nil
+    json_to_compare = JSON.parse(File.read(json_file))
+
+    get :show, id: object, format: 'json'
+    assert_response :success
+    puts @response.body
+    diff = JsonDiff.diff(json_to_compare,JSON.parse(@response.body))
+    for el in diff
+      #the self link must start with the pluralized controller's name (e.g. /people)
+      if (el["path"] =~ /self/)
+        assert el["value"] =~ /^\/#{@controller.controller_name.pluralize}/
+      end
+    end
+
+    diff.delete_if {
+        |el| el["path"] =~ /id|created|modified|uuid|jsonapi|self/
+    }
+
+    assert_equal [], diff
   end
 
   def perform_api_checks
