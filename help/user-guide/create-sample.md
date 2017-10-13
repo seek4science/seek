@@ -31,9 +31,9 @@ The form is split into the attributes required for the sample type:
 
 And then the general metadata information including
  
-* [Projects](generic-linking-variables.html#projects)
-* [Sharing](generic-linking-variables.html#sharing)
-* [Tags](generic-linking-variables.html#tags)
+* [Projects](general-attributes.html#projects)
+* [Sharing](general-attributes.html#sharing)
+* [Tags](general-attributes.html#tags)
 * Creators 
 
 Once you have completed all of the information select Create.

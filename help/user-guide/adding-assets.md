@@ -23,13 +23,13 @@ SEEK will show a preview of the link
 
 Assets in SEEK can be described using a number of fields, for example:
 
-* [Title](generic-linking-variables.html#title)
-* [Description](generic-linking-variables.html#description)
-* [Projects](generic-linking-variables.html#projects)
-* [Sharing](generic-linking-variables.html#sharing)
-* [Tags](generic-linking-variables.html#tags)
-* [Attributions](generic-linking-variables.html#attributions)
-* [Contributors](generic-linking-variables.html#contributors)
-* [Publications](generic-linking-variables.html#publications)
-* [Experimental assays and Modelling analysis](generic-linking-variables.html#experimental-assays-and-modelling-analysis)
-* [Events](generic-linking-variables.html#events)
+* [Title](general-attributes.html#title)
+* [Description](general-attributes.html#description)
+* [Projects](general-attributes.html#projects)
+* [Sharing](general-attributes.html#sharing)
+* [Tags](general-attributes.html#tags)
+* [Attributions](general-attributes.html#attributions)
+* [Contributors](general-attributes.html#contributors)
+* [Publications](general-attributes.html#publications)
+* [Experimental assays and Modelling analysis](general-attributes.html#experimental-assays-and-modelling-analysis)
+* [Events](general-attributes.html#events)

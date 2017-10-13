@@ -1,6 +1,7 @@
 ---
 title: SEEK User Guide - Generic linking variables
 layout: page
+redirect_from: "/help/user-guide/generic-linking-variables.html"
 ---
 
 # Generic linking variables in SEEK

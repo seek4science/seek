@@ -31,10 +31,10 @@ First we will show generating a Sample type through manually creating a sample t
 
 Sample Type allows you to include:
  
-* [Title](generic-linking-variables.html#title)
-* [Description](generic-linking-variables.html#description)
-* [Projects](generic-linking-variables.html#projects)
-* [Tags](generic-linking-variables.html#tags)
+* [Title](general-attributes.html#title)
+* [Description](general-attributes.html#description)
+* [Projects](general-attributes.html#projects)
+* [Tags](general-attributes.html#tags)
 
 
 You can define your own attributes for the Sample Type. 
@@ -87,10 +87,10 @@ When creating the sample type, first choose the tab _Use spreadsheet template_
 
 On the initial Sample Template page you can include the following metadata:
  
-* [Title](generic-linking-variables.html#title)
-* [Description](generic-linking-variables.html#description)
-* [Projects](generic-linking-variables.html#projects)
-* [Tags](generic-linking-variables.html#tags)
+* [Title](general-attributes.html#title)
+* [Description](general-attributes.html#description)
+* [Projects](general-attributes.html#projects)
+* [Tags](general-attributes.html#tags)
  
 and then also select Choose File to select a sample template to upload:
 

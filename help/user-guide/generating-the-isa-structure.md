@@ -13,11 +13,11 @@ The investigation is a high level concept that links related studies. To generat
 
 An investigation is described and linked using the following fields:
 
-* [Title](generic-linking-variables.html#title)
-* [Description](generic-linking-variables.html#description)
-* [Contributors](generic-linking-variables.html#contributors)
-* [Sharing](generic-linking-variables.html#sharing)
-* [Publications](generic-linking-variables.html#publications)
+* [Title](general-attributes.html#title)
+* [Description](general-attributes.html#description)
+* [Contributors](general-attributes.html#contributors)
+* [Sharing](general-attributes.html#sharing)
+* [Publications](general-attributes.html#publications)
 
 
 
@@ -28,13 +28,13 @@ A study is a particular biological hypothesis or analysis. Multiple studies can 
 
 A study is described and linked using the following fields:
 
-* [Title](generic-linking-variables.html#title)
-* [Description](generic-linking-variables.html#description)
-* [Experimentalists](generic-linking-variables.html#experimentalists)
-* [Investigation details](generic-linking-variables.html#investigation-details)
-* [Contributors](generic-linking-variables.html#contributors)
-* [Sharing](generic-linking-variables.html#sharing)
-* [Publications](generic-linking-variables.html#publications)
+* [Title](general-attributes.html#title)
+* [Description](general-attributes.html#description)
+* [Experimentalists](general-attributes.html#experimentalists)
+* [Investigation details](general-attributes.html#investigation-details)
+* [Contributors](general-attributes.html#contributors)
+* [Sharing](general-attributes.html#sharing)
+* [Publications](general-attributes.html#publications)
 
 ## Creating an experimental assay
 An assay is in general an experiment that converts either a material or data sample, into a new material or data sample, via a protocol. Multiple assays can be connected to a Study. Experimental assays refer specifically to laboratory assays. You can select to make an experimental assay by selecting assay from the create menu at the top of the SEEK.
@@ -47,19 +47,19 @@ You can then choose an assay type. Select experimental assay.
 
 A experimental assay is described and linked using the following fields:
 
-* [Title](generic-linking-variables.html#title)
-* [Description](generic-linking-variables.html#description)
-* [Study](generic-linking-variables.html#study)
-* [Assay Type](generic-linking-variables.html#assay-type)
-* [Technology Type](generic-linking-variables.html#technology-type)
-* [Organisms](generic-linking-variables.html#organisms)
-* [Contributors](generic-linking-variables.html#contributors)
-* [Sharing](generic-linking-variables.html#sharing)
-* [Tags](generic-linking-variables.html#tags)
-* [Contributors](generic-linking-variables.html#contributors)
-* [SOPs](generic-linking-variables.html#sops)
-* [Data Files](generic-linking-variables.html#data-files)
-* [Publications](generic-linking-variables.html#publications)
+* [Title](general-attributes.html#title)
+* [Description](general-attributes.html#description)
+* [Study](general-attributes.html#study)
+* [Assay Type](general-attributes.html#assay-type)
+* [Technology Type](general-attributes.html#technology-type)
+* [Organisms](general-attributes.html#organisms)
+* [Contributors](general-attributes.html#contributors)
+* [Sharing](general-attributes.html#sharing)
+* [Tags](general-attributes.html#tags)
+* [Contributors](general-attributes.html#contributors)
+* [SOPs](general-attributes.html#sops)
+* [Data Files](general-attributes.html#data-files)
+* [Publications](general-attributes.html#publications)
 
 ## Creating a modelling analysis
 An assay is in general an experiment that converts either a material or data sample, into a new material or data sample, via a protocol. Multiple assays can be connected to a Study. Modelling analysis refer specifically to simulations (in silico experiments) of models. You can select to make an modelling analysis by selecting assay from the create menu at the top of the SEEK.
@@ -72,15 +72,15 @@ You can then choose an assay type. Select modelling analysis.
 
 A modelling assay is described and linked using the following fields:
 
-* [Title](generic-linking-variables.html#title)
-* [Description](generic-linking-variables.html#description)
-* [Study](generic-linking-variables.html#study)
-* [Biological Problem Addressed](generic-linking-variables.html#biological-problem-addressed)
-* [Organisms](generic-linking-variables.html#organisms)
-* [Contributors](generic-linking-variables.html#contributors)
-* [Sharing](generic-linking-variables.html#sharing)
-* [Tags](generic-linking-variables.html#tags)
-* [Contributors](generic-linking-variables.html#contributors)
-* [SOPs](generic-linking-variables.html#sops)
-* [Data Files](generic-linking-variables.html#data-files)
-* [Publications](generic-linking-variables.html#publications)
+* [Title](general-attributes.html#title)
+* [Description](general-attributes.html#description)
+* [Study](general-attributes.html#study)
+* [Biological Problem Addressed](general-attributes.html#biological-problem-addressed)
+* [Organisms](general-attributes.html#organisms)
+* [Contributors](general-attributes.html#contributors)
+* [Sharing](general-attributes.html#sharing)
+* [Tags](general-attributes.html#tags)
+* [Contributors](general-attributes.html#contributors)
+* [SOPs](general-attributes.html#sops)
+* [Data Files](general-attributes.html#data-files)
+* [Publications](general-attributes.html#publications)
