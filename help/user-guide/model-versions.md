@@ -25,8 +25,12 @@ If you want to edit the metadata associated with the file you need to edit this 
 ![revision comments](/images/user-guide/revision_comments.png){:.screenshot}
 
 After uploading, you will be able to see the two versions displayed in the metadata.
+
+Note that, earlier versions are only visible if logged into SEEK. Anonymous users can only see the latest version.
  
 ![two versions](/images/user-guide/two_versions.png){:.screenshot}
+
+
 
 
 # Comparing two versions of a Model
@@ -35,9 +39,11 @@ After uploading, you will be able to see the two versions displayed in the metad
 
 If a model has a number of versions, you can compare between two versions to see what was changed.
  
-![two versions](/images/user-guide/two_versions.png){:.screenshot}
+![two versions](/images/user-guide/two_versions-zoomed.png){:.screenshot}
 
-Navigate down to the Version History and click _Compare_.
+Scroll down to the Version History towards the end of the page, and click _Compare_.
+
+You can only compare versions if you are logged into SEEK.
 
 ![compare versions](/images/user-guide/compare_versions.png){:.screenshot}
 
