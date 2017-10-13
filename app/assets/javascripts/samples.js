@@ -79,6 +79,25 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
                 }
             });
         }
+        // SEEK sample columns
+        var seekSampleColumns = [];
+        $j('table thead th', selector).each(function (index, column) {
+            if($j(column).data('columnType') == 'SeekSample') {
+                seekSampleColumns.push(index);
+            }
+        });
+        if(seekSampleColumns.length > 0) {
+            options["columnDefs"].push({
+                "targets": seekSampleColumns,
+                "render": function (data, type, row) {
+                    if (data) {
+                        return '<a href="/samples/' + data + '">' + data + '</a>';
+                    } else {
+                        return '<span class="none_text">Not specified</span>';
+                    }
+                }
+            });
+        }
 
         // Title column
         $j('table thead th', selector).each(function (index, column) {
