@@ -25,7 +25,7 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, -> { where(is_title: true) }
 
-  delegate :controlled_vocab?, :seek_sample?, :seek_strain?, to: :sample_attribute_type, allow_nil: true
+  delegate :controlled_vocab?, :seek_sample?, :seek_strain?, :seek_resource?, to: :sample_attribute_type, allow_nil: true
 
   # to store that this attribute should be linked to the sample_type it is being assigned to, but needs to wait until the
   # sample type exists
