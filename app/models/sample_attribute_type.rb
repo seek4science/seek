@@ -71,7 +71,7 @@ class SampleAttributeType < ActiveRecord::Base
   end
 
   def seek_resource?
-    base_type_handler.is_a?(Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeTypeHandler)
+    base_type_handler({}).is_a?(Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeTypeHandler)
   end
 
   def seek_sample?
