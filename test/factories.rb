@@ -295,6 +295,12 @@ Factory.define :assay_asset do |f|
   f.association :asset, factory: :data_file
 end
 
+Factory.define(:min_assay, class: Assay) do |f|
+  f.title "A Minimal Assay"
+  f.association :assay_class, factory: :experimental_assay_class
+  f.association :study, factory: :min_study
+end
+
 # Study
 Factory.define(:study) do |f|
   f.sequence(:title) { |n| "Study#{n}" }
@@ -302,11 +308,21 @@ Factory.define(:study) do |f|
   f.association :contributor, factory: :person
 end
 
+Factory.define(:min_study, class: Study) do |f|
+  f.title "A Minimal Study"
+  f.association :investigation, factory: :min_investigation
+end
+
 # Investigation
 Factory.define(:investigation) do |f|
   f.projects { [Factory.build(:project)] }
   f.sequence(:title) { |n| "Investigation#{n}" }
   f.association :contributor, factory: :person
+end
+
+Factory.define(:min_investigation, class: Investigation) do |f|
+  f.title "A Minimal Investigation"
+  f.projects { [Factory.build(:min_project)] }
 end
 
 # Strain
