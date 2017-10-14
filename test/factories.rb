@@ -333,6 +333,11 @@ Factory.define(:strain) do |f|
   f.association :contributor, factory: :person
 end
 
+Factory.define(:min_strain, class: Strain) do |f|
+  f.title 'A Minimal Strain'
+  f.association :organism, factory: :min_organism
+  f.projects {[Factory.build(:min_project)]}
+end
 # Culture growth type
 Factory.define(:culture_growth_type) do |f|
   f.title 'a culture_growth_type'
@@ -672,7 +677,9 @@ end
 Factory.define(:organism) do |f|
   f.title 'An Organism'
 end
-
+Factory.define(:min_organism, class: Organism) do |f|
+  f.title 'A Minimal Organism'
+end
 Factory.define(:bioportal_concept) do |f|
   f.ontology_id 'NCBITAXON'
   f.concept_uri 'http://purl.obolibrary.org/obo/NCBITaxon_2287'
@@ -684,6 +691,12 @@ Factory.define(:event) do |f|
   f.end_date 1.days.from_now
   f.projects { [Factory.build(:project)] }
   f.association :contributor, factory: :person
+end
+
+Factory.define(:min_event, class: Event) do |f|
+  f.title 'A Minimal Event'
+  f.start_date "2017-01-01T00:01:00.000Z"
+  f.projects { [Factory.build(:min_project)] }
 end
 
 Factory.define(:saved_search) do |f|
