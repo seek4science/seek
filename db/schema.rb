@@ -600,21 +600,26 @@ ActiveRecord::Schema.define(version: 20171006143805) do
   add_index "experimental_conditions", ["sop_id"], name: "index_experimental_conditions_on_sop_id", using: :btree
 
   create_table "external_assets", force: :cascade do |t|
-    t.string   "external_service",   limit: 255,             null: false
-    t.string   "external_id",        limit: 255,             null: false
+    t.string   "external_service",   limit: 255,               null: false
+    t.string   "external_id",        limit: 255,               null: false
     t.string   "external_mod_stamp", limit: 255
+    t.string   "external_type",      limit: 255
     t.datetime "synchronized_at"
-    t.integer  "sync_state",         limit: 1,   default: 0, null: false
+    t.integer  "sync_state",         limit: 1,     default: 0, null: false
+    t.text     "sync_options_json",  limit: 65535
+    t.integer  "version",            limit: 4,     default: 0, null: false
     t.integer  "seek_entity_id",     limit: 4
     t.string   "seek_entity_type",   limit: 255
-    t.integer  "version",            limit: 4,   default: 0, null: false
+    t.integer  "seek_service_id",    limit: 4
+    t.string   "seek_service_type",  limit: 255
     t.string   "class_type",         limit: 255
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
   end
 
   add_index "external_assets", ["external_id", "external_service"], name: "external_assets_by_external_id", unique: true, using: :btree
   add_index "external_assets", ["seek_entity_type", "seek_entity_id"], name: "index_external_assets_on_seek_entity_type_and_seek_entity_id", using: :btree
+  add_index "external_assets", ["seek_service_type", "seek_service_id"], name: "index_external_assets_on_seek_service_type_and_seek_service_id", using: :btree
 
   create_table "favourite_group_memberships", force: :cascade do |t|
     t.integer  "person_id",          limit: 4

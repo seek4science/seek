@@ -44,6 +44,7 @@ class Assay < ActiveRecord::Base
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample'
 
   has_one :investigation, through: :study
+  has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   validates_presence_of :assay_type_uri
   validates_presence_of :technology_type_uri, unless: :is_modelling?

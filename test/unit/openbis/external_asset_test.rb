@@ -84,32 +84,32 @@ class ExternalAssetTest < ActiveSupport::TestCase
 
   end
 
-  test 'stores UTF string content that can be retrieved' do
+  test 'stores UTF string in local_content_json that can be retrieved' do
     asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '25'})
-    asset1.content = 'Tomekółść'
+    asset1.local_content_json = 'Tomekółść'
     assert asset1.save
 
     asset2 = ExternalAsset.last
     assert_equal asset1, asset2
-    assert_equal 'Tomekółść', asset2.content
+    assert_equal 'Tomekółść', asset2.local_content_json
 
   end
 
-  test 'updates content on save' do
+  test 'updates local_content_json on save' do
     asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '25'})
-    asset1.content = 'Tomekółść'
+    asset1.local_content_json = 'Tomekółść'
     assert asset1.save
-    asset1.content = 'Tomek1'
+    asset1.local_content_json = 'Tomek1'
     assert asset1.save
 
     asset2 = ExternalAsset.last
     assert_equal asset1, asset2
-    assert_equal 'Tomek1', asset2.content
+    assert_equal 'Tomek1', asset2.local_content_json
 
-    asset1.content = 'Tomek2'
+    asset1.local_content_json = 'Tomek2'
     assert asset1.save
     asset2.reload
-    assert_equal 'Tomek2', asset2.content
+    assert_equal 'Tomek2', asset2.local_content_json
 
   end
 
@@ -122,7 +122,7 @@ class ExternalAssetTest < ActiveSupport::TestCase
 
     assert_no_difference('ExternalAsset.count') do
       assert_no_difference('ContentBlob.count') do
-        assert asset1.content = "23"
+        assert asset1.local_content_json = "23"
       end
     end
 
@@ -133,5 +133,136 @@ class ExternalAssetTest < ActiveSupport::TestCase
     end
 
   end
+
+  test 'options are serialized before saving and read back' do
+    asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '24'})
+    opt = {"tomek" => 2}
+    asset1.sync_options = opt
+    refute asset1.sync_options_json
+
+    assert asset1.save
+    assert_equal '{"tomek":2}', asset1.sync_options_json
+
+    asset1.sync_options = nil
+    asset2 = ExternalAsset.find(asset1.id)
+    assert_equal opt, asset2.sync_options
+
+  end
+
+  class TmpJson1
+    attr_reader :json
+    def  initialize
+      @json = 'Ha'
+    end
+
+    def to_json
+      raise 'should not be called'
+    end
+
+  end
+
+  class TmpJson2
+    attr_reader :json
+    def  initialize
+      @json = {'Ha' => 1}
+    end
+
+    def to_json
+      raise 'should not be called'
+    end
+
+  end
+
+
+  test 'serialize calls defaults json methods, fields' do
+    asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '24'})
+
+    assert_equal '[2,3]', asset1.serialize_content([2, 3])
+    assert_equal '{"t":false}', asset1.serialize_content({t: false})
+    assert_equal 'Ha', asset1.serialize_content(TmpJson1.new)
+    assert_equal '{"Ha":1}', asset1.serialize_content(TmpJson2.new)
+
+  end
+
+  test 'setting content object updates state' do
+    asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '24'})
+
+    obj = {key: 123}
+    asset1.content = obj
+
+    assert asset1.synchronized_at
+    assert_equal 'synchronized', asset1.sync_state
+    assert asset1.synchronized?
+    assert_equal 1, asset1.version
+
+    assert_same obj, asset1.content
+    assert asset1.save
+    assert_equal '{"key":123}', asset1.local_content_json
+
+  end
+
+  test 'accessing content deserialized local json if synchronized' do
+    asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '24'})
+
+    obj = {"tomek"=> 'yes'}
+    asset1.sync_state = :synchronized
+    asset1.local_content_json = obj.to_json
+    assert asset1.save
+
+    assert_equal obj, asset1.content
+    asset2 = ExternalAsset.find(asset1.id)
+    assert_equal obj, asset2.content
+
+  end
+
+  test 'accessing content triggers not implemented fetching if state is not synchronized' do
+    asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '24'})
+
+    obj = {"tomek"=> 'yes'}
+    asset1.content = obj
+    asset1.sync_state = :refresh
+
+    assert_raises(Exception) do
+      assert_equal obj, asset1.content
+    end
+
+
+  end
+
+  class ExternalWithRemote < ExternalAsset
+
+    attr_accessor :expected, :expected_date
+
+    def extract_mod_stamp(content_object)
+      @expected_date
+    end
+
+    def fetch_externally
+      @expected
+    end
+
+  end
+
+  test 'accessing content triggers fetching if state is not synchronized' do
+    asset1 = ExternalWithRemote.new({external_service: 'OpenBIS', external_id: '24'})
+
+    asset1.expected = {"remote" => 'yes'}
+    asset1.expected_date = '12345'
+    obj = {"tomek"=> 'no'}
+    asset1.content = obj
+    asset1.sync_state = :refresh
+
+    obj = asset1.content
+    assert_equal '12345', asset1.external_mod_stamp
+    assert_equal asset1.expected, obj
+    assert asset1.synchronized?
+
+    asset1.expected = {"hope" => 'yes'}
+    asset1.sync_state = :failed
+    assert_equal asset1.expected, asset1.content
+    assert asset1.synchronized?
+
+  end
+
 
 end
