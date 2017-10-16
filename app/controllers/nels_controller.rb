@@ -13,15 +13,16 @@ class NelsController < ApplicationController
     oauth_session.update_attributes(access_token: hash['access_token'], expires_in: 2.hours)
     if (match = params[:state].match(/assay_id:(\d+)/))
       params[:assay_id] = match[1].to_i
-      redirect_to nels_browser_path(assay_id: params[:assay_id])
+      redirect_to assay_nels_path(params[:assay_id])
     elsif (match = params[:state].match(/data_file_id:(\d+)/))
       redirect_to retrieve_nels_sample_metadata_data_file_path(match[1].to_i)
     else
-      redirect_to nels_browser_path
+      flash[:error] = "Bad redirect - Missing assay or data file ID from state parameter."
+      redirect_to root_path
     end
   end
 
-  def browser
+  def index
     respond_to do |format|
       format.html
     end
@@ -66,6 +67,10 @@ class NelsController < ApplicationController
 
   private
 
+  def find_assay
+    @assay = Assay.find(params[:assay_id])
+  end
+
   def oauth_client
     @oauth_client = Nels::Oauth2::Client.new(Seek::Config.nels_client_id,
                                              Seek::Config.nels_client_secret,
@@ -84,7 +89,7 @@ class NelsController < ApplicationController
   end
 
   def unauthorized_response
-    if action_name == 'browser'
+    if action_name == 'index'
       redirect_to @oauth_client.authorize_url
     else
       render json: { error: 'Unauthorized',

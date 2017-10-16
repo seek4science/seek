@@ -1352,7 +1352,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, id: assay
 
     assert_response :success
-    assert_select 'a[href=?]', nels_browser_path(assay_id: assay.id), count: 1
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 1
   end
 
   test 'should not show NeLS button for non-NeLS' do
@@ -1365,7 +1365,7 @@ class AssaysControllerTest < ActionController::TestCase
     get :show, id: assay
 
     assert_response :success
-    assert_select 'a[href=?]', nels_browser_path(assay_id: assay.id), count: 0
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0
   end
 
   test 'should not show NeLS button for NeLS-enabled project to non-NeLS project member' do
@@ -1383,6 +1383,6 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
-    assert_select 'a[href=?]', nels_browser_path(assay_id: assay.id), count: 0 # But not browse NeLS
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0 # But not browse NeLS
   end
 end
