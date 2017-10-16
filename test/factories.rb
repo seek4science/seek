@@ -506,6 +506,10 @@ Factory.define(:publication) do |f|
   f.association :contributor, factory: :person
 end
 
+Factory.define(:min_publication, class: Publication) do |f|
+  f.title 'A Minimal Publication'
+  f.projects { [Factory.build(:min_project)] }
+end
 # Presentation
 Factory.define(:presentation) do |f|
   f.sequence(:title) { |n| "A Presentation #{n}" }
