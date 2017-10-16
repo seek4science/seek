@@ -60,7 +60,8 @@ class StrainsController < ApplicationController
       format.rdf { render template: 'rdf/show' }
       format.xml
       format.html
-      format.json {render json: @strain}
+      # format.json {render json: @strain}
+      format.json {render json: :not_implemented, status: :not_implemented }
 
     end
   end
