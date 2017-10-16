@@ -1,10 +1,13 @@
 class NelsController < ApplicationController
 
+  before_filter :find_assay
   before_filter :oauth_client
   before_filter :nels_oauth_session, except: :callback
   before_filter :rest_client, except: :callback
 
   rescue_from RestClient::Unauthorized, :with => :unauthorized_response
+
+  include Seek::BreadCrumbs
 
   def callback
     hash = @oauth_client.get_token(params[:code])

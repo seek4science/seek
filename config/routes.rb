@@ -313,11 +313,6 @@ SEEK::Application.routes.draw do
         post :export, action: :export_submit
       end
     end
-    # get "/nels" => "nels#browser", as: 'nels_browser'
-    # get "/nels_projects" => "nels#projects", as: 'nels_projects'
-    # get "/nels_datasets" => "nels#datasets", as: 'nels_datasets'
-    # get "/nels_dataset" => "nels#dataset", as: 'nels_dataset'
-    # post "/nels_register" => "nels#register", as: 'nels_register'
     resources :nels, only: [:index] do
       collection do
         get :projects
