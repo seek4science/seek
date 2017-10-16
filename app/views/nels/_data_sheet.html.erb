@@ -1,4 +1,4 @@
-<% cache "nels_data_#{@display_data_file.id}" do %>
+<% cache "nels_data_#{@display_data_file.content_blob.id}" do %>
     <% spreadsheet = Rails.cache.fetch(@display_data_file.content_blob.cache_key) { @display_data_file.spreadsheet } %>
     <% if spreadsheet %>
         <% sheet = spreadsheet.sheets.detect { |s| s.name.downcase == 'data' } %>
