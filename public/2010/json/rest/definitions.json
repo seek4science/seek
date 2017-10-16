@@ -12,7 +12,13 @@
       "minLength" : 1
     },
     "nullableNonEmptyString" : {
-      "$ref" : "#/definitions/nonEmptyString"
+      "oneOf": [
+        {"$ref" : "#/definitions/nonEmptyString"},
+        {"type" : "null"}
+      ]
+//    ,
+//      "$ref" : "#/definitions/nonEmptyString",
+//      "nullable" : true
     },
     "nonEmptyStringList" : {
       "type" : "array",
@@ -22,7 +28,11 @@
       }
     },
     "nullableNonEmptyStringList" : {
-      "$ref" : "#/definitions/nonEmptyStringList"
+      "oneOf": [
+        {"$ref" : "#/definitions/nonEmptyStringList"},
+        {"type" : "null"}
+      ]
+//      "$ref" : "#/definitions/nonEmptyStringList"
     },
     "uriString" : {
       "type" : "string",
@@ -30,7 +40,11 @@
       "format" : "uri"
     },
     "nullableUriString" : {
-      "$ref" : "#/definitions/uriString"
+      "oneOf": [
+        {"$ref" : "#/definitions/uriString"},
+        {"type" : "null"}
+      ]
+//      "$ref" : "#/definitions/uriString"
     },
     "versionNumber" : {
       "type" : "string",
@@ -83,6 +97,9 @@
       "required" : [ "base_url" ],
       "additionalProperties" : false
     },
+
+      // Here is where the real definitions start
+
     "contributedTypeAttributes" : {
       "type" : "object",
       "properties" : {
@@ -201,6 +218,11 @@
         }
       },
       "required" : [ "title", "description", "assay_class", "assay_type", "technology_type" ]
+    },
+    "contentBlobsType" : {
+      "type" : "string",
+      "minLength" : 1,
+      "enum" : [ "content_blobs" ]
     },
     "dataFilesType" : {
       "type" : "string",
@@ -948,6 +970,69 @@
 				"jsonapi"
 			]
 		},
+				"getContentBlobsResponse": {
+			"type": "object",
+			"properties": {
+				"data": {
+					"type": "object",
+					"properties": {
+						"id": {
+							"$ref": "#/definitions/nonEmptyString"
+						},
+						"type": {
+							"$ref": "#/definitions/nonEmptyString"
+						},
+						"attributes": {
+							"type": "object",
+							"properties": {
+								"original_filename": {
+									"$ref": "#/definitions/nonEmptyString"
+								},
+								"url": {
+									"$ref": "#/definitions/nullableUriString"
+								},
+								"md5sum": {
+									"$ref": "#/definitions/nonEmptyString"
+								},
+								"sha1sum": {
+									"$ref": "#/definitions/nonEmptyString"
+								},
+								"content_type": {
+									"$ref": "#/definitions/contentBlobsType"
+								}
+							},
+							"required": [
+								"original_filename",
+								"md5sum",
+								"sha1sum",
+								"content_type"
+							]
+						},
+						"links": {
+							"$ref": "#/definitions/linksType"
+						},
+						"meta": {
+							"$ref": "#/definitions/metaType"
+						}
+					},
+					"required": [
+						"id",
+						"type",
+						"attributes",
+						"links",
+						"meta"
+					]
+				},
+				"jsonapi": {
+					"$ref": "#/definitions/JsonApiVersion"
+				}
+			},
+			"required": [
+				"data",
+				"jsonapi"
+			]
+		},
+
     "getDataFilesResponse" : {
       "type" : "object",
       "properties" : {
@@ -1189,7 +1274,7 @@
                   "type" : "object",
                   "properties" : {
                     "data" : {
-                      "$ref" : "#/definitions/peopleReference"
+                      "$ref" : "#/definitions/peopleReferenceList"
                     }
                   },
                   "required" : [ "data" ]
@@ -1891,7 +1976,7 @@
                   "$ref" : "#/definitions/peopleReferenceList"
                 },
                 "submitter" : {
-                  "$ref" : "#/definitions/peopleReference"
+                  "$ref" : "#/definitions/peopleReferenceList"
                 },
                 "people" : {
                   "$ref" : "#/definitions/peopleReferenceList"
@@ -2120,6 +2205,36 @@
       "properties" : {
         "data" : {
           "$ref" : "#/definitions/sopsReferences"
+        },
+        "jsonapi" : {
+          "$ref" : "#/definitions/JsonApiVersion"
+        },
+        "meta" : {
+          "$ref" : "#/definitions/baseMetaType"
+        }
+      },
+      "required" : [ "data", "jsonapi", "meta" ]
+    },
+      "indexSampleTypesResponse" : {
+        "type" : "object",
+        "properties" : {
+          "data" : {
+            "$ref" : "#/definitions/sampleTypesReferences"
+          },
+          "jsonapi" : {
+            "$ref" : "#/definitions/JsonApiVersion"
+          },
+          "meta" : {
+            "$ref" : "#/definitions/baseMetaType"
+          }
+        },
+        "required" : [ "data", "jsonapi", "meta" ]
+      },
+   "indexStrainsResponse" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "$ref" : "#/definitions/strainsReferences"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
