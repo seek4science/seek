@@ -44,8 +44,8 @@ module Seek
         if uri && uri.start_with?(suggested_key)
           id = uri.split(':')[1]
           suggested = suggested_key.classify.constantize.find(id)
-          send("#{suggested_key}=", suggested)
-          send("#{type}_uri=", suggested.ontology_uri)
+          update_attribute("#{suggested_key}_id", id)
+          update_attribute("#{type}_uri", suggested.ontology_uri)
           true
         else
           false
