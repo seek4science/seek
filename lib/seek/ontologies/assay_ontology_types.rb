@@ -44,10 +44,14 @@ module Seek
         if uri && uri.start_with?(suggested_key)
           id = uri.split(':')[1]
           suggested = suggested_key.classify.constantize.find(id)
-          update_attribute("#{suggested_key}_id", id)
-          update_attribute("#{type}_uri", suggested.ontology_uri)
+          send("#{suggested_key}=", suggested)
+          send("#{type}_uri=", suggested.ontology_uri)
           true
         else
+          # clear any previous suggested type, but only if it hasn't already been been changed (due to the recursive nature of <type>_uri= being recalled)
+          unless changes.keys.include?("#{suggested_key}_id")
+            send("#{suggested_key}=", nil)
+          end
           false
         end
       end

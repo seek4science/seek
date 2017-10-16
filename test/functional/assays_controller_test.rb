@@ -318,8 +318,7 @@ class AssaysControllerTest < ActionController::TestCase
     post :update, id: assay.id, assay: {
       technology_type_uri: tech_type.uri,
       assay_type_uri: assay_type.uri
-    },
-                  policy_attributes: valid_sharing
+    },policy_attributes: valid_sharing
 
     assay.reload
     assert_equal assay_type, assay.suggested_assay_type
@@ -328,6 +327,34 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics', assay.assay_type_uri
     assert_equal 'fish', assay.assay_type_label
     assert_equal 'carrot', assay.technology_type_label
+  end
+
+  test 'should clear suggested assay and tech types when updating with a URI' do
+    suggested_assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
+    suggested_tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
+    assay = Factory(:experimental_assay,
+                    assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
+                    technology_type_uri:'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
+                    suggested_assay_type:suggested_assay_type,
+                    suggested_technology_type:suggested_tech_type,
+                    contributor:User.current_user.person)
+
+    refute_nil assay.suggested_assay_type
+    refute_nil assay.suggested_technology_type
+    refute_nil assay.assay_type_uri
+    refute_nil assay.technology_type_uri
+
+    post :update, id: assay.id, assay: {
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics'
+    },policy_attributes: valid_sharing
+
+    assay.reload
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics',assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',assay.technology_type_uri
+    assert_nil assay.suggested_assay_type
+    assert_nil assay.suggested_technology_type
+
   end
 
   test 'should delete assay with study' do
