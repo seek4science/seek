@@ -1271,13 +1271,7 @@
                   "$ref" : "#/definitions/peopleReferenceList"
                 },
                 "submitter" : {
-                  "type" : "object",
-                  "properties" : {
-                    "data" : {
                       "$ref" : "#/definitions/peopleReferenceList"
-                    }
-                  },
-                  "required" : [ "data" ]
                 },
                 "people" : {
                   "$ref" : "#/definitions/peopleReferenceList"
