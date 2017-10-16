@@ -44,29 +44,30 @@ module Seek
           species << node.attributes['name']
           species << node.attributes['id']
         end
-        species.select { |s| !s.blank? }.uniq
+        species.reject(&:blank?).uniq
       rescue Exception => e
         Rails.logger.error("Error processing sbml #{t('model')} content for content_blob #{content_blob.id} #{e}")
         []
       end
 
       def species_from_jws_dat(content_blob)
-        contents = open(content_blob.filepath).read
-        start_tag = 'begin initial conditions'
-        start = contents.index(start_tag)
-        last = contents.index('end initial conditions')
-        unless start.nil? || last.nil?
-          interesting_bit = (contents[start + start_tag.length..last - 1]).strip || ''
-          lines = interesting_bit.each_line.reject do |line|
-            line.index('[').nil?
+        open(content_blob.filepath) do |f|
+          contents = f.read
+          start_tag = 'begin initial conditions'
+          start = contents.index(start_tag)
+          last = contents.index('end initial conditions')
+          if start.nil? || last.nil?
+            []
+          else
+            interesting_bit = (contents[start + start_tag.length..last - 1]).strip || ''
+            lines = interesting_bit.each_line.reject do |line|
+              line.index('[').nil?
+            end
+            lines.collect do |line|
+              line.gsub(/\[.*/, '').strip
+            end
           end
-          lines.collect do |line|
-            line.gsub(/\[.*/, '').strip
-          end
-        else
-          []
         end
-
       rescue Exception => e
         Rails.logger.error("Error processing dat #{t('model')}  content for content_blob #{content_blob.id} #{e}")
         []
@@ -88,20 +89,22 @@ module Seek
       end
 
       def parameters_and_values_from_jws_dat(content_blob)
-        contents = open(content_blob.filepath).read
-        start = contents.index('begin parameters')
-        last = contents.index('end parameters')
-        unless start.nil? || last.nil?
-          interesting_bit = (contents[start + 16..last - 1]).strip || ''
-          lines = interesting_bit.each_line.reject do |line|
-            line.index('=').nil?
+        open(content_blob.filepath) do |f|
+          contents = f.read
+          start = contents.index('begin parameters')
+          last = contents.index('end parameters')
+          if start.nil? || last.nil?
+            {}
+          else
+            interesting_bit = (contents[start + 16..last - 1]).strip || ''
+            lines = interesting_bit.each_line.reject do |line|
+              line.index('=').nil?
+            end
+            Hash[lines.map do |line|
+              p_and_v = line.split('=')
+              [p_and_v[0].strip, p_and_v[1].strip]
+            end]
           end
-          Hash[lines.map do |line|
-            p_and_v = line.split('=')
-            [p_and_v[0].strip, p_and_v[1].strip]
-          end]
-        else
-          {}
         end
       rescue Exception => e
         Rails.logger.error("Error processing dat #{t('model')}  content for content_blob #{content_blob.id} #{e}")
