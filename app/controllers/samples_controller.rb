@@ -11,6 +11,7 @@ class SamplesController < ApplicationController
   before_filter :auth_to_create, only: [:new, :create]
 
   include Seek::IsaGraphExtensions
+  include Seek::BreadCrumbs
 
   def index
     if @data_file || @sample_type
