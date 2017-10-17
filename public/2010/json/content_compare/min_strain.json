@@ -10,13 +10,16 @@
       "comment": null,
       "synonym": null,
       "genotype_info": "wild-type",
-      "phenotype_info": "wild-type",
-      "organism": {
-        "organism_id": "1343284969",
-        "title": "A Minimal Organism"
-      }
+      "phenotype_info": "wild-type"
     },
     "relationships": {
+      "organisms": {
+        "data": [
+          {
+            "id":"1343284969",
+            "type":"organisms"
+          }
+        ]
       "projects": {
         "data": [
           {
