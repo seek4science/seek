@@ -178,7 +178,7 @@ Factory.define(:min_sop, class: Sop) do |f|
   f.title 'A Minimal Sop'
   f.projects { [Factory.build(:min_project)] }
   f.after_create do |sop|
-    sop.content_blob = Factory.create(:content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
+    sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
   end
 end
 
@@ -551,7 +551,7 @@ Factory.define(:min_presentation, class: Presentation) do |f|
   f.title 'A Minimal Presentation'
   f.projects { [Factory.build(:min_project)] }
  f.after_create do |presentation|
-   presentation.content_blob = Factory.create(:content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
+   presentation.content_blob = Factory.create(:min_content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
  end
 end
 
@@ -747,6 +747,11 @@ Factory.define(:content_blob) do |f|
   f.sequence(:original_filename) { |n| "file-#{n}" }
 end
 
+Factory.define(:min_content_blob, class: ContentBlob) do |f|
+  f.sequence(:uuid) { UUID.generate }
+  f.data 'Min Data'
+  f.original_filename 'min file'
+end
 Factory.define(:url_content_blob, parent: :content_blob) do |f|
   f.url 'http://www.abc.com'
   f.data nil
