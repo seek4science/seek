@@ -17,6 +17,10 @@ class SopsControllerTest < ActionController::TestCase
     @object = sops(:downloadable_sop)
   end
 
+  def min_test_object
+    @min_object = Factory(:min_sop)
+  end
+
   def test_get_xml_specific_version
     login_as(:owner_of_my_first_sop)
     get :show, id: sops(:downloadable_sop), version: 2, format: 'xml'

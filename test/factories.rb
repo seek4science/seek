@@ -174,6 +174,14 @@ Factory.define(:sop) do |f|
   end
 end
 
+Factory.define(:min_sop, class: Sop) do |f|
+  f.title 'A Minimal Sop'
+  f.projects { [Factory.build(:min_project)] }
+  f.after_create do |sop|
+    sop.content_blob = Factory.create(:content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
+  end
+end
+
 Factory.define(:doc_sop, parent: :sop) do |f|
   f.association :content_blob, factory: :doc_content_blob
 end
@@ -418,6 +426,11 @@ Factory.define(:model) do |f|
   end
 end
 
+Factory.define(:min_model, class: Model) do |f|
+  f.title 'A Minimal Model'
+  f.projects { [Factory.build(:min_project)] }
+end
+
 Factory.define(:model_2_files, class: Model) do |f|
   f.sequence(:title) { |n| "A Model #{n}" }
   f.projects { [Factory.build(:project)] }
@@ -532,6 +545,14 @@ Factory.define(:presentation) do |f|
       presentation.content_blob.save
     end
   end
+end
+
+Factory.define(:min_presentation, class: Presentation) do |f|
+  f.title 'A Minimal Presentation'
+  f.projects { [Factory.build(:min_project)] }
+ f.after_create do |presentation|
+   presentation.content_blob = Factory.create(:content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
+ end
 end
 
 Factory.define(:ppt_presentation, parent: :presentation) do |f|
