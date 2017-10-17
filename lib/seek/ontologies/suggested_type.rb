@@ -16,6 +16,7 @@ module Seek
 
         after_destroy :join_parents_and_children
         after_destroy :update_ontology_uri_for_children
+
       end
 
       def default_parent_uri

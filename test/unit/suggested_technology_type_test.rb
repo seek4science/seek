@@ -201,4 +201,35 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding', top.ontology_uri
     assert_nil child2[:ontology_uri]
   end
+
+  test 'updating a suggested tech type should update associated assays' do
+    type = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = Factory(:experimental_assay, suggested_technology_type: type)
+    assay2 = Factory(:experimental_assay, suggested_technology_type: type)
+
+    type.reload
+    assert_equal [assay, assay2].sort, type.assays.sort
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay2.technology_type_uri
+
+    type.ontology_uri = 'http://wibble.com/ontology#fish'
+    type.save!
+    assay.reload
+    assay2.reload
+
+    assert_equal 'http://wibble.com/ontology#fish', assay.technology_type_uri
+    assert_equal 'http://wibble.com/ontology#fish', assay2.technology_type_uri
+  end
+
+  test 'assay adopts ontology uri if suggested type destroyed' do
+    type = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = Factory(:experimental_assay, suggested_technology_type: type)
+    type.reload
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.technology_type_uri
+    type.destroy
+    assay.reload
+
+    assert_nil assay.suggested_assay_type
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.technology_type_uri
+  end
 end
