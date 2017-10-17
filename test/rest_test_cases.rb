@@ -133,22 +133,27 @@ module RestTestCases
     assert_response :success
     parsed_response = JSON.parse(@response.body)
 
-    diff = JsonDiff.diff(json_to_compare, parsed_response)
+    check_content_diff(json_to_compare, parsed_response)
+  end
+
+  def check_content_diff(json1, json2)
     plural_obj = @controller.controller_name.pluralize
-    base = parsed_response["data"]["meta"]["base_url"]
+    base = json2["data"]["meta"]["base_url"]
+    diff = JsonDiff.diff(json1, json2)
 
     for el in diff
       #the self link must start with the pluralized controller's name (e.g. /people)
       if (el["path"] =~ /self/)
         assert el["value"] =~ /^\/#{plural_obj}/
+      # url in version, e.g.  base_url/data_files/877365356?version=1
       elsif (el["path"] =~ /versions\/\d+\/url/)
         assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\?version=\d+/
         diff.delete(el)
+      # link in content blob, e.g.  base_url/data_files/877365356/content_blobs/343567275
       elsif (el["path"] =~ /content_blobs\/\d+\/link/)
         assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\/content_blobs\/\d+/
         diff.delete(el)
       end
-
     end
 
     diff.delete_if {
