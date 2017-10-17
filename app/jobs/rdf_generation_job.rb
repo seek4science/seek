@@ -36,4 +36,9 @@ class RdfGenerationJob < SeekJob
     end
     result
   end
+
+  def allow_duplicate_jobs?
+    false
+  end
+
 end
