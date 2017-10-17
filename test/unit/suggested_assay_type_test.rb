@@ -261,10 +261,11 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     assay = Factory(:experimental_assay, suggested_assay_type: type)
     type.reload
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
-    type.destroy
-    assay.reload
 
     Delayed::Job.destroy_all
+
+    type.destroy
+    assay.reload
 
     assert_nil assay.suggested_assay_type
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
