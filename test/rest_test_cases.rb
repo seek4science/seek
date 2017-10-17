@@ -3,6 +3,7 @@
 require 'libxml'
 require 'pp'
 require 'json-schema'
+require 'json-diff'
 
 module RestTestCases
   XML_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
@@ -152,6 +153,47 @@ module RestTestCases
     end
   end
 
+  def test_min_content
+    check_for_json_type_skip
+    object = min_test_object
+    json_file = File.join(Rails.root, 'public', '2010', 'json', 'content_compare',
+                          "min_#{@controller.controller_name.classify.downcase}.json")
+    #parse such that backspace is eliminated + null turns to nil
+    json_to_compare = JSON.parse(File.read(json_file))
+
+    get :show, id: object, format: 'json'
+    assert_response :success
+    parsed_response = JSON.parse(@response.body)
+
+    check_content_diff(json_to_compare, parsed_response)
+  end
+
+  def check_content_diff(json1, json2)
+    plural_obj = @controller.controller_name.pluralize
+    base = json2["data"]["meta"]["base_url"]
+    diff = JsonDiff.diff(json1, json2)
+
+    for el in diff
+      #the self link must start with the pluralized controller's name (e.g. /people)
+      if (el["path"] =~ /self/)
+        assert el["value"] =~ /^\/#{plural_obj}/
+      # url in version, e.g.  base_url/data_files/877365356?version=1
+      elsif (el["path"] =~ /versions\/\d+\/url/)
+        assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\?version=\d+/
+        diff.delete(el)
+      # link in content blob, e.g.  base_url/data_files/877365356/content_blobs/343567275
+      elsif (el["path"] =~ /content_blobs\/\d+\/link/)
+        assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\/content_blobs\/\d+/
+        diff.delete(el)
+      end
+    end
+
+    diff.delete_if {
+        |el| el["path"] =~ /id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum/
+    }
+    assert_equal [], diff
+  end
+
   def perform_api_checks
     assert_response :success
     valid, message = check_xml
@@ -206,6 +248,14 @@ module RestTestCases
     end
   end
 
+  #skip if this current controller type doesn't support JSON format
+  def check_for_json_type_skip
+    clz = @controller.controller_name.classify.constantize.to_s
+    if %w[Sample SampleType Strain ContentBlob].include?(clz)
+      skip("skipping JSONAPI tests for #{clz}")
+    end
+  end
+
   #check if this current controller type doesn't support read
   def check_for_501_read_return
     clz = @controller.controller_name.classify.constantize.to_s
@@ -217,6 +267,5 @@ module RestTestCases
     clz = @controller.controller_name.classify.constantize.to_s
     return %w[Sample Strain].include?(clz)
   end
-
 
 end

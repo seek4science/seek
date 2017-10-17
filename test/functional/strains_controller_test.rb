@@ -16,6 +16,10 @@ class StrainsControllerTest < ActionController::TestCase
     @object = Factory(:strain, organism_id: Factory(:organism, bioportal_concept: Factory(:bioportal_concept)).id)
   end
 
+  def min_test_object
+    @min_object = Factory(:min_strain)
+  end
+
   test 'should get index' do
     get :index
     assert_response :success

@@ -1,5 +1,4 @@
 require 'test_helper'
-
 class PeopleControllerTest < ActionController::TestCase
   fixtures :people, :users, :projects, :work_groups, :group_memberships, :project_positions, :institutions
 
@@ -14,6 +13,10 @@ class PeopleControllerTest < ActionController::TestCase
 
   def rest_api_test_object
     @object = Factory(:person,orcid:'http://orcid.org/0000-0003-2130-0865')
+  end
+
+  def min_test_object
+    @min_object = Factory(:min_person)
   end
 
   def test_title
@@ -1744,6 +1747,14 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal res.map { |r| r['name'] }.uniq, ['Jon Bon Jovi']
   end
 
+  def edit_max_object(person)
+    assert true
+    Factory :expertise, value: 'golf', annotatable: person
+    Factory :expertise, value: 'fishing', annotatable: person
+    Factory :tool, value: 'fishing rod', annotatable: person
+
+    #person.add_to_project_and_institution(projects(:one), institutions(:two))
+  end
 
   def mask_for_admin
     Seek::Roles::Roles.instance.mask_for_role('admin')

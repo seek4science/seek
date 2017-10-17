@@ -17,6 +17,10 @@ class PublicationsControllerTest < ActionController::TestCase
     @object = Factory(:publication, published_date: Date.new(2013, 1, 1))
   end
 
+  def min_test_object
+    @min_object = Factory(:min_publication)
+  end
+
   def test_title
     get :index
     assert_select 'title', text: 'Publications', count: 1

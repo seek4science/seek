@@ -15,6 +15,10 @@ class EventsControllerTest < ActionController::TestCase
     @object = events(:event_with_no_files)
   end
 
+  def min_test_object
+    @min_object = Factory(:min_event)
+  end
+
   def test_title
     get :index
     assert_response :success

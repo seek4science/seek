@@ -363,6 +363,7 @@ GEM
       jquery-rails
       railties (>= 3.1.0)
     json (1.8.6)
+    json-diff (0.4.1)
     json-ld (1.1.11.1)
       multi_json (~> 1.11)
       rdf (~> 1.1, >= 1.1.17, < 1.99)
@@ -891,6 +892,7 @@ DEPENDENCIES
   jbuilder-json_api
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
+  json-diff
   json-schema
   libxml-ruby (~> 2.8.0)
   linkeddata
