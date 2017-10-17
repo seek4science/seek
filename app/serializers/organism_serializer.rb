@@ -7,4 +7,8 @@ class OrganismSerializer < BaseSerializer
   has_many :strains
   has_many :samples
 
+  def strains
+    object.strains
+  end
+
 end
