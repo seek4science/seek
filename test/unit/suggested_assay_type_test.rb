@@ -240,6 +240,8 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay2.assay_type_uri
 
+    Delayed::Job.destroy_all
+
     type.ontology_uri = 'http://wibble.com/ontology#fish'
     type.save!
     assay.reload
@@ -247,6 +249,11 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
 
     assert_equal 'http://wibble.com/ontology#fish', assay.assay_type_uri
     assert_equal 'http://wibble.com/ontology#fish', assay2.assay_type_uri
+
+    # checks that rdf generation jobs have been created, to update the RDF for the assays
+    rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}
+    assert_equal 2,rdfjobs.count
+    assert_equal [assay,assay2].sort,rdfjobs.collect{|j| j.payload_object.item}.sort
   end
 
   test 'assay adopts ontology uri if suggested type destroyed' do
@@ -257,7 +264,14 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     type.destroy
     assay.reload
 
+    Delayed::Job.destroy_all
+
     assert_nil assay.suggested_assay_type
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
+
+    # checks that rdf generation jobs have been created, to update the RDF for the assays
+    rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}
+    assert_equal 1,rdfjobs.count
+    assert_equal assay,rdfjobs.first.payload_object.item
   end
 end

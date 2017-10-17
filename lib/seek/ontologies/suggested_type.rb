@@ -16,6 +16,7 @@ module Seek
 
         after_destroy :join_parents_and_children
         after_destroy :update_ontology_uri_for_children
+        after_save :create_rdf_generation_job
 
       end
 
@@ -174,6 +175,14 @@ module Seek
             child.ontology_uri = self[:ontology_uri]
             child.save
           end
+        end
+      end
+
+      # creates a job to update rdf if the suggested ontology uri changes
+      def create_rdf_generation_job
+        return unless changes.include?(:ontology_uri)
+        assays.each do |assay|
+          RdfGenerationJob.new(assay).queue_job
         end
       end
     end
