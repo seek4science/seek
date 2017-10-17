@@ -19,6 +19,11 @@ module RestTestCases
               "get_#{@controller.controller_name}_200_response.json")
   end
 
+  def definitions_path
+    File.join(Rails.root, 'public', '2010', 'json', 'rest',
+              'definitions.json')
+  end
+
   def test_index_rest_api_xml
     check_for_xml_type_skip # some types do not support XML, only JSON
 
@@ -84,16 +89,43 @@ module RestTestCases
     end
   end
 
+  def validate_json_against_fragment (fragment)
+    if File.readable?(definitions_path)
+      errors = JSON::Validator.fully_validate_json(definitions_path, @response.body, fragment: fragment)
+      unless errors.empty?
+        msg = ""
+        errors.each do |e|
+          msg += e + "\n"
+        end
+        raise Minitest::Assertion, msg
+      end
+    end
+  end
+
   def test_show_json(object = rest_api_test_object)
+    clz = @controller.controller_name.classify.constantize
     get :show, id: object, format: 'json'
-    perform_jsonapi_checks
-    validate_json (get_schema_file_path)
-   end
+    if check_for_501_read_return
+      assert_response :not_implemented
+    else
+      perform_jsonapi_checks
+      validate_json_against_fragment ("#/definitions/get#{@controller.class.name.sub('Controller', 'Response')}")
+    end
+  # rescue ActionController::UrlGenerationError
+  #   skip("unable to test read JSON for #{clz}")
+  end
 
   def test_index_json
+    clz = @controller.controller_name.classify.constantize
     get :index, format: 'json'
+    if check_for_501_index_return
+      assert_response :not_implemented
+    else
     perform_jsonapi_checks
-    validate_json (index_schema_file_path)
+    validate_json_against_fragment ("#/definitions/index#{@controller.class.name.sub('Controller', 'Response')}")
+    end
+  # rescue ActionController::UrlGenerationError
+  #   skip("unable to test index JSON for #{clz}")
   end
 
   def test_response_code_for_not_accessible
@@ -222,6 +254,18 @@ module RestTestCases
     if %w[Sample SampleType ContentBlob].include?(clz)
       skip("skipping JSONAPI tests for #{clz}")
     end
+  end
+
+  #check if this current controller type doesn't support read
+  def check_for_501_read_return
+    clz = @controller.controller_name.classify.constantize.to_s
+    return %w[Sample SampleType Strain].include?(clz)
+  end
+
+  #check if this current controller type doesn't support index
+  def check_for_501_index_return
+    clz = @controller.controller_name.classify.constantize.to_s
+    return %w[Sample Strain].include?(clz)
   end
 
 end
