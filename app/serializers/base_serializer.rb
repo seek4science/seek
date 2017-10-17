@@ -20,7 +20,11 @@ class BaseSerializer < SimpleBaseSerializer
 
   def associated(name)
     unless @associated[name].blank?
-      @associated[name][:items]
+      items = @associated[name][:items]
+      unless items.blank?
+        items = items.sort { |x, y| x.id <=> y.id }
+      end
+      items
     else
       nil
     end
