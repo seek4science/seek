@@ -31,7 +31,7 @@ class RdfGenerationJob < SeekJob
     result = super
 
     # if we don't want to refresh_dependents, but a job exists that does, then we can say it exists
-    unless result || refresh_dependents
+    unless result || refresh_dependents || item.nil?
       result = RdfGenerationJob.new(item, true).exists?
     end
     result
@@ -40,5 +40,4 @@ class RdfGenerationJob < SeekJob
   def allow_duplicate_jobs?
     false
   end
-
 end
