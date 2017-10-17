@@ -7,10 +7,10 @@
       "title": "Maximilian Maxi-Mum",
       "description": "A person with all possible details",
       "first_name": "Maximilian",
-      "last_name": "Maxi-mum",
+      "last_name": "Maxi-Mum",
       "web_page": "http://www.website.com",
       "orcid": "https://orcid.org/0000-0001-9842-9718",
-      "email": "cefbdaab68ed59c001edc121705cb7e2a7db1a96",
+      "email": "88c4af0911164449f30870c60d161fddda8f9771",
       "expertise": [
         "golf",
         "fishing"
@@ -20,9 +20,6 @@
       ]
     },
     "relationships": {
-      "work_groups": {
-        "data": []
-      },
       "projects": {
         "data": []
       },

@@ -153,19 +153,21 @@ module RestTestCases
     end
   end
 
-  def test_min_content
+  def test_json_content
     check_for_json_type_skip
-    object = min_test_object
-    json_file = File.join(Rails.root, 'public', '2010', 'json', 'content_compare',
-                          "min_#{@controller.controller_name.classify.downcase}.json")
-    #parse such that backspace is eliminated + null turns to nil
-    json_to_compare = JSON.parse(File.read(json_file))
+    ['min','max'].each do |m|
+      object = get_test_object(m)
+      json_file = File.join(Rails.root, 'public', '2010', 'json', 'content_compare',
+                            "#{m}_#{@controller.controller_name.classify.downcase}.json")
+      #parse such that backspace is eliminated and null turns to nil
+      json_to_compare = JSON.parse(File.read(json_file))
+      edit_max_object(object) if (m == 'max')
+      get :show, id: object, format: 'json'
+      assert_response :success
+      parsed_response = JSON.parse(@response.body)
 
-    get :show, id: object, format: 'json'
-    assert_response :success
-    parsed_response = JSON.parse(@response.body)
-
-    check_content_diff(json_to_compare, parsed_response)
+      check_content_diff(json_to_compare, parsed_response)
+    end
   end
 
   def check_content_diff(json1, json2)

@@ -15,8 +15,8 @@ class PeopleControllerTest < ActionController::TestCase
     @object = Factory(:person,orcid:'http://orcid.org/0000-0003-2130-0865')
   end
 
-  def min_test_object
-    @min_object = Factory(:min_person)
+  def get_test_object(m)
+    @object = Factory(("#{m}_person").to_sym)
   end
 
   def test_title

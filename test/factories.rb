@@ -14,6 +14,15 @@ Factory.define(:min_person, class: Person) do |f|
   f.last_name "Minimal"
 end
 
+Factory.define(:max_person, class: Person) do |f|
+  f.first_name "Maximilian"
+  f.last_name "Maxi-Mum"
+  f.description "A person with all possible details"
+  f.web_page "http://www.website.com"
+  f.orcid "https://orcid.org/0000-0001-9842-9718"
+  f.email "maximal_person@email.com"
+end
+
 Factory.define(:brand_new_person, class: Person) do |f|
   f.sequence(:email) { |n| "test#{n}@test.com" }
   f.sequence(:first_name) { |n| "Person#{n}" }
