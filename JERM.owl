@@ -76,6 +76,9 @@
         <Class IRI="#Spectrum_interpretation"/>
     </Declaration>
     <Declaration>
+        <Class IRI="#experimental_assay"/>
+    </Declaration>
+    <Declaration>
         <DataProperty IRI="#sabioRKID"/>
     </Declaration>
     <Declaration>
@@ -83,9 +86,6 @@
     </Declaration>
     <Declaration>
         <Class IRI="#genotype"/>
-    </Declaration>
-    <Declaration>
-        <Class IRI="#Modelling_analysis"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Proteomics_file_format"/>
@@ -523,9 +523,6 @@
         <Class IRI="#Data_file_format"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Informatics_analysis"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#Limited_media_growth"/>
     </Declaration>
     <Declaration>
@@ -649,9 +646,6 @@
         <Class IRI="#Material_entity"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#Experimental_assay"/>
-    </Declaration>
-    <Declaration>
         <Class IRI="#Organism_colony"/>
     </Declaration>
     <Declaration>
@@ -737,6 +731,9 @@
     </Declaration>
     <Declaration>
         <Class abbreviatedIRI="owl:Thing"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#modelling_analysis"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Assay_type"/>
@@ -929,6 +926,9 @@
     </Declaration>
     <Declaration>
         <Class IRI="#Partial_differential_equation"/>
+    </Declaration>
+    <Declaration>
+        <Class IRI="#informatics_analysis"/>
     </Declaration>
     <Declaration>
         <Class IRI="#Person"/>
@@ -1467,24 +1467,6 @@
         <Class IRI="#Microarray"/>
     </SubClassOf>
     <SubClassOf>
-        <Class IRI="#Experimental_assay"/>
-        <Class IRI="#Assay"/>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Experimental_assay"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#hasPart"/>
-            <Class IRI="#Data"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Experimental_assay"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#hasPart"/>
-            <Class IRI="#Experimental_assay_type"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
         <Class IRI="#Experimental_assay_type"/>
         <Class IRI="#Assay_type"/>
     </SubClassOf>
@@ -1680,17 +1662,6 @@
     <SubClassOf>
         <Class IRI="#Inductively_coupled_plasma_mass_spectrometry"/>
         <Class IRI="#Mass_spectrometry"/>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Informatics_analysis"/>
-        <Class IRI="#Assay"/>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Informatics_analysis"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#hasPart"/>
-            <Class IRI="#informatics_analysis_type"/>
-        </ObjectSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Information_entity"/>
@@ -1925,52 +1896,6 @@
     <SubClassOf>
         <Class IRI="#Model_format"/>
         <Class IRI="#Format"/>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Modelling_analysis"/>
-        <Class IRI="#Assay"/>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Modelling_analysis"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#hasOutput"/>
-            <Class IRI="#Simulation_data"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Modelling_analysis"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#hasPart"/>
-            <Class IRI="#Model"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Modelling_analysis"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#hasPart"/>
-            <Class IRI="#Model_analysis_type"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Modelling_analysis"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#isConstructedFrom"/>
-            <Class IRI="#Data"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Modelling_analysis"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#isConstructedFrom"/>
-            <Class IRI="#Publication"/>
-        </ObjectSomeValuesFrom>
-    </SubClassOf>
-    <SubClassOf>
-        <Class IRI="#Modelling_analysis"/>
-        <ObjectSomeValuesFrom>
-            <ObjectProperty IRI="#isValidatedBy"/>
-            <Class IRI="#Data"/>
-        </ObjectSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#Molecule_labelling"/>
@@ -2458,7 +2383,7 @@
         <Class IRI="#Simulation_data"/>
         <ObjectSomeValuesFrom>
             <ObjectProperty IRI="#isPartOf"/>
-            <Class IRI="#Modelling_analysis"/>
+            <Class IRI="#modelling_analysis"/>
         </ObjectSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
@@ -2669,6 +2594,24 @@
         <Class IRI="#phenotype"/>
     </SubClassOf>
     <SubClassOf>
+        <Class IRI="#experimental_assay"/>
+        <Class IRI="#Assay"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#experimental_assay"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasPart"/>
+            <Class IRI="#Data"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#experimental_assay"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasPart"/>
+            <Class IRI="#Experimental_assay_type"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
         <Class IRI="#explantation"/>
         <Class IRI="#Characteristics_for_sample"/>
     </SubClassOf>
@@ -2693,6 +2636,17 @@
         <Class IRI="#ploidy"/>
     </SubClassOf>
     <SubClassOf>
+        <Class IRI="#informatics_analysis"/>
+        <Class IRI="#Assay"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#informatics_analysis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasPart"/>
+            <Class IRI="#informatics_analysis_type"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
         <Class IRI="#informatics_analysis_type"/>
         <Class IRI="#Assay_type"/>
     </SubClassOf>
@@ -2711,6 +2665,52 @@
     <SubClassOf>
         <Class IRI="#miRNA_microarray"/>
         <Class IRI="#Microarray"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#modelling_analysis"/>
+        <Class IRI="#Assay"/>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#modelling_analysis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasOutput"/>
+            <Class IRI="#Simulation_data"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#modelling_analysis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasPart"/>
+            <Class IRI="#Model"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#modelling_analysis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#hasPart"/>
+            <Class IRI="#Model_analysis_type"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#modelling_analysis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#isConstructedFrom"/>
+            <Class IRI="#Data"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#modelling_analysis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#isConstructedFrom"/>
+            <Class IRI="#Publication"/>
+        </ObjectSomeValuesFrom>
+    </SubClassOf>
+    <SubClassOf>
+        <Class IRI="#modelling_analysis"/>
+        <ObjectSomeValuesFrom>
+            <ObjectProperty IRI="#isValidatedBy"/>
+            <Class IRI="#Data"/>
+        </ObjectSomeValuesFrom>
     </SubClassOf>
     <SubClassOf>
         <Class IRI="#mutationType"/>
@@ -3841,16 +3841,6 @@
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#Experimental_assay</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00194</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#Experimental_assay</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Experimental Assay</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
         <IRI>#Experimental_assay_type</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00043</Literal>
     </AnnotationAssertion>
@@ -4354,16 +4344,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#Inductively_coupled_plasma_mass_spectrometry</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Inductively Coupled Plasma Mass Spectrometry</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#Informatics_analysis</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00195</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#Informatics_analysis</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Informatics Analysis</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
@@ -4889,16 +4869,6 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#Model_format</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Model Format</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
-        <IRI>#Modelling_analysis</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00196</Literal>
-    </AnnotationAssertion>
-    <AnnotationAssertion>
-        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
-        <IRI>#Modelling_analysis</IRI>
-        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Modelling Analysis</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:description"/>
@@ -6043,6 +6013,16 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <IRI>#experimental_assay</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00194</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#experimental_assay</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Experimental Assay</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
         <IRI>#explantation</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00160</Literal>
     </AnnotationAssertion>
@@ -6100,6 +6080,16 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#hexaploid</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Hexaploid</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <IRI>#informatics_analysis</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00195</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#informatics_analysis</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Informatics Analysis</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:description"/>
@@ -6166,6 +6156,16 @@ Liquid chromatography (LC) is a separation technique in which the mobile phase i
         <AnnotationProperty abbreviatedIRI="rdfs:label"/>
         <IRI>#miRNA_microarray</IRI>
         <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">miRNA Microarray</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="dc:identifier"/>
+        <IRI>#modelling_analysis</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">JERM:00196</Literal>
+    </AnnotationAssertion>
+    <AnnotationAssertion>
+        <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+        <IRI>#modelling_analysis</IRI>
+        <Literal datatypeIRI="http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral">Modelling Analysis</Literal>
     </AnnotationAssertion>
     <AnnotationAssertion>
         <AnnotationProperty abbreviatedIRI="dc:identifier"/>
