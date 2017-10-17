@@ -394,6 +394,66 @@ class DataFileTest < ActiveSupport::TestCase
 
     assert_includes DataFile.simulation_data,df
     refute_includes DataFile.simulation_data,df2
+  end
 
+  test 'can copy assay associations' do
+    df = Factory(:data_file)
+    aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING, asset: df)
+    aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING, asset: df)
+
+    s1 = Factory(:sample, originating_data_file: df)
+    s2 = Factory(:sample, originating_data_file: df)
+
+    assert_equal 2, df.extracted_samples.count
+
+    assert_difference('AssayAsset.count', 4) do # samples * assay_assets
+      df.copy_assay_associations(df.extracted_samples)
+    end
+
+    assert_equal df.assays.sort, s1.assays.sort
+    assert_equal df.assays.sort, s2.assays.sort
+
+    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
+    assert_equal aa2.direction, s1.assay_assets.where(assay_id: aa2.assay_id).first.direction
+  end
+
+  test 'can copy assay associations for selected assays' do
+    df = Factory(:data_file)
+    aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING, asset: df)
+    aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING, asset: df)
+
+    s1 = Factory(:sample, originating_data_file: df)
+    s2 = Factory(:sample, originating_data_file: df)
+
+    assert_equal 2, df.extracted_samples.count
+
+    assert_difference('AssayAsset.count', 2) do
+      df.copy_assay_associations(df.extracted_samples, [aa1.assay])
+    end
+
+    assert_equal [aa1.assay], s1.assays
+    assert_equal [aa1.assay], s2.assays
+
+    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
+  end
+
+  test 'can copy assay associations for selected assay IDs' do
+    df = Factory(:data_file)
+    aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING, asset: df)
+    aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING, asset: df)
+
+    s1 = Factory(:sample, originating_data_file: df)
+    s2 = Factory(:sample, originating_data_file: df)
+
+    assert_equal 2, df.extracted_samples.count
+
+    assert_difference('AssayAsset.count', 2) do
+      df.copy_assay_associations(df.extracted_samples, [aa1.assay_id])
+    end
+
+    assert_equal [aa1.assay], s1.assays
+    assert_equal [aa1.assay], s2.assays
+
+    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
   end
 end

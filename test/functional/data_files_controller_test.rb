@@ -2762,6 +2762,34 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_nil df.reload.policy.sharing_scope
   end
 
+  test 'extract from data file and associate with assay' do
+    person = Factory(:project_administrator)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title: 'String')
+
+    data_file = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy), contributor: person.user)
+    assay_asset1 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::INCOMING)
+    assay_asset2 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::OUTGOING)
+
+    sample_type = SampleType.new(title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id])
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    assert_difference('AssayAsset.count', 4) do
+      assert_difference('Sample.count', 4) do
+        post :extract_samples, id: data_file.id, confirm: 'true', assay_ids: [assay_asset1.assay_id]
+      end
+    end
+
+    assigns(:samples).each do |sample|
+      assert_equal [assay_asset1.assay], sample.assays
+      assert_equal assay_asset1.direction, sample.assay_assets.first.direction
+    end
+  end
+
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)

@@ -327,6 +327,7 @@ class DataFilesController < ApplicationController
       extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
       @samples = extractor.persist.select(&:persisted?)
       extractor.clear
+      @data_file.copy_assay_associations(@samples, params[:assay_ids]) if params[:assay_ids]
       flash[:notice] = "#{@samples.count} samples extracted successfully"
     else
       SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job

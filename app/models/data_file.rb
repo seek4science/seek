@@ -202,4 +202,16 @@ class DataFile < ActiveRecord::Base
       super
     end
   end
+
+  # Copy the AssayAsset associations to each of the given resources (usually Samples).
+  # If an array of `assays` is specified (can be Assay objects or IDs), only copy associations to these assays.
+  def copy_assay_associations(resources, assays = nil)
+    resources.map do |resource|
+      aa = assay_assets
+      aa = assay_assets.where(assay: assays) if assays
+      aa.map do |aa|
+        AssayAsset.create(assay: aa.assay, direction: aa.direction, asset: resource)
+      end
+    end.flatten
+  end
 end
