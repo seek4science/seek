@@ -371,6 +371,14 @@ Factory.define(:data_file) do |f|
   end
 end
 
+Factory.define(:min_data_file, class: DataFile) do |f|
+  f.title 'A Minimal DataFile'
+  f.projects { [Factory.build(:min_project)] }
+  f.after_create do |data_file|
+    data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+  end
+end
+
 Factory.define(:rightfield_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :rightfield_content_blob
 end

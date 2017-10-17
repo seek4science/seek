@@ -130,19 +130,32 @@ module RestTestCases
 
     get :show, id: object, format: 'json'
     assert_response :success
+    parsed_response = JSON.parse(@response.body)
+
+    diff = JsonDiff.diff(json_to_compare, parsed_response)
+    plural_obj = @controller.controller_name.pluralize
+    base = parsed_response["data"]["meta"]["base_url"]
+
     puts @response.body
-    diff = JsonDiff.diff(json_to_compare,JSON.parse(@response.body))
+
     for el in diff
       #the self link must start with the pluralized controller's name (e.g. /people)
       if (el["path"] =~ /self/)
-        assert el["value"] =~ /^\/#{@controller.controller_name.pluralize}/
+        assert el["value"] =~ /^\/#{plural_obj}/
+      elsif (el["path"] =~ /versions\/\d+\/url/)
+        assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\?version=\d+/
+        diff.delete(el)
+      elsif (el["path"] =~ /content_blobs\/\d+\/link/)
+        assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\/content_blobs\/\d+/
+        diff.delete(el)
       end
+
     end
 
     diff.delete_if {
-        |el| el["path"] =~ /id|created|modified|uuid|jsonapi|self/
+        |el| el["path"] =~ /id|created|updated|modified|uuid|jsonapi|self/
     }
-
+    puts diff
     assert_equal [], diff
   end
 

@@ -23,6 +23,10 @@ class DataFilesControllerTest < ActionController::TestCase
     @object
   end
 
+  def min_test_object
+    @min_object = Factory(:min_data_file)
+  end
+
   def test_title
     get :index
     assert_response :success
