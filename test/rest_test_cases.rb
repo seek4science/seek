@@ -251,7 +251,7 @@ module RestTestCases
   #skip if this current controller type doesn't support JSON format
   def check_for_json_type_skip
     clz = @controller.controller_name.classify.constantize.to_s
-    if %w[Sample SampleType ContentBlob].include?(clz)
+    if %w[Sample SampleType Strain ContentBlob].include?(clz)
       skip("skipping JSONAPI tests for #{clz}")
     end
   end
