@@ -104,25 +104,27 @@ module RestTestCases
   def test_show_json(object = rest_api_test_object)
     clz = @controller.controller_name.classify.constantize
     get :show, id: object, format: 'json'
-    if @response.status == 501
-      skip("reading is not implemented for #{clz}")
+    if check_for_501_read_return
+      assert_response :not_implemented
+    else
+      perform_jsonapi_checks
+      validate_json_against_fragment ("#/definitions/get#{@controller.class.name.sub('Controller', 'Response')}")
     end
-    perform_jsonapi_checks
-    validate_json_against_fragment ("#/definitions/get#{@controller.class.name.sub('Controller', 'Response')}")
-  rescue ActionController::UrlGenerationError
-    skip("unable to test read JSON for #{clz}")
-   end
+  # rescue ActionController::UrlGenerationError
+  #   skip("unable to test read JSON for #{clz}")
+  end
 
   def test_index_json
     clz = @controller.controller_name.classify.constantize
     get :index, format: 'json'
-    if @response.status == 501
-      skip("listing is not implemented for #{clz}")
-    end
+    if check_for_501_index_return
+      assert_response :not_implemented
+    else
     perform_jsonapi_checks
     validate_json_against_fragment ("#/definitions/index#{@controller.class.name.sub('Controller', 'Response')}")
-  rescue ActionController::UrlGenerationError
-    skip("unable to test index JSON for #{clz}")
+    end
+  # rescue ActionController::UrlGenerationError
+  #   skip("unable to test index JSON for #{clz}")
   end
 
   def test_response_code_for_not_accessible
@@ -203,4 +205,18 @@ module RestTestCases
       skip("skipping XML tests for #{clz}")
     end
   end
+
+  #check if this current controller type doesn't support read
+  def check_for_501_read_return
+    clz = @controller.controller_name.classify.constantize.to_s
+    return %w[Sample SampleType Strain].include?(clz)
+  end
+
+  #check if this current controller type doesn't support index
+  def check_for_501_index_return
+    clz = @controller.controller_name.classify.constantize.to_s
+    return %w[Sample Strain].include?(clz)
+  end
+
+
 end

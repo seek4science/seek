@@ -55,6 +55,15 @@ class StrainsController < ApplicationController
     end
   end
 
+  def index
+    respond_to do |format|
+      format.rdf {super}
+      format.xml {super}
+      format.html {super}
+      format.json {render json: :not_implemented, status: :not_implemented }
+    end
+  end
+
   def show
     respond_to do |format|
       format.rdf { render template: 'rdf/show' }
