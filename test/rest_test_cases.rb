@@ -122,6 +122,7 @@ module RestTestCases
   end
 
   def test_min_content
+    check_for_json_type_skip
     object = min_test_object
     json_file = File.join(Rails.root, 'public', '2010', 'json', 'content_compare',
                           "min_#{@controller.controller_name.classify.downcase}.json")
@@ -135,8 +136,6 @@ module RestTestCases
     diff = JsonDiff.diff(json_to_compare, parsed_response)
     plural_obj = @controller.controller_name.pluralize
     base = parsed_response["data"]["meta"]["base_url"]
-
-    puts @response.body
 
     for el in diff
       #the self link must start with the pluralized controller's name (e.g. /people)
@@ -153,9 +152,8 @@ module RestTestCases
     end
 
     diff.delete_if {
-        |el| el["path"] =~ /id|created|updated|modified|uuid|jsonapi|self/
+        |el| el["path"] =~ /id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum/
     }
-    puts diff
     assert_equal [], diff
   end
 
@@ -212,4 +210,13 @@ module RestTestCases
       skip("skipping XML tests for #{clz}")
     end
   end
+
+  #skip if this current controller type doesn't support JSON format
+  def check_for_json_type_skip
+    clz = @controller.controller_name.classify.constantize.to_s
+    if %w[Sample SampleType ContentBlob].include?(clz)
+      skip("skipping JSONAPI tests for #{clz}")
+    end
+  end
+
 end
