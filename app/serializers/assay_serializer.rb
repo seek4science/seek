@@ -1,5 +1,4 @@
 class AssaySerializer < PCSSerializer
-
   attributes :title, :description
   attribute :assay_class do
     { title: object.assay_class.title,
@@ -17,8 +16,8 @@ class AssaySerializer < PCSSerializer
       uri: object.technology_type_uri }
   end
 
-  has_many :organisms, include_data:true
-  has_many :assay_organisms, include_data:true
+  has_many :organisms, include_data: true
+  has_many :assay_organisms, include_data: true
 
   has_many :people
   has_many :projects
@@ -31,5 +30,4 @@ class AssaySerializer < PCSSerializer
   has_many :publications
   has_many :strains
   has_many :samples
-
 end

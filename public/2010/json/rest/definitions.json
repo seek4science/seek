@@ -83,18 +83,24 @@
         },
         "base_url" : {
           "$ref" : "#/definitions/uriString"
+        },
+        "api_version": {
+          "ref" : "#/definitions/nonEmptyString"
         }
       },
-      "required" : [ "created", "modified", "uuid", "base_url" ]
+      "required" : [ "created", "modified", "uuid", "base_url", "api_version" ]
     },
     "baseMetaType" : {
       "type" : "object",
       "properties" : {
         "base_url" : {
           "$ref" : "#/definitions/uriString"
+        },
+        "api_version": {
+          "ref" : "#/definitions/nonEmptyString"
         }
       },
-      "required" : [ "base_url" ],
+      "required" : [ "base_url", "api_version" ],
       "additionalProperties" : false
     },
 

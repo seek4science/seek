@@ -6,5 +6,4 @@ class StrainSerializer < BaseSerializer
   has_many :projects
   has_many :assays
   has_many :samples
-
 end
