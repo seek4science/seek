@@ -1,5 +1,4 @@
 class ModelSerializer < ContributedResourceSerializer
-
   attribute :model_type do
     object.model_type.try(:title)
   end
@@ -18,6 +17,4 @@ class ModelSerializer < ContributedResourceSerializer
   has_many :studies
   has_many :assays
   has_many :publications
-
 end
-

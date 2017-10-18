@@ -6,10 +6,10 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :versions do
     versions_data = []
     object.versions.each do |v|
-      path = polymorphic_path(object,version:v.version)
-      versions_data.append({version: v.version,
-                            revision_comments: v.revision_comments.presence,
-                           url: "#{base_url}#{path}"})
+      path = polymorphic_path(object, version: v.version)
+      versions_data.append(version: v.version,
+                           revision_comments: v.revision_comments.presence,
+                           url: "#{base_url}#{path}")
     end
     versions_data
   end
@@ -30,7 +30,6 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   attribute :content_blobs do
-
     requested_version = get_version
 
     blobs = []
@@ -47,19 +46,19 @@ class ContributedResourceSerializer < PCSSerializer
   def convert_content_blob_to_json(cb)
     path = polymorphic_path([cb.asset, cb])
     {
-        original_filename: cb.original_filename,
-        url: cb.url,
-        md5sum: cb.md5sum,
-        sha1sum: cb.sha1sum,
-        content_type: cb.content_type,
-        link: "#{base_url}#{path}",
-        size: cb.file_size
+      original_filename: cb.original_filename,
+      url: cb.url,
+      md5sum: cb.md5sum,
+      sha1sum: cb.sha1sum,
+      content_type: cb.content_type,
+      link: "#{base_url}#{path}",
+      size: cb.file_size
     }
   end
 
   def self_link
     if version_number
-      polymorphic_path(object,version:version_number)
+      polymorphic_path(object, version: version_number)
     else
       polymorphic_path(object)
     end
@@ -74,6 +73,4 @@ class ContributedResourceSerializer < PCSSerializer
   def version_number
     @scope[:requested_version] || object.try(:version)
   end
-
-
 end

@@ -1,8 +1,8 @@
 class ProjectSerializer < AvatarObjSerializer
-#class ProjectSerializer < ActiveModel::Serializer
+  # class ProjectSerializer < ActiveModel::Serializer
   attributes :title, :description,
              :web_page, :wiki_page
-  has_many :organisms,  include_data:true
+  has_many :organisms,  include_data: true
 
   has_many :people
   has_many :institutions
@@ -17,5 +17,4 @@ class ProjectSerializer < AvatarObjSerializer
   has_many :events
   has_many :strains
   has_many :samples
-
 end
