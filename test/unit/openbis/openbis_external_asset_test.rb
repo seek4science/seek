@@ -12,7 +12,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     options = {tomek: false}
-    asset = OpenbisExternalAsset.create(zample, options)
+    asset = OpenbisExternalAsset.build(zample, options)
 
     assert_equal @endpoint, asset.seek_service
     assert_equal '20171002172111346-37', asset.external_id

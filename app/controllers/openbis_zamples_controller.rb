@@ -1,5 +1,6 @@
 class OpenbisZamplesController < ApplicationController
 
+  before_filter :get_seek_util
   before_filter :get_project
   before_filter :get_endpoint
   before_filter :get_zample, only: [:show, :edit, :update]
@@ -20,27 +21,30 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def update
+    @linked_to_assay = ['20171002172401546-38']
     puts "update called"
     puts params
 
-    data_sets_ids = extract_requested_sets(@zample, params)
-    data_sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_perm_ids(data_sets_ids)
+    #data_sets_ids = extract_requested_sets(@zample, params)
+    #data_sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_perm_ids(data_sets_ids)
 
     # data_files = find_or_register_seek_files(data_sets)
 
-    permitted = params.require(:assay).permit(:study_id);
-    permitted[:assay_class_id] ||= AssayClass.for_type("experimental").id
-    permitted[:title] = "OpenBIS #{@zample.perm_id}"
-    # raise('Missing study') unless study_id
-    @assay = Assay.new(permitted)
+    assay_params = params.require(:assay).permit(:study_id, :assay_class_id, :title);
+    sync_options = params.permit(:link_datasets)
+
+    @assay = @seek_util.createObisAssay(assay_params,current_person, @zample, sync_options)
+
 
 
     if @assay.save
       flash[:notice] = "Registered: #{params}"
       redirect_to @assay
     else
-      flash[:notice] = "Problems: #{params}"
-      redirect_to edit_project_openbis_endpoint_openbis_zample_path
+      @reasons = @assay.errors
+      @error_msg = 'Could not create assay'
+      render action: 'edit'
+      # redirect_to edit_project_openbis_endpoint_openbis_zample_path
     end
   end
 
@@ -118,5 +122,9 @@ class OpenbisZamplesController < ApplicationController
 
   def get_project
     @project = Project.find(params[:project_id])
+  end
+
+  def get_seek_util
+    @seek_util = Seek::Openbis::SeekUtil.new unless @seek_util
   end
 end
