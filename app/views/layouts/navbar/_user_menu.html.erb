@@ -33,7 +33,7 @@
           <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
           Drop below to save
         </div>
-        <% cache "favourites/user/#{current_user.id}" do -%>
+        <% cache "favourites/user/#{current_user.id}", skip_digest: true do -%>
             <div id="add-favourites-zone">
               <div id="favourite_list">
                 <%= render :partial=>"favourites/gadget_list" %>
