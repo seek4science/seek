@@ -3,26 +3,9 @@
 
 #includes some helper methods for commonly used fragament expirations
 module CommonSweepers
-
-  def expire_all_fragments
-    expire_annotation_fragments
-    expire_all_favourite_fragments
-    expire_organism_gadget
-    expire_header_and_footer
-    expire_new_object_gadget
-    expire_download_activity
-    expire_create_activity
-    expire_resource_list_item_action_partial
-    expire_resource_list_item_content
-  end
-
-  def expire_new_object_gadget
-    expire_fragment "new_object_gadget"
-  end
-
   def expire_header_and_footer
-    expire_fragment(/header/)
-    expire_fragment("footer")
+    expire_fragment(/header.*/)
+    expire_fragment(/footer.*/)
   end
 
   def expire_download_activity
@@ -37,7 +20,7 @@ module CommonSweepers
     expire_fragment(/rli_actions.*/)
   end
 
-  def expire_resource_list_item_content item=nil
+  def expire_resource_list_item_content(item = nil)
     if item.nil?
       expire_fragment(/rli_.*/)
     else
@@ -53,12 +36,12 @@ module CommonSweepers
   end
 
   def expire_annotation_fragments name=nil
-    expire_fragment "sidebar_tag_cloud"
-    expire_fragment "super_tag_cloud"
-    if (name.nil?)
+    expire_fragment('sidebar_tag_cloud')
+    expire_fragment('super_tag_cloud')
+    if name.nil?
       expire_fragment(/suggestion_for.*/)
     else
-      expire_fragment "suggestions_for_#{name}"
+      expire_fragment("suggestions_for_#{name}")
     end
   end
 
@@ -68,11 +51,10 @@ module CommonSweepers
   end
   
   def expire_organism_gadget
-    expire_fragment "organisms_gadget"
+    expire_fragment('organisms_gadget')
   end
   
   def expire_fragment(frag)
     ActionController::Base.new.expire_fragment(frag)
   end
-    
 end

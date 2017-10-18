@@ -9,7 +9,7 @@
    cache_key = creators.collect{|c| c.cache_key}.join("")
    cache_key = Digest::SHA2.hexdigest(cache_key)
 %>
-<% cache cache_key do -%>
+<% cache cache_key, skip_digest: true do -%>
     <% unless creators.empty? -%>
         <div class="text-center">
           <% if creators.size <= 2 %>
