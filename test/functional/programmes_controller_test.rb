@@ -11,6 +11,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     Factory(:programme)
   end
 
+  def min_test_object
+    @min_object = Factory(:min_programme)
+  end
+
   # for now just admins can create programmes, later we will change this
   test 'new page accessible admin' do
     login_as(Factory(:admin))
