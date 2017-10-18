@@ -19,6 +19,10 @@ class ProjectsControllerTest < ActionController::TestCase
     @object = projects(:sysmo_project)
   end
 
+  def min_test_object
+    @min_object = Factory(:min_project)
+  end
+
   def test_title
     get :index
     assert_select 'title', text: I18n.t('project').pluralize, count: 1

@@ -104,8 +104,6 @@ class OrganismTest < ActiveSupport::TestCase
     object.save
     rdf = object.to_rdf
 
-    puts rdf.inspect
-
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count >= 1
       assert_equal RDF::URI.new("http://localhost:3000/organisms/#{object.id}"), reader.statements.first.subject

@@ -20,9 +20,9 @@ class BaseSerializer < SimpleBaseSerializer
 
   def associated(name)
     unless @associated[name].blank?
-      @associated[name][:items]
-    else
-      nil
+      items = @associated[name][:items]
+      items = items.sort_by(&:id) unless items.blank?
+      items
     end
   end
 
@@ -82,43 +82,34 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Sample')
   end
 
-
   def self_link
-    if object.class.name.end_with?("::Version")
-      polymorphic_path(object.parent,version:object.version)
-    else
-      polymorphic_path(object)
-    end
-
+    polymorphic_path(object)
   end
 
   def _links
-      {self: self_link}
-      end
+    { self: self_link }
+  end
 
-  #avoid dash-erizing attribute names
+  # avoid dash-erizing attribute names
   def format_name(attribute_name)
     attribute_name.to_s
   end
 
   def _meta
     meta = super
-    if object.respond_to?('uuid')
-      meta[:uuid] = object.uuid
-    end
-    meta[:base_url]=base_url
+    meta[:uuid] = object.uuid if object.respond_to?('uuid')
+    meta[:base_url] = base_url
     meta
   end
 
   def initialize(object, options = {})
     super
 
-    #access related resources with proper authorization & ignore version subclass
-    if (object.class.to_s.include?("::Version"))
-      @associated = associated_resources(object.parent)
-    else
-      @associated = associated_resources(object)
-    end
+    # access related resources with proper authorization & ignore version subclass
+    @associated = if object.class.to_s.include?('::Version')
+                    associated_resources(object.parent)
+                  else
+                    associated_resources(object)
+                  end
   end
-
 end

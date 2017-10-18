@@ -16,6 +16,10 @@ class OrganismsControllerTest < ActionController::TestCase
     @object = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
   end
 
+  def min_test_object
+    @min_object = Factory(:min_organism)
+  end
+
   test 'new organism route' do
     assert_routing '/organisms/new', controller: 'organisms', action: 'new'
     assert_equal '/organisms/new', new_organism_path.to_s

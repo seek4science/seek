@@ -290,7 +290,7 @@ class DataFilesController < ApplicationController
     scope = scope.with_extracted_samples if (params[:with_samples] == 'true')
 
     @data_files = DataFile.authorize_asset_collection(
-      scope.where('data_files.title LIKE ?', "#{params[:filter]}%").uniq, 'view'
+      scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").uniq, 'view'
     ).first(20)
 
     respond_to do |format|

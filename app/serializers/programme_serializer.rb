@@ -4,7 +4,7 @@ class ProgrammeSerializer < AvatarObjSerializer
              :funding_details
 
   attribute :tags do
-    serialize_annotations(object, context='funding_code')
+    serialize_annotations(object, context = 'funding_code')
   end
 
   has_many :people
@@ -19,5 +19,4 @@ class ProgrammeSerializer < AvatarObjSerializer
   has_many :publications
   has_many :presentations
   has_many :events
-
 end

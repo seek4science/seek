@@ -42,11 +42,9 @@ class SearchController < ApplicationController
 
     view_context.ie_support_faceted_browsing? if Seek::Config.faceted_search_enabled
 
-    options = {:is_collection=>true, :jsonapi=>{version: "1.0"}, :meta=>{base_url: Seek::Config.site_base_host}}
-
     respond_to do |format|
       format.html
-      format.json {render json: JSONAPI::Serializer.serialize(@results,options)}
+      format.json {render json: @results}
     end
     
   end

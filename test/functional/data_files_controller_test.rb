@@ -23,6 +23,10 @@ class DataFilesControllerTest < ActionController::TestCase
     @object
   end
 
+  def min_test_object
+    @min_object = Factory(:min_data_file)
+  end
+
   def test_title
     get :index
     assert_response :success
@@ -33,6 +37,16 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'title', text: df.title, count: 1
 
+  end
+
+  test 'json link includes version' do
+    df = Factory(:data_file,policy:Factory(:public_policy))
+    test_show_json(df)
+    json = JSON.parse(response.body)
+    refute_nil json['data']
+    refute_nil json['data']['links']
+    refute_nil json['data']['links']['self']
+    assert json['data']['links']['self'].ends_with?("?version=#{df.version}")
   end
 
   # because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent

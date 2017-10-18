@@ -39,7 +39,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
 
   test 'all term types' do
     types = SuggestedAssayType.all_term_types
-    assert_equal %w(assay modelling_analysis), types.sort
+    assert_equal %w[assay modelling_analysis], types.sort
   end
 
   test 'ontology_parent' do
@@ -228,5 +228,51 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
     child2.reload
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', top.ontology_uri
     assert_nil child2[:ontology_uri]
+  end
+
+  test 'updating a suggested assay type should update associated assays' do
+    type = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = Factory(:experimental_assay, suggested_assay_type: type)
+    assay2 = Factory(:experimental_assay, suggested_assay_type: type)
+
+    type.reload
+    assert_equal [assay, assay2].sort, type.assays.sort
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay2.assay_type_uri
+
+    Delayed::Job.destroy_all
+
+    type.ontology_uri = 'http://wibble.com/ontology#fish'
+    type.save!
+    assay.reload
+    assay2.reload
+
+    assert_equal 'http://wibble.com/ontology#fish', assay.assay_type_uri
+    assert_equal 'http://wibble.com/ontology#fish', assay2.assay_type_uri
+
+    # checks that rdf generation jobs have been created, to update the RDF for the assays
+    rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}
+    assert_equal 2,rdfjobs.count
+    assert_equal [assay,assay2].sort,rdfjobs.collect{|j| j.payload_object.item}.sort
+  end
+
+  test 'assay adopts ontology uri if suggested type destroyed' do
+    type = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = Factory(:experimental_assay, suggested_assay_type: type)
+    type.reload
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
+
+    Delayed::Job.destroy_all
+
+    type.destroy
+    assay.reload
+
+    assert_nil assay.suggested_assay_type
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
+
+    # checks that rdf generation jobs have been created, to update the RDF for the assays
+    rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}
+    assert_equal 1,rdfjobs.count
+    assert_equal assay,rdfjobs.first.payload_object.item
   end
 end

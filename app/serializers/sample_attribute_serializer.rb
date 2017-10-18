@@ -4,5 +4,4 @@ class SampleAttributeSerializer < BaseSerializer
              :unit, :unit_id, :pos,
              :sample_controlled_vocab, :sample_controlled_vocab_id, :linked_sample_type_id,
              :required, :is_title, :template_column_index
-
 end

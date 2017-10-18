@@ -136,4 +136,29 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     FileUtils.rm expected_rdf_file
     refute File.exist?(expected_rdf_file)
   end
+
+  test 'should not allow duplicates' do
+    assay = Factory(:assay)
+    Delayed::Job.delete_all
+    refute RdfGenerationJob.new(assay, false).exists?
+    assert_difference('Delayed::Job.count',1) do
+      RdfGenerationJob.new(assay, false).queue_job
+    end
+
+    assert_no_difference('Delayed::Job.count') do
+      RdfGenerationJob.new(assay, false).queue_job
+    end
+
+    refute RdfGenerationJob.new(assay, true).exists?
+    assert_difference('Delayed::Job.count',1) do
+      RdfGenerationJob.new(assay, true).queue_job
+    end
+
+    assert_no_difference('Delayed::Job.count') do
+      RdfGenerationJob.new(assay, true).queue_job
+    end
+
+
+
+  end
 end

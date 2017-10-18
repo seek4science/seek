@@ -18,6 +18,10 @@ class AssaysControllerTest < ActionController::TestCase
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
+  def min_test_object
+    @min_object = Factory(:min_assay)
+  end
+
   test 'modelling assay validates with schema' do
     df = Factory(:data_file, contributor: User.current_user.person)
     a = Factory(:modelling_assay, contributor: User.current_user.person)
@@ -318,8 +322,7 @@ class AssaysControllerTest < ActionController::TestCase
     post :update, id: assay.id, assay: {
       technology_type_uri: tech_type.uri,
       assay_type_uri: assay_type.uri
-    },
-                  policy_attributes: valid_sharing
+    },policy_attributes: valid_sharing
 
     assay.reload
     assert_equal assay_type, assay.suggested_assay_type
@@ -328,6 +331,34 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics', assay.assay_type_uri
     assert_equal 'fish', assay.assay_type_label
     assert_equal 'carrot', assay.technology_type_label
+  end
+
+  test 'should clear suggested assay and tech types when updating with a URI' do
+    suggested_assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
+    suggested_tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
+    assay = Factory(:experimental_assay,
+                    assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
+                    technology_type_uri:'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
+                    suggested_assay_type:suggested_assay_type,
+                    suggested_technology_type:suggested_tech_type,
+                    contributor:User.current_user.person)
+
+    refute_nil assay.suggested_assay_type
+    refute_nil assay.suggested_technology_type
+    refute_nil assay.assay_type_uri
+    refute_nil assay.technology_type_uri
+
+    post :update, id: assay.id, assay: {
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics'
+    },policy_attributes: valid_sharing
+
+    assay.reload
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics',assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',assay.technology_type_uri
+    assert_nil assay.suggested_assay_type
+    assert_nil assay.suggested_technology_type
+
   end
 
   test 'should delete assay with study' do
@@ -1340,4 +1371,66 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', assay_path(assay2), text: assay2.title, count: 0
     end
   end
+
+  test 'add data file button' do
+    assay=Factory(:experimental_assay)
+    person = assay.contributor
+    login_as(person)
+    assert assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:1
+    end
+
+    assay=Factory(:modelling_assay,contributor:person)
+    assert assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:1
+    end
+
+    assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy))
+    assert assay.can_view?
+    refute assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:0
+    end
+  end
+
+  test 'add model button' do
+    assay=Factory(:modelling_assay)
+    person = assay.contributor
+    login_as(person)
+    assert assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:1
+    end
+
+    assay=Factory(:modelling_assay,policy:Factory(:publicly_viewable_policy))
+    assert assay.can_view?
+    refute assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:0
+    end
+
+    #shouldn't show for an experimental assay, even if editable
+    assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy),contributor:person)
+    assert assay.can_view?
+    assert assay.can_edit?
+    refute assay.is_modelling?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:0
+    end
+  end
+
 end

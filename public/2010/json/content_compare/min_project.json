@@ -1,0 +1,69 @@
+{
+  "data": {
+    "id": "927855014",
+    "type": "projects",
+    "attributes": {
+      "avatar": null,
+      "title": "A Minimal Project",
+      "description": null,
+      "web_page": null,
+      "wiki_page": null
+    },
+    "relationships": {
+      "organisms": {
+        "data": []
+      },
+      "people": {
+        "data": []
+      },
+      "institutions": {
+        "data": []
+      },
+      "investigations": {
+        "data": []
+      },
+      "studies": {
+        "data": []
+      },
+      "assays": {
+        "data": []
+      },
+      "data_files": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "sops": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "presentations": {
+        "data": []
+      },
+      "events": {
+        "data": []
+      },
+      "strains": {
+        "data": []
+      },
+      "samples": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/projects/927855014"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

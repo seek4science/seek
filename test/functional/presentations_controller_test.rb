@@ -16,6 +16,10 @@ class PresentationsControllerTest < ActionController::TestCase
     @object
   end
 
+  def min_test_object
+    @min_object = Factory(:min_presentation)
+  end
+
   test 'index' do
     get :index
     assert_response :success
