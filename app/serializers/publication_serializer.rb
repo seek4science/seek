@@ -2,14 +2,14 @@ class PublicationSerializer < BaseSerializer
   attributes :title, #:publication_authors,
              :journal, :published_date,
              :doi, :pubmed_id,
-             :abstract, :citation #, :persons --> creators?
+             :abstract, :citation # , :persons --> creators?
   attribute :link_to_pub do
     if :pubmed_id
-      "https://www.ncbi.nlm.nih.gov/pubmed/"+object.pubmed_id.to_s
+      'https://www.ncbi.nlm.nih.gov/pubmed/' + object.pubmed_id.to_s
     elsif :doi
-      "http://dx.doi.org/"+object.doi.to_s
+      'http://dx.doi.org/' + object.doi.to_s
     else
-      ""
+      ''
     end
   end
 
@@ -17,7 +17,7 @@ class PublicationSerializer < BaseSerializer
     if object.publication_author_names.blank?
       []
     else
-     object.publication_author_names
+      object.publication_author_names
       end
   end
 

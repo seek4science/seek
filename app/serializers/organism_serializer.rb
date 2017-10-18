@@ -10,5 +10,4 @@ class OrganismSerializer < BaseSerializer
   def strains
     object.strains
   end
-
 end

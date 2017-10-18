@@ -2,15 +2,15 @@ require 'digest/sha1'
 class PersonSerializer < AvatarObjSerializer
   attributes :title, :description,
              :first_name, :last_name,
-             :web_page,  :orcid
+             :web_page, :orcid
   attribute :email do
     Digest::SHA1.hexdigest(object.email)
   end
   attribute :expertise do
-    serialize_annotations(object, context="expertise")
+    serialize_annotations(object, context = 'expertise')
   end
   attribute :tools do
-    serialize_annotations(object, context="tool")
+    serialize_annotations(object, context = 'tool')
   end
 
   has_many :projects
@@ -25,6 +25,4 @@ class PersonSerializer < AvatarObjSerializer
   has_many :presentations
   has_many :events
   has_many :samples
-
-
 end
