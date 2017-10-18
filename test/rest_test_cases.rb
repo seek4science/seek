@@ -165,7 +165,7 @@ module RestTestCases
       get :show, id: object, format: 'json'
       assert_response :success
       parsed_response = JSON.parse(@response.body)
-
+      puts parsed_response,"\n"
       check_content_diff(json_to_compare, parsed_response)
     end
   end
@@ -187,12 +187,17 @@ module RestTestCases
       elsif (el["path"] =~ /content_blobs\/\d+\/link/)
         assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\/content_blobs\/\d+/
         diff.delete(el)
+      elsif (el["path"] =~ /avatar/)
+        assert el["value"] =~ /^\/#{plural_obj}\/\d+\/avatars\/\d+/
+        diff.delete(el)
       end
     end
 
     diff.delete_if {
         |el| el["path"] =~ /id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum/
     }
+    puts diff
+
     assert_equal [], diff
   end
 
@@ -270,4 +275,9 @@ module RestTestCases
     return %w[Sample Strain].include?(clz)
   end
 
+  # m corresponds to 'min'/'max'
+  def get_test_object(m)
+    clz = @controller.controller_name.classify.downcase
+    return Factory(("#{m}_#{clz}").to_sym)
+  end
 end

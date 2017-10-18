@@ -15,10 +15,6 @@ class PeopleControllerTest < ActionController::TestCase
     @object = Factory(:person,orcid:'http://orcid.org/0000-0003-2130-0865')
   end
 
-  def get_test_object(m)
-    @object = Factory(("#{m}_person").to_sym)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: 'People', count: 1
@@ -1749,6 +1745,9 @@ class PeopleControllerTest < ActionController::TestCase
 
   def edit_max_object(person)
     assert true
+    person.avatar = Factory(:avatar, owner: person)
+    person.save
+
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person
     Factory :tool, value: 'fishing rod', annotatable: person
