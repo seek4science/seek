@@ -20,6 +20,7 @@ namespace :seek do
     flag_simulation_data
     rebuild_rdf
     generate_organism_uuids
+    strip_weblinks
 
   ]
 
@@ -120,6 +121,60 @@ namespace :seek do
       org.record_timestamps = false
       org.save(validate:false)
     end
+  end
+
+  task(strip_weblinks: :environment) do
+
+    #Person webpage
+    Person.select{|p| !p.web_page.blank?}.select{|p| p.web_page != p.web_page.strip}.each do |person|
+      person.record_timestamps = false
+      puts "Fixing '#{person.web_page}' for Person:#{person.id}"
+      person.web_page = person.web_page.strip
+      disable_authorization_checks do
+        person.save(validate:false)
+      end
+    end
+
+    #Project webpage
+    Project.select{|p| !p.web_page.blank?}.select{|p| p.web_page != p.web_page.strip}.each do |project|
+      project.record_timestamps = false
+      puts "Fixing '#{project.web_page}' for Project:#{project.id}"
+      project.web_page = project.web_page.strip
+      disable_authorization_checks do
+        project.save(validate:false)
+      end
+    end
+
+    #Project wiki page
+    Project.select{|p| !p.wiki_page.blank?}.select{|p| p.wiki_page != p.wiki_page.strip}.each do |project|
+      project.record_timestamps = false
+      puts "Fixing '#{project.wiki_page}' for Project:#{project.id}"
+      project.wiki_page = project.wiki_page.strip
+      disable_authorization_checks do
+        project.save(validate:false)
+      end
+    end
+
+    #Programme webpage
+    Programme.select{|p| !p.web_page.blank?}.select{|p| p.web_page != p.web_page.strip}.each do |prog|
+      prog.record_timestamps = false
+      puts "Fixing '#{prog.web_page}' for Programme:#{prog.id}"
+      prog.web_page = prog.web_page.strip
+      disable_authorization_checks do
+        project.save(validate:false)
+      end
+    end
+
+    #Institution webpage
+    Institution.select{|i| !i.web_page.blank?}.select{|i| i.web_page != i.web_page.strip}.each do |institution|
+      institution.record_timestamps = false
+      puts "Fixing '#{institution.web_page}' for Institution:#{institution.id}"
+      institution.web_page = institution.web_page.strip
+      disable_authorization_checks do
+        institution.save(validate:false)
+      end
+    end
+
   end
 
 end
