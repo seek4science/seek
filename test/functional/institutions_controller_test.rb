@@ -220,8 +220,7 @@ class InstitutionsControllerTest < ActionController::TestCase
 
   def edit_max_object(inst)
     for i in 1..5 do
-      work_group = Factory(:work_group, institution: inst)
-      a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+      Factory(:person).add_to_project_and_institution(Factory(:project), inst)
     end
     inst.avatar = Factory(:avatar, owner: inst)
     inst.save

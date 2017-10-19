@@ -1744,14 +1744,12 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(person)
-    person.avatar = Factory(:avatar, owner: person)
-    person.save
-
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person
     Factory :tool, value: 'fishing rod', annotatable: person
-
     person.add_to_project_and_institution(Factory(:min_project), Factory(:min_institution))
+    person.avatar = Factory(:avatar, owner: person)
+    person.save
   end
 
   def mask_for_admin
