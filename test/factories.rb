@@ -146,6 +146,14 @@ Factory.define(:min_programme, class: Programme) do |f|
   f.title "A Minimal Programme"
 end
 
+Factory.define(:max_programme, class: Programme) do |f|
+  f.title "A Maximal Programme"
+  f.description "A very exciting programme"
+  f.web_page "http://www.synbiochem.co.uk"
+  f.funding_details "Someone is funding this for me"
+  f.projects { [Factory.build(:project)] }
+end
+
 # Project
 Factory.define(:project) do |f|
   f.sequence(:title) { |n| "A Project: -#{n}" }
@@ -1108,6 +1116,10 @@ end
 
 Factory.define :expertise, parent: :annotation do |f|
   f.attribute_name 'expertise'
+end
+
+Factory.define :funding_code, parent: :annotation do |f|
+  f.attribute_name 'funding_code'
 end
 
 Factory.define :tool, parent: :annotation do |f|
