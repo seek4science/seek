@@ -1475,6 +1475,16 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  def edit_max_object(project)
+    for i in 1..5 do
+      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+      # work_group = Factory(:work_group, institution: inst)
+     # a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    end
+    project.avatar = Factory(:avatar, owner: project)
+    project.save
+  end
+
   private
 
   def valid_project

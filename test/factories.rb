@@ -155,6 +155,13 @@ Factory.define(:min_project, class: Project) do |f|
   f.title "A Minimal Project"
 end
 
+Factory.define(:max_project, class: Project) do |f|
+  f.title "A Maximal Project"
+  f.description "A Taverna project"
+  f.web_page "http://www.taverna.org.uk"
+  f.wiki_page "http://www.mygrid.org.uk"
+end
+
 # Institution
 Factory.define(:institution) do |f|
   f.sequence(:title) { |n| "An Institution: #{n}" }
