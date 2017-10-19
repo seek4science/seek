@@ -1744,7 +1744,6 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(person)
-    assert true
     person.avatar = Factory(:avatar, owner: person)
     person.save
 

@@ -14,10 +14,6 @@ class InstitutionsControllerTest < ActionController::TestCase
     @object = institutions(:ebi_inst)
   end
 
-  def min_test_object
-    @min_object = Factory(:min_institution)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: 'Institutions', count: 1
@@ -220,5 +216,14 @@ class InstitutionsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select '#resource-count-stats', count: 0
+  end
+
+  def edit_max_object(inst)
+    for i in 1..5 do
+      work_group = Factory(:work_group, institution: inst)
+      a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    end
+    inst.avatar = Factory(:avatar, owner: inst)
+    inst.save
   end
 end

@@ -178,17 +178,17 @@ module RestTestCases
     for el in diff
       #the self link must start with the pluralized controller's name (e.g. /people)
       if (el["path"] =~ /self/)
-        assert el["value"] =~ /^\/#{plural_obj}/
+        assert_match /^\/#{plural_obj}/, el["value"]
       # url in version, e.g.  base_url/data_files/877365356?version=1
       elsif (el["path"] =~ /versions\/\d+\/url/)
-        assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\?version=\d+/
+        assert_match /#{base}\/#{plural_obj}\/\d+\?version=\d+/, el["value"]
         diff.delete(el)
       # link in content blob, e.g.  base_url/data_files/877365356/content_blobs/343567275
       elsif (el["path"] =~ /content_blobs\/\d+\/link/)
-        assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\/content_blobs\/\d+/
+        assert_match /#{base}\/#{plural_obj}\/\d+\/content_blobs\/\d+/, el["value"]
         diff.delete(el)
       elsif (el["path"] =~ /avatar/)
-        assert el["value"] =~ /^\/#{plural_obj}\/\d+\/avatars\/\d+/
+        assert_match /^\/#{plural_obj}\/\d+\/avatars\/\d+/, el["value"]
         diff.delete(el)
       end
     end
