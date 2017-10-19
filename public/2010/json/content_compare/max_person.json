@@ -21,10 +21,20 @@
     },
     "relationships": {
       "projects": {
-        "data": []
+        "data": [
+          {
+            "id": "1022251312",
+            "type": "projects"
+          }
+        ]
       },
       "institutions": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "institutions"
+          }
+        ]
       },
       "investigations": {
         "data": []

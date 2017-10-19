@@ -1752,7 +1752,7 @@ class PeopleControllerTest < ActionController::TestCase
     Factory :expertise, value: 'fishing', annotatable: person
     Factory :tool, value: 'fishing rod', annotatable: person
 
-    #person.add_to_project_and_institution(projects(:one), institutions(:two))
+    person.add_to_project_and_institution(Factory(:min_project), Factory(:min_institution))
   end
 
   def mask_for_admin
