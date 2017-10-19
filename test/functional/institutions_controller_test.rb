@@ -14,6 +14,10 @@ class InstitutionsControllerTest < ActionController::TestCase
     @object = institutions(:ebi_inst)
   end
 
+  def min_test_object
+    @min_object = Factory(:min_institution)
+  end
+
   def test_title
     get :index
     assert_select 'title', text: 'Institutions', count: 1

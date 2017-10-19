@@ -46,6 +46,7 @@ Person,name,RDF::FOAF.name,l,,
 Person,projects,JERMVocab.isAssociatedWith,u,,
 Person,web_page,RDF::FOAF.homepage,l,URI.parse(item),compact
 Person,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
+Person,orcid_uri,RDF::OWL.sameAs,u,,
 Programme,assays,JERMVocab.hasItem,u,,
 Programme,studies,JERMVocab.hasItem,u,,
 Programme,investigations,JERMVocab.hasItem,u,,

@@ -7,5 +7,4 @@ class EventSerializer < BaseSerializer
   has_many :data_files
   has_many :publications
   has_many :presentations
-
 end

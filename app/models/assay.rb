@@ -185,6 +185,6 @@ class Assay < ActiveRecord::Base
 
   # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay
   def rdf_type_entity_fragment
-    { 'EXP' => 'Experimental_assay_type', 'MODEL' => 'Model_analysis_type' }[assay_class.key]
+    { 'EXP' => 'Experimental_assay', 'MODEL' => 'Modelling_analysis' }[assay_class.key]
   end
 end

@@ -69,7 +69,7 @@ module Seek
           item.rdf_resource
         elsif item.class.name.end_with?('::Version') # FIXME: this should be put into explicit_versioning
           uri = item.parent.rdf_resource
-          uri.query = "version=?#{item.version}"
+          uri.query = "version=#{item.version}"
           uri
         else
           uri = RDF::URI.new(item)

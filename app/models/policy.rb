@@ -33,8 +33,9 @@ class Policy < ActiveRecord::Base
   end
 
   def queue_rdf_generation_job
-    unless (previous_changes.keys - ['updated_at']).empty? || assets.empty?
-      assets.each { |asset| RdfGenerationJob.new(asset).queue_job }
+    supported_assets=assets.select(&:rdf_supported?)
+    unless (previous_changes.keys - ['updated_at']).empty? || supported_assets.empty?
+      supported_assets.each { |asset| RdfGenerationJob.new(asset).queue_job }
     end
   end
 

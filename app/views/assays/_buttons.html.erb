@@ -2,6 +2,12 @@
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item }%>
 <% if logged_in_and_member? %>
     <%= button_link_to("New #{assay_word} based on this one", 'new',  new_object_based_on_existing_one_assay_path(item,:controller_name=>"assays")) %>
+    <% if item.can_edit? %>
+        <%= button_link_to("Add #{t('data_file')}",'add',new_data_file_path("assay_ids[]":item.id)) %>
+        <% if item.is_modelling? %>
+            <%= button_link_to("Add #{t('model')}",'add',new_model_path("assay_ids[]":item.id)) %>
+        <% end %>
+    <% end %>
 <% end %>
 <% if show_nels_button?(item) %>
     <%= button_link_to('Add data from NeLS', 'add', assay_nels_path(item.id)) %>

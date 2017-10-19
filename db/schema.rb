@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171010135127) do
+ActiveRecord::Schema.define(version: 20171011095056) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -961,6 +961,7 @@ ActiveRecord::Schema.define(version: 20171010135127) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "first_letter", limit: 255
+    t.string   "uuid",         limit: 255
   end
 
   create_table "organisms_projects", id: false, force: :cascade do |t|
