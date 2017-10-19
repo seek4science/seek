@@ -365,6 +365,12 @@ Factory.define(:min_investigation, class: Investigation) do |f|
   f.projects { [Factory.build(:min_project)] }
 end
 
+Factory.define(:max_investigation, class: Investigation) do |f|
+  f.title "A Maximal Investigation"
+  f.projects { [Factory.build(:project)] }
+  f.description "Investigation of the Human Genome"
+end
+
 # Strain
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }

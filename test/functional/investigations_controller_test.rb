@@ -371,4 +371,13 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', investigation_path(investigation2), text: investigation2.title, count: 0
     end
   end
+
+  def edit_max_object(investigation)
+    assert true
+    for i in 1..5 do
+       tag = Factory :tag, value: "tag#{i}", source: User.current_user, annotatable: investigation
+    end
+    investigation.creators = [Factory(:person)]
+    investigation.save
+  end
 end

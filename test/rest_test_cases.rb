@@ -162,6 +162,7 @@ module RestTestCases
       #parse such that backspace is eliminated and null turns to nil
       json_to_compare = JSON.parse(File.read(json_file))
       edit_max_object(object) if (m == 'max')
+
       get :show, id: object, format: 'json'
       assert_response :success
       parsed_response = JSON.parse(@response.body)
