@@ -1,15 +1,17 @@
 module Seek
   module Rdf
     module CSVMappingsHandling
+
       MAPPINGS_FILE = File.join(File.dirname(__FILE__), 'rdf_mappings.csv')
+
       def generate_from_csv_definitions(rdf_graph)
         # load template
-        rows = Rails.cache.fetch('rdf_definitions', expires_in: 1.hour) do
-          CSV.read(MAPPINGS_FILE)
-        end
-        rows.select { |row| row.present? && !row.empty? }.each do |row|
-          unless row[0].casecmp('class').zero?
-            rdf_graph = generate_for_csv_row(rdf_graph, row)
+
+        CSV.open(MAPPINGS_FILE) do |rows|
+          rows.select { |row| row.present? && !row.empty? }.each do |row|
+            unless row[0].casecmp('class').zero?
+              rdf_graph = generate_for_csv_row(rdf_graph, row)
+            end
           end
         end
         rdf_graph
