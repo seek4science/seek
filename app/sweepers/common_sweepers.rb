@@ -1,7 +1,7 @@
 # To change this template, choose Tools | Templates
 # and open the template in the editor.
 
-#includes some helper methods for commonly used fragament expirations
+# includes some helper methods for commonly used fragament expirations
 module CommonSweepers
   def expire_header_and_footer
     expire_fragment(/header.*/)
@@ -28,14 +28,14 @@ module CommonSweepers
     end
   end
 
-  #fragments that should change due to authorization changes
+  # fragments that should change due to authorization changes
   def expire_auth_related_fragments
     expire_download_activity
     expire_create_activity
     expire_resource_list_item_action_partial
   end
 
-  def expire_annotation_fragments name=nil
+  def expire_annotation_fragments(name = nil)
     expire_fragment('sidebar_tag_cloud')
     expire_fragment('super_tag_cloud')
     if name.nil?
@@ -45,15 +45,15 @@ module CommonSweepers
     end
   end
 
-  #expires ALL fragment caches related to favourites
+  # expires ALL fragment caches related to favourites
   def expire_all_favourite_fragments
     expire_fragment(/\/favourites\/user\/.*/)
   end
-  
+
   def expire_organism_gadget
     expire_fragment('organisms_gadget')
   end
-  
+
   def expire_fragment(frag)
     ActionController::Base.new.expire_fragment(frag)
   end
