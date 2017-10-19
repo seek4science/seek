@@ -1372,7 +1372,6 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-<<<<<<< HEAD
   test 'should show NeLS button for NeLS-enabled project' do
     person = Factory(:person)
     login_as(person.user)
