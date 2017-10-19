@@ -32,20 +32,25 @@ module Seek
         rdf_graph
       end
 
-      def generate_triples_for_csv_row(subject, method, property, uri_or_literal, transformation, collection_transform, rdf_graph)
+      def generate_triples_for_csv_row(subject, method, property, uri_or_literal, transformation, collection_transformation, rdf_graph)
         resource = subject.rdf_resource
+        property_uri = eval(property)
+        Rails.logger.debug("Generating triples for subject #{rdf_resource}, method #{method}, property #{property_uri}")
         items = subject.send(method)
         # may be an array of items or a single item. Cant use Array(item) or [*item] here cos it screws up times and datetimes
         items = [items] unless items.respond_to?(:each)
 
         transformation.strip! if transformation
-        collection_transform.strip! if collection_transform
-        unless collection_transform.blank?
-          items = eval("items.#{collection_transform}")
+        collection_transformation.strip! if collection_transformation
+        unless collection_transformation.blank?
+          Rails.logger.debug("Performing collection transformation: #{collection_transformation}")
+          items = eval("items.#{collection_transformation}")
         end
         items.each do |item|
-          property_uri = eval(property)
-          item = eval(transformation) unless transformation.blank?
+          unless transformation.blank?
+            Rails.logger.debug("Performing transformation: #{transformation}")
+            item = eval(transformation)
+          end
           o = if uri_or_literal.casecmp('u').zero?
                 handle_uri_for_item(item)
               else
