@@ -899,6 +899,14 @@ class SopsControllerTest < ActionController::TestCase
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "never"/, count: 1
   end
 
+  def edit_max_object(sop)
+    for i in 1..5 do
+      tag = Factory :tag, value: "sop-tag#{i}", source: User.current_user, annotatable: sop
+    end
+    sop.creators = [Factory(:person)]
+    sop.save
+  end
+
   private
 
   def file_for_upload(options = {})

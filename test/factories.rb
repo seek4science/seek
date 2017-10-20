@@ -214,6 +214,15 @@ Factory.define(:min_sop, class: Sop) do |f|
   end
 end
 
+Factory.define(:max_sop, class: Sop) do |f|
+  f.title 'A Maximal Sop'
+  f.description 'How to run a simulation in GROMACS'
+  f.projects { [Factory.build(:max_project)] }
+  f.after_create do |sop|
+    sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
+  end
+end
+
 Factory.define(:doc_sop, parent: :sop) do |f|
   f.association :content_blob, factory: :doc_content_blob
 end
