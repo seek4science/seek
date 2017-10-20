@@ -22,7 +22,7 @@ myExperiment - http://www.myexperiment.org
 
 BioCatalogue - http://www.biocatalogue.org
 
-MethodBox - https://www.methodbox.org/
+MethodBox - http://www.esciencelab.org.uk/products/methodbox/
 
 ## External Services we use
 
