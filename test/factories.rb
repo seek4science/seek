@@ -353,6 +353,14 @@ Factory.define(:min_study, class: Study) do |f|
   f.association :investigation, factory: :min_investigation
 end
 
+Factory.define(:max_study, class: Study) do |f|
+  f.title "A Maximal Study"
+  f.description "The Study of many things"
+  f.experimentalists "Wet lab people"
+  #f.person_responsible Factory.build(:person)
+  f.association :investigation, factory: :max_investigation
+end
+
 # Investigation
 Factory.define(:investigation) do |f|
   f.projects { [Factory.build(:project)] }

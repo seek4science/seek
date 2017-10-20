@@ -549,4 +549,14 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', study_path(study2), text: study2.title, count: 0
     end
   end
+
+  def edit_max_object(study)
+    assert true
+    for i in 1..5 do
+      tag = Factory :tag, value: "stag#{i}", source: User.current_user, annotatable: study
+    end
+    study.creators = [Factory(:person)]
+    study.person_responsible = Factory(:person)
+    study.save
+  end
 end
