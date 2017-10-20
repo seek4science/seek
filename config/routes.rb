@@ -204,6 +204,7 @@ SEEK::Application.routes.draw do
         post :refresh_metadata_store
       end
       resources :openbis_zamples do
+        post :register, on: :member
       end
     end
     resources :avatars do

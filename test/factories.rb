@@ -1360,6 +1360,25 @@ Factory.define(:openbis_endpoint) do |f|
   f.association :project, factory: :project
 end
 
+FactoryGirl.define do
+  factory :openbis_zample,  class: Seek::Openbis::Zample do
+
+    json = JSON.parse(
+        '
+{"identifier":"\/API-SPACE\/TZ3","modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser",
+"code":"TZ3","modifier":"apiuser","permId":"20171002172111346-37",
+"registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40","20171004182824553-41"]
+,"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
+'
+    )
+
+    initialize_with { Seek::Openbis::Zample.new(Factory :openbis_endpoint).populate_from_json(json) }
+    # skipping save as not implemented
+    to_create { |instance| instance }
+  end
+end
+
+
 Factory.define(:validation_data_relationship_type, class:RelationshipType) do |f|
   f.title 'Validation data'
   f.key RelationshipType::VALIDATION

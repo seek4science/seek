@@ -5,7 +5,7 @@
 
 <% datasets = @zample.datasets %>
 
-<%= form_tag({controller: "openbis_zamples", action: "update", id: @zample.perm_id}, {method: 'put'}) do |f| %>
+<%= form_tag({controller: "openbis_zamples", action: "register", id: @zample.perm_id}, {method: 'post'}) do |f| %>
  <%= form_for @assay do |ff| %> <%# HACK to be able to render study form using the existing helpers%>
         <div class="form-group">
           <label>Register under Study </label><span class="required">*</span>

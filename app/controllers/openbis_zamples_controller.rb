@@ -3,7 +3,7 @@ class OpenbisZamplesController < ApplicationController
   before_filter :get_seek_util
   before_filter :get_project
   before_filter :get_endpoint
-  before_filter :get_zample, only: [:show, :edit, :update]
+  before_filter :get_zample, only: [:show, :edit, :register]
   before_filter :get_studies, only: [:edit]
 
   def index
@@ -20,10 +20,15 @@ class OpenbisZamplesController < ApplicationController
     @linked_to_assay = ['20171002172401546-38']
   end
 
-  def update
+  def register
     @linked_to_assay = ['20171002172401546-38']
-    puts "update called"
+    puts "register called"
     puts params
+
+    if OpenbisExternalAsset.registered?(@zample)
+      flash[:error] = 'Already registered as OpenBIS entity'
+      return redirect_to OpenbisExternalAsset.find_by_entity(@zample).seek_entity
+    end
 
     #data_sets_ids = extract_requested_sets(@zample, params)
     #data_sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_perm_ids(data_sets_ids)
@@ -33,18 +38,22 @@ class OpenbisZamplesController < ApplicationController
     assay_params = params.require(:assay).permit(:study_id, :assay_class_id, :title);
     sync_options = params.permit(:link_datasets)
 
-    @assay = @seek_util.createObisAssay(assay_params,current_person, @zample, sync_options)
+    @assay = @seek_util.createObisAssay(assay_params, current_person, @zample, sync_options)
 
-
+    # seperate testing of external_asset as the save on parent does not fails if the child was not saved correctly
+    unless @assay.external_asset.valid?
+      @reasons = @assay.external_asset.errors
+      @error_msg = 'Could not register OpenBIS assay'
+      return render action: 'edit'
+    end
 
     if @assay.save
-      flash[:notice] = "Registered: #{params}"
+      flash[:notice] = "Registered OpenBIS assay: #{@zample.perm_id}"
       redirect_to @assay
     else
       @reasons = @assay.errors
-      @error_msg = 'Could not create assay'
+      @error_msg = 'Could not register OpenBIS assay'
       render action: 'edit'
-      # redirect_to edit_project_openbis_endpoint_openbis_zample_path
     end
   end
 

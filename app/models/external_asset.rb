@@ -19,6 +19,8 @@ class ExternalAsset < ActiveRecord::Base
 
   after_initialize :options_from_json
 
+
+
   def content=(content_object)
     json = serialize_content(content_object)
     @local_content = content_object
@@ -87,7 +89,7 @@ class ExternalAsset < ActiveRecord::Base
   def init_content_holder()
     if content_blob.nil?
       build_content_blob({
-                             url: external_service+ '#' + external_id,
+                             url: (external_service ? external_service: '') + '#' + external_id,
                              content_type: 'application/json',
                              original_filename: external_id,
                              make_local_copy: false,

@@ -9,6 +9,8 @@ class ExternalAssetTest < ActiveSupport::TestCase
     assert asset.save
   end
 
+
+
   test 'validation fails if service and external id are not unique' do
 
     asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '23'})

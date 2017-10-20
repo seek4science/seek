@@ -52,21 +52,66 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     get :edit, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37'
 
     assert_response :success
+    assay = assigns(:assay)
+    assay = assigns(:zample)
+    assay = assigns(:linked_to_assay)
+
   end
 
   test 'register registers new Assay' do
     login_as(@user)
     study = Factory :study
 
-    put :update, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37', assay: {study_id: study.id }
-    # put :update, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37', assay: {x: '1'}
+    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37', assay: {study_id: study.id }
 
-    assert_not_nil assigns(:assay)
     assay = assigns(:assay)
-    # assay.save!
+    assert_not_nil assay
+    assert_redirected_to assay_path(assay)
+
     assert assay.persisted?
     assert_equal 'OpenBIS 20171002172111346-37', assay.title
+
+    assert assay.external_asset.persisted?
+
+    assert_equal 'Registered OpenBIS assay: 20171002172111346-37', flash[:notice]
   end
+
+  test 'register remains on registration screen on errors' do
+    login_as(@user)
+    study = Factory :study
+
+    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37', assay: {xl:true }
+
+    assert_response :success
+
+    assay = assigns(:assay)
+    assert_not_nil assay
+    refute assay.persisted?
+
+    assert assigns(:reasons)
+    assert assigns(:error_msg)
+    assert_select "div.alert-danger", /Could not register OpenBIS assay/
+
+  end
+
+  test 'register does not create if assay if zample already registered but redirects to it' do
+    login_as(@user)
+    study = Factory :study
+    existing = Factory :assay
+
+    external = OpenbisExternalAsset.build(@zample)
+    assert external.save
+    existing.external_asset = external
+    assert existing.save
+
+    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: "#{@zample.perm_id}", assay: {study_id: study.id }
+
+    assert_redirected_to assay_path(existing)
+
+    assert_equal 'Already registered as OpenBIS entity', flash[:error]
+
+  end
+
 
   # unit like tests
   test 'extract_requested_sets gives all sets from zample if linked is selected' do

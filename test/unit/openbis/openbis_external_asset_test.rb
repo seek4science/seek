@@ -6,9 +6,13 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
     @endpoint = Factory(:openbis_endpoint)
+
+    @asset = OpenbisExternalAsset.new
+    @asset.seek_service = @endpoint
+
   end
 
-  test 'can create from Zample' do
+  test 'builds from Zample' do
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     options = {tomek: false}
@@ -36,5 +40,49 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert_same zample, asset.content
   end
 
+  test 'deserializes Zample from content' do
+
+
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+    @asset.external_type = "#{zample.class}"
+    json = @asset.serialize_content zample
+    assert json
+
+    entity = @asset.deserialize_content json
+    assert entity
+    assert_equal Seek::Openbis::Zample, entity.class
+    assert_equal zample, entity
+
+
+  end
+
+
+  test 'registered? works' do
+
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+
+    refute OpenbisExternalAsset.registered?(zample)
+
+    asset = OpenbisExternalAsset.new({external_service: zample.openbis_endpoint.web_endpoint, external_id: zample.perm_id})
+    assert asset.save
+
+    assert OpenbisExternalAsset.registered?(zample)
+
+  end
+
+  test 'find_by_entity works' do
+
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+
+    assert_raises( ActiveRecord::RecordNotFound ) {
+      OpenbisExternalAsset.find_by_entity(zample)
+    }
+
+    asset = OpenbisExternalAsset.new({external_service: zample.openbis_endpoint.web_endpoint, external_id: zample.perm_id})
+    assert asset.save
+
+    assert OpenbisExternalAsset.find_by_entity(zample)
+
+  end
 
 end
