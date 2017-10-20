@@ -270,4 +270,22 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute attribute.validate_value?(bad_sample.id.to_s)
     refute attribute.validate_value?('fish')
   end
+
+  test 'samples linked via SeekSample must exist' do
+    sample = Factory(:patient_sample)
+    attribute = Factory(:sample_sample_attribute, required: true, sample_type: Factory(:simple_sample_type))
+    attribute.linked_sample_type = sample.sample_type
+
+    assert attribute.validate_value?(sample.title)
+    refute attribute.validate_value?('surely no one has used this as a sample title')
+  end
+
+  test 'samples linked via SeekSample can be non-existant if field not required' do
+    sample = Factory(:patient_sample)
+    attribute = Factory(:sample_sample_attribute, required: false, sample_type: Factory(:simple_sample_type))
+    attribute.linked_sample_type = sample.sample_type
+
+    assert attribute.validate_value?(sample.title)
+    assert attribute.validate_value?('surely no one has used this as a sample title')
+  end
 end

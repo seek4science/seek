@@ -44,7 +44,9 @@ class SampleAttribute < ActiveRecord::Base
 
   def validate_value?(value)
     return false if required? && value.blank?
-    (value.blank? && !required?) || sample_attribute_type.validate_value?(value, controlled_vocab: sample_controlled_vocab, linked_sample_type: linked_sample_type)
+    (value.blank? && !required?) || sample_attribute_type.validate_value?(value, required: required?,
+                                                                          controlled_vocab: sample_controlled_vocab,
+                                                                          linked_sample_type: linked_sample_type)
   end
 
   # The method name used to get this attribute via a method call
