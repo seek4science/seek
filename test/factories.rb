@@ -440,6 +440,15 @@ Factory.define(:min_datafile, class: DataFile) do |f|
   end
 end
 
+Factory.define(:max_datafile, class: DataFile) do |f|
+  f.title 'A Maximal DataFile'
+  f.description 'Results - Sampling conformations of ATP-Mg inside the binding pocket'
+  f.projects { [Factory.build(:max_project)] }
+  f.after_create do |data_file|
+    data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+  end
+end
+
 Factory.define(:rightfield_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :rightfield_content_blob
 end

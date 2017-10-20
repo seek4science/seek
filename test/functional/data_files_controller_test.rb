@@ -2705,6 +2705,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_nil df.reload.policy.sharing_scope
   end
 
+  def edit_max_object(df)
+    for i in 1..5 do
+      tag = Factory :tag, value: "df-tag#{i}", source: User.current_user, annotatable: df
+    end
+    df.creators = [Factory(:person)]
+    df.save
+  end
+
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)
