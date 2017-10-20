@@ -18,10 +18,6 @@ class AssaysControllerTest < ActionController::TestCase
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
-  def min_test_object
-    @min_object = Factory(:min_assay)
-  end
-
   test 'modelling assay validates with schema' do
     df = Factory(:data_file, contributor: User.current_user.person)
     a = Factory(:modelling_assay, contributor: User.current_user.person)
@@ -1343,5 +1339,13 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', assay_path(assay), text: assay.title
       assert_select 'a[href=?]', assay_path(assay2), text: assay2.title, count: 0
     end
+  end
+
+  def edit_max_object(assay)
+    for i in 1..5 do
+      tag = Factory :tag, value: "atag#{i}", source: User.current_user, annotatable: assay
+    end
+    assay.creators = [Factory(:person)]
+    assay.save
   end
 end

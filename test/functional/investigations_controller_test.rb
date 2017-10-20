@@ -373,7 +373,6 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(investigation)
-    assert true
     for i in 1..5 do
        tag = Factory :tag, value: "tag#{i}", source: User.current_user, annotatable: investigation
     end

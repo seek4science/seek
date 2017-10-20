@@ -313,6 +313,7 @@ end
 Factory.define(:experimental_assay_class, class: AssayClass) do |f|
   f.title I18n.t('assays.experimental_assay')
   f.key 'EXP'
+  f.description "An experimental assay class description"
 end
 
 Factory.define(:modelling_assay, parent: :assay_base) do |f|
@@ -341,6 +342,13 @@ Factory.define(:min_assay, class: Assay) do |f|
   f.association :study, factory: :min_study
 end
 
+Factory.define(:max_assay, class: Assay) do |f|
+  f.title "A Maximal Assay"
+  f.description "A Western Blot Assay"
+  f.association :assay_class, factory: :experimental_assay_class
+  f.association :study, factory: :max_study
+end
+
 # Study
 Factory.define(:study) do |f|
   f.sequence(:title) { |n| "Study#{n}" }
@@ -357,7 +365,6 @@ Factory.define(:max_study, class: Study) do |f|
   f.title "A Maximal Study"
   f.description "The Study of many things"
   f.experimentalists "Wet lab people"
-  #f.person_responsible Factory.build(:person)
   f.association :investigation, factory: :max_investigation
 end
 
