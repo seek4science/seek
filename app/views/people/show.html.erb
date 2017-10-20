@@ -67,11 +67,11 @@
 <div class="row">
   <% unless hide_contact_details?(@person) %>
       <div class="col-md-6">
-        <%= render :partial=>"people/contact_details" %>
+        <%= render :partial=>"contact_details" %>
       </div>
   <% end %>
   <div class="col-md-6">
-    <%= render :partial=>"people/project_positions", :locals=>{:editable=>false} %>
+    <%= render :partial=>"project_positions" %>
   </div>
 </div>
 <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>

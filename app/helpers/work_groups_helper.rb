@@ -52,4 +52,11 @@ module WorkGroupsHelper
 
     options
   end
-end
+
+  def membership_list memberships
+    memberships.collect do |membership|
+      project_link = link_to membership.work_group.project.title, membership.work_group.project
+      "#{project_link}"
+    end.join(' ; ').html_safe
+  end
+ end
