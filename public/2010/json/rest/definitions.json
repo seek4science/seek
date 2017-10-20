@@ -396,11 +396,11 @@
         "funding_details" : {
           "$ref" : "#/definitions/nullableNonEmptyString"
         },
-        "tags" : {
+        "funding_codes" : {
           "$ref" : "#/definitions/tagsType"
         }
       },
-      "required" : [ "avatar", "title", "description", "web_page", "funding_details", "tags" ]
+      "required" : [ "avatar", "title", "description", "web_page", "funding_details", "funding_codes" ]
     },
     "projectsType" : {
       "type" : "string",
