@@ -184,6 +184,5 @@ class EventsControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(event)
-    assert true
   end
 end

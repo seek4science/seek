@@ -803,9 +803,18 @@ end
 Factory.define(:organism) do |f|
   f.title 'An Organism'
 end
+
 Factory.define(:min_organism, class: Organism) do |f|
   f.title 'A Minimal Organism'
 end
+
+Factory.define(:max_organism, class: Organism) do |f|
+  f.title 'A Maximal Organism'
+  f.projects { [Factory.build(:max_project)] }
+  f.concept_uri 'https://identifiers.org/taxonomy/9606'
+  f.ontology_id "23"
+end
+
 Factory.define(:bioportal_concept) do |f|
   f.ontology_id 'NCBITAXON'
   f.concept_uri 'http://purl.obolibrary.org/obo/NCBITaxon_2287'
