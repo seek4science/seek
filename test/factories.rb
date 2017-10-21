@@ -502,6 +502,19 @@ Factory.define(:min_model, class: Model) do |f|
   f.projects { [Factory.build(:min_project)] }
 end
 
+Factory.define(:max_model, class: Model) do |f|
+  f.title 'A Maximal Model'
+  f.description 'Hidden Markov Model'
+  f.projects { [Factory.build(:max_project)] }
+  f.after_create do |model|
+    model.content_blobs = [Factory.create(:cronwright_model_content_blob,
+                                          asset: model, asset_version: model.version),
+                           Factory.create(:rightfield_content_blob,
+                                          asset: model,
+                                          asset_version: model.version)] if model.content_blobs.blank?
+  end
+end
+
 Factory.define(:model_2_files, class: Model) do |f|
   f.sequence(:title) { |n| "A Model #{n}" }
   f.projects { [Factory.build(:project)] }

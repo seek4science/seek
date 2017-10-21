@@ -176,7 +176,7 @@ module RestTestCases
     base = json2["data"]["meta"]["base_url"]
     diff = JsonDiff.diff(json1, json2)
 
-    for el in diff
+    diff.reverse_each do |el|
       #the self link must start with the pluralized controller's name (e.g. /people)
       if (el["path"] =~ /self/)
         assert_match /^\/#{plural_obj}/, el["value"]
@@ -197,7 +197,6 @@ module RestTestCases
     diff.delete_if {
         |el| el["path"] =~ /id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum/
     }
-    puts diff
 
     assert_equal [], diff
   end

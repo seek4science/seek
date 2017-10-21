@@ -1148,4 +1148,15 @@ class ModelsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png'
     [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data_url: 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png', original_filename: 'sysmo-db-logo-grad2.png', make_local_copy: '0' }]
   end
+
+  def edit_max_object(model)
+    for i in 1..5 do
+      tag = Factory :tag, value: "model-tag#{i}", source: User.current_user, annotatable: model
+    end
+    model[:model_type_id] = (model_types(:ODE)).id
+    model[:recommended_environment_id] = recommended_model_environments(:jws).id
+    model.creators = [Factory(:person)]
+    model.save
+  end
+
 end
