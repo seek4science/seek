@@ -15,10 +15,6 @@ class EventsControllerTest < ActionController::TestCase
     @object = events(:event_with_no_files)
   end
 
-  def min_test_object
-    @min_object = Factory(:min_event)
-  end
-
   def test_title
     get :index
     assert_response :success
@@ -185,5 +181,9 @@ class EventsControllerTest < ActionController::TestCase
     end
 
     assert_includes assigns(:event).data_files, data_file
+  end
+
+  def edit_max_object(event)
+    assert true
   end
 end

@@ -825,6 +825,18 @@ Factory.define(:min_event, class: Event) do |f|
   f.projects { [Factory.build(:min_project)] }
 end
 
+Factory.define(:max_event, class: Event) do |f|
+  f.title 'A Maximal Event'
+  f.description 'All you ever wanted to know about headaches'
+  f.url 'http://www.headache-center.org'
+  f.city 'Heidelberg'
+  f.country 'Germany'
+  f.address 'Sofienstr 2'
+  f.start_date "2017-01-01T00:20:00.000Z"
+  f.end_date "2017-01-01T00:22:00.000Z"
+  f.projects { [Factory.build(:max_project)] }
+end
+
 Factory.define(:saved_search) do |f|
   f.search_query 'cheese'
   f.search_type 'All'
