@@ -555,7 +555,7 @@ class StudiesControllerTest < ActionController::TestCase
       tag = Factory :tag, value: "stag#{i}", source: User.current_user, annotatable: study
     end
     study.creators = [Factory(:person)]
-    study.person_responsible = Factory(:person)
+    study.person_responsible = Factory(:max_person)
     study.save
   end
 end
