@@ -183,6 +183,4 @@ class EventsControllerTest < ActionController::TestCase
     assert_includes assigns(:event).data_files, data_file
   end
 
-  def edit_max_object(event)
-  end
 end

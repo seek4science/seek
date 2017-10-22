@@ -332,6 +332,4 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_select 'div.related-items .tab-pane a[href=?]', sample_path(sample), text: /#{sample.title}/
   end
 
-  def edit_max_object(organism)
-  end
 end
