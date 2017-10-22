@@ -1,0 +1,72 @@
+{
+  "data": {
+    "id": "927855014",
+    "type": "publications",
+    "attributes": {
+      "title": "A Maximal Publication",
+      "journal": "Journal of Molecular Biology",
+      "published_date": "2017-10-10",
+      "doi": "10.5072/abcd",
+      "pubmed_id": 873864488,
+      "abstract": "Amazing insights into the mechanism of TF2",
+      "citation": "JMB Oct 2017, 12:234-245",
+      "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
+      "authors": ["Person1 Last", "Person2 Last"]
+    },
+    "relationships": {
+      "people": {
+        "data": [
+          {
+            "id": "1039986644",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": []
+      },
+      "studies": {
+        "data": []
+      },
+      "assays": {
+        "data": []
+      },
+      "data_files": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "presentations": {
+        "data": []
+      },
+      "events": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/publications/927855014"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

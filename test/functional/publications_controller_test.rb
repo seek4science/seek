@@ -17,10 +17,6 @@ class PublicationsControllerTest < ActionController::TestCase
     @object = Factory(:publication, published_date: Date.new(2013, 1, 1))
   end
 
-  def min_test_object
-    @min_object = Factory(:min_publication)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: 'Publications', count: 1
@@ -788,6 +784,13 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal '10.5072/abcd', assigns(:publication).doi
   end
 
+  def edit_max_object(pub)
+    # for i in 1..5 do
+    #   tag = Factory :tag, value: "sop-tag#{i}", source: User.current_user, annotatable: sop
+    # end
+    # sop.creators = [Factory(:person)]
+    # sop.save
+  end
   private
 
   def publication_for_export_tests
@@ -796,4 +799,6 @@ class PublicationsControllerTest < ActionController::TestCase
                           published_date: 5.days.ago.to_s(:db),
                           pubmed_id: 5)
   end
+
+
 end
