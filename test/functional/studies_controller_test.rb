@@ -17,10 +17,6 @@ class StudiesControllerTest < ActionController::TestCase
     @object = Factory :study, policy: Factory(:public_policy)
   end
 
-  def min_test_object
-    @min_object = Factory(:min_study)
-  end
-
   test 'should get index' do
     Factory :study, policy: Factory(:public_policy)
     get :index

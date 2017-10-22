@@ -17,10 +17,6 @@ class InvestigationsControllerTest < ActionController::TestCase
     @object = Factory(:investigation, policy: Factory(:public_policy))
   end
 
-  def min_test_object
-    @min_object = Factory(:min_investigation)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: I18n.t('investigation').pluralize, count: 1

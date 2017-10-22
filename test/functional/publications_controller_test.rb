@@ -784,13 +784,6 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal '10.5072/abcd', assigns(:publication).doi
   end
 
-  def edit_max_object(pub)
-    # for i in 1..5 do
-    #   tag = Factory :tag, value: "sop-tag#{i}", source: User.current_user, annotatable: sop
-    # end
-    # sop.creators = [Factory(:person)]
-    # sop.save
-  end
   private
 
   def publication_for_export_tests

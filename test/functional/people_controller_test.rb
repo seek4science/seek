@@ -1748,8 +1748,7 @@ class PeopleControllerTest < ActionController::TestCase
     Factory :expertise, value: 'fishing', annotatable: person
     Factory :tool, value: 'fishing rod', annotatable: person
     person.add_to_project_and_institution(Factory(:min_project), Factory(:min_institution))
-    person.avatar = Factory(:avatar, owner: person)
-    person.save
+    add_avatar(person)
   end
 
   def mask_for_admin

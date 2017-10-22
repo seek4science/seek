@@ -161,7 +161,9 @@ module RestTestCases
                             "#{m}_#{@controller.controller_name.classify.downcase}.json")
       #parse such that backspace is eliminated and null turns to nil
       json_to_compare = JSON.parse(File.read(json_file))
-      edit_max_object(object) if (m == 'max')
+      begin
+        edit_max_object(object) if (m == 'max')
+      end
 
       get :show, id: object, format: 'json'
       assert_response :success

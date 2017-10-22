@@ -17,10 +17,6 @@ class ModelsControllerTest < ActionController::TestCase
     @object = Factory :model_2_files, contributor: User.current_user, policy: Factory(:private_policy), organism: Factory(:organism)
   end
 
-  def min_test_object
-    @min_object = Factory(:min_model)
-  end
-
   test 'should get index' do
     get :index
     assert_response :success

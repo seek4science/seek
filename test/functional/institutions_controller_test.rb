@@ -222,7 +222,6 @@ class InstitutionsControllerTest < ActionController::TestCase
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(Factory(:project), inst)
     end
-    inst.avatar = Factory(:avatar, owner: inst)
-    inst.save
+    add_avatar(inst)
   end
 end

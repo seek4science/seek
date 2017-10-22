@@ -19,10 +19,6 @@ class ProjectsControllerTest < ActionController::TestCase
     @object = projects(:sysmo_project)
   end
 
-  def min_test_object
-    @min_object = Factory(:min_project)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: I18n.t('project').pluralize, count: 1
@@ -1479,8 +1475,7 @@ class ProjectsControllerTest < ActionController::TestCase
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(project, Factory(:institution))
     end
-    project.avatar = Factory(:avatar, owner: project)
-    project.save
+    add_avatar(project)
   end
 
   private
