@@ -1343,7 +1343,6 @@ class AssaysControllerTest < ActionController::TestCase
 
   def edit_max_object(assay)
     add_tags_to_test_object(assay)
-    assay.creators = [Factory(:person)]
-    assay.save
+    add_creator_to_test_object(assay)
   end
 end

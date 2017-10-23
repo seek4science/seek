@@ -1149,8 +1149,7 @@ class ModelsControllerTest < ActionController::TestCase
     add_tags_to_test_object(model)
     model[:model_type_id] = (model_types(:ODE)).id
     model[:recommended_environment_id] = recommended_model_environments(:jws).id
-    model.creators = [Factory(:person)]
-    model.save
+    add_creator_to_test_object(model)
   end
 
 end

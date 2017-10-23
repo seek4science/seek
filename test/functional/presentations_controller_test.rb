@@ -332,8 +332,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   def edit_max_object(presentation)
     add_tags_to_test_object(presentation)
-    presentation.creators = [Factory(:person)]
-    presentation.save
+    add_creator_to_test_object(presentation)
   end
 
 end

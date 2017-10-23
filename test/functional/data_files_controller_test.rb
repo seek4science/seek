@@ -2703,8 +2703,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def edit_max_object(df)
     add_tags_to_test_object(df)
-    df.creators = [Factory(:person)]
-    df.save
+    add_creator_to_test_object(df)
   end
 
   private

@@ -897,8 +897,7 @@ class SopsControllerTest < ActionController::TestCase
 
   def edit_max_object(sop)
     add_tags_to_test_object(sop)
-    sop.creators = [Factory(:person)]
-    sop.save
+    add_creator_to_test_object(sop)
   end
 
   private
