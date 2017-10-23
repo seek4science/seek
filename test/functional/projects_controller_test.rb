@@ -1475,7 +1475,7 @@ class ProjectsControllerTest < ActionController::TestCase
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(project, Factory(:institution))
     end
-    add_avatar(project)
+    add_avatar_to_test_object(project)
   end
 
   private

@@ -804,6 +804,6 @@ class ProgrammesControllerTest < ActionController::TestCase
       Factory(:person).add_to_project_and_institution(programme.projects.first, Factory(:institution))
     end
     Factory :funding_code, value: 'DFG', annotatable: programme
-    add_avatar(programme)
+    add_avatar_to_test_object(programme)
   end
 end

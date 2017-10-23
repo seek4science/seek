@@ -136,11 +136,18 @@ class ActiveSupport::TestCase
     User.current_user = nil
   end
 
-  def add_avatar(obj)
+  def add_avatar_to_test_object(obj)
     obj.avatar = Factory(:avatar, owner: obj)
     obj.save
   end
 
+  def add_tags_to_test_object(obj)
+    name = obj.class.to_s
+    for i in 1..5 do
+      tag = Factory :tag, value: "#{name}-tag#{i}", source: User.current_user, annotatable: obj
+    end
+    #obj.annotations.sort_by { |a| a.value}
+  end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded
