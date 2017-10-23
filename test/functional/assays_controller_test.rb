@@ -1342,9 +1342,7 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(assay)
-    for i in 1..5 do
-      tag = Factory :tag, value: "atag#{i}", source: User.current_user, annotatable: assay
-    end
+    add_tags_to_test_object(assay)
     assay.creators = [Factory(:person)]
     assay.save
   end

@@ -896,9 +896,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(sop)
-    for i in 1..5 do
-      tag = Factory :tag, value: "sop-tag#{i}", source: User.current_user, annotatable: sop
-    end
+    add_tags_to_test_object(sop)
     sop.creators = [Factory(:person)]
     sop.save
   end

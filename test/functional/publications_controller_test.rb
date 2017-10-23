@@ -784,6 +784,27 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal '10.5072/abcd', assigns(:publication).doi
   end
 
+  def edit_max_object(pub)
+    # assay = Factory(:assay)
+    # data_file = Factory(:data_file)
+    # model = Factory(:model)
+    #
+    # puts "associate  assay: ", assay.id
+    # puts "associate  data_file: ", data_file.id
+    # puts "associate  model: ", model.id
+    #
+    # pub.associate(assay)
+    # pub.associate(data_file)
+    # pub.associate(model)
+    # pub.save!
+    # pub.reload
+
+#    investigation = Factory(:investigation, policy: Factory(:all_sysmo_viewable_policy))
+#    pub.investigation_ids = [investigation.id.to_s]
+    #put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: [investigation.id.to_s]
+    #pub.save
+  end
+
   private
 
   def publication_for_export_tests

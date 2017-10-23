@@ -3,7 +3,7 @@
     "id": "1039986486",
     "type": "assays",
     "attributes": {
-      "tags": ["atag1", "atag2", "atag3", "atag4", "atag5"],
+      "tags": ["Assay-tag1", "Assay-tag2", "Assay-tag3", "Assay-tag4", "Assay-tag5"],
       "title": "A Maximal Assay",
       "description": "A Western Blot Assay",
       "assay_class": {

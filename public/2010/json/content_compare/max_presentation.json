@@ -3,7 +3,7 @@
     "id": "883654268",
     "type": "presentations",
     "attributes": {
-      "tags": ["pr-tag1", "pr-tag2", "pr-tag3", "pr-tag4", "pr-tag5"],
+      "tags": ["Presentation-tag1", "Presentation-tag2", "Presentation-tag3", "Presentation-tag4", "Presentation-tag5"],
       "title": "A Maximal Presentation",
       "description": "Non-equilibrium Free Energy Calculations and their caveats",
       "license": null,

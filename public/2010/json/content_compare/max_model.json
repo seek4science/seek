@@ -4,11 +4,11 @@
     "type": "models",
     "attributes": {
       "tags": [
-        "model-tag1",
-        "model-tag2",
-        "model-tag3",
-        "model-tag4",
-        "model-tag5"
+        "Model-tag1",
+        "Model-tag2",
+        "Model-tag3",
+        "Model-tag4",
+        "Model-tag5"
       ],
       "title": "A Maximal Model",
       "description": "Hidden Markov Model",

@@ -1146,9 +1146,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(model)
-    for i in 1..5 do
-      tag = Factory :tag, value: "model-tag#{i}", source: User.current_user, annotatable: model
-    end
+    add_tags_to_test_object(model)
     model[:model_type_id] = (model_types(:ODE)).id
     model[:recommended_environment_id] = recommended_model_environments(:jws).id
     model.creators = [Factory(:person)]

@@ -3,7 +3,7 @@
     "id": "1039986486",
     "type": "investigations",
     "attributes": {
-      "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+      "tags": ["Investigation-tag1", "Investigation-tag2", "Investigation-tag3", "Investigation-tag4", "Investigation-tag5"],
       "title": "A Maximal Investigation",
       "description": "Investigation of the Human Genome"
     },

@@ -547,9 +547,7 @@ class StudiesControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(study)
-    for i in 1..5 do
-      tag = Factory :tag, value: "stag#{i}", source: User.current_user, annotatable: study
-    end
+    add_tags_to_test_object(study)
     study.creators = [Factory(:person)]
     study.person_responsible = Factory(:max_person)
     study.save

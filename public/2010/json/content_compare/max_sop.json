@@ -3,7 +3,7 @@
     "id": "883654268",
     "type": "sops",
     "attributes": {
-      "tags": ["sop-tag1", "sop-tag2", "sop-tag3", "sop-tag4", "sop-tag5"],
+      "tags": ["Sop-tag1", "Sop-tag2", "Sop-tag3", "Sop-tag4", "Sop-tag5"],
       "title": "A Maximal Sop",
       "description": "How to run a simulation in GROMACS",
       "license": null,

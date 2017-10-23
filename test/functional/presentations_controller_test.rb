@@ -331,9 +331,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(presentation)
-    for i in 1..5 do
-      tag = Factory :tag, value: "pr-tag#{i}", source: User.current_user, annotatable: presentation
-    end
+    add_tags_to_test_object(presentation)
     presentation.creators = [Factory(:person)]
     presentation.save
   end

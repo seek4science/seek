@@ -3,7 +3,7 @@
     "id": "883654268",
     "type": "data_files",
     "attributes": {
-      "tags": ["df-tag1", "df-tag2", "df-tag3", "df-tag4", "df-tag5"],
+      "tags": ["DataFile-tag1", "DataFile-tag2", "DataFile-tag3", "DataFile-tag4", "DataFile-tag5"],
       "title": "A Maximal DataFile",
       "description": "Results - Sampling conformations of ATP-Mg inside the binding pocket",
       "license": null,

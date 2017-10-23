@@ -2702,9 +2702,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(df)
-    for i in 1..5 do
-      tag = Factory :tag, value: "df-tag#{i}", source: User.current_user, annotatable: df
-    end
+    add_tags_to_test_object(df)
     df.creators = [Factory(:person)]
     df.save
   end
