@@ -1344,5 +1344,13 @@ class AssaysControllerTest < ActionController::TestCase
   def edit_max_object(assay)
     add_tags_to_test_object(assay)
     add_creator_to_test_object(assay)
+    df = Factory(:data_file, policy: Factory(:public_policy))
+    model = Factory(:model, policy: Factory(:public_policy))
+    sop = Factory(:sop, policy: Factory(:public_policy))
+    org = Factory(:organism)
+    assay.associate_organism(org)
+    assay.associate(df)
+    assay.associate(model)
+    assay.associate(sop)
   end
 end
