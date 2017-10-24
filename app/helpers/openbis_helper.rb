@@ -24,4 +24,13 @@ module OpenbisHelper
       render partial: 'data_files/openbis/dataset', locals: { dataset: dataset, data_file: data_file }
     end
   end
+
+  def openbis_entity_edit_path(entity)
+
+    if entity.is_a? Seek::Openbis::Zample
+      return edit_project_openbis_endpoint_openbis_zample_path project_id: entity.openbis_endpoint.project, openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
+    end
+
+    'Unsupported'
+  end
 end

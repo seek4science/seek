@@ -13,6 +13,10 @@ class OpenbisExternalAsset < ExternalAsset
     where(external_service: extract_external_service(openbis_entity), external_id: openbis_entity.perm_id).first!
   end
 
+  def self.find_or_create_by_entity(openbis_entity)
+    asset = where(external_service: extract_external_service(openbis_entity), external_id: openbis_entity.perm_id).first
+    return asset ? asset : OpenbisExternalAsset.build(openbis_entity)
+  end
 
   def self.extract_external_service(openbis_entity)
     openbis_entity.openbis_endpoint.web_endpoint

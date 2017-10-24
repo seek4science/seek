@@ -166,4 +166,32 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     end
 
   end
+
+  test 'get_linked_to gets ids of openbis data sets' do
+    controller = OpenbisZamplesController.new
+
+    assert_equal [], controller.get_linked_to(nil)
+
+    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40","20171004182824553-41"])
+    datafiles = datasets.map { |ds| DataFile.build_from_openbis_dataset(ds)}
+    assert_equal 3, datafiles.length
+
+    disable_authorization_checks do
+      datafiles.each { |df| df.save!}
+    end
+
+    normaldf = Factory :data_file
+
+    assay = Factory :assay
+
+    assay.data_files << normaldf
+    assay.data_files << datafiles[0]
+    assay.data_files << datafiles[1]
+    assay.save!
+
+    linked = controller.get_linked_to assay
+    assert_equal 2, linked.length
+    assert_equal ['20171004182824553-41','20171002190934144-40'], linked
+
+  end
 end

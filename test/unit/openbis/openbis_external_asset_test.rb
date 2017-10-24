@@ -85,4 +85,25 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 
   end
 
+  test 'find_or_create_by_entity finds or creates' do
+
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+
+    asset = OpenbisExternalAsset.find_or_create_by_entity(zample)
+    assert asset
+    assert asset.is_a? OpenbisExternalAsset
+    refute asset.persisted?
+    assert asset.new_record?
+    assert_same asset.content, zample
+
+    assert asset.save!
+
+    asset = OpenbisExternalAsset.find_or_create_by_entity(zample)
+    assert asset
+    assert asset.is_a? OpenbisExternalAsset
+    assert asset.persisted?
+    refute asset.new_record?
+    assert_equal asset.content, zample
+  end
+
 end

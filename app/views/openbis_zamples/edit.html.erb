@@ -3,23 +3,32 @@
 
 <%= render :partial => 'openbis_zample_panel', :object => @zample %>
 
-<% datasets = @zample.datasets %>
+<% datasets = @zample.datasets
+   not_registered = @assay.new_record?
+%>
 
-<%= form_tag({controller: "openbis_zamples", action: "register", id: @zample.perm_id}, {method: 'post'}) do |f| %>
+<%= form_tag({controller: "openbis_zamples", action: not_registered ? 'register': 'update' , id: @zample.perm_id}, {method: 'post'}) do |f| %>
  <%= form_for @assay do |ff| %> <%# HACK to be able to render study form using the existing helpers%>
+        <% if not_registered %>
         <div class="form-group">
           <label>Register under Study </label><span class="required">*</span>
           <%= assay_study_selection(@assay.study,ff) %>
         </div>
+        <% else %>
+            <div class="form-group">
+              <label>Registered under Assay:</label>
+              <%= link_to "#{@assay.title}", assay_path(@assay) %>
+            </div>
+        <% end %>
 
     <div class="form-group">
-      <%= check_box_tag(:link_datasets, 1, true) %>
+      <%= check_box_tag(:link_datasets, 1, @asset.sync_options['link_datasets'] == '1') %>
       <%= label_tag(:link_datasets, 'Automatically register all dependent datasets') %>
       <div class="help-block">Any new dependent OpenBIS datasets will be registered and linked with this assay</div>
     </div>
 
     <div class="form-group">
-      <%= submit_tag("Register", class: 'btn btn-primary') %>
+      <%= submit_tag(not_registered ? 'Register': 'Update', class: 'btn btn-primary') %>
     </div>
 
     <div id="linked_entities">

@@ -14,14 +14,16 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def edit
-    @assay=Assay.new
+    @asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
+    @assay = @asset.seek_entity || Assay.new
+    @linked_to_assay = get_linked_to(@asset.seek_entity)
+    #@assay=Assay.new
     #puts params
     #puts "ID: #{params[:id]}"
-    @linked_to_assay = ['20171002172401546-38']
+
   end
 
   def register
-    @linked_to_assay = ['20171002172401546-38']
     puts "register called"
     puts params
 
@@ -29,6 +31,7 @@ class OpenbisZamplesController < ApplicationController
       flash[:error] = 'Already registered as OpenBIS entity'
       return redirect_to OpenbisExternalAsset.find_by_entity(@zample).seek_entity
     end
+
 
     #data_sets_ids = extract_requested_sets(@zample, params)
     #data_sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_perm_ids(data_sets_ids)
@@ -39,6 +42,9 @@ class OpenbisZamplesController < ApplicationController
     sync_options = params.permit(:link_datasets)
 
     @assay = @seek_util.createObisAssay(assay_params, current_person, @zample, sync_options)
+    @asset = @assay.external_asset
+    # in case of rendering edit
+    @linked_to_assay = []
 
     # seperate testing of external_asset as the save on parent does not fails if the child was not saved correctly
     unless @assay.external_asset.valid?
@@ -73,6 +79,12 @@ class OpenbisZamplesController < ApplicationController
       end
       df
     end
+  end
+
+  def get_linked_to(assay)
+    return [] unless assay
+    assay.data_files.select {|df| df.openbis?}
+          .map {|df| df.content_blob.openbis_dataset.perm_id}
   end
 
   def get_studies
