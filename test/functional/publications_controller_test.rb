@@ -785,24 +785,20 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(pub)
-    # assay = Factory(:assay)
-    # data_file = Factory(:data_file)
-    # model = Factory(:model)
-    #
-    # puts "associate  assay: ", assay.id
-    # puts "associate  data_file: ", data_file.id
-    # puts "associate  model: ", model.id
-    #
-    # pub.associate(assay)
-    # pub.associate(data_file)
-    # pub.associate(model)
-    # pub.save!
-    # pub.reload
+    assay = Factory(:assay, policy: Factory(:public_policy))
+    study = Factory(:study, policy: Factory(:public_policy))
+    inv = Factory(:investigation, policy: Factory(:public_policy))
+    df = Factory(:data_file, policy: Factory(:public_policy))
+    model = Factory(:model, policy: Factory(:public_policy))
+    pr = Factory(:presentation, policy: Factory(:public_policy))
 
-#    investigation = Factory(:investigation, policy: Factory(:all_sysmo_viewable_policy))
-#    pub.investigation_ids = [investigation.id.to_s]
-    #put :update, id: p, publication: { abstract: p.abstract }, author: {}, investigation_ids: [investigation.id.to_s]
-    #pub.save
+    pub.associate(assay)
+    pub.associate(study)
+    pub.associate(inv)
+    pub.associate(df)
+    pub.associate(model)
+    pub.associate(pr)
+
   end
 
   private

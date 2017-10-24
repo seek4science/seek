@@ -143,7 +143,8 @@ class ActiveSupport::TestCase
 
   def add_tags_to_test_object(obj)
     name = obj.class.to_s
-    for i in 1..5 do
+    #for i in 1..5 do
+    [1,2,3,4,5].each do |i|
       tag = Factory :tag, value: "#{name}-tag#{i}", source: User.current_user, annotatable: obj
     end
     #obj.annotations.sort_by { |a| a.value}

@@ -31,25 +31,55 @@
         ]
       },
       "investigations": {
-        "data": []
+        "data": [
+          {
+            "id": "973655056",
+            "type": "investigations"
+          }
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+          {
+            "id": "873655023",
+            "type": "studies"
+          }
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+          {
+            "id": "4573633054",
+            "type": "assays"
+          }
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "data_files"
+          }
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "models"
+          }
+        ]
       },
       "publications": {
         "data": []
       },
       "presentations": {
-        "data": []
+        "data": [
+          {
+            "id": "25",
+            "type": "presentations"
+          }
+        ]
       },
       "events": {
         "data": []
