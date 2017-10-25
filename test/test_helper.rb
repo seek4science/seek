@@ -146,8 +146,8 @@ class ActiveSupport::TestCase
     #for i in 1..5 do
     [1,2,3,4,5].each do |i|
       tag = Factory :tag, value: "#{name}-tag#{i}", source: User.current_user, annotatable: obj
+      obj.reload
     end
-    #obj.annotations.sort_by { |a| a.value}
   end
 
   def add_creator_to_test_object(obj)
