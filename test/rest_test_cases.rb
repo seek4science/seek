@@ -170,7 +170,6 @@ module RestTestCases
       get :show, id: object, format: 'json'
       assert_response :success
       parsed_response = JSON.parse(@response.body)
-      puts parsed_response,"\n"
       check_content_diff(json_to_compare, parsed_response)
     end
   end
@@ -215,7 +214,6 @@ module RestTestCases
   def perform_jsonapi_checks
     assert_response :success
     assert_equal 'application/vnd.api+json', @response.content_type
-    #puts JSON::Validator.fully_validate(JSONAPI_SCHEMA_FILE_PATH, @response.body)
     assert JSON::Validator.validate(JSONAPI_SCHEMA_FILE_PATH, @response.body)
 
   end
