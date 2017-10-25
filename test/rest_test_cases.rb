@@ -105,6 +105,7 @@ module RestTestCases
   def test_show_json(object = rest_api_test_object)
     clz = @controller.controller_name.classify.constantize
     get :show, id: object, format: 'json'
+    
     if check_for_501_read_return
       assert_response :not_implemented
     else
