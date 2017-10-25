@@ -29,7 +29,16 @@
           {"id": "1022251407", "type": "institutions"},
           {"id": "1022251408", "type": "institutions"},
           {"id": "1022251409", "type": "institutions"}
-        ]      },
+        ]
+      },
+      "programmes": {
+        "data": [
+          {
+            "id": "78",
+            "type": "programmes"
+          }
+        ]
+      },
       "investigations": {
         "data": []
       },
