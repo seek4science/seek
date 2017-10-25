@@ -71,7 +71,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     json = JSON.parse(response.body)
     refute_nil json['data']
     refute_nil json['data']['meta']
-    assert_equal ['base_url','uuid'], json['data']['meta'].keys.sort
+    assert_equal ['api_version','base_url','uuid'], json['data']['meta'].keys.sort
   end
 
   def test_response_code_for_not_available

@@ -23,10 +23,6 @@ class DataFilesControllerTest < ActionController::TestCase
     @object
   end
 
-  def min_test_object
-    @min_object = Factory(:min_data_file)
-  end
-
   def test_title
     get :index
     assert_response :success
@@ -2703,6 +2699,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(df)
     assert_nil df.reload.policy.sharing_scope
+  end
+
+  def edit_max_object(df)
+    add_tags_to_test_object(df)
+    add_creator_to_test_object(df)
   end
 
   private

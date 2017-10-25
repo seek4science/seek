@@ -4,21 +4,35 @@
     "type": "programmes",
     "attributes": {
       "avatar": null,
-      "title": "A Minimal Programme",
-      "description": null,
-      "web_page": null,
-      "funding_details": null,
-      "funding_codes": null
+      "title": "A Maximal Programme",
+      "description": "A very exciting programme",
+      "web_page": "http://www.synbiochem.co.uk",
+      "funding_details": "Someone is funding this for me",
+      "funding_codes": ["DFG"]
     },
     "relationships": {
       "people": {
-        "data": []
+        "data": [
+          {"id": "1039986529", "type": "people"},
+          {"id": "1039986529", "type": "people"},
+          {"id": "1039986529", "type": "people"},
+          {"id": "1039986529", "type": "people"},
+          {"id": "1039986529", "type": "people"}
+        ]
       },
       "projects": {
-        "data": []
+        "data": [
+          {"id": "1022250691", "type": "projects"}
+        ]
       },
       "institutions": {
-        "data": []
+        "data": [
+          {"id": "980191045", "type": "institutions"},
+          {"id": "980191045", "type": "institutions"},
+          {"id": "980191045", "type": "institutions"},
+          {"id": "980191045", "type": "institutions"},
+          {"id": "980191045", "type": "institutions"}
+        ]
       },
       "investigations": {
         "data": []

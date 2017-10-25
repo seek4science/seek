@@ -1,18 +1,24 @@
 {
   "data": {
     "id": "883654268",
-    "type": "data_files",
+    "type": "models",
     "attributes": {
-      "tags": null,
-      "title": "A Minimal DataFile",
-      "description": null,
+      "tags": [
+        "Model-tag1",
+        "Model-tag2",
+        "Model-tag3",
+        "Model-tag4",
+        "Model-tag5"
+      ],
+      "title": "A Maximal Model",
+      "description": "Hidden Markov Model",
       "license": null,
       "latest_version": 1,
       "versions": [
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/883654268?version=1"
+          "url": "http://localhost:3000/models/883654268?version=1"
         }
       ],
       "version": 1,
@@ -21,19 +27,36 @@
       "updated_at": "2017-10-06T09:53:31.000Z",
       "content_blobs": [
         {
-          "original_filename": "a_pdf_file.pdf",
+          "original_filename": "cronwright.xml",
           "url": null,
-          "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
-          "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
-          "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/883654268/content_blobs/1050452533",
-          "size": 8827
+          "md5sum": "6b9283ed4ca52a081398b715aaeb8113",
+          "sha1sum": "454e4b6067f577b680bb8538772b12ebcdb6c4a4",
+          "content_type": "text/xml",
+          "link": "http://localhost:3000/models/1004285489/content_blobs/1050452553",
+          "size": 5933
+        },
+        {
+          "original_filename": "rightfield.xls",
+          "url": null,
+          "md5sum": "01788bca93265d80e8127ca0039bb69b",
+          "sha1sum": "ffd634ac7564083ab7b66bc3eb2053cbc3d608f5",
+          "content_type": "application/excel",
+          "link": "http://localhost:3000/models/1004285489/content_blobs/1050452554",
+          "size": 9216
         }
-      ]
+      ],
+      "model_type": "Ordinary differentail equations",
+      "model_format": "SBML",
+      "environment": "JWS Online"
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+          {
+            "id": "1039986841",
+            "type": "people"
+          }
+        ]
       },
       "submitter": {
         "data": [
@@ -47,6 +70,10 @@
         "data": [
           {
             "id": "1039986644",
+            "type": "people"
+          },
+          {
+            "id": "1039986841",
             "type": "people"
           }
         ]
@@ -70,16 +97,10 @@
       },
       "publications": {
         "data": []
-      },
-      "events": {
-        "data": []
-      },
-      "samples": {
-        "data": []
       }
     },
     "links": {
-      "self": "/data_files/883654268"
+      "self": "/models/883654268"
     },
     "meta": {
       "created": "2017-10-06T09:53:31.000Z",

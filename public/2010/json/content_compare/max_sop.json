@@ -1,18 +1,18 @@
 {
   "data": {
     "id": "883654268",
-    "type": "data_files",
+    "type": "sops",
     "attributes": {
-      "tags": null,
-      "title": "A Minimal DataFile",
-      "description": null,
+      "tags": ["Sop-tag1", "Sop-tag2", "Sop-tag3", "Sop-tag4", "Sop-tag5"],
+      "title": "A Maximal Sop",
+      "description": "How to run a simulation in GROMACS",
       "license": null,
       "latest_version": 1,
       "versions": [
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/883654268?version=1"
+          "url": "http://localhost:3000/sops/883654268?version=1"
         }
       ],
       "version": 1,
@@ -21,19 +21,24 @@
       "updated_at": "2017-10-06T09:53:31.000Z",
       "content_blobs": [
         {
-          "original_filename": "a_pdf_file.pdf",
+          "original_filename": "min file",
           "url": null,
-          "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
-          "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
+          "md5sum": "48f276f9bc2802e089e476069772a005",
+          "sha1sum": "8125ea3d0772712c91958b68015447c3a54bff78",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/883654268/content_blobs/1050452533",
-          "size": 8827
+          "link": "http://localhost:3000/sops/883654268/content_blobs/1050452533",
+          "size": 8
         }
       ]
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+          {
+            "id": "1039986841",
+            "type": "people"
+          }
+        ]
       },
       "submitter": {
         "data": [
@@ -47,6 +52,10 @@
         "data": [
           {
             "id": "1039986644",
+            "type": "people"
+          },
+          {
+            "id": "1039986841",
             "type": "people"
           }
         ]
@@ -70,16 +79,10 @@
       },
       "publications": {
         "data": []
-      },
-      "events": {
-        "data": []
-      },
-      "samples": {
-        "data": []
       }
     },
     "links": {
-      "self": "/data_files/883654268"
+      "self": "/sops/883654268"
     },
     "meta": {
       "created": "2017-10-06T09:53:31.000Z",

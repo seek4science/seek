@@ -3,13 +3,18 @@
     "id": "8233983736",
     "type": "organisms",
     "attributes": {
-      "title": "A Minimal Organism",
-      "concept_uri": null,
-      "ontology_id": null
+      "title": "A Maximal Organism",
+      "concept_uri": "https://identifiers.org/taxonomy/9606",
+      "ontology_id": "23"
     },
     "relationships": {
       "projects": {
-        "data": []
+        "data": [
+          {
+            "id": "1022251427",
+            "type": "projects"
+          }
+        ]
       },
       "assays": {
         "data": []

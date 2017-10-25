@@ -3,9 +3,9 @@
     "id": "883654268",
     "type": "data_files",
     "attributes": {
-      "tags": null,
-      "title": "A Minimal DataFile",
-      "description": null,
+      "tags": ["DataFile-tag1", "DataFile-tag2", "DataFile-tag3", "DataFile-tag4", "DataFile-tag5"],
+      "title": "A Maximal DataFile",
+      "description": "Results - Sampling conformations of ATP-Mg inside the binding pocket",
       "license": null,
       "latest_version": 1,
       "versions": [
@@ -33,7 +33,12 @@
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+          {
+            "id": "1039986841",
+            "type": "people"
+          }
+        ]
       },
       "submitter": {
         "data": [
@@ -47,6 +52,10 @@
         "data": [
           {
             "id": "1039986644",
+            "type": "people"
+          },
+          {
+            "id": "1039986841",
             "type": "people"
           }
         ]

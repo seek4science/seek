@@ -3,14 +3,14 @@
     "id": "599593473",
     "type": "people",
     "attributes": {
-      "avatar": null,
+      "avatar": "/people/1039986998/avatars/13",
       "title": "Maximilian Maxi-Mum",
       "description": "A person with all possible details",
       "first_name": "Maximilian",
-      "last_name": "Maxi-mum",
+      "last_name": "Maxi-Mum",
       "web_page": "http://www.website.com",
-      "orcid": "https://orcid.org/0000-0001-9842-9718",
-      "email": "cefbdaab68ed59c001edc121705cb7e2a7db1a96",
+      "orcid": "http://orcid.org/0000-0001-9842-9718",
+      "email": "88c4af0911164449f30870c60d161fddda8f9771",
       "expertise": [
         "golf",
         "fishing"
@@ -20,14 +20,21 @@
       ]
     },
     "relationships": {
-      "work_groups": {
-        "data": []
-      },
       "projects": {
-        "data": []
+        "data": [
+          {
+            "id": "1022251312",
+            "type": "projects"
+          }
+        ]
       },
       "institutions": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "institutions"
+          }
+        ]
       },
       "investigations": {
         "data": []
@@ -67,7 +74,8 @@
       "created": "2017-10-06T09:53:31.000Z",
       "modified": "2017-10-06T09:53:31.000Z",
       "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
-      "base_url": "http://localhost:3000"
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
     }
   },
   "jsonapi": {

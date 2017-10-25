@@ -83,18 +83,24 @@
         },
         "base_url" : {
           "$ref" : "#/definitions/uriString"
+        },
+        "api_version": {
+          "ref" : "#/definitions/nonEmptyString"
         }
       },
-      "required" : [ "created", "modified", "uuid", "base_url" ]
+      "required" : [ "created", "modified", "uuid", "base_url", "api_version" ]
     },
     "baseMetaType" : {
       "type" : "object",
       "properties" : {
         "base_url" : {
           "$ref" : "#/definitions/uriString"
+        },
+        "api_version": {
+          "ref" : "#/definitions/nonEmptyString"
         }
       },
-      "required" : [ "base_url" ],
+      "required" : [ "base_url", "api_version" ],
       "additionalProperties" : false
     },
 
@@ -390,11 +396,11 @@
         "funding_details" : {
           "$ref" : "#/definitions/nullableNonEmptyString"
         },
-        "tags" : {
+        "funding_codes" : {
           "$ref" : "#/definitions/tagsType"
         }
       },
-      "required" : [ "avatar", "title", "description", "web_page", "funding_details", "tags" ]
+      "required" : [ "avatar", "title", "description", "web_page", "funding_details", "funding_codes" ]
     },
     "projectsType" : {
       "type" : "string",
@@ -899,9 +905,6 @@
 								"projects": {
 									"$ref": "#/definitions/projectsReferenceList"
 								},
-								"institutions": {
-									"$ref": "#/definitions/institutionsReferenceList"
-								},
 								"investigations": {
 									"$ref": "#/definitions/investigationsReferenceList"
 								},
@@ -934,7 +937,6 @@
 								"assay_organisms",
 								"people",
 								"projects",
-								"institutions",
 								"investigations",
 								"studies",
 								"data_files",

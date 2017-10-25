@@ -3,14 +3,14 @@
     "id": "8233983736",
     "type": "events",
     "attributes": {
-      "title": "A Minimal Event",
-      "description": null,
-      "url": null,
-      "address": null,
-      "city": null,
-      "country": null,
-      "start_date": "2017-01-01T00:01:00.000Z",
-      "end_date": null
+      "title": "A Maximal Event",
+      "description": "All you ever wanted to know about headaches",
+      "url": "http://www.headache-center.org",
+      "address": "Sofienstr 2",
+      "city": "Heidelberg",
+      "country": "Germany",
+      "start_date": "2017-01-01T00:20:00.000Z",
+      "end_date": "2017-01-01T00:22:00.000Z"
     },
     "relationships": {
       "projects": {
