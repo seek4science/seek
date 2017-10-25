@@ -58,11 +58,16 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   end
 
-  test 'register registers new Assay' do
+  ## Register ##
+
+  test 'register registers new Assay with linked datasets' do
     login_as(@user)
     study = Factory :study
+    refute @zample.dataset_ids.empty?
 
-    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37', assay: {study_id: study.id }
+    sync_options = { 'link_datasets' => '1' }
+
+    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id, assay: { study_id: study.id }, sync_options: sync_options
 
     assay = assigns(:assay)
     assert_not_nil assay
@@ -73,6 +78,10 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     assert assay.external_asset.persisted?
 
+    assay.reload
+    assert_equal @zample.dataset_ids.length, assay.data_files.length
+
+    assert_nil flash[:error]
     assert_equal 'Registered OpenBIS assay: 20171002172111346-37', flash[:notice]
   end
 
@@ -80,7 +89,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     login_as(@user)
     study = Factory :study
 
-    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37', assay: {xl:true }
+    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37', assay: { xl: true }
 
     assert_response :success
 
@@ -104,7 +113,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     existing.external_asset = external
     assert existing.save
 
-    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: "#{@zample.perm_id}", assay: {study_id: study.id }
+    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: "#{@zample.perm_id}", assay: { study_id: study.id }
 
     assert_redirected_to assay_path(existing)
 
@@ -112,19 +121,92 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   end
 
+  ## Update ###
+  test 'update updates sync options and follows dependencies' do
+    login_as(@user)
+
+    assay = Factory :assay
+    asset = OpenbisExternalAsset.build(@zample)
+    assay.external_asset = asset
+    assert asset.save
+    assert assay.save
+    refute @zample.dataset_ids.empty?
+
+
+    sync_options = { 'link_datasets' => '1' }
+    assert_not_equal sync_options, asset.sync_options
+
+    post :update, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id, sync_options: sync_options
+
+    assay = assigns(:assay)
+    assert_not_nil assay
+    assert_redirected_to assay_path(assay)
+
+    last_mod = asset.updated_at
+    asset.reload
+    assert_equal sync_options, asset.sync_options
+    assert_not_equal last_mod, asset.updated_at
+
+    # TODO how to test for content update (or lack of it depends on decided simantics)
+
+
+    last_mod = assay.updated_at
+    assay.reload
+    assert_equal last_mod, assay.updated_at
+    assert_equal @zample.dataset_ids.length, assay.data_files.length
+
+    assert_nil flash[:error]
+    assert_equal "Updated sync of OpenBIS assay: #{@zample.perm_id}", flash[:notice]
+  end
+
 
   # unit like tests
+
+  test 'associate_data_sets links datasets with assay creating new datafiles if necessary' do
+
+    util = Seek::Openbis::SeekUtil.new
+    controller = OpenbisZamplesController.new
+    controller.get_seek_util
+
+    assay = Factory :assay
+
+    df0 = Factory :data_file
+    assay.associate(df0)
+    assert df0.persisted?
+    assert_equal 1, assay.data_files.length
+
+
+    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
+    assert_equal 3, datasets.length
+
+    df1 = util.createObisDataFile(OpenbisExternalAsset.build(datasets[0]))
+    assert df1.save
+
+    assert_difference('AssayAsset.count', 3) do
+      assert_difference('DataFile.count', 2) do
+        assert_difference('ExternalAsset.count', 2) do
+
+          assert_nil controller.associate_data_sets(assay, datasets)
+        end
+      end
+    end
+
+    assay.reload
+    assert_equal 4, assay.data_files.length
+
+  end
+
   test 'extract_requested_sets gives all sets from zample if linked is selected' do
 
     controller = OpenbisZamplesController.new
 
     assert_equal 3, @zample.dataset_ids.length
-    params = {}
+    params = ActionController::Parameters.new({})
 
     assert_equal [], controller.extract_requested_sets(@zample, params)
-    params = { link_datasets: '1' }
+    params = ActionController::Parameters.new({ sync_options: { link_datasets: '1' } })
     assert_same @zample.dataset_ids, controller.extract_requested_sets(@zample, params)
-    params = { link_datasets: '1', linked_datasets: ['123'] }
+    params = ActionController::Parameters.new({ sync_options: { link_datasets: '1', linked_datasets: ['123'] } })
     assert_same @zample.dataset_ids, controller.extract_requested_sets(@zample, params)
 
   end
@@ -134,15 +216,15 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     controller = OpenbisZamplesController.new
 
     assert_equal 3, @zample.dataset_ids.length
-    params = {}
+    params = ActionController::Parameters.new({})
     assert_equal [], controller.extract_requested_sets(@zample, params)
-    params = { linked_datasets: [] }
+    params = ActionController::Parameters.new({ linked_datasets: [] })
     assert_equal [], controller.extract_requested_sets(@zample, params)
-    params = { linked_datasets: ['123'] }
+    params = ActionController::Parameters.new({ linked_datasets: ['123'] })
     assert_equal [], controller.extract_requested_sets(@zample, params)
-    params = { linked_datasets: ['123', @zample.dataset_ids[0]] }
+    params = ActionController::Parameters.new({ linked_datasets: ['123', @zample.dataset_ids[0]] })
     assert_equal [@zample.dataset_ids[0]], controller.extract_requested_sets(@zample, params)
-    params = { linked_datasets: @zample.dataset_ids }
+    params = ActionController::Parameters.new({ linked_datasets: @zample.dataset_ids })
     assert_equal @zample.dataset_ids, controller.extract_requested_sets(@zample, params)
 
   end
@@ -152,7 +234,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     login_as(@project_administrator)
     controller = OpenbisZamplesController.new
 
-    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40","20171004182824553-41"])
+    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
     assert_equal 3, datasets.length
 
     datafile1 = DataFile.build_from_openbis_dataset(datasets[1])
@@ -160,24 +242,25 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     assert_difference('DataFile.count', 2) do
 
-        datafiles = controller.find_or_register_seek_files(datasets)
-        assert_equal datasets.length, datafiles.length
-        assert_equal datafile1, datafiles[1];
+      datafiles = controller.find_or_register_seek_files(datasets)
+      assert_equal datasets.length, datafiles.length
+      assert_equal datafile1, datafiles[1];
     end
 
   end
 
   test 'get_linked_to gets ids of openbis data sets' do
     controller = OpenbisZamplesController.new
+    util = Seek::Openbis::SeekUtil.new
 
     assert_equal [], controller.get_linked_to(nil)
 
-    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40","20171004182824553-41"])
-    datafiles = datasets.map { |ds| DataFile.build_from_openbis_dataset(ds)}
+    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
+    datafiles = datasets.map { |ds| util.createObisDataFile(OpenbisExternalAsset.build(ds)) }
     assert_equal 3, datafiles.length
 
     disable_authorization_checks do
-      datafiles.each { |df| df.save!}
+      datafiles.each { |df| df.save! }
     end
 
     normaldf = Factory :data_file
@@ -191,7 +274,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     linked = controller.get_linked_to assay
     assert_equal 2, linked.length
-    assert_equal ['20171004182824553-41','20171002190934144-40'], linked
+    assert_equal ['20171004182824553-41', '20171002190934144-40'], linked
 
   end
 end

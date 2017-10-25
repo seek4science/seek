@@ -15,6 +15,19 @@ module Seek
 
         assay
       end
+
+      def createObisDataFile(obis_asset)
+
+        dataset = obis_asset.content
+        openbis_endpoint = obis_asset.seek_service
+
+        df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{dataset.perm_id}",
+                          license: openbis_endpoint.project.default_license)
+
+        df.policy=openbis_endpoint.policy.deep_copy
+        df.external_asset = obis_asset
+        df
+      end
     end
   end
 end

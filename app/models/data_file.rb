@@ -21,6 +21,7 @@ class DataFile < ActiveRecord::Base
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+  has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   has_many :studied_factors, -> (r) { where('studied_factors.data_file_version =?', r.version) }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
@@ -99,6 +100,7 @@ class DataFile < ActiveRecord::Base
 
   # FIXME: bad name, its not whether it IS a template, but whether it originates from a template
   def sample_template?
+    return false if external_asset.is_a? OpenbisExternalAsset
     possible_sample_types.any?
   end
 

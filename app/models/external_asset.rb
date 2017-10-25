@@ -19,7 +19,11 @@ class ExternalAsset < ActiveRecord::Base
 
   after_initialize :options_from_json
 
-
+  # as there is no callback for reload
+  def reload
+    super
+    options_from_json
+  end
 
   def content=(content_object)
     json = serialize_content(content_object)

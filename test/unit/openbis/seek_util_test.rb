@@ -35,5 +35,24 @@ class SeekUtilTest < ActiveSupport::TestCase
       end
     end
 
+    assert_equal "OpenBIS #{@zample.perm_id}", assay.title
+    assert_equal @creator, assay.contributor
+  end
+
+  test 'creates valid datafile with dependent external_assed that can be saved' do
+    dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+    assert dataset
+
+    asset = OpenbisExternalAsset.build(dataset)
+
+    df = @util.createObisDataFile(asset)
+
+    assert df.valid?
+
+    assert_difference('DataFile.count') do
+      assert_difference('ExternalAsset.count') do
+        df.save!
+      end
+    end
   end
 end
