@@ -206,6 +206,9 @@ SEEK::Application.routes.draw do
       resources :openbis_zamples do
         post :register, on: :member
       end
+      resources :openbis_datasets do
+        post :register, on: :member
+      end
     end
     resources :avatars do
       member do

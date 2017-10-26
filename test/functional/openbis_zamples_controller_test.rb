@@ -228,27 +228,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_equal @zample.dataset_ids, controller.extract_requested_sets(@zample, params)
 
   end
-
-  test 'find_or_register_seek_files fetches existing or creates new datafiles with openbis content' do
-
-    login_as(@project_administrator)
-    controller = OpenbisZamplesController.new
-
-    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
-    assert_equal 3, datasets.length
-
-    datafile1 = DataFile.build_from_openbis_dataset(datasets[1])
-    datafile1.save!
-
-    assert_difference('DataFile.count', 2) do
-
-      datafiles = controller.find_or_register_seek_files(datasets)
-      assert_equal datasets.length, datafiles.length
-      assert_equal datafile1, datafiles[1];
-    end
-
-  end
-
+  
   test 'get_linked_to gets ids of openbis data sets' do
     controller = OpenbisZamplesController.new
     util = Seek::Openbis::SeekUtil.new

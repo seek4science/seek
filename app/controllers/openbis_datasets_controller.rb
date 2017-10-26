@@ -1,21 +1,22 @@
-class OpenbisZamplesController < ApplicationController
+class OpenbisDatasetsController < ApplicationController
 
   before_filter :get_seek_util
   before_filter :get_project
   before_filter :get_endpoint
-  before_filter :get_zample, only: [:show, :edit, :register, :update]
+  before_filter :get_dataset, only: [:show, :edit, :register, :update]
+  # before_filter :get_studies, only: [:edit]
 
   def index
-    get_zamples
+    get_datasets
   end
 
   def show
   end
 
   def edit
-    @asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
+    @asset = OpenbisExternalAsset.find_or_create_by_entity(@dataset)
     @assay = @asset.seek_entity || Assay.new
-    @linked_to_assay = get_linked_to(@asset.seek_entity)
+
   end
 
   def register
@@ -108,75 +109,17 @@ class OpenbisZamplesController < ApplicationController
 
   end
 
-  def follow_dependent
-    data_sets_ids = extract_requested_sets(@zample, params)
-    return nil if data_sets_ids.empty?
 
-    data_sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_perm_ids(data_sets_ids)
 
-    associate_data_sets(@assay, data_sets)
+  def get_dataset
 
+    @dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:id])
   end
 
-  def associate_data_sets(assay, data_sets)
+  def get_datasets
 
-    external_assets = data_sets.map { |ds| OpenbisExternalAsset.find_or_create_by_entity(ds) }
+    @datasets = Seek::Openbis::Dataset.new(@openbis_endpoint).all
 
-    existing_files = external_assets.select { |es| es.seek_entity.is_a? DataFile }
-                         .map { |es| es.seek_entity }
-
-    new_files = external_assets.select { |es| es.seek_entity.nil? }
-                    .map { |es| @seek_util.createObisDataFile(es) }
-
-    saving_problems = false
-    new_files.each { |df| saving_problems = true unless df.save }
-    return 'Could not register all depended datasets' if saving_problems
-
-    data_files = existing_files+new_files
-    data_files.each { |df| assay.associate(df)}
-
-    return nil
-
-  end
-
-
-  def sync_options(hash = nil)
-    hash ||= params
-    hash.fetch(:sync_options, {}).permit(:link_datasets)
-  end
-
-  def extract_requested_sets(zample, params)
-    return zample.dataset_ids if sync_options(params)[:link_datasets] == '1'
-
-    (params[:linked_datasets] || []) & zample.dataset_ids
-  end
-
-
-  def get_linked_to(assay)
-    return [] unless assay
-    assay.data_files.select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
-        .map { |df| df.external_asset.external_id }
-  end
-
-
-  def get_zample
-
-    # sample = Seek::Openbis::Zample.new(@openbis_endpoint)
-    # json = JSON.parse(
-    #        '
-    # {"identifier":"\/API-SPACE\/TZ3","modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser",
-    # "code":"TZ3","modifier":"apiuser","permId":"20171002172111346-37",
-    # "registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40","20171004182824553-41"]
-    # ,"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
-    # '
-    #    )
-    # @zample = sample.populate_from_json(json)
-
-    @zample = Seek::Openbis::Zample.new(@openbis_endpoint, params[:id])
-  end
-
-  def get_zamples
-    @zamples = Seek::Openbis::Zample.new(@openbis_endpoint).all
   end
 
   def get_endpoint
