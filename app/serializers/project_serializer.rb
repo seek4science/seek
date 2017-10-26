@@ -6,6 +6,7 @@ class ProjectSerializer < AvatarObjSerializer
 
   has_many :people
   has_many :institutions
+  has_many :programmes
   has_many :investigations
   has_many :studies
   has_many :assays

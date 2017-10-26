@@ -108,6 +108,7 @@ module RestTestCases
   def test_show_json(object = rest_api_test_object)
     clz = @controller.controller_name.classify.constantize
     get :show, id: object, format: 'json'
+    
     if check_for_501_read_return
       assert_response :not_implemented
     else
@@ -156,19 +157,25 @@ module RestTestCases
     end
   end
 
-  def test_min_content
+  def test_json_content
     check_for_json_type_skip
-    object = min_test_object
-    json_file = File.join(Rails.root, 'public', '2010', 'json', 'content_compare',
-                          "min_#{@controller.controller_name.classify.downcase}.json")
-    #parse such that backspace is eliminated + null turns to nil
-    json_to_compare = JSON.parse(File.read(json_file))
+    ['min','max'].each do |m|
+      object = get_test_object(m)
+      json_file = File.join(Rails.root, 'public', '2010', 'json', 'content_compare',
+                            "#{m}_#{@controller.controller_name.classify.downcase}.json")
+      #parse such that backspace is eliminated and null turns to nil
+      json_to_compare = JSON.parse(File.read(json_file))
+      begin
+        edit_max_object(object) if (m == 'max')
+      rescue NoMethodError => e
+        puts e.message
+      end
 
-    get :show, id: object, format: 'json'
-    assert_response :success
-    parsed_response = JSON.parse(@response.body)
-
-    check_content_diff(json_to_compare, parsed_response)
+      get :show, id: object, format: 'json'
+      assert_response :success
+      parsed_response = JSON.parse(@response.body)
+      check_content_diff(json_to_compare, parsed_response)
+    end
   end
 
   def check_content_diff(json1, json2)
@@ -176,24 +183,28 @@ module RestTestCases
     base = json2["data"]["meta"]["base_url"]
     diff = JsonDiff.diff(json1, json2)
 
-    for el in diff
+    diff.reverse_each do |el|
       #the self link must start with the pluralized controller's name (e.g. /people)
       if (el["path"] =~ /self/)
-        assert el["value"] =~ /^\/#{plural_obj}/
+        assert_match /^\/#{plural_obj}/, el["value"]
       # url in version, e.g.  base_url/data_files/877365356?version=1
       elsif (el["path"] =~ /versions\/\d+\/url/)
-        assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\?version=\d+/
+        assert_match /#{base}\/#{plural_obj}\/\d+\?version=\d+/, el["value"]
         diff.delete(el)
       # link in content blob, e.g.  base_url/data_files/877365356/content_blobs/343567275
       elsif (el["path"] =~ /content_blobs\/\d+\/link/)
-        assert el["value"] =~ /#{base}\/#{plural_obj}\/\d+\/content_blobs\/\d+/
+        assert_match /#{base}\/#{plural_obj}\/\d+\/content_blobs\/\d+/, el["value"]
+        diff.delete(el)
+      elsif (el["path"] =~ /avatar/)
+        assert_match /^\/#{plural_obj}\/\d+\/avatars\/\d+/, el["value"]
         diff.delete(el)
       end
     end
 
     diff.delete_if {
-        |el| el["path"] =~ /id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum/
+        |el| el["path"] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum/
     }
+
     assert_equal [], diff
   end
 
@@ -207,7 +218,6 @@ module RestTestCases
   def perform_jsonapi_checks
     assert_response :success
     assert_equal 'application/vnd.api+json', @response.content_type
-    #puts JSON::Validator.fully_validate(JSONAPI_SCHEMA_FILE_PATH, @response.body)
     assert JSON::Validator.validate(JSONAPI_SCHEMA_FILE_PATH, @response.body)
 
   end
@@ -271,4 +281,9 @@ module RestTestCases
     return %w[Sample Strain].include?(clz)
   end
 
+  # m corresponds to 'min'/'max'
+  def get_test_object(m)
+    clz = @controller.controller_name.classify.downcase
+    return Factory(("#{m}_#{clz}").to_sym)
+  end
 end

@@ -951,9 +951,6 @@
 								"projects": {
 									"$ref": "#/definitions/projectsReferenceList"
 								},
-								"institutions": {
-									"$ref": "#/definitions/institutionsReferenceList"
-								},
 								"investigations": {
 									"$ref": "#/definitions/investigationsReferenceList"
 								},
@@ -986,7 +983,6 @@
 								"assay_organisms",
 								"people",
 								"projects",
-								"institutions",
 								"investigations",
 								"studies",
 								"data_files",

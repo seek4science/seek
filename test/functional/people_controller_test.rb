@@ -15,10 +15,6 @@ class PeopleControllerTest < ActionController::TestCase
     @object = Factory(:person,orcid:'http://orcid.org/0000-0003-2130-0865')
   end
 
-  def min_test_object
-    @min_object = Factory(:min_person)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: 'People', count: 1
@@ -1748,12 +1744,11 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(person)
-    assert true
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person
     Factory :tool, value: 'fishing rod', annotatable: person
-
-    #person.add_to_project_and_institution(projects(:one), institutions(:two))
+    person.add_to_project_and_institution(Factory(:min_project), Factory(:min_institution))
+    add_avatar_to_test_object(person)
   end
 
   def mask_for_admin

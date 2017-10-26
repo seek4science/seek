@@ -16,10 +16,6 @@ class PresentationsControllerTest < ActionController::TestCase
     @object
   end
 
-  def min_test_object
-    @min_object = Factory(:min_presentation)
-  end
-
   test 'index' do
     get :index
     assert_response :success
@@ -333,4 +329,10 @@ class PresentationsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', presentation_path(presentation2), text: presentation2.title, count: 0
     end
   end
+
+  def edit_max_object(presentation)
+    add_tags_to_test_object(presentation)
+    add_creator_to_test_object(presentation)
+  end
+
 end

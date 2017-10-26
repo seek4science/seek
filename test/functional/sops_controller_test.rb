@@ -17,10 +17,6 @@ class SopsControllerTest < ActionController::TestCase
     @object = sops(:downloadable_sop)
   end
 
-  def min_test_object
-    @min_object = Factory(:min_sop)
-  end
-
   def test_get_xml_specific_version
     login_as(:owner_of_my_first_sop)
     get :show, id: sops(:downloadable_sop), version: 2, format: 'xml'
@@ -897,6 +893,11 @@ class SopsControllerTest < ActionController::TestCase
       get :edit, id: sop
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "never"/, count: 1
+  end
+
+  def edit_max_object(sop)
+    add_tags_to_test_object(sop)
+    add_creator_to_test_object(sop)
   end
 
   private

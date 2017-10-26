@@ -3,15 +3,20 @@
     "id": "1039986486",
     "type": "studies",
     "attributes": {
-      "tags": null,
-      "title": "A Minimal Study",
-      "description": null,
-      "experimentalists": null,
-      "person_responsible_id": null
+      "tags": ["Study-tag1", "Study-tag2", "Study-tag3", "Study-tag4", "Study-tag5"],
+      "title": "A Maximal Study",
+      "description": "The Study of many things",
+      "experimentalists": "Wet lab people",
+      "person_responsible_id": "887473922"
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+          {
+            "id": "1039986744",
+            "type": "people"
+          }
+        ]
       },
       "submitter": {
         "data": [
@@ -25,6 +30,14 @@
         "data": [
           {
             "id": "1039986548",
+            "type": "people"
+          },
+          {
+            "id": "1039986744",
+            "type": "people"
+          },
+          {
+            "id": "1039986744",
             "type": "people"
           }
         ]

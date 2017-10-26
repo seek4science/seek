@@ -3,26 +3,37 @@
     "id": "1039986486",
     "type": "assays",
     "attributes": {
-      "tags": null,
-      "title": "A Minimal Assay",
-      "description": null,
+      "tags": [
+        "Assay-tag1",
+        "Assay-tag2",
+        "Assay-tag3",
+        "Assay-tag4",
+        "Assay-tag5"
+      ],
+      "title": "A Maximal Assay",
+      "description": "A Western Blot Assay",
       "assay_class": {
-        "title":"Experimental assay",
-        "key":"EXP",
+        "title": "Experimental assay",
+        "key": "EXP",
         "description": "An experimental assay class description"
       },
       "assay_type": {
-        "label":"Experimental assay type",
-        "uri":"http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+        "label": "Experimental assay type",
+        "uri": "http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
       },
       "technology_type": {
-        "label":"Technology type",
-        "uri":"http://jermontology.org/ontology/JERMOntology#Technology_type"
+        "label": "Technology type",
+        "uri": "http://jermontology.org/ontology/JERMOntology#Technology_type"
       }
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+          {
+            "id": "1039986841",
+            "type": "people"
+          }
+        ]
       },
       "submitter": {
         "data": [
@@ -33,15 +44,29 @@
         ]
       },
       "organisms": {
-        "data":[]
+        "data": [
+          {
+            "id": "950658017",
+            "type": "organisms"
+          }
+        ]
       },
       "assay_organisms": {
-        "data":[]
+        "data": [
+          {
+            "id": "611798167",
+            "type": "assay_organisms"
+          }
+        ]
       },
       "people": {
         "data": [
           {
             "id": "1039986548",
+            "type": "people"
+          },
+          {
+            "id": "1039986841",
             "type": "people"
           }
         ]
@@ -71,13 +96,28 @@
         ]
       },
       "data_files": {
-        "data": []
+        "data": [
+          {
+            "id": "883654316",
+            "type": "data_files"
+          }
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+          {
+            "id": "1004285611",
+            "type": "models"
+          }
+        ]
       },
       "sops": {
-        "data": []
+        "data": [
+          {
+            "id": "1055250468",
+            "type": "sops"
+          }
+        ]
       },
       "publications": {
         "data": []
@@ -86,7 +126,7 @@
         "data": []
       },
       "samples": {
-        "data":[]
+        "data": []
       }
     },
     "links": {
