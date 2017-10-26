@@ -58,7 +58,8 @@
           "$ref" : "#/definitions/versionNumber"
         }
       },
-      "required" : [ "version" ]
+      "required" : [ "version" ],
+      "additionalProperties" : false
     },
     "linksType" : {
       "type" : "object",
@@ -67,7 +68,8 @@
           "$ref" : "#/definitions/uriString"
         }
       },
-      "required" : [ "self" ]
+      "required" : [ "self" ],
+      "additionalProperties" : false
     },
     "metaType" : {
       "type" : "object",
@@ -88,7 +90,8 @@
           "ref" : "#/definitions/nonEmptyString"
         }
       },
-      "required" : [ "created", "modified", "uuid", "base_url", "api_version" ]
+      "required" : [ "created", "modified", "uuid", "base_url", "api_version" ],
+      "additionalProperties" : false
     },
     "baseMetaType" : {
       "type" : "object",
@@ -155,7 +158,8 @@
           "minLength" : 1
         }
       },
-      "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at" ]
+      "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at" ],
+      "additionalProperties" : false
     },
     "assaysType" : {
       "type" : "string",
@@ -169,7 +173,8 @@
           "$ref" : "#/definitions/assaysReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "assaysDataType" : {
       "type" : "object",
@@ -196,7 +201,8 @@
               "type" : "string"
             }
           },
-          "required" : [ "title", "key" ]
+          "required" : [ "title", "key" ],
+          "additionalProperties" : false
         },
         "assay_type" : {
           "type" : "object",
@@ -208,7 +214,8 @@
               "$ref" : "#/definitions/uriString"
             }
           },
-          "required" : [ "label", "uri" ]
+          "required" : [ "label", "uri" ],
+          "additionalProperties" : false
         },
         "technology_type" : {
           "type" : "object",
@@ -223,7 +230,8 @@
           "required" : [ "label", "uri" ]
         }
       },
-      "required" : [ "title", "description", "assay_class", "assay_type", "technology_type" ]
+      "required" : [ "title", "description", "assay_class", "assay_type", "technology_type" ],
+      "additionalProperties" : false
     },
     "contentBlobsType" : {
       "type" : "string",
@@ -242,7 +250,8 @@
           "$ref" : "#/definitions/dataFilesReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "eventsType" : {
       "type" : "string",
@@ -256,7 +265,8 @@
           "$ref" : "#/definitions/eventsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "investigationsType" : {
       "type" : "string",
@@ -270,7 +280,8 @@
           "$ref" : "#/definitions/investigationsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "institutionsType" : {
       "type" : "string",
@@ -284,7 +295,8 @@
           "$ref" : "#/definitions/institutionsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "modelsType" : {
       "type" : "string",
@@ -298,7 +310,8 @@
           "$ref" : "#/definitions/modelsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "organismsType" : {
       "type" : "string",
@@ -314,7 +327,8 @@
           "$ref" : "#/definitions/organismsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "organismsReferenceList" : {
       "type" : "object",
@@ -323,7 +337,8 @@
           "$ref" : "#/definitions/organismsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "peopleType" : {
       "type" : "string",
@@ -339,7 +354,8 @@
           "$ref" : "#/definitions/peopleType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "peopleReferenceList" : {
       "type" : "object",
@@ -348,7 +364,8 @@
           "$ref" : "#/definitions/peopleReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "presentationsType" : {
       "type" : "string",
@@ -362,7 +379,8 @@
           "$ref" : "#/definitions/presentationsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "programmesType" : {
       "type" : "string",
@@ -376,7 +394,8 @@
           "$ref" : "#/definitions/programmesReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "programmeDataType" : {
       "type" : "object",
@@ -400,7 +419,8 @@
           "$ref" : "#/definitions/tagsType"
         }
       },
-      "required" : [ "avatar", "title", "description", "web_page", "funding_details", "funding_codes" ]
+      "required" : [ "avatar", "title", "description", "web_page", "funding_details", "funding_codes" ],
+      "additionalProperties" : false
     },
     "projectsType" : {
       "type" : "string",
@@ -414,7 +434,8 @@
           "$ref" : "#/definitions/projectsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "publicationsType" : {
       "type" : "string",
@@ -428,7 +449,8 @@
           "$ref" : "#/definitions/publicationsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "samplesType" : {
       "type" : "string",
@@ -444,7 +466,8 @@
           "$ref" : "#/definitions/samplesType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "samplesReferenceList" : {
       "type" : "object",
@@ -453,7 +476,8 @@
           "$ref" : "#/definitions/samplesReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "sampleTypesType" : {
       "type" : "string",
@@ -469,7 +493,8 @@
           "$ref" : "#/definitions/sampleTypesType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "sampleTypesReferenceList" : {
       "type" : "object",
@@ -478,7 +503,8 @@
           "$ref" : "#/definitions/sampleTypesReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "sopsType" : {
       "type" : "string",
@@ -492,7 +518,8 @@
           "$ref" : "#/definitions/sopsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "strainsType" : {
       "type" : "string",
@@ -508,7 +535,8 @@
           "$ref" : "#/definitions/strainsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "strainsReferenceList" : {
       "type" : "object",
@@ -517,7 +545,8 @@
           "$ref" : "#/definitions/strainsReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "studiesType" : {
       "type" : "string",
@@ -533,7 +562,8 @@
           "$ref" : "#/definitions/studiesType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "studiesReferenceList" : {
       "type" : "object",
@@ -542,7 +572,8 @@
           "$ref" : "#/definitions/studiesReferences"
         }
       },
-      "required" : [ "data" ]
+      "required" : [ "data" ],
+      "additionalProperties" : false
     },
     "tagsType" : {
       "$ref" : "#/definitions/nullableNonEmptyStringList"
@@ -556,7 +587,8 @@
           "$ref" : "#/definitions/assaysType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "assaysReferences" : {
       "type" : "array",
@@ -583,7 +615,8 @@
           "$ref" : "#/definitions/dataFilesType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "eventsReferences" : {
       "type" : "array",
@@ -602,7 +635,8 @@
           "$ref" : "#/definitions/eventsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "investigationsReferences" : {
       "type" : "array",
@@ -621,7 +655,8 @@
           "$ref" : "#/definitions/investigationsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "institutionsReferences" : {
       "type" : "array",
@@ -640,7 +675,8 @@
           "$ref" : "#/definitions/institutionsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "modelsReferences" : {
       "type" : "array",
@@ -659,7 +695,8 @@
           "$ref" : "#/definitions/modelsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "organismsReferences" : {
       "type" : "array",
@@ -694,7 +731,8 @@
           "$ref" : "#/definitions/presentationsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "programmesReferences" : {
       "type" : "array",
@@ -713,7 +751,8 @@
           "$ref" : "#/definitions/programmesType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "projectsReferences" : {
       "type" : "array",
@@ -732,7 +771,8 @@
           "$ref" : "#/definitions/projectsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "publicationsReferences" : {
       "type" : "array",
@@ -751,7 +791,8 @@
           "$ref" : "#/definitions/publicationsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "samplesReferences" : {
       "type" : "array",
@@ -786,7 +827,8 @@
           "$ref" : "#/definitions/sopsType"
         }
       },
-      "required" : [ "id", "type" ]
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
     },
     "strainsReferences" : {
       "type" : "array",
@@ -844,7 +886,8 @@
 									"required": [
 										"title",
 										"key"
-									]
+									],
+                                  "additionalProperties" : false
 								},
 								"assay_type": {
 									"type": "object",
@@ -859,7 +902,8 @@
 									"required": [
 										"label",
 										"uri"
-									]
+									],
+                                  "additionalProperties" : false
 								},
 								"technology_type": {
 									"type": "object",
@@ -874,7 +918,8 @@
 									"required": [
 										"label",
 										"uri"
-									]
+									],
+                                  "additionalProperties" : false
 								}
 							},
 							"required": [
@@ -882,7 +927,8 @@
 								"assay_class",
 								"assay_type",
 								"technology_type"
-							]
+							],
+                          "additionalProperties" : false
 						},
 						"relationships": {
 							"type": "object",
@@ -949,7 +995,8 @@
 								"publications",
 								"strains",
 								"samples"
-							]
+							],
+                          "additionalProperties" : false
 						},
 						"links": {
 							"$ref": "#/definitions/linksType"
@@ -965,7 +1012,8 @@
 						"relationships",
 						"links",
 						"meta"
-					]
+					],
+                  "additionalProperties" : false
 				},
 				"jsonapi": {
 					"$ref": "#/definitions/JsonApiVersion"
@@ -974,7 +1022,8 @@
 			"required": [
 				"data",
 				"jsonapi"
-			]
+			],
+                  "additionalProperties" : false
 		},
 				"getContentBlobsResponse": {
 			"type": "object",
@@ -1012,7 +1061,8 @@
 								"md5sum",
 								"sha1sum",
 								"content_type"
-							]
+							],
+                          "additionalProperties" : false
 						},
 						"links": {
 							"$ref": "#/definitions/linksType"
@@ -1027,7 +1077,8 @@
 						"attributes",
 						"links",
 						"meta"
-					]
+					],
+                  "additionalProperties" : false
 				},
 				"jsonapi": {
 					"$ref": "#/definitions/JsonApiVersion"
@@ -1036,7 +1087,8 @@
 			"required": [
 				"data",
 				"jsonapi"
-			]
+			],
+                  "additionalProperties" : false
 		},
 
     "getDataFilesResponse" : {
@@ -1088,7 +1140,8 @@
                   "$ref" : "#/definitions/samplesReferenceList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications", "events", "samples" ]
+              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications", "events", "samples" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1097,13 +1150,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getEventsResponse" : {
       "type" : "object",
@@ -1145,7 +1200,8 @@
                   "$ref" : "#/definitions/dateTimeString"
                 }
               },
-              "required" : [ "title", "description", "start_date", "end_date" ]
+              "required" : [ "title", "description", "start_date", "end_date" ],
+              "additionalProperties" : false
             },
             "relationships" : {
               "type" : "object",
@@ -1163,7 +1219,8 @@
                   "$ref" : "#/definitions/presentationsReferenceList"
                 }
               },
-              "required" : [ "projects", "data_files", "publications", "presentations" ]
+              "required" : [ "projects", "data_files", "publications", "presentations" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1172,13 +1229,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getInstitutionsResponse" : {
       "type" : "object",
@@ -1214,7 +1273,8 @@
                   "$ref" : "#/definitions/nullableUriString"
                 }
               },
-              "required" : [ "title", "country", "city", "address", "web_page" ]
+              "required" : [ "title", "country", "city", "address", "web_page" ],
+              "additionalProperties" : false
             },
             "relationships" : {
               "type" : "object",
@@ -1226,7 +1286,8 @@
                   "$ref" : "#/definitions/projectsReferenceList"
                 }
               },
-              "required" : [ "people", "projects" ]
+              "required" : [ "people", "projects" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1235,13 +1296,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getInvestigationsResponse" : {
       "type" : "object",
@@ -1268,7 +1331,8 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
-              "required" : [ "title" ]
+              "required" : [ "title" ],
+              "additionalProperties" : false
             },
             "relationships" : {
               "type" : "object",
@@ -1304,7 +1368,8 @@
                   "$ref" : "#/definitions/publicationsReferenceList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "studies", "assays", "data_files", "models", "sops", "publications" ]
+              "required" : [ "creators", "submitter", "people", "projects", "studies", "assays", "data_files", "models", "sops", "publications" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1313,13 +1378,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getModelsResponse" : {
       "type" : "object",
@@ -1364,7 +1431,8 @@
                   "$ref" : "#/definitions/publicationsReferenceList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications" ]
+              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1373,13 +1441,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getOrganismsResponse" : {
       "type" : "object",
@@ -1406,7 +1476,8 @@
                   "$ref" : "#/definitions/nonEmptyString"
                 }
               },
-              "required" : [ "title", "concept_uri", "ontology_id" ]
+              "required" : [ "title", "concept_uri", "ontology_id" ],
+              "additionalProperties" : false
             },
             "relationships" : {
               "type" : "object",
@@ -1427,7 +1498,8 @@
                   "$ref" : "#/definitions/samplesReferenceList"
                 }
               },
-              "required" : [ "projects", "assays", "models", "strains", "samples" ]
+              "required" : [ "projects", "assays", "models", "strains", "samples" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1436,13 +1508,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getPeopleResponse" : {
       "type" : "object",
@@ -1490,7 +1564,8 @@
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
                 }
               },
-              "required" : [ "title", "first_name", "last_name", "email" ]
+              "required" : [ "title", "first_name", "last_name", "email" ],
+              "additionalProperties" : false
             },
             "relationships" : {
               "type" : "object",
@@ -1532,7 +1607,8 @@
                   "$ref" : "#/definitions/samplesReferenceList"
                 }
               },
-              "required" : [ "projects", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events", "samples" ]
+              "required" : [ "projects", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events", "samples" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1541,13 +1617,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getPresentationsResponse" : {
       "type" : "object",
@@ -1595,7 +1673,8 @@
                   "$ref" : "#/definitions/eventsReferenceList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications", "events" ]
+              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications", "events" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1604,13 +1683,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getProgrammesResponse" : {
       "type" : "object",
@@ -1667,7 +1748,8 @@
                   "$ref" : "#/definitions/eventsReferenceList"
                 }
               },
-              "required" : [ "people", "projects", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events" ]
+              "required" : [ "people", "projects", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1676,13 +1758,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getProjectsResponse" : {
       "type" : "object",
@@ -1715,7 +1799,8 @@
                   "$ref" : "#/definitions/nullableUriString"
                 }
               },
-              "required" : [ "title", "description", "web_page", "wiki_page" ]
+              "required" : [ "title", "description", "web_page", "wiki_page" ],
+              "additionalProperties" : false
             },
             "relationships" : {
               "type" : "object",
@@ -1763,7 +1848,8 @@
                   "$ref" : "#/definitions/samplesReferenceList"
                 }
               },
-              "required" : [ "organisms", "people", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events", "strains", "samples" ]
+              "required" : [ "organisms", "people", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events", "strains", "samples" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1772,13 +1858,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getPublicationsResponse" : {
       "type" : "object",
@@ -1823,7 +1911,8 @@
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
                 }
               },
-              "required" : [ "title", "journal", "published_date", "pubmed_id", "citation", "link_to_pub" ]
+              "required" : [ "title", "journal", "published_date", "pubmed_id", "citation", "link_to_pub" ],
+              "additionalProperties" : false
             },
             "relationships" : {
               "type" : "object",
@@ -1859,7 +1948,8 @@
                   "$ref" : "#/definitions/eventsReferenceList"
                 }
               },
-              "required" : [ "people", "projects", "investigations", "studies", "assays", "data_files", "models", "publications", "presentations", "events" ]
+              "required" : [ "people", "projects", "investigations", "studies", "assays", "data_files", "models", "publications", "presentations", "events" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1868,13 +1958,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getSopsResponse" : {
       "type" : "object",
@@ -1919,7 +2011,8 @@
                   "$ref" : "#/definitions/publicationsReferenceList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications" ]
+              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -1928,13 +2021,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "getStudiesResponse" : {
       "type" : "object",
@@ -1967,7 +2062,8 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
-              "required" : [ "title", "person_responsible_id" ]
+              "required" : [ "title", "person_responsible_id" ],
+              "additionalProperties" : false
             },
             "relationships" : {
               "type" : "object",
@@ -2003,7 +2099,8 @@
                   "$ref" : "#/definitions/publicationsReferenceList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "investigations", "assays", "data_files", "models", "sops", "publications" ]
+              "required" : [ "creators", "submitter", "people", "projects", "investigations", "assays", "data_files", "models", "sops", "publications" ],
+              "additionalProperties" : false
             },
             "links" : {
               "$ref" : "#/definitions/linksType"
@@ -2012,13 +2109,15 @@
               "$ref" : "#/definitions/metaType"
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ]
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
         }
       },
-      "required" : [ "data", "jsonapi" ]
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     },
     "indexAssaysResponse" : {
       "type" : "object",
@@ -2033,7 +2132,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+      "additionalProperties" : false
     },
     "indexDataFilesResponse" : {
       "type" : "object",
@@ -2048,7 +2148,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+      "additionalProperties" : false
     },
    "indexEventsResponse" : {
       "type" : "object",
@@ -2063,7 +2164,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+     "additionalProperties" : false
     },
     "indexInstitutionsResponse" : {
       "type" : "object",
@@ -2078,7 +2180,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+      "additionalProperties" : false
     },
     "indexInvestigationsResponse" : {
       "type" : "object",
@@ -2093,7 +2196,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+      "additionalProperties" : false
     },
      "indexModelsResponse" : {
       "type" : "object",
@@ -2108,7 +2212,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+       "additionalProperties" : false
     },
      "indexOrganismsResponse" : {
       "type" : "object",
@@ -2123,7 +2228,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+       "additionalProperties" : false
     },
     "indexPeopleResponse" : {
       "type" : "object",
@@ -2138,7 +2244,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+      "additionalProperties" : false
     },
     "indexPresentationsResponse" : {
       "type" : "object",
@@ -2153,7 +2260,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+      "additionalProperties" : false
     },
     "indexProgrammesResponse" : {
       "type" : "object",
@@ -2168,7 +2276,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+      "additionalProperties" : false
     },
     "indexProjectsResponse" : {
       "type" : "object",
@@ -2183,7 +2292,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+      "additionalProperties" : false
     },
    "indexPublicationsResponse" : {
       "type" : "object",
@@ -2198,7 +2308,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+     "additionalProperties" : false
     },
    "indexSopsResponse" : {
       "type" : "object",
@@ -2213,7 +2324,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+     "additionalProperties" : false
     },
       "indexSampleTypesResponse" : {
         "type" : "object",
@@ -2228,7 +2340,8 @@
             "$ref" : "#/definitions/baseMetaType"
           }
         },
-        "required" : [ "data", "jsonapi", "meta" ]
+        "required" : [ "data", "jsonapi", "meta" ],
+        "additionalProperties" : false
       },
    "indexStrainsResponse" : {
       "type" : "object",
@@ -2243,7 +2356,8 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+     "additionalProperties" : false
     },
    "indexStudiesResponse" : {
       "type" : "object",
@@ -2258,10 +2372,12 @@
           "$ref" : "#/definitions/baseMetaType"
         }
       },
-      "required" : [ "data", "jsonapi", "meta" ]
+      "required" : [ "data", "jsonapi", "meta" ],
+     "additionalProperties" : false
     },
    "ErrorResponse" : {
       "required" : [ "message" ],
+     "additionalProperties" : false,
       "properties" : {
         "message" : {
           "type" : "string"
