@@ -45,6 +45,11 @@ class DataFile < ActiveRecord::Base
     def relationship_type(assay)
       parent.relationship_type(assay)
     end
+
+    def external_asset
+      parent.external_asset if parent.respond_to?(:external_asset)
+    end
+
   end
 
   if Seek::Config.events_enabled
@@ -185,11 +190,16 @@ class DataFile < ActiveRecord::Base
 
   #indicates that this is an openBIS based DataFile
   def openbis?
+    return true if external_asset.is_a? OpenbisExternalAsset
     content_blob && content_blob.openbis?
   end
 
+  def openbis_data_set
+    external_asset.is_a?(OpenbisExternalAsset) ? external_asset.content : content_blob.openbis_dataset
+  end
+
   def openbis_size_download_restricted?
-    openbis? && content_blob.openbis_dataset.size>Seek::Config.openbis_download_limit
+    openbis? && openbis_data_set.size > Seek::Config.openbis_download_limit
   end
 
   def download_disabled?

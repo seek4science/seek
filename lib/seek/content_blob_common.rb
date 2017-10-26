@@ -8,10 +8,8 @@ module Seek
 
       asset.just_used
 
-      if asset.respond_to?(:external_asset) && asset.external_asset.is_a?(OpenbisExternalAsset)
-        handle_openbis2_download(asset)
-      elsif asset.respond_to?(:openbis?) && asset.openbis?
-        handle_openbis_download(asset)
+      if asset.respond_to?(:openbis?) && asset.openbis?
+        handle_openbis_download(asset, params[:perm_id])
       else
         if asset_version.respond_to?(:content_blobs)
           content_blobs = asset_version.content_blobs
@@ -39,7 +37,7 @@ module Seek
     end
 
     def handle_openbis_download(asset, dataset_file_perm_id = nil)
-      dataset = asset.content_blob.openbis_dataset
+      dataset = asset.openbis_data_set #content_blob.openbis_dataset
       if dataset_file_perm_id
         dataset_file = dataset.dataset_files.detect { |f| f.file_perm_id == dataset_file_perm_id }
         fail 'No dataset file found for id' unless dataset_file
@@ -54,21 +52,6 @@ module Seek
       end
     end
 
-    def handle_openbis2_download(asset, dataset_file_perm_id = nil)
-      dataset = asset.external_asset.content
-      if dataset_file_perm_id
-        dataset_file = dataset.dataset_files.detect { |f| f.file_perm_id == dataset_file_perm_id }
-        fail 'No dataset file found for id' unless dataset_file
-        dest = File.join(Seek::Config.temporary_filestore_path, "#{asset.id}-dataset_file-#{dataset_file.dataset_perm_id}-#{dataset_file.filename}")
-        dataset_file.download(dest) unless File.exist?(dest)
-        send_file dest, filename: dataset_file.filename, type: 'application/octet-stream', disposition: 'attachment'
-      else
-        dest_folder = File.join(Seek::Config.temporary_filestore_path, "#{asset.id}-dataset-#{dataset.perm_id}")
-        zip_name = File.join(Seek::Config.temporary_filestore_path, "#{asset.id}-dataset-#{dataset.perm_id}.zip")
-        dataset.download(dest_folder, zip_name,asset.title.underscore)
-        send_file zip_name, filename: "#{dataset.perm_id}.zip", type: 'application/octet-stream', disposition: 'attachment'
-      end
-    end
 
     private
 

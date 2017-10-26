@@ -37,6 +37,7 @@ module Acts #:nodoc:
     end
 
     module InstanceMethods
+
       def content_type
         content_blob.content_type if self.respond_to?(:content_blob)
       end
@@ -104,6 +105,8 @@ module Acts #:nodoc:
                         :host => Seek::Config.host_with_port,
                         :protocol => Seek::Config.host_scheme)
       end
+
+
     end
   end
 end

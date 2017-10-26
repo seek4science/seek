@@ -10,14 +10,16 @@ module OpenbisHelper
 
     modal(modal_options) do
       modal_header(modal_title) +
-        modal_body do
-          content_tag(:div, '', id: :contents)
-        end
+          modal_body do
+            content_tag(:div, '', id: :contents)
+          end
     end
   end
 
   def openbis_datafile_dataset(data_file)
-    dataset = data_file.content_blob.openbis_dataset
+    (data_file.external_asset.is_a? OpenbisExternalAsset) ?
+        dataset = data_file.external_asset.content :
+        dataset = data_file.content_blob.openbis_dataset
     if dataset.error_occurred?
       render partial: 'data_files/openbis/dataset_error'
     else
