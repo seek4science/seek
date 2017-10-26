@@ -21,6 +21,7 @@ class GeneratorTest < ActiveSupport::TestCase
     file = Seek::ResearchObjects::Generator.new(inv).generate
     refute_nil file
     check_contents(file, inv)
+    puts file.path
     assert_equal Seek::ResearchObjects::Generator::DEFAULT_FILENAME, File.basename(file.path)
   end
 
