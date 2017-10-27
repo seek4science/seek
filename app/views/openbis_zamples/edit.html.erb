@@ -1,13 +1,15 @@
 
 <%= render :partial => 'errors_panel' %>
 
-<%= render :partial => 'openbis_zample_panel', :object => @zample %>
+<%= render :partial => 'openbis_zample_panel', :object => @entity %>
 
-<% datasets = @zample.datasets
+<%
+   zample = @entity
+   datasets = zample.datasets
    not_registered = @assay.new_record?
 %>
 
-<%= form_tag({controller: "openbis_zamples", action: not_registered ? 'register': 'update' , id: @zample.perm_id}, {method: 'post'}) do |f| %>
+<%= form_tag({controller: "openbis_zamples", action: not_registered ? 'register': 'update' , id: zample.perm_id}, {method: 'post'}) do |f| %>
  <%= form_for @assay do |ff| %> <%# HACK to be able to render study form using the existing helpers%>
         <% if not_registered %>
         <div class="form-group">
@@ -50,9 +52,9 @@
 <% end %>
 
 <% if false %>
- Edit <%= @zample.perm_id %>
- Datasets_id <%= @zample.dataset_ids %>
- Sets <% @zample.datasets.each do | s| %>
+ Edit <%= zample.perm_id %>
+ Datasets_id <%= zample.dataset_ids %>
+ Sets <% zample.datasets.each do | s| %>
     <%= s.perm_id %>
     <br>
  <% end %>

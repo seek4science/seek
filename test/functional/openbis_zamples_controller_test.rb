@@ -166,7 +166,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     util = Seek::Openbis::SeekUtil.new
     controller = OpenbisZamplesController.new
-    controller.get_seek_util
+    # controller.get_seek_util
 
     assay = Factory :assay
 
@@ -228,7 +228,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_equal @zample.dataset_ids, controller.extract_requested_sets(@zample, params)
 
   end
-  
+
   test 'get_linked_to gets ids of openbis data sets' do
     controller = OpenbisZamplesController.new
     util = Seek::Openbis::SeekUtil.new

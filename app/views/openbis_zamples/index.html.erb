@@ -8,12 +8,12 @@
 
     <div class="form-group"><label>Project:</label> <%= @project.title %></div>
     <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
-    <div class="form-group"><label>Samples:</label> <%= @zamples.length %></div>
+    <div class="form-group"><label>Samples:</label> <%= @entities.length %></div>
   </div>
 </div>
 
 <div class='row' id="openbis-zamples-cards">
-  <%= render partial:'openbis_zample_card', collection:@zamples %>
+  <%= render partial:'openbis_zample_card', collection:@entities %>
 </div>
 
 

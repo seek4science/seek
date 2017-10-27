@@ -25,7 +25,9 @@ class SeekUtilTest < ActiveSupport::TestCase
     params = { study_id: @study.id}
     sync_options = {link_datasets: '1'}
 
-    assay = @util.createObisAssay(params, @creator,@zample,sync_options)
+    asset = OpenbisExternalAsset.build(@zample, sync_options)
+
+    assay = @util.createObisAssay(params, @creator,asset)
 
     assert assay.valid?
 
@@ -35,8 +37,10 @@ class SeekUtilTest < ActiveSupport::TestCase
       end
     end
 
+
     assert_equal "OpenBIS #{@zample.perm_id}", assay.title
     assert_equal @creator, assay.contributor
+    assert_same asset, assay.external_asset
   end
 
   test 'creates valid datafile with dependent external_assed that can be saved' do

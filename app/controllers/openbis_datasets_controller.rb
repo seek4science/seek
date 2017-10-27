@@ -1,10 +1,8 @@
 class OpenbisDatasetsController < ApplicationController
 
-  before_filter :get_seek_util
-  before_filter :get_project
-  before_filter :get_endpoint
+  include Seek::Openbis::EntityControllerBase
+
   before_filter :get_dataset, only: [:show, :edit, :register, :update]
-  # before_filter :get_studies, only: [:edit]
 
   def index
     get_datasets
@@ -36,7 +34,7 @@ class OpenbisDatasetsController < ApplicationController
 
     assay_params = params.require(:assay).permit(:study_id, :assay_class_id, :title)
 
-    @assay = @seek_util.createObisAssay(assay_params, current_person, @zample, sync_options)
+    @assay = seek_util.createObisAssay(assay_params, current_person, @zample, sync_options)
     @asset = @assay.external_asset
     # in case rendering edit on errors
     @linked_to_assay = []
@@ -122,15 +120,4 @@ class OpenbisDatasetsController < ApplicationController
 
   end
 
-  def get_endpoint
-    @openbis_endpoint = OpenbisEndpoint.find(params[:openbis_endpoint_id])
-  end
-
-  def get_project
-    @project = Project.find(params[:project_id])
-  end
-
-  def get_seek_util
-    @seek_util = Seek::Openbis::SeekUtil.new unless @seek_util
-  end
 end

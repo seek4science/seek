@@ -1,19 +1,13 @@
 class OpenbisZamplesController < ApplicationController
 
-  before_filter :get_seek_util
-  before_filter :get_project
-  before_filter :get_endpoint
-  before_filter :get_zample, only: [:show, :edit, :register, :update]
+  include Seek::Openbis::EntityControllerBase
 
   def index
-    get_zamples
+    get_entities
   end
 
-  def show
-  end
 
   def edit
-    @asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
     @assay = @asset.seek_entity || Assay.new
     @linked_to_assay = get_linked_to(@asset.seek_entity)
   end
@@ -22,21 +16,16 @@ class OpenbisZamplesController < ApplicationController
     puts 'register called'
     puts params
 
-    if OpenbisExternalAsset.registered?(@zample)
+    if @asset.seek_entity
       flash[:error] = 'Already registered as OpenBIS entity'
-      return redirect_to OpenbisExternalAsset.find_by_entity(@zample).seek_entity
+      return redirect_to @asset.seek_entity
     end
 
-
-    #data_sets_ids = extract_requested_sets(@zample, params)
-    #data_sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_perm_ids(data_sets_ids)
-
-    # data_files = find_or_register_seek_files(data_sets)
-
+    @asset.sync_options = sync_options
     assay_params = params.require(:assay).permit(:study_id, :assay_class_id, :title)
 
-    @assay = @seek_util.createObisAssay(assay_params, current_person, @zample, sync_options)
-    @asset = @assay.external_asset
+    @assay = seek_util.createObisAssay(assay_params, current_person, @asset)
+
     # in case rendering edit on errors
     @linked_to_assay = []
 
@@ -52,7 +41,7 @@ class OpenbisZamplesController < ApplicationController
       err = follow_dependent
       flash[:error] = err if err
 
-      flash[:notice] = "Registered OpenBIS assay: #{@zample.perm_id}"
+      flash[:notice] = "Registered OpenBIS assay: #{@entity.perm_id}"
       redirect_to @assay
     else
       @reasons = @assay.errors
@@ -65,7 +54,6 @@ class OpenbisZamplesController < ApplicationController
     puts 'update called'
     puts params
 
-    @asset = OpenbisExternalAsset.find_by_entity(@zample)
     @assay = @asset.seek_entity
 
     unless @assay.is_a? Assay
@@ -76,11 +64,8 @@ class OpenbisZamplesController < ApplicationController
     # in case of rendering edit
     @linked_to_assay = get_linked_to(@asset.seek_entity)
 
-
-    puts "Sync: #{sync_options}"
-
     @asset.sync_options = sync_options
-    @asset.content = @zample #or maybe we should not update, but that is what the user saw on the screen
+    @asset.content = @entity #or maybe we should not update, but that is what the user saw on the screen
 
     # separate saving of external_asset as the save on parent does not fails if the child was not saved correctly
     unless @asset.save
@@ -103,13 +88,13 @@ class OpenbisZamplesController < ApplicationController
     #  render action: 'edit'
     #end
 
-    flash[:notice] = "Updated sync of OpenBIS assay: #{@zample.perm_id}"
+    flash[:notice] = "Updated sync of OpenBIS assay: #{@entity.perm_id}"
     redirect_to @assay
 
   end
 
   def follow_dependent
-    data_sets_ids = extract_requested_sets(@zample, params)
+    data_sets_ids = extract_requested_sets(@entity, params)
     return nil if data_sets_ids.empty?
 
     data_sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_perm_ids(data_sets_ids)
@@ -126,14 +111,14 @@ class OpenbisZamplesController < ApplicationController
                          .map { |es| es.seek_entity }
 
     new_files = external_assets.select { |es| es.seek_entity.nil? }
-                    .map { |es| @seek_util.createObisDataFile(es) }
+                    .map { |es| seek_util.createObisDataFile(es) }
 
     saving_problems = false
     new_files.each { |df| saving_problems = true unless df.save }
     return 'Could not register all depended datasets' if saving_problems
 
     data_files = existing_files+new_files
-    data_files.each { |df| assay.associate(df)}
+    data_files.each { |df| assay.associate(df) }
 
     return nil
 
@@ -159,7 +144,7 @@ class OpenbisZamplesController < ApplicationController
   end
 
 
-  def get_zample
+  def get_entity
 
     # sample = Seek::Openbis::Zample.new(@openbis_endpoint)
     # json = JSON.parse(
@@ -172,22 +157,12 @@ class OpenbisZamplesController < ApplicationController
     #    )
     # @zample = sample.populate_from_json(json)
 
-    @zample = Seek::Openbis::Zample.new(@openbis_endpoint, params[:id])
+    @entity = Seek::Openbis::Zample.new(@openbis_endpoint, params[:id])
   end
 
-  def get_zamples
-    @zamples = Seek::Openbis::Zample.new(@openbis_endpoint).all
+  def get_entities
+    @entities = Seek::Openbis::Zample.new(@openbis_endpoint).all
   end
 
-  def get_endpoint
-    @openbis_endpoint = OpenbisEndpoint.find(params[:openbis_endpoint_id])
-  end
 
-  def get_project
-    @project = Project.find(params[:project_id])
-  end
-
-  def get_seek_util
-    @seek_util = Seek::Openbis::SeekUtil.new unless @seek_util
-  end
 end
