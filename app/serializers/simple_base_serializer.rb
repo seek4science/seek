@@ -40,6 +40,7 @@ class SimpleBaseSerializer < ActiveModel::Serializer
         tags.append(tag.value.text)
       end
     end
+    tags.sort!
     tags
   end
 
