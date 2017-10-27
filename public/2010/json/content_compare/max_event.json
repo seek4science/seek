@@ -1,0 +1,48 @@
+{
+  "data": {
+    "id": "8233983736",
+    "type": "events",
+    "attributes": {
+      "title": "A Maximal Event",
+      "description": "All you ever wanted to know about headaches",
+      "url": "http://www.headache-center.org",
+      "address": "Sofienstr 2",
+      "city": "Heidelberg",
+      "country": "Germany",
+      "start_date": "2017-01-01T00:20:00.000Z",
+      "end_date": "2017-01-01T00:22:00.000Z"
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "1022250742",
+            "type":"projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "presentations": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/events/8233983736"
+    },
+    "meta": {
+      "created": "2014-02-12T13:05:43.000Z",
+      "modified": "2014-02-12T13:05:43.000Z",
+      "uuid": "60dd04ec-2d4a-48a3-ab27-cbebf4adca89",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

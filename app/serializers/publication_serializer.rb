@@ -2,7 +2,7 @@ class PublicationSerializer < BaseSerializer
   attributes :title, #:publication_authors,
              :journal, :published_date,
              :doi, :pubmed_id,
-             :abstract, :citation # , :persons --> creators?
+             :abstract, :citation 
   attribute :link_to_pub do
     if :pubmed_id
       'https://www.ncbi.nlm.nih.gov/pubmed/' + object.pubmed_id.to_s

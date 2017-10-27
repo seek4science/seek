@@ -16,10 +16,6 @@ class OrganismsControllerTest < ActionController::TestCase
     @object = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
   end
 
-  def min_test_object
-    @min_object = Factory(:min_organism)
-  end
-
   test 'new organism route' do
     assert_routing '/organisms/new', controller: 'organisms', action: 'new'
     assert_equal '/organisms/new', new_organism_path.to_s
@@ -335,6 +331,5 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_select 'div.related-items > ul > li > a', text: "Samples (1)"
     assert_select 'div.related-items .tab-pane a[href=?]', sample_path(sample), text: /#{sample.title}/
   end
-
 
 end

@@ -23,7 +23,8 @@ module Seek
         format.json  do sorted_objects = objects.sort { |x, y| x.id <=> y.id }
           render json: sorted_objects,
                             each_serializer: ActiveModel::Serializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host
+                            meta: {:base_url =>   Seek::Config.site_base_host,
+                                   :api_version => ActiveModel::Serializer.config.api_version
                             }
           end
       end

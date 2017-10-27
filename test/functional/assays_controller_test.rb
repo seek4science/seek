@@ -17,10 +17,7 @@ class AssaysControllerTest < ActionController::TestCase
   def rest_api_test_object
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
-
-  def min_test_object
-    @min_object = Factory(:min_assay)
-  end
+  
 
   test 'modelling assay validates with schema' do
     df = Factory(:data_file, contributor: User.current_user.person)
@@ -1370,6 +1367,19 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', assay_path(assay), text: assay.title
       assert_select 'a[href=?]', assay_path(assay2), text: assay2.title, count: 0
     end
+  end
+
+  def edit_max_object(assay)
+    add_tags_to_test_object(assay)
+    add_creator_to_test_object(assay)
+    df = Factory(:data_file, policy: Factory(:public_policy))
+    model = Factory(:model, policy: Factory(:public_policy))
+    sop = Factory(:sop, policy: Factory(:public_policy))
+    org = Factory(:organism)
+    assay.associate_organism(org)
+    assay.associate(df)
+    assay.associate(model)
+    assay.associate(sop)
   end
 
   test 'add data file button' do

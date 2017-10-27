@@ -17,10 +17,6 @@ class PublicationsControllerTest < ActionController::TestCase
     @object = Factory(:publication, published_date: Date.new(2013, 1, 1))
   end
 
-  def min_test_object
-    @min_object = Factory(:min_publication)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: 'Publications', count: 1
@@ -788,6 +784,23 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal '10.5072/abcd', assigns(:publication).doi
   end
 
+  def edit_max_object(pub)
+    assay = Factory(:assay, policy: Factory(:public_policy))
+    study = Factory(:study, policy: Factory(:public_policy))
+    inv = Factory(:investigation, policy: Factory(:public_policy))
+    df = Factory(:data_file, policy: Factory(:public_policy))
+    model = Factory(:model, policy: Factory(:public_policy))
+    pr = Factory(:presentation, policy: Factory(:public_policy))
+
+    pub.associate(assay)
+    pub.associate(study)
+    pub.associate(inv)
+    pub.associate(df)
+    pub.associate(model)
+    pub.associate(pr)
+
+  end
+
   private
 
   def publication_for_export_tests
@@ -796,4 +809,6 @@ class PublicationsControllerTest < ActionController::TestCase
                           published_date: 5.days.ago.to_s(:db),
                           pubmed_id: 5)
   end
+
+
 end

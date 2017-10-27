@@ -19,10 +19,6 @@ class ProjectsControllerTest < ActionController::TestCase
     @object = projects(:sysmo_project)
   end
 
-  def min_test_object
-    @min_object = Factory(:min_project)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: I18n.t('project').pluralize, count: 1
@@ -1473,6 +1469,14 @@ class ProjectsControllerTest < ActionController::TestCase
     assert project.default_policy
 
 
+  end
+
+  def edit_max_object(project)
+    for i in 1..5 do
+      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+    end
+    project.programme_id = (Factory(:programme)).id
+    add_avatar_to_test_object(project)
   end
 
   private

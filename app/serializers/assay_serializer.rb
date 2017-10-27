@@ -21,7 +21,6 @@ class AssaySerializer < PCSSerializer
 
   has_many :people
   has_many :projects
-  has_many :institutions
   has_many :investigations
   has_many :studies
   has_many :data_files

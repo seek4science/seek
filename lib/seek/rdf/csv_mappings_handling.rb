@@ -1,15 +1,17 @@
 module Seek
   module Rdf
     module CSVMappingsHandling
+
       MAPPINGS_FILE = File.join(File.dirname(__FILE__), 'rdf_mappings.csv')
+
       def generate_from_csv_definitions(rdf_graph)
         # load template
-        rows = Rails.cache.fetch('rdf_definitions', expires_in: 1.hour) do
-          CSV.read(MAPPINGS_FILE)
-        end
-        rows.select { |row| row.present? && !row.empty? }.each do |row|
-          unless row[0].casecmp('class').zero?
-            rdf_graph = generate_for_csv_row(rdf_graph, row)
+
+        CSV.open(MAPPINGS_FILE) do |rows|
+          rows.select { |row| row.present? && !row.empty? }.each do |row|
+            unless row[0].casecmp('class').zero?
+              rdf_graph = generate_for_csv_row(rdf_graph, row)
+            end
           end
         end
         rdf_graph
@@ -30,20 +32,25 @@ module Seek
         rdf_graph
       end
 
-      def generate_triples_for_csv_row(subject, method, property, uri_or_literal, transformation, collection_transform, rdf_graph)
+      def generate_triples_for_csv_row(subject, method, property, uri_or_literal, transformation, collection_transformation, rdf_graph)
         resource = subject.rdf_resource
+        property_uri = eval(property)
+        Rails.logger.debug("Generating triples for subject #{rdf_resource}, method #{method}, property #{property_uri}")
         items = subject.send(method)
         # may be an array of items or a single item. Cant use Array(item) or [*item] here cos it screws up times and datetimes
         items = [items] unless items.respond_to?(:each)
 
         transformation.strip! if transformation
-        collection_transform.strip! if collection_transform
-        unless collection_transform.blank?
-          items = eval("items.#{collection_transform}")
+        collection_transformation.strip! if collection_transformation
+        unless collection_transformation.blank?
+          Rails.logger.debug("Performing collection transformation: #{collection_transformation}")
+          items = eval("items.#{collection_transformation}")
         end
         items.each do |item|
-          property_uri = eval(property)
-          item = eval(transformation) unless transformation.blank?
+          unless transformation.blank?
+            Rails.logger.debug("Performing transformation: #{transformation}")
+            item = eval(transformation)
+          end
           o = if uri_or_literal.casecmp('u').zero?
                 handle_uri_for_item(item)
               else

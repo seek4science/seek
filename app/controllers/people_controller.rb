@@ -38,11 +38,8 @@ class PeopleController < ApplicationController
   # GET /people.xml
   def index
     if params[:discipline_id]
-      @discipline = Discipline.find(params[:discipline_id])
-      # FIXME: strips out the disciplines that don't match
-      @people = Person.where(['disciplines.id=?', @discipline.id]).includes(:disciplines)
-      # need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
-      @people.each(&:reload)
+      @discipline = Discipline.find_by_id(params[:discipline_id])
+      @people = @discipline.try(:people) || []
     elsif params[:project_position_id]
       @project_position = ProjectPosition.find(params[:project_position_id])
       @people = Person.includes(:group_memberships)
@@ -74,7 +71,8 @@ class PeopleController < ApplicationController
       format.xml
       format.json  { render json: @people,
                             each_serializer: ActiveModel::Serializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host
+                            meta: {:base_url =>   Seek::Config.site_base_host,
+                                   :api_version => ActiveModel::Serializer.config.api_version
                             } }
     end
   end

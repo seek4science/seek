@@ -6,7 +6,6 @@ module Seek
     def self.included(base)
       base.extend ClassMethods
     end
-
     module ClassMethods
       # this is the array of possible pages, defaults to A-Z. Can be set with the options[:pages] in grouped_pagination definition in model
       attr_reader :pages

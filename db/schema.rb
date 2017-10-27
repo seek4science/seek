@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171011095056) do
+ActiveRecord::Schema.define(version: 20171026131121) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -209,26 +209,6 @@ ActiveRecord::Schema.define(version: 20171011095056) do
   end
 
   add_index "assets_creators", ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type", using: :btree
-
-  create_table "attachments", force: :cascade do |t|
-    t.integer  "size",              limit: 4
-    t.integer  "height",            limit: 4
-    t.integer  "width",             limit: 4
-    t.integer  "parent_id",         limit: 4
-    t.integer  "attachable_id",     limit: 4
-    t.integer  "position",          limit: 4
-    t.string   "content_type",      limit: 255
-    t.string   "filename",          limit: 255
-    t.string   "thumbnail",         limit: 255
-    t.string   "attachable_type",   limit: 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "data_url",          limit: 255
-    t.string   "original_filename", limit: 255
-  end
-
-  add_index "attachments", ["attachable_id", "attachable_type"], name: "index_attachments_on_attachable_id_and_attachable_type", using: :btree
-  add_index "attachments", ["parent_id"], name: "index_attachments_on_parent_id", using: :btree
 
   create_table "auth_lookup_update_queues", force: :cascade do |t|
     t.integer  "item_id",    limit: 4
@@ -1040,12 +1020,6 @@ ActiveRecord::Schema.define(version: 20171011095056) do
     t.datetime "updated_at"
   end
 
-  create_table "ponds", force: :cascade do |t|
-    t.integer  "diameter",   limit: 4
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-  end
-
   create_table "posts", force: :cascade do |t|
     t.integer  "user_id",    limit: 4
     t.integer  "topic_id",   limit: 4
@@ -1430,11 +1404,6 @@ ActiveRecord::Schema.define(version: 20171011095056) do
     t.string   "first_letter",             limit: 1
     t.text     "other_creators",           limit: 65535
     t.integer  "originating_data_file_id", limit: 4
-  end
-
-  create_table "samples_tissue_and_cell_types", id: false, force: :cascade do |t|
-    t.integer "sample_id",               limit: 4
-    t.integer "tissue_and_cell_type_id", limit: 4
   end
 
   create_table "saved_searches", force: :cascade do |t|

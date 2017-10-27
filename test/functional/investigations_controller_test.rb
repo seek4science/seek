@@ -17,10 +17,6 @@ class InvestigationsControllerTest < ActionController::TestCase
     @object = Factory(:investigation, policy: Factory(:public_policy))
   end
 
-  def min_test_object
-    @min_object = Factory(:min_investigation)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: I18n.t('investigation').pluralize, count: 1
@@ -370,5 +366,11 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', investigation_path(investigation), text: investigation.title
       assert_select 'a[href=?]', investigation_path(investigation2), text: investigation2.title, count: 0
     end
+  end
+
+  def edit_max_object(investigation)
+    add_tags_to_test_object(investigation)
+    investigation.creators = [Factory(:person)]
+    investigation.save
   end
 end
