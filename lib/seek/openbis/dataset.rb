@@ -27,6 +27,18 @@ module Seek
         dataset_type['code']
       end
 
+      def type_code
+        dataset_type_code
+      end
+
+      def type_description
+        dataset_type_description
+      end
+
+      def type_text
+        dataset_type_text
+      end
+
       def dataset_files
         @dataset_files ||= Seek::Openbis::DatasetFile.new(openbis_endpoint).find_by_dataset_perm_id(perm_id)
       end
@@ -84,14 +96,8 @@ module Seek
         df
       end
 
-      def registered?
-        ContentBlob.where(url: content_blob_uri).any?
-      end
 
-      def registered_as
-        blob = ContentBlob.where(url: content_blob_uri)
-        blob.any? ? blob.first.asset : nil
-      end
+
 
       private
 

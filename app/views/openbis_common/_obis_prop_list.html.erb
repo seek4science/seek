@@ -1,0 +1,8 @@
+<% if entity.properties
+     entity.properties.each do |key, value|
+%>
+        <%= list_item_attribute(key, text_or_not_specified(value)) %>
+    <%
+      end
+      end
+    %>

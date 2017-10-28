@@ -1,0 +1,23 @@
+
+<%= render :partial => 'openbis_common/errors_panel' %>
+
+<%= render :partial => 'openbis_dataset_panel', :object => @entity %>
+
+<%
+  not_registered = @datafile.new_record?
+%>
+
+<%= form_tag({controller: "openbis_datasets", action: not_registered ? 'register': 'update' , id: @entity.perm_id}, {method: 'post'}) do |f| %>
+        <% unless not_registered %>
+            <div class="form-group">
+              <label>Registered as:</label>
+              <%= link_to "#{@datafile.title}", @datafile %>
+            </div>
+        <% end %>
+
+    <div class="form-group">
+      <%= submit_tag(not_registered ? 'Register': 'Update', class: 'btn btn-primary') %>
+    </div>
+
+<% end %>
+

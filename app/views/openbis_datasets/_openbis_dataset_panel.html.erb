@@ -1,0 +1,31 @@
+<%
+  entity ||= openbis_dataset_panel
+  data_file = entity.registered_as
+  modal_files ||= false
+%>
+
+<%= render :partial => 'openbis_common/files_view_modal', locals: {parent_id: '#openbis-details'} if modal_files%>
+
+<div class="panel panel-default" id="openbis-details">
+  <div class="panel-body">
+    <p>
+      <%= image(:openbis, :width=>'75px') %>
+    </p>
+
+    <%= render partial:'openbis_common/obis_attr_row', locals: {entity: entity} %>
+    <%= render partial:'openbis_common/obis_prop_row', locals: {entity: entity} %>
+
+    <div class="row">
+      <hr>
+      <div class="col-md-10">
+        <% if modal_files %>
+          <label>Files: </label> <%= openbis_files_modal_link(entity) %>
+        <% else %>
+          <%= render partial:'openbis_dataset_files_list', locals: {dataset: entity, data_file: data_file} %>
+        <% end %>
+      </div>
+
+
+    </div>
+  </div>
+</div>

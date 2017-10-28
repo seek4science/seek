@@ -13,7 +13,7 @@ var OpenBis = {
         var endpointId = $j(this).data('endpoint-id');
         var dataFileId = $j(this).data('datafile-id');
         var projectId = $j(this).data('project-id');
-        var path = '/projects/' + projectId + '/openbis_endpoints/show_dataset_files'
+        var path = '/projects/' + projectId + '/openbis_endpoints/show_dataset_files';
 
         $j.ajax(path, {
                 data: {id: endpointId, data_file_id: dataFileId, perm_id: permId},

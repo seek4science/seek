@@ -2,19 +2,14 @@ class OpenbisDatasetsController < ApplicationController
 
   include Seek::Openbis::EntityControllerBase
 
-  before_filter :get_dataset, only: [:show, :edit, :register, :update]
 
   def index
-    get_datasets
+    get_entities
   end
 
-  def show
-  end
 
   def edit
-    @asset = OpenbisExternalAsset.find_or_create_by_entity(@dataset)
-    @assay = @asset.seek_entity || Assay.new
-
+    @datafile = @asset.seek_entity || DataFile.new
   end
 
   def register
@@ -109,15 +104,12 @@ class OpenbisDatasetsController < ApplicationController
 
 
 
-  def get_dataset
-
-    @dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:id])
+  def get_entity
+    @entity = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:id])
   end
 
-  def get_datasets
-
-    @datasets = Seek::Openbis::Dataset.new(@openbis_endpoint).all
-
+  def get_entities
+    @entities = Seek::Openbis::Dataset.new(@openbis_endpoint).all
   end
 
 end

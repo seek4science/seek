@@ -23,7 +23,8 @@ module OpenbisHelper
     if dataset.error_occurred?
       render partial: 'data_files/openbis/dataset_error'
     else
-      render partial: 'data_files/openbis/dataset', locals: { dataset: dataset, data_file: data_file }
+      #render partial: 'data_files/openbis/dataset', locals: { dataset: dataset, data_file: data_file }
+      render partial: 'openbis_datasets/openbis_dataset_panel', locals: { entity: dataset, modal_files: true }
     end
   end
 
@@ -34,5 +35,20 @@ module OpenbisHelper
     end
 
     'Unsupported'
+  end
+
+  def openbis_files_modal_link(dataset)
+
+    openbis_endpoint = dataset.openbis_endpoint
+    project = openbis_endpoint.project
+    file_count=dataset.dataset_file_count
+    files_text = "#{file_count} File".pluralize(file_count)
+
+    link = link_to(files_text, '#', class: 'view-files-link',
+                     'data-toggle' => 'modal',
+        'data-target' => "#openbis-file-view",
+        'data-perm-id' => "#{dataset.perm_id}",
+        'data-project-id' => "#{project.id}",
+        'data-endpoint-id' => "#{openbis_endpoint.id}")
   end
 end

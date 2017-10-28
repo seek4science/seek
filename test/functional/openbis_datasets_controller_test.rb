@@ -3,7 +3,7 @@ require 'openbis_test_helper'
 
 include SharingFormTestHelper
 
-class OpenbisZamplesControllerTest < ActionController::TestCase
+class OpenbisDatasetsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
@@ -14,7 +14,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
     @endpoint = Factory(:openbis_endpoint, project: Factory(:project))
-    @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+    @dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
   end
 
   test 'test setup works' do
@@ -23,7 +23,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert @project
     assert_includes @user.projects, @project
     assert @endpoint
-    assert @zample
+    assert @dataset
   end
 
   test 'index gives index view' do
@@ -42,20 +42,17 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_select "div.form-group", /#{@project.title}/
     assert_select "div label", "Endpoint:"
     assert_select "div.form-group", /#{@endpoint.title}/
-    # assert_select "div", "Endpoint: #{@endpoint.id}"
-    # assert_select "div", "Samples: 2"
-    assert_select '#openbis-zamples-cards div.openbis-card', count: 2
+    assert_select '#openbis-dataset-cards div.openbis-card', count: 8
   end
 
-  test 'edit gives edit view' do
+  test 'edit renders edit view' do
     login_as(@user)
-    get :edit, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37'
+    get :edit, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
 
     assert_response :success
-    assert assigns(:assay)
-    assert assigns(:asset)
     assert assigns(:entity)
-    assert assigns(:linked_to_assay)
+    assert assigns(:asset)
+    assert assigns(:datafile)
 
   end
 

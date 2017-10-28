@@ -1,36 +1,24 @@
 <%
-  zample = openbis_zample_card
+  entity = openbis_zample_card
 %>
 
 <div class="col-md-3 openbis-card">
   <div class='panel panel-default'>
     <div class='openbis-card-heading'>
        <span>
-        <%= zample.perm_id %>
+        <%= entity.perm_id %>
        </span>
     </div>
     <div class='panel-body'>
-      <%= list_item_attribute('Code', text_or_not_specified(zample.code)) %>
-      <%= list_item_attribute('Type Code', text_or_not_specified(zample.sample_type['code'])) %>
-      <%= list_item_attribute('Type Dsc.', text_or_not_specified(zample.sample_type['description'])) %>
+      <%= render partial:'openbis_common/obis_attr_list', locals: {entity: entity} %>
+      <%= render partial:'openbis_common/obis_prop_list', locals: {entity: entity} %>
 
-      <%= list_item_attribute('Registrator', text_or_not_specified(zample.registrator)) %>
-      <%= list_item_attribute('Modifier', text_or_not_specified(zample.modifier)) %>
-
-      <%= list_item_attribute('Registered', text_or_not_specified(date_as_string(zample.registration_date, true))) %>
-      <%= list_item_attribute('Modified', text_or_not_specified(date_as_string(zample.modification_date, true))) %>
-      <% if zample.properties
-           zample.properties.each do |key, value|
-      %>
-              <%= list_item_attribute(key, text_or_not_specified(value)) %>
-          <%
-            end
-            end
-          %>
-      <% if zample.dataset_ids %>
-          <%= list_item_attribute('Datasets', text_or_not_specified(zample.dataset_ids.join(', '), none_text: 'None')) %>
+      <% if entity.dataset_ids %>
+          <%= list_item_attribute('Datasets', text_or_not_specified(entity.dataset_ids.join(', '), none_text: 'None')) %>
       <% end %>
-      <%= link_to('Show/Register', edit_project_openbis_endpoint_openbis_zample_path(@project, @openbis_endpoint, id: zample.perm_id)) %>
+      <%= render partial:'openbis_common/registered_link_item', locals: {entity: entity} %>
+
+      <%= link_to('Show/Register', edit_project_openbis_endpoint_openbis_zample_path(@project, @openbis_endpoint, entity.perm_id)) %>
     </div>
   </div>
 
