@@ -12,7 +12,6 @@ class DataFile < ActiveRecord::Base
   end if Seek::Config.solr_enabled
 
   acts_as_asset
-
   include Seek::Dois::DoiGeneration
 
   scope :default_order, -> { order('title') }

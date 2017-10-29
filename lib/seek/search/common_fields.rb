@@ -23,6 +23,10 @@ module Seek
             text :projects do
               projects.collect(&:title) if self.respond_to?(:projects)
             end
+
+            text :external_asset do
+              external_asset_search_terms if self.respond_to?(:external_asset_search_terms)
+            end
           end if Seek::Config.solr_enabled
         end
       end

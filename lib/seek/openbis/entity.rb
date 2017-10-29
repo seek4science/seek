@@ -100,7 +100,7 @@ module Seek
         asset = OpenbisExternalAsset.find_by_entity(self) if OpenbisExternalAsset.registered?(self)
         return asset.seek_entity if asset
 
-        blob = ContentBlob.where(url: self.respond_to?(:content_blob_uri) ? content_blob_uri : 'missing')
+        blob = ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing')
         blob.any? ? blob.first.asset : nil
       end
 

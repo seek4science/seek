@@ -112,4 +112,8 @@ class ExternalAsset < ActiveRecord::Base
   def options_from_json
     @sync_options = self.sync_options_json ? JSON.parse(self.sync_options_json) : {}
   end
+
+  def search_terms
+    ['YYTop']
+  end
 end

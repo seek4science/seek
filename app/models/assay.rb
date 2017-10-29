@@ -191,4 +191,8 @@ class Assay < ActiveRecord::Base
   def rdf_type_entity_fragment
     { 'EXP' => 'Experimental_assay_type', 'MODEL' => 'Model_analysis_type' }[assay_class.key]
   end
+
+  def external_asset_search_terms
+    external_asset ? external_asset.search_terms : []
+  end
 end

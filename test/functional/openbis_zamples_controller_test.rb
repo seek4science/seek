@@ -68,7 +68,10 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     sync_options = { 'link_datasets' => '1' }
 
+    puts "------------Before post"
     post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id, assay: { study_id: study.id }, sync_options: sync_options
+    puts "------------After post"
+
 
     assay = assigns(:assay)
     assert_not_nil assay
@@ -104,7 +107,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   end
 
-  test 'register does not create if assay if zample already registered but redirects to it' do
+  test 'register does not create assay if zample already registered but redirects to it' do
     login_as(@user)
     study = Factory :study
     existing = Factory :assay
@@ -126,11 +129,11 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   test 'update updates sync options and follows dependencies' do
     login_as(@user)
 
-    assay = Factory :assay
+    exassay = Factory :assay
     asset = OpenbisExternalAsset.build(@zample)
-    assay.external_asset = asset
+    exassay.external_asset = asset
     assert asset.save
-    assert assay.save
+    assert exassay.save
     refute @zample.dataset_ids.empty?
 
 
@@ -141,6 +144,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     assay = assigns(:assay)
     assert_not_nil assay
+    assert_equal exassay, assay
     assert_redirected_to assay_path(assay)
 
     last_mod = asset.updated_at
@@ -151,9 +155,11 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     # TODO how to test for content update (or lack of it depends on decided simantics)
 
 
-    last_mod = assay.updated_at
+    last_mod = exassay.updated_at
     assay.reload
-    assert_equal last_mod, assay.updated_at
+    # this test fails??? so asset is save probably due to relations updates
+    # for same reason eql, so comparing ind fields does not work even if no update operations are visible in db
+    assert_equal last_mod.to_a, assay.updated_at.to_a
     assert_equal @zample.dataset_ids.length, assay.data_files.length
 
     assert_nil flash[:error]

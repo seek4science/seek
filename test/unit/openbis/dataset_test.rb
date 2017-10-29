@@ -66,6 +66,20 @@ class DatasetTest < ActiveSupport::TestCase
     refute file.is_directory
   end
 
+  test 'checking indexing flow' do
+    User.current_user = Factory(:person).user
+    @openbis_endpoint.project.update_attributes(default_license: 'wibble')
+
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
+    datafile = dataset.create_seek_datafile
+
+    puts "-----BEFORE SAVE"
+    assert datafile.save
+    puts "-----AFTER SAVE"
+
+    datafile.solr_index!
+  end
+
   test 'create datafile' do
     User.current_user = Factory(:person).user
     @openbis_endpoint.project.update_attributes(default_license: 'wibble')
