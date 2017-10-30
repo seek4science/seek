@@ -836,6 +836,48 @@ class SampleTest < ActiveSupport::TestCase
     refute sample.can_view?(nil)
   end
 
+  test 'can overwrite existing samples when extracting from data file' do
+    project_ids = [Factory(:project).id]
+    disable_authorization_checks do
+      source_type = Factory(:source_sample_type, project_ids: project_ids)
+      lib1 = source_type.samples.create(data: { title: 'Lib-1', info: 'bla' }, sample_type: source_type, project_ids: project_ids)
+      lib2 = source_type.samples.create(data: { title: 'Lib-2', info: 'bla' }, sample_type: source_type, project_ids: project_ids)
+      lib3 = source_type.samples.create(data: { title: 'Lib-3', info: 'bla' }, sample_type: source_type, project_ids: project_ids)
+      lib4 = source_type.samples.create(data: { title: 'Lib-4', info: 'bla' }, sample_type: source_type, project_ids: project_ids)
+
+      assert_equal 4, source_type.samples.count
+
+      type = SampleType.new(title: 'Sample type linked to other', project_ids: project_ids)
+      type.sample_attributes << Factory.build(:sample_attribute, title: 'title', template_column_index: 1,
+                                              sample_attribute_type: Factory(:string_sample_attribute_type),
+                                              required: true, is_title: true, sample_type: type)
+      type.sample_attributes << Factory.build(:sample_attribute, title: 'library id', template_column_index: 2,
+                                              sample_attribute_type: Factory(:sample_sample_attribute_type),
+                                              required: false, sample_type: type, linked_sample_type: source_type)
+      type.sample_attributes << Factory.build(:sample_attribute, title: 'info', template_column_index: 3,
+                                              sample_attribute_type: Factory(:string_sample_attribute_type),
+                                              required: false, sample_type: type)
+      type.save!
+
+      data_file = Factory(:data_file, content_blob: Factory(:linked_samples_incomplete_content_blob), project_ids: project_ids)
+
+      assert_difference('Sample.count', 4) do
+        data_file.extract_samples(type, true, false)
+      end
+
+      assert_equal [lib1, lib2], data_file.extracted_samples.map { |s| s.related_samples }.flatten.sort
+
+      data_file.content_blob = Factory(:linked_samples_complete_content_blob)
+      data_file.save!
+
+      assert_no_difference('Sample.count') do
+        data_file.extract_samples(type, true, true)
+      end
+
+      assert_equal [lib1, lib2, lib3, lib4], data_file.reload.extracted_samples.map { |s| s.related_samples }.flatten.sort
+    end
+  end
+
   test 'strains linked through join table' do
     sample_type = Factory(:strain_sample_type)
     strain = Factory(:strain)

@@ -149,9 +149,24 @@ class DataFile < ActiveRecord::Base
 
   # Extracts samples using the given sample_type
   # Returns a list of extracted samples, including
-  def extract_samples(sample_type, confirm = false)
+  def extract_samples(sample_type, confirm = false, overwrite = false)
     samples = sample_type.build_samples_from_template(content_blob)
     extracted = []
+
+    # If the overwrite flag is set, find existing samples by their title and update their sample data.
+    if overwrite
+      samples = samples.map do |new_sample|
+        existing = extracted_samples.find_by_title(new_sample.title_from_data)
+
+        if existing
+          existing.data = new_sample.data
+          existing
+        else
+          new_sample
+        end
+      end
+    end
+
     samples.each do |sample|
       sample.project_ids = project_ids
       sample.contributor = contributor
@@ -161,6 +176,7 @@ class DataFile < ActiveRecord::Base
 
       extracted << sample
     end
+
     extracted
   end
 

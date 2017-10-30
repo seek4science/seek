@@ -957,6 +957,17 @@ Factory.define(:nels_fastq_paired_template_content_blob, parent: :content_blob) 
   f.data File.new("#{Rails.root}/test/fixtures/files/FASTQPaired.xlsx", 'rb').read
 end
 
+Factory.define(:linked_samples_incomplete_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'FASTQPaired.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data File.new("#{Rails.root}/test/fixtures/files/linked-samples-incomplete.xlsx", 'rb').read
+end
+
+Factory.define(:linked_samples_complete_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'FASTQPaired.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data File.new("#{Rails.root}/test/fixtures/files/linked-samples-complete.xlsx", 'rb').read
+end
 
 Factory.define(:activity_log) do |f|
   f.action 'create'
@@ -1373,6 +1384,14 @@ Factory.define(:optional_strain_sample_type, parent: :strain_sample_type) do |f|
   f.after_build do |type|
     type.sample_attributes = [Factory.build(:sample_attribute, template_column_index: 1, title: 'name', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type),
                               Factory.build(:sample_attribute, template_column_index: 2, title: 'seekstrain', sample_attribute_type: Factory(:strain_sample_attribute_type), required: false, sample_type: type)]
+  end
+end
+
+Factory.define(:source_sample_type, parent: :sample_type) do |f|
+  f.title 'Library'
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'info', sample_attribute_type: Factory(:string_sample_attribute_type), required: false, sample_type: type)
   end
 end
 

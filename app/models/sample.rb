@@ -108,6 +108,22 @@ class Sample < ActiveRecord::Base
     extracted? ? originating_data_file.creators : super
   end
 
+  def title_from_data
+    attr = title_attribute
+    if attr
+      value = get_attribute(title_attribute.hash_key)
+      if attr.seek_strain?
+        value[:title]
+      elsif attr.seek_sample?
+        Sample.find_by_id(value).try(:title)
+      else
+        value.to_s
+      end
+    else
+      nil
+    end
+  end
+
   private
 
   def samples_this_links_to
@@ -132,18 +148,7 @@ class Sample < ActiveRecord::Base
   end
 
   def set_title_to_title_attribute_value
-    attr = title_attribute
-    if attr
-      value = get_attribute(title_attribute.hash_key)
-      if attr.seek_strain?
-        value = value[:title]
-      elsif attr.seek_sample?
-        value = Sample.find_by_id(value).try(:title)
-      else
-        value = value.to_s
-      end
-      self.title = value
-    end
+    self.title = title_from_data
   end
 
   # the designated title attribute
