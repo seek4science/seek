@@ -302,15 +302,15 @@ class AssetTest < ActiveSupport::TestCase
     end
   end
 
-  test 'is_any_doi_minted?' do
+  test 'has_doi??' do
     df = Factory :data_file
     new_version = Factory :data_file_version, data_file: df
     assert_equal 2, df.version
-    assert !df.is_any_doi_minted?
+    assert !df.has_doi?
 
     new_version.doi = 'test_doi'
     disable_authorization_checks { new_version.save }
-    assert df.reload.is_any_doi_minted?
+    assert df.reload.has_doi?
   end
 
   test 'should not be able to delete after doi' do
