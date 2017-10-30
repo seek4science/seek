@@ -6,7 +6,7 @@ class StudySerializer < PCSSerializer
 
   has_many :people
   has_many :projects
-  has_many :investigations
+  has_one :investigation
   has_many :assays
   has_many :data_files
   has_many :models
