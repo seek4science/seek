@@ -159,7 +159,8 @@ class DataFile < ActiveRecord::Base
         existing = extracted_samples.find_by_title(new_sample.title_from_data)
 
         if existing
-          existing.data = new_sample.data
+          existing.clear_data
+          existing.data = new_sample.data.to_hash.select { |k, v| !v.nil? } # This is necessary because some conversions fail when run on nil
           existing
         else
           new_sample

@@ -8,17 +8,17 @@ module Seek
       end
 
       # Extract samples and store in the filesystem temporarily
-      def extract
+      def extract(overwrite = false)
         # Marshalling doesn't seem to work on AR objects, so we just extract the attributes into a hash and then
         # rebuild them on load
-        self.class.decode(cache { self.class.encode(@data_file.extract_samples(@sample_type)) })
+        self.class.decode(cache { self.class.encode(@data_file.extract_samples(@sample_type, false, overwrite)) })
       end
 
       # Persist the extracted samples to the database
       def persist
         samples = extract # Re-extracts samples if cache expired, otherwise returns the cached samples
 
-        samples.each(&:save)
+        disable_authorization_checks { samples.each(&:save) }
       end
 
       # Clear the temporarily-stored samples
@@ -62,7 +62,9 @@ module Seek
       def self.decode(values)
         if values
           values.map do |value|
-            Sample.new.tap { |s| s.assign_attributes(value) }
+            (value['id'] ? Sample.find(value['id']) : Sample.new).tap do |s|
+              s.assign_attributes(value)
+            end
           end
         end
       end

@@ -372,7 +372,11 @@ class DataFilesController < ApplicationController
         @sample_type = @data_file.reload.possible_sample_types.last
 
         if @sample_type
-          extract_samples
+          SampleDataExtractionJob.new(@data_file, @sample_type, false, overwrite: true).queue_job
+
+          respond_to do |format|
+            format.html { redirect_to @data_file }
+          end
         else
           flash[:notice] = 'Successfully downloaded sample metadata from NeLS, but could not find a matching sample type.'
 

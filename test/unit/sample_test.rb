@@ -870,11 +870,11 @@ class SampleTest < ActiveSupport::TestCase
       data_file.content_blob = Factory(:linked_samples_complete_content_blob)
       data_file.save!
 
-      assert_no_difference('Sample.count') do
+      assert_difference('Sample.count', 1) do # Spreadsheet contains 4 updated samples and 1 new one
         data_file.extract_samples(type, true, true)
       end
 
-      assert_equal [lib1, lib2, lib3, lib4], data_file.reload.extracted_samples.map { |s| s.related_samples }.flatten.sort
+      assert_equal [lib1, lib2, lib3, lib4], data_file.reload.extracted_samples.map { |s| s.related_samples }.flatten.uniq.sort
     end
   end
 
