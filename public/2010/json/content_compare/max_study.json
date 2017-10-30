@@ -50,13 +50,13 @@
           }
         ]
       },
-      "investigations": {
-        "data": [
+      "investigation": {
+        "data":
           {
             "id": "973654814",
             "type": "investigations"
           }
-        ]
+
       },
       "assays": {
         "data": []

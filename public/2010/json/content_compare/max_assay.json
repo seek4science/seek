@@ -51,14 +51,6 @@
           }
         ]
       },
-      "assay_organisms": {
-        "data": [
-          {
-            "id": "611798167",
-            "type": "assay_organisms"
-          }
-        ]
-      },
       "people": {
         "data": [
           {
@@ -79,21 +71,17 @@
           }
         ]
       },
-      "investigations": {
-        "data": [
-          {
+      "investigation" : {
+        "data": {
             "id": "973654814",
             "type": "investigations"
           }
-        ]
       },
-      "studies": {
-        "data": [
-          {
-            "id": "1060384872",
-            "type": "studies"
-          }
-        ]
+      "study": {
+        "data": {
+          "id": "1060384872",
+          "type": "studies"
+        }
       },
       "data_files": {
         "data": [

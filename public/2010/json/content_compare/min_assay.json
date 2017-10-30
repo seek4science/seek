@@ -35,9 +35,6 @@
       "organisms": {
         "data":[]
       },
-      "assay_organisms": {
-        "data":[]
-      },
       "people": {
         "data": [
           {
@@ -54,21 +51,20 @@
           }
         ]
       },
-      "investigations": {
-        "data": [
+      "investigation": {
+        "data":
           {
             "id": "973654814",
             "type": "investigations"
           }
-        ]
+
       },
-      "studies": {
-        "data": [
+      "study": {
+        "data":
           {
             "id": "1060384872",
             "type": "studies"
           }
-        ]
       },
       "data_files": {
         "data": []

@@ -1100,20 +1100,21 @@
 								"organisms": {
 									"$ref": "#/definitions/organismsReferenceList"
 								},
-								"assay_organisms": {
-									"$ref": "#/definitions/organismsReferenceList"
-								},
 								"people": {
 									"$ref": "#/definitions/peopleReferenceList"
 								},
 								"projects": {
 									"$ref": "#/definitions/projectsReferenceList"
 								},
-								"investigations": {
-									"$ref": "#/definitions/investigationsReferenceList"
+								"investigation": {
+                                    "data" : {
+                                      "$ref": "#/definitions/investigationsReference"
+                                    }
 								},
-								"studies": {
-									"$ref": "#/definitions/studiesReferenceList"
+								"study": {
+                                  "data" : {
+                                    "$ref": "#/definitions/studiesReference"
+                                  }
 								},
 								"data_files": {
 									"$ref": "#/definitions/dataFilesReferenceList"
@@ -1138,11 +1139,10 @@
 								"creators",
 								"submitter",
 								"organisms",
-								"assay_organisms",
 								"people",
 								"projects",
-								"investigations",
-								"studies",
+								"investigation",
+								"study",
 								"data_files",
 								"models",
 								"sops",
@@ -2237,8 +2237,10 @@
                 "projects" : {
                   "$ref" : "#/definitions/projectsReferenceList"
                 },
-                "investigations" : {
-                  "$ref" : "#/definitions/investigationsReferenceList"
+                "investigation" : {
+                  "data": {
+                    "$ref" : "#/definitions/investigationsReference"
+                }
                 },
                 "assays" : {
                   "$ref" : "#/definitions/assaysReferenceList"
@@ -2256,7 +2258,7 @@
                   "$ref" : "#/definitions/publicationsReferenceList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "investigations", "assays", "data_files", "models", "sops", "publications" ],
+              "required" : [ "creators", "submitter", "people", "projects", "investigation", "assays", "data_files", "models", "sops", "publications" ],
               "additionalProperties" : false
             },
             "links" : {
