@@ -181,7 +181,7 @@ module RestTestCases
   def check_content_diff(json1, json2)
     plural_obj = @controller.controller_name.pluralize
     base = json2["data"]["meta"]["base_url"]
-    diff = JsonDiff.diff(json1, json2)
+    diff = JsonDiff.diff(json1, json2, moves: false)
 
     diff.reverse_each do |el|
       #the self link must start with the pluralized controller's name (e.g. /people)
