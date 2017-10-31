@@ -7,7 +7,7 @@
       <%= list_item_optional_attribute "#{t('model')} type", resource.model_type.try(:title) %>
       <%= list_item_optional_attribute "#{t('model')} format", resource.model_format.try(:title) %>
       <%= list_item_optional_attribute "Environment", resource.recommended_environment.try(:title) %>
-      <%= resource_list_item_doi(resource) %>
+      <%= list_item_doi(resource) %>
     </div>
   </div>
 
