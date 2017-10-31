@@ -27,6 +27,11 @@ module Seek
         !asset_version.doi.blank?
       end
 
+      def latest_citable_doi
+        return nil unless has_doi?
+        versions.where('doi IS NOT NULL').last.doi
+      end
+
       def has_doi?
         versions.where('doi IS NOT NULL').compact.any?
       end

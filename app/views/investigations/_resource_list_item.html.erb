@@ -2,6 +2,7 @@
 <div class="row">
   <div class="col-sm-6">
     <%= list_item_snapshot_list resource %>
+    <%= resource_list_item_doi(resource) %>
   </div>
   <div class="col-sm-6 hidden-xs">
     <%= list_item_authorized_list resource.studies, t('study').pluralize %>

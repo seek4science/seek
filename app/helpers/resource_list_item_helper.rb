@@ -224,4 +224,15 @@ module ResourceListItemHelper
     other_authors = all_authors.select { |a| a.person.nil? }.map { |a| a.last_name + ' ' + a.first_name }.join(',')
     list_item_person_list(authors.map(&:person), other_authors, 'Author')
   end
+
+  def resource_list_item_doi(resource)
+    if resource.respond_to?(:has_doi?) && resource.has_doi?
+      content_tag(:p, class: 'list_item_attribute') do
+        content = content_tag(:b,'DOI: ')
+        content << doi_link(resource.latest_citable_doi)
+        content << content_tag(:span,'',class: :doi_icon)
+      end
+    end
+  end
+
 end
