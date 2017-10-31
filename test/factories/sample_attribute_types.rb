@@ -9,6 +9,10 @@ Factory.define(:string_sample_attribute_type, class: SampleAttributeType) do |f|
   f.base_type Seek::Samples::BaseType::STRING
 end
 
+Factory.define(:xxx_string_sample_attribute_type, parent: :string_sample_attribute_type) do |f|
+  f.regexp '.*xxx.*'
+end
+
 Factory.define(:float_sample_attribute_type, class: SampleAttributeType) do |f|
   f.sequence(:title) { |n| "Float attribute type #{n}" }
   f.base_type Seek::Samples::BaseType::FLOAT
