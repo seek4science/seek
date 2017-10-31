@@ -1,7 +1,7 @@
 # A couple of these rely on certain things existing in the test db ahead of time.
 #:pal relies on Role.pal_role being able to find an appropriate role in the db.
 #:assay_modelling and :assay_experimental rely on the existence of the AssayClass's
-include ActionDispatch::TestProcess
+# include ActionDispatch::TestProcess
 # Person
 Factory.define(:admin_defined_role_project, class: AdminDefinedRoleProject) do |_f|
 end
