@@ -2515,12 +2515,19 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'can get citation for data file with DOI' do
     doi_citation_mock
-    data_file = Factory(:data_file, policy: Factory(:public_policy), doi: '10.5072/test')
+    data_file = Factory(:data_file, policy: Factory(:public_policy))
+
     login_as(data_file.contributor)
 
     get :show, id: data_file
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+
+    data_file.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
+
+    get :show, id: data_file
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
   end
 
   test 'resource count stats' do

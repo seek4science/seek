@@ -895,12 +895,43 @@ class SopsControllerTest < ActionController::TestCase
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "never"/, count: 1
   end
 
+  test 'can get citation for sop with DOI' do
+    doi_citation_mock
+    sop = Factory(:sop, policy: Factory(:public_policy))
+
+    login_as(sop.contributor)
+
+    get :show, id: sop
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+
+    sop.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
+
+    get :show, id: sop
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+  end
+
   def edit_max_object(sop)
     add_tags_to_test_object(sop)
     add_creator_to_test_object(sop)
   end
 
   private
+
+  def doi_citation_mock
+    stub_request(:get, /https:\/\/dx\.doi\.org\/.+/)
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, 'https://dx.doi.org/10.5072/test')
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, 'https://dx.doi.org/10.5072/broken')
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/broken_doi_metadata_response.html"), status: 200)
+  end
 
   def file_for_upload(options = {})
     default = { filename: 'file_picture.png', content_type: 'image/png', tempfile_fixture: 'files/file_picture.png' }

@@ -1136,6 +1136,23 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can get citation for model with DOI' do
+    doi_citation_mock
+    model = Factory(:model, policy: Factory(:public_policy))
+
+    login_as(model.contributor)
+
+    get :show, id: model
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+
+    model.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
+
+    get :show, id: model
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+  end
+
   def valid_model
     { title: 'Test', project_ids: [projects(:sysmo_project).id] }
   end
