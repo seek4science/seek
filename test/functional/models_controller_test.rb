@@ -1153,6 +1153,8 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select '#snapshot-citation', text: /Bacall, F/, count:1
   end
 
+  private
+
   def valid_model
     { title: 'Test', project_ids: [projects(:sysmo_project).id] }
   end
@@ -1167,6 +1169,20 @@ class ModelsControllerTest < ActionController::TestCase
     model[:model_type_id] = (model_types(:ODE)).id
     model[:recommended_environment_id] = recommended_model_environments(:jws).id
     add_creator_to_test_object(model)
+  end
+
+  def doi_citation_mock
+    stub_request(:get, /https:\/\/dx\.doi\.org\/.+/)
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, 'https://dx.doi.org/10.5072/test')
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, 'https://dx.doi.org/10.5072/broken')
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/broken_doi_metadata_response.html"), status: 200)
   end
 
 end
