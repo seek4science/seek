@@ -161,7 +161,7 @@ module RestTestCases
     check_for_json_type_skip
     ['min','max'].each do |m|
       object = get_test_object(m)
-      json_file = File.join(Rails.root, 'public', '2010', 'json', 'content_compare',
+      json_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'content_compare',
                             "#{m}_#{@controller.controller_name.classify.downcase}.json")
       #parse such that backspace is eliminated and null turns to nil
       json_to_compare = JSON.parse(File.read(json_file))

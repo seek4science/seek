@@ -1,0 +1,19 @@
+// This fails as no JSON endpoint
+
+{
+    "data": {
+       "attributes": {
+            "title": "A new granulation method for compressed tablets [proceedings]. 27",
+            "journal": "J Pharm Pharmacol",
+            "published_date": "1976-12-01",
+            "doi": null,
+            "pubmed_id": 12345,
+            "abstract": null,
+            "citation": "J Pharm Pharmacol. 1976 Dec;28 Suppl:67P.",
+            "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/12345",
+            "authors": [
+                "M. H. Rubinstein"
+            ]
+        }
+    }
+}

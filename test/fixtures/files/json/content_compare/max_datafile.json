@@ -1,0 +1,104 @@
+{
+  "data": {
+    "id": "883654268",
+    "type": "data_files",
+    "attributes": {
+      "tags": ["DataFile-tag1", "DataFile-tag2", "DataFile-tag3", "DataFile-tag4", "DataFile-tag5"],
+      "title": "A Maximal DataFile",
+      "description": "Results - Sampling conformations of ATP-Mg inside the binding pocket",
+      "license": null,
+      "latest_version": 1,
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/data_files/883654268?version=1"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2017-10-06T09:53:31.000Z",
+      "updated_at": "2017-10-06T09:53:31.000Z",
+      "content_blobs": [
+        {
+          "original_filename": "a_pdf_file.pdf",
+          "url": null,
+          "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
+          "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/data_files/883654268/content_blobs/1050452533",
+          "size": 8827
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "1039986841",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "1039986644",
+            "type": "people"
+          },
+          {
+            "id": "1039986841",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": []
+      },
+      "studies": {
+        "data": []
+      },
+      "assays": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "events": {
+        "data": []
+      },
+      "samples": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/data_files/883654268"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}
