@@ -1,7 +1,8 @@
 class ExternalAsset < ActiveRecord::Base
 
   self.inheritance_column = 'class_type'
-  attr_accessor :sync_options
+  attr_accessor :sync_options, :content_changed
+
 
   enum sync_state: [ :synchronized, :refresh, :failed ]
 
@@ -19,6 +20,8 @@ class ExternalAsset < ActiveRecord::Base
 
   after_initialize :options_from_json
 
+  after_save(:trigger_reindexing) if Seek::Config.solr_enabled
+
   # as there is no callback for reload
   def reload
     super
@@ -27,6 +30,8 @@ class ExternalAsset < ActiveRecord::Base
 
   def content=(content_object)
     json = serialize_content(content_object)
+    self.content_changed = detect_change(content_object, json)
+
     @local_content = content_object
 
     self.local_content_json = json
@@ -34,6 +39,7 @@ class ExternalAsset < ActiveRecord::Base
     self.sync_state = :synchronized
     self.external_mod_stamp = extract_mod_stamp(content_object)
     self.version = self.version ? self.version+1 : 1
+
   end
 
   def content
@@ -76,7 +82,11 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def extract_mod_stamp(content_object)
-    return nil
+    content_object.nil? ? '-1' : "#{content_object.hash}"
+  end
+
+  def detect_change(content_object, object_json)
+    external_mod_stamp != extract_mod_stamp(content_object)
   end
 
   def local_content_json=(content)
@@ -86,8 +96,10 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def local_content_json
-    return nil if content_blob.nil?
-    content_blob.read
+    return nil if (content_blob.nil? || content_blob.new_record?)
+    ans = content_blob.read
+    content_blob.rewind
+    ans
   end
 
   def init_content_holder()
@@ -113,7 +125,15 @@ class ExternalAsset < ActiveRecord::Base
     @sync_options = self.sync_options_json ? JSON.parse(self.sync_options_json) : {}
   end
 
+  def needs_reindexing
+    content_changed || external_mod_stamp_changed?
+  end
+
+  def trigger_reindexing
+    ReindexingJob.new.add_items_to_queue seek_entity if seek_entity && needs_reindexing
+  end
+
   def search_terms
-    ['YYTop']
+    []
   end
 end

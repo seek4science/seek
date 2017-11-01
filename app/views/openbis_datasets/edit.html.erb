@@ -7,7 +7,7 @@
   not_registered = @datafile.new_record?
 %>
 
-<%= form_tag({controller: "openbis_datasets", action: not_registered ? 'register': 'update' , id: @entity.perm_id}, {method: 'post'}) do |f| %>
+<%= form_tag({controller: "openbis_datasets", action: not_registered ? 'register': 'update' , id: @entity.perm_id}, {method: not_registered ? 'post' : 'patch'}) do |f| %>
         <% unless not_registered %>
             <div class="form-group">
               <label>Registered as:</label>

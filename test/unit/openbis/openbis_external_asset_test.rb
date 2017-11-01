@@ -56,6 +56,33 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 
   end
 
+  test 'builds from Dataset' do
+
+    entity = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+    options = {tomek: false}
+    asset = OpenbisExternalAsset.build(entity, options)
+
+    assert_equal @endpoint, asset.seek_service
+    assert_equal '20160210130454955-23', asset.external_id
+
+    assert_equal 'https://openbis-api.fair-dom.org/openbis', asset.external_service
+    assert_equal '2016-02-10T12:04:55+00:00', asset.external_mod_stamp
+
+    assert_equal 'Seek::Openbis::Dataset', asset.external_type
+    assert asset.synchronized_at
+    assert_equal 'synchronized', asset.sync_state
+    assert asset.synchronized?
+    assert_equal  options, asset.sync_options
+    assert_equal 1, asset.version
+
+    refute asset.sync_options_json
+    assert asset.valid?
+    assert asset.save
+
+    assert asset.sync_options_json
+    assert asset.local_content_json
+    assert_same entity, asset.content
+  end
 
   test 'registered? works' do
 
@@ -106,4 +133,23 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert_equal asset.content, zample
   end
 
+  test 'openbis_search_terms' do
+
+    dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+
+    asset = OpenbisExternalAsset.build(dataset)
+    terms = asset.search_terms
+
+    assert_includes terms, '20160210130454955-23'
+    assert_includes terms, 'TEST_DATASET_TYPE'
+    assert_includes terms, 'for api test'
+    assert_includes terms, 'original/autumn.jpg'
+    assert_includes terms, 'autumn.jpg'
+    assert_includes terms, 'apiuser'
+
+    # values form openbis parametes as well as key:value pairs
+    assert_includes terms, 'DataFile_3'
+    assert_includes terms, 'SEEK_DATAFILE_ID:DataFile_3'
+
+  end
 end

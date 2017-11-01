@@ -11,7 +11,7 @@ module Seek
           if self.respond_to?(:content_blobs)
             content_blobs
           elsif self.respond_to?(:content_blob)
-            [content_blob]
+            content_blob ? [content_blob] : []
           else
             []
           end

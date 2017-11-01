@@ -53,4 +53,33 @@ class OpenbisExternalAsset < ExternalAsset
     entity.populate_from_json(JSON.parse serial)
   end
 
+  def search_terms
+    super | openbis_search_terms
+  end
+
+  def openbis_search_terms
+    entity = content
+
+    return [] unless entity
+
+    terms = [entity.perm_id, entity.type_code, entity.type_description,
+             entity.registrator, entity.modifier, entity.code]
+
+    if entity.properties
+      terms |= entity.properties.map { |key, value| [value, "#{key}:#{value}"]}.flatten
+    end
+
+    if entity.is_a? Seek::Openbis::Dataset
+
+      terms |= entity.dataset_files_no_directories.collect do |file|
+        # files dont have permid [file.perm_id, file.path, file.filename]
+        [file.path, file.filename]
+      end.flatten
+
+
+    end
+
+    terms.uniq
+  end
+
 end
