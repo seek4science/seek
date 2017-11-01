@@ -2184,10 +2184,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'can disambiguate sample type' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2327,11 +2326,10 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "can't extract from data file if no permissions" do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     another_person = Factory(:person)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:private_policy), contributor: person.user
     refute data_file.sample_template?
@@ -2356,10 +2354,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'strain samples successfully extracted from spreadsheet' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:strain_sample_data_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2387,10 +2384,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'extract from data file' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2425,10 +2421,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'extract from data file with multiple matching sample types redirects to selection page' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2459,10 +2454,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'extract from data file queues job' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2487,6 +2481,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "can't extract from data file if samples already extracted" do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
 
@@ -2713,6 +2708,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                     policy: Factory(:private_policy), contributor: contributor
     sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    create_sample_attribute_type
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
 

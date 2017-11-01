@@ -98,7 +98,7 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
-  setup :clear_rails_cache, :create_initial_person, :create_sample_attribute_type
+  setup :clear_rails_cache, :create_initial_person
   teardown :clear_current_user
 
   def file_for_upload(options = {})
