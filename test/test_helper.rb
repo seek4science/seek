@@ -98,7 +98,7 @@ Kernel.class_eval do
 end
 
 class ActiveSupport::TestCase
-  setup :clear_rails_cache, :create_initial_person
+  setup :clear_rails_cache, :create_initial_person, :create_sample_attribute_type
   teardown :clear_current_user
 
   def file_for_upload(options = {})
@@ -125,6 +125,11 @@ class ActiveSupport::TestCase
   # is unexpectedly an admin
   def create_initial_person
     Factory(:admin, first_name: 'default admin')
+  end
+
+  # At least one sample attribute type is needed for building sample types from spreadsheets
+  def create_sample_attribute_type
+    Factory(:string_sample_attribute_type)
   end
 
   def clear_rails_cache

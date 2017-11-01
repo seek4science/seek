@@ -2713,7 +2713,6 @@ class DataFilesControllerTest < ActionController::TestCase
                                     policy: Factory(:private_policy), contributor: contributor
     sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    Factory(:string_sample_attribute_type) # At least one sample attribute type is needed.
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
 
