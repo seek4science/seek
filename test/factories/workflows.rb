@@ -15,7 +15,7 @@ Factory.define(:workflow) do |f|
   end
 end
 
-# Workflow Category
+# WorkflowCategory
 Factory.define :workflow_category do |f|
   f.name 'a category'
 end

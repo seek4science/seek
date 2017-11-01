@@ -23,7 +23,7 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.projects { [Factory.build(:max_project)] }
 end
 
-# Publication Author
+# PublicationAuthor
 Factory.define :publication_author do |f|
   f.sequence(:first_name) { |n| "Person#{n}" }
   f.last_name 'Last'

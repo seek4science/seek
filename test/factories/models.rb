@@ -1,6 +1,6 @@
 include ActionDispatch::TestProcess
 
-# Model Format
+# ModelFormat
 Factory.define(:model_format) do |f|
   f.sequence(:title) { |n| "format #{n}" }
 end
@@ -117,7 +117,7 @@ Factory.define(:doc_model, parent: :model) do |f|
   end
 end
 
-# Model Version
+# Model::Version
 Factory.define(:model_version, class: Model::Version) do |f|
   f.association :model
   f.projects { model.projects }

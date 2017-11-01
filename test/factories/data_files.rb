@@ -62,7 +62,7 @@ end
 
 Factory.define(:subscribable, parent: :data_file) {}
 
-# DataFile Version
+# DataFile::Version
 Factory.define(:data_file_version, class: DataFile::Version) do |f|
   f.association :data_file
   f.projects { data_file.projects }

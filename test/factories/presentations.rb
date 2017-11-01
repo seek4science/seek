@@ -39,7 +39,7 @@ Factory.define(:odp_presentation, parent: :presentation) do |f|
   f.association :content_blob, factory: :odp_content_blob
 end
 
-# Presentation Version
+# Presentation::Version
 Factory.define(:presentation_version, class: Presentation::Version) do |f|
   f.association :presentation
   f.projects { presentation.projects }

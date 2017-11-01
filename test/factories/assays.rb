@@ -1,5 +1,5 @@
 # AssayClass
-#:assay_modelling and :assay_experimental rely on the existence of the AssayClass's
+#:assay_modelling and :assay_experimental rely on the existence of the AssayClasses
 Factory.define(:modelling_assay_class, class: AssayClass) do |f|
   f.title I18n.t('assays.modelling_analysis')
   f.key 'MODEL'
@@ -53,11 +53,6 @@ end
 
 Factory.define(:assay, parent: :modelling_assay) {}
 
-Factory.define :assay_asset do |f|
-  f.association :assay
-  f.association :asset, factory: :data_file
-end
-
 Factory.define(:min_assay, class: Assay) do |f|
   f.title "A Minimal Assay"
   f.association :assay_class, factory: :experimental_assay_class
@@ -69,4 +64,10 @@ Factory.define(:max_assay, class: Assay) do |f|
   f.description "A Western Blot Assay"
   f.association :assay_class, factory: :experimental_assay_class
   f.association :study, factory: :max_study
+end
+
+# AssayAsset
+Factory.define :assay_asset do |f|
+  f.association :assay
+  f.association :asset, factory: :data_file
 end

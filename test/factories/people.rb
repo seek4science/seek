@@ -1,3 +1,4 @@
+# Person
 Factory.define(:min_person, class: Person) do |f|
   f.email "minimal_person@email.com"
   f.last_name "Minimal"
