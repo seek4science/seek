@@ -2,7 +2,6 @@ require 'nokogiri'
 
 module DataCite
   class MetadataBuilder
-
     def initialize(hash)
       @hash = hash
     end
@@ -10,13 +9,13 @@ module DataCite
     def build
       Nokogiri::XML::Builder.new do |xml|
         @xml = xml
-        @xml.resource('xmlns' =>'http://datacite.org/schema/kernel-3',
+        @xml.resource('xmlns' => 'http://datacite.org/schema/kernel-3',
                       'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
                       'xsi:schemaLocation' => 'http://datacite.org/schema/kernel-3 '\
                                            'http://schema.datacite.org/meta/kernel-3/metadata.xsd') do
           @hash.each do |key, value|
             if respond_to?(key, true)
-              self.send(key, value)
+              send(key, value)
             else
               @xml.send(key, value)
             end
@@ -68,6 +67,5 @@ module DataCite
     def content_type(types)
       @xml.resourceType types[0], 'resourceTypeGeneral' => types[1]
     end
-
   end
 end

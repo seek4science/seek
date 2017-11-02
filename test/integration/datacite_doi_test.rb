@@ -229,7 +229,7 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_any_doi_minted?
+      assert asset.has_doi?
 
       get "/#{type.pluralize}/#{asset.id}/edit"
 

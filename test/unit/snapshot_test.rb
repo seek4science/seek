@@ -127,6 +127,30 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_not_empty snapshot.errors
   end
 
+  test 'has_doi?' do
+    datacite_mock
+    refute @investigation.has_doi?
+    s1 = @investigation.create_snapshot
+    @investigation.reload
+    refute @investigation.has_doi?
+    s1.update_attribute(:doi,'10.9999/seek.investigation.1.1')
+    assert @investigation.has_doi?
+
+    refute @study.has_doi?
+    s1 = @study.create_snapshot
+    @study.reload
+    refute @study.has_doi?
+    s1.update_attribute(:doi,'10.9999/seek.study.1.1')
+    assert @study.has_doi?
+
+    refute @assay.has_doi?
+    s1 = @assay.create_snapshot
+    @assay.reload
+    refute @assay.has_doi?
+    s1.update_attribute(:doi,'10.9999/seek.assay.1.1')
+    assert @assay.has_doi?
+  end
+
   test 'exports to Zenodo' do
     zenodo_mock
 

@@ -292,8 +292,6 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     count = triple_count(data_file)
     rdf_resource = data_file.rdf_resource
 
-    puts rdf_resource
-
     # check the count, and the type
     q = @repository.query.select.where([data_file.rdf_resource, :p, :o]).from(@private_graph)
     result = @repository.select(q)

@@ -19,7 +19,7 @@ module Seek
       # asset type
       # is_doi_already minted
       def is_doiable?(version)
-        self.supports_doi? && Seek::Config.doi_minting_enabled && self.can_manage? && self.is_published? && !is_doi_minted?(version) && !is_doi_time_locked?
+        supports_doi? && Seek::Config.doi_minting_enabled && can_manage? && is_published? && !is_doi_minted?(version) && !is_doi_time_locked?
       end
 
       def is_doi_minted?(version)
@@ -27,8 +27,13 @@ module Seek
         !asset_version.doi.blank?
       end
 
-      def is_any_doi_minted?
-        !versions.map(&:doi).compact.empty?
+      def latest_citable_doi
+        return nil unless has_doi?
+        versions.where('doi IS NOT NULL').last.doi
+      end
+
+      def has_doi?
+        versions.where('doi IS NOT NULL').compact.any?
       end
 
       # minting doi is locked until configuration days since the asset is created
@@ -38,8 +43,8 @@ module Seek
       end
 
       def state_allows_delete?(*args)
-        if self.supports_doi?
-          !self.is_any_doi_minted? && super
+        if supports_doi?
+          !has_doi? && super
         else
           super
         end

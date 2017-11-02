@@ -47,6 +47,14 @@ module Seek #:nodoc:
           snapshots.where(snapshot_number: number).first
         end
 
+        def has_doi?
+          latest_citable_snapshot.present?
+        end
+
+        def latest_citable_doi
+          latest_citable_snapshot.try(:doi)
+        end
+
         def latest_citable_snapshot
           snapshots.where('doi IS NOT NULL').last
         end

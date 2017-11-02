@@ -1,8 +1,8 @@
 class,method,property,uri or literal,transformation,collection transformation
-*,contributor,JERMVocab.hasContributor,u,item.is_a?(User) ? item.person : item,
-*,contributors,JERMVocab.hasContributor,u,item.is_a?(User) ? item.person : item,
+*,contributor,JERMVocab.hasContributor,u,item.class.name=='User' ? item.person : item,
+*,contributors,JERMVocab.hasContributor,u,item.class.name=='User' ? item.person : item,
 *,created_at,RDF::DC.created,l,item.to_datetime,
-*,creators,JERMVocab.hasCreator,u,item.is_a?(User) ? item.person : item,
+*,creators,JERMVocab.hasCreator,u,item.class.name=='User' ? item.person : item,
 *,creators,RDF::SIOC.has_creator,u,,
 *,description,RDF::DC.description,l,,
 *,title,RDF::DC.title,l,,
@@ -19,7 +19,7 @@ Assay,projects,JERMVocab.itemProducedBy,u,,
 Assay,strains,JERMVocab.investigates,u,,
 Assay,study,JERMVocab.isPartOf,u,,
 Assay,technology_type_uri,JERMVocab.hasType,u,,
-Assay,assets,JERMVocab.hasPart,u,,select{|item| !item.is_a?(Presentation)}
+Assay,assets,JERMVocab.hasPart,u,,select{|item| !item.class.name=='Presentation'}
 Assay,validation_assets,JERMVocab.isValidatedBy,u,,
 Assay,construction_assets,JERMVocab.isConstructedFrom,u,,
 Assay,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
@@ -36,8 +36,8 @@ Model,projects,JERMVocab.itemProducedBy,u,,
 Model,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
 Organism,assays,JERMVocab.isInvestigatedBy,u,,
 Organism,ncbi_uri,JERMVocab.NCBI_ID,l,URI.parse(item),compact
-Person,created_items,JERMVocab.isCreatorOf,u,,select{|item| !(item.is_a?(Presentation) || item.is_a?(Event) || item.is_a?(Sample))}
-Person,contributed_items,JERMVocab.isContributorOf,u,,select{|item| !(item.is_a?(Presentation) || item.is_a?(Event) || item.is_a?(Sample))}
+Person,created_items,JERMVocab.isCreatorOf,u,,select{|item| !(item.class.name=='Presentation' || item.class.name=='Event' || item.class.name=='Sample')}
+Person,contributed_items,JERMVocab.isContributorOf,u,,select{|item| !(item.class.name=='Presentation' || item.class.name=='Event' || item.class.name=='Sample')}
 Person,email_uri,RDF::FOAF.mbox_sha1sum,l,Digest::SHA1.hexdigest(item),
 Person,first_name,RDF::FOAF.firstName,l,,
 Person,last_name,RDF::FOAF.familyName,l,,
@@ -46,16 +46,13 @@ Person,name,RDF::FOAF.name,l,,
 Person,projects,JERMVocab.isAssociatedWith,u,,
 Person,web_page,RDF::FOAF.homepage,l,URI.parse(item),compact
 Person,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
-Programme,assays,JERMVocab.hasItem,u,,
-Programme,studies,JERMVocab.hasItem,u,,
-Programme,investigations,JERMVocab.hasItem,u,,
+Person,orcid_uri,RDF::OWL.sameAs,u,,
 Programme,organisms,JERMVocab.investigates,u,,
-Programme,assets,JERMVocab.hasItem,u,,select{|item| !item.is_a?(Presentation)}
 Programme,people,JERMVocab.isAssociatedWith,u,,
 Programme,projects,JERMVocab.hasPart,u,,
 Programme,rdf_seek_id,JERMVocab.seekID,l,URI.parse(item),
 Project,assays,JERMVocab.hasItem,u,,
-Project,assets,JERMVocab.hasItem,u,,select{|item| !item.is_a?(Presentation)}
+Project,assets,JERMVocab.hasItem,u,,select{|item| !item.class.name=='Presentation'}
 Project,investigations,JERMVocab.hasItem,u,,
 Project,organisms,JERMVocab.investigates,u,,
 Project,studies,JERMVocab.hasItem,u,,
