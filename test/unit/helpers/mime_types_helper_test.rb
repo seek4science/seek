@@ -146,6 +146,11 @@ class MimeTypesHelperTest < ActionView::TestCase
     end
   end
 
+  def test_recognised_but_no_icon
+    assert_equal 'Perl script', mime_find('application/x-perl')[:name]
+    assert_equal icon_filename_for_key('misc_file'), mime_icon_url('application/x-perl')
+  end
+
   def test_not_recognised
     assert_equal 'Unknown file type', mime_find('application/foobar-zoo-fish-squirrel')[:name]
   end
