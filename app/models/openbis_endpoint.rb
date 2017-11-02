@@ -4,6 +4,8 @@ class OpenbisEndpoint < ActiveRecord::Base
   belongs_to :policy, autosave: true
   attr_encrypted :password, key: :password_key
 
+  has_many :external_assets, as: :seek_service # , dependent: :destroy
+
   validates :as_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :dss_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :web_endpoint, url: { allow_nil: true, allow_blank: true }

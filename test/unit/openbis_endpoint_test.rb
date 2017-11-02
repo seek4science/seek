@@ -314,6 +314,36 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute_nil endpoint.encrypted_password_iv
   end
 
+  test 'follow external_assets' do
+
+    endpoint = Factory(:openbis_endpoint)
+
+    zample = Seek::Openbis::Zample.new(endpoint, '20171002172111346-37')
+    options = {tomek: false}
+
+    asset1 = OpenbisExternalAsset.build(zample, options)
+
+    dataset = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
+    asset2 = OpenbisExternalAsset.build(dataset, options)
+
+    endpoint2 = Factory(:openbis_endpoint, refresh_period_mins: 60, web_endpoint: 'https://openbis-api.fair-dom.org/openbis2', space_perm_id: 'API-SPACE2')
+
+
+    zample2 = Seek::Openbis::Zample.new(endpoint2, '20171002172111346-37')
+    asset3 = OpenbisExternalAsset.build(zample2, options)
+
+    assert asset1.save
+    assert asset2.save
+    assert asset3.save!
+
+    endpoint.reload
+    endpoint2.reload
+
+    assert_equal [asset1, asset2], endpoint.external_assets.to_ary
+    assert_equal [asset3], endpoint2.external_assets.to_ary
+
+  end
+
   test 'registered_datafiles finds only own datafiles' do
     endpoint1 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
                                     web_endpoint: 'http://my-openbis.org/doesnotmatter',
