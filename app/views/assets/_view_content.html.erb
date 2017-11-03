@@ -39,19 +39,23 @@
         <% end %>
     <% elsif !asset.is_a?(Model) && !(asset.is_a?(DataFile) && asset.contains_extractable_spreadsheet?) && asset.is_downloadable_asset? %>
         <% if content_blob.file_exists? %>
+            <% supported_file_formats = ['pdf'] %>
+            <% supported_file_formats += Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT if (Seek::Config.pdf_conversion_enabled && Seek::Config.soffice_available?) %>
             <% explanation = "Your #{text_for_resource(asset)} is unable to be viewed in browser. " +
-                "Supported file formats are: " +  (Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT + ["pdf"]).join(" , ") +
-                "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(" , ") %>
+                "Supported file formats are: " + supported_file_formats.join(', ') +
+                "; Supported image formats are: " + Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.join(', ') %>
         <% else %>
             <% explanation = "This content is stored externally and cannot be previewed." %>
         <% end %>
-        <% if icon_view %>
-            <%= image('show', :onclick => "javascript:alert('#{explanation}')", 'data-tooltip' => tooltip(explanation)) %>
-        <% else %>
-            <span class='disabled_icon disabled-button btn btn-default' onclick='javascript:alert("<%=explanation%>")' data-tooltip='<%= tooltip(explanation) %>'>
+        <span data-tooltip='<%= tooltip(explanation) %>'>
+          <% if icon_view %>
+              <%= image('show', :onclick => "alert('#{explanation}');") %>
+          <% else %>
+            <span class='disabled_icon disabled-button btn btn-default' onclick='alert("<%=explanation%>")'>
               <%= image('show', {:alt=>"View Content",:class=>"disabled"}) %> View Content
             </span>
-        <% end %>
+          <% end %>
+        </span>
     <% end %>
 <% end %>
 

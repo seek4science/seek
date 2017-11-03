@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
@@ -257,6 +258,21 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert File.exist?(ms_word_sop.content_blob.filepath)
     assert File.exist?(pdf_path)
+  end
+
+  test 'get_pdf raises exception if soffice not running and conversion is needed' do
+    check_for_soffice
+    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    pdf_path = ms_word_sop.content_blob.filepath('pdf')
+    FileUtils.rm pdf_path if File.exist?(pdf_path)
+    assert !File.exist?(pdf_path)
+    assert ms_word_sop.can_download?
+
+    Seek::Config.stub(:soffice_available?, false) do
+      assert_raises(RuntimeError) do
+        get :get_pdf, sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id
+      end
+    end
   end
 
   test 'get_pdf from url' do

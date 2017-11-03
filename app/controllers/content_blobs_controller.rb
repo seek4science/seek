@@ -116,19 +116,19 @@ class ContentBlobsController < ApplicationController
       pdf_filename = @content_blob.original_filename
     else
       pdf_filepath = @content_blob.filepath('pdf')
-      @content_blob.convert_to_pdf(filepath, pdf_filepath)
-
-      if File.exist?(pdf_filepath)
-        pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename)) + '.pdf'
-      else
-        raise Exception, "Couldn't find converted PDF file."
+      unless File.exist?(pdf_filepath)
+        if Seek::Config.soffice_available?
+          @content_blob.convert_to_pdf(filepath, pdf_filepath)
+          raise "Couldn't find converted PDF file." unless File.exist?(pdf_filepath) # If conversion didn't work somehow?
+        else
+          raise 'Cannot convert PDF - soffice not running'
+        end
       end
+
+      pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename)) + '.pdf'
     end
 
-    send_file pdf_filepath,
-              filename: pdf_filename,
-              type: 'application/pdf',
-              disposition: 'attachment'
+    send_file pdf_filepath, filename: pdf_filename, type: 'application/pdf', disposition: 'attachment'
 
     headers['Content-Length'] = File.size(pdf_filepath).to_s
   end
