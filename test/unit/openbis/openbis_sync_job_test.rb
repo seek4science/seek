@@ -90,4 +90,57 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
   end
 
+  test 'perfom_job does nothing on synchronized assets' do
+
+    assay = Factory :assay
+    assert assay.data_files.empty?
+
+    zample = Factory :openbis_zample
+    refute zample.dataset_ids.empty?
+
+    asset = OpenbisExternalAsset.build(zample)
+    asset.seek_entity = assay
+    asset.synchronized_at = DateTime.now - 1.days
+
+    assert asset.save
+    old = asset.synchronized_at
+
+    @job.perform_job(asset)
+
+    asset.reload
+    assert_equal old.to_date, asset.synchronized_at.to_date
+    assert assay.data_files.empty?
+
+  end
+
+  test 'perfom_job refresh content and dependencies on non-synchronized assets' do
+
+    assay = Factory :assay
+    assert assay.data_files.empty?
+
+    zample = Factory :openbis_zample
+    refute zample.dataset_ids.empty?
+
+    asset = OpenbisExternalAsset.build(zample, {link_datasets: '1'})
+    asset.seek_entity = assay
+    asset.synchronized_at = DateTime.now - 1.days
+    asset.sync_state = :refresh
+
+    assert asset.save
+
+    @job.perform_job(asset)
+
+    asset.reload
+    assay.reload
+
+    assert asset.synchronized?
+    assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
+    refute assay.data_files.empty?
+    assert_equal zample.dataset_ids.length, assay.data_files.length
+  end
+
+  test 'seek_util created only once' do
+    assert_same @job.seek_util, @job.seek_util
+  end
+
 end

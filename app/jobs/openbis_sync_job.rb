@@ -7,10 +7,12 @@ class OpenbisSyncJob < SeekJob
     @batch_size = batch_size || 10
   end
 
-  def perform_job(item)
-    puts "performing sync job on #{item}"
-    Rails.logger.info "performing sync job on #{item}"
-    # endpoint.refresh_metadata
+  def perform_job(obis_asset)
+    puts "performing sync job on #{obis_asset}"
+    Rails.logger.info "performing sync job on #{obis_asset}"
+
+    obis_asset.reload
+    seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
   end
 
   def gather_items
@@ -61,6 +63,10 @@ class OpenbisSyncJob < SeekJob
 
   def self.create_initial_jobs
     OpenbisEndpoint.all.each {|point| OpenbisSyncJob.new(point).queue_job}
+  end
+
+  def seek_util
+    @seek_util ||= Seek::Openbis::SeekUtil.new
   end
 
   private

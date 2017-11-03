@@ -67,7 +67,7 @@ class ExternalAsset < ActiveRecord::Base
   def synchronize_content
 
     obj = fetch_externally
-    if (obj) then
+    if obj
       self.content = obj
     else
       self.sync_state = :failed
@@ -122,7 +122,7 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def options_from_json
-    @sync_options = self.sync_options_json ? JSON.parse(self.sync_options_json) : {}
+    @sync_options = self.sync_options_json ? JSON.parse(self.sync_options_json).symbolize_keys : {}
   end
 
   def needs_reindexing

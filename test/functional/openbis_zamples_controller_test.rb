@@ -68,9 +68,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     sync_options = { 'link_datasets' => '1' }
 
-    puts "------------Before post"
     post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id, assay: { study_id: study.id }, sync_options: sync_options
-    puts "------------After post"
 
 
     assay = assigns(:assay)
@@ -169,39 +167,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   # unit like tests
 
-  test 'associate_data_sets links datasets with assay creating new datafiles if necessary' do
 
-    util = Seek::Openbis::SeekUtil.new
-    controller = OpenbisZamplesController.new
-    # controller.get_seek_util
-
-    assay = Factory :assay
-
-    df0 = Factory :data_file
-    assay.associate(df0)
-    assert df0.persisted?
-    assert_equal 1, assay.data_files.length
-
-
-    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
-    assert_equal 3, datasets.length
-
-    df1 = util.createObisDataFile(OpenbisExternalAsset.build(datasets[0]))
-    assert df1.save
-
-    assert_difference('AssayAsset.count', 3) do
-      assert_difference('DataFile.count', 2) do
-        assert_difference('ExternalAsset.count', 2) do
-
-          assert_nil controller.associate_data_sets(assay, datasets)
-        end
-      end
-    end
-
-    assay.reload
-    assert_equal 4, assay.data_files.length
-
-  end
 
   test 'extract_requested_sets gives all sets from zample if linked is selected' do
 

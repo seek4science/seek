@@ -97,32 +97,10 @@ class OpenbisZamplesController < ApplicationController
     data_sets_ids = extract_requested_sets(@entity, params)
     return nil if data_sets_ids.empty?
 
-    data_sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_perm_ids(data_sets_ids)
-
-    associate_data_sets(@assay, data_sets)
-
+    seek_util.associate_data_sets_ids(@assay, data_sets_ids, @openbis_endpoint)
   end
 
-  def associate_data_sets(assay, data_sets)
 
-    external_assets = data_sets.map { |ds| OpenbisExternalAsset.find_or_create_by_entity(ds) }
-
-    existing_files = external_assets.select { |es| es.seek_entity.is_a? DataFile }
-                         .map { |es| es.seek_entity }
-
-    new_files = external_assets.select { |es| es.seek_entity.nil? }
-                    .map { |es| seek_util.createObisDataFile(es) }
-
-    saving_problems = false
-    new_files.each { |df| saving_problems = true unless df.save }
-    return 'Could not register all depended datasets' if saving_problems
-
-    data_files = existing_files+new_files
-    data_files.each { |df| assay.associate(df) }
-
-    return nil
-
-  end
 
 
   def sync_options(hash = nil)

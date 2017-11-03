@@ -61,9 +61,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   test 'register registers new DataFile' do
     login_as(@user)
 
-    puts "----------- BEFORE REG"
     post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
-    puts "----------- AFTER REG"
 
     datafile = assigns(:datafile)
     assert_not_nil datafile

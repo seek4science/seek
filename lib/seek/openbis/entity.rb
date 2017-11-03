@@ -9,15 +9,17 @@ module Seek
         perm_id == other.perm_id
       end
 
-      def initialize(openbis_endpoint, perm_id = nil)
+      def initialize(openbis_endpoint, perm_id = nil, refresh = false)
         @openbis_endpoint = openbis_endpoint
         unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
           raise 'OpenbisEndpoint expected and required'
         end
 
         if perm_id
+
+          cache_option = refresh ? {force: true} : nil
           begin
-            json = query_application_server_by_perm_id(perm_id)
+            json = query_application_server_by_perm_id(perm_id,cache_option)
             unless json[json_key]
               raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
             end
@@ -112,25 +114,25 @@ module Seek
 
       private
 
-      def query_application_server_by_perm_id(perm_id = '')
-        cached_query_by_perm_id(perm_id) do
+      def query_application_server_by_perm_id(perm_id = '',cache_option = nil)
+        cached_query_by_perm_id(perm_id, cache_option) do
           application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
                                                   attribute: 'PermID', attributeValue: perm_id)
         end
       end
 
-      def query_datastore_server_by_dataset_perm_id(perm_id = '')
-        cached_query_by_perm_id(perm_id) do
+      def query_datastore_server_by_dataset_perm_id(perm_id = '', cache_option = nil)
+        cached_query_by_perm_id(perm_id, cache_option) do
           datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
                                                 attribute: 'DataSetPermID', attributeValue: perm_id)
         end
       end
 
-      def cached_query_by_perm_id(perm_id)
+      def cached_query_by_perm_id(perm_id, cache_option = nil)
         raise 'Block required for doing query' unless block_given?
-        key = cache_key(perm_id)
+        key = cache_key(perm_id, )
         Rails.logger.info("OBIS CACHE KEY = #{key}")
-        openbis_endpoint.metadata_store.fetch(key) do
+        openbis_endpoint.metadata_store.fetch(key, cache_option) do
           Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{perm_id}")
           yield
         end

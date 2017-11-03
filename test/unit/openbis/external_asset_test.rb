@@ -138,7 +138,7 @@ class ExternalAssetTest < ActiveSupport::TestCase
 
   test 'options are serialized before saving and read back' do
     asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '24'})
-    opt = {"tomek" => 2}
+    opt = {tomek: 2}
     asset1.sync_options = opt
     refute asset1.sync_options_json
 

@@ -82,4 +82,12 @@ class OpenbisExternalAsset < ExternalAsset
     terms.uniq
   end
 
+  def fetch_externally
+    seek_util.fetch_current_entity_version(self)
+  end
+
+  def seek_util
+    @seek_util ||= Seek::Openbis::SeekUtil.new
+  end
+
 end
