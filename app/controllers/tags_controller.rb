@@ -23,14 +23,14 @@ class TagsController < ApplicationController
     tags = get_tags
     @tags = tags ? get_tags.limit(params[:limit] || 50).map(&:text) : []
     respond_to do |format|
-      format.json { render json: @tags }
+      format.json { render json: @tags.to_json }
     end
   end
 
   def query
     @tags = get_tags.where('text LIKE ?', "#{params[:query]}%").limit(20).map(&:text)
     respond_to do |format|
-      format.json { render json: @tags }
+      format.json { render json: @tags.to_json }
     end
   end
 
