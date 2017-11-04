@@ -244,5 +244,25 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   end
 
+  test 'fetch_current_entity_version gets fresh version ignoring cache' do
+
+    dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+
+    dj = dataset1.json
+    dj['code']='123'
+    val = {'datasets' => [dj]}
+
+    assert_not_equal '123', dataset1.code
+
+    explicit_query_mock
+    set_mocked_value_for_id('20160210130454955-23',val)
+
+    dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+    assert_not_equal '123', dataset1.code
+
+    asset = OpenbisExternalAsset.build(dataset1)
+    dataset2 = @util.fetch_current_entity_version(asset)
+    assert_equal '123', dataset2.code
+  end
 
 end

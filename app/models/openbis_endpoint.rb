@@ -59,17 +59,19 @@ class OpenbisEndpoint < ActiveRecord::Base
       Rails.logger.info("REFRESHING METADATA FOR Openbis Space #{id}")
 
       clear_metadata_store
-      reindex_entities
+      #reindex_entities
+      mark_for_refresh
+      OpenbisSyncJob.new(self).queue_job
     else
       Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not refreshing METADATA")
     end
   end
 
-  def reindex_entities
-    # ugly should reindex only those that have changed
-    datafiles = registered_datafiles
-    ReindexingJob.new.add_items_to_queue datafiles unless datafiles.empty?
-  end
+  #def reindex_entities
+  #  # ugly should reindex only those that have changed
+  #  datafiles = registered_datafiles
+  #  ReindexingJob.new.add_items_to_queue datafiles unless datafiles.empty?
+  #end
 
   def registered_datafiles
     # ugly will scan all content blobs from data files
@@ -113,5 +115,14 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def metadata_store
     @metadata_store ||= Seek::Openbis::OpenbisMetadataStore.new(self)
+  end
+
+  def mark_for_refresh
+    due_to_refresh.update_all(sync_state: ExternalAsset.sync_states[:refresh])
+  end
+
+  def due_to_refresh
+    old = DateTime.now - refresh_period_mins.minutes
+    external_assets.synchronized.where("synchronized_at < ?",old)
   end
 end

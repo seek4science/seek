@@ -1,6 +1,7 @@
 require 'test_helper'
 require 'openbis_test_helper'
 
+
 class DatasetTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
@@ -67,6 +68,63 @@ class DatasetTest < ActiveSupport::TestCase
   end
 
 
+  test 'refresh=true skips the cache on initialization' do
+    explicit_query_mock
+
+    txt = '{"datasets":[
+        {"dataset_type":{"code":"TEST_DATASET_TYPE","description":"for api test"},
+         "modificationDate":"2016-02-15 13:10:39.43","registerator":"tomek",
+         "code":"20151217153943290-5",
+         "experiment":"20151216143716562-2","modifier":"apiuser",
+         "permId":"20151217153943290-5",
+         "registrationDate":"2015-12-17 14:39:43.618571","properties":{"SEEK_DATAFILE_ID":"DataFile_1"},
+         "samples":[],"tags":[]}]}'
+
+    val = JSON.parse(txt)
+    assert val
+    assert_equal 'tomek', val['datasets'][0]['registerator']
+    set_mocked_value_for_id('20151217153943290-5',val)
+
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20151217153943290-5')
+    assert_equal 'tomek', dataset.registrator
+
+    txt = '{"datasets":[
+        {"dataset_type":{"code":"TEST_DATASET_TYPE","description":"for api test"},
+         "modificationDate":"2016-02-15 13:10:39.43","registerator":"bolek",
+         "code":"20151217153943290-5",
+         "experiment":"20151216143716562-2","modifier":"apiuser",
+         "permId":"20151217153943290-5",
+         "registrationDate":"2015-12-17 14:39:43.618571","properties":{"SEEK_DATAFILE_ID":"DataFile_1"},
+         "samples":[],"tags":[]}]}'
+
+    val = JSON.parse(txt)
+    set_mocked_value_for_id('20151217153943290-5',val)
+
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20151217153943290-5')
+    assert_equal 'tomek', dataset.registrator
+
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20151217153943290-5',true)
+    assert_equal 'bolek', dataset.registrator
+
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20151217153943290-5')
+    assert_equal 'bolek', dataset.registrator
+
+  end
+
+  test 'explicit query mocking' do
+    explicit_query_mock
+
+    val = {key: 'val'}
+    set_mocked_value_for_id('20160210130454955-23', val)
+
+    res = Fairdom::OpenbisApi::ApplicationServerQuery.new(nil,nil).query(:attributeValue=>"20160210130454955-23", :entityType=>"DataSet", :queryType=>"ATTRIBUTE", :attribute=>"PermID")
+    assert_same val, res
+
+    assert_raises(Exception) do
+      Fairdom::OpenbisApi::ApplicationServerQuery.new(nil,nil).query(:attributeValue=>"xxx", :entityType=>"DataSet", :queryType=>"ATTRIBUTE", :attribute=>"PermID")
+    end
+
+  end
 
   test 'create datafile' do
     User.current_user = Factory(:person).user

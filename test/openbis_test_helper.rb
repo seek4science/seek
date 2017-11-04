@@ -50,6 +50,8 @@ module Fairdom
 end
 
 def mock_openbis_calls
+  Fairdom::OpenbisApi::ExplicitMockedQuery.clear
+
   Fairdom::OpenbisApi::Authentication.class_eval do
     prepend Fairdom::OpenbisApi::MockAuthentication
   end
@@ -82,4 +84,63 @@ end
 def openbis_linked_content_blob(perm_id = '20160210130454955-23', endpoint = nil)
   endpoint ||= Factory(:openbis_endpoint)
   Factory(:url_content_blob, make_local_copy: false, url: "openbis:#{endpoint.id}:dataset:#{perm_id}")
+end
+
+module Fairdom
+  module OpenbisApi
+    module ExplicitMockedQuery
+
+      @@hits = {}
+
+      def self.set_hit(id, val)
+        @@hits[id] = val
+      end
+
+      def self.get_hit(id)
+        @@hits[id]
+      end
+
+      def self.clear
+        @@hits = {}
+      end
+
+      def query(options)
+        puts "Explicit mocked query: #{options}"
+        id = options[:attributeValue]
+        #raise "Cannot find id (attributeValue) in query: #{options}" unless id
+        return file_query(options) unless id
+
+        res = Fairdom::OpenbisApi::ExplicitMockedQuery.get_hit(id)
+        #raise "Not set mocked value for id: #{id}" unless res
+        puts "Not set mocked value for id: #{id}" unless res
+        res ? res : file_query(options)
+      end
+
+      def file_query(options)
+        path = mock_file_path(options)
+        response = File.open(path).read
+        JSON.parse(response)
+      end
+
+      def mock_file_path(options)
+        name = Digest::SHA2.hexdigest(options.inspect) + '.json'
+        puts "Mock query, File: #{name} #{options}"
+        dir = File.join(Rails.root, 'test', 'fixtures', 'files', 'mocking', 'openbis')
+        File.join(dir, name)
+      end
+
+    end
+  end
+end
+
+def set_mocked_value_for_id(id, val)
+  Fairdom::OpenbisApi::ExplicitMockedQuery.set_hit(id,val)
+end
+
+def explicit_query_mock
+  Fairdom::OpenbisApi::ExplicitMockedQuery.clear
+
+    Fairdom::OpenbisApi::ApplicationServerQuery.class_eval do
+      prepend Fairdom::OpenbisApi::ExplicitMockedQuery
+    end
 end

@@ -46,7 +46,7 @@ module Seek
       end
 
       def fetch_current_entity_version(obis_asset)
-        obis_asset.external_type.constantize.new(obis_asset.seek_service, obis_asset.external_id)
+        obis_asset.external_type.constantize.new(obis_asset.seek_service, obis_asset.external_id,true)
       end
 
       def follow_dependent(obis_asset, current_entity)

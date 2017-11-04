@@ -314,7 +314,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute_nil endpoint.encrypted_password_iv
   end
 
-  test 'follow external_assets' do
+  test 'follows external_assets' do
 
     endpoint = Factory(:openbis_endpoint)
 
@@ -380,24 +380,27 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal [datafile3], df
   end
 
-  test 'reindex_entities queues new indexing job' do
-    endpoint = Factory(:openbis_endpoint)
-    datafile1 = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23').create_seek_datafile
-    assert datafile1.save
-    Delayed::Job.destroy_all
-    # don't know how to test that it was really reindexing job with correct content
-    assert_difference('Delayed::Job.count', 1) do
-      endpoint.reindex_entities
-    end
-    assert ReindexingQueue.exists?(item: datafile1)
-  end
+  # test 'reindex_entities queues new indexing job' do
+  #  endpoint = Factory(:openbis_endpoint)
+  #  datafile1 = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23').create_seek_datafile
+  #  assert datafile1.save
+  #  Delayed::Job.destroy_all
+  #  # don't know how to test that it was really reindexing job with correct content
+  #  assert_difference('Delayed::Job.count', 1) do
+  #    endpoint.reindex_entities
+  #  end
+  #  assert ReindexingQueue.exists?(item: datafile1)
+  # end
 
   # it should actually test for synchronization but I don't know how to achieve it
   # needs OpenBIS mock that can be set to return particular values
-  test 'refresh_metadata clears store and triggers reindexing' do
+  test 'refresh_metadata clears store, marks for refresh and adds sync job' do
     endpoint = Factory(:openbis_endpoint)
-    datafile1 = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23').create_seek_datafile
-    assert datafile1.save
+
+    dataset = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
+    asset = OpenbisExternalAsset.build(dataset)
+    asset.synchronized_at = DateTime.now - 1.days
+    assert asset.save
 
     key = 'TZ'
     store = endpoint.metadata_store
@@ -408,11 +411,92 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal 'Tomek', store.fetch(key)
 
     Delayed::Job.destroy_all
-    assert_difference('Delayed::Job.count', 1) do
+    #assert_difference('Delayed::Job.count', 1) do
       endpoint.refresh_metadata
-    end
-    assert ReindexingQueue.exists?(item: datafile1)
+    #end
 
     refute endpoint.metadata_store.exist?(key)
+    asset.reload
+    assert asset.refresh?
+
+    assert OpenbisSyncJob.new(endpoint).exists?
+
+  end
+
+  test 'due_to_refresh gives synchronized assets with elapsed synchronization time' do
+
+    endpoint = Factory(:openbis_endpoint)
+    endpoint.refresh_period_mins = 80
+    disable_authorization_checks do
+      assert endpoint.save!
+    end
+
+
+
+    assets = []
+    (0..9).each do |i|
+
+      asset = ExternalAsset.new
+      asset.seek_service = endpoint
+      asset.external_service = endpoint.web_endpoint
+      asset.external_id = i
+      asset.sync_state = :synchronized
+      asset.synchronized_at= DateTime.now - i.hours
+      assert asset.save
+      assets << asset
+    end
+
+
+    assets[9].sync_state = :refresh
+    assets[9].save
+
+    assets[8].sync_state = :failed
+    assets[8].save
+
+    endpoint.reload
+    assert_equal 10, endpoint.external_assets.count
+
+    assert_equal 6, endpoint.due_to_refresh.count
+    assert_equal assets[2..7].map{|r| r.external_id}, endpoint.due_to_refresh.map{|r| r.external_id}
+
+
+  end
+
+  test 'mark_for_refresh sets sync status for all due to refresh' do
+
+    endpoint = Factory(:openbis_endpoint)
+    endpoint.refresh_period_mins = 80
+    disable_authorization_checks do
+      assert endpoint.save!
+    end
+
+    assets = []
+    (0..9).each do |i|
+
+      asset = ExternalAsset.new
+      asset.seek_service = endpoint
+      asset.external_service = endpoint.web_endpoint
+      asset.external_id = i
+      asset.sync_state = :synchronized
+      asset.synchronized_at= DateTime.now - i.hours
+      assert asset.save
+      assets << asset
+    end
+
+
+    assets[9].sync_state = :failed
+    assets[9].save
+
+    endpoint.reload
+    assert_equal 10, endpoint.external_assets.count
+
+    endpoint.mark_for_refresh
+
+    assets.each &:reload
+
+    assert assets[9].failed?
+    assert assets[0].synchronized?
+    assert assets[1].synchronized?
+    assets[2..8].each {|a| assert a.refresh?}
   end
 end
