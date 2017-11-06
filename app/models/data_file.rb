@@ -160,7 +160,7 @@ class DataFile < ActiveRecord::Base
 
         if existing
           existing.clear_data
-          existing.data = new_sample.data.to_hash.select { |k, v| !v.nil? } # This is necessary because some conversions fail when run on nil
+          existing.json_metadata = new_sample.json_metadata
           existing
         else
           new_sample
