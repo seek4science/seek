@@ -7,4 +7,5 @@
     <% unless hide_sample_count %>
         <small>(<%= pluralize(association_preview.extracted_samples.count, 'sample') %>)</small>
     <% end %>
+    <span class="pull-right subtle">ID: <%= association_preview.id -%></span>
 <% end %>

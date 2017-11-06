@@ -1,0 +1,88 @@
+{
+  "data": {
+    "id": "883654268",
+    "type": "sops",
+    "attributes": {
+      "tags": null,
+      "title": "A Minimal Sop",
+      "description": null,
+      "license": null,
+      "latest_version": 1,
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/sops/883654268?version=1"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2017-10-06T09:53:31.000Z",
+      "updated_at": "2017-10-06T09:53:31.000Z",
+      "content_blobs": [
+        {
+          "original_filename": "min file",
+          "url": null,
+          "md5sum": "48f276f9bc2802e089e476069772a005",
+          "sha1sum": "8125ea3d0772712c91958b68015447c3a54bff78",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/sops/883654268/content_blobs/1050452533",
+          "size": 8
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "1039986644",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": []
+      },
+      "studies": {
+        "data": []
+      },
+      "assays": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/sops/883654268"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

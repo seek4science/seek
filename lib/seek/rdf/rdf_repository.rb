@@ -40,7 +40,7 @@ module Seek
 
       # send the rdf related to item to the repository, and update the rdf file
       def send_rdf(item, graphs = rdf_graph_uris(item), save_file = true)
-        if configured?
+        if configured? && item.rdf_supported?
           connect_to_repository
           with_statements(item) do |statement|
             if statement.valid?
@@ -59,7 +59,7 @@ module Seek
 
       # remove the rdf related to item from the repository, and delete the rdf file
       def remove_rdf(item, graphs = [get_configuration.public_graph, get_configuration.private_graph].compact, delete_file = true)
-        if configured?
+        if configured? && item.rdf_supported?
           connect_to_repository
           graphs.each do |graph|
             q = query.delete([item.rdf_resource, :p, :o]).where([item.rdf_resource, :p, :o]).graph(RDF::URI(graph))
@@ -73,7 +73,7 @@ module Seek
 
       # updates the rdf in the repository and updates the rdf file.
       def update_rdf(item)
-        if configured?
+        if configured? && item.rdf_supported?
           connect_to_repository
           remove_rdf(item)
           send_rdf(item)

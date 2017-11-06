@@ -9,6 +9,11 @@ end
 Factory.define(:admin_defined_role_programme, class: AdminDefinedRoleProgramme) do |_f|
 end
 
+Factory.define(:min_person, class: Person) do |f|
+  f.email "minimal_person@email.com"
+  f.last_name "Minimal"
+end
+
 Factory.define(:brand_new_person, class: Person) do |f|
   f.sequence(:email) { |n| "test#{n}@test.com" }
   f.sequence(:first_name) { |n| "Person#{n}" }
@@ -128,15 +133,28 @@ Factory.define(:programme) do |f|
   end
 end
 
+Factory.define(:min_programme, class: Programme) do |f|
+  f.title "A Minimal Programme"
+end
+
 # Project
 Factory.define(:project) do |f|
   f.sequence(:title) { |n| "A Project: -#{n}" }
+end
+
+Factory.define(:min_project, class: Project) do |f|
+  f.title "A Minimal Project"
 end
 
 # Institution
 Factory.define(:institution) do |f|
   f.sequence(:title) { |n| "An Institution: #{n}" }
   f.country { ISO3166::Country.all.sample.name }
+end
+
+Factory.define(:min_institution, class: Institution) do |f|
+  f.title "A Minimal Institution"
+  f.country "Germany"
 end
 
 # Sop
@@ -153,6 +171,14 @@ Factory.define(:sop) do |f|
       sop.content_blob.asset_version = sop.version
       sop.content_blob.save
     end
+  end
+end
+
+Factory.define(:min_sop, class: Sop) do |f|
+  f.title 'A Minimal Sop'
+  f.projects { [Factory.build(:min_project)] }
+  f.after_create do |sop|
+    sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
   end
 end
 
@@ -277,6 +303,12 @@ Factory.define :assay_asset do |f|
   f.association :asset, factory: :data_file
 end
 
+Factory.define(:min_assay, class: Assay) do |f|
+  f.title "A Minimal Assay"
+  f.association :assay_class, factory: :experimental_assay_class
+  f.association :study, factory: :min_study
+end
+
 # Study
 Factory.define(:study) do |f|
   f.sequence(:title) { |n| "Study#{n}" }
@@ -284,11 +316,21 @@ Factory.define(:study) do |f|
   f.association :contributor, factory: :person
 end
 
+Factory.define(:min_study, class: Study) do |f|
+  f.title "A Minimal Study"
+  f.association :investigation, factory: :min_investigation
+end
+
 # Investigation
 Factory.define(:investigation) do |f|
   f.projects { [Factory.build(:project)] }
   f.sequence(:title) { |n| "Investigation#{n}" }
   f.association :contributor, factory: :person
+end
+
+Factory.define(:min_investigation, class: Investigation) do |f|
+  f.title "A Minimal Investigation"
+  f.projects { [Factory.build(:min_project)] }
 end
 
 # Strain
@@ -299,6 +341,11 @@ Factory.define(:strain) do |f|
   f.association :contributor, factory: :person
 end
 
+Factory.define(:min_strain, class: Strain) do |f|
+  f.title 'A Minimal Strain'
+  f.association :organism, factory: :min_organism
+  f.projects {[Factory.build(:min_project)]}
+end
 # Culture growth type
 Factory.define(:culture_growth_type) do |f|
   f.title 'a culture_growth_type'
@@ -329,6 +376,14 @@ Factory.define(:data_file) do |f|
       data_file.content_blob.asset_version = data_file.version
       data_file.content_blob.save
     end
+  end
+end
+
+Factory.define(:min_data_file, class: DataFile) do |f|
+  f.title 'A Minimal DataFile'
+  f.projects { [Factory.build(:min_project)] }
+  f.after_create do |data_file|
+    data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
   end
 end
 
@@ -369,6 +424,11 @@ Factory.define(:model) do |f|
   f.after_create do |model|
     model.content_blobs = [Factory.create(:cronwright_model_content_blob, asset: model, asset_version: model.version)] if model.content_blobs.blank?
   end
+end
+
+Factory.define(:min_model, class: Model) do |f|
+  f.title 'A Minimal Model'
+  f.projects { [Factory.build(:min_project)] }
 end
 
 Factory.define(:model_2_files, class: Model) do |f|
@@ -467,6 +527,10 @@ Factory.define(:publication) do |f|
   f.association :contributor, factory: :person
 end
 
+Factory.define(:min_publication, class: Publication) do |f|
+  f.title 'A Minimal Publication'
+  f.projects { [Factory.build(:min_project)] }
+end
 # Presentation
 Factory.define(:presentation) do |f|
   f.sequence(:title) { |n| "A Presentation #{n}" }
@@ -481,6 +545,14 @@ Factory.define(:presentation) do |f|
       presentation.content_blob.save
     end
   end
+end
+
+Factory.define(:min_presentation, class: Presentation) do |f|
+  f.title 'A Minimal Presentation'
+  f.projects { [Factory.build(:min_project)] }
+ f.after_create do |presentation|
+   presentation.content_blob = Factory.create(:min_content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
+ end
 end
 
 Factory.define(:ppt_presentation, parent: :presentation) do |f|
@@ -638,7 +710,9 @@ end
 Factory.define(:organism) do |f|
   f.title 'An Organism'
 end
-
+Factory.define(:min_organism, class: Organism) do |f|
+  f.title 'A Minimal Organism'
+end
 Factory.define(:bioportal_concept) do |f|
   f.ontology_id 'NCBITAXON'
   f.concept_uri 'http://purl.obolibrary.org/obo/NCBITaxon_2287'
@@ -650,6 +724,12 @@ Factory.define(:event) do |f|
   f.end_date 1.days.from_now
   f.projects { [Factory.build(:project)] }
   f.association :contributor, factory: :person
+end
+
+Factory.define(:min_event, class: Event) do |f|
+  f.title 'A Minimal Event'
+  f.start_date "2017-01-01T00:01:00.000Z"
+  f.projects { [Factory.build(:min_project)] }
 end
 
 Factory.define(:saved_search) do |f|
@@ -667,6 +747,11 @@ Factory.define(:content_blob) do |f|
   f.sequence(:original_filename) { |n| "file-#{n}" }
 end
 
+Factory.define(:min_content_blob, class: ContentBlob) do |f|
+  f.sequence(:uuid) { UUID.generate }
+  f.data 'Min Data'
+  f.original_filename 'min file'
+end
 Factory.define(:url_content_blob, parent: :content_blob) do |f|
   f.url 'http://www.abc.com'
   f.data nil
@@ -872,6 +957,17 @@ Factory.define(:nels_fastq_paired_template_content_blob, parent: :content_blob) 
   f.data File.new("#{Rails.root}/test/fixtures/files/FASTQPaired.xlsx", 'rb').read
 end
 
+Factory.define(:linked_samples_incomplete_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'FASTQPaired.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data File.new("#{Rails.root}/test/fixtures/files/linked-samples-incomplete.xlsx", 'rb').read
+end
+
+Factory.define(:linked_samples_complete_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'FASTQPaired.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data File.new("#{Rails.root}/test/fixtures/files/linked-samples-complete.xlsx", 'rb').read
+end
 
 Factory.define(:activity_log) do |f|
   f.action 'create'
@@ -1288,6 +1384,14 @@ Factory.define(:optional_strain_sample_type, parent: :strain_sample_type) do |f|
   f.after_build do |type|
     type.sample_attributes = [Factory.build(:sample_attribute, template_column_index: 1, title: 'name', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type),
                               Factory.build(:sample_attribute, template_column_index: 2, title: 'seekstrain', sample_attribute_type: Factory(:strain_sample_attribute_type), required: false, sample_type: type)]
+  end
+end
+
+Factory.define(:source_sample_type, parent: :sample_type) do |f|
+  f.title 'Library'
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'info', sample_attribute_type: Factory(:string_sample_attribute_type), required: false, sample_type: type)
   end
 end
 

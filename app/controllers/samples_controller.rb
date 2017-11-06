@@ -11,16 +11,21 @@ class SamplesController < ApplicationController
   before_filter :auth_to_create, only: [:new, :create]
 
   include Seek::IsaGraphExtensions
+  include Seek::BreadCrumbs
 
   def index
+    # There must be better ways of coding this
     if @data_file || @sample_type
       respond_to do |format|
         format.html
-        format.json {render json: @samples}
+        format.json {render json: :not_implemented, status: :not_implemented }
       end
       #respond_with(@samples)
     else
-      super
+      respond_to do |format|
+        format.html {super}
+        format.json {render json: :not_implemented, status: :not_implemented }
+      end
     end
   end
 
@@ -44,7 +49,7 @@ class SamplesController < ApplicationController
     @sample = Sample.find(params[:id])
     respond_to do |format|
       format.html
-      format.json {render json: @sample}
+      format.json {render json: :not_implemented, status: :not_implemented }
     end
   end
 

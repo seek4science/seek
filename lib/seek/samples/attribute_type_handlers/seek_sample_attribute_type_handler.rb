@@ -9,10 +9,12 @@ module Seek
         end
 
         def test_value(value)
-          super
-          sample = find_resource(value)
-          fail 'Unable to find Sample in database' unless sample
-          fail 'Sample type does not match' unless sample.sample_type == linked_sample_type
+          if additional_options[:required]
+            super
+            sample = find_resource(value)
+            fail 'Unable to find Sample in database' unless sample
+            fail 'Sample type does not match' unless sample.sample_type == linked_sample_type
+          end
         end
 
         private

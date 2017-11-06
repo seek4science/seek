@@ -3,8 +3,8 @@ module Seek
     class JERMVocab < RDF::Vocabulary('http://jermontology.org/ontology/JERMOntology#')
       # these are explicitly defined, to prevent the undercores being changed to camelCase
       property :NCBI_ID
-      property :Experimental_assay_type
-      property :Model_analysis_type
+      property :Experimental_assay
+      property :Modelling_analysis
       property :seekID
       property :Factors_studied
       property :Gas_flow

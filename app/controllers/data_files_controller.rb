@@ -294,7 +294,7 @@ class DataFilesController < ApplicationController
     scope = scope.with_extracted_samples if (params[:with_samples] == 'true')
 
     @data_files = DataFile.authorize_asset_collection(
-      scope.where('data_files.title LIKE ?', "#{params[:filter]}%"), 'view'
+      scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").uniq, 'view'
     ).first(20)
 
     respond_to do |format|
@@ -327,6 +327,7 @@ class DataFilesController < ApplicationController
       extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
       @samples = extractor.persist.select(&:persisted?)
       extractor.clear
+      @data_file.copy_assay_associations(@samples, params[:assay_ids]) if params[:assay_ids]
       flash[:notice] = "#{@samples.count} samples extracted successfully"
     else
       SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
@@ -371,7 +372,11 @@ class DataFilesController < ApplicationController
         @sample_type = @data_file.reload.possible_sample_types.last
 
         if @sample_type
-          extract_samples
+          SampleDataExtractionJob.new(@data_file, @sample_type, false, overwrite: true).queue_job
+
+          respond_to do |format|
+            format.html { redirect_to @data_file }
+          end
         else
           flash[:notice] = 'Successfully downloaded sample metadata from NeLS, but could not find a matching sample type.'
 

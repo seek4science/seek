@@ -69,6 +69,11 @@ class Sample < ActiveRecord::Base
     @data ||= Seek::Samples::SampleData.new(sample_type, json_metadata)
   end
 
+  def clear_data
+    self.json_metadata = nil
+    @data = nil
+  end
+
   def referenced_strains
     sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_STRAIN }.map do |sa|
       value = get_attribute(sa.hash_key)
@@ -108,6 +113,20 @@ class Sample < ActiveRecord::Base
     extracted? ? originating_data_file.creators : super
   end
 
+  def title_from_data
+    attr = title_attribute
+    if attr
+      value = get_attribute(title_attribute.hash_key)
+      if attr.seek_resource?
+        value[:title] || value[:id]
+      else
+        value.to_s
+      end
+    else
+      nil
+    end
+  end
+
   private
 
   def samples_this_links_to
@@ -135,16 +154,7 @@ class Sample < ActiveRecord::Base
   end
 
   def set_title_to_title_attribute_value
-    attr = title_attribute
-    if attr
-      value = get_attribute(title_attribute.hash_key)
-      if attr.seek_resource?
-        value = value[:title] || value[:id]
-      else
-        value = value.to_s
-      end
-      self.title = value
-    end
+    self.title = title_from_data
   end
 
   # the designated title attribute

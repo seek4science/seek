@@ -313,6 +313,14 @@ SEEK::Application.routes.draw do
         post :export, action: :export_submit
       end
     end
+    resources :nels, only: [:index] do
+      collection do
+        get :projects
+        get :datasets
+        get :dataset
+        post :register
+      end
+    end
     member do
       post :update_annotations_ajax
       post :check_related_items
@@ -754,11 +762,6 @@ SEEK::Application.routes.draw do
 
   get "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
   get "/seek_nels" => "nels#callback", as: 'nels_oauth_callback'
-  get "/nels" => "nels#browser", as: 'nels_browser'
-  get "/nels_projects" => "nels#projects", as: 'nels_projects'
-  get "/nels_datasets" => "nels#datasets", as: 'nels_datasets'
-  get "/nels_dataset" => "nels#dataset", as: 'nels_dataset'
-  post "/nels_register" => "nels#register", as: 'nels_register'
 
   get "/citation/*doi(.:format)" => "citations#fetch", :as => :citation
 

@@ -42,14 +42,14 @@ module Seek
     end
 
     def show_contributor_avatars?
-      self.respond_to?(:contributor) || self.respond_to?(:creators)
+      respond_to?(:contributor) || respond_to?(:creators)
     end
 
     def is_downloadable?
       (respond_to?(:content_blob) || respond_to?(:content_blobs))
     end
 
-    #a method that can be overridden for cases where an item is downloadable, but for some reason (e.g. size), is disabled
+    # a method that can be overridden for cases where an item is downloadable, but for some reason (e.g. size), is disabled
     def download_disabled?
       !is_downloadable?
     end
@@ -60,6 +60,10 @@ module Seek
 
     def suggested_type?
       self.class.include? Seek::Ontologies::SuggestedType
+    end
+
+    def rdf_supported?
+      self.class.include? Seek::Rdf::RdfGeneration
     end
   end
 end

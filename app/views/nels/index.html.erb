@@ -13,7 +13,6 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
 </div>
 
 <script type="text/javascript">
-  var assayId = <%= params[:assay_id] %>;
   $j(document).ready(function () {
     $j('#nels-tree')
         .bind('loaded.jstree', function() {})
@@ -24,18 +23,17 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
             'data' : {
               'url': function (node) {
                 if (node.id === '#') {
-                  return 'nels_projects';
+                  return '<%= projects_assay_nels_path(params[:assay_id]) -%>';
                 } else {
-                  return 'nels_datasets';
+                  return '<%= datasets_assay_nels_path(params[:assay_id]) -%>';
                 }
               },
               'data': function (node) {
                 if (node.id === '#') {
-                  return { assay_id: assayId };
+                  return { };
                 }
 
-                var d = { id: node.data.id,
-                  assay_id: assayId };
+                var d = { id: node.data.id };
 
                 if (node.data.project_id) {
                   d.project_id = node.data.project_id
@@ -58,11 +56,10 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           $j('#nels-dataset').html('').spinner('add').show();
           $j('#nels-content').hide();
 
-          $j.ajax({ url: '<%= nels_dataset_path -%>',
+          $j.ajax({ url: '<%= dataset_assay_nels_path(params[:assay_id]) -%>',
             data: {
               project_id: data.node.data.project_id,
               dataset_id: data.node.data.id,
-              assay_id: assayId
             },
             success: function (data) {
               $j('#nels-dataset').html(data).spinner('remove');

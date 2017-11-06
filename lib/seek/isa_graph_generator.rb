@@ -12,6 +12,42 @@ module Seek
     end
   end
 
+  class ObjectAggregation
+    include ActionView::Helpers::TextHelper
+
+    attr_reader :object, :type, :count
+
+    def ==(other)
+      eql?(other)
+    end
+
+    def eql?(other)
+      id == other.id
+    end
+
+    def hash
+      id.hash
+    end
+
+    def id
+      "#{@object.class.name}-#{@object.id}-#{@type}-#{@count}"
+    end
+
+    def title
+      pluralize(@count, @type.to_s.humanize.singularize.downcase)
+    end
+
+    def avatar_key
+      "#{@type.to_s.singularize}_avatar"
+    end
+
+    def initialize(object, type, children)
+      @object = object
+      @type = type
+      @count = children.count
+    end
+  end
+
   class IsaGraphGenerator
     def initialize(object)
       @object = object
@@ -72,6 +108,19 @@ module Seek
       nodes = [node]
       edges = []
 
+      if method == :children
+        associations(object)[:aggregated_children].each do |type, method|
+          associations = resolve_association(object, method)
+          if associations.any?
+            agg = Seek::ObjectAggregation.new(object, type, associations)
+            agg_node = Seek::IsaGraphNode.new(agg)
+            agg_node.can_view = true
+            nodes << agg_node
+            edges << [object, agg]
+          end
+        end
+      end
+
       if max_depth.nil? || (depth < max_depth) || children.count == 1
         children.each do |child|
           hash = traverse(method, child, max_depth, depth + 1)
@@ -86,59 +135,69 @@ module Seek
 
     def children(object)
       associations = associations(object)
-      (associations[:children] + associations[:related]).uniq
+      (associations[:children].map { |a| resolve_association(object, a) }.flatten +
+      associations[:related].map { |a| resolve_association(object, a) }.flatten).uniq
     end
 
     def parents(object)
-      associations(object)[:parents].uniq
+      associations(object)[:parents].map { |a| resolve_association(object, a) }.flatten.uniq
+    end
+
+    def resolve_association(object, association)
+      return [] unless object.respond_to?(association)
+      associations = object.send(association)
+      associations = associations.respond_to?(:each) ? associations : [associations]
+      associations.compact
     end
 
     def associations(object)
       case object
       when Programme
         {
-          children: object.projects
+          children: [:projects]
         }
       when Project
         {
-          children: object.investigations,
-          parents: object.programme ? [object.programme] : []
+          children: [:investigations],
+          parents: [:programme]
         }
       when Investigation
         {
-          children: object.studies,
-          parents: object.projects,
-          related: object.publications
+          children: [:studies],
+          parents: [:projects],
+          related: [:publications]
         }
       when Study
         {
-          children: object.assays,
-          parents: [object.investigation],
-          related: object.publications
+          children: [:assays],
+          parents: [:investigation],
+          related: [:publications]
         }
       when Assay
         {
-          children: object.assets,
-          parents: [object.study],
-          related: object.publications
+          children: [:data_files, :models, :sops, :publications],
+          parents: [:study],
+          related: [:publications],
+          aggregated_children: { samples: :samples }
         }
       when Publication
         {
-          parents: (object.assays | object.studies | object.investigations | object.data_files | object.models | object.presentations),
-          related: object.events
+          parents: [:assays, :studies, :investigations, :data_files, :models, :presentations],
+          related: [:events]
         }
       when DataFile, Model, Sop, Sample, Presentation
         {
-          parents: object.assays,
-          related: object.publications | (object.respond_to?(:events) ? object.events : [])
+          parents: [:assays],
+          related: [:publications, :events],
+          aggregated_children: { samples: :extracted_samples },
         }
       when Event
         {
-          parents: (object.presentations | object.publications | object.data_files),
+          parents: [:presentations, :publications, :data_files],
         }
       else
         { }
-      end.reverse_merge!(parents: [], children: [], related: [])
+      end.reverse_merge!(parents: [], children: [], related: [], aggregated_children: {})
     end
   end
 end
