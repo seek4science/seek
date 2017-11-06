@@ -133,7 +133,7 @@ class Sample < ActiveRecord::Base
     return [] unless sample_type
     seek_sample_attributes = sample_type.sample_attributes.select { |attr| attr.sample_attribute_type.seek_sample? }
     seek_sample_attributes.map do |attr|
-      value = get_attribute(sa.hash_key)
+      value = get_attribute(attr.hash_key)
       Sample.find_by_id(value['id']) if value
     end.compact
   end
