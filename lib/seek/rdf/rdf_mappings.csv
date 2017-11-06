@@ -11,6 +11,7 @@ class,method,property,uri or literal,transformation,collection transformation
 *,managers,RDF::SIOC.has_owner,u,,
 *,updated_at,RDF::DC.modified,l,item.to_datetime,
 *,latest_version,RDF::DC.hasVersion,u,,
+*,doi_identifiers,JERMVocab.DOI,u,,
 Assay,assay_type_uri,JERMVocab.hasType,u,,
 Assay,incoming,JERMVocab.hasInput,u,,
 Assay,outgoing,JERMVocab.hasOutput,u,,
