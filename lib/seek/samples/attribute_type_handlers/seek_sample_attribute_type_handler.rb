@@ -11,7 +11,7 @@ module Seek
         def test_value(value)
           if additional_options[:required]
             super
-            sample = find_resource(value)
+            sample = find_resource(value['id'])
             fail 'Unable to find Sample in database' unless sample
             fail 'Sample type does not match' unless sample.sample_type == linked_sample_type
           end
