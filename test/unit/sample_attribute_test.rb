@@ -261,14 +261,14 @@ class SampleAttributeTest < ActiveSupport::TestCase
     bad_sample = Factory(:sample)
     attribute = Factory(:sample_sample_attribute, is_title: true, sample_type: Factory(:simple_sample_type), linked_sample_type: good_sample.sample_type)
 
-    assert attribute.validate_value?(good_sample.id)
-    assert attribute.validate_value?(good_sample.id.to_s)
+    assert valid_value?(attribute, good_sample.id)
+    assert valid_value?(attribute, good_sample.id.to_s)
     # also ok with title
-    assert attribute.validate_value?(good_sample.title)
+    assert valid_value?(attribute, good_sample.title)
 
-    refute attribute.validate_value?(bad_sample.id)
-    refute attribute.validate_value?(bad_sample.id.to_s)
-    refute attribute.validate_value?('fish')
+    refute valid_value?(attribute, bad_sample.id)
+    refute valid_value?(attribute, bad_sample.id.to_s)
+    refute valid_value?(attribute, 'fish')
   end
 
   test 'samples linked via SeekSample must exist' do
@@ -276,8 +276,8 @@ class SampleAttributeTest < ActiveSupport::TestCase
     attribute = Factory(:sample_sample_attribute, required: true, sample_type: Factory(:simple_sample_type))
     attribute.linked_sample_type = sample.sample_type
 
-    assert attribute.validate_value?(sample.title)
-    refute attribute.validate_value?('surely no one has used this as a sample title')
+    assert valid_value?(attribute, sample.title)
+    refute valid_value?(attribute, 'surely no one has used this as a sample title')
   end
 
   test 'samples linked via SeekSample can be non-existant if field not required' do
@@ -285,7 +285,13 @@ class SampleAttributeTest < ActiveSupport::TestCase
     attribute = Factory(:sample_sample_attribute, required: false, sample_type: Factory(:simple_sample_type))
     attribute.linked_sample_type = sample.sample_type
 
-    assert attribute.validate_value?(sample.title)
-    assert attribute.validate_value?('surely no one has used this as a sample title')
+    assert valid_value?(attribute, sample.title)
+    assert valid_value?(attribute, 'surely no one has used this as a sample title')
+  end
+
+  private
+
+  def valid_value?(attribute, value)
+    attribute.validate_value?(attribute.pre_process_value(value))
   end
 end

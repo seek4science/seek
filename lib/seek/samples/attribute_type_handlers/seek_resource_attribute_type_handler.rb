@@ -13,7 +13,7 @@ module Seek
 
         def convert(value)
           resource = find_resource(value)
-          hash = { id: resource ? resource.id : value, type: type }
+          hash = { id: resource ? resource.id : value, type: type }.with_indifferent_access
           hash[:title] = resource.title if resource
           hash
         end
