@@ -71,6 +71,13 @@ module DataCite
         base + resource
       end
 
+      # the resolvable doi identifier URI
+      def doi_identifier
+        unless doi.blank?
+          "https://doi.org/#{doi}"
+        end
+      end
+
       def has_doi?
         !doi.blank?
       end

@@ -58,6 +58,12 @@ module Seek #:nodoc:
         def latest_citable_snapshot
           snapshots.where('doi IS NOT NULL').last
         end
+
+        def doi_identifiers
+          snapshots.collect(&:doi_identifier).compact
+        end
+
+        alias latest_citable_resource latest_citable_snapshot
       end
     end
   end
