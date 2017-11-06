@@ -90,7 +90,7 @@ class Sample < ActiveRecord::Base
   end
 
   def blank_attribute?(attr)
-    data[attr].blank? || (data[attr].respond_to?(:values) && data[attr].values.all?(&:blank?))
+    data[attr].blank? || (data[attr].is_a?(Hash) && data[attr]['id'].blank? && data[attr]['title'].blank?)
   end
 
   def state_allows_edit?(*args)
