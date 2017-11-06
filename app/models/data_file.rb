@@ -159,8 +159,8 @@ class DataFile < ActiveRecord::Base
         existing = extracted_samples.find_by_title(new_sample.title_from_data)
 
         if existing
-          existing.clear_data
-          existing.json_metadata = new_sample.json_metadata
+          existing.data.clear
+          existing.data.mass_assign(new_sample.data, pre_process: false)
           existing
         else
           new_sample

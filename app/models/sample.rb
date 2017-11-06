@@ -69,11 +69,6 @@ class Sample < ActiveRecord::Base
     @data ||= Seek::Samples::SampleData.new(sample_type, json_metadata)
   end
 
-  def clear_data
-    self.json_metadata = nil
-    @data = nil
-  end
-
   def referenced_strains
     sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_STRAIN }.map do |sa|
       value = get_attribute(sa.hash_key)

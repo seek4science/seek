@@ -645,7 +645,7 @@ class SampleTest < ActiveSupport::TestCase
 
     sample = Sample.find(sample.id)
 
-    assert_equal patient.id, sample.get_attribute(:patient)
+    assert_equal patient.id, sample.get_attribute(:patient)['id']
     assert_equal [patient], sample.related_samples
   end
 
