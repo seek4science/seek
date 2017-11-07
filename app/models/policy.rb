@@ -242,7 +242,7 @@ class Policy < ActiveRecord::Base
   end
 
   def public?
-    access_type > Policy::NO_ACCESS
+    access_type > Policy::NO_ACCESS && sharing_scope!=Policy::ALL_USERS
   end
 
   # return the hash: key is access_type, value is the array of people

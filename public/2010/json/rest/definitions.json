@@ -1708,7 +1708,7 @@
                 "orcid" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
-                "email" : {
+                "mbox_sha1sum" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "expertise" : {
@@ -1718,7 +1718,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
                 }
               },
-              "required" : [ "title", "first_name", "last_name", "email" ],
+              "required" : [ "title", "first_name", "last_name", "mbox_sha1sum" ],
               "additionalProperties" : false
             },
             "relationships" : {

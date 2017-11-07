@@ -236,6 +236,11 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 'mailto:sfkh%5Esd@weoruweoru.com', p.email_uri
   end
 
+  test 'mbox_sha1sum' do
+    p = Factory :person, email: 'sfkh^sd@weoruweoru.com'
+    assert_equal '60f787c78d77437f192d8ebce5ee4ece7cbaaca6',p.mbox_sha1sum
+  end
+
   test 'only first admin person' do
     Person.delete_all
     person = Factory :admin
