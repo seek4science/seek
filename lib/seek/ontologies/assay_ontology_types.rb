@@ -19,6 +19,14 @@ module Seek
         suggested_technology_type.try(:label) || technology_type_reader.class_hierarchy.hash_by_uri[technology_type_uri].try(:label)
       end
 
+      def assay_type_uri
+        suggested_assay_type.try(:ontology_uri) || super
+      end
+
+      def technology_type_uri
+        suggested_technology_type.try(:ontology_uri) || super
+      end
+
       def assay_type_reader
         if is_modelling?
           Seek::Ontologies::ModellingAnalysisTypeReader.instance
@@ -45,19 +53,22 @@ module Seek
           id = uri.split(':')[1]
           suggested = suggested_key.classify.constantize.find(id)
           send("#{suggested_key}=", suggested)
-          send("#{type}_uri=", suggested.ontology_uri)
           true
         else
+          # clear any previous suggested type, but only if it hasn't already been been changed (due to the recursive nature of <type>_uri= being recalled)
+          unless changes.keys.include?("#{suggested_key}_id")
+            send("#{suggested_key}=", nil)
+          end
           false
         end
       end
 
       def default_assay_and_technology_type
-        self.use_default_assay_type_uri! unless assay_type_uri
+        use_default_assay_type_uri! unless assay_type_uri
         if is_modelling?
           self.technology_type_uri = nil
         else
-          self.use_default_technology_type_uri! unless technology_type_uri
+          use_default_technology_type_uri! unless technology_type_uri
         end
       end
 
@@ -74,11 +85,11 @@ module Seek
       end
 
       def use_default_technology_type_uri!
-        if is_modelling?
-          self.technology_type_uri = nil
-        else
-          self.technology_type_uri = default_technology_type_uri
-        end
+        self.technology_type_uri = if is_modelling?
+                                     nil
+                                   else
+                                     default_technology_type_uri
+                                   end
       end
 
       def valid_assay_type_uri?(uri = assay_type_uri)
@@ -103,7 +114,7 @@ module Seek
       # returns the label if it is an unrecognised suggested label, otherwise return nil
       def suggested_technology_type_label
         label = self[:technology_type_label]
-        return nil if self.is_modelling?
+        return nil if is_modelling?
         return nil unless label
         return label unless technology_type_reader.class_hierarchy.hash_by_label[label.downcase]
       end

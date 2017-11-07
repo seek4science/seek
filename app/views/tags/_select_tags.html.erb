@@ -14,7 +14,7 @@
 
 <%= tags_input(input_name, existing_tags, :typeahead => {:type => type}) %>
 
-<% cache "suggestions_for_#{name}" do %>
+<% cache "suggestions_for_#{name}", skip_digest: true do %>
     <%
        suggested_limit ||= 30
        suggested_tags = all_tags.sort { |a, b| b.tag_count <=> a.tag_count }[0...suggested_limit]

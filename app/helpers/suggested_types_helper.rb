@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 module SuggestedTypesHelper
   def suggested_type_modal_boxes
     boxes = suggested_type_modal_box(@assay.assay_type_reader.ontology_term_type)
@@ -8,8 +9,8 @@ module SuggestedTypesHelper
 
   def suggested_type_modal_box(term_type)
     modal_id = "#{term_type.underscore.downcase}-new-term-modal"
-    modal_options = {id: modal_id, size: 's', 'data-role' => 'create-new-suggested-type'}
-    suggested_type = if term_type=='technology'
+    modal_options = { id: modal_id, size: 's', 'data-role' => 'create-new-suggested-type' }
+    suggested_type = if term_type == 'technology'
                        SuggestedTechnologyType.new
                      else
                        SuggestedAssayType.new
@@ -20,9 +21,9 @@ module SuggestedTypesHelper
 
     modal(modal_options) do
       modal_header(modal_title) +
-          modal_body do
-            render partial: 'suggested_types/new_modal_type', locals: {suggested_type: suggested_type}
-          end
+        modal_body do
+          render partial: 'suggested_types/new_modal_type', locals: { suggested_type: suggested_type }
+        end
     end
   end
 
@@ -95,7 +96,7 @@ module SuggestedTypesHelper
   def show_ontology_class_link(clz)
     label = clz.label
     type = clz.term_type
-    fail 'error' if type.nil?
+    raise 'error' if type.nil?
     path = send("#{type}_types_path", uri: clz.uri.try(:to_s), label: label)
     html_options = clz.suggested_type? ? { style: 'color:green;font-style:italic' } : {}
     link_to label, path, html_options
@@ -130,8 +131,7 @@ module SuggestedTypesHelper
                                           url: send("edit_suggested_#{type}_type_path", id: clz, term_type: type),
                                           method: :get,
                                           loading: "$('RB_redbox').scrollTo();Element.show('edit_suggested_type_spinner'); Element.hide('new_suggested_#{type}_type_form')",
-                                          loaded: "Element.hide('edit_suggested_type_spinner'); Element.show('new_suggested_#{type}_type_form')"
-                          )
+                                          loaded: "Element.hide('edit_suggested_type_spinner'); Element.show('new_suggested_#{type}_type_form')")
   end
 
   def new_popup_request?

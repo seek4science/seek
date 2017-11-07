@@ -29,8 +29,8 @@ class JsonMetaTest < ActiveSupport::TestCase
     assert_equal item.title, json['title']
     assert_equal 'my ro assay', json['description']
 
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type', json['assay_type_uri']
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type', json['technology_type_uri']
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type', json['assay_type_uri']
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Technology_type', json['technology_type_uri']
 
     json_contributor = json['contributor']
     assert_equal contributor.name, json_contributor['name']

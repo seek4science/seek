@@ -2,7 +2,14 @@ require 'test_helper'
 
 class ProgrammesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
+  include RestTestCases
   include ActionView::Helpers::NumberHelper
+
+  include RdfTestCases
+
+  def rest_api_test_object
+    Factory(:programme)
+  end
 
   # for now just admins can create programmes, later we will change this
   test 'new page accessible admin' do
@@ -790,5 +797,13 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_redirected_to prog
 
     assert_equal 0, assigns(:programme).funding_codes.length
+  end
+
+  def edit_max_object(programme)
+    for i in 1..5 do
+      Factory(:person).add_to_project_and_institution(programme.projects.first, Factory(:institution))
+    end
+    Factory :funding_code, value: 'DFG', annotatable: programme
+    add_avatar_to_test_object(programme)
   end
 end

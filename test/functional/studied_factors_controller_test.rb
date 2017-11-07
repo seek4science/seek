@@ -3,14 +3,41 @@ require 'test_helper'
 class StudiedFactorsControllerTest < ActionController::TestCase
   fixtures :all
 
+  #include RdfTestCases
   include AuthenticatedTestHelper
+  include ActionDispatch::Routing::PolymorphicRoutes
 
   def setup
     login_as(:quentin)
   end
 
+  def rest_api_test_object
+    Factory(:studied_factor, data_file: Factory(:data_file, policy: Factory(:public_policy)))
+  end
+
+  # required for the rdf tests
+  def expected_rdf_resource_uri(object)
+    data_file_studied_factor_url(object.data_file, object, host: 'localhost', port: '3000')
+  end
+
+  # overides RdfTestCases, due to the nested route
+  def invoke_rdf_get(object)
+    get :show, id: object, data_file_id: object.data_file.id, format: 'rdf'
+  end
+
+  # overides RdfTestCases, due to the nested route
+  def test_response_code_for_not_available_rdf
+    id = 9999
+    id += 1 until StudiedFactor.find_by_id(id).nil?
+
+    logout
+    get :show, id: id, data_file_id: 1, format: 'rdf'
+    assert_response :not_found
+  end
+
   test 'routes' do
     assert_generates '/data_files/1/studied_factors', controller: 'studied_factors', action: 'index', data_file_id: '1'
+    assert_generates '/data_files/1/studied_factors/2', controller: 'studied_factors', action: 'show', data_file_id: '1', id: '2'
   end
 
   test 'can only go to factors studied if the user can edit the data file' do
@@ -162,7 +189,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
     cp = compounds(:compound_glycine)
     put :update, id: fs.id, data_file_id: fs.data_file.id, studied_factor: { start_value: fs.start_value },
-        substance_list: cp.name
+                 substance_list: cp.name
     fs_updated = assigns(:studied_factor)
     assert_not_nil fs_updated
     assert fs_updated.valid?
@@ -233,7 +260,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     fs_array.each do |fs|
       substances_of_existing_fses.push fs.studied_factor_links.first.substance
     end
-    assert_equal substances_of_existing_fses.sort { |a, b| a.id <=> b.id }, substances_of_new_fses.sort { |a, b| a.id <=> b.id }
+    assert_equal substances_of_existing_fses.sort_by(&:id), substances_of_new_fses.sort_by(&:id)
   end
 
   test 'should destroy FS' do
@@ -268,7 +295,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
     assert_equal 'one value', fs.annotations_with_attribute('description').first.value.text
 
     put :update, id: fs.id, data_file_id: fs.data_file.id,
-        annotation: { annotation_attribute: 'description', value: 'update value' }, studied_factor: { start_value: fs.start_value }
+                 annotation: { annotation_attribute: 'description', value: 'update value' }, studied_factor: { start_value: fs.start_value }
     fs = assigns(:studied_factor)
     assert_not_nil fs
     assert fs.valid?

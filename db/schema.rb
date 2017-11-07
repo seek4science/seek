@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170711121424) do
+ActiveRecord::Schema.define(version: 20171026131121) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -319,6 +319,7 @@ ActiveRecord::Schema.define(version: 20170711121424) do
     t.string   "template_name",     limit: 255,   default: "none"
     t.string   "doi",               limit: 255
     t.string   "license",           limit: 255
+    t.boolean  "simulation_data",                 default: false
   end
 
   add_index "data_file_versions", ["contributor_id", "contributor_type"], name: "index_data_file_versions_contributor", using: :btree
@@ -347,6 +348,7 @@ ActiveRecord::Schema.define(version: 20170711121424) do
     t.string   "template_name",    limit: 255,   default: "none"
     t.string   "doi",              limit: 255
     t.string   "license",          limit: 255
+    t.boolean  "simulation_data",                default: false
   end
 
   add_index "data_files", ["contributor_id", "contributor_type"], name: "index_data_files_on_contributor_id_and_contributor_type", using: :btree
@@ -959,6 +961,7 @@ ActiveRecord::Schema.define(version: 20170711121424) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "first_letter", limit: 255
+    t.string   "uuid",         limit: 255
   end
 
   create_table "organisms_projects", id: false, force: :cascade do |t|
@@ -1284,6 +1287,7 @@ ActiveRecord::Schema.define(version: 20170711121424) do
     t.text     "description", limit: 65535
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "key",         limit: 255
   end
 
   create_table "relationships", force: :cascade do |t|
@@ -1317,6 +1321,8 @@ ActiveRecord::Schema.define(version: 20170711121424) do
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
     t.string   "placeholder", limit: 255
+    t.text     "description", limit: 65535
+    t.string   "resolution",  limit: 255
   end
 
   create_table "sample_attributes", force: :cascade do |t|

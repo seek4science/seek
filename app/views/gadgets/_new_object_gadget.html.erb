@@ -8,7 +8,7 @@
 %>
 
 <% if current_user.person.can_create_new_items? -%>
-    <% cache "new_object_gadget" do -%>
+    <% cache 'new_object_gadget', skip_digest: true do -%>
         <div id="new_asset" class="sysmo_gadget">
 
           <div class="header curved_top">

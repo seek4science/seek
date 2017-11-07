@@ -1,8 +1,7 @@
 class OrcidValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    unless value && valid_orcid_id?(value.gsub(/http(s)?\:\/\/orcid.org\//, ''))
-      record.errors[attribute] << (options[:message] || "isn't a valid ORCID identifier")
-    end
+    return if value.nil? || valid_orcid_id?(value.gsub(%r{http(s)?\:\/\/orcid.org\/}, ''))
+    record.errors[attribute] << (options[:message] || "isn't a valid ORCID identifier")
   end
 
   private

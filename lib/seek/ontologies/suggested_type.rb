@@ -16,6 +16,8 @@ module Seek
 
         after_destroy :join_parents_and_children
         after_destroy :update_ontology_uri_for_children
+        after_save :create_rdf_generation_job
+
       end
 
       def default_parent_uri
@@ -68,9 +70,11 @@ module Seek
         error_messages = []
         type_name = humanize_term_type
         error_messages << "Unable to delete #{type_name} types with children." unless children.empty?
-        error_messages << "Unable to delete #{type_name} type " \
-                                          "due to reliance from #{assays.count} " \
-                                          "existing #{type_name}." unless assays.empty?
+        unless assays.empty?
+          error_messages << "Unable to delete #{type_name} type " \
+                                            "due to reliance from #{assays.count} " \
+                                            "existing #{type_name}."
+        end
         error_messages
       end
 
@@ -171,6 +175,14 @@ module Seek
             child.ontology_uri = self[:ontology_uri]
             child.save
           end
+        end
+      end
+
+      # creates a job to update rdf if the suggested ontology uri changes
+      def create_rdf_generation_job
+        return unless changes.include?(:ontology_uri)
+        assays.each do |assay|
+          RdfGenerationJob.new(assay).queue_job
         end
       end
     end

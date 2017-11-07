@@ -19,6 +19,7 @@ class Policy < ActiveRecord::Base
   alias_attribute :title, :name
 
   after_commit :queue_update_auth_table
+  after_commit :queue_rdf_generation_job
   before_save :update_timestamp_if_permissions_change
 
   def update_timestamp_if_permissions_change
@@ -26,8 +27,15 @@ class Policy < ActiveRecord::Base
   end
 
   def queue_update_auth_table
-    unless (previous_changes.keys - ['updated_at']).empty?
-      AuthLookupUpdateJob.new.add_items_to_queue(assets) unless assets.empty?
+    unless (previous_changes.keys - ['updated_at']).empty? || assets.empty?
+      AuthLookupUpdateJob.new.add_items_to_queue(assets)
+    end
+  end
+
+  def queue_rdf_generation_job
+    supported_assets=assets.select(&:rdf_supported?)
+    unless (previous_changes.keys - ['updated_at']).empty? || supported_assets.empty?
+      supported_assets.each { |asset| RdfGenerationJob.new(asset).queue_job }
     end
   end
 
@@ -108,6 +116,9 @@ class Policy < ActiveRecord::Base
       if policy_params
         # Set attributes on the policy
         policy.access_type = policy_params[:access_type]
+        if policy.access_type > Policy::NO_ACCESS
+          policy.sharing_scope = nil # This field should not be used anymore
+        end
 
         # Set attributes on the policy's permissions
         if policy_params[:permissions_attributes]

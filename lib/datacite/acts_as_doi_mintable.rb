@@ -4,13 +4,11 @@ require 'seek/util'
 
 module DataCite
   module ActsAsDoiMintable
-
     def self.included(mod)
       mod.extend(ClassMethods)
     end
 
     module ClassMethods
-
       def acts_as_doi_mintable(proxy: nil)
         cattr_accessor :doi_proxy_resource
 
@@ -20,11 +18,9 @@ module DataCite
 
         include Rails.application.routes.url_helpers # For URL generation
       end
-
     end
 
     module InstanceMethods
-
       def mint_doi
         unless doi.blank?
           errors.add(:doi, 'already minted')
@@ -58,12 +54,12 @@ module DataCite
 
       def datacite_metadata
         DataCite::Metadata.new(
-          :identifier => suggested_doi,
-          :title => title,
-          :description => description,
-          :creators => related_people,
-          :year => Time.now.year.to_s,
-          :publisher => Seek::Config.project_name
+          identifier: suggested_doi,
+          title: title,
+          description: description,
+          creators: related_people,
+          year: Time.now.year.to_s,
+          publisher: Seek::Config.project_name
         )
       end
 
@@ -73,6 +69,13 @@ module DataCite
         resource << ".#{doi_resource_suffix}" unless doi_resource_suffix.blank?
 
         base + resource
+      end
+
+      # the resolvable doi identifier URI
+      def doi_identifier
+        unless doi.blank?
+          "https://doi.org/#{doi}"
+        end
       end
 
       def has_doi?
@@ -94,13 +97,13 @@ module DataCite
       private
 
       def doi_resource
-        @doi_resource ||= (self.class.doi_proxy_resource ? self.send(self.class.doi_proxy_resource) : self)
+        @doi_resource ||= (self.class.doi_proxy_resource ? send(self.class.doi_proxy_resource) : self)
       end
 
       def doi_target_url
         polymorphic_url(self,
-                        :host => Seek::Config.host_with_port,
-                        :protocol => Seek::Config.host_scheme)
+                        host: Seek::Config.host_with_port,
+                        protocol: Seek::Config.host_scheme)
       end
 
       def doi_resource_type
@@ -120,7 +123,6 @@ module DataCite
                            doi: suggested_doi, action: AssetDoiLog::MINT, user_id: User.current_user.try(:id))
       end
     end
-
   end
 end
 

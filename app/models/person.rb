@@ -314,8 +314,19 @@ class Person < ActiveRecord::Base
     memberships.collect(&:project_positions).flatten
   end
 
-  def assets
-    created_data_files | created_models | created_sops | created_publications | created_presentations
+  # all items, assets, ISA and samples that are linked to this person as a creator
+  def created_items
+    assets_creators.map(&:asset).uniq.compact
+  end
+
+  # all items, assets, ISA, samples and events that are linked to this person as a contributor
+  def contributed_items
+    assays = Assay.where(contributor_id: id) # assays contributor is not polymorphic
+    [Study, Investigation, DataFile, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
+      assets = type.where("contributor_type = 'Person' AND contributor_id=?",id)
+      assets |= type.where("contributor_type = 'User' AND contributor_id=?",user.id) unless user.nil?
+      assets
+    end.flatten.uniq.compact | assays
   end
 
   # can be edited by:
@@ -381,20 +392,6 @@ class Person < ActiveRecord::Base
 
   def tools
     annotations_with_attribute('tool').collect(&:value)
-  end
-
-  # retrieve the items that this person is contributor (owner for assay)
-  def contributed_items
-    items = []
-    items |= assays
-    unless user.blank?
-      items |= user.assets
-      items |= user.presentations
-      items |= user.events
-      items |= user.investigations
-      items |= user.studies
-    end
-    items
   end
 
   def recent_activity(limit = 10)

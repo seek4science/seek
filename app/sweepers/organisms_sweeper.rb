@@ -1,22 +1,17 @@
 class OrganismsSweeper < ActionController::Caching::Sweeper
-
   include CommonSweepers
 
-  observe Organism  
+  observe Organism
 
-  def after_create(o)
+  def after_create(_o)
     expire_organism_gadget
   end
 
-  def after_update(o)
+  def after_update(_o)
     expire_organism_gadget
   end
 
-  def after_destroy(o)
+  def after_destroy(_o)
     expire_organism_gadget
   end
-
-  private
-
-
 end

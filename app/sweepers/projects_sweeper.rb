@@ -2,27 +2,17 @@
 # and open the template in the editor.
 
 class ProjectsSweeper < ActionController::Caching::Sweeper
-
   include CommonSweepers
 
   observe Project
 
   def before_save(p)
-    if (p.changed.include?("avatar_id"))
-      expire_all_favourite_fragments
-    end
+    expire_all_favourite_fragments if p.changed.include?('avatar_id')
   end
 
-  def after_create(p)
+  def after_create(p); end
 
-  end
+  def after_update(p); end
 
-  def after_update(p)
-
-  end
-
-  def after_destroy(p)
-
-  end
-
+  def after_destroy(p); end
 end

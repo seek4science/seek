@@ -39,9 +39,18 @@ module Seek
       private
 
       def openbis_search_terms
-        return [] unless openbis? && (dataset = openbis_dataset)
+        # otherwise it gets repopulated for each attribute access
+        dataset = openbis_dataset
+
+        return [] unless dataset
+
         terms = [dataset.perm_id, dataset.dataset_type_code, dataset.dataset_type_description,
                  dataset.experiment_id, dataset.registrator, dataset.modifier, dataset.code]
+
+        if dataset.properties
+          terms |= dataset.properties.map { |key, value| [value, "#{key}:#{value}"]}.flatten
+        end
+
         terms | dataset.dataset_files_no_directories.collect do |file|
           [file.perm_id, file.path, file.filename]
         end.flatten.uniq

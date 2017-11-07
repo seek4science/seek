@@ -1029,8 +1029,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, id: proj, format: 'json'
     assert_response :success
     json = JSON.parse(@response.body)
-    assert_equal 'fishing project', json['title']
-    assert_equal 'investigating fishing', json['description']
+    assert_equal 'fishing project', json['data']['attributes']['title']
+    assert_equal 'investigating fishing', json['data']['attributes']['description']
   end
 
   test 'admin members available to admin' do
@@ -1469,6 +1469,14 @@ class ProjectsControllerTest < ActionController::TestCase
     assert project.default_policy
 
 
+  end
+
+  def edit_max_object(project)
+    for i in 1..5 do
+      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+    end
+    project.programme_id = (Factory(:programme)).id
+    add_avatar_to_test_object(project)
   end
 
   private

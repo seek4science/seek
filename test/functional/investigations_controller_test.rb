@@ -367,4 +367,10 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', investigation_path(investigation2), text: investigation2.title, count: 0
     end
   end
+
+  def edit_max_object(investigation)
+    add_tags_to_test_object(investigation)
+    investigation.creators = [Factory(:person)]
+    investigation.save
+  end
 end

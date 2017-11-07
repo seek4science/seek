@@ -2,7 +2,6 @@ require 'zip'
 
 # Investigation "snapshot"
 class Snapshot < ActiveRecord::Base
-
   belongs_to :resource, polymorphic: true
   has_one :content_blob, as: :asset, foreign_key: :asset_id
 
@@ -16,12 +15,10 @@ class Snapshot < ActiveRecord::Base
 
   delegate :md5sum, :sha1sum, to: :content_blob
 
-  validates :snapshot_number, :uniqueness => { :scope =>  [:resource_type, :resource_id] }
+  validates :snapshot_number, uniqueness: { scope: %i[resource_type resource_id] }
 
   acts_as_doi_mintable(proxy: :resource)
-  acts_as_zenodo_depositable do |snapshot|
-    snapshot.content_blob # The thing to be deposited
-  end
+  acts_as_zenodo_depositable(&:content_blob)
 
   def to_param
     snapshot_number.to_s
@@ -83,7 +80,7 @@ class Snapshot < ActiveRecord::Base
 
   def can_mint_doi?
     Seek::Config.doi_minting_enabled &&
-         (resource.created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) <= Time.now
+      (resource.created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) <= Time.now
   end
 
   private
@@ -94,8 +91,8 @@ class Snapshot < ActiveRecord::Base
 
   def doi_target_url
     polymorphic_url([resource, self],
-                    :host => Seek::Config.host_with_port,
-                    :protocol => Seek::Config.host_scheme)
+                    host: Seek::Config.host_with_port,
+                    protocol: Seek::Config.host_scheme)
   end
 
   def parse_metadata
@@ -104,7 +101,6 @@ class Snapshot < ActiveRecord::Base
 
   # Need to re-index the parent model to update its' "doi" field
   def reindex_parent_resource
-    ReindexingJob.new.add_items_to_queue(self.resource) if self.doi_changed?
+    ReindexingJob.new.add_items_to_queue(resource) if doi_changed?
   end
-
 end

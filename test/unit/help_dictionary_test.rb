@@ -5,6 +5,7 @@ class HelpDictionaryTest < ActiveSupport::TestCase
     @dic = Seek::Help::HelpDictionary.instance
   end
 
+
   test 'all_links' do
     refute_empty @dic.all_links
     assert_includes @dic.all_links, 'http://docs.seek4science.org/tech/investigation-checksum.html'
@@ -17,8 +18,10 @@ class HelpDictionaryTest < ActiveSupport::TestCase
     assert_nil @dic.help_link(:funky_fish)
   end
 
+
   test 'check links' do
     fails = []
+    WebMock.allow_net_connect!
     begin
       RestClient.head('http://www.google.com')
     rescue Exception => e
@@ -32,6 +35,8 @@ class HelpDictionaryTest < ActiveSupport::TestCase
         end
       end
       assert_empty fails, fails.join(', ')
+    ensure WebMock.disable_net_connect!
     end
+
   end
 end

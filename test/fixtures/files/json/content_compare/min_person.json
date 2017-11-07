@@ -1,0 +1,69 @@
+{
+  "data": {
+    "id": "1039986486",
+    "type": "people",
+    "attributes": {
+      "avatar": null,
+      "title": "Minimal",
+      "description": null,
+      "first_name": null,
+      "last_name": "Minimal",
+      "web_page": null,
+      "orcid": null,
+      "email": "f65adacb4f4ddc963fec0bae4626f32279242ca2",
+      "expertise": null,
+      "tools": null
+    },
+    "relationships": {
+      "projects": {
+        "data": []
+      },
+      "institutions": {
+        "data": []
+      },
+      "investigations": {
+        "data": []
+      },
+      "studies": {
+        "data": []
+      },
+      "assays": {
+        "data": []
+      },
+      "data_files": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "sops": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "presentations": {
+        "data": []
+      },
+      "events": {
+        "data": []
+      },
+      "samples": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/people/1039986486"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

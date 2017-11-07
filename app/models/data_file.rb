@@ -27,6 +27,8 @@ class DataFile < ActiveRecord::Base
 
   scope :with_extracted_samples, -> { joins(:extracted_samples).uniq }
 
+  scope :simulation_data, -> {where(simulation_data:true)}
+
   explicit_versioning(version_column: 'version') do
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent)
@@ -183,4 +185,17 @@ class DataFile < ActiveRecord::Base
     super || openbis_size_download_restricted?
   end
 
+  def openbis_dataset_json_details
+    return content_blob.openbis_dataset.json if openbis?
+    nil
+  end
+
+  # overides that from Seek::RDF::RdfGeneration, as simulation data needs to be #Simulation_data
+  def rdf_type_entity_fragment
+    if simulation_data
+      'Simulation_data'
+    else
+      super
+    end
+  end
 end

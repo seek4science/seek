@@ -1,0 +1,13 @@
+{
+    "data": {
+        "attributes": {
+            "avatar": null,
+            "title": "My Friday26 programme",
+            "description": null,
+            "web_page": null,
+            "funding_details": null,
+            "funding_codes": ["1234", "ABCD"]
+        }
+    }
+}
+

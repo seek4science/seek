@@ -7,14 +7,15 @@
     <%= render :partial => "assets/resource_authors_box", :locals => { :resource => resource, :truncate_to => truncate_length_for_boxes,:creators=>creators,:title=>authors_title } -%>
 <% end -%>
 
-<% if resource.respond_to?(:doi) %>
-  <%= render :partial => "assets/citation_box", locals: { doi: resource.doi } unless resource.doi.blank? %>
-<% elsif resource.respond_to?(:snapshots) && resource.snapshots.any? %>
+
+<% if resource.respond_to?(:snapshots) && resource.snapshots.any? %>
     <% if resource.latest_citable_snapshot %>
         <%= render :partial => "assets/citation_box", locals: { doi: resource.latest_citable_snapshot.doi,
                                                                 snapshot: resource.latest_citable_snapshot }  %>
     <% end %>
     <%= render :partial => "snapshots/snapshots", locals: { snapshots: resource.snapshots, resource: resource } %>
+<% elsif versioned_resource.respond_to?(:doi) && versioned_resource.doi.present? %>
+    <%= render :partial => "assets/citation_box", locals: { doi: versioned_resource.doi } %>
 <% end %>
 
 <% if resource.respond_to?(:license) %>

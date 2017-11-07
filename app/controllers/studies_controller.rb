@@ -68,9 +68,7 @@ class StudiesController < ApplicationController
 
   def update
     @study = Study.find(params[:id])
-
     @study.attributes = study_params
-
     update_sharing_policies @study
 
     respond_to do |format|
@@ -80,10 +78,10 @@ class StudiesController < ApplicationController
 
         flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
-        format.xml  { head :ok }
+        format.json {render json: @study}
       else
         format.html { render action: 'edit' }
-        format.xml  { render xml: @study.errors, status: :unprocessable_entity }
+        format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
       end
     end
   end
@@ -91,19 +89,20 @@ class StudiesController < ApplicationController
   def show
     @study = Study.find(params[:id])
     @study.create_from_asset = params[:create_from_asset]
+
     respond_to do |format|
       format.html
       format.xml
       format.rdf { render template: 'rdf/show' }
+      format.json {render json: @study}
     end
   end
 
   def create
     @study = Study.new(study_params)
-
     update_sharing_policies @study
-
-    if @study.save
+    ### TO DO: what about validation of person responsible? is it already included (for json?)
+    if @study.present? && @study.save
       update_scales @study
       update_relationships(@study, params)
 
@@ -115,16 +114,17 @@ class StudiesController < ApplicationController
           if @study.create_from_asset == 'true'
             flash.now[:notice] << "Now you can create new #{t('assays.assay')} by clicking -Add an #{t('assays.assay')}- button".html_safe
             format.html { redirect_to study_path(id: @study, create_from_asset: @study.create_from_asset) }
+            format.json {render json: @study}
           else
             format.html { redirect_to study_path(@study) }
-            format.xml { render xml: @study, status: :created, location: @study }
+            format.json {render json: @study}
           end
         end
       end
     else
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @study.errors, status: :unprocessable_entity }
+        format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
       end
     end
   end
@@ -160,6 +160,13 @@ class StudiesController < ApplicationController
   end
 
   private
+  def validate_person_responsible(p)
+    if (!p[:person_responsible_id].nil?) && (!Person.exists?(p[:person_responsible_id]))
+      render json: {error: "Person responsible does not exist", status: :unprocessable_entity}, status: :unprocessable_entity
+      return false
+    end
+    true
+  end
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,

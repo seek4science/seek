@@ -8,11 +8,11 @@ module RdfTestCases
     # in the in the database, rather than between that created in memory and that in the database.
     object = object.class.find(object.id)
 
-    expected_resource_uri = eval("#{object.class.name.underscore}_url(object,:host=>'localhost',:port=>'3000')")
+    expected_resource_uri = expected_rdf_resource_uri(object)
 
     assert object.can_view?
     assert object.respond_to?(:to_rdf)
-    get :show, id: object, format: 'rdf'
+    invoke_rdf_get(object)
     assert_response :success
     rdf = @response.body
 
@@ -25,6 +25,14 @@ module RdfTestCases
         assert statement.valid?, "RDF contained an invalid statement - #{statement}"
       end
     end
+  end
+
+  def invoke_rdf_get(object)
+    get :show, id: object, format: 'rdf'
+  end
+
+  def expected_rdf_resource_uri(object)
+    eval("#{object.class.name.underscore}_url(object,:host=>'localhost',:port=>'3000')")
   end
 
   def test_response_code_for_not_accessible_rdf

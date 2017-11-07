@@ -9,19 +9,22 @@ module Seek
         allow_empty_content_blob = model_image_present?
 
         unless allow_empty_content_blob || retained_content_blob_ids.present?
-          if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
+          if !blob_params || blob_params.empty? || blob_params.none? {|p| check_for_data_or_url(p) }
+
             flash.now[:error] ||= 'Please select a file to upload or provide a URL to the data.'
             return false
           end
         end
 
-        blob_params.select! { |p| !(p[:data].blank? && p[:data_url].blank?) }
+        blob_params.select! { |p| !(p[:data].blank? && p[:data_url].blank? &&p[:base64_data].blank?) }
 
         blob_params.each do |item_params|
           return false unless allow_empty_content_blob || check_for_data_or_url(item_params)
 
           if add_from_upload?(item_params)
             return false unless add_data_for_upload(item_params)
+          elsif add_from_base64?(item_params)
+            return false unless add_data_for_base64(item_params)
           else
             return false unless add_data_for_url(item_params)
           end
@@ -33,6 +36,11 @@ module Seek
       def add_data_for_upload(item_params)
         return false unless check_for_empty_data_if_present(item_params)
         process_upload(item_params)
+      end
+
+      def add_data_for_base64(item_params)
+        return false unless check_for_base64_data(item_params)
+        process_from_base64(item_params)
       end
 
       def add_data_for_url(item_params)
@@ -100,6 +108,17 @@ module Seek
         blob_params[:content_type] = data.content_type || content_type_from_filename(blob_params[:original_filename])
       end
 
+      def process_from_base64(blob_params)
+        base64_data = blob_params[:base64_data]
+        blob_params.delete(:data)
+        file_contents = Paperclip.io_adapters.for(base64_data)
+        blob_params[:original_filename] = file_contents.original_filename
+        blob_params[:tmp_io_object] = file_contents
+        blob_params[:content_type] = file_contents.content_type
+        blob_params[:file_size] = file_contents.size
+        true
+      end
+
       def process_from_url(blob_params)
         @data_url = blob_params[:data_url]
         blob_params.delete(:data)
@@ -130,12 +149,17 @@ module Seek
         !blob_params[:data].blank?
       end
 
+      def add_from_base64?(blob_params)
+        !blob_params[:base64_data].blank?
+      end
+
       def handle_upload_data_failure
         if render_new?
           respond_to do |format|
             format.html do
               render action: :new
             end
+            format.json {render json: '{ "not ok" }' }
           end
         end
       end

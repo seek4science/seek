@@ -1,5 +1,4 @@
 class Institution < ActiveRecord::Base
-  include Seek::Rdf::RdfGeneration
 
   acts_as_yellow_pages
   title_trimmer
@@ -46,4 +45,5 @@ class Institution < ActiveRecord::Base
     User.admin_or_project_administrator_logged_in? ||
       User.activated_programme_administrator_logged_in?
   end
+  
 end

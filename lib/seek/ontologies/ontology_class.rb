@@ -3,7 +3,7 @@ module Seek
     class OntologyClass
       attr_reader :uri, :description, :label, :subclasses, :parents, :term_type
 
-      alias_method :children, :subclasses
+      alias children subclasses
 
       include OntologyClassExtensionWithSuggestedType
 
@@ -59,9 +59,9 @@ module Seek
       private
 
       def validate_uri
-        fail Exception.new('URI must be provided, as either as a string or RDF::URI type') if @uri.nil?
+        raise Exception, 'URI must be provided, as either as a string or RDF::URI type' if @uri.nil?
         @uri = RDF::URI.new(@uri) if @uri.is_a?(String)
-        fail Exception.new('URI must be provided, as either as a string or RDF::URI type') unless @uri.is_a?(RDF::URI)
+        raise Exception, 'URI must be provided, as either as a string or RDF::URI type' unless @uri.is_a?(RDF::URI)
       end
 
       def extract_label_from_uri_fragment

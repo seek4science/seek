@@ -1,0 +1,19 @@
+{
+    "data": {
+        "attributes": {
+            "tags": null,
+            "title": "An investigation27",
+            "description": null
+        },
+        "relationships": {
+            "projects": {
+                "data": [
+                    {
+                        "id": "1",
+                        "type": "projects"
+                    }
+                ]
+            }
+        }
+    }
+}

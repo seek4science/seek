@@ -110,9 +110,7 @@
   $j(document).ready(function () {
     // Reset the "Add individual samples" modal after it is closed
     $j('#modalAddIndividualSamples').on('hidden.bs.modal', function () {
-      var filterField = $j('[data-role="seek-association-filter"]', $j(this));
-      filterField.val('');
-      Associations.filter(filterField[0]);
+      $j('[data-role="seek-association-filter-group"]', $j(this)).data('filterGroup').reset();
       $j('select', $j(this)).val('0');
     });
 
@@ -175,9 +173,7 @@
 
     // Reset the wizard when the modal is closed
     $j('#AddSamplesFromDataFileModal').on('hide.bs.modal', function () {
-      var filterField = $j('[data-role="seek-association-filter"]', $j(this));
-      filterField.val('');
-      Associations.filter(filterField[0]);
+      $j('[data-role="seek-association-filter-group"]', $j(this)).data('filterGroup').reset();
       samplesTable.rows().deselect();
       wizard.reset();
     });

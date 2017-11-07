@@ -35,6 +35,16 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'json link includes version' do
+    df = Factory(:data_file,policy:Factory(:public_policy))
+    test_show_json(df)
+    json = JSON.parse(response.body)
+    refute_nil json['data']
+    refute_nil json['data']['links']
+    refute_nil json['data']['links']['self']
+    assert json['data']['links']['self'].ends_with?("?version=#{df.version}")
+  end
+
   # because the activity logging is currently an after_filter, the AuthorizationEnforcement can silently prevent
   # the log being saved, unless it is public, since it has passed out of the around filter and User.current_user is nil
   test 'download and view activity logging for private items' do
@@ -371,8 +381,26 @@ class DataFilesControllerTest < ActionController::TestCase
     assert assigns(:data_file).content_blob.url.blank?
     assert_equal 1, assigns(:data_file).version
     assert_not_nil assigns(:data_file).latest_version
+    refute assigns(:data_file).simulation_data?
     assay.reload
     assert_includes assay.data_files, assigns(:data_file)
+  end
+
+  test 'should create data file as simulation data' do
+    login_as(:datafile_owner) # can edit assay
+    data_file, blob = valid_data_file
+    data_file.merge!({simulation_data: '1'})
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('DataFile::Version.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing
+          end
+        end
+      end
+    end
+    assert_redirected_to data_file_path(assigns(:data_file))
+    assert assigns(:data_file).simulation_data?
   end
 
   test 'upload_for_tool inacessible with normal login' do
@@ -1745,10 +1773,10 @@ class DataFilesControllerTest < ActionController::TestCase
     get :show, id: df, format: 'json'
     assert_response :success
     json = JSON.parse(response.body)
-    assert_equal df.id, json['id']
-    assert_equal 'fish flop', json['title']
-    assert_equal 'testing json description', json['description']
-    assert_equal df.version, json['version']
+    assert_equal df.id, json['data']['id'].to_i
+    assert_equal 'fish flop', json['data']['attributes']['title']
+    assert_equal 'testing json description', json['data']['attributes']['description']
+    assert_equal df.version, json['data']['attributes']['version']
   end
 
   test 'landing page for hidden item' do
@@ -2189,28 +2217,68 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'filtering for sample association form' do
     person = Factory(:person)
-    d1 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: 'fish')
-    d2 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: 'frog')
-    d3 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
-    d4 = Factory(:data_file, contributor: person.user, policy: Factory(:public_policy), title: 'no samples')
+    d1 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'fish')
+    d2 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'frog')
+    d3 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
+    d4 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'no samples')
     [d1, d2, d3].each do |data_file|
       Factory(:sample, originating_data_file_id: data_file.id)
     end
     login_as(person.user)
 
-    get :filter, filter: '', with_samples: true
+    get :filter, filter: 'no'
+    assert_select 'a', text: /no samples/, count: 1
+    assert_response :success
+
+    get :filter, filter: '', with_samples: 'true'
     assert_select 'a', count: 3
     assert_select 'a', text: /no samples/, count: 0
     assert_response :success
 
-    get :filter, filter: 'f', with_samples: true
+    get :filter, filter: 'f', with_samples: 'true'
     assert_select 'a', count: 2
     assert_select 'a', text: /fish/
     assert_select 'a', text: /frog/
 
-    get :filter, filter: 'fi', with_samples: true
+    get :filter, filter: 'fi', with_samples: 'true'
     assert_select 'a', count: 1
     assert_select 'a', text: /fish/
+  end
+
+
+  test 'filtering using other fields in association form' do
+    person = Factory(:person)
+    project1 = person.projects.first
+
+    person2 = Factory(:person)
+    project2 = person2.projects.first
+
+    d1 = Factory(:data_file, projects: [project1], contributor: person.user, policy: Factory(:public_policy), title: 'datax1a')
+    d2 = Factory(:data_file, projects: [project1], contributor: person.user, policy: Factory(:public_policy), title: 'datax1b')
+    d3 = Factory(:data_file, projects: [project2], contributor: person2.user, policy: Factory(:public_policy), title: 'datax2a')
+    d4 = Factory(:data_file, projects: [project2], contributor: person2.user, policy: Factory(:public_policy), title: 'datax2b', simulation_data: true)
+
+    login_as(person.user)
+
+    get :filter, filter: 'datax'
+    assert_select 'a', count: 2
+    assert_select 'a', text: /datax1./, count: 2
+    assert_select 'a', text: /datax2./, count: 0
+    assert_response :success
+
+    get :filter, filter: 'datax', all_projects: 'true'
+    assert_select 'a', count: 4
+    assert_select 'a', text: /datax./, count: 4
+    assert_response :success
+
+    get :filter, filter: 'datax', all_projects: 'true', simulation_data: 'true'
+    assert_select 'a', count: 1
+    assert_select 'a', text: /datax2b/, count: 1
+    assert_response :success
+
+    get :filter, filter: 'datax', simulation_data: 'true'
+    assert response.body.blank?
+    assert_response :success
   end
 
   test 'programme data files through nested routing' do
@@ -2447,12 +2515,19 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'can get citation for data file with DOI' do
     doi_citation_mock
-    data_file = Factory(:data_file, policy: Factory(:public_policy), doi: '10.5072/test')
+    data_file = Factory(:data_file, policy: Factory(:public_policy))
+
     login_as(data_file.contributor)
 
     get :show, id: data_file
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+
+    data_file.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
+
+    get :show, id: data_file
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
   end
 
   test 'resource count stats' do
@@ -2540,6 +2615,38 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div#openbis-details', count: 1
   end
 
+  test 'show openbis datafile with rich metadata' do
+    mock_openbis_calls
+    login_as(Factory(:person))
+    df = openbis_linked_data_file
+
+    get :show, id: df.id
+    assert_response :success
+    assert assigns(:data_file)
+    assert_equal df, assigns(:data_file)
+    assert_select 'div#openbis-details-properties', count: 1
+    assert_select 'div#openbis-details-properties label', text: 'SEEK_DATAFILE_ID:', count: 1
+  end
+
+  test 'get data_file as json gives openbis details' do
+    skip('json endpoint underdeveloppment, has changed since my edit')
+    mock_openbis_calls
+    login_as(Factory(:person))
+    df = openbis_linked_data_file
+    get :show, id: df, format: 'json'
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal df.id, json['id']
+    assert_equal 'OpenBIS 20160210130454955-23', json['title']
+    #assert_equal nil, json['description']
+    assert_equal df.version, json['version']
+    bis = json['openbis_dataset']
+    assert_not_nil bis
+    assert_equal 'DataFile_3', bis['properties']['SEEK_DATAFILE_ID']
+    assert_equal '20151216143716562-2', bis['experiment']
+
+  end
+
   test "associated assays don't cause 500 error if create fails" do
     mock_http
     data_file, blob = valid_data_file_with_http_url
@@ -2586,6 +2693,24 @@ class DataFilesControllerTest < ActionController::TestCase
     get :download, id: data_file
     assert_equal 'qwe', @response.body
     assert_response :success
+  end
+
+  test 'should unset policy sharing scope when updated' do
+    login_as(:datafile_owner)
+    df = data_files(:editable_data_file)
+    df.policy.update_column(:sharing_scope, Policy::ALL_USERS)
+
+    assert_equal df.reload.policy.sharing_scope, Policy::ALL_USERS
+
+    put :update, id: df, data_file: { title: df.title }, policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
+
+    assert_redirected_to data_file_path(df)
+    assert_nil df.reload.policy.sharing_scope
+  end
+
+  def edit_max_object(df)
+    add_tags_to_test_object(df)
+    add_creator_to_test_object(df)
   end
 
   private
@@ -2667,7 +2792,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def valid_data_file
-    [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data: file_for_upload }]
+    [{ title: 'Test',simulation_data:'0', project_ids: [projects(:sysmo_project).id] }, { data: file_for_upload }]
   end
 
   def valid_data_file_with_http_url

@@ -3,14 +3,18 @@
 <div class="row">
   <div class="col-sm-6">
     <%= list_item_authorized_attribute t('person_responsible').capitalize, resource.person_responsible %>
+    <%= list_item_snapshot_list resource %>
+    <%= list_item_doi(resource) %>
   </div>
 
   <div class="col-sm-6 hidden-xs">
     <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true  %>
+    <%= list_item_authorized_list resource.assays, t('assays.assay').pluralize %>
   </div>
 </div>
 
-<%= list_item_authorized_list resource.assays, t('assays.assay').pluralize %>
+
+
 <div class="hidden-xs">
   <%= scales_list_for_list_item resource %>
 </div>

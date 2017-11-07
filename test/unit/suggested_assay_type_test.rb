@@ -19,7 +19,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
 
   test 'its only one parent is either from ontology or from suggested assay types' do
     # ontology parent
-    uri = 'http://www.mygrid.org.uk/ontology/JERMOntology#Gene_expression_profiling'
+    uri = 'http://jermontology.org/ontology/JERMOntology#Gene_expression_profiling'
     ontology_class = Seek::Ontologies::AssayTypeReader.instance.class_hierarchy.hash_by_uri[uri]
     at = Factory :suggested_assay_type, ontology_uri: uri
     assert_equal 1, at.parents.count
@@ -39,19 +39,19 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
 
   test 'all term types' do
     types = SuggestedAssayType.all_term_types
-    assert_equal %w(assay modelling_analysis), types.sort
+    assert_equal %w[assay modelling_analysis], types.sort
   end
 
   test 'ontology_parent' do
-    type = Factory(:suggested_assay_type, parent_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics')
+    type = Factory(:suggested_assay_type, parent_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
     parent = type.ontology_parent
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', parent.uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', parent.uri
     assert_equal 'Fluxomics', parent.label
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', type.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', type.ontology_uri
   end
 
   test 'term type' do
-    type = Factory(:suggested_assay_type, parent_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics')
+    type = Factory(:suggested_assay_type, parent_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics')
     assert_equal 'assay', type.term_type
   end
 
@@ -64,7 +64,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'assays' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics'
+    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     child1 = Factory :suggested_assay_type, parent: top, ontology_uri: nil
     child2 = Factory :suggested_assay_type, parent: child1, ontology_uri: nil
 
@@ -81,14 +81,14 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'parent cannot be self' do
-    child = Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics'
+    child = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     assert child.valid?
     child.parent = child
     refute child.valid?
   end
 
   test 'parent cannot be a child' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics'
+    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     child1 = Factory :suggested_assay_type, parent: top
     child2 = Factory :suggested_assay_type, parent: child1
     child3 = Factory :suggested_assay_type, parent: child2
@@ -109,7 +109,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'all children' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics'
+    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     child1 = Factory :suggested_assay_type, parent: top
     child2 = Factory :suggested_assay_type, parent: child1
     child3 = Factory :suggested_assay_type, parent: child2
@@ -121,7 +121,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'children' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics'
+    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     child1 = Factory :suggested_assay_type, parent: top
     child2 = Factory :suggested_assay_type, parent: child1
     child3 = Factory :suggested_assay_type, parent: child2
@@ -138,13 +138,13 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'traverse hierarchy for parent' do
-    parent = Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics'
+    parent = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     child = Factory :suggested_assay_type, parent: parent, ontology_uri: nil
     child_child = Factory :suggested_assay_type, parent: child, ontology_uri: nil
     ontology_parent = parent.parent
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', parent.ontology_uri
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', child.ontology_uri
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', child_child.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', parent.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', child.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', child_child.ontology_uri
     assert_equal ontology_parent, parent.ontology_parent
     assert_equal ontology_parent, child.ontology_parent
     assert_equal ontology_parent, child_child.ontology_parent
@@ -180,7 +180,7 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'join parent and children after destroy' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics'
+    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     child1 = Factory :suggested_assay_type, parent: top
     child2 = Factory :suggested_assay_type, parent: child1
     child3 = Factory :suggested_assay_type, parent: child2
@@ -205,28 +205,74 @@ class SuggestedAssayTypeTest < ActiveSupport::TestCase
   end
 
   test 'updates new parent ontology uri when deleting old parent' do
-    top = Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics'
+    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     child1 = Factory :suggested_assay_type, parent: top, ontology_uri: nil
     child2 = Factory :suggested_assay_type, parent: child1, ontology_uri: nil
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', top.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', top.ontology_uri
     assert_nil child1[:ontology_uri]
     assert_nil child2[:ontology_uri]
 
     top.destroy
     child1.reload
     child2.reload
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', child1.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', child1.ontology_uri
     assert_nil child2[:ontology_uri]
 
     # check it only affects the children when the item being destroyed hangs from an ontology term
-    top = Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics'
+    top = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
     child1 = Factory :suggested_assay_type, parent: top, ontology_uri: nil
     child2 = Factory :suggested_assay_type, parent: child1, ontology_uri: nil
 
     child1.destroy
     top.reload
     child2.reload
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', top.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', top.ontology_uri
     assert_nil child2[:ontology_uri]
+  end
+
+  test 'updating a suggested assay type should update associated assays' do
+    type = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = Factory(:experimental_assay, suggested_assay_type: type)
+    assay2 = Factory(:experimental_assay, suggested_assay_type: type)
+
+    type.reload
+    assert_equal [assay, assay2].sort, type.assays.sort
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay2.assay_type_uri
+
+    Delayed::Job.destroy_all
+
+    type.ontology_uri = 'http://wibble.com/ontology#fish'
+    type.save!
+    assay.reload
+    assay2.reload
+
+    assert_equal 'http://wibble.com/ontology#fish', assay.assay_type_uri
+    assert_equal 'http://wibble.com/ontology#fish', assay2.assay_type_uri
+
+    # checks that rdf generation jobs have been created, to update the RDF for the assays
+    rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}
+    assert_equal 2,rdfjobs.count
+    assert_equal [assay,assay2].sort,rdfjobs.collect{|j| j.payload_object.item}.sort
+  end
+
+  test 'assay adopts ontology uri if suggested type destroyed' do
+    type = Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = Factory(:experimental_assay, suggested_assay_type: type)
+    type.reload
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
+
+    Delayed::Job.destroy_all
+
+    type.destroy
+    assay.reload
+
+    assert_nil assay.suggested_assay_type
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.assay_type_uri
+
+    # checks that rdf generation jobs have been created, to update the RDF for the assays
+    rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}
+    assert_equal 1,rdfjobs.count
+    assert_equal assay,rdfjobs.first.payload_object.item
   end
 end

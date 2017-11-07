@@ -1,0 +1,24 @@
+{
+    "data": {
+        "attributes": {
+            "title": "An interesting event 27",
+            "description": "The opening event",
+            "url": null,
+            "address": null,
+            "city": null,
+            "country": null,
+            "start_date": "2017-08-26T21:29:00.000Z",
+            "end_date": "2017-08-30T21:29:00.000Z"
+        },
+        "relationships": {
+            "projects": {
+                "data": [
+                    {
+                        "id": "1",
+                        "type": "projects"
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -26,7 +26,7 @@ module Seek
       end
 
       def ro_package_path_id_fragment(item = self)
-        "#{item.id}-#{item.title[0..128].parameterize}"
+        "#{item.id}-#{item.title.parameterize[0..49]}"
       end
 
       # whether an item is permitted to be included within a research objec

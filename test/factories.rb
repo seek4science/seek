@@ -9,6 +9,20 @@ end
 Factory.define(:admin_defined_role_programme, class: AdminDefinedRoleProgramme) do |_f|
 end
 
+Factory.define(:min_person, class: Person) do |f|
+  f.email "minimal_person@email.com"
+  f.last_name "Minimal"
+end
+
+Factory.define(:max_person, class: Person) do |f|
+  f.first_name "Maximilian"
+  f.last_name "Maxi-Mum"
+  f.description "A person with all possible details"
+  f.web_page "http://www.website.com"
+  f.orcid "https://orcid.org/0000-0001-9842-9718"
+  f.email "maximal_person@email.com"
+end
+
 Factory.define(:brand_new_person, class: Person) do |f|
   f.sequence(:email) { |n| "test#{n}@test.com" }
   f.sequence(:first_name) { |n| "Person#{n}" }
@@ -128,15 +142,51 @@ Factory.define(:programme) do |f|
   end
 end
 
+Factory.define(:min_programme, class: Programme) do |f|
+  f.title "A Minimal Programme"
+end
+
+Factory.define(:max_programme, class: Programme) do |f|
+  f.title "A Maximal Programme"
+  f.description "A very exciting programme"
+  f.web_page "http://www.synbiochem.co.uk"
+  f.funding_details "Someone is funding this for me"
+  f.projects { [Factory.build(:project)] }
+end
+
 # Project
 Factory.define(:project) do |f|
   f.sequence(:title) { |n| "A Project: -#{n}" }
+end
+
+Factory.define(:min_project, class: Project) do |f|
+  f.title "A Minimal Project"
+end
+
+Factory.define(:max_project, class: Project) do |f|
+  f.title "A Maximal Project"
+  f.description "A Taverna project"
+  f.web_page "http://www.taverna.org.uk"
+  f.wiki_page "http://www.mygrid.org.uk"
 end
 
 # Institution
 Factory.define(:institution) do |f|
   f.sequence(:title) { |n| "An Institution: #{n}" }
   f.country { ISO3166::Country.all.sample.name }
+end
+
+Factory.define(:min_institution, class: Institution) do |f|
+  f.title "A Minimal Institution"
+  f.country "Germany"
+end
+
+Factory.define(:max_institution, class: Institution) do |f|
+  f.title "A Maximal Institution"
+  f.country "United Kingdom"
+  f.city "Manchester"
+  f.address "Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"
+  f.web_page "http://www.mib.ac.uk/"
 end
 
 # Sop
@@ -153,6 +203,23 @@ Factory.define(:sop) do |f|
       sop.content_blob.asset_version = sop.version
       sop.content_blob.save
     end
+  end
+end
+
+Factory.define(:min_sop, class: Sop) do |f|
+  f.title 'A Minimal Sop'
+  f.projects { [Factory.build(:min_project)] }
+  f.after_create do |sop|
+    sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
+  end
+end
+
+Factory.define(:max_sop, class: Sop) do |f|
+  f.title 'A Maximal Sop'
+  f.description 'How to run a simulation in GROMACS'
+  f.projects { [Factory.build(:max_project)] }
+  f.after_create do |sop|
+    sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
   end
 end
 
@@ -224,18 +291,18 @@ end
 
 Factory.define(:suggested_technology_type) do |f|
   f.sequence(:label) { |n| "A TechnologyType#{n}" }
-  f.ontology_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type'
+  f.ontology_uri 'http://jermontology.org/ontology/JERMOntology#Technology_type'
 end
 
 Factory.define(:suggested_assay_type) do |f|
   f.sequence(:label) { |n| "An AssayType#{n}" }
-  f.ontology_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type'
+  f.ontology_uri 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type'
   f.after_build { |type| type.term_type = 'assay' }
 end
 
 Factory.define(:suggested_modelling_analysis_type, class: SuggestedAssayType) do |f|
   f.sequence(:label) { |n| "An Modelling Analysis Type#{n}" }
-  f.ontology_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type'
+  f.ontology_uri 'http://jermontology.org/ontology/JERMOntology#Model_analysis_type'
   f.after_build { |type| type.term_type = 'modelling_analysis' }
 end
 
@@ -255,6 +322,7 @@ end
 Factory.define(:experimental_assay_class, class: AssayClass) do |f|
   f.title I18n.t('assays.experimental_assay')
   f.key 'EXP'
+  f.description "An experimental assay class description"
 end
 
 Factory.define(:modelling_assay, parent: :assay_base) do |f|
@@ -266,8 +334,8 @@ Factory.define(:modelling_assay_with_organism, parent: :modelling_assay) do |f|
 end
 Factory.define(:experimental_assay, parent: :assay_base) do |f|
   f.association :assay_class, factory: :experimental_assay_class
-  f.assay_type_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type'
-  f.technology_type_uri 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type'
+  f.assay_type_uri 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type'
+  f.technology_type_uri 'http://jermontology.org/ontology/JERMOntology#Technology_type'
 end
 
 Factory.define(:assay, parent: :modelling_assay) {}
@@ -277,6 +345,19 @@ Factory.define :assay_asset do |f|
   f.association :asset, factory: :data_file
 end
 
+Factory.define(:min_assay, class: Assay) do |f|
+  f.title "A Minimal Assay"
+  f.association :assay_class, factory: :experimental_assay_class
+  f.association :study, factory: :min_study
+end
+
+Factory.define(:max_assay, class: Assay) do |f|
+  f.title "A Maximal Assay"
+  f.description "A Western Blot Assay"
+  f.association :assay_class, factory: :experimental_assay_class
+  f.association :study, factory: :max_study
+end
+
 # Study
 Factory.define(:study) do |f|
   f.sequence(:title) { |n| "Study#{n}" }
@@ -284,11 +365,34 @@ Factory.define(:study) do |f|
   f.association :contributor, factory: :person
 end
 
+Factory.define(:min_study, class: Study) do |f|
+  f.title "A Minimal Study"
+  f.association :investigation, factory: :min_investigation
+end
+
+Factory.define(:max_study, class: Study) do |f|
+  f.title "A Maximal Study"
+  f.description "The Study of many things"
+  f.experimentalists "Wet lab people"
+  f.association :investigation, factory: :max_investigation
+end
+
 # Investigation
 Factory.define(:investigation) do |f|
   f.projects { [Factory.build(:project)] }
   f.sequence(:title) { |n| "Investigation#{n}" }
   f.association :contributor, factory: :person
+end
+
+Factory.define(:min_investigation, class: Investigation) do |f|
+  f.title "A Minimal Investigation"
+  f.projects { [Factory.build(:min_project)] }
+end
+
+Factory.define(:max_investigation, class: Investigation) do |f|
+  f.title "A Maximal Investigation"
+  f.projects { [Factory.build(:project)] }
+  f.description "Investigation of the Human Genome"
 end
 
 # Strain
@@ -299,6 +403,11 @@ Factory.define(:strain) do |f|
   f.association :contributor, factory: :person
 end
 
+Factory.define(:min_strain, class: Strain) do |f|
+  f.title 'A Minimal Strain'
+  f.association :organism, factory: :min_organism
+  f.projects {[Factory.build(:min_project)]}
+end
 # Culture growth type
 Factory.define(:culture_growth_type) do |f|
   f.title 'a culture_growth_type'
@@ -329,6 +438,23 @@ Factory.define(:data_file) do |f|
       data_file.content_blob.asset_version = data_file.version
       data_file.content_blob.save
     end
+  end
+end
+
+Factory.define(:min_datafile, class: DataFile) do |f|
+  f.title 'A Minimal DataFile'
+  f.projects { [Factory.build(:min_project)] }
+  f.after_create do |data_file|
+    data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+  end
+end
+
+Factory.define(:max_datafile, class: DataFile) do |f|
+  f.title 'A Maximal DataFile'
+  f.description 'Results - Sampling conformations of ATP-Mg inside the binding pocket'
+  f.projects { [Factory.build(:max_project)] }
+  f.after_create do |data_file|
+    data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
   end
 end
 
@@ -368,6 +494,24 @@ Factory.define(:model) do |f|
   f.association :contributor, factory: :person
   f.after_create do |model|
     model.content_blobs = [Factory.create(:cronwright_model_content_blob, asset: model, asset_version: model.version)] if model.content_blobs.blank?
+  end
+end
+
+Factory.define(:min_model, class: Model) do |f|
+  f.title 'A Minimal Model'
+  f.projects { [Factory.build(:min_project)] }
+end
+
+Factory.define(:max_model, class: Model) do |f|
+  f.title 'A Maximal Model'
+  f.description 'Hidden Markov Model'
+  f.projects { [Factory.build(:max_project)] }
+  f.after_create do |model|
+    model.content_blobs = [Factory.create(:cronwright_model_content_blob,
+                                          asset: model, asset_version: model.version),
+                           Factory.create(:rightfield_content_blob,
+                                          asset: model,
+                                          asset_version: model.version)] if model.content_blobs.blank?
   end
 end
 
@@ -467,6 +611,23 @@ Factory.define(:publication) do |f|
   f.association :contributor, factory: :person
 end
 
+Factory.define(:min_publication, class: Publication) do |f|
+  f.title 'A Minimal Publication'
+  f.projects { [Factory.build(:min_project)] }
+end
+
+Factory.define(:max_publication, class: Publication) do |f|
+  f.title 'A Maximal Publication'
+  f.journal 'Journal of Molecular Biology'
+  f.published_date '2017-10-10'
+  f.doi 'http://dx.doi.org/10.5072/abcd'
+  f.pubmed_id '873864488'
+  f.citation 'JMB Oct 2017, 12:234-245'
+  f.publication_authors {[Factory(:publication_author), Factory(:publication_author)]}
+  f.abstract 'Amazing insights into the mechanism of TF2'
+  f.projects { [Factory.build(:max_project)] }
+end
+
 # Presentation
 Factory.define(:presentation) do |f|
   f.sequence(:title) { |n| "A Presentation #{n}" }
@@ -480,6 +641,23 @@ Factory.define(:presentation) do |f|
       presentation.content_blob.asset_version = presentation.version
       presentation.content_blob.save
     end
+  end
+end
+
+Factory.define(:min_presentation, class: Presentation) do |f|
+  f.title 'A Minimal Presentation'
+  f.projects { [Factory.build(:min_project)] }
+ f.after_create do |presentation|
+   presentation.content_blob = Factory.create(:min_content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
+ end
+end
+
+Factory.define(:max_presentation, class: Presentation) do |f|
+  f.title 'A Maximal Presentation'
+  f.description 'Non-equilibrium Free Energy Calculations and their caveats'
+  f.projects { [Factory.build(:max_project)] }
+  f.after_create do |presentation|
+    presentation.content_blob = Factory.create(:min_content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
   end
 end
 
@@ -639,6 +817,17 @@ Factory.define(:organism) do |f|
   f.title 'An Organism'
 end
 
+Factory.define(:min_organism, class: Organism) do |f|
+  f.title 'A Minimal Organism'
+end
+
+Factory.define(:max_organism, class: Organism) do |f|
+  f.title 'A Maximal Organism'
+  f.projects { [Factory.build(:max_project)] }
+  f.concept_uri 'https://identifiers.org/taxonomy/9606'
+  f.ontology_id "23"
+end
+
 Factory.define(:bioportal_concept) do |f|
   f.ontology_id 'NCBITAXON'
   f.concept_uri 'http://purl.obolibrary.org/obo/NCBITaxon_2287'
@@ -650,6 +839,24 @@ Factory.define(:event) do |f|
   f.end_date 1.days.from_now
   f.projects { [Factory.build(:project)] }
   f.association :contributor, factory: :person
+end
+
+Factory.define(:min_event, class: Event) do |f|
+  f.title 'A Minimal Event'
+  f.start_date "2017-01-01T00:01:00.000Z"
+  f.projects { [Factory.build(:min_project)] }
+end
+
+Factory.define(:max_event, class: Event) do |f|
+  f.title 'A Maximal Event'
+  f.description 'All you ever wanted to know about headaches'
+  f.url 'http://www.headache-center.org'
+  f.city 'Heidelberg'
+  f.country 'Germany'
+  f.address 'Sofienstr 2'
+  f.start_date "2017-01-01T00:20:00.000Z"
+  f.end_date "2017-01-01T00:22:00.000Z"
+  f.projects { [Factory.build(:max_project)] }
 end
 
 Factory.define(:saved_search) do |f|
@@ -667,6 +874,11 @@ Factory.define(:content_blob) do |f|
   f.sequence(:original_filename) { |n| "file-#{n}" }
 end
 
+Factory.define(:min_content_blob, class: ContentBlob) do |f|
+  f.sequence(:uuid) { UUID.generate }
+  f.data 'Min Data'
+  f.original_filename 'min file'
+end
 Factory.define(:url_content_blob, parent: :content_blob) do |f|
   f.url 'http://www.abc.com'
   f.data nil
@@ -999,6 +1211,10 @@ end
 
 Factory.define :expertise, parent: :annotation do |f|
   f.attribute_name 'expertise'
+end
+
+Factory.define :funding_code, parent: :annotation do |f|
+  f.attribute_name 'funding_code'
 end
 
 Factory.define :tool, parent: :annotation do |f|
@@ -1358,4 +1574,22 @@ Factory.define(:openbis_endpoint) do |f|
   f.password 'apiuser'
   f.space_perm_id 'API-SPACE'
   f.association :project, factory: :project
+end
+
+Factory.define(:validation_data_relationship_type, class:RelationshipType) do |f|
+  f.title 'Validation data'
+  f.key RelationshipType::VALIDATION
+  f.description 'Data used for validating a model'
+end
+
+Factory.define(:simulation_data_relationship_type, class:RelationshipType) do |f|
+  f.title 'Simulation results'
+  f.key RelationshipType::SIMULATION
+  f.description 'Data resulting from running a model simulation'
+end
+
+Factory.define(:construction_data_relationship_type, class:RelationshipType) do |f|
+  f.title 'Construction data'
+  f.key RelationshipType::CONSTRUCTION
+  f.description 'Data used for model testing'
 end

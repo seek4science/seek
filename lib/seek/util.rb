@@ -7,7 +7,7 @@ module Seek
     def self.remove_rails_special_params_from(params, additional_to_remove = [])
       return {} if params.blank?
 
-      special_params = %w( id format controller action commit ).concat(additional_to_remove)
+      special_params = %w[id format controller action commit].concat(additional_to_remove)
       params.reject { |k, _v| special_params.include?(k.to_s.downcase) }
     end
 
@@ -112,14 +112,14 @@ module Seek
         persistent_classes.select(&:supports_doi?).sort_by(&:name)
       end
     end
-	
+
     # determines the batch size for bulk inserts, as sqlite3 below version 3.7.11 doesn't handle it and requires a size
     # of 1
     def self.bulk_insert_batch_size
       cache('bulk_insert_batch_size') do
-        default_size=100
-        if database_type =='sqlite3' && !sqlite3_supports_bulk_inserts
-          Rails.logger.info("Sqlite3 version < 3.7.11 detected, so using single rather than bulk inserts")
+        default_size = 100
+        if database_type == 'sqlite3' && !sqlite3_supports_bulk_inserts
+          Rails.logger.info('Sqlite3 version < 3.7.11 detected, so using single rather than bulk inserts')
           1
         else
           default_size
@@ -147,8 +147,11 @@ module Seek
 
     def self.cache(name, &block)
       @@cache ||= {}
-      @@cache = {} if Rails.env.development? # Don't use caching in development mode
-      @@cache[name] ||= block.call
+      if Rails.env.development? # Don't use caching in development mode
+        block.call
+      else
+        @@cache[name] ||= block.call
+      end
     end
   end
 end

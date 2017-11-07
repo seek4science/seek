@@ -36,17 +36,25 @@ module AssociationsHelper
       end
   end
 
+  def association_select_filter
+    text_field_tag(:filter, nil, class: 'form-control', 'data-role' => 'seek-association-filter-field',
+                   placeholder: 'Type to filter...',
+                   autocomplete: 'off')
+  end
+
+  def association_select_results(options = {}, &_block)
+    content_tag(:div, class: 'list-group association-candidate-list',
+                data: { role: 'seek-association-candidate-list',
+                        multiple: options.delete(:multiple) || 'false' }) do
+      yield if block_given?
+    end
+  end
+
   def filterable_association_select(filter_url, options = {}, &_block)
     options.reverse_merge!(multiple: false)
-    content_tag(:div, class: 'form-group') do
-      text_field_tag(nil, nil, class: 'form-control', 'data-role' => 'seek-association-filter',
-                               placeholder: 'Type to filter...',
-                               autocomplete: 'off', 'data-filter-url' => filter_url) +
-        content_tag(:div, class: 'list-group association-candidate-list',
-                          data: { role: 'seek-association-candidate-list',
-                                  multiple: options.delete(:multiple) || 'false' }) do
-          yield
-        end
+    content_tag(:div, class: 'form-group', 'data-role' => 'seek-association-filter-group', 'data-filter-url' => filter_url) do
+      association_select_filter +
+      association_select_results(options = {}) { yield }
     end
   end
 

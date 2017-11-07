@@ -1,12 +1,50 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
+  include RestTestCases
 
   def setup
     login_as(:quentin)
+  end
+
+  # Is this still needed?
+  def rest_api_test_object
+    Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+  end
+
+  test 'should resolve to json' do
+    sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    blob = sop.content_blob
+
+    get :show, id: blob.id, sop_id: sop.id, format: 'json'
+    assert_response :success
+    perform_jsonapi_checks
+  end
+
+  test 'html and xml not acceptable' do
+    sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    blob = sop.content_blob
+
+    get :show, id: blob.id, sop_id: sop.id
+    assert_response :not_acceptable
+
+    get :show, id: blob.id, sop_id: sop.id, format: 'xml'
+    assert_response :not_acceptable
+
+    get :show, id: blob.id, sop_id: sop.id, format: 'rdf'
+    assert_response :not_acceptable
+  end
+
+  test 'should fail for unauthorized json' do
+    sop = Factory(:pdf_sop, policy: Factory(:private_policy))
+    blob = sop.content_blob
+
+    get :show, id: blob.id, sop_id: sop.id, format: 'json'
+    assert_response :forbidden
   end
 
   test 'should find_and_auth_asset for get_pdf' do
@@ -19,6 +57,41 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :get_pdf, sop_id: sop2.id, id: sop2.content_blob.id
     assert_redirected_to sop2
     assert_not_nil flash[:error]
+  end
+
+  def test_index_json
+    # nothing to do, no indexes for content blobs
+  end
+
+  def test_show_json(object = rest_api_test_object)
+    get :show, id: object.content_blob, sop_id: object, format: 'json'
+
+    perform_jsonapi_checks
+
+    #check meta doesn't include created_at and updated_at
+    json = JSON.parse(response.body)
+    refute_nil json['data']
+    refute_nil json['data']['meta']
+    assert_equal ['api_version','base_url','uuid'], json['data']['meta'].keys.sort
+  end
+
+  def test_response_code_for_not_available
+    sop = rest_api_test_object
+    id = 9999
+    id += 1 until ContentBlob.find_by_id(id).nil?
+
+    # blob not found
+    get :show, sop_id: sop.id, id: id, format: 'json'
+    assert_response :not_found
+
+    # asset not found
+    id += 1 until Sop.find_by_id(id).nil?
+    get :show, sop_id: id, id: sop.content_blob.id, format: 'json'
+    assert_response :not_found
+
+    # asset not found for blob
+    get :show, sop_id: Factory(:sop, policy: Factory(:public_policy)), id: sop.content_blob.id, format: 'json'
+    assert_response :not_found
   end
 
   test 'examine url to file' do
@@ -136,6 +209,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :get_pdf, sop_id: sop1.id, id: sop1.content_blob.id
     assert_response :success
 
+    # don't match
     get :get_pdf, sop_id: sop1.id, id: sop2.content_blob.id
     assert_redirected_to :root
     assert_not_nil flash[:error]
@@ -148,6 +222,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :download, sop_id: sop1.id, id: sop1.content_blob.id
     assert_response :success
 
+    # don't match
     get :download, sop_id: sop1.id, id: sop2.content_blob.id
     assert_redirected_to :root
     assert_not_nil flash[:error]
@@ -160,7 +235,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :download, model_id: model.id, id: model.content_blobs.first.id
     end
     assert_response :success
-    assert_equal "attachment; filename=\"file_with_no_extension\"", @response.header['Content-Disposition']
+    assert_equal 'attachment; filename="file_with_no_extension"', @response.header['Content-Disposition']
     assert_equal 'application/octet-stream', @response.header['Content-Type']
     assert_equal '31', @response.header['Content-Length']
   end
@@ -176,13 +251,28 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :get_pdf, sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id
     assert_response :success
 
-    assert_equal "attachment; filename=\"ms_word_test.pdf\"", @response.header['Content-Disposition']
+    assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
     # assert_equal 16235, @response.header['Content-Length'].to_i
     assert_includes 9200..16_300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 9200-9300 bytes'
 
     assert File.exist?(ms_word_sop.content_blob.filepath)
     assert File.exist?(pdf_path)
+  end
+
+  test 'get_pdf raises exception if soffice not running and conversion is needed' do
+    check_for_soffice
+    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    pdf_path = ms_word_sop.content_blob.filepath('pdf')
+    FileUtils.rm pdf_path if File.exist?(pdf_path)
+    assert !File.exist?(pdf_path)
+    assert ms_word_sop.can_download?
+
+    Seek::Config.stub(:soffice_available?, false) do
+      assert_raises(RuntimeError) do
+        get :get_pdf, sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id
+      end
+    end
   end
 
   test 'get_pdf from url' do
@@ -205,7 +295,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_equal "attachment; filename=\"a_pdf_file.pdf\"", @response.header['Content-Disposition']
+    assert_equal 'attachment; filename="a_pdf_file.pdf"', @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
     assert_equal '8827', @response.header['Content-Length']
 
@@ -229,7 +319,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :get_pdf, sop_id: doc_sop.id, id: doc_sop.content_blob.id
     end
     assert_response :success
-    assert_equal "attachment; filename=\"ms_word_test.pdf\"", @response.header['Content-Disposition']
+    assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
     # assert_equal 16235, @response.header['Content-Length'].to_i
     assert_includes 9200..16_300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 9200-9300 bytes'
@@ -361,7 +451,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :download, data_file_id: df, id: df.content_blob
     end
     assert_response :success
-    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"", @response.header['Content-Disposition']
+    assert_equal 'attachment; filename="small-test-spreadsheet.xls"', @response.header['Content-Disposition']
     assert_equal 'application/excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
@@ -389,11 +479,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should gracefully handle when downloading a unknown host url' do
     mock_http
-    df  = Factory :data_file,
-                  policy: Factory(:all_sysmo_downloadable_policy),
-                  content_blob: Factory(:url_content_blob,
-                                        url: 'http://unknownhost.com/pic.png',
-                                        uuid: UUID.generate)
+    df = Factory :data_file,
+                 policy: Factory(:all_sysmo_downloadable_policy),
+                 content_blob: Factory(:url_content_blob,
+                                       url: 'http://unknownhost.com/pic.png',
+                                       uuid: UUID.generate)
 
     get :download, data_file_id: df, id: df.content_blob
 
@@ -403,11 +493,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   test 'should gracefully handle when downloading a url resulting in 404' do
     mock_http
-    df  = Factory :data_file,
-                  policy: Factory(:all_sysmo_downloadable_policy),
-                  content_blob: Factory(:url_content_blob,
-                                        url: 'http://mocked404.com',
-                                        uuid: UUID.generate)
+    df = Factory :data_file,
+                 policy: Factory(:all_sysmo_downloadable_policy),
+                 content_blob: Factory(:url_content_blob,
+                                       url: 'http://mocked404.com',
+                                       uuid: UUID.generate)
 
     get :download, data_file_id: df, id: df.content_blob
     assert_redirected_to data_file_path(df, version: df.version)
@@ -461,6 +551,25 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_equal "attachment; filename=\"#{first_content_blob.original_filename}\"", @response.header['Content-Disposition']
     assert_equal first_content_blob.content_type, @response.header['Content-Type']
     assert_equal first_content_blob.file_size.to_s, @response.header['Content-Length']
+  end
+
+  test 'should not download private data if url manipulated' do
+    id = [Sop.last.id, DataFile.last.id].max + 1
+    sop = Factory(:sop, id: id, policy: Factory(:public_policy),
+                        content_blob: Factory(:txt_content_blob, data: 'public'))
+    data_file = Factory(:data_file, id: id, policy: Factory(:private_policy),
+                                    content_blob: Factory(:txt_content_blob, data: 'secret'))
+
+    assert_equal sop.id, data_file.id
+    assert sop.can_download?
+    refute data_file.can_download?
+
+    get :download, sop_id: sop.id, id: data_file.content_blob.id
+    assert_not_equal 'secret', response.body.force_encoding(Encoding::UTF_8)
+    assert_response :redirect
+
+    get :download, sop_id: sop.id, id: data_file.content_blob.id, format: 'json'
+    assert_response :not_found
   end
 
   private

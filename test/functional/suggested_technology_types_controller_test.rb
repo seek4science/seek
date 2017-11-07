@@ -30,7 +30,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
 
   test 'should create with suggested parent' do
     login_as Factory(:admin)
-    suggested = Factory(:suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography')
+    suggested = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography')
     assert suggested.children.empty?
     assert_difference('SuggestedTechnologyType.count') do
       post :create, suggested_technology_type: { label: 'test tech type', parent_uri: "suggested_technology_type:#{suggested.id}" }
@@ -45,10 +45,10 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     login_as Factory(:admin)
 
     assert_difference('SuggestedTechnologyType.count') do
-      post :create, suggested_technology_type: { label: 'test tech type', parent_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography' }
+      post :create, suggested_technology_type: { label: 'test tech type', parent_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography' }
     end
     assert_redirected_to action: :index
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography', SuggestedTechnologyType.last.parent.uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', SuggestedTechnologyType.last.parent.uri
     get :index
     assert_select 'li a', text: /test tech type/
   end
@@ -66,7 +66,7 @@ class SuggestedTechnologyTypesControllerTest < ActionController::TestCase
     login_as Factory(:admin)
     suggested_parent1 = Factory(:suggested_technology_type)
     suggested_parent2 = Factory(:suggested_technology_type)
-    ontology_parent_uri = 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography'
+    ontology_parent_uri = 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography'
 
     suggested_technology_type = Factory(:suggested_technology_type, contributor_id: User.current_user.person.try(:id), parent_id: suggested_parent1.id)
     assert_equal 1, suggested_technology_type.parents.size

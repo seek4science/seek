@@ -78,6 +78,15 @@ class SampleAttribute < ActiveRecord::Base
     { "#{title}" => controlled_vocab_labels }
   end
 
+  def resolve(value)
+    if sample_attribute_type.resolution.present? && sample_attribute_type.regexp.present?
+      resolution = value.sub(Regexp.new(sample_attribute_type.regexp), sample_attribute_type.resolution)
+    else
+      resolution = nil
+    end
+    resolution
+  end
+
   private
 
   def generate_accessor_name
@@ -112,4 +121,5 @@ class SampleAttribute < ActiveRecord::Base
       errors.add(:sample_controlled_vocab, 'Linked Sample Type must be set if attribute type is SeekSample')
     end
   end
+
 end

@@ -3,7 +3,7 @@ require 'rdf'
 module Seek
   module Ontologies
     class TechnologyTypeReader < OntologyReader
-      TERM_TYPE = 'technology'
+      TERM_TYPE = 'technology'.freeze
 
       def default_parent_class_uri
         RDF::URI.new(Seek::Config.technology_type_base_uri)

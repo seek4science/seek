@@ -36,6 +36,42 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'rdf generation job created after policy change' do
+    item = Factory(:sop, policy: Factory(:public_policy))
+    Delayed::Job.delete_all
+
+    handlers = Delayed::Job.all.collect(&:handler).join(',')
+    refute_includes(handlers, 'RdfGenerationJob')
+
+    item.policy.access_type = Policy::NO_ACCESS
+    disable_authorization_checks do
+      assert_difference('Delayed::Job.count', 1) do
+        item.policy.save!
+      end
+    end
+
+    handlers = Delayed::Job.all.collect(&:handler).join(',')
+    assert_includes(handlers, 'RdfGenerationJob')
+  end
+
+  test 'rdf generation job not created after policy change for non rdf supported entity' do
+    item = Factory(:event, policy: Factory(:public_policy))
+    Delayed::Job.delete_all
+
+    handlers = Delayed::Job.all.collect(&:handler).join(',')
+    refute_includes(handlers, 'RdfGenerationJob')
+
+    item.policy.access_type = Policy::NO_ACCESS
+    disable_authorization_checks do
+      assert_no_difference('Delayed::Job.count') do
+        item.policy.save!
+      end
+    end
+
+    handlers = Delayed::Job.all.collect(&:handler).join(',')
+    refute_includes(handlers, 'RdfGenerationJob')
+  end
+
   test 'create job' do
     item = Factory(:assay)
 
@@ -48,24 +84,37 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     assert_equal 2, job.priority
   end
 
+  test 'skip items that dont support rdf' do
+    item = Factory(:event)
+    refute item.rdf_supported?
+
+    assert_empty RdfGenerationJob.new(item).gather_items
+
+    item = Factory(:sop)
+    assert item.rdf_supported?
+
+    assert_equal [item], RdfGenerationJob.new(item).gather_items
+
+  end
+
   test 'exists' do
     project = Factory(:project)
     project2 = Factory(:project)
 
     Delayed::Job.delete_all
 
-    assert !RdfGenerationJob.new(project, true).exists?
-    assert !RdfGenerationJob.new(project, false).exists?
+    refute RdfGenerationJob.new(project, true).exists?
+    refute RdfGenerationJob.new(project, false).exists?
 
     Delayed::Job.enqueue RdfGenerationJob.new(project, true), priority: 1, run_at: Time.now
     assert RdfGenerationJob.new(project, true).exists?
     assert RdfGenerationJob.new(project, false).exists?, 'should say that it exists, because one already exists with refresh_dependents true'
-    assert !RdfGenerationJob.new(project2, true).exists?
-    assert !RdfGenerationJob.new(project2, false).exists?
+    refute RdfGenerationJob.new(project2, true).exists?
+    refute RdfGenerationJob.new(project2, false).exists?
 
     Delayed::Job.enqueue RdfGenerationJob.new(project2, false), priority: 1, run_at: Time.now
     assert RdfGenerationJob.new(project2, false).exists?
-    assert !RdfGenerationJob.new(project2, true).exists?, "shouldn't reports exists, because one already exists with refresh_dependents false, but this is true"
+    refute RdfGenerationJob.new(project2, true).exists?, "shouldn't reports exists, because one already exists with refresh_dependents false, but this is true"
   end
 
   test 'perform' do
@@ -85,6 +134,31 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     end
     assert_equal item.to_rdf, rdf
     FileUtils.rm expected_rdf_file
-    assert !File.exist?(expected_rdf_file)
+    refute File.exist?(expected_rdf_file)
+  end
+
+  test 'should not allow duplicates' do
+    assay = Factory(:assay)
+    Delayed::Job.delete_all
+    refute RdfGenerationJob.new(assay, false).exists?
+    assert_difference('Delayed::Job.count',1) do
+      RdfGenerationJob.new(assay, false).queue_job
+    end
+
+    assert_no_difference('Delayed::Job.count') do
+      RdfGenerationJob.new(assay, false).queue_job
+    end
+
+    refute RdfGenerationJob.new(assay, true).exists?
+    assert_difference('Delayed::Job.count',1) do
+      RdfGenerationJob.new(assay, true).queue_job
+    end
+
+    assert_no_difference('Delayed::Job.count') do
+      RdfGenerationJob.new(assay, true).queue_job
+    end
+
+
+
   end
 end

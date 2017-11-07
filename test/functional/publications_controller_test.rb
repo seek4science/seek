@@ -736,7 +736,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :query_authors_typeahead, format: :json, full_name: query
     assert_response :success
     authors = JSON.parse(@response.body)
-    assert_equal 0, authors.length
+    assert_equal 0, authors['data'].length
   end
 
   test 'query authors for initilization' do
@@ -784,6 +784,23 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal '10.5072/abcd', assigns(:publication).doi
   end
 
+  def edit_max_object(pub)
+    assay = Factory(:assay, policy: Factory(:public_policy))
+    study = Factory(:study, policy: Factory(:public_policy))
+    inv = Factory(:investigation, policy: Factory(:public_policy))
+    df = Factory(:data_file, policy: Factory(:public_policy))
+    model = Factory(:model, policy: Factory(:public_policy))
+    pr = Factory(:presentation, policy: Factory(:public_policy))
+
+    pub.associate(assay)
+    pub.associate(study)
+    pub.associate(inv)
+    pub.associate(df)
+    pub.associate(model)
+    pub.associate(pr)
+
+  end
+
   private
 
   def publication_for_export_tests
@@ -792,4 +809,6 @@ class PublicationsControllerTest < ActionController::TestCase
                           published_date: 5.days.ago.to_s(:db),
                           pubmed_id: 5)
   end
+
+
 end

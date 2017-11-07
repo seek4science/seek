@@ -308,54 +308,6 @@ module ApplicationHelper
     end
   end
 
-  def favourite_group_popup_link_action_new(resource_type = nil)
-    link_to_remote_redbox("Create new #{t('favourite_group')}",
-                          { url: main_app.new_favourite_group_url,
-                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
-                            with: "'resource_type=' + '#{resource_type}'" },
-                          #:style => options[:style],
-                          id: 'create_new_f_group_redbox',
-                          onclick: 'javascript: currentFavouriteGroupSettings = {};') # ,
-    #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-    #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-  end
-
-  def favourite_group_popup_link_action_edit(resource_type = nil)
-    link_to_remote_redbox("Edit selected #{t('favourite_group')}",
-                          { url: main_app.edit_favourite_group_url,
-                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
-                            with: "'resource_type=' + '#{resource_type}' + '&id=' + selectedFavouriteGroup()" },
-                          #:style => options[:style],
-                          id: 'edit_existing_f_group_redbox',
-                          onclick: 'javascript: currentFavouriteGroupSettings = {};') # ,
-    #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-    #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-  end
-
-  def workgroup_member_review_popup_link(resource_type = nil)
-    link_to_remote_redbox('<b>Review members, set individual<br/>permissions and add afterwards</b>'.html_safe,
-                          { url: main_app.review_work_group_url('type', 'id', 'access_type'),
-                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
-                            with: "'resource_type=' + '#{resource_type}'" },
-                          #:style => options[:style],
-                          id: 'review_work_group_redbox') # ,
-    #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-    #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-  end
-
-  # the parameter must be the *standard* name of the whitelist or blacklist (depending on the link that needs to be produced)
-  # (standard names are defined in FavouriteGroup model)
-  def whitelist_blacklist_edit_popup_link(f_group_name)
-    link_to_remote_redbox('edit',
-                          { url: edit_favourite_group_url,
-                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();" },
-                          #:style => options[:style],
-                          id: "#{f_group_name}_edit_redbox",
-                          onclick: 'javascript: currentFavouriteGroupSettings = {};') # ,
-    #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-    #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-  end
-
   def preview_permission_popup_link(resource)
     locals = {}
     locals[:resource_name] = resource.class.name.underscore

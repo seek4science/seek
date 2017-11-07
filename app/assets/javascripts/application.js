@@ -13,7 +13,6 @@
 //= require bootstrap
 //= require vue/vue
 //= require collapsible_panels
-//= require redbox
 //= require builder
 //= require application_shared
 //= require tagging
