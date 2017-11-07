@@ -64,7 +64,7 @@ module SamplesHelper
   end
 
   def seek_sample_attribute_display(value)
-    sample = Sample.find_by_id(value)
+    sample = Sample.find_by_id(value['id'])
     if sample
       if sample.can_view?
         link_to sample.title, sample
@@ -72,7 +72,7 @@ module SamplesHelper
         content_tag :span, 'Hidden', class: 'none_text'
       end
     else
-      content_tag :span, 'Not found', class: 'none_text'
+      content_tag :span, value['title'], class: 'none_text'
     end
   end
 

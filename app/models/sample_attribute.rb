@@ -5,7 +5,7 @@ class SampleAttribute < ActiveRecord::Base
   #                :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index, :sample_controlled_vocab,
   #                :sample_controlled_vocab_id, :linked_sample_type_id
 
-  belongs_to :sample_attribute_type
+  belongs_to :sample_attribute_type, inverse_of: :sample_attributes
   belongs_to :sample_type, inverse_of: :sample_attributes
   belongs_to :unit
   belongs_to :sample_controlled_vocab, inverse_of: :sample_attributes

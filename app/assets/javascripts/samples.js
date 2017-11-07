@@ -90,8 +90,11 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             options["columnDefs"].push({
                 "targets": seekSampleColumns,
                 "render": function (data, type, row) {
-                    if (data) {
-                        return '<a href="/samples/' + data + '">' + data + '</a>';
+                    if(data && data.id) {
+                        if (data.title)
+                            return '<a href="/samples/' + data.id + '">' + data.title + '</a>';
+                        else
+                            return '<span class="none_text">' + (data.id || data.title) + '</span>';
                     } else {
                         return '<span class="none_text">Not specified</span>';
                     }
