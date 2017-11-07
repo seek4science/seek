@@ -127,6 +127,10 @@ class Person < ActiveRecord::Base
     URI.escape('mailto:' + email)
   end
 
+  def mbox_sha1sum
+    Digest::SHA1.hexdigest(email_uri)
+  end
+
   def studies
     result = studies_for_person
     result = (result | user.studies).compact if user
