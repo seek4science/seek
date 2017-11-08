@@ -4,7 +4,7 @@ class SamplesHelperTest < ActionView::TestCase
   test 'seek sample attribute display' do
     sample = Factory(:sample, policy: Factory(:public_policy))
     assert sample.can_view?
-    value = { id: sample.id, title: sample.title, type: 'Sample' }
+    value = { id: sample.id, title: sample.title, type: 'Sample' }.with_indifferent_access
     display = seek_sample_attribute_display(value)
     tag = HTML::Document.new(display).root.children.first
     assert_equal 'a', tag.name
@@ -14,7 +14,7 @@ class SamplesHelperTest < ActionView::TestCase
     # private sample
     sample = Factory(:sample, policy: Factory(:private_policy))
     refute sample.can_view?
-    value = { id: sample.id, title: sample.title, type: 'Sample' }
+    value = { id: sample.id, title: sample.title, type: 'Sample' }.with_indifferent_access
     display = seek_sample_attribute_display(value)
     tag = HTML::Document.new(display).root.children.first
     assert_equal 'span', tag.name
@@ -22,7 +22,7 @@ class SamplesHelperTest < ActionView::TestCase
     assert_equal 'Hidden', tag.children.first.content
 
     # doesn't exist
-    value = { id: (Sample.max(:id)+1), title: 'Blah', type: 'Sample' }
+    value = { id: (Sample.maximum(:id)+1), title: 'Blah', type: 'Sample' }.with_indifferent_access
     display = seek_sample_attribute_display(value)
     tag = HTML::Document.new(display).root.children.first
     assert_equal 'span', tag.name
