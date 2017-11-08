@@ -21,6 +21,7 @@ namespace :seek do
     rebuild_rdf
     generate_organism_uuids
     strip_weblinks
+    remove_dangling_policies
 
   ]
 
@@ -175,6 +176,13 @@ namespace :seek do
       end
     end
 
+  end
+
+  task(remove_dangling_polices: :environment) do
+    puts "Looking for unused dangling Policies ..."
+    dangling = Policy.all.select{|p| p.associated_items.empty?}
+    puts "#{dangling.count} unused Policies found, which will be deleted"
+    dangling.each(&:destroy)
   end
 
 end
