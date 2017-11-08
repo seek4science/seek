@@ -477,4 +477,11 @@ class Policy < ActiveRecord::Base
   def self.max_public_access_type
     Policy::ACCESSIBLE
   end
+
+  # utility to get all items associated with this policy, which may be any asset or ISA item.
+  def associated_items
+    Seek::Util.authorized_types.collect do |type|
+      type.where(policy_id:id)
+    end.flatten.compact.uniq
+  end
 end
