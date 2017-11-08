@@ -338,4 +338,34 @@ class AssetTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'doi indentifier' do
+    df = Factory :data_file
+    assert_nil df.latest_version.doi_identifier
+    disable_authorization_checks do
+      df.latest_version.update_attribute(:doi,'10.x.x.x/1')
+    end
+    assert_equal 'https://doi.org/10.x.x.x/1',df.latest_version.doi_identifier
+  end
+
+  test 'doi identifiers' do
+    df = Factory :data_file
+    assert_empty df.doi_identifiers
+
+    disable_authorization_checks do
+      df.latest_version.update_attribute(:doi,'10.x.x.x/1')
+      df.save_as_new_version
+      df.save_as_new_version
+      df.reload
+      df.latest_version.update_attribute(:doi,'10.x.x.x/2')
+    end
+
+    assert_equal 3,df.versions.count
+
+    assert_equal ['https://doi.org/10.x.x.x/1','https://doi.org/10.x.x.x/2'].sort,df.doi_identifiers
+
+    #just check others respond to method
+    assert Factory(:model).respond_to?(:doi_identifiers)
+    assert Factory(:sop).respond_to?(:doi_identifiers)
+  end
 end

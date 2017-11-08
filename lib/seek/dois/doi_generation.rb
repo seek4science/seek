@@ -29,11 +29,19 @@ module Seek
 
       def latest_citable_doi
         return nil unless has_doi?
-        versions.where('doi IS NOT NULL').last.doi
+        latest_citable_resource.doi
+      end
+
+      def latest_citable_resource
+        versions.where('doi IS NOT NULL').last
       end
 
       def has_doi?
-        versions.where('doi IS NOT NULL').compact.any?
+        latest_citable_resource.present?
+      end
+
+      def doi_identifiers
+        versions.collect(&:doi_identifier).compact
       end
 
       # minting doi is locked until configuration days since the asset is created

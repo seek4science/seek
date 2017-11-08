@@ -96,6 +96,32 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_empty snapshot.errors
   end
 
+  test 'doi identifier' do
+    datacite_mock
+
+    snapshot = @investigation.create_snapshot
+    doi = snapshot.mint_doi
+    assert_equal "https://doi.org/#{doi}", snapshot.doi_identifier
+  end
+
+  test 'doi identifiers' do
+    datacite_mock
+    dois = []
+
+    snapshot = @investigation.create_snapshot
+    dois << snapshot.mint_doi
+    @investigation.create_snapshot # one without a doi
+    snapshot = @investigation.create_snapshot
+    dois << snapshot.mint_doi
+
+    identifiers = dois.collect{|doi| "https://doi.org/#{doi}"}
+
+    @investigation.reload
+    assert_equal 3,@investigation.snapshots.count
+    assert_equal identifiers.sort, @investigation.doi_identifiers
+
+  end
+
   test 'logs when minting DOI' do
     datacite_mock
 

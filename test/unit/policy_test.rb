@@ -225,4 +225,11 @@ class PolicyTest < ActiveSupport::TestCase
 
     assert_nil Policy.find_by_id(policy.id)
   end
+
+  test 'public? false if sharing scope ALL::USERS' do
+    policy = Factory(:public_policy,sharing_scope:Policy::ALL_USERS, access_type:Policy::ACCESSIBLE)
+    refute policy.public?
+    policy.update_attribute(:sharing_scope,Policy::PRIVATE) # is ignored unless ALL_USERS
+    assert policy.public?
+  end
 end

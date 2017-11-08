@@ -227,7 +227,7 @@ module ResourceListItemHelper
     if resource.respond_to?(:has_doi?) && resource.has_doi?
       content_tag(:p, class: 'list_item_attribute') do
         content = content_tag(:b, 'DOI: ')
-        content << doi_link(resource.latest_citable_doi)
+        content << doi_link(resource.latest_citable_resource)
         content << content_tag(:span, '', class: :doi_icon)
       end
     end

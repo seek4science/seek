@@ -40,6 +40,7 @@ module Seek
             false
           else
             policy.access_type = Policy::ACCESSIBLE
+            policy.sharing_scope = Policy::EVERYONE #anything but ALL_USERS
             policy.save
             # FIXME: may need to add comment
             resource_publish_logs.create(publish_state: ResourcePublishLog::PUBLISHED,
