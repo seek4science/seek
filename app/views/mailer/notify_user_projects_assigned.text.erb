@@ -1,10 +1,10 @@
 Hi <%= @name %>,
 
-You have just joined a <%= t('project') %>.
+You have just joined one or more <%= t('project').pluralize %>.
 
-An administrator, or <%= t('project') %> administrator, has assigned you to the following <%= t('project').pluralize(@projects.size) %>:
+You have been assigned to the following <%= t('project').pluralize(@projects.size) %>:
 <% @projects.each do |project| %>
-    * <%= link_to(project.title,project) -%>
+    * <%= project.title %> - <%= project_url(project) %>
 <% end %>
 
 Regards,
