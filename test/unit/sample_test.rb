@@ -895,6 +895,7 @@ class SampleTest < ActiveSupport::TestCase
     end
 
     assert_includes sample.referenced_strains, strain
+    assert_includes sample.referenced_resources, strain
     assert_includes sample.strains, strain
     assert_includes strain.samples, sample
   end
@@ -914,7 +915,93 @@ class SampleTest < ActiveSupport::TestCase
     end
 
     assert_not_includes sample.referenced_strains, strain
+    assert_not_includes sample.referenced_resources, strain
     assert_not_includes sample.strains, strain
     assert_not_includes strain.samples, sample
   end
+
+  test 'samples linked through join table' do
+    project = Factory(:project)
+    sample_type = Factory(:linked_optional_sample_type, project_ids: [project.id])
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample.set_attribute(:title, 'Linking sample')
+    sample.set_attribute(:patient, linked_sample.id)
+
+    assert_includes sample.referenced_samples, linked_sample
+    assert_includes sample.referenced_samples, linked_sample
+    assert_not_includes sample.linked_samples, linked_sample
+    assert_not_includes linked_sample.linking_samples, sample
+
+    assert_difference('SampleResourceLink.count', 1) do
+      disable_authorization_checks { sample.save }
+    end
+
+    assert_includes sample.referenced_samples, linked_sample
+    assert_includes sample.referenced_resources, linked_sample
+    assert_includes sample.linked_samples, linked_sample
+    assert_includes linked_sample.linking_samples, sample # linked both ways
+  end
+
+  test 'samples unlinked when no longer referenced' do
+    project = Factory(:project)
+    sample_type = Factory(:linked_optional_sample_type, project_ids: [project.id])
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id],
+                        data: { title: 'Linking sample',
+                                patient: linked_sample.id})
+
+    disable_authorization_checks { sample.save! }
+
+    assert_includes sample.referenced_samples, linked_sample
+    assert_includes sample.referenced_resources, linked_sample
+    assert_includes sample.linked_samples, linked_sample
+    assert_includes linked_sample.linking_samples, sample
+
+    assert_difference('SampleResourceLink.count', -1) do
+      sample.set_attribute(:patient, '')
+      disable_authorization_checks { sample.save! }
+    end
+
+    assert_not_includes sample.referenced_samples, linked_sample
+    assert_not_includes sample.referenced_resources, linked_sample
+    assert_not_includes sample.linked_samples, linked_sample
+    assert_not_includes linked_sample.linking_samples, sample
+  end
+
+  test 'samples unlinked when source destroyed' do
+    project = Factory(:project)
+    sample_type = Factory(:linked_optional_sample_type, project_ids: [project.id])
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id],
+                        data: { title: 'Linking sample',
+                                patient: linked_sample.id})
+
+    disable_authorization_checks { sample.save! }
+
+    assert_difference('SampleResourceLink.count', -1) do
+      disable_authorization_checks { sample.destroy! }
+    end
+  end
+
+  test 'samples unlinked when destination destroyed' do
+    project = Factory(:project)
+    sample_type = Factory(:linked_optional_sample_type, project_ids: [project.id])
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id],
+                        data: { title: 'Linking sample',
+                                patient: linked_sample.id})
+
+    disable_authorization_checks { sample.save! }
+
+    assert_difference('SampleResourceLink.count', -1) do
+      disable_authorization_checks { linked_sample.destroy! }
+    end
+  end
+
+
 end

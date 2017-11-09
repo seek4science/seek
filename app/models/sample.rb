@@ -16,9 +16,15 @@ class Sample < ActiveRecord::Base
 
   belongs_to :sample_type, inverse_of: :samples
   belongs_to :originating_data_file, class_name: 'DataFile'
-  has_many :sample_resource_links, dependent: :destroy
+
+  has_many :sample_resource_links, inverse_of: :sample, dependent: :destroy
+  has_many :reverse_sample_resource_links, inverse_of: :resource, class_name: 'SampleResourceLink', as: :resource, dependent: :destroy
+
   has_many :strains, through: :sample_resource_links, source: :resource, source_type: 'Strain'
   has_many :organisms, through: :strains
+
+  has_many :linked_samples, through: :sample_resource_links, source: :resource, source_type: 'Sample'
+  has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
   scope :default_order, -> { order('title') }
 
@@ -29,7 +35,7 @@ class Sample < ActiveRecord::Base
   before_validation :update_json_metadata
   before_validation :set_title_to_title_attribute_value
 
-  before_save :update_sample_strain_links
+  before_save :update_sample_resource_links
   after_save :queue_sample_type_update_job
   after_destroy :queue_sample_type_update_job
 
@@ -57,7 +63,7 @@ class Sample < ActiveRecord::Base
   end
 
   def related_samples
-    samples_this_links_to
+    linked_samples + linking_samples
   end
 
   # Mass assignment of attributes
@@ -69,11 +75,20 @@ class Sample < ActiveRecord::Base
     @data ||= Seek::Samples::SampleData.new(sample_type, json_metadata)
   end
 
-  def referenced_strains
-    sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_STRAIN }.map do |sa|
+  def referenced_resources
+    sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
       value = get_attribute(sa.hash_key)
-      Strain.find_by_id(value['id']) if value
+      type = sa.sample_attribute_type.base_type_handler.type
+      type.constantize.find_by_id(value['id']) if value && type
     end.compact
+  end
+
+  def referenced_strains
+    referenced_resources.select { |r| r.is_a?(Strain) }
+  end
+
+  def referenced_samples
+    referenced_resources.select { |r| r.is_a?(Sample) }
   end
 
   def get_attribute(attr)
@@ -188,7 +203,8 @@ class Sample < ActiveRecord::Base
     SampleTypeUpdateJob.new(sample_type, false).queue_job
   end
 
-  def update_sample_strain_links
+  def update_sample_resource_links
     self.strains = referenced_strains
+    self.linked_samples = referenced_samples
   end
 end
