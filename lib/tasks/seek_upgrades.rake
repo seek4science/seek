@@ -182,7 +182,7 @@ namespace :seek do
     puts "Looking for unused dangling Policies ..."
     dangling = Policy.all.select{|p| p.associated_items.empty?}
     puts "#{dangling.count} unused Policies found, which will be deleted"
-    dangling.each(&:destroy)
+    #dangling.each(&:destroy)
   end
 
 end
