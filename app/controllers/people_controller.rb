@@ -246,7 +246,7 @@ class PeopleController < ApplicationController
         @person.save # this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
         if Seek::Config.email_enabled && @person.user && new_projects.any? && @person != current_person
-          Mailer.notify_user_projects_assigned(@person,new_projects).deliver_now
+          Mailer.notify_user_projects_assigned(@person,new_projects).deliver_later
         end
 
         flash[:notice] = 'Person was successfully updated.'

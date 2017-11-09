@@ -274,7 +274,7 @@ class ProjectsController < ApplicationController
     new_members = @project.people - current_members
     if Seek::Config.email_enabled
       new_members.each do |member|
-        Mailer.notify_user_projects_assigned(member,[@project]).deliver_now
+        Mailer.notify_user_projects_assigned(member,[@project]).deliver_later
       end
     end
     flag_memberships
