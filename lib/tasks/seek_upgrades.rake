@@ -178,7 +178,7 @@ namespace :seek do
 
   end
 
-  task(remove_dangling_polices: :environment) do
+  task(remove_dangling_policies: :environment) do
     puts "Looking for unused dangling Policies ..."
     dangling = Policy.all.select{|p| p.associated_items.empty?}
     puts "#{dangling.count} unused Policies found, which will be deleted"
