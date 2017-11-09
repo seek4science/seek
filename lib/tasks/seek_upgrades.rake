@@ -21,6 +21,7 @@ namespace :seek do
     rebuild_rdf
     generate_organism_uuids
     strip_weblinks
+    update_sample_resource_links
 
   ]
 
@@ -177,4 +178,11 @@ namespace :seek do
 
   end
 
+  task(update_sample_resource_links: :environment) do
+    pre_count = SampleResourceLink.count
+    Sample.all.each do |sample|
+      sample.send(:update_sample_resource_links)
+    end
+    puts "Created #{SampleResourceLink.count - pre_count} SampleResourceLinks"
+  end
 end
