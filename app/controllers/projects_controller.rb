@@ -268,7 +268,15 @@ class ProjectsController < ApplicationController
   end
 
   def update_members
+    current_members = @project.people
     add_and_remove_members_and_institutions
+    @project.reload
+    new_members = @project.people - current_members
+    if Seek::Config.email_enabled
+      new_members.each do |member|
+        Mailer.notify_user_projects_assigned(member,[@project]).deliver_now
+      end
+    end
     flag_memberships
     update_administrative_roles
 
