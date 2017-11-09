@@ -478,11 +478,14 @@ class Policy < ActiveRecord::Base
     Policy::ACCESSIBLE
   end
 
-  # utility to get all items associated with this policy, which may be any asset or ISA item.
+  # utility to get all items associated with this policy.
   def associated_items
-    Seek::Util.authorized_types.collect do |type|
+    types = (Seek::Util.authorized_types + [OpenbisEndpoint])
+    items = types.collect do |type|
       type.where(policy_id: id)
-    end.flatten.compact.uniq
+    end
+    items |= Project.where(default_policy_id: id)
+    items.flatten.compact.uniq
   end
 
 end
