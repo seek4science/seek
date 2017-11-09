@@ -1,11 +1,11 @@
 Hi <%= @name %>,
 
-An administrator has assigned you to the following project<%= 's' if @projects.size > 1 -%>:
-<% @projects.each do |project| %>
-    * <%= project.title -%>
-<% end %>
+You have just joined a <%= t('project') %>.
 
-You may now upload assets<%= " and execute workflows" if Seek::Config.workflows_enabled %>.
+An administrator, or <%= t('project') %> administrator, has assigned you to the following <%= t('project').pluralize(@projects.size) %>:
+<% @projects.each do |project| %>
+    * <%= link_to(project.title,project) -%>
+<% end %>
 
 Regards,
 
