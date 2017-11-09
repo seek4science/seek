@@ -37,13 +37,18 @@ namespace :seek do
     solr = Seek::Config.solr_enabled
     Seek::Config.solr_enabled = false
 
-    Rake::Task['seek:standard_upgrade_tasks'].invoke
-    Rake::Task['seek:upgrade_version_tasks'].invoke
+    begin
+      Rake::Task['seek:standard_upgrade_tasks'].invoke
+      Rake::Task['seek:upgrade_version_tasks'].invoke
 
-    Seek::Config.solr_enabled = solr
-    Rake::Task['seek:reindex_all'].invoke if solr
+      Seek::Config.solr_enabled = solr
+      Rake::Task['seek:reindex_all'].invoke if solr
 
-    puts 'Upgrade completed successfully'
+      puts 'Upgrade completed successfully'
+    ensure
+      Seek::Config.solr_enabled = solr
+    end
+
   end
 
   task(update_ontology_settings_for_jerm: :environment) do
