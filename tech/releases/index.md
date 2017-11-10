@@ -9,6 +9,14 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+## Version 1.5.0
+
+Relase date: _November 2017_
+
+Blah blah blah
+
+A full list of changes included in this release can be found in the [SEEK v1.5.0 release notes](release-notes-1.5.0.html).
+
 ## Version 1.4.1
 
 Release date: _September 4th 2017_
