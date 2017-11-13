@@ -190,7 +190,7 @@ module PolicyHelper
         'download'
       when Policy::VISIBLE
         'view'
-      when Policy::NO_ACCES
+      when Policy::NO_ACCESS
         'no_access'
     end
   end
