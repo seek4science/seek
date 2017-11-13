@@ -395,7 +395,7 @@ class InvestigationsControllerTest < ActionController::TestCase
       put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
 
-    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), investigation
+    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
   end
 
   def edit_max_object(investigation)
