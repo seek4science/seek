@@ -1,5 +1,4 @@
 class PeopleController < ApplicationController
-
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
   include Seek::Publishing::GatekeeperPublish
