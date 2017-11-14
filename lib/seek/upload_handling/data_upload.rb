@@ -64,6 +64,12 @@ module Seek
             end
           end
         end
+
+        #FIXME: temporary fix, until OPSK-1499 is investigated and validations added
+        if asset.respond_to?(:content_blob) && asset.content_blob.nil?
+          raise 'No content-blob defined'
+        end
+
         retain_previous_content_blobs(asset)
       end
 
