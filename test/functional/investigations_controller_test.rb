@@ -368,6 +368,36 @@ class InvestigationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'send publish approval request' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    investigation = Factory(:investigation, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:private_policy))
+    login_as(investigation.contributor)
+
+    refute investigation.can_view?(nil)
+
+    assert_emails 1 do
+      put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::VISIBLE }
+    end
+
+    refute investigation.can_view?(nil)
+
+    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), investigation
+  end
+
+  test 'dont send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do # They're the same for ISA things
+    gatekeeper = Factory(:asset_gatekeeper)
+    investigation = Factory(:investigation, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    login_as(investigation.contributor)
+
+    assert investigation.is_published?
+
+    assert_emails 0 do
+      put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    end
+
+    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+  end
+
   def edit_max_object(investigation)
     add_tags_to_test_object(investigation)
     investigation.creators = [Factory(:person)]

@@ -24,11 +24,11 @@ module WorkGroupsHelper
     options = []
     last_project = nil
     # if current_user is project manager and not admin, load work_groups of projects he is in
-    if project_administrator_logged_in? && !admin_logged_in? && !Seek::Config.is_virtualliver
-      work_groups = current_user.person.projects.collect(&:work_groups).flatten.uniq
-    else
-      work_groups = WorkGroup.includes(:project, :institution)
-    end
+    work_groups = if project_administrator_logged_in? && !admin_logged_in? && !Seek::Config.is_virtualliver
+                    current_user.person.projects.collect(&:work_groups).flatten.uniq
+                  else
+                    WorkGroup.includes(:project, :institution)
+                  end
 
     work_groups = work_groups.to_a.select { |wg| wg.project.can_be_administered_by?(current_user) }
 
@@ -53,7 +53,7 @@ module WorkGroupsHelper
     options
   end
 
-  def membership_list memberships
+  def membership_list(memberships)
     memberships.collect do |membership|
       project_link = link_to membership.work_group.project.title, membership.work_group.project
       institution_link = link_to membership.work_group.institution.title, membership.work_group.institution

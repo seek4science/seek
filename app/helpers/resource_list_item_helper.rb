@@ -128,7 +128,8 @@ module ResourceListItemHelper
   end
 
   def list_profile_registered_timestamp(resource)
-    html = '<p class="list_item_attribute none_text" style="text-align:center;"><b>Registered:</b> <label>' + (resource.try(:user).try(:created_at).nil? ? 'Not yet registered' : date_as_string(resource.try(:user).try(:created_at)))
+    html = '<p class="list_item_attribute none_text" style="text-align:center;"><b>Registered:</b> <label>'
+    html << (resource.try(:user).try(:created_at).nil? ? 'Not yet registered' : date_as_string(resource.try(:user).try(:created_at)))
     html << '</label></p>'
     html.html_safe
   end

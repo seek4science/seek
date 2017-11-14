@@ -1066,18 +1066,24 @@ class ProjectsControllerTest < ActionController::TestCase
     new_institution = Factory(:institution)
     new_person = Factory(:person)
     new_person2 = Factory(:person)
+    new_person3 = Factory(:person)
 
-    assert_no_difference('GroupMembership.count') do # 2 deleted, 2 added
+    assert_difference('GroupMembership.count',1) do # 2 deleted, 3 added
       assert_no_difference('WorkGroup.count') do # 1 empty group will be deleted, 1 will be added
-        post :update_members,
-             id: project,
-             group_memberships_to_remove: [group_membership.id, group_membership2.id],
-             people_and_institutions_to_add: [{ 'person_id' => new_person.id, 'institution_id' => new_institution.id }.to_json, { 'person_id' => new_person2.id, 'institution_id' => new_institution.id }.to_json]
-        assert_redirected_to project_path(project)
-        assert_nil flash[:error]
-        refute_nil flash[:notice]
+        assert_emails(3) do
+          post :update_members,
+               id: project,
+               group_memberships_to_remove: [group_membership.id, group_membership2.id],
+               people_and_institutions_to_add: [{ 'person_id' => new_person.id, 'institution_id' => new_institution.id }.to_json,
+                                                { 'person_id' => new_person2.id, 'institution_id' => new_institution.id }.to_json,
+                                                { 'person_id' => new_person3.id, 'institution_id' => new_institution.id }.to_json]
+        end
       end
     end
+
+    assert_redirected_to project_path(project)
+    assert_nil flash[:error]
+    refute_nil flash[:notice]
 
     assert_includes project.institutions, new_institution
     assert_includes project.people, new_person

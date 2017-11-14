@@ -1,5 +1,4 @@
 class PeopleController < ApplicationController
-
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
   include Seek::Publishing::GatekeeperPublish
@@ -238,13 +237,15 @@ class PeopleController < ApplicationController
     had_no_projects = @person.work_groups.empty?
 
     respond_to do |format|
+      previous_projects = @person.projects
       if @person.update_attributes(administer_person_params)
+        new_projects = @person.projects - previous_projects
         set_project_related_roles(@person)
 
         @person.save # this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
-        if Seek::Config.email_enabled && @person.user && had_no_projects && !@person.work_groups.empty? && @person != current_person
-          Mailer.notify_user_projects_assigned(@person).deliver_now
+        if Seek::Config.email_enabled && @person.user && new_projects.any? && @person != current_person
+          Mailer.notify_user_projects_assigned(@person,new_projects).deliver_later
         end
 
         flash[:notice] = 'Person was successfully updated.'

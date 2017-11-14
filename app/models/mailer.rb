@@ -147,9 +147,9 @@ class Mailer < ActionMailer::Base
          subject: 'SEEK Configuration Email Test')
   end
 
-  def notify_user_projects_assigned(person)
+  def notify_user_projects_assigned(person,new_projects)
     @name = person.name
-    @projects = person.projects
+    @projects = new_projects
 
     mail(from: Seek::Config.noreply_sender,
          to: person.email_with_name,

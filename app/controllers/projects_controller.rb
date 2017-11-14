@@ -268,7 +268,17 @@ class ProjectsController < ApplicationController
   end
 
   def update_members
+    current_members = @project.people.to_a
     add_and_remove_members_and_institutions
+    @project.reload
+    new_members = @project.people.to_a - current_members
+    Rails.logger.debug("New members added to project = #{new_members.collect(&:id).inspect}")
+    if Seek::Config.email_enabled
+      new_members.each do |member|
+        Rails.logger.info("Notifying new member: #{member.title}")
+        Mailer.notify_user_projects_assigned(member,[@project]).deliver_later
+      end
+    end
     flag_memberships
     update_administrative_roles
 
