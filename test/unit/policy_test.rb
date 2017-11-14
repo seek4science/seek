@@ -232,4 +232,32 @@ class PolicyTest < ActiveSupport::TestCase
     policy.update_attribute(:sharing_scope,Policy::PRIVATE) # is ignored unless ALL_USERS
     assert policy.public?
   end
+
+  test 'associated items' do
+    df = Factory(:data_file)
+    policy = df.policy
+
+    assert_equal [df],policy.associated_items
+
+    model = Factory(:model,policy:policy)
+    sample = Factory(:sample,policy:policy)
+    event = Factory(:event,policy:policy)
+
+    assert_equal [df,event,model,sample],policy.associated_items.sort_by{|i| i.class.name}
+
+    policy = Factory(:public_policy,sharing_scope:Policy::ALL_USERS, access_type:Policy::ACCESSIBLE)
+    assert_empty policy.associated_items
+
+    project = Factory(:project,default_policy:Factory(:public_policy))
+    policy = project.default_policy
+    refute_nil policy
+    assert_equal [project],policy.associated_items
+
+
+    endpoint = Factory(:openbis_endpoint,policy:policy)
+    sweep = Factory(:sweep,policy:policy)
+    assert_equal [endpoint,project,sweep],policy.associated_items.sort_by{|i| i.class.name}
+
+
+  end
 end

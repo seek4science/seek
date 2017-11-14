@@ -735,7 +735,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     assert sop.can_publish?
     assert_emails 1 do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
   end
 
@@ -748,7 +748,7 @@ class SopsControllerTest < ActionController::TestCase
     assert !sop.is_published?
     assert sop.can_publish?
     assert_emails 0 do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
   end
 
@@ -761,12 +761,60 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_publish?
     # send the first time
     assert_emails 1 do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
     # dont send again
     assert_emails 0 do
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    end
+  end
+
+  test 'dont send publish approval request if item was already public' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:public_policy))
+    login_as(sop.contributor)
+
+    assert sop.can_view?(nil)
+
+    assert_emails 0 do
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    end
+
+    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+  end
+
+  test 'dont send publish approval request if item is only being made visible' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:private_policy))
+    login_as(sop.contributor)
+
+    refute sop.can_view?(nil)
+
+    assert_emails 0 do
       put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
+
+    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+  end
+
+  test 'send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    login_as(sop.contributor)
+
+    refute sop.is_published?
+    assert sop.can_view?(nil)
+    refute sop.can_download?(nil)
+
+    assert_emails 1 do
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    end
+
+    refute sop.is_published?
+    assert sop.can_view?(nil)
+    refute sop.can_download?(nil)
+
+    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), sop
   end
 
   test 'should not loose permissions when managing a sop' do

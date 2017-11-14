@@ -1509,22 +1509,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_includes assigns(:person).work_groups, work_group
   end
 
-  test 'should not email user after assigned to a project, if they were already in one' do
-    established_person = Factory(:person)
-    admin = Factory(:admin)
-    work_group = Factory(:work_group)
-
-    login_as admin.user
-
-    assert_emails 0 do
-      put :administer_update, id: established_person.id, person: { work_group_ids: [work_group.id] }
-    end
-
-    assert_redirected_to person_path(established_person)
-
-    assert_includes assigns(:person).work_groups, work_group
-  end
-
   test 'should email admin and project administrators when specifying project' do
     proj_man1 = Factory :project_administrator
     proj_man2 = Factory :project_administrator

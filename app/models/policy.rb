@@ -33,7 +33,7 @@ class Policy < ActiveRecord::Base
   end
 
   def queue_rdf_generation_job
-    supported_assets=assets.select(&:rdf_supported?)
+    supported_assets = assets.select(&:rdf_supported?)
     unless (previous_changes.keys - ['updated_at']).empty? || supported_assets.empty?
       supported_assets.each { |asset| RdfGenerationJob.new(asset).queue_job }
     end
@@ -242,7 +242,7 @@ class Policy < ActiveRecord::Base
   end
 
   def public?
-    access_type > Policy::NO_ACCESS && sharing_scope!=Policy::ALL_USERS
+    access_type > Policy::NO_ACCESS && sharing_scope != Policy::ALL_USERS
   end
 
   # return the hash: key is access_type, value is the array of people
@@ -476,5 +476,15 @@ class Policy < ActiveRecord::Base
 
   def self.max_public_access_type
     Policy::ACCESSIBLE
+  end
+
+  # utility to get all items associated with this policy.
+  def associated_items
+    types = (Seek::Util.authorized_types + [OpenbisEndpoint])
+    items = types.collect do |type|
+      type.where(policy_id: id)
+    end
+    items |= Project.where(default_policy_id: id)
+    items.flatten.compact.uniq
   end
 end
