@@ -127,6 +127,11 @@ class ActiveSupport::TestCase
     Factory(:admin, first_name: 'default admin')
   end
 
+  # At least one sample attribute type is needed for building sample types from spreadsheets
+  def create_sample_attribute_type
+    Factory(:string_sample_attribute_type)
+  end
+
   def clear_rails_cache
     Rails.cache.clear
     Seek::Config.clear_temporary_filestore
