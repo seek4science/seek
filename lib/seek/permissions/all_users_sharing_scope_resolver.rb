@@ -17,6 +17,23 @@ module Seek
         authorized_item
       end
 
+      # Removes old Project default policies, that had a sharing scope of ALL USERS. This a legacy from the old SysMO
+      # JERM harvesting
+      def remove_legacy_default_policies
+        policies_to_go = Project.all.collect(&:default_policy).compact.select { |policy| policy.sharing_scope == Policy::ALL_USERS }
+
+        # shouldn't be a case where these policies are used, but just in case set use_default_policy to false
+        associated_projects = policies_to_go.collect(&:associated_items).flatten.uniq.compact.select { |item| item.is_a?(Project) }
+        associated_projects.select!(&:use_default_policy)
+        associated_projects.each do |project|
+          disable_authorization_checks do
+            project.update_attribute(:use_default_policy, false)
+          end
+        end
+
+        policies_to_go.each(&:destroy)
+      end
+
       private
 
       def build_policies_for_projects(policy, projects)

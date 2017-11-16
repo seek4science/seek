@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class AllUsersSharingScopeResolver < ActiveSupport::TestCase
+
   def setup
     @resolver = Seek::Permissions::AllUsersSharingScopeResolver.new
   end
@@ -197,6 +198,7 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal 4, df.policy.permissions.count
 
     updated_df = @resolver.resolve(df)
+
     assert_nil updated_df.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_df.policy.access_type
     assert_equal 5, updated_df.policy.permissions.count
@@ -252,5 +254,29 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal 5, updated_df.policy.permissions.count
     assert_equal [person, project1, project2, project3, project4], updated_df.policy.permissions.collect(&:contributor)
     assert_equal [Policy::EDITING, Policy::ACCESSIBLE, Policy::VISIBLE, Policy::MANAGING, Policy::ACCESSIBLE], updated_df.policy.permissions.collect(&:access_type)
+  end
+
+  test 'remove legacy default policies' do
+    bad_policy = Factory(:project, default_policy: Factory(:policy, sharing_scope: Policy::ALL_USERS), use_default_policy: false).default_policy
+    project = Factory(:project, default_policy: Factory(:policy, sharing_scope: Policy::ALL_USERS), use_default_policy: true)
+    bad_policy2 = project.default_policy
+    good_policy = Factory(:project, default_policy: Factory(:policy), use_default_policy: false).default_policy
+    good_policy2 = Factory(:project, default_policy: Factory(:policy), use_default_policy: true).default_policy
+
+    # have a project in the db with no default, to catch nil errors
+    project_with_no_default = Factory(:project)
+    assert_nil project_with_no_default.default_policy
+
+    assert_difference('Policy.count', -2) do
+      @resolver.remove_legacy_default_policies
+    end
+
+    assert_nil Policy.find_by_id(bad_policy.id)
+    assert_nil Policy.find_by_id(bad_policy2.id)
+    refute_nil Policy.find_by_id(good_policy.id)
+    refute_nil Policy.find_by_id(good_policy2.id)
+
+    project.reload
+    refute project.use_default_policy
   end
 end
