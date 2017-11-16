@@ -1132,7 +1132,7 @@
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/anyReferences"
+          "$ref" : "#/definitions/anySkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
