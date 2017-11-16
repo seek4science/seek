@@ -203,4 +203,54 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal [person, project1, project2, project3, project4], updated_df.policy.permissions.collect(&:contributor)
     assert_equal [Policy::EDITING, Policy::ACCESSIBLE, Policy::VISIBLE, Policy::MANAGING, Policy::ACCESSIBLE], updated_df.policy.permissions.collect(&:access_type)
   end
+
+  test 'policy not saved' do
+    sop = Factory(:sop, policy: Factory(:public_download_and_no_custom_sharing, sharing_scope: Policy::ALL_USERS))
+    assert_empty sop.policy.permissions
+    assert_equal 1, (projects = sop.projects).count
+    assert_equal Policy::ALL_USERS, sop.policy.sharing_scope
+    assert_equal Policy::ACCESSIBLE, sop.policy.access_type
+
+    updated_sop = @resolver.resolve(sop)
+
+    assert updated_sop.policy.changed?
+
+    # check the stored records are still the original state
+    sop = Sop.find(sop.id)
+    assert_empty sop.policy.permissions
+    assert_equal 1, (projects = sop.projects).count
+    assert_equal Policy::ALL_USERS, sop.policy.sharing_scope
+    assert_equal Policy::ACCESSIBLE, sop.policy.access_type
+  end
+
+  test 'check everythings saves correctly' do
+    project1 = Factory(:project)
+    project2 = Factory(:project)
+    project3 = Factory(:project)
+    project4 = Factory(:project)
+    person = Factory(:person)
+    permission1 = Factory(:permission, contributor: person, access_type: Policy::EDITING)
+    permission2 = Factory(:permission, contributor: project1, access_type: Policy::VISIBLE)
+    permission3 = Factory(:permission, contributor: project2, access_type: Policy::VISIBLE)
+    permission4 = Factory(:permission, contributor: project3, access_type: Policy::MANAGING)
+    df = Factory(:data_file, projects: [project1, project4], policy: Factory(:policy,
+                                                                             sharing_scope: Policy::ALL_USERS,
+                                                                             access_type: Policy::ACCESSIBLE,
+                                                                             permissions: [permission1, permission2, permission3, permission4]))
+    assert_equal [project1, project4], df.projects
+    assert_equal Policy::ALL_USERS, df.policy.sharing_scope
+    assert_equal Policy::ACCESSIBLE, df.policy.access_type
+    assert_equal 4, df.policy.permissions.count
+
+    updated_df = @resolver.resolve(df)
+
+    updated_df.policy.save!
+    updated_df = DataFile.find(updated_df.id)
+
+    assert_nil updated_df.policy.sharing_scope
+    assert_equal Policy::PRIVATE, updated_df.policy.access_type
+    assert_equal 5, updated_df.policy.permissions.count
+    assert_equal [person, project1, project2, project3, project4], updated_df.policy.permissions.collect(&:contributor)
+    assert_equal [Policy::EDITING, Policy::ACCESSIBLE, Policy::VISIBLE, Policy::MANAGING, Policy::ACCESSIBLE], updated_df.policy.permissions.collect(&:access_type)
+  end
 end

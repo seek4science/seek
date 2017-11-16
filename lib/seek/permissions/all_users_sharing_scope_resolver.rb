@@ -26,7 +26,7 @@ module Seek
           if project_permissions.any?
             resolve_project_permissions(project_permissions, access_type)
           else
-            policy.permissions << Permission.new(contributor: project, access_type: access_type)
+            policy.permissions.build(contributor: project, access_type: access_type)
           end
         end
       end
