@@ -6,8 +6,44 @@ module Seek
     class AllUsersSharingScopeResolver
 
       def resolve(authorized_item)
+        scope = authorized_item.policy.sharing_scope
+        return authorized_item unless scope
+
+        #always set it to nil
+        authorized_item.policy.sharing_scope=nil
+        if scope==Policy::ALL_USERS
+          build_policies_for_projects(authorized_item.policy,authorized_item.projects)
+          authorized_item.policy.access_type=Policy::PRIVATE
+        end
         authorized_item
       end
-    end
+
+      private
+
+      def build_policies_for_projects(policy,projects)
+        access_type = policy.access_type
+        projects.each do |project|
+          project_permissions = filter_permissions_for_project(policy.permissions,project)
+          if project_permissions.any?
+            resolve_project_permissions(project_permissions,access_type)
+          else
+            policy.permissions << Permission.new(contributor:project,access_type:access_type)
+          end
+        end
+      end
+
+      def filter_permissions_for_project(permissions,project)
+        permissions.select{|permission| permission.contributor==project}
+      end
+
+      def resolve_project_permissions(permissions,access_type)
+        permissions.each do |permission|
+          permission.access_type = access_type if permission.access_type < access_type
+        end
+      end
+
+    end #class
+
+
   end
 end

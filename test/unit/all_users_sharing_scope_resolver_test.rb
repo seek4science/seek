@@ -18,6 +18,35 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, updated_df.policy.access_type
   end
 
+  # should set the scope to nil, but do nothing else
+  test 'sharing scope but not ALL_USERS' do
+    other_project = Factory(:project)
+    presentation = Factory(:presentation,
+                           policy: Factory(:policy,
+                                           access_type: Policy::VISIBLE,
+                                           sharing_scope: Policy::EVERYONE,
+                                           permissions: [Factory(:permission, contributor: other_project, access_type: Policy::ACCESSIBLE)]))
+    assert_equal 1, (permissions = presentation.policy.permissions).count
+    assert_equal 1, (projects = presentation.projects).count
+    refute_includes projects, other_project
+    assert_equal Policy::EVERYONE, presentation.policy.sharing_scope
+    assert_equal Policy::VISIBLE, presentation.policy.access_type
+    permission = permissions.first
+    assert_equal other_project, permission.contributor
+    assert_equal Policy::ACCESSIBLE, permission.access_type
+
+    updated_presentation = @resolver.resolve(presentation)
+
+    assert_nil updated_presentation.policy.sharing_scope
+    assert_equal Policy::VISIBLE, updated_presentation.policy.access_type
+    assert_equal 1, (permissions = updated_presentation.policy.permissions).count
+    assert_equal 1, (projects = updated_presentation.projects).count
+    assert_equal Policy::VISIBLE, updated_presentation.policy.access_type
+    permission = permissions.first
+    assert_equal other_project, permission.contributor
+    assert_equal Policy::ACCESSIBLE, permission.access_type
+  end
+
   test 'no original permissions' do
     sop = Factory(:sop, policy: Factory(:public_download_and_no_custom_sharing, sharing_scope: Policy::ALL_USERS))
     assert_empty sop.policy.permissions
