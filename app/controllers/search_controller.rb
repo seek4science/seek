@@ -45,7 +45,7 @@ class SearchController < ApplicationController
     respond_to do |format|
       format.html
       format.json {render json: @results,
-                          each_serializer: ActiveModel::Serializer,
+                          each_serializer: SkeletonSerializer,
                           meta: {:base_url =>   Seek::Config.site_base_host,
                                  :api_version => ActiveModel::Serializer.config.api_version
                           }}
