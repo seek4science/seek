@@ -755,24 +755,39 @@
     "tagsType" : {
       "$ref" : "#/definitions/nullableNonEmptyStringList"
     },
-    "anyReference" : {
+    "anySkeleton" : {
       "properties" : {
         "id" : {
           "$ref" : "#/definitions/nonEmptyString"
         },
         "type" : {
           "$ref" : "#/definitions/anyType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
         }
       },
-      "required" : [ "id", "type" ],
+      "required" : [ "id", "type", "attributes", "links"],
       "additionalProperties" : false
     },
-    "anyReferences" : {
+    "anySkeletons" : {
       "type" : "array",
       "minItems" : 0,
       "uniqueItems" : true,
       "items" : {
-        "$ref" : "#/definitions/anyReference"
+        "$ref" : "#/definitions/anySkeleton"
       }
     },
     "assayReference" : {
@@ -795,6 +810,41 @@
         "$ref" : "#/definitions/assayReference"
       }
     },
+    "assaySkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/assayType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "assaySkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/assaySkeleton"
+      }
+    },
     "dataFileReferences" : {
       "type" : "array",
       "minItems" : 0,
@@ -814,6 +864,41 @@
       },
       "required" : [ "id", "type" ],
       "additionalProperties" : false
+    },
+    "dataFileSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/dataFileType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "dataFileSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/dataFileSkeleton"
+      }
     },
     "eventReferences" : {
       "type" : "array",
@@ -2279,7 +2364,7 @@
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/assayReferences"
+          "$ref" : "#/definitions/assaySkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2295,7 +2380,7 @@
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/dataFileReferences"
+          "$ref" : "#/definitions/dataFileSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2306,12 +2391,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "eventSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/eventType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "eventSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/eventSkeleton"
+      }
     },
     "eventsResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/eventReferences"
+          "$ref" : "#/definitions/eventSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2322,12 +2442,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "institutionSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/institutionType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "institutionSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/institutionSkeleton"
+      }
     },
     "institutionsResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/institutionReferences"
+          "$ref" : "#/definitions/institutionSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2338,12 +2493,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "investigationSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/investigationType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "investigationSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/investigationSkeleton"
+      }
     },
     "investigationsResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/investigationReferences"
+          "$ref" : "#/definitions/investigationSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2354,12 +2544,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "modelSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/modelType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "modelSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/modelSkeleton"
+      }
     },
     "modelsResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/modelReferences"
+          "$ref" : "#/definitions/modelSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2370,12 +2595,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "organismSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/organismType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "organismSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/organismSkeleton"
+      }
     },
     "organismsResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/organismReferences"
+          "$ref" : "#/definitions/organismSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2386,12 +2646,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "personSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/peopleType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "peopleSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/personSkeleton"
+      }
     },
     "peopleResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/peopleReferences"
+          "$ref" : "#/definitions/peopleSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2402,12 +2697,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "presentationSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/presentationType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "presentationSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/presentationSkeleton"
+      }
     },
     "presentationsResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/presentationReferences"
+          "$ref" : "#/definitions/presentationSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2418,12 +2748,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "programmeSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/programmeType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "programmeSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/programmeSkeleton"
+      }
     },
     "programmesResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/programmeReferences"
+          "$ref" : "#/definitions/programmeSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2434,12 +2799,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "projectSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/projectType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "projectSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/projectSkeleton"
+      }
     },
     "projectsResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/projectReferences"
+          "$ref" : "#/definitions/projectSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2450,12 +2850,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "publicationSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/publicationType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "publicationSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/publicationSkeleton"
+      }
     },
     "publicationsResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/publicationReferences"
+          "$ref" : "#/definitions/publicationSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2466,12 +2901,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "sopSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/sopType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "sopSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/sopSkeleton"
+      }
     },
     "sopsResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/sopReferences"
+          "$ref" : "#/definitions/sopSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2482,12 +2952,47 @@
       },
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
+    },
+    "sampleTypeSkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/sampleTypeType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "sampleTypeSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/sampleTypeSkeleton"
+      }
     },
     "sampleTypesResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/sampleTypeReferences"
+          "$ref" : "#/definitions/sampleTypeSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -2499,11 +3004,46 @@
       "required" : [ "data", "jsonapi", "meta" ],
       "additionalProperties" : false
     },
+    "studySkeleton" : {
+      "properties" : {
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "type": {
+          "$ref": "#/definitions/studyType"
+        },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/nonEmptyString"
+            }
+          },
+          "required": [
+            "title"
+          ],
+          "additionalProperties": false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "studySkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/studySkeleton"
+      }
+    },
     "studiesResponse" : {
       "type" : "object",
       "properties" : {
         "data" : {
-          "$ref" : "#/definitions/studyReferences"
+          "$ref" : "#/definitions/studySkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
