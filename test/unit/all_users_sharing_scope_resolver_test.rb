@@ -181,25 +181,26 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     project1 = Factory(:project)
     project2 = Factory(:project)
     project3 = Factory(:project)
-    another_project = Factory(:project)
+    project4 = Factory(:project)
     person = Factory(:person)
     permission1 = Factory(:permission, contributor: person, access_type: Policy::EDITING)
-    permission2 = Factory(:permission, contributor: project1, access_type: Policy::MANAGING)
+    permission2 = Factory(:permission, contributor: project1, access_type: Policy::VISIBLE)
     permission3 = Factory(:permission, contributor: project2, access_type: Policy::VISIBLE)
-    df = Factory(:data_file, projects: [project1, project3], policy: Factory(:policy,
+    permission4 = Factory(:permission, contributor: project3, access_type: Policy::MANAGING)
+    df = Factory(:data_file, projects: [project1, project4], policy: Factory(:policy,
                                                                              sharing_scope: Policy::ALL_USERS,
                                                                              access_type: Policy::ACCESSIBLE,
-                                                                             permissions: [permission1, permission2, permission3]))
-    assert_equal [project1, project3], df.projects
+                                                                             permissions: [permission1, permission2, permission3, permission4]))
+    assert_equal [project1, project4], df.projects
     assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE, df.policy.access_type
-    assert_equal 3, df.policy.permissions.count
+    assert_equal 4, df.policy.permissions.count
 
     updated_df = @resolver.resolve(df)
     assert_nil updated_df.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_df.policy.access_type
-    assert_equal 4, updated_df.policy.permissions.count
-    assert_equal [person, project1, project2, project3], updated_df.policy.permissions.collect(&:contributor)
-    assert_equal [Policy::EDITING, Policy::MANAGING, Policy::ACCESSIBLE, Policy::ACCESSIBLE], updated_df.policy.permissions.collect(&:access_type)
+    assert_equal 5, updated_df.policy.permissions.count
+    assert_equal [person, project1, project2, project3, project4], updated_df.policy.permissions.collect(&:contributor)
+    assert_equal [Policy::EDITING, Policy::ACCESSIBLE, Policy::VISIBLE, Policy::MANAGING, Policy::ACCESSIBLE], updated_df.policy.permissions.collect(&:access_type)
   end
 end
