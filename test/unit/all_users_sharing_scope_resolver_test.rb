@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AllUsersSharingScopeResolver < ActiveSupport::TestCase
+class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
   def setup
     @resolver = Seek::Permissions::AllUsersSharingScopeResolver.new
   end
@@ -38,9 +38,8 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, permission.access_type
 
     updated_presentation = @resolver.resolve(presentation)
-    disable_authorization_checks do
-      updated_presentation.save!
-    end
+
+    updated_presentation.policy.save!
 
     assert_nil updated_presentation.policy.sharing_scope
     assert_equal Policy::VISIBLE, updated_presentation.policy.access_type
@@ -60,9 +59,8 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, sop.policy.access_type
 
     updated_sop = @resolver.resolve(sop)
-    disable_authorization_checks do
-      updated_sop.save!
-    end
+
+    updated_sop.policy.save!
 
     assert_nil updated_sop.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_sop.policy.access_type
@@ -90,9 +88,8 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, permission.access_type
 
     updated_presentation = @resolver.resolve(presentation)
-    disable_authorization_checks do
-      updated_presentation.save!
-    end
+
+    updated_presentation.policy.save!
 
     assert_nil updated_presentation.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_presentation.policy.access_type
@@ -121,9 +118,8 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::VISIBLE, permission.access_type
 
     updated_model = @resolver.resolve(model)
-    disable_authorization_checks do
-      updated_model.save!
-    end
+
+    updated_model.policy.save!
 
     assert_nil updated_model.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_model.policy.access_type
@@ -153,9 +149,8 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::VISIBLE, permission.access_type
 
     updated_investigation = @resolver.resolve(investigation)
-    disable_authorization_checks do
-      updated_investigation.save!
-    end
+
+    updated_investigation.policy.save!
 
     assert_nil updated_investigation.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_investigation.policy.access_type
@@ -185,9 +180,8 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, permission.access_type
 
     updated_investigation = @resolver.resolve(investigation)
-    disable_authorization_checks do
-      updated_investigation.save!
-    end
+
+    updated_investigation.policy.save!
 
     assert_nil updated_investigation.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_investigation.policy.access_type
@@ -217,9 +211,8 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal 4, df.policy.permissions.count
 
     updated_df = @resolver.resolve(df)
-    disable_authorization_checks do
-      updated_df.save!
-    end
+
+    updated_df.policy.save!
 
     assert_nil updated_df.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_df.policy.access_type
@@ -301,5 +294,36 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
 
     project.reload
     refute project.use_default_policy
+  end
+
+  test 'changed for audit' do
+    auditor = @resolver.auditor
+    df = Factory(:data_file, policy: Factory(:public_policy, sharing_scope: Policy::ALL_USERS, access_type: Policy::VISIBLE))
+    refute auditor.changed_for_audit?(df)
+    df.policy.sharing_scope = nil
+
+    # just changing the scope doesn't require an audit
+    refute auditor.changed_for_audit?(df)
+
+    df.policy.save!
+    refute auditor.changed_for_audit?(df)
+
+    # changing the policy access type does
+    df.policy.access_type = Policy::PRIVATE
+    assert auditor.changed_for_audit?(df)
+
+    df.policy.save!
+    refute auditor.changed_for_audit?(df)
+
+    # adding a permission does
+    df.policy.permissions.build(contributor: Factory(:project), access_type: Policy::EDITING)
+    assert auditor.changed_for_audit?(df)
+
+    df.policy.save!
+    refute auditor.changed_for_audit?(df)
+
+    # changing a permission access_type does
+    df.policy.permissions.first.access_type = Policy::ACCESSIBLE
+    assert auditor.changed_for_audit?(df)
   end
 end

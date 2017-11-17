@@ -4,6 +4,12 @@ module Seek
     # the sharing scope is removed, but is shared with with same access type with associated projects. This is to remove
     # the legacy policy, and is part of an upgrade described by: https://jira-bsse.ethz.ch/browse/OPSK-1494
     class AllUsersSharingScopeResolver
+      attr_reader :auditor
+
+      def initialize
+        @auditor = Auditor.new
+      end
+
       def resolve(authorized_item)
         scope = authorized_item.policy.sharing_scope
         return authorized_item unless scope
@@ -55,6 +61,17 @@ module Seek
       def resolve_project_permissions(permissions, access_type)
         permissions.each do |permission|
           permission.access_type = access_type if permission.access_type < access_type
+        end
+      end
+
+      class Auditor
+        def audit(item); end
+
+        def changed_for_audit?(item)
+          return true if item.policy.changes.include?(:access_type)
+          return true if item.policy.permissions.detect(&:changed?)
+          return true if item.policy.permissions.detect(&:new_record?)
+          false
         end
       end
     end # class
