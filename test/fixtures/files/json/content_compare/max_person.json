@@ -37,31 +37,76 @@
         ]
       },
       "investigations": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "investigations"
+          }
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "studies"
+          }
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "assays"
+          }
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "data_files"
+          }
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "models"
+          }
+        ]
       },
       "sops": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "sops"
+          }
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "publications"
+          }
+        ]
       },
       "presentations": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "presentations"
+          }
+        ]
       },
       "events": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "events"
+          }
+        ]
       },
       "samples": {
         "data": []

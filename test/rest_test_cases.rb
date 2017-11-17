@@ -171,8 +171,9 @@ module RestTestCases
         puts e.message
       end
 
-      get :show, id: object, format: 'json'
+      get :show, id: object , format: 'json'
       assert_response :success
+      puts response.body
       parsed_response = JSON.parse(@response.body)
       check_content_diff(json_to_compare, parsed_response)
     end
