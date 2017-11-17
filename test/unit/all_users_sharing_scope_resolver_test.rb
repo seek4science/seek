@@ -14,6 +14,8 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, df.policy.access_type
 
     updated_df = @resolver.resolve(df)
+    updated_df.save!
+
     assert_nil updated_df.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE, updated_df.policy.access_type
   end
@@ -36,6 +38,9 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, permission.access_type
 
     updated_presentation = @resolver.resolve(presentation)
+    disable_authorization_checks do
+      updated_presentation.save!
+    end
 
     assert_nil updated_presentation.policy.sharing_scope
     assert_equal Policy::VISIBLE, updated_presentation.policy.access_type
@@ -55,6 +60,9 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, sop.policy.access_type
 
     updated_sop = @resolver.resolve(sop)
+    disable_authorization_checks do
+      updated_sop.save!
+    end
 
     assert_nil updated_sop.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_sop.policy.access_type
@@ -82,6 +90,9 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, permission.access_type
 
     updated_presentation = @resolver.resolve(presentation)
+    disable_authorization_checks do
+      updated_presentation.save!
+    end
 
     assert_nil updated_presentation.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_presentation.policy.access_type
@@ -110,6 +121,9 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::VISIBLE, permission.access_type
 
     updated_model = @resolver.resolve(model)
+    disable_authorization_checks do
+      updated_model.save!
+    end
 
     assert_nil updated_model.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_model.policy.access_type
@@ -139,6 +153,9 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::VISIBLE, permission.access_type
 
     updated_investigation = @resolver.resolve(investigation)
+    disable_authorization_checks do
+      updated_investigation.save!
+    end
 
     assert_nil updated_investigation.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_investigation.policy.access_type
@@ -168,6 +185,9 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal Policy::ACCESSIBLE, permission.access_type
 
     updated_investigation = @resolver.resolve(investigation)
+    disable_authorization_checks do
+      updated_investigation.save!
+    end
 
     assert_nil updated_investigation.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_investigation.policy.access_type
@@ -197,6 +217,9 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     assert_equal 4, df.policy.permissions.count
 
     updated_df = @resolver.resolve(df)
+    disable_authorization_checks do
+      updated_df.save!
+    end
 
     assert_nil updated_df.policy.sharing_scope
     assert_equal Policy::PRIVATE, updated_df.policy.access_type
@@ -206,7 +229,6 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
   end
 
   test 'policy not saved' do
-    skip('need to rethink, and probably simpler to always save')
     sop = Factory(:sop, policy: Factory(:public_download_and_no_custom_sharing, sharing_scope: Policy::ALL_USERS))
     assert_empty sop.policy.permissions
     assert_equal 1, (projects = sop.projects).count
@@ -216,6 +238,7 @@ class AllUsersSharingScopeResolver < ActiveSupport::TestCase
     updated_sop = @resolver.resolve(sop)
 
     assert updated_sop.policy.changed?
+    assert updated_sop.policy.permissions.detect(&:new_record?)
 
     # check the stored records are still the original state
     sop = Sop.find(sop.id)
