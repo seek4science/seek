@@ -262,6 +262,16 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_match(/.*url.*/, response.body)
   end
 
+  test 'should export pre-print publication as bibtex' do
+    publication_formatter_mock
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: pre_print_publication_for_export_tests, format: 'bibtex'
+    end
+    assert_response :success
+    assert_match(/.*author.*/, response.body)
+    assert_match(/.*title.*/, response.body)
+  end
+
   test 'should export publication as embl' do
     publication_formatter_mock
     with_config_value :pubmed_api_email, 'fred@email.com' do
@@ -810,5 +820,11 @@ class PublicationsControllerTest < ActionController::TestCase
                           pubmed_id: 5)
   end
 
-
+  def pre_print_publication_for_export_tests
+    Factory(:publication, title: 'A paper on blabla',
+                          abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
+                          pubmed_id: nil,
+                          publication_authors: [Factory(:publication_author),
+                                                Factory(:publication_author)])
+  end
 end
