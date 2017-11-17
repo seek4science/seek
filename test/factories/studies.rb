@@ -14,5 +14,6 @@ Factory.define(:max_study, class: Study) do |f|
   f.title "A Maximal Study"
   f.description "The Study of many things"
   f.experimentalists "Wet lab people"
-  f.association :investigation, factory: :max_investigation
+  f.association :investigation, factory: :investigation
+  f.assays {[Factory(:assay, policy: Factory(:public_policy))]}
 end
