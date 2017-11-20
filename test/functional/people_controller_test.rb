@@ -1761,9 +1761,8 @@ class PeopleControllerTest < ActionController::TestCase
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person
     Factory :tool, value: 'fishing rod', annotatable: person
-    project = Factory(:min_project)
-    project.events.append(Factory(:event, policy: Factory(:public_policy)))
-    person.add_to_project_and_institution(project, Factory(:min_institution))
+    person.add_to_project_and_institution(Factory(:project), Factory(:min_institution))
+    Factory(:event, contributor: person.user, policy: Factory(:public_policy))
     add_avatar_to_test_object(person)
   end
 
