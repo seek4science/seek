@@ -59,7 +59,12 @@
 
       },
       "assays": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "assays"
+          }
+        ]
       },
       "data_files": {
         "data": []
