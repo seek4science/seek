@@ -267,7 +267,7 @@ class Publication < ActiveRecord::Base
       # TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
       Bio::Reference.new({ title: title, journal: journal, abstract: abstract,
                            authors: publication_authors.map { |e| e.person ? [e.person.last_name, e.person.first_name].join(', ') : [e.last_name, e.first_name].join(', ') },
-                           year: published_date.year }.with_indifferent_access)
+                           year: published_date.try(:year) }.with_indifferent_access)
     end
   end
 
