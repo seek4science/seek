@@ -1,7 +1,14 @@
 class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
+  include PolicyHelper
   include RelatedItemsHelper
   include Rails.application.routes.url_helpers
+
+  attribute :policy, if: :show_policy?
+
+  def policy
+    convert_policy object.policy
+  end
 
   # has_many :people
   # has_many :projects
@@ -112,4 +119,34 @@ class BaseSerializer < SimpleBaseSerializer
                     associated_resources(object)
                   end
   end
+
+  def convert_policy policy
+    { 'access' => (access_type_key policy.access_type),
+      'permissions' => (permits policy)}
+  end
+
+  def permits policy
+    result = []
+    policy.permissions.each do |p|
+      result.append ({'resource_type' => p.contributor_type.downcase.pluralize,
+                      'resource_id' => p.contributor_id,
+                      'access' => (access_type_key p.access_type) } )
+    end
+    return result
+  end
+
+  def administerable?
+    answer = false
+    begin
+      answer = object.can_be_administered_by?(User.current_user)
+    rescue
+    end
+    return answer
+  end
+
+  def show_policy?
+    return object.respond_to?('policy') && object.respond_to?('can_manage?') && object.can_manage?(User.current_user)
+  end
+
+
 end

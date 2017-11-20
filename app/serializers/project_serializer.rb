@@ -1,7 +1,15 @@
 class ProjectSerializer < AvatarObjSerializer
+
   # class ProjectSerializer < ActiveModel::Serializer
   attributes :title, :description,
              :web_page, :wiki_page
+
+  attribute :default_policy, if: :administerable?
+
+  def default_policy
+    convert_policy object.default_policy
+  end
+
   has_many :organisms,  include_data: true
 
   has_many :people
