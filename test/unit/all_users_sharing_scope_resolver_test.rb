@@ -350,7 +350,7 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
     csv = CSV.read(file.path)
     assert_equal 2, csv.length
     line1 = csv[0]
-    assert_equal ['Class', 'id', 'Contributor id, Project ids'], line1
+    assert_equal ['Class', 'id', 'Contributor id', 'Project ids'], line1
     line2 = csv[1]
     assert_equal ['DataFile', df.id.to_s, df.contributor.person.id.to_s, project1.id.to_s, project4.id.to_s], line2
   end

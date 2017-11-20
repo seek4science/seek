@@ -91,7 +91,7 @@ module Seek
 
         def save(file_path)
           CSV.open(file_path, 'wb') do |csv|
-            csv << ['Class', 'id', 'Contributor id, Project ids']
+            csv << ['Class', 'id', 'Contributor id', 'Project ids']
             @logs.each { |log| csv << log }
           end
         end
