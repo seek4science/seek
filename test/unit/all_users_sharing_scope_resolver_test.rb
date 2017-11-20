@@ -326,4 +326,32 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
     df.policy.permissions.first.access_type = Policy::ACCESSIBLE
     assert auditor.changed_for_audit?(df)
   end
+
+  test 'save audit' do
+    project1 = Factory(:project)
+    project2 = Factory(:project)
+    project3 = Factory(:project)
+    project4 = Factory(:project)
+    person = Factory(:person)
+    permission1 = Factory(:permission, contributor: person, access_type: Policy::EDITING)
+    permission2 = Factory(:permission, contributor: project1, access_type: Policy::VISIBLE)
+    permission3 = Factory(:permission, contributor: project2, access_type: Policy::VISIBLE)
+    permission4 = Factory(:permission, contributor: project3, access_type: Policy::MANAGING)
+    df = Factory(:data_file, projects: [project1, project4], policy: Factory(:policy,
+                                                                             sharing_scope: Policy::ALL_USERS,
+                                                                             access_type: Policy::ACCESSIBLE,
+                                                                             permissions: [permission1, permission2, permission3, permission4]))
+    @resolver.resolve(df)
+    file = Tempfile.new('resolver-test')
+
+    @resolver.auditor.save(file.path)
+
+    assert File.exist?(file.path)
+    csv = CSV.read(file.path)
+    assert_equal 2, csv.length
+    line1 = csv[0]
+    assert_equal ['Class', 'id', 'Contributor id, Project ids'], line1
+    line2 = csv[1]
+    assert_equal ['DataFile', df.id.to_s, df.contributor.person.id.to_s, project1.id.to_s, project4.id.to_s], line2
+  end
 end
