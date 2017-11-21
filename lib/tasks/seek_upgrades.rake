@@ -228,7 +228,7 @@ namespace :seek do
       end
       bar.increment!
     end
-    audit_file = File.join(Rails.root,'tmp','all-users-policy-update-audit.csv')
+    audit_file = File.join(Rails.root,'tmp',"all-users-policy-update-audit-#{Time.now.to_i}.csv")
     puts "Storing a record of updated items to #{audit_file}"
     resolver.auditor.save(audit_file)
   end
