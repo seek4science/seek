@@ -55,16 +55,15 @@ Factory.define(:assay, parent: :modelling_assay) {}
 
 Factory.define(:min_assay, class: Assay) do |f|
   f.title "A Minimal Assay"
-  #f.description ""
   f.association :assay_class, factory: :experimental_assay_class
-  f.association :study, factory: :min_study
+  f.association :study, factory: :study
 end
 
 Factory.define(:max_assay, class: Assay) do |f|
   f.title "A Maximal Assay"
   f.description "A Western Blot Assay"
   f.association :assay_class, factory: :experimental_assay_class
-  f.association :study, factory: :max_study
+  f.association :study, factory: :study
   f.assay_assets {[Factory(:assay_asset, asset: Factory(:data_file, policy: Factory(:public_policy))),
                    Factory(:assay_asset, asset: Factory(:sop, policy: Factory(:public_policy))),
                    Factory(:assay_asset, asset: Factory(:model, policy: Factory(:public_policy)))]}

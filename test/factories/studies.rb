@@ -7,7 +7,7 @@ end
 
 Factory.define(:min_study, class: Study) do |f|
   f.title "A Minimal Study"
-  f.association :investigation, factory: :min_investigation
+  f.association :investigation, factory: :investigation
 end
 
 Factory.define(:max_study, class: Study) do |f|
@@ -15,5 +15,5 @@ Factory.define(:max_study, class: Study) do |f|
   f.description "The Study of many things"
   f.experimentalists "Wet lab people"
   f.association :investigation, factory: :investigation
-  f.assays {[Factory(:assay, policy: Factory(:public_policy))]}
+  f.assays {[Factory(:max_assay, policy: Factory(:public_policy))]}
 end
