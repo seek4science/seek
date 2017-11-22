@@ -108,7 +108,12 @@
         ]
       },
       "publications": {
-        "data": []
+        "data": [
+          {
+            "id": "1055250468",
+            "type": "publications"
+          }
+        ]
       },
       "strains": {
         "data": []
