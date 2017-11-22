@@ -619,33 +619,6 @@
       "required" : [ "data" ],
       "additionalProperties" : false
     },
-    "sampleType" : {
-      "type" : "string",
-      "minLength" : 1,
-      "enum" : [ "samples" ]
-    },
-    "sampleReference" : {
-      "properties" : {
-        "id" : {
-          "$ref" : "#/definitions/nonEmptyString"
-        },
-        "type" : {
-          "$ref" : "#/definitions/sampleType"
-        }
-      },
-      "required" : [ "id", "type" ],
-      "additionalProperties" : false
-    },
-    "sampleReferencesList" : {
-      "type" : "object",
-      "properties" : {
-        "data" : {
-          "$ref" : "#/definitions/sampleReferences"
-        }
-      },
-      "required" : [ "data" ],
-      "additionalProperties" : false
-    },
     "sampleTypeType" : {
       "type" : "string",
       "minLength" : 1,
@@ -683,33 +656,6 @@
       "properties" : {
         "data" : {
           "$ref" : "#/definitions/sopReferences"
-        }
-      },
-      "required" : [ "data" ],
-      "additionalProperties" : false
-    },
-    "strainType" : {
-      "type" : "string",
-      "minLength" : 1,
-      "enum" : [ "strains" ]
-    },
-    "strainReference" : {
-      "properties" : {
-        "id" : {
-          "$ref" : "#/definitions/nonEmptyString"
-        },
-        "type" : {
-          "$ref" : "#/definitions/strainType"
-        }
-      },
-      "required" : [ "id", "type" ],
-      "additionalProperties" : false
-    },
-    "strainReferencesList" : {
-      "type" : "object",
-      "properties" : {
-        "data" : {
-          "$ref" : "#/definitions/strainReferences"
         }
       },
       "required" : [ "data" ],
@@ -1076,14 +1022,6 @@
       "required" : [ "id", "type" ],
       "additionalProperties" : false
     },
-    "sampleReferences" : {
-      "type" : "array",
-      "minItems" : 0,
-      "uniqueItems" : true,
-      "items" : {
-        "$ref" : "#/definitions/sampleReference"
-      }
-    },
     "sampleTypeReferences" : {
       "type" : "array",
       "minItems" : 0,
@@ -1111,14 +1049,6 @@
       },
       "required" : [ "id", "type" ],
       "additionalProperties" : false
-    },
-    "strainReferences" : {
-      "type" : "array",
-      "minItems" : 0,
-      "uniqueItems" : true,
-      "items" : {
-        "$ref" : "#/definitions/strainReference"
-      }
     },
     "studyReferences" : {
       "type" : "array",
@@ -1250,15 +1180,9 @@
                 },
                 "publications" : {
                   "$ref" : "#/definitions/publicationReferencesList"
-                },
-                "strains" : {
-                  "$ref" : "#/definitions/strainReferencesList"
-                },
-                "samples" : {
-                  "$ref" : "#/definitions/sampleReferencesList"
                 }
               },
-              "required" : [ "creators", "submitter", "organisms", "people", "projects", "investigation", "study", "data_files", "models", "sops", "publications", "strains", "samples" ],
+              "required" : [ "creators", "submitter", "organisms", "people", "projects", "investigation", "study", "data_files", "models", "sops", "publications" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -1373,12 +1297,9 @@
                 },
                 "events" : {
                   "$ref" : "#/definitions/eventReferencesList"
-                },
-                "samples" : {
-                  "$ref" : "#/definitions/sampleReferencesList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications", "events", "samples" ],
+              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications", "events" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -1728,15 +1649,9 @@
                 },
                 "models" : {
                   "$ref" : "#/definitions/modelReferencesList"
-                },
-                "strains" : {
-                  "$ref" : "#/definitions/strainReferencesList"
-                },
-                "samples" : {
-                  "$ref" : "#/definitions/sampleReferencesList"
                 }
               },
-              "required" : [ "projects", "assays", "models", "strains", "samples" ],
+              "required" : [ "projects", "assays", "models" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -1840,12 +1755,9 @@
                 },
                 "events" : {
                   "$ref" : "#/definitions/eventReferencesList"
-                },
-                "samples" : {
-                  "$ref" : "#/definitions/sampleReferencesList"
                 }
               },
-              "required" : [ "projects", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events", "samples" ],
+              "required" : [ "projects", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -2079,17 +1991,11 @@
                 "events" : {
                   "$ref" : "#/definitions/eventReferencesList"
                 },
-                "strains" : {
-                  "$ref" : "#/definitions/strainReferencesList"
-                },
-                "samples" : {
-                  "$ref" : "#/definitions/sampleReferencesList"
-                },
                 "programmes" : {
                   "$ref" : "#/definitions/programmeReferencesList"
                 }
               },
-              "required" : [ "organisms", "people", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events", "strains", "samples", "programmes" ],
+              "required" : [ "organisms", "people", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events", "programmes" ],
               "additionalProperties" : false
             },
             "links" : {
