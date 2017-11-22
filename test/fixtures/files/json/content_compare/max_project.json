@@ -98,12 +98,6 @@
             "type": "events"
           }
         ]
-      },
-      "strains": {
-        "data": []
-      },
-      "samples": {
-        "data": []
       }
     },
     "links": {

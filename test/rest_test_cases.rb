@@ -9,17 +9,7 @@ module RestTestCases
   XML_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'xml', 'rest', 'schema-v1.xsd')
   JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', '2010', 'json', 'rest', 'jsonapi-schema-v1')
 
-  def index_schema_file_path
-    File.join(Rails.root, 'public', '2010', 'json', 'rest',
-              "index_#{@controller.controller_name}_200_response.json")
-  end
-
-  def get_schema_file_path
-    File.join(Rails.root, 'public', '2010', 'json', 'rest',
-              "get_#{@controller.controller_name}_200_response.json")
-  end
-
-  def definitions_path
+ def definitions_path
     File.join(Rails.root, 'public', '2010', 'json', 'rest',
               'definitions.json')
   end
@@ -106,27 +96,31 @@ module RestTestCases
   end
 
   def test_show_json(object = rest_api_test_object)
-    clz = @controller.controller_name.classify.constantize
+    className = object.class.name.dup
+    className[0] = className[0].downcase
+    fragment = '#/definitions/' + className + 'Response'
     get :show, id: object, format: 'json'
     
     if check_for_501_read_return
       assert_response :not_implemented
     else
       perform_jsonapi_checks
-      validate_json_against_fragment ("#/definitions/get#{@controller.class.name.sub('Controller', 'Response')}")
+      validate_json_against_fragment fragment
     end
   # rescue ActionController::UrlGenerationError
   #   skip("unable to test read JSON for #{clz}")
   end
 
   def test_index_json
-    clz = @controller.controller_name.classify.constantize
-    get :index, format: 'json'
+    className = @controller.class.name.dup
+    className[0] = className[0].downcase
+    fragment = '#/definitions/' + className.gsub('Controller','Response')
+   get :index, format: 'json'
     if check_for_501_index_return
       assert_response :not_implemented
     else
     perform_jsonapi_checks
-    validate_json_against_fragment ("#/definitions/index#{@controller.class.name.sub('Controller', 'Response')}")
+    validate_json_against_fragment fragment
     end
   # rescue ActionController::UrlGenerationError
   #   skip("unable to test index JSON for #{clz}")
