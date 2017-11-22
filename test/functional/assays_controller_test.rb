@@ -1372,8 +1372,13 @@ class AssaysControllerTest < ActionController::TestCase
   def edit_max_object(assay)
     add_tags_to_test_object(assay)
     add_creator_to_test_object(assay)
+
     org = Factory(:organism)
     assay.associate_organism(org)
+    assay.contributor = User.current_user.person
+    assay.save
+    login_as(User.current_user)
+
   end
 
   test 'add data file button' do
