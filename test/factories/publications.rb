@@ -21,6 +21,8 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.publication_authors {[Factory(:publication_author), Factory(:publication_author)]}
   f.abstract 'Amazing insights into the mechanism of TF2'
   f.projects { [Factory.build(:max_project)] }
+  f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
+  f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
 end
 
 # PublicationAuthor
