@@ -63,7 +63,7 @@ Factory.define(:max_assay, class: Assay) do |f|
   f.title "A Maximal Assay"
   f.description "A Western Blot Assay"
   f.association :assay_class, factory: :experimental_assay_class
-  f.association :study, factory: :study
+  f.study { Factory(:study, policy: Factory(:public_policy), investigation: Factory(:investigation, policy: Factory(:public_policy))) }
   f.association :contributor,  factory: :person
   f.assay_assets {[Factory(:assay_asset, asset: Factory(:data_file, policy: Factory(:public_policy))),
                    Factory(:assay_asset, asset: Factory(:sop, policy: Factory(:public_policy))),
