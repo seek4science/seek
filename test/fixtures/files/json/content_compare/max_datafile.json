@@ -69,36 +69,44 @@
         ]
       },
       "investigations": {
-        "data": [          {
-          "id": "1022250817",
-          "type": "investigations"
-        }]
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "investigations"
+          }
+        ]
       },
       "studies": {
-        "data": [          {
-          "id": "1022250817",
-          "type": "studies"
-        }]
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "studies"
+          }
+        ]
       },
       "assays": {
-        "data": [          {
-          "id": "1022250817",
-          "type": "assays"
-        }]
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "assays"
+          }
+        ]
       },
       "publications": {
         "data": [
           {
-          "id": "1022250817",
-          "type": "publications"
+            "id": "1022250817",
+            "type": "publications"
           }
         ]
       },
       "events": {
-        "data": [          {
-          "id": "1022250817",
-          "type": "events"
-        }]
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "events"
+          }
+        ]
       }
     },
     "links": {
