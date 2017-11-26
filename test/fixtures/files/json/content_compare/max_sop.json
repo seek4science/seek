@@ -69,16 +69,36 @@
         ]
       },
       "investigations": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "investigations"
+          }
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "studies"
+          }
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "assays"
+          }
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "publications"
+          }
+        ]
       }
     },
     "links": {

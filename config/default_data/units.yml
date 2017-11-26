@@ -178,42 +178,52 @@ mL/min:
   order: 32
 
 metre:
+  title: meter
   symbol: m
   comment: metre
   factors_studied: false
   order: 33
 
+centimeter:
+  title: centimeter
+  symbol: cm
+  comment: centimeter
+  order: 34
+
 µm:
+  title: micrometer
   symbol: µm
   comment: micrometer
-  order: 34
+  order: 35
 
 celcius:
   symbol: °C
   comment: Celcius
-  order: 35
+  order: 36
 
 bar:
   symbol: bar
   comment: headspace pressure
-  order: 36
+  order: 37
 
 rpm:
   symbol: rpm
   comment: revolutions per minute
-  order: 37
+  order: 38
 
 percent:
   symbol: "%"
   comment: percentage
-  order: 38
+  order: 39
 
 a.u.:
   symbol: a.u.
   comment: arbitrary units
-  order: 39
+  order: 40
 
 dimensionless:
   symbol: dimensionless
   comment: dimensionless
-  order: 40
+  order: 41
+
+#add title element if the unit should appear like e.g. "cm centimeter"
