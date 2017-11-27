@@ -8,7 +8,7 @@ class ProjectsController < ApplicationController
   include ApiHelper
 
   before_filter :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
-                                               admin_member_roles update_members storage_report]
+                                               admin_member_roles update_members storage_report request_membership]
   before_filter :find_assets, only: [:index]
   before_filter :auth_to_create, only: %i[new create]
   before_filter :is_user_admin_auth, only: %i[manage destroy]
@@ -301,6 +301,17 @@ class ProjectsController < ApplicationController
         render partial: 'projects/storage_usage_content',
                locals: { project: @project, standalone: true }
       end
+    end
+  end
+
+  def request_membership
+    details = params[:details]
+    mail = Mailer.request_membership(current_user, @project, details)
+    mail.deliver_now
+
+    render :update do |page|
+      html = "An email has been sent on your behalf requesting membership."
+      page[:requesting_membership].replace_html(html)
     end
   end
 
