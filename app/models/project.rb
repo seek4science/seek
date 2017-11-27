@@ -286,6 +286,13 @@ class Project < ActiveRecord::Base
     end
   end
 
+  # whether the user is able to request membership of this project
+  def allow_request_membership?(user = User.current_user)
+    user.present? &&
+        project_administrators.any? &&
+        !has_member?(user)
+  end
+
   # should put below at the bottom in order to override methods for hierarchies,
   # Try to find a better way for overriding methods regardless where to include the module
   include Seek::ProjectHierarchies::ProjectExtension if Seek::Config.project_hierarchy_enabled

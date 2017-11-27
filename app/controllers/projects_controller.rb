@@ -15,6 +15,8 @@ class ProjectsController < ApplicationController
   before_filter :editable_by_user, only: %i[edit update]
   before_filter :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
   before_filter :member_of_this_project, only: [:asset_report], unless: :admin?
+  before_filter :login_required, only: [:request_membership]
+  before_filter :allow_request_membership, only: [:request_membership]
 
   skip_before_filter :project_membership_required
 
@@ -92,7 +94,7 @@ class ProjectsController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json {render json: @project}
+      format.json { render json: @project }
     end
   end
 
@@ -160,7 +162,7 @@ class ProjectsController < ApplicationController
   # POST /projects
   # POST /projects.xml
   def create
-      @project = Project.new(project_params)
+    @project = Project.new(project_params)
 
     if @project.present?
       @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
@@ -176,20 +178,19 @@ class ProjectsController < ApplicationController
         end
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
-        #format.json {render json: @project, adapter: :json, status: 200 }
-        format.json {render json: @project}
+        # format.json {render json: @project, adapter: :json, status: 200 }
+        format.json { render json: @project }
       else
         format.html { render action: 'new' }
-        format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+        format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
       end
     end
   end
 
-
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
-      update_params = project_params
+    update_params = project_params
 
     if @project.present? && !@is_json
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
@@ -206,12 +207,12 @@ class ProjectsController < ApplicationController
             flash[:notice] = "#{t('project')} was successfully updated."
             format.html { redirect_to(@project) }
             format.xml  { head :ok }
-            format.json {render json: @project}
-#            format.json {render json: @project, adapter: :json, status: 200 }
+            format.json { render json: @project }
+          #            format.json {render json: @project, adapter: :json, status: 200 }
           else
             format.html { render action: 'edit' }
             format.xml  { render xml: @project.errors, status: :unprocessable_entity }
-            format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+            format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
           end
         end
       end
@@ -276,7 +277,7 @@ class ProjectsController < ApplicationController
     if Seek::Config.email_enabled
       new_members.each do |member|
         Rails.logger.info("Notifying new member: #{member.title}")
-        Mailer.notify_user_projects_assigned(member,[@project]).deliver_later
+        Mailer.notify_user_projects_assigned(member, [@project]).deliver_later
       end
     end
     flag_memberships
@@ -310,7 +311,7 @@ class ProjectsController < ApplicationController
     mail.deliver_now
 
     render :update do |page|
-      html = "An email has been sent on your behalf requesting membership."
+      html = 'An email has been sent on your behalf requesting membership.'
       page[:requesting_membership].replace_html(html)
     end
   end
@@ -412,6 +413,13 @@ class ProjectsController < ApplicationController
     unless @project.can_be_administered_by?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)')
       return false
+    end
+  end
+
+  def allow_request_membership
+    unless Seek::Config.email_enabled && @project.allow_request_membership?
+      error('Cannot reqest membership of this project', 'is invalid (invalid state)')
+      false
     end
   end
 end
