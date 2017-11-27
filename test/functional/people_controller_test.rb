@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
-
   fixtures :people, :users, :projects, :work_groups, :group_memberships, :project_positions, :institutions
 
   include AuthenticatedTestHelper
@@ -14,7 +13,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object = Factory(:person,orcid:'http://orcid.org/0000-0003-2130-0865')
+    @object = Factory(:person, orcid: 'http://orcid.org/0000-0003-2130-0865')
   end
 
   def test_title
@@ -583,14 +582,14 @@ class PeopleControllerTest < ActionController::TestCase
     assert_not_nil project
 
     put :administer_update, id: person.id, person: { work_group_ids: person.work_group_ids },
-        roles: { project_administrator: [project.id] }
+                            roles: { project_administrator: [project.id] }
 
     person = assigns(:person)
 
     assert_not_nil person
     assert person.is_project_administrator?(project)
     assert person.is_admin?
-    assert_equal %w(admin project_administrator), person.roles.sort
+    assert_equal %w[admin project_administrator], person.roles.sort
   end
 
   test 'set the asset housekeeper role for a person with workgroup' do
@@ -692,7 +691,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should have asset housekeeper icon on people index page' do
-    (0..5).each do
+    6.times do
       Factory(:asset_housekeeper)
     end
     get :index
@@ -707,7 +706,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should have project administrator icon on people index page' do
-    (0..5).each do
+    6.times do
       Factory(:project_administrator)
     end
 
@@ -992,7 +991,7 @@ class PeopleControllerTest < ActionController::TestCase
     refute person.is_asset_gatekeeper?(project)
 
     put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
-        roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
+                            roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
     assert_redirected_to person_path(person)
     assert assigns(:person).is_asset_gatekeeper?(project)
     assert assigns(:person).is_project_administrator?(project)
@@ -1010,7 +1009,7 @@ class PeopleControllerTest < ActionController::TestCase
     refute person.is_asset_gatekeeper?(project)
 
     put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
-        roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
+                            roles: { asset_gatekeeper: [project.id], project_administrator: [project.id] }
     assert_redirected_to person_path(person)
 
     refute assigns(:person).is_asset_gatekeeper?(project)
@@ -1037,7 +1036,7 @@ class PeopleControllerTest < ActionController::TestCase
     person.reload
 
     put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
-        roles: { project_administrator: [managed_project.id] }
+                            roles: { project_administrator: [managed_project.id] }
     assert_redirected_to person_path(person)
 
     assert assigns(:person).is_admin?
@@ -1058,7 +1057,7 @@ class PeopleControllerTest < ActionController::TestCase
     refute person.is_project_administrator?(proj)
 
     put :administer_update, id: person, person: { work_group_ids: person.work_group_ids },
-        roles: { project_administrator: [proj.id] }
+                            roles: { project_administrator: [proj.id] }
     assert_redirected_to person_path(person)
 
     assert assigns(:person).is_admin?
@@ -1162,7 +1161,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'should have gatekeeper icon on people index page' do
-    (0..5).each do
+    6.times do
       Factory(:asset_gatekeeper)
     end
     get :index
@@ -1730,31 +1729,55 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'list by discipline' do
-    exp = Factory(:discipline,title:'experimentalist')
-    mod = Factory(:discipline,title:'modeller')
-    experimentalist = Factory(:person,disciplines:[exp])
-    modeller = Factory(:person,disciplines:[mod])
-    assert_includes experimentalist.disciplines,exp
-    refute_includes modeller.disciplines,exp
+    exp = Factory(:discipline, title: 'experimentalist')
+    mod = Factory(:discipline, title: 'modeller')
+    experimentalist = Factory(:person, disciplines: [exp])
+    modeller = Factory(:person, disciplines: [mod])
+    assert_includes experimentalist.disciplines, exp
+    refute_includes modeller.disciplines, exp
 
-    get :index,discipline_id:exp.id
+    get :index, discipline_id: exp.id
     assert_response :success
 
-    assert_select 'h2',text:/People with the discipline 'experimentalist'/
+    assert_select 'h2', text: /People with the discipline 'experimentalist'/
 
     assert_select '.list_items_container' do
       assert_select '.list_item_title' do
-        assert_select 'a',text:experimentalist.name,count:1
-        assert_select 'a',text:modeller.name,count:0
+        assert_select 'a', text: experimentalist.name, count: 1
+        assert_select 'a', text: modeller.name, count: 0
       end
     end
 
-    #handles an unknown discipline id
-    get :index,discipline_id:Discipline.last.id+1
+    # handles an unknown discipline id
+    get :index, discipline_id: Discipline.last.id + 1
     assert_response :success
 
-    assert_select '.list_items_container',count:0
+    assert_select '.list_items_container', count: 0
+  end
 
+  test 'related samples are checked for authorization' do
+    person = Factory(:person)
+    other_person = Factory(:person)
+    sample1 = Factory(:sample, contributor: other_person, policy: Factory(:public_policy))
+    sample2 = Factory(:sample, contributor: other_person, policy: Factory(:private_policy))
+    login_as(person)
+    assert sample1.can_view?
+    refute sample2.can_view?
+    other_person.reload
+    assert_equal [sample1, sample2].sort, other_person.related_samples.sort
+
+    get :show, id: other_person
+
+    assert_response :success
+
+    assert_select 'div.list_items_container' do
+      # assert_select 'div.list_item' do
+      # assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', sample_path(sample1), text: /#{sample1.title}/, count: 1
+      assert_select 'a[href=?]', sample_path(sample2), text: /#{sample2.title}/, count: 0
+      # end
+      # end
+    end
   end
 
   def edit_max_object(person)
