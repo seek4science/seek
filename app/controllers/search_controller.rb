@@ -70,8 +70,7 @@ class SearchController < ApplicationController
       if type == "all"
           sources = Seek::Util.searchable_types
           if is_json
-            sources.delete(Strain.class)
-            sources.delete(Sample.class)
+            sources -= [Strain, Sample]
           end
           sources.each do |source|
             search = source.search do |query|
