@@ -108,13 +108,12 @@
         ]
       },
       "publications": {
-        "data": []
-      },
-      "strains": {
-        "data": []
-      },
-      "samples": {
-        "data": []
+        "data": [
+          {
+            "id": "1055250468",
+            "type": "publications"
+          }
+        ]
       }
     },
     "links": {

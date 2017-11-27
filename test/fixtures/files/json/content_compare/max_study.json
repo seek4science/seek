@@ -59,19 +59,44 @@
 
       },
       "assays": {
-        "data": []
+        "data": [
+          {
+            "id": "980191497",
+            "type": "assays"
+          }
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+          {
+            "id": "883654316",
+            "type": "data_files"
+          }
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+          {
+            "id": "1004285611",
+            "type": "models"
+          }
+        ]
       },
       "sops": {
-        "data": []
+        "data": [
+          {
+            "id": "1055250468",
+            "type": "sops"
+          }
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+          {
+            "id": "1055250468",
+            "type": "publications"
+          }
+        ]
       }
     },
     "links": {

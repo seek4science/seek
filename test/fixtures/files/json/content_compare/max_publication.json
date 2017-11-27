@@ -71,7 +71,12 @@
         ]
       },
       "publications": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "publications"
+          }
+        ]
       },
       "presentations": {
         "data": [
@@ -82,7 +87,12 @@
         ]
       },
       "events": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "events"
+          }
+        ]
       }
     },
     "links": {

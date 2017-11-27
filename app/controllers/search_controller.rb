@@ -8,7 +8,7 @@ class SearchController < ApplicationController
   def index
 
     if Seek::Config.solr_enabled
-      perform_search
+      perform_search (request.format.json?)
     else
       @results = []
     end
@@ -45,7 +45,7 @@ class SearchController < ApplicationController
     respond_to do |format|
       format.html
       format.json {render json: @results,
-                          each_serializer: ActiveModel::Serializer,
+                          each_serializer: SkeletonSerializer,
                           meta: {:base_url =>   Seek::Config.site_base_host,
                                  :api_version => ActiveModel::Serializer.config.api_version
                           }}
@@ -53,7 +53,7 @@ class SearchController < ApplicationController
     
   end
 
-  def perform_search
+  def perform_search (is_json = false)
     @search_query = params[:q] || params[:search_query]
     @search=@search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query||=""
@@ -69,6 +69,9 @@ class SearchController < ApplicationController
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
           sources = Seek::Util.searchable_types
+          if is_json
+            sources -= [Strain, Sample]
+          end
           sources.each do |source|
             search = source.search do |query|
               query.keywords(downcase_query)

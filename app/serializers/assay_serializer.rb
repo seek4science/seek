@@ -27,6 +27,4 @@ class AssaySerializer < PCSSerializer
   has_many :models
   has_many :sops
   has_many :publications
-  has_many :strains
-  has_many :samples
 end
