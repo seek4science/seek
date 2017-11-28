@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171026131121) do
+ActiveRecord::Schema.define(version: 20171128133429) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -775,6 +775,19 @@ ActiveRecord::Schema.define(version: 20171026131121) do
     t.datetime "updated_at"
     t.boolean  "factors_studied",             default: true
   end
+
+  create_table "message_logs", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "message_type",  limit: 4
+    t.text     "details",       limit: 65535
+    t.integer  "resource_id",   limit: 4
+    t.string   "resource_type", limit: 255
+    t.integer  "sender_id",     limit: 4
+  end
+
+  add_index "message_logs", ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id", using: :btree
+  add_index "message_logs", ["sender_id"], name: "index_message_logs_on_sender_id", using: :btree
 
   create_table "model_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
