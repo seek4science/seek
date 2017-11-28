@@ -308,11 +308,11 @@ class ProjectsController < ApplicationController
   def request_membership
     details = params[:details]
     mail = Mailer.request_membership(current_user, @project, details)
-    mail.deliver_now
+    mail.deliver_later
+    flash[:notice]='Membership request has been sent'
 
-    render :update do |page|
-      html = 'An email has been sent on your behalf requesting membership.'
-      page[:requesting_membership].replace_html(html)
+    respond_with do |format|
+      format.html{redirect_to(@project)}
     end
   end
 
