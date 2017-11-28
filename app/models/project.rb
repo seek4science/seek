@@ -290,7 +290,8 @@ class Project < ActiveRecord::Base
   def allow_request_membership?(user = User.current_user)
     user.present? &&
         project_administrators.any? &&
-        !has_member?(user)
+        !has_member?(user) &&
+        MessageLog.recent_project_membership_requests(user.try(:person),self).empty?
   end
 
   # should put below at the bottom in order to override methods for hierarchies,

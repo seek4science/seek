@@ -1483,16 +1483,25 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
     assert_emails(1) do
-      post :request_membership, id:project,details:'blah blah'
+      assert_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+
     end
     assert_redirected_to(project)
     refute_nil flash[:notice]
+    log = MessageLog.last
+    assert_equal project,log.resource
+    assert_equal person,log.sender
+    assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST,log.message_type
 
     logout
     login_as(project.project_administrators.first)
 
     assert_emails(0)  do
-      post :request_membership, id:project,details:'blah blah'
+      assert_no_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
     end
     assert_redirected_to :root
     refute_nil flash[:error]
@@ -1500,7 +1509,9 @@ class ProjectsControllerTest < ActionController::TestCase
     project=Factory(:project)
     assert_empty(project.people)
     assert_emails(0)  do
-      post :request_membership, id:project,details:'blah blah'
+      assert_no_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
     end
     assert_redirected_to :root
     refute_nil flash[:error]
