@@ -18,6 +18,10 @@ class MessageLog < ActiveRecord::Base
     MessageLog.where("resource_type = 'Project' AND resource_id = ?", project.id).where(sender: person).project_membership_requests.recent
   end
 
+  def self.log_project_membership_request(sender, project, details)
+    MessageLog.create(resource: project, sender: sender, details: details, message_type: PROJECT_MEMBERSHIP_REQUEST)
+  end
+
   private
 
   def project_required_for_project_membership_request

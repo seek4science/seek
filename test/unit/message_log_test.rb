@@ -88,6 +88,19 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_equal [log], logs
   end
 
+  test 'log project membership request' do
+    proj = Factory(:project)
+    sender = Factory(:person)
+    assert_difference('MessageLog.count') do
+      MessageLog.log_project_membership_request(sender, proj, 'blah')
+    end
+    log = MessageLog.last
+    assert_equal proj, log.resource
+    assert_equal sender, log.sender
+    assert_equal 'blah', log.details
+    assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST, log.message_type
+  end
+
   private
 
   def valid_log

@@ -309,10 +309,8 @@ class ProjectsController < ApplicationController
     details = params[:details]
     mail = Mailer.request_membership(current_user, @project, details)
     mail.deliver_later
-    MessageLog.create(resource:@project,
-                      sender:current_user.person,
-                      details:details,
-                      message_type:MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+    MessageLog.log_project_membership_request(current_user.person,@project,details)
+
     flash[:notice]='Membership request has been sent'
 
     respond_with do |format|
