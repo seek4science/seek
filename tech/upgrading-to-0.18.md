@@ -116,7 +116,7 @@ If your database is already UTF-8 encoded, you don't need to convert.
 First refer to *config/database.yml* to check the database name, and the
 username and password you use.
 
-The following commands help you to check the current encoding, but replacing <mysql_username> and <database_name>:
+The following commands help you to check the current encoding, but replacing _mysql_username_ and _database_name_:
 
     mysql -u <mysql_username> -p <database_name>
     SHOW VARIABLES LIKE 'character_set%';
@@ -128,6 +128,7 @@ If the current encoding is latin1, please follow the next steps to convert it
 to UTF-8.
 
 First, make a dump of the database using the following:
+
     mysqldump -u <mysql_username> -p --opt --default-character-set=latin1 --skip-set-charset  <database_name> > seek_db.sql
 
 Now a couple of commands to change the contents of the dump
