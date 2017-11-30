@@ -17,5 +17,5 @@ Factory.define(:max_programme, class: Programme) do |f|
   f.description "A very exciting programme"
   f.web_page "http://www.synbiochem.co.uk"
   f.funding_details "Someone is funding this for me"
-  f.projects { [Factory.build(:project)] }
+  f.projects { [Factory.build(:max_project)] }
 end

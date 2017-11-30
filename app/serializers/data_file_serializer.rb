@@ -6,5 +6,4 @@ class DataFileSerializer < ContributedResourceSerializer
   has_many :assays
   has_many :publications
   has_many :events
-  has_many :samples
 end

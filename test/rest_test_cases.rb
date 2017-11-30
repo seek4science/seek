@@ -161,12 +161,12 @@ module RestTestCases
       json_to_compare = JSON.parse(File.read(json_file))
       begin
         edit_max_object(object) if (m == 'max')
-      rescue NoMethodError => e
-        puts e.message
+      rescue NoMethodError
       end
 
-      get :show, id: object, format: 'json'
+      get :show, id: object , format: 'json'
       assert_response :success
+      #puts response.body
       parsed_response = JSON.parse(@response.body)
       check_content_diff(json_to_compare, parsed_response)
     end

@@ -12,6 +12,8 @@ Factory.define(:max_organism, class: Organism) do |f|
   f.projects { [Factory.build(:max_project)] }
   f.concept_uri 'https://identifiers.org/taxonomy/9606'
   f.ontology_id "23"
+  f.assays {[Factory.build(:assay, policy: Factory(:public_policy))]}
+  f.models {[Factory.build(:model, policy: Factory(:public_policy))]}
 end
 
 # AssayOrganism

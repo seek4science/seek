@@ -84,6 +84,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project
     assert project.default_policy
     assert project.use_default_policy
+    assert_nil project.default_policy.sharing_scope
   end
 
   test 'create project with programme' do

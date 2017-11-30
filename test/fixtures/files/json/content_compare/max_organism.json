@@ -17,16 +17,20 @@
         ]
       },
       "assays": {
-        "data": []
+        "data": [
+          {
+            "id": "1022251427",
+            "type": "assays"
+          }
+        ]
       },
       "models": {
-        "data": []
-      },
-      "strains": {
-        "data": []
-      },
-      "samples": {
-        "data": []
+        "data": [
+          {
+            "id": "1022251427",
+            "type": "models"
+          }
+        ]
       }
     },
     "links": {
