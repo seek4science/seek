@@ -6,8 +6,10 @@ class ProjectSubscriptionJob < SeekJob
   end
 
   def perform_job(ps)
-    all_in_project(ps.project).each do |item|
-      item.subscriptions << Subscription.new(person: ps.person, project_subscription_id: project_subscription_id) unless item.subscribed?(ps.person)
+    disable_authorization_checks do
+      all_in_project(ps.project).reject { |item| item.subscribed?(ps.person) }.each do |item|
+        item.subscriptions << Subscription.new(person: ps.person, project_subscription_id: project_subscription_id)
+      end
     end
   end
 
