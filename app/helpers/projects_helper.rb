@@ -134,7 +134,12 @@ module ProjectsHelper
 
   # whether the request membership button should be shown
   def request_project_membership_button_enabled?(project)
-    Seek::Config.email_enabled &&     
+    Seek::Config.email_enabled &&
       project.allow_request_membership?
+  end
+
+  def request_project_memberhip_pending?(project)
+    return nil unless logged_in?
+    MessageLog.recent_project_membership_requests(current_user.try(:person), project).first
   end
 end

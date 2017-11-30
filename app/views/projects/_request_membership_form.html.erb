@@ -9,10 +9,10 @@
                 Please provide some extra information you feel may be useful to your request.
               </p>
               <p>
-
-              <%=  text_area_tag :details,'',:rows=>10,class: 'form-control' %>
-
-
+                <%=  text_area_tag :details,'',:rows=>10,class: 'form-control' %>
+              </p>
+              <p>
+                <em>A request can only be made once every <%= (MessageLog::RECENT_PERIOD / 3600).to_i %> hours</em>
               </p>
           <% end -%>
         </div>

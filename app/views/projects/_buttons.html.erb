@@ -13,6 +13,13 @@
     <span id="request_membership_button">
         <%= button_link_to("Request membership", "message", '#', 'data-toggle' => 'modal', 'data-target' => "#request-membership-dialog") -%>
     </span>
+<% elsif log = request_project_memberhip_pending?(item) %>
+    <%
+      reason = "A recent request was made, and cannot be made again for another #{log.hours_until_next_allowed_str}"
+    %>
+    <span data-tooltip='<%= reason %>'>
+      <%= button_link_to("Request membership", "message", '#', disabled: true) -%>
+    </span>
 <% end -%>
 
 
@@ -34,8 +41,6 @@
 
     <% end -%>
 <% end -%>
-<% if request_project_membership_button_enabled?(item) %>
-    <%= render partial: 'request_membership_form',locals:{project:item} %>
-<% end %>
+
 
 
