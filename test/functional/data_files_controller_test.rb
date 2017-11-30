@@ -155,7 +155,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:data_files)
   end
 
-  test 'creators show in list item' do
+  test 'creators show in list private_item' do
     p1 = Factory :person
     p2 = Factory :person
     df = Factory(:data_file, title: 'ZZZZZ', creators: [p2], contributor: p1.user, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
@@ -165,7 +165,7 @@ class DataFilesControllerTest < ActionController::TestCase
     # check the test is behaving as expected:
     assert_equal p1.user, df.contributor
     assert df.creators.include?(p2)
-    assert_select '.list_item_title a[href=?]', data_file_path(df), 'ZZZZZ', 'the data file for this test should appear as a list item'
+    assert_select '.list_item_title a[href=?]', data_file_path(df), 'ZZZZZ', 'the data file for this test should appear as a list private_item'
 
     # check for avatars
     assert_select '.list_item_avatar' do
@@ -1403,7 +1403,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'uploader can publish the item when projects associated with the item have no gatekeeper' do
+  test 'uploader can publish the private_item when projects associated with the private_item have no gatekeeper' do
     uploader = Factory(:user)
     data_file = Factory(:data_file, contributor: uploader)
     assert_equal Policy::NO_ACCESS, data_file.policy.access_type
@@ -1415,7 +1415,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
-  test 'the person who has the manage right to the item, CAN publish the item, if no gatekeeper for projects associated with the item' do
+  test 'the person who has the manage right to the private_item, CAN publish the private_item, if no gatekeeper for projects associated with the private_item' do
     person = Factory(:person)
     policy = Factory(:policy)
     Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
@@ -1431,7 +1431,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
-  test 'the person who has the manage right to the item, CAN publish the item, if the item WAS published' do
+  test 'the person who has the manage right to the private_item, CAN publish the private_item, if the private_item WAS published' do
     person = Factory(:person)
     policy = Factory(:policy)
     Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
@@ -1447,7 +1447,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   # TODO: Permission UI testing - Replace these with Jasmine tests
-  # test "should enable the policy scope 'all visitor...' when uploader edit the item" do
+  # test "should enable the policy scope 'all visitor...' when uploader edit the private_item" do
   #   uploader = Factory(:user)
   #   data_file = Factory(:data_file, contributor: uploader)
   #   assert_equal Policy::NO_ACCESS, data_file.policy.access_type
@@ -1779,7 +1779,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df.version, json['data']['attributes']['version']
   end
 
-  test 'landing page for hidden item' do
+  test 'landing page for hidden private_item' do
     df = Factory(:data_file, policy: Factory(:private_policy), title: 'fish flop', description: 'testing json description')
     assert !df.can_view?
 
@@ -1792,7 +1792,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', person_path(contributor_person), count: 0
   end
 
-  test 'landing page for hidden item with the contributor contact' do
+  test 'landing page for hidden private_item with the contributor contact' do
     df = Factory(:data_file, policy: Factory(:private_policy), title: 'fish flop', description: 'testing json description')
 
     project = df.projects.first
@@ -1813,7 +1813,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', person_path(contributor_person)
   end
 
-  test 'landing page for hidden item which DOI was minted' do
+  test 'landing page for hidden private_item which DOI was minted' do
     df = Factory(:data_file, policy: Factory(:private_policy), title: 'fish flop', description: 'testing json description')
     comment = 'the paper was retracted'
     AssetDoiLog.create(asset_type: df.class.name, asset_id: df.id, asset_version: df.version, action: AssetDoiLog::MINT)
@@ -1827,14 +1827,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'p.comment', text: /#{comment}/
   end
 
-  test 'landing page for non-existing item' do
+  test 'landing page for non-existing private_item' do
     get :show, id: 123
     assert_response :not_found
     assert_select 'h1', text: '404'
     assert_select 'h2', text: 'The requested page or resource does not exist.'
   end
 
-  test 'landing page for deleted item which DOI was minted' do
+  test 'landing page for deleted private_item which DOI was minted' do
     comment = 'the paper was restracted'
     klass = 'DataFile'
     id = 123
@@ -2797,5 +2797,54 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def valid_data_file_with_https_url
     [{ title: 'Test HTTP', project_ids: [projects(:sysmo_project).id] }, { data_url: 'https://mockedlocation.com/txt_test.txt', make_local_copy: '0' }]
+  end
+
+  test 'AAApolicy visibility in JSON' do
+    asset_housekeeper = Factory(:asset_housekeeper)
+    private_policy = Factory(:private_policy)
+    visible_policy = Factory(:publicly_viewable_policy)
+    owner = Factory(:person)
+    random_person = Factory(:person)
+    private_item = Factory(:data_file,
+                   policy: private_policy,
+                   title: 'some title',
+                   description: 'some description',
+                   contributor: owner.user)
+    visible_item = Factory(:data_file,
+                           policy: visible_policy,
+                           title: 'some title',
+                           description: 'some description',
+                           contributor: owner.user)
+
+   login_as owner.user
+
+      get :show, id: private_item, format: :json
+      assert_response :success
+      parsed_response = JSON.parse(@response.body)
+      assert parsed_response['data']['attributes'].has_key?('policy')
+      assert parsed_response['data']['attributes']['policy'].has_key?('access')
+    get :show, id: visible_item, format: :json
+    assert_response :success
+    parsed_response = JSON.parse(@response.body)
+    assert parsed_response['data']['attributes'].has_key?('policy')
+    assert parsed_response['data']['attributes']['policy'].has_key?('access')
+
+    logout
+
+    get :show, id: private_item, format: :json
+    assert_response :forbidden
+    get :show, id: visible_item, format: :json
+    assert_response :success
+    parsed_response = JSON.parse(@response.body)
+    assert_not parsed_response['data']['attributes'].has_key?('policy')
+
+    login_as random_person.user
+    get :show, id: private_item, format: :json
+    assert_response :forbidden
+    get :show, id: visible_item, format: :json
+    assert_response :success
+    parsed_response = JSON.parse(@response.body)
+    assert_not parsed_response['data']['attributes'].has_key?('policy')
+    logout
   end
 end

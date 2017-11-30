@@ -4,11 +4,11 @@ class BaseSerializer < SimpleBaseSerializer
   include RelatedItemsHelper
   include Rails.application.routes.url_helpers
 
-  # attribute :policy, if: :show_policy?
-  #
-  # def policy
-  #   convert_policy object.policy
-  # end
+  attribute :policy, if: :show_policy?
+
+  def policy
+    convert_policy object.policy
+  end
 
   def associated(name)
     unless @associated[name].blank?
@@ -97,33 +97,29 @@ class BaseSerializer < SimpleBaseSerializer
                   end
   end
 
-  # def convert_policy policy
-  #   { 'access' => (access_type_key policy.access_type),
-  #     'permissions' => (permits policy)}
-  # end
-  #
-  # def permits policy
-  #   result = []
-  #   policy.permissions.each do |p|
-  #     result.append ({'resource_type' => p.contributor_type.downcase.pluralize,
-  #                     'resource_id' => p.contributor_id,
-  #                     'access' => (access_type_key p.access_type) } )
-  #   end
-  #   return result
-  # end
-
-  def administerable?
-    answer = false
-    begin
-      answer = object.can_be_administered_by?(User.current_user)
-    rescue
-    end
-    return answer
+  def convert_policy policy
+    { 'access' => (access_type_key policy.access_type),
+      'permissions' => (permits policy)}
   end
 
-  # def show_policy?
-  #   return object.respond_to?('policy') && object.respond_to?('can_manage?') && object.can_manage?(User.current_user)
-  # end
+  def permits policy
+    result = []
+    policy.permissions.each do |p|
+      result.append ({'resource_type' => p.contributor_type.downcase.pluralize,
+                      'resource_id' => p.contributor_id,
+                      'access' => (access_type_key p.access_type) } )
+    end
+    return result
+  end
+
+  def show_policy?
+    has_policy = object.respond_to?('policy')
+    respond_to_manage = object.respond_to?('can_manage?')
+    respond_to_policy = object.respond_to?('policy')
+    current_user = User.current_user
+    can_manage = object.can_manage?(current_user)
+    return respond_to_policy && respond_to_manage && can_manage
+  end
 
 
 end
