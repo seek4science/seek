@@ -116,8 +116,8 @@ If your database is already UTF-8 encoded, you don't need to convert.
 First refer to *config/database.yml* to check the database name, and the
 username and password you use.
 
-The following commands help you to check the current encoding, but replacing
-<mysql_username> and <database_name>:
+The following commands help you to check the current encoding, but replacing <mysql_username> and <database_name>:
+
     mysql -u <mysql_username> -p <database_name>
     SHOW VARIABLES LIKE 'character_set%';
 
