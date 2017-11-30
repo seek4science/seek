@@ -10,7 +10,7 @@ class SessionsController < ApplicationController
 
   # render new.html.erb
   def new
-    
+
   end
 
   def index
@@ -56,7 +56,6 @@ class SessionsController < ApplicationController
       failed_login "Invalid username/password. Have you <b> #{view_context.link_to "forgotten your password?", main_app.forgot_password_url }</b>".html_safe
     end
   end
-
 
   private
 
