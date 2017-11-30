@@ -177,6 +177,6 @@ If you don't use SEEK with Apache, the command to start it is now:
 
 If you run SEEK with Apache, you may find you need to update and reconfigure
 Apache and Passenger Phusion. Please follow the steps in this section of the
-[Production Installation Guide](doc/INSTALL-PRODUCTION.html)
+[Production Installation Guide](install-production.html)
 
 
