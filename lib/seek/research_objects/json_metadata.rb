@@ -6,8 +6,8 @@ module Seek
     class JSONMetadata < Metadata
       include Singleton
 
-      CANDIDATE_PROPERTIES = [:title, :description, :assay_type_uri, :technology_type_uri,
-                              :version, :doi, :doi_uri, :pubmed_id, :pubmed_uri]
+      CANDIDATE_PROPERTIES = %i[title description assay_type_uri technology_type_uri
+                                version doi doi_uri pubmed_id pubmed_uri].freeze
 
       def metadata_content(item, parents = [])
         json = { id: item.id, uri: item_uri(item) }

@@ -181,19 +181,21 @@ module BootstrapHelper
 
     original_opts = typeahead_opts.is_a?(TrueClass) ? {} : typeahead_opts
 
-    unless options.key?('data-typeahead-prefetch-url')
-      options['data-typeahead-prefetch-url'] = if original_opts[:type]
-        latest_tags_path(type: original_opts[:type])
-      else
-        latest_tags_path
+    unless options.key?('data-typeahead-local-values')
+      unless options.key?('data-typeahead-prefetch-url')
+        options['data-typeahead-prefetch-url'] = if original_opts[:type]
+          latest_tags_path(type: original_opts[:type])
+        else
+          latest_tags_path
+        end
       end
-    end
 
-    unless options.key?('data-typeahead-query-url')
-      options['data-typeahead-query-url'] = if original_opts[:type]
-        (query_tags_path(type: original_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
-      else
-        (query_tags_path + '?query=%QUERY').html_safe
+      unless options.key?('data-typeahead-query-url')
+        options['data-typeahead-query-url'] = if original_opts[:type]
+          (query_tags_path(type: original_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
+        else
+          (query_tags_path + '?query=%QUERY').html_safe
+        end
       end
     end
 

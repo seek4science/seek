@@ -1,0 +1,102 @@
+{
+  "data": {
+    "id": "1039986486",
+    "type": "assays",
+    "attributes": {
+      "tags": null,
+      "title": "A Minimal Assay",
+      "description": null,
+      "assay_class": {
+        "title":"Experimental assay",
+        "key":"EXP",
+        "description": "An experimental assay class description"
+      },
+      "assay_type": {
+        "label":"Experimental assay type",
+        "uri":"http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+      },
+      "technology_type": {
+        "label":"Technology type",
+        "uri":"http://jermontology.org/ontology/JERMOntology#Technology_type"
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "1039986548",
+            "type": "people"
+          }
+        ]
+      },
+      "organisms": {
+        "data":[]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "1039986548",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1022250702",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigation": {
+        "data":
+          {
+            "id": "973654814",
+            "type": "investigations"
+          }
+
+      },
+      "study": {
+        "data":
+          {
+            "id": "1060384872",
+            "type": "studies"
+          }
+      },
+      "data_files": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "sops": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "strains": {
+        "data": []
+      },
+      "samples": {
+        "data":[]
+      }
+    },
+    "links": {
+      "self": "/assays/1039986486"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

@@ -76,3 +76,5 @@ vendor/cache/
 coverage/
 
 Test\ Results*.html
+
+bin/

@@ -3,7 +3,7 @@ require 'rdf'
 module Seek
   module Ontologies
     class AssayTypeReader < OntologyReader
-      TERM_TYPE = 'assay'
+      TERM_TYPE = 'assay'.freeze
 
       def default_parent_class_uri
         RDF::URI.new(Seek::Config.assay_type_base_uri)

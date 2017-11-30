@@ -73,7 +73,7 @@ class AssetTest < ActiveSupport::TestCase
     df = Factory :data_file
     assay = Factory :experimental_assay
     assay2 = Factory :modelling_assay
-    assay3 = Factory :modelling_assay, assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle'
+    assay3 = Factory :modelling_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Cell_cycle'
     assay4 = Factory :modelling_assay, assay_type_uri: 'http://some-made-up-uri-not-resolvable-from-ontology.org/types#to_force_nil_label'
 
     disable_authorization_checks do
@@ -159,8 +159,8 @@ class AssetTest < ActiveSupport::TestCase
 
   test 'tech type titles' do
     df = Factory :data_file
-    assay = Factory :experimental_assay, technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding'
-    assay2 = Factory :experimental_assay, technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Imaging'
+    assay = Factory :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+    assay2 = Factory :experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Imaging'
     assay3 = Factory :modelling_assay
 
     disable_authorization_checks do
@@ -302,15 +302,15 @@ class AssetTest < ActiveSupport::TestCase
     end
   end
 
-  test 'is_any_doi_minted?' do
+  test 'has_doi??' do
     df = Factory :data_file
     new_version = Factory :data_file_version, data_file: df
     assert_equal 2, df.version
-    assert !df.is_any_doi_minted?
+    assert !df.has_doi?
 
     new_version.doi = 'test_doi'
     disable_authorization_checks { new_version.save }
-    assert df.reload.is_any_doi_minted?
+    assert df.reload.has_doi?
   end
 
   test 'should not be able to delete after doi' do
@@ -337,5 +337,35 @@ class AssetTest < ActiveSupport::TestCase
         assert_equal "xxx/yyy.model.#{model.id}.1", model.generated_doi(1)
       end
     end
+  end
+
+  test 'doi indentifier' do
+    df = Factory :data_file
+    assert_nil df.latest_version.doi_identifier
+    disable_authorization_checks do
+      df.latest_version.update_attribute(:doi,'10.x.x.x/1')
+    end
+    assert_equal 'https://doi.org/10.x.x.x/1',df.latest_version.doi_identifier
+  end
+
+  test 'doi identifiers' do
+    df = Factory :data_file
+    assert_empty df.doi_identifiers
+
+    disable_authorization_checks do
+      df.latest_version.update_attribute(:doi,'10.x.x.x/1')
+      df.save_as_new_version
+      df.save_as_new_version
+      df.reload
+      df.latest_version.update_attribute(:doi,'10.x.x.x/2')
+    end
+
+    assert_equal 3,df.versions.count
+
+    assert_equal ['https://doi.org/10.x.x.x/1','https://doi.org/10.x.x.x/2'].sort,df.doi_identifiers
+
+    #just check others respond to method
+    assert Factory(:model).respond_to?(:doi_identifiers)
+    assert Factory(:sop).respond_to?(:doi_identifiers)
   end
 end

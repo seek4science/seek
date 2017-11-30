@@ -23,6 +23,8 @@ require 'minitest'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
 
+Minitest::Test.i_suck_and_my_tests_are_order_dependent!
+
 module ActionView
   class Renderer
     def self.get_alternative(key)
@@ -125,6 +127,11 @@ class ActiveSupport::TestCase
     Factory(:admin, first_name: 'default admin')
   end
 
+  # At least one sample attribute type is needed for building sample types from spreadsheets
+  def create_sample_attribute_type
+    Factory(:string_sample_attribute_type)
+  end
+
   def clear_rails_cache
     Rails.cache.clear
     Seek::Config.clear_temporary_filestore
@@ -134,6 +141,24 @@ class ActiveSupport::TestCase
     User.current_user = nil
   end
 
+  def add_avatar_to_test_object(obj)
+    obj.avatar = Factory(:avatar, owner: obj)
+    obj.save
+  end
+
+  def add_tags_to_test_object(obj)
+    name = obj.class.to_s
+    #for i in 1..5 do
+    [1,2,3,4,5].each do |i|
+      tag = Factory :tag, value: "#{name}-tag#{i}", source: User.current_user, annotatable: obj
+      obj.reload
+    end
+  end
+
+  def add_creator_to_test_object(obj)
+    obj.creators = [Factory(:person)]
+    obj.save
+  end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded

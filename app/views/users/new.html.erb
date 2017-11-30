@@ -1,5 +1,6 @@
 <h1>Signup for <%= Seek::Config.application_name %></h1>
 
+
 <% if User.count == 0 -%>
     <%= alert_box('info', :hide_button => true) do %>
         There are currently no users defined in the system. You should now register an initial user.
@@ -31,6 +32,9 @@
       </p>
     </div>
     <div class="col-md-7 col-md-pull-5">
+      <p style="text-align:right">
+        <%= help_link :registering,link_text:'Registration guide',include_icon:true %>
+      </p>
       <%= form_for @user do |f| -%>
 
 

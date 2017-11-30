@@ -13,8 +13,8 @@ class OpenbisEndpoint < ActiveRecord::Base
   validates :space_perm_id, uniqueness: { scope: %i[dss_endpoint as_endpoint space_perm_id project_id],
                                           message: 'the endpoints and the space must be unique for this project' }
 
-  after_create :create_refresh_metadata_store_job
-  after_destroy :clear_metadata_store, :remove_refresh_metadata_store_job
+  after_create :create_refresh_metadata_job
+  after_destroy :clear_metadata_store, :remove_refresh_metadata_job
   after_initialize :default_policy, autosave: true
 
   def self.can_create?
@@ -52,6 +52,29 @@ class OpenbisEndpoint < ActiveRecord::Base
     "#{web_endpoint} : #{space_perm_id}"
   end
 
+  def refresh_metadata
+    if test_authentication
+      Rails.logger.info("REFRESHING METADATA FOR Openbis Space #{id}")
+
+      clear_metadata_store
+      reindex_entities
+    else
+      Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not refreshing METADATA")
+    end
+  end
+
+  def reindex_entities
+    # ugly should reindex only those that have changed
+    datafiles = registered_datafiles
+    ReindexingJob.new.add_items_to_queue datafiles unless datafiles.empty?
+  end
+
+  def registered_datafiles
+    # ugly will scan all content blobs from data files
+    url = "openbis:#{id}"
+    DataFile.all.select { |df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url) }
+  end
+
   def clear_metadata_store
     if test_authentication
       Rails.logger.info("CLEARING METADATA STORE FOR Openbis Space #{id}")
@@ -61,11 +84,11 @@ class OpenbisEndpoint < ActiveRecord::Base
     end
   end
 
-  def create_refresh_metadata_store_job
+  def create_refresh_metadata_job
     OpenbisEndpointCacheRefreshJob.new(self).queue_job
   end
 
-  def remove_refresh_metadata_store_job
+  def remove_refresh_metadata_job
     OpenbisEndpointCacheRefreshJob.new(self).delete_jobs
   end
 

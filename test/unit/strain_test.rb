@@ -48,7 +48,7 @@ class StrainTest < ActiveSupport::TestCase
 
   test 'ncbi uri' do
     strain = Factory(:strain, organism: Factory(:organism, bioportal_concept: Factory(:bioportal_concept)))
-    assert_equal 'http://purl.obolibrary.org/obo/NCBITaxon_2287', strain.ncbi_uri
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2287', strain.ncbi_uri
 
     strain = Factory(:organism)
 

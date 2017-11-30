@@ -48,7 +48,7 @@ SEEK::Application.configure do
   config.action_view.raise_on_missing_translations = true
 
   # TODO: Change this to: `:random` when tests are all passing
-  config.active_support.test_order = :random
+  config.active_support.test_order = :sorted
 
   # Asset digests allow you to set far-future HTTP expiration dates on all assets,
   # yet still be able to expire them through the digest params.
@@ -56,4 +56,5 @@ SEEK::Application.configure do
 
   # Uncomment this to raise exception on unpermitted params:
   # config.action_controller.action_on_unpermitted_parameters = :raise
+
 end

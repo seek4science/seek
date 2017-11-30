@@ -1,8 +1,8 @@
 class SampleAttributeType < ActiveRecord::Base
-  # attr_accessible :base_type, :regexp, :title, :placeholder
+  # attr_accessible :base_type, :regexp, :title, :placeholder, :description, :resolution
 
   validates :title, :base_type, :regexp, presence: true
-  validate :validate_allowed_type, :validate_regular_expression
+  validate :validate_allowed_type, :validate_regular_expression, :validate_resolution
 
   before_save :set_defaults_attributes
   after_initialize :set_defaults_attributes
@@ -52,6 +52,10 @@ class SampleAttributeType < ActiveRecord::Base
   def check_value_against_regular_expression(value)
     match = regular_expression.match(value.to_s)
     match && (match.to_s == value.to_s)
+  end
+
+  def validate_resolution
+    (!resolution.present?) || (resolution.include? '\\')
   end
 
   def check_value_against_base_type(value, additional_options)

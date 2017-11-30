@@ -262,15 +262,15 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute endpoint.metadata_store.exist?(key)
   end
 
-  test 'create_refresh_metadata_store_job' do
+  test 'create_refresh_metadata_job' do
     endpoint = Factory(:openbis_endpoint)
     Delayed::Job.destroy_all
     refute OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
     assert_difference('Delayed::Job.count', 1) do
-      endpoint.create_refresh_metadata_store_job
+      endpoint.create_refresh_metadata_job
     end
     assert_no_difference('Delayed::Job.count') do
-      endpoint.create_refresh_metadata_store_job
+      endpoint.create_refresh_metadata_job
     end
     assert OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
   end
@@ -312,5 +312,77 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal 'frog', endpoint.password
     refute_nil endpoint.encrypted_password
     refute_nil endpoint.encrypted_password_iv
+  end
+
+  test 'registered_datafiles finds only own datafiles' do
+    endpoint1 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
+                                    web_endpoint: 'http://my-openbis.org/doesnotmatter',
+                                    as_endpoint: 'http://my-openbis.org/doesnotmatter',
+                                    dss_endpoint: 'http://my-openbis.org/doesnotmatter',
+                                    space_perm_id: 'space1',
+                                    refresh_period_mins: 60
+
+    endpoint2 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
+                                    web_endpoint: 'http://my-openbis.org/doesnotmatter',
+                                    as_endpoint: 'http://my-openbis.org/doesnotmatter',
+                                    dss_endpoint: 'http://my-openbis.org/doesnotmatter',
+                                    space_perm_id: 'space2',
+                                    refresh_period_mins: 60
+
+    disable_authorization_checks do
+      assert endpoint1.save
+      assert endpoint2.save
+    end
+
+    datafile1 = Seek::Openbis::Dataset.new(endpoint1, '20160210130454955-23').create_seek_datafile
+    assert datafile1.save
+    datafile2 = Seek::Openbis::Dataset.new(endpoint1, '20160215111736723-31').create_seek_datafile
+    assert datafile2.save
+    datafile3 = Seek::Openbis::Dataset.new(endpoint2, '20160210130454955-23').create_seek_datafile
+    assert datafile3.save
+
+    df = endpoint1.registered_datafiles
+    assert_includes df, datafile1
+    assert_includes df, datafile2
+    assert_not_includes df, datafile3
+
+    df = endpoint2.registered_datafiles
+    assert_equal [datafile3], df
+  end
+
+  test 'reindex_entities queues new indexing job' do
+    endpoint = Factory(:openbis_endpoint)
+    datafile1 = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23').create_seek_datafile
+    assert datafile1.save
+    Delayed::Job.destroy_all
+    # don't know how to test that it was really reindexing job with correct content
+    assert_difference('Delayed::Job.count', 1) do
+      endpoint.reindex_entities
+    end
+    assert ReindexingQueue.exists?(item: datafile1)
+  end
+
+  # it should actually test for synchronization but I don't know how to achieve it
+  # needs OpenBIS mock that can be set to return particular values
+  test 'refresh_metadata clears store and triggers reindexing' do
+    endpoint = Factory(:openbis_endpoint)
+    datafile1 = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23').create_seek_datafile
+    assert datafile1.save
+
+    key = 'TZ'
+    store = endpoint.metadata_store
+    store.fetch(key) do
+      'Tomek'
+    end
+
+    assert_equal 'Tomek', store.fetch(key)
+
+    Delayed::Job.destroy_all
+    assert_difference('Delayed::Job.count', 1) do
+      endpoint.refresh_metadata
+    end
+    assert ReindexingQueue.exists?(item: datafile1)
+
+    refute endpoint.metadata_store.exist?(key)
   end
 end

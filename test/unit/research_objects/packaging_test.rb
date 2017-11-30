@@ -24,4 +24,12 @@ class PackagingTest < ActiveSupport::TestCase
     assert_equal "data_files/#{data_file.ro_package_path_id_fragment}/", data_file.research_object_package_path([study, assay])
     assert_equal "data_files/#{data_file.ro_package_path_id_fragment}/", data_file.research_object_package_path([inv, study, assay])
   end
+
+  test 'fragment truncated and parameterized' do
+    #should be truncated to 50 chars + id
+    assay = Factory(:assay,title:'Lorem ipsum dolor sit amet consectetur adipiscing elit. Curabitur molestie at mauris sit amet amet.')
+    fragment = assay.ro_package_path_id_fragment
+    assert_equal "#{assay.id}-lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-",fragment
+    assert_equal 50,fragment.gsub(assay.id.to_s+'-','').length
+  end
 end

@@ -1,13 +1,12 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.8'
+gem 'rails', '~> 4.2.9'
 gem 'rdoc'
 
 #database adaptors
 gem 'mysql2'
 gem 'pg'
 gem 'sqlite3'
-
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
@@ -29,9 +28,13 @@ gem 'dynamic_form'
 gem 'prototype-rails', git: 'https://github.com/rails/prototype-rails', branch: '4.2'
 gem 'delayed_job_active_record'
 gem 'daemons'
-gem 'cancan'
 gem 'linkeddata'
 gem 'openseek-api'
+gem 'jbuilder', '~> 2.0'
+gem 'jbuilder-json_api'
+gem 'active_model_serializers', '~> 0.10.2'
+gem 'json-schema'
+gem 'json-diff'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
@@ -68,7 +71,7 @@ gem 'white_list', git: 'https://github.com/SysMO-DB/white_list.git'
 gem 'white_list_formatted_content', git: 'https://github.com/SysMO-DB/white_list_formatted_content.git'
 gem 'my_savage_beast', git: 'https://github.com/SysMO-DB/my_savage_beast.git'
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
-gem 'bioportal', '>=2.3', git: 'https://github.com/SysMO-DB/bioportal.git'
+gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'acts_as_activity_logged', git: 'https://github.com/SysMO-DB/acts_as_activity_logged.git'
 gem 'app_version', git: 'https://github.com/SysMO-DB/app_version.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
@@ -121,8 +124,6 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'activerecord-session_store'
 # gem 'protected_attributes' # Delete me after refactoring
 gem 'rails-observers'
-
-gem 'jbuilder', '~> 2.0'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'

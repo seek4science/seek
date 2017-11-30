@@ -29,6 +29,10 @@ module Seek
       end
 
       def populate_from_json(json)
+        # for debug by TZ
+        # puts "Populates #{self.class} from json"
+        # puts json
+        # puts '-----'
         @json = json
         @modifier = json['modifier']
         @code = json['code']
@@ -112,9 +116,9 @@ module Seek
       def cached_query_by_perm_id(perm_id)
         raise 'Block required for doing query' unless block_given?
         key = cache_key(perm_id)
-        Rails.logger.info("CACHE KEY = #{key}")
+        Rails.logger.info("OBIS CACHE KEY = #{key}")
         openbis_endpoint.metadata_store.fetch(key) do
-          Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")
+          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{perm_id}")
           yield
         end
       end

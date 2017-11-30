@@ -10,7 +10,10 @@
         <%= f.hidden_field :ontology_id -%>
 
         <div class="form-group">
-          <label>Taxonomy uri</label>
+          <label>NCBI Taxonomy URI</label>
+          <span class='help-block'>A valid NCBI taxonomy URI is required. This can be of the form http://purl.bioontology.org/ontology/NCBITAXON/&lt;Number&gt; or https://identifiers.org/taxonomy/&lt;Number&gt;<br/>
+          You can just enter the NCBI number, and it will automatically be turned into a valid URI.
+          </span>
           <%= f.text_field :concept_uri, :class => "form-control" -%>
         </div>
 

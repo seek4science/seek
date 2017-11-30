@@ -1,0 +1,34 @@
+// This fails
+
+{
+    "data": {
+        "attributes": {
+            "tags": null,
+            "title": "An assay 27",
+            "description": null,
+            "assay_class": {
+                "title": "Experimental assay",
+                "key": "EXP",
+                "description": null
+            },
+            "assay_type": {
+                "label": "Experimental Assay Type",
+                "uri": "http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+            },
+            "technology_type": {
+                "label": "Technology Type",
+                "uri": "http://jermontology.org/ontology/JERMOntology#Technology_type"
+            }
+        },
+        "relationships": {
+            "studies": {
+                "data": [
+                    {
+                        "id": "1",
+                        "type": "studies"
+                    }
+                ]
+            }
+        }
+    }
+}

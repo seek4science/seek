@@ -1029,8 +1029,8 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, id: proj, format: 'json'
     assert_response :success
     json = JSON.parse(@response.body)
-    assert_equal 'fishing project', json['title']
-    assert_equal 'investigating fishing', json['description']
+    assert_equal 'fishing project', json['data']['attributes']['title']
+    assert_equal 'investigating fishing', json['data']['attributes']['description']
   end
 
   test 'admin members available to admin' do
@@ -1066,18 +1066,24 @@ class ProjectsControllerTest < ActionController::TestCase
     new_institution = Factory(:institution)
     new_person = Factory(:person)
     new_person2 = Factory(:person)
+    new_person3 = Factory(:person)
 
-    assert_no_difference('GroupMembership.count') do # 2 deleted, 2 added
+    assert_difference('GroupMembership.count',1) do # 2 deleted, 3 added
       assert_no_difference('WorkGroup.count') do # 1 empty group will be deleted, 1 will be added
-        post :update_members,
-             id: project,
-             group_memberships_to_remove: [group_membership.id, group_membership2.id],
-             people_and_institutions_to_add: [{ 'person_id' => new_person.id, 'institution_id' => new_institution.id }.to_json, { 'person_id' => new_person2.id, 'institution_id' => new_institution.id }.to_json]
-        assert_redirected_to project_path(project)
-        assert_nil flash[:error]
-        refute_nil flash[:notice]
+        assert_emails(3) do
+          post :update_members,
+               id: project,
+               group_memberships_to_remove: [group_membership.id, group_membership2.id],
+               people_and_institutions_to_add: [{ 'person_id' => new_person.id, 'institution_id' => new_institution.id }.to_json,
+                                                { 'person_id' => new_person2.id, 'institution_id' => new_institution.id }.to_json,
+                                                { 'person_id' => new_person3.id, 'institution_id' => new_institution.id }.to_json]
+        end
       end
     end
+
+    assert_redirected_to project_path(project)
+    assert_nil flash[:error]
+    refute_nil flash[:notice]
 
     assert_includes project.institutions, new_institution
     assert_includes project.people, new_person
@@ -1469,6 +1475,14 @@ class ProjectsControllerTest < ActionController::TestCase
     assert project.default_policy
 
 
+  end
+
+  def edit_max_object(project)
+    for i in 1..5 do
+      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+    end
+    project.programme_id = (Factory(:programme)).id
+    add_avatar_to_test_object(project)
   end
 
   private

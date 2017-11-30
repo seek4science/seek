@@ -41,7 +41,8 @@ class PublicationsController < ApplicationController
       format.html # show.html.erb
       format.xml
       format.rdf { render template: 'rdf/show' }
-      format.any(*Publication::EXPORT_TYPES.keys) { send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}" }
+      format.json {render json: @publication}
+      format.any( *Publication::EXPORT_TYPES.keys ) { send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}" }
     end
   end
 
@@ -145,9 +146,11 @@ class PublicationsController < ApplicationController
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
         format.xml  { head :ok }
+        format.json { render json: @publication, status: :ok}
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
+        format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -393,6 +396,7 @@ class PublicationsController < ApplicationController
           flash[:notice] = 'Publication was successfully created.'
           format.html { redirect_to(edit_publication_url(@publication)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
+          format.json  { render json: @publication, status: :created, location: @publication }
         end
       end
     else # Publication save not successful
@@ -429,12 +433,14 @@ class PublicationsController < ApplicationController
           flash[:notice] = 'Publication was successfully created.'
           format.html { redirect_to(edit_publication_url(@publication)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
+          format.json { render json: @publication, status: :created, location: @publication }
         end
       end
     else # Publication save not successful
       respond_to do |format|
         format.html { render action: 'new' }
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
+        format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -468,10 +474,13 @@ class PublicationsController < ApplicationController
       respond_to do |format|
         format.html { render action: 'new' }
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
+        format.json { render json: @publication.errors, status: :unprocessable_entity }
+
       end
     else
       respond_to do |format|
         format.html { render action: 'new' }
+        format.json { render json: @publication, status: :ok }
       end
     end
   end
@@ -526,11 +535,13 @@ class PublicationsController < ApplicationController
       respond_to do |format|
         format.html { render action: 'new' }
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
+        format.json  { render json: @publication.errors, status: :unprocessable_entity }
       end
     else
       respond_to do |format|
         format.html { redirect_to(action: :index) }
         format.xml  { render xml: publications, status: :created, location: @publication }
+        format.json  { render json: publications, status: :created, location: @publication }
       end
     end
   end

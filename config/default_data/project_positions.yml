@@ -1,7 +1,3 @@
-member:
-  id: 1
-  name: Member
-
 vice coordinator:
   id: 2
   name: Vice Coordinator

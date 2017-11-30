@@ -1,6 +1,6 @@
-<% logged_in?? cache_name = "footer" : cache_name = "footer1" %>
+<% logged_in?? cache_name = 'footer' : cache_name = 'footer1' %>
 
-<% cache cache_name do -%>
+<% cache cache_name, skip_digest: true do -%>
     <div id="ft">
       <div class="container">
         <div id="seek-credit">

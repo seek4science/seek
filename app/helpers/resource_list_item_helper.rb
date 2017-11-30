@@ -4,20 +4,18 @@ module ResourceListItemHelper
   end
 
   def get_list_item_actions_partial(resource)
-    if resource.authorization_supported? && resource.is_downloadable_asset?
-      actions_partial = 'assets/resource_actions_td'
-    elsif resource.is_a?(Organism)
-      actions_partial = 'organisms/resource_actions_td'
-    else
-      actions_partial = nil
-    end
+    actions_partial = if resource.authorization_supported? && resource.is_downloadable_asset?
+                        'assets/resource_actions_td'
+                      elsif resource.is_a?(Organism)
+                        'organisms/resource_actions_td'
+                      end
     actions_partial
   end
 
   def get_list_item_avatar_partial(resource)
     if resource.show_contributor_avatars?
       'assets/asset_avatars'
-    elsif resource.class.name.downcase == 'event'
+    elsif resource.class.name.casecmp('event').zero?
       ''
     else
       'avatars/list_item_avatars'
@@ -34,7 +32,7 @@ module ResourceListItemHelper
 
       title = get_object_title(resource) if title.nil?
 
-      html = "<div class=\"list_item_title\">"
+      html = '<div class="list_item_title">'
 
       if resource.class.name.split('::')[0] == 'Person'
         html = list_item_title_for_person(html, resource, title, url)
@@ -42,7 +40,7 @@ module ResourceListItemHelper
         if include_avatar && (resource.avatar_key || resource.use_mime_type_for_avatar?)
           html = list_item_title_with_avatar(html, resource, title, url)
         else
-          html << "#{link_to title, (url.nil? ? show_resource_path(resource) : url)}"
+          html << (link_to title, (url.nil? ? show_resource_path(resource) : url)).to_s
         end
       end
       html << '</div>'
@@ -81,11 +79,11 @@ module ResourceListItemHelper
       html << "<span class='none_text'>Not specified</span>"
     else
       items.each do |i|
-        if block_given?
-          value = yield(i)
-        else
-          value = (link_to get_object_title(i), show_resource_path(i))
-        end
+        value = if block_given?
+                  yield(i)
+                else
+                  (link_to get_object_title(i), show_resource_path(i))
+                end
         html << value + (i == items.last ? '' : ', ')
       end
     end
@@ -130,7 +128,8 @@ module ResourceListItemHelper
   end
 
   def list_profile_registered_timestamp(resource)
-    html = "<p class=\"list_item_attribute none_text\" style=\"text-align:center;\"><b>Registered:</b> <label>" + (resource.try(:user).try(:created_at).nil? ? 'Not yet registered' : date_as_string(resource.try(:user).try(:created_at)))
+    html = '<p class="list_item_attribute none_text" style="text-align:center;"><b>Registered:</b> <label>'
+    html << (resource.try(:user).try(:created_at).nil? ? 'Not yet registered' : date_as_string(resource.try(:user).try(:created_at)))
     html << '</label></p>'
     html.html_safe
   end
@@ -155,7 +154,7 @@ module ResourceListItemHelper
     trunc_text = text_or_not_specified(text, description: false, auto_link: false, length: length)
     # Don't bother with fancy stuff if not enough text to expand
     if full_text == trunc_text
-      html = (attribute ? "<p class=\"list_item_attribute\"><b>#{attribute}</b>:</p>" : '') + "<div class=\"list_item_desc\">"
+      html = (attribute ? "<p class=\"list_item_attribute\"><b>#{attribute}</b>:</p>" : '') + '<div class="list_item_desc">'
       html << trunc_text
       html << '</div>'
       html.html_safe
@@ -223,5 +222,19 @@ module ResourceListItemHelper
     authors = all_authors.select { |a| a.person && a.person.can_view? }
     other_authors = all_authors.select { |a| a.person.nil? }.map { |a| a.last_name + ' ' + a.first_name }.join(',')
     list_item_person_list(authors.map(&:person), other_authors, 'Author')
+  end
+
+  def list_item_doi(resource)
+    if resource.respond_to?(:has_doi?) && resource.has_doi?
+      content_tag(:p, class: 'list_item_attribute') do
+        content = content_tag(:b, 'DOI: ')
+        content << doi_link(resource.latest_citable_resource)
+        content << content_tag(:span, '', class: :doi_icon)
+      end
+    end
+  end
+
+  def list_item_orcid(person)
+    orcid_identifier(person) if person.orcid.present?
   end
 end

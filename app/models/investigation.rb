@@ -3,7 +3,6 @@ class Investigation < ActiveRecord::Base
 
   acts_as_isa
   acts_as_snapshottable
-  acts_as_doi_mintable
 
   attr_accessor :new_link_from_study
 

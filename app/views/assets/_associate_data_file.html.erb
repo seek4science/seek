@@ -52,26 +52,53 @@
     <hr/>
 
     <%= association_selector('data_file_to_list', 'Associate data', 'Associate data', size: 'md') do %>
-        <label>Select data file</label>
-        <%= filterable_association_select(filter_data_files_path(:assay_id => resource.id)) do %>
-            <%= render :partial => 'data_files/association_preview', :collection => DataFile.limit(0),
-                       :locals => { :existing => resource.data_files }
-            %>
+        <% if has_relationships -%>
+            <div class="form-group">
+              <%= label_tag "How was the data used in this #{resource_text}?" %>
+              <%= select_tag :relationship_type, options_for_select([['Not specified',0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),
+                             class: 'form-control', 'data-role' => 'seek-association-common-field'
+              %>
+            </div>
         <% end %>
 
         <hr/>
-        <% if has_relationships -%>
-            <div class="form-group">
-              <%= label_tag "How was the data used in this #{resource_text}" %>
-              <%= select_tag :relationship_type, options_for_select([["None",0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),:class => 'form-control',
-                             'data-role' => 'seek-association-common-field' %>
-            </div>
-        <% end %>
+
+        <label>Select data file</label>
+        <div class="form-group" data-role="seek-association-filter-group" data-filter-url="<%= filter_data_files_path(assay_id: resource.id) -%>">
+          <%= association_select_filter %>
+
+          <div class="checkbox">
+            <label>
+              <%= check_box_tag(:all_projects, '1', false, 'data-role' => 'seek-association-filter-field') %>
+              <strong>Show data from all projects?</strong>
+            </label>
+          </div>
+
+          <%= check_box_tag(:simulation_data, '1', false, style: 'display: none', 'data-role' => 'seek-association-filter-field') %>
+
+          <%= association_select_results %>
+        </div>
+
         <% if has_direction -%>
+            <hr/>
+
             <div class="form-group">
               <label>Select direction</label>
               <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
             </div>
         <% end %>
     <% end %>
+<% end %>
+
+<% if has_relationships -%>
+    <script>
+      $j(document).ready(function () {
+        var simulationRelationshipTypeId = '<%= RelationshipType.find_by_key(RelationshipType::SIMULATION).id -%>';
+
+        $j('#modalAssociateData #relationship_type').change(function () {
+          $j('#modalAssociateData #simulation_data').prop('checked', ($j(this).val() == simulationRelationshipTypeId));
+          $j('#modalAssociateData [data-role="seek-association-filter-group"]').data('filterGroup').filter();
+        });
+      });
+    </script>
 <% end %>

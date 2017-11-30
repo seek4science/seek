@@ -29,6 +29,7 @@ RUN bundle config --local frozen 1 && \
 # App code
 COPY . .
 RUN mkdir log tmp
+COPY docker/virtuoso_settings.docker.yml config/virtuoso_settings.yml
 
 USER root
 RUN chown -R www-data solr config docker public /var/www db/schema.rb

@@ -16,7 +16,7 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal projects(:sysmo_project), study.investigation.projects.first
     assert_equal projects(:sysmo_project), study.projects.first
 
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics', study.assays.first.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics', study.assays.first.assay_type_uri
   end
 
   test 'to_rdf' do

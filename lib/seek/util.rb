@@ -147,8 +147,11 @@ module Seek
 
     def self.cache(name, &block)
       @@cache ||= {}
-      @@cache = {} if Rails.env.development? # Don't use caching in development mode
-      @@cache[name] ||= block.call
+      if Rails.env.development? # Don't use caching in development mode
+        block.call
+      else
+        @@cache[name] ||= block.call
+      end
     end
   end
 end

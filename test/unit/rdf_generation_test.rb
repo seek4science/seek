@@ -159,4 +159,33 @@ class RDFGenerationTest < ActiveSupport::TestCase
       assert_equal RDF::URI.new("http://localhost:3000/data_files/#{df.id}"), reader.statements.first.subject
     end
   end
+
+  test 'rdf type uri' do
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Data'), Factory(:data_file).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Model'), Factory(:model).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#SOP'), Factory(:sop).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Experimental_assay'), Factory(:experimental_assay).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Modelling_analysis'), Factory(:modelling_assay).rdf_type_uri
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Organism'), Factory(:organism).rdf_type_uri
+
+
+    assert_equal RDF::URI.new('http://jermontology.org/ontology/JERMOntology#Simulation_data'), Factory(:data_file,simulation_data:true).rdf_type_uri
+
+  end
+
+  test 'rdf_seek_id' do
+    df = Factory(:data_file)
+    assert_equal "http://localhost:3000/data_files/#{df.id}",df.rdf_seek_id
+  end
+
+  test 'rdf_supported?' do
+    assert Factory(:person).rdf_supported?
+    assert Factory(:assay).rdf_supported?
+    assert Factory(:data_file).rdf_supported?
+
+
+    refute Factory(:event).rdf_supported?
+    refute Factory(:institution).rdf_supported?
+  end
+
 end

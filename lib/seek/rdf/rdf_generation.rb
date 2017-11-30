@@ -55,12 +55,26 @@ module Seek
       end
 
       def describe_type(rdf_graph)
-        it_is = JERMVocab.for_type self
-        unless it_is.nil?
+        unless rdf_type_entity_fragment.nil?
           resource = rdf_resource
-          rdf_graph << [resource, RDF.type, it_is]
+          rdf_graph << [resource, RDF.type, rdf_type_uri]
         end
         rdf_graph
+      end
+
+      # this is what is needed for the SEEK_ID term from JERM. It is essentially the same as the resource, but this method
+      # make the mappings clearer
+      def rdf_seek_id
+        rdf_resource.to_s
+      end
+
+      # the URI for the type of this object, for example http://jermontology.org/ontology/JERMOntology#Study for a Study
+      def rdf_type_uri
+        JERMVocab[rdf_type_entity_fragment]
+      end
+
+      def rdf_type_entity_fragment
+        JERMVocab.defined_types[self.class]
       end
 
       # the hash of namespace prefixes to pass to the RDF::Writer when generating the RDF

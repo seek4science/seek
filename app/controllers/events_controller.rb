@@ -15,6 +15,12 @@ class EventsController < ApplicationController
   include Seek::BreadCrumbs
 
   def show
+    respond_to do |format|
+      format.html # show.html.erb
+      format.rdf { render template: 'rdf/show' }
+      format.xml
+      format.json {render json: @event}
+    end
   end
 
   def new
@@ -62,8 +68,15 @@ class EventsController < ApplicationController
       if @event.save
         flash.now[:notice] = "#{t('event')} was updated successfully." if flash.now[:notice].nil?
         format.html { redirect_to @event }
+        format.json { if @new
+                        render json: @event, status: :created, location: @event
+                      else
+                        render json: @event
+                      end
+        }
       else
         format.html { render 'events/form' }
+        format.json { render json: @event.errors, status: :unprocessable_entity}
       end
     end
   end

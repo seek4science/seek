@@ -10,7 +10,7 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show assay types to public' do
-    assay = Factory :experimental_assay, assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', policy: Factory(:public_policy)
+    assay = Factory :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: Factory(:public_policy)
     logout
     get :show, uri: assay.assay_type_uri
     assert_response :success
@@ -22,9 +22,9 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'hierarchy' do
-    assay = Factory :experimental_assay, title: 'flux balance assay', assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Flux_balance_analysis', policy: Factory(:public_policy)
+    assay = Factory :experimental_assay, title: 'flux balance assay', assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Flux_balance_analysis', policy: Factory(:public_policy)
     logout
-    get :show, uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type'
+    get :show, uri: 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type'
     assert_response :success
 
     assert_select 'h1', text: /Assay type 'Experimental assay type'/
@@ -45,10 +45,10 @@ class AssayTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show only related authorized assays' do
-    pub_assay = Factory :experimental_assay, assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', policy: Factory(:public_policy)
-    priv_assay = Factory :experimental_assay, assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', policy: Factory(:private_policy)
+    pub_assay = Factory :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: Factory(:public_policy)
+    priv_assay = Factory :experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics', policy: Factory(:private_policy)
     logout
-    get :show, uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type'
+    get :show, uri: 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type'
     assert_response :success
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item div.list_item_title a[href=?]', assay_path(pub_assay), text: /#{pub_assay.title}/
