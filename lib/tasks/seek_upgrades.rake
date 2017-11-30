@@ -22,7 +22,7 @@ namespace :seek do
     generate_organism_uuids
     strip_weblinks
     remove_dangling_policies
-
+    fix_all_user_sharing_policies
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -185,13 +185,52 @@ namespace :seek do
 
   task(remove_dangling_policies: :environment) do
     puts "Looking for unused dangling Policies ..."
-    dangling = Policy.all.select{|p| p.associated_items.empty?}
+    all_policies = Policy.all
+    bar=ProgressBar.new(all_policies.count)
+    dangling = all_policies.select do |policy|
+      bar.increment!
+      policy.associated_items.empty?
+    end
+
     if dangling.empty?
       puts "No unused Policies found"
     else
       puts "#{dangling.count} unused Policies found, which will be deleted"
+      bar=ProgressBar.new(dangling.count)
+      dangling.each do |policy|
+        policy.destroy
+        bar.increment!
+      end
     end
-    dangling.each(&:destroy)
+
+  end
+
+  task(fix_all_user_sharing_policies: :environment) do
+    resolver = Seek::Permissions::AllUsersSharingScopeResolver.new
+
+    puts 'removing legacy default policies'
+    count = resolver.remove_legacy_default_policies.count
+    puts "... #{count} policies removed"
+
+    Project.all.collect(&:default_policy).compact.each do |policy|
+      policy.update_attribute(:sharing_scope,nil) # nillify all the sharing scopes
+    end
+
+    puts 'resolving policies with legacy ALL_USERS'
+    policies=Policy.where('sharing_scope IS NOT NULL').order(:id)
+    bar=ProgressBar.new(policies.count)
+    policies.each do |policy|
+      policy.associated_items.each do |item|
+        unless item.is_a?(OpenbisEndpoint) || item.is_a?(Project)
+          item = resolver.resolve(item)
+          item.policy.save!
+        end
+      end
+      bar.increment!
+    end
+    audit_file = File.join(Rails.root,'tmp',"all-users-policy-update-audit-#{Time.now.to_i}.csv")
+    puts "Storing a record of updated items to #{audit_file}"
+    resolver.auditor.save(audit_file)
   end
 
 end

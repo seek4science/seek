@@ -22,13 +22,28 @@
         ]
       },
       "data_files": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "data_files"
+          }
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "publications"
+          }
+        ]
       },
       "presentations": {
-        "data": []
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "presentations"
+          }
+        ]
       }
     },
     "links": {

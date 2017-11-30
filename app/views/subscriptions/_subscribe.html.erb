@@ -2,10 +2,9 @@
     <% if object.subscribed? %>
         <%= button_link_to 'Unsubscribe', 'unsubscribe', object.current_users_subscription, :method => :delete-%>
     <% else %>
-        <%=form_for Subscription.new(:subscribable => object, :person => current_user.person), :html => {:style => 'display:inline;', :id => 'new_subscription'} do |f| %>
+        <%=form_for Subscription.new(:subscribable => object), :html => {:style => 'display:inline;', :id => 'new_subscription'} do |f| %>
             <%= f.hidden_field :subscribable_id -%>
             <%= f.hidden_field :subscribable_type -%>
-            <%= f.hidden_field :person_id -%>
         <% end %>
         <%= image_tag_for_key "subscribe", "$('new_subscription').submit()", nil, {:class => 'btn btn-default'}, 'Subscribe', :function %>
     <% end %>
