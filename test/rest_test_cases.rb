@@ -83,8 +83,7 @@ module RestTestCases
     if File.readable?(definitions_path)
       errors = JSON::Validator.fully_validate_json(definitions_path,
                                                    @response.body,
-                                                   {:fragment => fragment,
-                                                         :strict => true})
+                                                   {:fragment => fragment})
       unless errors.empty?
         msg = ""
         errors.each do |e|
