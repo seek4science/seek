@@ -191,12 +191,15 @@ module RestTestCases
       elsif (el["path"] =~ /avatar/)
         assert_match /^\/#{plural_obj}\/\d+\/avatars\/\d+/, el["value"]
         diff.delete(el)
+      elsif (el["path"] =~ /policy/)
+         diff.delete(el)
       end
     end
 
     diff.delete_if {
         |el| el["path"] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum/
     }
+
 
     assert_equal [], diff
   end
