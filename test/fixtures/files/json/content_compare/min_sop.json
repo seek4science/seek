@@ -3,6 +3,11 @@
     "id": "883654268",
     "type": "sops",
     "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
       "tags": null,
       "title": "A Minimal Sop",
       "description": null,

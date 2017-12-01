@@ -106,14 +106,13 @@ class BaseSerializer < SimpleBaseSerializer
     result = []
     policy.permissions.each do |p|
       result.append ({'resource_type' => p.contributor_type.downcase.pluralize,
-                      'resource_id' => p.contributor_id,
+                      'resource_id' => p.contributor_id.to_s,
                       'access' => (access_type_key p.access_type) } )
     end
     return result
   end
 
   def show_policy?
-    has_policy = object.respond_to?('policy')
     respond_to_manage = object.respond_to?('can_manage?')
     respond_to_policy = object.respond_to?('policy')
     current_user = User.current_user

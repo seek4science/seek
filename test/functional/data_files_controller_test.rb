@@ -2799,7 +2799,7 @@ class DataFilesControllerTest < ActionController::TestCase
     [{ title: 'Test HTTP', project_ids: [projects(:sysmo_project).id] }, { data_url: 'https://mockedlocation.com/txt_test.txt', make_local_copy: '0' }]
   end
 
-  test 'AAApolicy visibility in JSON' do
+  test 'policy visibility in JSON' do
     asset_housekeeper = Factory(:asset_housekeeper)
     private_policy = Factory(:private_policy)
     visible_policy = Factory(:publicly_viewable_policy)

@@ -3,6 +3,11 @@
     "id": "8233983736",
     "type": "events",
     "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
       "title": "A Minimal Event",
       "description": null,
       "url": null,
