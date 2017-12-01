@@ -258,6 +258,14 @@ class Publication < ActiveRecord::Base
     end
   end
 
+  def has_doi?
+    self.doi.present?
+  end
+
+  def latest_citable_resource
+    self
+  end
+
   private
 
   def bio_reference
