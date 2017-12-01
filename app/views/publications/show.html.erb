@@ -16,7 +16,7 @@
         <% unless @publication.doi.nil? %>
           <p>
             <strong>DOI:</strong>
-            <%= link_to @publication.doi, @publication.doi_uri, { :target => "_blank" } %>
+            <%= doi_link(@publication.doi, { :target => "_blank" }) %>
           </p>
         <% end %>
 
