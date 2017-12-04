@@ -17,7 +17,7 @@ class ModelsController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
   include Bives
-  include Seek::DataciteDoi
+  include Seek::DoiMinting
 
   include Seek::IsaGraphExtensions
 

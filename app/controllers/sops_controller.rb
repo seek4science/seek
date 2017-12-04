@@ -11,7 +11,7 @@ class SopsController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   include Seek::BreadCrumbs
-  include Seek::DataciteDoi
+  include Seek::DoiMinting
 
   include Seek::IsaGraphExtensions
 

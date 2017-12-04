@@ -1,5 +1,5 @@
 module Seek
-  module DataciteDoi
+  module DoiMinting
     include Seek::ExternalServiceWrapper
 
     def self.included(base)

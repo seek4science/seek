@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class DataciteDoiTest < ActionDispatch::IntegrationTest
+class DoiMintingTest < ActionDispatch::IntegrationTest
   include MockHelper
 
   DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect { |type| type.name.underscore }
