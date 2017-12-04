@@ -41,7 +41,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
       assert_response :success
 
-      assert_select 'p', text: /The DOI that will be generated will be #{asset.generated_doi}/
+      assert_select 'pre', text: asset.generated_doi(asset.version)
     end
   end
 
