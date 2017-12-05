@@ -50,6 +50,9 @@ module Seek
 
           create_log
 
+          # Update the parent resource's index with the new DOI
+          doi_resource.reload.index! if Seek::Config.solr_enabled && doi_resource.respond_to?(:index!)
+
           suggested_doi
         end
 
