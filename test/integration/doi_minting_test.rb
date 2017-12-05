@@ -3,7 +3,8 @@ require 'test_helper'
 class DoiMintingTest < ActionDispatch::IntegrationTest
   include MockHelper
 
-  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect { |type| type.name.underscore }
+  # Only test the versioned types. Types with snapshots are tested separately.
+  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.select { |type| type.method_defined?(:versions) }.collect { |type| type.name.underscore }
 
   setup do
     @user = Factory(:user, login: 'test')
