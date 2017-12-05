@@ -10,6 +10,9 @@ module GeneralAuthorizationTestCases
 
     get :show, id: item.id
     assert_response :forbidden
+
+    get :show, id: item.id, format: 'json'
+    assert_response :forbidden
   end
 
   def test_private_item_not_accessible_by_another_user
@@ -21,6 +24,9 @@ module GeneralAuthorizationTestCases
     login_as(another_user)
 
     get :show, id: item.id
+    assert_response :forbidden
+
+    get :show, id: item.id, format: 'json'
     assert_response :forbidden
   end
 
@@ -37,5 +43,8 @@ module GeneralAuthorizationTestCases
     get :show, id: item.id
     assert_response :success
     assert_nil flash[:error]
+
+    get :show, id: item.id, format: 'json'
+    assert_response :success
   end
 end

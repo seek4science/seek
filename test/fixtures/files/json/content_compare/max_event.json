@@ -3,6 +3,11 @@
     "id": "8233983736",
     "type": "events",
     "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
       "title": "A Maximal Event",
       "description": "All you ever wanted to know about headaches",
       "url": "http://www.headache-center.org",

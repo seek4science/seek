@@ -3,6 +3,11 @@
     "id": "883654268",
     "type": "data_files",
     "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
       "tags": ["DataFile-tag1", "DataFile-tag2", "DataFile-tag3", "DataFile-tag4", "DataFile-tag5"],
       "title": "A Maximal DataFile",
       "description": "Results - Sampling conformations of ATP-Mg inside the binding pocket",
