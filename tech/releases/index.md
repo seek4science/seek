@@ -11,9 +11,26 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 ## Version 1.5.0
 
-Relase date: _November 2017_
+Release date: _December 6th 2017_
 
-Blah blah blah
+This is quite a large release, and the main highlights include:
+
+  * Our first released version of our JSON API. This has been built to conform to the [JSON API](http://jsonapi.org) specification, 
+    and is documented on [SwaggerHub](https://app.swaggerhub.com/apis/FAIRDOM/SEEK/0.1).
+    This read API has been developed in conjuction with, and feeds into, a write API; this will be released incrementally
+    in subsequent releases. For more details please read [API](/help/user-guide/api.html)
+  * Incorporating a new version 2 of the [JERM ontology](http://jermontology.org), along with updates and extensions to the RDF produced by 
+    SEEK.
+  * Old legacy sharing permissions that shared with _"All registered users"_ have now been removed and updated. This permission no longer made
+    sense with a SEEK that supported open registration, and no longer provides the level of sharing that was probably originally intended. Although the
+    permission was removed from the user interface for some time, old permissions were still recorded and being honoured. These permissions
+    have now been updated, and to be safe have been changed to be slightly more restrictive: the access rights have now been transferred to the projects
+    the item is associated with, and will otherwise retain the original public access rights unchanged.
+  * If users wish to join a project, but do not know the user that administers it, there is now a button available to request to join. A message
+  will be sent the administrators of those projects with additional details. When added to a project, the new member is automatically notified
+  by email. A request can only be sent once every 12 hours.
+
+
 
 A full list of changes included in this release can be found in the [SEEK v1.5.0 release notes](release-notes-1.5.0.html).
 
