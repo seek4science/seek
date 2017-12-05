@@ -17,7 +17,7 @@ This is quite a large release, and the main highlights include:
 
   * Our first released version of our **JSON API**. This has been built to conform to the [JSON API](http://jsonapi.org) specification, 
     and is documented on [SwaggerHub](https://app.swaggerhub.com/apis/FAIRDOM/SEEK/0.1).
-    This read API has been developed in conjuction with, and feeds into, a write API; this will be released incrementally
+    This read API has been developed in conjuction with, and feeds into, a write API which will be released incrementally
     in subsequent releases. For more details please read [API](/help/user-guide/api.html).
   * Incorporating the new **[JERM 2 ontology](http://jermontology.org)**, along with updates and extensions to the RDF produced by 
     SEEK.
