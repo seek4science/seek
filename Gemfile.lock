@@ -119,10 +119,10 @@ GIT
 
 GIT
   remote: https://github.com/tzielins/openseek-api-gem
-  revision: 875a94c474844a91a5439a6b0ee724d9793ac12c
-  branch: dataset
+  revision: ef8c20cac26ee278ea8e3f3f299cb39fbcff6519
+  ref: ef8c20cac26ee278ea8e3f3f299cb39fbcff6519
   specs:
-    openseek-api (0.12.0)
+    openseek-api (0.13.0)
       cocaine
 
 GEM
@@ -983,4 +983,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.15.4
+   1.16.0
