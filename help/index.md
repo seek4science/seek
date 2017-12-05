@@ -7,6 +7,10 @@ layout: page
 
 [SEEK user documentation](user-guide/index.html)
 
+## API
+
+[API introduction](user-guide/api.html)
+
 ## Guidelines for Data and Model Annotation in SEEK
 
 [Metadata Guidelines](metadata-guidelines.html)
