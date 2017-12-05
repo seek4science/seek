@@ -21,7 +21,7 @@ This is quite a large release, and the main highlights include:
     in subsequent releases. For more details please read [API](/help/user-guide/api.html).
   * Incorporating the new **[JERM 2 ontology](http://jermontology.org)**, along with updates and extensions to the RDF produced by 
     SEEK.
-  * **Migrated legacy sharing permissions** that shared with _"All registered users". This permission no longer made
+  * **Migrated legacy sharing permissions** that shared with _"All registered users"_. This permission no longer made
     sense since SEEK was updated to allow open registration, and no longer provides the level of sharing that was probably originally intended. Although the
     permission was removed from the user interface for some time, old permissions were still stored and being honoured. These permissions
     have now been updated, and to be safe have been changed to be slightly more restrictive: the access rights have now been transferred to the projects
