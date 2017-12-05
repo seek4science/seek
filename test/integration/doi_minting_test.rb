@@ -18,7 +18,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   test 'mint a DOI button' do
     DOIABLE_ASSETS.each do |type|
       asset = Factory(type.to_sym, policy: Factory(:public_policy))
-      assert asset.is_doiable?(1)
+      assert asset.find_version(1).can_mint_doi?
 
       get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
       assert_response :success
@@ -34,14 +34,15 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       asset = Factory(type.to_sym, policy: Factory(:public_policy))
       assert asset.is_published?
       assert asset.can_manage?
+      versioned_asset = asset.latest_version
 
       asset.creators = [Factory(:person)]
       asset.save
 
-      get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
+      get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{versioned_asset.version}"
       assert_response :success
 
-      assert_select 'pre', text: asset.generated_doi(asset.version)
+      assert_select 'pre', text: versioned_asset.suggested_doi
     end
   end
 
@@ -53,10 +54,11 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       asset = Factory(type.to_sym, policy: Factory(:private_policy), contributor: User.current_user)
       refute asset.is_published?
       assert asset.can_manage?
-      refute asset.is_doiable?(asset.version)
+      assert asset.find_version(asset.version).can_mint_doi?
 
       get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
       assert_response :redirect
+      refute asset.find_version(asset.version).has_doi?
 
       asset.publish!
       assert asset.reload.is_published?
@@ -64,10 +66,10 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       login_as(a_user)
       assert_equal a_user, User.current_user
       refute asset.can_manage?
-      refute asset.is_doiable?(asset.version)
 
       get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
       assert_response :redirect
+      refute asset.find_version(asset.version).has_doi?
     end
   end
 
@@ -169,7 +171,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       get "/#{type.pluralize}/#{asset.id}"
 
@@ -183,7 +185,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       post "/#{type.pluralize}/#{asset.id}/new_version", data_file: {}, content_blobs: [{ data: {} }], revision_comment: 'This is a new revision'
 
@@ -198,7 +200,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       get "/#{type.pluralize}/#{asset.id}"
 
@@ -212,7 +214,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       delete "/#{type.pluralize}/#{asset.id}"
 
@@ -243,7 +245,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       unpublic_sharing = { access_type: Policy::VISIBLE }
 

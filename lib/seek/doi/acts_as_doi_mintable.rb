@@ -33,7 +33,7 @@ module Seek
             return false
           end
 
-          if time_locked?
+          if doi_time_locked?
             errors.add(:base, "DOIs may only be minted for resources older than #{Seek::Config.time_lock_doi_for} days.")
             return false
           end
@@ -84,10 +84,10 @@ module Seek
         end
 
         def can_mint_doi?
-          Seek::Config.doi_minting_enabled && !time_locked?
+          Seek::Config.doi_minting_enabled && !doi_time_locked? && !has_doi?
         end
 
-        def time_locked?
+        def doi_time_locked?
           (created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) > Time.now
         end
 

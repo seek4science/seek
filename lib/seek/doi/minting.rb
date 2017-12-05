@@ -46,10 +46,20 @@ module Seek
       end
 
       def mint_doi_auth
-        unless @asset_version.parent.is_doiable?(@asset_version.version)
-          error('Creating a DOI is not possible', 'is invalid')
-          false
+        unless @asset_version.parent.can_manage?
+          error('You are not authorized to create a DOI for this resource', 'is invalid')
+          return false
         end
+        unless @asset_version.parent.is_published?
+          error('Cannot create a DOI for an unpublished resource', 'is invalid')
+          return false
+        end
+        unless @asset_version.can_mint_doi?
+          error('Creating a DOI is not possible', 'is invalid')
+          return false
+        end
+
+        true
       end
 
       def new_version_auth
