@@ -9,13 +9,13 @@
 
 
 <% if resource.respond_to?(:snapshots) && resource.snapshots.any? %>
-    <% if resource.latest_citable_snapshot %>
-        <%= render :partial => "assets/citation_box", locals: { doi: resource.latest_citable_snapshot.doi,
-                                                                snapshot: resource.latest_citable_snapshot }  %>
+    <% if resource.latest_citable_resource %>
+        <%= render :partial => "assets/citation_box", locals: { doi: resource.latest_citable_resource.doi,
+                                                                snapshot: resource.latest_citable_resource }  %>
     <% end %>
     <%= render :partial => "snapshots/snapshots", locals: { snapshots: resource.snapshots, resource: resource } %>
-<% elsif versioned_resource.respond_to?(:doi) && versioned_resource.doi.present? %>
-    <%= render :partial => "assets/citation_box", locals: { doi: versioned_resource.doi } %>
+<% elsif versioned_resource.respond_to?(:doi) %>
+    <%= render :partial => "assets/citation_box", locals: { resource: resource, doi: versioned_resource.doi } %>
 <% end %>
 
 <% if resource.respond_to?(:license) %>
