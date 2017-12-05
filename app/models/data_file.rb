@@ -13,7 +13,7 @@ class DataFile < ActiveRecord::Base
 
   acts_as_asset
 
-  include Seek::Dois::DoiGeneration
+  include Seek::Doi::Generation
 
   scope :default_order, -> { order('title') }
 

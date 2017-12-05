@@ -1,6 +1,6 @@
 module Seek
-  module Dois
-    module DoiGeneration
+  module Doi
+    module Generation
       extend ActiveSupport::Concern
 
       included do

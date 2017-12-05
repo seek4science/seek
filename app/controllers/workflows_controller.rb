@@ -18,7 +18,7 @@ class WorkflowsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
-  include Seek::DoiMinting
+  include Seek::Doi::Minting
 
   def index
     respond_to do |format|
