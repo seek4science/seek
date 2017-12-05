@@ -603,8 +603,13 @@ class ApplicationController < ActionController::Base
       # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
       params[controller_name.classify.downcase.to_sym] =
           ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
-
+      params = tweak_json_params hacked_params
     end
+  end
+
+  # override in sub-classes
+  def tweak_json_params params
+    params
   end
 
   # take out policies, annotations, etc(?) outside of the given object attributes

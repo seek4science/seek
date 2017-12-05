@@ -238,4 +238,13 @@ class AssaysController < ApplicationController
                                   :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset)
   end
 
+  def tweak_json_params json_params
+    if json_params[:assay][:assay_class].present?
+        json_params[:assay][:assay_class_id] = json_params[:assay][:assay_class][:key]
+      json_params[:assay].delete :assay_class
+    end
+    json_params
+  end
+
+
 end
