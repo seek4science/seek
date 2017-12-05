@@ -91,7 +91,11 @@ module Seek
         end
 
         def doi_time_locked?
-          (created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days) > Time.now
+          doi_time_lock_end > Time.now
+        end
+
+        def doi_time_lock_end
+          (created_at + (Seek::Config.time_lock_doi_for || 0).to_i.days)
         end
 
         def doi_logs
