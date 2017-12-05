@@ -21,11 +21,12 @@ This is quite a large release, and the main highlights include:
     in subsequent releases. For more details please read [API](/help/user-guide/api.html).
   * Incorporating the new **[JERM 2 ontology](http://jermontology.org)**, along with updates and extensions to the RDF produced by 
     SEEK.
-  * **Migrated legacy sharing permissions** that shared with _"All registered users"_. This permission no longer made
-    sense since SEEK was updated to allow open registration, and no longer provides the level of sharing that was probably originally intended. Although the
-    permission was removed from the user interface for some time, old permissions were still stored and being honoured. These permissions
-    have now been updated, and to be safe have been changed to be slightly more restrictive: the access rights have now been transferred to the projects
-    the item is associated with, and will otherwise retain the original public access rights unchanged.
+  * **Migrated legacy sharing permissions**: Given registration for SEEK is open to anyone, 
+  we have removed the ability of projects to administer sharing permissions of items for _“all registered users”_. 
+  This ability was removed from the user interface several versions ago, but a number of items retained this legacy sharing permission. 
+  Items shared with “all registered users” have now been updated so that their sharing permission is “project wide” instead, according to the projects the item is associated with. 
+  This restricts the audience which can interact with the item. 
+  Owners and managers of items are still free to continue to choose and change the sharing permissions as they wish.
   * If users wish to **request to join a project**, but do not know the user that administers it, there is now a button available to do so. A message
   will be sent the administrators of those projects with additional details. When added to a project, the new member is automatically notified
   by email. A request can only be sent once every 12 hours.
