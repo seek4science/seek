@@ -24,6 +24,11 @@ miligram:
   comment: milligram
   order: 5
 
+nanogram:
+  symbol: ng
+  comment: nanogram
+  order: 5
+
 microgram:
   symbol: µg
   comment: microgram
@@ -103,6 +108,36 @@ mmol/L_CV:
 µmol/(g_DW*min):
   symbol: µmol/(g_DW*min)
   comment: specific rate per gram of dry weigh biomass
+  factors_studied: false
+  order: 20
+
+mmol/L:
+  symbol: mmol/L
+  symbol: specific concentration per litre
+  factors_studied: false
+  order: 20
+
+µmol/L:
+  symbol: µmol/L
+  symbol: specific concentration per litre
+  factors_studied: false
+  order: 20
+
+mg/ml:
+  symbol: mg/ml
+  comment: concentration - milligram per millilitre
+  factors_studied: false
+  order: 20
+
+µg/ml:
+  symbol: µg/ml
+  comment: concentration - microgram per milliltre
+  factors_studied: false
+  order: 20
+
+µg/µl:
+  symbol: µg/µl
+  comment: concentration - microgram per microlitre
   factors_studied: false
   order: 20
 
@@ -225,5 +260,23 @@ dimensionless:
   symbol: dimensionless
   comment: dimensionless
   order: 41
+
+CFU:
+  symbol: CFU
+  comment: colony forming units
+  factors_studied: false
+  order: 42
+
+CFU/g:
+  symbol: CFU/g
+  comment: colony forming units per gram
+  factors_studied: false
+  order: 42
+
+CFU/ml:
+  symbol: CFU/ml
+  comment: colony forming units per millilitre
+  factors_studied: false
+  order: 42
 
 #add title element if the unit should appear like e.g. "cm centimeter"

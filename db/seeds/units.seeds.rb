@@ -9,9 +9,6 @@ units.each do |unit|
   factors_studied=unit['factors_studied']
   factors_studied=true if factors_studied.nil?
   unit = Unit.find_or_initialize_by(symbol:symbol)
-  if unit.new_record?
-    "Creating unit for #{symbol} - #{comment}"
-  end
   unit.update_attributes(comment:comment,order:order,title:title,factors_studied:factors_studied)
 
 end
