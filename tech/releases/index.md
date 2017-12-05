@@ -22,7 +22,7 @@ This is quite a large release, and the main highlights include:
   * Incorporating the new **[JERM 2 ontology](http://jermontology.org)**, along with updates and extensions to the RDF produced by 
     SEEK.
   * **Migrated legacy sharing permissions**: Given registration for SEEK is open to anyone, 
-  we have removed the ability of projects to administer sharing permissions of items for _“all registered users”_. 
+  we have removed the ability to administer sharing permissions of items for _“all registered users”_. 
   This ability was removed from the user interface several versions ago, but a number of items retained this legacy sharing permission. 
   Items shared with “all registered users” have now been updated so that their sharing permission is “project wide” instead, according to the projects the item is associated with. 
   This restricts the audience which can interact with the item. 
