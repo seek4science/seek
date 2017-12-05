@@ -48,9 +48,12 @@ module AssaysHelper
   # options for grouped_option_for_select, for building the select box for assay->study selection, grouped by investigation
   def grouped_options_for_study_selection(current_study)
     investigation_map = selectable_studies_mapped_to_investigation(current_study)
+    investigation_map.compact!
     investigation_map.keys.collect do |investigation|
-      title = investigation.can_view? ? h(investigation.title) : "#{t('investigation')} title is hidden"
-      [title, investigation_map[investigation].collect { |study| [h(study.title), study.id] }]
+      if investigation.present? then
+        title = investigation.can_view? ? h(investigation.title) : "#{t('investigation')} title is hidden"
+        [title, investigation_map[investigation].collect { |study| [h(study.title), study.id] }]
+      end
     end
   end
 
