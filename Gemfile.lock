@@ -119,8 +119,8 @@ GIT
 
 GIT
   remote: https://github.com/tzielins/openseek-api-gem
-  revision: ef8c20cac26ee278ea8e3f3f299cb39fbcff6519
-  ref: ef8c20cac26ee278ea8e3f3f299cb39fbcff6519
+  revision: feaac0017c005e9bf85260e5f6146b1798fba17a
+  ref: feaac0017c005e9bf85260e5f6146b1798fba17a
   specs:
     openseek-api (0.13.0)
       cocaine

@@ -17,9 +17,9 @@ module Seek
 
         if perm_id
 
-          cache_option = refresh ? {force: true} : nil
+          cache_option = refresh ? { force: true } : nil
           begin
-            json = query_application_server_by_perm_id(perm_id,cache_option)
+            json = query_application_server_by_perm_id(perm_id, cache_option)
             unless json[json_key]
               raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
             end
@@ -32,9 +32,9 @@ module Seek
 
       def populate_from_json(json)
         # for debug by TZ
-         puts "Populates #{self.class} from json:"
-         puts json
-         puts '-----'
+        puts "Populates #{self.class} from json:"
+        puts json
+        puts '-----'
         @json = json
         @modifier = json['modifier']
         @code = json['code']
@@ -62,6 +62,13 @@ module Seek
         perm_ids << 'xxx222111sddd-dummy' if perm_ids.empty?
         ids_str = perm_ids.compact.uniq.join(',')
         json = query_application_server_by_perm_id(ids_str)
+        construct_from_json(json)
+      end
+
+      def find_by_type_codes(codes, refresh = false)
+        return [] if codes.empty?
+        cache_option = refresh ? { force: true } : nil
+        json = query_application_server_by_type_codes(codes, cache_option)
         construct_from_json(json)
       end
 
@@ -114,10 +121,19 @@ module Seek
 
       private
 
-      def query_application_server_by_perm_id(perm_id = '',cache_option = nil)
+      def query_application_server_by_perm_id(perm_id = '', cache_option = nil)
         cached_query_by_perm_id(perm_id, cache_option) do
           application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
                                                   attribute: 'PermID', attributeValue: perm_id)
+        end
+      end
+
+      def query_application_server_by_type_codes(codes, cache_option = nil)
+        codes_str = codes.join(",")
+
+        cached_query_by_type_codes(codes_str, cache_option) do
+          application_server_query_instance.query(entityType: type_name, queryType: 'TYPE',
+                                                  typeCodes: codes_str)
         end
       end
 
@@ -130,10 +146,20 @@ module Seek
 
       def cached_query_by_perm_id(perm_id, cache_option = nil)
         raise 'Block required for doing query' unless block_given?
-        key = cache_key(perm_id, )
+        key = cache_key(perm_id,)
         Rails.logger.info("OBIS CACHE KEY = #{key}")
         openbis_endpoint.metadata_store.fetch(key, cache_option) do
           Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{perm_id}")
+          yield
+        end
+      end
+
+      def cached_query_by_type_codes(codes_str, cache_option = nil)
+        raise 'Block required for doing query' unless block_given?
+        key = cache_key("TYPE_CODES:#{codes_str}")
+        Rails.logger.info("OBIS CACHE KEY = #{key}")
+        openbis_endpoint.metadata_store.fetch(key, cache_option) do
+          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{codes_str}")
           yield
         end
       end

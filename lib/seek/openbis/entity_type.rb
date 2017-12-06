@@ -59,8 +59,16 @@ module Seek
         self
       end
 
-      def all
-        json = query_application_server_for_all
+      def all(refresh = false)
+        cache_option = refresh ? { force: true } : nil
+        json = query_application_server_for_all(cache_option)
+        construct_from_json(json, entity_type)
+      end
+
+      def find_by_semantic(semantic,refresh = false)
+        cache_option = refresh ? { force: true } : nil
+
+        json = query_application_server_by_semantic(semantic,cache_option)
         construct_from_json(json, entity_type)
       end
 
@@ -99,6 +107,23 @@ module Seek
         cached_query_by_code(code, cache_option) do
           application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
                                                   attribute: 'CODE', attributeValue: code)
+        end
+      end
+
+      def query_application_server_by_semantic(semantic, cache_option = nil)
+        cache_code = type_name+':'+semantic.to_json
+        # puts cache_code
+        query = {entityType: type_name, queryType: 'SEMANTIC'}
+        query[:predicateOntologyId] = semantic.predicateOntologyId if semantic.predicateOntologyId
+        query[:predicateOntologyVersion] = semantic.predicateOntologyVersion if semantic.predicateOntologyVersion
+        query[:predicateAccessionId] = semantic.predicateAccessionId if semantic.predicateAccessionId
+        query[:descriptorOntologyId] = semantic.descriptorOntologyId if semantic.descriptorOntologyId
+        query[:descriptorOntologyVersion] = semantic.descriptorOntologyVersion if semantic.descriptorOntologyVersion
+        query[:descriptorAccessionId] = semantic.descriptorAccessionId if semantic.descriptorAccessionId
+        # puts query
+
+        cached_query_by_code(cache_code, cache_option) do
+          application_server_query_instance.query(query)
         end
       end
 
