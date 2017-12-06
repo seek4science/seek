@@ -13,6 +13,7 @@ module Seek
       property :Growth_medium_composition
       property :Optical_density_600
       property :Simulation_data
+      property :Data_sample
 
       # returns the correct Class IRI according to the instance 'type' - or nil if its not recognised
       def self.for_type(type)
@@ -34,7 +35,8 @@ module Seek
           Publication => :Publication,
           Strain => :Strain,
           Compound => :Compound,
-          StudiedFactor => :Factors_studied }
+          StudiedFactor => :Factors_studied,
+          Sample => :Data_sample}
       end
 
       # this is the class fragment according to the measured item title
