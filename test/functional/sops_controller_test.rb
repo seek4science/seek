@@ -990,8 +990,7 @@ class SopsControllerTest < ActionController::TestCase
 
       assert_response :success
       assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 0
-      assert_select '#citation-instructions',
-                    text: /Resources must be older than 10 days/
+      assert_select '#citation-instructions', text: /SOPs must be older than 10 days/
     end
   end
 
