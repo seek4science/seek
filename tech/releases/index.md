@@ -36,6 +36,8 @@ This is quite a large release, and the main highlights include:
 
 A full list of changes included in this release can be found in the [SEEK v1.5.0 release notes](release-notes-1.5.0.html).
 
+If you have any comments of feedback then please [Contact Us](/contacting-us.html)
+
 ## Version 1.4.1
 
 Release date: _September 4th 2017_
