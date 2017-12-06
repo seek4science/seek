@@ -212,6 +212,24 @@ mL/min:
   comment: flow rate
   order: 32
 
+CFU:
+  symbol: CFU
+  comment: colony forming units
+  factors_studied: false
+  order: 32
+
+CFU/g:
+  symbol: CFU/g
+  comment: colony forming units per gram
+  factors_studied: false
+  order: 32
+
+CFU/ml:
+  symbol: CFU/ml
+  comment: colony forming units per millilitre
+  factors_studied: false
+  order: 32
+
 metre:
   title: meter
   symbol: m
@@ -261,22 +279,6 @@ dimensionless:
   comment: dimensionless
   order: 41
 
-CFU:
-  symbol: CFU
-  comment: colony forming units
-  factors_studied: false
-  order: 42
 
-CFU/g:
-  symbol: CFU/g
-  comment: colony forming units per gram
-  factors_studied: false
-  order: 42
-
-CFU/ml:
-  symbol: CFU/ml
-  comment: colony forming units per millilitre
-  factors_studied: false
-  order: 42
 
 #add title element if the unit should appear like e.g. "cm centimeter"
