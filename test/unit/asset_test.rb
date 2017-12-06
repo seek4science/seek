@@ -251,10 +251,12 @@ class AssetTest < ActiveSupport::TestCase
     assert Assay.supports_doi?
 
     refute Presentation.supports_doi?
+    refute Publication.supports_doi?
 
     assert Factory(:model).supports_doi?
     assert Factory(:data_file).supports_doi?
     refute Factory(:presentation).supports_doi?
+    refute Factory(:publication).supports_doi?
   end
 
   test 'can_mint_doi?' do
