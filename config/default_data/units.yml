@@ -114,13 +114,13 @@ mmol/L_CV:
 
 mmol/L:
   symbol: mmol/L
-  symbol: specific concentration per litre
+  comment: specific concentration per litre
   factors_studied: false
   order: 220
 
 µmol/L:
   symbol: µmol/L
-  symbol: specific concentration per litre
+  comment: specific concentration per litre
   factors_studied: false
   order: 230
 
