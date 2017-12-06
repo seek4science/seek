@@ -28,10 +28,6 @@ class SubscriptionsForItemJob < SeekJob
     1
   end
 
-  def default_delay
-    30.seconds
-  end
-
   def subscribable
     subscribable_type.constantize.find_by_id(subscribable_id)
   end

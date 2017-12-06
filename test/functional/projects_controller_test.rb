@@ -1478,6 +1478,48 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'request membership' do
+    project = Factory(:project_administrator).projects.first #needs a project admin
+    person = Factory(:person)
+    login_as(person)
+    assert_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+
+    end
+    assert_redirected_to(project)
+    refute_nil flash[:notice]
+    log = MessageLog.last
+    assert_equal project,log.resource
+    assert_equal person,log.sender
+    assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST,log.message_type
+
+    logout
+    login_as(project.project_administrators.first)
+
+    assert_emails(0)  do
+      assert_no_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+    end
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    project=Factory(:project)
+    assert_empty(project.people)
+    assert_emails(0)  do
+      assert_no_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+    end
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+  end
+
+  private
+
   def edit_max_object(project)
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(project, Factory(:institution))
@@ -1485,8 +1527,6 @@ class ProjectsControllerTest < ActionController::TestCase
     project.programme_id = (Factory(:programme)).id
     add_avatar_to_test_object(project)
   end
-
-  private
 
   def valid_project
     { title: 'a title' }

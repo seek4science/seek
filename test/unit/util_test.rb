@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class UtilTest < ActiveSupport::TestCase
+
   test 'creatable types' do
     types = Seek::Util.user_creatable_types
     expected = [DataFile, Model, Presentation, Publication, Sample, Sop, Workflow, Assay, Investigation, Study, Event, SampleType, Strain]
@@ -20,8 +21,8 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'rdf capable types' do
     types = Seek::Util.rdf_capable_types
-    assert types.include?(DataFile)
-    assert !types.include?(Policy)
+    expected = %w[Assay Compound CultureGrowthType DataFile Investigation Model Organism Person Programme Project Publication Sop Strain Study]
+    assert_equal expected, types.collect(&:name).sort
   end
 
   test 'searchable types' do

@@ -12,7 +12,7 @@
 
   <div class="col-sm-6 hidden-xs">
     <%= list_item_attribute "PubMed ID", resource.pubmed_id, resource.pubmed_uri, {:onclick => "window.open(this.href);return false;"} unless resource.pubmed_id.nil? %>
-    <%= list_item_attribute "DOI", resource.doi, resource.doi_uri, {:onclick => "window.open(this.href);return false;"} unless resource.doi.nil? %>
+    <%= list_item_doi(resource) %>
     <%= list_item_attribute "Citation", h(resource.citation)%>
   </div>
 </div>

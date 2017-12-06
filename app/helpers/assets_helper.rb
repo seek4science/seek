@@ -153,8 +153,8 @@ module AssetsHelper
     render partial: 'assets/view_content', locals: { content_blob: asset.single_content_blob, button_style: true }
   end
 
-  def doi_link(resource)
-    link_to resource.doi, resource.doi_identifier
+  def doi_link(doi, opts = { target: '_blank' })
+    link_to(doi, "https://doi.org/#{doi}", opts) + content_tag(:span, '', class: :doi_icon)
   end
 
   def sharing_text(item)

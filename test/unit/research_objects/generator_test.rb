@@ -44,6 +44,15 @@ class GeneratorTest < ActiveSupport::TestCase
     assert_includes paths, "models/#{model.ro_package_path_id_fragment}/2-xxx.txt"
   end
 
+  test 'generate assay with a sample' do
+    assay = Factory(:assay,policy:Factory(:public_policy))
+    sample = Factory(:sample,policy:Factory(:public_policy))
+    AssayAsset.create assay: assay, asset: sample, direction: AssayAsset::Direction::INCOMING
+    assay.reload
+    assert_equal [sample],assay.samples
+    file = Seek::ResearchObjects::Generator.new(assay).generate
+  end
+
   private
 
   def check_contents(file, inv)

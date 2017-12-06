@@ -3,6 +3,11 @@
     "id": "1039986486",
     "type": "studies",
     "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
       "tags": ["Study-tag1", "Study-tag2", "Study-tag3", "Study-tag4", "Study-tag5"],
       "title": "A Maximal Study",
       "description": "The Study of many things",

@@ -3,6 +3,11 @@
     "id": "883654268",
     "type": "models",
     "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
       "tags": [
         "Model-tag1",
         "Model-tag2",

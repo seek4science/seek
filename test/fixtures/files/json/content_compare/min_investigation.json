@@ -3,6 +3,11 @@
     "id": "1039986486",
     "type": "investigations",
     "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
       "tags": null,
       "title": "A Minimal Investigation",
       "description": null
