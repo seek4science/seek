@@ -1,7 +1,6 @@
 ---
 title: API Introduction
 layout: page
-redirect_from: "/api.html"
 ---
 
 # API introduction
