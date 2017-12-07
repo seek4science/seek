@@ -253,9 +253,18 @@ class OrganismTest < ActiveSupport::TestCase
   end
 
   test 'can have more than one organism with no concept' do
-    o = Factory(:organism_with_blank_concept)
-    o2 = Factory.create(:organism_with_blank_concept)
-    assert o2.valid?
-    o2.save!
+    Factory.create(:organism, concept_uri: '')
+    org = Factory.build(:organism, concept_uri: '')
+
+    assert org.valid?
   end
+
+  test 'none blank concept uris must be unique' do
+    o = Factory.create(:organism, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/562')
+    assert o.valid?
+    o2 = Factory.build(:organism, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/562')
+    refute o2.valid?
+  end
+
+
 end

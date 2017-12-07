@@ -332,4 +332,20 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_select 'div.related-items .tab-pane a[href=?]', sample_path(sample), text: /#{sample.title}/
   end
 
+  test 'create multiple organisms with blank concept uri' do
+    login_as(Factory(:admin))
+    assert_difference('Organism.count') do
+      post :create, organism: { title: 'An organism', concept_uri:'' }
+    end
+    assert_not_nil assigns(:organism)
+    assert_nil assigns(:organism).concept_uri
+
+    assert_difference('Organism.count') do
+      post :create, organism: { title: 'An organism 2', concept_uri:'' }
+    end
+
+    refute_nil assigns(:organism)
+    assert_nil assigns(:organism).concept_uri
+  end
+
 end
