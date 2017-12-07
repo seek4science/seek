@@ -66,12 +66,12 @@ class UtilTest < ActiveSupport::TestCase
   test 'doiable asset types' do
     types = Seek::Util.doiable_asset_types
 
-    expected = [DataFile, Model, Sop, Workflow]
+    expected = [DataFile, Model, Sop, Workflow, Investigation, Study, Assay]
 
     # first as strings for more readable failed assertion message
-    assert_equal expected.map(&:to_s), types.map(&:to_s)
+    assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
 
     # double check they are actual types
-    assert_equal expected, types
+    assert_equal expected.sort_by(&:to_s), types.sort_by(&:to_s)
   end
 end
