@@ -240,4 +240,22 @@ class OrganismTest < ActiveSupport::TestCase
     x.save
     assert_equal x.uuid, uuid
   end
+
+  test 'ncbi_id nil for organism with blank concept id or ontology id' do
+    x = Factory(:organism_with_blank_concept)
+    assert_equal '', x.bioportal_concept.concept_uri
+    assert_nil x.ncbi_id
+    assert_nil x.ncbi_uri
+
+    o = Factory(:organism,concept_uri:'')
+    assert_nil o.ncbi_id
+    assert_nil o.ncbi_uri
+  end
+
+  test 'can have more than one organism with no concept' do
+    o = Factory(:organism_with_blank_concept)
+    o2 = Factory.create(:organism_with_blank_concept)
+    assert o2.valid?
+    o2.save!
+  end
 end
