@@ -1,9 +1,9 @@
 <% if item.permitted_for_research_object? %>
     <li><%= image_tag_for_key('snapshot', polymorphic_path([item, :snapshot], :action => 'new'), "Make a Snapshot", nil, "Make a Snapshot") -%></li>
 <% else %>
-    <% explanation = "You may only create snapshots of publicly accessible #{text_for_resource(item).pluralize.downcase}." %>
+    <% explanation = "You may only create snapshots of publicly accessible #{item.class.name.pluralize.downcase}." %>
     <li>
-      <span class='disabled_icon disabled' onclick='alert("<%= explanation-%>")' data-tooltip='<%= tooltip(explanation) -%>'>
+      <span class='disabled_icon disabled' onclick='javascript:alert("<%= explanation-%>")' data-tooltip='<%= tooltip(explanation) -%>'>
           <%= image('snapshot', {:alt=>"Snapshot", :class=>"disabled"}) %> Make Snapshot
       </span>
     </li>

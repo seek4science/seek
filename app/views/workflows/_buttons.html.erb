@@ -47,7 +47,7 @@
         <% end %>
     <% end -%>
 
-    <% if item.is_published? && item.can_manage? && @display_workflow.can_mint_doi? %>
+    <% if item.is_doiable?(version) %>
         <li><%= image_tag_for_key('doi', polymorphic_path(item, :action => 'mint_doi_confirm', :version => version), nil, {}, "Generate a DOI") -%></li>
     <% end %>
     <% if @workflow.runs.empty? %>

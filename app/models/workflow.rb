@@ -10,7 +10,7 @@ class Workflow < ActiveRecord::Base
 
   acts_as_asset
 
-  acts_as_doi_parent(child_accessor: :versions)
+  include Seek::Dois::DoiGeneration
 
   scope :default_order, -> { order('title') }
 

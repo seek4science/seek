@@ -24,7 +24,7 @@ class DataFilesController < ApplicationController
 
   include Seek::BreadCrumbs
 
-  include Seek::Doi::Minting
+  include Seek::DataciteDoi
 
   include Seek::IsaGraphExtensions
 

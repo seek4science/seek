@@ -1,5 +1,3 @@
-<% type_text = "#{text_for_resource(@resource)} snapshot" %>
-
 <div class="row">
   <div class="col-md-8 col-md-push-2">
     <%= panel("Confirmation") do %>
@@ -7,17 +5,13 @@
             <%= image_tag('logos/doi_logo.svg', class: 'mint-doi') %>
 
             <p>
-              You are about to mint a DOI for the following <%= type_text %>.
+              You are about to mint a DOI for the following <%= text_for_resource @resource %> snapshot.
               Please review the contents of the snapshot below and then click the "Mint DOI" button to continue,
               or "Cancel" to go back.
             </p>
 
-            The DOI that will be generated will be:
-            <pre><%= @snapshot.suggested_doi %></pre>
-
             <div class="alert alert-warning">
               <strong>Please note:</strong><br/>
-              Once you have generated a DOI you will be unable to easily delete, or hide, the <%= type_text %> except under special circumstances where a retraction is necessary.
               Once a snapshot has been given a DOI, it can no longer be deleted.
             </div>
 
