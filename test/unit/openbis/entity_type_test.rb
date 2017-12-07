@@ -54,6 +54,7 @@ class EntityTypeTest < ActiveSupport::TestCase
     assert_includes codes, 'TZ_ASSAY'
     assert_equal ['CHEMICAL','TZ_ASSAY'], codes
 
+    puts '-----------------'
     semantic.predicateAccessionId = 'is_a'
     semantic.descriptorAccessionId = 'assay'
     types = Seek::Openbis::EntityType.SampleType(@openbis_endpoint).find_by_semantic(semantic)
@@ -85,5 +86,13 @@ class EntityTypeTest < ActiveSupport::TestCase
     zamples = Seek::Openbis::Zample.new(@openbis_endpoint).find_by_type_codes(codes)
     assert zamples
     assert_equal 0, zamples.size
+  end
+
+  test 'All samples can be found' do
+
+    zamples = Seek::Openbis::Zample.new(@openbis_endpoint).all
+    assert zamples
+    assert_equal 8, zamples.size
+
   end
 end

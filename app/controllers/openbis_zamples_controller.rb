@@ -2,7 +2,13 @@ class OpenbisZamplesController < ApplicationController
 
   include Seek::Openbis::EntityControllerBase
 
+  before_filter :get_assay_types, only: [:index]
+
+  ALL_ASSAYS = 'ALL ASSAYS'.freeze
+  ALL_TYPES = 'ALL TYPES'.freeze
+
   def index
+    @zample_type = params[:zample_type] || ALL_ASSAYS
     get_entities
   end
 
@@ -139,8 +145,18 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def get_entities
-    @entities = Seek::Openbis::Zample.new(@openbis_endpoint).all
+    if ALL_TYPES == @zample_type
+      @entities = Seek::Openbis::Zample.new(@openbis_endpoint).all
+    else
+      codes = @zample_type == ALL_ASSAYS ? @assay_types_codes : [@zample_type]
+      @entities = Seek::Openbis::Zample.new(@openbis_endpoint).find_by_type_codes(codes)
+    end
   end
 
+  def get_assay_types
+    @assay_types = seek_util.assay_types(@openbis_endpoint)
+    @assay_types_codes = @assay_types.map {|t| t.code}
+    @zample_type_options = @assay_types.map {|t| t.code} + [ALL_ASSAYS, ALL_TYPES]
+  end
 
 end

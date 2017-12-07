@@ -1,0 +1,8 @@
+{"samples": [
+  {"identifier":"\/API-SPACE\/TZ3","modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser",
+    "code":"TZ3","modifier":"apiuser","permId":"20171002172111346-37",
+    "registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40"],
+    "sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
+,
+  {"identifier":"\/API-SPACE\/TZ4","modificationDate":"2017-10-02 16:26:39.055471","registerator":"apiuser","code":"TZ4","modifier":"apiuser","permId":"20171002172639055-39","registrationDate":"2017-10-02 16:26:39.055471","datasets":[],"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample\/assay with a dataset. Karolina. Longer description","NAME":"Tomek Second"},"tags":[]}
+]}

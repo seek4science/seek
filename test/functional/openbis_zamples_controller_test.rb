@@ -33,6 +33,41 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'index sets assay_types and entities' do
+    login_as(@user)
+    get :index, project_id: @project.id, openbis_endpoint_id: @endpoint.id
+
+    assert_response :success
+    assert assigns(:assay_types)
+    assert assigns(:assay_types_codes)
+    assert assigns(:zample_type_options)
+    assert assigns(:zample_type)
+    assert_equal 'ALL ASSAYS', assigns(:zample_type)
+    assert_includes assigns(:zample_type_options), 'ALL ASSAYS'
+    assert_includes assigns(:zample_type_options), 'ALL TYPES'
+    assert assigns(:entities)
+    assert_equal 2, assigns(:entities).size
+  end
+
+  test 'index filters by zample_type' do
+    login_as(@user)
+    get :index, project_id: @project.id, openbis_endpoint_id: @endpoint.id, zample_type: 'TZ_TEST'
+
+    assert_response :success
+    assert_equal 1, assigns(:entities).size
+
+    get :index, project_id: @project.id, openbis_endpoint_id: @endpoint.id, zample_type: 'ALL ASSAYS'
+
+    assert_response :success
+    assert_equal 2, assigns(:entities).size
+
+    get :index, project_id: @project.id, openbis_endpoint_id: @endpoint.id, zample_type: 'ALL TYPES'
+
+    assert_response :success
+    assert_equal 8, assigns(:entities).size
+  end
+
+
   test 'index renders parents details' do
     login_as(@user)
     get :index, project_id: @project.id, openbis_endpoint_id: @endpoint.id
@@ -230,4 +265,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_equal ['20171004182824553-41', '20171002190934144-40'], linked
 
   end
+
+  test ''
 end

@@ -69,6 +69,7 @@ module Seek
         cache_option = refresh ? { force: true } : nil
 
         json = query_application_server_by_semantic(semantic,cache_option)
+        # puts json.to_json
         construct_from_json(json, entity_type)
       end
 

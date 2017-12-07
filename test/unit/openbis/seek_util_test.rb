@@ -265,4 +265,12 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal '123', dataset2.code
   end
 
+  test 'assay_types gives types annotated as assay' do
+    types = @util.assay_types(@endpoint)
+    assert types
+    codes = types.map {|t| t.code}
+    assert_equal ['TZ_ASSAY', 'UNKNOWN'], codes
+  end
+
+
 end

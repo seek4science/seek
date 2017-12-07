@@ -45,8 +45,10 @@ module Seek
         self
       end
 
-      def all
-        json = query_application_server_by_perm_id
+      def all(refresh = false)
+        cache_option = refresh ? { force: true } : nil
+        json = query_application_server_for_all(cache_option)
+        # puts json.to_json
         construct_from_json(json)
       end
 
@@ -125,6 +127,12 @@ module Seek
         cached_query_by_perm_id(perm_id, cache_option) do
           application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
                                                   attribute: 'PermID', attributeValue: perm_id)
+        end
+      end
+
+      def query_application_server_for_all(cache_option = nil)
+        cached_query_by_perm_id('ALL:'+type_name, cache_option) do
+          application_server_query_instance.query(entityType: type_name, queryType: 'ALL')
         end
       end
 

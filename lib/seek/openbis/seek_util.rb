@@ -84,6 +84,17 @@ module Seek
         return nil
 
       end
+
+      def assay_types(openbis_endpoint)
+
+        semantic = Seek::Openbis::SemanticAnnotation.new
+
+        semantic.predicateAccessionId = 'is_a'
+        semantic.descriptorAccessionId = 'assay'
+
+        Seek::Openbis::EntityType.SampleType(openbis_endpoint).find_by_semantic(semantic)
+
+      end
     end
   end
 end
