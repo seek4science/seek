@@ -1,0 +1,34 @@
+<div class="row contribution-header">
+  <div class="col-md-6">
+    <h1>
+      OpenBis endpoint: <%= @openbis_endpoint.space_perm_id %>
+    </h1>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-8">
+    <div class="panel panel-default">
+      <div class="panel-body">
+
+        <p>
+          <%= image(:openbis, :width => '75px') %>
+        </p>
+
+        <div class="form-group"><label>Project:</label> <%= @project.title %></div>
+        <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
+        <div class="form-group"><label>Registered Studies:</label> 2</div>
+        <div class="form-group"><label>Registered Assays:</label> 11</div>
+        <div class="form-group"><label>Registered DataSets:</label> 101</div>
+        <div class="form-group"><label>Registered SOP:</label> 0</div>
+
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <%= button_link_to("Manage OBis Assays", 'organise', openbis_endpoint_openbis_zamples_path(@openbis_endpoint, seek: 'assay')) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

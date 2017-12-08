@@ -1,0 +1,45 @@
+<div class="modal" role="dialog" tabindex="-1" id="openbis_batch_parent-view2" size="xl"
+     data-role="modal_openbis_batch_parent" style="display: none;">
+
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Select parent for registration</h4>
+      </div>
+
+      <div class="modal-body">
+
+        <%= form_for(Assay.new) do |f| %>
+            <div class="form-group">
+              <label>Register under Study </label><span class="required">*</span>
+              <%= assay_study_selection(nil, f) %>
+            </div>
+            <div class="form-group">
+              <%= check_box_tag('sync_options[link_datasets]', 1, true) %>
+              <%= label_tag('sync_options[link_datasets]', 'Automatically register all dependent enties') %>
+              <div class="help-block">All dependend recognized openbis entities (e.g. DataSets) will be registered and linked during
+                periodical synchronization
+              </div>
+            </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="btn btn-primary" onclick="set_registration_parameters()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    function set_registration_parameters() {
+        console.log('srp called');
+        console.log("S: "+$j('#new_assay select').val()+":"+$j('#new_assay select'), $j('#new_assay select'));
+        console.log("C1: "+$j('#new_assay input[type="checkbox"]').prop("checked"), $j('#new_assay input[type="checkbox"]'));
+        console.log("C2: "+$j('#sync_options_link_datasets').prop("checked"));
+    }
+
+
+</script>

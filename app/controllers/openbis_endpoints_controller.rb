@@ -13,10 +13,13 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :project_can_admin?, except: [:browse, :add_dataset, :show_dataset_files, :show_items, :show_item_count]
   before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
   before_filter :get_endpoints, only: [:index, :browse]
-  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_metadata_store, :destroy]
+  before_filter :get_endpoint, only: [:show, :add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_metadata_store, :destroy]
 
   def index
     respond_with(@project, @openbis_endpoints)
+  end
+
+  def show
   end
 
   def new

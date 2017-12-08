@@ -1,0 +1,8 @@
+<%
+  registered = false
+%>
+<p class="list_item_attribute">
+  <%= check_box_tag('batch_ids[]', entity.perm_id, registered,
+                    disabled: registered, class: registered ? 'linked' : 'unlinked') unless registered %>
+  <%= label_tag(nil, registered ? "Already registered": "batch register" ) %>
+</p>

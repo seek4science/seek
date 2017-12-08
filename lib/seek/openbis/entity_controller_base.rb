@@ -3,8 +3,8 @@ module Seek
     module EntityControllerBase
 
       def self.included(base)
-        base.before_filter :get_project
         base.before_filter :get_endpoint
+        base.before_filter :get_project
         base.before_filter :get_entity, only: [:show, :edit, :register, :update]
         base.before_filter :prepare_asset, only: [:show, :edit, :register, :update]
       end
@@ -14,7 +14,7 @@ module Seek
       end
 
       def get_project
-        @project = Project.find(params[:project_id])
+        @project = @openbis_endpoint.project
       end
 
       def prepare_asset

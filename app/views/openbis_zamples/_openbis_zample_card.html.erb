@@ -1,7 +1,9 @@
 <%
   entity = openbis_zample_card
-%>
+  extra ||= nil
+  extra_params ||= nil
 
+%>
 <div class="col-md-3 openbis-card">
   <div class='panel panel-default'>
     <div class='openbis-card-heading'>
@@ -18,7 +20,8 @@
       <% end %>
       <%= render partial:'openbis_common/registered_link_item', locals: {entity: entity} %>
 
-      <%= link_to('Show/Register', edit_project_openbis_endpoint_openbis_zample_path(@project, @openbis_endpoint, entity.perm_id)) %>
+      <%= link_to('Show/Register', edit_openbis_endpoint_openbis_zample_path(@openbis_endpoint, entity.perm_id, seek: seek_type)) %>
+      <%= render partial: extra, locals: {entity: entity, extra_params: extra_params} if extra %>
     </div>
   </div>
 

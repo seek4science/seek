@@ -7,8 +7,10 @@
     </p>
 
     <%= form_tag({controller: 'openbis_zamples', action: 'index'}, {method: 'get'} ) do %>
+        <%= hidden_field_tag(:seek, @seek_type) %>
       <div class="form-group"><label>Project:</label> <%= @project.title %></div>
       <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
+        <div class="form-group"><label>Entities like:</label> <%= @seek_type.capitalize %></div>
       <div class="form-group"><label>OpenBIS Type</label>
         <%= select_tag :zample_type, options_for_select(@zample_type_options, @zample_type),
                        id: 'zample_type', class: 'form-control1', :onchange => 'this.form.submit();' %></div>
@@ -17,8 +19,26 @@
   </div>
 </div>
 
-<div class='row' id="openbis-zamples-cards">
-  <%= render partial:'openbis_zample_card', collection:@entities %>
-</div>
+<%= render 'batch_parent_form_modal' %>
+
+<%= form_tag({controller: 'openbis_zamples', action: 'batch_register'} ) do |f| %>
+    <%= hidden_field_tag(:seek, @seek_type) %>
+    <%= hidden_field_tag(:seek_parent) %>
+    <div class='row'>
+      <div class='col-md-6'>
+        <%= submit_tag 'Batch registration', class: 'btn btn-default' %>
+        <%= link_to 'Batch registration', '#',  {'data-toggle' =>  "modal", 'data-target' => '#openbis_batch_parent-view2'}  %>
+      </div>
+    </div>
+    <div class='row' id="openbis-zamples-cards">
+
+      <%= render partial:'openbis_zample_card', collection:@entities,
+                 locals: {seek_type: @seek_type, extra: 'openbis_zamples/zample_batch_form'}
+
+      %>
+
+    </div>
+
+<% end %>
 
 
