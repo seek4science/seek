@@ -398,6 +398,61 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
   end
 
+  test 'shows how to create snapshot to get a citation' do
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), studies: [Factory(:study)])
+    login_as(investigation.contributor)
+
+    refute investigation.snapshots.any?
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', new_investigation_snapshot_path(investigation)
+  end
+
+  test 'shows how to publish investigation to get a citation' do
+    investigation = Factory(:investigation, policy: Factory(:private_policy), studies: [Factory(:study)])
+    login_as(investigation.contributor)
+
+    refute investigation.permitted_for_research_object?
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', check_related_items_investigation_path(investigation)
+  end
+
+  test 'shows how to get a citation for a snapshotted investigation' do
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), studies: [Factory(:study)])
+    login_as(investigation.contributor)
+    investigation.create_snapshot
+
+    assert investigation.permitted_for_research_object?
+    assert investigation.snapshots.any?
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions .alert p', text: /You have created 1 snapshot of this Investigation/
+    assert_select '#citation-instructions a[href=?]', '#snapshots'
+  end
+
+  test 'does not show how to get a citation if no manage permission' do
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), studies: [Factory(:study)])
+    person = Factory(:person)
+    login_as(person)
+    investigation.create_snapshot
+
+    assert investigation.permitted_for_research_object?
+    assert investigation.snapshots.any?
+    refute investigation.can_manage?(person.user)
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions', count: 0
+  end
+
   def edit_max_object(investigation)
     add_tags_to_test_object(investigation)
     investigation.creators = [Factory(:person)]
