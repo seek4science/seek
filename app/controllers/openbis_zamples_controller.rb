@@ -100,6 +100,27 @@ class OpenbisZamplesController < ApplicationController
 
   end
 
+  def batch_register
+    puts params
+
+    batch_ids = params[:batch_ids] || []
+
+    if batch_ids.empty?
+      flash[:error] = 'Select entities first';
+      return back_to_index
+    end
+
+    flash[:notice] = 'Registered';
+    return back_to_index
+
+  end
+
+  def back_to_index
+    get_zample_types
+    index;
+    render action: 'index'
+  end
+
   def follow_dependent
     data_sets_ids = extract_requested_sets(@entity, params)
     return nil if data_sets_ids.empty?
