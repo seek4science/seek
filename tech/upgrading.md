@@ -97,6 +97,10 @@ content.
     bundle install --deployment
     bundle exec rake seek:upgrade
     bundle exec rake assets:precompile # this task will take a while
+    
+**Note**: During the upgrade, and items that previously were shared with _All registered users_ have had their permissions updated,
+and this permission has been transferred to its associated projects. An audit CSV file is created, tmp/all-users-policy-update-audit-<timestamp>.csv .
+This file contains a list of all the items affected, along with the contributor and project ids.    
        
 
 ### Restarting services
