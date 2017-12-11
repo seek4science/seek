@@ -85,7 +85,7 @@ class ModelsController < ApplicationController
 
   def new_version
     if handle_upload_data
-      comments = params[:revision_comment]
+      comments = params[:revision_comments]
 
       respond_to do |format|
         create_new_version comments

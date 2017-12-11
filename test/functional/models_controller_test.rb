@@ -402,7 +402,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert_difference('ModelImage.count') do
         post :new_version, id: m, model: { title: m.title },
              content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
-             revision_comment: 'This is a new revision',
+             revision_comments: 'This is a new revision',
              model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
       end
     end
@@ -642,7 +642,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model::Version.count', 1) do
       post :new_version, id: m, model: { title: m.title},
            content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
-           revision_comment: 'This is a new revision'
+           revision_comments: 'This is a new revision'
     end
 
     assert_redirected_to model_path(m)

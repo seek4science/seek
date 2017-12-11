@@ -148,7 +148,7 @@ class WorkflowsController < ApplicationController
 
   def new_version
     if (handle_data nil)
-      comments=params[:revision_comment]
+      comments=params[:revision_comments]
 
       respond_to do |format|
         if @workflow.save_as_new_version(comments)

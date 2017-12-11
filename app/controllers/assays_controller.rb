@@ -240,8 +240,11 @@ class AssaysController < ApplicationController
 
   def tweak_json_params json_params
     if json_params[:assay][:assay_class].present?
-        json_params[:assay_class] = :experimental
-        json_params[:assay][:assay_class_id] = :experimental
+      if json_params[:assay][:assay_class] == :EXP
+        json_params[:assay][:assay_class_id] = "1"
+      else
+        json_params[:assay][:assay_class_id] = "2"
+      end
       json_params[:assay].delete :assay_class
     end
     if json_params[:assay][:assay_type].present?

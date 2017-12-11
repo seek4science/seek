@@ -366,7 +366,7 @@ class SopsControllerTest < ActionController::TestCase
     s = sops(:editable_sop)
 
     assert_difference('Sop::Version.count', 1) do
-      post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision'
+      post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
     end
 
     assert_redirected_to sop_path(s)
@@ -389,7 +389,7 @@ class SopsControllerTest < ActionController::TestCase
     current_version_count = s.versions.size
 
     assert_no_difference('Sop::Version.count') do
-      post :new_version, id: s, data: fixture_file_upload('files/file_picture.png'), revision_comment: 'This is a new revision'
+      post :new_version, id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision'
     end
 
     assert_redirected_to sop_path(s)
@@ -409,7 +409,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1, s.experimental_conditions.count
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
+        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' # v2
       end
     end
 
@@ -424,7 +424,7 @@ class SopsControllerTest < ActionController::TestCase
                                               start_value: 1, sop_id: s.id, sop_version: s.version)
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
+        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' # v2
       end
     end
 
@@ -684,7 +684,7 @@ class SopsControllerTest < ActionController::TestCase
     s = assigns(:sop)
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop::Version.count', 1) do
-        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision'
+        post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
       end
     end
     al2 = ActivityLog.last
@@ -697,7 +697,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not create duplication sop_versions_projects when uploading new version' do
     sop = Factory(:sop)
     login_as(sop.contributor)
-    post :new_version, id: sop, sop: { title: sop.title }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision'
+    post :new_version, id: sop, sop: { title: sop.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
 
     sop.reload
     assert_equal 2, sop.versions.count

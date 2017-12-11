@@ -57,7 +57,7 @@ class DataFilesController < ApplicationController
 
   def new_version
     if handle_upload_data
-      comments = params[:revision_comment]
+      comments = params[:revision_comments]
 
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
@@ -79,9 +79,10 @@ class DataFilesController < ApplicationController
             end
           end
         else
-          flash[:error] = 'Unable to save new version'
+          flash[:error] = 'Unable to save newflash[:error] version'
         end
         format.html { redirect_to @data_file }
+        format.json { render json: @data_file}
       end
     else
       flash[:error] = flash.now[:error]

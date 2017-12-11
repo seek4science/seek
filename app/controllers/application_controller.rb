@@ -35,7 +35,7 @@ class ApplicationController < ActionController::Base
   # after_filter :unescape_response
 
   before_filter :write_api_enabled, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new]
+  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new, :new_version]
 
   helper :all
 
