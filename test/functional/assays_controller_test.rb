@@ -1442,4 +1442,20 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can delete an assay with subscriptions' do
+    assay = Factory(:assay, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    p = Factory(:person)
+    Factory(:subscription, person: assay.contributor, subscribable: assay)
+    Factory(:subscription, person: p, subscribable: assay)
+
+    login_as(assay.contributor)
+
+    assert_difference('Subscription.count', -2) do
+      assert_difference('Assay.count', -1) do
+        delete :destroy, id: assay.id
+      end
+    end
+
+    assert_redirected_to assays_path
+  end
 end
