@@ -11,7 +11,7 @@ Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
 ## Version 1.5.0
 
-Release date: _December 6th 2017_
+Release date: _December 11th 2017_
 
 This is quite a large release, and the main highlights include:
 
