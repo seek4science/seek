@@ -11,6 +11,7 @@ layout: page
 - [Logging into SEEK](login.html)
 - [Editing your profile](editing-profile.html)
 - [Managing your account](managing-account.html)
+- [Requesting to join a Project](request-to-join-project.html)
 - [Adding assets (data, models, SOPs, publications) to SEEK](adding-assets.html)
 - [Creating new asset versions](uploading-new-versions.html)
 - [Comparing two versions of a Model](model-comparison.html)

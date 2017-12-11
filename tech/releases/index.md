@@ -9,6 +9,35 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+## Version 1.5.0
+
+Release date: _December 11th 2017_
+
+This is quite a large release, and the main highlights include:
+
+  * Our first released version of our **JSON API**. This has been built to conform to the [JSON API](http://jsonapi.org) specification, 
+    and is documented on [SwaggerHub](https://app.swaggerhub.com/apis/FAIRDOM/SEEK/0.1).
+    This read API has been developed in conjuction with, and feeds into, a write API which will be released incrementally
+    in subsequent releases. For more details please read [API](/help/user-guide/api.html).
+  * Incorporating the new **[JERM 2 ontology](http://jermontology.org)**, along with updates and extensions to the RDF produced by 
+    SEEK.
+  * **Migrated legacy sharing permissions**: Given registration for SEEK is open to anyone, 
+  we have removed the ability to administer sharing permissions of items for _“all registered users”_. 
+  This ability was removed from the user interface several versions ago, but a number of items retained this legacy sharing permission. 
+  Items shared with “all registered users” have now been updated so that their sharing permission is “project wide” instead, according to the projects the item is associated with. 
+  This restricts the audience which can interact with the item. 
+  Owners and managers of items are still free to continue to choose and change the sharing permissions as they wish.
+  * If users wish to **request to join a project**, but do not know the user that administers it, there is now a button available to do so. A message
+  will be sent the administrators of those projects with additional details. When added to a project, the new member is automatically notified
+  by email. A request can only be sent once every 12 hours.
+  * **DOI's and ORCiD** identifiers, where used or created, are now displayed more clearly in various views and lists.
+
+
+
+A full list of changes included in this release can be found in the [SEEK v1.5.0 release notes](release-notes-1.5.0.html).
+
+If you have any comments or feedback then please [Contact Us](/contacting-us.html)
+
 ## Version 1.4.1
 
 Release date: _September 4th 2017_

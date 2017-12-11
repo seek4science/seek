@@ -40,7 +40,7 @@ It should only be necessary to run *bundle install* and the *db:migrate* rake
 task. Using *seek:upgrade* should still work, but could take a lot of
 unnecessary time. 
 
-## Steps to upgrade from 1.3.x to 1.4.x
+## Steps to upgrade from 1.4.x to 1.5.x
 
 
 ### Set RAILS_ENV
@@ -51,8 +51,6 @@ unnecessary time.
 
 ### Stopping services before upgrading
 
-**For this version, it really is critical to stop these services at this stage. You will be unable to later.**
-
     bundle exec rake seek:workers:stop
     bundle exec rake sunspot:solr:stop
 
@@ -62,16 +60,16 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.4.1
+    git checkout v1.5.0
 
 ### Updating using the tarball
 
 
 You can download the file from
-<https://bitbucket.org/fairdom/seek/downloads/seek-1.4.1.tar.gz> You can
+<https://bitbucket.org/fairdom/seek/downloads/seek-1.5.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.4.1.tar.gz
+    tar zxvf seek-1.5.0.tar.gz
     mv seek seek-previous
     mv seek-{{ site.current_seek_version }} seek
     cd seek/
@@ -99,42 +97,17 @@ content.
     bundle install --deployment
     bundle exec rake seek:upgrade
     bundle exec rake assets:precompile # this task will take a while
-    
-### Updating the Sunspot configuration
-    
-If you moved away from the default Sunspot/SOLR config, by making your own copy of _config/sunspot.yml_, this will need updating.
-
-If you don't have a _config/sunspot.yml_ you don't need to do anything.
-   
-Update your _sunspot.yml_ based on the new format in _[config/sunspot.default.yml](https://github.com/seek4science/seek/blob/seek-1.4/config/sunspot.default.yml)_   
+       
 
 ### Restarting services
 
     bundle exec rake sunspot:solr:start
-    bundle exec rake seek:workers:start            
-
-If you are running a production SEEK behing Apache, then move onto the next part. Otherwise, or you want to do a quick test,
- you can simply start SEEK again with:  
-  
-    bundle exec rails s    
+    bundle exec rake seek:workers:start                
             
-    
-### Upgrading Passenger Phusion
-    
-If you are running SEEK with Passenger, it is likely you will need to upgrade Passenger and your Apache or Ngninx configuration.
- 
-Please read [Serving SEEK through Apache](/tech/install-production.html#serving-seek-through-apache) for a reminder
-on how to install the new version, and update your virtual host configuration accordingly.
-
-### Note on Search results
-    
-Initially you won't get any search results, due to the upgrade of Sunspot/SOLR. The upgrade steps will have triggered
-some jobs to rebuild the search index. How long this takes depends upon the number of items in the database and the speed of your
-machine. You can track the progress by going to the Admin page of _SEEK_, and looking at _Job Queue_ under _Statistics_.
     
 ---
     
 ## Earlier upgrade notes
 
-For details of how to upgrade to 1.2.x and for earlier versions please visit
+For details of how to upgrade between earlier versions please visit
 [Upgrades between earlier versions](earlier-upgrades.html)
