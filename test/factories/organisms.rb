@@ -38,3 +38,7 @@ Factory.define(:bioportal_concept) do |f|
   f.ontology_id 'NCBITAXON'
   f.concept_uri 'http://purl.obolibrary.org/obo/NCBITaxon_2287'
 end
+
+Factory.define(:organism_with_blank_concept, parent: :organism) do |f|
+  f.bioportal_concept Factory(:bioportal_concept,ontology_id:'',concept_uri:'')
+end

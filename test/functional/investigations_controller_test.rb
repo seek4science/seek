@@ -398,6 +398,23 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
   end
 
+  test 'can delete an investigation with subscriptions' do
+    i = Factory(:investigation, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    p = Factory(:person)
+    Factory(:subscription, person: i.contributor, subscribable: i)
+    Factory(:subscription, person: p, subscribable: i)
+
+    login_as(i.contributor)
+
+    assert_difference('Subscription.count', -2) do
+      assert_difference('Investigation.count', -1) do
+        delete :destroy, id: i.id
+      end
+    end
+
+    assert_redirected_to investigations_path
+  end
+
   def edit_max_object(investigation)
     add_tags_to_test_object(investigation)
     investigation.creators = [Factory(:person)]

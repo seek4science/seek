@@ -26,7 +26,7 @@ class Subscription < ActiveRecord::Base
   end
 
   def can_delete?(user = User.current_user)
-    can_manage?(user)
+    can_manage?(user) || subscribable.try(:can_delete?, user)
   end
 
   def can_edit?(user = User.current_user)

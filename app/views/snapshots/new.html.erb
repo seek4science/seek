@@ -5,13 +5,13 @@
 
 <% included_text = capture do %>
     The following public resources will be included in the snapshot.
-    Please ensure this list is correct before clicking the "Create Snapshot" button below.
+    Please ensure this list is correct before clicking the <strong>Create Snapshot</strong> button below.
 <% end %>
 <% excluded_text = capture do %>
     These resources will be excluded from the snapshot due to not having public access privileges.
     To include an excluded resource in the snapshot, please make it publicly accessible.
     <% if excluded_items.any? %>
-    <br/>To quickly publish these items you can select the Publish full <%=t(@resource.class.name.downcase)%> button below.
+    <br/>To quickly publish these items you can select the <strong>Publish full <%=t(@resource.class.name.downcase)%></strong> button below.
     <% end %>
 <% end %>
 
