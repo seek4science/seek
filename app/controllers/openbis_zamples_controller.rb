@@ -28,7 +28,7 @@ class OpenbisZamplesController < ApplicationController
       return redirect_to @asset.seek_entity
     end
 
-    @asset.sync_options = sync_options
+    @asset.sync_options = get_sync_options
     assay_params = params.require(:assay).permit(:study_id, :assay_class_id, :title)
 
     @assay = seek_util.createObisAssay(assay_params, current_person, @asset)
@@ -71,7 +71,7 @@ class OpenbisZamplesController < ApplicationController
     # in case of rendering edit
     @linked_to_assay = get_linked_to(@asset.seek_entity)
 
-    @asset.sync_options = sync_options
+    @asset.sync_options = get_sync_options
     @asset.content = @entity #or maybe we should not update, but that is what the user saw on the screen
 
     # separate saving of external_asset as the save on parent does not fails if the child was not saved correctly
@@ -104,16 +104,94 @@ class OpenbisZamplesController < ApplicationController
     puts params
 
     batch_ids = params[:batch_ids] || []
+    seek_parent_id = params[:seek_parent]
 
     if batch_ids.empty?
       flash[:error] = 'Select entities first';
       return back_to_index
     end
 
-    flash[:notice] = 'Registered';
+    unless seek_parent_id
+      flash[:error] = 'Select parent for new elements';
+      return back_to_index
+    end
+
+    status = case @seek_type
+      when :assay then batch_register_assays(batch_ids, seek_parent_id)
+    end
+
+    msg = "Registered all #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
+    msg = "Registered #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
+    flash[:notice] = msg;
+    status[:issues].each {|m| flash[:error] = m}
+
     return back_to_index
 
   end
+
+  def batch_register_assays(zample_ids, study_id)
+
+    sync_options = get_sync_options
+    sync_options[:link_datasets] = '1' if sync_options[:link_dependent]
+
+    assay_params = {study_id: study_id}
+
+    registered = []
+    failed = []
+    issues = []
+
+    zample_ids.each do |id|
+
+      get_entity(id)
+      prepare_asset
+
+      reg_info = do_assay_registration(@asset, assay_params, sync_options)
+      if (reg_info[:assay])
+        registered << id
+      else
+        failed << id
+      end
+      issues << "Openbis #{id}: " + reg_info[:issues].join(', ') if reg_info[:issues]
+
+    end
+
+    return {registred: registered, failed: failed, issues: issues}
+
+  end
+
+  def do_assay_registration(asset, assay_params, sync_options)
+
+    issues = []
+    reg_status = {assay: nil, issues: issues}
+
+    if asset.seek_entity
+      issues << 'Already registered as OpenBIS entity'
+      return reg_status
+    end
+
+    asset.sync_options = sync_options
+
+    assay = seek_util.createObisAssay(assay_params, current_person, asset)
+
+    # separate testing of external_asset as the save on parent does not fails if the child was not saved correctly
+    unless asset.valid?
+      issues.concat asset.errors.full_messages()
+      return reg_status
+    end
+
+    if assay.save
+
+      errs = follow_assay_dependent(asset.content, assay, sync_options, {})
+      issues.concat(errs) if errs
+
+      reg_status[:assay] = assay
+    else
+      issues.concat assay.errors.full_messages()
+    end
+
+    return reg_status
+  end
+
 
   def back_to_index
     get_zample_types
@@ -121,21 +199,21 @@ class OpenbisZamplesController < ApplicationController
     render action: 'index'
   end
 
-  def follow_dependent
-    data_sets_ids = extract_requested_sets(@entity, params)
+  def follow_assay_dependent(entity, assay, sync_options, params)
+    data_sets_ids = extract_requested_sets(entity, sync_options, params)
     return nil if data_sets_ids.empty?
 
-    seek_util.associate_data_sets_ids(@assay, data_sets_ids, @openbis_endpoint)
+    seek_util.associate_data_sets_ids(assay, data_sets_ids, @openbis_endpoint)
   end
 
 
-  def sync_options(hash = nil)
+  def get_sync_options(hash = nil)
     hash ||= params
-    hash.fetch(:sync_options, {}).permit(:link_datasets)
+    hash.fetch(:sync_options, {}).permit(:link_datasets,:link_dependent)
   end
 
-  def extract_requested_sets(zample, params)
-    return zample.dataset_ids if sync_options(params)[:link_datasets] == '1'
+  def extract_requested_sets(zample, sync_options, params)
+    return zample.dataset_ids if sync_options[:link_datasets] == '1'
 
     (params[:linked_datasets] || []) & zample.dataset_ids
   end
@@ -148,7 +226,7 @@ class OpenbisZamplesController < ApplicationController
   end
 
 
-  def get_entity
+  def get_entity(id = nil)
 
     # sample = Seek::Openbis::Zample.new(@openbis_endpoint)
     # json = JSON.parse(
@@ -161,7 +239,7 @@ class OpenbisZamplesController < ApplicationController
     #    )
     # @zample = sample.populate_from_json(json)
 
-    @entity = Seek::Openbis::Zample.new(@openbis_endpoint, params[:id])
+    @entity = Seek::Openbis::Zample.new(@openbis_endpoint, id ? id : params[:id])
   end
 
   def get_entities

@@ -74,15 +74,21 @@ module Seek
         new_files = external_assets.select { |es| es.seek_entity.nil? }
                         .map { |es| createObisDataFile(es) }
 
-        saving_problems = false
-        new_files.each { |df| saving_problems = true unless df.save }
-        return 'Could not register all depended datasets' if saving_problems
+        issues = []
+        saved =  []
 
-        data_files = existing_files+new_files
+        new_files.each do |df|
+          if df.save
+            saved << df
+          else
+            issues.concat df.errors.full_messages()
+          end
+        end
+
+        data_files = existing_files+saved
         data_files.each { |df| assay.associate(df) }
 
-        return nil
-
+        issues.empty? ? nil : issues
       end
 
       def assay_types(openbis_endpoint)

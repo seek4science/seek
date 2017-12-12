@@ -16,9 +16,9 @@
               <%= assay_study_selection(nil, f) %>
             </div>
             <div class="form-group">
-              <%= check_box_tag('sync_options[link_dependent]', 1, true) %>
-              <%= label_tag('sync_options[link_dependent]', 'Automatically register all dependent enties') %>
-              <div class="help-block">All dependent recognized openbis entities (e.g. DataSets) will be registered and linked during
+              <%= check_box_tag('link_dependent', 1, true) %>
+              <%= label_tag('link_dependent', 'Automatically register all dependent enties') %>
+              <div class="help-block">All dependent recognized OpenBis entities (e.g. DataSets) will be registered and linked during
                 periodical synchronization
               </div>
             </div>
@@ -26,7 +26,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-        <button class="btn btn-primary" onclick="set_registration_parameters()">Save changes</button>
+        <button class="btn btn-primary" onclick="set_registration_parameters()">Register selected</button>
       </div>
     </div>
   </div>
@@ -35,15 +35,17 @@
 <script>
 
     function set_registration_parameters() {
-        console.log('srp called');
-        console.log("S: "+$j('#new_assay select').val()+":"+$j('#new_assay select'), $j('#new_assay select'));
-        console.log("C1: "+$j('#new_assay input[type="checkbox"]').prop("checked"), $j('#new_assay input[type="checkbox"]'));
-        console.log("C2: "+$j('#sync_options_link_dependent').prop("checked"));
-        console.log("BF: ",$j('#batch_form'));
-        $j('#seek_parent').val($j('#new_assay select').val());
-        $j('#link_dependent').val($j('#sync_options_link_dependent').prop("checked") ? '1' : undefined);
-        $j('#openbis_batch_parent-view2').modal('hide');
-        $j('#batch_form').submit();
+        //console.log('srp called');
+        //console.log("S: "+$j('#new_assay select').val()+":"+$j('#new_assay select'), $j('#new_assay select'));
+        //console.log("C1: "+$j('#new_assay input[type="checkbox"]').prop("checked"), $j('#new_assay input[type="checkbox"]'));
+        //console.log("C2: "+$j('#link_dependent').prop("checked"));
+        //console.log("BF: ",$j('#batch_form'));
+        if ($j('#new_assay select').val()) {
+            $j('#seek_parent').val($j('#new_assay select').val());
+            $j('#sync_options_link_dependent').val($j('#link_dependent').prop("checked") ? '1' : undefined);
+            $j('#openbis_batch_parent-view2').modal('hide');
+            $j('#batch_form').submit();
+        };
     }
 
 
