@@ -20,7 +20,6 @@ namespace :seek_stats do
   task(creation_dates: :environment) do
     types=[User, Investigation, Study, Assay, DataFile, Model, Sop, Presentation, Project]
     total = types.sum(&:count)
-    puts total
     bar=ProgressBar.new(total)
     file=File.join(Rails.root, 'tmp', 'creation-dates-stats.csv')
     n=0
