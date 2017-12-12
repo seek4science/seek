@@ -17,6 +17,25 @@ namespace :seek_stats do
 
   end
 
+  task(creation_dates: :environment) do
+    types=[User, Investigation, Study, Assay, DataFile, Model, Sop, Presentation, Project]
+    total = types.sum(&:count)
+    puts total
+    bar=ProgressBar.new(total)
+    file=File.join(Rails.root, 'tmp', 'creation-dates-stats.csv')
+    n=0
+    CSV.open(file, 'wb') do |csv|
+      csv << ['type', 'creation date']
+      types.each do |type|
+        type.all.order(:created_at).each do |item|
+          csv << [type.name, item.created_at.strftime('%d-%m-%Y')]
+          bar.increment!(5) if (n+=1)%5==0
+        end
+      end
+    end
+    bar.increment!(bar.remaining)
+  end
+
   #filesizes and versions across projects
   task(:filesizes_and_versions => :environment) do
     types=[Model, Sop, Presentation, DataFile]
