@@ -7,7 +7,7 @@ module Seek
     # fallback attributes
     def project_long_name_fallback
       if project_type.blank?
-        "#{project_name}"
+        project_name.to_s
       else
         "#{project_name} #{project_type}"
       end
@@ -41,8 +41,7 @@ module Seek
       script_name = (SEEK::Application.config.relative_url_root || '/')
       ActionMailer::Base.default_url_options = { host: host_with_port,
                                                  protocol: host_scheme,
-                                                 script_name: script_name
-      }
+                                                 script_name: script_name }
     end
 
     def smtp_propagate
@@ -69,11 +68,11 @@ module Seek
     end
 
     def google_analytics_enabled_propagate
-      if google_analytics_enabled
-        GA.tracker = google_analytics_tracker_id
-      else
-        GA.tracker = '000-000'
-      end
+      GA.tracker = if google_analytics_enabled
+                     google_analytics_tracker_id
+                   else
+                     '000-000'
+                   end
     end
 
     def application_name_propagate
@@ -99,13 +98,13 @@ module Seek
 
     def configure_recaptcha_keys
       Recaptcha.configure do |config|
-        config.site_key  = recaptcha_public_key
+        config.site_key = recaptcha_public_key
         config.secret_key = recaptcha_private_key
       end
     end
 
     def configure_exception_notification
-      if exception_notification_enabled && !Rails.application.config.consider_all_requests_local
+      if exception_notification_enabled && Rails.env.production?
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
                                                 email: {
                                                   sender_address: [noreply_sender],
@@ -115,6 +114,8 @@ module Seek
       else
         SEEK::Application.config.middleware.delete ExceptionNotifier
       end
+    rescue RuntimeError => e
+      Rails.logger.warn('Cannot update middleware with exception notification changes, server needs restarting')
     end
 
     def solr_enabled_propagate
@@ -140,7 +141,7 @@ module Seek
     def recaptcha_setup?
       if Seek::Config.recaptcha_enabled
         if Seek::Config.recaptcha_public_key.blank? || Seek::Config.recaptcha_private_key.blank?
-          fail Exception.new('Recaptcha is enabled, but public and private key are not set')
+          raise Exception, 'Recaptcha is enabled, but public and private key are not set'
           false
         else
           true
@@ -170,7 +171,7 @@ module Seek
     end
 
     def secret_key_base
-      if File.exists?(secret_key_base_path)
+      if File.exist?(secret_key_base_path)
         File.read(secret_key_base_path)
       else
         write_secret_key_base
@@ -228,11 +229,11 @@ module Seek
     end
 
     def set_smtp_settings(field, value)
-      if [:password, :user_name, :authentication].include? field.to_sym
+      if %i[password user_name authentication].include? field.to_sym
         value = nil if value.blank?
       end
 
-      value = value.to_sym if field.to_sym == :authentication and value
+      value = value.to_sym if field.to_sym == :authentication && value
       if field.to_sym == :password
         unless value.blank?
           value = encrypt(value, generate_key(GLOBAL_PASSPHRASE))
@@ -367,18 +368,18 @@ module Seek
 
     def merge!(var, value)
       result = Settings.merge! var, value
-      send "#{var}_propagate" if self.respond_to? "#{var}_propagate"
+      send "#{var}_propagate" if respond_to? "#{var}_propagate"
       result
     end
 
     def setting(setting, options = {})
       options ||= {}
       setter = "#{setting}="
-      getter = "#{setting}"
+      getter = setting.to_s
       propagate = "#{getter}_propagate"
       fallback = "#{getter}_fallback"
       default = "default_#{setting}"
-      if self.respond_to?(fallback)
+      if respond_to?(fallback)
         define_class_method getter do
           get_value(getter, options[:convert]) || send(fallback)
         end
@@ -394,7 +395,7 @@ module Seek
 
       define_class_method setter do |val|
         set_value(setter, val, options[:convert])
-        send propagate if self.respond_to?(propagate)
+        send propagate if respond_to?(propagate)
       end
     end
   end
