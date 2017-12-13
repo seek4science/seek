@@ -158,6 +158,37 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   end
 
+  ## Batch register assay ##
+
+  test 'batch registers multiple Assays' do
+
+    login_as(@user)
+    study = Factory :study
+
+    sync_options = {}
+    batch_ids = ['20171002172111346-37', '20171002172639055-39']
+
+    assert_difference('Assay.count', 2) do
+        assert_difference('ExternalAsset.count', 2) do
+
+          post :batch_register, openbis_endpoint_id: @endpoint.id,
+               seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+        end
+    end
+
+    assert_response :success
+    puts flash[:error]
+    refute flash[:error]
+    assert_equal "Registered all #{batch_ids.size} assays", flash[:notice]
+
+    study.reload
+    assert_equal batch_ids.size, study.assays.size
+
+  end
+
+
+  ## END --- Batch register assay ##
+
   ## Update ###
   test 'update updates sync options and follows dependencies' do
     login_as(@user)
@@ -185,7 +216,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_equal sync_options, asset.sync_options
     assert_not_equal last_mod, asset.updated_at
 
-    # TODO how to test for content update (or lack of it depends on decided simantics)
+    # TODO how to test for content update (or lack of it depends on decided semantics)
 
 
     last_mod = exassay.updated_at
@@ -202,6 +233,79 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   # unit like tests
 
+  ## registration ##
+  test 'do_assay_registration creates assay from sample and returns status info' do
+
+    controller = OpenbisZamplesController.new
+
+    asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
+    refute asset.seek_entity
+
+    study = Factory :study
+    assay_params = { study_id: study.id }
+
+    sync_options = {}
+
+    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user)
+    assert reg_status
+
+    assay = reg_status[:assay]
+    assert assay
+    assert_equal assay, asset.seek_entity
+    assert_equal study, assay.study
+    assert_equal [], reg_status[:issues]
+  end
+
+  test 'do_assay_registration sets issues on errors if not recovable' do
+
+    controller = OpenbisZamplesController.new
+
+    exassay = Factory :assay
+
+    asset = OpenbisExternalAsset.build(@zample)
+    asset.seek_entity = exassay
+    assert asset.save
+
+    study = Factory :study
+    assay_params = { study_id: study.id }
+
+    sync_options = {}
+
+    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user)
+    assert reg_status
+
+    assay = reg_status[:assay]
+    refute assay
+
+    issues = reg_status[:issues]
+    assert issues
+    assert_equal 1, issues.size
+  end
+
+  test 'do_assay_registration creates assay links datasets if sync_option says so' do
+
+    controller = OpenbisZamplesController.new
+
+    asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
+    refute asset.seek_entity
+
+    study = Factory :study
+    assay_params = { study_id: study.id }
+
+    sync_options = { link_datasets: '1' }
+
+    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user)
+    assert reg_status
+
+    assay = reg_status[:assay]
+    assert assay
+    assert_equal assay, asset.seek_entity
+    assert_equal study, assay.study
+    assert_equal [], reg_status[:issues]
+    assert_equal 3, assay.data_files.size
+  end
+
+  ## registration end ##
 
 
   test 'extract_requested_sets gives all sets from zample if linked is selected' do

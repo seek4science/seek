@@ -3,13 +3,13 @@ class OpenbisZamplesController < ApplicationController
   include Seek::Openbis::EntityControllerBase
 
   before_filter :get_seek_type
-  before_filter :get_zample_types, only: [:index]
 
   ALL_ASSAYS = 'ALL ASSAYS'.freeze
   ALL_TYPES = 'ALL TYPES'.freeze
 
   def index
     @zample_type = params[:zample_type] || ALL_ASSAYS
+    get_zample_types
     get_entities
   end
 
@@ -145,13 +145,13 @@ class OpenbisZamplesController < ApplicationController
       get_entity(id)
       prepare_asset
 
-      reg_info = do_assay_registration(@asset, assay_params, sync_options)
+      reg_info = do_assay_registration(@asset, assay_params, sync_options, current_person)
       if (reg_info[:assay])
         registered << id
       else
         failed << id
       end
-      issues << "Openbis #{id}: " + reg_info[:issues].join(', ') if reg_info[:issues]
+      issues << "Openbis #{id}: " + reg_info[:issues].join(', ') unless reg_info[:issues].empty?
 
     end
 
@@ -159,7 +159,7 @@ class OpenbisZamplesController < ApplicationController
 
   end
 
-  def do_assay_registration(asset, assay_params, sync_options)
+  def do_assay_registration(asset, assay_params, sync_options, creator)
 
     issues = []
     reg_status = {assay: nil, issues: issues}
@@ -170,8 +170,7 @@ class OpenbisZamplesController < ApplicationController
     end
 
     asset.sync_options = sync_options
-
-    assay = seek_util.createObisAssay(assay_params, current_person, asset)
+    assay = seek_util.createObisAssay(assay_params, creator, asset)
 
     # separate testing of external_asset as the save on parent does not fails if the child was not saved correctly
     unless asset.valid?
@@ -180,21 +179,18 @@ class OpenbisZamplesController < ApplicationController
     end
 
     if assay.save
-
       errs = follow_assay_dependent(asset.content, assay, sync_options, {})
       issues.concat(errs) if errs
-
       reg_status[:assay] = assay
     else
       issues.concat assay.errors.full_messages()
     end
 
-    return reg_status
+    reg_status
   end
 
 
   def back_to_index
-    get_zample_types
     index;
     render action: 'index'
   end
@@ -203,7 +199,7 @@ class OpenbisZamplesController < ApplicationController
     data_sets_ids = extract_requested_sets(entity, sync_options, params)
     return nil if data_sets_ids.empty?
 
-    seek_util.associate_data_sets_ids(assay, data_sets_ids, @openbis_endpoint)
+    seek_util.associate_data_sets_ids(assay, data_sets_ids, entity.openbis_endpoint)
   end
 
 
