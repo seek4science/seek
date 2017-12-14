@@ -12,6 +12,7 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
+    rebuild_sample_templates
 
   ]
 
@@ -40,6 +41,12 @@ namespace :seek do
       Seek::Config.solr_enabled = solr
     end
 
+  end
+
+  task(rebuild_sample_template: :environment) do
+    SampleType.all.reject{|st| st.uploaded_template?}.each do |sample_type|
+      sample_type.queue_template_generation
+    end
   end
 
 end
