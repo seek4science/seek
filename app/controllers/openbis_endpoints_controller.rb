@@ -7,19 +7,20 @@ class OpenbisEndpointsController < ApplicationController
 
   before_filter :openbis_enabled?
 
+  before_filter :get_endpoint, only: [:show, :add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_metadata_store, :destroy]
   before_filter :get_project
   before_filter :project_required, except: [:show_dataset_files]
   before_filter :project_member?, except: [:show_dataset_files]
   before_filter :project_can_admin?, except: [:browse, :add_dataset, :show_dataset_files, :show_items, :show_item_count]
   before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
   before_filter :get_endpoints, only: [:index, :browse]
-  before_filter :get_endpoint, only: [:show, :add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_metadata_store, :destroy]
 
   def index
     respond_with(@project, @openbis_endpoints)
   end
 
   def show
+    puts 'show called'
   end
 
   def new
@@ -133,7 +134,8 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def get_project
-    @project = Project.find(params[:project_id])
+    @project = @openbis_endpoint.project if @openbis_endpoint
+    @project = Project.find(params[:project_id]) unless @openbis_endpoint
   end
 
   def project_can_admin?

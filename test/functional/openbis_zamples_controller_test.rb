@@ -191,15 +191,17 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     login_as(@user)
     study = Factory :study
 
-    sync_options = {}
+    sync_options = {link_dependent: 'false'}
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
 
     assert_difference('Assay.count', 2) do
+      assert_no_difference('DataFile.count') do
         assert_difference('ExternalAsset.count', 2) do
 
           post :batch_register, openbis_endpoint_id: @endpoint.id,
                seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
         end
+      end
     end
 
     assert_response :success

@@ -1,5 +1,5 @@
 <%
-  registered = false
+  registered = entity.registered?
 %>
 <p class="list_item_attribute">
   <%= check_box_tag('batch_ids[]', entity.perm_id, registered,

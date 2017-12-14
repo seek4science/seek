@@ -14,6 +14,11 @@ module Seek
         super(json)
       end
 
+      # @deprecated
+      def content_blob_uri
+        "openbis:#{openbis_endpoint.id}:zample:#{perm_id}"
+      end
+
       def sample_type_text
         txt = sample_type_description
         txt = sample_type_code if txt.blank?

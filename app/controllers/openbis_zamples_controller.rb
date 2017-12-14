@@ -120,7 +120,8 @@ class OpenbisZamplesController < ApplicationController
   def batch_register_assays(zample_ids, study_id)
 
     sync_options = get_sync_options
-    sync_options[:link_datasets] = '1' if sync_options[:link_dependent]
+    puts "SYNC OPT #{sync_options}"
+    sync_options[:link_datasets] = '1' if sync_options[:link_dependent] == '1'
 
     assay_params = {study_id: study_id}
 
