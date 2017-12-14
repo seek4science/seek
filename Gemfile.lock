@@ -213,7 +213,7 @@ GEM
     citeproc-ruby (1.1.6)
       citeproc (>= 1.0.4, < 2.0)
       csl (~> 1.4)
-    climate_control (0.1.0)
+    climate_control (0.2.0)
     cocaine (0.5.8)
       climate_control (>= 0.0.3, < 1.0)
     code_analyzer (0.4.7)
@@ -644,7 +644,7 @@ GEM
       rdf (~> 1.1, >= 1.1.10)
     rdf-xsd (1.1.5.1)
       rdf (~> 1.1, >= 1.1.9, < 1.99)
-    rdoc (5.1.0)
+    rdoc (6.0.0)
     recaptcha (4.1.0)
       json
     reek (4.6.1)
@@ -707,7 +707,7 @@ GEM
     rubyntlm (0.3.4)
     rubyzip (1.1.7)
     safe_yaml (1.0.4)
-    sample-template-generator (0.3.3)
+    sample-template-generator (0.4.0)
       cocaine
       rdoc
     sass (3.4.23)
@@ -949,7 +949,7 @@ DEPENDENCIES
   ruby-prof (~> 0.15.9)
   rubycritic
   rubyzip (~> 1.1.4)
-  sample-template-generator
+  sample-template-generator (> 0.3)
   sass-rails
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
