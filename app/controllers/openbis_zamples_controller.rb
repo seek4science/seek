@@ -28,33 +28,29 @@ class OpenbisZamplesController < ApplicationController
       return redirect_to @asset.seek_entity
     end
 
-    @asset.sync_options = get_sync_options
+    sync_options = get_sync_options
     assay_params = params.require(:assay).permit(:study_id, :assay_class_id, :title)
 
-    @assay = seek_util.createObisAssay(assay_params, current_person, @asset)
+    reg_info = do_assay_registration(@asset, assay_params, sync_options, current_person, params)
 
-    # in case rendering edit on errors
-    @linked_to_assay = []
+    @assay = reg_info[:assay]
+    issues = reg_info[:issues]
 
     # seperate testing of external_asset as the save on parent does not fails if the child was not saved correctly
-    unless @asset.valid?
-      @reasons = @asset.errors
+    unless @assay
+      @reasons = issues
       @error_msg = 'Could not register OpenBIS assay'
+
+      # for edit screen
+      @linked_to_assay = get_linked_to(@asset.seek_entity)
+      @assay = Assay.new
       return render action: 'edit'
     end
 
-    if @assay.save
+    flash[:notice] = "Registered OpenBIS assay: #{@entity.perm_id}#{issues.empty? ? '' : ' with some issues'}"
+    issues.each {|m| flash[:error] = m}
 
-      err = follow_dependent
-      flash[:error] = err if err
-
-      flash[:notice] = "Registered OpenBIS assay: #{@entity.perm_id}"
-      redirect_to @assay
-    else
-      @reasons = @assay.errors
-      @error_msg = 'Could not register OpenBIS assay'
-      render action: 'edit'
-    end
+    redirect_to @assay
   end
 
   def update
@@ -68,8 +64,6 @@ class OpenbisZamplesController < ApplicationController
       return redirect_to @assay
     end
 
-    # in case of rendering edit
-    @linked_to_assay = get_linked_to(@asset.seek_entity)
 
     @asset.sync_options = get_sync_options
     @asset.content = @entity #or maybe we should not update, but that is what the user saw on the screen
@@ -78,22 +72,16 @@ class OpenbisZamplesController < ApplicationController
     unless @asset.save
       @reasons = @asset.errors
       @error_msg = 'Could not update sync of OpenBIS assay'
+
+      # for edit screen
+      @linked_to_assay = get_linked_to(@asset.seek_entity)
       return render action: 'edit'
     end
 
-    err = follow_dependent
-    flash[:error] = err if err
+    errs = follow_assay_dependent(@asset.content, @assay, @asset.sync_options, params)
+    errs.each {|m| flash[:error] = m} if errs
 
     # TODO should the assay be saved as well???
-
-    # if @assay.save
-    #  flash[:notice] = "Registered OpenBIS assay: #{@zample.perm_id}"
-    #  redirect_to @assay
-    #else
-    #  @reasons = @assay.errors
-    #  @error_msg = 'Could not register OpenBIS assay'
-    #  render action: 'edit'
-    #end
 
     flash[:notice] = "Updated sync of OpenBIS assay: #{@entity.perm_id}"
     redirect_to @assay
@@ -159,7 +147,7 @@ class OpenbisZamplesController < ApplicationController
 
   end
 
-  def do_assay_registration(asset, assay_params, sync_options, creator)
+  def do_assay_registration(asset, assay_params, sync_options, creator, parameters = params)
 
     issues = []
     reg_status = {assay: nil, issues: issues}
@@ -179,7 +167,7 @@ class OpenbisZamplesController < ApplicationController
     end
 
     if assay.save
-      errs = follow_assay_dependent(asset.content, assay, sync_options, {})
+      errs = follow_assay_dependent(asset.content, assay, sync_options, parameters)
       issues.concat(errs) if errs
       reg_status[:assay] = assay
     else
