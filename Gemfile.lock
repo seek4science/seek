@@ -901,6 +901,7 @@ DEPENDENCIES
   libxml-ruby (~> 2.8.0)
   linkeddata
   lograge
+  loofah
   magic_lamp
   mechanize
   metainspector

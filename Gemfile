@@ -31,6 +31,8 @@ gem 'daemons'
 gem 'linkeddata'
 #gem 'openseek-api'
 gem 'openseek-api', git: 'https://github.com/tzielins/openseek-api-gem', ref: 'feaac0017c005e9bf85260e5f6146b1798fba17a'
+# for fancy content escaping
+gem 'loofah'
 gem 'jbuilder', '~> 2.0'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'

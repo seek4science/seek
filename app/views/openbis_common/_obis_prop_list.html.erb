@@ -1,7 +1,8 @@
 <% if entity.properties
      entity.properties.each do |key, value|
 %>
-        <%= list_item_attribute(key, text_or_not_specified(value)) %>
+        <div class="list_item_attribute"><p class="list_item_attribute"><b><%= key %></b>:
+        <%= openbis_rich_content_sanitizer(value, 100) %></div>
     <%
       end
       end

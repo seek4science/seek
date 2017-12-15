@@ -1,4 +1,6 @@
+
 module OpenbisHelper
+
   def can_browse_openbis?(project, user = User.current_user)
     Seek::Config.openbis_enabled && project.has_member?(user) && project.openbis_endpoints.any?
   end
@@ -50,5 +52,77 @@ module OpenbisHelper
         'data-perm-id' => "#{dataset.perm_id}",
         'data-project-id' => "#{project.id}",
         'data-endpoint-id' => "#{openbis_endpoint.id}")
+  end
+
+  class StatefulWordTrimmer
+
+    attr_reader :trimmed
+
+    def initialize(limit)
+      @left = limit
+      @trimmed = false
+    end
+
+    def trim(content)
+
+      return '' if (@trimmed || !content)
+
+      words = []
+      content.split(/\s/).each do |w|
+        if (@left - w.length) >= 0
+          words << w unless w.empty?
+          @left -= w.length
+        else
+          words << '...'
+          @trimmed = true
+          break
+        end
+      end
+      words.join(' ')
+    end
+
+  end
+
+  class TextTrimmingScrubber < Loofah::Scrubber
+
+    def initialize(limit)
+      @direction = :top_down
+      @trimmer = StatefulWordTrimmer.new(limit)
+    end
+
+    def scrub(node)
+      if @trimmer.trimmed
+        node.remove
+        Loofah::Scrubber::STOP
+      else
+        node.content = @trimmer.trim(node.content) if node.text?
+        node
+      end
+    end
+
+  end
+
+  class StylingScrubber < Loofah::Scrubber
+
+    def initialize
+      @direction = :top_down
+      @style_attrs = ['class','style']
+    end
+
+    def scrub(node)
+      node.attribute_nodes.each do |attr_node|
+        attr_node.remove if @style_attrs.include? attr_node.node_name
+      end
+    end
+
+  end
+
+  def openbis_rich_content_sanitizer(content, max_length = nil)
+
+    cleaned = Loofah.fragment(content).scrub!(StylingScrubber.new)
+    cleaned = cleaned.scrub!(TextTrimmingScrubber.new(max_length)) if max_length
+
+    cleaned.scrub!(:prune).to_s.html_safe
+
   end
 end
