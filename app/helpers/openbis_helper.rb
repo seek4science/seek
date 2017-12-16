@@ -117,11 +117,26 @@ module OpenbisHelper
 
   end
 
+  class ObisXMLScrubber < Loofah::Scrubber
+
+    def initialize
+      @direction = :top_down
+    end
+
+    def scrub(node)
+      case node.name
+        when 'commententry' then node.name = 'p'
+        when 'root' then node.name = 'div'
+      end
+    end
+
+  end
+
   def openbis_rich_content_sanitizer(content, max_length = nil)
 
     cleaned = Loofah.fragment(content).scrub!(StylingScrubber.new)
     cleaned = cleaned.scrub!(TextTrimmingScrubber.new(max_length)) if max_length
-
+    cleaned = cleaned.scrub!(ObisXMLScrubber.new)
     cleaned.scrub!(:prune).to_s.html_safe
 
   end

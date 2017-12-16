@@ -27,14 +27,13 @@
     <%= hidden_field_tag('sync_options[link_dependent]') %>
     <div class='row'>
       <div class='col-md-6'>
-        <%= submit_tag 'Batch registration', class: 'btn btn-default' %>
-        <%= link_to 'Batch registration', '#',  {'data-toggle' =>  "modal", 'data-target' => '#openbis_batch_parent-view2'}  %>
+        <%= button_tag 'Batch registration', class: 'btn btn-default', type: 'button', 'data-toggle' =>  'modal', 'data-target' => '#openbis_batch_parent-view' %>
       </div>
     </div>
     <div class='row' id="openbis-zamples-cards">
 
       <%= render partial:'openbis_zample_card', collection:@entities,
-                 locals: {seek_type: @seek_type, extra: 'openbis_zamples/zample_batch_form'}
+                 locals: {seek_type: @seek_type, extra: 'openbis_common/entity_batch_form_part'}
 
       %>
 

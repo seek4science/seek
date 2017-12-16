@@ -5,10 +5,14 @@ module Seek
       attr_reader :json, :modification_date, :code, :description,
                   :perm_id, :openbis_endpoint, :entity_type, :exception
 
-      @@TYPES = ['Sample']
+      @@TYPES = ['Sample','DataSet']
 
       def self.SampleType(openbis_endpoint, code = nil, refresh = false)
         EntityType.new(openbis_endpoint, 'Sample', code, refresh)
+      end
+
+      def self.DataSetType(openbis_endpoint, code = nil, refresh = false)
+        EntityType.new(openbis_endpoint, 'DataSet', code, refresh)
       end
 
       def ==(other)

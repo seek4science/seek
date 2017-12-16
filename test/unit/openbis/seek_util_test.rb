@@ -272,5 +272,11 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal ['TZ_ASSAY', 'UNKNOWN'], codes
   end
 
-
+  test 'dataset_types gives all dataset types' do
+    types = @util.dataset_types(@endpoint)
+    assert types
+    codes = types.map {|t| t.code}
+    assert_equal 7, codes.size
+    assert_includes codes, 'TZ_FAIR'
+  end
 end

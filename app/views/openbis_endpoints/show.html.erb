@@ -23,10 +23,11 @@
 
       </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-8">
       <div class="panel panel-default">
         <div class="panel-body">
           <%= button_link_to("Manage OBis Assays", 'organise', openbis_endpoint_openbis_zamples_path(@openbis_endpoint, seek: 'assay')) %>
+          <%= button_link_to("Manage OBis DataSets", 'organise', openbis_endpoint_openbis_datasets_path(@openbis_endpoint)) %>
         </div>
       </div>
     </div>

@@ -5,23 +5,20 @@
     <div class="modal-content">
       <div class="modal-header">
         <button class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-        <h4 class="modal-title">Select parent for registration</h4>
+        <h4 class="modal-title">Select parent assay for registration</h4>
       </div>
 
       <div class="modal-body">
 
-        <%= form_for(Assay.new) do |f| %>
+        <%= form_for(DataFile.new) do |f| %>
+
             <div class="form-group">
-              <label>Register under Study </label><span class="required">*</span>
-              <%= assay_study_selection(nil, f) %>
+              <label>Register under Assay </label><span class="required">*</span>
+
+              <%= assay_selection(@project, f) %>
             </div>
-            <div class="form-group">
-              <%= check_box_tag('link_dependent', 1, true) %>
-              <%= label_tag('link_dependent', 'Automatically register all dependent enties') %>
-              <div class="help-block">All dependent recognized OpenBis entities (e.g. DataSets) will be registered and linked during
-                periodical synchronization
-              </div>
-            </div>
+
+            <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} %>
         <% end %>
       </div>
       <div class="modal-footer">
@@ -40,9 +37,9 @@
         //console.log("C1: "+$j('#new_assay input[type="checkbox"]').prop("checked"), $j('#new_assay input[type="checkbox"]'));
         //console.log("C2: "+$j('#link_dependent').prop("checked"));
         //console.log("BF: ",$j('#batch_form'));
-        if ($j('#new_assay select').val()) {
-            $j('#seek_parent').val($j('#new_assay select').val());
-            $j('#sync_options_link_dependent').val($j('#link_dependent').prop("checked") ? '1' : undefined);
+        //console.log($j('#new_data_file select').val());
+        if ($j('#new_data_file select').val()) {
+            $j('#seek_parent').val($j('#new_data_file select').val());
             $j('#openbis_batch_parent-view').modal('hide');
             $j('#batch_form').submit();
         };

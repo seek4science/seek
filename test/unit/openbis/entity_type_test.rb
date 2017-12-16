@@ -95,4 +95,42 @@ class EntityTypeTest < ActiveSupport::TestCase
     assert_equal 8, zamples.size
 
   end
+
+  test 'DataSetType by code' do
+    code = 'TZ_FAIR'
+    type = Seek::Openbis::EntityType.DataSetType(@openbis_endpoint, code, true)
+    assert type
+    assert_equal code, type.code
+    assert_equal 'DataSet', type.entity_type
+    assert_equal 'DataSetType', type.type_name
+
+  end
+
+  test 'DatasetType all' do
+    types = Seek::Openbis::EntityType.DataSetType(@openbis_endpoint).all(true)
+    assert types
+    assert_equal 7, types.size
+
+    codes = types.map { |t| t.code}
+    assert_includes codes, 'TZ_FAIR'
+  end
+
+  test 'DataSets can be found by types codes' do
+    codes = ['TZ_FAIR']
+
+    sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_type_codes(codes)
+    assert sets
+    assert_equal 7, sets.size
+
+    codes = ['TZ_FAIR','UNKNOWN']
+    sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_type_codes(codes)
+    assert sets
+    assert_equal 8, sets.size
+
+    codes = ['TZ_MISSING_TYPE']
+    sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_type_codes(codes)
+    assert sets
+    assert_equal 0, sets.size
+  end
+
 end

@@ -30,9 +30,10 @@ gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
 #gem 'openseek-api'
-gem 'openseek-api', git: 'https://github.com/tzielins/openseek-api-gem', ref: 'feaac0017c005e9bf85260e5f6146b1798fba17a'
-# for fancy content escaping
+gem 'openseek-api', git: 'https://github.com/tzielins/openseek-api-gem', ref: 'c5278ff1b1e56bb1802dbefa61a536b75695a851'
+# for fancy content escaping in openbis
 gem 'loofah'
+
 gem 'jbuilder', '~> 2.0'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'

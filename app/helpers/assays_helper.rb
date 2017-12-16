@@ -63,6 +63,14 @@ module AssaysHelper
     investigation_map
   end
 
+  def assay_selection(project, form)
+    assays = authorised_assays(project)
+
+    options = assays.collect {|a| [ a.title, a.id ] }
+    form.select(:assay_ids, options,
+                { include_blank: 'Not specified' }, class: 'form-control').html_safe
+  end
+
   def authorised_assays(projects = nil, action = 'edit')
     authorised_assets(Assay, projects, action)
   end

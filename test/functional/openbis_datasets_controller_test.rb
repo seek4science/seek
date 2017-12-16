@@ -28,26 +28,39 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   test 'index gives index view' do
     login_as(@user)
-    get :index, project_id: @project.id, openbis_endpoint_id: @endpoint.id
+    get :index, openbis_endpoint_id: @endpoint.id
 
     assert_response :success
   end
 
   test 'index renders parents details' do
     login_as(@user)
-    get :index, project_id: @project.id, openbis_endpoint_id: @endpoint.id
+    get :index, openbis_endpoint_id: @endpoint.id
 
     assert_response :success
     assert_select "div label", "Project:"
-    assert_select "div.form-group", /#{@project.title}/
+    assert_select "div.form-group", /#{@endpoint.project.title}/
     assert_select "div label", "Endpoint:"
     assert_select "div.form-group", /#{@endpoint.title}/
-    assert_select '#openbis-dataset-cards div.openbis-card', count: 8
+    assert_select '#openbis-dataset-cards div.openbis-card', count: 3
+  end
+
+  test 'index filters by dataset types' do
+    login_as(@user)
+    get :index, openbis_endpoint_id: @endpoint.id, dataset_type: 'TZ_FAIR_TEST'
+
+    assert_response :success
+    assert_equal 2, assigns(:entities).size
+
+    get :index, openbis_endpoint_id: @endpoint.id, dataset_type: 'ALL DATASETS'
+
+    assert_response :success
+    assert_equal 3, assigns(:entities).size
   end
 
   test 'edit renders edit view' do
     login_as(@user)
-    get :edit, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    get :edit, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
 
     assert_response :success
     assert assigns(:entity)

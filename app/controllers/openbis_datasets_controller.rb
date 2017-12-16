@@ -2,8 +2,12 @@ class OpenbisDatasetsController < ApplicationController
 
   include Seek::Openbis::EntityControllerBase
 
+  ALL_DATASETS = 'ALL DATASETS'.freeze
 
   def index
+    @dataset_type = params[:dataset_type] || ALL_DATASETS
+    get_dataset_types
+
     get_entities
   end
 
@@ -64,7 +68,34 @@ class OpenbisDatasetsController < ApplicationController
 
   end
 
+  def batch_register
+    puts params
 
+    batch_ids = params[:batch_ids] || []
+    seek_parent_id = params[:seek_parent]
+
+    if batch_ids.empty?
+      flash[:error] = 'Select entities first';
+      return back_to_index
+    end
+
+    unless seek_parent_id
+      flash[:error] = 'Select parent for new elements';
+      return back_to_index
+    end
+
+    status = case @seek_type
+               when :assay then batch_register_assays(batch_ids, seek_parent_id)
+             end
+
+    msg = "Registered all #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
+    msg = "Registered #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
+    flash[:notice] = msg;
+    status[:issues].each {|m| flash[:error] = m}
+
+    return back_to_index
+
+  end
 
   def get_entity
     @entity = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:id])
@@ -72,6 +103,18 @@ class OpenbisDatasetsController < ApplicationController
 
   def get_entities
     @entities = Seek::Openbis::Dataset.new(@openbis_endpoint).all
+
+    if ALL_DATASETS == @dataset_type
+      @entities = Seek::Openbis::Dataset.new(@openbis_endpoint).all
+    else
+      codes = [@dataset_type]
+      @entities = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_type_codes(codes)
+    end
   end
 
+  def get_dataset_types
+    @dataset_types = seek_util.dataset_types(@openbis_endpoint)
+    @dataset_types_codes = @dataset_types.map { |t| t.code }
+    @dataset_type_options = @dataset_types_codes + [ALL_DATASETS]
+  end
 end

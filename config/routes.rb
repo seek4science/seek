@@ -236,6 +236,10 @@ SEEK::Application.routes.draw do
       post :register, on: :member
       post :batch_register, on: :collection
     end
+    resources :openbis_datasets do
+      post :register, on: :member
+      post :batch_register, on: :collection
+    end
   end
 
   resources :institutions do

@@ -101,6 +101,10 @@ module Seek
         Seek::Openbis::EntityType.SampleType(openbis_endpoint).find_by_semantic(semantic)
 
       end
+
+      def dataset_types(openbis_endpoint)
+        Seek::Openbis::EntityType.DataSetType(openbis_endpoint).all
+      end
     end
   end
 end
