@@ -100,7 +100,8 @@ module AssaysHelper
     entity = seekobj.external_asset.content
 
     if seekobj.external_asset.is_a?(OpenbisExternalAsset) then
-      return render :partial => 'openbis_zamples/openbis_entity_panel', :object => entity
+      #return render :partial => 'openbis_zamples/openbis_entity_panel', :object => entity
+      return render :partial => 'openbis_zamples/openbis_zample_panel', :object => entity, locals: {edit_button: true}
     end
 
     "Unsupported external asset #{seekobj.external_asset.class}".html_safe

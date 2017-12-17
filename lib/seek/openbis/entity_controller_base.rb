@@ -25,6 +25,14 @@ module Seek
         @seek_util ||= Seek::Openbis::SeekUtil.new
       end
 
+      def flash_issues(issues, canal = :error)
+        return unless issues
+        return if issues.empty?
+
+        msg = issues.join(' <br>')
+        msg = msg.html_safe
+        flash[canal] = msg
+      end
 
     end
   end

@@ -5,9 +5,11 @@ class OpenbisDatasetsController < ApplicationController
   ALL_DATASETS = 'ALL DATASETS'.freeze
 
   def index
+    puts "---\nINDEX\n#{params}"
     @dataset_type = params[:dataset_type] || ALL_DATASETS
     get_dataset_types
 
+    #puts "---\nINDEX GET ENTITIES\n"
     get_entities
   end
 
@@ -25,18 +27,21 @@ class OpenbisDatasetsController < ApplicationController
       return redirect_to @asset.seek_entity
     end
 
+    reg_info = do_datafile_registration(@asset, {}, {})
 
-    @datafile = seek_util.createObisDataFile(@asset)
+    @datafile = reg_info[:datafile]
+    issues = reg_info[:issues]
 
-    if @datafile.save
-
-      flash[:notice] = "Registered OpenBIS dataset: #{@entity.perm_id}"
-      redirect_to @datafile
-    else
-      @reasons = @datafile.errors
+    unless @datafile
+      @reasons = issues
       @error_msg = 'Could not register OpenBIS dataset'
-      render action: 'edit'
+
+      return render action: 'edit'
     end
+
+    flash[:notice] = "Registered OpenBIS dataset: #{@entity.perm_id}"
+    flash_issues(issues)
+    redirect_to @datafile
   end
 
   def update
@@ -75,34 +80,101 @@ class OpenbisDatasetsController < ApplicationController
     seek_parent_id = params[:seek_parent]
 
     if batch_ids.empty?
-      flash[:error] = 'Select entities first';
+      flash[:error] = 'Select datasets first';
       return back_to_index
     end
 
     unless seek_parent_id
-      flash[:error] = 'Select parent for new elements';
+      flash[:error] = 'Select parent assay for new elements';
       return back_to_index
     end
 
-    status = case @seek_type
-               when :assay then batch_register_assays(batch_ids, seek_parent_id)
-             end
+    status = batch_register_datasets(batch_ids, seek_parent_id)
 
-    msg = "Registered all #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
-    msg = "Registered #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
+    msg = "Registered all #{status[:registred].size} #{'datafile'.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
+    msg = "Registered #{status[:registred].size} #{'datafile'.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
     flash[:notice] = msg;
-    status[:issues].each {|m| flash[:error] = m}
 
+    flash_issues(status[:issues])
     return back_to_index
 
   end
 
-  def get_entity
-    @entity = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:id])
+  def batch_register_datasets(dataset_ids, assay_id)
+
+    sync_options = {}
+    datafile_params = {}
+
+    registered = []
+    failed = []
+    issues = []
+
+    data_files = []
+
+    assay = Assay.find(assay_id)
+    dataset_ids.each do |id|
+
+      get_entity(id)
+      prepare_asset
+
+      reg_info = do_datafile_registration(@asset, datafile_params, sync_options)
+      if (reg_info[:datafile])
+        registered << id
+        data_files << reg_info[:datafile]
+      else
+        failed << id
+      end
+      issues << "Openbis #{id}: " + reg_info[:issues].join('; ') unless reg_info[:issues].empty?
+
+    end
+
+    unless data_files.empty?
+      data_files.each { |df| assay.associate(df) }
+    end
+
+    return {registred: registered, failed: failed, issues: issues}
+
+  end
+
+  def do_datafile_registration(asset, datafile_params, sync_options)
+
+    issues = []
+    reg_status = {datafile: nil, issues: issues}
+
+    if asset.seek_entity
+      issues << 'Already registered as OpenBIS entity'
+      return reg_status
+    end
+
+    asset.sync_options = sync_options
+
+    # separate testing of external_asset as the save on parent does not fails if the child was not saved correctly
+    unless asset.valid?
+      issues.concat asset.errors.full_messages()
+      return reg_status
+    end
+
+    datafile = seek_util.createObisDataFile(asset)
+
+    if datafile.save
+      reg_status[:datafile] = datafile
+    else
+      issues.concat datafile.errors.full_messages()
+    end
+
+    reg_status
+  end
+
+  def back_to_index
+    index
+    render action: 'index'
+  end
+
+  def get_entity(id = nil)
+    @entity = Seek::Openbis::Dataset.new(@openbis_endpoint, id ? id : params[:id])
   end
 
   def get_entities
-    @entities = Seek::Openbis::Dataset.new(@openbis_endpoint).all
 
     if ALL_DATASETS == @dataset_type
       @entities = Seek::Openbis::Dataset.new(@openbis_endpoint).all

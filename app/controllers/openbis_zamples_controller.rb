@@ -36,7 +36,6 @@ class OpenbisZamplesController < ApplicationController
     @assay = reg_info[:assay]
     issues = reg_info[:issues]
 
-    # seperate testing of external_asset as the save on parent does not fails if the child was not saved correctly
     unless @assay
       @reasons = issues
       @error_msg = 'Could not register OpenBIS assay'
@@ -48,7 +47,7 @@ class OpenbisZamplesController < ApplicationController
     end
 
     flash[:notice] = "Registered OpenBIS assay: #{@entity.perm_id}#{issues.empty? ? '' : ' with some issues'}"
-    issues.each {|m| flash[:error] = m}
+    flash_issues(issues)
 
     redirect_to @assay
   end
@@ -79,8 +78,7 @@ class OpenbisZamplesController < ApplicationController
     end
 
     errs = follow_assay_dependent(@asset.content, @assay, @asset.sync_options, params)
-    errs.each {|m| flash[:error] = m} if errs
-
+    flash_issues(errs)
     # TODO should the assay be saved as well???
 
     flash[:notice] = "Updated sync of OpenBIS assay: #{@entity.perm_id}"
@@ -111,7 +109,7 @@ class OpenbisZamplesController < ApplicationController
     msg = "Registered all #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
     msg = "Registered #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
     flash[:notice] = msg;
-    status[:issues].each {|m| flash[:error] = m}
+    flash_issues(status[:issues])
 
     return back_to_index
 
@@ -140,7 +138,7 @@ class OpenbisZamplesController < ApplicationController
       else
         failed << id
       end
-      issues << "Openbis #{id}: " + reg_info[:issues].join(', ') unless reg_info[:issues].empty?
+      issues << "Openbis #{id}: " + reg_info[:issues].join('; ') unless reg_info[:issues].empty?
 
     end
 
@@ -159,13 +157,14 @@ class OpenbisZamplesController < ApplicationController
     end
 
     asset.sync_options = sync_options
-    assay = seek_util.createObisAssay(assay_params, creator, asset)
 
     # separate testing of external_asset as the save on parent does not fails if the child was not saved correctly
     unless asset.valid?
       issues.concat asset.errors.full_messages()
       return reg_status
     end
+
+    assay = seek_util.createObisAssay(assay_params, creator, asset)
 
     if assay.save
       errs = follow_assay_dependent(asset.content, assay, sync_options, parameters)
@@ -180,7 +179,7 @@ class OpenbisZamplesController < ApplicationController
 
 
   def back_to_index
-    index;
+    index
     render action: 'index'
   end
 
@@ -250,7 +249,7 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def get_seek_type
-    type = params[:seek] || 'empty'
+    type = params[:seek] || :assay
     @seek_type = type.to_sym
   end
 end

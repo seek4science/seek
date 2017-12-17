@@ -74,7 +74,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   test 'register registers new DataFile' do
     login_as(@user)
 
-    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
 
     datafile = assigns(:datafile)
     assert_not_nil datafile
@@ -102,7 +102,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     existing.external_asset = external
     assert existing.save
 
-    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: "#{@dataset.perm_id}"
+    post :register, openbis_endpoint_id: @endpoint.id, id: "#{@dataset.perm_id}"
 
     assert_redirected_to data_file_path(existing)
 
@@ -120,7 +120,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     assert asset.save
     assert exdatafile.save
 
-    post :update, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    post :update, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
 
 
     datafile = assigns(:datafile)
@@ -144,6 +144,35 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     assert_equal "Updated sync of OpenBIS datafile: #{@dataset.perm_id}", flash[:notice]
   end
 
+  ## Batch register assay ##
+
+  test 'batch registers multiple DataSets' do
+
+    login_as(@user)
+    assay = Factory :assay
+
+    sync_options = {}
+    batch_ids = ['20160210130454955-23', '20160215111736723-31']
+
+      assert_difference('DataFile.count', 2) do
+        assert_difference('ExternalAsset.count', 2) do
+
+          post :batch_register, openbis_endpoint_id: @endpoint.id,
+               seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids
+        end
+      end
+
+    assert_response :success
+    puts flash[:error]
+    refute flash[:error]
+    assert_equal "Registered all #{batch_ids.size} datafiles", flash[:notice]
+
+    assay.reload
+    assert_equal batch_ids.size, assay.data_files.size
+
+  end
+
+  ## Barch register
 
   # unit like tests
 

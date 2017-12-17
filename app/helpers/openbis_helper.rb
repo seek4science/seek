@@ -26,14 +26,17 @@ module OpenbisHelper
       render partial: 'data_files/openbis/dataset_error'
     else
       #render partial: 'data_files/openbis/dataset', locals: { dataset: dataset, data_file: data_file }
-      render partial: 'openbis_datasets/openbis_dataset_panel', locals: { entity: dataset, modal_files: true }
+      render partial: 'openbis_datasets/openbis_dataset_panel', locals: { entity: dataset, modal_files: true, edit_button: true }
     end
   end
 
   def openbis_entity_edit_path(entity)
 
     if entity.is_a? Seek::Openbis::Zample
-      return edit_project_openbis_endpoint_openbis_zample_path project_id: entity.openbis_endpoint.project, openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
+      return edit_openbis_endpoint_openbis_zample_path openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
+    end
+    if entity.is_a? Seek::Openbis::Dataset
+      return edit_openbis_endpoint_openbis_dataset_path openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
     end
 
     'Unsupported'

@@ -232,6 +232,7 @@ SEEK::Application.routes.draw do
   end
 
   resources :openbis_endpoints do
+    get :refresh, on: :member
     resources :openbis_zamples do
       post :register, on: :member
       post :batch_register, on: :collection

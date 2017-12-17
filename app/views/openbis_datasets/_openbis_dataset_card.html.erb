@@ -19,7 +19,7 @@
        </p>
        <%= render partial:'openbis_common/registered_link_item', locals: {entity: entity} %>
        <p class="list_item_attribute">
-           <%= link_to(entity.registered? ? 'Show/Update' : 'Show/Register', edit_project_openbis_endpoint_openbis_dataset_path(entity.openbis_endpoint.project, entity.openbis_endpoint, entity.perm_id)) %>
+           <%= link_to(entity.registered? ? 'Show/Update' : 'Show/Register', edit_openbis_endpoint_openbis_dataset_path(entity.openbis_endpoint, entity.perm_id)) %>
        </p>
 
       <%= render partial: extra, locals: {entity: entity, extra_params: extra_params} if extra %>

@@ -2,6 +2,7 @@
   entity ||= openbis_dataset_panel
   data_file = entity.registered_as
   modal_files ||= false
+  edit_button = false ## always at this moment as far nothing to do at the edit screen ||= false
 %>
 
 <%= render :partial => 'openbis_common/files_view_modal', locals: {parent_id: '#openbis-details'} if modal_files%>
@@ -24,8 +25,14 @@
           <%= render partial:'openbis_dataset_files_list', locals: {dataset: entity, data_file: data_file} %>
         <% end %>
       </div>
-
-
     </div>
+
+    <% if edit_button %>
+        <div class="row">
+          <div class="col-md-5">
+            <%= link_to 'Edit Sync Options', openbis_entity_edit_path(entity), class: "btn btn-primary"%>
+          </div>
+        </div>
+    <% end %>
   </div>
 </div>

@@ -7,7 +7,7 @@ class OpenbisEndpointsController < ApplicationController
 
   before_filter :openbis_enabled?
 
-  before_filter :get_endpoint, only: [:show, :add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_metadata_store, :destroy]
+  before_filter :get_endpoint, only: [:show, :add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh, :refresh_metadata_store, :destroy]
   before_filter :get_project
   before_filter :project_required, except: [:show_dataset_files]
   before_filter :project_member?, except: [:show_dataset_files]
@@ -63,6 +63,12 @@ class OpenbisEndpointsController < ApplicationController
   def create
     @openbis_endpoint = @project.openbis_endpoints.build(openbis_endpoint_params)
     save_and_respond 'The space was successfully created.'
+  end
+
+  def refresh
+    # puts "\n\n\n\nrefreshing metatdata"
+    @openbis_endpoint.refresh_metadata
+    redirect_to @openbis_endpoint
   end
 
   def refresh_metadata_store

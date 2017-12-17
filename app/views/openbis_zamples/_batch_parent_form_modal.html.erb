@@ -35,17 +35,19 @@
 <script>
 
     function set_registration_parameters() {
-        //console.log('srp called');
-        //console.log("S: "+$j('#new_assay select').val()+":"+$j('#new_assay select'), $j('#new_assay select'));
-        //console.log("C1: "+$j('#new_assay input[type="checkbox"]').prop("checked"), $j('#new_assay input[type="checkbox"]'));
-        //console.log("C2: "+$j('#link_dependent').prop("checked"));
-        //console.log("BF: ",$j('#batch_form'));
+
         if ($j('#new_assay select').val()) {
             $j('#seek_parent').val($j('#new_assay select').val());
             $j('#sync_options_link_dependent').val($j('#link_dependent').prop("checked") ? '1' : undefined);
             $j('#openbis_batch_parent-view').modal('hide');
-            $j('#batch_form').submit();
-        };
+            if($j('#batch_form input:checkbox:checked').length > 0) {
+                $j('#batch_form').submit();
+            } else {
+                alert('First select elements for batch registration');
+            }
+        } else {
+            alert('Select the parent element');
+        }
     }
 
 

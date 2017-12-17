@@ -23,7 +23,7 @@
 
 <%= form_tag({controller: 'openbis_datasets', action: 'batch_register'}, {id: 'batch_form'} ) do |f| %>
   <%= hidden_field_tag(:seek_parent) %>
-
+  <%= hidden_field_tag(:dataset_type, @dataset_type) %>
   <div class='row'>
     <div class='col-md-6'>
       <%= button_tag 'Batch registration', class: 'btn btn-default', type: 'button', 'data-toggle' =>  'modal', 'data-target' => '#openbis_batch_parent-view' %>

@@ -24,6 +24,7 @@
 <%= form_tag({controller: 'openbis_zamples', action: 'batch_register'}, {id: 'batch_form'} ) do |f| %>
     <%= hidden_field_tag(:seek, @seek_type) %>
     <%= hidden_field_tag(:seek_parent) %>
+    <%= hidden_field_tag(:zample_type, @zample_type) %>
     <%= hidden_field_tag('sync_options[link_dependent]') %>
     <div class='row'>
       <div class='col-md-6'>
