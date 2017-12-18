@@ -1,7 +1,5 @@
-
 <% unless displayed_resource.doi.blank? %>
     <p>
-      <b>DOI:</b> <%= doi_link(displayed_resource) %> <span class='doi_icon'/>
+      <b>DOI:</b> <%= doi_link(displayed_resource.doi) %>
     </p>
 <% end %>
-

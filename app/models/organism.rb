@@ -33,7 +33,7 @@ class Organism < ActiveRecord::Base
     !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
   end
 
-  def can_manage?
+  def can_manage?(user = User.current_user)
     User.admin_logged_in?
   end
 

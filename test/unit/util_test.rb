@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class UtilTest < ActiveSupport::TestCase
+
   test 'creatable types' do
     types = Seek::Util.user_creatable_types
     expected = [DataFile, Model, Presentation, Publication, Sample, Sop, Workflow, Assay, Investigation, Study, Event, SampleType, Strain]
@@ -20,8 +21,8 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'rdf capable types' do
     types = Seek::Util.rdf_capable_types
-    assert types.include?(DataFile)
-    assert !types.include?(Policy)
+    expected = %w[Assay Compound CultureGrowthType DataFile Investigation Model Organism Person Programme Project Publication Sop Strain Study]
+    assert_equal expected, types.collect(&:name).sort
   end
 
   test 'searchable types' do
@@ -65,12 +66,12 @@ class UtilTest < ActiveSupport::TestCase
   test 'doiable asset types' do
     types = Seek::Util.doiable_asset_types
 
-    expected = [DataFile, Model, Sop, Workflow]
+    expected = [DataFile, Model, Sop, Workflow, Investigation, Study, Assay]
 
     # first as strings for more readable failed assertion message
-    assert_equal expected.map(&:to_s), types.map(&:to_s)
+    assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
 
     # double check they are actual types
-    assert_equal expected, types
+    assert_equal expected.sort_by(&:to_s), types.sort_by(&:to_s)
   end
 end

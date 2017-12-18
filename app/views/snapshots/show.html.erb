@@ -12,7 +12,7 @@
         <p>
           <strong>DOI:</strong>
           <% if @snapshot.doi %>
-              <%= doi_link(@snapshot) %>
+              <%= doi_link(@snapshot.doi) %>
           <% else %>
               <span class="none_text">None</span>
           <% end %>

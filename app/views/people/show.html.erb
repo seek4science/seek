@@ -15,10 +15,10 @@
         <p>
           <% locations = @person.locations -%>
           <% unless locations.empty? -%>
-              <b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b>
-              <% locations.each do |location| -%>
-                  <%= flag_icon(location) + "&nbsp;".html_safe + link_to(location, country_path(location)) -%>
-                  <%= ", " unless location==locations.last -%>
+              <b><%= locations.length == 1 ? 'Location' : 'Locations' %>:</b>
+              <% locations.each do |location| %>
+                  <%= flag_icon(location) %>
+                  <%= link_to(location, country_path(location)) -%><%= ', ' unless location == locations.last -%>
               <% end -%>
           <% else -%>
               <b>Location:</b>

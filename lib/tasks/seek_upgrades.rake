@@ -23,6 +23,7 @@ namespace :seek do
     strip_weblinks
     remove_dangling_policies
     fix_all_user_sharing_policies
+    db:seed:units
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change

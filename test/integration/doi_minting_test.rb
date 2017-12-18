@@ -1,9 +1,10 @@
 require 'test_helper'
 
-class DataciteDoiTest < ActionDispatch::IntegrationTest
+class DoiMintingTest < ActionDispatch::IntegrationTest
   include MockHelper
 
-  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.collect { |type| type.name.underscore }
+  # Only test the versioned types. Types with snapshots are tested separately.
+  DOIABLE_ASSETS = Seek::Util.doiable_asset_types.select { |type| type.method_defined?(:versions) }.collect { |type| type.name.underscore }
 
   setup do
     @user = Factory(:user, login: 'test')
@@ -18,7 +19,7 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
   test 'mint a DOI button' do
     DOIABLE_ASSETS.each do |type|
       asset = Factory(type.to_sym, policy: Factory(:public_policy))
-      assert asset.is_doiable?(1)
+      assert asset.find_version(1).can_mint_doi?
 
       get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
       assert_response :success
@@ -34,14 +35,15 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       asset = Factory(type.to_sym, policy: Factory(:public_policy))
       assert asset.is_published?
       assert asset.can_manage?
+      versioned_asset = asset.latest_version
 
       asset.creators = [Factory(:person)]
       asset.save
 
-      get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
+      get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{versioned_asset.version}"
       assert_response :success
 
-      assert_select 'p', text: /The DOI that will be generated will be #{asset.generated_doi}/
+      assert_select 'pre', text: versioned_asset.suggested_doi
     end
   end
 
@@ -53,10 +55,11 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       asset = Factory(type.to_sym, policy: Factory(:private_policy), contributor: User.current_user)
       refute asset.is_published?
       assert asset.can_manage?
-      refute asset.is_doiable?(asset.version)
+      assert asset.find_version(asset.version).can_mint_doi?
 
       get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
       assert_response :redirect
+      refute asset.find_version(asset.version).has_doi?
 
       asset.publish!
       assert asset.reload.is_published?
@@ -64,10 +67,10 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       login_as(a_user)
       assert_equal a_user, User.current_user
       refute asset.can_manage?
-      refute asset.is_doiable?(asset.version)
 
       get "/#{type.pluralize}/#{asset.id}/mint_doi_confirm?version=#{asset.version}"
       assert_response :redirect
+      refute asset.find_version(asset.version).has_doi?
     end
   end
 
@@ -108,7 +111,7 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
       assert_response :success
 
-      assert_select 'p', text: /#{doi}/
+      assert_select 'a', text: /#{doi}/
     end
   end
 
@@ -135,12 +138,12 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
 
       get "/#{type.pluralize}/#{asset.id}?version=2"
       assert_response :success
-      assert_select 'p', text: /#{doi}/
+      assert_select 'a', text: /#{doi}/
 
       get "/#{type.pluralize}/#{asset.id}?version=1"
       assert_response :success
 
-      assert_select 'p', text: /#{doi}/, count: 0
+      assert_select 'a', text: /#{doi}/, count: 0
     end
   end
 
@@ -169,7 +172,7 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       get "/#{type.pluralize}/#{asset.id}"
 
@@ -183,7 +186,7 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       post "/#{type.pluralize}/#{asset.id}/new_version", data_file: {}, content_blobs: [{ data: {} }], revision_comment: 'This is a new revision'
 
@@ -198,7 +201,7 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       get "/#{type.pluralize}/#{asset.id}"
 
@@ -212,7 +215,7 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       delete "/#{type.pluralize}/#{asset.id}"
 
@@ -243,7 +246,7 @@ class DataciteDoiTest < ActionDispatch::IntegrationTest
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
-      assert asset.is_doi_minted?(latest_version.version)
+      assert latest_version.has_doi?
 
       unpublic_sharing = { access_type: Policy::VISIBLE }
 

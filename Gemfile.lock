@@ -12,7 +12,7 @@ GIT
 
 GIT
   remote: https://github.com/SysMO-DB/bioportal.git
-  revision: 870180c646f5cce18a5b63782a26d954c92169aa
+  revision: 0f80b4281af3f71234a425d40981b1185a3e5d0b
   specs:
     bioportal (3.0)
 
@@ -980,4 +980,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.15.3
+   1.16.0

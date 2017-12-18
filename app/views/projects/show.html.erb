@@ -105,3 +105,7 @@
 
 <%# get, classify and authorize all assets for this project -%>
 <%= render :partial=>"general/items_related_to",:object => @project %>
+
+<% if request_project_membership_button_enabled?(@project) %>
+    <%= render partial: 'request_membership_form',locals:{project:@project} %>
+<% end %>

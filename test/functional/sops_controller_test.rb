@@ -968,6 +968,43 @@ class SopsControllerTest < ActionController::TestCase
     add_creator_to_test_object(sop)
   end
 
+  test 'shows how to get doi for private sop' do
+    sop = Factory(:sop, policy: Factory(:private_policy))
+
+    login_as(sop.contributor)
+
+    get :show, id: sop
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 0
+    assert_select '#citation-instructions a[href=?]', check_related_items_sop_path(sop)
+  end
+
+  test 'shows how to get doi for time-locked sop' do
+    sop = Factory(:sop, policy: Factory(:private_policy))
+
+    login_as(sop.contributor)
+
+    with_config_value(:time_lock_doi_for, 10) do
+      get :show, id: sop
+
+      assert_response :success
+      assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 0
+      assert_select '#citation-instructions', text: /SOPs must be older than 10 days/
+    end
+  end
+
+  test 'shows how to get doi for eligible sop' do
+    sop = Factory(:sop, policy: Factory(:public_policy))
+
+    login_as(sop.contributor)
+
+    get :show, id: sop
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 1
+  end
+
   private
 
   def doi_citation_mock

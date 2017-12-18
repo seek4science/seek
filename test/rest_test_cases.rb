@@ -83,8 +83,7 @@ module RestTestCases
     if File.readable?(definitions_path)
       errors = JSON::Validator.fully_validate_json(definitions_path,
                                                    @response.body,
-                                                   {:fragment => fragment,
-                                                         :strict => true})
+                                                   {:fragment => fragment})
       unless errors.empty?
         msg = ""
         errors.each do |e|
@@ -192,12 +191,15 @@ module RestTestCases
       elsif (el["path"] =~ /avatar/)
         assert_match /^\/#{plural_obj}\/\d+\/avatars\/\d+/, el["value"]
         diff.delete(el)
+      elsif (el["path"] =~ /policy/)
+         diff.delete(el)
       end
     end
 
     diff.delete_if {
         |el| el["path"] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum/
     }
+
 
     assert_equal [], diff
   end

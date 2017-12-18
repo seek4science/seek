@@ -1,5 +1,5 @@
 <% selected ||= nil %>
-<%= panel("Snapshots") do %>
+<%= panel('Snapshots', id: 'snapshots') do %>
     <% snapshots.order("created_at DESC").each do |snapshot| %>
         <div>
           <% if snapshot == selected %>

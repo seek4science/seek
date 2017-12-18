@@ -6,7 +6,7 @@ class StrainsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
-  include GeneralAuthorizationTestCases
+#  include GeneralAuthorizationTestCases
 
   def setup
     login_as :owner_of_fully_public_policy
