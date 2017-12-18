@@ -20,7 +20,6 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def show
-    puts 'show called'
   end
 
   def new

@@ -380,6 +380,95 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal [datafile3], df
   end
 
+  test 'registered_datasets gives only own datafiles' do
+    endpoint1 = Factory :openbis_endpoint
+
+    endpoint2 = Factory :openbis_endpoint
+
+    disable_authorization_checks do
+      assert endpoint1.save
+      assert endpoint2.save
+    end
+
+    set1 = Seek::Openbis::Dataset.new(endpoint1, '20160210130454955-23')
+    asset1 = OpenbisExternalAsset.build(set1)
+    df1 = Factory :data_file
+    asset1.seek_entity = df1
+    assert asset1.save
+
+    set2= Seek::Openbis::Dataset.new(endpoint1, '20160215111736723-31')
+    asset2 = OpenbisExternalAsset.build(set2)
+    df2 = Factory :data_file
+    asset2.seek_entity = df2
+    assert asset2.save
+
+    set3 = Seek::Openbis::Dataset.new(endpoint2, '20160210130454955-23')
+    asset3 = OpenbisExternalAsset.build(set3)
+    df3 = Factory :data_file
+    asset3.seek_entity = df3
+    assert asset3.save
+
+    registered = endpoint1.registered_datasets
+    assert_equal 2, registered.count
+
+    registered.each do |e|
+      assert e.is_a? DataFile
+    end
+
+    registered = endpoint2.registered_datasets
+    assert_equal 1, registered.count
+  end
+
+  test 'registered_assays gives own zamples registered in seek as assays' do
+    endpoint1 = Factory :openbis_endpoint
+
+    zample1 = zample_for_id('12', endpoint1)
+
+    zample2 = zample_for_id('12')
+
+    zample3 = zample_for_id('13', endpoint1)
+
+    asset1 = OpenbisExternalAsset.build(zample1)
+    asset1.seek_entity = Factory :assay
+
+    asset2 = OpenbisExternalAsset.build(zample2)
+    asset2.seek_entity = Factory :assay
+
+    asset3 = OpenbisExternalAsset.build(zample3)
+    asset3.seek_entity = Factory :assay
+
+    assert asset1.save
+    assert asset2.save
+    assert asset3.save
+
+    assert_equal 3, OpenbisExternalAsset.count
+
+    assert_equal 2, endpoint1.registered_assays.count
+
+    endpoint1.registered_assays.each do |e|
+      assert e.is_a? Assay
+    end
+    
+    assert_equal 1, zample2.openbis_endpoint.registered_assays.count
+
+  end
+
+  def zample_for_id(permId = nil, endpoint = nil)
+
+    endpoint ||= Factory :openbis_endpoint
+
+    json = JSON.parse(
+        '
+{"identifier":"\/API-SPACE\/TZ3","modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser",
+"code":"TZ3","modifier":"apiuser","permId":"20171002172111346-37",
+"registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40","20171004182824553-41"]
+,"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
+'
+    )
+    json["permId"] = permId if permId
+    Seek::Openbis::Zample.new(endpoint).populate_from_json(json)
+  end
+
   # test 'reindex_entities queues new indexing job' do
   #  endpoint = Factory(:openbis_endpoint)
   #  datafile1 = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23').create_seek_datafile

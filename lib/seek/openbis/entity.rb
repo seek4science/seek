@@ -12,7 +12,7 @@ module Seek
       def initialize(openbis_endpoint, perm_id = nil, refresh = false)
         @openbis_endpoint = openbis_endpoint
         unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
-          raise 'OpenbisEndpoint expected and required'
+          raise 'OpenbisEndpoint expected and required'+ "Got #{@openbis_endpoint} #{@openbis_endpoint.class}"
         end
 
         if perm_id

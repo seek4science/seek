@@ -13,6 +13,15 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     @project = @project_administrator.projects.first
   end
 
+  test 'show' do
+    ep = Factory(:openbis_endpoint, project: @project)
+    login_as(@project_administrator)
+
+    get :show, id: ep.id
+    assert_response :success
+
+  end
+
   test 'destroy' do
     ep = Factory(:openbis_endpoint, project: @project)
     login_as(@project_administrator)

@@ -19,6 +19,8 @@ class OpenbisEndpoint < ActiveRecord::Base
   after_destroy :clear_metadata_store, :remove_refresh_metadata_job
   after_initialize :default_policy, autosave: true
 
+
+
   def self.can_create?
     User.logged_in_and_member? && User.current_user.is_admin_or_project_administrator? && Seek::Config.openbis_enabled
   end
@@ -77,6 +79,14 @@ class OpenbisEndpoint < ActiveRecord::Base
     # ugly will scan all content blobs from data files
     url = "openbis:#{id}"
     DataFile.all.select { |df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url) }
+  end
+
+  def registered_assays
+    Assay.joins(:external_asset).where(external_assets: {seek_service_id: id, seek_service_type: self.class})
+  end
+
+  def registered_datasets
+    DataFile.joins(:external_asset).where(external_assets: {seek_service_id: id, seek_service_type: self.class})
   end
 
   def clear_metadata_store

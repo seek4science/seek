@@ -1351,12 +1351,12 @@ Factory.define(:sample_from_file, parent: :sample) do |f|
 end
 
 Factory.define(:openbis_endpoint) do |f|
-  f.as_endpoint 'https://openbis-api.fair-dom.org/openbis/openbis'
-  f.dss_endpoint 'https://openbis-api.fair-dom.org/datastore_server'
-  f.web_endpoint 'https://openbis-api.fair-dom.org/openbis'
+  f.sequence(:as_endpoint) { |nr| "https://openbis-api.fair-dom.org/openbis/openbis#{nr}" }
+  f.sequence(:dss_endpoint) { |nr| "https://openbis-api.fair-dom.org/datastore_server#{nr}" }
+  f.sequence(:web_endpoint) { |nr| "https://openbis-api.fair-dom.org/openbis#{nr}" }
   f.username 'apiuser'
   f.password 'apiuser'
-  f.space_perm_id 'API-SPACE'
+  f.sequence(:space_perm_id) { |nr| "API-SPACE#{nr}" }
   f.association :project, factory: :project
 end
 
