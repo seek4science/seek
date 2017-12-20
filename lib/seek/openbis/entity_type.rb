@@ -5,7 +5,7 @@ module Seek
       attr_reader :json, :modification_date, :code, :description,
                   :perm_id, :openbis_endpoint, :entity_type, :exception
 
-      @@TYPES = ['Sample','DataSet']
+      @@TYPES = ['Sample','DataSet','Experiment']
 
       def self.SampleType(openbis_endpoint, code = nil, refresh = false)
         EntityType.new(openbis_endpoint, 'Sample', code, refresh)
@@ -13,6 +13,10 @@ module Seek
 
       def self.DataSetType(openbis_endpoint, code = nil, refresh = false)
         EntityType.new(openbis_endpoint, 'DataSet', code, refresh)
+      end
+
+      def self.ExperimentType(openbis_endpoint, code = nil, refresh = false)
+        EntityType.new(openbis_endpoint, 'Experiment', code, refresh)
       end
 
       def ==(other)
@@ -73,6 +77,14 @@ module Seek
         cache_option = refresh ? { force: true } : nil
 
         json = query_application_server_by_semantic(semantic,cache_option)
+        # puts json.to_json
+        construct_from_json(json, entity_type)
+      end
+
+      def find_by_codes(codes,refresh = false)
+        cache_option = refresh ? { force: true } : nil
+
+        json = query_application_server_by_code(codes.join(","),cache_option)
         # puts json.to_json
         construct_from_json(json, entity_type)
       end

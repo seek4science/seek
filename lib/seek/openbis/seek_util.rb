@@ -105,6 +105,14 @@ module Seek
       def dataset_types(openbis_endpoint)
         Seek::Openbis::EntityType.DataSetType(openbis_endpoint).all
       end
+
+      def study_types(openbis_endpoint)
+
+        study_codes = ['DEFAULT_EXPERIMENT']
+
+        Seek::Openbis::EntityType.ExperimentType(openbis_endpoint).find_by_codes(study_codes)
+
+      end
     end
   end
 end

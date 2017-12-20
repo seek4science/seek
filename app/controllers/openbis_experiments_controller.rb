@@ -2,14 +2,14 @@ class OpenbisExperimentsController < ApplicationController
 
   include Seek::Openbis::EntityControllerBase
 
-  before_filter :get_seek_type
+  # before_filter :get_seek_type
 
-  ALL_ASSAYS = 'ALL ASSAYS'.freeze
+  ALL_STUDIES = 'ALL STUDIES'.freeze
   ALL_TYPES = 'ALL TYPES'.freeze
 
   def index
-    @zample_type = params[:zample_type] || ALL_ASSAYS
-    get_zample_types
+    @entity_type = params[:entity_type] || ALL_STUDIES
+    get_entity_types
     get_entities
   end
 
@@ -235,21 +235,15 @@ class OpenbisExperimentsController < ApplicationController
     end
   end
 
-  def get_zample_types
-    case @seek_type
-      when :assay then get_assay_types
-      else raise "Don't recognize obis types for seek: #{@seek_type}"
-    end
+  def get_entity_types
+    get_study_types
   end
 
-  def get_assay_types
-    @zample_types = seek_util.assay_types(@openbis_endpoint)
-    @zample_types_codes = @zample_types.map { |t| t.code }
-    @zample_type_options = @zample_types_codes + [ALL_ASSAYS, ALL_TYPES]
+  def get_study_types
+    @entity_types = seek_util.study_types(@openbis_endpoint)
+    @entity_types_codes = @entity_types.map { |t| t.code }
+    @entity_type_options = @entity_types_codes + [ALL_STUDIES, ALL_TYPES]
   end
 
-  def get_seek_type
-    type = params[:seek] || :assay
-    @seek_type = type.to_sym
-  end
+
 end

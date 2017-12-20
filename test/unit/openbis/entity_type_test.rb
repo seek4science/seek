@@ -133,4 +133,50 @@ class EntityTypeTest < ActiveSupport::TestCase
     assert_equal 0, sets.size
   end
 
+  test 'ExperimentType by code' do
+    code = 'DEFAULT_EXPERIMENT'
+    type = Seek::Openbis::EntityType.ExperimentType(@openbis_endpoint, code, true)
+    assert type
+    assert_equal code, type.code
+    assert_equal 'Experiment', type.entity_type
+    assert_equal 'ExperimentType', type.type_name
+
+  end
+
+  test 'ExperimentType all' do
+    types = Seek::Openbis::EntityType.ExperimentType(@openbis_endpoint).all(true)
+    assert types
+    assert_equal 6, types.size
+
+    codes = types.map { |t| t.code}
+    assert_includes codes, 'DEFAULT_EXPERIMENT'
+  end
+
+  test 'ExperimentType by codes' do
+    codes = ['DEFAULT_EXPERIMENT','MATERIALS']
+    types = Seek::Openbis::EntityType.ExperimentType(@openbis_endpoint).find_by_codes(codes,true)
+    assert types
+    assert_equal 2, types.size
+
+    codes = types.map { |t| t.code}
+    assert_includes codes, 'DEFAULT_EXPERIMENT'
+  end
+
+  test 'Experiment can be found by types codes' do
+    codes = ['DEFAULT_EXPERIMENT']
+
+    sets = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
+    assert sets
+    assert_equal 4, sets.size
+
+    codes = ['DEFAULT_EXPERIMENT','MATERIALS']
+    sets = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
+    assert sets
+    assert_equal 16, sets.size
+
+    codes = ['TZ_MISSING_TYPE']
+    sets = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
+    assert sets
+    assert_equal 0, sets.size
+  end
 end
