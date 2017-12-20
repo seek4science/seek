@@ -1,0 +1,23 @@
+<%
+  entity ||= openbis_zample_panel
+  edit_button ||= false
+%>
+
+<div class="panel panel-default" id="openbis-details">
+  <div class="panel-body">
+    <p>
+      <%= image(:openbis, :width=>'75px') %>
+    </p>
+
+    <%= render partial:'openbis_common/obis_attr_row', locals: {entity: entity} %>
+    <%= render partial:'openbis_common/obis_prop_row', locals: {entity: entity} %>
+
+    <% if edit_button %>
+    <div class="row">
+      <div class="col-md-5">
+        <%= link_to 'Edit Sync Options', openbis_entity_edit_path(entity), class: "btn btn-primary"%>
+      </div>
+    </div>
+    <% end %>
+  </div>
+</div>
