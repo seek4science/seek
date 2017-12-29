@@ -9,9 +9,7 @@ class SessionsController < ApplicationController
   prepend_before_filter :strip_root_for_xml_requests
 
   # render new.html.erb
-  def new
-
-  end
+  def new; end
 
   def index
     redirect_to root_path
@@ -104,7 +102,6 @@ class SessionsController < ApplicationController
     end
     return_to_url
   end
-
 
   def authenticateLDAP(login, password)
 
