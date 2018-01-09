@@ -84,7 +84,7 @@ module Seek
 
       def samples
         unless @samples
-          @samples = Seek::Openbis::Zample.find_by_perm_ids(sample_ids)
+          @samples = Seek::Openbis::Zample.new(openbis_endpoint).find_by_perm_ids(sample_ids)
         end
         @samples
       end
@@ -104,7 +104,7 @@ module Seek
 
       def registered?
         return true if OpenbisExternalAsset.registered?(self)
-        ContentBlob.where(url: content_blob_uri).any?
+        ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing').any?
       end
 
       def registered_as

@@ -8,10 +8,22 @@ module Seek
         @properties = json['properties']
         @properties.delete_if { |key, _value| key == '@type' }
         @experiment_type = json['experiment_type']
-        @dataset_ids = json['datasets'].last
-        @sample_ids = json['samples'].last
+        @dataset_ids = json['datasets']
+        @sample_ids = json['samples']
         @identifier = json['identifier']
         super(json)
+      end
+
+      def type_description
+        experiment_type_description
+      end
+
+      def type_code
+        experiment_type_code
+      end
+
+      def type_text
+        experiment_type_text
       end
 
       def experiment_type_description

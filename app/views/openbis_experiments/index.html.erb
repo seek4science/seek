@@ -6,35 +6,33 @@
       <%= image(:openbis, :width => '75px') %>
     </p>
 
-    <%= form_tag({controller: 'openbis_zamples', action: 'index'}, {method: 'get'} ) do %>
-        <%= hidden_field_tag(:seek, @seek_type) %>
+    <%= form_tag({controller: 'openbis_experiments', action: 'index'}, {method: 'get'} ) do %>
       <div class="form-group"><label>Project:</label> <%= @project.title %></div>
       <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
-        <div class="form-group"><label>Entities like:</label> <%= @seek_type.capitalize %></div>
+        <div class="form-group"><label>Entities like:</label> STUDY </div>
       <div class="form-group"><label>OpenBIS Type</label>
-        <%= select_tag :zample_type, options_for_select(@zample_type_options, @zample_type),
-                       id: 'zample_type', class: 'form-control1', :onchange => 'this.form.submit();' %></div>
-      <div class="form-group"><label>Samples:</label> <%= @entities.length %></div>
+        <%= select_tag :entity_type, options_for_select(@entity_type_options, @entity_type),
+                       id: 'entity_type', class: 'form-control1', :onchange => 'this.form.submit();' %></div>
+      <div class="form-group"><label>Experiments:</label> <%= @entities.length %></div>
       <% end %>
   </div>
 </div>
 
 <%= render 'batch_parent_form_modal' %>
 
-<%= form_tag({controller: 'openbis_zamples', action: 'batch_register'}, {id: 'batch_form'} ) do |f| %>
-    <%= hidden_field_tag(:seek, @seek_type) %>
+<%= form_tag({controller: 'openbis_experiments', action: 'batch_register'}, {id: 'batch_form'} ) do |f| %>
     <%= hidden_field_tag(:seek_parent) %>
-    <%= hidden_field_tag(:zample_type, @zample_type) %>
+    <%= hidden_field_tag(:entity_type, @entity_type) %>
     <%= hidden_field_tag('sync_options[link_dependent]') %>
     <div class='row'>
       <div class='col-md-6'>
         <%= button_tag 'Batch registration', class: 'btn btn-default', type: 'button', 'data-toggle' =>  'modal', 'data-target' => '#openbis_batch_parent-view' %>
       </div>
     </div>
-    <div class='row' id="openbis-zamples-cards">
+    <div class='row' id="openbis-experiments-cards">
 
-      <%= render partial:'openbis_zample_card', collection:@entities,
-                 locals: {seek_type: @seek_type, extra: 'openbis_common/entity_batch_form_part'}
+      <%= render partial:'openbis_experiment_card', collection:@entities,
+                 locals: {extra: 'openbis_common/entity_batch_form_part'}
 
       %>
 

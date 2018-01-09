@@ -15,8 +15,9 @@ class OpenbisExperimentsController < ApplicationController
 
 
   def edit
-    @assay = @asset.seek_entity || Assay.new
-    @linked_to_assay = get_linked_to(@asset.seek_entity)
+    @study = @asset.seek_entity || Study.new
+    @zamples_linked_to_study = get_zamples_linked_to(@asset.seek_entity)
+    @datasets_linked_to_study = get_datasets_linked_to(@asset.seek_entity)
   end
 
   def register
@@ -203,35 +204,31 @@ class OpenbisExperimentsController < ApplicationController
   end
 
 
-  def get_linked_to(assay)
-    return [] unless assay
-    assay.data_files.select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
+  def get_zamples_linked_to(study)
+    return [] unless study
+    #assay.data_files.select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
+    #    .map { |df| df.external_asset.external_id }
+    study.assays.select { |a| a.external_asset.is_a?(OpenbisExternalAsset)}
+          .map{ |a| a.external_asset.external_id }
+  end
+
+  def get_datasets_linked_to(study)
+    return [] unless study
+
+    study.related_data_files.select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
         .map { |df| df.external_asset.external_id }
   end
 
-
   def get_entity(id = nil)
-
-    # sample = Seek::Openbis::Zample.new(@openbis_endpoint)
-    # json = JSON.parse(
-    #        '
-    # {"identifier":"\/API-SPACE\/TZ3","modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser",
-    # "code":"TZ3","modifier":"apiuser","permId":"20171002172111346-37",
-    # "registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40","20171004182824553-41"]
-    # ,"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
-    # '
-    #    )
-    # @zample = sample.populate_from_json(json)
-
-    @entity = Seek::Openbis::Zample.new(@openbis_endpoint, id ? id : params[:id])
+    @entity = Seek::Openbis::Experiment.new(@openbis_endpoint, id ? id : params[:id])
   end
 
   def get_entities
-    if ALL_TYPES == @zample_type
-      @entities = Seek::Openbis::Zample.new(@openbis_endpoint).all
+    if ALL_TYPES == @entity_type
+      @entities = Seek::Openbis::Experiment.new(@openbis_endpoint).all
     else
-      codes = @zample_type == ALL_ASSAYS ? @zample_types_codes : [@zample_type]
-      @entities = Seek::Openbis::Zample.new(@openbis_endpoint).find_by_type_codes(codes)
+      codes = @entity_type == ALL_STUDIES ? @entity_types_codes : [@entity_type]
+      @entities = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
     end
   end
 

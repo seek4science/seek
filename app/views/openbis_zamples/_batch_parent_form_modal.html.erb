@@ -36,7 +36,7 @@
 
     function set_registration_parameters() {
 
-        if ($j('#new_assay select').val()) {
+        if ($j('#new_assay select').val() > 0) {
             $j('#seek_parent').val($j('#new_assay select').val());
             $j('#sync_options_link_dependent').val($j('#link_dependent').prop("checked") ? '1' : undefined);
             $j('#openbis_batch_parent-view').modal('hide');

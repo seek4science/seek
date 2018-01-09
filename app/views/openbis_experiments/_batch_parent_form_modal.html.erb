@@ -10,15 +10,18 @@
 
       <div class="modal-body">
 
-        <%= form_for(Assay.new) do |f| %>
+        <%= form_tag do |f| %>
             <div class="form-group">
-              <label>Register under Study </label><span class="required">*</span>
-              <%= assay_study_selection(nil, f) %>
+              <label>Register under Investigation </label><span class="required">*</span>
+              <%= render :partial=>"studies/investigation_list",
+                         :locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects},
+                                   :study => Study.new} %>
+
             </div>
             <div class="form-group">
               <%= check_box_tag('link_dependent', 1, true) %>
               <%= label_tag('link_dependent', 'Automatically register all dependent enties') %>
-              <div class="help-block">All dependent recognized OpenBis entities (e.g. DataSets) will be registered and linked during
+              <div class="help-block">All dependent recognized OpenBis entities (e.g. Studies, DataSets) will be registered and linked during
                 periodical synchronization
               </div>
             </div>
@@ -36,8 +39,8 @@
 
     function set_registration_parameters() {
 
-        if ($j('#new_assay select').val()) {
-            $j('#seek_parent').val($j('#new_assay select').val());
+        if ($j('#study_investigation_id').val() > 0) {
+            $j('#seek_parent').val($j('#study_investigation_id').val());
             $j('#sync_options_link_dependent').val($j('#link_dependent').prop("checked") ? '1' : undefined);
             $j('#openbis_batch_parent-view').modal('hide');
             if($j('#batch_form input:checkbox:checked').length > 0) {

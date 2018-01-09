@@ -1,5 +1,5 @@
 <%
-  entity = openbis_zample_card
+  entity = openbis_experiment_card
   extra ||= nil
   extra_params ||= nil
 
@@ -20,7 +20,7 @@
       <% end %>
       <%= render partial:'openbis_common/registered_link_item', locals: {entity: entity} %>
 
-      <%= link_to('Show/Register', edit_openbis_endpoint_openbis_zample_path(@openbis_endpoint, entity.perm_id, seek: seek_type)) %>
+      <%= link_to('Show/Register', edit_openbis_endpoint_openbis_experiment_path(@openbis_endpoint, entity.perm_id)) %>
       <%= render partial: extra, locals: {entity: entity, extra_params: extra_params} if extra %>
     </div>
   </div>
