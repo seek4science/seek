@@ -3,6 +3,18 @@ module Seek
 
     class SeekUtil
 
+      def createObisStudy(study_params, creator, obis_asset)
+
+        experiment = obis_asset.content
+
+        study_params[:title] ||= "OpenBIS #{experiment.perm_id}"
+        study = Study.new(study_params)
+        study.contributor = creator
+
+        study.external_asset = obis_asset
+        study
+      end
+
       def createObisAssay(assay_params, creator, obis_asset)
 
         zample = obis_asset.content
@@ -89,6 +101,57 @@ module Seek
         data_files.each { |df| assay.associate(df) }
 
         issues.empty? ? nil : issues
+      end
+
+      def associate_zample_ids_as_assays(study, zamples_ids, sync_options, endpoint)
+        return [] if zamples_ids.empty?
+
+        zamples = Seek::Openbis::Zample.new(endpoint).find_by_perm_ids(zamples_ids)
+        associate_zamples_as_assays(study, zamples, sync_options)
+      end
+
+      def associate_zamples_as_assays(study, zamples, sync_options)
+
+        issues = []
+
+        external_assets = zamples.map { |ds| OpenbisExternalAsset.find_or_create_by_entity(ds) }
+
+        non_assays = external_assets.reject { |es| es.seek_entity.nil? || es.seek_entity.is_a?(Assay) }
+        non_assays.each {|ea| puts "#{ea.external_id} #{ea.seek_entity}"}
+
+        issues.concat non_assays.map { |es| "#{es.external_id} already registered as #{es.seek_entity.class} #{es.seek_entity.id}"}
+
+        existing_assays = external_assets.select { |es| es.seek_entity.is_a? Assay }
+                              .map { |es| es.seek_entity }
+
+        issues.concat existing_assays.reject { |es| es.study.id == study.id }
+                            .map { |es| "#{es.external_asset.external_id} already registered under different Study #{es.study.id}" }
+
+        existing_assays = existing_assays.select { |es| es.study.id == study.id }
+
+        assay_params = {study_id: study.id}
+        contributor = study.contributor
+
+        new_assay = external_assets.select { |es| es.seek_entity.nil? }
+                        .map do |es|
+                          es.sync_options = sync_options
+                          createObisAssay(assay_params, contributor, es)
+                        end
+
+        saved = []
+
+        new_assay.each do |df|
+          if df.save
+            saved << df
+          else
+            issues.concat df.errors.full_messages()
+          end
+        end
+
+        assays = existing_assays+saved
+        #follow_dependent on assay assays.each { |df| assay.associate(df) }
+
+        issues
       end
 
       def assay_types(openbis_endpoint)

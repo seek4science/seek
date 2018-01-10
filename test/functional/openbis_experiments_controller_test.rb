@@ -14,7 +14,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
     @endpoint = Factory(:openbis_endpoint, project: Factory(:project))
-    @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+    @experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
   end
 
   test 'test setup works' do
@@ -421,6 +421,48 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   ## registration end ##
 
+  test 'extract_requested_zamples gives all zamples if linked is selected' do
+
+    controller = OpenbisExperimentsController.new
+
+    assert_equal 2, @experiment.sample_ids.length
+    sync_options = {}
+    params = {}
+
+    assert_equal [], controller.extract_requested_zamples(@experiment, sync_options, params)
+
+    sync_options = { link_assays: '1' }
+    assert_same @experiment.sample_ids, controller.extract_requested_zamples(@experiment, sync_options, params)
+
+    params = {linked_zamples: ['123'] }
+    assert_same @experiment.sample_ids, controller.extract_requested_zamples(@experiment, sync_options, params)
+
+  end
+
+  test 'extract_requested_zamples gives only selected zamples that belongs to exp' do
+
+    controller = OpenbisExperimentsController.new
+
+    sync_options = {}
+    params = {}
+
+    assert_equal 2, @experiment.sample_ids.length
+
+    assert_equal [], controller.extract_requested_zamples(@experiment, sync_options, params)
+
+    params = { linked_zamples: [] }
+    assert_equal [], controller.extract_requested_zamples(@experiment, sync_options, params)
+
+    params = { linked_zamples: ['123'] }
+    assert_equal [], controller.extract_requested_zamples(@experiment, sync_options, params)
+
+    params = { linked_zamples: ['123', @experiment.sample_ids[0]] }
+    assert_equal [@experiment.sample_ids[0]], controller.extract_requested_zamples(@experiment, sync_options, params)
+
+    params = { linked_zamples: @experiment.sample_ids }
+    assert_equal @experiment.sample_ids, controller.extract_requested_zamples(@experiment, sync_options, params)
+
+  end
 
   test 'extract_requested_sets gives all sets from zample if linked is selected' do
 

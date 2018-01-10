@@ -20,6 +20,36 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert @creator
   end
 
+  test 'creates valid study with external_asset that can be saved' do
+
+    investigation = Factory(:investigation)
+    assert investigation.save
+
+    params = { investigation_id: investigation.id}
+    sync_options = {link_datasets: '1', link_assays: '1'}
+
+    experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
+
+    asset = OpenbisExternalAsset.build(experiment, sync_options)
+
+    study = @util.createObisStudy(params, @creator,asset)
+
+    assert study.valid?
+
+
+    assert_difference('Study.count') do
+      assert_difference('ExternalAsset.count') do
+        study.save!
+      end
+    end
+
+
+    assert_equal "OpenBIS #{experiment.perm_id}", study.title
+    assert_equal @creator, study.contributor
+    assert_same asset, study.external_asset
+    assert_equal investigation, study.investigation
+  end
+
   test 'creates valid assay with dependent external_asset that can be saved' do
 
     params = { study_id: @study.id}
@@ -222,6 +252,120 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     assay.reload
     assert_equal 4, assay.data_files.length
+
+  end
+
+  test 'associate_zamples_as_assays links zamples as new assays with study' do
+
+
+    study = Factory :study
+
+    assert study.assays.empty?
+
+    zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
+    assert_equal 2, zamples.length
+
+    sync_options = {}
+
+    assert_difference('Assay.count', 2) do
+      assert_difference('AssayAsset.count', 0) do
+        assert_difference('DataFile.count', 0) do
+          assert_difference('ExternalAsset.count', 2) do
+
+          assert_equal [], @util.associate_zamples_as_assays(study, zamples, sync_options)
+          end
+        end
+      end
+    end
+
+
+    study.reload
+    assert_equal 2, study.assays.count
+
+  end
+
+  test 'associate_zamples_as_assays reports issues if zample already registered but not as assay' do
+
+
+    study = Factory :study
+
+    assert study.assays.empty?
+
+    zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
+    assert_equal 2, zamples.length
+
+    df = Factory :data_file
+    ea = OpenbisExternalAsset.find_or_create_by_entity(zamples[0])
+    df.external_asset = ea
+    assert df.save
+    assert ea.save
+
+    sync_options = {}
+    issues = []
+    assert_difference('Assay.count', 1) do
+      assert_difference('AssayAsset.count', 0) do
+        assert_difference('DataFile.count', 0) do
+          assert_difference('ExternalAsset.count', 1) do
+
+            issues =@util.associate_zamples_as_assays(study, zamples, sync_options)
+          end
+        end
+      end
+    end
+
+    refute issues.empty?
+    study.reload
+    assert_equal 1, study.assays.count
+
+  end
+
+  test 'associate_zamples_as_assays reports issues if zample already registered under different study' do
+
+
+    study = Factory :study
+
+    assert study.assays.empty?
+
+    zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
+    assert_equal 2, zamples.length
+
+    study2 = Factory :study
+    assay2 = Factory :assay
+    assay2.study = study2
+
+    ea = OpenbisExternalAsset.find_or_create_by_entity(zamples[0])
+    assay2.external_asset = ea
+    assert_equal study2, assay2.study
+
+    assay2.valid?
+    puts assay2.errors.full_messages
+
+    disable_authorization_checks do
+      assert assay2.save
+      assert ea.save
+    end
+
+    sync_options = {}
+    issues = []
+    assert_difference('Assay.count', 1) do
+      assert_difference('AssayAsset.count', 0) do
+        assert_difference('DataFile.count', 0) do
+          assert_difference('ExternalAsset.count', 1) do
+
+            issues =@util.associate_zamples_as_assays(study, zamples, sync_options)
+          end
+        end
+      end
+    end
+
+    refute issues.empty?
+    study.reload
+    assert_equal 1, study.assays.count
+
+    study2.reload
+    assay2.reload
+    assert_equal study2, assay2.study
+
 
   end
 
