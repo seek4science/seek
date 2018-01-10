@@ -1780,6 +1780,29 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'admin should destroy person with project subscriptions' do
+    admin = Factory(:admin)
+    person = Factory(:person)
+    project = person.projects.first
+    data_file = Factory(:data_file, projects: [project])
+
+    project_sub = person.project_subscriptions.first
+    Factory(:subscription, person: person, subscribable: data_file, project_subscription: project_sub)
+
+    refute data_file.can_delete?(admin.user)
+    assert person.can_delete?(admin.user)
+
+    assert_difference('Person.count', -1) do
+      assert_difference('ProjectSubscription.count', -1) do
+        assert_difference('Subscription.count', -1) do
+          delete :destroy, id: person
+        end
+      end
+    end
+
+    assert_redirected_to people_path
+  end
+
   def edit_max_object(person)
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person
