@@ -9,6 +9,20 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+## Version 1.5.1
+
+Release date: _January 11th 2018_
+
+Bugfix patch release that in particular fixes:
+
+  * An error that prevented people entries being deleted in some cases.
+  * An error turning exception emails on or off in the admin settings
+  * An error that prevented a Programme submission being rejected
+  
+A full list of changes included in this release can be found in the [SEEK v1.5.1 release notes](release-notes-1.5.1.html).
+
+If you have any comments or feedback then please [Contact Us](/contacting-us.html)  
+
 ## Version 1.5.0
 
 Release date: _December 11th 2017_
@@ -36,7 +50,6 @@ This is quite a large release, and the main highlights include:
 
 A full list of changes included in this release can be found in the [SEEK v1.5.0 release notes](release-notes-1.5.0.html).
 
-If you have any comments or feedback then please [Contact Us](/contacting-us.html)
 
 ## Version 1.4.1
 
