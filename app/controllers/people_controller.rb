@@ -332,7 +332,7 @@ class PeopleController < ApplicationController
 
   def person_params
     params.require(:person).permit(:first_name, :last_name, :orcid, :description, :email, :web_page, :phone,
-                                   :skype_name, { discipline_ids: [] },
+                                   :skype_name, { discipline_ids: [] }, { expertise: [] }, { tools: [] },
                                    project_subscriptions_attributes: %i[id project_id _destroy frequency])
   end
 
@@ -350,8 +350,8 @@ class PeopleController < ApplicationController
   end
 
   def set_tools_and_expertise(person, params)
-    exp_changed = person.tag_annotations(params[:expertise_list], 'expertise')
-    tools_changed = person.tag_annotations(params[:tool_list], 'tool')
+    exp_changed = person.tag_annotations(params[:expertise_list], 'expertise') if params[:expertise_list]
+    tools_changed = person.tag_annotations(params[:tool_list], 'tool') if params[:tool_list]
     if immediately_clear_tag_cloud?
       expire_annotation_fragments('expertise') if exp_changed
       expire_annotation_fragments('tool') if tools_changed
