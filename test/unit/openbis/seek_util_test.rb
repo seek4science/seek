@@ -2,14 +2,15 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class SeekUtilTest < ActiveSupport::TestCase
-  fixtures :studies
+  #fixtures :studies
 
   def setup
     mock_openbis_calls
     @endpoint = Factory(:openbis_endpoint)
     @util = Seek::Openbis::SeekUtil.new
-    @study = studies(:junk_study)
+    @study = Factory :study #studies(:junk_study)
     @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+    @experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
     @creator = Factory(:person)
   end
 
@@ -197,6 +198,8 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   end
 
+  ## --------- linking datasets to assay ---------- ##
+
 
   test 'associate_data_sets links datasets with assay creating new datafiles if necessary' do
 
@@ -219,7 +222,7 @@ class SeekUtilTest < ActiveSupport::TestCase
       assert_difference('DataFile.count', 2) do
         assert_difference('ExternalAsset.count', 2) do
 
-          assert_nil @util.associate_data_sets(assay, datasets)
+          assert_equal [], @util.associate_data_sets(assay, datasets)
         end
       end
     end
@@ -245,7 +248,7 @@ class SeekUtilTest < ActiveSupport::TestCase
       assert_difference('DataFile.count', 3) do
         assert_difference('ExternalAsset.count', 3) do
 
-          assert_nil @util.associate_data_sets_ids(assay, data_sets_ids, @endpoint)
+          assert_equal [], @util.associate_data_sets_ids(assay, data_sets_ids, @endpoint)
         end
       end
     end
@@ -255,6 +258,9 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   end
 
+  ## --------- linking datasets to assay end ---------- ##
+
+  ## --------- linking assays to study ---------- ##
   test 'associate_zamples_as_assays links zamples as new assays with study' do
 
 
@@ -281,6 +287,41 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     study.reload
     assert_equal 2, study.assays.count
+
+  end
+
+  test 'associate_zamples_as_assays links datafiles to assays under the study if selected so' do
+
+
+    study = Factory :study
+
+    assert study.assays.empty?
+
+    zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
+    assert_equal 2, zamples.length
+
+    ds_count = zamples.map {|z| z.dataset_ids}
+                   .flatten.length
+
+    assert ds_count > 0
+
+    sync_options = {link_datasets: '1'}
+
+    assert_difference('Assay.count', 2) do
+      assert_difference('AssayAsset.count', ds_count) do
+        assert_difference('DataFile.count', ds_count) do
+          assert_difference('ExternalAsset.count', 2+ds_count) do
+
+            assert_equal [], @util.associate_zamples_as_assays(study, zamples, sync_options)
+          end
+        end
+      end
+    end
+
+
+    study.reload
+    assert_equal 2, study.assays.count
+    assert_equal ds_count, study.related_data_files.count
 
   end
 
@@ -369,6 +410,286 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   end
 
+  test 'associate_zamples_as_assays sets sync_options for new assays and leaves existing untouched' do
+
+
+    study = Factory :study
+
+    assert study.assays.empty?
+
+    zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
+    assert_equal 2, zamples.length
+
+    assay2 = Factory :assay
+    assay2.study = study
+
+    ea = OpenbisExternalAsset.find_or_create_by_entity(zamples[0])
+    org_sync_options = {tomek: 'yes'}
+    ea.sync_options = org_sync_options
+    assay2.external_asset = ea
+
+    disable_authorization_checks do
+      assert assay2.save
+      assert ea.save
+    end
+
+    sync_options = {edin: 1}
+    issues = []
+    assert_difference('Assay.count', 1) do
+            issues =@util.associate_zamples_as_assays(study, zamples, sync_options)
+    end
+
+    assert issues.empty?
+    study.reload
+
+    assay2 = study.assays.first
+    assert_equal org_sync_options, assay2.external_asset.sync_options
+
+    assay_new = study.assays.last
+    assert_equal sync_options, assay_new.external_asset.sync_options
+
+
+  end
+
+  ## --------- linking assays to study end ---------- ##
+
+  ## --------- follow_study_dependent_assays ---------- ##
+
+  test 'follow_study_dependent_assays registers assays if set so' do
+
+    study = Factory :study
+    assert study.assays.empty?
+    refute @experiment.sample_ids.empty?
+
+    sync_options = {}
+
+    issues = @util.follow_study_dependent_assays(@experiment,study,sync_options)
+
+    assert_equal [],issues
+
+    study.reload
+    assert study.assays.empty?
+
+    sync_options = {link_assays: '1'}
+    issues = @util.follow_study_dependent_assays(@experiment,study,sync_options)
+
+    assert_equal [],issues
+
+    study.reload
+    assert_equal @experiment.sample_ids.length, study.assays.count
+
+  end
+  ## --------- follow_study_dependent_assays end ---------- ##
+
+  ## --------- follow_study_dependent_datafiles ---------- ##
+
+  test 'follow_study_dependent_assays registers datafiles under fake assay if said so' do
+
+  study = Factory :study
+  assert study.assays.empty?
+  assert study.related_data_files.empty?
+  refute @experiment.dataset_ids.empty?
+
+  sync_options = {}
+
+  issues = @util.follow_study_dependent_datafiles(@experiment,study,sync_options)
+
+  assert_equal [],issues
+
+  study.reload
+  assert study.assays.empty?
+  assert study.related_data_files.empty?
+
+  sync_options = {link_datasets: '1'}
+  issues = @util.follow_study_dependent_datafiles(@experiment,study,sync_options)
+
+  assert_equal [],issues
+
+  study.reload
+  assert_equal @experiment.dataset_ids.length, study.related_data_files.count
+  assert_equal 'OpenBIS FILES', study.assays.first!.title
+  assert_equal @experiment.dataset_ids.length, study.assays.first!.data_files.count
+
+  end
+
+  test 'follow_study_dependent_assays registers selected datafiles under fake assay if said so' do
+
+    study = Factory :study
+    assert study.assays.empty?
+    assert study.related_data_files.empty?
+    refute @experiment.dataset_ids.empty?
+
+
+    sync_options = {linked_datasets: [@experiment.dataset_ids[1]]}
+    issues = @util.follow_study_dependent_datafiles(@experiment,study,sync_options)
+
+    assert_equal [],issues
+
+    study.reload
+    assert_equal 1, study.related_data_files.count
+    assert_equal 'OpenBIS FILES', study.assays.first!.title
+
+  end
+
+  ## --------- follow_study_dependent_datafiles end ---------- ##
+
+  ## --------- follow_assay ---------- ##
+
+  test 'follow assay registers all dependent datasets if set so' do
+    #puts @zample.dataset_ids
+
+    assay = Factory :assay
+    es = OpenbisExternalAsset.find_or_create_by_entity(@zample)
+    es.sync_options = {link_datasets: '1'}
+    assay.external_asset = es
+
+    assert assay.save
+    assert assay.data_files.empty?
+    refute @zample.dataset_ids.empty?
+
+    issues = @util.follow_assay_dependent(assay)
+    assert issues.empty?
+
+    assert_equal @zample.dataset_ids.count, assay.data_files.count
+  end
+
+  test 'follow assay registers selected detasets' do
+    #puts @zample.dataset_ids
+
+    assay = Factory :assay
+    es = OpenbisExternalAsset.find_or_create_by_entity(@zample)
+    es.sync_options = {linked_datasets: [@zample.dataset_ids[1]]}
+    assay.external_asset = es
+
+    assert assay.save
+    assert assay.data_files.empty?
+
+    issues = @util.follow_assay_dependent(assay)
+    assert issues.empty?
+
+    assert_equal 1, assay.data_files.count
+  end
+
+  ## --------- follow_assay end ---------- ##
+
+  test 'extract_requested_sets gives all sets from zample if linked is selected' do
+
+    assert_equal 3, @zample.dataset_ids.length
+    sync_options = {}
+    params = {}
+
+    assert_equal [], @util.extract_requested_sets(@zample, sync_options)
+
+    sync_options = { link_datasets: '1' }
+    assert_same @zample.dataset_ids, @util.extract_requested_sets(@zample, sync_options)
+
+    sync_options = {link_datasets: '1', linked_datasets: ['123'] }
+    assert_same @zample.dataset_ids, @util.extract_requested_sets(@zample, sync_options)
+
+  end
+
+  test 'extract_requested_sets gives only selected sets that belongs to zample' do
+
+    sync_options = {}
+
+    assert_equal 3, @zample.dataset_ids.length
+
+    assert_equal [], @util.extract_requested_sets(@zample, sync_options)
+
+    sync_options = { linked_datasets: [] }
+    assert_equal [], @util.extract_requested_sets(@zample, sync_options)
+
+    sync_options = { linked_datasets: ['123'] }
+    assert_equal [], @util.extract_requested_sets(@zample, sync_options)
+
+    sync_options = { linked_datasets: ['123', @zample.dataset_ids[0]] }
+    assert_equal [@zample.dataset_ids[0]], @util.extract_requested_sets(@zample, sync_options)
+
+    sync_options = { linked_datasets: @zample.dataset_ids }
+    assert_equal @zample.dataset_ids, @util.extract_requested_sets(@zample, sync_options)
+
+  end
+
+  test 'filter_assay_like_zamples returns ids of only samples marked as assays in openbis types' do
+     ids = ["20171002172111346-37", "20171002172639055-39","20171121152441898-53"]
+     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(ids)
+
+     corr = @util.filter_assay_like_zamples(zamples, @endpoint)
+     assert_equal 2, corr.length
+     assert_equal ["20171002172111346-37", "20171002172639055-39"], corr.map(&:perm_id)
+  end
+
+  test 'extract_requested_zamples gives all assay-like zamples if linked is selected' do
+
+    assert_equal 2, @experiment.sample_ids.length
+    sync_options = {}
+
+    assert_equal [], @util.extract_requested_assays(@experiment, sync_options)
+
+    sync_options = { link_assays: '1' }
+    assert_equal @experiment.sample_ids, @util.extract_requested_assays(@experiment, sync_options).map(&:perm_id)
+
+    sync_options = {link_assays: '1', linked_zamples: ['123'] }
+    assert_equal @experiment.sample_ids, @util.extract_requested_assays(@experiment, sync_options).map(&:perm_id)
+
+  end
+
+  test 'extract_requested_zamples gives only selected zamples that belongs to exp' do
+
+
+    sync_options = {}
+
+    assert_equal 2, @experiment.sample_ids.length
+
+    assert_equal [], @util.extract_requested_assays(@experiment, sync_options)
+
+    sync_options = { linked_assays: [] }
+    assert_equal [], @util.extract_requested_assays(@experiment, sync_options).map(&:perm_id)
+
+    sync_options = { linked_assays: ['123'] }
+    assert_equal [], @util.extract_requested_assays(@experiment, sync_options).map(&:perm_id)
+
+    sync_options =  { linked_assays: ['123', @experiment.sample_ids[0]] }
+    assert_equal [@experiment.sample_ids[0]], @util.extract_requested_assays(@experiment, sync_options).map(&:perm_id)
+
+    sync_options =  { linked_assays: @experiment.sample_ids }
+    assert_equal @experiment.sample_ids, @util.extract_requested_assays(@experiment, sync_options).map(&:perm_id)
+
+  end
+
+  test 'fake_file_assay gives first assay of the openbis name' do
+
+    disable_authorization_checks do
+
+    study = Factory :study
+    assay1 = Factory :assay
+    assay1.title = 'Cos'
+    assay1.study = study
+    assert assay1.save
+
+    assay2 = Factory :assay
+    assay2.title = 'OpenBIS FILES'
+    assay2.study = study
+    assert assay2.save
+
+    assert_equal assay2, @util.fake_file_assay(study)
+
+    end
+  end
+
+  test 'fake_file_assay creates assay of the openbis name if missing' do
+
+
+      study = Factory :study
+      assert study.assays.empty?
+      assay = @util.fake_file_assay(study)
+
+      assert_equal 'OpenBIS FILES', assay.title
+      assert_equal study, assay.study
+      assert assay.persisted?
+  end
+
+
   test 'follow_dependent links datasets' do
 
     refute @zample.dataset_ids.empty?
@@ -381,7 +702,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset.seek_entity = assay
 
     errs  = @util.follow_dependent(asset,@zample)
-    refute errs
+    assert_equal [], errs
 
     refute assay.data_files.empty?
     assert_equal @zample.dataset_ids.length, assay.data_files.length
@@ -413,7 +734,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     types = @util.assay_types(@endpoint)
     assert types
     codes = types.map {|t| t.code}
-    assert_equal ['TZ_ASSAY', 'UNKNOWN'], codes
+    assert_equal ['TZ_FAIR_ASSAY', 'UNKNOWN'], codes
   end
 
   test 'dataset_types gives all dataset types' do

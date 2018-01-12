@@ -33,7 +33,7 @@ class OpenbisExperimentsController < ApplicationController
     puts sync_options
     study_params = params.require(:study).permit(:investigation_id)
 
-    reg_info = do_study_registration(@asset, study_params, sync_options, current_person, params)
+    reg_info = do_study_registration(@asset, study_params, sync_options, current_person)
 
     @study = reg_info[:study]
     issues = reg_info[:issues]
@@ -106,8 +106,9 @@ class OpenbisExperimentsController < ApplicationController
     end
 
     status = case @seek_type
-      when :assay then batch_register_assays(batch_ids, seek_parent_id)
-    end
+               when :assay then
+                 batch_register_assays(batch_ids, seek_parent_id)
+             end
 
     msg = "Registered all #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
     msg = "Registered #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
@@ -124,7 +125,7 @@ class OpenbisExperimentsController < ApplicationController
     puts "SYNC OPT #{sync_options}"
     sync_options[:link_datasets] = '1' if sync_options[:link_dependent] == '1'
 
-    assay_params = {study_id: study_id}
+    assay_params = { study_id: study_id }
 
     registered = []
     failed = []
@@ -145,14 +146,14 @@ class OpenbisExperimentsController < ApplicationController
 
     end
 
-    return {registred: registered, failed: failed, issues: issues}
+    return { registred: registered, failed: failed, issues: issues }
 
   end
 
-  def do_study_registration(asset, study_params, sync_options, creator, parameters = params)
+  def do_study_registration(asset, study_params, sync_options, creator)
 
     issues = []
-    reg_status = {study: nil, issues: issues}
+    reg_status = { study: nil, issues: issues }
 
     if asset.seek_entity
       issues << 'Already registered as OpenBIS entity'
@@ -170,7 +171,7 @@ class OpenbisExperimentsController < ApplicationController
     study = seek_util.createObisStudy(study_params, creator, asset)
 
     if study.save
-      errs = follow_study_dependent(asset.content, study, sync_options, parameters)
+      errs = follow_study_dependent(asset.content, study, sync_options)
       issues.concat(errs) if errs
       reg_status[:study] = study
     else
@@ -186,43 +187,46 @@ class OpenbisExperimentsController < ApplicationController
     render action: 'index'
   end
 
-  def follow_study_dependent(entity, study, sync_options, params)
+  def follow_study_dependent(entity, study, sync_options)
 
     issues = []
-    zamples_ids = extract_requested_zamples(entity, sync_options, params)
 
-    issues.concat seek_util.associate_zamples_ids(study, zamples_ids, sync_options, entity.openbis_endpoint)
+    isses.concat follow_dependent_assays(entity, study, sync_options)
 
     # data_sets_ids = extract_requested_sets(entity, sync_options, params)
     # seek_util.associate_data_sets_ids(assay, data_sets_ids, entity.openbis_endpoint)
     issues
   end
 
+  def follow_dependent_assays(entity, study, sync_options)
+
+    zamples_ids = extract_requested_assays_zamples(entity, sync_options)
+
+    assay_sync = simplify_assay_sync(sync_options)
+    seek_util.associate_zample_ids_as_assays(study, zamples_ids, assay_sync, entity.openbis_endpoint)
+
+  end
+
+
+
 
   def get_sync_options(hash = nil)
     hash ||= params
-    hash.fetch(:sync_options, {}).permit(:link_datasets,:link_assays,:link_dependent)
+    hash.fetch(:sync_options, {}).permit(:link_datasets, :link_assays, :link_dependent,
+                                         {linked_datasets: []}, {linked_assays: []})
   end
 
-  def extract_requested_sets(zample, sync_options, params)
-    return zample.dataset_ids if sync_options[:link_datasets] == '1'
 
-    (params[:linked_datasets] || []) & zample.dataset_ids
-  end
 
-  def extract_requested_zamples(entity, sync_options, params)
-    return entity.sample_ids if sync_options[:link_assays] == '1'
 
-    (params[:linked_zamples] || []) & entity.sample_ids
-  end
 
 
   def get_zamples_linked_to(study)
     return [] unless study
     #assay.data_files.select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
     #    .map { |df| df.external_asset.external_id }
-    study.assays.select { |a| a.external_asset.is_a?(OpenbisExternalAsset)}
-          .map{ |a| a.external_asset.external_id }
+    study.assays.select { |a| a.external_asset.is_a?(OpenbisExternalAsset) }
+        .map { |a| a.external_asset.external_id }
   end
 
   def get_datasets_linked_to(study)

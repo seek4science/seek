@@ -32,7 +32,7 @@
         <div class="form-group">
           <%= check_box_tag('sync_options[link_datasets]', 1, @asset.sync_options['link_datasets'] == '1') %>
           <%= label_tag('sync_options[link_datasets]', 'Automatically register all dependent datasets') %>
-          <div class="help-block">All dependent datasets will be registered and linked with this assay during
+          <div class="help-block">Dependent datasets will be registered and linked with this study and sub assays during
             synchronization
           </div>
         </div>
