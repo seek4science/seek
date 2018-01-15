@@ -82,7 +82,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     assert_match "The specified data:type does not match the URL's object (no type vs. people)", response.body
 
     #missing type
-    @json_mm["min"]"data"].delete("type")
+    @json_mm["min"]["data"].delete("type")
     post "/people.json", @json_mm["min"]
     assert_response :unprocessable_entity
     assert_match "A POST/PUT request must specify a data:type", response.body
