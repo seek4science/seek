@@ -1,12 +1,16 @@
 require 'test_helper'
 
 class PersonCUDTest < ActionDispatch::IntegrationTest
+  include AuthenticatedTestHelper
 
   def setup
-    post '/session', login: 'quentin', password: 'test'
-    json_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'post', 'person_post.json')
+    #log in
+    admin_user = Factory(:admin).user
+    admin_user.password = "blah"
+    post '/session', login: admin_user.login, password: admin_user.password
+
+    #prepare content for POST
     @json_mm = {}
-    @json_hash = JSON.parse(File.read(json_file))
     ['min','max'].each do |m|
       json_mm_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'content_compare', "#{m}_person.json")
       @json_mm["#{m}"] = JSON.parse(File.read(json_mm_file))
@@ -61,10 +65,9 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
   end
 
   def test_create_should_error_on_given_id
-    @json_hash["data"]["id"] = "100000000"
-    @json_hash["data"]["type"] = "people"
-
-    post "/people.json", @json_hash
+    @json_mm["min"]["data"]["id"] = "100000000"
+    @json_mm["min"]["data"]["type"] = "people"
+    post "/people.json", @json_mm["min"]
     assert_response :unprocessable_entity
     assert_match "A POST request is not allowed to specify an id", response.body
   end
@@ -73,29 +76,30 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     a_person = Factory(:person)
 
     #wrong type
-    @json_hash["data"]["type"] = "no type"
-    post "/people.json", @json_hash
+    @json_mm["min"]["data"]["type"] = "no type"
+    post "/people.json", @json_mm["min"]
     assert_response :unprocessable_entity
     assert_match "The specified data:type does not match the URL's object (no type vs. people)", response.body
 
     #missing type
-    @json_hash["data"].delete("type")
-    post "/people.json", @json_hash
+    @json_mm["min"]"data"].delete("type")
+    post "/people.json", @json_mm["min"]
     assert_response :unprocessable_entity
     assert_match "A POST/PUT request must specify a data:type", response.body
   end
 
   def test_update_should_error_on_wrong_id
     a_person = Factory(:person)
-    @json_hash["data"]["id"] = "100000000"
-    @json_hash["data"]["type"] = "people"
+    @json_mm["min"]["data"]["id"] = "100000000"
+    @json_mm["min"]["data"]["type"] = "people"
 
-    put "/people/#{a_person.id}.json", @json_hash
+    put "/people/#{a_person.id}.json", @json_mm["min"]
     assert_response :unprocessable_entity
     assert_match "id specified by the PUT request does not match object-id in the JSON input", response.body
 
-    @json_hash["data"]["id"] = a_person.id
-    put "/people/#{a_person.id}.json", @json_hash
+    @json_mm["min"]["data"]["id"] = a_person.id
+    @json_mm["min"]["data"]["attributes"]["email"] = "updateTest@email.com"
+    put "/people/#{a_person.id}.json", @json_mm["min"]
     assert_response :success
   end
 
@@ -103,14 +107,14 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     a_person = Factory(:person)
 
     #wrong type
-    @json_hash["data"]["type"] = "no type"
-    put "/people/#{a_person.id}.json", @json_hash
+    @json_mm["min"]["data"]["type"] = "no type"
+    put "/people/#{a_person.id}.json", @json_mm["min"]
     assert_response :unprocessable_entity
     assert_match "The specified data:type does not match the URL's object (no type vs. people)", response.body
 
     #missing type
-    @json_hash["data"].delete("type")
-    put "/people/#{a_person.id}.json", @json_hash
+    @json_mm["min"]["data"].delete("type")
+    put "/people/#{a_person.id}.json", @json_mm["min"]
     assert_response :unprocessable_entity
     assert_match "A POST/PUT request must specify a data:type", response.body
   end
