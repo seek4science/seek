@@ -13,7 +13,7 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     rebuild_sample_templates
-
+    delete_redundant_subscriptions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -49,4 +49,31 @@ namespace :seek do
     end
   end
 
+  task(delete_redundant_subscriptions: :environment) do
+    types = ['Specimen', 'Treatment']
+    types.each do |type|
+      subs = Subscription.where(subscribable_type: 'Specimen')
+      if subs.any?
+        puts "Deleting #{subs.count} subscriptions linked to #{type}"
+        disable_authorization_checks { subs.destroy_all }
+      end
+    end
+
+    sample_switch_date = Date.parse('2016-09-01')
+    samp_subs = Subscription.where(subscribable_type: 'Sample').where('created_at < ?', sample_switch_date)
+    if samp_subs.any?
+      puts "Deleting #{samp_subs.count} subscriptions linked to old samples (created before #{sample_switch_date})"
+      disable_authorization_checks { samp_subs.destroy_all }
+    end
+
+    types = ['Strain', 'Sample']
+    types.each do |type|
+      subs = Subscription.where(subscribable_type: type)
+      subs = subs.select { |s| s.subscribable.nil? rescue true }
+      if subs.any?
+        puts "Deleting #{subs.count} subscriptions linked to non-existent #{type}"
+        disable_authorization_checks { subs.each(&:destroy) }
+      end
+    end
+  end
 end
