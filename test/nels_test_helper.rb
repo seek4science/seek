@@ -1,6 +1,8 @@
 module NelsTestHelper
 
   def setup_nels_for_units
+    create_sample_attribute_type
+
     person = Factory(:person)
     @user = person.user
     @project = person.projects.first
@@ -21,7 +23,7 @@ module NelsTestHelper
       @nels_sample_type = SampleType.new(title: 'NeLS FASTQ Paired', uploaded_template: true, project_ids: [@project.id])
       @nels_sample_type.content_blob = Factory(:nels_fastq_paired_template_content_blob)
       @nels_sample_type.build_attributes_from_template
-      @nels_sample_type.save
+      @nels_sample_type.save!
     end
   end
 
