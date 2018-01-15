@@ -31,7 +31,6 @@ class ApplicationController < ActionController::Base
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
   before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :check_illegal_id, :only=>[:create]
   before_filter :check_json_id_type,  :only=>[:create, :update], :if => "@is_json"   #from Rails 5.x use: proc {@is_json}
   # after_filter :unescape_response
 
