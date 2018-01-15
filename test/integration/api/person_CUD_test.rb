@@ -1,9 +1,6 @@
 require 'test_helper'
 
 class PersonCUDTest < ActionDispatch::IntegrationTest
-  include AuthenticatedTestHelper
-  #include RestTestCases
-  include ApplicationHelper
 
   def setup
     post '/session', login: 'quentin', password: 'test'
@@ -18,9 +15,12 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   def test_should_create_person
     #debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
+    #a_project = Factory(:project)
     ['min','max'].each do |m|
       @json_mm["#{m}"]["data"].delete("id")
       @json_mm["#{m}"]["data"]["attributes"]["email"] = "#{m}_createTest@email.com"
+      #@json_mm["#{m}"]["data"]["relationships"]["projects"]["data"].append({:id => a_project.id, :type => "projects"})
+
       assert_difference('Person.count') do
         assert_difference('NotifieeInfo.count') do
           post "/people.json", @json_mm["#{m}"]

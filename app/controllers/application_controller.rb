@@ -588,6 +588,7 @@ class ApplicationController < ActionController::Base
 
   def check_json_id_type
     begin
+      raise ArgumentError.new('A POST/PUT request must have a data record complying with JSONAPI specs') if params[:data].nil?
       #type should always appear in POST or PUT requests
       if params[:data][:type].nil?
         raise ArgumentError.new('A POST/PUT request must specify a data:type')
