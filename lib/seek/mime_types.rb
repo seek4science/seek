@@ -48,7 +48,7 @@ module Seek
 
     # Get the appropriate file icon for the MIME type
     def mime_icon_url(mime)
-      icon_filename_for_key(mime_icon_key(mime))
+      icon_filename_for_key(mime_icon_key(mime)) || icon_filename_for_key('misc_file')
     end
 
     def mime_extensions(mime)

@@ -3,6 +3,8 @@ class Sample < ActiveRecord::Base
   #                :policy_id, :sample_type_id, :sample_type, :title, :uuid, :project_ids, :policy, :contributor,
   #                :other_creators, :data
 
+  include Seek::Rdf::RdfGeneration
+
   searchable(auto_index: false) do
     text :attribute_values do
       attribute_values_for_search
@@ -11,6 +13,7 @@ class Sample < ActiveRecord::Base
       sample_type.title
     end
   end if Seek::Config.solr_enabled
+
 
   acts_as_asset
 
@@ -135,6 +138,11 @@ class Sample < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  # although it includes the RdfGeneration for some rdf support, it can't be considered to fully support it yet.
+  def rdf_supported?
+    false
   end
 
   private

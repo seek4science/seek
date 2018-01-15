@@ -19,7 +19,7 @@ class SimpleBaseSerializer < ActiveModel::Serializer
   def relationship_related_link(attribute_name); end
 
   def _meta
-    if object.respond_to?(:created_at)
+    meta = if object.respond_to?(:created_at)
       created = object.created_at
       updated = object.updated_at
       {
@@ -28,7 +28,9 @@ class SimpleBaseSerializer < ActiveModel::Serializer
       }
     else
       {}
-    end
+           end
+    meta[:api_version] = ActiveModel::Serializer.config.api_version
+    meta
   end
 
   def serialize_annotations(object, context = nil)
@@ -38,6 +40,7 @@ class SimpleBaseSerializer < ActiveModel::Serializer
         tags.append(tag.value.text)
       end
     end
+    tags.sort!
     tags
   end
 

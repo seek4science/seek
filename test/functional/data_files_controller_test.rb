@@ -24,10 +24,6 @@ class DataFilesControllerTest < ActionController::TestCase
     @object
   end
 
-  def min_test_object
-    @min_object = Factory(:min_data_file)
-  end
-
   def test_title
     get :index
     assert_response :success
@@ -160,7 +156,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_nil assigns(:data_files)
   end
 
-  test 'creators show in list item' do
+  test 'creators show in list private_item' do
     p1 = Factory :person
     p2 = Factory :person
     df = Factory(:data_file, title: 'ZZZZZ', creators: [p2], contributor: p1.user, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
@@ -170,7 +166,7 @@ class DataFilesControllerTest < ActionController::TestCase
     # check the test is behaving as expected:
     assert_equal p1.user, df.contributor
     assert df.creators.include?(p2)
-    assert_select '.list_item_title a[href=?]', data_file_path(df), 'ZZZZZ', 'the data file for this test should appear as a list item'
+    assert_select '.list_item_title a[href=?]', data_file_path(df), 'ZZZZZ', 'the data file for this test should appear as a list private_item'
 
     # check for avatars
     assert_select '.list_item_avatar' do
@@ -1408,7 +1404,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'uploader can publish the item when projects associated with the item have no gatekeeper' do
+  test 'uploader can publish the private_item when projects associated with the private_item have no gatekeeper' do
     uploader = Factory(:user)
     data_file = Factory(:data_file, contributor: uploader)
     assert_equal Policy::NO_ACCESS, data_file.policy.access_type
@@ -1420,7 +1416,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
-  test 'the person who has the manage right to the item, CAN publish the item, if no gatekeeper for projects associated with the item' do
+  test 'the person who has the manage right to the private_item, CAN publish the private_item, if no gatekeeper for projects associated with the private_item' do
     person = Factory(:person)
     policy = Factory(:policy)
     Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
@@ -1436,7 +1432,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_nil flash[:error]
   end
 
-  test 'the person who has the manage right to the item, CAN publish the item, if the item WAS published' do
+  test 'the person who has the manage right to the private_item, CAN publish the private_item, if the private_item WAS published' do
     person = Factory(:person)
     policy = Factory(:policy)
     Factory(:permission, policy: policy, contributor: person, access_type: Policy::MANAGING)
@@ -1452,7 +1448,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   # TODO: Permission UI testing - Replace these with Jasmine tests
-  # test "should enable the policy scope 'all visitor...' when uploader edit the item" do
+  # test "should enable the policy scope 'all visitor...' when uploader edit the private_item" do
   #   uploader = Factory(:user)
   #   data_file = Factory(:data_file, contributor: uploader)
   #   assert_equal Policy::NO_ACCESS, data_file.policy.access_type
@@ -1784,7 +1780,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df.version, json['data']['attributes']['version']
   end
 
-  test 'landing page for hidden item' do
+  test 'landing page for hidden private_item' do
     df = Factory(:data_file, policy: Factory(:private_policy), title: 'fish flop', description: 'testing json description')
     assert !df.can_view?
 
@@ -1797,7 +1793,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', person_path(contributor_person), count: 0
   end
 
-  test 'landing page for hidden item with the contributor contact' do
+  test 'landing page for hidden private_item with the contributor contact' do
     df = Factory(:data_file, policy: Factory(:private_policy), title: 'fish flop', description: 'testing json description')
 
     project = df.projects.first
@@ -1818,7 +1814,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', person_path(contributor_person)
   end
 
-  test 'landing page for hidden item which DOI was minted' do
+  test 'landing page for hidden private_item which DOI was minted' do
     df = Factory(:data_file, policy: Factory(:private_policy), title: 'fish flop', description: 'testing json description')
     comment = 'the paper was retracted'
     AssetDoiLog.create(asset_type: df.class.name, asset_id: df.id, asset_version: df.version, action: AssetDoiLog::MINT)
@@ -1832,14 +1828,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'p.comment', text: /#{comment}/
   end
 
-  test 'landing page for non-existing item' do
+  test 'landing page for non-existing private_item' do
     get :show, id: 123
     assert_response :not_found
     assert_select 'h1', text: '404'
     assert_select 'h2', text: 'The requested page or resource does not exist.'
   end
 
-  test 'landing page for deleted item which DOI was minted' do
+  test 'landing page for deleted private_item which DOI was minted' do
     comment = 'the paper was restracted'
     klass = 'DataFile'
     id = 123
@@ -2189,10 +2185,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'can disambiguate sample type' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2332,11 +2327,10 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "can't extract from data file if no permissions" do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     another_person = Factory(:person)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:private_policy), contributor: person.user
     refute data_file.sample_template?
@@ -2361,10 +2355,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'strain samples successfully extracted from spreadsheet' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:strain_sample_data_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2392,10 +2385,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'extract from data file' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2430,10 +2422,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'extract from data file with multiple matching sample types redirects to selection page' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2464,10 +2455,9 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'extract from data file queues job' do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
                                     policy: Factory(:private_policy), contributor: person.user
@@ -2492,6 +2482,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "can't extract from data file if samples already extracted" do
+    create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
 
@@ -2520,12 +2511,19 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'can get citation for data file with DOI' do
     doi_citation_mock
-    data_file = Factory(:data_file, policy: Factory(:public_policy), doi: '10.5072/test')
+    data_file = Factory(:data_file, policy: Factory(:public_policy))
+
     login_as(data_file.contributor)
 
     get :show, id: data_file
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+
+    data_file.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
+
+    get :show, id: data_file
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
   end
 
   test 'resource count stats' do
@@ -2762,7 +2760,7 @@ class DataFilesControllerTest < ActionController::TestCase
       end
     end
   end
-  
+
   test 'should unset policy sharing scope when updated' do
     login_as(:datafile_owner)
     df = data_files(:editable_data_file)
@@ -2804,6 +2802,11 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  def edit_max_object(df)
+    add_tags_to_test_object(df)
+    add_creator_to_test_object(df)
+  end
+
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user)
@@ -2811,6 +2814,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                     policy: Factory(:private_policy), contributor: contributor
     sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    create_sample_attribute_type
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
 
@@ -2892,5 +2896,54 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def valid_data_file_with_https_url
     [{ title: 'Test HTTP', project_ids: [projects(:sysmo_project).id] }, { data_url: 'https://mockedlocation.com/txt_test.txt', make_local_copy: '0' }]
+  end
+
+  test 'policy visibility in JSON' do
+    asset_housekeeper = Factory(:asset_housekeeper)
+    private_policy = Factory(:private_policy)
+    visible_policy = Factory(:publicly_viewable_policy)
+    owner = Factory(:person)
+    random_person = Factory(:person)
+    private_item = Factory(:data_file,
+                   policy: private_policy,
+                   title: 'some title',
+                   description: 'some description',
+                   contributor: owner.user)
+    visible_item = Factory(:data_file,
+                           policy: visible_policy,
+                           title: 'some title',
+                           description: 'some description',
+                           contributor: owner.user)
+
+   login_as owner.user
+
+      get :show, id: private_item, format: :json
+      assert_response :success
+      parsed_response = JSON.parse(@response.body)
+      assert parsed_response['data']['attributes'].has_key?('policy')
+      assert parsed_response['data']['attributes']['policy'].has_key?('access')
+    get :show, id: visible_item, format: :json
+    assert_response :success
+    parsed_response = JSON.parse(@response.body)
+    assert parsed_response['data']['attributes'].has_key?('policy')
+    assert parsed_response['data']['attributes']['policy'].has_key?('access')
+
+    logout
+
+    get :show, id: private_item, format: :json
+    assert_response :forbidden
+    get :show, id: visible_item, format: :json
+    assert_response :success
+    parsed_response = JSON.parse(@response.body)
+    assert_not parsed_response['data']['attributes'].has_key?('policy')
+
+    login_as random_person.user
+    get :show, id: private_item, format: :json
+    assert_response :forbidden
+    get :show, id: visible_item, format: :json
+    assert_response :success
+    parsed_response = JSON.parse(@response.body)
+    assert_not parsed_response['data']['attributes'].has_key?('policy')
+    logout
   end
 end

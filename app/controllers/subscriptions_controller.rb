@@ -3,7 +3,7 @@ class SubscriptionsController < ApplicationController
   before_filter :find_and_authorize_requested_item, :only => [:destroy]
 
   def create
-    @subscription = Subscription.new params[:subscription]
+    @subscription = current_user.person.subscriptions.build(subscription_params)
     respond_to do |format|
       if @subscription.save
         flash[:notice] = "You have subscribed to this #{@subscription.subscribable.class.name.humanize}"
@@ -23,5 +23,11 @@ class SubscriptionsController < ApplicationController
       format.html { redirect_to(subscribable) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+
+  def subscription_params
+    params.require(:subscription).permit(:subscribable_id, :subscribable_type)
   end
 end

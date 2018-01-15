@@ -4,7 +4,7 @@ module Seek
     class Generator
       include Utils
 
-      DEFAULT_FILENAME = 'ro-bundle.zip'
+      DEFAULT_FILENAME = 'ro-bundle.zip'.freeze
 
       def initialize(resource)
         @resource = resource

@@ -38,11 +38,8 @@ class PeopleController < ApplicationController
   # GET /people.xml
   def index
     if params[:discipline_id]
-      @discipline = Discipline.find(params[:discipline_id])
-      # FIXME: strips out the disciplines that don't match
-      @people = Person.where(['disciplines.id=?', @discipline.id]).includes(:disciplines)
-      # need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
-      @people.each(&:reload)
+      @discipline = Discipline.find_by_id(params[:discipline_id])
+      @people = @discipline.try(:people) || []
     elsif params[:project_position_id]
       @project_position = ProjectPosition.find(params[:project_position_id])
       @people = Person.includes(:group_memberships)
@@ -73,8 +70,9 @@ class PeopleController < ApplicationController
       format.html # index.html.erb
       format.xml
       format.json  { render json: @people,
-                            each_serializer: ActiveModel::Serializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host
+                            each_serializer: SkeletonSerializer,
+                            meta: {:base_url =>   Seek::Config.site_base_host,
+                                   :api_version => ActiveModel::Serializer.config.api_version
                             } }
     end
   end
@@ -239,13 +237,15 @@ class PeopleController < ApplicationController
     had_no_projects = @person.work_groups.empty?
 
     respond_to do |format|
+      previous_projects = @person.projects
       if @person.update_attributes(administer_person_params)
+        new_projects = @person.projects - previous_projects
         set_project_related_roles(@person)
 
         @person.save # this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
-        if Seek::Config.email_enabled && @person.user && had_no_projects && !@person.work_groups.empty? && @person != current_person
-          Mailer.notify_user_projects_assigned(@person).deliver_now
+        if Seek::Config.email_enabled && @person.user && new_projects.any? && @person != current_person
+          Mailer.notify_user_projects_assigned(@person,new_projects).deliver_later
         end
 
         flash[:notice] = 'Person was successfully updated.'

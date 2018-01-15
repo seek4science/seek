@@ -1,6 +1,7 @@
 require 'test_helper'
 require 'docsplit'
 require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
+require 'minitest/mock'
 
 class ContentBlobTest < ActiveSupport::TestCase
 
@@ -508,26 +509,58 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'is_content_viewable?' do
-    viewable_formats = %w[application/pdf]
-    viewable_formats << 'application/msword'
-    viewable_formats << 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    viewable_formats << 'application/vnd.ms-powerpoint'
-    viewable_formats << 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-    viewable_formats << 'application/vnd.oasis.opendocument.text'
-    viewable_formats << 'application/vnd.oasis.opendocument.presentation'
-    viewable_formats << 'application/rtf'
+    Seek::Config.stub(:soffice_available?, true) do
+      viewable_formats = %w[application/pdf]
+      viewable_formats << 'application/msword'
+      viewable_formats << 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      viewable_formats << 'application/vnd.ms-powerpoint'
+      viewable_formats << 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      viewable_formats << 'application/vnd.oasis.opendocument.text'
+      viewable_formats << 'application/vnd.oasis.opendocument.presentation'
+      viewable_formats << 'application/rtf'
 
-    viewable_formats.each do |viewable_format|
-      cb_with_content_viewable_format = Factory(:content_blob, content_type: viewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
-      User.with_current_user cb_with_content_viewable_format.asset.contributor do
-        assert cb_with_content_viewable_format.is_viewable_format?
-        assert cb_with_content_viewable_format.is_content_viewable?
+      viewable_formats.each do |viewable_format|
+        cb_with_content_viewable_format = Factory(:content_blob, content_type: viewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
+        User.with_current_user cb_with_content_viewable_format.asset.contributor do
+          assert cb_with_content_viewable_format.is_viewable_format?
+          assert cb_with_content_viewable_format.is_content_viewable?
+        end
+      end
+      cb_with_no_viewable_format = Factory(:content_blob, content_type: 'application/excel', asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet.xls", 'rb').read)
+      User.with_current_user cb_with_no_viewable_format.asset.contributor do
+        assert !cb_with_no_viewable_format.is_viewable_format?
+        assert !cb_with_no_viewable_format.is_content_viewable?
       end
     end
-    cb_with_no_viewable_format = Factory(:content_blob, content_type: 'application/excel', asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet.xls", 'rb').read)
-    User.with_current_user cb_with_no_viewable_format.asset.contributor do
-      assert !cb_with_no_viewable_format.is_viewable_format?
-      assert !cb_with_no_viewable_format.is_content_viewable?
+  end
+
+  test 'is_content_viewable? without soffice' do
+    Seek::Config.stub(:soffice_available?, false) do
+      viewable_formats = %w[application/pdf] # Can still view PDFs
+
+      unviewable_formats = []
+      unviewable_formats << 'application/msword'
+      unviewable_formats << 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      unviewable_formats << 'application/vnd.ms-powerpoint'
+      unviewable_formats << 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      unviewable_formats << 'application/vnd.oasis.opendocument.text'
+      unviewable_formats << 'application/vnd.oasis.opendocument.presentation'
+      unviewable_formats << 'application/rtf'
+
+      viewable_formats.each do |viewable_format|
+        cb_with_content_viewable_format = Factory(:content_blob, content_type: viewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
+        User.with_current_user cb_with_content_viewable_format.asset.contributor do
+          assert cb_with_content_viewable_format.is_viewable_format?
+          assert cb_with_content_viewable_format.is_content_viewable?
+        end
+      end
+      unviewable_formats.each do |unviewable_format|
+        cb_with_content_unviewable_format = Factory(:content_blob, content_type: unviewable_format, asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/a_pdf_file.pdf", 'rb').read)
+        User.with_current_user cb_with_content_unviewable_format.asset.contributor do
+          refute cb_with_content_unviewable_format.is_viewable_format?
+          refute cb_with_content_unviewable_format.is_content_viewable?
+        end
+      end
     end
   end
 

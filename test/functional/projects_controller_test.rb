@@ -19,10 +19,6 @@ class ProjectsControllerTest < ActionController::TestCase
     @object = projects(:sysmo_project)
   end
 
-  def min_test_object
-    @min_object = Factory(:min_project)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: I18n.t('project').pluralize, count: 1
@@ -88,6 +84,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project
     assert project.default_policy
     assert project.use_default_policy
+    assert_nil project.default_policy.sharing_scope
   end
 
   test 'create project with programme' do
@@ -1070,18 +1067,24 @@ class ProjectsControllerTest < ActionController::TestCase
     new_institution = Factory(:institution)
     new_person = Factory(:person)
     new_person2 = Factory(:person)
+    new_person3 = Factory(:person)
 
-    assert_no_difference('GroupMembership.count') do # 2 deleted, 2 added
+    assert_difference('GroupMembership.count',1) do # 2 deleted, 3 added
       assert_no_difference('WorkGroup.count') do # 1 empty group will be deleted, 1 will be added
-        post :update_members,
-             id: project,
-             group_memberships_to_remove: [group_membership.id, group_membership2.id],
-             people_and_institutions_to_add: [{ 'person_id' => new_person.id, 'institution_id' => new_institution.id }.to_json, { 'person_id' => new_person2.id, 'institution_id' => new_institution.id }.to_json]
-        assert_redirected_to project_path(project)
-        assert_nil flash[:error]
-        refute_nil flash[:notice]
+        assert_emails(3) do
+          post :update_members,
+               id: project,
+               group_memberships_to_remove: [group_membership.id, group_membership2.id],
+               people_and_institutions_to_add: [{ 'person_id' => new_person.id, 'institution_id' => new_institution.id }.to_json,
+                                                { 'person_id' => new_person2.id, 'institution_id' => new_institution.id }.to_json,
+                                                { 'person_id' => new_person3.id, 'institution_id' => new_institution.id }.to_json]
+        end
       end
     end
+
+    assert_redirected_to project_path(project)
+    assert_nil flash[:error]
+    refute_nil flash[:notice]
 
     assert_includes project.institutions, new_institution
     assert_includes project.people, new_person
@@ -1475,7 +1478,55 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'request membership' do
+    project = Factory(:project_administrator).projects.first #needs a project admin
+    person = Factory(:person)
+    login_as(person)
+    assert_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+
+    end
+    assert_redirected_to(project)
+    refute_nil flash[:notice]
+    log = MessageLog.last
+    assert_equal project,log.resource
+    assert_equal person,log.sender
+    assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST,log.message_type
+
+    logout
+    login_as(project.project_administrators.first)
+
+    assert_emails(0)  do
+      assert_no_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+    end
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    project=Factory(:project)
+    assert_empty(project.people)
+    assert_emails(0)  do
+      assert_no_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+    end
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+  end
+
   private
+
+  def edit_max_object(project)
+    for i in 1..5 do
+      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+    end
+    project.programme_id = (Factory(:programme)).id
+    add_avatar_to_test_object(project)
+  end
 
   def valid_project
     { title: 'a title' }

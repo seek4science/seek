@@ -6,7 +6,7 @@ class StrainsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
-  include GeneralAuthorizationTestCases
+#  include GeneralAuthorizationTestCases
 
   def setup
     login_as :owner_of_fully_public_policy
@@ -14,10 +14,6 @@ class StrainsControllerTest < ActionController::TestCase
 
   def rest_api_test_object
     @object = Factory(:strain, organism_id: Factory(:organism, bioportal_concept: Factory(:bioportal_concept)).id)
-  end
-
-  def min_test_object
-    @min_object = Factory(:min_strain)
   end
 
   test 'should get index' do

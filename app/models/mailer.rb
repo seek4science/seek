@@ -147,9 +147,9 @@ class Mailer < ActionMailer::Base
          subject: 'SEEK Configuration Email Test')
   end
 
-  def notify_user_projects_assigned(person)
+  def notify_user_projects_assigned(person,new_projects)
     @name = person.name
-    @projects = person.projects
+    @projects = new_projects
 
     mail(from: Seek::Config.noreply_sender,
          to: person.email_with_name,
@@ -195,6 +195,17 @@ class Mailer < ActionMailer::Base
     mail(:from=>Seek::Config.noreply_sender,
          :to=>Seek::Config.support_email_address,
          :subject=>"#{Seek::Config.application_name} user has reported a problem with a workflow run")
+  end
+
+  def request_membership(user, project, details)
+    @owners = project.project_administrators
+    @requester = user.person
+    @resource = project
+    @details = details
+    mail(from: Seek::Config.noreply_sender,
+         to: project.project_administrators.collect(&:email_with_name),
+         reply_to: user.person.email_with_name,
+         subject: "#{@requester.email_with_name} requested membership of project: #{@resource.title}")
   end
 
   private

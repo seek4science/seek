@@ -18,9 +18,6 @@ class AssaysControllerTest < ActionController::TestCase
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
-  def min_test_object
-    @min_object = Factory(:min_assay)
-  end
 
   test 'modelling assay validates with schema' do
     df = Factory(:data_file, contributor: User.current_user.person)
@@ -1417,6 +1414,18 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0 # But not browse NeLS
   end
 
+  def edit_max_object(assay)
+    add_tags_to_test_object(assay)
+    add_creator_to_test_object(assay)
+
+    org = Factory(:organism)
+    assay.associate_organism(org)
+    assay.contributor = User.current_user.person
+    assay.save
+    login_as(User.current_user)
+
+  end
+
   test 'add data file button' do
     assay=Factory(:experimental_assay)
     person = assay.contributor
@@ -1476,5 +1485,22 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select '#buttons' do
       assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:0
     end
+  end
+
+  test 'can delete an assay with subscriptions' do
+    assay = Factory(:assay, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    p = Factory(:person)
+    Factory(:subscription, person: assay.contributor, subscribable: assay)
+    Factory(:subscription, person: p, subscribable: assay)
+
+    login_as(assay.contributor)
+
+    assert_difference('Subscription.count', -2) do
+      assert_difference('Assay.count', -1) do
+        delete :destroy, id: assay.id
+      end
+    end
+
+    assert_redirected_to assays_path
   end
 end

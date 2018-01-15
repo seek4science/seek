@@ -7,6 +7,7 @@ gem 'rdoc'
 gem 'mysql2'
 gem 'pg'
 gem 'sqlite3'
+
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
@@ -14,7 +15,7 @@ gem 'libxml-ruby', '~>2.8.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '4.2.9'
 gem 'simple-spreadsheet-extractor', '~>0.15.2'
-gem 'sample-template-generator'
+gem 'sample-template-generator', '~>0.4'
 gem 'rmagick', '2.15.2'
 gem 'rest-client'
 gem 'factory_girl', '2.6.4'
@@ -122,7 +123,7 @@ gem 'coffee-rails', '~> 4.1.0'
 
 # Rails 4 upgrade
 gem 'activerecord-session_store'
-# gem 'protected_attributes' # Delete me after refactoring
+
 gem 'rails-observers'
 
 # javascript assets from https://rails-assets.org

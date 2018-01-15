@@ -42,6 +42,7 @@ module Seek
       def send_rdf(item, graphs = rdf_graph_uris(item), save_file = true)
         if configured? && item.rdf_supported?
           connect_to_repository
+          Rails.logger.debug("RDF about to be sent for item: #{item.to_rdf}")
           with_statements(item) do |statement|
             if statement.valid?
               graphs.each do |graph_uri|
@@ -63,7 +64,7 @@ module Seek
           connect_to_repository
           graphs.each do |graph|
             q = query.delete([item.rdf_resource, :p, :o]).where([item.rdf_resource, :p, :o]).graph(RDF::URI(graph))
-            Rails.logger.debug("remove all SPARQL query #{q}")
+            Rails.logger.debug("Remove all SPARQL: #{q}")
             result = delete(q)
             Rails.logger.debug(result)
           end
@@ -74,8 +75,9 @@ module Seek
       # updates the rdf in the repository and updates the rdf file.
       def update_rdf(item)
         if configured? && item.rdf_supported?
-          connect_to_repository
+          Rails.logger.debug("About to remove RDF for item #{item.inspect}")
           remove_rdf(item)
+          Rails.logger.debug("About to add RDF for item #{item.inspect}")
           send_rdf(item)
         end
       end
@@ -133,16 +135,11 @@ module Seek
       end
 
       def send_statement_to_repository(statement, graph_uri)
+        Rails.logger.debug("sending statement #{statement} to graph #{graph_uri}")
         graph = RDF::URI.new graph_uri
         q = query.insert([statement.subject, statement.predicate, statement.object]).graph(graph)
+        Rails.logger.debug("Insert statement SPARQL: #{q}")
         result = insert(q)
-        Rails.logger.debug(result)
-      end
-
-      def remove_statement_from_repository(statement, graph_uri)
-        graph = RDF::URI.new graph_uri
-        q = query.delete([statement.subject, statement.predicate, statement.object]).graph(graph)
-        result = delete(q)
         Rails.logger.debug(result)
       end
 
@@ -157,15 +154,6 @@ module Seek
       def with_statements(item)
         RDF::Reader.for(:rdfxml).new(item.to_rdf) do |reader|
           reader.each_statement do |statement|
-            yield(statement)
-          end
-        end
-      end
-
-      def with_statements_from_file(path)
-        RDF::Reader.for(:rdfxml).open(path) do |reader|
-          reader.each_statement do |statement|
-            Rails.logger.debug "Statement from #{path}- #{statement}"
             yield(statement)
           end
         end

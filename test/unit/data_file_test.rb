@@ -298,7 +298,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'sample template?' do
-    Factory(:string_sample_attribute_type, title: 'String')
+    create_sample_attribute_type
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:public_policy)
     refute data_file.sample_template?

@@ -243,10 +243,10 @@ module Seek
       end
 
       def is_gatekeeper_approval_required?(object)
-        params[:policy_attributes] &&
-          params[:policy_attributes][:access_type].to_i > Policy::NO_ACCESS &&
-          object.gatekeeper_required? &&
-          !User.current_user.person.is_asset_gatekeeper_of?(object)
+        will_be_published?(object, params[:policy_attributes]) && # Incoming policy change counts as "publishing"
+          !object.is_published? && # Not already published
+          object.gatekeeper_required? && # Gatekeeper required
+          !User.current_user.person.is_asset_gatekeeper_of?(object) # Current user is not the gatekeeper
       end
 
       def was_item_unpublished?(object)
@@ -255,6 +255,11 @@ module Seek
 
       def last_log_state_published?(object)
         object.last_publishing_log.try(:publish_state) == ResourcePublishLog::PUBLISHED
+      end
+
+      def will_be_published?(object, policy_params)
+        policy_params &&
+            (policy_params[:access_type].to_i >= (object.is_downloadable? ? Policy::ACCESSIBLE : Policy::VISIBLE))
       end
     end
   end

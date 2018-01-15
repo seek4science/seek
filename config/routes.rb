@@ -186,6 +186,7 @@ SEEK::Application.routes.draw do
       get :admin_member_roles
       get :storage_report
       post :update_members
+      post :request_membership
       get :isa_children
     end
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
@@ -763,7 +764,7 @@ SEEK::Application.routes.draw do
   get "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
   get "/seek_nels" => "nels#callback", as: 'nels_oauth_callback'
 
-  get "/citation/*doi(.:format)" => "citations#fetch", :as => :citation
+  get "/citation/(*doi)" => "citations#fetch", as: :citation, constraints: { doi: /.+/ }
 
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.

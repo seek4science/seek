@@ -686,3 +686,7 @@ div.popup-contributor {
   max-height: 250px;
   overflow-y: auto;
 }
+
+.disabled_icon.disabled {
+  pointer-events: inherit;
+}

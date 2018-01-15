@@ -8,13 +8,15 @@ class ProjectsController < ApplicationController
   include ApiHelper
 
   before_filter :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
-                                               admin_member_roles update_members storage_report]
+                                               admin_member_roles update_members storage_report request_membership]
   before_filter :find_assets, only: [:index]
   before_filter :auth_to_create, only: %i[new create]
   before_filter :is_user_admin_auth, only: %i[manage destroy]
   before_filter :editable_by_user, only: %i[edit update]
   before_filter :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
   before_filter :member_of_this_project, only: [:asset_report], unless: :admin?
+  before_filter :login_required, only: [:request_membership]
+  before_filter :allow_request_membership, only: [:request_membership]
 
   skip_before_filter :project_membership_required
 
@@ -92,7 +94,7 @@ class ProjectsController < ApplicationController
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.xml
-      format.json {render json: @project}
+      format.json { render json: @project }
     end
   end
 
@@ -160,7 +162,7 @@ class ProjectsController < ApplicationController
   # POST /projects
   # POST /projects.xml
   def create
-      @project = Project.new(project_params)
+    @project = Project.new(project_params)
 
     if @project.present?
       @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
@@ -176,20 +178,19 @@ class ProjectsController < ApplicationController
         end
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
-        #format.json {render json: @project, adapter: :json, status: 200 }
-        format.json {render json: @project}
+        # format.json {render json: @project, adapter: :json, status: 200 }
+        format.json { render json: @project }
       else
         format.html { render action: 'new' }
-        format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+        format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
       end
     end
   end
 
-
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
-      update_params = project_params
+    update_params = project_params
 
     if @project.present? && !@is_json
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
@@ -206,12 +207,12 @@ class ProjectsController < ApplicationController
             flash[:notice] = "#{t('project')} was successfully updated."
             format.html { redirect_to(@project) }
             format.xml  { head :ok }
-            format.json {render json: @project}
-#            format.json {render json: @project, adapter: :json, status: 200 }
+            format.json { render json: @project }
+          #            format.json {render json: @project, adapter: :json, status: 200 }
           else
             format.html { render action: 'edit' }
             format.xml  { render xml: @project.errors, status: :unprocessable_entity }
-            format.json { render json: {error: @project.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+            format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
           end
         end
       end
@@ -268,7 +269,17 @@ class ProjectsController < ApplicationController
   end
 
   def update_members
+    current_members = @project.people.to_a
     add_and_remove_members_and_institutions
+    @project.reload
+    new_members = @project.people.to_a - current_members
+    Rails.logger.debug("New members added to project = #{new_members.collect(&:id).inspect}")
+    if Seek::Config.email_enabled
+      new_members.each do |member|
+        Rails.logger.info("Notifying new member: #{member.title}")
+        Mailer.notify_user_projects_assigned(member, [@project]).deliver_later
+      end
+    end
     flag_memberships
     update_administrative_roles
 
@@ -291,6 +302,19 @@ class ProjectsController < ApplicationController
         render partial: 'projects/storage_usage_content',
                locals: { project: @project, standalone: true }
       end
+    end
+  end
+
+  def request_membership
+    details = params[:details]
+    mail = Mailer.request_membership(current_user, @project, details)
+    mail.deliver_later
+    MessageLog.log_project_membership_request(current_user.person,@project,details)
+
+    flash[:notice]='Membership request has been sent'
+
+    respond_with do |format|
+      format.html{redirect_to(@project)}
     end
   end
 
@@ -391,6 +415,13 @@ class ProjectsController < ApplicationController
     unless @project.can_be_administered_by?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)')
       return false
+    end
+  end
+
+  def allow_request_membership
+    unless Seek::Config.email_enabled && @project.allow_request_membership?
+      error('Cannot reqest membership of this project', 'is invalid (invalid state)')
+      false
     end
   end
 end

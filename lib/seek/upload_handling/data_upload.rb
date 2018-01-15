@@ -9,14 +9,14 @@ module Seek
         allow_empty_content_blob = model_image_present?
 
         unless allow_empty_content_blob || retained_content_blob_ids.present?
-          if !blob_params || blob_params.empty? || blob_params.none? {|p| check_for_data_or_url(p) }
+          if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
 
             flash.now[:error] ||= 'Please select a file to upload or provide a URL to the data.'
             return false
           end
         end
 
-        blob_params.select! { |p| !(p[:data].blank? && p[:data_url].blank? &&p[:base64_data].blank?) }
+        blob_params.reject! { |params| (params[:data].blank? && params[:data_url].blank? && params[:base64_data].blank?) }
 
         blob_params.each do |item_params|
           return false unless allow_empty_content_blob || check_for_data_or_url(item_params)
@@ -64,6 +64,12 @@ module Seek
             end
           end
         end
+
+        # FIXME: temporary fix, until OPSK-1499 is investigated and validations added
+        if asset.respond_to?(:content_blob) && asset.content_blob.nil?
+          raise 'No content-blob defined'
+        end
+
         retain_previous_content_blobs(asset)
       end
 
@@ -159,7 +165,7 @@ module Seek
             format.html do
               render action: :new
             end
-            format.json {render json: '{ "not ok" }' }
+            format.json { render json: '{ "not ok" }' }
           end
         end
       end
@@ -178,7 +184,7 @@ module Seek
 
       def check_for_valid_scheme(blob_params)
         if !blob_params[:data_url].blank? && !valid_scheme?(blob_params[:data_url])
-          flash.now[:error] = "The URL type is invalid, URLs with the scheme: #{INVALID_SCHEMES.map { |s| "#{s}" }.join ', '} are not permitted."
+          flash.now[:error] = "The URL type is invalid, URLs with the scheme: #{INVALID_SCHEMES.map(&:to_s).join ', '} are not permitted."
           false
         else
           true

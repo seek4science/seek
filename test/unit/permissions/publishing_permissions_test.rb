@@ -295,4 +295,15 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       assert_equal Policy::ACCESSIBLE, df.policy.access_type
     end
   end
+
+  test 'publishing should clear sharing scope' do
+    df = Factory(:data_file,policy:Factory(:public_policy,sharing_scope:Policy::ALL_USERS))
+    assert_equal Policy::ALL_USERS,df.policy.sharing_scope
+    User.with_current_user(df.contributor.user) do
+      assert df.can_publish?
+      df.publish!
+      df.reload
+      refute_equal Policy::ALL_USERS,df.policy.sharing_scope
+    end
+  end
 end

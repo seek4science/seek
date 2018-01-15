@@ -8,7 +8,7 @@ class SearchController < ApplicationController
   def index
 
     if Seek::Config.solr_enabled
-      perform_search
+      perform_search (request.format.json?)
     else
       @results = []
     end
@@ -44,12 +44,16 @@ class SearchController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json {render json: @results}
+      format.json {render json: @results,
+                          each_serializer: SkeletonSerializer,
+                          meta: {:base_url =>   Seek::Config.site_base_host,
+                                 :api_version => ActiveModel::Serializer.config.api_version
+                          }}
     end
     
   end
 
-  def perform_search
+  def perform_search (is_json = false)
     @search_query = params[:q] || params[:search_query]
     @search=@search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query||=""
@@ -62,9 +66,14 @@ class SearchController < ApplicationController
 
     @results=[]
 
+    searchable_types = Seek::Util.searchable_types
+
     if (Seek::Config.solr_enabled and !downcase_query.blank?)
       if type == "all"
-          sources = Seek::Util.searchable_types
+          sources = searchable_types
+          if is_json
+            sources -= [Strain, Sample]
+          end
           sources.each do |source|
             search = source.search do |query|
               query.keywords(downcase_query)
@@ -72,18 +81,17 @@ class SearchController < ApplicationController
             end #.results
             @search_hits = search.hits
             search_result = search.results
-            search_result = search_result.sort_by(&:published_date).reverse if source == Publication && Seek::Config.is_virtualliver
             @results |= search_result
           end
       else
-           object = type.singularize.camelize.constantize
-           search = object.search do |query|
+           search_type = type.singularize.camelize.constantize
+           raise "#{type} is not a valid search type" unless searchable_types.include?(search_type)
+           search = search_type.search do |query|
              query.keywords(downcase_query)
-             query.paginate(:page => 1, :per_page => object.count ) if object.count > 30 # By default, Sunspot requests the first 30 results from Solr
+             query.paginate(:page => 1, :per_page => search_type.count ) if search_type.count > 30 # By default, Sunspot requests the first 30 results from Solr
            end #.results
            @search_hits = search.hits
            search_result = search.results
-           search_result = search_result.sort_by(&:published_date).reverse if object == Publication
            @results = search_result
       end
 

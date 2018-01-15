@@ -17,10 +17,6 @@ class StudiesControllerTest < ActionController::TestCase
     @object = Factory :study, policy: Factory(:public_policy)
   end
 
-  def min_test_object
-    @min_object = Factory(:min_study)
-  end
-
   test 'should get index' do
     Factory :study, policy: Factory(:public_policy)
     get :index
@@ -548,5 +544,28 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', study_path(study), text: study.title
       assert_select 'a[href=?]', study_path(study2), text: study2.title, count: 0
     end
+  end
+
+  def edit_max_object(study)
+    add_tags_to_test_object(study)
+    study.person_responsible = Factory(:max_person)
+    add_creator_to_test_object(study)
+  end
+
+  test 'can delete a study with subscriptions' do
+    study = Factory(:study, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    p = Factory(:person)
+    Factory(:subscription, person: study.contributor, subscribable: study)
+    Factory(:subscription, person: p, subscribable: study)
+
+    login_as(study.contributor)
+
+    assert_difference('Subscription.count', -2) do
+      assert_difference('Study.count', -1) do
+        delete :destroy, id: study.id
+      end
+    end
+
+    assert_redirected_to studies_path
   end
 end

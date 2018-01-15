@@ -246,71 +246,79 @@ class AssetTest < ActiveSupport::TestCase
     assert Sop.supports_doi?
     assert Workflow.supports_doi?
 
-    refute Assay.supports_doi?
+    assert Investigation.supports_doi?
+    assert Study.supports_doi?
+    assert Assay.supports_doi?
+
     refute Presentation.supports_doi?
+    refute Publication.supports_doi?
 
     assert Factory(:model).supports_doi?
     assert Factory(:data_file).supports_doi?
     refute Factory(:presentation).supports_doi?
+    refute Factory(:publication).supports_doi?
   end
 
-  test 'is_doiable?' do
+  test 'can_mint_doi?' do
     df = Factory(:data_file, policy: Factory(:public_policy))
     assert df.can_manage?
-    assert !df.is_doi_minted?(1)
-    assert df.is_doiable?(1)
+    assert !df.find_version(1).has_doi?
+    assert df.find_version(1).can_mint_doi?
 
-    df.policy = Factory(:private_policy)
-    disable_authorization_checks { df.save }
-    assert !df.is_doiable?(1)
+    with_config_value(:doi_minting_enabled, false) do
+      assert !df.find_version(1).can_mint_doi?
+    end
 
     df.policy = Factory(:public_policy)
     df.doi = 'test_doi'
     disable_authorization_checks { df.save }
-    assert !df.is_doiable?(1)
+    assert !df.find_version(1).can_mint_doi?
   end
 
-  test 'is_doi_minted?' do
+  test 'has_doi?' do
     df = Factory :data_file
-    assert !df.is_doi_minted?(1)
+    assert !df.find_version(1).has_doi?
+    assert !df.has_doi?
     df.doi = 'test_doi'
     disable_authorization_checks { df.save }
-    assert df.is_doi_minted?(1)
+    assert df.find_version(1).has_doi?
+    assert df.has_doi?
   end
 
   test 'is_doi_time_locked?' do
-    df = Factory :data_file
+    df = Factory(:data_file)
+    dfv = df.latest_version
     with_config_value :time_lock_doi_for, 7 do
-      assert df.is_doi_time_locked?
+      assert dfv.doi_time_locked?
     end
     with_config_value :time_lock_doi_for, nil do
-      refute df.is_doi_time_locked?
+      refute dfv.doi_time_locked?
     end
 
-    df.created_at = 8.days.ago
-    disable_authorization_checks { df.save }
+    dfv.created_at = 8.days.ago
+    disable_authorization_checks { dfv.save }
     with_config_value :time_lock_doi_for, 7 do
-      refute df.is_doi_time_locked?
+      refute dfv.doi_time_locked?
     end
 
     with_config_value :time_lock_doi_for, '7' do
-      refute df.is_doi_time_locked?
+      refute dfv.doi_time_locked?
     end
 
     with_config_value :time_lock_doi_for, nil do
-      refute df.is_doi_time_locked?
+      refute dfv.doi_time_locked?
     end
   end
 
-  test 'is_any_doi_minted?' do
+  test 'has_doi??' do
     df = Factory :data_file
     new_version = Factory :data_file_version, data_file: df
     assert_equal 2, df.version
-    assert !df.is_any_doi_minted?
+    assert !df.has_doi?
 
     new_version.doi = 'test_doi'
     disable_authorization_checks { new_version.save }
-    assert df.reload.is_any_doi_minted?
+    assert df.reload.has_doi?
   end
 
   test 'should not be able to delete after doi' do
@@ -332,10 +340,39 @@ class AssetTest < ActiveSupport::TestCase
     model = Factory :model
     with_config_value :doi_prefix, 'xxx' do
       with_config_value :doi_suffix, 'yyy' do
-        assert_equal "xxx/yyy.datafile.#{df.id}", df.generated_doi
-        assert_equal "xxx/yyy.datafile.#{df.id}.1", df.generated_doi(1)
-        assert_equal "xxx/yyy.model.#{model.id}.1", model.generated_doi(1)
+        assert_equal "xxx/yyy.datafile.#{df.id}.1", df.find_version(1).suggested_doi
+        assert_equal "xxx/yyy.model.#{model.id}.1", model.find_version(1).suggested_doi
       end
     end
+  end
+
+  test 'doi indentifier' do
+    df = Factory :data_file
+    assert_nil df.latest_version.doi_identifier
+    disable_authorization_checks do
+      df.latest_version.update_attribute(:doi,'10.x.x.x/1')
+    end
+    assert_equal 'https://doi.org/10.x.x.x/1',df.latest_version.doi_identifier
+  end
+
+  test 'doi identifiers' do
+    df = Factory :data_file
+    assert_empty df.doi_identifiers
+
+    disable_authorization_checks do
+      df.latest_version.update_attribute(:doi,'10.x.x.x/1')
+      df.save_as_new_version
+      df.save_as_new_version
+      df.reload
+      df.latest_version.update_attribute(:doi,'10.x.x.x/2')
+    end
+
+    assert_equal 3,df.versions.count
+
+    assert_equal ['https://doi.org/10.x.x.x/1','https://doi.org/10.x.x.x/2'].sort,df.doi_identifiers
+
+    #just check others respond to method
+    assert Factory(:model).respond_to?(:doi_identifiers)
+    assert Factory(:sop).respond_to?(:doi_identifiers)
   end
 end

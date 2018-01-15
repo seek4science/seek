@@ -28,7 +28,7 @@ class DataFilesController < ApplicationController
 
   include Seek::BreadCrumbs
 
-  include Seek::DataciteDoi
+  include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
 
@@ -66,6 +66,7 @@ class DataFilesController < ApplicationController
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
           create_content_blobs
+
           # Duplicate studied factors
           factors = @data_file.find_version(@data_file.version - 1).studied_factors
           factors.each do |f|

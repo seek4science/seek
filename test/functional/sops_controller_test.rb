@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class SopsControllerTest < ActionController::TestCase
   fixtures :all
@@ -15,10 +16,6 @@ class SopsControllerTest < ActionController::TestCase
 
   def rest_api_test_object
     @object = sops(:downloadable_sop)
-  end
-
-  def min_test_object
-    @min_object = Factory(:min_sop)
   end
 
   def test_get_xml_specific_version
@@ -642,20 +639,22 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should be able to view ms/open office word content' do
-    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
-    content_blob = ms_word_sop.content_blob
-    pdf_filepath = content_blob.filepath('pdf')
-    FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
-    assert content_blob.is_content_viewable?
-    get :show, id: ms_word_sop.id
-    assert_response :success
-    assert_select 'a', text: /View content/, count: 1
+    Seek::Config.stub(:soffice_available?, true) do
+      ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
+      content_blob = ms_word_sop.content_blob
+      pdf_filepath = content_blob.filepath('pdf')
+      FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
+      assert content_blob.is_content_viewable?
+      get :show, id: ms_word_sop.id
+      assert_response :success
+      assert_select 'a', text: /View content/, count: 1
 
-    openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
-    assert openoffice_word_sop.content_blob.is_content_viewable?
-    get :show, id: openoffice_word_sop.id
-    assert_response :success
-    assert_select 'a', text: /View content/, count: 1
+      openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
+      assert openoffice_word_sop.content_blob.is_content_viewable?
+      get :show, id: openoffice_word_sop.id
+      assert_response :success
+      assert_select 'a', text: /View content/, count: 1
+    end
   end
 
   test 'should disappear view content button for the document needing pdf conversion, when pdf_conversion_enabled is false' do
@@ -736,7 +735,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     assert sop.can_publish?
     assert_emails 1 do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
   end
 
@@ -749,7 +748,7 @@ class SopsControllerTest < ActionController::TestCase
     assert !sop.is_published?
     assert sop.can_publish?
     assert_emails 0 do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
   end
 
@@ -762,12 +761,60 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_publish?
     # send the first time
     assert_emails 1 do
-      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
     # dont send again
     assert_emails 0 do
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    end
+  end
+
+  test 'dont send publish approval request if item was already public' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:public_policy))
+    login_as(sop.contributor)
+
+    assert sop.can_view?(nil)
+
+    assert_emails 0 do
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    end
+
+    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+  end
+
+  test 'dont send publish approval request if item is only being made visible' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:private_policy))
+    login_as(sop.contributor)
+
+    refute sop.can_view?(nil)
+
+    assert_emails 0 do
       put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
+
+    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+  end
+
+  test 'send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    sop = Factory(:sop, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    login_as(sop.contributor)
+
+    refute sop.is_published?
+    assert sop.can_view?(nil)
+    refute sop.can_download?(nil)
+
+    assert_emails 1 do
+      put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    end
+
+    refute sop.is_published?
+    assert sop.can_view?(nil)
+    refute sop.can_download?(nil)
+
+    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), sop
   end
 
   test 'should not loose permissions when managing a sop' do
@@ -899,7 +946,80 @@ class SopsControllerTest < ActionController::TestCase
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "never"/, count: 1
   end
 
+  test 'can get citation for sop with DOI' do
+    doi_citation_mock
+    sop = Factory(:sop, policy: Factory(:public_policy))
+
+    login_as(sop.contributor)
+
+    get :show, id: sop
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+
+    sop.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
+
+    get :show, id: sop
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+  end
+
+  def edit_max_object(sop)
+    add_tags_to_test_object(sop)
+    add_creator_to_test_object(sop)
+  end
+
+  test 'shows how to get doi for private sop' do
+    sop = Factory(:sop, policy: Factory(:private_policy))
+
+    login_as(sop.contributor)
+
+    get :show, id: sop
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 0
+    assert_select '#citation-instructions a[href=?]', check_related_items_sop_path(sop)
+  end
+
+  test 'shows how to get doi for time-locked sop' do
+    sop = Factory(:sop, policy: Factory(:private_policy))
+
+    login_as(sop.contributor)
+
+    with_config_value(:time_lock_doi_for, 10) do
+      get :show, id: sop
+
+      assert_response :success
+      assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 0
+      assert_select '#citation-instructions', text: /SOPs must be older than 10 days/
+    end
+  end
+
+  test 'shows how to get doi for eligible sop' do
+    sop = Factory(:sop, policy: Factory(:public_policy))
+
+    login_as(sop.contributor)
+
+    get :show, id: sop
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 1
+  end
+
   private
+
+  def doi_citation_mock
+    stub_request(:get, /https:\/\/dx\.doi\.org\/.+/)
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, 'https://dx.doi.org/10.5072/test')
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, 'https://dx.doi.org/10.5072/broken')
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/broken_doi_metadata_response.html"), status: 200)
+  end
 
   def file_for_upload(options = {})
     default = { filename: 'file_picture.png', content_type: 'image/png', tempfile_fixture: 'files/file_picture.png' }

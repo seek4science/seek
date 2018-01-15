@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class ModelsControllerTest < ActionController::TestCase
   fixtures :all
@@ -15,10 +16,6 @@ class ModelsControllerTest < ActionController::TestCase
 
   def rest_api_test_object
     @object = Factory :model_2_files, contributor: User.current_user, policy: Factory(:private_policy), organism: Factory(:organism)
-  end
-
-  def min_test_object
-    @min_object = Factory(:min_model)
   end
 
   test 'should get index' do
@@ -981,21 +978,23 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should have -View content- button on the model containing one inline viewable file' do
-    one_file_model = Factory(:doc_model, policy: Factory(:all_sysmo_downloadable_policy))
-    assert_equal 1, one_file_model.content_blobs.count
-    assert one_file_model.content_blobs.first.is_content_viewable?
-    get :show, id: one_file_model.id
-    assert_response :success
-    assert_select '#buttons a', text: /View content/, count: 1
+    Seek::Config.stub(:soffice_available?, true) do
+      one_file_model = Factory(:doc_model, policy: Factory(:all_sysmo_downloadable_policy))
+      assert_equal 1, one_file_model.content_blobs.count
+      assert one_file_model.content_blobs.first.is_content_viewable?
+      get :show, id: one_file_model.id
+      assert_response :success
+      assert_select '#buttons a', text: /View content/, count: 1
 
-    multiple_files_model = Factory(:model,
-                                   content_blobs: [Factory(:doc_content_blob), Factory(:content_blob)],
-                                   policy: Factory(:all_sysmo_downloadable_policy))
-    assert_equal 2, multiple_files_model.content_blobs.count
-    assert multiple_files_model.content_blobs.first.is_content_viewable?
-    get :show, id: multiple_files_model.id
-    assert_response :success
-    assert_select '#buttons a', text: /View content/, count: 0
+      multiple_files_model = Factory(:model,
+                                     content_blobs: [Factory(:doc_content_blob), Factory(:content_blob)],
+                                     policy: Factory(:all_sysmo_downloadable_policy))
+      assert_equal 2, multiple_files_model.content_blobs.count
+      assert multiple_files_model.content_blobs.first.is_content_viewable?
+      get :show, id: multiple_files_model.id
+      assert_response :success
+      assert_select '#buttons a', text: /View content/, count: 0
+    end
   end
 
   test 'compare versions' do
@@ -1140,6 +1139,25 @@ class ModelsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can get citation for model with DOI' do
+    doi_citation_mock
+    model = Factory(:model, policy: Factory(:public_policy))
+
+    login_as(model.contributor)
+
+    get :show, id: model
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+
+    model.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
+
+    get :show, id: model
+    assert_response :success
+    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+  end
+
+  private
+
   def valid_model
     { title: 'Test', project_ids: [projects(:sysmo_project).id] }
   end
@@ -1148,4 +1166,26 @@ class ModelsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png'
     [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data_url: 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png', original_filename: 'sysmo-db-logo-grad2.png', make_local_copy: '0' }]
   end
+
+  def edit_max_object(model)
+    add_tags_to_test_object(model)
+    model[:model_type_id] = (model_types(:ODE)).id
+    model[:recommended_environment_id] = recommended_model_environments(:jws).id
+    add_creator_to_test_object(model)
+  end
+
+  def doi_citation_mock
+    stub_request(:get, /https:\/\/dx\.doi\.org\/.+/)
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, 'https://dx.doi.org/10.5072/test')
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
+
+    stub_request(:get, 'https://dx.doi.org/10.5072/broken')
+        .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
+        .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/broken_doi_metadata_response.html"), status: 200)
+  end
+
 end

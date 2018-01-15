@@ -1,0 +1,112 @@
+{
+  "data": {
+    "id": "927855014",
+    "type": "programmes",
+    "attributes": {
+      "avatar": null,
+      "title": "A Maximal Programme",
+      "description": "A very exciting programme",
+      "web_page": "http://www.synbiochem.co.uk",
+      "funding_details": "Someone is funding this for me",
+      "funding_codes": ["DFG"]
+    },
+    "relationships": {
+      "people": {
+        "data": [
+          {"id": "1039986529", "type": "people"},
+          {"id": "1039986529", "type": "people"},
+          {"id": "1039986529", "type": "people"},
+          {"id": "1039986529", "type": "people"},
+          {"id": "1039986529", "type": "people"}
+        ]
+      },
+      "projects": {
+        "data": [
+          {"id": "1022250691", "type": "projects"}
+        ]
+      },
+      "institutions": {
+        "data": [
+          {"id": "980191045", "type": "institutions"},
+          {"id": "980191045", "type": "institutions"},
+          {"id": "980191045", "type": "institutions"},
+          {"id": "980191045", "type": "institutions"},
+          {"id": "980191045", "type": "institutions"}
+        ]
+      },
+      "investigations": {
+        "data": [{
+          "id": "980191497",
+          "type": "investigations"
+        }]
+      },
+      "studies": {
+        "data": [{
+          "id": "980191497",
+          "type": "studies"
+        }]
+      },
+      "assays": {
+        "data": [{
+          "id": "980191497",
+          "type": "assays"
+        }]
+      },
+      "data_files": {
+        "data": [{
+          "id": "980191497",
+          "type": "data_files"
+        }]
+      },
+      "models": {
+        "data": [{
+          "id": "980191497",
+          "type": "models"
+        }]
+      },
+      "sops": {
+        "data": [{
+          "id": "980191497",
+          "type": "sops"
+        }]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "events"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/programmes/927855014"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

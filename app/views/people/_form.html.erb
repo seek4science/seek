@@ -17,7 +17,7 @@
         <%= render :partial => "select_expertise", :locals => {:person => (person ? person : Person.new) } -%>
         <%= render :partial => "select_tools", :locals => {:person => (person ? person : Person.new) } -%>
     <% end %>
-    <%= render :partial=>"project_positions",:locals=>{:editable=>true} -%>
+    <%= render :partial=> "edit_project_positions" -%>
 <% end %>
 
 <% if person && person.notifiee_info -%>
