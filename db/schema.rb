@@ -255,14 +255,14 @@ ActiveRecord::Schema.define(version: 20171128133429) do
 
   create_table "content_blobs", force: :cascade do |t|
     t.string  "md5sum",            limit: 255
-    t.string  "url",               limit: 255
+    t.text    "url",               limit: 65535
     t.string  "uuid",              limit: 255
     t.string  "original_filename", limit: 255
     t.string  "content_type",      limit: 255
     t.integer "asset_id",          limit: 4
     t.string  "asset_type",        limit: 255
     t.integer "asset_version",     limit: 4
-    t.boolean "is_webpage",                    default: false
+    t.boolean "is_webpage",                      default: false
     t.boolean "external_link"
     t.string  "sha1sum",           limit: 255
     t.integer "file_size",         limit: 8
@@ -959,8 +959,8 @@ ActiveRecord::Schema.define(version: 20171128133429) do
     t.string   "space_perm_id",         limit: 255
     t.string   "username",              limit: 255
     t.integer  "project_id",            limit: 4
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "dss_endpoint",          limit: 255
     t.string   "web_endpoint",          limit: 255
     t.integer  "refresh_period_mins",   limit: 4,   default: 120
