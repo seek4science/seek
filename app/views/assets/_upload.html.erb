@@ -1,16 +1,18 @@
 <%
-upload_field = asset_field_prefix
-obj=eval("@"+upload_field)
-asset_name = text_for_resource upload_field
+asset_name = text_for_resource(asset_field_prefix)
 new_version ||= false
-original_filename=nil
 batch ||= false
 with_image_file ||= false
 
-if params[upload_field.to_sym]
-  url_from_params=params[upload_field.to_sym][:data_url] if params[upload_field.to_sym][:data_url]
-  original_filename_from_params = params[upload_field.to_sym][:original_filename] if params[upload_field.to_sym][:original_filename]
+url_from_params = nil
+original_filename_from_params = nil
+
+if params[:content_blobs] && params[:content_blobs].any?
+  blob = params[:content_blobs].first
+  url_from_params = blob[:data_url] if blob[:data_url].present?
+  original_filename_from_params = blob[:original_filename] if blob[:original_filename].present?
 end
+
 %>
 
 <%# MERGENOTE - need to pluralize text for batch upload %>
@@ -25,7 +27,7 @@ end
           You should only upload a new version if you have made minor modifications,
           such as tidying up or fixing errors, that do not change the original purpose of the file.
           If you think this new version changes the original purpose or meaning of the <%= asset_name -%>,
-          then you should <%= link_to "upload it as a new item",polymorphic_path(obj,:action=>:new) -%>
+          then you should <%= link_to "upload it as a new item",polymorphic_path(resource,:action=>:new) -%>
           rather than create a new version.
         </p>
     <% end -%>
@@ -34,35 +36,40 @@ end
 <div id="upload_type_selection" role="tabpanel">
 
   <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" class="active">
+    <li role="presentation" <%= 'class="active"'.html_safe unless url_from_params -%>>
       <a href="#local-file" aria-controls="local-file" role="tab" data-toggle="tab">Local file</a>
     </li>
-    <li role="presentation">
+    <li role="presentation" <%= 'class="active"'.html_safe if url_from_params -%>>
       <a href="#remote-url" aria-controls="remote-url" role="tab" data-toggle="tab">Remote URL</a>
     </li>
   </ul>
   <div class="tab-content">
 
-    <div role="tabpanel" class="tab-pane active" id="local-file">
+    <div role="tabpanel" class="tab-pane <%= 'active'.html_safe unless url_from_params -%>" id="local-file">
       <div class="form-group">
         <label>File to upload<span class="required">*</span></label>
         <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => batch } -%>
       </div>
     </div>
 
-    <div role="tabpanel" class="tab-pane" id="remote-url">
+    <div role="tabpanel" class="tab-pane <%= 'active'.html_safe if url_from_params -%>" id="remote-url">
       <div class="form-group">
         <label>URL<span class="required">*</span></label>
 
         <div class="row">
           <div class="col-sm-8">
-
-            <div class="input-group">
-              <%= text_field_tag "content_blobs[][data_url]", "", :id => "data_url_field", :class => 'form-control' -%>
-              <span class="input-group-btn">
-                <%= button_link_to 'Test', 'test', "#", :id => "examine_url" %>
-              </span>
-            </div>
+            <% if url_from_params && url_from_params.start_with?(Nels::Blob::NELS_BASE) %>
+                <div class="form-group">
+                  <%= text_field_tag 'content_blobs[][data_url]', url_from_params, id: 'data_url_field', class: 'form-control', readonly: :readonly -%>
+                </div>
+            <% else %>
+                <div class="input-group">
+                  <%= text_field_tag 'content_blobs[][data_url]', url_from_params, id: 'data_url_field', class: 'form-control' -%>
+                  <span class="input-group-btn">
+                    <%= button_link_to 'Test', 'test', '#', id: 'examine_url' %>
+                  </span>
+                </div>
+            <% end %>
           </div>
         </div>
       </div>
@@ -75,7 +82,7 @@ end
         </label>
       </div>
 
-      <%= hidden_field_tag "content_blobs[][original_filename]", original_filename, :id => :original_filename %>
+      <%= hidden_field_tag "content_blobs[][original_filename]", original_filename_from_params, :id => :original_filename %>
       <%= hidden_field_tag "url_checked", false %>
 
       <% if batch %>
@@ -91,13 +98,13 @@ end
 <% if with_image_file -%>
     <hr/>
     <div id="image_file_box">
-      <% resource_name = obj.class.name.underscore %>
-      <%= hidden_field_tag("#{resource_name}_id", obj.id) -%>
+      <% resource_name = resource.class.name.underscore %>
+      <%= hidden_field_tag("#{resource_name}_id", resource.id) -%>
       <div class="form-group">
         <label>Image file</label>
         <%= file_field "#{resource_name}_image", :image_file, :onchange => "detectFileFormat('#{resource_name}_image_image_file')" %>
       </div>
-      <% if new_version && previous_version_image_file = obj.latest_version.model_image.try(:original_filename) -%>
+      <% if new_version && previous_version_image_file = resource.latest_version.model_image.try(:original_filename) -%>
           <p>
             The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %></span>
             will be used if you dont specify the image file
@@ -107,18 +114,13 @@ end
     </div>
 <% end -%>
 
-
 <script type="text/javascript">
   setup_url_field("<%= examine_url_content_blobs_path %>","examine_url");
 
-  <%# FIXME: I don't know what this code does and whether or not I broke it %>
-  <% if false && url_from_params && original_filename_from_params %>
-    createElementsForNewItem('<%= url_from_params %>','<%= original_filename_from_params %>',"1");
-  <% end %>
-
   <% if batch %>
-      <% obj.content_blobs.each do |blob| %>
+      <% resource.content_blobs.each do |blob| %>
           addExistingFile('<%= blob.url.blank? ? blob.original_filename : blob.url %> (original)', <%= blob.id %>);
       <% end %>
   <% end %>
 </script>
+

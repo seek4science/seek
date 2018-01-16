@@ -329,40 +329,38 @@ module Seek
 
     # unlike default, always sets the value
     def fixed(setting, value)
-      setter = "#{setting}="
-      set_value setter, value
+      set_value(setting, value)
     end
 
     def define_class_method(method, *args, &block)
       singleton_class.instance_eval { define_method method.to_sym, *args, &block }
     end
 
-    def get_default_value(getter, conversion = nil)
-      val = Settings.defaults[getter.to_sym]
+    def get_default_value(setting, conversion = nil)
+      val = Settings.defaults[setting.to_sym]
       val = val.send(conversion) if conversion && val
       val
     end
 
     if Settings.table_exists?
-      def get_value(getter, conversion = nil)
-        val = Settings.send getter
+      def get_value(setting, conversion = nil)
+        val = Settings.global[setting]
         val = val.send(conversion) if conversion && val
         val
       end
 
-      def set_value(setter, val, conversion = nil)
+      def set_value(setting, val, conversion = nil)
         val = val.send(conversion) if conversion && val
-        Settings.send setter, val
+        Settings.global[setting] = val
       end
-
     else
-      def get_value(getter, conversion = nil)
-        get_default_value(getter, conversion)
+      def get_value(setting, conversion = nil)
+        get_default_value(setting, conversion)
       end
 
-      def set_value(setter, val, conversion = nil)
+      def set_value(setting, val, conversion = nil)
         val = val.send(conversion) if conversion && val
-        Settings.defaults[setter.to_sym] = val
+        Settings.defaults[setting.to_sym] = val
       end
     end
 
@@ -381,20 +379,20 @@ module Seek
       default = "default_#{setting}"
       if respond_to?(fallback)
         define_class_method getter do
-          get_value(getter, options[:convert]) || send(fallback)
+          get_value(setting, options[:convert]) || send(fallback)
         end
       else
         define_class_method getter do
-          get_value(getter, options[:convert])
+          get_value(setting, options[:convert])
         end
       end
 
       define_class_method default do
-        get_default_value(getter, options[:convert])
+        get_default_value(setting, options[:convert])
       end
 
       define_class_method setter do |val|
-        set_value(setter, val, options[:convert])
+        set_value(setting, val, options[:convert])
         send propagate if respond_to?(propagate)
       end
     end

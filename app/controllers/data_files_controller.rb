@@ -17,7 +17,11 @@ class DataFilesController < ApplicationController
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_filter :get_sample_type, only: :extract_samples
   before_filter :check_already_extracted, only: :extract_samples
-  before_filter :forbid_new_version_if_samples, :only => :new_version	
+  before_filter :forbid_new_version_if_samples, :only => :new_version
+
+  before_filter :oauth_client, only: :retrieve_nels_sample_metadata
+  before_filter :nels_oauth_session, only: :retrieve_nels_sample_metadata
+  before_filter :rest_client, only: :retrieve_nels_sample_metadata
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -324,6 +328,7 @@ class DataFilesController < ApplicationController
       extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
       @samples = extractor.persist.select(&:persisted?)
       extractor.clear
+      @data_file.copy_assay_associations(@samples, params[:assay_ids]) if params[:assay_ids]
       flash[:notice] = "#{@samples.count} samples extracted successfully"
     else
       SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
@@ -359,6 +364,42 @@ class DataFilesController < ApplicationController
 
     respond_to do |format|
       format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
+    end
+  end
+
+  def retrieve_nels_sample_metadata
+    begin
+      if @data_file.content_blob.retrieve_from_nels(@oauth_session.access_token)
+        @sample_type = @data_file.reload.possible_sample_types.last
+
+        if @sample_type
+          SampleDataExtractionJob.new(@data_file, @sample_type, false, overwrite: true).queue_job
+
+          respond_to do |format|
+            format.html { redirect_to @data_file }
+          end
+        else
+          flash[:notice] = 'Successfully downloaded sample metadata from NeLS, but could not find a matching sample type.'
+
+          respond_to do |format|
+            format.html { redirect_to @data_file }
+          end
+        end
+      else
+        flash[:error] = 'Could not download sample metadata from NeLS.'
+
+        respond_to do |format|
+          format.html { redirect_to @data_file }
+        end
+      end
+    rescue RestClient::Unauthorized
+      redirect_to @oauth_client.authorize_url
+    rescue RestClient::ResourceNotFound
+      flash[:error] = 'No sample metadata available.'
+
+      respond_to do |format|
+        format.html { redirect_to @data_file }
+      end
     end
   end
 
@@ -417,4 +458,20 @@ class DataFilesController < ApplicationController
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
   end
 
+  def oauth_client
+    @oauth_client = Nels::Oauth2::Client.new(Seek::Config.nels_client_id,
+                                             Seek::Config.nels_client_secret,
+                                             nels_oauth_callback_url,
+                                             "data_file_id:#{params[:id]}")
+  end
+
+  def nels_oauth_session
+    @oauth_session = current_user.oauth_sessions.where(provider: 'NeLS').first
+    redirect_to @oauth_client.authorize_url if !@oauth_session || @oauth_session.expired?
+  end
+
+  def rest_client
+    client_class = Nels::Rest::Client
+    @rest_client = client_class.new(@oauth_session.access_token)
+  end
 end

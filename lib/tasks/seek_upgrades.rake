@@ -14,6 +14,7 @@ namespace :seek do
     environment
     rebuild_sample_templates
     delete_redundant_subscriptions
+    update_sample_resource_links
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -75,5 +76,13 @@ namespace :seek do
         disable_authorization_checks { subs.each(&:destroy) }
       end
     end
+  end
+
+  task(update_sample_resource_links: :environment) do
+    pre_count = SampleResourceLink.count
+    Sample.all.each do |sample|
+      sample.send(:update_sample_resource_links)
+    end
+    puts "Created #{SampleResourceLink.count - pre_count} SampleResourceLinks"
   end
 end
