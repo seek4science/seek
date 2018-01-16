@@ -11,6 +11,7 @@ class ContentBlob < ActiveRecord::Base
   include Seek::UrlValidation
   include Seek::Data::Checksums
   prepend Seek::Openbis::Blob
+  prepend Nels::Blob
 
   belongs_to :asset, polymorphic: true
 
@@ -36,6 +37,7 @@ class ContentBlob < ActiveRecord::Base
   before_save :check_version
   before_save :calculate_file_size
   after_create :create_retrieval_job
+  before_save :clear_sample_type_matches
 
   has_many :worksheets, inverse_of: :content_blob, dependent: :destroy
 
@@ -207,7 +209,7 @@ class ContentBlob < ActiveRecord::Base
 
   # whether this content blob represents a custom integration, such as integrated with openBIS
   def custom_integration?
-    openbis?
+    openbis? || nels?
   end
 
   def is_downloadable?
@@ -280,5 +282,9 @@ class ContentBlob < ActiveRecord::Base
     when 'http', 'https'
       Seek::DownloadHandling::HTTPHandler.new(url)
       end
+  end
+
+  def clear_sample_type_matches
+    Rails.cache.delete_matched("st-match-#{self.id}*") if self.changed?
   end
 end

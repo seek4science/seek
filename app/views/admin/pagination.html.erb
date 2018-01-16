@@ -23,7 +23,7 @@
         </div>
     <% end %>
 
-    <%= admin_text_setting(:limit_latest, Settings.limit_latest,
+    <%= admin_text_setting(:limit_latest, Seek::Config.limit_latest,
                            'Latest list length', "This is the maximum number of items that are listed when viewing 'latest'.",
                            :onkeypress => "javascript: return onlyNumbers(event);") %>
 

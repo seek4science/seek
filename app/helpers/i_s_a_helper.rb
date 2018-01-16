@@ -39,7 +39,7 @@ module ISAHelper
     elements = []
     hash[:nodes].each do |node|
       item = node.object
-      item_type = item.class.name
+      item_type = item.is_a?(Seek::ObjectAggregation) ? "#{item.type} collection" : item.class.name
       data = { id: node_id(item) }
 
       if node.can_view?
@@ -57,7 +57,7 @@ module ISAHelper
         data['fullName'] = h(item.title)
         avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
         data['imageUrl'] = asset_path(avatar)
-        data['url'] = polymorphic_path(item)
+        data['url'] = item.is_a?(Seek::ObjectAggregation) ? polymorphic_path([item.object, item.type]) : polymorphic_path(item)
 
         if item.is_a?(Assay) # distinquish two assay classes
           assay_class_title = item.assay_class.title
@@ -237,7 +237,7 @@ module ISAHelper
   private
 
   def node_id(object)
-    "#{object.class.name}-#{object.id}"
+    "#{object.class.name.gsub('::', '_')}-#{object.id}"
   end
 
   def unique_node_id(object)

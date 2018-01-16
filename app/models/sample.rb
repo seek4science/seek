@@ -19,9 +19,15 @@ class Sample < ActiveRecord::Base
 
   belongs_to :sample_type, inverse_of: :samples
   belongs_to :originating_data_file, class_name: 'DataFile'
-  has_many :sample_resource_links, dependent: :destroy
+
+  has_many :sample_resource_links, inverse_of: :sample, dependent: :destroy
+  has_many :reverse_sample_resource_links, inverse_of: :resource, class_name: 'SampleResourceLink', as: :resource, dependent: :destroy
+
   has_many :strains, through: :sample_resource_links, source: :resource, source_type: 'Strain'
   has_many :organisms, through: :strains
+
+  has_many :linked_samples, through: :sample_resource_links, source: :resource, source_type: 'Sample'
+  has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
   scope :default_order, -> { order('title') }
 
@@ -32,7 +38,7 @@ class Sample < ActiveRecord::Base
   before_validation :update_json_metadata
   before_validation :set_title_to_title_attribute_value
 
-  before_save :update_sample_strain_links
+  before_save :update_sample_resource_links
   after_save :queue_sample_type_update_job
   after_destroy :queue_sample_type_update_job
 
@@ -60,7 +66,7 @@ class Sample < ActiveRecord::Base
   end
 
   def related_samples
-    samples_this_links_to
+    linked_samples + linking_samples
   end
 
   # Mass assignment of attributes
@@ -72,11 +78,20 @@ class Sample < ActiveRecord::Base
     @data ||= Seek::Samples::SampleData.new(sample_type, json_metadata)
   end
 
-  def referenced_strains
-    sample_type.sample_attributes.select { |sa| sa.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_STRAIN }.map do |sa|
+  def referenced_resources
+    sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
       value = get_attribute(sa.hash_key)
-      Strain.find_by_id(value['id']) if value
+      type = sa.sample_attribute_type.base_type_handler.type
+      type.constantize.find_by_id(value['id']) if value && type
     end.compact
+  end
+
+  def referenced_strains
+    referenced_resources.select { |r| r.is_a?(Strain) }
+  end
+
+  def referenced_samples
+    referenced_resources.select { |r| r.is_a?(Sample) }
   end
 
   def get_attribute(attr)
@@ -88,7 +103,7 @@ class Sample < ActiveRecord::Base
   end
 
   def blank_attribute?(attr)
-    data[attr].blank? || (data[attr].respond_to?(:values) && data[attr].values.all?(&:blank?))
+    data[attr].blank? || (data[attr].is_a?(Hash) && data[attr]['id'].blank? && data[attr]['title'].blank?)
   end
 
   def state_allows_edit?(*args)
@@ -111,6 +126,20 @@ class Sample < ActiveRecord::Base
     extracted? ? originating_data_file.creators : super
   end
 
+  def title_from_data
+    attr = title_attribute
+    if attr
+      value = get_attribute(title_attribute.hash_key)
+      if attr.seek_resource?
+        value[:title] || value[:id]
+      else
+        value.to_s
+      end
+    else
+      nil
+    end
+  end
+
   # although it includes the RdfGeneration for some rdf support, it can't be considered to fully support it yet.
   def rdf_supported?
     false
@@ -121,7 +150,10 @@ class Sample < ActiveRecord::Base
   def samples_this_links_to
     return [] unless sample_type
     seek_sample_attributes = sample_type.sample_attributes.select { |attr| attr.sample_attribute_type.seek_sample? }
-    seek_sample_attributes.map { |attr| Sample.find_by_id(get_attribute(attr.hash_key)) }.compact
+    seek_sample_attributes.map do |attr|
+      value = get_attribute(attr.hash_key)
+      Sample.find_by_id(value['id']) if value
+    end.compact
   end
 
   def attribute_values_for_search
@@ -140,18 +172,7 @@ class Sample < ActiveRecord::Base
   end
 
   def set_title_to_title_attribute_value
-    attr = title_attribute
-    if attr
-      value = get_attribute(title_attribute.hash_key)
-      if attr.seek_strain?
-        value = value[:title]
-      elsif attr.seek_sample?
-        value = Sample.find_by_id(value).try(:title)
-      else
-        value = value.to_s
-      end
-      self.title = value
-    end
+    self.title = title_from_data
   end
 
   # the designated title attribute
@@ -190,7 +211,8 @@ class Sample < ActiveRecord::Base
     SampleTypeUpdateJob.new(sample_type, false).queue_job
   end
 
-  def update_sample_strain_links
+  def update_sample_resource_links
     self.strains = referenced_strains
+    self.linked_samples = referenced_samples
   end
 end

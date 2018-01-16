@@ -1,0 +1,75 @@
+<h1>NeLS Browser</h1>
+
+Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
+
+<div class="row">
+  <div class="col-sm-3">
+    <div id="nels-tree" style="min-height: 300px; border-right: 1px solid #ddd"></div>
+  </div>
+  <div class="col-sm-9">
+    <div id="nels-dataset" style="display: none"></div>
+    <div id="nels-content" style="display: none"></div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $j(document).ready(function () {
+    $j('#nels-tree')
+        .bind('loaded.jstree', function() {})
+        .jstree({
+          'core': {
+            'check_callback': true,
+            'force_text': true,
+            'data' : {
+              'url': function (node) {
+                if (node.id === '#') {
+                  return '<%= projects_assay_nels_path(params[:assay_id]) -%>';
+                } else {
+                  return '<%= datasets_assay_nels_path(params[:assay_id]) -%>';
+                }
+              },
+              'data': function (node) {
+                if (node.id === '#') {
+                  return { };
+                }
+
+                var d = { id: node.data.id };
+
+                if (node.data.project_id) {
+                  d.project_id = node.data.project_id
+                }
+                return d;
+              },
+              'error': function (error) {
+                $j('#nels-dataset').hide();
+                $j('#nels-content').show();
+                $j('#nels-content').html(HandlebarsTemplates['nels/error'](error));
+                if (error.responseJSON.url) {
+                  window.location.href = error.responseJSON.url;
+                }
+              }
+            }
+          }
+        })
+      .on('activate_node.jstree', function (e, data) {
+        if (data.node.data.project_id) {
+          $j('#nels-dataset').html('').spinner('add').show();
+          $j('#nels-content').hide();
+
+          $j.ajax({ url: '<%= dataset_assay_nels_path(params[:assay_id]) -%>',
+            data: {
+              project_id: data.node.data.project_id,
+              dataset_id: data.node.data.id,
+            },
+            success: function (data) {
+              $j('#nels-dataset').html(data).spinner('remove');
+            }
+          });
+        } else {
+          $j('#nels-dataset').hide();
+          $j('#nels-content').show();
+          $j('#nels-content').html(HandlebarsTemplates['nels/project'](data.node.data));
+        }
+    });
+  });
+</script>
