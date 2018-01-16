@@ -81,7 +81,6 @@ class SearchController < ApplicationController
             end #.results
             @search_hits = search.hits
             search_result = search.results
-            search_result = search_result.sort_by(&:published_date).reverse if source == Publication && Seek::Config.is_virtualliver
             @results |= search_result
           end
       else
@@ -93,7 +92,6 @@ class SearchController < ApplicationController
            end #.results
            @search_hits = search.hits
            search_result = search.results
-           search_result = search_result.sort_by(&:published_date).reverse if search_type == Publication
            @results = search_result
       end
 
