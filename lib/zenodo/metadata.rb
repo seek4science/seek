@@ -6,7 +6,8 @@ module Zenodo
     REQUIRED_FIELDS = [:upload_type, :publication_date, :title, :creators, :description, :access_right]
 
     def initialize(hash)
-      super.merge!(hash)
+      merge!(hash)
+      self
     end
 
     def build
@@ -20,11 +21,11 @@ module Zenodo
 
     def validate
       REQUIRED_FIELDS.each do |property|
-        unless keys.include?(property) && !self[property].blank?
+        unless keys.include?(property) && !fetch(property).blank?
           raise MissingMetadataException.new("Required field: '#{property}' is missing")
         end
       end
-      self[:creators].each do |creator|
+      fetch(:creators).each do |creator|
         unless creator[:name]
           raise MissingMetadataException.new("Creator missing name: #{creator.inspect}")
         end
