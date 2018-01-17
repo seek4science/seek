@@ -156,15 +156,53 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def create_metadata
+    @data_file = DataFile.new(data_file_params)
+
+    update_sharing_policies(@data_file)
+
+    # associate_content_blob
+    blob_id = params[:content_blob_id]
+    blob = ContentBlob.find(blob_id)
+    blob.asset=@data_file
+
+    if @data_file.save && blob.save
+      update_annotations(params[:tag_list], @data_file)
+      update_scales @data_file
+
+      update_relationships(@data_file, params)
+
+      respond_to do |format|
+        flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
+        # parse the data file if it is with sample data
+
+        # the assay_id param can also contain the relationship type
+        assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
+        update_assay_assets(@data_file, assay_ids, relationship_types)
+        format.html {redirect_to data_file_path(@data_file)}
+        format.json {render json: @data_file}
+      end
+
+    else
+      respond_to do |format|
+        format.html do
+          render action: 'new'
+        end
+        format.json {render json: "{}"} #fix
+      end
+
+    end
+  end
+
   def create
     if params[:data_file].empty? && !params[:datafile].empty?
       params[:data_file] = params[:datafile]
     end
 
-     if params.key?(:content)
-        params[:content_blobs] = params[:content]["data"] #Why a string?
-     end
-      @data_file = DataFile.new(data_file_params.except!(:content))
+    if params.key?(:content)
+      params[:content_blobs] = params[:content]["data"] #Why a string?
+    end
+    @data_file = DataFile.new(data_file_params.except!(:content))
 
     if handle_upload_data
       update_sharing_policies(@data_file)
@@ -178,7 +216,7 @@ class DataFilesController < ApplicationController
         update_relationships(@data_file, params)
 
         if !@data_file.parent_name.blank?
-          render partial: 'assets/back_to_fancy_parent', locals: { child: @data_file, parent_name: @data_file.parent_name, is_not_fancy: true }
+          render partial: 'assets/back_to_fancy_parent', locals: {child: @data_file, parent_name: @data_file.parent_name, is_not_fancy: true}
         else
           respond_to do |format|
             flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
@@ -186,7 +224,7 @@ class DataFilesController < ApplicationController
             if @data_file.is_with_sample
               bio_samples = @data_file.bio_samples_population params[:institution_id]
 
-              unless  bio_samples.errors.blank?
+              unless bio_samples.errors.blank?
                 flash[:notice] << '<br/> However, Sample database population failed.'
                 flash[:error] = bio_samples.errors.html_safe
               end
@@ -194,16 +232,16 @@ class DataFilesController < ApplicationController
             # the assay_id param can also contain the relationship type
             assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
             update_assay_assets(@data_file, assay_ids, relationship_types)
-            format.html { redirect_to data_file_path(@data_file) }
-            format.json { render json: @data_file}
+            format.html {redirect_to data_file_path(@data_file)}
+            format.json {render json: @data_file}
           end
-      end
+        end
       else
         respond_to do |format|
           format.html do
             render action: 'new'
           end
-          format.json {render json: "{}" } #fix
+          format.json {render json: "{}"} #fix
         end
 
       end
@@ -469,7 +507,7 @@ class DataFilesController < ApplicationController
   private
 
   def data_file_params
-    params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,
+    params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,:content_blob_id,
                                       :parent_name, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
   end

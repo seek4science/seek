@@ -2822,6 +2822,27 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
+  test 'create metadata' do
+    blob = Factory(:content_blob)
+    project = Factory(:project)
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    },policy_attributes: valid_sharing,
+              content_blob_id: blob.id
+              }
+
+    assert_difference('DataFile.count') do
+      post :create_metadata,params
+    end
+
+    assert ( df = assigns(:data_file))
+    assert_equal [project],df.projects
+    assert_equal blob,df.content_blob
+    assert_equal 'Small File',df.title
+
+  end
+
   def edit_max_object(df)
     add_tags_to_test_object(df)
     add_creator_to_test_object(df)
