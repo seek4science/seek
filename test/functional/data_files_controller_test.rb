@@ -2837,10 +2837,35 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert ( df = assigns(:data_file))
+
     assert_equal [project],df.projects
     assert_equal blob,df.content_blob
     assert_equal 'Small File',df.title
 
+    assert_redirected_to df
+
+  end
+
+  test 'create metadata with validation failure' do
+    blob = Factory(:content_blob)
+    project = Factory(:project)
+    params = {data_file: {
+        project_ids: [project.id]
+    },policy_attributes: valid_sharing,
+              content_blob_id: blob.id
+    }
+
+    assert_no_difference('DataFile.count') do
+      post :create_metadata,params
+    end
+
+    assert_response :unprocessable_entity
+
+    assert ( df = assigns(:data_file))
+    assert_equal [project],df.projects
+    assert_equal blob,df.content_blob
+    assert_nil df.title
+    refute_empty df.errors
   end
 
   def edit_max_object(df)

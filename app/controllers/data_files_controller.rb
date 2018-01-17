@@ -164,7 +164,7 @@ class DataFilesController < ApplicationController
     # associate_content_blob
     blob_id = params[:content_blob_id]
     blob = ContentBlob.find(blob_id)
-    blob.asset=@data_file
+    @data_file.content_blob=blob
 
     if @data_file.save && blob.save
       update_annotations(params[:tag_list], @data_file)
@@ -186,11 +186,9 @@ class DataFilesController < ApplicationController
     else
       respond_to do |format|
         format.html do
-          render action: 'new'
+          render :provide_metadata, status: :unprocessable_entity
         end
-        format.json {render json: "{}"} #fix
       end
-
     end
   end
 
