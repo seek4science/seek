@@ -56,7 +56,6 @@ SEEK::Application.routes.draw do
   get 'funding' => 'homes#funding', :as => :funding
   get 'index.html' => 'homes#index'
   get 'index' => 'homes#index'
-  get 'my_biovel' => 'homes#my_biovel', :as => :my_biovel
 
   resource :favourites do
     collection do

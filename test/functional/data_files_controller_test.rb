@@ -1734,21 +1734,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'input#tag_list', count: 1
   end
 
-  test 'new with biovel sharing form' do
-    with_alternative_rendering({ seek_partial: 'sharing/form' }, 'sharing/form') do
-      get :new
-      assert_response :success
-    end
-  end
-
-  test 'edit with biovel sharing form' do
-    with_alternative_rendering({ seek_partial: 'sharing/form' }, 'sharing/form') do
-      df = Factory :data_file, policy: Factory(:public_policy)
-      get :edit, id: df
-      assert_response :success
-    end
-  end
-
   test 'edit should include not include tags element when tags disabled' do
     with_config_value :tagging_enabled, false do
       df = Factory(:data_file, policy: Factory(:public_policy))

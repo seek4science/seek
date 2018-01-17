@@ -96,11 +96,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def guest_project_member?
-    project = Project.find_by_title('BioVeL Portal Guests')
-    !project.nil? && projects == [project]
-  end
-
   def projects_with_default_license
     projects.select(&:default_license)
   end
