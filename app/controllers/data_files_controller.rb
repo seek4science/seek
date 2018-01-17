@@ -11,7 +11,7 @@ class DataFilesController < ApplicationController
   include Seek::AssetsCommon
 
   before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, only: [:show, :explore, :download, :matching_models]
   skip_before_filter :verify_authenticity_token, only: [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
@@ -22,6 +22,8 @@ class DataFilesController < ApplicationController
   before_filter :oauth_client, only: :retrieve_nels_sample_metadata
   before_filter :nels_oauth_session, only: :retrieve_nels_sample_metadata
   before_filter :rest_client, only: :retrieve_nels_sample_metadata
+
+  before_filter :login_required, only: [:create, :create_content_blob]
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -49,6 +51,20 @@ class DataFilesController < ApplicationController
       end
       super
     end
+  end
+
+  def create_content_blob
+    @data_file=DataFile.new
+    respond_to do |format|
+      if handle_upload_data
+        create_content_blobs
+        format.html {render :provide_metadata}
+      else
+        format.html {render action: :new}
+      end
+    end
+
+
   end
 
   def destroy_samples_confirm

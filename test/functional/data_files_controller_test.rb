@@ -2802,6 +2802,26 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'create content blob' do
+    person = Factory(:person)
+    login_as(person)
+    blob = { data: file_for_upload }
+    assert_difference('ContentBlob.count') do
+      post :create_content_blob,content_blobs:[blob]
+    end
+    assert_response :success
+    assert assigns(@data_file)
+  end
+
+  test 'create content blob requires login' do
+    logout
+    blob = { data: file_for_upload }
+    assert_no_difference('ContentBlob.count') do
+      post :create_content_blob,content_blobs:[blob]
+    end
+    assert_response :redirect
+  end
+
   def edit_max_object(df)
     add_tags_to_test_object(df)
     add_creator_to_test_object(df)

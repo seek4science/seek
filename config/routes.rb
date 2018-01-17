@@ -354,6 +354,7 @@ SEEK::Application.routes.draw do
       post :upload_from_email
       post :items_for_result
       post :resource_in_tab
+      post :create_content_blob
     end
     member do
       get :matching_models
