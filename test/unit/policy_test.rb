@@ -255,9 +255,6 @@ class PolicyTest < ActiveSupport::TestCase
 
 
     endpoint = Factory(:openbis_endpoint,policy:policy)
-    sweep = Factory(:sweep,policy:policy)
-    assert_equal [endpoint,project,sweep],policy.associated_items.sort_by{|i| i.class.name}
-
-
+    assert_equal [endpoint,project],policy.associated_items.sort_by{|i| i.class.name}
   end
 end

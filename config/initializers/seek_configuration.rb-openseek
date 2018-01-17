@@ -56,7 +56,6 @@ SEEK::Application.configure do
   Seek::Config.default :factors_studied_enabled,false
   Seek::Config.default :experimental_conditions_enabled,false
   Seek::Config.default :tagging_enabled, true
-  Seek::Config.default :workflows_enabled,false
   Seek::Config.default :assays_enabled,true
   Seek::Config.default :publications_enabled,true
   Seek::Config.default :authorization_checks_enabled, true

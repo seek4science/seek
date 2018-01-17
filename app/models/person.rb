@@ -236,18 +236,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def workflows
-    try(:user).try(:workflows) || []
-  end
-
-  def runs
-    try(:user).try(:taverna_player_runs) || []
-  end
-
-  def sweeps
-    try(:user).try(:sweeps) || []
-  end
-
   def projects # ALL projects, former and current
     # updating workgroups doesn't change groupmemberships until you save. And vice versa.
     work_groups.collect(&:project).uniq | group_memberships.collect { |gm| gm.work_group.project }

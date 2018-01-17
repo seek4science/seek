@@ -94,47 +94,6 @@ namespace :seek_stats do
     end
   end
 
-  desc "Create retrospective ActivityLog entries for the creation of Runs and Sweeps."
-  task(:retrospectively_log_run_and_sweep_creation => :environment) do
-    email_setting = Seek::Config.email_enabled
-    # Disable timestamps so we can set the log entry time to the same time that the run/sweep was created, rather than the current time
-    ActiveRecord::Base.record_timestamps = false
-
-    begin
-      # Disabling email is the only way to prevent an email job being created when an activity log is saved
-      Seek::Config.email_enabled = false
-      # Log single runs (not part of a sweep)
-      TavernaPlayer::Run.where(:sweep_id => nil).find_each do |run|
-        unless ActivityLog.where(:activity_loggable_id => run.id, :activity_loggable_type => 'TavernaPlayer::Run', :action => 'create').exists?
-          ActivityLog.create(:activity_loggable => run, :action => 'create', :culprit => run.contributor,
-                             :referenced => run.workflow, :user_agent => 'script', :created_at => run.created_at,
-                             :updated_at => run.created_at, :controller_name => 'runs')
-          puts "Logged creation of Run #{run.id}"
-        else
-          puts "Skipping Run #{run.id} (log entry exists)"
-        end
-      end
-
-      # Log sweeps
-      Sweep.find_each do |sweep|
-        unless ActivityLog.where(:activity_loggable_id => sweep.id, :activity_loggable_type => 'Sweep', :action => 'create').exists?
-          ActivityLog.create(:activity_loggable => sweep, :action => 'create', :culprit => sweep.contributor,
-                             :referenced => sweep.workflow, :user_agent => 'script', :created_at => sweep.created_at,
-                             :updated_at => sweep.created_at, :controller_name => 'sweeps')
-          puts "Logged creation of Sweep #{sweep.id}"
-        else
-          puts "Skipping Sweep #{sweep.id} (log entry exists)"
-        end
-      end
-    ensure
-
-      ActiveRecord::Base.record_timestamps = true
-      Seek::Config.email_enabled = email_setting
-    end
-
-    puts "Done"
-  end
-
   task(:top_of_the_pops=>:environment) do
     [DataFile,Sop,Model,Presentation].each do |type|
       sorted = type.all.sort_by(&:view_count).reverse[0..9]

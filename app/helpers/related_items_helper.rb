@@ -88,7 +88,7 @@ module RelatedItemsHelper
 
     # Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
-      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample Run Workflow Sweep].include?(resource.class.name)
+      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]
       end
@@ -100,15 +100,11 @@ module RelatedItemsHelper
   def relatable_types
     { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
       'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
-      'Workflow' => {}, 'TavernaPlayer::Run' => {}, 'Sweep' => {}, 'Strain' => {}, 'Sample' => {} }
+      'Strain' => {}, 'Sample' => {} }
   end
 
   def related_items_method(resource, item_type)
-    method_name = if item_type == 'TavernaPlayer::Run'
-                    'runs'
-                  else
-                    item_type.underscore.pluralize
-                  end
+    method_name = item_type.underscore.pluralize
 
     if resource.respond_to? "related_#{method_name}"
       resource.send "related_#{method_name}"
@@ -127,11 +123,7 @@ module RelatedItemsHelper
     resource_klass = self.class
     method_hash = {}
     relatable_types.each_key do |item_type|
-      method_name = if item_type == 'TavernaPlayer::Run'
-                      'runs'
-                    else
-                      item_type.underscore.pluralize
-                    end
+      method_name = item_type.underscore.pluralize
 
       if resource_klass.method_defined? "related_#{method_name}"
         method_hash[item_type] = "related_#{method_name}"

@@ -330,10 +330,6 @@ class AdminController < ApplicationController
         render partial: 'admin/stats/job_queue'
       when 'auth_consistency'
         render partial: 'admin/stats/auth_consistency'
-      when 'monthly_stats'
-        render partial: 'admin/stats/monthly_stats', locals: { stats: get_monthly_stats }
-      when 'workflow_stats'
-        render partial: 'admin/stats/workflow_stats'
       when 'storage_usage_stats'
         render partial: 'admin/stats/storage_usage_stats'
       when 'snapshot_and_doi_stats'
@@ -391,23 +387,6 @@ class AdminController < ApplicationController
         format.html { render partial: partial, locals: locals }
       end
     end
-  end
-
-  def get_monthly_stats
-    first_month = User.all.sort_by(&:created_at).first.created_at
-    number_of_months_since_first = (Date.today.year * 12 + Date.today.month) - (first_month.year * 12 + first_month.month)
-    stats = {}
-    (0..number_of_months_since_first).each do |x|
-      time_range = (x.month.ago.beginning_of_month.to_date..x.month.ago.end_of_month.to_date)
-      registrations = User.where(created_at: time_range).count
-      active_users = 0
-      User.find_each do |user|
-        active_users += 1 unless user.taverna_player_runs.where(created_at: time_range, saved_state: 'finished').empty?
-      end
-      complete_runs = TavernaPlayer::Run.where(created_at: time_range, saved_state: 'finished').count
-      stats[x.month.ago.beginning_of_month.to_i] = [registrations, active_users, complete_runs]
-    end
-    stats
   end
 
   def test_email_configuration

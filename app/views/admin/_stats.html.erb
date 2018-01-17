@@ -18,7 +18,6 @@
                     ["PALs","pals"],
                     ["Profiles without users","profiles_without_users"],
                     ["Administrators","administrators"]]
-    statistics_options = statistics_options | [["Workflow Statistics", "workflow_stats"]] if Seek::Config.workflows_enabled
 
     grouped_options = [['Status', status_options], ['Statistics', statistics_options], ['User Information', user_options]]
   %>
