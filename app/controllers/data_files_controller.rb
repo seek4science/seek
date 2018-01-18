@@ -138,7 +138,7 @@ class DataFilesController < ApplicationController
   end
 
   def create
-    if params[:data_file].empty? && !params[:datafile].empty?
+    if params[:data_file].blank? && !params[:datafile].blank?
       params[:data_file] = params[:datafile]
     end
 
