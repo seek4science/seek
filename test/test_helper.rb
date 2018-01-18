@@ -20,6 +20,7 @@ require 'mock_helper'
 require 'html_helper'
 require 'minitest/reporters'
 require 'minitest'
+require 'ostruct'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
 
