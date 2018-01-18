@@ -11,10 +11,11 @@
    owned_annotations = current_user.annotations_by.collect{|a| a.value}
    #remove duplicates
    all_tags,item_tags = fetch_tags_for_item(object)
+  collapsed = item_tags.blank? if collapsed.nil?
 %>
 
 
-<%= folding_panel('Tags', item_tags.blank?,
+<%= folding_panel('Tags', collapsed,
                   :help_text => "Here you can provide some tags to help describe, and allow other people to find, your #{type_name}.") do %>
     <p>
       <% if object.id.nil? -%>

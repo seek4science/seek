@@ -1,6 +1,6 @@
 Content blob id: <%= @data_file.content_blob.id %>
 
-<%= form_tag({:action => :create_metadata}, :multipart => true) do -%>
+<%= form_tag({action: :create_metadata}, multipart: true) do -%>
   <%= hidden_field_tag 'content_blob_id', @data_file.content_blob.id %>
   <div id='datafile-multi-set' class='multi-step'>
     <div class="asset_form">
@@ -29,58 +29,70 @@ Content blob id: <%= @data_file.content_blob.id %>
           </label>
         </div>
 
-        <%= render :partial => "projects/project_selector", :locals => {:resource => @data_file, :allow_nil => Seek::Config.is_virtualliver} -%>
+        <%= render :partial => "projects/project_selector", locals: {resource: @data_file, allow_nil: Seek::Config.is_virtualliver} -%>
 
-        <%= render :seek_partial=>"assets/select_tags" -%>
+        <%= render :seek_partial => "assets/select_tags", locals: {collapsed: false} -%>
 
-        <button class="multi-step-next-button btn btn-primary">Next</button>
+        <div class="multi-step-buttons">
+          <button class="multi-step-next-button btn btn-primary">Next</button>
+          <%= cancel_button(data_files_path) -%>
+        </div>
       </div>
 
 
       <div id='step-2' class='multi-step-block'>
 
-        <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>
+        <%= render :partial => "scales/scales_selector", locals: {object: @data_file} if show_scales? %>
 
-        <%= render :partial => 'assets/license_selector', :locals => {:resource => @data_file} %>
+        <%= render :partial => 'assets/license_selector', locals: {resource: @data_file} %>
 
         <%= render :seek_partial => "sharing/form" -%>
 
-        <%= render :partial => "assets/author_form", :locals => {:resource_type => "DataFile",
-                                                                 :existing_creators => [],
-                                                                 :other_creators => []} -%>
+        <%= render :partial => "assets/author_form", locals: {resource_type: "DataFile",
+                                                              existing_creators: [],
+                                                              other_creators: [],
+                                                              collapsed: false} %>
 
-        <button class="multi-step-back-button btn btn-default">Back</button>
-        <button class="multi-step-next-button btn btn-primary">Next</button>
+        <div class="multi-step-buttons">
+          <button class="multi-step-back-button btn btn-default">Back</button>
+          <button class="multi-step-next-button btn btn-primary">Next</button>
+          <%= cancel_button(data_files_path) -%>
+        </div>
       </div>
 
 
       <div id='step-3' class='multi-step-block'>
         <% if Seek::Config.assays_enabled %>
-          <%= render :partial => "assays/associate_assays", :locals => {:resource => @data_file} -%>
+          <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} -%>
         <% end %>
-        <button class="multi-step-back-button btn btn-default">Back</button>
-        <button class="multi-step-next-button btn btn-primary">Next</button>
+        <div class="multi-step-buttons">
+          <button class="multi-step-back-button btn btn-default">Back</button>
+          <button class="multi-step-next-button btn btn-primary">Next</button>
+          <%= cancel_button(data_files_path) -%>
+        </div>
       </div>
 
 
       <div id='step-4' class='multi-step-block'>
         <%= render :partial => "assets/attribution_form", :locals => {:resource_class => DataFile,
-                                                                      :existing_attributions => [] }   -%>
+                                                                      :existing_attributions => [], collapsed: false} -%>
 
         <%= render :partial => "assets/associate_publication", :locals => {:resource_type => "DataFile",
-                                                                           :related_publications => []} -%>
+                                                                           :related_publications => [], collapsed: false} -%>
 
         <% if Seek::Config.events_enabled %>
-          <%= render :partial => "assets/associate_event", :locals => {:resource => @data_file} -%>
+          <%= render :partial => "assets/associate_event", :locals => {:resource => @data_file, collapsed: false} -%>
         <% end -%>
 
-        <button class="multi-step-back-button btn btn-default">Back</button>
-
-          <%= submit_tag "Upload and Save",
-                         :id => "data_file_submit_btn",
-                         :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
-                         :class => 'btn btn-primary' -%>
+        <div class="multi-step-buttons">
+          <button class="multi-step-back-button btn btn-default">Back</button>
           <%= cancel_button(data_files_path) -%>
+        </div>
+
+        <%= submit_tag "Create",
+                       :id => "data_file_submit_btn",
+                       :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
+                       :class => 'btn btn-primary' -%>
         <%= preview_permission_popup_link(@data_file) -%>
       </div>
 
@@ -89,22 +101,22 @@ Content blob id: <%= @data_file.content_blob.id %>
 <% end -%>
 
 <script type="application/javascript">
-  $j(document).ready(function() {
-     var currentStep=1;
-     $j('#step-'+currentStep).show();
+    $j(document).ready(function () {
+        var currentStep = 1;
+        $j('#step-' + currentStep).show();
 
-     $j('.multi-step-next-button').click(function (){
-         $j('#step-'+currentStep).hide();
-         currentStep=currentStep+1;
-         $j('#step-'+currentStep).show();
-        return false;
-     });
+        $j('.multi-step-next-button').click(function () {
+            $j('#step-' + currentStep).hide();
+            currentStep = currentStep + 1;
+            $j('#step-' + currentStep).fadeIn();
+            return false;
+        });
 
-      $j('.multi-step-back-button').click(function (){
-          $j('#step-'+currentStep).hide();
-          currentStep=currentStep-1;
-          $j('#step-'+currentStep).show();
-          return false;
-      });
-  });
+        $j('.multi-step-back-button').click(function () {
+            $j('#step-' + currentStep).hide();
+            currentStep = currentStep - 1;
+            $j('#step-' + currentStep).fadeIn();
+            return false;
+        });
+    });
 </script>

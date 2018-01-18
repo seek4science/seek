@@ -3,10 +3,13 @@
 <%# - existing_creators - list of creators for the current resource (this should be collection of Person objects) -%>
 <%# - other_creators - list of non-SEEK creators for the current resource (this should be a string) -%>
 
-<% original_resource_type = resource_type -%>
-<% resource_type = text_for_resource(resource_type) -%>
+<%
+  original_resource_type = resource_type
+  resource_type = text_for_resource(resource_type)
+  collapsed = existing_creators.blank? if collapsed.nil?
+%>
 
-<%= folding_panel(t('creator').capitalize.pluralize, existing_creators.blank?, :body_options => {:id => 'creator_fold_content'},
+<%= folding_panel(t('creator').capitalize.pluralize, collapsed, :body_options => {:id => 'creator_fold_content'},
                   :help_text => "Here you attribute this #{resource_type} to other people.") do %>
   <p>
     If this <%= resource_type %> was contributed by, or together with, other members, please list their names below.
