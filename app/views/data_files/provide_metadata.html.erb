@@ -1,3 +1,5 @@
+<%= javascript_include_tag :multi_step_wizard %>
+
 Content blob id: <%= @data_file.content_blob.id %>
 
 <%= form_tag({action: :create_metadata}, multipart: true) do -%>
@@ -34,7 +36,7 @@ Content blob id: <%= @data_file.content_blob.id %>
         <%= render :seek_partial => "assets/select_tags", locals: {collapsed: false} -%>
 
         <div class="multi-step-buttons">
-          <button class="multi-step-next-button btn btn-primary">Next</button>
+          <%= multi_step_forward_buttons %>
           <%= cancel_button(data_files_path) -%>
         </div>
       </div>
@@ -54,8 +56,8 @@ Content blob id: <%= @data_file.content_blob.id %>
                                                               collapsed: false} %>
 
         <div class="multi-step-buttons">
-          <button class="multi-step-back-button btn btn-default">Back</button>
-          <button class="multi-step-next-button btn btn-primary">Next</button>
+          <%= multi_step_back_buttons %>
+          <%= multi_step_forward_buttons %>
           <%= cancel_button(data_files_path) -%>
         </div>
       </div>
@@ -66,8 +68,8 @@ Content blob id: <%= @data_file.content_blob.id %>
           <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} -%>
         <% end %>
         <div class="multi-step-buttons">
-          <button class="multi-step-back-button btn btn-default">Back</button>
-          <button class="multi-step-next-button btn btn-primary">Next</button>
+          <%= multi_step_back_buttons %>
+          <%= multi_step_forward_buttons %>
           <%= cancel_button(data_files_path) -%>
         </div>
       </div>
@@ -85,7 +87,7 @@ Content blob id: <%= @data_file.content_blob.id %>
         <% end -%>
 
         <div class="multi-step-buttons">
-          <button class="multi-step-back-button btn btn-default">Back</button>
+          <%= multi_step_back_buttons %>
           <%= cancel_button(data_files_path) -%>
         </div>
 
@@ -100,23 +102,4 @@ Content blob id: <%= @data_file.content_blob.id %>
   </div>
 <% end -%>
 
-<script type="application/javascript">
-    $j(document).ready(function () {
-        var currentStep = 1;
-        $j('#step-' + currentStep).show();
 
-        $j('.multi-step-next-button').click(function () {
-            $j('#step-' + currentStep).hide();
-            currentStep = currentStep + 1;
-            $j('#step-' + currentStep).fadeIn();
-            return false;
-        });
-
-        $j('.multi-step-back-button').click(function () {
-            $j('#step-' + currentStep).hide();
-            currentStep = currentStep - 1;
-            $j('#step-' + currentStep).fadeIn();
-            return false;
-        });
-    });
-</script>
