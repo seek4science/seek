@@ -11,7 +11,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
     #prepare content for POST
     @json_mm = {}
-    ['min','max'].each do |m|
+    ['min', 'max'].each do |m|
       json_mm_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'content_compare', "#{m}_person.json")
       @json_mm["#{m}"] = JSON.parse(File.read(json_mm_file))
     end
@@ -19,11 +19,9 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   def test_should_create_person
     #debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
-    #a_project = Factory(:project)
-    ['min','max'].each do |m|
+    ['min', 'max'].each do |m|
       @json_mm["#{m}"]["data"].delete("id")
       @json_mm["#{m}"]["data"]["attributes"]["email"] = "#{m}_createTest@email.com"
-      #@json_mm["#{m}"]["data"]["relationships"]["projects"]["data"].append({:id => a_project.id, :type => "projects"})
 
       assert_difference('Person.count') do
         assert_difference('NotifieeInfo.count') do
@@ -33,10 +31,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
           get "/people/#{Person.last.id}.json"
           assert_response :success
 
-          #check some of the content
-          h = JSON.parse(response.body)
-          assert_equal @json_mm["#{m}"]["data"]["attributes"]["title"], h["data"]["attributes"]["title"]
-          check_content(m, h)
+          check_content(m, "post")
         end
       end
     end
@@ -44,23 +39,20 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   def test_should_update_person
     a_person = Factory(:person)
-    ['min','max'].each do |m|
+    ['min', 'max'].each do |m|
       @json_mm["#{m}"]["data"]["attributes"]["email"] = "#{m}_updateTest@email.com"
-      @json_mm["#{m}"]["data"]["attributes"].each do |k,v|
+      @json_mm["#{m}"]["data"]["attributes"].each do |k, v|
         @json_mm["#{m}"]["data"]["attributes"].delete k if @json_mm["#{m}"]["data"]["attributes"][k].nil?
       end
       @json_mm["#{m}"]["data"]["id"] = "#{a_person.id}"
-      put "/people/#{a_person.id}.json", @json_mm["#{m}"]
+      patch "/people/#{a_person.id}.json", @json_mm["#{m}"]
       assert_response :success
 
       get "/people/#{a_person.id}.json"
       assert_response :success
-
-      h = JSON.parse(response.body)
-      #check no overwrite when no attribute was given
-      assert_equal a_person.first_name, h["data"]["attributes"]["first_name"] if (m == 'min')
-
-      check_content(m, h)
+      @json_mm["min"]["data"]["attributes"]["title"] =
+          a_person.first_name + " " + @json_mm["min"]["data"]["attributes"]["last_name"]
+      check_content(m, "patch")
     end
   end
 
@@ -72,16 +64,16 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     assert_match "A POST request is not allowed to specify an id", response.body
   end
 
-  def test_create_should_error_on_missing_or_wrong_type
+  def test_create_should_error_on_wrong_type
     a_person = Factory(:person)
-
-    #wrong type
-    @json_mm["min"]["data"]["type"] = "no type"
+    @json_mm["min"]["data"]["type"] = "wrong"
     post "/people.json", @json_mm["min"]
     assert_response :unprocessable_entity
-    assert_match "The specified data:type does not match the URL's object (no type vs. people)", response.body
+    assert_match "The specified data:type does not match the URL's object (#{@json_mm["min"]["data"]["type"]} vs. people)", response.body
+  end
 
-    #missing type
+  def test_create_should_error_on_missing_type
+    a_person = Factory(:person)
     @json_mm["min"]["data"].delete("type")
     post "/people.json", @json_mm["min"]
     assert_response :unprocessable_entity
@@ -103,16 +95,16 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  def test_update_should_error_on_missing_or_wrong_type
+  def test_update_should_error_wrong_type
     a_person = Factory(:person)
-
-    #wrong type
-    @json_mm["min"]["data"]["type"] = "no type"
+    @json_mm["min"]["data"]["type"] = "wrong"
     put "/people/#{a_person.id}.json", @json_mm["min"]
     assert_response :unprocessable_entity
-    assert_match "The specified data:type does not match the URL's object (no type vs. people)", response.body
+    assert_match "The specified data:type does not match the URL's object (#{@json_mm["min"]["data"]["type"]} vs. people)", response.body
+  end
 
-    #missing type
+  def test_update_should_error_on_missing_type
+    a_person = Factory(:person)
     @json_mm["min"]["data"].delete("type")
     put "/people/#{a_person.id}.json", @json_mm["min"]
     assert_response :unprocessable_entity
@@ -131,16 +123,20 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   private
 
-  def check_content(m, response_hash)
-    case m
-      when 'min'
-        assert_nil response_hash["data"]["attributes"]["expertise"]
-        assert_nil response_hash["data"]["attributes"]["tools"]
-        assert_nil response_hash["data"]["attributes"]["description"]
-      when 'max'
-        assert_equal @json_mm["#{m}"]["data"]["attributes"]["expertise"].sort!, response_hash["data"]["attributes"]["expertise"]
-        assert_equal @json_mm["#{m}"]["data"]["attributes"]["tools"].sort!, response_hash["data"]["attributes"]["tools"]
-        assert_equal @json_mm["#{m}"]["data"]["attributes"]["description"], response_hash["data"]["attributes"]["description"]
+  def check_content(m, action)
+    #check some of the content
+    h = JSON.parse(response.body)
+    h['data']['attributes'].delete("mbox_sha1sum")
+    h['data']['attributes'].delete("avatar")
+    h['data']['attributes'].each do |key, value|
+      next if (@json_mm["#{m}"]['data']['attributes'][key].nil? && action="patch")
+      if value.nil?
+        assert_nil @json_mm["#{m}"]['data']['attributes'][key]
+      elsif value.kind_of?(Array)
+        assert_equal value, @json_mm["#{m}"]['data']['attributes'][key].sort!
+      else
+        assert_equal value, @json_mm["#{m}"]['data']['attributes'][key]
+      end
     end
   end
 end
