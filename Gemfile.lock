@@ -635,7 +635,7 @@ GEM
       netrc (~> 0.7)
     rfc-822 (0.4.1)
     rmagick (2.15.2)
-    ro-bundle (0.2.2)
+    ro-bundle (0.2.3)
       json (~> 1.8)
       ucf (~> 2.0.1)
       uuid (~> 2.3)
