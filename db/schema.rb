@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180122105804) do
+ActiveRecord::Schema.define(version: 20180122121232) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -526,6 +526,19 @@ ActiveRecord::Schema.define(version: 20180122105804) do
 
   add_index "disciplines_people", ["person_id"], name: "index_disciplines_people_on_person_id", using: :btree
 
+  create_table "document_auth_lookup", force: :cascade do |t|
+    t.integer "user_id",      limit: 4
+    t.integer "asset_id",     limit: 4
+    t.boolean "can_view",               default: false
+    t.boolean "can_manage",             default: false
+    t.boolean "can_edit",               default: false
+    t.boolean "can_download",           default: false
+    t.boolean "can_delete",             default: false
+  end
+
+  add_index "document_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_document_user_id_asset_id_can_view", using: :btree
+  add_index "document_auth_lookup", ["user_id", "can_view"], name: "index_document_auth_lookup_on_user_id_and_can_view", using: :btree
+
   create_table "document_versions", force: :cascade do |t|
     t.integer  "document_id",       limit: 4
     t.integer  "version",           limit: 4
@@ -542,10 +555,19 @@ ActiveRecord::Schema.define(version: 20180122105804) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "other_creators",    limit: 65535
   end
 
   add_index "document_versions", ["contributor_type", "contributor_id"], name: "index_document_versions_on_contributor_type_and_contributor_id", using: :btree
   add_index "document_versions", ["document_id"], name: "index_document_versions_on_document_id", using: :btree
+
+  create_table "document_versions_projects", force: :cascade do |t|
+    t.integer "version_id", limit: 4
+    t.integer "project_id", limit: 4
+  end
+
+  add_index "document_versions_projects", ["project_id"], name: "index_document_versions_projects_on_project_id", using: :btree
+  add_index "document_versions_projects", ["version_id", "project_id"], name: "index_document_versions_projects_on_version_id_and_project_id", using: :btree
 
   create_table "documents", force: :cascade do |t|
     t.text     "title",            limit: 65535
@@ -561,6 +583,7 @@ ActiveRecord::Schema.define(version: 20180122105804) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "other_creators",   limit: 65535
   end
 
   add_index "documents", ["contributor_type", "contributor_id"], name: "index_documents_on_contributor_type_and_contributor_id", using: :btree
