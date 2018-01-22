@@ -19,7 +19,6 @@ gem 'sample-template-generator', '~>0.4'
 gem 'rmagick', '2.15.2'
 gem 'rest-client'
 gem 'factory_girl', '2.6.4'
-gem 'rubyzip', '~> 1.1.4'
 gem 'bio', '~> 1.5.1'
 gem 'sunspot_rails', '~>2.2.0'
 gem 'sunspot_solr', '~>2.2.0'
@@ -82,8 +81,6 @@ gem 'search_biomodel', '2.2.1', git: 'https://github.com/myGrid/search_biomodel.
 gem 'my_annotations', git: 'https://github.com/myGrid/annotations.git', branch: 'rails4.2'
 
 
-gem 'taverna-t2flow'
-gem 'taverna-player', git: 'https://github.com/myGrid/taverna-player.git', branch: 'rails4-list-inputs'
 gem 'jquery-rails', '~> 3'
 gem 'jquery-ui-rails', '~>3'
 gem 'recaptcha', '~> 4.1.0'
@@ -123,8 +120,8 @@ gem 'coffee-rails', '~> 4.1.0'
 
 # Rails 4 upgrade
 gem 'activerecord-session_store'
-
 gem 'rails-observers'
+gem 'responders', '~> 2.0'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'

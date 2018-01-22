@@ -184,19 +184,6 @@ class Mailer < ActionMailer::Base
     )
   end
 
-  def report_run_problem(person, run)
-    @person = person
-    @run = run
-    @error_outputs = run.outputs.select { |o| o.value_is_error? }
-
-    attachments['taverna_server_log.txt'] = File.read(run.log.path) unless run.log.path.nil?
-    attachments['portal_log.txt'] = run.failure_message unless run.failure_message.nil?
-
-    mail(:from=>Seek::Config.noreply_sender,
-         :to=>Seek::Config.support_email_address,
-         :subject=>"#{Seek::Config.application_name} user has reported a problem with a workflow run")
-  end
-
   def request_membership(user, project, details)
     @owners = project.project_administrators
     @requester = user.person

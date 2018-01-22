@@ -371,22 +371,6 @@ class ApplicationController < ActionController::Base
                              activity_loggable: object,
                              user_agent: request.env['HTTP_USER_AGENT'])
         end
-      when 'sweeps', 'runs'
-        if %w(show update destroy download).include?(action)
-          ref = object.projects.first
-        elsif action == 'create'
-          ref = object.workflow
-        end
-
-        check_log_exists(action, controller_name, object)
-        ActivityLog.create(action: action,
-                           culprit: current_user,
-                           referenced: ref,
-                           controller_name: controller_name,
-                           activity_loggable: object,
-                           data: object.title,
-                           user_agent: request.env['HTTP_USER_AGENT'])
-        break
       when 'people', 'projects', 'institutions'
         if %w(show create update destroy).include?(action)
           ActivityLog.create(action: action,

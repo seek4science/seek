@@ -74,27 +74,6 @@ GIT
     search_biomodel (2.2.1)
 
 GIT
-  remote: https://github.com/myGrid/taverna-player.git
-  revision: db5dc649af7089d4a2d9acfb3579fb6f7c3dae68
-  branch: rails4-list-inputs
-  specs:
-    taverna-player (0.12.0)
-      coderay (~> 1.1)
-      daemons (~> 1.1.9)
-      delayed_job_active_record (~> 4.0)
-      jbuilder (~> 2.0)
-      jquery-rails (~> 3.0)
-      paperclip (~> 4.1)
-      pmrpc-rails (~> 1.0.0)
-      rails (~> 4.2.1)
-      rails_autolink (~> 1.1.0)
-      require_all (~> 1.3.1)
-      responders (~> 2.0)
-      rubyzip (~> 1.1.4)
-      t2-server (~> 1.3)
-      taverna-t2flow (~> 0.5.1)
-
-GIT
   remote: https://github.com/rails/prototype-rails
   revision: 0fed929ff48c10c3b978edd3baa983a81f404dbf
   branch: 4.2
@@ -491,8 +470,6 @@ GEM
       rake (>= 0.8.1)
     path_expander (1.0.1)
     pg (0.20.0)
-    pmrpc-rails (1.0.1)
-      railties (>= 3.1.0)
     polyamorous (1.3.1)
       activerecord (>= 3.0)
     pothoven-attachment_fu (3.3.0)
@@ -583,8 +560,6 @@ GEM
       activesupport (>= 3.0)
       i18n
       polyamorous (~> 1.3)
-    ratom (0.9.0)
-      libxml-ruby (~> 2.6)
     rb-fsevent (0.9.8)
     rb-inotify (0.9.8)
       ffi (>= 0.5.0)
@@ -660,9 +635,9 @@ GEM
       netrc (~> 0.7)
     rfc-822 (0.4.1)
     rmagick (2.15.2)
-    ro-bundle (0.2.1)
+    ro-bundle (0.2.3)
       json (~> 1.8)
-      ucf (~> 2.0)
+      ucf (~> 2.0.1)
       uuid (~> 2.3)
     rsolr (1.1.2)
       builder (>= 2.1.2)
@@ -704,7 +679,7 @@ GEM
       ruby_parser (~> 3.8)
       virtus (~> 1.0)
     rubyntlm (0.3.4)
-    rubyzip (1.1.7)
+    rubyzip (1.2.1)
     safe_yaml (1.0.4)
     sample-template-generator (0.4.1)
       cocaine (~> 0.5)
@@ -772,15 +747,6 @@ GEM
     system (0.1.3)
       version (~> 1.0.0)
     systemu (2.6.5)
-    t2-server (1.3.0)
-      libxml-ruby (~> 2.6)
-      net-http-persistent (~> 2.6)
-      ratom (~> 0.9)
-      taverna-baclava (~> 1.0)
-    taverna-baclava (1.0.1)
-      builder (~> 3.0)
-    taverna-t2flow (0.5.1)
-      libxml-ruby (>= 1.1.4)
     teaspoon (1.1.5)
       railties (>= 3.2.5, < 6)
     teaspoon-mocha (2.3.3)
@@ -795,8 +761,8 @@ GEM
     tins (1.13.2)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
-    ucf (2.0.0)
-      zip-container (~> 3.0.1)
+    ucf (2.0.1)
+      zip-container (~> 3.0.2)
     uglifier (3.2.0)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
@@ -836,8 +802,8 @@ GEM
       rails (>= 3.0, < 5.1)
       rake (>= 0.8.7)
     yard (0.9.12)
-    zip-container (3.0.1)
-      rubyzip (~> 1.1.6)
+    zip-container (3.0.2)
+      rubyzip (~> 1.2.1)
 
 PLATFORMS
   ruby
@@ -939,6 +905,7 @@ DEPENDENCIES
   rdoc
   recaptcha (~> 4.1.0)
   request-log-analyzer
+  responders (~> 2.0)
   rest-client
   rfc-822
   rmagick (= 2.15.2)
@@ -947,7 +914,6 @@ DEPENDENCIES
   rubocop
   ruby-prof (~> 0.15.9)
   rubycritic
-  rubyzip (~> 1.1.4)
   sample-template-generator (~> 0.4)
   sass-rails
   savon (= 1.1.0)
@@ -960,8 +926,6 @@ DEPENDENCIES
   sunspot_rails (~> 2.2.0)
   sunspot_solr (~> 2.2.0)
   system
-  taverna-player!
-  taverna-t2flow
   teaspoon
   teaspoon-mocha
   test_after_commit

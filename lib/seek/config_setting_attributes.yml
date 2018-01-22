@@ -89,7 +89,6 @@ documentation_enabled:
 tagging_enabled:
 authorization_checks_enabled:
 magic_guest_enabled:
-workflows_enabled:
 programmes_enabled:
 assay_type_ontology_file:
 technology_type_ontology_file:

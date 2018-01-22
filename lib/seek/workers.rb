@@ -3,9 +3,10 @@ require 'delayed/command'
 # module for handling interaction with delayed job workers
 module Seek
   module Workers
+    # TODO: Come back to this when removing workflows
     def self.start(number_of_taverna_workers = 0, action = 'start')
       @identifier = 0
-      number_of_taverna_workers = 0 unless Seek::Config.workflows_enabled
+      number_of_taverna_workers = 0
 
       commands = create_commands(number_of_taverna_workers, action)
 

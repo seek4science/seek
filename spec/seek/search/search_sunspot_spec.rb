@@ -89,20 +89,6 @@ describe Publication do
 #  it { should have_searchable_field(:organism_terms) }
 end
 
-describe Workflow do
-  it { should have_searchable_field(:title) }
-  it { should have_searchable_field(:description) }
-  it { should have_searchable_field(:searchable_tags) }
-  it { should have_searchable_field(:contributor) }
-  it { should have_searchable_field(:projects) }
-
-  it { should have_searchable_field(:creators) }
-  it { should have_searchable_field(:other_creators) }
-  it { should have_searchable_field(:content_blob) }
-
-  it { should have_searchable_field(:category) }
-end
-
 #acts_as_isa
 describe Assay do
   it { should have_searchable_field(:title) }

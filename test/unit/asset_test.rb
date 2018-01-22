@@ -244,7 +244,6 @@ class AssetTest < ActiveSupport::TestCase
     assert Model.supports_doi?
     assert DataFile.supports_doi?
     assert Sop.supports_doi?
-    assert Workflow.supports_doi?
 
     assert Investigation.supports_doi?
     assert Study.supports_doi?
