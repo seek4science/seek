@@ -7,6 +7,11 @@ module ApiIntegrationTestHelper
     post '/session', login: admin_user.login, password: admin_user.password
   end
 
+  def user_login
+    User.current_user = Factory(:user, login: 'test')
+    post '/session', login: 'test', password: 'blah'
+  end
+
   def load_mm_objects(clz)
     @json_mm = {}
     ['min', 'max'].each do |m|

@@ -50,4 +50,16 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+
+  def test_normal_user_cannot_create_person
+    user_login
+    @json_mm["min"]["data"]["attributes"]["email"] = "normalUserCreate@testEmail.com"
+    assert_no_difference('Person.count') do
+      post "/people.json", @json_mm["min"]
+    end
+  end
+
+  #add test for testing update_works_only_on_self / can admin update other people?
+  # and/or sort out what other permissions need testing
+
 end
