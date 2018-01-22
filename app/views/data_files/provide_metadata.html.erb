@@ -10,92 +10,107 @@ Content blob id: <%= @data_file.content_blob.id %>
 
 
       <div id='step-1' class='multi-step-block'>
-        <div class="form-group">
-          <label>Title <span class="required">*</span></label>
-          <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
-          <%= text_field_tag 'data_file[title]', data_file_title_value, :class => "form-control" -%>
-        </div>
+        <div class="panel panel-default">
 
-        <div class="form-group">
-          <label>Description</label>
-          <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
-          <%= text_area_tag 'data_file[description]', data_file_description_value, :class => "form-control", :rows => 5 -%>
-        </div>
+          <div class="form-group">
+            <label>Title <span class="required">*</span></label>
+            <% data_file_title_value = (params[:data_file].blank? || params[:data_file][:title].blank?) ? nil : params[:data_file][:title] -%>
+            <%= text_field_tag 'data_file[title]', data_file_title_value, :class => "form-control" -%>
+          </div>
 
-        <div class="form-group">
-          <% data_file_simulation_data_value = (params[:data_file].blank? || params[:data_file][:simulation_data].blank?) ? false : params[:data_file][:simulation_data] -%>
-          <div class='help-block'>Check this box if this data is the result of a model simulation</div>
-          <label>
-            <%= check_box_tag 'data_file[simulation_data]', '1', data_file_simulation_data_value %>
-            Model simulation data
-          </label>
-        </div>
+          <div class="form-group">
+            <label>Description</label>
+            <% data_file_description_value = (params[:data_file].blank? || params[:data_file][:description].blank?) ? nil : params[:data_file][:description] -%>
+            <%= text_area_tag 'data_file[description]', data_file_description_value, :class => "form-control", :rows => 5 -%>
+          </div>
 
-        <%= render :partial => "projects/project_selector", locals: {resource: @data_file, allow_nil: Seek::Config.is_virtualliver} -%>
+          <div class="form-group">
+            <% data_file_simulation_data_value = (params[:data_file].blank? || params[:data_file][:simulation_data].blank?) ? false : params[:data_file][:simulation_data] -%>
+            <div class='help-block'>Check this box if this data is the result of a model simulation</div>
+            <label>
+              <%= check_box_tag 'data_file[simulation_data]', '1', data_file_simulation_data_value %>
+              Model simulation data
+            </label>
+          </div>
 
-        <%= render :seek_partial => "assets/select_tags", locals: {collapsed: false} -%>
+          <%= render :partial => "projects/project_selector", locals: {resource: @data_file, allow_nil: Seek::Config.is_virtualliver} -%>
 
-        <div class="multi-step-buttons">
-          <%= multi_step_forward_buttons %>
+          <%= render :seek_partial => "assets/select_tags", locals: {collapsed: false} -%>
+
+
           <%= cancel_button(data_files_path) -%>
+
+          <div class="multi-step-buttons">
+            <%= multi_step_forward_buttons %>
+          </div>
+
         </div>
       </div>
 
 
-      <div id='step-2' class='multi-step-block'>
+      <div id='step-2' class='multi-step-block multi-step-datafile-block'>
+        <div class="panel panel-default">
 
-        <%= render :partial => "scales/scales_selector", locals: {object: @data_file} if show_scales? %>
+          <%= render :partial => "scales/scales_selector", locals: {object: @data_file} if show_scales? %>
 
-        <%= render :partial => 'assets/license_selector', locals: {resource: @data_file} %>
+          <%= render :partial => 'assets/license_selector', locals: {resource: @data_file} %>
 
-        <%= render :seek_partial => "sharing/form" -%>
+          <%= render :seek_partial => "sharing/form" -%>
 
-        <%= render :partial => "assets/author_form", locals: {resource_type: "DataFile",
-                                                              existing_creators: [],
-                                                              other_creators: [],
-                                                              collapsed: false} %>
+          <%= render :partial => "assets/author_form", locals: {resource_type: "DataFile",
+                                                                existing_creators: [],
+                                                                other_creators: [],
+                                                                collapsed: false} %>
 
-        <div class="multi-step-buttons">
-          <%= multi_step_back_buttons %>
-          <%= multi_step_forward_buttons %>
           <%= cancel_button(data_files_path) -%>
+
+          <div class="multi-step-buttons">
+            <%= multi_step_back_buttons %>
+            <%= multi_step_forward_buttons %>
+          </div>
         </div>
       </div>
 
 
-      <div id='step-3' class='multi-step-block'>
-        <% if Seek::Config.assays_enabled %>
-          <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} -%>
-        <% end %>
-        <div class="multi-step-buttons">
-          <%= multi_step_back_buttons %>
-          <%= multi_step_forward_buttons %>
+      <div id='step-3' class='multi-step-block multi-step-datafile-block'>
+        <div class="panel panel-default">
+          <% if Seek::Config.assays_enabled %>
+            <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} -%>
+          <% end %>
+
           <%= cancel_button(data_files_path) -%>
+
+          <div class="multi-step-buttons">
+            <%= multi_step_back_buttons %>
+            <%= multi_step_forward_buttons %>
+          </div>
         </div>
       </div>
 
 
-      <div id='step-4' class='multi-step-block'>
-        <%= render :partial => "assets/attribution_form", :locals => {:resource_class => DataFile,
-                                                                      :existing_attributions => [], collapsed: false} -%>
+      <div id='step-4' class='multi-step-block multi-step-datafile-block'>
+        <div class="panel panel-default">
+          <%= render :partial => "assets/attribution_form", :locals => {:resource_class => DataFile,
+                                                                        :existing_attributions => [], collapsed: false} -%>
 
-        <%= render :partial => "assets/associate_publication", :locals => {:resource_type => "DataFile",
-                                                                           :related_publications => [], collapsed: false} -%>
+          <%= render :partial => "assets/associate_publication", :locals => {:resource_type => "DataFile",
+                                                                             :related_publications => [], collapsed: false} -%>
 
-        <% if Seek::Config.events_enabled %>
-          <%= render :partial => "assets/associate_event", :locals => {:resource => @data_file, collapsed: false} -%>
-        <% end -%>
+          <% if Seek::Config.events_enabled %>
+            <%= render :partial => "assets/associate_event", :locals => {:resource => @data_file, collapsed: false} -%>
+          <% end -%>
 
-        <div class="multi-step-buttons">
-          <%= multi_step_back_buttons %>
+          <div class="multi-step-buttons">
+            <%= multi_step_back_buttons %>
+          </div>
+
+          <%= submit_tag "Create",
+                         :id => "data_file_submit_btn",
+                         :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
+                         :class => 'btn btn-primary' -%>
           <%= cancel_button(data_files_path) -%>
+          <%= preview_permission_popup_link(@data_file) -%>
         </div>
-
-        <%= submit_tag "Create",
-                       :id => "data_file_submit_btn",
-                       :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
-                       :class => 'btn btn-primary' -%>
-        <%= preview_permission_popup_link(@data_file) -%>
       </div>
 
     </div>
