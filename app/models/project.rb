@@ -19,6 +19,7 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :strains
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
+  has_and_belongs_to_many :documents
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
   has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?, inverse_of: :projects
@@ -91,7 +92,7 @@ class Project < ActiveRecord::Base
   before_save :set_credentials
 
   def assets
-    data_files | sops | models | publications | presentations
+    data_files | sops | models | publications | presentations | documents
   end
 
   def institutions=(new_institutions)

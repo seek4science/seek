@@ -99,7 +99,8 @@ module RelatedItemsHelper
 
   def relatable_types
     { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
-      'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
+      'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Document' => {},
+      'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
       'Strain' => {}, 'Sample' => {} }
   end
 

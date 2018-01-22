@@ -12,6 +12,7 @@ en:
     modelling_analysis:  "Modelling analysis"
 
   data_file: "Data file"
+  document: "Document"
   model: "Model"
   sop: "SOP"
   publication: "Publication"
