@@ -2790,9 +2790,9 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'create content blob' do
     person = Factory(:person)
     login_as(person)
-    blob = { data: file_for_upload }
+    blob = {data: file_for_upload}
     assert_difference('ContentBlob.count') do
-      post :create_content_blob,content_blobs:[blob]
+      post :create_content_blob, content_blobs: [blob]
     end
     assert_response :success
     assert assigns(@data_file)
@@ -2800,57 +2800,104 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'create content blob requires login' do
     logout
-    blob = { data: file_for_upload }
+    blob = {data: file_for_upload}
     assert_no_difference('ContentBlob.count') do
-      post :create_content_blob,content_blobs:[blob]
+      post :create_content_blob, content_blobs: [blob]
     end
     assert_response :redirect
   end
 
   test 'create metadata' do
+    person = Factory(:person)
+    login_as(person)
     blob = Factory(:content_blob)
-    project = Factory(:project)
+    project = person.projects.last
     params = {data_file: {
         title: 'Small File',
         project_ids: [project.id]
-    },policy_attributes: valid_sharing,
+    }, policy_attributes: valid_sharing,
               content_blob_id: blob.id
-              }
+    }
 
     assert_difference('DataFile.count') do
-      post :create_metadata,params
+      post :create_metadata, params
     end
 
-    assert ( df = assigns(:data_file))
+    assert (df = assigns(:data_file))
 
-    assert_equal [project],df.projects
-    assert_equal blob,df.content_blob
-    assert_equal 'Small File',df.title
+    assert_equal [project], df.projects
+    assert_equal blob, df.content_blob
+    assert_equal 'Small File', df.title
+    assert_equal person.user, df.contributor
 
     assert_redirected_to df
 
   end
 
   test 'create metadata with validation failure' do
+    person = Factory(:person)
+    login_as(person)
     blob = Factory(:content_blob)
-    project = Factory(:project)
+    project = person.projects.last
     params = {data_file: {
         project_ids: [project.id]
-    },policy_attributes: valid_sharing,
+    }, policy_attributes: valid_sharing,
               content_blob_id: blob.id
     }
 
     assert_no_difference('DataFile.count') do
-      post :create_metadata,params
+      post :create_metadata, params
     end
 
     assert_response :unprocessable_entity
 
-    assert ( df = assigns(:data_file))
-    assert_equal [project],df.projects
-    assert_equal blob,df.content_blob
+    assert (df = assigns(:data_file))
+    assert_equal [project], df.projects
+    assert_equal blob, df.content_blob
     assert_nil df.title
     refute_empty df.errors
+  end
+
+  test 'create metadata requires login' do
+    logout
+    blob = Factory(:content_blob)
+    project = Factory(:project)
+    params = {data_file: {
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id
+    }
+
+    assert_no_difference('DataFile.count') do
+      post :create_metadata, params
+    end
+
+    assert_response :redirect
+
+  end
+
+  test 'create metadata filters projects' do
+    # won't associate to projects the current_user isn't a member of
+    person = Factory(:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    project = Factory(:project)
+    refute_includes person.projects, project
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id
+    }
+
+    assert_no_difference('DataFile.count') do
+      post :create_metadata, params
+    end
+
+    assert_response :unprocessable_entity
+
+    assert (df = assigns(:data_file))
+    assert_empty df.projects
   end
 
   def edit_max_object(df)

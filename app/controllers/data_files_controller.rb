@@ -23,7 +23,7 @@ class DataFilesController < ApplicationController
   before_filter :nels_oauth_session, only: :retrieve_nels_sample_metadata
   before_filter :rest_client, only: :retrieve_nels_sample_metadata
 
-  before_filter :login_required, only: [:create, :create_content_blob]
+  before_filter :login_required, only: [:create, :create_content_blob, :create_metadata]
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -161,10 +161,12 @@ class DataFilesController < ApplicationController
 
     update_sharing_policies(@data_file)
 
+    filter_associated_projects(@data_file)
+
     # associate_content_blob
     blob_id = params[:content_blob_id]
     blob = ContentBlob.find(blob_id)
-    @data_file.content_blob=blob
+    @data_file.content_blob = blob
 
     if @data_file.save && blob.save
       update_annotations(params[:tag_list], @data_file)
@@ -201,6 +203,8 @@ class DataFilesController < ApplicationController
       params[:content_blobs] = params[:content]["data"] #Why a string?
     end
     @data_file = DataFile.new(data_file_params.except!(:content))
+
+    filter_associated_projects(@data_file)
 
     if handle_upload_data
       update_sharing_policies(@data_file)

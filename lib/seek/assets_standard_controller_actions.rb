@@ -92,6 +92,11 @@ module Seek
       end
     end
 
+    #makes sure the asset it only associated with projects that match the current user
+    def filter_associated_projects(asset,user=User.current_user)
+      asset.projects = asset.projects & user.person.projects
+    end
+
     def update_sharing_policies(item)
       Rails.logger.info("=====Policy=====")
       Rails.logger.info(policy_params)
