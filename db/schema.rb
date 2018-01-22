@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180117120616) do
+ActiveRecord::Schema.define(version: 20180122105804) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -525,6 +525,53 @@ ActiveRecord::Schema.define(version: 20180117120616) do
   end
 
   add_index "disciplines_people", ["person_id"], name: "index_disciplines_people_on_person_id", using: :btree
+
+  create_table "document_versions", force: :cascade do |t|
+    t.integer  "document_id",       limit: 4
+    t.integer  "version",           limit: 4
+    t.text     "revision_comments", limit: 65535
+    t.text     "title",             limit: 65535
+    t.text     "description",       limit: 65535
+    t.integer  "contributor_id",    limit: 4
+    t.string   "contributor_type",  limit: 255
+    t.string   "first_letter",      limit: 1
+    t.string   "uuid",              limit: 255
+    t.integer  "policy_id",         limit: 4
+    t.string   "doi",               limit: 255
+    t.string   "license",           limit: 255
+    t.datetime "last_used_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "document_versions", ["contributor_type", "contributor_id"], name: "index_document_versions_on_contributor_type_and_contributor_id", using: :btree
+  add_index "document_versions", ["document_id"], name: "index_document_versions_on_document_id", using: :btree
+
+  create_table "documents", force: :cascade do |t|
+    t.text     "title",            limit: 65535
+    t.text     "description",      limit: 65535
+    t.integer  "contributor_id",   limit: 4
+    t.string   "contributor_type", limit: 255
+    t.integer  "version",          limit: 4
+    t.string   "first_letter",     limit: 1
+    t.string   "uuid",             limit: 255
+    t.integer  "policy_id",        limit: 4
+    t.string   "doi",              limit: 255
+    t.string   "license",          limit: 255
+    t.datetime "last_used_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "documents", ["contributor_type", "contributor_id"], name: "index_documents_on_contributor_type_and_contributor_id", using: :btree
+
+  create_table "documents_projects", force: :cascade do |t|
+    t.integer "document_id", limit: 4
+    t.integer "project_id",  limit: 4
+  end
+
+  add_index "documents_projects", ["document_id", "project_id"], name: "index_documents_projects_on_document_id_and_project_id", using: :btree
+  add_index "documents_projects", ["project_id"], name: "index_documents_projects_on_project_id", using: :btree
 
   create_table "event_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
