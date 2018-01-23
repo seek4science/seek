@@ -38,9 +38,6 @@ module RightField
 
   def generate_rightfield_rdf_graph datafile
     rdf = generate_rightfield_rdf datafile
-    f=Tempfile.new("rdf")
-    f.write(rdf)
-    f.flush
     graph = RDF::Graph.new
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       reader.each_statement do |stmt|
