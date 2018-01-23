@@ -14,7 +14,7 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
   end
 
   def test_should_create_project
-    #debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
+    #min would create a project with a blank programme, max: with a programme.
     ['min', 'max'].each do |m|
       assert_difference('Project.count') do
         post "/projects.json", @json_mm["#{m}"]
@@ -28,6 +28,33 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_should_create_project_with_hierarchy
+    parent = Factory(:project, title: 'Test Parent')
+    @json_mm['min']['data']['attributes']['title'] = 'test project hierarchy'
+    @json_mm['min']['data']['attributes']['parent_id'] = parent.id
+    assert_difference('Project.count') do
+      post "/projects.json",  @json_mm['min']
+    end
+
+    assert_includes assigns(:project).ancestors, parent
+  end
+
+
+  # def test_should_not_create_project_with_programme_if_not_programme_admin
+  #   person = Factory(:programme_administrator)
+  #   login_as(person)
+  #   user_login
+  #   prog = Factory(:programme)
+  #   refute_nil prog
+  #
+  #   assert_difference('Project.count') do
+  #     post :create, project: { title: 'proj with prog', programme_id: prog.id }
+  #   end
+  #
+  #   project = assigns(:project)
+  #   assert_empty project.programmes
+  # end
+  #
   def test_should_update_project
     project = Factory(:project)
     remove_nil_values_before_update
