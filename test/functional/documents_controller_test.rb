@@ -5,14 +5,24 @@ class DocumentsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  # include RestTestCases # TODO: Enable me
+  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include MockHelper
   include HtmlHelper
 
+  def test_json_content
+    login_as(:quentin)
+    super
+  end
+
   def rest_api_test_object
     @object = Factory(:public_document)
+  end
+
+  def edit_max_object(document)
+    add_tags_to_test_object(document)
+    add_creator_to_test_object(document)
   end
 
   test 'should get index' do
