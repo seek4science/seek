@@ -183,7 +183,7 @@ class ContentBlobsController < ApplicationController
         rescue NameError
         else
           if c.method_defined?(:content_blob) || c.method_defined?(:content_blobs)
-            return c.find(value)
+            return c.find_by_id(value)
           end
         end
       end
