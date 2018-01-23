@@ -22,6 +22,14 @@ module ApiIntegrationTestHelper
     end
   end
 
+  #only in max object
+  def edit_relationships
+    @json_mm['max']['data']['relationships'].each do |k,v|
+      obj = Factory(("#{k}".singularize).to_sym)
+      @json_mm['max']['data']['relationships'][k]['data'] = [].append({"id": "#{obj.id}", "type": "#{k}"})
+    end
+  end
+
   def remove_nil_values_before_update
     ['min', 'max'].each do |m|
       @json_mm["#{m}"]["data"]["attributes"].each do |k, v|
