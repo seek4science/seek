@@ -58,8 +58,10 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       if handle_upload_data
         create_content_blobs
+        session[:uploaded_content_blob_id] = @data_file.content_blob.id
         format.html {render :provide_metadata}
       else
+        session.delete(:uploaded_content_blob_id)
         format.html {render action: :new}
       end
     end
@@ -165,10 +167,14 @@ class DataFilesController < ApplicationController
 
     # associate_content_blob
     blob_id = params[:content_blob_id]
+
+    #check it matches that previously uploaded and recorded on the session
+    valid_blob = (blob_id == session[:uploaded_content_blob_id])
+
     blob = ContentBlob.find(blob_id)
     @data_file.content_blob = blob
 
-    if @data_file.save && blob.save
+    if valid_blob && @data_file.save && blob.save
       update_annotations(params[:tag_list], @data_file)
       update_scales @data_file
 

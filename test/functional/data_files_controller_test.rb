@@ -2795,7 +2795,9 @@ class DataFilesControllerTest < ActionController::TestCase
       post :create_content_blob, content_blobs: [blob]
     end
     assert_response :success
-    assert assigns(@data_file)
+    assert df = assigns(:data_file)
+    refute_nil df.content_blob
+    assert_equal df.content_blob.id,session[:uploaded_content_blob_id]
   end
 
   test 'create content blob requires login' do
@@ -2811,6 +2813,7 @@ class DataFilesControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
     blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = {data_file: {
         title: 'Small File',
@@ -2841,10 +2844,61 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'create metadata fails if content blob not on session' do
+    person = Factory(:person)
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session.delete(:uploaded_content_blob_id)
+    project = person.projects.last
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id
+    }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
+    end
+
+    assert_response :unprocessable_entity
+
+
+  end
+
+  test 'create metadata fails if content blob mismatched id on session' do
+    person = Factory(:person)
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = Factory(:content_blob).id
+    project = person.projects.last
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id
+    }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
+    end
+
+    assert_response :unprocessable_entity
+
+
+  end
+
   test 'create metadata with validation failure' do
     person = Factory(:person)
     login_as(person)
     blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = {data_file: {
         project_ids: [project.id]
@@ -2870,6 +2924,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'create metadata requires login' do
     logout
     blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
     project = Factory(:project)
     params = {data_file: {
         project_ids: [project.id]
@@ -2892,6 +2947,7 @@ class DataFilesControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person)
     blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
     project = Factory(:project)
     refute_includes person.projects, project
     params = {data_file: {
