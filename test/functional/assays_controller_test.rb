@@ -1514,7 +1514,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_not_includes assay.documents, document
 
     assert_difference('AssayAsset.count') do
-      put :update, id: assay, document_ids: [document.id], assay: { title: assay.title }
+      put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
     end
 
     assert_redirected_to assay_path(assay)
