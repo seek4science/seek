@@ -2819,18 +2819,25 @@ class DataFilesControllerTest < ActionController::TestCase
               content_blob_id: blob.id
     }
 
-    assert_difference('DataFile.count') do
-      post :create_metadata, params
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        post :create_metadata, params
+      end
     end
 
     assert (df = assigns(:data_file))
+
+    assert_redirected_to df
 
     assert_equal [project], df.projects
     assert_equal blob, df.content_blob
     assert_equal 'Small File', df.title
     assert_equal person.user, df.contributor
 
-    assert_redirected_to df
+    al = ActivityLog.last
+    assert_equal 'create',al.action
+    assert_equal df, al.activity_loggable
+    assert_equal person.user, al.culprit
 
   end
 
@@ -2845,8 +2852,10 @@ class DataFilesControllerTest < ActionController::TestCase
               content_blob_id: blob.id
     }
 
-    assert_no_difference('DataFile.count') do
-      post :create_metadata, params
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
     end
 
     assert_response :unprocessable_entity
@@ -2868,8 +2877,10 @@ class DataFilesControllerTest < ActionController::TestCase
               content_blob_id: blob.id
     }
 
-    assert_no_difference('DataFile.count') do
-      post :create_metadata, params
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
     end
 
     assert_response :redirect
@@ -2890,8 +2901,10 @@ class DataFilesControllerTest < ActionController::TestCase
               content_blob_id: blob.id
     }
 
-    assert_no_difference('DataFile.count') do
-      post :create_metadata, params
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        post :create_metadata, params
+      end
     end
 
     assert_response :unprocessable_entity
