@@ -127,6 +127,14 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to documents_path
   end
 
+  test 'should be able to view pdf content' do
+    doc = Factory(:public_document)
+    assert doc.content_blob.is_content_viewable?
+    get :show, id: doc.id
+    assert_response :success
+    assert_select 'a', text: /View content/, count: 1
+  end
+
   private
 
   def valid_document

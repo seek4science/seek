@@ -274,7 +274,11 @@ module Seek
     end
 
     def default_page(controller)
-      default_pages[controller.to_sym]
+      if default_pages.key?(controller.to_sym)
+        default_pages[controller.to_sym]
+      else
+        Settings.defaults['default_pages'][controller.to_sym] || 'latest'
+      end
     end
 
     # FIXME: change to standard setter=
