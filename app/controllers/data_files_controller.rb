@@ -192,6 +192,7 @@ class DataFilesController < ApplicationController
       end
 
     else
+      @data_file.errors[:base]="The file uploaded doesn't match" unless valid_blob
       respond_to do |format|
         format.html do
           render :provide_metadata, status: :unprocessable_entity

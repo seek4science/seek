@@ -2866,6 +2866,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_response :unprocessable_entity
 
+    refute_empty (df = assigns(:data_file)).errors
+    assert_equal ["The file uploaded doesn't match"],df.errors[:base]
+
 
   end
 
@@ -2890,6 +2893,9 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_response :unprocessable_entity
+
+    refute_empty (df = assigns(:data_file)).errors
+    assert_equal ["The file uploaded doesn't match"],df.errors[:base]
 
 
   end
