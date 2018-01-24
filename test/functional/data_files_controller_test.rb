@@ -2819,7 +2819,7 @@ class DataFilesControllerTest < ActionController::TestCase
         title: 'Small File',
         project_ids: [project.id]
     }, policy_attributes: valid_sharing,
-              content_blob_id: blob.id
+              content_blob_id: blob.id.to_s
     }
 
     assert_difference('ActivityLog.count') do
@@ -2842,6 +2842,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df, al.activity_loggable
     assert_equal person.user, al.culprit
 
+    assert_nil session[:uploaded_content_blob_id]
+
   end
 
   test 'create metadata fails if content blob not on session' do
@@ -2855,7 +2857,7 @@ class DataFilesControllerTest < ActionController::TestCase
         title: 'Small File',
         project_ids: [project.id]
     }, policy_attributes: valid_sharing,
-              content_blob_id: blob.id
+              content_blob_id: blob.id.to_s
     }
 
     assert_no_difference('ActivityLog.count') do
@@ -2883,7 +2885,7 @@ class DataFilesControllerTest < ActionController::TestCase
         title: 'Small File',
         project_ids: [project.id]
     }, policy_attributes: valid_sharing,
-              content_blob_id: blob.id
+              content_blob_id: blob.id.to_s
     }
 
     assert_no_difference('ActivityLog.count') do

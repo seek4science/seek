@@ -169,7 +169,7 @@ class DataFilesController < ApplicationController
     blob_id = params[:content_blob_id]
 
     #check it matches that previously uploaded and recorded on the session
-    valid_blob = (blob_id == session[:uploaded_content_blob_id])
+    valid_blob = (blob_id == session[:uploaded_content_blob_id].to_s)
 
     blob = ContentBlob.find(blob_id)
     @data_file.content_blob = blob
@@ -179,6 +179,8 @@ class DataFilesController < ApplicationController
       update_scales @data_file
 
       update_relationships(@data_file, params)
+
+      session.delete(:uploaded_content_blob_id)
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
