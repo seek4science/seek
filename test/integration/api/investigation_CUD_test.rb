@@ -4,13 +4,17 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
 
   def setup
-    # log in
-    admin_user = Factory(:admin).user
-    admin_user.password = 'blah'
-    post '/session', login: admin_user.login, password: admin_user.password
+
+    admin = Factory.create(:admin)
+     @current_user = admin.user
+    @current_user.password = 'blah'
 
     @project = Factory(:min_project)
     @project.title = 'Fred'
+
+
+    # log in
+    post '/session', login: admin.user.login, password: admin.user.password
 
     template_file = File.join(Rails.root, 'test', 'fixtures',
                               'files', 'json', 'templates', 'min_investigation.json.erb')
@@ -20,6 +24,17 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
   end
 
   def test_create
+
+    extra_attributes = {}
+    extra_attributes[:policy] = BaseSerializer::convert_policy Factory(:private_policy)
+    extra_attributes = extra_attributes.with_indifferent_access
+
+    person_id = @current_user.person.id
+    extra_relationships = {}
+    extra_relationships[:submitter] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
+    extra_relationships[:people] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
+    extra_relationships = extra_relationships.with_indifferent_access
+
     # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
     assert_difference('Investigation.count') do
       post '/investigations.json', @to_post
@@ -32,9 +47,38 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
       assert_equal value, h['data']['attributes'][key]
     end
 
+    h['data']['attributes'].each do |key, value|
+      if @to_post['data']['attributes'].has_key? key
+        assert_equal value, @to_post['data']['attributes'][key]
+      elsif extra_attributes.has_key? key
+        assert_equal value, extra_attributes[key]
+      elsif value.blank?
+        # Should be OK
+        else
+        warn("Unexpected attribute [#{key}]=#{value}")
+      end
+    end
+
+
     @to_post['data']['relationships'].each do |key, value|
       assert_equal value, h['data']['relationships'][key]
     end
+
+    h['data']['relationships'].each do |key, value|
+      if @to_post['data']['relationships'].has_key? key
+        assert_equal value, @to_post['data']['relationships'][key]
+      elsif extra_relationships.has_key? key
+        assert_equal value, extra_relationships[key]
+      elsif value.blank?
+        # Should be OK
+      elsif value['data'].blank?
+        # Should be OK
+      else
+        warn("Unexpected relationship [#{key}]=#{value}")
+      end
+    end
+
+
   end
 
   def test_update

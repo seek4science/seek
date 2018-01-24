@@ -1,9 +1,7 @@
 {
     "data": {
         "attributes": {
-            "tags": null,
-            "title": "An investigation27",
-            "description": null
+            "title": "An investigation27"
         },
         "relationships": {
             "projects": {

@@ -7,7 +7,7 @@ class BaseSerializer < SimpleBaseSerializer
   attribute :policy, if: :show_policy?
 
   def policy
-    convert_policy object.policy
+    BaseSerializer.convert_policy object.policy
   end
 
   def associated(name)
@@ -97,17 +97,17 @@ class BaseSerializer < SimpleBaseSerializer
                   end
   end
 
-  def convert_policy policy
-    { 'access' => (access_type_key policy.access_type),
-      'permissions' => (permits policy)}
+  def self.convert_policy policy
+    { 'access' => (PolicyHelper::access_type_key policy.access_type),
+      'permissions' => (self.permits policy)}
   end
 
-  def permits policy
+  def self.permits policy
     result = []
     policy.permissions.each do |p|
       result.append ({'resource_type' => p.contributor_type.downcase.pluralize,
                       'resource_id' => p.contributor_id.to_s,
-                      'access' => (access_type_key p.access_type) } )
+                      'access' => (PolicyHelper::access_type_key p.access_type) } )
     end
     return result
   end

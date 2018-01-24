@@ -25,7 +25,7 @@ module ISAHelper
   BORDER_COLOURS.default = '#71b7be'
 
   def cytoscape_elements(elements_hash)
-    elements = cytoscape_edge_elements(elements_hash) + cytoscape_node_elements(elements_hash)
+    elements = cytoscape_edge_elements(elements_hash) + cytoscape_node_elecontribments(elements_hash)
     # aggregate_hidden_nodes(elements)
   rescue Exception => e
     raise e if Rails.env.development?
