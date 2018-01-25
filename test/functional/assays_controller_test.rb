@@ -1503,4 +1503,22 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_redirected_to assays_path
   end
+
+  test 'should associate document' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+    document = Factory(:document, contributor: person)
+    timestamp = assay.updated_at
+
+    assert_not_includes assay.documents, document
+
+    assert_difference('AssayAsset.count') do
+      put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_includes assigns(:assay).documents, document
+    assert_not_equal timestamp, assigns(:assay).updated_at
+  end
 end

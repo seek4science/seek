@@ -183,6 +183,7 @@ class AdminController < ApplicationController
     Seek::Config.set_default_page 'publications', params[:publications]
     Seek::Config.set_default_page 'presentations', params[:presentations]
     Seek::Config.set_default_page 'events', params[:events]
+    Seek::Config.set_default_page 'documents', params[:documents]
     Seek::Config.limit_latest = params[:limit_latest] if only_positive_integer params[:limit_latest], 'latest limit'
     update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'), 'pagination'
   end

@@ -66,6 +66,10 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Event')
   end
 
+  def documents
+    associated('Document')
+  end
+
   def self_link
     polymorphic_path(object)
   end

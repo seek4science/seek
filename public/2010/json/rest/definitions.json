@@ -325,40 +325,13 @@
           "$ref" : "#/definitions/policy"
         }
       },
-      "required": [
-        "title",
-        "license",
-        "latest_version",
-        "versions",
-        "version",
-        "created_at",
-        "updated_at",
-        "content_blobs",
-        "model_type",
-        "model_format",
-        "environment"
-      ],
-      "additionalProperties": false
+      "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at", "content_blobs", "model_type", "model_format", "environment" ],
+      "additionalProperties" : false
     },
-    "anyType": {
-      "type": "string",
-      "minLength": 1,
-      "enum": [
-        "assays",
-        "content_blobs",
-        "data_files",
-        "events",
-        "models",
-        "organisms",
-        "people",
-        "presentations",
-        "programmes",
-        "projects",
-        "publications",
-        "sample_types",
-        "sops",
-        "studies"
-      ]
+    "anyType" : {
+      "type" : "string",
+      "minLength" : 1,
+      "enum" : [ "assays", "content_blobs", "data_files", "documents", "events", "models", "organisms", "people", "presentations", "programmes", "projects", "publications", "sample_types", "sops", "studies" ]
     },
     "assayType" : {
       "type" : "string",
@@ -447,6 +420,21 @@
       "properties" : {
         "data" : {
           "$ref" : "#/definitions/dataFileReferences"
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
+    "documentType" : {
+      "type" : "string",
+      "minLength" : 1,
+      "enum" : [ "documents" ]
+    },
+    "documentReferencesList" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "$ref" : "#/definitions/documentReferences"
         }
       },
       "required" : [ "data" ],
@@ -888,6 +876,26 @@
         "$ref" : "#/definitions/dataFileSkeleton"
       }
     },
+    "documentReferences" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/documentReference"
+      }
+    },
+    "documentReference" : {
+      "properties" : {
+        "id" : {
+          "$ref" : "#/definitions/nonEmptyString"
+        },
+        "type" : {
+          "$ref" : "#/definitions/documentType"
+        }
+      },
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
+    },
     "eventReferences" : {
       "type" : "array",
       "minItems" : 0,
@@ -1217,6 +1225,9 @@
                 "data_files" : {
                   "$ref" : "#/definitions/dataFileReferencesList"
                 },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
                 "models" : {
                   "$ref" : "#/definitions/modelReferencesList"
                 },
@@ -1227,7 +1238,7 @@
                   "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
-              "required" : [ "creators", "submitter", "organisms", "people", "projects", "investigation", "study", "data_files", "models", "sops", "publications" ],
+              "required" : [ "creators", "submitter", "organisms", "people", "projects", "investigation", "study", "data_files", "documents", "models", "sops", "publications" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -1345,6 +1356,69 @@
                 }
               },
               "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications", "events" ],
+              "additionalProperties" : false
+            },
+            "links" : {
+              "$ref" : "#/definitions/linksType"
+            },
+            "meta" : {
+              "$ref" : "#/definitions/metaType"
+            }
+          },
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
+        },
+        "jsonapi" : {
+          "$ref" : "#/definitions/JsonApiVersion"
+        }
+      },
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
+    },
+    "documentResponse" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
+            "type" : {
+              "$ref" : "#/definitions/documentType"
+            },
+            "attributes" : {
+              "$ref" : "#/definitions/contributedTypeAttributes"
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "submitter" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "people" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "investigations" : {
+                  "$ref" : "#/definitions/investigationReferencesList"
+                },
+                "studies" : {
+                  "$ref" : "#/definitions/studyReferencesList"
+                },
+                "assays" : {
+                  "$ref" : "#/definitions/assayReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
+                }
+              },
+              "required" : [ "creators", "submitter", "people", "projects", "investigations", "studies", "assays", "publications" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -1568,6 +1642,9 @@
                 "data_files" : {
                   "$ref" : "#/definitions/dataFileReferencesList"
                 },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
                 "models" : {
                   "$ref" : "#/definitions/modelReferencesList"
                 },
@@ -1578,7 +1655,7 @@
                   "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "studies", "assays", "data_files", "models", "sops", "publications" ],
+              "required" : [ "creators", "submitter", "people", "projects", "studies", "assays", "data_files", "documents", "models", "sops", "publications" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -1792,6 +1869,9 @@
                 "data_files" : {
                   "$ref" : "#/definitions/dataFileReferencesList"
                 },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
                 "models" : {
                   "$ref" : "#/definitions/modelReferencesList"
                 },
@@ -1808,7 +1888,7 @@
                   "$ref" : "#/definitions/eventReferencesList"
                 }
               },
-              "required" : [ "projects", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events" ],
+              "required" : [ "projects", "institutions", "investigations", "studies", "assays", "data_files", "documents", "models", "sops", "publications", "presentations", "events" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -1933,6 +2013,9 @@
                 "data_files" : {
                   "$ref" : "#/definitions/dataFileReferencesList"
                 },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
                 "models" : {
                   "$ref" : "#/definitions/modelReferencesList"
                 },
@@ -1949,7 +2032,7 @@
                   "$ref" : "#/definitions/eventReferencesList"
                 }
               },
-              "required" : [ "people", "projects", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events" ],
+              "required" : [ "people", "projects", "institutions", "investigations", "studies", "assays", "data_files", "documents", "models", "sops", "publications", "presentations", "events" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -2030,6 +2113,9 @@
                 "data_files" : {
                   "$ref" : "#/definitions/dataFileReferencesList"
                 },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
                 "models" : {
                   "$ref" : "#/definitions/modelReferencesList"
                 },
@@ -2049,7 +2135,7 @@
                   "$ref" : "#/definitions/programmeReferencesList"
                 }
               },
-              "required" : [ "organisms", "people", "institutions", "investigations", "studies", "assays", "data_files", "models", "sops", "publications", "presentations", "events", "programmes" ],
+              "required" : [ "organisms", "people", "institutions", "investigations", "studies", "assays", "data_files", "documents", "models", "sops", "publications", "presentations", "events", "programmes" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -2296,6 +2382,9 @@
                 "data_files" : {
                   "$ref" : "#/definitions/dataFileReferencesList"
                 },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
                 "models" : {
                   "$ref" : "#/definitions/modelReferencesList"
                 },
@@ -2306,7 +2395,7 @@
                   "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
-              "required" : [ "creators", "submitter", "people", "projects", "investigation", "assays", "data_files", "models", "sops", "publications" ],
+              "required" : [ "creators", "submitter", "people", "projects", "investigation", "assays", "data_files", "documents", "models", "sops", "publications" ],
               "additionalProperties" : false
             },
             "links" : {
@@ -2347,6 +2436,55 @@
       "properties" : {
         "data" : {
           "$ref" : "#/definitions/dataFileSkeletons"
+        },
+        "jsonapi" : {
+          "$ref" : "#/definitions/JsonApiVersion"
+        },
+        "meta" : {
+          "$ref" : "#/definitions/baseMetaType"
+        }
+      },
+      "required" : [ "data", "jsonapi", "meta" ],
+      "additionalProperties" : false
+    },
+    "documentSkeleton" : {
+      "properties" : {
+        "id" : {
+          "$ref" : "#/definitions/nonEmptyString"
+        },
+        "type" : {
+          "$ref" : "#/definitions/documentType"
+        },
+        "attributes" : {
+          "type" : "object",
+          "properties" : {
+            "title" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            }
+          },
+          "required" : [ "title" ],
+          "additionalProperties" : false
+        },
+        "links" : {
+          "$ref" : "#/definitions/linksType"
+        }
+      },
+      "required" : [ "id", "type", "attributes", "links" ],
+      "additionalProperties" : false
+    },
+    "documentSkeletons" : {
+      "type" : "array",
+      "minItems" : 0,
+      "uniqueItems" : true,
+      "items" : {
+        "$ref" : "#/definitions/documentSkeleton"
+      }
+    },
+    "documentsResponse" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "$ref" : "#/definitions/documentSkeletons"
         },
         "jsonapi" : {
           "$ref" : "#/definitions/JsonApiVersion"
@@ -3032,4 +3170,3 @@
     }
   }
 }
-
