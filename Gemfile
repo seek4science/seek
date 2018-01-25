@@ -62,9 +62,6 @@ gem "attr_encrypted", "~> 3.0.0"
 # gem for BiVeS and BudHat
 gem 'bives'
 
-# 4.3 starts giving a deprecation warning about rails 3 unsupported
-gem 'paperclip', '~>4.2.0'
-
 # Linked to SysMO Git repositories
 gem 'gibberish', git: 'https://github.com/SysMO-DB/gibberish.git'
 gem 'white_list', git: 'https://github.com/SysMO-DB/white_list.git'
