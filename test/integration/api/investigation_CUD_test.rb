@@ -1,26 +1,24 @@
 require 'test_helper'
+require 'integration/api_test_helper'
 
 class InvestigationCUDTest < ActionDispatch::IntegrationTest
-  include AuthenticatedTestHelper
+  include ApiTestHelper
 
   def setup
-
-    admin = Factory.create(:admin)
-     @current_user = admin.user
-    @current_user.password = 'blah'
+    admin_login
+    @clz = "investigation"
+    @plural_clz = @clz.pluralize
 
     @project = Factory(:min_project)
     @project.title = 'Fred'
-
-
-    # log in
-    post '/session', login: admin.user.login, password: admin.user.password
 
     template_file = File.join(Rails.root, 'test', 'fixtures',
                               'files', 'json', 'templates', 'min_investigation.json.erb')
     template = ERB.new(File.read(template_file))
     namespace = OpenStruct.new(project_id: @project.id)
     @to_post = JSON.parse(template.result(namespace.instance_eval { binding }))
+
+
   end
 
   def test_create
@@ -129,37 +127,6 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def test_create_with_id
-    post_clone = JSON.parse(JSON.generate(@to_post))
-    post_clone['data']['id'] = '100000000'
-
-    assert_no_difference ('Investigation.count') do
-      post '/investigations.json', post_clone
-      assert_response :unprocessable_entity
-      assert_match 'A POST request is not allowed to specify an id', response.body
-    end
-  end
-
-  def test_create_wrong_type
-    post_clone = JSON.parse(JSON.generate(@to_post))
-    post_clone['data']['type'] = 'wrong'
-    assert_no_difference ('Investigation.count') do
-      post '/investigations.json', post_clone
-      assert_response :unprocessable_entity
-      assert_match "The specified data:type does not match the URL's object (wrong vs. investigations)", response.body
-    end
-  end
-
-  def test_create_missing_type
-    post_clone = JSON.parse(JSON.generate(@to_post))
-    post_clone['data'].delete('type')
-    assert_no_difference ('Investigation.count') do
-      post '/investigations.json', post_clone
-      assert_response :unprocessable_entity
-      assert_match 'A POST/PUT request must specify a data:type', response.body
-    end
-  end
-
   def test_update_wrong_id
     post '/investigations.json', @to_post
     assert_response :success
@@ -217,18 +184,5 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def test_delete
-    post '/investigations.json', @to_post
-    assert_response :success
 
-    h = JSON.parse(response.body)
-    investigation_id = h['data']['id']
-    assert_difference ('Investigation.count'), -1 do
-      delete "/investigations/#{investigation_id}.json"
-      assert_response :success
-    end
-
-    get "/investigations/#{investigation_id}.json"
-    assert_response :not_found
-  end
 end
