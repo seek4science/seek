@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180117120616) do
+ActiveRecord::Schema.define(version: 20180125113031) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -254,18 +254,20 @@ ActiveRecord::Schema.define(version: 20180117120616) do
   end
 
   create_table "content_blobs", force: :cascade do |t|
-    t.string  "md5sum",            limit: 255
-    t.text    "url",               limit: 65535
-    t.string  "uuid",              limit: 255
-    t.string  "original_filename", limit: 255
-    t.string  "content_type",      limit: 255
-    t.integer "asset_id",          limit: 4
-    t.string  "asset_type",        limit: 255
-    t.integer "asset_version",     limit: 4
-    t.boolean "is_webpage",                      default: false
-    t.boolean "external_link"
-    t.string  "sha1sum",           limit: 255
-    t.integer "file_size",         limit: 8
+    t.string   "md5sum",            limit: 255
+    t.text     "url",               limit: 65535
+    t.string   "uuid",              limit: 255
+    t.string   "original_filename", limit: 255
+    t.string   "content_type",      limit: 255
+    t.integer  "asset_id",          limit: 4
+    t.string   "asset_type",        limit: 255
+    t.integer  "asset_version",     limit: 4
+    t.boolean  "is_webpage",                      default: false
+    t.boolean  "external_link"
+    t.string   "sha1sum",           limit: 255
+    t.integer  "file_size",         limit: 8
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "content_blobs", ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type", using: :btree
