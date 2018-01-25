@@ -6,6 +6,7 @@ require 'active_record/fixtures'
 require 'colorize'
 require 'seek/mime_types'
 
+
 include Seek::MimeTypes
 
 namespace :seek do
@@ -15,6 +16,7 @@ namespace :seek do
     rebuild_sample_templates
     delete_redundant_subscriptions
     update_sample_resource_links
+    update_content_blob_timestamps
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -84,5 +86,31 @@ namespace :seek do
       sample.send(:update_sample_resource_links)
     end
     puts "Created #{SampleResourceLink.count - pre_count} SampleResourceLinks"
+  end
+
+  task(update_content_blob_timestamps: :environment) do
+    bar = ProgressBar.new(ContentBlob.where('created_at IS NULL').count)
+    puts "Collecting content blobs with assets ..."
+    bar = ProgressBar.new(ContentBlob.where('created_at IS NULL').count)
+    blobs_with_assets = ContentBlob.where('created_at IS NULL').find_each.select do |blob|
+      bar.increment!
+      blob.asset.present?
+    end
+    puts " ... transferring timestamps from assets ..."
+    bar = ProgressBar.new(blobs_with_assets.count)
+    blobs_with_assets.each do |blob|
+      blob.update_attribute(:created_at,blob.asset.created_at)
+      blob.update_attribute(:updated_at,blob.asset.updated_at)
+      bar.increment!
+    end
+
+    #clean up the remaining ones.
+    puts "Removing content blobs without assets ..."
+    bar = ProgressBar.new(ContentBlob.where('created_at IS NULL AND updated_at IS NULL').count)
+    ContentBlob.where('created_at IS NULL AND updated_at IS NULL').find_each do |blob|
+      blob.destroy
+      bar.increment!
+    end
+
   end
 end
