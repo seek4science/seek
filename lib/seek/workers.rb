@@ -23,10 +23,9 @@ module Seek
       queues << QueueNames::AUTH_LOOKUP if Seek::Config.auth_lookup_enabled
       queues << QueueNames::REMOTE_CONTENT if Seek::Config.cache_remote_files
       queues << QueueNames::SAMPLES if Seek::Config.samples_enabled
-      queues << TavernaPlayer.job_queue_name if number_of_taverna_workers > 0
+
       queues.each do |queue_name|
-        number = (queue_name == TavernaPlayer.job_queue_name) ? number_of_taverna_workers : 1
-        commands << command(queue_name, number, action)
+        commands << command(queue_name, 1, action)
       end
       commands
     end
