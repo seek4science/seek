@@ -99,8 +99,8 @@ namespace :seek do
     puts " ... transferring timestamps from assets ..."
     bar = ProgressBar.new(blobs_with_assets.count)
     blobs_with_assets.each do |blob|
-      blob.update_attribute(:created_at,blob.asset.created_at)
-      blob.update_attribute(:updated_at,blob.asset.updated_at)
+      blob.update_attribute(:created_at, blob.asset.created_at)
+      blob.update_attribute(:updated_at, blob.asset.updated_at)
       bar.increment!
     end
 
@@ -108,6 +108,7 @@ namespace :seek do
     puts "Removing content blobs without assets ..."
     bar = ProgressBar.new(ContentBlob.where('created_at IS NULL AND updated_at IS NULL').count)
     ContentBlob.where('created_at IS NULL AND updated_at IS NULL').find_each do |blob|
+      raise 'Attempting to destroy a content blob with an asset' if blob.asset.present?
       blob.destroy
       bar.increment!
     end
