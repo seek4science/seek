@@ -3,12 +3,10 @@ require 'delayed/command'
 # module for handling interaction with delayed job workers
 module Seek
   module Workers
-    # TODO: Come back to this when removing workflows
-    def self.start(number_of_taverna_workers = 0, action = 'start')
+    def self.start(action = 'start')
       @identifier = 0
-      number_of_taverna_workers = 0
 
-      commands = create_commands(number_of_taverna_workers, action)
+      commands = create_commands(action)
 
       daemonize_commands(commands)
     end
@@ -17,16 +15,14 @@ module Seek
       commands.map { |command| Delayed::Command.new(command.split).daemonize }
     end
 
-    def self.create_commands(number_of_taverna_workers, action)
+    def self.create_commands(action)
       commands = []
       queues = [QueueNames::DEFAULT]
       queues << QueueNames::AUTH_LOOKUP if Seek::Config.auth_lookup_enabled
       queues << QueueNames::REMOTE_CONTENT if Seek::Config.cache_remote_files
       queues << QueueNames::SAMPLES if Seek::Config.samples_enabled
-      queues << TavernaPlayer.job_queue_name if number_of_taverna_workers > 0
       queues.each do |queue_name|
-        number = (queue_name == TavernaPlayer.job_queue_name) ? number_of_taverna_workers : 1
-        commands << command(queue_name, number, action)
+        commands << command(queue_name, 1, action)
       end
       commands
     end
@@ -39,8 +35,8 @@ module Seek
       daemonize_commands(['status'])
     end
 
-    def self.restart(number = 0)
-      start(number, 'restart')
+    def self.restart
+      start('restart')
     end
 
     def self.start_data_file_auth_lookup_worker(number = 1)

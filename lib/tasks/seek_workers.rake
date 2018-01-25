@@ -5,10 +5,8 @@ namespace :seek do
   namespace :workers do
 
     desc "Start the delayed job workers"
-    task :start, [:number] => [:environment] do |t, args|
-      args.with_defaults(:number => "0")
-      number = args.number.to_i
-      Seek::Workers.start(number)
+    task :start => :environment do
+      Seek::Workers.start
     end
 
     desc "Stop the delayed job workers"
@@ -21,10 +19,8 @@ namespace :seek do
       Seek::Workers.status
     end
 
-    task :restart, [:number] => [:environment] do |t, args|
-      args.with_defaults(:number => "0")
-      number = args.number.to_i
-      Seek::Workers.restart(number)
+    task :restart => :environment do
+      Seek::Workers.restart
     end
 
   end
