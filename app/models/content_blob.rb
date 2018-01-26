@@ -112,7 +112,8 @@ class ContentBlob < ActiveRecord::Base
   # include all image types
 
   def cache_key
-    "#{super}-#{sha1sum}"
+    base = new_record? ? "#{model_name.cache_key}/new" : "#{model_name.cache_key}/#{id}"
+    "#{base}-#{sha1sum}"
   end
 
   # returns an IO Object to the data content, or nil if the data file doesn't exist.
