@@ -4,5 +4,17 @@ Welcome to <%= Seek::Config.application_name %>. You have now registered and act
 
 You may now update your profile at <%=  edit_person_url(@person) %>
 
+If during the registration you indicated you are a member of a <%= t('project') %> you will need to wait until you have been assigned to that <%= t('project') %> by a <%= t('project') %> administrator.
+Otherwise, you could request to join projects, read here to see how: <%= Seek::Help::HelpDictionary.instance.help_link(:join_project)-%>.
+
+<% if Seek::Config.programme_user_creation_enabled %>
+It is also possible to create your own <%= t('programme') %> and <%= t('project').pluralize %> - for more information please read <%= Seek::Help::HelpDictionary.instance.help_link(:programme_self_management) %>
+<% end %>
+For further documentation, see the User Guide: <%= Seek::Help::HelpDictionary.instance.help_link(:get_started)-%>.
+
+If you require any assistance, please contact one of the following administrators:
+<% for admin in Person.admins -%>
+  <%= "#{h admin.name}: " %><%= admin.email %>
+<% end -%>
 
 - The <%= Seek::Config.dm_project_name %> Team
