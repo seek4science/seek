@@ -1,7 +1,5 @@
 class ContentBlobCleanerJob < SeekJob
-  def follow_on_job?
-    true
-  end
+  include PeriodicRegularSeekJob
 
   def follow_on_delay
     grace_period
@@ -9,10 +7,6 @@ class ContentBlobCleanerJob < SeekJob
 
   def default_priority
     3
-  end
-
-  def self.create_initial_job
-    new.queue_job
   end
 
   def perform_job(item)
@@ -29,17 +23,11 @@ class ContentBlobCleanerJob < SeekJob
     false
   end
 
-  # overidden to ignore_locked false by default
-  def exists?(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  # overidden to ignore_locked false by default
-  def count(ignore_locked = false)
-    super(ignore_locked)
-  end
-
   def grace_period
     8.hours
+  end
+
+  def self.create_initial_job
+    new.queue_job
   end
 end

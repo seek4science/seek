@@ -5,6 +5,7 @@ class ContentBlobCleanerJobTest < ActiveSupport::TestCase
   def setup
     @job = ContentBlobCleanerJob.new
     ContentBlob.destroy_all
+    Delayed::Job.destroy_all
   end
 
   test 'defaults' do
@@ -16,7 +17,6 @@ class ContentBlobCleanerJobTest < ActiveSupport::TestCase
   end
 
   test 'create initial job' do
-    Delayed::Job.destroy_all
     assert_difference('Delayed::Job.count') do
       ContentBlobCleanerJob.create_initial_job
     end
@@ -50,5 +50,35 @@ class ContentBlobCleanerJobTest < ActiveSupport::TestCase
     assert ContentBlob.exists?(keep2.id)
     assert ContentBlob.exists?(keep3.id)
     assert ContentBlob.exists?(keep4.id)
+  end
+
+  test 'queue job' do
+    assert_difference('Delayed::Job.count') do
+      ContentBlobCleanerJob.new.queue_job
+    end
+
+    assert_equal ContentBlobCleanerJob, Delayed::Job.last.payload_object.class
+
+    assert_no_difference('Delayed::Job.count') do
+      ContentBlobCleanerJob.new.queue_job
+    end
+
+    Delayed::Job.last.update_attribute(:locked_at, Time.now)
+
+    assert_no_difference('Delayed::Job.count') do
+      ContentBlobCleanerJob.new.queue_job
+    end
+  end
+
+  test 'exists?' do
+    refute @job.exists?
+
+    ContentBlobCleanerJob.new.queue_job
+
+    assert @job.exists?
+
+    Delayed::Job.last.update_attribute(:locked_at, Time.now)
+
+    assert @job.exists?
   end
 end

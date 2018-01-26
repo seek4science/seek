@@ -1,5 +1,7 @@
 class SendPeriodicEmailsJob < SeekEmailJob
-  DELAYS = { 'daily' => 1.day, 'weekly' => 1.week, 'monthly' => 1.month }
+  include PeriodicRegularSeekJob
+
+  DELAYS = { 'daily' => 1.day, 'weekly' => 1.week, 'monthly' => 1.month }.freeze
 
   Subscription::FREQUENCIES.drop(1).each do |frequency|
     eval <<-END_EVAL
@@ -13,7 +15,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
 
   def initialize(frequency)
     @frequency = frequency.to_s.downcase
-    fail Exception.new("invalid frequency - #{frequency}") unless DELAYS.keys.include?(@frequency)
+    raise Exception, "invalid frequency - #{frequency}" unless DELAYS.keys.include?(@frequency)
   end
 
   def perform_job(_item)
@@ -23,10 +25,6 @@ class SendPeriodicEmailsJob < SeekEmailJob
 
   def gather_items
     [nil]
-  end
-
-  def follow_on_job?
-    true
   end
 
   def default_priority
@@ -43,16 +41,6 @@ class SendPeriodicEmailsJob < SeekEmailJob
 
   def delay_for_frequency
     DELAYS[frequency]
-  end
-
-  # overidden to ignore_locked false by default
-  def exists?(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  # overidden to ignore_locked false by default
-  def count(ignore_locked = false)
-    super(ignore_locked)
   end
 
   def send_subscription_mails(logs)
@@ -104,14 +92,14 @@ class SendPeriodicEmailsJob < SeekEmailJob
   end
 
   def activity_logs_since(time_point)
-    ActivityLog.where(['created_at>=? and action in (?) and controller_name!=?', time_point, %w(create update), 'sessions'])
+    ActivityLog.where(['created_at>=? and action in (?) and controller_name!=?', time_point, %w[create update], 'sessions'])
   end
 
   # puts the initial jobs on the queue for each period - daily, weekly, monthly - if they do not exist already
   # starting at midday
   def self.create_initial_jobs
     time = time_for_initial_job
-    %w(daily weekly monthly).each do |freq|
+    %w[daily weekly monthly].each do |freq|
       SendPeriodicEmailsJob.new(freq).queue_job(default_priority, time)
       time += 5.minutes
     end
@@ -124,7 +112,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
            else
              Time.now
     end
-    Time.local(time.year, time.month, time.day, 12, 00, 00)
+    Time.local(time.year, time.month, time.day, 12, 0o0, 0o0)
   end
 
   def self.default_priority
