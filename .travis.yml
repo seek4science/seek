@@ -4,19 +4,18 @@ cache: bundler
 
 jdk:
   - oraclejdk8
-  - openjdk8
 
 sudo: false
 
 env:
   - SUITE="rake test:units" DB_TYPE=mysql
-#  - SUITE="rake test:units" DB_TYPE=sqlite3
-#  - SUITE="rake test:functionals" DB_TYPE=mysql
-#  - SUITE="rake test:functionals" DB_TYPE=sqlite3
-#  - SUITE="rake test:functionals" DB_TYPE=postgres
-#  - SUITE="rake test:integration" DB_TYPE=mysql
-#  - SUITE="rspec spec" DB_TYPE=mysql
-#  - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
+  - SUITE="rake test:units" DB_TYPE=sqlite3
+  - SUITE="rake test:functionals" DB_TYPE=mysql
+  - SUITE="rake test:functionals" DB_TYPE=sqlite3
+  - SUITE="rake test:functionals" DB_TYPE=postgres
+  - SUITE="rake test:integration" DB_TYPE=mysql
+  - SUITE="rspec spec" DB_TYPE=mysql
+  - SUITE="rake assets:precompile RAILS_ENV=production" DB_TYPE=mysql
 #  - SUITE="rake teaspoon" RAILS_ENV=test DB_TYPE=mysql
 
 before_script:
