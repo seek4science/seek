@@ -11,6 +11,7 @@ Factory.define(:min_content_blob, class: ContentBlob) do |f|
   f.data 'Min Data'
   f.original_filename 'min file'
 end
+
 Factory.define(:url_content_blob, parent: :content_blob) do |f|
   f.url 'http://www.abc.com'
   f.data nil

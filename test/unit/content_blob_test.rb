@@ -193,11 +193,10 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def test_uuid
-    pic = content_blobs(:picture_blob)
-    blob = ContentBlob.new(data: pic.data_io_object.read, original_filename: 'piccy.jpg')
+    blob = Factory(:content_blob)
     blob.save!
     assert_not_nil blob.uuid
-    assert_not_nil ContentBlob.find(blob.id).uuid
+    assert_equal blob.uuid, ContentBlob.find(blob.id).uuid
   end
 
   def data_for_test(filename)
