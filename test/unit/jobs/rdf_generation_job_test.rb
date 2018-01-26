@@ -94,7 +94,6 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     assert item.rdf_supported?
 
     assert_equal [item], RdfGenerationJob.new(item).gather_items
-
   end
 
   test 'exists' do
@@ -141,7 +140,7 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     assay = Factory(:assay)
     Delayed::Job.delete_all
     refute RdfGenerationJob.new(assay, false).exists?
-    assert_difference('Delayed::Job.count',1) do
+    assert_difference('Delayed::Job.count', 1) do
       RdfGenerationJob.new(assay, false).queue_job
     end
 
@@ -150,15 +149,12 @@ class RdfGenerationJobTest < ActiveSupport::TestCase
     end
 
     refute RdfGenerationJob.new(assay, true).exists?
-    assert_difference('Delayed::Job.count',1) do
+    assert_difference('Delayed::Job.count', 1) do
       RdfGenerationJob.new(assay, true).queue_job
     end
 
     assert_no_difference('Delayed::Job.count') do
       RdfGenerationJob.new(assay, true).queue_job
     end
-
-
-
   end
 end

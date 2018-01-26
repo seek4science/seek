@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class PersonLeavingJobTest < ActiveSupport::TestCase
-
   test 'perform' do
     asset_housekeeper = Factory(:asset_housekeeper)
     project = asset_housekeeper.projects.first
@@ -19,6 +18,4 @@ class PersonLeavingJobTest < ActiveSupport::TestCase
       assert_equal [person, asset_housekeeper].sort, AuthLookupUpdateQueue.last(2).map(&:item).sort
     end
   end
-
 end
-

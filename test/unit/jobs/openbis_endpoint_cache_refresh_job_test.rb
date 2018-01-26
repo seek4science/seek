@@ -52,7 +52,6 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
   end
 
   test 'create_initial_jobs creates jobs for each endpoint' do
-
     endpoint1 = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: 'frog',
                                     web_endpoint: 'http://my-openbis.org/doesnotmatter',
                                     as_endpoint: 'http://my-openbis.org/doesnotmatter',
@@ -80,7 +79,6 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
     end
     assert OpenbisEndpointCacheRefreshJob.new(endpoint1).exists?
     assert OpenbisEndpointCacheRefreshJob.new(endpoint2).exists?
-
   end
 
   class MockEndpoint
