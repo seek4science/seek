@@ -70,6 +70,17 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           $j('#nels-content').show();
           $j('#nels-content').html(HandlebarsTemplates['nels/project'](data.node.data));
         }
+    }).on('load_node.jstree', function (e, data) {
+      if (data.node.id === '#') { // The root node - list of projects
+        if (!data.node.children.length) {
+          $j('#nels-dataset').hide();
+          $j('#nels-content').show();
+          $j('#nels-content').html(HandlebarsTemplates['nels/no_projects']);
+        } else {
+          $j('#nels-dataset').hide();
+          $j('#nels-content').show();
+        }
+      }
     });
   });
 </script>
