@@ -270,8 +270,12 @@ class MailerTest < ActionMailer::TestCase
     @expected.from = 'no-reply@sysmo-db.org'
 
     @expected.body = read_fixture('welcome')
+
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-person_id-', users(:quentin).person.id.to_s)
+    expected_text.gsub!('-join_project-', Seek::Help::HelpDictionary.instance.help_link(:join_project))
+    expected_text.gsub!('-programme_manage-', Seek::Help::HelpDictionary.instance.help_link(:programme_self_management))
+    expected_text.gsub!('-user_guide-', Seek::Help::HelpDictionary.instance.help_link(:get_started))
 
     assert_equal expected_text, encode_mail(Mailer.welcome(users(:quentin)))
   end
