@@ -280,16 +280,6 @@ class MailerTest < ActionMailer::TestCase
     assert_equal expected_text, encode_mail(Mailer.welcome(users(:quentin)))
   end
 
-  test 'welcome no projects' do
-    @expected.subject = 'Welcome to Sysmo SEEK'
-    @expected.to = 'Quentin Jones <quentin@email.com>'
-    @expected.from = 'no-reply@sysmo-db.org'
-
-    @expected.body = read_fixture('welcome_no_projects')
-
-    assert_equal encode_mail(@expected), encode_mail(Mailer.welcome_no_projects(users(:quentin)))
-  end
-
   test 'project changed' do
     project_admin = Factory(:project_administrator)
     project = project_admin.projects.first
