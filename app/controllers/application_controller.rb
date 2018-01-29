@@ -226,6 +226,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  #_status is mostly important for the json responses, default is 400 (Bad Request)
   def error(notice, _message, _status=400)
     flash[:error] = notice
     respond_to do |format|
