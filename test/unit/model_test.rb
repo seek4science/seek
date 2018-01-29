@@ -82,12 +82,6 @@ class ModelTest < ActiveSupport::TestCase
     assert !model.is_jws_supported?
     assert !model.contains_jws_dat?
 
-    # should also be able to handle versions
-    model = models(:teusink).latest_version
-    assert model.contains_sbml?
-    assert model.is_jws_supported?
-    assert !model.contains_jws_dat?
-
     model = Factory(:teusink_jws_model).latest_version
     assert !model.contains_sbml?
     assert model.is_jws_supported?
@@ -102,6 +96,23 @@ class ModelTest < ActiveSupport::TestCase
     assert !model.contains_sbml?
     assert !model.is_jws_supported?
     assert !model.contains_jws_dat?
+
+    # should also be able to handle new versions
+    model = Factory(:non_sbml_xml_model)
+    assert !model.contains_sbml?
+    assert !model.is_jws_supported?
+
+    disable_authorization_checks {
+      assert model.save_as_new_version
+      model.content_blobs = [Factory(:teusink_model_content_blob, asset: model, asset_version: model.version)]
+      model.save
+    }
+    model.reload
+    assert_equal 2,model.version
+    assert model.contains_sbml?
+    assert model.is_jws_supported?
+    assert !model.contains_jws_dat?
+
   end
 
   test 'assay association' do
