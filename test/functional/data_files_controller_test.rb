@@ -1215,7 +1215,6 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should create sharing permissions 'with your project and with all SysMO members'" do
     mock_http
     data_file, blob = valid_data_file_with_http_url
-    login_as(:quentin)
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
@@ -1605,15 +1604,15 @@ class DataFilesControllerTest < ActionController::TestCase
   # end
 
   test 'you should not subscribe to the asset created by the person whose projects overlap with you' do
-    proj = Factory(:project)
     current_person = User.current_user.person
+    proj = current_person.projects.first
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     a_person = Factory(:person)
     a_person.project_subscriptions.create project: a_person.projects.first, frequency: 'weekly'
     current_person.group_memberships << Factory(:group_membership, work_group: Factory(:work_group, project: a_person.projects.first))
     assert current_person.save
     assert current_person.reload.projects.include?(a_person.projects.first)
-    assert Subscription.all.empty?
+    assert_empty Subscription.all
 
     df_param = { title: 'Test', project_ids: [proj.id] }
     blob = { data: file_for_upload }
@@ -1625,7 +1624,7 @@ class DataFilesControllerTest < ActionController::TestCase
     SetSubscriptionsForItemJob.new(df, df.projects).perform
 
     assert df.subscribed?(current_person)
-    assert !df.subscribed?(a_person)
+    refute df.subscribed?(a_person)
     assert_equal 1, current_person.subscriptions.count
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
   end
