@@ -28,7 +28,7 @@
 
       <div>
         <%= preview_permission_popup_link(@document)-%>
-        <%= submit_tag "Upload and Save", :id => "document_submit_btn",
+        <%= create_button :id => "document_submit_btn",
                        :onclick => "validateResourceFields(true,'document',true); return(false);",
                        :class => 'btn btn-primary' -%>
         or <%= cancel_button(documents_path) -%>

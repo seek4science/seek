@@ -182,4 +182,8 @@ module AssetsHelper
     end
     sharing_text.html_safe
   end
+
+  def create_button(opts)
+    submit_tag('Upload and Save', opts.merge({ 'data-upload-button' => '' }))
+  end
 end
