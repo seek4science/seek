@@ -819,7 +819,6 @@ class ContentBlobTest < ActiveSupport::TestCase
       blob.save!
       assert_equal t2.to_s,blob.updated_at.to_s
     end
-
-
   end
+
 end
