@@ -69,6 +69,15 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  def test_normal_user_cannot_delete_others
+    user_login(Factory(:person))
+    other_person = Factory(:person)
+    assert_no_difference('Person.count') do
+      delete "/people/#{other_person.id}.json"
+      assert_response :forbidden
+    end
+  end
+
   def test_admin_can_update_others
     remove_nil_values_before_update
     other_person = Factory(:person)

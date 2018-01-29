@@ -109,7 +109,7 @@ class ApplicationController < ActionController::Base
 
   def is_user_admin_auth
     unless User.admin_logged_in?
-      error('Admin rights required', 'is invalid (not admin)')
+      error('Admin rights required', 'is invalid (not admin)', :forbidden)
       return false
     end
     true
@@ -226,12 +226,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def error(notice, _message)
+  def error(notice, _message, _status=422)
     flash[:error] = notice
-
     respond_to do |format|
       format.html { redirect_to root_url }
-      format.json { redirect_to root_url }
+      format.json {
+        render json: {"title": notice, "detail": _message}, status: _status
+      }
     end
   end
 

@@ -41,4 +41,30 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_normal_user_cannot_create_institution
+    user_login(Factory(:person))
+    assert_no_difference('Institution.count') do
+      post "/institutions.json", @json_mm["min"]
+    end
+  end
+
+  def test_normal_user_cannot_update_institution
+    remove_nil_values_before_update
+    user_login(Factory(:person))
+    inst = Factory(:institution)
+    @json_mm["min"]["data"]["id"] = "#{inst.id}"
+    @json_mm["min"]["data"]["attributes"]["title"] = "updated institution"
+    patch "/institutions/#{inst.id}.json", @json_mm["max"]
+    assert_response :forbidden
+  end
+
+  def test_normal_user_cannot_delete_institution
+    user_login(Factory(:person))
+    inst = Factory(:institution)
+    assert_no_difference('Institution.count') do
+      delete "/institutions/#{inst.id}.json"
+      assert_response :forbidden
+    end
+  end
+
 end
