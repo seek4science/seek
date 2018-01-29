@@ -69,4 +69,29 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_normal_user_cannot_create_project
+    user_login(Factory(:person))
+    assert_no_difference('Project.count') do
+      post "/projects.json", @json_mm["min"]
+    end
+  end
+
+  def test_normal_user_cannot_update_project
+    remove_nil_values_before_update
+    user_login(Factory(:person))
+    project = Factory(:project)
+    @json_mm["min"]["data"]["id"] = "#{project.id}"
+    @json_mm["min"]["data"]["attributes"]["title"] = "updated project"
+    patch "/projects/#{project.id}.json", @json_mm["min"]
+    assert_response :forbidden
+  end
+
+  def test_normal_user_cannot_delete_project
+    user_login(Factory(:person))
+    project = Factory(:project)
+    assert_no_difference('Project.count') do
+      delete "/projects/#{project.id}.json"
+      assert_response :forbidden
+    end
+  end
 end

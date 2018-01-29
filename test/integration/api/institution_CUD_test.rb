@@ -54,7 +54,7 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
     inst = Factory(:institution)
     @json_mm["min"]["data"]["id"] = "#{inst.id}"
     @json_mm["min"]["data"]["attributes"]["title"] = "updated institution"
-    patch "/institutions/#{inst.id}.json", @json_mm["max"]
+    patch "/institutions/#{inst.id}.json", @json_mm["min"]
     assert_response :forbidden
   end
 
