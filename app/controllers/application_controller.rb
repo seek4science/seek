@@ -226,7 +226,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def error(notice, _message, _status=422)
+  def error(notice, _message, _status=400)
     flash[:error] = notice
     respond_to do |format|
       format.html { redirect_to root_url }
