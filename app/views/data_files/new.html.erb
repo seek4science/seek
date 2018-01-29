@@ -15,14 +15,10 @@
 
       <div>
         <%= preview_permission_popup_link(@data_file)-%>
-        <%= submit_tag "Register",
-                       :id => "data_file_submit_btn",
+        <%= create_button :id => "data_file_submit_btn",
                        :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
                        :class => 'btn btn-primary'-%>
         or <%= cancel_button(data_files_path) -%>
       </div>
     </div>
 <% end -%>
-
-
-

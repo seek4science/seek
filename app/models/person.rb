@@ -54,6 +54,7 @@ class Person < ActiveRecord::Base
 
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
   has_many :created_data_files, through: :assets_creators, source: :asset, source_type: 'DataFile'
+  has_many :created_documents, through: :assets_creators, source: :asset, source_type: 'Document'
   has_many :created_models, through: :assets_creators, source: :asset, source_type: 'Model'
   has_many :created_sops, through: :assets_creators, source: :asset, source_type: 'Sop'
   has_many :created_publications, through: :assets_creators, source: :asset, source_type: 'Publication'
@@ -174,7 +175,7 @@ class Person < ActiveRecord::Base
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
-  RELATED_RESOURCE_TYPES = %i[data_files models sops presentations events publications investigations
+  RELATED_RESOURCE_TYPES = %i[data_files documents models sops presentations events publications investigations
                               studies assays].freeze
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
@@ -309,7 +310,7 @@ class Person < ActiveRecord::Base
   # all items, assets, ISA, samples and events that are linked to this person as a contributor
   def contributed_items
     assays = Assay.where(contributor_id: id) # assays contributor is not polymorphic
-    [Study, Investigation, DataFile, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
+    [Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
       assets = type.where("contributor_type = 'Person' AND contributor_id=?",id)
       assets |= type.where("contributor_type = 'User' AND contributor_id=?",user.id) unless user.nil?
       assets

@@ -668,6 +668,42 @@ SEEK::Application.routes.draw do
 
   resources :sample_controlled_vocabs
 
+  ### DOCUMENTS
+
+  resources :documents do
+    collection do
+      get :typeahead
+      get :preview
+      post :test_asset_url
+      post :items_for_result
+      post :resource_in_tab
+    end
+    member do
+      post :check_related_items
+      post :check_gatekeeper_required
+      get :download
+      get :published
+      post :publish_related_items
+      post :publish
+      post :request_resource
+      post :update_annotations_ajax
+      post :new_version
+      delete :destroy_version
+      post :mint_doi
+      get :mint_doi_confirm
+      get :isa_children
+    end
+    resources :content_blobs do
+      member do
+        get :view_pdf_content
+        get :view_content
+        get :get_pdf
+        get :download
+      end
+    end
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/',:to=>"assay_types#show",:as=>"assay_types"

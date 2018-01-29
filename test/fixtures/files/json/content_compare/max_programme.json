@@ -93,6 +93,14 @@
             "type": "events"
           }
         ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "documents"
+          }
+        ]
       }
     },
     "links": {

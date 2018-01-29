@@ -2745,6 +2745,22 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should show nels links' do
+    setup_nels
+    mock_http
+    nels_url = "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
+                        content_blob: Factory(:url_content_blob, url: nels_url))
+
+    get :show, id: data_file
+
+    assert_response :success
+
+    assert_select '.fileinfo b', text: /NeLS URL/
+    assert_select '.fileinfo a[href=?]', nels_url
+    assert_select '#buttons a.btn[href=?]', nels_url
+  end
+
   test 'should unset policy sharing scope when updated' do
     login_as(:datafile_owner)
     df = data_files(:editable_data_file)

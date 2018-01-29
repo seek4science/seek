@@ -39,6 +39,7 @@ class Assay < ActiveRecord::Base
   has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop'
   has_many :models, through: :assay_assets, source: :asset, source_type: 'Model'
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample'
+  has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document'
 
   has_one :investigation, through: :study
 
@@ -110,7 +111,7 @@ class Assay < ActiveRecord::Base
   end
 
   def assets
-    data_files + models + sops + publications + samples
+    data_files + models + sops + publications + samples + documents
   end
 
   def incoming

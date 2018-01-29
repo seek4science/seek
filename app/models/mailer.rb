@@ -80,10 +80,6 @@ class Mailer < ActionMailer::Base
          subject: "Welcome to #{Seek::Config.application_name}")
   end
 
-  def welcome_no_projects(user)
-    welcome(user) # the only difference is the view template, which is picked from the method name
-  end
-
   def contact_admin_new_user(params, user)
     new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
     @details = new_member_details.message
