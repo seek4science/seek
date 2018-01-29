@@ -33,6 +33,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   def test_should_update_person
     a_person = Factory(:person)
+    user_login(a_person)
     remove_nil_values_before_update
 
     ['min', 'max'].each do |m|
@@ -50,16 +51,34 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
-
   def test_normal_user_cannot_create_person
-    user_login
+    user_login(Factory(:person))
     @json_mm["min"]["data"]["attributes"]["email"] = "normalUserCreate@testEmail.com"
     assert_no_difference('Person.count') do
       post "/people.json", @json_mm["min"]
     end
   end
 
-  #add test for testing update_works_only_on_self / can admin update other people?
-  # and/or sort out what other permissions need testing
+  def test_normal_user_cannot_update_others
+    remove_nil_values_before_update
+    user_login(Factory(:person))
+    other_person = Factory(:person)
+    @json_mm["min"]["data"]["id"] = "#{other_person.id}"
+    @json_mm["min"]["data"]["attributes"]["email"] = "updateTest@email.com"
+    patch "/people/#{other_person.id}.json", @json_mm["min"]
+    assert_response :forbidden
+  end
+
+  def test_admin_can_update_others
+    remove_nil_values_before_update
+    other_person = Factory(:person)
+    ['min', 'max'].each do |m|
+       @json_mm["#{m}"]["data"]["id"] = "#{other_person.id}"
+       @json_mm["#{m}"]["data"]["attributes"]["email"] = "updateTest@email.com"
+       patch "/people/#{other_person.id}.json", @json_mm["#{m}"]
+       assert_response :success
+    end
+
+  end
 
 end

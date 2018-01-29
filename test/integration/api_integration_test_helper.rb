@@ -2,14 +2,17 @@ module ApiIntegrationTestHelper
   include AuthenticatedTestHelper
 
   def admin_login
-    admin_user = Factory(:admin).user
-    admin_user.password = "blah"
-    post '/session', login: admin_user.login, password: admin_user.password
+    admin = Factory.create(:admin)
+    @current_user = admin.user
+    @current_user.password = 'blah'
+    post '/session', login: admin.user.login, password: admin.user.password
   end
 
-  def user_login
+  def user_login(person)
+    @current_user = person.user
+    @current_user.password = 'blah'
     User.current_user = Factory(:user, login: 'test')
-    post '/session', login: 'test', password: 'blah'
+    post '/session', login: person.user.login, password: person.user.password
   end
 
   def load_mm_objects(clz)
