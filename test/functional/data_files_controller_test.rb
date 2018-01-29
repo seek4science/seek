@@ -73,12 +73,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correct title and text for associating an assay for new' do
     login_as(Factory(:user))
     as_virtualliver do
-      get :new
+      register_content_blob
       assert_response :success
       assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
     end
     as_not_virtualliver do
-      get :new
+      register_content_blob
       assert_response :success
       assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
     end
@@ -654,7 +654,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'div#publications_fold_content', true
 
-    get :new
+    register_content_blob
     assert_response :success
     assert_select 'div#publications_fold_content', true
   end
@@ -1727,8 +1727,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'input#tag_list', count: 1
   end
 
-  test 'new should include tags element' do
-    get :new
+  test 'register form should include tags element' do
+    register_content_blob
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
     assert_select 'input#tag_list', count: 1
@@ -1745,9 +1745,9 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'new should not include tags element when tags disabled' do
+  test 'register form should not include tags element when tags disabled' do
     with_config_value :tagging_enabled, false do
-      get :new, class: :experimental
+      register_content_blob
       assert_response :success
       assert_select 'div.panel-heading', text: /Tags/, count: 0
       assert_select 'input#tag_list', count: 0
@@ -2164,7 +2164,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#license-select option[selected=?]', 'selected', text: 'License Not Specified'
 
-    get :new
+    register_content_blob
     assert_response :success
     assert_select '#license-select option[selected=?]', 'selected', text: 'Creative Commons Attribution 4.0'
   end
@@ -3120,5 +3120,13 @@ class DataFilesControllerTest < ActionController::TestCase
     parsed_response = JSON.parse(@response.body)
     assert_not parsed_response['data']['attributes'].has_key?('policy')
     logout
+  end
+
+  # registers a new content blob, and results in the metadata form HTML in the response
+  def register_content_blob
+    blob = {data: file_for_upload}
+    assert_difference('ContentBlob.count') do
+      post :create_content_blob, content_blobs: [blob]
+    end
   end
 end
