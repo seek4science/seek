@@ -38,6 +38,7 @@ class ContentBlob < ActiveRecord::Base
   before_save :calculate_file_size
   after_create :create_retrieval_job
   before_save :clear_sample_type_matches
+  after_destroy :delete_converted_files
 
   has_many :worksheets, inverse_of: :content_blob, dependent: :destroy
 
@@ -286,6 +287,14 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def clear_sample_type_matches
-    Rails.cache.delete_matched("st-match-#{self.id}*") if self.changed?
+    Rails.cache.delete_matched("st-match-#{id}*") if changed?
+  end
+
+  # cleans up any files converted to txt or pdf, if they exist
+  def delete_converted_files
+    %w[pdf txt].each do |format|
+      path = filepath(format)
+      FileUtils.rm(path) if File.exist?(path)
+    end
   end
 end

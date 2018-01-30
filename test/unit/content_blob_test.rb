@@ -5,7 +5,6 @@ require 'minitest/mock'
 require 'time_test_helper'
 
 class ContentBlobTest < ActiveSupport::TestCase
-
   include NelsTestHelper
 
   fixtures :content_blobs
@@ -795,7 +794,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'raises 404 when nels sample metadata missing' do
     setup_nels_for_units
 
-    blob = ContentBlob.create(url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404")
+    blob = ContentBlob.create(url: 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404')
 
     assert_raises(RestClient::ResourceNotFound) do
       VCR.use_cassette('nels/missing_sample_metadata') do
@@ -809,16 +808,55 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob = nil
     pretend_now_is(t1) do
       blob = Factory(:content_blob)
-      assert_equal t1.to_s,blob.created_at.to_s
-      assert_equal t1.to_s,blob.updated_at.to_s
+      assert_equal t1.to_s, blob.created_at.to_s
+      assert_equal t1.to_s, blob.updated_at.to_s
     end
 
     t2 = 1.hour.ago
     pretend_now_is(t2) do
-      blob.content_type='text/xml'
+      blob.content_type = 'text/xml'
       blob.save!
-      assert_equal t2.to_s,blob.updated_at.to_s
+      assert_equal t2.to_s, blob.updated_at.to_s
     end
   end
 
+  test 'deletes image files after destroy' do
+    blob = Factory(:image_content_blob)
+    filepath = blob.file_path
+    refute_nil filepath
+    assert File.exist?(filepath)
+    assert_difference('ContentBlob.count', -1) do
+      blob.destroy
+    end
+    refute File.exist?(filepath)
+  end
+
+  test 'deletes files after destroy' do
+    blob = Factory(:spreadsheet_content_blob)
+    filepath = blob.file_path
+    refute_nil filepath
+    assert File.exist?(filepath)
+    assert_difference('ContentBlob.count', -1) do
+      blob.destroy
+    end
+    refute File.exist?(filepath)
+  end
+
+  test 'deletes converted files after destroy' do
+    blob = Factory(:doc_content_blob)
+    pdf_path = blob.filepath('pdf')
+    txt_path = blob.filepath('txt')
+
+    # pretend the conversion has taken place
+    FileUtils.touch(pdf_path)
+    FileUtils.touch(txt_path)
+
+    assert File.exist?(pdf_path)
+    assert File.exist?(txt_path)
+    assert_difference('ContentBlob.count', -1) do
+      blob.destroy
+    end
+    refute File.exist?(pdf_path)
+    refute File.exist?(txt_path)
+  end
 end
