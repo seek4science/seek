@@ -9,7 +9,7 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential git \ 
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
-		libxslt1-dev mysql-client nginx nodejs openjdk-7-jdk poppler-utils \
+		libxslt1-dev mysql-client nginx nodejs openjdk-8-jdk poppler-utils \
 		postgresql-client sqlite3 links telnet && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
