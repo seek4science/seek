@@ -72,18 +72,38 @@ Content blob id: <%= @data_file.content_blob.id %>
 
 
       <div id='step-3' class='multi-step-block multi-step-datafile-block'>
-        <div class="panel panel-default">
-          <% if Seek::Config.assays_enabled %>
-            <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} -%>
-          <% end %>
+        <% if Seek::Config.assays_enabled %>
+          <div class="panel panel-default">
 
-          <%= cancel_button(data_files_path) -%>
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="active">
+                <a href="#existing-assay" aria-controls="existing-assay" role="tab" data-toggle="tab">Existing assay</a>
+              </li>
+              <li>
+                <a href="#new-assay" aria-controls="new-assay" role="tab" data-toggle="tab">New assay</a>
+              </li>
+            </ul>
 
-          <div class="multi-step-buttons">
-            <%= multi_step_back_buttons %>
-            <%= multi_step_forward_buttons %>
+            <div class="tab-content">
+
+              <div role="tabpanel" class="tab-pane active" id="existing-assay">
+                <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} -%>
+              </div>
+
+              <div role="tabpanel" class="tab-pane" id="new-assay">
+                Womble
+              </div>
+            </div>
+
+
+            <%= cancel_button(data_files_path) -%>
+
+            <div class="multi-step-buttons">
+              <%= multi_step_back_buttons %>
+              <%= multi_step_forward_buttons %>
+            </div>
           </div>
-        </div>
+        <% end %>
       </div>
 
 
