@@ -111,7 +111,10 @@ class AssaysController < ApplicationController
     update_annotations(params[:tag_list], @assay) #this saves the assay
     update_scales @assay
 
-    if @assay.present? && @assay.save
+    a = @assay.present?
+    b = @assay.save
+
+    if a && b
       update_assets_linked_to_assay @assay, params
       update_relationships(@assay, params)
 
@@ -240,11 +243,12 @@ class AssaysController < ApplicationController
 
   def tweak_json_params json_params
     if json_params[:assay][:assay_class].present?
-      if json_params[:assay][:assay_class] == :EXP
-        json_params[:assay][:assay_class_id] = "1"
-      else
-        json_params[:assay][:assay_class_id] = "2"
-      end
+      json_params[:assay][:assay_class_id] = AssayClass.find_by(key: json_params[:assay][:assay_class][:key]).id
+      # if json_params[:assay][:assay_class] == :EXP
+      #   json_params[:assay][:assay_class_id] = "1"
+      # else
+      #   json_params[:assay][:assay_class_id] = "2"
+      # end
       json_params[:assay].delete :assay_class
     end
     if json_params[:assay][:assay_type].present?

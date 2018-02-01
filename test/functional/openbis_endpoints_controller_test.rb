@@ -339,7 +339,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
             username: 'wibble',
             password: 'wobble' },
         format: :json
-    assert_response :redirect
+    assert_response 400
     refute @response.body.include?('true')
 
     # none project member cannot
@@ -350,7 +350,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
                         username: 'wibble',
                         password: 'wobble',
                         format: :json
-    assert_response :redirect
+    assert_response 400
     refute @response.body.include?('true')
   end
 

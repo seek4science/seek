@@ -27,7 +27,10 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+  #admin access
   def test_should_create_programme
+    #a_person = Factory(:person)
+    #user_login(a_person)
     ['min', 'max'].each do |m|
       assert_difference('Programme.count') do
         change_funding_codes_before_CU(m)
@@ -43,6 +46,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+  #admin access
   def test_should_update_programme
     prog = Factory(:programme)
     remove_nil_values_before_update
@@ -60,4 +64,28 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def test_programme_admin_can_update
+    person = Factory(:person)
+    user_login(person)
+    prog = Factory(:programme)
+    person.is_programme_administrator = true, prog
+    disable_authorization_checks { person.save! }
+    @json_mm["min"]["data"]["id"] = "#{prog.id}"
+    @json_mm["min"]["data"]['attributes']['title'] = "Updated programme"
+    change_funding_codes_before_CU("min")
+
+    patch "/programmes/#{prog.id}.json", @json_mm["min"]
+    assert_response :success
+  end
+
+  # def test_programme_admin_can_delete
+  #   person = Factory(:person)
+  #   user_login(person)
+  #   prog = Factory(:programme)
+  #   person.is_programme_administrator = true, prog
+  #   disable_authorization_checks { person.save! }
+  #
+  #   delete "/programmes/#{prog.id}.json"
+  #   assert_response :success
+  # end
 end

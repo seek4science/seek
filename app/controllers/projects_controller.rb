@@ -406,7 +406,7 @@ class ProjectsController < ApplicationController
   def editable_by_user
     @project = Project.find(params[:id])
     unless User.admin_logged_in? || @project.can_be_edited_by?(current_user)
-      error('Insufficient privileges', 'is invalid (insufficient_privileges)')
+      error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
   end
@@ -425,14 +425,14 @@ class ProjectsController < ApplicationController
   def administerable_by_user
     @project = Project.find(params[:id])
     unless @project.can_be_administered_by?(current_user)
-      error('Insufficient privileges', 'is invalid (insufficient_privileges)')
+      error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
   end
 
   def allow_request_membership
     unless Seek::Config.email_enabled && @project.allow_request_membership?
-      error('Cannot reqest membership of this project', 'is invalid (invalid state)')
+      error('Cannot request membership of this project', 'is invalid (invalid state)')
       false
     end
   end
