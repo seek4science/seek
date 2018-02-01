@@ -1,8 +1,27 @@
 require 'test_helper'
+require 'time_test_helper'
 
 class SessionStoreTest < ActionDispatch::IntegrationTest
   def setup
     login_as_test_user 'http://www.example.com'
+  end
+
+  test 'should timeout after 15 minutes' do
+    assert_equal 15.minutes, Rails.application.config.session_options[:expire_after]
+    df = Factory :data_file, contributor: User.current_user
+    User.current_user = nil
+    get "/data_files/#{df.id}"
+    assert_response :success
+
+    pretend_now_is(14.minutes.from_now) do
+      get "/data_files/#{df.id}"
+      assert_response :success
+    end
+
+    pretend_now_is(30.minutes.from_now) do
+      get "/data_files/#{df.id}"
+      assert_response :forbidden
+    end
   end
 
   test 'should forbid the unauthorized page' do
