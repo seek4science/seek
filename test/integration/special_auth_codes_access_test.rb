@@ -7,7 +7,7 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
     test "form allows creating temporary access links for #{type_name}" do
       user = Factory(:user, login: 'test')
       User.with_current_user user do
-        post '/session', login: 'test', password: 'blah'
+        post '/session', login: 'test', password: factory_user_password
 
         get "/#{type_name}/new"
         assert_select 'form div#temporary_links', count: 0
