@@ -9,18 +9,32 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
      @current_user = admin.user
     @current_user.password = 'blah'
 
-    @project = Factory(:min_project)
-    @project.title = 'Fred'
+    @min_project = Factory(:min_project)
+    @min_project.title = 'Fred'
+
+    @max_project = Factory(:max_project)
+    @max_project.title = 'Bert'
 
 
     # log in
     post '/session', login: admin.user.login, password: admin.user.password
 
-    template_file = File.join(Rails.root, 'test', 'fixtures',
-                              'files', 'json', 'templates', 'min_investigation.json.erb')
+    @@template_dir = File.join(Rails.root, 'test', 'fixtures',
+                               'files', 'json', 'templates')
+    template_file = File.join(@@template_dir, 'post_min_investigation.json.erb')
     template = ERB.new(File.read(template_file))
-    namespace = OpenStruct.new(project_id: @project.id)
-    @to_post = JSON.parse(template.result(namespace.instance_eval { binding }))
+    namespace = OpenStruct.new({:project_ids => [@min_project.id, @max_project.id], :r => InvestigationCUDTest.method(:render_erb)} )
+    template_result = template.result(namespace.instance_eval {binding})
+    @to_post = JSON.parse(template_result)
+  end
+
+  def self.render_erb (path, locals)
+    content = File.read(File.join(@@template_dir, path))
+    template = ERB.new(content)
+    h = locals
+    h[:r] = method(:render_erb)
+    namespace = OpenStruct.new(h)
+    template.result(namespace.instance_eval {binding})
   end
 
   def test_create
