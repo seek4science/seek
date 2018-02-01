@@ -2,8 +2,9 @@ require 'digest/sha1'
 require 'savage_beast/user_init'
 
 class User < ActiveRecord::Base
+  MIN_PASSWORD_LENGTH=10
+
   acts_as_annotation_source
-  #  include SavageBeast::UserInit
 
   acts_as_tagger
 
@@ -33,7 +34,7 @@ class User < ActiveRecord::Base
   validates     :login, presence: true
   validates     :password, presence: true, if: :password_required?
   validates     :password_confirmation, presence: true, if: :password_required?
-  validates_length_of       :password, within: 4..40, if: :password_required?
+  validates_length_of       :password, minimum: MIN_PASSWORD_LENGTH, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
   validates_length_of       :login, within: 3..40
   validates_uniqueness_of   :login, case_sensitive: false
