@@ -3,8 +3,8 @@ require 'test_helper'
 class StatisticsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
-  def test_content_statistic
-    user = Factory :user
+  test 'admin can view statistics' do
+    user = Factory :admin
     login_as user
     get :index
     assert_response :success
@@ -12,11 +12,17 @@ class StatisticsControllerTest < ActionController::TestCase
     assert_select 'h3', text: /Content statistics/, count: 1
   end
 
-  test 'anonymous_user_cannot_view_content_statistic' do
+  test 'normal user cannot view statistics' do
+    user = Factory :user
+    login_as user
+    get :index
+    assert_response :redirect
+  end
+
+  test 'anonymous user cannot view content statistics' do
     logout
     get :index
-    assert_response :success
-    assert_select 'h3', text: /Content statistics/, count: 0
+    assert_response :redirect
   end
 
   test 'application status' do
