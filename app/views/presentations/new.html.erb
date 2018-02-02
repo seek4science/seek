@@ -34,7 +34,7 @@
 
       <div>
         <%= preview_permission_popup_link(@presentation)-%>
-        <%= submit_tag "Upload and Save", :id => "presentation_submit_btn",
+        <%= create_button :id => "presentation_submit_btn",
                        :onclick => "javascript: validateResourceFields(true,'presentation',true); return(false);",
                        :class => 'btn btn-primary' -%>
         or <%= cancel_button(presentations_path) -%>

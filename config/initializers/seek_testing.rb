@@ -29,7 +29,6 @@ SEEK::Application.configure do
       Settings.defaults[:authorization_checks_enabled] = true
       Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:modelling_analysis_enabled] = true
-      Settings.defaults[:workflows_enabled] = true
       Settings.defaults[:assays_enabled] = true
       Settings.defaults[:models_enabled] = true
       Settings.defaults[:show_as_external_link_enabled] = false

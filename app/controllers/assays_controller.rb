@@ -49,6 +49,12 @@ class AssaysController < ApplicationController
           break
         end
       end
+      @existing_assay.documents.each do |d|
+        if !d.can_view?
+          notice_message << "Some or all #{t('document').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
+          break
+        end
+      end
 
       unless notice_message.blank?
         flash.now[:notice] = notice_message.html_safe
@@ -201,7 +207,11 @@ class AssaysController < ApplicationController
       assay_assets_to_keep << assay.associate(s, :direction => sample[:direction]) if s.can_view?
     end
     #Destroy AssayAssets that aren't needed
-    (assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
+    (assay.assay_assets - assay_assets_to_keep.compact).each do |a|
+      unless a.asset_type == 'Document' # These are cleaned up automatically
+        a.destroy
+      end
+    end
   end
 
   def show
@@ -238,7 +248,8 @@ class AssaysController < ApplicationController
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
-                                  :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset)
+                                  :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset,
+                                  { document_ids: []})
   end
 
   def tweak_json_params json_params

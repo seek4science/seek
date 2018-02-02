@@ -12,11 +12,11 @@ en:
     modelling_analysis:  "Modelling analysis"
 
   data_file: "Data file"
+  document: "Document"
   model: "Model"
   sop: "SOP"
   publication: "Publication"
   presentation: "Presentation"
-  workflow: "Workflow"
   event: "Event"
 
   sample: "Sample"
@@ -46,8 +46,6 @@ en:
     jerm_templates: "JERM templates"
     feedback: "Provide feedback"
     isa_best_practice: "ISA best practice"
-
-  taverna_player/run: "workflow run"
 
   favourite_group: "favourite groups"
 

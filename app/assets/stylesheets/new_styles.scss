@@ -682,6 +682,11 @@ div.popup-contributor {
   }
 }
 
+[data-role="seek-associations-list"] ul {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
 .disabled_icon.disabled {
   pointer-events: inherit;
 }

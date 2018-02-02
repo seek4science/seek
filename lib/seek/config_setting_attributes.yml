@@ -89,7 +89,6 @@ documentation_enabled:
 tagging_enabled:
 authorization_checks_enabled:
 magic_guest_enabled:
-workflows_enabled:
 programmes_enabled:
 assay_type_ontology_file:
 technology_type_ontology_file:
@@ -180,3 +179,6 @@ openbis_download_limit:
 default_license:
 about_page_enabled:
 about_page:
+nels_enabled:
+nels_client_id:
+nels_client_secret:

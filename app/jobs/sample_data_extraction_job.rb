@@ -1,10 +1,11 @@
 class SampleDataExtractionJob < SeekJob
-  attr_reader :data_file_id, :sample_type_id, :persist
+  attr_reader :data_file_id, :sample_type_id, :persist, :overwrite
 
-  def initialize(data_file, sample_type, persist = false)
+  def initialize(data_file, sample_type, persist = false, overwrite: false)
     @data_file_id = data_file.id
     @sample_type_id = sample_type.id
     @persist = persist
+    @overwrite = overwrite
   end
 
   def gather_items
@@ -23,7 +24,7 @@ class SampleDataExtractionJob < SeekJob
       extractor.persist
     else
       extractor.clear
-      extractor.extract
+      extractor.extract(overwrite)
     end
   end
 

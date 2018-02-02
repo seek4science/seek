@@ -49,7 +49,7 @@ class Programme < ActiveRecord::Base
     studies(include_clause).collect(&:assays).flatten.uniq
   end
 
-  %i[data_files models sops presentations events publications].each do |type|
+  %i[data_files documents models sops presentations events publications].each do |type|
     define_method(type) do
       projects.includes(type).collect(&type).flatten.uniq
     end
@@ -60,7 +60,7 @@ class Programme < ActiveRecord::Base
   end
 
   def assets
-    (data_files+models+sops+presentations+events+publications).uniq.compact
+    (data_files+models+sops+presentations+events+publications+documents).uniq.compact
   end
 
   def can_be_edited_by?(user)

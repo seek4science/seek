@@ -149,9 +149,25 @@ class DataFile < ActiveRecord::Base
 
   # Extracts samples using the given sample_type
   # Returns a list of extracted samples, including
-  def extract_samples(sample_type, confirm = false)
+  def extract_samples(sample_type, confirm = false, overwrite = false)
     samples = sample_type.build_samples_from_template(content_blob)
     extracted = []
+
+    # If the overwrite flag is set, find existing samples by their title and update their sample data.
+    if overwrite
+      samples = samples.map do |new_sample|
+        existing = extracted_samples.find_by_title(new_sample.title_from_data)
+
+        if existing
+          existing.data.clear
+          existing.data.mass_assign(new_sample.data, pre_process: false)
+          existing
+        else
+          new_sample
+        end
+      end
+    end
+
     samples.each do |sample|
       sample.project_ids = project_ids
       sample.contributor = contributor
@@ -161,6 +177,7 @@ class DataFile < ActiveRecord::Base
 
       extracted << sample
     end
+
     extracted
   end
 
@@ -185,6 +202,10 @@ class DataFile < ActiveRecord::Base
     super || openbis_size_download_restricted?
   end
 
+  def nels?
+    content_blob && content_blob.nels?
+  end
+
   def openbis_dataset_json_details
     return content_blob.openbis_dataset.json if openbis?
     nil
@@ -197,5 +218,17 @@ class DataFile < ActiveRecord::Base
     else
       super
     end
+  end
+
+  # Copy the AssayAsset associations to each of the given resources (usually Samples).
+  # If an array of `assays` is specified (can be Assay objects or IDs), only copy associations to these assays.
+  def copy_assay_associations(resources, assays = nil)
+    resources.map do |resource|
+      aa = assay_assets
+      aa = assay_assets.where(assay: assays) if assays
+      aa.map do |aa|
+        AssayAsset.create(assay: aa.assay, direction: aa.direction, asset: resource)
+      end
+    end.flatten
   end
 end

@@ -210,8 +210,20 @@ Factory.define(:strain_sample_data_content_blob, parent: :content_blob) do |f|
   f.data File.new("#{Rails.root}/test/fixtures/files/strain-sample-data.xlsx", 'rb').read
 end
 
-Factory.define(:enm_workflow, parent: :content_blob) do |f|
-  f.original_filename 'enm.t2flow'
-  f.content_type 'application/pdf'
-  f.data File.new("#{Rails.root}/test/fixtures/files/enm.t2flow", 'rb').read
+Factory.define(:nels_fastq_paired_template_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'FASTQPaired.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data File.new("#{Rails.root}/test/fixtures/files/FASTQPaired.xlsx", 'rb').read
+end
+
+Factory.define(:linked_samples_incomplete_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'FASTQPaired.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data File.new("#{Rails.root}/test/fixtures/files/linked-samples-incomplete.xlsx", 'rb').read
+end
+
+Factory.define(:linked_samples_complete_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'FASTQPaired.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data File.new("#{Rails.root}/test/fixtures/files/linked-samples-complete.xlsx", 'rb').read
 end

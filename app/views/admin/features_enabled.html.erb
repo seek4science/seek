@@ -70,6 +70,16 @@
     <%= admin_checkbox_setting(:openbis_enabled, 1, Seek::Config.openbis_enabled,
                                "openBIS enabled", "Whether support for a #{t('project')} to connect to openBIS is enabled.") %>
 
+    <%= admin_checkbox_setting(:nels_enabled, 1, Seek::Config.nels_enabled,
+                               "NeLS enabled", "Whether support for #{t('project').pluralize} to connect to NeLS is enabled.",
+                               onchange: toggle_appear_javascript('nels_block')) %>
+    <div id="nels_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.nels_enabled -%>">
+      <%= admin_text_setting(:nels_client_id, Seek::Config.nels_client_id,
+                             'NeLS OAuth client ID', 'The ID for this application to authenticate users through the NeLS OAuth provider.') %>
+      <%= admin_text_setting(:nels_client_secret, Seek::Config.nels_client_secret,
+                             'NeLS OAuth client secret', 'The secret token for this application to authenticate users through the NeLS OAuth provider.') %>
+    </div>
+
     <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path-%>
 <% end -%>

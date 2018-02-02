@@ -19,6 +19,7 @@ Factory.define(:max_project, class: Project) do |f|
   f.presentations {[Factory(:presentation, policy: Factory(:public_policy))]}
   f.publications {[Factory(:publication, policy: Factory(:public_policy))]}
   f.events {[Factory(:event, policy: Factory(:public_policy))]}
+  f.documents {[Factory(:document, policy: Factory(:public_policy))]}
 end
 
 # WorkGroup
