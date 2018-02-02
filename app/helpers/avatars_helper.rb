@@ -79,7 +79,8 @@ module AvatarsHelper
 
     image_tag avatar_filename,
               alt: alt,
-              size: "#{size}x#{size}",
+              height: size,
+              'max-width': size,
               class: css_class,
               onclick: onclick_options
   end
