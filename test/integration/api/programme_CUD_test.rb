@@ -29,8 +29,6 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
 
   #admin access
   def test_should_create_programme
-    #a_person = Factory(:person)
-    #user_login(a_person)
     ['min', 'max'].each do |m|
       assert_difference('Programme.count') do
         change_funding_codes_before_CU(m)
@@ -43,6 +41,20 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
         change_funding_codes_after_CU(m)
         check_attr_content(@json_mm["#{m}"], "post")
       end
+    end
+  end
+
+  #normal user without admin rights
+  def test_user_can_create_programme
+    a_person = Factory(:person)
+    user_login(a_person)
+    assert_difference('Programme.count') do
+      post "/programmes.json", @json_mm["min"]
+      assert_response :success
+      get "/programmes/#{Programme.last.id}.json"
+      assert_response :success
+
+      check_attr_content(@json_mm["min"], "post")
     end
   end
 
@@ -64,6 +76,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+  #programme_admin role access
   def test_programme_admin_can_update
     person = Factory(:person)
     user_login(person)
@@ -78,14 +91,28 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # def test_programme_admin_can_delete
-  #   person = Factory(:person)
-  #   user_login(person)
-  #   prog = Factory(:programme)
-  #   person.is_programme_administrator = true, prog
-  #   disable_authorization_checks { person.save! }
-  #
-  #   delete "/programmes/#{prog.id}.json"
-  #   assert_response :success
-  # end
+   def test_programme_admin_can_delete_when_no_projects
+     person = Factory(:person)
+     user_login(person)
+     prog = Factory(:programme)
+     person.is_programme_administrator = true, prog
+     disable_authorization_checks { person.save! }
+
+     #programme has projects ==> cannot delete
+     assert_no_difference('Programme.count', -1) do
+       delete "/programmes/#{prog.id}.json"
+       assert_response :forbidden
+     end
+
+     #no projects ==> can delete
+     prog.projects = []
+     prog.save!
+     assert_difference('Programme.count', -1) do
+       delete "/programmes/#{prog.id}.json"
+       assert_response :success
+     end
+
+     get "/programmes/#{prog.id}.json"
+     assert_response :not_found
+   end
 end
