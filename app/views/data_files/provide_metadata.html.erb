@@ -54,7 +54,7 @@ Content blob id: <%= @data_file.content_blob.id %>
 
           <%= render :partial => 'assets/license_selector', locals: {resource: @data_file} %>
 
-          <%= render :seek_partial => "sharing/form" -%>
+          <%= render :partial => "sharing/form" -%>
 
           <%= render :partial => "assets/author_form", locals: {resource_type: "DataFile",
                                                                 existing_creators: [],
@@ -87,11 +87,31 @@ Content blob id: <%= @data_file.content_blob.id %>
             <div class="tab-content">
 
               <div role="tabpanel" class="tab-pane active" id="existing-assay">
-                <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} -%>
+                <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} %>
               </div>
 
               <div role="tabpanel" class="tab-pane" id="new-assay">
-                Womble
+
+                <%= hidden_field_tag 'assay[assay_class_id]', @assay.assay_class_id %>
+
+                <div class="form-group">
+                  <label>Title <span class="required">*</span></label>
+                  <%= text_field_tag 'assay[title]', @assay.title, :class=>"form-control" %>
+                </div>
+
+                <div class="form-group">
+                  <label>Description</label>
+                  <%= text_area_tag 'assay[description]', @assay.description, :class=>"form-control", :rows => 5 %>
+                </div>
+
+                <div class="form-group">
+                  <%= f.label "Assay type" %>
+                  <%#= create_suggested_type_popup_link @assay.assay_type_reader.ontology_term_type %>
+                  <div>
+                    <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay, {:class => "form-control"} %>
+                  </div>
+                </div>
+
               </div>
             </div>
 

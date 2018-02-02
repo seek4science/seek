@@ -55,6 +55,7 @@ class DataFilesController < ApplicationController
 
   def create_content_blob
     @data_file=DataFile.new
+    @assay = Assay.new(assay_class:AssayClass.experimental)
     respond_to do |format|
       if handle_upload_data
         create_content_blobs
