@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180205100124) do
+ActiveRecord::Schema.define(version: 20180205164611) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -30,11 +30,11 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string   "controller_name",        limit: 255
   end
 
-  add_index "activity_logs", ["action"], name: "act_logs_action_index"
-  add_index "activity_logs", ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
-  add_index "activity_logs", ["culprit_type", "culprit_id"], name: "act_logs_culprit_index"
-  add_index "activity_logs", ["format"], name: "act_logs_format_index"
-  add_index "activity_logs", ["referenced_type", "referenced_id"], name: "act_logs_referenced_index"
+  add_index "activity_logs", ["action"], name: "act_logs_action_index", using: :btree
+  add_index "activity_logs", ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index", using: :btree
+  add_index "activity_logs", ["culprit_type", "culprit_id"], name: "act_logs_culprit_index", using: :btree
+  add_index "activity_logs", ["format"], name: "act_logs_format_index", using: :btree
+  add_index "activity_logs", ["referenced_type", "referenced_id"], name: "act_logs_referenced_index", using: :btree
 
   create_table "admin_defined_role_programmes", force: :cascade do |t|
     t.integer "programme_id", limit: 4
@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string   "identifier", limit: 255, null: false
   end
 
-  add_index "annotation_attributes", ["name"], name: "index_annotation_attributes_on_name"
+  add_index "annotation_attributes", ["name"], name: "index_annotation_attributes_on_name", using: :btree
 
   create_table "annotation_value_seeds", force: :cascade do |t|
     t.integer  "attribute_id", limit: 4,                     null: false
@@ -66,7 +66,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer  "value_id",     limit: 4,   default: 0,       null: false
   end
 
-  add_index "annotation_value_seeds", ["attribute_id"], name: "index_annotation_value_seeds_on_attribute_id"
+  add_index "annotation_value_seeds", ["attribute_id"], name: "index_annotation_value_seeds_on_attribute_id", using: :btree
 
   create_table "annotation_versions", force: :cascade do |t|
     t.integer  "annotation_id",      limit: 4,                     null: false
@@ -84,7 +84,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer  "value_id",           limit: 4,   default: 0,       null: false
   end
 
-  add_index "annotation_versions", ["annotation_id"], name: "index_annotation_versions_on_annotation_id"
+  add_index "annotation_versions", ["annotation_id"], name: "index_annotation_versions_on_annotation_id", using: :btree
 
   create_table "annotations", force: :cascade do |t|
     t.string   "source_type",        limit: 255,                   null: false
@@ -101,10 +101,10 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer  "value_id",           limit: 4,   default: 0,       null: false
   end
 
-  add_index "annotations", ["annotatable_type", "annotatable_id"], name: "index_annotations_on_annotatable_type_and_annotatable_id"
-  add_index "annotations", ["attribute_id"], name: "index_annotations_on_attribute_id"
-  add_index "annotations", ["source_type", "source_id"], name: "index_annotations_on_source_type_and_source_id"
-  add_index "annotations", ["value_type", "value_id"], name: "index_annotations_on_value_type_and_value_id"
+  add_index "annotations", ["annotatable_type", "annotatable_id"], name: "index_annotations_on_annotatable_type_and_annotatable_id", using: :btree
+  add_index "annotations", ["attribute_id"], name: "index_annotations_on_attribute_id", using: :btree
+  add_index "annotations", ["source_type", "source_id"], name: "index_annotations_on_source_type_and_source_id", using: :btree
+  add_index "annotations", ["value_type", "value_id"], name: "index_annotations_on_value_type_and_value_id", using: :btree
 
   create_table "assay_assets", force: :cascade do |t|
     t.integer  "assay_id",             limit: 4
@@ -117,8 +117,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer  "direction",            limit: 4,   default: 0
   end
 
-  add_index "assay_assets", ["assay_id"], name: "index_assay_assets_on_assay_id"
-  add_index "assay_assets", ["asset_id", "asset_type"], name: "index_assay_assets_on_asset_id_and_asset_type"
+  add_index "assay_assets", ["assay_id"], name: "index_assay_assets_on_assay_id", using: :btree
+  add_index "assay_assets", ["asset_id", "asset_type"], name: "index_assay_assets_on_asset_id_and_asset_type", using: :btree
 
   create_table "assay_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
@@ -130,8 +130,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "assay_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_assay_auth_lookup_on_user_id_and_asset_id_and_can_view"
-  add_index "assay_auth_lookup", ["user_id", "can_view"], name: "index_assay_auth_lookup_on_user_id_and_can_view"
+  add_index "assay_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_assay_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "assay_auth_lookup", ["user_id", "can_view"], name: "index_assay_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "assay_classes", force: :cascade do |t|
     t.string   "title",       limit: 255
@@ -151,8 +151,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer  "tissue_and_cell_type_id", limit: 4
   end
 
-  add_index "assay_organisms", ["assay_id"], name: "index_assay_organisms_on_assay_id"
-  add_index "assay_organisms", ["organism_id"], name: "index_assay_organisms_on_organism_id"
+  add_index "assay_organisms", ["assay_id"], name: "index_assay_organisms_on_assay_id", using: :btree
+  add_index "assay_organisms", ["organism_id"], name: "index_assay_organisms_on_organism_id", using: :btree
 
   create_table "assays", force: :cascade do |t|
     t.string   "title",                        limit: 255
@@ -208,7 +208,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  add_index "assets_creators", ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type"
+  add_index "assets_creators", ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type", using: :btree
 
   create_table "auth_lookup_update_queues", force: :cascade do |t|
     t.integer  "item_id",    limit: 4
@@ -226,7 +226,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  add_index "avatars", ["owner_type", "owner_id"], name: "index_avatars_on_owner_type_and_owner_id"
+  add_index "avatars", ["owner_type", "owner_id"], name: "index_avatars_on_owner_type_and_owner_id", using: :btree
 
   create_table "bioportal_concepts", force: :cascade do |t|
     t.string  "ontology_id",         limit: 255
@@ -268,7 +268,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer "file_size",         limit: 8
   end
 
-  add_index "content_blobs", ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type"
+  add_index "content_blobs", ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type", using: :btree
 
   create_table "culture_growth_types", force: :cascade do |t|
     t.string   "title",      limit: 255
@@ -296,8 +296,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "data_file_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_data_file_auth_lookup_user_asset_view"
-  add_index "data_file_auth_lookup", ["user_id", "can_view"], name: "index_data_file_auth_lookup_on_user_id_and_can_view"
+  add_index "data_file_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_data_file_auth_lookup_user_asset_view", using: :btree
+  add_index "data_file_auth_lookup", ["user_id", "can_view"], name: "index_data_file_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "data_file_versions", force: :cascade do |t|
     t.integer  "data_file_id",      limit: 4
@@ -322,8 +322,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean  "simulation_data",                 default: false
   end
 
-  add_index "data_file_versions", ["contributor_id", "contributor_type"], name: "index_data_file_versions_contributor"
-  add_index "data_file_versions", ["data_file_id"], name: "index_data_file_versions_on_data_file_id"
+  add_index "data_file_versions", ["contributor_id", "contributor_type"], name: "index_data_file_versions_contributor", using: :btree
+  add_index "data_file_versions", ["data_file_id"], name: "index_data_file_versions_on_data_file_id", using: :btree
 
   create_table "data_file_versions_projects", id: false, force: :cascade do |t|
     t.integer "project_id", limit: 4
@@ -351,7 +351,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean  "simulation_data",                default: false
   end
 
-  add_index "data_files", ["contributor_id", "contributor_type"], name: "index_data_files_on_contributor_id_and_contributor_type"
+  add_index "data_files", ["contributor_id", "contributor_type"], name: "index_data_files_on_contributor_id_and_contributor_type", using: :btree
 
   create_table "data_files_events", id: false, force: :cascade do |t|
     t.integer "data_file_id", limit: 4
@@ -363,11 +363,11 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer "data_file_id", limit: 4
   end
 
-  add_index "data_files_projects", ["data_file_id", "project_id"], name: "index_data_files_projects_on_data_file_id_and_project_id"
-  add_index "data_files_projects", ["project_id"], name: "index_data_files_projects_on_project_id"
+  add_index "data_files_projects", ["data_file_id", "project_id"], name: "index_data_files_projects_on_data_file_id_and_project_id", using: :btree
+  add_index "data_files_projects", ["project_id"], name: "index_data_files_projects_on_project_id", using: :btree
 
   create_table "db_files", force: :cascade do |t|
-    t.binary "data"
+    t.binary "data", limit: 65535
   end
 
   create_table "delayed_jobs", force: :cascade do |t|
@@ -384,7 +384,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at",                           null: false
   end
 
-  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority"
+  add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
 
   create_table "deprecated_sample_assets", force: :cascade do |t|
     t.integer  "deprecated_sample_id", limit: 4
@@ -450,8 +450,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "deprecated_specimen_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_spec_user_id_asset_id_can_view"
-  add_index "deprecated_specimen_auth_lookup", ["user_id", "can_view"], name: "index_specimen_auth_lookup_on_user_id_and_can_view"
+  add_index "deprecated_specimen_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_spec_user_id_asset_id_can_view", using: :btree
+  add_index "deprecated_specimen_auth_lookup", ["user_id", "can_view"], name: "index_specimen_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "deprecated_specimens", force: :cascade do |t|
     t.string   "title",                  limit: 255
@@ -524,7 +524,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer "person_id",     limit: 4
   end
 
-  add_index "disciplines_people", ["person_id"], name: "index_disciplines_people_on_person_id"
+  add_index "disciplines_people", ["person_id"], name: "index_disciplines_people_on_person_id", using: :btree
 
   create_table "document_auth_lookup", force: :cascade do |t|
     t.integer "user_id",      limit: 4
@@ -536,8 +536,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "document_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_document_user_id_asset_id_can_view"
-  add_index "document_auth_lookup", ["user_id", "can_view"], name: "index_document_auth_lookup_on_user_id_and_can_view"
+  add_index "document_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_document_user_id_asset_id_can_view", using: :btree
+  add_index "document_auth_lookup", ["user_id", "can_view"], name: "index_document_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "document_versions", force: :cascade do |t|
     t.integer  "document_id",       limit: 4
@@ -558,16 +558,16 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.text     "other_creators",    limit: 65535
   end
 
-  add_index "document_versions", ["contributor_type", "contributor_id"], name: "index_document_versions_on_contributor_type_and_contributor_id"
-  add_index "document_versions", ["document_id"], name: "index_document_versions_on_document_id"
+  add_index "document_versions", ["contributor_type", "contributor_id"], name: "index_document_versions_on_contributor_type_and_contributor_id", using: :btree
+  add_index "document_versions", ["document_id"], name: "index_document_versions_on_document_id", using: :btree
 
   create_table "document_versions_projects", force: :cascade do |t|
     t.integer "version_id", limit: 4
     t.integer "project_id", limit: 4
   end
 
-  add_index "document_versions_projects", ["project_id"], name: "index_document_versions_projects_on_project_id"
-  add_index "document_versions_projects", ["version_id", "project_id"], name: "index_document_versions_projects_on_version_id_and_project_id"
+  add_index "document_versions_projects", ["project_id"], name: "index_document_versions_projects_on_project_id", using: :btree
+  add_index "document_versions_projects", ["version_id", "project_id"], name: "index_document_versions_projects_on_version_id_and_project_id", using: :btree
 
   create_table "documents", force: :cascade do |t|
     t.text     "title",            limit: 65535
@@ -586,15 +586,15 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.text     "other_creators",   limit: 65535
   end
 
-  add_index "documents", ["contributor_type", "contributor_id"], name: "index_documents_on_contributor_type_and_contributor_id"
+  add_index "documents", ["contributor_type", "contributor_id"], name: "index_documents_on_contributor_type_and_contributor_id", using: :btree
 
   create_table "documents_projects", force: :cascade do |t|
     t.integer "document_id", limit: 4
     t.integer "project_id",  limit: 4
   end
 
-  add_index "documents_projects", ["document_id", "project_id"], name: "index_documents_projects_on_document_id_and_project_id"
-  add_index "documents_projects", ["project_id"], name: "index_documents_projects_on_project_id"
+  add_index "documents_projects", ["document_id", "project_id"], name: "index_documents_projects_on_document_id_and_project_id", using: :btree
+  add_index "documents_projects", ["project_id"], name: "index_documents_projects_on_project_id", using: :btree
 
   create_table "event_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
@@ -606,8 +606,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "event_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_event_auth_lookup_on_user_id_and_asset_id_and_can_view"
-  add_index "event_auth_lookup", ["user_id", "can_view"], name: "index_event_auth_lookup_on_user_id_and_can_view"
+  add_index "event_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_event_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "event_auth_lookup", ["user_id", "can_view"], name: "index_event_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "events", force: :cascade do |t|
     t.datetime "start_date"
@@ -637,8 +637,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer "event_id",   limit: 4
   end
 
-  add_index "events_projects", ["event_id", "project_id"], name: "index_events_projects_on_event_id_and_project_id"
-  add_index "events_projects", ["project_id"], name: "index_events_projects_on_project_id"
+  add_index "events_projects", ["event_id", "project_id"], name: "index_events_projects_on_event_id_and_project_id", using: :btree
+  add_index "events_projects", ["project_id"], name: "index_events_projects_on_project_id", using: :btree
 
   create_table "events_publications", id: false, force: :cascade do |t|
     t.integer "publication_id", limit: 4
@@ -664,7 +664,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer  "sop_version",      limit: 4
   end
 
-  add_index "experimental_conditions", ["sop_id"], name: "index_experimental_conditions_on_sop_id"
+  add_index "experimental_conditions", ["sop_id"], name: "index_experimental_conditions_on_sop_id", using: :btree
 
   create_table "favourite_group_memberships", force: :cascade do |t|
     t.integer  "person_id",          limit: 4
@@ -687,26 +687,6 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string   "resource_type", limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "forum_attachments", force: :cascade do |t|
-    t.integer  "post_id",      limit: 4
-    t.string   "title",        limit: 255
-    t.string   "content_type", limit: 255
-    t.string   "filename",     limit: 255
-    t.integer  "size",         limit: 4
-    t.integer  "db_file_id",   limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "forums", force: :cascade do |t|
-    t.string  "name",             limit: 255
-    t.string  "description",      limit: 255
-    t.integer "topics_count",     limit: 4,     default: 0
-    t.integer "posts_count",      limit: 4,     default: 0
-    t.integer "position",         limit: 4
-    t.text    "description_html", limit: 65535
   end
 
   create_table "genes", force: :cascade do |t|
@@ -735,9 +715,9 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "time_left_at"
   end
 
-  add_index "group_memberships", ["person_id"], name: "index_group_memberships_on_person_id"
-  add_index "group_memberships", ["work_group_id", "person_id"], name: "index_group_memberships_on_work_group_id_and_person_id"
-  add_index "group_memberships", ["work_group_id"], name: "index_group_memberships_on_work_group_id"
+  add_index "group_memberships", ["person_id"], name: "index_group_memberships_on_person_id", using: :btree
+  add_index "group_memberships", ["work_group_id", "person_id"], name: "index_group_memberships_on_work_group_id_and_person_id", using: :btree
+  add_index "group_memberships", ["work_group_id"], name: "index_group_memberships_on_work_group_id", using: :btree
 
   create_table "group_memberships_project_positions", force: :cascade do |t|
     t.integer "group_membership_id", limit: 4
@@ -799,8 +779,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "investigation_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_inv_user_id_asset_id_can_view"
-  add_index "investigation_auth_lookup", ["user_id", "can_view"], name: "index_investigation_auth_lookup_on_user_id_and_can_view"
+  add_index "investigation_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_inv_user_id_asset_id_can_view", using: :btree
+  add_index "investigation_auth_lookup", ["user_id", "can_view"], name: "index_investigation_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "investigations", force: :cascade do |t|
     t.string   "title",            limit: 255
@@ -820,8 +800,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer "investigation_id", limit: 4
   end
 
-  add_index "investigations_projects", ["investigation_id", "project_id"], name: "index_investigations_projects_inv_proj_id"
-  add_index "investigations_projects", ["project_id"], name: "index_investigations_projects_on_project_id"
+  add_index "investigations_projects", ["investigation_id", "project_id"], name: "index_investigations_projects_inv_proj_id", using: :btree
+  add_index "investigations_projects", ["project_id"], name: "index_investigations_projects_on_project_id", using: :btree
 
   create_table "mapping_links", force: :cascade do |t|
     t.string   "substance_type", limit: 255
@@ -856,8 +836,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer  "sender_id",     limit: 4
   end
 
-  add_index "message_logs", ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id"
-  add_index "message_logs", ["sender_id"], name: "index_message_logs_on_sender_id"
+  add_index "message_logs", ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id", using: :btree
+  add_index "message_logs", ["sender_id"], name: "index_message_logs_on_sender_id", using: :btree
 
   create_table "model_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
@@ -869,8 +849,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "model_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_model_auth_lookup_on_user_id_and_asset_id_and_can_view"
-  add_index "model_auth_lookup", ["user_id", "can_view"], name: "index_model_auth_lookup_on_user_id_and_can_view"
+  add_index "model_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_model_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "model_auth_lookup", ["user_id", "can_view"], name: "index_model_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "model_formats", force: :cascade do |t|
     t.string   "title",      limit: 255
@@ -920,8 +900,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string   "license",                    limit: 255
   end
 
-  add_index "model_versions", ["contributor_id", "contributor_type"], name: "index_model_versions_on_contributor_id_and_contributor_type"
-  add_index "model_versions", ["model_id"], name: "index_model_versions_on_model_id"
+  add_index "model_versions", ["contributor_id", "contributor_type"], name: "index_model_versions_on_contributor_id_and_contributor_type", using: :btree
+  add_index "model_versions", ["model_id"], name: "index_model_versions_on_model_id", using: :btree
 
   create_table "model_versions_projects", id: false, force: :cascade do |t|
     t.integer "project_id", limit: 4
@@ -952,22 +932,22 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string   "license",                    limit: 255
   end
 
-  add_index "models", ["contributor_id", "contributor_type"], name: "index_models_on_contributor_id_and_contributor_type"
+  add_index "models", ["contributor_id", "contributor_type"], name: "index_models_on_contributor_id_and_contributor_type", using: :btree
 
   create_table "models_projects", id: false, force: :cascade do |t|
     t.integer "project_id", limit: 4
     t.integer "model_id",   limit: 4
   end
 
-  add_index "models_projects", ["model_id", "project_id"], name: "index_models_projects_on_model_id_and_project_id"
-  add_index "models_projects", ["project_id"], name: "index_models_projects_on_project_id"
+  add_index "models_projects", ["model_id", "project_id"], name: "index_models_projects_on_model_id_and_project_id", using: :btree
+  add_index "models_projects", ["project_id"], name: "index_models_projects_on_project_id", using: :btree
 
   create_table "moderatorships", force: :cascade do |t|
     t.integer "forum_id", limit: 4
     t.integer "user_id",  limit: 4
   end
 
-  add_index "moderatorships", ["forum_id"], name: "index_moderatorships_on_forum_id"
+  add_index "moderatorships", ["forum_id"], name: "index_moderatorships_on_forum_id", using: :btree
 
   create_table "modifications", force: :cascade do |t|
     t.string   "title",       limit: 255
@@ -1002,7 +982,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  add_index "number_value_versions", ["number_value_id"], name: "index_number_value_versions_on_number_value_id"
+  add_index "number_value_versions", ["number_value_id"], name: "index_number_value_versions_on_number_value_id", using: :btree
 
   create_table "number_values", force: :cascade do |t|
     t.integer  "version",            limit: 4
@@ -1022,7 +1002,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at",                null: false
   end
 
-  add_index "oauth_sessions", ["user_id"], name: "index_oauth_sessions_on_user_id"
+  add_index "oauth_sessions", ["user_id"], name: "index_oauth_sessions_on_user_id", using: :btree
 
   create_table "openbis_endpoints", force: :cascade do |t|
     t.string   "as_endpoint",           limit: 255
@@ -1052,8 +1032,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer "project_id",  limit: 4
   end
 
-  add_index "organisms_projects", ["organism_id", "project_id"], name: "index_organisms_projects_on_organism_id_and_project_id"
-  add_index "organisms_projects", ["project_id"], name: "index_organisms_projects_on_project_id"
+  add_index "organisms_projects", ["organism_id", "project_id"], name: "index_organisms_projects_on_organism_id_and_project_id", using: :btree
+  add_index "organisms_projects", ["project_id"], name: "index_organisms_projects_on_project_id", using: :btree
 
   create_table "people", force: :cascade do |t|
     t.datetime "created_at"
@@ -1082,7 +1062,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  add_index "permissions", ["policy_id"], name: "index_permissions_on_policy_id"
+  add_index "permissions", ["policy_id"], name: "index_permissions_on_policy_id", using: :btree
 
   create_table "phenotypes", force: :cascade do |t|
     t.text     "description",            limit: 65535
@@ -1103,20 +1083,6 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  create_table "posts", force: :cascade do |t|
-    t.integer  "user_id",    limit: 4
-    t.integer  "topic_id",   limit: 4
-    t.text     "body",       limit: 65535
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "forum_id",   limit: 4
-    t.text     "body_html",  limit: 65535
-  end
-
-  add_index "posts", ["forum_id", "created_at"], name: "index_posts_on_forum_id"
-  add_index "posts", ["topic_id", "created_at"], name: "index_posts_on_topic_id"
-  add_index "posts", ["user_id", "created_at"], name: "index_posts_on_user_id"
-
   create_table "presentation_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
     t.integer "asset_id",     limit: 4
@@ -1127,8 +1093,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "presentation_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_presentation_user_id_asset_id_can_view"
-  add_index "presentation_auth_lookup", ["user_id", "can_view"], name: "index_presentation_auth_lookup_on_user_id_and_can_view"
+  add_index "presentation_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_presentation_user_id_asset_id_can_view", using: :btree
+  add_index "presentation_auth_lookup", ["user_id", "can_view"], name: "index_presentation_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "presentation_versions", force: :cascade do |t|
     t.integer  "presentation_id",   limit: 4
@@ -1174,8 +1140,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer "presentation_id", limit: 4
   end
 
-  add_index "presentations_projects", ["presentation_id", "project_id"], name: "index_presentations_projects_pres_proj_id"
-  add_index "presentations_projects", ["project_id"], name: "index_presentations_projects_on_project_id"
+  add_index "presentations_projects", ["presentation_id", "project_id"], name: "index_presentations_projects_pres_proj_id", using: :btree
+  add_index "presentations_projects", ["project_id"], name: "index_presentations_projects_on_project_id", using: :btree
 
   create_table "programmes", force: :cascade do |t|
     t.string   "title",                       limit: 255
@@ -1229,7 +1195,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string  "frequency",          limit: 255
   end
 
-  add_index "project_subscriptions", ["person_id", "project_id"], name: "index_project_subscriptions_on_person_id_and_project_id"
+  add_index "project_subscriptions", ["person_id", "project_id"], name: "index_project_subscriptions_on_person_id_and_project_id", using: :btree
 
   create_table "projects", force: :cascade do |t|
     t.string   "title",              limit: 255
@@ -1257,16 +1223,16 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer "publication_id", limit: 4
   end
 
-  add_index "projects_publications", ["project_id"], name: "index_projects_publications_on_project_id"
-  add_index "projects_publications", ["publication_id", "project_id"], name: "index_projects_publications_on_publication_id_and_project_id"
+  add_index "projects_publications", ["project_id"], name: "index_projects_publications_on_project_id", using: :btree
+  add_index "projects_publications", ["publication_id", "project_id"], name: "index_projects_publications_on_publication_id_and_project_id", using: :btree
 
   create_table "projects_sample_types", id: false, force: :cascade do |t|
     t.integer "project_id",     limit: 4
     t.integer "sample_type_id", limit: 4
   end
 
-  add_index "projects_sample_types", ["project_id"], name: "index_projects_sample_types_on_project_id"
-  add_index "projects_sample_types", ["sample_type_id", "project_id"], name: "index_projects_sample_types_on_sample_type_id_and_project_id"
+  add_index "projects_sample_types", ["project_id"], name: "index_projects_sample_types_on_project_id", using: :btree
+  add_index "projects_sample_types", ["sample_type_id", "project_id"], name: "index_projects_sample_types_on_sample_type_id_and_project_id", using: :btree
 
   create_table "projects_samples", id: false, force: :cascade do |t|
     t.integer "project_id", limit: 4
@@ -1298,8 +1264,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "publication_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_pub_user_id_asset_id_can_view"
-  add_index "publication_auth_lookup", ["user_id", "can_view"], name: "index_publication_auth_lookup_on_user_id_and_can_view"
+  add_index "publication_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_pub_user_id_asset_id_can_view", using: :btree
+  add_index "publication_auth_lookup", ["user_id", "can_view"], name: "index_publication_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "publication_authors", force: :cascade do |t|
     t.string   "first_name",     limit: 255
@@ -1330,7 +1296,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string   "citation",         limit: 255
   end
 
-  add_index "publications", ["contributor_id", "contributor_type"], name: "index_publications_on_contributor_id_and_contributor_type"
+  add_index "publications", ["contributor_id", "contributor_type"], name: "index_publications_on_contributor_id_and_contributor_type", using: :btree
 
   create_table "recommended_model_environments", force: :cascade do |t|
     t.string   "title",      limit: 255
@@ -1373,9 +1339,9 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.text     "comment",       limit: 65535
   end
 
-  add_index "resource_publish_logs", ["publish_state"], name: "index_resource_publish_logs_on_publish_state"
-  add_index "resource_publish_logs", ["resource_type", "resource_id"], name: "index_resource_publish_logs_on_resource_type_and_resource_id"
-  add_index "resource_publish_logs", ["user_id"], name: "index_resource_publish_logs_on_user_id"
+  add_index "resource_publish_logs", ["publish_state"], name: "index_resource_publish_logs_on_publish_state", using: :btree
+  add_index "resource_publish_logs", ["resource_type", "resource_id"], name: "index_resource_publish_logs_on_resource_type_and_resource_id", using: :btree
+  add_index "resource_publish_logs", ["user_id"], name: "index_resource_publish_logs_on_user_id", using: :btree
 
   create_table "sample_attribute_types", force: :cascade do |t|
     t.string   "title",       limit: 255
@@ -1404,8 +1370,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer  "linked_sample_type_id",      limit: 4
   end
 
-  add_index "sample_attributes", ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
-  add_index "sample_attributes", ["unit_id"], name: "index_sample_attributes_on_unit_id"
+  add_index "sample_attributes", ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id", using: :btree
+  add_index "sample_attributes", ["unit_id"], name: "index_sample_attributes_on_unit_id", using: :btree
 
   create_table "sample_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
@@ -1417,8 +1383,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "sample_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_sample_user_id_asset_id_can_view"
-  add_index "sample_auth_lookup", ["user_id", "can_view"], name: "index_sample_auth_lookup_on_user_id_and_can_view"
+  add_index "sample_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_sample_user_id_asset_id_can_view", using: :btree
+  add_index "sample_auth_lookup", ["user_id", "can_view"], name: "index_sample_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "sample_controlled_vocab_terms", force: :cascade do |t|
     t.string   "label",                      limit: 255
@@ -1441,8 +1407,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string  "resource_type", limit: 255
   end
 
-  add_index "sample_resource_links", ["resource_id", "resource_type"], name: "index_sample_resource_links_on_resource_id_and_resource_type"
-  add_index "sample_resource_links", ["sample_id"], name: "index_sample_resource_links_on_sample_id"
+  add_index "sample_resource_links", ["resource_id", "resource_type"], name: "index_sample_resource_links_on_resource_id_and_resource_type", using: :btree
+  add_index "sample_resource_links", ["sample_id"], name: "index_sample_resource_links_on_sample_id", using: :btree
 
   create_table "sample_types", force: :cascade do |t|
     t.string   "title",             limit: 255
@@ -1503,8 +1469,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id"
-  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at"
+  add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
+  add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "settings", force: :cascade do |t|
     t.string   "var",         limit: 255,   null: false
@@ -1515,7 +1481,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  add_index "settings", ["target_type", "target_id", "var"], name: "index_settings_on_target_type_and_target_id_and_var", unique: true
+  add_index "settings", ["target_type", "target_id", "var"], name: "index_settings_on_target_type_and_target_id_and_var", unique: true, using: :btree
 
   create_table "site_announcement_categories", force: :cascade do |t|
     t.string   "title",      limit: 255
@@ -1559,8 +1525,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "sop_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_sop_auth_lookup_on_user_id_and_asset_id_and_can_view"
-  add_index "sop_auth_lookup", ["user_id", "can_view"], name: "index_sop_auth_lookup_on_user_id_and_can_view"
+  add_index "sop_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_sop_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "sop_auth_lookup", ["user_id", "can_view"], name: "index_sop_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "sop_deprecated_specimens", force: :cascade do |t|
     t.integer "deprecated_specimen_id", limit: 4
@@ -1587,8 +1553,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string   "license",           limit: 255
   end
 
-  add_index "sop_versions", ["contributor_id", "contributor_type"], name: "index_sop_versions_on_contributor_id_and_contributor_type"
-  add_index "sop_versions", ["sop_id"], name: "index_sop_versions_on_sop_id"
+  add_index "sop_versions", ["contributor_id", "contributor_type"], name: "index_sop_versions_on_contributor_id_and_contributor_type", using: :btree
+  add_index "sop_versions", ["sop_id"], name: "index_sop_versions_on_sop_id", using: :btree
 
   create_table "sops", force: :cascade do |t|
     t.string   "contributor_type", limit: 255
@@ -1607,7 +1573,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.string   "license",          limit: 255
   end
 
-  add_index "sops", ["contributor_id", "contributor_type"], name: "index_sops_on_contributor_id_and_contributor_type"
+  add_index "sops", ["contributor_id", "contributor_type"], name: "index_sops_on_contributor_id_and_contributor_type", using: :btree
 
   create_table "special_auth_codes", force: :cascade do |t|
     t.string   "code",            limit: 255
@@ -1628,8 +1594,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "strain_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_strain_user_id_asset_id_can_view"
-  add_index "strain_auth_lookup", ["user_id", "can_view"], name: "index_strain_auth_lookup_on_user_id_and_can_view"
+  add_index "strain_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_strain_user_id_asset_id_can_view", using: :btree
+  add_index "strain_auth_lookup", ["user_id", "can_view"], name: "index_strain_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "strain_descendants", id: false, force: :cascade do |t|
     t.integer "ancestor_id",   limit: 4
@@ -1675,7 +1641,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.integer  "data_file_version",  limit: 4
   end
 
-  add_index "studied_factors", ["data_file_id"], name: "index_studied_factors_on_data_file_id"
+  add_index "studied_factors", ["data_file_id"], name: "index_studied_factors_on_data_file_id", using: :btree
 
   create_table "studies", force: :cascade do |t|
     t.string   "title",                 limit: 255
@@ -1704,8 +1670,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.boolean "can_delete",             default: false
   end
 
-  add_index "study_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_study_auth_lookup_on_user_id_and_asset_id_and_can_view"
-  add_index "study_auth_lookup", ["user_id", "can_view"], name: "index_study_auth_lookup_on_user_id_and_can_view"
+  add_index "study_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_study_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
+  add_index "study_auth_lookup", ["user_id", "can_view"], name: "index_study_auth_lookup_on_user_id_and_can_view", using: :btree
 
   create_table "subscriptions", force: :cascade do |t|
     t.integer  "person_id",               limit: 4
@@ -1743,7 +1709,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  add_index "synonyms", ["substance_id", "substance_type"], name: "index_synonyms_on_substance_id_and_substance_type"
+  add_index "synonyms", ["substance_id", "substance_type"], name: "index_synonyms_on_substance_id_and_substance_type", using: :btree
 
   create_table "taggings", force: :cascade do |t|
     t.integer  "tag_id",        limit: 4
@@ -1755,8 +1721,8 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "created_at"
   end
 
-  add_index "taggings", ["tag_id"], name: "index_taggings_on_tag_id"
-  add_index "taggings", ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context"
+  add_index "taggings", ["tag_id"], name: "index_taggings_on_tag_id", using: :btree
+  add_index "taggings", ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context", using: :btree
 
   create_table "tags", force: :cascade do |t|
     t.string "name", limit: 255
@@ -1771,7 +1737,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  add_index "text_value_versions", ["text_value_id"], name: "index_text_value_versions_on_text_value_id"
+  add_index "text_value_versions", ["text_value_id"], name: "index_text_value_versions_on_text_value_id", using: :btree
 
   create_table "text_values", force: :cascade do |t|
     t.integer  "version",            limit: 4
@@ -1787,34 +1753,15 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  create_table "topics", force: :cascade do |t|
-    t.integer  "forum_id",     limit: 4
-    t.integer  "user_id",      limit: 4
-    t.string   "title",        limit: 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "hits",         limit: 4,   default: 0
-    t.integer  "sticky",       limit: 4,   default: 0
-    t.integer  "posts_count",  limit: 4,   default: 0
-    t.datetime "replied_at"
-    t.boolean  "locked",                   default: false
-    t.integer  "replied_by",   limit: 4
-    t.integer  "last_post_id", limit: 4
-  end
-
-  add_index "topics", ["forum_id", "replied_at"], name: "index_topics_on_forum_id_and_replied_at"
-  add_index "topics", ["forum_id", "sticky", "replied_at"], name: "index_topics_on_sticky_and_replied_at"
-  add_index "topics", ["forum_id"], name: "index_topics_on_forum_id"
-
   create_table "trash_records", force: :cascade do |t|
     t.string   "trashable_type", limit: 255
     t.integer  "trashable_id",   limit: 4
-    t.binary   "data"
+    t.binary   "data",           limit: 65535
     t.datetime "created_at"
   end
 
-  add_index "trash_records", ["created_at", "trashable_type"], name: "index_trash_records_on_created_at_and_trashable_type"
-  add_index "trash_records", ["trashable_type", "trashable_id"], name: "index_trash_records_on_trashable_type_and_trashable_id"
+  add_index "trash_records", ["created_at", "trashable_type"], name: "index_trash_records_on_created_at_and_trashable_type", using: :btree
+  add_index "trash_records", ["trashable_type", "trashable_id"], name: "index_trash_records_on_trashable_type_and_trashable_id", using: :btree
 
   create_table "units", force: :cascade do |t|
     t.string   "title",           limit: 255
@@ -1852,7 +1799,7 @@ ActiveRecord::Schema.define(version: 20180205100124) do
     t.datetime "updated_at"
   end
 
-  add_index "work_groups", ["project_id"], name: "index_work_groups_on_project_id"
+  add_index "work_groups", ["project_id"], name: "index_work_groups_on_project_id", using: :btree
 
   create_table "worksheets", force: :cascade do |t|
     t.integer "content_blob_id", limit: 4
