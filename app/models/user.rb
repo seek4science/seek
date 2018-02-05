@@ -147,17 +147,38 @@ class User < ActiveRecord::Base
   end
 
   # Encrypts some data with the salt.
-  def self.encrypt(password, salt)
+  def self.sha1_encrypt(password, salt)
     Digest::SHA1.hexdigest("--#{salt}--#{password}--")
   end
 
-  # Encrypts the password with the user salt
-  def encrypt(password)
-    self.class.encrypt(password, salt)
+  def self.sha256_encrypt(password, salt)
+    Digest::SHA256.hexdigest("--#{salt}--#{password}--")
   end
 
+  def self.encrypt(password, salt)
+    sha256_encrypt(password, salt)
+  end
+
+  # Encrypts the password with the user salt
+  def sha1_encrypt(password)
+    self.class.sha1_encrypt(password, salt)
+  end
+
+  def sha256_encrypt(password)
+    self.class.sha256_encrypt(password, salt)
+  end
+
+  alias_method :encrypt, :sha256_encrypt
+
   def authenticated?(password)
-    crypted_password == encrypt(password)
+    if crypted_password == encrypt(password)
+      true
+    elsif crypted_password == sha1_encrypt(password)
+      update_column(:crypted_password, encrypt(password))
+      true
+    else
+      false
+    end
   end
 
   def remember_token?

@@ -246,6 +246,20 @@ class SessionsControllerTest < ActionController::TestCase
     assert !Person.where(first_name: 'new', last_name: 'ldap_user').empty?
   end
 
+  test 'should authenticate user with legacy encryption and update password' do
+    sha1_user = Factory(:sha1_pass_user)
+    test_password = '0' * User::MIN_PASSWORD_LENGTH
+
+    assert_equal User.sha1_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
+
+    post :create, login: sha1_user.login, password: test_password
+    assert session[:user_id]
+    assert_response :redirect
+
+    sha1_user.reload
+    assert_equal User.sha256_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
+  end
+
   protected
 
   def cookie_for(user)
