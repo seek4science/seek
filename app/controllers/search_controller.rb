@@ -54,7 +54,7 @@ class SearchController < ApplicationController
   end
 
   def perform_search (is_json = false)
-    @search_query = params[:q] || params[:search_query]
+    @search_query = ActionController::Base.helpers.sanitize(params[:q] || params[:search_query])
     @search=@search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query||=""
     @search_type = params[:search_type]
