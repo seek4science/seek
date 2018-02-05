@@ -35,3 +35,10 @@ Factory.define(:oauth_session) do |f|
   f.refresh_token 'ref'
   f.expires_at (Time.now + 1.hour)
 end
+
+Factory.define(:sha1_pass_user, parent: :brand_new_user) do |f|
+  test_password = '0' * User::MIN_PASSWORD_LENGTH
+  f.after_create do |user|
+    user.update_column(:crypted_password, user.sha1_encrypt(test_password))
+  end
+end
