@@ -1,7 +1,6 @@
 // ...
 //= require jquery
 //= require jquery_no_conflict
-//= require savage_beast/application
 //= require prototype
 //= require prototype_ujs
 //= require prototype_patch

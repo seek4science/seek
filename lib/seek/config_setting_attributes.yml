@@ -61,7 +61,6 @@ organisms_enabled:
 models_enabled:
 assays_enabled:
 publications_enabled:
-forum_enabled:
 jerm_enabled:
 email_enabled:
 jws_enabled:
