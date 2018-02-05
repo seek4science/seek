@@ -1,5 +1,4 @@
 require 'digest/sha1'
-require 'savage_beast/user_init'
 
 class User < ActiveRecord::Base
   MIN_PASSWORD_LENGTH=10
@@ -224,12 +223,6 @@ class User < ActiveRecord::Base
   # returns a 'blacklist' favourite group for the user (or 'nil' if not found)
   def get_blacklist
     FavouriteGroup.where(user_id: id, name: FavouriteGroup::BLACKLIST_NAME).first
-  end
-
-  # required for savage beast plugin
-  # see http://www.williambharding.com/blog/rails/savage-beast-23-a-rails-22-23-message-forum-plugin/
-  def admin?
-    is_admin?
   end
 
   def currently_online
