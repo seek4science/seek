@@ -8,7 +8,7 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
   def setup
     User.current_user = Factory(:user, login: 'test')
     @current_user = User.current_user
-    post '/session', login: 'test', password: 'blah'
+    post '/session', login: 'test', password: factory_user_password
     stub_request(:head, 'http://somewhere.com/piccy.pdf').to_return(status: 404)
     stub_request(:head, 'http://www.abc.com/').to_return(status: 404)
     stub_request(:head, 'http://somewhere.com/piccy_no_copy.pdf').to_return(status: 404)
@@ -114,4 +114,5 @@ class AssetButtonsTest < ActionDispatch::IntegrationTest
       assert_select 'a', { text: text }, "Couldn't find '#{text}' button at #{path}"
     end
   end
+
 end
