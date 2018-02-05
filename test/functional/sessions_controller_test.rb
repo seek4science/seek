@@ -170,6 +170,21 @@ class SessionsControllerTest < ActionController::TestCase
     assert_redirected_to :back
   end
 
+  test 'should redirect to given path' do
+    post :create, login: 'quentin', password: 'test', called_from: { path: '/data_files' }
+    assert session[:user_id]
+    assert_redirected_to data_files_path
+  end
+
+  test 'should not redirect to external url' do
+    post :create, login: 'quentin', password: 'test', called_from: { path: 'http://not.our.domain/data_files' }
+
+    assert session[:user_id]
+
+    assert_not_includes @response.location, 'not.our.domain'
+    assert_includes @response.location, 'test.host'
+  end
+
   test 'should have only seek login' do
     assert !Seek::Config.omniauth_enabled
     get :new
