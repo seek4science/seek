@@ -1,5 +1,5 @@
 
-<%= render :partial => "general/page_title",:locals=>{:title=>"Technology type '#{@type_class.try(:label) || params[:label]}'"} %>
+<%= render :partial => "general/page_title",:locals=>{:title=>"Technology type '#{@type_class.try(:label) || h(params[:label])}'"} %>
 
 
 <% unless @type_class.nil? -%>
