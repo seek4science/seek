@@ -19,6 +19,7 @@ require 'authenticated_test_helper'
 require 'mock_helper'
 require 'html_helper'
 require 'nels_test_helper'
+require 'upload_helper'
 require 'minitest/reporters'
 require 'minitest'
 
@@ -35,13 +36,7 @@ module ActionView
   end
 end
 
-# This method is used in factories
-def fixture_file_upload(path, mime_type = nil, binary = false)
-  if self.class.respond_to?(:fixture_path) && self.class.fixture_path
-    path = File.join(self.class.fixture_path, path)
-  end
-  Rack::Test::UploadedFile.new(path, mime_type, binary)
-end
+include UploadHelper
 
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
