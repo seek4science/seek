@@ -215,9 +215,10 @@ class UsersControllerTest < ActionController::TestCase
   def test_update_password
     login_as :quentin
     u = users(:quentin)
-    post :update, id: u.id, user: { id: u.id, password: 'mmmmm', password_confirmation: 'mmmmm' }
+    pwd = 'b' * User::MIN_PASSWORD_LENGTH
+    post :update, id: u.id, user: { id: u.id, password: pwd, password_confirmation: pwd }
     assert_nil flash[:error]
-    assert User.authenticate('quentin', 'mmmmm')
+    assert User.authenticate('quentin', pwd)
   end
 
   test 'reset code cleared after updating password' do
@@ -225,7 +226,8 @@ class UsersControllerTest < ActionController::TestCase
     user.reset_password
     user.save!
     login_as(user)
-    post :update, id: user.id, user: { id: user.id, password: 'mmmmm', password_confirmation: 'mmmmm' }
+    pwd = 'a' * User::MIN_PASSWORD_LENGTH
+    post :update, id: user.id, user: { id: user.id, password: pwd, password_confirmation: pwd }
     user.reload
     assert_nil user.reset_password_code
     assert_nil user.reset_password_code_until
@@ -312,7 +314,8 @@ class UsersControllerTest < ActionController::TestCase
   protected
 
   def create_user(options = {})
+    pwd = 'a' * User::MIN_PASSWORD_LENGTH
     post :create, user: { login: 'quire', email: 'quire@example.com',
-                          password: 'quire', password_confirmation: 'quire' }.merge(options), person: { first_name: 'fred' }
+                          password: pwd, password_confirmation: pwd }.merge(options), person: { first_name: 'fred' }
   end
 end
