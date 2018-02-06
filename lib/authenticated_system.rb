@@ -18,12 +18,11 @@ module AuthenticatedSystem
 
   # Store the given user id in the session.
   def current_user=(new_user)
-    session[:user_id] = new_user ? new_user.id : nil
-    @current_user = new_user || false
+    session[:user_id] = new_user.try(:id)
+    @current_user = new_user
   end
 
   def clear_current_user
-    session.delete(:user_id)
     @current_user = nil
     remove_instance_variable(:@current_user)
   end

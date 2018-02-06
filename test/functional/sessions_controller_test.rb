@@ -14,10 +14,6 @@ class SessionsControllerTest < ActionController::TestCase
   fixtures :users, :people
 
   def setup
-    @controller = SessionsController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
-
     Seek::Config.omniauth_providers = {
       ldap: {
         title: 'organization-ldap',

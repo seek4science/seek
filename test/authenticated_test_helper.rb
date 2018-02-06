@@ -11,12 +11,15 @@ module AuthenticatedTestHelper
                users(user)
            end
 
-    @controller.send(:current_user=, user)
+    # Clear the current_user from the controller so authentication will happen again using the session
+    @controller.send(:clear_current_user)
+    @request.session[:user_id] = user.try(:id)
     User.current_user = user
   end
 
   def logout
     @controller.send(:clear_current_user)
+    @request.session[:user_id] = nil
     User.current_user = nil
   end
 
