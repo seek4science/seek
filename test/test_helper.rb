@@ -262,6 +262,11 @@ class ActiveSupport::TestCase
     f.close
     puts "Written @response.body to #{f.path}"
   end
+
+  # the password used for the Factories
+  def factory_user_password
+    Factory.build(:user).password
+  end
 end
 
 # Load seed data

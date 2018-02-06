@@ -154,7 +154,7 @@
  <script type = "text/javascript">
      var perPage = <%= default_per_page %>;
        <% if params[:page_rows] %>
-           perPage = <%= params[:page_rows] %>;
+           perPage = <%= params[:page_rows].try(:to_i) %>;
        <% end %>
   </script>
 

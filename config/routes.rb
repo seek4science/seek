@@ -81,12 +81,6 @@ SEEK::Application.routes.draw do
   end
   resources :help_images, only: [:create, :destroy]
 
-  resources :forum_attachments, :only => [:create, :destroy] do
-    member do
-      get :download
-    end
-  end
-
   resources :avatars
   resources :attachments
   resources :subscriptions

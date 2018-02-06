@@ -118,10 +118,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert !Seek::Config.delete_asset_version_enabled
   end
 
-  test 'forum_enabled' do
-    assert !Seek::Config.forum_enabled
-  end
-
   test 'smtp_settings port' do
     assert_equal '25', Seek::Config.smtp_settings('port')
   end

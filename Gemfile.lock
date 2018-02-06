@@ -43,12 +43,6 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/my_savage_beast.git
-  revision: 4ff41d5e7d1f17440240fe0886a7c9827f8f53c6
-  specs:
-    my_savage_beast (2.3)
-
-GIT
   remote: https://github.com/SysMO-DB/white_list.git
   revision: 3f9798ec54f227e852b944bb14f6f90d05cde893
   specs:
@@ -865,7 +859,6 @@ DEPENDENCIES
   minitest-reporters
   my_annotations!
   my_responds_to_parent!
-  my_savage_beast!
   mysql2
   nokogiri (~> 1.8.1)
   omniauth (~> 1.3.1)
