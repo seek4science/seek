@@ -1,19 +1,11 @@
 <% @job_status ||= SampleDataExtractionJob.get_status(data_file) %>
-<% waiting_for_confirmation = !Seek::Samples::Extractor.new(data_file).fetch.nil? %>
+<% in_progress = SampleDataExtractionJob.in_progress?(data_file) %>
 
 <div id="sample-extraction-status">
-  <% if data_file.can_manage? && (waiting_for_confirmation || SampleDataExtractionJob.in_progress?(data_file)) %>
+  <% if data_file.can_manage? && (in_progress || !Seek::Samples::Extractor.new(data_file).fetch.nil?) %>
       <div class="alert alert-info" role="alert">
         <strong>Sample extraction:</strong>
-        <% if waiting_for_confirmation %>
-            Waiting for confirmation
-            <p>
-              Please review the extracted samples by clicking the button below, and decide whether to continue or cancel
-              the extraction process.
-            </p>
-            <%= link_to('Review Extracted Samples', confirm_extraction_data_file_path(data_file),
-                        class: 'btn btn-primary') %>
-        <% else %>
+        <% if in_progress %>
             <%= @job_status.to_s.humanize %>
             <%= image 'spinner' %>
             <script>
@@ -27,6 +19,14 @@
                 );
               }, 5000);
             </script>
+        <% else %>
+            Waiting for confirmation
+            <p>
+              Please review the extracted samples by clicking the button below, and decide whether to continue or cancel
+              the extraction process.
+            </p>
+            <%= link_to('Review Extracted Samples', confirm_extraction_data_file_path(data_file),
+                        class: 'btn btn-primary') %>
         <% end %>
       </div>
   <% end %>

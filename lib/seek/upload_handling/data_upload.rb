@@ -117,11 +117,15 @@ module Seek
       def process_from_base64(blob_params)
         base64_data = blob_params[:base64_data]
         blob_params.delete(:data)
-        file_contents = Paperclip.io_adapters.for(base64_data)
-        blob_params[:original_filename] = file_contents.original_filename
+        regexp = /\Adata:([-\w]+\/[-\w\+\.]+)?;base64,(.+)/
+        parts = base64_data.match(regexp) || []
+        content_type = parts[1]
+        file_contents = StringIO.new(Base64.decode64(parts[2] || ''))
+        extension = (mime_extensions(content_type) || []).first
+        blob_params[:original_filename] = "data#{extension ? ".#{extension}" : ''}"
         blob_params[:tmp_io_object] = file_contents
-        blob_params[:content_type] = file_contents.content_type
-        blob_params[:file_size] = file_contents.size
+        blob_params[:content_type] = content_type
+        blob_params[:file_size] = file_contents.length
         true
       end
 

@@ -6,7 +6,6 @@ require 'app_version'
 module ApplicationHelper
   include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
-  include TavernaPlayer::RunsHelper
   include Recaptcha::ClientHelper
   include VersionHelper
 

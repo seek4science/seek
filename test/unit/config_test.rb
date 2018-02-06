@@ -324,7 +324,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'convert setting from database' do
-    Settings.limit_latest = '6'
+    Settings.global['limit_latest'] = '6'
     assert_equal 6, Seek::Config.limit_latest
   end
 
@@ -470,5 +470,35 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 128,key.length
     FileUtils.rm(path)
     refute_equal key, Seek::Config.secret_key_base
+  end
+
+  test 'project-specific setting' do
+    many_bananas_project = Factory(:project)
+    no_bananas_project = Factory(:project)
+    many_bananas_project.settings['banana_count'] = 10
+    no_bananas_project.settings['banana_count'] = 0
+
+    assert_equal 10, many_bananas_project.settings['banana_count']
+    assert_equal 0, no_bananas_project.settings['banana_count']
+  end
+
+  test 'project-specific settings can be accessed in various waya' do
+    many_bananas_project = Factory(:project)
+    many_bananas_project.settings['banana_count'] = 10
+
+    assert_equal 10, many_bananas_project.settings['banana_count']
+    assert_equal 10, Settings.for(many_bananas_project)['banana_count']
+  end
+
+  test 'project-specific settings do no conflict with global settings' do
+    many_bananas_project = Factory(:project)
+    no_bananas_project = Factory(:project)
+    many_bananas_project.settings['banana_count'] = 10
+    Settings.global['banana_count'] = 5
+    no_bananas_project.settings['banana_count'] = 0
+
+    assert_equal 10, many_bananas_project.settings['banana_count']
+    assert_equal 5, Settings.global['banana_count']
+    assert_equal 0, no_bananas_project.settings['banana_count']
   end
 end

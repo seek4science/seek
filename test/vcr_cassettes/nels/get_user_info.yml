@@ -1,0 +1,38 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://test-fe.cbu.uib.no/nels-api/user-info
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*; q=0.5, application/xml"
+      Accept-Encoding:
+      - gzip, deflate
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 28 Jul 2017 08:57:28 GMT
+      Content-Length:
+      - '62'
+      Connection:
+      - close
+      Content-Type:
+      - text/plain; charset=UTF-8
+    body:
+      encoding: UTF-8
+      string: '{"nels_id":261,"name":"Finn Bacall","user_type":"Normal User"}'
+    http_version: 
+  recorded_at: Fri, 28 Jul 2017 08:57:29 GMT
+recorded_with: VCR 2.9.3

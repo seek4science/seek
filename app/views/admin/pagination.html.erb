@@ -8,7 +8,8 @@
     <% [['People','people'], [t('project').pluralize,'projects'], ['Institutions','institutions'],
         [t('investigation').pluralize,'investigations'], [t('study').pluralize,'studies'], [t('assays.assay').pluralize.capitalize, 'assays'],
         [t('data_file').pluralize,'data_files'], [t('model').pluralize, 'models'], [t('sop').pluralize,'sops'],
-        ['Publications','publications'], [t('presentation').pluralize, 'presentations'], [t('event').pluralize,'events']
+        ['Publications','publications'], [t('presentation').pluralize, 'presentations'], [t('event').pluralize,'events'],
+        [t('document').pluralize,'documents']
        ].each do |type| %>
         <div class="form-group index-page-setting">
           <label><%= type[0] -%></label>
@@ -23,7 +24,7 @@
         </div>
     <% end %>
 
-    <%= admin_text_setting(:limit_latest, Settings.limit_latest,
+    <%= admin_text_setting(:limit_latest, Seek::Config.limit_latest,
                            'Latest list length', "This is the maximum number of items that are listed when viewing 'latest'.",
                            :onkeypress => "javascript: return onlyNumbers(event);") %>
 

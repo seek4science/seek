@@ -16,12 +16,10 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :publications
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
-  has_and_belongs_to_many :taverna_player_runs, class_name: 'TavernaPlayer::Run',
-                                                join_table: 'projects_taverna_player_runs', association_foreign_key: 'run_id'
-
   has_and_belongs_to_many :strains
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
+  has_and_belongs_to_many :documents
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
   has_many :institutions, through: :work_groups, before_remove: :group_memberships_empty?, inverse_of: :projects
@@ -73,6 +71,8 @@ class Project < ActiveRecord::Base
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
+  has_many :settings, class_name: 'Settings', as: :target, dependent: :destroy
+
   def group_memberships_empty?(institution)
     work_group = WorkGroup.where(['project_id=? AND institution_id=?', id, institution.id]).first
     unless work_group.people.empty?
@@ -92,7 +92,7 @@ class Project < ActiveRecord::Base
   before_save :set_credentials
 
   def assets
-    data_files | sops | models | publications | presentations
+    data_files | sops | models | publications | presentations | documents
   end
 
   def institutions=(new_institutions)

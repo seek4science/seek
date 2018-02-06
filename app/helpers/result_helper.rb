@@ -1,5 +1,4 @@
 module ResultHelper
-  include TavernaPlayer::RunsHelper
 
   # Override
   def deep_parse(types, output, zip, index = [])
@@ -20,7 +19,6 @@ module ResultHelper
           path = (index + [i]).join('/')
           data = run_path(output.run_id) + "/output/#{output.name}/#{path}"
         end
-        content += TavernaPlayer.output_renderer.render(data, type)
         content += '</p></li>'
       end
       i += 1
