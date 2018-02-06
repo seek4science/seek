@@ -2,14 +2,6 @@ require 'database_cleaner'
 require 'factory_girl'
 require '../test/upload_helper.rb'
 
-# This method is used in factories
-def fixture_file_upload(path, mime_type = nil, binary = false)
-  if self.class.respond_to?(:fixture_path) && self.class.fixture_path
-    path = File.join(self.class.fixture_path, path)
-  end
-  Rack::Test::UploadedFile.new(path, mime_type, binary)
-end
-
 # This config file is executed twice for some reason, so the following prevents the factories loading twice and causing
 #   an exception
 unless (FactoryGirl.factory_by_name(:user) rescue nil)
