@@ -1,5 +1,3 @@
-include ActionDispatch::TestProcess
-
 # ModelFormat
 Factory.define(:model_format) do |f|
   f.sequence(:title) { |n| "format #{n}" }
