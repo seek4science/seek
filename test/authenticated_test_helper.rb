@@ -5,18 +5,12 @@ module AuthenticatedTestHelper
     user = users(user) unless user.class == User || user.class == Person
     user = user.user if user.class == Person
     @request.session[:user_id] = user.try(:id)
+    @controller.send(:current_user=, user)
     User.current_user = user
   end
 
   def logout
-    # forces ApplicationController.@current_user=false
-    class << @controller
-      def force_logout
-        @current_user = nil
-      end
-    end
-    @controller.force_logout
-
+    @controller.send(:current_user=, nil)
     @request.session[:user_id] = nil
     User.current_user = nil
   end
