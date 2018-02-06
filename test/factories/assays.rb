@@ -1,5 +1,6 @@
 # AssayClass
-#:assay_modelling and :assay_experimental rely on the existence of the AssayClasses
+# :assay_modelling and :assay_experimental rely on the existence of the AssayClasses
+
 Factory.define(:modelling_assay_class, class: AssayClass) do |f|
   f.title I18n.t('assays.modelling_analysis')
   f.key 'MODEL'
