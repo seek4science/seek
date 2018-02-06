@@ -22,6 +22,12 @@ module AuthenticatedSystem
     @current_user = new_user || false
   end
 
+  def clear_current_user
+    session.delete(:user_id)
+    @current_user = nil
+    remove_instance_variable(:@current_user)
+  end
+
   # Check if the user is authorized
   #
   # Override this method in your controllers if you want to restrict access
