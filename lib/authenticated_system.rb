@@ -121,6 +121,8 @@ module AuthenticatedSystem
   def login_from_basic_auth
     authenticate_with_http_basic do |username, password|
       self.current_user = User.authenticate(username, password)
+      sleep 2 if Rails.env.production? && (username.present? && !self.current_user) # Throttle incorrect login
+      self.current_user
     end
   end
 
