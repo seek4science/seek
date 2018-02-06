@@ -488,6 +488,12 @@ namespace :seek do
     puts "Done - (#{saved}/#{total} converted)"
   end
 
+  desc "clear rack attack's throttling cache"
+  task :clear_rack_attack_cache => :environment do
+    Rack::Attack.cache.store.delete_matched("#{Rack::Attack.cache.prefix}:*")
+    puts 'Done'
+  end
+
   private
 
   def set_projects_parent array, parent

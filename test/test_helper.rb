@@ -19,6 +19,7 @@ require 'authenticated_test_helper'
 require 'mock_helper'
 require 'html_helper'
 require 'nels_test_helper'
+require 'upload_helper'
 require 'minitest/reporters'
 require 'minitest'
 
@@ -34,6 +35,8 @@ module ActionView
     end
   end
 end
+
+include UploadHelper
 
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
