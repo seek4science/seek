@@ -7,6 +7,7 @@ require 'colorize'
 require 'seek/mime_types'
 
 include Seek::MimeTypes
+include SimpleCrypt
 
 namespace :seek do
   # these are the tasks required for this version upgrade
@@ -15,6 +16,7 @@ namespace :seek do
     rebuild_sample_templates
     delete_redundant_subscriptions
     update_sample_resource_links
+    move_site_credentials_to_settings
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -84,5 +86,22 @@ namespace :seek do
       sample.send(:update_sample_resource_links)
     end
     puts "Created #{SampleResourceLink.count - pre_count} SampleResourceLinks"
+  end
+
+  task(move_site_credentials_to_settings: :environment) do
+    global_passphrase = defined? GLOBAL_PASSPHRASE ? GLOBAL_PASSPHRASE : 'ohx0ipuk2baiXah'
+    conversions = 0
+
+    Project.all.each do |project|
+      if project.site_credentials.present?
+        credentials_hash = decrypt(project.site_credentials, generate_key(global_passphrase))
+        project.site_username = credentials_hash[:username]
+        project.site_password = credentials_hash[:password]
+        project.update_column(:site_credentials, nil)
+        conversions += 1
+      end
+    end
+
+    puts "#{conversions} project site credentials migrated"
   end
 end
