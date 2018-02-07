@@ -12,9 +12,7 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     @min_study = Factory(:min_study)
     @min_study.title = 'Fred'
 
-    @@template_dir = File.join(Rails.root, 'test', 'fixtures',
-                               'files', 'json', 'templates')
-    template_file = File.join(@@template_dir, 'post_min_assay.json.erb')
+    template_file = File.join(ApiIntegrationTestHelper.template_dir, 'post_min_assay.json.erb')
     template = ERB.new(File.read(template_file))
     namespace = OpenStruct.new({:study_id => @min_study.id, :r => ApiIntegrationTestHelper.method(:render_erb)})
     template_result = template.result(namespace.instance_eval {binding})

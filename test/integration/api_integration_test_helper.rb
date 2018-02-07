@@ -164,8 +164,13 @@ module ApiIntegrationTestHelper
 
   # Here starts templatey stuff
 
+  def self.template_dir
+    File.join(Rails.root, 'test', 'fixtures',
+                               'files', 'json', 'templates')
+  end
+
   def self.render_erb (path, locals)
-    content = File.read(File.join(@@template_dir, path))
+    content = File.read(File.join(template_dir, path))
     template = ERB.new(content)
     h = locals
     h[:r] = method(:render_erb)

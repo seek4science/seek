@@ -15,9 +15,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     @max_project = Factory(:max_project)
     @max_project.title = 'Bert'
 
-    @@template_dir = File.join(Rails.root, 'test', 'fixtures',
-                               'files', 'json', 'templates')
-    template_file = File.join(@@template_dir, 'post_min_investigation.json.erb')
+     template_file = File.join(ApiIntegrationTestHelper.template_dir, 'post_min_investigation.json.erb')
     template = ERB.new(File.read(template_file))
     namespace = OpenStruct.new({:project_ids => [@min_project.id, @max_project.id], :r => ApiIntegrationTestHelper.method(:render_erb)})
     template_result = template.result(namespace.instance_eval {binding})
