@@ -791,4 +791,33 @@ class ProjectTest < ActiveSupport::TestCase
     assert !project_administrator.is_project_administrator?(project)
     assert !project.can_be_administered_by?(project_administrator.user)
   end
+
+  test 'stores project settings' do
+    project = Factory(:project)
+
+    assert_nil project.settings['nels_enabled']
+
+    assert_difference('Settings.count') do
+      project.settings['nels_enabled'] = true
+    end
+
+    assert project.settings['nels_enabled']
+  end
+
+  test 'stores encrypted project settings' do
+    project = Factory(:project)
+
+    assert_nil project.settings['site_password']
+
+    assert_difference('Settings.count') do
+      project.settings['site_password'] = 'p@ssw0rd!'
+    end
+
+    setting = project.settings.where(var: 'site_password').first
+
+    refute_equal 'p@ssw0rd!', setting[:encrypted_value]
+    assert_nil setting[:value] # This is the database value
+    assert_equal 'p@ssw0rd!',  setting.value
+    assert_equal 'p@ssw0rd!',  project.settings['site_password']
+  end
 end

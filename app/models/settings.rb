@@ -26,8 +26,8 @@ class Settings < ActiveRecord::Base
 
   belongs_to :target, polymorphic: true, required: false
 
-  attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, if: :encrypt?, marshal: true, marsheler: YAML
-  before_save :ensure_no_plaintext
+  attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, marshal: true, marsheler: YAML
+  before_save :ensure_no_plaintext, if: :encrypt?
 
   cattr_accessor :defaults
   @@defaults = {}.with_indifferent_access
@@ -92,7 +92,13 @@ class Settings < ActiveRecord::Base
   #get the value field, YAML decoded
   alias_method :attr_enc_value, :value
   def value
-    encrypt? ? attr_enc_value : YAML::load(self[:value])
+    if encrypted?
+      attr_enc_value
+    elsif self[:value].present?
+      YAML::load(self[:value])
+    else
+      nil
+    end
   end
 
   #set the value field, YAML encoded
@@ -117,13 +123,19 @@ class Settings < ActiveRecord::Base
     where(target_type: target.class.name, target_id: target.id)
   end
 
-  private
+  # Is this setting encrypted? - To handle settings that existed before encryption was introduced
+  def encrypted?
+    self[:encrypted_value].present?
+  end
 
+  # Should this setting be encrypted?
   def encrypt?
     Seek::Config.encrypted_setting?(self.var)
   end
 
+  private
+
   def ensure_no_plaintext
-    self[:value] = nil if encrypt?
+    self[:value] = nil if encrypted_value_changed?
   end
 end

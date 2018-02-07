@@ -223,50 +223,12 @@ module Seek
     end
 
     def smtp_settings(field)
-      value = smtp[field.to_sym]
-      value = decrypt_value(value) if field == :password || field == 'password'
-      value
+      smtp[field.to_sym]
     end
 
     def set_smtp_settings(field, value)
-      if %i[password user_name authentication].include? field.to_sym
-        value = nil if value.blank?
-      end
-
-      value = value.to_sym if field.to_sym == :authentication && value
-      if field.to_sym == :password
-        unless value.blank?
-          value = encrypt(value, generate_key(GLOBAL_PASSPHRASE))
-        end
-      end
       merge! :smtp, field => value
       value
-    end
-
-    # TODO: update to use attr_encrypted
-    def datacite_password_decrypt
-      datacite_password = Seek::Config.datacite_password
-      decrypt_value(datacite_password)
-    end
-
-    # TODO: update to use attr_encrypted
-    def decrypt_value(value)
-      unless value.blank?
-        begin
-          decrypt(value, generate_key(GLOBAL_PASSPHRASE))
-        rescue => exception
-          Rails.logger.error 'ERROR decrypting value - reverting to a blank string'
-          ''
-        end
-      end
-    end
-
-    # TODO: update to use attr_encrypted
-    def datacite_password_encrypt(password)
-      unless password.blank?
-        Seek::Config.datacite_password = encrypt(password, generate_key(GLOBAL_PASSPHRASE))
-      end
-      datacite_password
     end
 
     def facet_enable_for_page(controller)
@@ -399,10 +361,6 @@ module Seek
         set_value(setting, val, options[:convert])
         send propagate if respond_to?(propagate)
       end
-
-      if options[:encrypt]
-        register_encrypted_setting(setting)
-      end
     end
 
     def register_encrypted_setting(setting)
@@ -437,8 +395,18 @@ module Seek
       HashWithIndifferentAccess.new(yaml)
     end
 
+    def self.read_project_setting_attributes
+      yaml = YAML.load_file(File.join(File.dirname(File.expand_path(__FILE__)), 'project_setting_attributes.yml'))
+      HashWithIndifferentAccess.new(yaml)
+    end
+
     read_setting_attributes.each do |method, opts|
       setting method, opts
+      register_encrypted_setting(method) if opts && opts[:encrypt]
+    end
+
+    read_project_setting_attributes.each do |method, opts|
+      register_encrypted_setting(method) if opts && opts[:encrypt]
     end
   end
 end

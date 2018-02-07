@@ -39,7 +39,7 @@ module Seek
           end
 
           username = Seek::Config.datacite_username
-          password = Seek::Config.datacite_password_decrypt
+          password = Seek::Config.datacite_password
           url = Seek::Config.datacite_url.blank? ? nil : Seek::Config.datacite_url
           endpoint = DataCite::Client.new(username, password, url)
 
