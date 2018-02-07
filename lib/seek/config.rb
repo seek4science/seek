@@ -365,7 +365,6 @@ module Seek
 
     def register_encrypted_setting(setting)
       encrypted_settings << setting.to_sym
-      attr
     end
 
     def encrypted_settings
