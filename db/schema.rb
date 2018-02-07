@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180205164611) do
+ActiveRecord::Schema.define(version: 20180207102508) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1473,12 +1473,14 @@ ActiveRecord::Schema.define(version: 20180205164611) do
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "settings", force: :cascade do |t|
-    t.string   "var",         limit: 255,   null: false
-    t.text     "value",       limit: 65535
-    t.integer  "target_id",   limit: 4
-    t.string   "target_type", limit: 30
+    t.string   "var",                limit: 255,   null: false
+    t.text     "value",              limit: 65535
+    t.integer  "target_id",          limit: 4
+    t.string   "target_type",        limit: 30
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "encrypted_value",    limit: 65535
+    t.string   "encrypted_value_iv", limit: 255
   end
 
   add_index "settings", ["target_type", "target_id", "var"], name: "index_settings_on_target_type_and_target_id_and_var", unique: true, using: :btree

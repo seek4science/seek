@@ -399,6 +399,20 @@ module Seek
         set_value(setting, val, options[:convert])
         send propagate if respond_to?(propagate)
       end
+
+      if options[:encrypt]
+        register_encrypted_setting(setting)
+      end
+    end
+
+    def register_encrypted_setting(setting)
+      @@encrypted_settings ||= []
+      @@encrypted_settings << setting.to_sym
+      attr
+    end
+
+    def encrypted_setting?(setting)
+      @@encrypted_settings.include?(setting.to_sym)
     end
   end
 

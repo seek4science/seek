@@ -77,5 +77,3 @@ module SEEK
     config.active_record.raise_in_transactional_callbacks = true
   end
 end
-
-require 'settings' # This is here rather than in seek_main.rb because it has to be loaded before seek_configuration.rb

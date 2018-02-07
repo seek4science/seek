@@ -26,6 +26,9 @@ class Settings < ActiveRecord::Base
 
   belongs_to :target, polymorphic: true, required: false
 
+  attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, if: :encrypt?, marshal: true, marsheler: YAML
+  before_save :ensure_no_plaintext
+
   cattr_accessor :defaults
   @@defaults = {}.with_indifferent_access
   # Support old plugin
@@ -87,13 +90,19 @@ class Settings < ActiveRecord::Base
   end
 
   #get the value field, YAML decoded
+  alias_method :attr_enc_value, :value
   def value
-    YAML::load(self[:value])
+    encrypt? ? attr_enc_value : YAML::load(self[:value])
   end
 
   #set the value field, YAML encoded
+  alias_method :attr_enc_value=, :value=
   def value=(new_value)
-    self[:value] = new_value.to_yaml
+    if encrypt?
+      self.attr_enc_value = new_value
+    else
+      self[:value] = new_value.to_yaml
+    end
   end
 
   def self.target(var_name)
@@ -106,5 +115,15 @@ class Settings < ActiveRecord::Base
 
   def self.for(target)
     where(target_type: target.class.name, target_id: target.id)
+  end
+
+  private
+
+  def encrypt?
+    Seek::Config.encrypted_setting?(self.var)
+  end
+
+  def ensure_no_plaintext
+    self[:value] = nil if encrypt?
   end
 end
