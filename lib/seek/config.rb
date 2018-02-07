@@ -406,13 +406,16 @@ module Seek
     end
 
     def register_encrypted_setting(setting)
-      @@encrypted_settings ||= []
-      @@encrypted_settings << setting.to_sym
+      encrypted_settings << setting.to_sym
       attr
     end
 
+    def encrypted_settings
+      @@encrypted_settings ||= []
+    end
+
     def encrypted_setting?(setting)
-      @@encrypted_settings.include?(setting.to_sym)
+      encrypted_settings.include?(setting.to_sym)
     end
   end
 
