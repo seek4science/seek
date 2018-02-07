@@ -5,6 +5,7 @@ require 'rake'
 require 'active_record/fixtures'
 require 'colorize'
 require 'seek/mime_types'
+require 'simple_crypt'
 
 include Seek::MimeTypes
 include SimpleCrypt
@@ -89,12 +90,12 @@ namespace :seek do
   end
 
   task(move_site_credentials_to_settings: :environment) do
-    global_passphrase = defined? GLOBAL_PASSPHRASE ? GLOBAL_PASSPHRASE : 'ohx0ipuk2baiXah'
+    global_passphrase = (defined? GLOBAL_PASSPHRASE) ? GLOBAL_PASSPHRASE : 'ohx0ipuk2baiXah'
     conversions = 0
 
     Project.all.each do |project|
       if project.site_credentials.present?
-        credentials_hash = decrypt(project.site_credentials, generate_key(global_passphrase))
+        credentials_hash = decrypt(Base64.decode64(project.site_credentials), generate_key(global_passphrase))
         project.site_username = credentials_hash[:username]
         project.site_password = credentials_hash[:password]
         project.update_column(:site_credentials, nil)
