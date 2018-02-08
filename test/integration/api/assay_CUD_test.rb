@@ -1,8 +1,8 @@
 require 'test_helper'
-require 'integration/api_integration_test_helper'
+require 'integration/api_test_helper'
 
 class AssayCUDTest < ActionDispatch::IntegrationTest
-  include ApiIntegrationTestHelper
+  include ApiTestHelper
 
   def setup
     admin_login
@@ -12,9 +12,9 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     @min_study = Factory(:min_study)
     @min_study.title = 'Fred'
 
-    template_file = File.join(ApiIntegrationTestHelper.template_dir, 'post_min_assay.json.erb')
+    template_file = File.join(ApiTestHelper.template_dir, 'post_min_assay.json.erb')
     template = ERB.new(File.read(template_file))
-    namespace = OpenStruct.new({:study_id => @min_study.id, :r => ApiIntegrationTestHelper.method(:render_erb)})
+    namespace = OpenStruct.new({:study_id => @min_study.id, :r => ApiTestHelper.method(:render_erb)})
     template_result = template.result(namespace.instance_eval {binding})
     @to_post = JSON.parse(template_result)
   end
