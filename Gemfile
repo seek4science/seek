@@ -119,6 +119,8 @@ gem 'activerecord-session_store'
 gem 'rails-observers'
 gem 'responders', '~> 2.0'
 
+gem 'rack-attack', '~> 5.0.1'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
