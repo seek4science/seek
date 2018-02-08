@@ -18,6 +18,7 @@ namespace :seek do
     delete_redundant_subscriptions
     update_sample_resource_links
     move_site_credentials_to_settings
+    reencrypt_settings
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -90,12 +91,15 @@ namespace :seek do
   end
 
   task(move_site_credentials_to_settings: :environment) do
+    puts 'Moving project site credentials into settings table...'
+
     global_passphrase = (defined? GLOBAL_PASSPHRASE) ? GLOBAL_PASSPHRASE : 'ohx0ipuk2baiXah'
+    key = generate_key(global_passphrase)
     conversions = 0
 
     Project.all.each do |project|
       if project.site_credentials.present?
-        credentials_hash = decrypt(Base64.decode64(project.site_credentials), generate_key(global_passphrase))
+        credentials_hash = decrypt(Base64.decode64(project.site_credentials), key)
         project.site_username = credentials_hash[:username]
         project.site_password = credentials_hash[:password]
         project.update_column(:site_credentials, nil)
@@ -104,5 +108,57 @@ namespace :seek do
     end
 
     puts "#{conversions} project site credentials migrated"
+  end
+
+  task(reencrypt_settings: :environment) do
+    puts 'Re-encrypting SMTP settings and Datacite password...'
+
+    global_passphrase = (defined? GLOBAL_PASSPHRASE) ? GLOBAL_PASSPHRASE : 'ohx0ipuk2baiXah'
+    key = generate_key(global_passphrase)
+
+    smtp = Seek::Config.smtp
+    if smtp
+      begin
+        if smtp[:password]
+          if smtp[:password].encoding.name == 'ASCII-8BIT'
+            print "Attempting to decrypt SMTP password... "
+            plaintext = decrypt(smtp[:password], key)
+            smtp[:password] = plaintext
+            Seek::Config.smtp = smtp
+            puts 'done'
+          else
+            puts "SMTP password already decrypted (encoding: #{smtp[:password].encoding.name})- skipping"
+          end
+        else
+          puts 'No SMTP password found - skipping'
+        end
+      rescue OpenSSL::Cipher::CipherError => e
+        puts 'OpenSSL::Cipher::CipherError occurred when decrypting SMTP password - Already decrypted?'
+        puts e.message
+      end
+    else
+      puts 'No SMTP settings found - skipping'
+    end
+
+    datacite_password = Seek::Config.datacite_password
+    if datacite_password.present?
+      begin
+        if datacite_password.encoding.name == 'ASCII-8BIT'
+          print "Attempting to decrypt datacite password... "
+          plaintext = decrypt(datacite_password, key)
+          Seek::Config.datacite_password = plaintext
+          puts 'done'
+        else
+          puts "Datacite password already decrypted (encoding: #{datacite_password.encoding.name})- skipping"
+        end
+      rescue OpenSSL::Cipher::CipherError => e
+        puts 'OpenSSL::Cipher::CipherError occurred when decrypting SMTP password - Already decrypted?'
+        puts e.message
+      end
+    else
+      puts 'No datacite password found - skipping'
+    end
+
+    puts 'Done'
   end
 end
