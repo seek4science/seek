@@ -1,5 +1,3 @@
-require 'simple_crypt'
-
 module Seek
   # Fallback attribute, which if defined will be the result if the stored/default value for a setting is nil
   # Convention to create a new fallback is to name the method <setting_name>_fallback
@@ -136,8 +134,6 @@ module Seek
 
   # Custom accessors for settings that are not a simple mapping
   module CustomAccessors
-    include SimpleCrypt
-
     def recaptcha_setup?
       if Seek::Config.recaptcha_enabled
         if Seek::Config.recaptcha_public_key.blank? || Seek::Config.recaptcha_private_key.blank?

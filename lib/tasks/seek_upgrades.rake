@@ -5,10 +5,10 @@ require 'rake'
 require 'active_record/fixtures'
 require 'colorize'
 require 'seek/mime_types'
-require 'simple_crypt'
+require 'simple_crypt' # TODO: Remove me in 1.7
 
 include Seek::MimeTypes
-include SimpleCrypt
+include SimpleCrypt # TODO: Remove me in 1.7
 
 namespace :seek do
   # these are the tasks required for this version upgrade
