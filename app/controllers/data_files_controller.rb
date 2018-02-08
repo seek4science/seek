@@ -161,6 +161,9 @@ class DataFilesController < ApplicationController
 
   def create_metadata
     @data_file = DataFile.new(data_file_params)
+    assay_params = data_file_assay_params
+    create_new_assay = assay_params.delete(:create_assay)
+    @assay = Assay.new(assay_params)
 
     update_sharing_policies(@data_file)
 
@@ -175,7 +178,7 @@ class DataFilesController < ApplicationController
     blob = ContentBlob.find(blob_id)
     @data_file.content_blob = blob
 
-    if valid_blob && @data_file.save && blob.save
+    if valid_blob && @data_file.save && blob.save && (!create_new_assay || @assay.save)
       update_annotations(params[:tag_list], @data_file)
       update_scales @data_file
 
@@ -189,7 +192,8 @@ class DataFilesController < ApplicationController
 
         # the assay_id param can also contain the relationship type
         assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
-        update_assay_assets(@data_file, assay_ids, relationship_types)
+        assay_ids = [@assay.id.to_s] if create_new_assay
+        update_assay_assets(@data_file, assay_ids)
         format.html {redirect_to data_file_path(@data_file)}
         format.json {render json: @data_file}
       end
@@ -522,6 +526,10 @@ class DataFilesController < ApplicationController
     params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,:content_blob_id,
                                       :parent_name, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+  end
+
+  def data_file_assay_params
+    params.fetch(:assay,{}).permit(:title, :description, :assay_class_id, :study_id, :assay_type_uri,:technology_type_uri, :create_assay)
   end
 
   def oauth_client

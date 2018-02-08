@@ -39,7 +39,6 @@ module Seek
       assay_ids ||= []
       relationship_type_titles ||= Array.new(assay_ids.size)
       create_assay_assets(asset, assay_ids, relationship_type_titles)
-
       destroy_redundant_assay_assets(asset, assay_ids)
     end
 

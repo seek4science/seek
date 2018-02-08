@@ -18,4 +18,8 @@ class AssayClass < ActiveRecord::Base
   def is_modelling?
     key == "MODEL"
   end
+
+  def is_experimental?
+    key == 'EXP'
+  end
 end

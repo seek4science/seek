@@ -2834,12 +2834,17 @@ class DataFilesControllerTest < ActionController::TestCase
         title: 'Small File',
         project_ids: [project.id]
     }, policy_attributes: valid_sharing,
-              content_blob_id: blob.id.to_s
+              content_blob_id: blob.id.to_s,
+              assay_ids:[]
     }
 
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
-        post :create_metadata, params
+        assert_no_difference('Assay.count') do
+          assert_no_difference('AssayAsset.count') do
+            post :create_metadata, params
+          end
+        end
       end
     end
 
@@ -2851,6 +2856,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal blob, df.content_blob
     assert_equal 'Small File', df.title
     assert_equal person.user, df.contributor
+    assert_empty df.assays
 
     al = ActivityLog.last
     assert_equal 'create',al.action
@@ -2858,6 +2864,40 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal person.user, al.culprit
 
     assert_nil session[:uploaded_content_blob_id]
+
+  end
+
+  test 'create metadata with associated assay' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay,contributor:person)
+    assert assay.can_edit?
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = person.projects.last
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id],
+    }, policy_attributes: valid_sharing,
+              content_blob_id: blob.id.to_s,
+              assay_ids:[assay.id]
+    }
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_no_difference('Assay.count') do
+          assert_difference('AssayAsset.count') do
+            post :create_metadata, params
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+
+    assert_redirected_to df
+
+    assert_equal [assay],df.assays
 
   end
 
@@ -2990,6 +3030,54 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert (df = assigns(:data_file))
     assert_empty df.projects
+  end
+
+  test 'create metadata together with assay' do
+    person = Factory(:person)
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+
+    project = person.projects.last
+    assay_class = AssayClass.experimental
+    study = Factory(:study,investigation:Factory(:investigation,projects:[project]))
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, assay: {
+        create_assay: true,
+        assay_class_id: assay_class.id,
+        title: 'my wonderful assay',
+        description: 'assay description',
+        study_id: study.id,
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+    },
+              policy_attributes: valid_sharing,
+              content_blob_id: blob.id.to_s
+    }
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('Assay.count') do
+          assert_difference('AssayAsset.count') do
+            post :create_metadata, params
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+    assert_equal 1,df.assays.count
+    assay = df.assays.first
+    assert_equal 'my wonderful assay',assay.title
+    assert_equal 'assay description',assay.description
+    assert_equal study,assay.study
+    assert assay.assay_class.is_experimental?
+    assert_equal [project],assay.projects
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding',assay.technology_type_uri
   end
 
   def edit_max_object(df)
