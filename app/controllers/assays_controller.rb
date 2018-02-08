@@ -253,8 +253,8 @@ class AssaysController < ApplicationController
   end
 
   def tweak_json_params json_params
-    if json_params[:assay][:assay_class].present?
-      json_params[:assay][:assay_class_id] = AssayClass.find_by(key: json_params[:assay][:assay_class][:key]).id
+    if json_params[:assay][:assay_class].present? && json_params[:assay][:assay_class][:key].present?
+      json_params[:assay][:assay_class_id] = AssayClass.find_by(key: json_params[:assay][:assay_class][:key].to_sym).id
       # if json_params[:assay][:assay_class] == :EXP
       #   json_params[:assay][:assay_class_id] = "1"
       # else
