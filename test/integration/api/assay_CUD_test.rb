@@ -12,6 +12,10 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     @min_study = Factory(:min_study)
     @min_study.title = 'Fred'
 
+    # Populate the assay classes
+    Factory(:modelling_assay_class)
+    Factory(:experimental_assay_class)
+
     template_file = File.join(ApiTestHelper.template_dir, 'post_min_assay.json.erb')
     template = ERB.new(File.read(template_file))
     namespace = OpenStruct.new({:study_id => @min_study.id, :r => ApiTestHelper.method(:render_erb)})
