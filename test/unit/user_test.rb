@@ -335,10 +335,25 @@ class UserTest < ActiveSupport::TestCase
     refute_nil user.reset_password_code_until
   end
 
+  test 'password length' do
+    assert_equal 10,User::MIN_PASSWORD_LENGTH
+    user = Factory(:user,password:'1234567890',password_confirmation:'1234567890')
+    assert user.valid?
+    user.password='123456789'
+    user.password_confirmation='123456789'
+    refute user.valid?
+
+    user.password='123456789A'
+    user.password_confirmation='123456789A'
+    assert user.valid?
+
+
+  end
+
   protected
 
   def create_user(options = {})
-    record = User.new({ login: 'quire', password: 'quire', password_confirmation: 'quire' }.merge(options))
+    record = User.new({ login: 'quire', password: ('0' * User::MIN_PASSWORD_LENGTH), password_confirmation: ('0' * User::MIN_PASSWORD_LENGTH) }.merge(options))
     record.save
     record
   end

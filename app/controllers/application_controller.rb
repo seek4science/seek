@@ -108,7 +108,7 @@ class ApplicationController < ActionController::Base
   end
 
   def is_user_admin_auth
-    unless User.admin_logged_in?
+    unless admin_logged_in?
       error('Admin rights required', 'is invalid (not admin)')
       return false
     end
@@ -116,6 +116,10 @@ class ApplicationController < ActionController::Base
   end
 
   def can_manage_announcements?
+    admin_logged_in?
+  end
+
+  def admin_logged_in?
     User.admin_logged_in?
   end
 
@@ -175,7 +179,7 @@ class ApplicationController < ActionController::Base
   private
 
   def project_membership_required
-    unless User.logged_in_and_member? || User.admin_logged_in?
+    unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
       respond_to do |format|
         format.html do
@@ -233,11 +237,6 @@ class ApplicationController < ActionController::Base
       format.html { redirect_to root_url }
       format.json { redirect_to root_url }
     end
-  end
-
-  # required for the Savage Beast
-  def admin?
-    User.admin_logged_in?
   end
 
   # handles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)

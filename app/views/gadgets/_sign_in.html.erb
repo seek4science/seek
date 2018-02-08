@@ -26,8 +26,8 @@
         <div class="tab-content">
           <div role="tabpanel" class="tab-pane active" id="password_login">
             <%= form_tag main_app.session_path do %>
-              <% original_url ||= request.original_url %>
-              <%= hidden_field_tag "called_from[url]", original_url -%>
+              <% original_path ||= request.original_fullpath %>
+              <%= hidden_field_tag "called_from[path]", original_path -%>
               <%= hidden_field_tag "called_from[controller]", controller.controller_name -%>
               <%= hidden_field_tag "called_from[action]", controller.action_name -%>
               <%= hidden_field_tag "called_from[id]", params[:id] -%>
@@ -58,8 +58,8 @@
               <div role="tabpanel" class="tab-pane" id="<%= provider.to_s %>_login">
                 <% if provider.to_s == "ldap" %>
                   <%= form_tag '/auth/ldap/callback' do %>
-                    <% original_url ||= request.original_url %>
-                    <%= hidden_field_tag "called_from[url]", original_url -%>
+                    <% original_path ||= request.original_fullpath %>
+                    <%= hidden_field_tag "called_from[path]", original_path -%>
                     <div class="form-group">
                       <label>Username</label>
                       <%= text_field_tag 'username', nil, :class => 'form-control' -%>

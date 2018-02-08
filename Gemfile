@@ -66,7 +66,6 @@ gem 'bives'
 gem 'gibberish', git: 'https://github.com/SysMO-DB/gibberish.git'
 gem 'white_list', git: 'https://github.com/SysMO-DB/white_list.git'
 gem 'white_list_formatted_content', git: 'https://github.com/SysMO-DB/white_list_formatted_content.git'
-gem 'my_savage_beast', git: 'https://github.com/SysMO-DB/my_savage_beast.git'
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
 gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'acts_as_activity_logged', git: 'https://github.com/SysMO-DB/acts_as_activity_logged.git'
@@ -119,6 +118,8 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'activerecord-session_store'
 gem 'rails-observers'
 gem 'responders', '~> 2.0'
+
+gem 'rack-attack', '~> 5.0.1'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'

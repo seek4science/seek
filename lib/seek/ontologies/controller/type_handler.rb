@@ -22,7 +22,7 @@ module Seek
           if !@type_class
             flash.now[:error] = "Unrecognised #{type_text}"
           elsif invalid_label?
-            flash.now[:notice] = "Undefined #{type_text} with label <b> #{params[:label]} </b>. Did you mean #{link_to_alternative}?".html_safe
+            flash.now[:notice] = "Undefined #{type_text} with label <b> #{h(params[:label])} </b>. Did you mean #{link_to_alternative}?".html_safe
             @type_class = nil
           end
         end

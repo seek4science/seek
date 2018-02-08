@@ -4,6 +4,6 @@
     <p class="text-center"><%= link_to "Sign out", logout_url %></p>
 <% else %>
     <div class="container">
-        <%= render :partial => "gadgets/sign_in", :locals => {:original_url => params[:return_to]} %>
+        <%= render :partial => "gadgets/sign_in", :locals => {:original_path => params[:return_to]} %>
     </div>
 <% end %>

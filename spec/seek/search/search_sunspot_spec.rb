@@ -1,6 +1,8 @@
 require 'rails_helper'
 require 'factory_girl'
+require_relative '../../../test/upload_helper.rb'
 
+include UploadHelper
 FactoryGirl.find_definitions
 
 #acts_as_asset

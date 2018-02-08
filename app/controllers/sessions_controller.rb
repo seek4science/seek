@@ -77,20 +77,20 @@ class SessionsController < ApplicationController
       cookies[:auth_token] = { :value => @user.remember_token , :expires => @user.remember_token_expires_at }
     end
     respond_to do |format|
-      return_to_url = determine_return_url_after_login
+      return_to_path = determine_return_path_after_login
       format.html do
-        is_search = return_to_url && return_to_url.normalize_trailing_slash == search_url.normalize_trailing_slash
-        default_url = is_search ? root_url : return_to_url || root_url
-        redirect_back_or_default(default_url)
+        is_search = return_to_path && return_to_path.normalize_trailing_slash == search_path.normalize_trailing_slash
+        default_path = is_search ? root_path : return_to_path || root_path
+        redirect_back_or_default(default_path)
       end
       format.xml {session[:xml_login] = true; head :ok }
     end
     clear_return_to
   end
 
-  def determine_return_url_after_login
-    if !params[:called_from].blank? && !params[:called_from][:url].blank?
-      return_to_url = params[:called_from][:url]
+  def determine_return_path_after_login
+    if !params[:called_from].blank? && !params[:called_from][:path].blank?
+      return_to_url = params[:called_from][:path]
     elsif !params[:called_from].blank? && params[:called_from][:controller] != "sessions"
       if params[:called_from][:id].blank?
         return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action])
@@ -98,16 +98,17 @@ class SessionsController < ApplicationController
         return_to_url = url_for(:controller => params[:called_from][:controller], :action => params[:called_from][:action], :id => params[:called_from][:id])
       end
     else
-        return_to_url = session[:return_to] || request.env['HTTP_REFERER']
+      return_to_url = session[:return_to] || request.env['HTTP_REFERER']
     end
-    return_to_url
+
+    URI.parse(return_to_url).path rescue root_path
   end
 
   def failed_login(message)
     logout_user
     flash[:error] = message
     respond_to do |format|
-      return_to = params[:called_from] ? params[:called_from][:url] : nil
+      return_to = params[:called_from] ? params[:called_from][:path] : nil
       format.html { redirect_to(login_path(:return_to=>return_to)) }
       format.xml { head :not_found }
     end

@@ -46,7 +46,6 @@ SEEK::Application.configure do
   Seek::Config.default :experimental_features_enabled,true
   Seek::Config.default :pdf_conversion_enabled,true
   Seek::Config.default :delete_asset_version_enabled, false
-  Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
   Seek::Config.default :biosamples_enabled, true
   Seek::Config.default :modelling_analysis_enabled,true
