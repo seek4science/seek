@@ -450,7 +450,7 @@ class ConfigTest < ActiveSupport::TestCase
     refute_nil key = Seek::Config.attr_encrypted_key
     assert File.exist?(Seek::Config.attr_encrypted_key_path)
     FileUtils.rm(Seek::Config.attr_encrypted_key_path)
-    assert_equal 64, key.length
+    assert_equal 32, key.length
 
     # check it regenerates it different each time
     refute_equal key, Seek::Config.attr_encrypted_key
