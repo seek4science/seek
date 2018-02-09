@@ -159,7 +159,7 @@ module Seek
 
     def attr_encrypted_key
       if File.exist?(attr_encrypted_key_path)
-        File.read(attr_encrypted_key_path)
+        File.binread(attr_encrypted_key_path)[0..31]
       else
         write_attr_encrypted_key
         attr_encrypted_key
@@ -260,8 +260,8 @@ module Seek
     end
 
     def write_attr_encrypted_key
-      File.open(attr_encrypted_key_path, 'w') do |f|
-        f << SecureRandom.hex(32)
+      File.open(attr_encrypted_key_path, 'wb') do |f|
+        f << SecureRandom.random_bytes(32)
       end
     end
 
