@@ -3,7 +3,7 @@
 require 'seek/config'
 require 'seek/seek_render_override'
 
-SEEK::Application.configure do
+def load_seek_config_defaults!
   #Main settings
 
   Seek::Config.default :sycamore_enabled,true
@@ -164,4 +164,8 @@ SEEK::Application.configure do
 
   Seek::Config.default :front_page_buttons_enabled, false
   Seek::Config.default :default_license, 'CC-BY-4.0'
+end
+
+SEEK::Application.configure do
+  load_seek_config_defaults!
 end

@@ -29,8 +29,6 @@ class Settings < ActiveRecord::Base
   attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, marshal: true, marsheler: YAML
   before_save :ensure_no_plaintext, if: :encrypt?
 
-  cattr_accessor :defaults
-  @@defaults = {}.with_indifferent_access
   # Support old plugin
   if defined?(SettingsDefaults::DEFAULTS)
     @@defaults = SettingsDefaults::DEFAULTS.with_indifferent_access
@@ -62,7 +60,7 @@ class Settings < ActiveRecord::Base
     if var = target(var_name)
       var.value
     else
-      @@defaults[var_name.to_s]
+      defaults[var_name.to_s]
     end
   end
 
@@ -131,6 +129,16 @@ class Settings < ActiveRecord::Base
   # Should this setting be encrypted?
   def encrypt?
     Seek::Config.encrypted_setting?(self.var)
+  end
+
+  def self.defaults
+    if (defined? @@defaults) && @@defaults
+      @@defaults
+    else
+      @@defaults = {}.with_indifferent_access
+      load_seek_config_defaults!
+      defaults
+    end
   end
 
   private
