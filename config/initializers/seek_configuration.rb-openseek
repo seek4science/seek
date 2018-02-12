@@ -3,9 +3,8 @@
 require 'seek/config'
 require 'seek/seek_render_override'
 
-SEEK::Application.configure do
+def load_seek_config_defaults!
   #Main settings
-
   Seek::Config.default :sycamore_enabled,false
   Seek::Config.default :events_enabled,true
   Seek::Config.default :jerm_enabled,false
@@ -203,4 +202,8 @@ SEEK::Application.configure do
   Seek::Config.default :openbis_download_limit, 2.gigabytes
 
   Seek::Config.default :default_license, 'CC-BY-4.0'
+end
+
+SEEK::Application.configure do
+  load_seek_config_defaults!
 end
