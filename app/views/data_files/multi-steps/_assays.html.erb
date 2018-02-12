@@ -1,0 +1,61 @@
+<% if Seek::Config.assays_enabled %>
+  <div class="panel panel-default">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="active">
+        <a href="#existing-assay" aria-controls="existing-assay" role="tab" data-toggle="tab">Existing assay</a>
+      </li>
+      <li>
+        <a href="#new-assay" aria-controls="new-assay" role="tab" data-toggle="tab">New assay</a>
+      </li>
+    </ul>
+    <div class="tab-content">
+
+      <%# Existing Assay %>
+      <div role="tabpanel" class="tab-pane active" id="existing-assay">
+        <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} %>
+      </div>
+
+      <%# New Assay %>
+      <div role="tabpanel" class="tab-pane" id="new-assay">
+        <%= hidden_field_tag 'assay[assay_class_id]', @assay.assay_class_id %>
+        <div class="form-group">
+          <label>
+            <%= check_box_tag 'assay[create_assay]' %>
+            Create a new Assay ?
+          </label>
+        </div>
+        <div class="form-group">
+          <label>Title <span class="required">*</span></label>
+          <%= text_field_tag 'assay[title]', @assay.title, :class => "form-control" %>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <%= text_area_tag 'assay[description]', @assay.description, :class => "form-control", :rows => 5 %>
+        </div>
+        <div class="form-group">
+          <label>Study</label>
+          <%= assay_study_selection('assay[study_id]', @assay.study) %>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label>Experimental assay type</label>
+              <%= assay_type_select_tag "assay[assay_type_uri]", @assay.is_modelling?, @assay, {:class => "form-control"} %>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label>Technology type</label>
+              <%= technology_type_select_tag "assay[technology_type_uri]", @assay, {:class => "form-control"} %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <%= cancel_button(data_files_path) -%>
+    <div class="multi-step-buttons">
+      <%= multi_step_back_buttons %>
+      <%= multi_step_forward_buttons %>
+    </div>
+  </div>
+<% end %>
