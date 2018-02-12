@@ -6,8 +6,6 @@ class Project < ActiveRecord::Base
   title_trimmer
   validates :title, uniqueness: true
 
-  include SimpleCrypt
-
   has_and_belongs_to_many :investigations
 
   has_and_belongs_to_many :data_files
@@ -87,10 +85,6 @@ class Project < ActiveRecord::Base
   has_and_belongs_to_many :organisms, before_add: :update_rdf_on_associated_change, before_remove: :update_rdf_on_associated_change
   has_many :project_subscriptions, dependent: :destroy
 
-  attr_accessor :site_username, :site_password
-
-  before_save :set_credentials
-
   def assets
     data_files | sops | models | publications | presentations | documents
   end
@@ -151,20 +145,20 @@ class Project < ActiveRecord::Base
     studies.collect(&:assays).flatten.uniq
   end
 
-  def set_credentials
-    unless site_username.nil? && site_password.nil?
-      cred = { username: site_username, password: site_password }
-      cred = encrypt(cred, generate_key(GLOBAL_PASSPHRASE))
-      self.site_credentials = Base64.encode64(cred).encode('utf-8')
-    end
+  def site_password
+    settings['site_password']
   end
 
-  def decrypt_credentials
-    decoded = Base64.decode64 site_credentials
-    cred = decrypt(decoded, generate_key(GLOBAL_PASSPHRASE))
-    self.site_password = cred[:password]
-    self.site_username = cred[:username]
-  rescue
+  def site_password= password
+    settings['site_password'] = password
+  end
+
+  def site_username
+    settings['site_username']
+  end
+
+  def site_username= username
+    settings['site_username'] = username
   end
 
   # indicates whether this project has a person, or associated user, as a member

@@ -78,7 +78,7 @@ class AdminController < ApplicationController
 
     Seek::Config.doi_minting_enabled = string_to_boolean params[:doi_minting_enabled]
     Seek::Config.datacite_username = params[:datacite_username]
-    Seek::Config.datacite_password_encrypt params[:datacite_password]
+    Seek::Config.datacite_password = params[:datacite_password]
     Seek::Config.datacite_url = params[:datacite_url]
     Seek::Config.doi_prefix = params[:doi_prefix]
     Seek::Config.doi_suffix = params[:doi_suffix]
