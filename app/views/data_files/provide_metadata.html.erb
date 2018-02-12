@@ -95,6 +95,13 @@ Content blob id: <%= @data_file.content_blob.id %>
                 <%= hidden_field_tag 'assay[assay_class_id]', @assay.assay_class_id %>
 
                 <div class="form-group">
+                  <label>
+                  <%= check_box_tag 'assay[create_assay]' %>
+                    Create a new Assay ?
+                  </label>
+                </div>
+
+                <div class="form-group">
                   <label>Title <span class="required">*</span></label>
                   <%= text_field_tag 'assay[title]', @assay.title, :class=>"form-control" %>
                 </div>
@@ -105,12 +112,10 @@ Content blob id: <%= @data_file.content_blob.id %>
                 </div>
 
                 <div class="form-group">
-                  <%= f.label "Assay type" %>
-                  <%#= create_suggested_type_popup_link @assay.assay_type_reader.ontology_term_type %>
-                  <div>
-                    <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay, {:class => "form-control"} %>
-                  </div>
+                  <label>Study</label>
+                  <%= assay_study_selection('assay[study_id]',@assay.study) %>
                 </div>
+
 
               </div>
             </div>

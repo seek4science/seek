@@ -29,7 +29,7 @@
   <label><%= t('study') -%></label><span class="required">*</span>
   <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %>
 
-  <%= assay_study_selection(@assay.study,f) %>
+  <%= assay_study_selection('assay[study_id]',@assay.study) %>
 </div>
 
 

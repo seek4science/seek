@@ -37,12 +37,13 @@ module AssaysHelper
   end
 
   # the selection dropdown box for selecting the study for an assay
-  def assay_study_selection(current_study, form)
+  def assay_study_selection(element_id, current_study)
     grouped_options = grouped_options_for_study_selection(current_study)
     blank = current_study.blank? ? 'Not specified' : nil
     disabled = current_study && !current_study.can_edit?
-    form.select(:study_id, grouped_options_for_select(grouped_options, current_study.try(:id)),
-                { include_blank: blank }, class: 'form-control', disabled: disabled).html_safe
+    options = grouped_options_for_select(grouped_options, current_study.try(:id))
+    select_tag(element_id, options,
+               class: 'form-control', include_blank: blank, disabled: disabled).html_safe
   end
 
   # options for grouped_option_for_select, for building the select box for assay->study selection, grouped by investigation
@@ -92,7 +93,7 @@ module AssaysHelper
 
   def show_nels_button?(assay)
     current_user && current_user.person && assay.can_edit? &&
-        current_user.person.projects.any? { |p| p.settings['nels_enabled'] } &&
-        assay.projects.any? { |p| p.settings['nels_enabled'] }
+      current_user.person.projects.any? { |p| p.settings['nels_enabled'] } &&
+      assay.projects.any? { |p| p.settings['nels_enabled'] }
   end
 end
