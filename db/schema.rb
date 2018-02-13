@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180213151824) do
+ActiveRecord::Schema.define(version: 20180207102508) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -1756,6 +1756,16 @@ ActiveRecord::Schema.define(version: 20180213151824) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "trash_records", force: :cascade do |t|
+    t.string   "trashable_type", limit: 255
+    t.integer  "trashable_id",   limit: 4
+    t.binary   "data",           limit: 16777215
+    t.datetime "created_at"
+  end
+
+  add_index "trash_records", ["created_at", "trashable_type"], name: "index_trash_records_on_created_at_and_trashable_type", using: :btree
+  add_index "trash_records", ["trashable_type", "trashable_id"], name: "index_trash_records_on_trashable_type_and_trashable_id", using: :btree
 
   create_table "units", force: :cascade do |t|
     t.string   "title",           limit: 255
