@@ -138,8 +138,8 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
     data_file.populate_metadata_from_template
 
-    assert_nil data_file.title
-    assert_nil data_file.description
+    assert_equal '', data_file.title
+    assert_equal '', data_file.description
     assert_equal [project], data_file.projects
 
     assay = data_file.initialise_assay_from_template
