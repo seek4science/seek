@@ -232,29 +232,29 @@ end
 Factory.define(:rightfield_base_sample_template, parent: :content_blob) do |f|
   f.original_filename 'populated-base-samples-template.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  f.data File.new("#{Rails.root}/test/fixtures/files/populated-base-samples-template.xlsx", 'rb').read
+  f.data File.new("#{Rails.root}/test/fixtures/files/populated_templates/populated-base-samples-template.xlsx", 'rb').read
 end
 
 Factory.define(:rightfield_base_sample_template_with_assay, parent: :content_blob) do |f|
   f.original_filename 'populated-base-samples-template-with-assay.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  f.data File.new("#{Rails.root}/test/fixtures/files/populated-base-samples-template-with-assay.xlsx", 'rb').read
+  f.data File.new("#{Rails.root}/test/fixtures/files/populated_templates/populated-base-samples-template-with-assay.xlsx", 'rb').read
 end
 
 Factory.define(:rightfield_base_sample_template_with_assay_no_study, parent: :content_blob) do |f|
   f.original_filename 'populated-base-samples-template-with-assay-no-study.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  f.data File.new("#{Rails.root}/test/fixtures/files/populated-base-samples-template-with-assay-no-study.xlsx", 'rb').read
+  f.data File.new("#{Rails.root}/test/fixtures/files/populated_templates/populated-base-samples-template-with-assay-no-study.xlsx", 'rb').read
 end
 
 Factory.define(:rightfield_base_sample_template_with_assay_no_assay_title, parent: :content_blob) do |f|
   f.original_filename 'populated-base-samples-template-with-assay-assay-title.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  f.data File.new("#{Rails.root}/test/fixtures/files/populated-base-samples-template-with-assay-no-assay-title.xlsx", 'rb').read
+  f.data File.new("#{Rails.root}/test/fixtures/files/populated_templates/populated-base-samples-template-with-assay-no-assay-title.xlsx", 'rb').read
 end
 
 Factory.define(:rightfield_base_sample_template_with_assay_no_df_metadata, parent: :content_blob) do |f|
   f.original_filename 'populated-base-samples-template-with-assay-no-df-title.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-  f.data File.new("#{Rails.root}/test/fixtures/files/populated-base-samples-template-with-assay-no-df-title.xlsx", 'rb').read
+  f.data File.new("#{Rails.root}/test/fixtures/files/populated_templates/populated-base-samples-template-with-assay-no-df-title.xlsx", 'rb').read
 end
