@@ -19,6 +19,18 @@ module Seek
         data_file.projects = [project] if project
       end
 
+      def populate_assay(assay)
+        unless assay_title.blank?
+          assay.title = assay_title
+          assay.description = assay_description
+          assay.assay_type_uri = assay_assay_type_uri
+          assay.technology_type_uri = assay_technology_type_uri
+          assay.study = study if study
+        end
+      end
+
+      private
+
       def title
         solutions = RDF::Query.execute(@rdf_graph) do
           pattern [:s, Seek::Rdf::JERMVocab.title, :title]
@@ -38,7 +50,38 @@ module Seek
         Project.find_by_id(id) if id
       end
 
-      private
+      def study
+        id = seek_id_by_type(Study)
+        Study.find_by_id(id) if id
+      end
+
+      def assay_title
+        solutions = RDF::Query.execute(@rdf_graph) do
+          pattern [:s, Seek::Rdf::JERMVocab.title, :title]
+        end
+        solutions[1].title.value if solutions.count > 1
+      end
+
+      def assay_description
+        solutions = RDF::Query.execute(@rdf_graph) do
+          pattern [:s, Seek::Rdf::JERMVocab.description, :description]
+        end
+        solutions[1].description.value if solutions.count > 1
+      end
+
+      def assay_assay_type_uri
+        solutions = RDF::Query.execute(@rdf_graph) do
+          pattern [:s, Seek::Rdf::JERMVocab.hasType, :type]
+        end
+        solutions.first.type.value if solutions.any?
+      end
+
+      def assay_technology_type_uri
+        solutions = RDF::Query.execute(@rdf_graph) do
+          pattern [:s, Seek::Rdf::JERMVocab.hasType, :type]
+        end
+        solutions[1].type.value if solutions.count > 1
+      end
 
       def seek_id_by_type(type)
         uri = seek_ids.find { |id| id.include?("/#{type.name.tableize}/") }
