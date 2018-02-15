@@ -55,10 +55,11 @@ class DataFilesController < ApplicationController
 
   def create_content_blob
     @data_file=DataFile.new
-    @assay = Assay.new(assay_class:AssayClass.experimental)
     respond_to do |format|
       if handle_upload_data
         create_content_blobs
+        @data_file.populate_metadata_from_template
+        @assay=@data_file.initialise_assay_from_template
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
         format.html {render :provide_metadata}
       else
@@ -66,8 +67,6 @@ class DataFilesController < ApplicationController
         format.html {render action: :new}
       end
     end
-
-
   end
 
   def destroy_samples_confirm

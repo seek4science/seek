@@ -2824,6 +2824,30 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
+  test 'create content blob extracts from template' do
+    person = Factory(:person)
+    login_as(person)
+    file = ActionDispatch::Http::UploadedFile.new(filename: 'template.xlsx',
+                                           content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                           tempfile: fixture_file_upload('files/populated_templates/populated-base-samples-template-with-assay.xlsx'))
+    assert_difference('ContentBlob.count') do
+      post :create_content_blob, content_blobs: [{data:file}]
+    end
+
+    assert_response :success
+    assert data_file = assigns(:data_file)
+    assert assay = assigns(:assay)
+
+    assert_equal 'My Title', data_file.title
+    assert_equal 'My Description', data_file.description
+
+    assert_equal 'My Assay Title', assay.title
+    assert_equal 'My Assay Description', assay.description
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
+
+  end
+
   test 'create metadata' do
     person = Factory(:person)
     login_as(person)
