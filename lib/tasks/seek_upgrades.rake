@@ -19,6 +19,7 @@ namespace :seek do
     update_sample_resource_links
     move_site_credentials_to_settings
     reencrypt_settings
+    merge_duplicate_organisms
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -160,5 +161,89 @@ namespace :seek do
     end
 
     puts 'Done'
+  end
+
+  task(:merge_duplicate_organisms, [:dry_run] => :environment) do |t,args|
+    dry_run = (args.dry_run == 'true')
+
+    polymorphic_associations = {
+        Annotation => [:annotatable],
+        Annotation::Version => [:annotatable],
+        AssayAsset => [:asset],
+        AssetsCreator => [:asset],
+        ContentBlob => [:asset],
+        Favourite => [:resource],
+        ProjectFolderAsset => [:asset],
+        Relationship => [:subject, :other_object],
+        SampleResourceLink => [:resource],
+        SpecialAuthCode => [:asset],
+        Subscription => [:subscribable],
+        ActsAsTaggableOn::Tagging => [:taggable]
+    }
+
+    begin
+      logger = ActiveRecord::Base.logger
+      ActiveRecord::Base.logger = Logger.new(STDOUT) if dry_run
+      ActiveRecord::Base.transaction do
+        disable_authorization_checks do
+          duplicated = Organism.all.
+              group_by { |o| o.ncbi_id }.
+              select { |ncbi_id, organisms| !ncbi_id.nil? && organisms.length > 1 }
+
+          duplicated.each do |ncbi_id, organisms|
+            sorted = organisms.sort_by(&:created_at)
+            canonical = sorted.shift
+
+            puts "Resolving #{organisms.count} duplicate#{'s' if organisms.count > 1} of #{canonical.title} (NCBI ID: #{canonical.ncbi_id})"
+            puts "\tCanonical: #{canonical.title} (#{canonical.id})"
+            sorted.each do |duplicate|
+              puts "\tDuplicate: #{duplicate.title} (#{duplicate.id})"
+            end
+
+            sorted.each do |duplicate|
+              # Strains
+              duplicate.strains.each do |s|
+                s.update_column(:organism_id, canonical.id)
+              end
+
+              # Projects
+              canonical.projects += (duplicate.projects - canonical.projects)
+
+              # Assays
+              duplicate.assay_organisms.each do |ao|
+                ao.update_column(:organism_id, canonical.id)
+                # ao.refresh_assay_rdf
+              end
+
+              # Models
+              duplicate.models.each do |m|
+                m.update_column(:organism_id, canonical.id)
+                m.versions.each do |mv|
+                  if mv.organism_id == duplicate.id
+                    mv.update_column(:organism_id, canonical.id)
+                  end
+                end
+                # m.index!
+              end
+
+              # Other associations
+              polymorphic_associations.each do |klass, associations|
+                associations.each do |association|
+                  klass.
+                      where("#{association}_type" => 'Organism', "#{association}_id" => duplicate.id).
+                      update_all("#{association}_id" => canonical.id)
+                end
+              end
+
+              duplicate.destroy
+            end
+          end
+        end
+
+        raise ActiveRecord::Rollback if dry_run
+      end
+    ensure
+      ActiveRecord::Base.logger = logger
+    end
   end
 end
