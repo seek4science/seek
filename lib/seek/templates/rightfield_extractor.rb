@@ -28,20 +28,6 @@ module Seek
 
       private
 
-      def title
-        solutions = RDF::Query.execute(@rdf_graph) do
-          pattern [:s, Seek::Rdf::JERMVocab.title, :title]
-        end
-        solutions.first.title.value if solutions.any?
-      end
-
-      def description
-        solutions = RDF::Query.execute(@rdf_graph) do
-          pattern [:s, Seek::Rdf::JERMVocab.description, :description]
-        end
-        solutions.first.description.value if solutions.any?
-      end
-
       def project
         id = seek_id_by_type(Project)
         Project.find_by_id(id) if id
@@ -52,32 +38,39 @@ module Seek
         Study.find_by_id(id) if id
       end
 
+      def title
+        value_for_property_and_index(:title, 0)
+      end
+
+      def description
+        value_for_property_and_index(:description, 0)
+      end
+
       def assay_title
-        solutions = RDF::Query.execute(@rdf_graph) do
-          pattern [:s, Seek::Rdf::JERMVocab.title, :title]
-        end
-        solutions[1].title.value if solutions.count > 1
+        value_for_property_and_index(:title, 1)
       end
 
       def assay_description
-        solutions = RDF::Query.execute(@rdf_graph) do
-          pattern [:s, Seek::Rdf::JERMVocab.description, :description]
-        end
-        solutions[1].description.value if solutions.count > 1
+        value_for_property_and_index(:description, 1)
       end
 
       def assay_assay_type_uri
-        solutions = RDF::Query.execute(@rdf_graph) do
-          pattern [:s, Seek::Rdf::JERMVocab.hasType, :type]
-        end
-        solutions.first.type.value if solutions.any?
+        value_for_property_and_index(:hasType, 0)
       end
 
       def assay_technology_type_uri
-        solutions = RDF::Query.execute(@rdf_graph) do
-          pattern [:s, Seek::Rdf::JERMVocab.hasType, :type]
+        value_for_property_and_index(:hasType, 1)
+      end
+
+      def value_for_property_and_index(property, index)
+        solution = query_solutions_for_property(property)[index]
+        solution.result.value if solution
+      end
+
+      def query_solutions_for_property(property)
+        RDF::Query.execute(@rdf_graph) do
+          pattern [:s, Seek::Rdf::JERMVocab[property], :result]
         end
-        solutions[1].type.value if solutions.count > 1
       end
 
       def seek_id_by_type(type)
@@ -98,7 +91,6 @@ module Seek
       def uri_matches_host?(uri)
         URI.parse(uri).host == URI.parse(Seek::Config.site_base_host).host
       end
-
     end
   end
 end
