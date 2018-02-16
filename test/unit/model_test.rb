@@ -250,34 +250,6 @@ class ModelTest < ActiveSupport::TestCase
     end
   end
 
-  test 'is restorable after destroy' do
-    model = Factory :model, policy: Factory(:all_sysmo_viewable_policy), title: 'is it restorable?'
-    User.with_current_user model.contributor do
-      assert_difference('Model.count', -1) do
-        model.destroy
-      end
-    end
-    assert_nil Model.find_by_title 'is it restorable?'
-    assert_difference('Model.count', 1) do
-      disable_authorization_checks { Model.restore_trash!(model.id) }
-    end
-    assert_not_nil Model.find_by_title 'is it restorable?'
-  end
-
-  test 'failing to delete due to can_delete still creates trash' do
-    user = Factory :user
-    contributor = Factory :person
-    model = Factory :model, policy: Factory(:private_policy), contributor: contributor
-    User.with_current_user user do
-      assert !model.can_delete?
-      assert_no_difference('Model.count') do
-        model.destroy
-      end
-    end
-
-    assert_not_nil Model.restore_trash(model.id)
-  end
-
   test 'test uuid generated' do
     x = models(:teusink)
     assert_nil x.attributes['uuid']
