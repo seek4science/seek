@@ -159,7 +159,6 @@ group :test do
   gem 'rails-perftest'
   gem 'minitest'
   gem 'minitest-reporters'
-  gem 'coveralls', require: false
   gem 'sunspot_matchers'
   gem 'database_cleaner'
   gem 'vcr', '~> 2.9'
