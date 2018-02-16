@@ -15,6 +15,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
     assert_equal 'My Title', data_file.title
     assert_equal 'My Description', data_file.description
     assert_equal [project], data_file.projects
+    assert_empty data_file.assays
   end
 
   test 'handles none excel blob' do
@@ -37,6 +38,24 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
     assert_nil data_file.title
     assert_nil data_file.description
+  end
+
+  test 'template with link to assay' do
+    blob = Factory(:rightfield_base_sample_template_with_assay_link)
+    data_file = DataFile.new(content_blob: blob)
+
+    assay = Factory(:assay,id:9999)
+    assert_equal 9999,assay.id
+
+    project = Factory(:project, id: 9999)
+    assert_equal 9999, project.id
+
+    data_file.populate_metadata_from_template
+
+    assert_equal 'My Title', data_file.title
+    assert_equal 'My Description', data_file.description
+    assert_equal [project], data_file.projects
+    assert_equal [assay], data_file.assays
   end
 
   test 'initialise assay as blank when missing' do
@@ -180,4 +199,6 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
       assert_nil  assay.study
     end
   end
+
+
 end
