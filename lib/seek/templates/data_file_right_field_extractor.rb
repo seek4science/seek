@@ -1,0 +1,20 @@
+module Seek
+  module Templates
+    # populates a data file with the metadata that can be found in Rightfield template
+    class DataFileRightFieldExtractor < RightfieldExtractor
+      def populate(data_file)
+        data_file.title = title
+        data_file.description = description
+        data_file.projects = [project] if project
+      end
+
+      def title
+        value_for_property_and_index(:title, 0)
+      end
+
+      def description
+        value_for_property_and_index(:description, 0)
+      end
+    end
+  end
+end

@@ -2,6 +2,7 @@ require 'test_helper'
 
 # tests related to populating data file from rightfield metadata template
 class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
+
   test 'basic metadata population' do
     project = Factory(:project, id: 9999)
     assert_equal 9999, project.id

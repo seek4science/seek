@@ -234,19 +234,17 @@ class DataFile < ActiveRecord::Base
 
   def populate_metadata_from_template
     if contains_extractable_spreadsheet?
-      rightfield_extractor.populate
+      Seek::Templates::DataFileRightFieldExtractor.new(self).populate(self)
     end
   end
 
   def initialise_assay_from_template
     assay = Assay.new
     if contains_extractable_spreadsheet?
-      rightfield_extractor.populate_assay(assay)
+      Seek::Templates::AssayRightfieldExtractor.new(self).populate(assay)
     end
     assay
   end
 
-  def rightfield_extractor
-    @rightfield_extractor ||= Seek::Templates::RightfieldExtractor.new(self)
-  end
+
 end
