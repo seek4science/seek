@@ -104,7 +104,7 @@ class DataFilesController < ApplicationController
         @data_file.creators = [current_person]
         create_content_blobs
         # send email to the file uploader and receiver
-        Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_now
+        Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_later
 
         flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         render text: flash.now[:notice]
