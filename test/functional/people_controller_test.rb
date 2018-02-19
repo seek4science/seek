@@ -1188,7 +1188,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert df.subscribed?(current_person)
       assert current_person.receive_notifications?
 
-      assert_emails 1 do
+      assert_enqueued_emails 1 do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
         SendPeriodicEmailsJob.new('weekly').perform
@@ -1205,7 +1205,7 @@ class PeopleControllerTest < ActionController::TestCase
       refute df.subscribed?(current_person)
       assert current_person.receive_notifications?
 
-      assert_emails 0 do
+      assert_no_enqueued_emails do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
         SendPeriodicEmailsJob.new('weekly').perform
@@ -1499,7 +1499,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert new_person.user
     login_as admin.user
 
-    assert_emails(1) do
+    assert_enqueued_emails(1) do
       put :administer_update, id: new_person.id, person: { work_group_ids: [work_group.id] }
     end
 
@@ -1523,7 +1523,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(user)
 
     # 3 emails - 1 to admin and 2 to project administrators
-    assert_emails(3) do
+    assert_enqueued_emails(3) do
       post :create,
            person: { first_name: 'Fred', last_name: 'BBB', email: 'fred.bbb@email.com' },
            projects: [proj1.id, proj2.id, project_without_manager.id]

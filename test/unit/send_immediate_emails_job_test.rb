@@ -55,7 +55,7 @@ class SendImmediateEmailsJobTest < ActiveSupport::TestCase
     project_subscription2 = ProjectSubscription.create(person_id: person2.id, project_id: sop.projects.first.id, frequency: 'immediately')
     ProjectSubscriptionJob.new(project_subscription1.id).perform
     ProjectSubscriptionJob.new(project_subscription2.id).perform
-    assert_emails 2 do
+    assert_enqueued_emails 2 do
       disable_authorization_checks do
         al = ActivityLog.create(activity_loggable: sop, culprit: Factory(:user), action: 'create')
         SendImmediateEmailsJob.new(al.id).perform

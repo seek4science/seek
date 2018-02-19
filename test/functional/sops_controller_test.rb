@@ -734,7 +734,7 @@ class SopsControllerTest < ActionController::TestCase
     # request publish
     login_as(sop.contributor)
     assert sop.can_publish?
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
   end
@@ -747,7 +747,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     assert !sop.is_published?
     assert sop.can_publish?
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
   end
@@ -760,11 +760,11 @@ class SopsControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     assert sop.can_publish?
     # send the first time
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
     # dont send again
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
   end
@@ -776,7 +776,7 @@ class SopsControllerTest < ActionController::TestCase
 
     assert sop.can_view?(nil)
 
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
 
@@ -790,7 +790,7 @@ class SopsControllerTest < ActionController::TestCase
 
     refute sop.can_view?(nil)
 
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
 
@@ -806,7 +806,7 @@ class SopsControllerTest < ActionController::TestCase
     assert sop.can_view?(nil)
     refute sop.can_download?(nil)
 
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       put :update, sop: { title: sop.title }, id: sop.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
 

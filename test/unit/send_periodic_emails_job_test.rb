@@ -167,13 +167,13 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     Factory :activity_log, activity_loggable: sop, culprit: Factory(:user), action: 'create'
     Factory :activity_log, activity_loggable: nil, culprit: Factory(:user), action: 'search'
 
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       SendPeriodicEmailsJob.new('daily').perform
     end
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       SendPeriodicEmailsJob.new('weekly').perform
     end
-    assert_emails 2 do
+    assert_enqueued_emails 2 do
       SendPeriodicEmailsJob.new('monthly').perform
     end
   end
@@ -198,7 +198,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
 
     user = Factory :user
 
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       Factory :activity_log, activity_loggable: sop, culprit: user, action: 'show'
       Factory :activity_log, activity_loggable: sop, culprit: user, action: 'download'
       Factory :activity_log, activity_loggable: sop, culprit: user, action: 'destroy'
@@ -250,7 +250,7 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       Factory :activity_log, activity_loggable: data_file2, culprit: user, action: 'update'
     end
 
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       SendPeriodicEmailsJob.new('daily').perform
     end
   end
