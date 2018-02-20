@@ -1071,7 +1071,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_difference('GroupMembership.count',1) do # 2 deleted, 3 added
       assert_no_difference('WorkGroup.count') do # 1 empty group will be deleted, 1 will be added
-        assert_emails(3) do
+        assert_enqueued_emails(3) do
           post :update_members,
                id: project,
                group_memberships_to_remove: [group_membership.id, group_membership2.id],
@@ -1482,7 +1482,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project_administrator).projects.first #needs a project admin
     person = Factory(:person)
     login_as(person)
-    assert_emails(1) do
+    assert_enqueued_emails(1) do
       assert_difference('MessageLog.count') do
         post :request_membership, id:project,details:'blah blah'
       end
@@ -1498,7 +1498,7 @@ class ProjectsControllerTest < ActionController::TestCase
     logout
     login_as(project.project_administrators.first)
 
-    assert_emails(0)  do
+    assert_no_enqueued_emails  do
       assert_no_difference('MessageLog.count') do
         post :request_membership, id:project,details:'blah blah'
       end
@@ -1508,7 +1508,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     project=Factory(:project)
     assert_empty(project.people)
-    assert_emails(0)  do
+    assert_no_enqueued_emails  do
       assert_no_difference('MessageLog.count') do
         post :request_membership, id:project,details:'blah blah'
       end

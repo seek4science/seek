@@ -179,7 +179,7 @@ class PeopleController < ApplicationController
           format.xml { render xml: @person, status: :created, location: @person }
           format.json {render json: @person, status: :created, location: @person }
         else
-          Mailer.signup(current_user).deliver_now
+          Mailer.signup(current_user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
@@ -194,12 +194,12 @@ class PeopleController < ApplicationController
   end
 
   def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(params, current_user).deliver_now
+    Mailer.contact_admin_new_user(params, current_user).deliver_later
 
     # send mail to project managers
     project_administrators = project_administrators_of_selected_projects params[:projects]
     project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_now
+      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_later
     end
   end
 

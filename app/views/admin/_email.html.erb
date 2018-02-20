@@ -37,13 +37,25 @@
       <%= panel('Test email configuration') do %>
           <p class="help-block">Here you can input an email address for a testing message to be sent to.</p>
           <%= text_field_tag :testing_email, '', :class => 'form-control', :placeholder => 'email@example.com' %>
-          <%= link_to_with_callbacks image("test",:title=>"Send testing email",:alt=>"Test")+" Send test email",
-                                     {:url=>{:action=>'test_email_configuration'},
-                                      :method=>:post,
-                                      :with=>"'address=' + $F('address') + '&port=' + $F('port') + '&domain=' + $F('domain') + '&authentication=' + $F('authentication')
-                             + '&enable_starttls_auto='+$F('enable_starttls_auto') + '&user_name=' + $F('smtp_user_name') + '&password=' + $F('smtp_password') + '&testing_email=' + $F('testing_email')",
-                                      :before => "show_ajax_loader('ajax_loader_position');"},
-                                     {:remote=>true, :class => 'btn btn-default'}-%>
+          <% email_params =  %(
+          'address=' + $F('address') +
+          '&port=' + $F('port') +
+          '&domain=' + $F('domain') +
+          '&authentication=' + $F('authentication') +
+          '&enable_starttls_auto='+$F('enable_starttls_auto') +
+          '&user_name=' + $F('smtp_user_name') +
+          '&password=' + $F('smtp_password') +
+          '&testing_email=' + $F('testing_email')) %>
+          <%= link_to_with_callbacks "#{image("test", title: "Send testing email", alt: "Test")} Send immediate test email".html_safe,
+                                     { url: { action: 'test_email_configuration'},
+                                       method: :post, with: email_params,
+                                       before: "show_ajax_loader('ajax_loader_position');"},
+                                     { remote: true,  class:  'btn btn-default' }-%>
+          <%= link_to_with_callbacks "#{image("test", title: "Send testing email", alt: "Test")} Queue test email".html_safe,
+                                     { url: { action: 'test_email_configuration'},
+                                       method: :post, with: email_params + "+ '&deliver_later=true'",
+                                       before: "show_ajax_loader('ajax_loader_position');"},
+                                     { remote: true,  class:  'btn btn-default' }-%>
           <div id='ajax_loader_position'></div>
       <% end %>
     </div>

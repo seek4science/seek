@@ -403,10 +403,19 @@ class AdminController < ApplicationController
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
     ActionMailer::Base.raise_delivery_errors = true
     begin
-      Mailer.test_email(params[:testing_email]).deliver_now
-      render :update do |page|
-        page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
-        page.alert("test email is sent successfully to #{params[:testing_email]}")
+      mail = Mailer.test_email(params[:testing_email])
+      if params[:deliver_later]
+        mail.deliver_later
+        render :update do |page|
+          page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
+          page.alert("Test email to #{params[:testing_email]} was added to the queue.")
+        end
+      else
+        mail.deliver_now
+        render :update do |page|
+          page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
+          page.alert("Test email sent successfully to #{params[:testing_email]}.")
+        end
       end
     rescue => e
       render :update do |page|

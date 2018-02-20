@@ -241,7 +241,7 @@ class ActiveSupport::TestCase
     path
   end
 
-  def assert_emails(n)
+  def assert_enqueued_emails(n)
     assert_difference 'ActionMailer::Base.deliveries.size', n do
       yield
     end
@@ -249,6 +249,18 @@ class ActiveSupport::TestCase
 
   def assert_no_emails
     assert_no_difference 'ActionMailer::Base.deliveries.size' do
+      yield
+    end
+  end
+
+  def assert_enqueued_emails(n)
+    assert_difference(-> { ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j.fetch(:job) == ActionMailer::DeliveryJob }.count }, n) do
+      yield
+    end
+  end
+
+  def assert_no_enqueued_emails
+    assert_no_difference(-> { ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j.fetch(:job) == ActionMailer::DeliveryJob }.count }) do
       yield
     end
   end
