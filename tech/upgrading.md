@@ -92,7 +92,7 @@ After updating the files, the following steps will update the database, gems,
 and other necessary changes. Note that seek:upgrade may take longer than usual if you have data stored that points to remote
 content.
 
-    cd .. && cd seek #this is to allow RVM to pick up the ruby and gemset changes
+    cd . #this is to allow RVM to pick up the ruby and gemset changes
     gem install bundler
     bundle install --deployment
     bundle exec rake seek:upgrade
