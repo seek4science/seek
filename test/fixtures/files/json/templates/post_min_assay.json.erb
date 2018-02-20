@@ -1,0 +1,26 @@
+{
+  "data": {
+     "type": "assays",
+    "attributes": {
+     "title": "A Minimal Assay",
+      "assay_class": {
+       "key":"EXP"
+      },
+      "assay_type": {
+        "uri":"http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+      },
+      "technology_type": {
+        "uri":"http://jermontology.org/ontology/JERMOntology#Technology_type"
+      }
+    },
+    "relationships": {
+    "study": {
+        "data":
+          {
+            "id": "<%=study_id%>",
+            "type": "studies"
+          }
+      }
+    }
+  }
+}

@@ -950,9 +950,9 @@ class DataFilesControllerTest < ActionController::TestCase
     # upload a data file
     df = Factory :data_file, contributor: User.current_user
     # upload new version 1 of the data file
-    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 1'
+    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 1'
     # upload new version 2 of the data file
-    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 2'
+    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 2'
 
     df.reload
     assert_equal 3, df.versions.length
@@ -975,7 +975,7 @@ class DataFilesControllerTest < ActionController::TestCase
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
-        post :new_version, id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
+        post :new_version, id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' # v2
       end
     end
 
@@ -2576,7 +2576,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('DataFile::Version.count') do
       post :new_version, id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }],
-                         revision_comment: 'This is a new revision'
+                         revision_comments: 'This is a new revision'
     end
 
     assert_redirected_to data_file

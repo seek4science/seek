@@ -79,7 +79,7 @@ class DataFilesController < ApplicationController
 
   def new_version
     if handle_upload_data
-      comments = params[:revision_comment]
+      comments = params[:revision_comments]
 
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
@@ -101,9 +101,10 @@ class DataFilesController < ApplicationController
             end
           end
         else
-          flash[:error] = 'Unable to save new version'
+          flash[:error] = 'Unable to save newflash[:error] version'
         end
         format.html { redirect_to @data_file }
+        format.json { render json: @data_file}
       end
     else
       flash[:error] = flash.now[:error]
@@ -122,7 +123,7 @@ class DataFilesController < ApplicationController
         @data_file.creators = [current_person]
         create_content_blobs
         # send email to the file uploader and receiver
-        Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_now
+        Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_later
 
         flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         render text: flash.now[:notice]
@@ -208,7 +209,7 @@ class DataFilesController < ApplicationController
   end
 
   def create
-    if params[:data_file].empty? && !params[:datafile].empty?
+    if params[:data_file].blank? && !params[:datafile].blank?
       params[:data_file] = params[:datafile]
     end
 

@@ -117,7 +117,10 @@ class AssaysController < ApplicationController
     update_annotations(params[:tag_list], @assay) #this saves the assay
     update_scales @assay
 
-    if @assay.present? && @assay.save
+    a = @assay.present?
+    b = @assay.save
+
+    if a && b
       update_assets_linked_to_assay @assay, params
       update_relationships(@assay, params)
 
@@ -248,5 +251,34 @@ class AssaysController < ApplicationController
                                   :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset,
                                   { document_ids: []})
   end
+
+  def tweak_json_params json_params
+    if json_params[:assay][:assay_class].present? && json_params[:assay][:assay_class][:key].present?
+      sym = json_params[:assay][:assay_class][:key].to_sym
+      the_class = AssayClass.find_by(key: sym)
+      if the_class.blank? then
+        raise "No id for class key #{sym}"
+      end
+      json_params[:assay][:assay_class_id] = the_class.id
+      # if json_params[:assay][:assay_class] == :EXP
+      #   json_params[:assay][:assay_class_id] = "1"
+      # else
+      #   json_params[:assay][:assay_class_id] = "2"
+      # end
+      json_params[:assay].delete :assay_class
+    end
+    if json_params[:assay][:assay_type].present?
+      json_params[:assay][:assay_type_uri] = json_params[:assay][:assay_type][:uri]
+      json_params[:assay].delete :assay_type
+    end
+    if json_params[:assay][:technology_type].present?
+      json_params[:assay][:technology_type_uri] = json_params[:assay][:technology_type][:uri]
+      json_params[:assay].delete :technology_type
+    end
+
+
+    json_params
+  end
+
 
 end

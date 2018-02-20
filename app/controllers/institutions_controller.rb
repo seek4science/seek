@@ -114,7 +114,7 @@ class InstitutionsController < ApplicationController
   def editable_by_user
     @institution = Institution.find(params[:id])
     unless User.admin_logged_in? || @institution.can_be_edited_by?(current_user)
-      error('Insufficient privileges', 'is invalid (insufficient_privileges)')
+      error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
   end

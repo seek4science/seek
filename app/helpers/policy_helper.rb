@@ -180,7 +180,7 @@ module PolicyHelper
     end
   end
 
-  def access_type_key(access_type)
+  def self.access_type_key(access_type)
     case access_type
       when Policy::MANAGING
         'manage'

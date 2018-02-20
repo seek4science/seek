@@ -375,7 +375,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     refute investigation.can_view?(nil)
 
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
 
@@ -391,7 +391,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert investigation.is_published?
 
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
 

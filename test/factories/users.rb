@@ -1,7 +1,7 @@
 # User
 Factory.define(:brand_new_user, class: User) do |f|
   f.sequence(:login) { |n| "user#{n}" }
-  test_password = '0' * User::MIN_PASSWORD_LENGTH
+  test_password = generate_user_password
   f.password test_password
   f.password_confirmation test_password
 end
@@ -37,7 +37,7 @@ Factory.define(:oauth_session) do |f|
 end
 
 Factory.define(:sha1_pass_user, parent: :brand_new_user) do |f|
-  test_password = '0' * User::MIN_PASSWORD_LENGTH
+  test_password = generate_user_password
   f.after_create do |user|
     user.update_column(:crypted_password, user.sha1_encrypt(test_password))
   end

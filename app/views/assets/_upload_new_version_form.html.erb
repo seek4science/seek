@@ -5,7 +5,7 @@
 
             <div class="form-group">
               <label>Revision comments (optional)</label>
-              <%= text_area_tag :revision_comment, nil, :size=>"55x4", :class => 'form-control' -%>
+              <%= text_area_tag :revision_comments, nil, :size=>"55x4", :class => 'form-control' -%>
             </div>
             <%= submit_tag "Upload", :id => "new_version_submit_btn",
                            :onclick => "javascript: validateUploadNewVersion(#{resource.respond_to?(:content_blobs)}, '#{controller_name.singularize}'); return(false);",

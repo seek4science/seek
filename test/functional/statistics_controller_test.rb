@@ -26,12 +26,14 @@ class StatisticsControllerTest < ActionController::TestCase
   end
 
   test 'application status' do
+    soffice = Seek::Config.soffice_available? ? 'running' : 'not running'
     with_config_value :application_name, 'Euro SEEK' do
       with_config_value :solr_enabled, true do
         logout
         get :application_status
         assert_response :success
-        assert_match(/Euro SEEK is running \| search is enabled \| [0-9] delayed jobs running/, @response.body)
+        assert_match(/Euro SEEK is running \| search is enabled \| [0-9] delayed jobs running \| soffice is #{soffice}/, @response.body)
+        puts @response.body
       end
     end
   end

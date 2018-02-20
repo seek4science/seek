@@ -125,5 +125,27 @@ module Seek
       render partial: 'assets/back_to_fancy_parent', locals: { child: item, parent_name: item.parent_name }
       true
     end
+
+    def tweak_json_params json_params
+      content_blob_param = nil
+      comments_param = nil
+      json_params.each do | key, v |
+        if (v.is_a?(Hash)) && (v.key? (:content_blobs))
+          content_blob_param = v[:content_blobs]
+          end
+          if (v.is_a?(Hash)) && (v.key? (:revision_comments))
+            comments_param = v[:revision_comments]
+          end
+      end
+        if content_blob_param.present?
+          json_params[:content_blobs] = content_blob_param
+        end
+        if comments_param.present?
+          json_params[:revision_comments] = comments_param
+        end
+        json_params
+    end
+
   end
 end
+

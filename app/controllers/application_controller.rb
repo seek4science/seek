@@ -31,11 +31,11 @@ class ApplicationController < ActionController::Base
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
   before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :check_illegal_id, :only=>[:create]
+  before_filter :check_json_id_type,  :only=>[:create, :update], :if => "@is_json"   #from Rails 5.x use: proc {@is_json}
   # after_filter :unescape_response
 
   before_filter :write_api_enabled, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new]
+  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new, :new_version]
 
   helper :all
 
@@ -108,8 +108,8 @@ class ApplicationController < ActionController::Base
   end
 
   def is_user_admin_auth
-    unless admin_logged_in?
-      error('Admin rights required', 'is invalid (not admin)')
+    unless User.admin_logged_in?
+      error('Admin rights required', 'is invalid (not admin)', :forbidden)
       return false
     end
     true
@@ -230,12 +230,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def error(notice, _message)
+  #_status is mostly important for the json responses, default is 400 (Bad Request)
+  def error(notice, _message, _status=400)
     flash[:error] = notice
-
     respond_to do |format|
       format.html { redirect_to root_url }
-      format.json { redirect_to root_url }
+      format.json {
+        render json: {"title": notice, "detail": _message}, status: _status
+      }
     end
   end
 
@@ -539,17 +541,6 @@ class ApplicationController < ActionController::Base
     redirect_to signup_path if User.count == 0
   end
 
-  def check_illegal_id
-    begin
-      Rails.logger.info("checking illegal ID")
-      if !params[:id].nil?
-        raise ArgumentError.new('A POST request is not allowed to specify an id')
-      end
-    rescue ArgumentError => e
-      render json: {error: e.message, status: :forbidden}, status: :forbidden
-    end
-  end
-
   # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
   # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
   # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
@@ -574,20 +565,50 @@ class ApplicationController < ActionController::Base
     if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
       return
     end
-    if @is_json && !Rails.env.development?
+    if @is_json && !(Rails.env.development? || Rails.env.test?)
       raise NotImplementedError
+    end
+  end
+
+  def check_json_id_type
+    begin
+      raise ArgumentError.new('A POST/PUT request must have a data record complying with JSONAPI specs') if params[:data].nil?
+      #type should always appear in POST or PUT requests
+      if params[:data][:type].nil?
+        raise ArgumentError.new('A POST/PUT request must specify a data:type')
+      elsif params[:data][:type] != params[:controller]
+        raise ArgumentError.new("The specified data:type does not match the URL's object (#{params[:data][:type]} vs. #{params[:controller]})")
+      end
+      #id should not appear on POST, but should be accurate IF it appears on PUT
+      case params[:action]
+        when "create"
+          if !params[:data][:id].nil?
+            raise ArgumentError.new('A POST request is not allowed to specify an id')
+          end
+        when "update"
+          if (!params[:data][:id].nil?) && (params[:id] != params[:data][:id])
+            raise ArgumentError.new('id specified by the PUT request does not match object-id in the JSON input')
+          end
+      end
+    rescue ArgumentError => e
+      render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
     end
   end
 
   def convert_json_params
    if @is_json
-      organize_external_attributes_from_json
       hacked_params = flatten_relationships(params)
       # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
       params[controller_name.classify.downcase.to_sym] =
           ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
-
+      organize_external_attributes_from_json
+      params = tweak_json_params hacked_params
     end
+  end
+
+  # override in sub-classes
+  def tweak_json_params params
+    params
   end
 
   # take out policies, annotations, etc(?) outside of the given object attributes

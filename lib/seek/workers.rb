@@ -18,6 +18,7 @@ module Seek
     def self.create_commands(action)
       commands = []
       queues = [QueueNames::DEFAULT]
+      queues << QueueNames::MAILERS if Seek::Config.email_enabled
       queues << QueueNames::AUTH_LOOKUP if Seek::Config.auth_lookup_enabled
       queues << QueueNames::REMOTE_CONTENT if Seek::Config.cache_remote_files
       queues << QueueNames::SAMPLES if Seek::Config.samples_enabled

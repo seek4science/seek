@@ -36,7 +36,9 @@
       </tr>
       <% unless item.last_error.nil? -%>
           <tr id='<%= "last_error_#{item.id}" -%>' style="display:none;">
-            <td colspan="7"><%= item.last_error -%></td>
+            <td colspan="7">
+              <pre><%= item.last_error -%></pre>
+            </td>
           </tr>
       <% end %>
   <% end -%>

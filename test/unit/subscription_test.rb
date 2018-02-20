@@ -73,7 +73,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       s.subscribe
     end
 
-    assert_emails(1) do
+    assert_enqueued_emails(1) do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
       SendImmediateEmailsJob.new(al.id).perform
     end
@@ -85,7 +85,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       s.subscribe(other_guy)
     end
 
-    assert_emails(2) do
+    assert_enqueued_emails(2) do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
       SendImmediateEmailsJob.new(al.id).perform
     end

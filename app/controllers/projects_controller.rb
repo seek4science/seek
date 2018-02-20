@@ -354,6 +354,18 @@ class ProjectsController < ApplicationController
     params.require(:project).permit(permitted_params)
   end
 
+  def tweak_json_params json_params
+    if json_params[:project][:programme_ids].present?
+      if json_params[:project][:programme_ids].empty?
+        json_params[:project][:programme_id] = nil
+      else
+        json_params[:project][:programme_id] = json_params[:project][:programme_ids][0]
+      end
+      json_params[:project].delete :programme_ids
+    end
+    json_params
+  end
+
   def add_and_remove_members_and_institutions
     groups_to_remove = params[:group_memberships_to_remove] || []
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
@@ -394,7 +406,7 @@ class ProjectsController < ApplicationController
   def editable_by_user
     @project = Project.find(params[:id])
     unless User.admin_logged_in? || @project.can_be_edited_by?(current_user)
-      error('Insufficient privileges', 'is invalid (insufficient_privileges)')
+      error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
   end
@@ -413,14 +425,14 @@ class ProjectsController < ApplicationController
   def administerable_by_user
     @project = Project.find(params[:id])
     unless @project.can_be_administered_by?(current_user)
-      error('Insufficient privileges', 'is invalid (insufficient_privileges)')
+      error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
   end
 
   def allow_request_membership
     unless Seek::Config.email_enabled && @project.allow_request_membership?
-      error('Cannot reqest membership of this project', 'is invalid (invalid state)')
+      error('Cannot request membership of this project', 'is invalid (invalid state)')
       false
     end
   end
