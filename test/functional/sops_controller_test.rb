@@ -1005,6 +1005,19 @@ class SopsControllerTest < ActionController::TestCase
     assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 1
   end
 
+  test 'does not show how to get a doi if no manage permission' do
+    sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
+    person = Factory(:person)
+    refute sop.can_manage?(person.user)
+
+    login_as(person)
+
+    get :show, id: sop
+
+    assert_response :success
+    assert_select '#citation-instructions', count: 0
+  end
+
   private
 
   def doi_citation_mock

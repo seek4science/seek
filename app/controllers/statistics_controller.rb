@@ -1,12 +1,11 @@
 class StatisticsController < ApplicationController
+  before_filter :is_user_admin_auth, only: [:index]
 
-  def index
-  end
+  def index; end
 
   def application_status
     respond_to do |format|
-      format.html {render :formats=>[:text]}
+      format.html { render formats: [:text] }
     end
   end
-
 end

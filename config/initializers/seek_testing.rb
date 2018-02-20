@@ -61,7 +61,7 @@ SEEK::Application.configure do
       Settings.defaults[:doi_suffix] = "Sysmo.SEEK"
       Settings.defaults[:datacite_url] = "https://test.datacite.org/mds/"
       Settings.defaults[:datacite_username] = 'test'
-      Seek::Config.datacite_password_encrypt('test')
+      Settings.defaults[:datacite_password] = 'test'
       Settings.defaults[:time_lock_doi_for] = 0
 
       Seek::Config.fixed :css_prepended,''

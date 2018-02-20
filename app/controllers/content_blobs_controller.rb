@@ -135,7 +135,6 @@ class ContentBlobsController < ApplicationController
 
   def get_file_from_jerm
     project = @asset_version.projects.first
-    project.decrypt_credentials
     downloader = Jerm::DownloaderFactory.create project.title
     resource_type = @asset_version.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
     begin

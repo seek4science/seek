@@ -14,7 +14,7 @@ class ProjectsController < ApplicationController
   before_filter :is_user_admin_auth, only: %i[manage destroy]
   before_filter :editable_by_user, only: %i[edit update]
   before_filter :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
-  before_filter :member_of_this_project, only: [:asset_report], unless: :admin?
+  before_filter :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
   before_filter :login_required, only: [:request_membership]
   before_filter :allow_request_membership, only: [:request_membership]
 

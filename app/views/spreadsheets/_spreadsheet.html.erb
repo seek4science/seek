@@ -91,12 +91,12 @@
     var perPage = <%= default_per_page %>;
 
     <% if params[:page_rows] %>
-    perPage = <%= params[:page_rows] %>;
+    perPage = <%= params[:page_rows].try(:to_i) %>;
     <% end %>
 
     window.onload=function(){
         //"activate" the worksheet
-        activateSheet(<%= params[:sheet] || 1 %>);
+        activateSheet(<%= params[:sheet].try(:to_i) || 1 %>);
         displayAnnotation();
         displayRowsPerPage();
     }

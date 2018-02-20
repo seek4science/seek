@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180122121232) do
+ActiveRecord::Schema.define(version: 20180207102508) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -689,26 +689,6 @@ ActiveRecord::Schema.define(version: 20180122121232) do
     t.datetime "updated_at"
   end
 
-  create_table "forum_attachments", force: :cascade do |t|
-    t.integer  "post_id",      limit: 4
-    t.string   "title",        limit: 255
-    t.string   "content_type", limit: 255
-    t.string   "filename",     limit: 255
-    t.integer  "size",         limit: 4
-    t.integer  "db_file_id",   limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "forums", force: :cascade do |t|
-    t.string  "name",             limit: 255
-    t.string  "description",      limit: 255
-    t.integer "topics_count",     limit: 4,     default: 0
-    t.integer "posts_count",      limit: 4,     default: 0
-    t.integer "position",         limit: 4
-    t.text    "description_html", limit: 65535
-  end
-
   create_table "genes", force: :cascade do |t|
     t.string   "title",       limit: 255
     t.string   "symbol",      limit: 255
@@ -1103,20 +1083,6 @@ ActiveRecord::Schema.define(version: 20180122121232) do
     t.datetime "updated_at"
   end
 
-  create_table "posts", force: :cascade do |t|
-    t.integer  "user_id",    limit: 4
-    t.integer  "topic_id",   limit: 4
-    t.text     "body",       limit: 65535
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "forum_id",   limit: 4
-    t.text     "body_html",  limit: 65535
-  end
-
-  add_index "posts", ["forum_id", "created_at"], name: "index_posts_on_forum_id", using: :btree
-  add_index "posts", ["topic_id", "created_at"], name: "index_posts_on_topic_id", using: :btree
-  add_index "posts", ["user_id", "created_at"], name: "index_posts_on_user_id", using: :btree
-
   create_table "presentation_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
     t.integer "asset_id",     limit: 4
@@ -1507,12 +1473,14 @@ ActiveRecord::Schema.define(version: 20180122121232) do
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "settings", force: :cascade do |t|
-    t.string   "var",         limit: 255,   null: false
-    t.text     "value",       limit: 65535
-    t.integer  "target_id",   limit: 4
-    t.string   "target_type", limit: 30
+    t.string   "var",                limit: 255,   null: false
+    t.text     "value",              limit: 65535
+    t.integer  "target_id",          limit: 4
+    t.string   "target_type",        limit: 30
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "encrypted_value",    limit: 65535
+    t.string   "encrypted_value_iv", limit: 255
   end
 
   add_index "settings", ["target_type", "target_id", "var"], name: "index_settings_on_target_type_and_target_id_and_var", unique: true, using: :btree
@@ -1787,29 +1755,10 @@ ActiveRecord::Schema.define(version: 20180122121232) do
     t.datetime "updated_at"
   end
 
-  create_table "topics", force: :cascade do |t|
-    t.integer  "forum_id",     limit: 4
-    t.integer  "user_id",      limit: 4
-    t.string   "title",        limit: 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "hits",         limit: 4,   default: 0
-    t.integer  "sticky",       limit: 4,   default: 0
-    t.integer  "posts_count",  limit: 4,   default: 0
-    t.datetime "replied_at"
-    t.boolean  "locked",                   default: false
-    t.integer  "replied_by",   limit: 4
-    t.integer  "last_post_id", limit: 4
-  end
-
-  add_index "topics", ["forum_id", "replied_at"], name: "index_topics_on_forum_id_and_replied_at", using: :btree
-  add_index "topics", ["forum_id", "sticky", "replied_at"], name: "index_topics_on_sticky_and_replied_at", using: :btree
-  add_index "topics", ["forum_id"], name: "index_topics_on_forum_id", using: :btree
-
   create_table "trash_records", force: :cascade do |t|
     t.string   "trashable_type", limit: 255
     t.integer  "trashable_id",   limit: 4
-    t.binary   "data",           limit: 16777215
+    t.binary   "data",           limit: 65535
     t.datetime "created_at"
   end
 
@@ -1828,7 +1777,7 @@ ActiveRecord::Schema.define(version: 20180122121232) do
 
   create_table "users", force: :cascade do |t|
     t.string   "login",                     limit: 255
-    t.string   "crypted_password",          limit: 40
+    t.string   "crypted_password",          limit: 64
     t.string   "salt",                      limit: 40
     t.datetime "created_at"
     t.datetime "updated_at"

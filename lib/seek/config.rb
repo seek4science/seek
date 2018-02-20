@@ -1,5 +1,3 @@
-require 'simple_crypt'
-
 module Seek
   # Fallback attribute, which if defined will be the result if the stored/default value for a setting is nil
   # Convention to create a new fallback is to name the method <setting_name>_fallback
@@ -136,8 +134,6 @@ module Seek
 
   # Custom accessors for settings that are not a simple mapping
   module CustomAccessors
-    include SimpleCrypt
-
     def recaptcha_setup?
       if Seek::Config.recaptcha_enabled
         if Seek::Config.recaptcha_public_key.blank? || Seek::Config.recaptcha_private_key.blank?
@@ -163,7 +159,7 @@ module Seek
 
     def attr_encrypted_key
       if File.exist?(attr_encrypted_key_path)
-        File.read(attr_encrypted_key_path)
+        File.binread(attr_encrypted_key_path)[0..31]
       else
         write_attr_encrypted_key
         attr_encrypted_key
@@ -223,50 +219,12 @@ module Seek
     end
 
     def smtp_settings(field)
-      value = smtp[field.to_sym]
-      value = decrypt_value(value) if field == :password || field == 'password'
-      value
+      smtp[field.to_sym]
     end
 
     def set_smtp_settings(field, value)
-      if %i[password user_name authentication].include? field.to_sym
-        value = nil if value.blank?
-      end
-
-      value = value.to_sym if field.to_sym == :authentication && value
-      if field.to_sym == :password
-        unless value.blank?
-          value = encrypt(value, generate_key(GLOBAL_PASSPHRASE))
-        end
-      end
       merge! :smtp, field => value
       value
-    end
-
-    # TODO: update to use attr_encrypted
-    def datacite_password_decrypt
-      datacite_password = Seek::Config.datacite_password
-      decrypt_value(datacite_password)
-    end
-
-    # TODO: update to use attr_encrypted
-    def decrypt_value(value)
-      unless value.blank?
-        begin
-          decrypt(value, generate_key(GLOBAL_PASSPHRASE))
-        rescue => exception
-          Rails.logger.error 'ERROR decrypting value - reverting to a blank string'
-          ''
-        end
-      end
-    end
-
-    # TODO: update to use attr_encrypted
-    def datacite_password_encrypt(password)
-      unless password.blank?
-        Seek::Config.datacite_password = encrypt(password, generate_key(GLOBAL_PASSPHRASE))
-      end
-      datacite_password
     end
 
     def facet_enable_for_page(controller)
@@ -302,8 +260,8 @@ module Seek
     end
 
     def write_attr_encrypted_key
-      File.open(attr_encrypted_key_path, 'w') do |f|
-        f << SecureRandom.hex(32)
+      File.open(attr_encrypted_key_path, 'wb') do |f|
+        f << SecureRandom.random_bytes(32)
       end
     end
 
@@ -400,6 +358,18 @@ module Seek
         send propagate if respond_to?(propagate)
       end
     end
+
+    def register_encrypted_setting(setting)
+      encrypted_settings << setting.to_sym
+    end
+
+    def encrypted_settings
+      @@encrypted_settings ||= []
+    end
+
+    def encrypted_setting?(setting)
+      encrypted_settings.include?(setting.to_sym)
+    end
   end
 
   # Configuration class.
@@ -420,8 +390,18 @@ module Seek
       HashWithIndifferentAccess.new(yaml)
     end
 
+    def self.read_project_setting_attributes
+      yaml = YAML.load_file(File.join(File.dirname(File.expand_path(__FILE__)), 'project_setting_attributes.yml'))
+      HashWithIndifferentAccess.new(yaml)
+    end
+
     read_setting_attributes.each do |method, opts|
       setting method, opts
+      register_encrypted_setting(method) if opts && opts[:encrypt]
+    end
+
+    read_project_setting_attributes.each do |method, opts|
+      register_encrypted_setting(method) if opts && opts[:encrypt]
     end
   end
 end

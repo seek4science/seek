@@ -34,10 +34,6 @@ module Zenodo
           errors.add(:base, "Zenodo publishing is not enabled")
           return false
         end
-        if !has_doi?
-          errors.add(:base, "Please generate a DOI before exporting to Zenodo.")
-          return false
-        end
         if in_zenodo?
           errors.add(:base, "Already deposited in Zenodo, ID: #{zenodo_deposition_id}")
           return false
@@ -64,7 +60,7 @@ module Zenodo
           errors.add(:base, "Zenodo publishing is not enabled")
           return false
         end
-        if !in_zenodo?
+        unless in_zenodo?
           errors.add(:base, "Please export to Zenodo first.")
           return false
         end
@@ -77,7 +73,9 @@ module Zenodo
         deposition = client.deposition(zenodo_deposition_id)
 
         if deposition.publish
-          update_attribute(:zenodo_record_url, deposition.details['record_url'])
+          record_url = deposition.details['record_url'] || deposition.details['links']['record_html']
+          update_attribute(:zenodo_record_url, record_url)
+          update_attribute(:doi, deposition.details['doi'])
         end
       end
 
@@ -104,7 +102,7 @@ module Zenodo
       end
 
       def can_export_to_zenodo?
-        Seek::Config.zenodo_publishing_enabled && has_doi? && !in_zenodo?
+        Seek::Config.zenodo_publishing_enabled && !in_zenodo?
       end
 
       private

@@ -1,8 +1,5 @@
 ENV['RAILS_ENV'] ||= 'test'
 
-require 'coveralls'
-Coveralls.wear!('rails')
-
 require File.expand_path(File.dirname(__FILE__) + '/../config/environment')
 require 'rails/test_help'
 
@@ -19,6 +16,7 @@ require 'authenticated_test_helper'
 require 'mock_helper'
 require 'html_helper'
 require 'nels_test_helper'
+require 'upload_helper'
 require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
@@ -35,6 +33,8 @@ module ActionView
     end
   end
 end
+
+include UploadHelper
 
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
@@ -262,6 +262,11 @@ class ActiveSupport::TestCase
     f.flush
     f.close
     puts "Written @response.body to #{f.path}"
+  end
+
+  # the password used for the Factories
+  def factory_user_password
+    Factory.build(:user).password
   end
 end
 

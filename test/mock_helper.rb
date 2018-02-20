@@ -26,6 +26,7 @@ module MockHelper
                  "https://sandbox.zenodo.org/api/deposit/depositions/#{ZENODO_DEPOSITION_ID}/actions/publish?access_token=#{ZENODO_ACCESS_TOKEN}").to_return(
                    body: { id: ZENODO_FILE_ID.to_s,
                            submitted: true,
+                           doi: '10.5072/test.doi',
                            record_url: "https://sandbox.zenodo.org/record/#{ZENODO_DEPOSITION_ID}" }.to_json,
                    status: 202
                  )

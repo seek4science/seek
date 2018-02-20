@@ -58,6 +58,8 @@ module SEEK
     config.middleware.use Rack::Deflater,
                           include: %w(text/html application/xml application/json text/css application/javascript)
 
+    config.middleware.use Rack::Attack
+
     config.exceptions_app = self.routes
 
     config.active_support.escape_html_entities_in_json = true
@@ -75,5 +77,3 @@ module SEEK
     config.active_record.raise_in_transactional_callbacks = true
   end
 end
-
-require 'settings' # This is here rather than in seek_main.rb because it has to be loaded before seek_configuration.rb

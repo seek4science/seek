@@ -224,18 +224,6 @@ class SnapshotTest < ActiveSupport::TestCase
     assert_not_empty snapshot.errors
   end
 
-  test "doesn't export to Zenodo if no DOI" do
-    zenodo_mock
-
-    snapshot = @investigation.create_snapshot
-
-    res = snapshot.export_to_zenodo(MockHelper::ZENODO_ACCESS_TOKEN)
-
-    assert !res
-    assert_nil snapshot.zenodo_deposition_id
-    assert_not_empty snapshot.errors
-  end
-
   test "doesn't publish to Zenodo if not exported first" do
     zenodo_mock
 

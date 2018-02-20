@@ -1,11 +1,11 @@
 <% if @resource.can_manage? %>
-    <% if @snapshot.has_doi? %>
-        <% if @snapshot.can_export_to_zenodo? %>
-            <%= button_link_to("Export to Zenodo", 'snapshot_export', @zenodo_oauth_client.authorize_url(polymorphic_path([@resource, @snapshot], :action => 'export'))) %>
+    <% if @snapshot.can_export_to_zenodo? %>
+        <%= button_link_to("Export to Zenodo", 'snapshot_export', @zenodo_oauth_client.authorize_url(polymorphic_path([@resource, @snapshot], :action => 'export'))) %>
+    <% end %>
+    <% unless @snapshot.has_doi? %>
+        <% if @snapshot.can_mint_doi? %>
+            <%= button_link_to("Generate a DOI", 'doi',  polymorphic_path([@resource, @snapshot], action: 'mint_doi_confirm')) %>
         <% end %>
-    <% elsif @snapshot.can_mint_doi? %>
-        <%= button_link_to("Generate a DOI", 'doi',  polymorphic_path([@resource, @snapshot], action: 'mint_doi_confirm')) %>
-    <% else %>
         <%= button_link_to("Delete", 'destroy',  polymorphic_path([@resource, @snapshot]),
                            { confirm: "Are you sure you wish to delete this snapshot?", method: :delete }) %>
     <% end %>

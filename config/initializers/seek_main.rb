@@ -47,11 +47,7 @@ require 'seek/grouped_pagination'
 require 'explicit_versioning'
 
 SEEK::Application.configure do
-  GLOBAL_PASSPHRASE="ohx0ipuk2baiXah" unless defined? GLOBAL_PASSPHRASE
-
   ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
-
-  PORTER_SECRET = "" unless defined? PORTER_SECRET
 
   Seek::Config.propagate_all
 

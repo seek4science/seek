@@ -1,10 +1,8 @@
 # Methods added to this helper will be available to all templates in the application.
 # require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','helpers','application_helper')
-require 'savage_beast/application_helper'
 require 'app_version'
 
 module ApplicationHelper
-  include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
   include Recaptcha::ClientHelper
   include VersionHelper

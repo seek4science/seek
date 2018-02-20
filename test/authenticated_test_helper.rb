@@ -2,21 +2,23 @@ module AuthenticatedTestHelper
   # Sets the current user in the session from the user fixtures.
 
   def login_as(user)
-    user = users(user) unless user.class == User || user.class == Person
-    user = user.user if user.class == Person
+    user = case user
+             when User
+               user
+             when Person
+               user.user
+             else
+               users(user)
+           end
+
+    # Clear the current_user from the controller so authentication will happen again using the session
+    @controller.send(:clear_current_user)
     @request.session[:user_id] = user.try(:id)
     User.current_user = user
   end
 
   def logout
-    # forces ApplicationController.@current_user=false
-    class << @controller
-      def force_logout
-        @current_user = nil
-      end
-    end
-    @controller.force_logout
-
+    @controller.send(:clear_current_user)
     @request.session[:user_id] = nil
     User.current_user = nil
   end
