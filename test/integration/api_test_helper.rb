@@ -5,9 +5,8 @@ module ApiTestHelper
     admin = Factory.create(:admin)
     @current_person = admin
     @current_user = admin.user
-    @current_user.password = 'blah'
     # log in
-    post '/session', login: admin.user.login, password: admin.user.password
+    post '/session', login: admin.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH)
   end
 
   def self.template_dir
