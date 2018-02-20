@@ -9,6 +9,13 @@ module ApiTestHelper
     post '/session', login: admin.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH)
   end
 
+  def user_login(person)
+    @current_person = person
+    @current_user = person.user
+    #User.current_user = Factory(:user, login: 'test')
+    post '/session', login: person.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH)
+  end
+
   def self.template_dir
     File.join(Rails.root, 'test', 'fixtures',
               'files', 'json', 'templates')
@@ -70,6 +77,7 @@ module ApiTestHelper
   # end ("#{m}_#{clz}").to_sym
 
   def test_create
+    puts "to_post", @to_post
 
     if @to_post.blank? then
       skip
@@ -92,9 +100,15 @@ module ApiTestHelper
   end
 
   def check_response (h)
-    extra_attributes = populate_extra_attributes
+    begin
+      extra_attributes = populate_extra_attributes
 
-    extra_relationships = populate_extra_relationships
+      extra_relationships = populate_extra_relationships
+    rescue NameError
+      extra_attributes={}
+      extra_relationships={}
+    end
+
 
     @to_post['data']['attributes'].each do |key, value|
       assert_equal value, h['data']['attributes'][key]
@@ -112,29 +126,34 @@ module ApiTestHelper
       end
     end
 
+    if @to_post['data'].has_key? 'relationships'
+      @to_post['data']['relationships'].each do |key, value|
+        assert_equal value, h['data']['relationships'][key]
+      end
 
-    @to_post['data']['relationships'].each do |key, value|
-      assert_equal value, h['data']['relationships'][key]
-    end
-
-    h['data']['relationships'].each do |key, value|
-      if @to_post['data']['relationships'].has_key? key
-        assert_equal value, @to_post['data']['relationships'][key]
-      elsif extra_relationships.has_key? key
-        assert_equal value, extra_relationships[key]
-      elsif value.blank?
-        # Should be OK
-      elsif value['data'].blank?
-        # Should be OK
-      else
-        warn("Unexpected relationship [#{key}]=#{value}")
+      h['data']['relationships'].each do |key, value|
+        if @to_post['data']['relationships'].has_key? key
+          assert_equal value, @to_post['data']['relationships'][key]
+        elsif extra_relationships.has_key? key
+          assert_equal value, extra_relationships[key]
+        elsif value.blank?
+          # Should be OK
+        elsif value['data'].blank?
+          # Should be OK
+        else
+          warn("Unexpected relationship [#{key}]=#{value}")
+        end
       end
     end
 
   end
 
   def test_should_delete_object
-    obj = Factory(("#{@clz}").to_sym, contributor: @current_person)
+    begin
+      obj = Factory(("#{@clz}").to_sym, contributor: @current_person)
+    rescue NoMethodError
+      obj = Factory(("#{@clz}").to_sym)
+    end
     assert_difference ("#{@clz.classify.constantize}.count"), -1 do
       delete "/#{@plural_clz}/#{obj.id}.json"
       assert_response :success
@@ -192,10 +211,11 @@ module ApiTestHelper
     patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_#{@clz}.json.erb")
     the_patch = ERB.new(File.read(patch_file))
     namespace = OpenStruct.new(id: the_id)
-    @to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding } ) )
+    to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding } ) )
 
     assert_no_difference( "#{@clz.capitalize}.count") do
-      patch "/#{@plural_clz}/#{the_id}.json", @to_patch
+      patch "/#{@plural_clz}/#{the_id}.json", to_patch
+      puts response.body
       assert_response :success
     end
 
