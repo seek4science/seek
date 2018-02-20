@@ -405,13 +405,17 @@ class AdminController < ApplicationController
     begin
       mail = Mailer.test_email(params[:testing_email])
       if params[:deliver_later]
-        Mailer.test_email(params[:testing_email]).deliver_later
+        mail.deliver_later
+        render :update do |page|
+          page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
+          page.alert("Test email to #{params[:testing_email]} was added to the queue.")
+        end
       else
-        Mailer.test_email(params[:testing_email]).deliver_now
-      end
-      render :update do |page|
-        page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
-        page.alert("test email is sent successfully to #{params[:testing_email]}")
+        mail.deliver_now
+        render :update do |page|
+          page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
+          page.alert("Test email sent successfully to #{params[:testing_email]}.")
+        end
       end
     rescue => e
       render :update do |page|
