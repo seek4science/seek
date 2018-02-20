@@ -12,7 +12,6 @@ module ApiTestHelper
   def user_login(person)
     @current_person = person
     @current_user = person.user
-    #User.current_user = Factory(:user, login: 'test')
     post '/session', login: person.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH)
   end
 
@@ -30,6 +29,14 @@ module ApiTestHelper
     template.result(namespace.instance_eval {binding})
   end
 
+  def load_template(erb_file, hash)
+    template_file = File.join(ApiTestHelper.template_dir, erb_file)
+    template = ERB.new(File.read(template_file))
+    namespace = OpenStruct.new(hash)
+    json_obj = JSON.parse(template.result(namespace.instance_eval { binding }))
+    return json_obj
+  end
+
   def load_patch_template(hash)
     patch_file = File.join(Rails.root, 'test', 'fixtures',
                                      'files', 'json', 'templates', "patch_#{@clz}.json.erb")
@@ -38,20 +45,6 @@ module ApiTestHelper
     to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding }))
     return to_patch
   end
-
-  # def user_login
-  #   User.current_user = Factory(:user, login: 'test')
-  #   post '/session', login: 'test', password: 'blah'
-  # end
-
-  #only in max object
-  # def edit_relationships
-  #   @json_mm['max']['data']['relationships'].each do |k,v|
-  #     obj = Factory(("#{k}".singularize).to_sym)
-  #     @json_mm['max']['data']['relationships'][k]['data'] = [].append({"id": "#{obj.id}", "type": "#{k}"})
-  #   end
-  # end
-
 
   # def check_attr_content(to_post, action)
   #   #check some of the content, h = the response hash after the post/patch action
@@ -77,26 +70,29 @@ module ApiTestHelper
   # end ("#{m}_#{clz}").to_sym
 
   def test_create
-    puts "to_post", @to_post
+    ['min', 'max'].each do |m|
+      inst = Factory(:institution)
+      @to_post = load_template("post_#{m}_#{@clz}.json.erb", {title: "Post "+inst.title, country: inst.country})
 
-    if @to_post.blank? then
-      skip
+      #puts "to_post", @to_post
+
+      if @to_post.blank? then
+        skip
+      end
+
+      # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
+      assert_difference("#{@clz.capitalize}.count") do
+        post "/#{@plural_clz}.json", @to_post
+        assert_response :success
+      end
+
+      # check some of the content
+      h = JSON.parse(response.body)
+      if defined? self.tweak_response then
+        tweak_response h
+      end
+      check_response h
     end
-
-    # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
-    assert_difference("#{@clz.capitalize}.count") do
-      post "/#{@plural_clz}.json", @to_post
-      assert_response :success
-    end
-    # check some of the content
-    h = JSON.parse(response.body)
-
-    if defined? self.tweak_response then
-      tweak_response h
-    end
-
-    check_response h
-
   end
 
   def check_response (h)
@@ -148,74 +144,10 @@ module ApiTestHelper
 
   end
 
-  def test_should_delete_object
-    begin
-      obj = Factory(("#{@clz}").to_sym, contributor: @current_person)
-    rescue NoMethodError
-      obj = Factory(("#{@clz}").to_sym)
-    end
-    assert_difference ("#{@clz.classify.constantize}.count"), -1 do
-      delete "/#{@plural_clz}/#{obj.id}.json"
-      assert_response :success
-    end
-    get "/#{@plural_clz}/#{obj.id}.json"
-    assert_response :not_found
-  end
-
-  def test_create_should_error_on_given_id
-    post_clone = JSON.parse(JSON.generate(@to_post))
-    post_clone['data']['id'] = '100000000'
-
-    assert_no_difference ("#{@clz.classify.constantize}.count") do
-      post "/#{@plural_clz}.json", post_clone
-      assert_response :unprocessable_entity
-      assert_match "A POST request is not allowed to specify an id", response.body
-    end
-  end
-
-  def test_create_should_error_on_wrong_type
-    post_clone = JSON.parse(JSON.generate(@to_post))
-    post_clone['data']['type'] = 'wrong'
-
-    assert_no_difference ("#{@clz.classify.constantize}.count") do
-      post "/#{@plural_clz}.json", post_clone
-      assert_response :unprocessable_entity
-      assert_match "The specified data:type does not match the URL's object (#{post_clone['data']['type']} vs. #{@plural_clz})", response.body
-    end
-  end
-
-  def test_create_should_error_on_missing_type
-    post_clone = JSON.parse(JSON.generate(@to_post))
-    post_clone['data'].delete('type')
-
-    assert_no_difference ("#{@clz.classify.constantize}.count") do
-      post "/#{@plural_clz}.json", post_clone
-      assert_response :unprocessable_entity
-      assert_match "A POST/PUT request must specify a data:type", response.body
-    end
-  end
-
   def test_update
-    if @to_post.blank? then
-      skip
-    end
-    post "/#{@plural_clz}.json", @to_post
-    assert_response :success
-
-    h = JSON.parse(response.body)
-    if defined? self.tweak_response then
-      tweak_response h
-    end
-    the_id = h['data']['id']
-
-    patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_#{@clz}.json.erb")
-    the_patch = ERB.new(File.read(patch_file))
-    namespace = OpenStruct.new(id: the_id)
-    to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding } ) )
-
     assert_no_difference( "#{@clz.capitalize}.count") do
-      patch "/#{@plural_clz}/#{the_id}.json", to_patch
-      puts response.body
+      patch "/#{@plural_clz}/#{@to_patch['data']['id']}.json", @to_patch
+     # puts response.body
       assert_response :success
     end
 
@@ -297,6 +229,53 @@ module ApiTestHelper
 
     assert_no_difference ("#{@clz.classify.constantize}.count") do
       put "/#{@plural_clz}/#{obj.id}.json", to_patch
+      assert_response :unprocessable_entity
+      assert_match "A POST/PUT request must specify a data:type", response.body
+    end
+  end
+
+  def test_should_delete_object
+    begin
+      obj = Factory(("#{@clz}").to_sym, contributor: @current_person)
+    rescue NoMethodError
+      obj = Factory(("#{@clz}").to_sym)
+    end
+    assert_difference ("#{@clz.classify.constantize}.count"), -1 do
+      delete "/#{@plural_clz}/#{obj.id}.json"
+      assert_response :success
+    end
+    get "/#{@plural_clz}/#{obj.id}.json"
+    assert_response :not_found
+  end
+
+  def test_create_should_error_on_given_id
+    post_clone = JSON.parse(JSON.generate(@to_post))
+    post_clone['data']['id'] = '100000000'
+
+    assert_no_difference ("#{@clz.classify.constantize}.count") do
+      post "/#{@plural_clz}.json", post_clone
+      assert_response :unprocessable_entity
+      assert_match "A POST request is not allowed to specify an id", response.body
+    end
+  end
+
+  def test_create_should_error_on_wrong_type
+    post_clone = JSON.parse(JSON.generate(@to_post))
+    post_clone['data']['type'] = 'wrong'
+
+    assert_no_difference ("#{@clz.classify.constantize}.count") do
+      post "/#{@plural_clz}.json", post_clone
+      assert_response :unprocessable_entity
+      assert_match "The specified data:type does not match the URL's object (#{post_clone['data']['type']} vs. #{@plural_clz})", response.body
+    end
+  end
+
+  def test_create_should_error_on_missing_type
+    post_clone = JSON.parse(JSON.generate(@to_post))
+    post_clone['data'].delete('type')
+
+    assert_no_difference ("#{@clz.classify.constantize}.count") do
+      post "/#{@plural_clz}.json", post_clone
       assert_response :unprocessable_entity
       assert_match "A POST/PUT request must specify a data:type", response.body
     end
