@@ -17,6 +17,7 @@ require 'mock_helper'
 require 'html_helper'
 require 'nels_test_helper'
 require 'upload_helper'
+require 'password_helper'
 require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
@@ -35,6 +36,7 @@ module ActionView
 end
 
 include UploadHelper
+include PasswordHelper
 
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
@@ -274,11 +276,6 @@ class ActiveSupport::TestCase
     f.flush
     f.close
     puts "Written @response.body to #{f.path}"
-  end
-
-  # the password used for the Factories
-  def factory_user_password
-    Factory.build(:user).password
   end
 end
 
