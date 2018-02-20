@@ -9,6 +9,19 @@ layout: page
 
 Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
 
+## Version 1.5.2
+
+Release date: _February 20th 2018_
+
+Bugfix release that includes:
+
+  * Minor security fixes, following an external security review  (more details available later)
+  * Image scaling fix - where some avatars were scaled down, and then expanded causing them to appear blurred.
+
+A full list of changes included in this release can be found in the [SEEK v1.5.2 release notes](release-notes-1.5.2.html).
+
+If you have any comments or feedback then please [Contact Us](/contacting-us.html)  
+
 ## Version 1.5.1
 
 Release date: _January 11th 2018_
@@ -19,9 +32,6 @@ Bugfix patch release that in particular fixes:
   * An error turning exception emails on or off in the admin settings
   * An error that prevented a Programme submission being rejected
   
-A full list of changes included in this release can be found in the [SEEK v1.5.1 release notes](release-notes-1.5.1.html).
-
-If you have any comments or feedback then please [Contact Us](/contacting-us.html)  
 
 ## Version 1.5.0
 
