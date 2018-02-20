@@ -265,6 +265,6 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   def login_as(user)
     User.current_user = user
-    post '/session', login: user.login, password: factory_user_password
+    post '/session', login: user.login, password: generate_user_password
   end
 end

@@ -80,12 +80,12 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
   private
 
   def test_user
-    User.authenticate('test', factory_user_password) || Factory(:user, login: 'test')
+    User.authenticate('test', generate_user_password) || Factory(:user, login: 'test')
   end
 
   def login_as_test_user(referer)
     User.current_user = test_user
-    post '/session', { login: test_user.login, password: factory_user_password }, 'HTTP_REFERER' => referer
+    post '/session', { login: test_user.login, password: generate_user_password }, 'HTTP_REFERER' => referer
   end
 
   def logout(referer)
