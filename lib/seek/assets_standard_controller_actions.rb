@@ -121,26 +121,24 @@ module Seek
       true
     end
 
-    def tweak_json_params json_params
+    def tweak_json_params
       content_blob_param = nil
       comments_param = nil
-      json_params.each do | key, v |
+      params.each do | key, v |
         if (v.is_a?(Hash)) && (v.key? (:content_blobs))
           content_blob_param = v[:content_blobs]
-          end
-          if (v.is_a?(Hash)) && (v.key? (:revision_comments))
-            comments_param = v[:revision_comments]
-          end
+        end
+        if (v.is_a?(Hash)) && (v.key? (:revision_comments))
+          comments_param = v[:revision_comments]
+        end
       end
-        if content_blob_param.present?
-          json_params[:content_blobs] = content_blob_param
-        end
-        if comments_param.present?
-          json_params[:revision_comments] = comments_param
-        end
-        json_params
+      if content_blob_param.present?
+        params[:content_blobs] = content_blob_param
+      end
+      if comments_param.present?
+        params[:revision_comments] = comments_param
+      end
     end
-
   end
 end
 

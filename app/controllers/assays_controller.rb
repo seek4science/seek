@@ -251,32 +251,29 @@ class AssaysController < ApplicationController
                                   { document_ids: []})
   end
 
-  def tweak_json_params json_params
-    if json_params[:assay][:assay_class].present? && json_params[:assay][:assay_class][:key].present?
-      sym = json_params[:assay][:assay_class][:key].to_sym
+  def tweak_json_params
+    if params[:assay][:assay_class].present? && params[:assay][:assay_class][:key].present?
+      sym = params[:assay][:assay_class][:key].to_sym
       the_class = AssayClass.find_by(key: sym)
       if the_class.blank? then
         raise "No id for class key #{sym}"
       end
-      json_params[:assay][:assay_class_id] = the_class.id
-      # if json_params[:assay][:assay_class] == :EXP
-      #   json_params[:assay][:assay_class_id] = "1"
+      params[:assay][:assay_class_id] = the_class.id
+      # if params[:assay][:assay_class] == :EXP
+      #   params[:assay][:assay_class_id] = "1"
       # else
-      #   json_params[:assay][:assay_class_id] = "2"
+      #   params[:assay][:assay_class_id] = "2"
       # end
-      json_params[:assay].delete :assay_class
+      params[:assay].delete :assay_class
     end
-    if json_params[:assay][:assay_type].present?
-      json_params[:assay][:assay_type_uri] = json_params[:assay][:assay_type][:uri]
-      json_params[:assay].delete :assay_type
+    if params[:assay][:assay_type].present?
+      params[:assay][:assay_type_uri] = params[:assay][:assay_type][:uri]
+      params[:assay].delete :assay_type
     end
-    if json_params[:assay][:technology_type].present?
-      json_params[:assay][:technology_type_uri] = json_params[:assay][:technology_type][:uri]
-      json_params[:assay].delete :technology_type
+    if params[:assay][:technology_type].present?
+      params[:assay][:technology_type_uri] = params[:assay][:technology_type][:uri]
+      params[:assay].delete :technology_type
     end
-
-
-    json_params
   end
 
 

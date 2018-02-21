@@ -590,16 +590,15 @@ class ApplicationController < ActionController::Base
 
   def convert_json_params
     params[controller_name.singularize.to_sym] =
-        ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
+        ActiveModelSerializers::Deserialization.jsonapi_parse(params)
     params.delete(:data)
 
     organize_external_attributes_from_json
-    params = tweak_json_params(params)
+    tweak_json_params
   end
 
   # override in sub-classes
-  def tweak_json_params params
-    params
+  def tweak_json_params
   end
 
   # take out policies, annotations, etc(?) outside of the given object attributes
