@@ -7,7 +7,7 @@ class PublicationSerializer < BaseSerializer
     if :pubmed_id
       'https://www.ncbi.nlm.nih.gov/pubmed/' + object.pubmed_id.to_s
     elsif :doi
-      'http://dx.doi.org/' + object.doi.to_s
+      'https://doi.org/' + object.doi.to_s
     else
       ''
     end
