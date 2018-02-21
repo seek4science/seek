@@ -314,7 +314,7 @@ jQuery(document).ready(function() {
     doi = doi.replace(/^http:\/\/dx\.doi\.org/, '');
 
     jQuery.ajax({
-      url: 'https://dx.doi.org/' + doi,
+      url: 'https://doi.org/' + doi,
       accepts: { 'citeproc': "application/vnd.citationstyles.csl+json" },
       dataType: 'json',
       success: function(data, textStatus, jqXHR) {

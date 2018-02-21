@@ -17,7 +17,7 @@ module Seek
 
     def csl
       Rails.cache.fetch("citation-#{@doi}") do
-        resp = RestClient.get("https://dx.doi.org/#{@doi}", accept: 'application/vnd.citationstyles.csl+json')
+        resp = RestClient.get("https://doi.org/#{@doi}", accept: 'application/vnd.citationstyles.csl+json')
         JSON.parse(resp)
       end
     end

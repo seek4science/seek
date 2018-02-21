@@ -81,7 +81,7 @@ class Publication < ActiveRecord::Base
   end
 
   def doi_uri
-    "https://dx.doi.org/#{doi}" if doi
+    "https://doi.org/#{doi}" if doi
   end
 
   # Automatically extract the actual DOI if the user put in the full URL

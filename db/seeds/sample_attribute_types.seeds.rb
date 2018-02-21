@@ -46,7 +46,7 @@ uri_type = SampleAttributeType.find_or_initialize_by(title:'URI')
 uri_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: URI.regexp.to_s, placeholder: 'http://www.example.com/123', resolution:'\\0')
 
 doi_type = SampleAttributeType.find_or_initialize_by(title:'DOI')
-doi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: '(DOI:)?(.*)', placeholder: 'DOI:10.1109/5.771073', resolution:'https://dx.doi.org/\\2')
+doi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: '(DOI:)?(.*)', placeholder: 'DOI:10.1109/5.771073', resolution:'https://doi.org/\\2')
 
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types"
 
