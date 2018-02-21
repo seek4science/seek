@@ -311,10 +311,10 @@ jQuery(document).ready(function() {
     e.preventDefault(); // prevent the default form submit action
 
     var doi = jQuery('#publication_doi').val();
-    doi = doi.replace(/^http:\/\/dx\.doi\.org/, '');
+    doi = doi.replace(/^(https?:\/\/)?(dx\.)?doi\.org/, '');
 
     jQuery.ajax({
-      url: 'https://dx.doi.org/' + doi,
+      url: 'https://doi.org/' + doi,
       accepts: { 'citeproc': "application/vnd.citationstyles.csl+json" },
       dataType: 'json',
       success: function(data, textStatus, jqXHR) {
