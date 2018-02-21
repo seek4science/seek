@@ -86,7 +86,7 @@ class Publication < ActiveRecord::Base
 
   # Automatically extract the actual DOI if the user put in the full URL
   def doi=(doi)
-    doi = doi.gsub(/(https?:\/\/)?dx\.doi\.org\//,'') if doi
+    doi = doi.gsub(/(https?:\/\/)?(dx\.)?doi\.org\//,'') if doi
     super(doi)
   end
 
