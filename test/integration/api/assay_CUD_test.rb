@@ -41,14 +41,5 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     extra_relationships[:projects] = JSON.parse "{\"data\" : [{\"id\" : \"#{project_id}\", \"type\" : \"projects\"}]}"
     extra_relationships[:investigation] = JSON.parse "{\"data\" : {\"id\" : \"#{investigation_id}\", \"type\" : \"investigations\"}}"
     extra_relationships.with_indifferent_access
-
   end
-
-  def tweak_response h
-    h['data']['attributes']['assay_class'].delete('title')
-    h['data']['attributes']['assay_class'].delete('description')
-    h['data']['attributes']['assay_type'].delete('label')
-    h['data']['attributes']['technology_type'].delete('label')
-  end
-
 end
