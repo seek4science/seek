@@ -169,7 +169,7 @@ module Seek
             format.html do
               render action: :new
             end
-            format.json { render json: '{ "not ok" }' }
+            format.json { render json: { error: 'bad upload' }, status: 400 } # TODO: Change this to a valid error object
           end
         end
       end

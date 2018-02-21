@@ -145,8 +145,7 @@ class AssaysController < ApplicationController
   end
 
   def update
-
-    set_assay_organisms_from_json if @is_json
+    set_assay_organisms_from_json if json_api_request?
 
     update_assay_organisms @assay, params
     update_annotations(params[:tag_list], @assay)
