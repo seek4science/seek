@@ -70,11 +70,15 @@ module ApiTestHelper
   # end ("#{m}_#{clz}").to_sym
 
   def test_create
-    ['min', 'max'].each do |m|
-      inst = Factory(:institution)
-      @to_post = load_template("post_#{m}_#{@clz}.json.erb", {title: "Post "+inst.title, country: inst.country})
+    begin
+      create_post_values
+    rescue NoMethodError
+    end
 
-      #puts "to_post", @to_post
+    ['min','max'].each do |m|
+      @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values[m])
+
+      puts "to_post", @to_post
 
       if @to_post.blank? then
         skip

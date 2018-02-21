@@ -8,12 +8,21 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
     admin_login
     @clz = "institution"
     @plural_clz = @clz.pluralize
-    inst = Factory(:institution)
 
+    inst = Factory(:institution)
     @to_patch = load_template("patch_#{@clz}.json.erb", {id: inst.id})
 
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
     @to_post = load_template("post_min_#{@clz}.json.erb", {title: "Post "+inst.title, country: inst.country})
+  end
+
+  #no need for this to be called for every possible test (upon setup)
+  def create_post_values
+    @post_values = {}
+    ['min','max'].each do |m|
+      i = Factory(:institution)
+      @post_values[m] = {title: "Post "+i.title, country: i.country}
+    end
   end
 
   def test_normal_user_cannot_create_institution
