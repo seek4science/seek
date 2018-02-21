@@ -142,14 +142,7 @@ class DataFilesController < ApplicationController
   end
 
   def create
-    if params[:data_file].blank? && !params[:datafile].blank?
-      params[:data_file] = params[:datafile]
-    end
-
-     if params.key?(:content)
-        params[:content_blobs] = params[:content]["data"] #Why a string?
-     end
-      @data_file = DataFile.new(data_file_params.except!(:content))
+    @data_file = DataFile.new(data_file_params)
 
     if handle_upload_data
       update_sharing_policies(@data_file)
