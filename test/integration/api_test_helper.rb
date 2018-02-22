@@ -80,161 +80,24 @@ module ApiTestHelper
 
       puts "to_post", @to_post
 
-      if @to_post.blank? then
+      if @to_post.blank?
         skip
       end
 
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
-      assert_difference("#{@clz.capitalize}.count") do
+      assert_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", @to_post
         assert_response :success
       end
 
       # check some of the content
       h = JSON.parse(response.body)
-      if defined? self.tweak_response then
-        tweak_response h
-      end
-      check_response h
-    end
-  end
 
-  def check_response (h)
-    begin
-      extra_attributes = populate_extra_attributes
+      hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
+      hash_comparison(populate_extra_attributes, h['data']['attributes'])
 
-      extra_relationships = populate_extra_relationships
-    rescue NameError
-      extra_attributes={}
-      extra_relationships={}
-    end
-
-
-    @to_post['data']['attributes'].each do |key, value|
-      assert_equal value, h['data']['attributes'][key]
-    end
-
-    h['data']['attributes'].each do |key, value|
-      if @to_post['data']['attributes'].has_key? key
-        assert_equal value, @to_post['data']['attributes'][key]
-      elsif extra_attributes.has_key? key
-        assert_equal value, extra_attributes[key]
-      elsif value.blank?
-        # Should be OK
-      else
-        warn("Unexpected attribute [#{key}]=#{value}")
-      end
-    end
-
-    if @to_post['data'].has_key? 'relationships'
-      @to_post['data']['relationships'].each do |key, value|
-        assert_equal value, h['data']['relationships'][key]
-      end
-
-      h['data']['relationships'].each do |key, value|
-        if @to_post['data']['relationships'].has_key? key
-          assert_equal value, @to_post['data']['relationships'][key]
-        elsif extra_relationships.has_key? key
-          assert_equal value, extra_relationships[key]
-        elsif value.blank?
-          # Should be OK
-        elsif value['data'].blank?
-          # Should be OK
-        else
-          warn("Unexpected relationship [#{key}]=#{value}")
-        end
-      end
-    end
-
-  end
-
-  def test_update
-    assert_no_difference( "#{@clz.capitalize}.count") do
-      patch "/#{@plural_clz}/#{@to_patch['data']['id']}.json", @to_patch
-     # puts response.body
-      assert_response :success
-    end
-
-    h = JSON.parse(response.body)
-    if defined? self.tweak_response then  def test_create_missing_type
-      if @to_post.blank? then
-        skip
-      end
-      post_clone = JSON.parse(JSON.generate(@to_post))
-      post_clone['data'].delete('type')
-      assert_no_difference ("#{@clz.capitalize}.count") do
-        post "/#{@plural_clz}.json", post_clone
-        assert_response :unprocessable_entity
-        assert_match 'A POST/PUT request must specify a data:type', response.body
-      end
-    end
-
-
-    tweak_response h
-    end
-
-    if @to_patch['data'].key? 'attributes'
-      @to_patch['data']['attributes'].each do |key, value|
-        assert_equal value, h['data']['attributes'][key]
-      end
-    end
-
-    if @to_patch['data'].key? 'relationships'
-      @to_patch['data']['relationships'].each do |key, value|
-        assert_equal value, h['data']['relationships'][key]
-      end
-    end
-
-    if (@to_post['data'].key? 'attributes') && (@to_patch['data'].key? 'attributes')
-      @to_post['data']['attributes'].each do |key, value|
-        unless @to_patch['data']['attributes'].key? key
-          assert_equal value, h['data']['attributes'][key]
-        end
-      end
-    end
-
-    if (@to_post['data'].key? 'relationships') && (@to_patch['data'].key? 'relationships')
-      @to_post['data']['relationships'].each do |key, value|
-        unless @to_patch['data']['relationships'].key? key
-          assert_equal value, h['data']['relationships'][key]
-        end
-      end
-    end
-  end
-
-  def test_update_should_error_on_wrong_id
-    obj = Factory(("#{@clz}").to_sym)
-
-    to_patch = load_patch_template(id: '100000000')
-
-    assert_no_difference ("#{@clz.classify.constantize}.count") do
-      put "/#{@plural_clz}/#{obj.id}.json", to_patch
-      assert_response :unprocessable_entity
-      assert_match "id specified by the PUT request does not match object-id in the JSON input", response.body
-    end
-  end
-
-  def test_update_should_error_on_wrong_type
-    obj = Factory(("#{@clz}").to_sym)
-    to_patch = load_patch_template({})
-    to_patch['data']['type'] = 'wrong'
-
-    assert_no_difference ("#{@clz.classify.constantize}.count") do
-      put "/#{@plural_clz}/#{obj.id}.json", to_patch
-      assert_response :unprocessable_entity
-      assert_match "The specified data:type does not match the URL's object (#{to_patch['data']['type']} vs. #{@plural_clz})", response.body
-    end
-  end
-
-  def test_update_should_error_on_missing_type
-    obj = Factory(("#{@clz}").to_sym)
-    to_patch = load_patch_template({})
-    to_patch['data'].delete('type')
-
-    assert_no_difference ("#{@clz.classify.constantize}.count") do
-      put "/#{@plural_clz}/#{obj.id}.json", to_patch
-      assert_response :unprocessable_entity
-      assert_match "A POST/PUT request must specify a data:type", response.body
+      hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
+      hash_comparison(populate_extra_relationships, h['data']['relationships'])
     end
   end
 
@@ -285,4 +148,102 @@ module ApiTestHelper
     end
   end
 
+  def test_update
+
+    #fetch original object
+    obj_id = @to_patch['data']['id']
+    get "/#{@plural_clz}/#{obj.id}.json"
+    assert_response :success
+    original = JSON.parse(response.body)
+
+    #update request
+    assert_no_difference( "#{@clz.capitalize}.count") do
+      patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
+     # puts response.body
+      assert_response :success
+    end
+
+    h = JSON.parse(response.body)
+
+    # Check the changed attributes and relationships
+    if @to_patch['data'].key?('attributes')
+      hash_comparison(@to_patch['data']['attributes'], h['data']['attributes'])
+    end
+
+    if @to_patch['data'].key?('relationships')
+      hash_comparison(@to_patch['data']['relationships'], h['data']['relationships'])
+    end
+
+    # Check the original, unchanged attributes and relationships
+    if original['data'].key?('attributes') && @to_patch['data'].key?('attributes')
+      original_attributes = original['data']['attributes'].except(@to_patch['data']['attributes'].keys)
+      hash_comparison(original_attributes, h['data']['attributes'])
+    end
+
+    if original['data'].key?('relationships') && @to_patch['data'].key?('relationships')
+      original_relationships = original['data']['relationships'].except(@to_patch['data']['relationships'].keys)
+      hash_comparison(original_relationships, h['data']['relationships'])
+    end
+  end
+
+  def test_update_should_error_on_wrong_id
+    obj = Factory(("#{@clz}").to_sym)
+
+    to_patch = load_patch_template(id: '100000000')
+
+    assert_no_difference ("#{@clz.classify.constantize}.count") do
+      put "/#{@plural_clz}/#{obj.id}.json", to_patch
+      assert_response :unprocessable_entity
+      assert_match "id specified by the PUT request does not match object-id in the JSON input", response.body
+    end
+  end
+
+  def test_update_should_error_on_wrong_type
+    obj = Factory(("#{@clz}").to_sym)
+    to_patch = load_patch_template({})
+    to_patch['data']['type'] = 'wrong'
+
+    assert_no_difference ("#{@clz.classify.constantize}.count") do
+      put "/#{@plural_clz}/#{obj.id}.json", to_patch
+      assert_response :unprocessable_entity
+      assert_match "The specified data:type does not match the URL's object (#{to_patch['data']['type']} vs. #{@plural_clz})", response.body
+    end
+  end
+
+  def test_update_should_error_on_missing_type
+    obj = Factory(("#{@clz}").to_sym)
+    to_patch = load_patch_template({})
+    to_patch['data'].delete('type')
+
+    assert_no_difference ("#{@clz.classify.constantize}.count") do
+      put "/#{@plural_clz}/#{obj.id}.json", to_patch
+      assert_response :unprocessable_entity
+      assert_match "A POST/PUT request must specify a data:type", response.body
+    end
+  end
+
+private
+
+  ##
+  # Compare `result` Hash against `source`.
+  def hash_comparison(source, result)
+    source.each do |key, value|
+      deep_comparison(value, result[key], key)
+    end
+  end
+
+  ##
+  # Compares `result` against `source`. If `source` is a Hash, compare each each key/value pair with that in `result`.
+  # `key` is used to generate meaningful failure messages if the assertion fails.
+  def deep_comparison(source, result, key)
+    if source.is_a?(Hash)
+      source.each do |sub_key, sub_value|
+        actual = result.try(:[], sub_key)
+        assert_equal sub_value, actual, "Expected #{key}[#{sub_key}] to be `#{sub_value}` but was `#{actual}`"
+      end
+    else
+      assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
+    end
+  end
 end
+

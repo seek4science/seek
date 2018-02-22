@@ -259,7 +259,7 @@ class SessionsControllerTest < ActionController::TestCase
 
   test 'should authenticate user with legacy encryption and update password' do
     sha1_user = Factory(:sha1_pass_user)
-    test_password = '0' * User::MIN_PASSWORD_LENGTH
+    test_password = generate_user_password
 
     assert_equal User.sha1_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
 

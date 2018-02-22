@@ -192,7 +192,7 @@ class ProjectsController < ApplicationController
   def update
     update_params = project_params
 
-    if @project.present? && !@is_json
+    if @project.present? && !json_api_request?
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end
 
@@ -354,16 +354,15 @@ class ProjectsController < ApplicationController
     params.require(:project).permit(permitted_params)
   end
 
-  def tweak_json_params json_params
-    if json_params[:project][:programme_ids].present?
-      if json_params[:project][:programme_ids].empty?
-        json_params[:project][:programme_id] = nil
+  def tweak_json_params
+    if params[:project][:programme_ids].present?
+      if params[:project][:programme_ids].empty?
+        params[:project][:programme_id] = nil
       else
-        json_params[:project][:programme_id] = json_params[:project][:programme_ids][0]
+        params[:project][:programme_id] = params[:project][:programme_ids][0]
       end
-      json_params[:project].delete :programme_ids
+      params[:project].delete :programme_ids
     end
-    json_params
   end
 
   def add_and_remove_members_and_institutions

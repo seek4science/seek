@@ -10,7 +10,6 @@ class ApplicationController < ActionController::Base
   include Recaptcha::Verify
 
   include CommonSweepers
-  @is_json = false
 
   before_filter :log_extra_exception_data
 
@@ -30,12 +29,10 @@ class ApplicationController < ActionController::Base
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
-  before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :check_json_id_type,  :only=>[:create, :update], :if => "@is_json"   #from Rails 5.x use: proc {@is_json}
-  # after_filter :unescape_response
 
-  before_filter :write_api_enabled, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new, :new_version]
+  before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
+  before_filter :write_api_enabled, only: [:update, :destroy, :create], if: :json_api_request?
+  before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
   helper :all
 
@@ -73,10 +70,6 @@ class ApplicationController < ActionController::Base
 
   def base_host
     request.host_with_port
-  end
-
-  def set_is_json
-    @is_json = (request.format.json?)
   end
 
   def api_version
@@ -565,7 +558,7 @@ class ApplicationController < ActionController::Base
     if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
       return
     end
-    if @is_json && !(Rails.env.development? || Rails.env.test?)
+    if json_api_request? && Rails.env.production?
       raise NotImplementedError
     end
   end
@@ -596,19 +589,16 @@ class ApplicationController < ActionController::Base
   end
 
   def convert_json_params
-   if @is_json
-      hacked_params = flatten_relationships(params)
-      # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
-      params[controller_name.classify.downcase.to_sym] =
-          ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
-      organize_external_attributes_from_json
-      params = tweak_json_params hacked_params
-    end
+    params[controller_name.singularize.to_sym] =
+        ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    params.delete(:data)
+
+    organize_external_attributes_from_json
+    tweak_json_params
   end
 
   # override in sub-classes
-  def tweak_json_params params
-    params
+  def tweak_json_params
   end
 
   # take out policies, annotations, etc(?) outside of the given object attributes
@@ -623,26 +613,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def flatten_relationships(original_params)
-    replacements = {}
-    begin
-      rels = original_params[:data][:relationships]
-      assoc = rels[:associated]
-      assoc_relationships = assoc[:data]
-      assoc_relationships.each do |assoc_rel|
-        the_type = assoc_rel["type"]
-        the_id = assoc_rel["id"]
-        if !replacements.key?(the_type)
-          replacements[the_type] = {}
-          replacements[the_type][:data] = []
-        end
-        replacements[the_type][:data].push({:type => the_type, :id => the_id})
-      end
-      rels.delete(:associated)
-      original_params[:data][:relationships].merge!(ActionController::Parameters.new(replacements))
-    rescue Exception
-    end
-    original_params
+  def json_api_request?
+    request.format.json?
   end
 
 end

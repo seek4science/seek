@@ -67,7 +67,7 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
     site_announcement = SiteAnnouncement.create(title: 'test announcement', body: 'test', email_notification: true)
     assert SendAnnouncementEmailsJob.new(site_announcement.id, 1).exists?
     Delayed::Job.delete_all
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       assert_difference('Delayed::Job.count', 1, 'a new job should have been created for the next batch') do
         SendAnnouncementEmailsJob.new(site_announcement.id, notifiee1.id).perform
       end
@@ -77,7 +77,7 @@ class SendAnnouncementEmailsJobTest < ActiveSupport::TestCase
     from_new_notifiee_id = notifiee1.id + SendAnnouncementEmailsJob::BATCHSIZE + 1
     assert SendAnnouncementEmailsJob.new(site_announcement.id, from_new_notifiee_id).exists?
     Delayed::Job.delete_all
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       assert_no_difference('Delayed::Job.count', 'no new jobs should have been created, since there is need for a new batch') do
         SendAnnouncementEmailsJob.new(site_announcement.id, from_new_notifiee_id).perform
       end
