@@ -72,13 +72,15 @@ module ApiTestHelper
   def test_create
     begin
       create_post_values
-    rescue NoMethodError
+    rescue NameError
     end
 
     ['min','max'].each do |m|
-      @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values[m])
+      if defined? @post_values
+        @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values[m])
+      end
 
-      puts "to_post", @to_post
+      #puts "to_post", @to_post
 
       if @to_post.blank?
         skip
@@ -94,10 +96,16 @@ module ApiTestHelper
       h = JSON.parse(response.body)
 
       hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-      hash_comparison(populate_extra_attributes, h['data']['attributes'])
+      if @to_post['data'].has_key? 'relationships'
+        hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
+      end
 
-      hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-      hash_comparison(populate_extra_relationships, h['data']['relationships'])
+      begin
+        hash_comparison(populate_extra_attributes, h['data']['attributes'])
+        hash_comparison(populate_extra_relationships, h['data']['relationships'])
+      rescue NameError
+      end
+
     end
   end
 
@@ -152,14 +160,13 @@ module ApiTestHelper
 
     #fetch original object
     obj_id = @to_patch['data']['id']
-    get "/#{@plural_clz}/#{obj.id}.json"
+    get "/#{@plural_clz}/#{obj_id}.json"
     assert_response :success
     original = JSON.parse(response.body)
 
     #update request
     assert_no_difference( "#{@clz.capitalize}.count") do
       patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
-     # puts response.body
       assert_response :success
     end
 
@@ -169,19 +176,18 @@ module ApiTestHelper
     if @to_patch['data'].key?('attributes')
       hash_comparison(@to_patch['data']['attributes'], h['data']['attributes'])
     end
-
     if @to_patch['data'].key?('relationships')
       hash_comparison(@to_patch['data']['relationships'], h['data']['relationships'])
     end
 
     # Check the original, unchanged attributes and relationships
     if original['data'].key?('attributes') && @to_patch['data'].key?('attributes')
-      original_attributes = original['data']['attributes'].except(@to_patch['data']['attributes'].keys)
+      original_attributes = original['data']['attributes'].except(*@to_patch['data']['attributes'].keys)
       hash_comparison(original_attributes, h['data']['attributes'])
     end
 
     if original['data'].key?('relationships') && @to_patch['data'].key?('relationships')
-      original_relationships = original['data']['relationships'].except(@to_patch['data']['relationships'].keys)
+      original_relationships = original['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
       hash_comparison(original_relationships, h['data']['relationships'])
     end
   end

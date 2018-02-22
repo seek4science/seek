@@ -12,11 +12,17 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     @min_investigation = Factory(:min_investigation)
     @min_investigation.title = 'Fred'
 
+    study = Factory(:study, policy: Factory(:public_policy))
+    study.contributor = @current_user.person
+    study.save
+
     template_file = File.join(ApiTestHelper.template_dir, 'post_min_study.json.erb')
     template = ERB.new(File.read(template_file))
     namespace = OpenStruct.new({:investigation_id => @min_investigation.id, :r => ApiTestHelper.method(:render_erb)})
     template_result = template.result(namespace.instance_eval {binding})
     @to_post = JSON.parse(template_result)
+
+    @to_patch = load_template("patch_#{@clz}.json.erb", {id: study.id})
   end
 
   def populate_extra_attributes

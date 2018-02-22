@@ -15,12 +15,17 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     # Populate the assay classes
     Factory(:modelling_assay_class)
     Factory(:experimental_assay_class)
+    assay = Factory(:experimental_assay, policy: Factory(:public_policy))
+    assay.contributor = @current_user.person
+    assay.save
 
     template_file = File.join(ApiTestHelper.template_dir, 'post_min_assay.json.erb')
     template = ERB.new(File.read(template_file))
     namespace = OpenStruct.new({:study_id => @min_study.id, :r => ApiTestHelper.method(:render_erb)})
     template_result = template.result(namespace.instance_eval {binding})
     @to_post = JSON.parse(template_result)
+
+    @to_patch = load_template("patch_#{@clz}.json.erb", {id: assay.id})
   end
 
   def populate_extra_attributes
