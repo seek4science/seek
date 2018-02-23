@@ -124,3 +124,10 @@ downloadable_spreadsheet_data_file:
   projects: [other_project] # not linked to any project for now
   policy: download_for_all_sysmo_users_policy
 
+data_file_with_no_content_blob:
+  contributor: datafile_owner (User)
+  title: No content
+  description: No content
+  version: 1
+  projects: [sysmo_project]
+  policy: public_download_with_no_custom_sharing
