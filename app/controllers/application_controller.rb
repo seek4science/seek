@@ -591,9 +591,9 @@ class ApplicationController < ActionController::Base
   def convert_json_params
     params[controller_name.singularize.to_sym] =
         ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    organize_external_attributes_from_json
     params.delete(:data)
 
-    organize_external_attributes_from_json
     tweak_json_params
   end
 

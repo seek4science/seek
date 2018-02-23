@@ -46,29 +46,6 @@ module ApiTestHelper
     return to_patch
   end
 
-  # def check_attr_content(to_post, action)
-  #   #check some of the content, h = the response hash after the post/patch action
-  #   h = JSON.parse(response.body)
-  #   h['data']['attributes'].delete("mbox_sha1sum")
-  #   h['data']['attributes'].delete("avatar")
-  #   h['data']['attributes'].each do |key, value|
-  #     next if (to_post['data']['attributes'][key].nil? && action=="patch")
-  #     if value.nil?
-  #       assert_nil to_post['data']['attributes'][key]
-  #     elsif value.kind_of?(Array)
-  #       assert_equal value, to_post['data']['attributes'][key].sort!
-  #     else
-  #       assert_equal value, to_post['data']['attributes'][key]
-  #     end
-  #   end
-  # end
-
-  # def check_relationships_content(m, action)
-  #   @to_post['data']['relationships'].each do |key, value|
-  #     assert_equal value, h['data']['relationships'][key]
-  #   end
-  # end ("#{m}_#{clz}").to_sym
-
   def test_create
     begin
       create_post_values
@@ -80,7 +57,7 @@ module ApiTestHelper
         @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values[m])
       end
 
-      #puts "to_post", @to_post
+     # puts "to_post", @to_post
 
       if @to_post.blank?
         skip
@@ -89,13 +66,18 @@ module ApiTestHelper
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", @to_post
+        #puts "returned response: ", response.body
         assert_response :success
       end
 
       # check some of the content
       h = JSON.parse(response.body)
+      to_ignore = []
+      if defined? ignore_non_read_or_write_attributes
+        to_ignore = ignore_non_read_or_write_attributes
+      end
 
-      hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
+      hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
       if @to_post['data'].has_key? 'relationships'
         hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
       end
@@ -164,14 +146,18 @@ module ApiTestHelper
     assert_response :success
     original = JSON.parse(response.body)
 
+    #puts "original: ", original
+    #puts "to patch: ", @to_patch
     #update request
     assert_no_difference( "#{@clz.capitalize}.count") do
       patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
+     # puts "response: ", response.body
       assert_response :success
     end
 
     h = JSON.parse(response.body)
 
+    to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
     # Check the changed attributes and relationships
     if @to_patch['data'].key?('attributes')
       hash_comparison(@to_patch['data']['attributes'], h['data']['attributes'])
@@ -182,7 +168,7 @@ module ApiTestHelper
 
     # Check the original, unchanged attributes and relationships
     if original['data'].key?('attributes') && @to_patch['data'].key?('attributes')
-      original_attributes = original['data']['attributes'].except(*@to_patch['data']['attributes'].keys)
+      original_attributes = original['data']['attributes'].(*(to_ignore + @to_patch['data']['attributes'].keys))
       hash_comparison(original_attributes, h['data']['attributes'])
     end
 

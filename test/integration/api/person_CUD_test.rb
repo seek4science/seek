@@ -1,71 +1,60 @@
 require 'test_helper'
-require 'integration/api_integration_test_helper'
+require 'integration/api_test_helper'
 
 class PersonCUDTest < ActionDispatch::IntegrationTest
-  include ApiIntegrationTestHelper
+  include ApiTestHelper
 
   def setup
     admin_login
     @clz = "person"
     @plural_clz = @clz.pluralize
 
-    load_mm_objects(@clz)
+    p = Factory(:person)
+    @to_patch = load_template("patch_#{@clz}.json.erb", {id: p.id})
+
+    #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
+    @to_post = load_template("post_min_#{@clz}.json.erb", {first_name: "Post", last_name: p.last_name, email: p.email})
   end
 
-  def test_should_create_person
-    #debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
-    ['min', 'max'].each do |m|
-      @json_mm["#{m}"]["data"]["attributes"]["email"] = "#{m}_createTest@email.com"
-
-      assert_difference('Person.count') do
-        assert_difference('NotifieeInfo.count') do
-          post "/people.json", @json_mm["#{m}"]
-          assert_response :success
-
-          get "/people/#{Person.last.id}.json"
-          assert_response :success
-
-          check_attr_content(@json_mm["#{m}"], "post")
-        end
-      end
+  def create_post_values
+    @post_values = {}
+    ['min','max'].each do |m|
+      p = Factory(:person)
+      @post_values[m] = {first_name: "Post", last_name: p.last_name, email: "Post"+p.email}
     end
   end
 
-  def test_should_update_person
-    a_person = Factory(:person)
-    user_login(a_person)
-    remove_nil_values_before_update
+  # title cannot be POSTed or PATCHed
+  # email and expertise/tool_list are not as are in the readAPI
+  def ignore_non_read_or_write_attributes
+    ['title', 'email', 'expertise_list', 'tool_list']
+  end
 
-    ['min', 'max'].each do |m|
-      @json_mm["#{m}"]["data"]["attributes"]["email"] = "#{m}_updateTest@email.com"
-
-      @json_mm["#{m}"]["data"]["id"] = "#{a_person.id}"
-      patch "/people/#{a_person.id}.json", @json_mm["#{m}"]
-      assert_response :success
-
-      get "/people/#{a_person.id}.json"
-      assert_response :success
-      @json_mm["min"]["data"]["attributes"]["title"] =
-          a_person.first_name + " " + @json_mm["min"]["data"]["attributes"]["last_name"]
-      check_attr_content(@json_mm["#{m}"], "patch")
+  def populate_extra_attributes()
+    extra_attributes = {}
+    extra_attributes[:mbox_sha1sum] =  Digest::SHA1.hexdigest(URI.escape('mailto:' + @to_post['data']['attributes']['email']))
+    #by construction, expertise & tools appear together IF they appear at all
+    if @to_post['data']['attributes'].has_key? 'expertise_list'
+      extra_attributes[:expertise] = @to_post['data']['attributes']['expertise_list'].split(', ')
+      extra_attributes[:tools] =  @to_post['data']['attributes']['tool_list'].split(', ')
     end
+    extra_attributes.with_indifferent_access
   end
 
   def test_normal_user_cannot_create_person
     user_login(Factory(:person))
-    @json_mm["min"]["data"]["attributes"]["email"] = "normalUserCreate@testEmail.com"
+    #@to_post["data"]["attributes"]["email"] = "normalUserCreate@testEmail.com"
     assert_no_difference('Person.count') do
-      post "/people.json", @json_mm["min"]
+      post "/people.json", @to_post
     end
   end
 
   def test_normal_user_cannot_update_others
-    remove_nil_values_before_update
     user_login(Factory(:person))
     other_person = Factory(:person)
-    @json_mm["min"]["data"]["id"] = "#{other_person.id}"
-    @json_mm["min"]["data"]["attributes"]["email"] = "updateTest@email.com"
-    patch "/people/#{other_person.id}.json", @json_mm["min"]
+    @to_post["data"]["id"] = "#{other_person.id}"
+    @to_post["data"]["attributes"]["email"] = "updateTest@email.com"
+    patch "/people/#{other_person.id}.json", @to_post
     assert_response :forbidden
   end
 
@@ -79,15 +68,13 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
   end
 
   def test_admin_can_update_others
-    remove_nil_values_before_update
     other_person = Factory(:person)
     ['min', 'max'].each do |m|
-       @json_mm["#{m}"]["data"]["id"] = "#{other_person.id}"
-       @json_mm["#{m}"]["data"]["attributes"]["email"] = "updateTest@email.com"
-       patch "/people/#{other_person.id}.json", @json_mm["#{m}"]
+      @to_post["data"]["id"] = "#{other_person.id}"
+      @to_post["data"]["attributes"]["email"] = "updateTest@email.com"
+       patch "/people/#{other_person.id}.json", @to_post
        assert_response :success
     end
-
   end
 
 end

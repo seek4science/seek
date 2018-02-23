@@ -16,7 +16,6 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
     @to_post = load_template("post_min_#{@clz}.json.erb", {title: "Post "+inst.title, country: inst.country})
   end
 
-  #no need for this to be called for every possible test (upon setup)
   def create_post_values
     @post_values = {}
     ['min','max'].each do |m|
