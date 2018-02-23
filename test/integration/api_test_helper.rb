@@ -72,10 +72,8 @@ module ApiTestHelper
 
       # check some of the content
       h = JSON.parse(response.body)
-      to_ignore = []
-      if defined? ignore_non_read_or_write_attributes
-        to_ignore = ignore_non_read_or_write_attributes
-      end
+
+      to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
 
       hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
       if @to_post['data'].has_key? 'relationships'
@@ -168,7 +166,7 @@ module ApiTestHelper
 
     # Check the original, unchanged attributes and relationships
     if original['data'].key?('attributes') && @to_patch['data'].key?('attributes')
-      original_attributes = original['data']['attributes'].(*(to_ignore + @to_patch['data']['attributes'].keys))
+      original_attributes = original['data']['attributes'].except(*(to_ignore + @to_patch['data']['attributes'].keys))
       hash_comparison(original_attributes, h['data']['attributes'])
     end
 
