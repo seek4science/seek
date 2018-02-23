@@ -117,6 +117,7 @@ module Seek
       def associate_zample_ids_as_assays(study, zamples_ids, sync_options, endpoint)
         return [] if zamples_ids.empty?
 
+
         zamples = Seek::Openbis::Zample.new(endpoint).find_by_perm_ids(zamples_ids)
         associate_zamples_as_assays(study, zamples, sync_options)
       end

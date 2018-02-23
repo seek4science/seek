@@ -59,11 +59,11 @@ class OpenbisExperimentsController < ApplicationController
     puts 'update called'
     puts params
 
-    @assay = @asset.seek_entity
+    @study = @asset.seek_entity
 
-    unless @assay.is_a? Assay
-      flash[:error] = 'Already registered Openbis entity but not as assay'
-      return redirect_to @assay
+    unless @study.is_a? Study
+      flash[:error] = 'Already registered Openbis entity but not as study'
+      return redirect_to @study
     end
 
 
@@ -73,19 +73,21 @@ class OpenbisExperimentsController < ApplicationController
     # separate saving of external_asset as the save on parent does not fails if the child was not saved correctly
     unless @asset.save
       @reasons = @asset.errors
-      @error_msg = 'Could not update sync of OpenBIS assay'
+      @error_msg = 'Could not update sync of OpenBIS study'
 
       # for edit screen
-      @linked_to_assay = get_linked_to(@asset.seek_entity)
+      @zamples_linked_to_study = get_zamples_linked_to(@asset.seek_entity)
+      @datasets_linked_to_study = get_datasets_linked_to(@asset.seek_entity)
       return render action: 'edit'
     end
 
-    errs = follow_assay_dependent(@asset.content, @assay, @asset.sync_options, params)
+    errs = follow_study_dependent(@asset.content, @study, @asset.sync_options)
+
     flash_issues(errs)
     # TODO should the assay be saved as well???
 
-    flash[:notice] = "Updated sync of OpenBIS assay: #{@entity.perm_id}"
-    redirect_to @assay
+    flash[:notice] = "Updated sync of OpenBIS study: #{@entity.perm_id}"
+    redirect_to @study
 
   end
 
@@ -105,13 +107,12 @@ class OpenbisExperimentsController < ApplicationController
       return back_to_index
     end
 
-    status = case @seek_type
-               when :assay then
-                 batch_register_assays(batch_ids, seek_parent_id)
-             end
+    status = batch_register_studies(batch_ids, seek_parent_id)
 
-    msg = "Registered all #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
-    msg = "Registered #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
+    seek_type = Study
+
+    msg = "Registered all #{status[:registred].size} #{seek_type.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
+    msg = "Registered #{status[:registred].size} #{seek_type.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
     flash[:notice] = msg;
     flash_issues(status[:issues])
 
@@ -119,25 +120,26 @@ class OpenbisExperimentsController < ApplicationController
 
   end
 
-  def batch_register_assays(zample_ids, study_id)
+  def batch_register_studies(experiment_ids, investigation_id)
 
     sync_options = get_sync_options
     puts "SYNC OPT #{sync_options}"
     sync_options[:link_datasets] = '1' if sync_options[:link_dependent] == '1'
+    sync_options[:link_assays] = '1' if sync_options[:link_dependent] == '1'
 
-    assay_params = { study_id: study_id }
+    study_params = { investigation_id: investigation_id }
 
     registered = []
     failed = []
     issues = []
 
-    zample_ids.each do |id|
+    experiment_ids.each do |id|
 
       get_entity(id)
       prepare_asset
 
-      reg_info = do_assay_registration(@asset, assay_params, sync_options, current_person)
-      if (reg_info[:assay])
+      reg_info = do_study_registration(@asset, study_params, sync_options, current_person)
+      if reg_info[:study]
         registered << id
       else
         failed << id
@@ -146,7 +148,7 @@ class OpenbisExperimentsController < ApplicationController
 
     end
 
-    return { registred: registered, failed: failed, issues: issues }
+    { registred: registered, failed: failed, issues: issues }
 
   end
 
@@ -191,7 +193,7 @@ class OpenbisExperimentsController < ApplicationController
 
     issues = []
 
-    isses.concat follow_dependent_assays(entity, study, sync_options)
+    issues.concat follow_dependent_assays(entity, study, sync_options)
 
     # data_sets_ids = extract_requested_sets(entity, sync_options, params)
     # seek_util.associate_data_sets_ids(assay, data_sets_ids, entity.openbis_endpoint)
@@ -200,10 +202,10 @@ class OpenbisExperimentsController < ApplicationController
 
   def follow_dependent_assays(entity, study, sync_options)
 
-    zamples_ids = extract_requested_assays_zamples(entity, sync_options)
+    zamples = seek_util.extract_requested_assays(entity, sync_options)
 
-    assay_sync = simplify_assay_sync(sync_options)
-    seek_util.associate_zample_ids_as_assays(study, zamples_ids, assay_sync, entity.openbis_endpoint)
+    assay_sync = seek_util.simplify_assay_sync(sync_options)
+    seek_util.associate_zamples_as_assays(study, zamples, assay_sync)
 
   end
 
@@ -223,8 +225,7 @@ class OpenbisExperimentsController < ApplicationController
 
   def get_zamples_linked_to(study)
     return [] unless study
-    #assay.data_files.select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
-    #    .map { |df| df.external_asset.external_id }
+
     study.assays.select { |a| a.external_asset.is_a?(OpenbisExternalAsset) }
         .map { |a| a.external_asset.external_id }
   end
