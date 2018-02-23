@@ -149,7 +149,7 @@ module ApiTestHelper
     namespace = OpenStruct.new(id: the_id)
     @to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding } ) )
 
-    assert_no_difference( "#{@clz.capitalize}.count") do
+    assert_no_difference( "#{@clz.classify}.count") do
       patch "/#{@plural_clz}/#{the_id}.json", @to_patch
       assert_response :success
     end

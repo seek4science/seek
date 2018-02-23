@@ -3,6 +3,16 @@
     "type": "data_files",
     "attributes": {
       "title": "A Minimal Data File"
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
     }
   }
 }
