@@ -15,8 +15,8 @@
         <% if @data_file.can_download? %>
             <% if @data_file.openbis? %>
                 <%= openbis_datafile_dataset(@data_file) %>
-            <% else %>
-                <%= render partial:'assets/fileinfo',object:@display_data_file.content_blob %>
+            <% elsif @display_data_file.content_blob.present? %>
+                <%= render partial:'assets/fileinfo', object: @display_data_file.content_blob %>
             <% end %>
         <% end %>
 

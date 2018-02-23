@@ -151,7 +151,7 @@ module AssetsHelper
       else
         link_button_or_nil
       end
-    elsif asset.respond_to?(:content_blob)
+    elsif asset.respond_to?(:content_blob) && asset.content_blob.present?
       if asset.content_blob.nels?
         icon_link_to('Open in NeLS', 'external_link', link_url, opts.merge(target: 'blank'))
       elsif asset.content_blob.show_as_external_link?
@@ -159,6 +159,8 @@ module AssetsHelper
       else
         download_button
       end
+    else
+      nil
     end
   end
 
