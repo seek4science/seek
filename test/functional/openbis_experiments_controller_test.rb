@@ -17,6 +17,9 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     @experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
 
     @controller = OpenbisExperimentsController.new
+    # hack, has to be initialized so controller has access to types constants from module,
+    # maybe it can be fixed in different way
+    # @seek_util = Seek::Openbis::SeekUtil.new
 
   end
 

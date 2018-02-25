@@ -12,7 +12,7 @@
       <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
         <div class="form-group"><label>Entities like:</label> <%= @seek_type.capitalize %></div>
       <div class="form-group"><label>OpenBIS Type</label>
-        <%= select_tag :zample_type, options_for_select(@zample_type_options, @zample_type),
+        <%= select_tag :entity_type, options_for_select(@entity_type_options, @entity_type),
                        id: 'zample_type', class: 'form-control1', :onchange => 'this.form.submit();' %></div>
       <div class="form-group"><label>Samples:</label> <%= @entities.length %></div>
       <% end %>
@@ -24,7 +24,7 @@
 <%= form_tag({controller: 'openbis_zamples', action: 'batch_register'}, {id: 'batch_form'} ) do |f| %>
     <%= hidden_field_tag(:seek, @seek_type) %>
     <%= hidden_field_tag(:seek_parent) %>
-    <%= hidden_field_tag(:zample_type, @zample_type) %>
+    <%= hidden_field_tag(:entity_type, @entity_type) %>
     <%= hidden_field_tag('sync_options[link_dependent]') %>
     <div class='row'>
       <div class='col-md-6'>

@@ -4,12 +4,9 @@ class OpenbisZamplesController < ApplicationController
 
   before_filter :get_seek_type
 
-  ALL_ASSAYS = 'ALL ASSAYS'.freeze
-  ALL_TYPES = 'ALL TYPES'.freeze
-
   def index
-    @zample_type = params[:zample_type] || ALL_ASSAYS
-    get_zample_types
+    @entity_type = params[:entity_type] || Seek::Openbis::ALL_ASSAYS
+    get_entity_types
     get_entities
   end
 
@@ -227,25 +224,26 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def get_entities
-    if ALL_TYPES == @zample_type
+    if Seek::Openbis::ALL_TYPES == @entity_type
       @entities = Seek::Openbis::Zample.new(@openbis_endpoint).all
     else
-      codes = @zample_type == ALL_ASSAYS ? @zample_types_codes : [@zample_type]
+      codes = @entity_type == Seek::Openbis::ALL_ASSAYS ? @entity_types_codes : [@entity_type]
       @entities = Seek::Openbis::Zample.new(@openbis_endpoint).find_by_type_codes(codes)
     end
   end
 
-  def get_zample_types
+  def get_entity_types
     case @seek_type
       when :assay then get_assay_types
-      else raise "Don't recognize obis types for seek: #{@seek_type}"
+      else raise "Don't recognized obis types for seek: #{@seek_type}"
     end
   end
 
+
   def get_assay_types
-    @zample_types = seek_util.assay_types(@openbis_endpoint)
-    @zample_types_codes = @zample_types.map { |t| t.code }
-    @zample_type_options = @zample_types_codes + [ALL_ASSAYS, ALL_TYPES]
+    @entity_types = seek_util.assay_types(@openbis_endpoint)
+    @entity_types_codes = @entity_types.map { |t| t.code }
+    @entity_type_options = @entity_types_codes + [Seek::Openbis::ALL_ASSAYS, Seek::Openbis::ALL_TYPES]
   end
 
   def get_seek_type

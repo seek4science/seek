@@ -1,5 +1,10 @@
 module Seek
   module Openbis
+
+    ALL_TYPES = 'ALL TYPES'.freeze
+    ALL_STUDIES = 'ALL STUDIES'.freeze
+    ALL_ASSAYS = 'ALL ASSAYS'.freeze
+
     module EntityControllerBase
 
       def self.included(base)

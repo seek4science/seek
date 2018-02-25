@@ -1,7 +1,10 @@
 module Seek
   module Openbis
 
+
+
     class SeekUtil
+
 
       FAKE_FILE_ASSAY_NAME = 'OpenBIS FILES'.freeze
 

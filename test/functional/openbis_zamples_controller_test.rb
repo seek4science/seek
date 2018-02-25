@@ -38,30 +38,30 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     get :index, openbis_endpoint_id: @endpoint.id, seek: :assay
 
     assert_response :success
-    assert assigns(:zample_types)
-    assert assigns(:zample_types_codes)
-    assert assigns(:zample_type_options)
-    assert assigns(:zample_type)
-    assert_equal 'ALL ASSAYS', assigns(:zample_type)
-    assert_includes assigns(:zample_type_options), 'ALL ASSAYS'
-    assert_includes assigns(:zample_type_options), 'ALL TYPES'
+    assert assigns(:entity_types)
+    assert assigns(:entity_types_codes)
+    assert assigns(:entity_type_options)
+    assert assigns(:entity_types)
+    assert_equal 'ALL ASSAYS', assigns(:entity_type)
+    assert_includes assigns(:entity_type_options), 'ALL ASSAYS'
+    assert_includes assigns(:entity_type_options), 'ALL TYPES'
     assert assigns(:entities)
     assert_equal 2, assigns(:entities).size
   end
 
-  test 'index filters by zample_type' do
+  test 'index filters by entity_type' do
     login_as(@user)
-    get :index, openbis_endpoint_id: @endpoint.id, seek: :assay, zample_type: 'TZ_TEST'
+    get :index, openbis_endpoint_id: @endpoint.id, seek: :assay, entity_type: 'TZ_TEST'
 
     assert_response :success
     assert_equal 1, assigns(:entities).size
 
-    get :index, openbis_endpoint_id: @endpoint.id, seek: :assay, zample_type: 'ALL ASSAYS'
+    get :index, openbis_endpoint_id: @endpoint.id, seek: :assay, entity_type: 'ALL ASSAYS'
 
     assert_response :success
     assert_equal 2, assigns(:entities).size
 
-    get :index, openbis_endpoint_id: @endpoint.id, seek: :assay, zample_type: 'ALL TYPES'
+    get :index, openbis_endpoint_id: @endpoint.id, seek: :assay, entity_type: 'ALL TYPES'
 
     assert_response :success
     assert_equal 8, assigns(:entities).size
@@ -84,7 +84,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   test 'edit gives edit view' do
     login_as(@user)
-    get :edit, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37'
+    get :edit, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37'
 
     assert_response :success
     assert assigns(:assay)
