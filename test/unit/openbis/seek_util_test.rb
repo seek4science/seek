@@ -461,8 +461,8 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert study.assays.empty?
     refute @experiment.sample_ids.empty?
 
+    # no linking
     sync_options = {}
-
     issues = @util.follow_study_dependent_assays(@experiment,study,sync_options)
 
     assert_equal [],issues
@@ -470,6 +470,8 @@ class SeekUtilTest < ActiveSupport::TestCase
     study.reload
     assert study.assays.empty?
 
+    # automated assays linking
+    assert(@experiment.sample_ids.length > 1)
     sync_options = {link_assays: '1'}
     issues = @util.follow_study_dependent_assays(@experiment,study,sync_options)
 
@@ -479,11 +481,28 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal @experiment.sample_ids.length, study.assays.count
 
   end
+
+  test 'follow_study_dependent_assays registers selected assays if set so' do
+
+    study = Factory :study
+    assert study.assays.empty?
+    assert(@experiment.sample_ids.length > 1)
+
+    # selected assays
+    sync_options = {linked_assays: [@experiment.sample_ids[0]]}
+    issues = @util.follow_study_dependent_assays(@experiment,study,sync_options)
+
+    assert_equal [],issues
+
+    study.reload
+    assert_equal 1, study.assays.count
+
+  end
   ## --------- follow_study_dependent_assays end ---------- ##
 
   ## --------- follow_study_dependent_datafiles ---------- ##
 
-  test 'follow_study_dependent_assays registers datafiles under fake assay if said so' do
+  test 'follow_study_dependent_datafiles registers datafiles under fake assay if said so' do
 
   study = Factory :study
   assert study.assays.empty?
@@ -512,7 +531,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   end
 
-  test 'follow_study_dependent_assays registers selected datafiles under fake assay if said so' do
+  test 'follow_study_dependent_datafiles registers selected datafiles under fake assay if said so' do
 
     study = Factory :study
     assert study.assays.empty?

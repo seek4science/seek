@@ -208,7 +208,7 @@ module Seek
 
         external_assets = data_sets.map { |ds| OpenbisExternalAsset.find_or_create_by_entity(ds) }
 
-        # warn about non assay
+        # warn about non datafiles
         non_files = external_assets.reject { |es| es.seek_entity.nil? || es.seek_entity.is_a?(DataFile) }
         issues.concat non_files.map { |es| "#{es.external_id} already registered as #{es.seek_entity.class} #{es.seek_entity.id}" }
 

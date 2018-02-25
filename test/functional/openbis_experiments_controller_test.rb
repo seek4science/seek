@@ -156,6 +156,103 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     assert_equal 'Registered OpenBIS Study: 20171121152132641-51', flash[:notice]
   end
 
+  test 'register registers new Study with linked datasets in special assay' do
+    login_as(@user)
+    investigation = Factory :investigation
+
+    refute @experiment.sample_ids.empty?
+
+    sync_options = { 'link_datasets' => '1' }
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
+         study: { investigation_id: investigation.id },
+         sync_options: sync_options
+
+
+    study = assigns(:study)
+    assert_not_nil study
+    assert_redirected_to study_path(study)
+
+    assert study.persisted?
+
+    study.reload
+
+    files_assay = study.assays.where(title: 'OpenBIS FILES').first
+    assert files_assay
+
+    assert_equal @experiment.dataset_ids.length, files_assay.data_files.length
+
+    assert_nil flash[:error]
+    assert_equal 'Registered OpenBIS Study: 20171121152132641-51', flash[:notice]
+  end
+
+  test 'register registers new Study with selected datasets in special assay' do
+    login_as(@user)
+    investigation = Factory :investigation
+
+    refute @experiment.sample_ids.empty?
+
+    to_link = ['20171002190934144-40']
+    sync_options = { 'link_datasets' => '0', 'linked_datasets' => to_link }
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
+         study: { investigation_id: investigation.id },
+         sync_options: sync_options
+
+
+    study = assigns(:study)
+    assert_not_nil study
+    assert_redirected_to study_path(study)
+
+    assert study.persisted?
+
+    study.reload
+
+    files_assay = study.assays.where(title: 'OpenBIS FILES').first
+    assert files_assay
+
+    assert_equal to_link.length, files_assay.data_files.length
+
+  end
+
+  test 'register registers new Study with selected datasets in special assay and inside selected assay' do
+    login_as(@user)
+    investigation = Factory :investigation
+
+    refute @experiment.sample_ids.empty?
+
+    to_link_s = ['20171002172111346-37']
+    to_link_d = ['20171002190934144-40']
+    sync_options = { 'link_datasets' => '0', 'linked_datasets' => to_link_d, 'linked_assays' => to_link_s}
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
+         study: { investigation_id: investigation.id },
+         sync_options: sync_options
+
+
+    study = assigns(:study)
+    assert_not_nil study
+    assert_redirected_to study_path(study)
+
+    assert study.persisted?
+
+    study.reload
+
+    files_assay = study.assays.where(title: 'OpenBIS FILES').first
+    assert files_assay
+
+    assert_equal to_link_d.length, files_assay.data_files.length
+
+    zample = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(to_link_s)[0]
+    assert zample
+
+    assay = OpenbisExternalAsset.find_by_entity(zample).seek_entity
+    assert assay
+
+    assert_equal to_link_d.length, assay.data_files.length
+
+  end
+
 
 
   test 'register remains on registration screen on errors' do
@@ -237,7 +334,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   end
 
-  test 'batch registers multiple Studies and follows assays' do
+  test 'batch registers multiple Studies and follows assays and datasets' do
 
     login_as(@user)
     investigation = Factory :investigation
@@ -245,10 +342,18 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     sync_options = {link_dependent: '1'}
     batch_ids = ["20171121153715264-58","20171121152132641-51"]
 
+    # 20171121152132641-51 2 samples, 20171121153715264-58 no samples
+    # plus 2 fake assays for files
+    assays = 2 + batch_ids.size
+    # 20171121152132641-51 3 sets, 20171121153715264-58 1 set
+    datasets = 3 + 1
+    # 2 studies, 2 assays, 4 files
+    externals = batch_ids.size + (assays-batch_ids.size) + datasets
+
     assert_difference('Study.count', 2) do
-      assert_difference('Assay.count', 2) do
-      assert_difference('DataFile.count', 2) do
-        assert_difference('ExternalAsset.count', 6) do
+      assert_difference('Assay.count', assays) do
+      assert_difference('DataFile.count', datasets) do
+        assert_difference('ExternalAsset.count', externals) do
 
           post :batch_register, openbis_endpoint_id: @endpoint.id,
                seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids

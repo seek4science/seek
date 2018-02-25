@@ -32,6 +32,13 @@
 
       </div>
     </div>
+    <% if @study.external_asset %>
+        <div class="row">
+          <div class="col-md-12">
+            <%= external_asset_details(@study) %>
+          </div>
+        </div>
+    <% end %>
     <%= render :partial=>"general/isa_graph", :locals => {:root_item => @study, :deep => false, :include_parents => true} %>
   </div>
 

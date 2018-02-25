@@ -30,6 +30,19 @@ module OpenbisHelper
     end
   end
 
+
+  def external_asset_details(seekobj)
+    return 'No external asset'.html_safe unless seekobj.external_asset
+
+    entity = seekobj.external_asset.content
+
+    if seekobj.external_asset.is_a?(OpenbisExternalAsset) then
+      return render :partial => 'openbis_common/openbis_entity_panel', :object => entity, locals: {edit_button: true}
+    end
+
+    "Unsupported external asset #{seekobj.external_asset.class}".html_safe
+  end
+
   def openbis_entity_edit_path(entity)
 
     if entity.is_a? Seek::Openbis::Zample
@@ -37,6 +50,9 @@ module OpenbisHelper
     end
     if entity.is_a? Seek::Openbis::Dataset
       return edit_openbis_endpoint_openbis_dataset_path openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
+    end
+    if entity.is_a? Seek::Openbis::Experiment
+      return edit_openbis_endpoint_openbis_experiment_path openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
     end
 
     'Unsupported'

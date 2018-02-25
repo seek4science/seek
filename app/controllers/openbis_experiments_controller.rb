@@ -81,7 +81,7 @@ class OpenbisExperimentsController < ApplicationController
       return render action: 'edit'
     end
 
-    errs = follow_study_dependent(@asset.content, @study, @asset.sync_options)
+    errs = seek_util.follow_study_dependent(@study)
 
     flash_issues(errs)
     # TODO should the assay be saved as well???
@@ -173,7 +173,7 @@ class OpenbisExperimentsController < ApplicationController
     study = seek_util.createObisStudy(study_params, creator, asset)
 
     if study.save
-      errs = follow_study_dependent(asset.content, study, sync_options)
+      errs = seek_util.follow_study_dependent(study)
       issues.concat(errs) if errs
       reg_status[:study] = study
     else
@@ -189,39 +189,12 @@ class OpenbisExperimentsController < ApplicationController
     render action: 'index'
   end
 
-  def follow_study_dependent(entity, study, sync_options)
-
-    issues = []
-
-    issues.concat follow_dependent_assays(entity, study, sync_options)
-
-    # data_sets_ids = extract_requested_sets(entity, sync_options, params)
-    # seek_util.associate_data_sets_ids(assay, data_sets_ids, entity.openbis_endpoint)
-    issues
-  end
-
-  def follow_dependent_assays(entity, study, sync_options)
-
-    zamples = seek_util.extract_requested_assays(entity, sync_options)
-
-    assay_sync = seek_util.simplify_assay_sync(sync_options)
-    seek_util.associate_zamples_as_assays(study, zamples, assay_sync)
-
-  end
-
-
-
 
   def get_sync_options(hash = nil)
     hash ||= params
     hash.fetch(:sync_options, {}).permit(:link_datasets, :link_assays, :link_dependent,
                                          {linked_datasets: []}, {linked_assays: []})
   end
-
-
-
-
-
 
   def get_zamples_linked_to(study)
     return [] unless study
