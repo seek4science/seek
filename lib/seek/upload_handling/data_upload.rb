@@ -5,6 +5,8 @@ module Seek
       include Seek::UploadHandling::ContentInspection
 
       def handle_upload_data
+        return true if json_api_request?
+
         blob_params = params[:content_blobs]
         allow_empty_content_blob = model_image_present?
 
@@ -53,6 +55,8 @@ module Seek
       def create_content_blobs
         asset = eval "@#{controller_name.downcase.singularize}"
         version = asset.version
+
+        return if json_api_request?
 
         unless model_image_present? && params[:content_blobs].blank?
           content_blobs_params.each do |item_params|

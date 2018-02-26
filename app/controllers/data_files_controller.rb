@@ -144,14 +144,14 @@ class DataFilesController < ApplicationController
   def create
     @data_file = DataFile.new(data_file_params)
 
-    if handle_upload_data || json_api_request?
+    if handle_upload_data
       update_sharing_policies(@data_file)
 
       if @data_file.save
         update_annotations(params[:tag_list], @data_file)
         update_scales @data_file
 
-        create_content_blobs unless json_api_request? && !params.key?(:content_blob)
+        create_content_blobs
 
         update_relationships(@data_file, params)
 
