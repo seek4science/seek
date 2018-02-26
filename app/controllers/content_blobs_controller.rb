@@ -1,10 +1,25 @@
 class ContentBlobsController < ApplicationController
-  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show]
-  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show]
+  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show update]
+  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
   before_filter :set_asset_version, only: %i[get_pdf download]
 
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
+
+  def update
+    if @content_blob.empty?
+      @content_blob.tmp_io_object = request.body
+      @content_blob.save
+      @asset.touch
+      respond_to do |format|
+        format.all { render text: @content_blob.file_size, status: :ok }
+      end
+    else
+      respond_to do |format|
+        format.json { render json: {}, status: :bad_request }
+      end
+    end
+  end
 
   def view_content
     if @content_blob.is_text?
