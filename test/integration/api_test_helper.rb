@@ -224,13 +224,18 @@ module ApiTestHelper
   end
 
   ##
-  # Compares `result` against `source`. If `source` is a Hash, compare each each key/value pair with that in `result`.
+  # Compares `result` against `source`. If `source` is a Hash, compare each each key/value pair with that in `result`. If `source` is an Array, compare each value.
   # `key` is used to generate meaningful failure messages if the assertion fails.
   def deep_comparison(source, result, key)
     if source.is_a?(Hash)
       source.each do |sub_key, sub_value|
         actual = result.try(:[], sub_key)
         assert_equal sub_value, actual, "Expected #{key}[#{sub_key}] to be `#{sub_value}` but was `#{actual}`"
+      end
+    elsif source.is_a?(Array)
+      sorted = result.sort
+      source.sort.each_with_index do |sub_value, index|
+        deep_comparison(sub_value, sorted[index], "#{key[index]}")
       end
     else
       assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"

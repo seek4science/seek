@@ -591,10 +591,12 @@ class ApplicationController < ActionController::Base
   def convert_json_params
     params[controller_name.singularize.to_sym] =
         ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-    params.delete(:data)
 
     organize_external_attributes_from_json
     tweak_json_params
+    params.delete(:data)
+
+    params
   end
 
   # override in sub-classes
@@ -603,11 +605,10 @@ class ApplicationController < ActionController::Base
 
   # take out policies, annotations, etc(?) outside of the given object attributes
   def organize_external_attributes_from_json
-    if (params[:data] && params[:data][:attributes])
-      [:tag_list, :expertise_list, :tool_list, :policy_attributes].each do |item|
-        if params[:data][:attributes][item]
-          params[item] = params[:data][:attributes][item]
-          params[:data][:attributes].delete item
+    if params[:data] && params[:data][:attributes]
+      [:tag_list, :expertise_list, :tool_list, :policy_attributes, :content_blobs].each do |key|
+        if params[:data][:attributes][key]
+          params[key] = params[:data][:attributes].delete(key)
         end
       end
     end
