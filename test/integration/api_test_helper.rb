@@ -56,8 +56,7 @@ module ApiTestHelper
       if defined? @post_values
         @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values[m])
       end
-
-     # puts "to_post", @to_post
+      #puts "to_post", @to_post
 
       if @to_post.blank?
         skip
@@ -66,7 +65,7 @@ module ApiTestHelper
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", @to_post
-        #puts "returned response: ", response.body
+       # puts "returned response: ", response.body
         assert_response :success
       end
 
@@ -74,8 +73,8 @@ module ApiTestHelper
       h = JSON.parse(response.body)
 
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
-
       hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
+
       if @to_post['data'].has_key? 'relationships'
         hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
       end
@@ -218,6 +217,7 @@ private
   # Compare `result` Hash against `source`.
   def hash_comparison(source, result)
     source.each do |key, value|
+      puts "#{key}: #{value} <==> #{result[key]}"
       deep_comparison(value, result[key], key)
     end
   end
