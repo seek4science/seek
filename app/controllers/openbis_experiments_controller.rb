@@ -179,17 +179,10 @@ class OpenbisExperimentsController < ApplicationController
   end
 
 
-  def back_to_index
-    index
-    render action: 'index'
-  end
 
 
-  def get_sync_options(hash = nil)
-    hash ||= params
-    hash.fetch(:sync_options, {}).permit(:link_datasets, :link_assays, :link_dependent,
-                                         {linked_datasets: []}, {linked_assays: []})
-  end
+
+
 
   def get_zamples_linked_to(study)
     return [] unless study

@@ -30,7 +30,7 @@
         <% end %>
 
         <div class="form-group">
-          <%= check_box_tag('sync_options[link_datasets]', 1, @asset.sync_options['link_datasets'] == '1') %>
+          <%= check_box_tag('sync_options[link_datasets]', 1, @asset.sync_options[:link_datasets] == '1') %>
           <%= label_tag('sync_options[link_datasets]', 'Automatically register all dependent datasets') %>
           <div class="help-block">Dependent datasets will be registered and linked with this study and sub assays during
             synchronization
@@ -38,7 +38,7 @@
         </div>
 
         <div class="form-group">
-          <%= check_box_tag('sync_options[link_assays]', 1, @asset.sync_options['link_assays'] == '1') %>
+          <%= check_box_tag('sync_options[link_assays]', 1, @asset.sync_options[:link_assays] == '1') %>
           <%= label_tag('sync_options[link_assays]', 'Automatically register dependent assays') %>
           <div class="help-block">Objects marked as Assay will be registered and linked with this study during
             synchronization

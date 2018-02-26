@@ -103,7 +103,8 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     sync_options = { 'link_datasets' => '1' }
 
-    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id, assay: { study_id: study.id }, sync_options: sync_options
+    post :register, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
+         assay: { study_id: study.id }, sync_options: sync_options
 
 
     assay = assigns(:assay)
@@ -127,11 +128,11 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     study = Factory :study
     assert @zample.dataset_ids.size > 2
 
-    sync_options = { 'link_datasets' => '0' }
     to_link = @zample.dataset_ids[0..1]
+    sync_options = { 'link_datasets' => '0', 'linked_datasets' => to_link }
 
-    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
-         assay: { study_id: study.id }, sync_options: sync_options, linked_datasets: to_link
+    post :register, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
+         assay: { study_id: study.id }, sync_options: sync_options
 
 
     assay = assigns(:assay)
@@ -150,9 +151,8 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   test 'register remains on registration screen on errors' do
     login_as(@user)
-    study = Factory :study
 
-    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37', assay: { xl: true }
+    post :register, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37', assay: { xl: true }
 
     assert_response :success
 
@@ -176,7 +176,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     existing.external_asset = external
     assert existing.save
 
-    post :register, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: "#{@zample.perm_id}", assay: { study_id: study.id }
+    post :register, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id, assay: { study_id: study.id }
 
     assert_redirected_to assay_path(existing)
 
@@ -260,7 +260,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     sync_options = { link_datasets: '1' }
     assert_not_equal sync_options, asset.sync_options
 
-    post :update, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id, sync_options: sync_options
+    post :update, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id, sync_options: sync_options
 
     assay = assigns(:assay)
     assert_not_nil assay
@@ -298,11 +298,11 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert @zample.dataset_ids.size > 2
 
     to_link = @zample.dataset_ids[0..1]
-    sync_options = { link_datasets: '0' }
+    sync_options = { link_datasets: '0', linked_datasets: to_link }
     assert_not_equal sync_options, asset.sync_options
 
-    post :update, project_id: @project.id, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
-         sync_options: sync_options, linked_datasets: to_link
+    post :update, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
+         sync_options: sync_options
 
     assay = assigns(:assay)
     assert_not_nil assay
@@ -333,8 +333,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assay_params = { study_id: study.id }
 
     sync_options = {}
-    params = {}
-    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user, params)
+    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user)
     assert reg_status
 
     assay = reg_status[:assay]
@@ -358,9 +357,8 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assay_params = { study_id: study.id }
 
     sync_options = {}
-    params = {}
 
-    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user, params)
+    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user)
     assert reg_status
 
     assay = reg_status[:assay]
@@ -382,9 +380,8 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assay_params = { study_id: study.id }
 
     sync_options = { link_datasets: '1' }
-    params = {}
 
-    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user, params)
+    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user)
     assert reg_status
 
     assay = reg_status[:assay]
@@ -405,10 +402,9 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     study = Factory :study
     assay_params = { study_id: study.id }
 
-    sync_options = { link_datasets: '0' }
-    params = {linked_datasets: @zample.dataset_ids[0..1]}
+    sync_options = { link_datasets: '0', linked_datasets: @zample.dataset_ids[0..1] }
 
-    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user, params)
+    reg_status = controller.do_assay_registration(asset, assay_params, sync_options, @user)
     assert reg_status
 
     assay = reg_status[:assay]
@@ -422,48 +418,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   ## registration end ##
 
 
-  test 'extract_requested_sets gives all sets from zample if linked is selected' do
-
-    controller = OpenbisZamplesController.new
-
-    assert_equal 3, @zample.dataset_ids.length
-    sync_options = {}
-    params = {}
-
-    assert_equal [], controller.extract_requested_sets(@zample, sync_options, params)
-
-    sync_options = { link_datasets: '1' }
-    assert_same @zample.dataset_ids, controller.extract_requested_sets(@zample, sync_options, params)
-
-    params = {linked_datasets: ['123'] }
-    assert_same @zample.dataset_ids, controller.extract_requested_sets(@zample, sync_options, params)
-
-  end
-
-  test 'extract_requested_sets gives only selected sets that belongs to zample' do
-
-    controller = OpenbisZamplesController.new
-
-    sync_options = {}
-    params = {}
-
-    assert_equal 3, @zample.dataset_ids.length
-
-    assert_equal [], controller.extract_requested_sets(@zample, sync_options, params)
-
-    params = { linked_datasets: [] }
-    assert_equal [], controller.extract_requested_sets(@zample, sync_options, params)
-
-    params = { linked_datasets: ['123'] }
-    assert_equal [], controller.extract_requested_sets(@zample, sync_options, params)
-
-    params = { linked_datasets: ['123', @zample.dataset_ids[0]] }
-    assert_equal [@zample.dataset_ids[0]], controller.extract_requested_sets(@zample, sync_options, params)
-
-    params = { linked_datasets: @zample.dataset_ids }
-    assert_equal @zample.dataset_ids, controller.extract_requested_sets(@zample, sync_options, params)
-
-  end
 
   test 'get_linked_to gets ids of openbis data sets' do
     controller = OpenbisZamplesController.new

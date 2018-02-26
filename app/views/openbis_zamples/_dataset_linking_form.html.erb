@@ -2,7 +2,7 @@
   linked = extra_params.include?(entity.perm_id)
 %>
 <p class="list_item_attribute">
-  <%= check_box_tag('linked_datasets[]', entity.perm_id, linked,
+  <%= check_box_tag('sync_options[linked_datasets][]', entity.perm_id, linked,
                     disabled: linked, class: linked ? 'linked' : 'unlinked') %>
   <%= label_tag(nil, linked ? "Already linked": "Register with assay" ) %>
 </p>

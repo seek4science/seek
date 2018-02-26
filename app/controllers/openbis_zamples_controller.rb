@@ -28,7 +28,7 @@ class OpenbisZamplesController < ApplicationController
     sync_options = get_sync_options
     assay_params = params.require(:assay).permit(:study_id, :assay_class_id, :title)
 
-    reg_info = do_assay_registration(@asset, assay_params, sync_options, current_person, params)
+    reg_info = do_assay_registration(@asset, assay_params, sync_options, current_person)
 
     @assay = reg_info[:assay]
     issues = reg_info[:issues]
@@ -74,7 +74,7 @@ class OpenbisZamplesController < ApplicationController
       return render action: 'edit'
     end
 
-    errs = follow_assay_dependent(@asset.content, @assay, @asset.sync_options, params)
+    errs = seek_util.follow_assay_dependent(@assay)
     flash_issues(errs)
     # TODO should the assay be saved as well???
 
@@ -143,7 +143,7 @@ class OpenbisZamplesController < ApplicationController
 
   end
 
-  def do_assay_registration(asset, assay_params, sync_options, creator, parameters = params)
+  def do_assay_registration(asset, assay_params, sync_options, creator)
 
     issues = []
     reg_status = {assay: nil, issues: issues}
@@ -164,7 +164,7 @@ class OpenbisZamplesController < ApplicationController
     assay = seek_util.createObisAssay(assay_params, creator, asset)
 
     if assay.save
-      errs = follow_assay_dependent(asset.content, assay, sync_options, parameters)
+      errs = seek_util.follow_assay_dependent(assay)
       issues.concat(errs) if errs
       reg_status[:assay] = assay
     else
@@ -175,29 +175,6 @@ class OpenbisZamplesController < ApplicationController
   end
 
 
-  def back_to_index
-    index
-    render action: 'index'
-  end
-
-  def follow_assay_dependent(entity, assay, sync_options, params)
-    data_sets_ids = extract_requested_sets(entity, sync_options, params)
-    return nil if data_sets_ids.empty?
-
-    seek_util.associate_data_sets_ids(assay, data_sets_ids, entity.openbis_endpoint)
-  end
-
-
-  def get_sync_options(hash = nil)
-    hash ||= params
-    hash.fetch(:sync_options, {}).permit(:link_datasets,:link_dependent)
-  end
-
-  def extract_requested_sets(zample, sync_options, params)
-    return zample.dataset_ids if sync_options[:link_datasets] == '1'
-
-    (params[:linked_datasets] || []) & zample.dataset_ids
-  end
 
 
   def get_linked_to(assay)
