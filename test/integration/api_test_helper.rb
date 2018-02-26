@@ -217,7 +217,7 @@ private
   # Compare `result` Hash against `source`.
   def hash_comparison(source, result)
     source.each do |key, value|
-      puts "#{key}: #{value} <==> #{result[key]}"
+     # puts "#{key}: #{value} <==> #{result[key]}"
       deep_comparison(value, result[key], key)
     end
   end
