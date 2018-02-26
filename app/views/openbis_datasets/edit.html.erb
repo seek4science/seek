@@ -7,17 +7,29 @@
   not_registered = @datafile.new_record?
 %>
 
-<%= form_tag({controller: "openbis_datasets", action: not_registered ? 'register': 'update' , id: @entity.perm_id}, {method: not_registered ? 'post' : 'patch'}) do |f| %>
-        <% unless not_registered %>
-            <div class="form-group">
-              <label>Registered as:</label>
-              <%= link_to "#{@datafile.title}", @datafile %>
-            </div>
+<%= form_tag({controller: "openbis_datasets", action: not_registered ? 'register': 'update' , id: @entity.perm_id}, { method: 'post' }) do |f| %>
+
+    <%= form_for(@datafile) do |ff| %>
+        <% if not_registered %>
+          <div class="form-group">
+            <label>Register under Assay </label>
+
+            <%= assay_selection(@project, ff) %>
+          </div>
+
+          <%= select_tag :assay_ids,'',{:multiple=>true,:style=>"display:none;"} %>
+        <% else %>
+          <div class="form-group">
+            <label>Registered as:</label>
+            <%= link_to "#{@datafile.title}", @datafile %>
+          </div>
         <% end %>
 
-    <div class="form-group">
-      <%= submit_tag(not_registered ? 'Register': 'Update', class: 'btn btn-primary') %>
-    </div>
+      <div class="form-group">
+        <%= submit_tag(not_registered ? 'Register': 'Update', class: 'btn btn-primary') %>
+      </div>
+
+    <% end %>
 
 <% end %>
 

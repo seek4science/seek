@@ -32,13 +32,16 @@ module Seek
         assay
       end
 
-      def createObisDataFile(obis_asset)
+      def createObisDataFile(datafile_params, creator, obis_asset)
 
         dataset = obis_asset.content
         openbis_endpoint = obis_asset.seek_service
 
-        df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{dataset.perm_id}",
-                          license: openbis_endpoint.project.default_license)
+        datafile_params[:projects] = [openbis_endpoint.project]
+        datafile_params[:title] ||= "OpenBIS #{dataset.perm_id}"
+        datafile_params[:license] ||= openbis_endpoint.project.default_license
+        df = DataFile.new(datafile_params)
+        df.contributor = creator
 
         df.policy=openbis_endpoint.policy.deep_copy
         df.external_asset = obis_asset
@@ -218,8 +221,10 @@ module Seek
         existing_files = external_assets.select { |es| es.seek_entity.is_a? DataFile }
                              .map { |es| es.seek_entity }
 
+        datafile_params = {}
+        contributor = assay.contributor
         new_files = external_assets.select { |es| es.seek_entity.nil? }
-                        .map { |es| createObisDataFile(es) }
+                        .map { |es| createObisDataFile(datafile_params, contributor,es) }
 
         saved = []
 

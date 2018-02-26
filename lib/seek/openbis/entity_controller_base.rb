@@ -4,6 +4,7 @@ module Seek
     ALL_TYPES = 'ALL TYPES'.freeze
     ALL_STUDIES = 'ALL STUDIES'.freeze
     ALL_ASSAYS = 'ALL ASSAYS'.freeze
+    ALL_DATASETS = 'ALL DATASETS'.freeze
 
     module EntityControllerBase
 

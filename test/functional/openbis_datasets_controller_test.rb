@@ -47,12 +47,12 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   test 'index filters by dataset types' do
     login_as(@user)
-    get :index, openbis_endpoint_id: @endpoint.id, dataset_type: 'TZ_FAIR_TEST'
+    get :index, openbis_endpoint_id: @endpoint.id, entity_type: 'TZ_FAIR_TEST'
 
     assert_response :success
     assert_equal 2, assigns(:entities).size
 
-    get :index, openbis_endpoint_id: @endpoint.id, dataset_type: 'ALL DATASETS'
+    get :index, openbis_endpoint_id: @endpoint.id, entity_type: 'ALL DATASETS'
 
     assert_response :success
     assert_equal 3, assigns(:entities).size
@@ -90,6 +90,27 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     assert_nil flash[:error]
     assert_equal "Registered OpenBIS dataset: #{@dataset.perm_id}", flash[:notice]
+  end
+
+  test 'register registers new DataFile under Assay if passed' do
+    login_as(@user)
+
+    assay = Factory :assay
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id,
+         data_file: { assay_ids: assay.id }
+
+    datafile = assigns(:datafile)
+    assert_not_nil datafile
+    assert_redirected_to data_file_path(datafile)
+
+    assert datafile.persisted?
+
+    datafile.reload
+    assay.reload
+
+    assert_equal datafile, assay.data_files.first
+
   end
 
 
@@ -172,7 +193,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   end
 
-  ## Barch register
+  ## Batch register
 
   # unit like tests
 

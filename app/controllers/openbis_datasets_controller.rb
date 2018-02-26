@@ -2,14 +2,11 @@ class OpenbisDatasetsController < ApplicationController
 
   include Seek::Openbis::EntityControllerBase
 
-  ALL_DATASETS = 'ALL DATASETS'.freeze
 
   def index
     puts "---\nINDEX\n#{params}"
-    @dataset_type = params[:dataset_type] || ALL_DATASETS
-    get_dataset_types
-
-    #puts "---\nINDEX GET ENTITIES\n"
+    @entity_type = params[:entity_type] || Seek::Openbis::ALL_DATASETS
+    get_entity_types
     get_entities
   end
 
@@ -22,12 +19,16 @@ class OpenbisDatasetsController < ApplicationController
     puts 'register called'
     puts params
 
+
     if @asset.seek_entity
       flash[:error] = 'Already registered as OpenBIS entity'
       return redirect_to @asset.seek_entity
     end
 
-    reg_info = do_datafile_registration(@asset, {}, {})
+    sync_options = {} # no options for dataset get_sync_options
+    datafile_params = params.fetch(:data_file, {}).permit(:assay_ids)
+
+    reg_info = do_datafile_registration(@asset, datafile_params, sync_options, current_person)
 
     @datafile = reg_info[:datafile]
     issues = reg_info[:issues]
@@ -55,6 +56,8 @@ class OpenbisDatasetsController < ApplicationController
       return redirect_to @datafile
     end
 
+    # currently no sync options
+    # @asset.sync_options = get_sync_options
     @asset.content = @entity #or maybe we should not update, but that is what the user saw on the screen
 
     # separate saving of external_asset as the save on parent does not fails if the child was not saved correctly
@@ -102,25 +105,21 @@ class OpenbisDatasetsController < ApplicationController
 
   def batch_register_datasets(dataset_ids, assay_id)
 
-    sync_options = {}
-    datafile_params = {}
+    sync_options = {} # currently always empty
+    datafile_params = {assay_ids: assay_id}
 
     registered = []
     failed = []
     issues = []
 
-    data_files = []
-
-    assay = Assay.find(assay_id)
     dataset_ids.each do |id|
 
       get_entity(id)
       prepare_asset
 
-      reg_info = do_datafile_registration(@asset, datafile_params, sync_options)
+      reg_info = do_datafile_registration(@asset, datafile_params, sync_options, current_person)
       if (reg_info[:datafile])
         registered << id
-        data_files << reg_info[:datafile]
       else
         failed << id
       end
@@ -128,15 +127,16 @@ class OpenbisDatasetsController < ApplicationController
 
     end
 
-    unless data_files.empty?
-      data_files.each { |df| assay.associate(df) }
-    end
+    #
+    #unless data_files.empty?
+    #  data_files.each { |df| assay.associate(df) }
+    #end
 
     return {registred: registered, failed: failed, issues: issues}
 
   end
 
-  def do_datafile_registration(asset, datafile_params, sync_options)
+  def do_datafile_registration(asset, datafile_params, sync_options, creator)
 
     issues = []
     reg_status = {datafile: nil, issues: issues}
@@ -154,7 +154,7 @@ class OpenbisDatasetsController < ApplicationController
       return reg_status
     end
 
-    datafile = seek_util.createObisDataFile(asset)
+    datafile = seek_util.createObisDataFile(datafile_params, creator, asset)
 
     if datafile.save
       reg_status[:datafile] = datafile
@@ -165,10 +165,7 @@ class OpenbisDatasetsController < ApplicationController
     reg_status
   end
 
-  def back_to_index
-    index
-    render action: 'index'
-  end
+
 
   def get_entity(id = nil)
     @entity = Seek::Openbis::Dataset.new(@openbis_endpoint, id ? id : params[:id])
@@ -176,17 +173,21 @@ class OpenbisDatasetsController < ApplicationController
 
   def get_entities
 
-    if ALL_DATASETS == @dataset_type
+    if Seek::Openbis::ALL_DATASETS == @entity_type
       @entities = Seek::Openbis::Dataset.new(@openbis_endpoint).all
     else
-      codes = [@dataset_type]
+      codes = [@entity_type]
       @entities = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_type_codes(codes)
     end
   end
 
+  def get_entity_types
+    get_dataset_types
+  end
+
   def get_dataset_types
-    @dataset_types = seek_util.dataset_types(@openbis_endpoint)
-    @dataset_types_codes = @dataset_types.map { |t| t.code }
-    @dataset_type_options = @dataset_types_codes + [ALL_DATASETS]
+    @entity_types = seek_util.dataset_types(@openbis_endpoint)
+    @entity_types_codes = @entity_types.map { |t| t.code }
+    @entity_type_options = @entity_types_codes + [Seek::Openbis::ALL_DATASETS]
   end
 end

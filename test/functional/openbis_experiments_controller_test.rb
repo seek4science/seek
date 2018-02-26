@@ -555,7 +555,8 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     assert_equal [], @controller.get_datasets_linked_to(nil)
 
     datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
-    datafiles = datasets.map { |ds| util.createObisDataFile(OpenbisExternalAsset.build(ds)) }
+
+    datafiles = datasets.map { |ds| util.createObisDataFile({}, @user,OpenbisExternalAsset.build(ds)) }
     assert_equal 3, datafiles.length
 
     disable_authorization_checks do

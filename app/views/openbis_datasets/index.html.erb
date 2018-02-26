@@ -11,7 +11,7 @@
     <div class="form-group"><label>Project:</label> <%= @project.title %></div>
     <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
     <div class="form-group"><label>OpenBIS Type</label>
-      <%= select_tag :dataset_type, options_for_select(@dataset_type_options, @dataset_type),
+      <%= select_tag :entity_type, options_for_select(@entity_type_options, @entity_type),
                      id: 'dataset_type', class: 'form-control1', :onchange => 'this.form.submit();' %></div>
 
     <div class="form-group"><label>Datasets:</label> <%= @entities.length %></div>
@@ -23,7 +23,7 @@
 
 <%= form_tag({controller: 'openbis_datasets', action: 'batch_register'}, {id: 'batch_form'} ) do |f| %>
   <%= hidden_field_tag(:seek_parent) %>
-  <%= hidden_field_tag(:dataset_type, @dataset_type) %>
+  <%= hidden_field_tag(:entity_type, @entity_type) %>
   <div class='row'>
     <div class='col-md-6'>
       <%= button_tag 'Batch registration', class: 'btn btn-default', type: 'button', 'data-toggle' =>  'modal', 'data-target' => '#openbis_batch_parent-view' %>
