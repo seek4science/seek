@@ -593,7 +593,7 @@ class ApplicationController < ActionController::Base
         ActiveModelSerializers::Deserialization.jsonapi_parse(params)
     organize_external_attributes_from_json
     params.delete(:data)
-
+    puts "params: ", params
     tweak_json_params
   end
 
@@ -606,8 +606,10 @@ class ApplicationController < ActionController::Base
     if (params[:data] && params[:data][:attributes])
       [:tag_list, :expertise_list, :tool_list, :policy_attributes].each do |item|
         if params[:data][:attributes][item]
+       #   puts item, params[:data][:attributes][item]
           params[item] = params[:data][:attributes][item]
           params[:data][:attributes].delete item
+       #   puts params[item]
         end
       end
     end

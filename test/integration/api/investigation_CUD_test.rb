@@ -19,13 +19,21 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     inv.contributor = @current_user.person
     inv.save
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_min_investigation.json.erb')
-    template = ERB.new(File.read(template_file))
-    namespace = OpenStruct.new({:project_ids => [@min_project.id, @max_project.id], :r => ApiTestHelper.method(:render_erb)})
-    template_result = template.result(namespace.instance_eval {binding})
-    @to_post = JSON.parse(template_result)
-
+    hash = {project_ids: [@min_project.id, @max_project.id],
+            r: ApiTestHelper.method(:render_erb) }
+    puts "setup hash #{hash}"
+    @to_post = load_template("post_min_#{@clz}.json.erb", hash)
+    puts "setup post #{@to_post}"
     @to_patch = load_template("patch_#{@clz}.json.erb", {id: inv.id})
+  end
+
+  def create_post_values
+    @post_values = {}
+    ['min','max'].each do |m|
+      @post_values[m] = {project_ids:  [@min_project.id, @max_project.id],
+                         r: ApiTestHelper.method(:render_erb) }
+    end
+    puts "created post values"
   end
 
   def populate_extra_attributes

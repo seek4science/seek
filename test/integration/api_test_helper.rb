@@ -33,6 +33,7 @@ module ApiTestHelper
     template_file = File.join(ApiTestHelper.template_dir, erb_file)
     template = ERB.new(File.read(template_file))
     namespace = OpenStruct.new(hash)
+    #puts template.result(namespace.instance_eval { binding })
     json_obj = JSON.parse(template.result(namespace.instance_eval { binding }))
     return json_obj
   end
@@ -54,9 +55,10 @@ module ApiTestHelper
 
     ['min','max'].each do |m|
       if defined? @post_values
+        puts "post #{m} values: #{@post_values[m]}"
         @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values[m])
       end
-      #puts "to_post", @to_post
+      puts "create, to_post #{m}", @to_post
 
       if @to_post.blank?
         skip
@@ -65,11 +67,11 @@ module ApiTestHelper
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", @to_post
-       # puts "returned response: ", response.body
+        puts "returned response: ", response.body
         assert_response :success
       end
 
-      # check some of the content
+      # content check
       h = JSON.parse(response.body)
 
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
