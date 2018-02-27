@@ -222,7 +222,7 @@ class ContentBlob < ActiveRecord::Base
     !remote_content_handler
   end
 
-  def empty?
+  def no_content?
     file.size == 0 && url.blank?
   end
 

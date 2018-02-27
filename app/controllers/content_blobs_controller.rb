@@ -7,7 +7,7 @@ class ContentBlobsController < ApplicationController
   include Seek::UploadHandling::ExamineUrl
 
   def update
-    if @content_blob.empty?
+    if @content_blob.no_content?
       @content_blob.tmp_io_object = request.body
       @content_blob.save
       @asset.touch
