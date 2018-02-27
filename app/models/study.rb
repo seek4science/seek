@@ -59,7 +59,8 @@ class Study < ActiveRecord::Base
     return new_object
   end
 
-
-
+  def external_asset_search_terms
+    external_asset ? external_asset.search_terms : []
+  end
 
 end
