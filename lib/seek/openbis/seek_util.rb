@@ -43,10 +43,27 @@ module Seek
         df = DataFile.new(datafile_params)
         df.contributor = creator
 
-        df.policy=openbis_endpoint.policy.deep_copy
+        df.policy = openbis_endpoint.policy.deep_copy
         df.external_asset = obis_asset
+
+        # datafile needs content blob as there is lots of seek code which assumes that content blob is present on assets
+        df.content_blob = ContentBlob.create(url: uri_for_content_blob(obis_asset),
+                           make_local_copy: false,
+                           external_link: true, original_filename: "openbis-#{dataset.perm_id}")
         df
       end
+
+      def uri_for_content_blob(obis_asset)
+        openbis_endpoint = obis_asset.seek_service
+        entity = obis_asset.content
+        "openbis2:#{openbis_endpoint.id}/#{entity.class.name}/#{entity.perm_id}"
+      end
+
+      def legacy_uri_for_content_blob(dataset)
+        openbis_endpoint = dataset.openbis_endpoint
+        "openbis:#{openbis_endpoint.id}:dataset:#{dataset.perm_id}"
+      end
+
 
       def fake_file_assay(study)
 
@@ -148,13 +165,14 @@ module Seek
         # only own assays
         existing_assays = existing_assays.select { |es| es.study.id == study.id }
 
+        # params must be cloned so they will be independent in each creation
         assay_params = { study_id: study.id }
         contributor = study.contributor
 
         new_assays = external_assets.select { |es| es.seek_entity.nil? }
                          .map do |es|
           es.sync_options = sync_options.clone
-          createObisAssay(assay_params, contributor, es)
+          createObisAssay(assay_params.clone, contributor, es)
         end
 
         saved = []
@@ -221,10 +239,11 @@ module Seek
         existing_files = external_assets.select { |es| es.seek_entity.is_a? DataFile }
                              .map { |es| es.seek_entity }
 
+        # they have to be cloned before each creation!
         datafile_params = {}
         contributor = assay.contributor
         new_files = external_assets.select { |es| es.seek_entity.nil? }
-                        .map { |es| createObisDataFile(datafile_params, contributor,es) }
+                        .map { |es| createObisDataFile(datafile_params.clone, contributor,es) }
 
         saved = []
 

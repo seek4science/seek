@@ -80,7 +80,8 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     asset = OpenbisExternalAsset.build(dataset)
 
-    df = @util.createObisDataFile(asset)
+    params = {}
+    df = @util.createObisDataFile(params, @user,asset)
 
     assert df.valid?
 
@@ -89,6 +90,56 @@ class SeekUtilTest < ActiveSupport::TestCase
         df.save!
       end
     end
+
+    assert df.content_blob
+  end
+
+  test 'uri_for_content_blob follows expected pattern' do
+    dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+    asset = OpenbisExternalAsset.build(dataset)
+
+    expected = "openbis2:#{@endpoint.id}/Seek::Openbis::Dataset/20160210130454955-23"
+
+    val = @util.uri_for_content_blob(asset)
+    assert URI.parse(val)
+    puts val
+    assert_equal expected, val
+
+    asset = OpenbisExternalAsset.build(@zample)
+    expected = "openbis2:#{@endpoint.id}/Seek::Openbis::Zample/#{@zample.perm_id}"
+    val = @util.uri_for_content_blob(asset)
+    puts val
+    assert_equal expected, val
+
+  end
+
+  test 'uri_for_content_blob differs from leggacy one' do
+    dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+    asset = OpenbisExternalAsset.build(dataset)
+
+    new_uri = @util.uri_for_content_blob(asset)
+    old_uri = @util.legacy_uri_for_content_blob(dataset)
+    ds_uri = dataset.content_blob_uri
+
+    assert_not_equal new_uri, old_uri
+    assert_not_equal new_uri, ds_uri
+
+    assert_not_equal URI.parse(new_uri).scheme, URI.parse(old_uri).scheme
+    assert_not_equal URI.parse(new_uri).scheme, URI.parse(ds_uri).scheme
+
+  end
+
+  test 'legacy content blob uri is correct' do
+    dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+
+    expected = "openbis:#{@endpoint.id}:dataset:20160210130454955-23"
+
+    val = @util.legacy_uri_for_content_blob(dataset)
+    assert_equal expected, val
+
+    #puts dataset.content_blob_uri
+    assert_equal dataset.content_blob_uri, val
+
   end
 
   test 'should_follow_depended gives false on datafile or nil' do
@@ -215,7 +266,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
     assert_equal 3, datasets.length
 
-    df1 = @util.createObisDataFile(OpenbisExternalAsset.build(datasets[0]))
+    df1 = @util.createObisDataFile({}, @user,OpenbisExternalAsset.build(datasets[0]))
     assert df1.save
 
     assert_difference('AssayAsset.count', 3) do
@@ -498,6 +549,26 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal 1, study.assays.count
 
   end
+
+  test 'follow_study_dependent_assays registers assays with unique titles' do
+
+    study = Factory :study
+    assert study.assays.empty?
+    assert @experiment.sample_ids.size > 1
+
+
+    # automated assays linking
+    sync_options = {link_assays: '1'}
+    issues = @util.follow_study_dependent_assays(@experiment,study,sync_options)
+
+    assert_equal [],issues
+
+    study.reload
+    assert_equal @experiment.sample_ids.length, study.assays.count
+    titles = study.assays.map(&:title).uniq
+    assert_equal @experiment.sample_ids.length, titles.length
+  end
+
   ## --------- follow_study_dependent_assays end ---------- ##
 
   ## --------- follow_study_dependent_datafiles ---------- ##
@@ -550,6 +621,27 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   end
 
+  test 'follow_study_dependent_datafiles registers datafiles with unique names' do
+
+    study = Factory :study
+    assert study.assays.empty?
+    assert study.related_data_files.empty?
+    assert @experiment.dataset_ids.size > 1
+
+    sync_options = {link_datasets: '1'}
+    issues = @util.follow_study_dependent_datafiles(@experiment,study,sync_options)
+
+    assert_equal [],issues
+
+    study.reload
+    assert_equal @experiment.dataset_ids.length, study.related_data_files.count
+
+    titles = study.related_data_files.map(&:title).uniq
+    assert_equal @experiment.dataset_ids.length, titles.length
+
+  end
+
+
   ## --------- follow_study_dependent_datafiles end ---------- ##
 
   ## --------- follow_assay ---------- ##
@@ -587,6 +679,26 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert issues.empty?
 
     assert_equal 1, assay.data_files.count
+  end
+
+  test 'follow assay registers dependent datasets with unique names' do
+
+    assay = Factory :assay
+    es = OpenbisExternalAsset.find_or_create_by_entity(@zample)
+    es.sync_options = {link_datasets: '1'}
+    assay.external_asset = es
+
+    assert assay.save
+    assert assay.data_files.empty?
+    assert @zample.dataset_ids.size > 1
+
+    issues = @util.follow_assay_dependent(assay)
+    assert issues.empty?
+
+    assert_equal @zample.dataset_ids.size, assay.data_files.size
+    titles = assay.data_files.map(&:title).uniq
+    assert_equal @zample.dataset_ids.size, titles.size
+
   end
 
   ## --------- follow_assay end ---------- ##

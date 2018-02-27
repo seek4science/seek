@@ -184,7 +184,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   end
 
-  ## Batch register assay ##
+  ## Batch register ##
 
   test 'batch registers multiple Assays' do
 
@@ -242,8 +242,28 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   end
 
+  test 'batch register independently names them' do
 
-  ## END --- Batch register assay ##
+    login_as(@user)
+    study = Factory :study
+
+    sync_options = {link_dependent: 'false'}
+    batch_ids = ['20171002172111346-37', '20171002172639055-39']
+
+    post :batch_register, openbis_endpoint_id: @endpoint.id,
+               seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+
+    assert_response :success
+
+    study.reload
+    assert_equal batch_ids.size, study.assays.size
+    titles = study.assays.map(&:title).uniq
+    assert_equal batch_ids.size, titles.size
+
+  end
+
+
+  ## END --- Batch register  ##
 
   ## Update ###
   test 'update updates sync options and follows dependencies' do

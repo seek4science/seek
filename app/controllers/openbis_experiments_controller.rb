@@ -133,7 +133,8 @@ class OpenbisExperimentsController < ApplicationController
       get_entity(id)
       prepare_asset
 
-      reg_info = do_study_registration(@asset, study_params, sync_options, current_person)
+      # study params must be cloned so they won't be reused
+      reg_info = do_study_registration(@asset, study_params.clone, sync_options, current_person)
       if reg_info[:study]
         registered << id
       else

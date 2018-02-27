@@ -98,12 +98,13 @@ module Seek
 
 
 
-
-      private
-
       def content_blob_uri
         "openbis:#{openbis_endpoint.id}:dataset:#{perm_id}"
       end
+
+      private
+
+
     end
   end
 end

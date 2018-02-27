@@ -129,7 +129,8 @@ class OpenbisZamplesController < ApplicationController
       get_entity(id)
       prepare_asset
 
-      reg_info = do_assay_registration(@asset, assay_params, sync_options, current_person)
+      # params must be clones so not to be shared
+      reg_info = do_assay_registration(@asset, assay_params.clone, sync_options, current_person)
       if (reg_info[:assay])
         registered << id
       else

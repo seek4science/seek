@@ -165,9 +165,9 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     assert_equal "Updated sync of OpenBIS datafile: #{@dataset.perm_id}", flash[:notice]
   end
 
-  ## Batch register assay ##
+  ## Batch register ##
 
-  test 'batch registers multiple DataSets' do
+  test 'batch register multiple DataSets' do
 
     login_as(@user)
     assay = Factory :assay
@@ -190,6 +190,28 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     assay.reload
     assert_equal batch_ids.size, assay.data_files.size
+
+  end
+
+  # there was a bug and all were named same, lets have test for it
+  test 'batch register independently names them' do
+
+    login_as(@user)
+    assay = Factory :assay
+
+    sync_options = {}
+    batch_ids = ['20160210130454955-23', '20160215111736723-31']
+
+    post :batch_register, openbis_endpoint_id: @endpoint.id,
+         seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids
+
+
+    assert_response :success
+
+    assay.reload
+    assert_equal batch_ids.size, assay.data_files.size
+    titles = assay.data_files.map(&:title).uniq
+    assert_equal batch_ids.size, titles.size
 
   end
 

@@ -117,7 +117,8 @@ class OpenbisDatasetsController < ApplicationController
       get_entity(id)
       prepare_asset
 
-      reg_info = do_datafile_registration(@asset, datafile_params, sync_options, current_person)
+      # have to clone params so the titles and such won't be overwritten
+      reg_info = do_datafile_registration(@asset, datafile_params.clone, sync_options, current_person)
       if (reg_info[:datafile])
         registered << id
       else
