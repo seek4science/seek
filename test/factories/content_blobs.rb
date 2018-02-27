@@ -227,3 +227,13 @@ Factory.define(:linked_samples_complete_content_blob, parent: :content_blob) do 
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   f.data File.new("#{Rails.root}/test/fixtures/files/linked-samples-complete.xlsx", 'rb').read
 end
+
+Factory.define(:blank_content_blob, class: ContentBlob) do |f|
+  f.url nil
+  f.data nil
+end
+
+Factory.define(:blank_pdf_content_blob, parent: :blank_content_blob) do |f|
+  f.original_filename 'sample-type-populated.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+end

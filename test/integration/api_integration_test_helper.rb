@@ -5,7 +5,7 @@ module ApiIntegrationTestHelper
     admin = Factory.create(:admin)
     @current_person = admin
     @current_user = admin.user
-    post '/session', login: admin.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH)
+    post '/session', login: admin.user.login, password: generate_user_password
 
   end
 
@@ -14,7 +14,7 @@ module ApiIntegrationTestHelper
     @current_user = person.user
     @current_user.password = 'blah'
     User.current_user = Factory(:user, login: 'test')
-    post '/session', login: person.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH)
+    post '/session', login: person.user.login, password: generate_user_password
   end
 
   def load_mm_objects(clz)

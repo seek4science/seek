@@ -223,7 +223,7 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def no_content?
-    file.size == 0 && url.blank?
+    (!file_size || file_size == 0) && url.blank?
   end
 
   private

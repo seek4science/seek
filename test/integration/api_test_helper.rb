@@ -6,7 +6,7 @@ module ApiTestHelper
     @current_person = admin
     @current_user = admin.user
     # log in
-    post '/session', login: admin.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH)
+    post '/session', login: @current_user.login, password: generate_user_password
   end
 
   def self.template_dir

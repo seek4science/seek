@@ -3,6 +3,8 @@ class ContentBlobsController < ApplicationController
   before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
   before_filter :set_asset_version, only: %i[get_pdf download]
 
+  skip_before_filter :check_json_id_type, only: [:update]
+
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
 
@@ -163,7 +165,7 @@ class ContentBlobsController < ApplicationController
   def find_and_authorize_associated_asset
     asset = asset_object
     if asset
-      if asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))
+      if asset.can_edit? || (action_name != 'update' && (asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))))
         @asset = asset
       else
         respond_to do |format|
