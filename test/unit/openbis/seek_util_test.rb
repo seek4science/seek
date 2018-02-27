@@ -818,6 +818,7 @@ class SeekUtilTest < ActiveSupport::TestCase
       assert_equal 'OpenBIS FILES', assay.title
       assert_equal study, assay.study
       assert assay.persisted?
+      assert_not_empty assay.description
   end
 
 

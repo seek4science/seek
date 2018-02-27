@@ -2,7 +2,6 @@ module Seek
   module Openbis
 
 
-
     class SeekUtil
 
 
@@ -48,8 +47,8 @@ module Seek
 
         # datafile needs content blob as there is lots of seek code which assumes that content blob is present on assets
         df.content_blob = ContentBlob.create(url: uri_for_content_blob(obis_asset),
-                           make_local_copy: false,
-                           external_link: true, original_filename: "openbis-#{dataset.perm_id}")
+                                             make_local_copy: false,
+                                             external_link: true, original_filename: "openbis-#{dataset.perm_id}")
         df
       end
 
@@ -70,7 +69,11 @@ module Seek
         assay = study.assays.where(title: FAKE_FILE_ASSAY_NAME).first
         return assay if assay
 
-        assay_params = { assay_class_id: AssayClass.for_type("experimental").id, title: FAKE_FILE_ASSAY_NAME }
+        assay_params = { assay_class_id: AssayClass.for_type("experimental").id,
+                         title: FAKE_FILE_ASSAY_NAME,
+                         description: 'Automatically generated assay to host openbis files that are linked to
+the original OpenBIS experiment. Its content and linked data files will be updated by the system if automatic synchronization was selected.'
+        }
         assay = Assay.new(assay_params)
         assay.contributor = study.contributor
         assay.study = study
@@ -243,7 +246,7 @@ module Seek
         datafile_params = {}
         contributor = assay.contributor
         new_files = external_assets.select { |es| es.seek_entity.nil? }
-                        .map { |es| createObisDataFile(datafile_params.clone, contributor,es) }
+                        .map { |es| createObisDataFile(datafile_params.clone, contributor, es) }
 
         saved = []
 
@@ -272,7 +275,7 @@ module Seek
         sample_ids = (sync_options[:link_assays] == '1') ? entity.sample_ids : (sync_options[:linked_assays] || []) & entity.sample_ids
         zamples = Seek::Openbis::Zample.new(entity.openbis_endpoint).find_by_perm_ids(sample_ids)
 
-        zamples = filter_assay_like_zamples(zamples,entity.openbis_endpoint) if (sync_options[:link_assays] == '1')
+        zamples = filter_assay_like_zamples(zamples, entity.openbis_endpoint) if (sync_options[:link_assays] == '1')
         zamples
       end
 
@@ -280,7 +283,7 @@ module Seek
         types = assay_types(openbis_endpoint).map(&:code)
 
         zamples
-          .select {|s| types.include? s.type_code}
+            .select { |s| types.include? s.type_code }
       end
 
       def assay_types(openbis_endpoint)
