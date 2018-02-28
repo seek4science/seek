@@ -134,6 +134,9 @@ module Seek
       end
       if content_blob_param.present?
         params[:content_blobs] = content_blob_param
+        params[:content_blobs].each do |cb|
+          cb[:data_url] = cb.delete(:url)
+        end
       end
       if comments_param.present?
         params[:revision_comments] = comments_param

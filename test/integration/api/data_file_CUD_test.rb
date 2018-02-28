@@ -84,4 +84,27 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
   end
+
+  test 'can create data file with remote content' do
+    stub_request(:get, 'http://mockedlocation.com/txt_test.txt').to_return(body: File.new("#{Rails.root}/test/fixtures/files/txt_test.txt"),
+                                                                           status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
+    stub_request(:head, 'http://mockedlocation.com/txt_test.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
+
+    template_file = File.join(ApiTestHelper.template_dir, 'post_remote_data_file.json.erb')
+    template = ERB.new(File.read(template_file))
+    @to_post = JSON.parse(template.result(binding))
+
+    assert_difference("#{@clz.classify}.count") do
+      post "/#{@plural_clz}.json", @to_post
+      assert_response :success
+    end
+
+    h = JSON.parse(response.body)
+
+    hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
+    hash_comparison(populate_extra_attributes, h['data']['attributes'])
+
+    hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
+    hash_comparison(populate_extra_relationships, h['data']['relationships'])
+  end
 end
