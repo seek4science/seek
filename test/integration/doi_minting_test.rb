@@ -13,7 +13,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'doiable assets' do
-    assert_equal %w(data_file model sop workflow), DOIABLE_ASSETS
+    assert_equal %w(data_file document model sop), DOIABLE_ASSETS
   end
 
   test 'mint a DOI button' do
@@ -120,14 +120,8 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       asset = Factory(type.to_sym, contributor: User.current_user)
 
       asset.save_as_new_version
-      if type == 'workflow'
-        Factory(:content_blob, asset: asset, asset_version: asset.version,
-                               data: File.new("#{Rails.root}/test/fixtures/files/enm.t2flow", 'rb').read,
-                               original_filename: 'enm.t2flow',
-                               content_type: 'application/pdf')
-      else
-        Factory(:content_blob, asset: asset, asset_version: asset.version)
-      end
+
+      Factory(:content_blob, asset: asset, asset_version: asset.version)
 
       asset.reload
       assert_equal 2, asset.version
@@ -188,7 +182,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert latest_version.save
       assert latest_version.has_doi?
 
-      post "/#{type.pluralize}/#{asset.id}/new_version", data_file: {}, content_blobs: [{ data: {} }], revision_comment: 'This is a new revision'
+      post "/#{type.pluralize}/#{asset.id}/new_version", data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision'
 
       assert_redirected_to :root
       assert_not_nil flash[:error]
@@ -271,6 +265,6 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   def login_as(user)
     User.current_user = user
-    post '/session', login: user.login, password: factory_user_password
+    post '/session', login: user.login, password: generate_user_password
   end
 end

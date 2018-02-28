@@ -1,4 +1,4 @@
-describe('tab selection', function(){
+describe('upload selection', function(){
     beforeEach(function() {
         this.timeout(10000);
         MagicLamp.load('sops/new');
@@ -20,5 +20,15 @@ describe('tab selection', function(){
         expect(remoteUrlTab.find("a[href='#remote-url']")).to.have.$text('Remote URL');
         expect($j('#local-file')).to.not.have.$class('active');
         expect($j('#remote-url')).to.have.$class('active');
+    });
+
+    it('should rename the upload button when a URL is chosen', function() {
+        var button = $j('#sop_submit_btn');
+
+        expect(button).to.have.$val('Upload and Save');
+
+        update_url_checked_status(true);
+
+        expect(button).to.have.$val('Register');
     });
 });

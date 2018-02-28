@@ -402,7 +402,7 @@ class ModelsControllerTest < ActionController::TestCase
       assert_difference('ModelImage.count') do
         post :new_version, id: m, model: { title: m.title },
              content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
-             revision_comment: 'This is a new revision',
+             revision_comments: 'This is a new revision',
              model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
       end
     end
@@ -642,7 +642,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model::Version.count', 1) do
       post :new_version, id: m, model: { title: m.title},
            content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
-           revision_comment: 'This is a new revision'
+           revision_comments: 'This is a new revision'
     end
 
     assert_redirected_to model_path(m)
@@ -1175,15 +1175,15 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def doi_citation_mock
-    stub_request(:get, /https:\/\/dx\.doi\.org\/.+/)
+    stub_request(:get, /(https?:\/\/)?(dx\.)?doi\.org\/.+/)
         .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
         .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
 
-    stub_request(:get, 'https://dx.doi.org/10.5072/test')
+    stub_request(:get, 'https://doi.org/10.5072/test')
         .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
         .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/doi_metadata.json"), status: 200)
 
-    stub_request(:get, 'https://dx.doi.org/10.5072/broken')
+    stub_request(:get, 'https://doi.org/10.5072/broken')
         .with(headers: { 'Accept' => 'application/vnd.citationstyles.csl+json' })
         .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/broken_doi_metadata_response.html"), status: 200)
   end

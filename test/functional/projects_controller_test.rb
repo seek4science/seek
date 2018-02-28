@@ -1071,7 +1071,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_difference('GroupMembership.count',1) do # 2 deleted, 3 added
       assert_no_difference('WorkGroup.count') do # 1 empty group will be deleted, 1 will be added
-        assert_emails(3) do
+        assert_enqueued_emails(3) do
           post :update_members,
                id: project,
                group_memberships_to_remove: [group_membership.id, group_membership2.id],
@@ -1482,7 +1482,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project_administrator).projects.first #needs a project admin
     person = Factory(:person)
     login_as(person)
-    assert_emails(1) do
+    assert_enqueued_emails(1) do
       assert_difference('MessageLog.count') do
         post :request_membership, id:project,details:'blah blah'
       end
@@ -1498,7 +1498,7 @@ class ProjectsControllerTest < ActionController::TestCase
     logout
     login_as(project.project_administrators.first)
 
-    assert_emails(0)  do
+    assert_no_enqueued_emails  do
       assert_no_difference('MessageLog.count') do
         post :request_membership, id:project,details:'blah blah'
       end
@@ -1508,7 +1508,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     project=Factory(:project)
     assert_empty(project.people)
-    assert_emails(0)  do
+    assert_no_enqueued_emails  do
       assert_no_difference('MessageLog.count') do
         post :request_membership, id:project,details:'blah blah'
       end
@@ -1516,6 +1516,36 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to :root
     refute_nil flash[:error]
 
+  end
+
+  test 'can remove members with project subscriptions' do
+    proj_admin = Factory(:project_administrator)
+    project = proj_admin.projects.first
+    login_as(proj_admin)
+
+    wg = Factory(:work_group, project: project)
+    group_membership = Factory(:group_membership, work_group: wg)
+    person = Factory(:person, group_memberships: [group_membership])
+
+    data_file = Factory(:data_file, projects: [project], contributor: person,
+                        policy: Factory(:policy, access_type: Policy::NO_ACCESS,
+                                        permissions: [Factory(:permission,
+                                                              contributor: project,
+                                                              access_type: Policy::VISIBLE)]))
+    refute data_file.can_delete?(proj_admin)
+    refute person.can_delete?(proj_admin)
+    subscription = Factory(:subscription, subscribable: data_file, person: person, project_subscription: person.project_subscriptions.first)
+
+    assert_difference('ProjectSubscription.count', -1) do
+      assert_difference('Subscription.count', -1) do
+          post :update_members, id: project,
+               group_memberships_to_remove: [group_membership.id],
+               people_and_institutions_to_add: []
+          assert_redirected_to project_path(project)
+          assert_nil flash[:error]
+          refute_nil flash[:notice]
+      end
+    end
   end
 
   private

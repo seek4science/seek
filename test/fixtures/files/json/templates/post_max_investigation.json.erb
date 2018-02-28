@@ -1,0 +1,29 @@
+{
+  "data": {
+    "type": "investigations",
+    "attributes": {
+      "title": "A Maximal Investigation",
+      "description": "This is a more complex investigation"
+    },
+    "relationships": {
+      <% unless project_ids.nil? %>
+       "projects": {
+       "data": [
+         <% for project_id in project_ids do %>
+           <%= r.call("_related.json.erb",{:type => "projects",:id => project_id}) %>
+        <% end %>
+       ]
+      },
+      <% end %>
+      <% unless creator_ids.nil? %>
+      "creators": {
+        "data": [
+          <% for creator_id in creator_ids do %>
+          <%= r.call("_related.json.erb",{:type => "people",:id => creator_id}) %>
+          <% end %>
+        ]
+      }
+      <% end %>
+    }
+  }
+}

@@ -30,7 +30,6 @@ SEEK::Application.configure do
       Settings.defaults[:authorization_checks_enabled] = true
       Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:modelling_analysis_enabled] = true
-      Settings.defaults[:workflows_enabled] = true
       Settings.defaults[:assays_enabled] = true
       Settings.defaults[:models_enabled] = true
       Settings.defaults[:show_as_external_link_enabled] = false
@@ -63,7 +62,7 @@ SEEK::Application.configure do
       Settings.defaults[:doi_suffix] = "Sysmo.SEEK"
       Settings.defaults[:datacite_url] = "https://test.datacite.org/mds/"
       Settings.defaults[:datacite_username] = 'test'
-      Seek::Config.datacite_password_encrypt('test')
+      Settings.defaults[:datacite_password] = 'test'
       Settings.defaults[:time_lock_doi_for] = 0
 
       Seek::Config.fixed :css_prepended,''

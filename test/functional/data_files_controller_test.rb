@@ -12,6 +12,7 @@ class DataFilesControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
   include MockHelper
+  include NelsTestHelper
 
   def setup
     login_as(:datafile_owner)
@@ -949,9 +950,9 @@ class DataFilesControllerTest < ActionController::TestCase
     # upload a data file
     df = Factory :data_file, contributor: User.current_user
     # upload new version 1 of the data file
-    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 1'
+    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 1'
     # upload new version 2 of the data file
-    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision 2'
+    post :new_version, id: df, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision 2'
 
     df.reload
     assert_equal 3, df.versions.length
@@ -974,7 +975,7 @@ class DataFilesControllerTest < ActionController::TestCase
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
     assert_difference('DataFile::Version.count', 1) do
       assert_difference('StudiedFactor.count', 1) do
-        post :new_version, id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comment: 'This is a new revision' # v2
+        post :new_version, id: d, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' # v2
       end
     end
 
@@ -1731,21 +1732,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'div.panel-heading', text: /Tags/, count: 1
     assert_select 'input#tag_list', count: 1
-  end
-
-  test 'new with biovel sharing form' do
-    with_alternative_rendering({ seek_partial: 'sharing/form' }, 'sharing/form') do
-      get :new
-      assert_response :success
-    end
-  end
-
-  test 'edit with biovel sharing form' do
-    with_alternative_rendering({ seek_partial: 'sharing/form' }, 'sharing/form') do
-      df = Factory :data_file, policy: Factory(:public_policy)
-      get :edit, id: df
-      assert_response :success
-    end
   end
 
   test 'edit should include not include tags element when tags disabled' do
@@ -2591,7 +2577,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('DataFile::Version.count') do
       post :new_version, id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }],
-                         revision_comment: 'This is a new revision'
+                         revision_comments: 'This is a new revision'
     end
 
     assert_redirected_to data_file
@@ -2690,6 +2676,92 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'should allow fetching of sample metadata for nels data' do
+    setup_nels
+    mock_http
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
+                 content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"))
+
+    refute data_file.content_blob.is_excel?
+    refute data_file.content_blob.file_size
+
+    assert_no_difference('Sample.count') do
+      assert_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count", 1) do
+        VCR.use_cassette('nels/get_sample_metadata') do
+          post :retrieve_nels_sample_metadata, id: data_file
+
+          assert_redirected_to data_file
+        end
+      end
+    end
+
+    assert assigns(:data_file).content_blob.is_excel?
+    assert assigns(:data_file).content_blob.file_size > 0
+  end
+
+  test 'should gracefully handle case when sample metadata is unavailable when attempting to fetch' do
+    setup_nels
+    mock_http
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
+                        content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404"))
+
+    refute data_file.content_blob.is_excel?
+    refute data_file.content_blob.file_size
+
+    assert_no_difference('Sample.count') do
+      assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
+        VCR.use_cassette('nels/missing_sample_metadata') do
+          post :retrieve_nels_sample_metadata, id: data_file
+
+          assert_redirected_to data_file
+          assert flash[:error].include?('No sample metadata')
+        end
+      end
+    end
+
+    refute assigns(:data_file).content_blob.is_excel?
+  end
+
+  test 'should re-authenticate with nels if oauth token expired when trying to fetch sample metadata' do
+    setup_nels
+    mock_http
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
+                        content_blob: Factory(:url_content_blob, url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"))
+
+    @user.oauth_sessions.where(provider: 'NeLS').first.update_column(:expires_at, 1.day.ago)
+
+    oauth_client = Nels::Oauth2::Client.new(Seek::Config.nels_client_id,
+                                            Seek::Config.nels_client_secret,
+                                            nels_oauth_callback_url,
+                                            "data_file_id:#{data_file.id}")
+
+    assert_no_difference('Sample.count') do
+      assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
+        VCR.use_cassette('nels/get_sample_metadata') do
+          post :retrieve_nels_sample_metadata, id: data_file
+
+          assert_redirected_to oauth_client.authorize_url
+        end
+      end
+    end
+  end
+
+  test 'should show nels links' do
+    setup_nels
+    mock_http
+    nels_url = "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}"
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @user.person, assay_ids: [@assay.id],
+                        content_blob: Factory(:url_content_blob, url: nels_url))
+
+    get :show, id: data_file
+
+    assert_response :success
+
+    assert_select '.fileinfo b', text: /NeLS URL/
+    assert_select '.fileinfo a[href=?]', nels_url
+    assert_select '#buttons a.btn[href=?]', nels_url
+  end
+
   test 'should unset policy sharing scope when updated' do
     login_as(:datafile_owner)
     df = data_files(:editable_data_file)
@@ -2701,6 +2773,34 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(df)
     assert_nil df.reload.policy.sharing_scope
+  end
+
+  test 'extract from data file and associate with assay' do
+    person = Factory(:project_administrator)
+    login_as(person)
+
+    Factory(:string_sample_attribute_type, title: 'String')
+
+    data_file = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy), contributor: person.user)
+    assay_asset1 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::INCOMING)
+    assay_asset2 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::OUTGOING)
+
+    sample_type = SampleType.new(title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id])
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    assert_difference('AssayAsset.count', 4) do
+      assert_difference('Sample.count', 4) do
+        post :extract_samples, id: data_file.id, confirm: 'true', assay_ids: [assay_asset1.assay_id]
+      end
+    end
+
+    assigns(:samples).each do |sample|
+      assert_equal [assay_asset1.assay], sample.assays
+      assert_equal assay_asset1.direction, sample.assay_assets.first.direction
+    end
   end
 
   def edit_max_object(df)

@@ -80,10 +80,6 @@ class Mailer < ActionMailer::Base
          subject: "Welcome to #{Seek::Config.application_name}")
   end
 
-  def welcome_no_projects(user)
-    welcome(user) # the only difference is the view template, which is picked from the method name
-  end
-
   def contact_admin_new_user(params, user)
     new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
     @details = new_member_details.message
@@ -182,19 +178,6 @@ class Mailer < ActionMailer::Base
          to: programme.programme_administrators.map(&:email_with_name),
          subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} has been rejected"
     )
-  end
-
-  def report_run_problem(person, run)
-    @person = person
-    @run = run
-    @error_outputs = run.outputs.select { |o| o.value_is_error? }
-
-    attachments['taverna_server_log.txt'] = File.read(run.log.path) unless run.log.path.nil?
-    attachments['portal_log.txt'] = run.failure_message unless run.failure_message.nil?
-
-    mail(:from=>Seek::Config.noreply_sender,
-         :to=>Seek::Config.support_email_address,
-         :subject=>"#{Seek::Config.application_name} user has reported a problem with a workflow run")
   end
 
   def request_membership(user, project, details)

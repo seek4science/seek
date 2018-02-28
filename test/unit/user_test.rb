@@ -353,7 +353,8 @@ class UserTest < ActiveSupport::TestCase
   protected
 
   def create_user(options = {})
-    record = User.new({ login: 'quire', password: ('0' * User::MIN_PASSWORD_LENGTH), password_confirmation: ('0' * User::MIN_PASSWORD_LENGTH) }.merge(options))
+    test_password = generate_user_password
+    record = User.new({ login: 'quire', password: test_password, password_confirmation: test_password }.merge(options))
     record.save
     record
   end

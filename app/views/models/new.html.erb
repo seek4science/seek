@@ -36,7 +36,7 @@
 
       <div>
         <%= preview_permission_popup_link(@model)-%>
-        <%= submit_tag "Upload and Save", :id => "model_submit_btn",
+        <%= create_button :id => "model_submit_btn",
                        :onclick => "javascript: validateResourceFields(true, 'model',true); return(false);",
                        :class => 'btn btn-primary' -%>
         or <%= cancel_button(models_path) -%>

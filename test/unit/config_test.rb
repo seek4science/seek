@@ -122,10 +122,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert !Seek::Config.delete_asset_version_enabled
   end
 
-  test 'forum_enabled' do
-    assert !Seek::Config.forum_enabled
-  end
-
   test 'smtp_settings port' do
     assert_equal '25', Seek::Config.smtp_settings('port')
   end
@@ -328,7 +324,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'convert setting from database' do
-    Settings.limit_latest = '6'
+    Settings.global['limit_latest'] = '6'
     assert_equal 6, Seek::Config.limit_latest
   end
 
@@ -348,14 +344,15 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'encrypt/decrypt smtp password' do
-    Seek::Config.set_smtp_settings 'password', 'abcd'
-    assert_equal Seek::Config.smtp_settings('password'), 'abcd'
-    assert_equal ActionMailer::Base.smtp_settings[:password], 'abcd'
-  end
+    password = 'a-distinctive-password-that-can-be-identified-easily'
+    Seek::Config.set_smtp_settings 'password', password
+    assert_equal password, Seek::Config.smtp_settings('password')
+    assert_equal password, ActionMailer::Base.smtp_settings[:password]
 
-  test 'encrypt/decrypt datacite password' do
-    Seek::Config.datacite_password_encrypt 'abcd'
-    assert_equal Seek::Config.datacite_password_decrypt, 'abcd'
+    setting = Settings.global.where(var: 'smtp').first
+    assert setting.encrypted?
+    assert_nil setting[:value]
+    refute setting[:encrypted_value].include?(password)
   end
 
   test 'doi_prefix, doi_suffix' do
@@ -372,7 +369,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'datacite_password' do
-    assert_equal 'test', Seek::Config.datacite_password_decrypt
+    assert_equal 'test', Seek::Config.datacite_password
   end
 
   test 'time_lock_doi_for' do
@@ -457,7 +454,7 @@ class ConfigTest < ActiveSupport::TestCase
     refute_nil key = Seek::Config.attr_encrypted_key
     assert File.exist?(Seek::Config.attr_encrypted_key_path)
     FileUtils.rm(Seek::Config.attr_encrypted_key_path)
-    assert_equal 64, key.length
+    assert_equal 32, key.length
 
     # check it regenerates it different each time
     refute_equal key, Seek::Config.attr_encrypted_key
@@ -474,5 +471,70 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 128,key.length
     FileUtils.rm(path)
     refute_equal key, Seek::Config.secret_key_base
+  end
+
+  test 'project-specific setting' do
+    many_bananas_project = Factory(:project)
+    no_bananas_project = Factory(:project)
+    many_bananas_project.settings['banana_count'] = 10
+    no_bananas_project.settings['banana_count'] = 0
+
+    assert_equal 10, many_bananas_project.settings['banana_count']
+    assert_equal 0, no_bananas_project.settings['banana_count']
+  end
+
+  test 'project-specific settings can be accessed in various ways' do
+    many_bananas_project = Factory(:project)
+    many_bananas_project.settings['banana_count'] = 10
+
+    assert_equal 10, many_bananas_project.settings['banana_count']
+    assert_equal 10, Settings.for(many_bananas_project)['banana_count']
+  end
+
+  test 'project-specific settings do no conflict with global settings' do
+    many_bananas_project = Factory(:project)
+    no_bananas_project = Factory(:project)
+    many_bananas_project.settings['banana_count'] = 10
+    Settings.global['banana_count'] = 5
+    no_bananas_project.settings['banana_count'] = 0
+
+    assert_equal 10, many_bananas_project.settings['banana_count']
+    assert_equal 5, Settings.global['banana_count']
+    assert_equal 0, no_bananas_project.settings['banana_count']
+  end
+
+  test 'encrypts settings' do
+    Seek::Config.datacite_password = 'test'
+
+    setting = Settings.global.where(var: 'datacite_password').last
+
+    assert_equal 'test', setting.value
+    refute_equal 'test', setting.encrypted_value
+    assert_nil setting[:value], 'Password should be encrypted in database'
+
+    setting.destroy!
+  end
+
+  test 'handles legacy encrypted settings before encryption was implemented' do
+    Seek::Config.datacite_password = 'test'
+
+    setting = Settings.global.where(var: 'datacite_password').last
+
+    setting.update_column(:value, 'test')
+    setting.update_column(:encrypted_value, nil)
+    setting.update_column(:encrypted_value_iv, nil)
+
+    refute setting.encrypted?
+    assert setting.encrypt?
+    assert_equal 'test', setting.reload.value
+    assert_equal 'test', setting[:value], 'Password should not be encrypted yet'
+
+    setting.value = 'test'
+    setting.save!
+
+    assert setting.encrypted?
+    assert setting.encrypt?
+    assert_equal 'test', setting.reload.value
+    assert_nil setting[:value], 'Password should be encrypted now'
   end
 end

@@ -90,7 +90,7 @@ class AdminController < ApplicationController
 
     Seek::Config.doi_minting_enabled = string_to_boolean params[:doi_minting_enabled]
     Seek::Config.datacite_username = params[:datacite_username]
-    Seek::Config.datacite_password_encrypt params[:datacite_password]
+    Seek::Config.datacite_password = params[:datacite_password]
     Seek::Config.datacite_url = params[:datacite_url]
     Seek::Config.doi_prefix = params[:doi_prefix]
     Seek::Config.doi_suffix = params[:doi_suffix]
@@ -102,6 +102,10 @@ class AdminController < ApplicationController
     Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].try(:strip)
 
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
+
+    Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
+    Seek::Config.nels_client_id = params[:nels_client_id].try(:strip)
+    Seek::Config.nels_client_secret = params[:nels_client_secret].try(:strip)
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
@@ -191,6 +195,7 @@ class AdminController < ApplicationController
     Seek::Config.set_default_page 'publications', params[:publications]
     Seek::Config.set_default_page 'presentations', params[:presentations]
     Seek::Config.set_default_page 'events', params[:events]
+    Seek::Config.set_default_page 'documents', params[:documents]
     Seek::Config.limit_latest = params[:limit_latest] if only_positive_integer params[:limit_latest], 'latest limit'
     update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'), 'pagination'
   end
@@ -338,10 +343,6 @@ class AdminController < ApplicationController
         render partial: 'admin/stats/job_queue'
       when 'auth_consistency'
         render partial: 'admin/stats/auth_consistency'
-      when 'monthly_stats'
-        render partial: 'admin/stats/monthly_stats', locals: { stats: get_monthly_stats }
-      when 'workflow_stats'
-        render partial: 'admin/stats/workflow_stats'
       when 'storage_usage_stats'
         render partial: 'admin/stats/storage_usage_stats'
       when 'snapshot_and_doi_stats'
@@ -401,23 +402,6 @@ class AdminController < ApplicationController
     end
   end
 
-  def get_monthly_stats
-    first_month = User.all.sort_by(&:created_at).first.created_at
-    number_of_months_since_first = (Date.today.year * 12 + Date.today.month) - (first_month.year * 12 + first_month.month)
-    stats = {}
-    (0..number_of_months_since_first).each do |x|
-      time_range = (x.month.ago.beginning_of_month.to_date..x.month.ago.end_of_month.to_date)
-      registrations = User.where(created_at: time_range).count
-      active_users = 0
-      User.find_each do |user|
-        active_users += 1 unless user.taverna_player_runs.where(created_at: time_range, saved_state: 'finished').empty?
-      end
-      complete_runs = TavernaPlayer::Run.where(created_at: time_range, saved_state: 'finished').count
-      stats[x.month.ago.beginning_of_month.to_i] = [registrations, active_users, complete_runs]
-    end
-    stats
-  end
-
   def test_email_configuration
     smtp_hash_old = ActionMailer::Base.smtp_settings
     smtp_hash_new = { address: params[:address],
@@ -431,10 +415,19 @@ class AdminController < ApplicationController
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
     ActionMailer::Base.raise_delivery_errors = true
     begin
-      Mailer.test_email(params[:testing_email]).deliver_now
-      render :update do |page|
-        page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
-        page.alert("test email is sent successfully to #{params[:testing_email]}")
+      mail = Mailer.test_email(params[:testing_email])
+      if params[:deliver_later]
+        mail.deliver_later
+        render :update do |page|
+          page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
+          page.alert("Test email to #{params[:testing_email]} was added to the queue.")
+        end
+      else
+        mail.deliver_now
+        render :update do |page|
+          page.replace_html 'ajax_loader_position', "<div id='ajax_loader_position'></div>"
+          page.alert("Test email sent successfully to #{params[:testing_email]}.")
+        end
       end
     rescue => e
       render :update do |page|

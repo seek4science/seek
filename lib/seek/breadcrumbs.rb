@@ -37,6 +37,9 @@ module Seek
           add_index_breadcrumb 'sample_types'
           add_show_breadcrumb @sample_type
         end
+      elsif controller_name == 'nels'
+        add_index_breadcrumb 'assays'
+        add_show_breadcrumb @assay
       elsif %w(compounds suggested_assay_types suggested_technology_types site_announcements).include?(controller_name)
         add_index_breadcrumb('admin', 'Administration')
       end

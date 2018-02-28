@@ -4,6 +4,9 @@ require 'seek/download_handling/http_streamer' # Needed to load exceptions that 
 require 'minitest/mock'
 
 class ContentBlobTest < ActiveSupport::TestCase
+
+  include NelsTestHelper
+
   fixtures :content_blobs
 
   test 'search terms' do
@@ -773,5 +776,31 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     refute Factory(:ppt_content_blob).is_text?
     refute Factory(:binary_content_blob).is_text?
+  end
+
+  test 'can retrieve from NeLS' do
+    setup_nels_for_units
+
+    blob = ContentBlob.create(url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=#{@reference}")
+
+    VCR.use_cassette('nels/get_sample_metadata') do
+      blob.retrieve_from_nels(@nels_access_token)
+    end
+    blob.reload
+
+    assert blob.is_excel?
+    assert blob.file_size > 0
+  end
+
+  test 'raises 404 when nels sample metadata missing' do
+    setup_nels_for_units
+
+    blob = ContentBlob.create(url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404")
+
+    assert_raises(RestClient::ResourceNotFound) do
+      VCR.use_cassette('nels/missing_sample_metadata') do
+        blob.retrieve_from_nels(@nels_access_token)
+      end
+    end
   end
 end

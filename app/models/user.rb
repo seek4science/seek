@@ -1,5 +1,4 @@
 require 'digest/sha1'
-require 'savage_beast/user_init'
 
 class User < ActiveRecord::Base
   MIN_PASSWORD_LENGTH=10
@@ -20,10 +19,6 @@ class User < ActiveRecord::Base
 
   has_many :investigations, as: :contributor
   has_many :studies, as: :contributor
-
-  has_many :workflows, as: :contributor
-  has_many :taverna_player_runs, class_name: 'TavernaPlayer::Run', as: :contributor
-  has_many :sweeps, as: :contributor
 
   has_many :oauth_sessions, dependent: :destroy
 
@@ -151,17 +146,38 @@ class User < ActiveRecord::Base
   end
 
   # Encrypts some data with the salt.
-  def self.encrypt(password, salt)
+  def self.sha1_encrypt(password, salt)
     Digest::SHA1.hexdigest("--#{salt}--#{password}--")
   end
 
-  # Encrypts the password with the user salt
-  def encrypt(password)
-    self.class.encrypt(password, salt)
+  def self.sha256_encrypt(password, salt)
+    Digest::SHA256.hexdigest("--#{salt}--#{password}--")
   end
 
+  def self.encrypt(password, salt)
+    sha256_encrypt(password, salt)
+  end
+
+  # Encrypts the password with the user salt
+  def sha1_encrypt(password)
+    self.class.sha1_encrypt(password, salt)
+  end
+
+  def sha256_encrypt(password)
+    self.class.sha256_encrypt(password, salt)
+  end
+
+  alias_method :encrypt, :sha256_encrypt
+
   def authenticated?(password)
-    crypted_password == encrypt(password)
+    if crypted_password == encrypt(password)
+      true
+    elsif crypted_password == sha1_encrypt(password)
+      update_column(:crypted_password, encrypt(password))
+      true
+    else
+      false
+    end
   end
 
   def remember_token?
@@ -207,12 +223,6 @@ class User < ActiveRecord::Base
   # returns a 'blacklist' favourite group for the user (or 'nil' if not found)
   def get_blacklist
     FavouriteGroup.where(user_id: id, name: FavouriteGroup::BLACKLIST_NAME).first
-  end
-
-  # required for savage beast plugin
-  # see http://www.williambharding.com/blog/rails/savage-beast-23-a-rails-22-23-message-forum-plugin/
-  def admin?
-    is_admin?
   end
 
   def currently_online

@@ -705,7 +705,7 @@ class PersonTest < ActiveSupport::TestCase
     p.save!
     assert_not_nil p.notifiee_info
     assert_difference('NotifieeInfo.count', -1) do
-      p.destroy
+      disable_authorization_checks { p.destroy }
     end
   end
 
@@ -714,7 +714,7 @@ class PersonTest < ActiveSupport::TestCase
     u = users(:quentin)
     assert_difference('Person.count', -1) do
       assert_difference('User.count', -1) do
-        p.destroy
+        disable_authorization_checks { p.destroy }
       end
     end
     assert_nil User.find_by_id(u.id)
@@ -722,7 +722,7 @@ class PersonTest < ActiveSupport::TestCase
     p = people(:random_userless_person)
     assert_difference('Person.count', -1) do
       assert_no_difference('User.count') do
-        p.destroy
+        disable_authorization_checks { p.destroy }
       end
     end
   end

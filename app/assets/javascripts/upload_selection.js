@@ -58,4 +58,26 @@ function set_original_filename_for_upload(filename) {
 
 function update_url_checked_status(url_ok) {
     $j("#url_checked")[0].value=url_ok;
+    changeUploadButtonText(false);
 }
+
+function changeUploadButtonText(isFile) {
+    if ($j('[data-upload-button]').length) {
+        if (isFile) {
+            $j('[data-upload-button]').val('Upload and Save');
+        } else {
+            $j('[data-upload-button]').val('Register');
+        }
+    }
+}
+
+$j(document).ready(function () {
+    if ($j('#local-file').length) {
+        $j('#local-file').on('change', 'input[type=file]', function () { changeUploadButtonText(true); });
+
+        // If the URL field was pre-filled through params, make sure the button text is updated.
+        if ($j('#data_url_field').val().length) {
+            changeUploadButtonText(false);
+        }
+    }
+});

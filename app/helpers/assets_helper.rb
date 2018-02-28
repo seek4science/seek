@@ -145,8 +145,21 @@ module AssetsHelper
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})
     download_button = icon_link_to('Download', 'download', download_path, opts)
     link_button_or_nil = link_url ? icon_link_to('External Link', 'external_link', link_url, opts.merge(target: 'blank')) : nil
-    return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ? download_button : link_button_or_nil if asset.respond_to?(:content_blobs)
-    return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob)
+    if asset.respond_to?(:content_blobs)
+      if asset.content_blobs.detect { |blob| !blob.show_as_external_link? }
+        download_button
+      else
+        link_button_or_nil
+      end
+    elsif asset.respond_to?(:content_blob)
+      if asset.content_blob.nels?
+        icon_link_to('Open in NeLS', 'external_link', link_url, opts.merge(target: 'blank'))
+      elsif asset.content_blob.show_as_external_link?
+        link_button_or_nil
+      else
+        download_button
+      end
+    end
   end
 
   def view_content_button(asset)
@@ -168,5 +181,9 @@ module AssetsHelper
       sharing_text = "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
     end
     sharing_text.html_safe
+  end
+
+  def create_button(opts)
+    submit_tag('Upload and Save', opts.merge({ 'data-upload-button' => '' }))
   end
 end

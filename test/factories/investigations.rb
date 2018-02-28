@@ -1,8 +1,11 @@
 # Investigation
-Factory.define(:investigation) do |f|
+Factory.define(:investigation, class: Investigation) do |f|
   f.projects { [Factory.build(:project)] }
   f.sequence(:title) { |n| "Investigation#{n}" }
   f.association :contributor, factory: :person
+  f.after_create do |p|
+    y = p.save
+  end
 end
 
 Factory.define(:min_investigation, class: Investigation) do |f|

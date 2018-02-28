@@ -72,8 +72,6 @@
         <div class="section">
           <!-- Events tab -->
           <%= tab_definition :controllers => ["events"] ,:title=>t('event').pluralize if Seek::Config.events_enabled -%>
-          <!-- Forums tab -->
-          <%= tab_definition :controllers => ["forums"] if logged_in? -%>
         </div>
 
       </div>

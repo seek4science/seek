@@ -181,7 +181,7 @@ class PeopleController < ApplicationController
           format.xml { render xml: @person, status: :created, location: @person }
           format.json {render json: @person, status: :created, location: @person }
         else
-          Mailer.signup(current_user).deliver_now
+          Mailer.signup(current_user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
@@ -196,12 +196,12 @@ class PeopleController < ApplicationController
   end
 
   def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(params, current_user).deliver_now
+    Mailer.contact_admin_new_user(params, current_user).deliver_later
 
     # send mail to project managers
     project_administrators = project_administrators_of_selected_projects params[:projects]
     project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_now
+      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_later
     end
   end
 
@@ -334,7 +334,7 @@ class PeopleController < ApplicationController
 
   def person_params
     params.require(:person).permit(:first_name, :last_name, :orcid, :description, :email, :web_page, :phone,
-                                   :skype_name, { discipline_ids: [] },
+                                   :skype_name, { discipline_ids: [] }, { expertise: [] }, { tools: [] },
                                    project_subscriptions_attributes: %i[id project_id _destroy frequency])
   end
 
@@ -352,8 +352,8 @@ class PeopleController < ApplicationController
   end
 
   def set_tools_and_expertise(person, params)
-    exp_changed = person.tag_annotations(params[:expertise_list], 'expertise')
-    tools_changed = person.tag_annotations(params[:tool_list], 'tool')
+    exp_changed = person.tag_annotations(params[:expertise_list], 'expertise') if params[:expertise_list]
+    tools_changed = person.tag_annotations(params[:tool_list], 'tool') if params[:tool_list]
     if immediately_clear_tag_cloud?
       expire_annotation_fragments('expertise') if exp_changed
       expire_annotation_fragments('tool') if tools_changed
