@@ -167,12 +167,12 @@ module ApiTestHelper
 
     # Check the original, unchanged attributes and relationships
     if @to_post['data'].key?('attributes') && @to_patch['data'].key?('attributes')
-      original_attributes = @to_post['data']['attributes'].except(@to_patch['data']['attributes'].keys)
+      original_attributes = @to_post['data']['attributes'].except(*@to_patch['data']['attributes'].keys)
       hash_comparison(original_attributes, h['data']['attributes'])
     end
 
     if @to_post['data'].key?('relationships') && @to_patch['data'].key?('relationships')
-      original_relationships = @to_post['data']['relationships'].except(@to_patch['data']['relationships'].keys)
+      original_relationships = @to_post['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
       hash_comparison(original_relationships, h['data']['relationships'])
     end
   end
