@@ -202,13 +202,9 @@ class DataFilesController < ApplicationController
   end
 
   def update
-
-    if params[:data_file].empty? && !params[:datafile].empty?
-      params[:data_file] = params[:datafile]
-    end
     @data_file.attributes = data_file_params.except!(:content)
 
-    update_annotations(params[:tag_list], @data_file)
+    update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_scales @data_file
 
     respond_to do |format|
