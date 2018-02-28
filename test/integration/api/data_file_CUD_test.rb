@@ -9,15 +9,20 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     @clz = 'data_file'
     @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
+    investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
+    study = Factory(:study, investigation: investigation, contributor: @current_person)
+    @assay = Factory(:assay, study: study, contributor: @current_person)
+    @creator = Factory(:person)
+    @publication = Factory(:publication, projects: [@project])
+    @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_min_data_file.json.erb')
+    template_file = File.join(ApiTestHelper.template_dir, 'post_max_data_file.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
   end
 
   def populate_extra_attributes
     extra_attributes = {}
-    extra_attributes[:policy] = BaseSerializer::convert_policy Factory(:private_policy)
     extra_attributes.with_indifferent_access
   end
 
@@ -25,9 +30,10 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     person_id = @current_user.person.id
     project_id = @project.id
     extra_relationships = {}
-    extra_relationships[:submitter] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships[:people] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships[:projects] = JSON.parse "{\"data\" : [{\"id\" : \"#{project_id}\", \"type\" : \"projects\"}]}"
+    extra_relationships[:submitter] = { data: [{ id: person_id.to_s, type: 'people' }] }
+    extra_relationships[:people] = { data: [{ id: person_id.to_s, type: 'people' },
+                                            { id: @creator.id.to_s, type: 'people' }] }
+    extra_relationships[:projects] = { data: [{ id: project_id.to_s, type: 'projects' }] }
     extra_relationships.with_indifferent_access
   end
 
