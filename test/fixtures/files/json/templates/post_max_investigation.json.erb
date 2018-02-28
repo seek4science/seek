@@ -3,7 +3,8 @@
     "type": "investigations",
     "attributes": {
       "title": "A Maximal Investigation",
-      "description": "This is a more complex investigation"
+      "description": "This is a more complex investigation",
+      "other_creators": "Max Blumenthal, Ed Snowden"
     },
     "relationships": {
       <% unless project_ids.nil? %>
@@ -18,7 +19,7 @@
        }
       <% end %>
       <% unless creator_ids.nil? %>
-      "creators": {
+      ,"creators": {
         "data": [
           <% for creator_id in creator_ids do %>
           <%= r.call("_related.json.erb",{:type => "people",:id => creator_id}) %>
