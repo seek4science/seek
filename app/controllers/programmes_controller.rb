@@ -65,7 +65,7 @@ class ProgrammesController < ApplicationController
         else
           format.html { render action: 'edit' }
           format.xml { render xml: @programme.errors, status: :unprocessable_entity }
-          format.json { render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+          format.json { render json: {error: @programme.errors, status: :forbidden}, status: :forbidden }
         end
       end
     end
@@ -162,7 +162,7 @@ class ProgrammesController < ApplicationController
   def inactive_view_allowed?
     return true if @programme.is_activated? || User.admin_logged_in?
     unless result=(User.logged_in_and_registered? && @programme.programme_administrators.include?(current_person))
-      error("This programme is not activated and cannot be viewed", "cannot view (not activated)")
+      error("This programme is not activated and cannot be viewed", "cannot view (not activated)", :forbidden)
     end
     result
   end

@@ -17,7 +17,7 @@ class AssaysControllerTest < ActionController::TestCase
   def rest_api_test_object
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
-  
+
 
   test 'modelling assay validates with schema' do
     df = Factory(:data_file, contributor: User.current_user.person)
@@ -1369,6 +1369,51 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should show NeLS button for NeLS-enabled project' do
+    person = Factory(:person)
+    login_as(person.user)
+    project = person.projects.first
+    project.settings['nels_enabled'] = true
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    assay = Factory(:assay, contributor: person, study: study)
+
+    get :show, id: assay
+
+    assert_response :success
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 1
+  end
+
+  test 'should not show NeLS button for non-NeLS' do
+    person = Factory(:person)
+    login_as(person.user)
+    project = person.projects.first
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    assay = Factory(:assay, contributor: person, study: study)
+
+    get :show, id: assay
+
+    assert_response :success
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0
+  end
+
+  test 'should not show NeLS button for NeLS-enabled project to non-NeLS project member' do
+    nels_person = Factory(:person)
+    non_nels_person = Factory(:person)
+    login_as(non_nels_person.user)
+    nels_project = nels_person.projects.first
+    non_nels_project = non_nels_person.projects.first
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [non_nels_project.id, non_nels_project.id]))
+    assay = Factory(:assay, contributor: nels_person, study: study, policy: Factory(:policy, permissions: [
+        Factory(:permission, contributor: nels_project, access_type: Policy::MANAGING),
+        Factory(:permission, contributor: non_nels_project, access_type: Policy::MANAGING)]))
+
+    get :show, id: assay
+
+    assert_response :success
+    assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0 # But not browse NeLS
+  end
+
   def edit_max_object(assay)
     add_tags_to_test_object(assay)
     add_creator_to_test_object(assay)
@@ -1457,5 +1502,23 @@ class AssaysControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to assays_path
+  end
+
+  test 'should associate document' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+    document = Factory(:document, contributor: person)
+    timestamp = assay.updated_at
+
+    assert_not_includes assay.documents, document
+
+    assert_difference('AssayAsset.count') do
+      put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_includes assigns(:assay).documents, document
+    assert_not_equal timestamp, assigns(:assay).updated_at
   end
 end

@@ -49,6 +49,12 @@ class AssaysController < ApplicationController
           break
         end
       end
+      @existing_assay.documents.each do |d|
+        if !d.can_view?
+          notice_message << "Some or all #{t('document').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
+          break
+        end
+      end
 
       unless notice_message.blank?
         flash.now[:notice] = notice_message.html_safe
@@ -111,7 +117,10 @@ class AssaysController < ApplicationController
     update_annotations(params[:tag_list], @assay) #this saves the assay
     update_scales @assay
 
-    if @assay.present? && @assay.save
+    a = @assay.present?
+    b = @assay.save
+
+    if a && b
       update_assets_linked_to_assay @assay, params
       update_relationships(@assay, params)
 
@@ -136,8 +145,7 @@ class AssaysController < ApplicationController
   end
 
   def update
-
-    set_assay_organisms_from_json if @is_json
+    set_assay_organisms_from_json if json_api_request?
 
     update_assay_organisms @assay, params
     update_annotations(params[:tag_list], @assay)
@@ -198,7 +206,11 @@ class AssaysController < ApplicationController
       assay_assets_to_keep << assay.associate(s, :direction => sample[:direction]) if s.can_view?
     end
     #Destroy AssayAssets that aren't needed
-    (assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
+    (assay.assay_assets - assay_assets_to_keep.compact).each do |a|
+      unless a.asset_type == 'Document' # These are cleaned up automatically
+        a.destroy
+      end
+    end
   end
 
   def show
@@ -235,7 +247,34 @@ class AssaysController < ApplicationController
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
-                                  :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset)
+                                  :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset,
+                                  { document_ids: []})
   end
+
+  def tweak_json_params
+    if params[:assay][:assay_class].present? && params[:assay][:assay_class][:key].present?
+      sym = params[:assay][:assay_class][:key].to_sym
+      the_class = AssayClass.find_by(key: sym)
+      if the_class.blank? then
+        raise "No id for class key #{sym}"
+      end
+      params[:assay][:assay_class_id] = the_class.id
+      # if params[:assay][:assay_class] == :EXP
+      #   params[:assay][:assay_class_id] = "1"
+      # else
+      #   params[:assay][:assay_class_id] = "2"
+      # end
+      params[:assay].delete :assay_class
+    end
+    if params[:assay][:assay_type].present?
+      params[:assay][:assay_type_uri] = params[:assay][:assay_type][:uri]
+      params[:assay].delete :assay_type
+    end
+    if params[:assay][:technology_type].present?
+      params[:assay][:technology_type_uri] = params[:assay][:technology_type][:uri]
+      params[:assay].delete :technology_type
+    end
+  end
+
 
 end

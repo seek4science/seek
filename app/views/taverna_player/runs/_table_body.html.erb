@@ -1,8 +1,0 @@
-<% redirect_to ||= taverna_player.runs_path %>
-<% runs_table(runs, redirect_to).each do |run_row| -%>
-  <tr>
-    <% run_row.each do |run_col| %>
-      <td><%= run_col %></td>
-    <% end %>
-  </tr>
-<% end -%>

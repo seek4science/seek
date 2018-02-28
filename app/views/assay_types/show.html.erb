@@ -2,7 +2,7 @@
 assay_type_text = is_modelling_type?(@type_class) ? "Biological problem addressed" : "#{t('assays.assay')} type"
 %>
 
-<%= render :partial => "general/page_title",:locals=>{:title=>"#{assay_type_text} '#{@type_class.try(:label) || params[:label]}'"} %>
+<%= render :partial => "general/page_title",:locals=>{:title=>"#{assay_type_text} '#{@type_class.try(:label) || h(params[:label])}'"} %>
 
 <% unless @type_class.nil? -%>
 

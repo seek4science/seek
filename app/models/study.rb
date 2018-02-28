@@ -26,7 +26,7 @@ class Study < ActiveRecord::Base
 
   validates :investigation, :presence => { message: "Investigation is blank or invalid" }
 
-  ["data_file","sop","model"].each do |type|
+  ["data_file","sop","model","document"].each do |type|
     eval <<-END_EVAL
       def #{type}_versions
         assays.collect{|a| a.send(:#{type}_versions)}.flatten.uniq
@@ -39,7 +39,7 @@ class Study < ActiveRecord::Base
   end
 
   def assets
-    related_data_files + related_sops + related_models + related_publications
+    related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
   def project_ids
@@ -56,8 +56,4 @@ class Study < ActiveRecord::Base
 
     return new_object
   end
-
-
-
-
 end

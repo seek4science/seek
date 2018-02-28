@@ -135,7 +135,6 @@ class ContentBlobsController < ApplicationController
 
   def get_file_from_jerm
     project = @asset_version.projects.first
-    project.decrypt_credentials
     downloader = Jerm::DownloaderFactory.create project.title
     resource_type = @asset_version.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
     begin
@@ -176,19 +175,20 @@ class ContentBlobsController < ApplicationController
   end
 
   def asset_object
-    if params[:data_file_id]
-      DataFile.find(params[:data_file_id])
-    elsif params[:model_id]
-      Model.find(params[:model_id])
-    elsif params[:sop_id]
-      Sop.find(params[:sop_id])
-    elsif params[:presentation_id]
-      Presentation.find(params[:presentation_id])
-    elsif params[:sample_type_id]
-      SampleType.find(params[:sample_type_id])
+    params.each do |param, value|
+      if param.end_with?('_id')
+        begin
+          c = param.chomp('_id').classify.constantize
+        rescue NameError
+        else
+          if c.method_defined?(:content_blob) || c.method_defined?(:content_blobs)
+            return c.find_by_id(value)
+          end
+        end
+      end
     end
-  rescue ActiveRecord::RecordNotFound
-    nil
+
+    nil # If nothing found
   end
 
   def find_and_authorize_content_blob

@@ -782,7 +782,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_difference('Publication.count') do
       post :create, publication: { project_ids: ['', project.id.to_s],
-                                   doi: 'http://dx.doi.org/10.5072/abcd',
+                                   doi: 'https://doi.org/10.5072/abcd',
                                    title: 'Cool stuff',
                                    publication_authors: ['', User.current_user.person.name],
                                    abstract: 'We did stuff',

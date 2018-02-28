@@ -9,6 +9,9 @@
         <% end %>
     <% end %>
 <% end %>
+<% if show_nels_button?(item) %>
+    <%= button_link_to('Add data from NeLS', 'add', assay_nels_path(item.id)) %>
+<% end -%>
 
 <%= admin_dropdown do %>
     <% if item.can_manage? -%>

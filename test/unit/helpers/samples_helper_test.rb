@@ -4,7 +4,8 @@ class SamplesHelperTest < ActionView::TestCase
   test 'seek sample attribute display' do
     sample = Factory(:sample, policy: Factory(:public_policy))
     assert sample.can_view?
-    display = seek_sample_attribute_display(sample.id)
+    value = { id: sample.id, title: sample.title, type: 'Sample' }.with_indifferent_access
+    display = seek_sample_attribute_display(value)
     tag = HTML::Document.new(display).root.children.first
     assert_equal 'a', tag.name
     assert_equal "/samples/#{sample.id}", tag['href']
@@ -13,17 +14,19 @@ class SamplesHelperTest < ActionView::TestCase
     # private sample
     sample = Factory(:sample, policy: Factory(:private_policy))
     refute sample.can_view?
-    display = seek_sample_attribute_display(sample.id)
+    value = { id: sample.id, title: sample.title, type: 'Sample' }.with_indifferent_access
+    display = seek_sample_attribute_display(value)
     tag = HTML::Document.new(display).root.children.first
     assert_equal 'span', tag.name
     assert_equal 'none_text', tag['class']
     assert_equal 'Hidden', tag.children.first.content
 
     # doesn't exist
-    display = seek_sample_attribute_display(999_999)
+    value = { id: (Sample.maximum(:id)+1), title: 'Blah', type: 'Sample' }.with_indifferent_access
+    display = seek_sample_attribute_display(value)
     tag = HTML::Document.new(display).root.children.first
     assert_equal 'span', tag.name
     assert_equal 'none_text', tag['class']
-    assert_equal 'Not found', tag.children.first.content
+    assert_equal 'Blah', tag.children.first.content
   end
 end

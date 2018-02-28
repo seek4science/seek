@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171128133429) do
+ActiveRecord::Schema.define(version: 20180207102508) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -255,14 +255,14 @@ ActiveRecord::Schema.define(version: 20171128133429) do
 
   create_table "content_blobs", force: :cascade do |t|
     t.string  "md5sum",            limit: 255
-    t.string  "url",               limit: 255
+    t.text    "url",               limit: 65535
     t.string  "uuid",              limit: 255
     t.string  "original_filename", limit: 255
     t.string  "content_type",      limit: 255
     t.integer "asset_id",          limit: 4
     t.string  "asset_type",        limit: 255
     t.integer "asset_version",     limit: 4
-    t.boolean "is_webpage",                    default: false
+    t.boolean "is_webpage",                      default: false
     t.boolean "external_link"
     t.string  "sha1sum",           limit: 255
     t.integer "file_size",         limit: 8
@@ -526,6 +526,76 @@ ActiveRecord::Schema.define(version: 20171128133429) do
 
   add_index "disciplines_people", ["person_id"], name: "index_disciplines_people_on_person_id", using: :btree
 
+  create_table "document_auth_lookup", force: :cascade do |t|
+    t.integer "user_id",      limit: 4
+    t.integer "asset_id",     limit: 4
+    t.boolean "can_view",               default: false
+    t.boolean "can_manage",             default: false
+    t.boolean "can_edit",               default: false
+    t.boolean "can_download",           default: false
+    t.boolean "can_delete",             default: false
+  end
+
+  add_index "document_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_document_user_id_asset_id_can_view", using: :btree
+  add_index "document_auth_lookup", ["user_id", "can_view"], name: "index_document_auth_lookup_on_user_id_and_can_view", using: :btree
+
+  create_table "document_versions", force: :cascade do |t|
+    t.integer  "document_id",       limit: 4
+    t.integer  "version",           limit: 4
+    t.text     "revision_comments", limit: 65535
+    t.text     "title",             limit: 65535
+    t.text     "description",       limit: 65535
+    t.integer  "contributor_id",    limit: 4
+    t.string   "contributor_type",  limit: 255
+    t.string   "first_letter",      limit: 1
+    t.string   "uuid",              limit: 255
+    t.integer  "policy_id",         limit: 4
+    t.string   "doi",               limit: 255
+    t.string   "license",           limit: 255
+    t.datetime "last_used_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "other_creators",    limit: 65535
+  end
+
+  add_index "document_versions", ["contributor_type", "contributor_id"], name: "index_document_versions_on_contributor_type_and_contributor_id", using: :btree
+  add_index "document_versions", ["document_id"], name: "index_document_versions_on_document_id", using: :btree
+
+  create_table "document_versions_projects", force: :cascade do |t|
+    t.integer "version_id", limit: 4
+    t.integer "project_id", limit: 4
+  end
+
+  add_index "document_versions_projects", ["project_id"], name: "index_document_versions_projects_on_project_id", using: :btree
+  add_index "document_versions_projects", ["version_id", "project_id"], name: "index_document_versions_projects_on_version_id_and_project_id", using: :btree
+
+  create_table "documents", force: :cascade do |t|
+    t.text     "title",            limit: 65535
+    t.text     "description",      limit: 65535
+    t.integer  "contributor_id",   limit: 4
+    t.string   "contributor_type", limit: 255
+    t.integer  "version",          limit: 4
+    t.string   "first_letter",     limit: 1
+    t.string   "uuid",             limit: 255
+    t.integer  "policy_id",        limit: 4
+    t.string   "doi",              limit: 255
+    t.string   "license",          limit: 255
+    t.datetime "last_used_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "other_creators",   limit: 65535
+  end
+
+  add_index "documents", ["contributor_type", "contributor_id"], name: "index_documents_on_contributor_type_and_contributor_id", using: :btree
+
+  create_table "documents_projects", force: :cascade do |t|
+    t.integer "document_id", limit: 4
+    t.integer "project_id",  limit: 4
+  end
+
+  add_index "documents_projects", ["document_id", "project_id"], name: "index_documents_projects_on_document_id_and_project_id", using: :btree
+  add_index "documents_projects", ["project_id"], name: "index_documents_projects_on_project_id", using: :btree
+
   create_table "event_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
     t.integer "asset_id",     limit: 4
@@ -617,26 +687,6 @@ ActiveRecord::Schema.define(version: 20171128133429) do
     t.string   "resource_type", limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "forum_attachments", force: :cascade do |t|
-    t.integer  "post_id",      limit: 4
-    t.string   "title",        limit: 255
-    t.string   "content_type", limit: 255
-    t.string   "filename",     limit: 255
-    t.integer  "size",         limit: 4
-    t.integer  "db_file_id",   limit: 4
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "forums", force: :cascade do |t|
-    t.string  "name",             limit: 255
-    t.string  "description",      limit: 255
-    t.integer "topics_count",     limit: 4,     default: 0
-    t.integer "posts_count",      limit: 4,     default: 0
-    t.integer "position",         limit: 4
-    t.text    "description_html", limit: 65535
   end
 
   create_table "genes", force: :cascade do |t|
@@ -1033,20 +1083,6 @@ ActiveRecord::Schema.define(version: 20171128133429) do
     t.datetime "updated_at"
   end
 
-  create_table "posts", force: :cascade do |t|
-    t.integer  "user_id",    limit: 4
-    t.integer  "topic_id",   limit: 4
-    t.text     "body",       limit: 65535
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "forum_id",   limit: 4
-    t.text     "body_html",  limit: 65535
-  end
-
-  add_index "posts", ["forum_id", "created_at"], name: "index_posts_on_forum_id", using: :btree
-  add_index "posts", ["topic_id", "created_at"], name: "index_posts_on_topic_id", using: :btree
-  add_index "posts", ["user_id", "created_at"], name: "index_posts_on_user_id", using: :btree
-
   create_table "presentation_auth_lookup", id: false, force: :cascade do |t|
     t.integer "user_id",      limit: 4
     t.integer "asset_id",     limit: 4
@@ -1216,26 +1252,6 @@ ActiveRecord::Schema.define(version: 20171128133429) do
   create_table "projects_strains", id: false, force: :cascade do |t|
     t.integer "project_id", limit: 4
     t.integer "strain_id",  limit: 4
-  end
-
-  create_table "projects_sweeps", force: :cascade do |t|
-    t.integer "sweep_id",   limit: 4
-    t.integer "project_id", limit: 4
-  end
-
-  create_table "projects_taverna_player_runs", id: false, force: :cascade do |t|
-    t.integer "run_id",     limit: 4
-    t.integer "project_id", limit: 4
-  end
-
-  create_table "projects_workflow_versions", id: false, force: :cascade do |t|
-    t.integer "version_id", limit: 4
-    t.integer "project_id", limit: 4
-  end
-
-  create_table "projects_workflows", id: false, force: :cascade do |t|
-    t.integer "workflow_id", limit: 4
-    t.integer "project_id",  limit: 4
   end
 
   create_table "publication_auth_lookup", id: false, force: :cascade do |t|
@@ -1457,12 +1473,14 @@ ActiveRecord::Schema.define(version: 20171128133429) do
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "settings", force: :cascade do |t|
-    t.string   "var",         limit: 255,   null: false
-    t.text     "value",       limit: 65535
-    t.integer  "target_id",   limit: 4
-    t.string   "target_type", limit: 30
+    t.string   "var",                limit: 255,   null: false
+    t.text     "value",              limit: 65535
+    t.integer  "target_id",          limit: 4
+    t.string   "target_type",        limit: 30
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "encrypted_value",    limit: 65535
+    t.string   "encrypted_value_iv", limit: 255
   end
 
   add_index "settings", ["target_type", "target_id", "var"], name: "index_settings_on_target_type_and_target_id_and_var", unique: true, using: :btree
@@ -1685,33 +1703,6 @@ ActiveRecord::Schema.define(version: 20171128133429) do
     t.integer  "parent_id",      limit: 4
   end
 
-  create_table "sweep_auth_lookup", force: :cascade do |t|
-    t.integer "user_id",      limit: 4
-    t.integer "asset_id",     limit: 4
-    t.boolean "can_view"
-    t.boolean "can_manage"
-    t.boolean "can_edit"
-    t.boolean "can_download"
-    t.boolean "can_delete"
-  end
-
-  add_index "sweep_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_sweep_auth_lookup_on_user_id_and_asset_id_and_can_view", using: :btree
-  add_index "sweep_auth_lookup", ["user_id", "can_view"], name: "index_sweep_auth_lookup_on_user_id_and_can_view", using: :btree
-
-  create_table "sweeps", force: :cascade do |t|
-    t.string   "name",             limit: 255
-    t.integer  "contributor_id",   limit: 4
-    t.integer  "workflow_id",      limit: 4
-    t.integer  "workflow_version", limit: 4,     default: 1
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-    t.string   "contributor_type", limit: 255
-    t.text     "description",      limit: 65535
-    t.string   "uuid",             limit: 255
-    t.string   "first_letter",     limit: 1
-    t.integer  "policy_id",        limit: 4
-  end
-
   create_table "synonyms", force: :cascade do |t|
     t.string   "name",           limit: 255
     t.integer  "substance_id",   limit: 4
@@ -1739,113 +1730,6 @@ ActiveRecord::Schema.define(version: 20171128133429) do
     t.string "name", limit: 255
   end
 
-  create_table "taverna_player_interactions", force: :cascade do |t|
-    t.boolean  "replied",                     default: false
-    t.integer  "run_id",     limit: 4
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.boolean  "displayed",                   default: false
-    t.text     "page",       limit: 65535
-    t.string   "feed_reply", limit: 255
-    t.text     "data",       limit: 16777215
-    t.string   "serial",     limit: 255
-    t.string   "page_uri",   limit: 255
-  end
-
-  add_index "taverna_player_interactions", ["run_id", "replied"], name: "index_taverna_player_interactions_on_run_id_and_replied", using: :btree
-  add_index "taverna_player_interactions", ["run_id", "serial"], name: "index_taverna_player_interactions_on_run_id_and_serial", using: :btree
-  add_index "taverna_player_interactions", ["run_id"], name: "index_taverna_player_interactions_on_run_id", using: :btree
-
-  create_table "taverna_player_run_auth_lookup", force: :cascade do |t|
-    t.integer "user_id",      limit: 4
-    t.integer "asset_id",     limit: 4
-    t.boolean "can_view"
-    t.boolean "can_manage"
-    t.boolean "can_edit"
-    t.boolean "can_download"
-    t.boolean "can_delete"
-  end
-
-  add_index "taverna_player_run_auth_lookup", ["user_id", "asset_id", "can_view"], name: "tav_player_run_user_asset_view_index", using: :btree
-  add_index "taverna_player_run_auth_lookup", ["user_id", "can_view"], name: "tav_player_run_user_view_index", using: :btree
-
-  create_table "taverna_player_run_ports", force: :cascade do |t|
-    t.string   "name",              limit: 255
-    t.string   "value",             limit: 255
-    t.string   "port_type",         limit: 255
-    t.integer  "run_id",            limit: 4
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.string   "file_file_name",    limit: 255
-    t.string   "file_content_type", limit: 255
-    t.integer  "file_file_size",    limit: 4
-    t.datetime "file_updated_at"
-    t.integer  "depth",             limit: 4,     default: 0
-    t.text     "metadata",          limit: 65535
-    t.integer  "data_file_id",      limit: 4
-    t.integer  "data_file_version", limit: 4
-  end
-
-  add_index "taverna_player_run_ports", ["run_id", "name"], name: "index_taverna_player_run_ports_on_run_id_and_name", using: :btree
-  add_index "taverna_player_run_ports", ["run_id"], name: "index_taverna_player_run_ports_on_run_id", using: :btree
-
-  create_table "taverna_player_runs", force: :cascade do |t|
-    t.string   "run_id",             limit: 255
-    t.string   "saved_state",        limit: 255,   default: "pending", null: false
-    t.datetime "create_time"
-    t.datetime "start_time"
-    t.datetime "finish_time"
-    t.integer  "workflow_id",        limit: 4,                         null: false
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
-    t.string   "status_message_key", limit: 255
-    t.string   "results_file_name",  limit: 255
-    t.integer  "results_file_size",  limit: 4
-    t.boolean  "embedded",                         default: false
-    t.boolean  "stop",                             default: false
-    t.string   "log_file_name",      limit: 255
-    t.integer  "log_file_size",      limit: 4
-    t.string   "name",               limit: 255,   default: "None"
-    t.integer  "delayed_job_id",     limit: 4
-    t.integer  "sweep_id",           limit: 4
-    t.integer  "contributor_id",     limit: 4
-    t.integer  "policy_id",          limit: 4
-    t.string   "contributor_type",   limit: 255
-    t.text     "failure_message",    limit: 65535
-    t.integer  "parent_id",          limit: 4
-    t.string   "uuid",               limit: 255
-    t.string   "first_letter",       limit: 1
-    t.text     "description",        limit: 65535
-    t.integer  "user_id",            limit: 4
-    t.integer  "workflow_version",   limit: 4,     default: 1
-    t.boolean  "reported",                         default: false
-  end
-
-  add_index "taverna_player_runs", ["parent_id"], name: "index_taverna_player_runs_on_parent_id", using: :btree
-  add_index "taverna_player_runs", ["user_id"], name: "index_taverna_player_runs_on_user_id", using: :btree
-  add_index "taverna_player_runs", ["workflow_id"], name: "index_taverna_player_runs_on_workflow_id", using: :btree
-
-  create_table "taverna_player_service_credentials", force: :cascade do |t|
-    t.string   "uri",         limit: 255,   null: false
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.string   "login",       limit: 255
-    t.string   "password",    limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  add_index "taverna_player_service_credentials", ["uri"], name: "index_taverna_player_service_credentials_on_uri", using: :btree
-
-  create_table "taverna_player_workflows", force: :cascade do |t|
-    t.string   "title",       limit: 255
-    t.string   "author",      limit: 255
-    t.text     "description", limit: 65535
-    t.string   "file",        limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
   create_table "text_value_versions", force: :cascade do |t|
     t.integer  "text_value_id",      limit: 4,        null: false
     t.integer  "version",            limit: 4,        null: false
@@ -1871,29 +1755,10 @@ ActiveRecord::Schema.define(version: 20171128133429) do
     t.datetime "updated_at"
   end
 
-  create_table "topics", force: :cascade do |t|
-    t.integer  "forum_id",     limit: 4
-    t.integer  "user_id",      limit: 4
-    t.string   "title",        limit: 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "hits",         limit: 4,   default: 0
-    t.integer  "sticky",       limit: 4,   default: 0
-    t.integer  "posts_count",  limit: 4,   default: 0
-    t.datetime "replied_at"
-    t.boolean  "locked",                   default: false
-    t.integer  "replied_by",   limit: 4
-    t.integer  "last_post_id", limit: 4
-  end
-
-  add_index "topics", ["forum_id", "replied_at"], name: "index_topics_on_forum_id_and_replied_at", using: :btree
-  add_index "topics", ["forum_id", "sticky", "replied_at"], name: "index_topics_on_sticky_and_replied_at", using: :btree
-  add_index "topics", ["forum_id"], name: "index_topics_on_forum_id", using: :btree
-
   create_table "trash_records", force: :cascade do |t|
     t.string   "trashable_type", limit: 255
     t.integer  "trashable_id",   limit: 4
-    t.binary   "data",           limit: 16777215
+    t.binary   "data",           limit: 65535
     t.datetime "created_at"
   end
 
@@ -1912,7 +1777,7 @@ ActiveRecord::Schema.define(version: 20171128133429) do
 
   create_table "users", force: :cascade do |t|
     t.string   "login",                     limit: 255
-    t.string   "crypted_password",          limit: 40
+    t.string   "crypted_password",          limit: 64
     t.string   "salt",                      limit: 40
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1937,95 +1802,6 @@ ActiveRecord::Schema.define(version: 20171128133429) do
   end
 
   add_index "work_groups", ["project_id"], name: "index_work_groups_on_project_id", using: :btree
-
-  create_table "workflow_auth_lookup", force: :cascade do |t|
-    t.integer "user_id",      limit: 4
-    t.integer "asset_id",     limit: 4
-    t.boolean "can_view"
-    t.boolean "can_manage"
-    t.boolean "can_edit"
-    t.boolean "can_download"
-    t.boolean "can_delete"
-  end
-
-  add_index "workflow_auth_lookup", ["user_id", "asset_id", "can_view"], name: "index_wf_on_user_asset_view", using: :btree
-  add_index "workflow_auth_lookup", ["user_id", "can_view"], name: "index_wf_on_user_view", using: :btree
-
-  create_table "workflow_categories", force: :cascade do |t|
-    t.string "name", limit: 255
-  end
-
-  create_table "workflow_input_port_types", force: :cascade do |t|
-    t.string "name", limit: 255
-  end
-
-  create_table "workflow_input_ports", force: :cascade do |t|
-    t.string  "name",                 limit: 255
-    t.text    "description",          limit: 65535
-    t.integer "port_type_id",         limit: 4
-    t.text    "example_value",        limit: 65535
-    t.integer "example_data_file_id", limit: 4
-    t.integer "workflow_id",          limit: 4
-    t.integer "workflow_version",     limit: 4
-    t.string  "mime_type",            limit: 255
-  end
-
-  create_table "workflow_output_port_types", force: :cascade do |t|
-    t.string "name", limit: 255
-  end
-
-  create_table "workflow_output_ports", force: :cascade do |t|
-    t.string  "name",                 limit: 255
-    t.text    "description",          limit: 65535
-    t.integer "port_type_id",         limit: 4
-    t.text    "example_value",        limit: 65535
-    t.integer "example_data_file_id", limit: 4
-    t.integer "workflow_id",          limit: 4
-    t.integer "workflow_version",     limit: 4
-    t.string  "mime_type",            limit: 255
-  end
-
-  create_table "workflow_versions", force: :cascade do |t|
-    t.string   "title",              limit: 255
-    t.text     "description",        limit: 65535
-    t.integer  "category_id",        limit: 4
-    t.integer  "contributor_id",     limit: 4
-    t.string   "contributor_type",   limit: 255
-    t.string   "uuid",               limit: 255
-    t.integer  "policy_id",          limit: 4
-    t.text     "other_creators",     limit: 65535
-    t.string   "first_letter",       limit: 1
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-    t.datetime "last_used_at"
-    t.integer  "workflow_id",        limit: 4
-    t.text     "revision_comments",  limit: 65535
-    t.integer  "version",            limit: 4
-    t.boolean  "sweepable"
-    t.string   "myexperiment_link",  limit: 255
-    t.string   "documentation_link", limit: 255
-    t.string   "doi",                limit: 255
-  end
-
-  create_table "workflows", force: :cascade do |t|
-    t.string   "title",              limit: 255
-    t.text     "description",        limit: 65535
-    t.integer  "category_id",        limit: 4
-    t.integer  "contributor_id",     limit: 4
-    t.string   "contributor_type",   limit: 255
-    t.string   "uuid",               limit: 255
-    t.integer  "policy_id",          limit: 4
-    t.text     "other_creators",     limit: 65535
-    t.string   "first_letter",       limit: 1
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-    t.datetime "last_used_at"
-    t.integer  "version",            limit: 4
-    t.boolean  "sweepable"
-    t.string   "myexperiment_link",  limit: 255
-    t.string   "documentation_link", limit: 255
-    t.string   "doi",                limit: 255
-  end
 
   create_table "worksheets", force: :cascade do |t|
     t.integer "content_blob_id", limit: 4

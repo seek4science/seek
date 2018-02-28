@@ -74,7 +74,7 @@ class SendPeriodicEmailsJob < SeekEmailJob
 
   def collect_and_deliver(logs, person)
     activity_logs = collect_relevant_logs(logs, person)
-    SubMailer.send_digest_subscription(person, activity_logs, frequency).deliver_now if activity_logs.any?
+    SubMailer.send_digest_subscription(person, activity_logs, frequency).deliver_later if activity_logs.any?
   end
 
   def collect_relevant_logs(logs, person)

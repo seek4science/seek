@@ -7,13 +7,11 @@
 *= require favourites
 *= require fast_auto_complete
 *= require autocompleter_advanced
-*= require savage_beast/forums
 *= require site_announcements
 *= require tabnav
 *= require top_menu
 *= require dynamic_menu
 *= require easytabs
-*= require taverna_player/application
 *= require projects
 *= require jquery.bxslider
 *= require jws

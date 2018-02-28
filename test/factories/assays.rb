@@ -1,5 +1,6 @@
 # AssayClass
-#:assay_modelling and :assay_experimental rely on the existence of the AssayClasses
+# :assay_modelling and :assay_experimental rely on the existence of the AssayClasses
+
 Factory.define(:modelling_assay_class, class: AssayClass) do |f|
   f.title I18n.t('assays.modelling_analysis')
   f.key 'MODEL'
@@ -67,7 +68,8 @@ Factory.define(:max_assay, class: Assay) do |f|
   f.association :contributor,  factory: :person
   f.assay_assets {[Factory(:assay_asset, asset: Factory(:data_file, policy: Factory(:public_policy))),
                    Factory(:assay_asset, asset: Factory(:sop, policy: Factory(:public_policy))),
-                   Factory(:assay_asset, asset: Factory(:model, policy: Factory(:public_policy)))]}
+                   Factory(:assay_asset, asset: Factory(:model, policy: Factory(:public_policy))),
+                   Factory(:assay_asset, asset: Factory(:document, policy: Factory(:public_policy)))]}
 
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
 end

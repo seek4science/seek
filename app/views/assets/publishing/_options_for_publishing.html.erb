@@ -30,11 +30,10 @@
     <% elsif item.can_publish? %>
         <div class="publish-checkbox">
           <div class="checkbox">
-            <label>Publish?
-              <%= check_box_tag publishing_item_param(item), 1, checked,
+            <label><%= check_box_tag publishing_item_param(item), 1, checked,
                                 {:class=>"#{item.class.name}_#{item.id}",
                                  :onclick=>"checkRepeatedItems(this)"} -%>
-
+              Publish?
             </label>
           </div>
         </div>

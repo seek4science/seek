@@ -19,6 +19,7 @@ Factory.define(:max_person, class: Person) do |f|
   f.created_presentations {[Factory(:presentation, policy: Factory(:public_policy))]}
   f.created_data_files {[Factory(:data_file, policy: Factory(:public_policy))]}
   f.created_publications {[Factory(:publication)]}
+  f.created_documents {[Factory(:public_document)]}
   f.association :user, factory: :activated_user
 end
 

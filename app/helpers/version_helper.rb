@@ -30,4 +30,8 @@ module VersionHelper
   def presentation_version_url(presentation_version)
     presentation_url(presentation_version.parent, version: presentation_version.version)
   end
+
+  def document_version_url(document_version)
+    document_url(document_version.parent, version: document_version.version)
+  end
 end

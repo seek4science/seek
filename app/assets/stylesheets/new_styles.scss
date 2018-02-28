@@ -631,6 +631,10 @@ div.popup-contributor {
   .list_item_title {
     flex-grow: 1;
     flex-shrink: 0;
+
+    img {
+      max-height: 34px;
+    }
   }
 
   .rli-project-list {
@@ -680,6 +684,11 @@ div.popup-contributor {
       background-color: $body-bg; /* This stops the <ul>'s background overlapping */
     }
   }
+}
+
+[data-role="seek-associations-list"] ul {
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 .disabled_icon.disabled {

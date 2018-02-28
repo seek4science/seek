@@ -10,7 +10,6 @@ class ApplicationController < ActionController::Base
   include Recaptcha::Verify
 
   include CommonSweepers
-  @is_json = false
 
   before_filter :log_extra_exception_data
 
@@ -30,12 +29,10 @@ class ApplicationController < ActionController::Base
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
-  before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :check_illegal_id, :only=>[:create]
-  # after_filter :unescape_response
 
-  before_filter :write_api_enabled, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new]
+  before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
+  before_filter :write_api_enabled, only: [:update, :destroy, :create], if: :json_api_request?
+  before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
   helper :all
 
@@ -75,10 +72,6 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
-  def set_is_json
-    @is_json = (request.format.json?)
-  end
-
   def api_version
     @default = 1
     version_re_arr = [/version=(?<v>.+?)/, /api.v(?<v>\d+?)\+json/]
@@ -109,13 +102,17 @@ class ApplicationController < ActionController::Base
 
   def is_user_admin_auth
     unless User.admin_logged_in?
-      error('Admin rights required', 'is invalid (not admin)')
+      error('Admin rights required', 'is invalid (not admin)', :forbidden)
       return false
     end
     true
   end
 
   def can_manage_announcements?
+    admin_logged_in?
+  end
+
+  def admin_logged_in?
     User.admin_logged_in?
   end
 
@@ -175,7 +172,7 @@ class ApplicationController < ActionController::Base
   private
 
   def project_membership_required
-    unless User.logged_in_and_member? || User.admin_logged_in?
+    unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
       respond_to do |format|
         format.html do
@@ -226,18 +223,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def error(notice, _message)
+  #_status is mostly important for the json responses, default is 400 (Bad Request)
+  def error(notice, _message, _status=400)
     flash[:error] = notice
-
     respond_to do |format|
       format.html { redirect_to root_url }
-      format.json { redirect_to root_url }
+      format.json {
+        render json: {"title": notice, "detail": _message}, status: _status
+      }
     end
-  end
-
-  # required for the Savage Beast
-  def admin?
-    User.admin_logged_in?
   end
 
   # handles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
@@ -371,22 +365,6 @@ class ApplicationController < ActionController::Base
                              activity_loggable: object,
                              user_agent: request.env['HTTP_USER_AGENT'])
         end
-      when 'sweeps', 'runs'
-        if %w(show update destroy download).include?(action)
-          ref = object.projects.first
-        elsif action == 'create'
-          ref = object.workflow
-        end
-
-        check_log_exists(action, controller_name, object)
-        ActivityLog.create(action: action,
-                           culprit: current_user,
-                           referenced: ref,
-                           controller_name: controller_name,
-                           activity_loggable: object,
-                           data: object.title,
-                           user_agent: request.env['HTTP_USER_AGENT'])
-        break
       when 'people', 'projects', 'institutions'
         if %w(show create update destroy).include?(action)
           ActivityLog.create(action: action,
@@ -556,17 +534,6 @@ class ApplicationController < ActionController::Base
     redirect_to signup_path if User.count == 0
   end
 
-  def check_illegal_id
-    begin
-      Rails.logger.info("checking illegal ID")
-      if !params[:id].nil?
-        raise ArgumentError.new('A POST request is not allowed to specify an id')
-      end
-    rescue ArgumentError => e
-      render json: {error: e.message, status: :forbidden}, status: :forbidden
-    end
-  end
-
   # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
   # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
   # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
@@ -591,20 +558,47 @@ class ApplicationController < ActionController::Base
     if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
       return
     end
-    if @is_json && !Rails.env.development?
+    if json_api_request? && Rails.env.production?
       raise NotImplementedError
     end
   end
 
-  def convert_json_params
-   if @is_json
-      organize_external_attributes_from_json
-      hacked_params = flatten_relationships(params)
-      # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
-      params[controller_name.classify.downcase.to_sym] =
-          ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
-
+  def check_json_id_type
+    begin
+      raise ArgumentError.new('A POST/PUT request must have a data record complying with JSONAPI specs') if params[:data].nil?
+      #type should always appear in POST or PUT requests
+      if params[:data][:type].nil?
+        raise ArgumentError.new('A POST/PUT request must specify a data:type')
+      elsif params[:data][:type] != params[:controller]
+        raise ArgumentError.new("The specified data:type does not match the URL's object (#{params[:data][:type]} vs. #{params[:controller]})")
+      end
+      #id should not appear on POST, but should be accurate IF it appears on PUT
+      case params[:action]
+        when "create"
+          if !params[:data][:id].nil?
+            raise ArgumentError.new('A POST request is not allowed to specify an id')
+          end
+        when "update"
+          if (!params[:data][:id].nil?) && (params[:id] != params[:data][:id])
+            raise ArgumentError.new('id specified by the PUT request does not match object-id in the JSON input')
+          end
+      end
+    rescue ArgumentError => e
+      render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
     end
+  end
+
+  def convert_json_params
+    params[controller_name.singularize.to_sym] =
+        ActiveModelSerializers::Deserialization.jsonapi_parse(params)
+    params.delete(:data)
+
+    organize_external_attributes_from_json
+    tweak_json_params
+  end
+
+  # override in sub-classes
+  def tweak_json_params
   end
 
   # take out policies, annotations, etc(?) outside of the given object attributes
@@ -619,26 +613,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def flatten_relationships(original_params)
-    replacements = {}
-    begin
-      rels = original_params[:data][:relationships]
-      assoc = rels[:associated]
-      assoc_relationships = assoc[:data]
-      assoc_relationships.each do |assoc_rel|
-        the_type = assoc_rel["type"]
-        the_id = assoc_rel["id"]
-        if !replacements.key?(the_type)
-          replacements[the_type] = {}
-          replacements[the_type][:data] = []
-        end
-        replacements[the_type][:data].push({:type => the_type, :id => the_id})
-      end
-      rels.delete(:associated)
-      original_params[:data][:relationships].merge!(ActionController::Parameters.new(replacements))
-    rescue Exception
-    end
-    original_params
+  def json_api_request?
+    request.format.json?
   end
 
 end

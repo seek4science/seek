@@ -56,7 +56,7 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'should send feedback for anonymous user' do
     logout
-    assert_emails(0) do
+    assert_no_enqueued_emails do
       post :send_feedback, anon: false, details: 'test feedback', subject: 'test feedback'
     end
   end
@@ -129,21 +129,6 @@ class HomesControllerTest < ActionController::TestCase
     Factory(:user)
     get :index
     assert_response :success
-  end
-
-  test 'should hide the forum tab for unlogin user' do
-    logout
-    get :index
-    assert_response :success
-    assert_select 'a', text: /Forum/, count: 0
-  end
-
-  test 'should hide forum tab for logged in user' do
-    # this test may break if we re-enable forums - which is currently under question. If it does and we have re-enabled just change :count=>1
-    login_as(:quentin)
-    get :index
-    assert_response :success
-    assert_select 'a', text: /Forum/, count: 0
   end
 
   test 'should display home description' do

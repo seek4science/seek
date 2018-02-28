@@ -9,13 +9,22 @@ module AuthenticatedSystem
   # Accesses the current user from the session.
   # Future calls avoid the database because nil is not equal to false.
   def current_user
-    @current_user ||= (login_from_session || login_from_basic_auth || login_from_cookie || User.guest) unless @current_user == false
+    if defined? @current_user
+      @current_user
+    else
+      @current_user = (login_from_session || login_from_basic_auth || login_from_cookie || User.guest)
+    end
   end
 
   # Store the given user id in the session.
   def current_user=(new_user)
-    session[:user_id] = new_user ? new_user.id : nil
-    @current_user = new_user || false
+    session[:user_id] = new_user.try(:id)
+    @current_user = new_user
+  end
+
+  def clear_current_user
+    @current_user = nil
+    remove_instance_variable(:@current_user)
   end
 
   # Check if the user is authorized
@@ -117,6 +126,8 @@ module AuthenticatedSystem
   def login_from_basic_auth
     authenticate_with_http_basic do |username, password|
       self.current_user = User.authenticate(username, password)
+      sleep 2 if Rails.env.production? && (username.present? && !self.current_user) # Throttle incorrect login
+      self.current_user
     end
   end
 

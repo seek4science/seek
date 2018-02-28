@@ -48,7 +48,7 @@ class JsonMetaTest < ActiveSupport::TestCase
     assert_empty json['contains']
 
     assert_equal '10.1111/ecog.01552', json['doi']
-    assert_equal 'https://dx.doi.org/10.1111/ecog.01552', json['doi_uri']
+    assert_equal 'https://doi.org/10.1111/ecog.01552', json['doi_uri']
     assert_nil json['pubmed_id']
     assert_nil json['pubmed_uri']
 

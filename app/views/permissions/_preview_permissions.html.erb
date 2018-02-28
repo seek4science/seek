@@ -36,7 +36,7 @@
             <h3>Additionally...</h3>
             <% [Policy::MANAGING, Policy::EDITING, downloadable ? Policy::ACCESSIBLE : nil, Policy::VISIBLE].compact.each do |access_type| %>
                 <% if grouped_contributors[access_type].try(:any?) %>
-                    <div class="access-type-<%= access_type_key(access_type)-%>">
+                    <div class="access-type-<%= PolicyHelper::access_type_key(access_type)-%>">
                       <p>The following can <strong><%= Policy.get_access_type_wording(access_type, resource_name.camelize.constantize.new.try(:is_downloadable?)).downcase -%></strong></p>
                       <ul>
                         <% grouped_contributors[access_type].each do |contributor| %>
