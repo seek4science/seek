@@ -1,6 +1,6 @@
 <%
 version ||= params[:version]
-avatar = favouritable_icon(version ? item.find_version(version) : item, 34)
+avatar = favouritable_icon(version ? item.find_version(version) : item, 120)
 title_prefix||="" 
 title_postfix||=""
 title ||= item.title || ""

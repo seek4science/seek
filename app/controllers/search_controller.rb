@@ -54,7 +54,7 @@ class SearchController < ApplicationController
   end
 
   def perform_search (is_json = false)
-    @search_query = params[:q] || params[:search_query]
+    @search_query = ActionController::Base.helpers.sanitize(params[:q] || params[:search_query])
     @search=@search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
     @search_query||=""
     @search_type = params[:search_type]
@@ -81,7 +81,6 @@ class SearchController < ApplicationController
             end #.results
             @search_hits = search.hits
             search_result = search.results
-            search_result = search_result.sort_by(&:published_date).reverse if source == Publication && Seek::Config.is_virtualliver
             @results |= search_result
           end
       else
@@ -93,7 +92,6 @@ class SearchController < ApplicationController
            end #.results
            @search_hits = search.hits
            search_result = search.results
-           search_result = search_result.sort_by(&:published_date).reverse if search_type == Publication
            @results = search_result
       end
 

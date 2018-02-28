@@ -6,7 +6,7 @@ class RegistrationStateTest < ActionDispatch::IntegrationTest
 
   test 'partially registered user always redirects to select person' do
     User.current_user = Factory(:user, login: 'partial', person: nil)
-    post '/session', login: 'partial', password: 'blah'
+    post '/session', login: 'partial', password: factory_user_password
     assert_redirected_to register_people_path
 
     assert_nil User.current_user.person
