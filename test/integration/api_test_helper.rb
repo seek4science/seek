@@ -225,13 +225,19 @@ private
   end
 
   ##
-  # Compares `result` against `source`. If `source` is a Hash, compare each each key/value pair with that in `result`.
+  # Compares `result` against `source`. If `source` is a Hash, compare each each key/value pair with that in `result`. If `source` is an Array, compare each value.
   # `key` is used to generate meaningful failure messages if the assertion fails.
   def deep_comparison(source, result, key)
     if source.is_a?(Hash)
       source.each do |sub_key, sub_value|
         actual = result.try(:[], sub_key)
-        assert_equal sub_value, actual, "Expected #{key}[#{sub_key}] to be `#{sub_value}` but was `#{actual}`"
+        deep_comparison(sub_value, actual, "#{key}[#{sub_key}]")
+      end
+    elsif source.is_a?(Array)
+      sorted_result = result.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
+      sorted_source = source.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
+      sorted_source.each_with_index do |sub_value, index|
+        deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
       end
     else
       assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
