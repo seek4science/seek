@@ -15,7 +15,7 @@ class Organism < ActiveRecord::Base
 
   has_and_belongs_to_many :projects
 
-  before_validation :convert_ncbi_id
+  before_validation :convert_concept_uri
 
   validates_presence_of :title
   validates :concept_uri, url: { allow_nil: true, allow_blank: true }
@@ -33,7 +33,7 @@ class Organism < ActiveRecord::Base
     !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
   end
 
-  def can_manage?(user = User.current_user)
+  def can_manage?(_user = User.current_user)
     User.admin_logged_in?
   end
 
@@ -50,17 +50,25 @@ class Organism < ActiveRecord::Base
     User.admin_or_project_administrator_logged_in? || User.activated_programme_administrator_logged_in?
   end
 
-  #overides that from the bioportal gem, to always make sure it is based on http://purl.bioontology.org/ontology/NCBITAXON/
+  # overides that from the bioportal gem, to always make sure it is based on http://purl.bioontology.org/ontology/NCBITAXON/
   def ncbi_uri
     return nil if ncbi_id.nil?
     "http://purl.bioontology.org/ontology/NCBITAXON/#{ncbi_id}"
   end
 
-  # if present, and just a number, then converts to the http://purl.bioontology.org/ontology/NCBITAXON/[:id] form,
-  # otherwise does nothing
-  def convert_ncbi_id
-    if concept_uri && /\A\d+\Z/.match(concept_uri)
+  # converts the concept uri into a common form of http://purl.bioontology.org/ontology/NCBITAXON/<Number> if:
+  #   - it is just a number
+  #   - of the form NCBITaxon:<Number>
+  #   - a identifiers.org URI
+  # if it doesn't match these rules it is left as it is
+  def convert_concept_uri
+    case concept_uri
+    when /\A\d+\Z/
       self.concept_uri = "http://purl.bioontology.org/ontology/NCBITAXON/#{concept_uri}"
+    when /\ANCBITaxon:\d+\Z/i
+      self.concept_uri = "http://purl.bioontology.org/ontology/NCBITAXON/#{concept_uri.gsub(/NCBITaxon:/i, '')}"
+    when /\Ahttps?:\/\/identifiers\.org\/taxonomy\/\d+\Z/i
+      self.concept_uri = "http://purl.bioontology.org/ontology/NCBITAXON/#{concept_uri.gsub(/https?:\/\/identifiers\.org\/taxonomy\//i, '')}"
     end
   end
 end
