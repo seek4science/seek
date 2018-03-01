@@ -198,7 +198,7 @@ namespace :seek do
         disable_authorization_checks do
           duplicated = Organism.all.
               group_by { |o| o.ncbi_id }.
-              select { |ncbi_id, organisms| !ncbi_id.nil? && organisms.length > 1 }
+              select { |ncbi_id, organisms| !ncbi_id.nil? && ncbi_id!=0 && organisms.length > 1 }
 
           duplicated.each do |ncbi_id, organisms|
             sorted = organisms.sort_by(&:created_at)
