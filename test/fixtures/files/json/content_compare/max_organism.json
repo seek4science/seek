@@ -4,7 +4,7 @@
     "type": "organisms",
     "attributes": {
       "title": "A Maximal Organism",
-      "concept_uri": "https://identifiers.org/taxonomy/9606",
+      "concept_uri": "http://purl.bioontology.org/ontology/NCBITAXON/9606",
       "ontology_id": "23"
     },
     "relationships": {
