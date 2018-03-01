@@ -22,18 +22,14 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
   end
 
   def populate_extra_attributes
-    extra_attributes = {}
-    extra_attributes.with_indifferent_access
+    {}
   end
 
   def populate_extra_relationships
-    person_id = @current_user.person.id
-    project_id = @project.id
     extra_relationships = {}
-    extra_relationships[:submitter] = { data: [{ id: person_id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: person_id.to_s, type: 'people' },
+    extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
+    extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
                                             { id: @creator.id.to_s, type: 'people' }] }
-    extra_relationships[:projects] = { data: [{ id: project_id.to_s, type: 'projects' }] }
     extra_relationships.with_indifferent_access
   end
 
