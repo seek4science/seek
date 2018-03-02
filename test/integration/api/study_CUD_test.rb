@@ -63,7 +63,7 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     assert_difference('Subscription.count', -2) do
       assert_difference('Study.count', -1) do
         delete "/#{@plural_clz}/#{study.id}.json"
-        asset_response :success
+        assert_response :success
       end
     end
   end
