@@ -238,43 +238,9 @@ class AssaysController < ApplicationController
     end
   end
 
-  def set_creators
-    if !(params[:data][:attributes][:creators].nil?)
-      params[:creators] = params[:data][:attributes][:creators]
-      params[:data][:attributes].delete :creators
-    end
-  end
-
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
                                   :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset,
                                   { document_ids: []})
   end
-
-  def tweak_json_params
-    if params[:assay][:assay_class].present? && params[:assay][:assay_class][:key].present?
-      sym = params[:assay][:assay_class][:key].to_sym
-      the_class = AssayClass.find_by(key: sym)
-      if the_class.blank? then
-        raise "No id for class key #{sym}"
-      end
-      params[:assay][:assay_class_id] = the_class.id
-      # if params[:assay][:assay_class] == :EXP
-      #   params[:assay][:assay_class_id] = "1"
-      # else
-      #   params[:assay][:assay_class_id] = "2"
-      # end
-      params[:assay].delete :assay_class
-    end
-    if params[:assay][:assay_type].present?
-      params[:assay][:assay_type_uri] = params[:assay][:assay_type][:uri]
-      params[:assay].delete :assay_type
-    end
-    if params[:assay][:technology_type].present?
-      params[:assay][:technology_type_uri] = params[:assay][:technology_type][:uri]
-      params[:assay].delete :technology_type
-    end
-  end
-
-
 end
