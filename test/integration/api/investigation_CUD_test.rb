@@ -30,7 +30,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
 
     ['min','max'].each do |m|
       @post_values[m] = {project_ids:  [@min_project.id, @max_project.id],
-                      #   creator_ids: [@current_user.person.id],
+                         creator_ids: [@current_user.person.id],
                          r: ApiTestHelper.method(:render_erb) }
     end
   end
