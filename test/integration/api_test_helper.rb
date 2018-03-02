@@ -58,7 +58,7 @@ module ApiTestHelper
         #puts "post #{m} values: #{@post_values[m]}"
         @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values[m])
       end
-      #puts "create, to_post #{m}", @to_post
+      puts "create, to_post #{m}", @to_post
 
       if @to_post.blank?
         skip
@@ -67,7 +67,7 @@ module ApiTestHelper
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", @to_post
-        #puts "returned response: ", response.body
+        puts "returned response: ", response.body
         assert_response :success
       end
 

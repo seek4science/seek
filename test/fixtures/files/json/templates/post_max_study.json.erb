@@ -1,0 +1,41 @@
+{
+  "data": {
+    "type": "studies",
+    "attributes": {
+      "title": "A Maximal Study",
+      "description": "The Study of many things",
+      "experimentalists": "Wet lab people",
+      "person_responsible_id": "<%= person_id %>",
+      "other_creators": "Marie Curie",
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource_id": "<%=investigation_id%>",
+            "resource_type": "investigations",
+            "access": "manage"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "investigation": {
+        "data":
+        {
+          "id": "<%=investigation_id%>",
+          "type": "investigations"
+        }
+      }
+      <% unless creator_ids.nil? %>
+      ,"creators": {
+        "data": [
+          <% for creator_id in creator_ids do %>
+          <%= r.call("_related.json.erb",{:type => "people",:id => creator_id}) %>
+          <% end %>
+        ]
+      }
+      <% end %>
+
+    }
+  }
+}
