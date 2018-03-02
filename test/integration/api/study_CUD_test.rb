@@ -63,19 +63,25 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     assert_difference('Subscription.count', -2) do
       assert_difference('Study.count', -1) do
         delete "/#{@plural_clz}/#{study.id}.json"
+        asset_response :success
       end
     end
   end
-  #
-  # test 'project member can delete' do
-  #   person = Factory(:person_in_project)
-  #   proj = person.projects.first
-  #   study = Factory(:study,
-  #                   investigation: Factory(:investigation, project_ids: [proj.id]),
-  #                   policy: Factory(:policy,
-  #                       access_type: Policy::NO_ACCESS,
-  #                       permissions: [Factory(:permission, contributor: proj, access_type: Policy::EDITING)]))
-  #
-  #
-  # end
+
+  test 'project member can delete' do
+    person = Factory(:person)
+    user_login(person)
+    proj = person.projects.first
+    study = Factory(:study,
+                    investigation: Factory(:investigation, project_ids: [proj.id]),
+                    policy: Factory(:policy,
+                        access_type: Policy::NO_ACCESS,
+                        permissions: [Factory(:permission, contributor: proj, access_type: Policy::MANAGING)]))
+
+    assert_difference('Study.count', -1) do
+      delete "/#{@plural_clz}/#{study.id}.json"
+      assert_response :success
+    end
+
+  end
 end
