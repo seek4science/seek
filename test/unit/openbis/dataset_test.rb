@@ -53,8 +53,8 @@ class DatasetTest < ActiveSupport::TestCase
 
   test 'all' do
     all = Seek::Openbis::Dataset.new(@openbis_endpoint).all
-    assert_equal 8, all.count
-    assert_includes all.collect(&:perm_id), '20160210130454955-23'
+    assert_equal 3, all.count
+    assert_includes all.collect(&:perm_id), '20171004182824553-41'
   end
 
   test 'dataset files' do

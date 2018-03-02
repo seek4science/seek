@@ -4,7 +4,10 @@ require 'openbis_test_helper'
 class OpenbisSynJobTest < ActiveSupport::TestCase
 
   def setup
+    mock_openbis_calls
+
     @batch_size = 3;
+    #@endpoint = Factory(:openbis_endpoint)
     @endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
     @job = OpenbisSyncJob.new(@endpoint, @batch_size)
     Delayed::Job.destroy_all # avoids jobs created from the after_create callback, this is tested for OpenbisEndpoint
@@ -95,7 +98,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     assay = Factory :assay
     assert assay.data_files.empty?
 
-    zample = Factory :openbis_zample
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     refute zample.dataset_ids.empty?
 
     asset = OpenbisExternalAsset.build(zample)
@@ -118,7 +121,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     assay = Factory :assay
     assert assay.data_files.empty?
 
-    zample = Factory :openbis_zample
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     refute zample.dataset_ids.empty?
 
     asset = OpenbisExternalAsset.build(zample, {link_datasets: '1'})

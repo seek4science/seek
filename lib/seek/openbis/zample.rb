@@ -5,7 +5,7 @@ module Seek
       attr_reader :sample_type, :experiment_id, :dataset_ids, :identifier, :properties
 
       def populate_from_json(json)
-        @properties = json['properties']
+        @properties = json['properties'] || {}
         @properties.delete_if { |key, _value| key == '@type' }
         @sample_type = json['sample_type']
         @dataset_ids = json['datasets']

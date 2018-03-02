@@ -156,19 +156,23 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   end
 
-  test 'should_follow gives true if link_datasets selected' do
+  test 'should_follow gives true if part of assay or study' do
 
-    sync_options = {link_datasets: '1'}
+    sync_options = {}
     asset = OpenbisExternalAsset.build(@zample, sync_options)
 
-    asset.seek_entity = Factory :assay
-
-    assert @util.should_follow_dependent(asset)
-
-    asset.sync_options = {}
     refute @util.should_follow_dependent(asset)
 
+    asset.seek_entity = Factory :assay
+    assert @util.should_follow_dependent(asset)
+
+    asset = OpenbisExternalAsset.build(@experiment, sync_options)
+    asset.seek_entity = Factory :study
+    assert @util.should_follow_dependent(asset)
+
   end
+
+
 
   test 'fetch_current_entity_version fetches entity' do
     asset = OpenbisExternalAsset.build(@zample)
@@ -183,7 +187,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     end
   end
 
-  test 'sync_external_asset refreshes content and set sync status' do
+  test 'sync_external_asset refreshes dataset content and set sync status' do
 
     dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
     dataset2 = Seek::Openbis::Dataset.new(@endpoint, '20160215111736723-31')
@@ -191,6 +195,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset = OpenbisExternalAsset.build(dataset1)
     asset.synchronized_at = DateTime.now - 1.days
     asset.external_id = dataset2.perm_id
+    asset.seek_entity = Factory :data_file
 
     assert_not_equal dataset2.perm_id, asset.content.perm_id
 
@@ -206,6 +211,39 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
 
     assert_equal dataset2.perm_id, asset.content.perm_id
+  end
+
+  test 'sync_external_asset queues data_file index job if content changed' do
+
+    dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+    dataset2 = Seek::Openbis::Dataset.new(@endpoint, '20160215111736723-31')
+
+    data_file = Factory :data_file
+    asset = OpenbisExternalAsset.build(dataset1)
+    asset.synchronized_at = DateTime.now - 1.days
+    asset.external_id = dataset2.perm_id
+
+    asset.seek_entity = data_file
+
+    assert_not_equal dataset2.perm_id, asset.content.perm_id
+
+    assert asset.save
+
+    Delayed::Job.destroy_all
+    ReindexingQueue.destroy_all
+    assert_difference('Delayed::Job.count', 1) do
+      @util.sync_external_asset(asset)
+    end
+    assert ReindexingQueue.exists?(item: data_file)
+
+    asset.reload
+    Delayed::Job.destroy_all
+    ReindexingQueue.destroy_all
+    assert_no_difference('Delayed::Job.count') do
+      # same content no change
+      @util.sync_external_asset(asset)
+    end
+    refute ReindexingQueue.exists?(item: data_file)
   end
 
   test 'sync_external_asset links datasets to assay if follow links' do
@@ -246,6 +284,80 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     assert asset.synchronized?
     assert assay.data_files.empty?
+
+  end
+
+  test 'sync_external_asset does not link to study if sync_options not set' do
+
+    refute @experiment.dataset_ids.empty?
+    refute @experiment.sample_ids.empty?
+
+    study = Factory :study
+
+    assert study.assays.empty?
+    assert study.related_data_files.empty?
+
+    asset = OpenbisExternalAsset.build(@experiment)
+    asset.sync_options = {link_datasets: '0'}
+    asset.seek_entity = study
+
+    @util.sync_external_asset(asset)
+
+    study.reload
+    assert asset.synchronized?
+    assert study.assays.empty?
+    assert study.related_data_files.empty?
+  end
+
+  test 'sync_external_asset links to study if sync_options set' do
+
+    refute @experiment.dataset_ids.empty?
+    refute @experiment.sample_ids.empty?
+
+    study = Factory :study
+
+    assert study.assays.empty?
+    assert study.related_data_files.empty?
+
+    asset = OpenbisExternalAsset.build(@experiment)
+    asset.sync_options = {link_datasets: '1'}
+    asset.seek_entity = study
+
+    @util.sync_external_asset(asset)
+
+    study.reload
+    assert asset.synchronized?
+    assert_equal 1, study.assays.size # the fake files assay
+    assert_equal  @experiment.dataset_ids.size, study.related_data_files.size
+
+    asset.sync_options = {link_datasets: '1', linked_assays: @experiment.sample_ids}
+    @util.sync_external_asset(asset)
+
+    study.reload
+    assert_equal  @experiment.sample_ids.size+1, study.assays.size # one extra for linking datasets
+    assert_equal  @experiment.dataset_ids.size, study.related_data_files.size
+
+  end
+
+
+  test 'follow_dependent links datasets to assay' do
+
+    refute @zample.dataset_ids.empty?
+
+    assay = Factory :assay
+
+    assert assay.data_files.empty?
+
+    asset = OpenbisExternalAsset.build(@zample)
+    asset.sync_options = {link_datasets: '1'}
+    asset.seek_entity = assay
+    asset.save!
+
+    errs  = @util.follow_dependent(asset)
+    assert_equal [], errs
+
+    refute assay.data_files.empty?
+    assert_equal @zample.dataset_ids.length, assay.data_files.length
 
   end
 
@@ -822,24 +934,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
 
-  test 'follow_dependent links datasets' do
 
-    refute @zample.dataset_ids.empty?
-
-    assay = Factory :assay
-
-    assert assay.data_files.empty?
-
-    asset = OpenbisExternalAsset.build(@zample)
-    asset.seek_entity = assay
-
-    errs  = @util.follow_dependent(asset,@zample)
-    assert_equal [], errs
-
-    refute assay.data_files.empty?
-    assert_equal @zample.dataset_ids.length, assay.data_files.length
-
-  end
 
   test 'fetch_current_entity_version gets fresh version ignoring cache' do
 

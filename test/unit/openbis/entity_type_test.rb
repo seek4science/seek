@@ -92,7 +92,7 @@ class EntityTypeTest < ActiveSupport::TestCase
 
     zamples = Seek::Openbis::Zample.new(@openbis_endpoint).all
     assert zamples
-    assert_equal 8, zamples.size
+    assert_equal 16, zamples.size
 
   end
 

@@ -33,7 +33,6 @@ class ExternalAsset < ActiveRecord::Base
     self.content_changed = detect_change(content_object, json)
 
     @local_content = content_object
-
     self.local_content_json = json
     self.synchronized_at = DateTime.now
     self.sync_state = :synchronized
@@ -65,7 +64,6 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def synchronize_content
-
     obj = fetch_externally
     if obj
       self.content = obj

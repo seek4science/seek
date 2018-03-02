@@ -85,29 +85,34 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
         entity = fetch_current_entity_version(obis_asset)
 
+        obis_asset.content=entity
+        # saving automatically triggers reindexing
+        obis_asset.save!
+
+        # TODO maybe depended should be followed first (before the saving and indexing )in case of errors?
         errs = []
-        errs = follow_dependent(obis_asset, entity) if should_follow_dependent(obis_asset)
+        errs = follow_dependent(obis_asset) if should_follow_dependent(obis_asset)
         raise errs.join(', ') unless errs.empty?
 
-        obis_asset.content=entity
-        obis_asset.save!
       end
 
       def should_follow_dependent(obis_asset)
 
-        return false unless obis_asset.seek_entity.is_a? Assay
-        obis_asset.sync_options[:link_datasets] == '1'
+        return false unless obis_asset.seek_entity
+        return true if obis_asset.seek_entity.is_a? Assay
+        return true if obis_asset.seek_entity.is_a? Study
+        false
       end
 
       def fetch_current_entity_version(obis_asset)
         obis_asset.external_type.constantize.new(obis_asset.seek_service, obis_asset.external_id, true)
       end
 
-      def follow_dependent(obis_asset, current_entity)
+      def follow_dependent(obis_asset)
 
-        puts 'following dependent'
-        data_sets_ids = current_entity.dataset_ids || []
-        associate_data_sets_ids(obis_asset.seek_entity, data_sets_ids, obis_asset.seek_service)
+        return follow_study_dependent(obis_asset.seek_entity) if obis_asset.seek_entity.is_a? Study
+        return follow_assay_dependent(obis_asset.seek_entity) if obis_asset.seek_entity.is_a? Assay
+        raise "Not supported openbis following of #{obis_asset.seek_entity.class} from #{obis_asset}"
 
       end
 
@@ -150,6 +155,7 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
       def associate_zamples_as_assays(study, zamples, sync_options)
 
+        return [] if zamples.empty?
         issues = []
 
         external_assets = zamples.map { |ds| OpenbisExternalAsset.find_or_create_by_entity(ds) }
@@ -231,6 +237,7 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
       def associate_data_sets(assay, data_sets)
 
+        return [] if data_sets.empty?
         issues = []
 
         external_assets = data_sets.map { |ds| OpenbisExternalAsset.find_or_create_by_entity(ds) }
