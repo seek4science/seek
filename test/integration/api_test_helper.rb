@@ -55,7 +55,7 @@ module ApiTestHelper
 
     ['min','max'].each do |m|
       if defined? @post_values
-        puts "post #{m} values: #{@post_values[m]}"
+        #puts "post #{m} values: #{@post_values[m]}"
         @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values[m])
       end
       puts "create, to_post #{m}", @to_post
@@ -80,7 +80,6 @@ module ApiTestHelper
       if @to_post['data'].has_key? 'relationships'
         hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
       end
-
       begin
         hash_comparison(populate_extra_attributes, h['data']['attributes'])
         hash_comparison(populate_extra_relationships, h['data']['relationships'])
@@ -102,6 +101,24 @@ module ApiTestHelper
     end
     get "/#{@plural_clz}/#{obj.id}.json"
     assert_response :not_found
+  end
+
+  def test_unauthorized_user_cannot_update
+    user_login(Factory(:person))
+    obj = object_with_private_policy
+    @to_post["data"]["id"] = "#{obj.id}"
+    @to_post["data"]["attributes"]["title"] = "updated by an unauthorized"
+    patch "/#{@plural_clz}/#{obj.id}.json", @to_post
+    assert_response :forbidden
+  end
+
+  def test_unauthorized_user_cannot_delete
+    user_login(Factory(:person))
+    obj = object_with_private_policy
+    assert_no_difference("#{@clz.classify.constantize}.count") do
+      delete "/#{@plural_clz}/#{obj.id}.json"
+      assert_response :forbidden
+    end
   end
 
   def test_create_should_error_on_given_id
@@ -213,13 +230,13 @@ module ApiTestHelper
     end
   end
 
-private
+  private
 
   ##
   # Compare `result` Hash against `source`.
   def hash_comparison(source, result)
     source.each do |key, value|
-     # puts "#{key}: #{value} <==> #{result[key]}"
+      #puts "#{key}: #{value} <==> #{result[key]}"
       deep_comparison(value, result[key], key)
     end
   end
@@ -234,14 +251,23 @@ private
         deep_comparison(sub_value, actual, "#{key}[#{sub_key}]")
       end
     elsif source.is_a?(Array)
-      sorted_result = result.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
-      sorted_source = source.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
+      sorted_result = result.sort_by {|e| e.is_a?(Hash) ? e['id'] : e}
+      sorted_source = source.sort_by {|e| e.is_a?(Hash) ? e['id'] : e}
       sorted_source.each_with_index do |sub_value, index|
         deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
       end
     else
       assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
     end
+  end
+
+  def object_with_private_policy
+    begin
+      obj = Factory(("#{@clz}").to_sym, policy: Factory(:private_policy))
+    rescue NoMethodError
+      obj = Factory(("#{@clz}").to_sym)
+    end
+    obj
   end
 end
 

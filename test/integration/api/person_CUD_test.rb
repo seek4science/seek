@@ -43,27 +43,8 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   def test_normal_user_cannot_create_person
     user_login(Factory(:person))
-    #@to_post["data"]["attributes"]["email"] = "normalUserCreate@testEmail.com"
     assert_no_difference('Person.count') do
       post "/people.json", @to_post
-    end
-  end
-
-  def test_normal_user_cannot_update_others
-    user_login(Factory(:person))
-    other_person = Factory(:person)
-    @to_post["data"]["id"] = "#{other_person.id}"
-    @to_post["data"]["attributes"]["email"] = "updateTest@email.com"
-    patch "/people/#{other_person.id}.json", @to_post
-    assert_response :forbidden
-  end
-
-  def test_normal_user_cannot_delete_others
-    user_login(Factory(:person))
-    other_person = Factory(:person)
-    assert_no_difference('Person.count') do
-      delete "/people/#{other_person.id}.json"
-      assert_response :forbidden
     end
   end
 

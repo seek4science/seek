@@ -31,20 +31,4 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def test_normal_user_cannot_update_institution
-    user_login(Factory(:person))
-    @to_patch["data"]["attributes"]["title"] = "update institution fails for a normal user"
-    patch "/institutions/#{@to_patch["data"]["id"]}.json", @to_patch
-    assert_response :forbidden
-  end
-
-  def test_normal_user_cannot_delete_institution
-    user_login(Factory(:person))
-    inst = Factory(:institution)
-    assert_no_difference('Institution.count') do
-      delete "/institutions/#{inst.id}.json"
-      assert_response :forbidden
-    end
-  end
-
 end

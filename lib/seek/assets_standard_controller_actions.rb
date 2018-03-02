@@ -125,10 +125,10 @@ module Seek
       content_blob_param = nil
       comments_param = nil
       params.each do | key, v |
-        if (v.is_a?(Hash)) && (v.key? (:content_blobs))
+        if (v.is_a?(Hash)) && (v.key?(:content_blobs))
           content_blob_param = v[:content_blobs]
         end
-        if (v.is_a?(Hash)) && (v.key? (:revision_comments))
+        if (v.is_a?(Hash)) && (v.key?(:revision_comments))
           comments_param = v[:revision_comments]
         end
       end
@@ -137,6 +137,14 @@ module Seek
       end
       if comments_param.present?
         params[:revision_comments] = comments_param
+      end
+
+      if params[:creator_ids]
+        params[:creators] = params.delete(:creator_ids).map { |id| ['', id.to_i] }.to_json
+      end
+
+      if params[:publication_ids]
+        params[:related_publication_ids] = params.delete(:publication_ids).map { |id| "#{id}," }
       end
     end
   end

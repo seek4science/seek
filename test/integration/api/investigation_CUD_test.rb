@@ -21,26 +21,18 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
 
     hash = {project_ids: [@min_project.id, @max_project.id],
             r: ApiTestHelper.method(:render_erb) }
-    puts "setup hash #{hash}"
     @to_post = load_template("post_min_#{@clz}.json.erb", hash)
-    puts "setup post #{@to_post}"
     @to_patch = load_template("patch_#{@clz}.json.erb", {id: inv.id})
   end
 
   def create_post_values
     @post_values = {}
+
     ['min','max'].each do |m|
       @post_values[m] = {project_ids:  [@min_project.id, @max_project.id],
+                         creator_ids: [@current_user.person.id],
                          r: ApiTestHelper.method(:render_erb) }
     end
-    puts "created post values"
-  end
-
-  def populate_extra_attributes
-    extra_attributes = {}
-    extra_attributes[:policy] = BaseSerializer::convert_policy Factory(:private_policy)
-    extra_attributes.with_indifferent_access
-
   end
 
   def populate_extra_relationships
@@ -49,6 +41,28 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     extra_relationships[:submitter] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
     extra_relationships[:people] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
     extra_relationships.with_indifferent_access
+  end
 
+  test 'should not delete investigation with studies' do
+    inv = Factory(:max_investigation)
+    assert_no_difference('Investigation.count') do
+      delete "/#{@plural_clz}/#{inv.id}.json"
+      assert_response :forbidden
+    end
+  end
+
+  test 'can delete an investigation with subscriptions' do
+    inv = Factory(:investigation, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    p = Factory(:person)
+    Factory(:subscription, person: inv.contributor, subscribable: inv)
+    Factory(:subscription, person: p, subscribable: inv)
+
+    user_login(inv.contributor)
+
+    assert_difference('Subscription.count', -2) do
+      assert_difference('Investigation.count', -1) do
+        delete "/#{@plural_clz}/#{inv.id}.json"
+      end
+    end
   end
 end
