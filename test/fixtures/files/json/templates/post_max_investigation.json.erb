@@ -3,6 +3,20 @@
     "type": "investigations",
     "attributes": {
       "title": "A Maximal Investigation",
+      "policy": {
+        "access": "download",
+        "permissions": [
+          <% unless project_ids.nil? %>
+             <% policies = Array.new %>
+             <% for project_id in project_ids do %>
+              <% policies.push("{\"resource_id\": \"#{project_id}\",
+                                \"resource_type\": \"projects\",
+                                \"access\": \"manage\"}") %>
+             <% end %>
+              <%= policies.join(',') %>
+          <% end %>
+        ]
+      },
       "description": "This is a more complex investigation",
       "other_creators": "Max Blumenthal, Ed Snowden"
     },

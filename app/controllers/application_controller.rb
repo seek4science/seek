@@ -593,7 +593,6 @@ class ApplicationController < ActionController::Base
         ActiveModelSerializers::Deserialization.jsonapi_parse(params)
     organize_external_attributes_from_json
     params.delete(:data)
-    puts "params: ", params
     tweak_json_params
   end
 

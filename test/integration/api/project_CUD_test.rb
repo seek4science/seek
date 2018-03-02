@@ -65,7 +65,7 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     project = Factory(:project)
     @to_post["data"]["id"] = "#{project.id}"
     @to_post["data"]["attributes"]["title"] = "updated project by a normal user"
-    patch "/projects/#{project.id}.json", @to_post
+    patch "/#{@plural_clz}/#{project.id}.json", @to_post
     assert_response :forbidden
   end
 
@@ -73,7 +73,7 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     user_login(Factory(:person))
     project = Factory(:project)
     assert_no_difference('Project.count') do
-      delete "/projects/#{project.id}.json"
+      delete "/#{@plural_clz}/#{project.id}.json"
       assert_response :forbidden
     end
   end
