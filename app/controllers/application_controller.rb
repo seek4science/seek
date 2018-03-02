@@ -31,7 +31,6 @@ class ApplicationController < ActionController::Base
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
 
   before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
-  before_filter :write_api_enabled, only: [:update, :destroy, :create], if: :json_api_request?
   before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
   helper :all
@@ -551,16 +550,6 @@ class ApplicationController < ActionController::Base
                             { permissions_attributes: [:access_type,
                                                        :contributor_type,
                                                        :contributor_id] }])[:policy_attributes] || {}
-  end
-
-  def write_api_enabled
-    controller_class = self.controller_name.classify
-    if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
-      return
-    end
-    if json_api_request? && Rails.env.production?
-      raise NotImplementedError
-    end
   end
 
   def check_json_id_type
