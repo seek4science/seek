@@ -3056,7 +3056,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty df.projects
   end
 
-  test 'create metadata together with assay' do
+  test 'create metadata together with new assay' do
     person = Factory(:person)
     login_as(person)
 
@@ -3065,7 +3065,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
     project = person.projects.last
     assay_class = AssayClass.experimental
-    study = Factory(:study,investigation:Factory(:investigation,projects:[project]))
+    study = Factory(:study,investigation:Factory(:investigation,projects:[project]), contributor:person)
+    assert study.can_edit?
+
     params = {data_file: {
         title: 'Small File',
         project_ids: [project.id]
@@ -3102,6 +3104,48 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [project],assay.projects
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',assay.assay_type_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding',assay.technology_type_uri
+  end
+
+  test 'create metadata with new assay fails if study not editable' do
+    person = Factory(:person)
+    project = person.projects.last
+    study = Factory(:study,investigation:Factory(:investigation,projects:[project]))
+
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+
+    assay_class = AssayClass.experimental
+    refute study.can_edit?
+
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, assay: {
+        create_assay: true,
+        assay_class_id: assay_class.id,
+        title: 'my wonderful assay',
+        description: 'assay description',
+        study_id: study.id,
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+    },
+              policy_attributes: valid_sharing,
+              content_blob_id: blob.id.to_s
+    }
+
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
+        assert_no_difference('Assay.count') do
+          assert_no_difference('AssayAsset.count') do
+            post :create_metadata, params
+          end
+        end
+      end
+    end
+
+    assert_response :unprocessable_entity
   end
 
   def edit_max_object(df)

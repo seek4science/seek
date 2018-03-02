@@ -178,7 +178,8 @@ class DataFilesController < ApplicationController
     blob = ContentBlob.find(blob_id)
     @data_file.content_blob = blob
 
-    if valid_blob && @data_file.save && blob.save && (!create_new_assay || @assay.save)
+    # FIXME: clunky
+    if valid_blob && (!create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)) && @data_file.save && blob.save
       update_annotations(params[:tag_list], @data_file)
       update_scales @data_file
 
@@ -194,8 +195,8 @@ class DataFilesController < ApplicationController
         assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
         assay_ids = [@assay.id.to_s] if create_new_assay
         update_assay_assets(@data_file, assay_ids)
-        format.html {redirect_to data_file_path(@data_file)}
-        format.json {render json: @data_file}
+        format.html { redirect_to data_file_path(@data_file) }
+        format.json { render json: @data_file }
       end
 
     else
