@@ -17,11 +17,8 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_post_values
-    @post_values = {}
-    ['min','max'].each do |m|
       p = Factory(:person)
-      @post_values[m] = {first_name: "Post", last_name: p.last_name, email: "Post"+p.email}
-    end
+      @post_values = {first_name: "Post", last_name: p.last_name, email: "Post"+p.email}
   end
 
   # title cannot be POSTed or PATCHed

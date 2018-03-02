@@ -17,10 +17,7 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_post_values
-    @post_values = {}
-    ['min','max'].each do |m|
-      @post_values[m] = {title: "Post #{m} Project"}
-    end
+      @post_values = {title: "Post Project"}
   end
 
    def test_should_create_project_with_hierarchy

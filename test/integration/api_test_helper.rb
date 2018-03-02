@@ -55,10 +55,9 @@ module ApiTestHelper
 
     ['min','max'].each do |m|
       if defined? @post_values
-        #puts "post #{m} values: #{@post_values[m]}"
-        @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values[m])
+        @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
       end
-      #puts "create, to_post #{m}", @to_post
+     # puts "create, to_post #{m}", @to_post
 
       if @to_post.blank?
         skip

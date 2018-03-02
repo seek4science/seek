@@ -9,8 +9,8 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     @clz = 'assay'
     @plural_clz = @clz.pluralize
 
-    @min_study = Factory(:min_study)
-    @min_study.title = 'Fred'
+    @study = Factory(:study)
+    @study.title = 'Fred'
 
     # Populate the assay classes
     Factory(:modelling_assay_class)
@@ -19,19 +19,16 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     assay.contributor = @current_user.person
     assay.save
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_min_assay.json.erb')
-    template = ERB.new(File.read(template_file))
-    namespace = OpenStruct.new({:study_id => @min_study.id, :r => ApiTestHelper.method(:render_erb)})
-    template_result = template.result(namespace.instance_eval {binding})
-    @to_post = JSON.parse(template_result)
-
+    hash = {study_id: @study.id, r: ApiTestHelper.method(:render_erb)}
+    @to_post = load_template("post_min_#{@clz}.json.erb", hash)
     @to_patch = load_template("patch_#{@clz}.json.erb", {id: assay.id})
   end
 
-  def populate_extra_attributes
-    extra_attributes = {}
-    extra_attributes[:policy] = BaseSerializer::convert_policy Factory(:private_policy)
-    extra_attributes.with_indifferent_access
+  def create_post_values
+      @post_values[m] = {study_id: @study.id,
+                         project_id: Factory(:project).id,
+                         creator_ids: [@current_user.person.id],
+                         r: ApiTestHelper.method(:render_erb) }
   end
 
   def populate_extra_relationships

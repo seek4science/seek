@@ -17,11 +17,8 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_post_values
-    @post_values = {}
-    ['min','max'].each do |m|
       i = Factory(:institution)
-      @post_values[m] = {title: "Post "+i.title, country: i.country}
-    end
+      @post_values = {title: "Post "+i.title, country: i.country}
   end
 
   def test_normal_user_cannot_create_institution

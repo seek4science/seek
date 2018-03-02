@@ -17,10 +17,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_post_values
-    @post_values = {}
-    ['min','max'].each do |m|
-      @post_values[m] = {title: "Post #{m} programme"}
-    end
+      @post_values = {title: "Post programme"}
   end
 
   # funding_codes are an Array in the readAPI, but a comma-separated string in POST/PATCH

@@ -24,13 +24,10 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_post_values
-    @post_values = {}
-    ['min','max'].each do |m|
-      @post_values[m] = {investigation_id: @investigation.id,
+      @post_values = {investigation_id: @investigation.id,
                          person_id: @current_user.person.id,
                          creator_ids: [@current_user.person.id],
                          r: ApiTestHelper.method(:render_erb) }
-    end
   end
 
   def populate_extra_relationships
