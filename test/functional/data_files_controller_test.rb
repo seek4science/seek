@@ -2925,6 +2925,36 @@ class DataFilesControllerTest < ActionController::TestCase
 
   end
 
+  test 'create metadata with associated assay ignores assay if not editable' do
+    assay = Factory(:assay)
+    person = Factory(:person)
+    login_as(person)
+    refute assay.can_edit?
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    project = person.projects.last
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id],
+    }, policy_attributes: valid_sharing,
+        content_blob_id: blob.id.to_s,
+        assay_ids:[assay.id]
+    }
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_no_difference('Assay.count') do
+          assert_no_difference('AssayAsset.count') do
+            post :create_metadata, params
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+    assert_empty df.assays
+  end
+
   test 'create metadata fails if content blob not on session' do
     person = Factory(:person)
     login_as(person)
