@@ -91,3 +91,7 @@ Factory.define(:data_file_version_with_blob, parent: :data_file_version) do |f|
     end
   end
 end
+
+Factory.define(:api_pdf_data_file, parent: :data_file) do |f|
+  f.association :content_blob, factory: :blank_pdf_content_blob
+end

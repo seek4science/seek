@@ -126,26 +126,35 @@ module Seek
       true
     end
 
-    def tweak_json_params json_params
+    def tweak_json_params
       content_blob_param = nil
       comments_param = nil
-      json_params.each do | key, v |
-        if (v.is_a?(Hash)) && (v.key? (:content_blobs))
+      params.each do | key, v |
+        if (v.is_a?(Hash)) && (v.key?(:content_blobs))
           content_blob_param = v[:content_blobs]
-          end
-          if (v.is_a?(Hash)) && (v.key? (:revision_comments))
-            comments_param = v[:revision_comments]
-          end
+        end
+        if (v.is_a?(Hash)) && (v.key?(:revision_comments))
+          comments_param = v[:revision_comments]
+        end
       end
-        if content_blob_param.present?
-          json_params[:content_blobs] = content_blob_param
+      if content_blob_param.present?
+        params[:content_blobs] = content_blob_param
+        params[:content_blobs].each do |cb|
+          cb[:data_url] = cb.delete(:url)
         end
-        if comments_param.present?
-          json_params[:revision_comments] = comments_param
-        end
-        json_params
-    end
+      end
+      if comments_param.present?
+        params[:revision_comments] = comments_param
+      end
 
+      if params[:creator_ids]
+        params[:creators] = params.delete(:creator_ids).map { |id| ['', id.to_i] }.to_json
+      end
+
+      if params[:publication_ids]
+        params[:related_publication_ids] = params.delete(:publication_ids).map { |id| "#{id}," }
+      end
+    end
   end
 end
 

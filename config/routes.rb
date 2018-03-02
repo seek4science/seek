@@ -3,13 +3,24 @@ SEEK::Application.routes.draw do
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   #mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
+  # Concerns
+  concern :has_content_blobs do
+    resources :content_blobs do
+      member do
+        get :view_pdf_content
+        get :view_content
+        get :get_pdf
+        get :download
+      end
+    end
+  end
+
   resources :scales do
     collection do
       post :search
       post :search_and_lazy_load_results
     end
   end
-
 
   ### GENERAL PAGES ###
 
@@ -335,7 +346,7 @@ SEEK::Application.routes.draw do
 
   ### ASSETS ###
 
-  resources :data_files do
+  resources :data_files, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -382,18 +393,10 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :view_content
-        get :get_pdf
-        get :download
-      end
-    end
     resources :people,:projects,:investigations,:assays, :samples, :studies,:publications,:events,:only=>[:index]
   end
 
-  resources :presentations do
+  resources :presentations, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -414,18 +417,10 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       get :isa_children
     end
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :view_content
-        get :get_pdf
-        get :download
-      end
-    end
     resources :people,:projects,:publications,:events,:only=>[:index]
   end
 
-  resources :models do
+  resources :models, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -465,19 +460,10 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
-
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :view_content
-        get :get_pdf
-        get :download
-      end
-    end
     resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
-  resources :sops do
+  resources :sops, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -503,14 +489,6 @@ SEEK::Application.routes.draw do
     resources :experimental_conditions do
       collection do
         post :create_from_existing
-      end
-    end
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :view_content
-        get :get_pdf
-        get :download
       end
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
@@ -664,7 +642,7 @@ SEEK::Application.routes.draw do
 
   ### DOCUMENTS
 
-  resources :documents do
+  resources :documents, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -686,14 +664,6 @@ SEEK::Application.routes.draw do
       post :mint_doi
       get :mint_doi_confirm
       get :isa_children
-    end
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :view_content
-        get :get_pdf
-        get :download
-      end
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
   end

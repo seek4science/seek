@@ -138,7 +138,9 @@ class OrganismsControllerTest < ActionController::TestCase
       post :create, organism: { title: 'An organism', concept_uri:'https://identifiers.org/taxonomy/9606' }
     end
     assert_not_nil assigns(:organism)
-    assert_equal 'https://identifiers.org/taxonomy/9606',assigns(:organism).concept_uri
+
+    #uri is converted the taxonomy form
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/9606',assigns(:organism).concept_uri
   end
 
   #should convert to the purl version

@@ -6,7 +6,7 @@ module Seek
 
       def handle_upload_data
         blob_params = params[:content_blobs]
-        allow_empty_content_blob = model_image_present?
+        allow_empty_content_blob = model_image_present? || json_api_request?
 
         unless allow_empty_content_blob || retained_content_blob_ids.present?
           if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
@@ -16,7 +16,9 @@ module Seek
           end
         end
 
-        blob_params.reject! { |params| (params[:data].blank? && params[:data_url].blank? && params[:base64_data].blank?) }
+        unless json_api_request?
+          blob_params.reject! { |params| (params[:data].blank? && params[:data_url].blank? && params[:base64_data].blank?) }
+        end
 
         blob_params.each do |item_params|
           return false unless allow_empty_content_blob || check_for_data_or_url(item_params)
@@ -25,7 +27,7 @@ module Seek
             return false unless add_data_for_upload(item_params)
           elsif add_from_base64?(item_params)
             return false unless add_data_for_base64(item_params)
-          else
+          elsif add_from_url?(item_params)
             return false unless add_data_for_url(item_params)
           end
         end
@@ -163,13 +165,17 @@ module Seek
         !blob_params[:base64_data].blank?
       end
 
+      def add_from_url?(blob_params)
+        !blob_params[:data_url].blank?
+      end
+
       def handle_upload_data_failure
         if render_new?
           respond_to do |format|
             format.html do
               render action: :new
             end
-            format.json { render json: '{ "not ok" }' }
+            format.json { render json: { error: 'bad upload' }, status: 400 } # TODO: Change this to a valid error object
           end
         end
       end

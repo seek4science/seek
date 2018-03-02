@@ -6,7 +6,7 @@ module ApiTestHelper
     @current_person = admin
     @current_user = admin.user
     # log in
-    post '/session', login: admin.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH)
+    post '/session', login: @current_user.login, password: generate_user_password
   end
 
   def self.template_dir
@@ -70,67 +70,25 @@ module ApiTestHelper
   # end ("#{m}_#{clz}").to_sym
 
   def test_create
-
-    if @to_post.blank? then
+    if @to_post.blank?
       skip
     end
 
     # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
-    assert_difference("#{@clz.capitalize}.count") do
+    assert_difference("#{@clz.classify}.count") do
       post "/#{@plural_clz}.json", @to_post
+
       assert_response :success
     end
+
     # check some of the content
     h = JSON.parse(response.body)
 
-    if defined? self.tweak_response then
-      tweak_response h
-    end
+    hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
+    hash_comparison(populate_extra_attributes, h['data']['attributes'])
 
-    check_response h
-
-  end
-
-  def check_response (h)
-    extra_attributes = populate_extra_attributes
-
-    extra_relationships = populate_extra_relationships
-
-    @to_post['data']['attributes'].each do |key, value|
-      assert_equal value, h['data']['attributes'][key]
-    end
-
-    h['data']['attributes'].each do |key, value|
-      if @to_post['data']['attributes'].has_key? key
-        assert_equal value, @to_post['data']['attributes'][key]
-      elsif extra_attributes.has_key? key
-        assert_equal value, extra_attributes[key]
-      elsif value.blank?
-        # Should be OK
-      else
-        warn("Unexpected attribute [#{key}]=#{value}")
-      end
-    end
-
-
-    @to_post['data']['relationships'].each do |key, value|
-      assert_equal value, h['data']['relationships'][key]
-    end
-
-    h['data']['relationships'].each do |key, value|
-      if @to_post['data']['relationships'].has_key? key
-        assert_equal value, @to_post['data']['relationships'][key]
-      elsif extra_relationships.has_key? key
-        assert_equal value, extra_relationships[key]
-      elsif value.blank?
-        # Should be OK
-      elsif value['data'].blank?
-        # Should be OK
-      else
-        warn("Unexpected relationship [#{key}]=#{value}")
-      end
-    end
-
+    hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
+    hash_comparison(populate_extra_relationships, h['data']['relationships'])
   end
 
   def test_should_delete_object
@@ -184,9 +142,6 @@ module ApiTestHelper
     assert_response :success
 
     h = JSON.parse(response.body)
-    if defined? self.tweak_response then
-      tweak_response h
-    end
     the_id = h['data']['id']
 
     patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_#{@clz}.json.erb")
@@ -194,55 +149,31 @@ module ApiTestHelper
     namespace = OpenStruct.new(id: the_id)
     @to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding } ) )
 
-    assert_no_difference( "#{@clz.capitalize}.count") do
+    assert_no_difference( "#{@clz.classify}.count") do
       patch "/#{@plural_clz}/#{the_id}.json", @to_patch
       assert_response :success
     end
 
     h = JSON.parse(response.body)
-    if defined? self.tweak_response then  def test_create_missing_type
-      if @to_post.blank? then
-        skip
-      end
-      post_clone = JSON.parse(JSON.generate(@to_post))
-      post_clone['data'].delete('type')
-      assert_no_difference ("#{@clz.capitalize}.count") do
-        post "/#{@plural_clz}.json", post_clone
-        assert_response :unprocessable_entity
-        assert_match 'A POST/PUT request must specify a data:type', response.body
-      end
+
+    # Check the changed attributes and relationships
+    if @to_patch['data'].key?('attributes')
+      hash_comparison(@to_patch['data']['attributes'], h['data']['attributes'])
     end
 
-
-    tweak_response h
+    if @to_patch['data'].key?('relationships')
+      hash_comparison(@to_patch['data']['relationships'], h['data']['relationships'])
     end
 
-    if @to_patch['data'].key? 'attributes'
-      @to_patch['data']['attributes'].each do |key, value|
-        assert_equal value, h['data']['attributes'][key]
-      end
+    # Check the original, unchanged attributes and relationships
+    if @to_post['data'].key?('attributes') && @to_patch['data'].key?('attributes')
+      original_attributes = @to_post['data']['attributes'].except(*@to_patch['data']['attributes'].keys)
+      hash_comparison(original_attributes, h['data']['attributes'])
     end
 
-    if @to_patch['data'].key? 'relationships'
-      @to_patch['data']['relationships'].each do |key, value|
-        assert_equal value, h['data']['relationships'][key]
-      end
-    end
-
-    if (@to_post['data'].key? 'attributes') && (@to_patch['data'].key? 'attributes')
-      @to_post['data']['attributes'].each do |key, value|
-        unless @to_patch['data']['attributes'].key? key
-          assert_equal value, h['data']['attributes'][key]
-        end
-      end
-    end
-
-    if (@to_post['data'].key? 'relationships') && (@to_patch['data'].key? 'relationships')
-      @to_post['data']['relationships'].each do |key, value|
-        unless @to_patch['data']['relationships'].key? key
-          assert_equal value, h['data']['relationships'][key]
-        end
-      end
+    if @to_post['data'].key?('relationships') && @to_patch['data'].key?('relationships')
+      original_relationships = @to_post['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
+      hash_comparison(original_relationships, h['data']['relationships'])
     end
   end
 
@@ -282,4 +213,38 @@ module ApiTestHelper
     end
   end
 
+  private
+
+  ##
+  # Compare `result` Hash against `source`.
+  def hash_comparison(source, result)
+    source.each do |key, value|
+      deep_comparison(value, result[key], key)
+    end
+  end
+
+  ##
+  # Compares `result` against `source`. If `source` is a Hash, compare each each key/value pair with that in `result`. If `source` is an Array, compare each value.
+  # `key` is used to generate meaningful failure messages if the assertion fails.
+  def deep_comparison(source, result, key)
+    if source.is_a?(Hash)
+      source.each do |sub_key, sub_value|
+        actual = result.try(:[], sub_key)
+        deep_comparison(sub_value, actual, "#{key}[#{sub_key}]")
+      end
+    elsif source.is_a?(Array)
+      sorted_result = result.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
+      sorted_source = source.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
+      sorted_source.each_with_index do |sub_value, index|
+        deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
+      end
+    elsif source.is_a?(Array)
+      sorted = result.sort
+      source.sort.each_with_index do |sub_value, index|
+        deep_comparison(sub_value, sorted[index], "#{key[index]}")
+      end
+    else
+      assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
+    end
+  end
 end

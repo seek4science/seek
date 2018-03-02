@@ -17,8 +17,8 @@ class OrganismTest < ActiveSupport::TestCase
     org = Factory(:organism, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/2104')
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2104', org.ncbi_uri
 
-    org = Factory(:organism, concept_uri: 'http://identifiers.org/taxonomy/2104')
-    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2104', org.ncbi_uri
+    org = Factory(:organism, concept_uri: 'http://identifiers.org/taxonomy/2105')
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2105', org.ncbi_uri
 
     org = Factory(:organism, concept_uri: 'http://purl.obolibrary.org/obo/NCBITaxon_2387')
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2387', org.ncbi_uri
@@ -41,8 +41,8 @@ class OrganismTest < ActiveSupport::TestCase
     org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'http://identifiers.org/taxonomy/9606'))
     assert_equal 9606, org.ncbi_id
 
-    org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://identifiers.org/taxonomy/9606'))
-    assert_equal 9606, org.ncbi_id
+    org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: 'https://identifiers.org/taxonomy/9607'))
+    assert_equal 9607, org.ncbi_id
 
     org = Factory(:organism, bioportal_concept: Factory(:bioportal_concept, concept_uri: nil))
     assert_nil org.ncbi_id
@@ -208,22 +208,42 @@ class OrganismTest < ActiveSupport::TestCase
     assert org2.errors[:concept_uri].any?
   end
 
-  test 'convert ncbi id' do
+  test 'convert concept uri' do
     org = Factory.build(:organism, concept_uri: '1234')
-    org.convert_ncbi_id
+    org.convert_concept_uri
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/1234', org.concept_uri
 
     org = Factory.build(:organism, concept_uri: nil)
-    org.convert_ncbi_id
-    assert_nil org.convert_ncbi_id
+    org.convert_concept_uri
+    assert_nil org.convert_concept_uri
 
     org = Factory.build(:organism, concept_uri: 'http://purl.bioontology.org/ontology/NCBITAXON/562')
-    org.convert_ncbi_id
+    org.convert_concept_uri
     assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/562', org.concept_uri
 
+    org = Factory.build(:organism, concept_uri: 'NCBITaxon:1314')
+    org.convert_concept_uri
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/1314', org.concept_uri
+
+    org = Factory.build(:organism, concept_uri: 'ncbitaxon:1314')
+    org.convert_concept_uri
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/1314', org.concept_uri
+
+    org = Factory.build(:organism, concept_uri: 'https://identifiers.org/taxonomy/5622')
+    org.convert_concept_uri
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/5622', org.concept_uri
+
+    org = Factory.build(:organism, concept_uri: 'http://identifiers.org/taxonomy/5622')
+    org.convert_concept_uri
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/5622', org.concept_uri
+
     org = Factory.build(:organism, concept_uri: 'wibble')
-    org.convert_ncbi_id
+    org.convert_concept_uri
     assert_equal 'wibble', org.concept_uri
+
+    org = Factory.build(:organism, concept_uri: nil)
+    org.convert_concept_uri
+    assert_nil org.concept_uri
   end
 
   test 'test uuid generated' do
