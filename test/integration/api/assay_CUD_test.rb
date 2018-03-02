@@ -25,10 +25,10 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_post_values
-      @post_values[m] = {study_id: @study.id,
-                         project_id: Factory(:project).id,
-                         creator_ids: [@current_user.person.id],
-                         r: ApiTestHelper.method(:render_erb) }
+      @post_values = {study_id: @study.id,
+                      creator_ids: [@current_user.person.id],
+                      project_id: Factory(:project).id,
+                      r: ApiTestHelper.method(:render_erb) }
   end
 
   def populate_extra_relationships
