@@ -33,6 +33,13 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     assert_includes assigns(:project).ancestors, parent
   end
 
+  def test_normal_user_cannot_create_project
+    user_login(Factory(:person))
+    assert_no_difference('Project.count') do
+      post "/projects.json", @to_post
+    end
+  end
+
   # TO DO: revisit after doing relationships linkage
   # def test_should_not_create_project_with_programme_if_not_programme_admin
   #   person = Factory(:person)
@@ -51,30 +58,4 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
   #   assert_empty project.programmes
   #   puts project.programmes
   # end
-
-
-  def test_normal_user_cannot_create_project
-    user_login(Factory(:person))
-    assert_no_difference('Project.count') do
-      post "/projects.json", @to_post
-    end
-  end
-
-  def test_normal_user_cannot_update_project
-    user_login(Factory(:person))
-    project = Factory(:project)
-    @to_post["data"]["id"] = "#{project.id}"
-    @to_post["data"]["attributes"]["title"] = "updated project by a normal user"
-    patch "/#{@plural_clz}/#{project.id}.json", @to_post
-    assert_response :forbidden
-  end
-
-  def test_normal_user_cannot_delete_project
-    user_login(Factory(:person))
-    project = Factory(:project)
-    assert_no_difference('Project.count') do
-      delete "/#{@plural_clz}/#{project.id}.json"
-      assert_response :forbidden
-    end
-  end
 end
