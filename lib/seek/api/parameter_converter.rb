@@ -7,7 +7,6 @@ module Seek
     # 1. Convert - Certain parameter values are converted according to the `CONVERSIONS` mapping between keys and procs.
     # 3. Rename - Keys the above form are renamed according to the `RENAME` mapping below.
     # 4. Elevate - Parameters in the `ELEVATE` list are moved up out of e.g. `params['data_file']` into the top-level `params`
-
     class ParameterConverter
       # Custom conversions required on certain parameters to fit how the controller expects.
       CONVERSIONS = {
@@ -62,7 +61,7 @@ module Seek
           programme_ids: ->(value) {
             value.try(:first)
           }
-      }
+      }.freeze
 
       # Parameters to rename
       RENAME = {
@@ -74,11 +73,11 @@ module Seek
           assay_type: :assay_type_uri,
           technology_type: :technology_type_uri,
           programme_ids: :programme_id
-      }
+      }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
       ELEVATE = %i[assay_organism_ids tag_list expertise_list tool_list policy_attributes content_blobs
-       assay_ids related_publication_ids revision_comments creators]
+       assay_ids related_publication_ids revision_comments creators].freeze
 
       def initialize(controller_name)
         @controller_name = controller_name
@@ -87,17 +86,17 @@ module Seek
       def convert(parameters)
         @parameters = parameters
 
-        # Step 1
+        # Step 1 - JSON-API -> Rails format
         @parameters[@controller_name.singularize.to_sym] =
             ActiveModelSerializers::Deserialization.jsonapi_parse(@parameters)
 
-        # Step 2
+        # Step 2 - Perform any conversions on parameter values
         convert_parameters
 
-        # Step 3
+        # Step 3 - Rename any parameter keys
         rename_parameters
 
-        # Step 4
+        # Step 4 - Move any parameters into top-level
         elevate_parameters
 
         @parameters.delete(:data)
