@@ -232,11 +232,7 @@ class ContentBlob < ActiveRecord::Base
     if @headers
       @headers
     else
-      begin
-        remote_content_handler.info
-      rescue
-        {}
-      end
+      @headers = remote_content_handler.info rescue {}
     end
   end
 
