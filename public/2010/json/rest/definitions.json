@@ -1277,6 +1277,9 @@
                 "description" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
                 "assay_class" : {
                   "type" : "object",
                   "properties" : {
@@ -1357,6 +1360,9 @@
                   "$ref" : "#/definitions/nonEmptyString"
                 },
                 "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "other_creators" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "assay_class" : {
@@ -1943,6 +1949,9 @@
                 "description" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
                 }
@@ -1988,6 +1997,9 @@
                   "$ref" : "#/definitions/nonEmptyString"
                 },
                 "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "other_creators" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "policy" : {
@@ -3043,6 +3055,9 @@
                 "experimentalists" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
                 "person_responsible_id" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
@@ -3099,6 +3114,9 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "experimentalists" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "other_creators" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "person_responsible_id" : {
