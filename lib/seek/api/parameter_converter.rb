@@ -42,7 +42,7 @@ module Seek
 
           assay_class: ->(value) {
             if value && value[:key]
-              AssayClass.find_by(key: value[:key])
+              AssayClass.where(key: value[:key]).pluck(:id).first
             end
           },
 
