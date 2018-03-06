@@ -1,6 +1,7 @@
 class NelsController < ApplicationController
 
-  before_filter :find_assay, except: :callback
+  before_filter :project_membership_required, except: :callback
+  before_filter :find_and_authorize_assay, except: :callback
   before_filter :oauth_client
   before_filter :nels_oauth_session, except: :callback
   before_filter :rest_client, except: :callback
@@ -72,8 +73,20 @@ class NelsController < ApplicationController
 
   private
 
-  def find_assay
+  def find_and_authorize_assay
     @assay = Assay.find(params[:assay_id])
+
+    unless @assay.can_edit?
+      flash[:error] = 'You are not authorized to add NeLS data to this assay.'
+      redirect_to @assay
+      return false
+    end
+
+    unless @assay.projects.any? { |p| p.settings['nels_enabled'] }
+      flash[:error] = 'This assay is not associated with a NeLS-enabled project.'
+      redirect_to @assay
+      return false
+    end
   end
 
   def oauth_client
