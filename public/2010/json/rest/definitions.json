@@ -1167,26 +1167,26 @@
                   "type" : "object",
                   "properties" : {
                     "label" : {
-                      "$ref" : "#/definitions/nonEmptyString"
+                      "$ref" : "#/definitions/nullableNonEmptyString"
                     },
                     "uri" : {
                       "$ref" : "#/definitions/uriString"
                     }
                   },
-                  "required" : [ "label", "uri" ],
+                  "required" : [ "uri" ],
                   "additionalProperties" : false
                 },
                 "technology_type" : {
                   "type" : "object",
                   "properties" : {
                     "label" : {
-                      "$ref" : "#/definitions/nonEmptyString"
+                      "$ref" : "#/definitions/nullableNonEmptyString"
                     },
                     "uri" : {
                       "$ref" : "#/definitions/uriString"
                     }
                   },
-                  "required" : [ "label", "uri" ],
+                  "required" : [ "uri" ],
                   "additionalProperties" : false
                 },
                 "policy" : {
@@ -1327,7 +1327,7 @@
                   "$ref" : "#/definitions/studySingletonReference"
                 }
               },
-              "required" : [ "creators", "study" ],
+              "required" : [ "study" ],
               "additionalProperties" : false
             }
           },
@@ -1781,7 +1781,7 @@
                   "$ref" : "#/definitions/nullableUriString"
                 }
               },
-              "required" : [ "title", "country", "city", "address", "web_page" ],
+              "required" : [ "title" ],
               "additionalProperties" : false
             }
           },
@@ -1828,7 +1828,7 @@
               "additionalProperties" : false
             }
           },
-          "required" : [ "type", "attributes" ]
+            "required" : [ "id", "type" ]
         }
       },
       "required" : [ "data" ],
@@ -1971,7 +1971,7 @@
               "additionalProperties" : false
             }
           },
-          "required" : [ "id", "type", "attributes", "relationships" ],
+          "required" : [ "id", "type" ],
           "additionalProperties" : false
         }
       },
@@ -2019,7 +2019,7 @@
                   "$ref" : "#/definitions/projectReferencesList"
                 }
               },
-              "required" : [ "creators", "projects" ],
+              "required" : [ "projects" ],
               "additionalProperties" : false
             }
           },
@@ -2306,7 +2306,7 @@
               "additionalProperties" : false
             }
           },
-          "required" : [ "id", "type", "attributes" ],
+          "required" : [ "id", "type" ],
           "additionalProperties" : false
         }
       },
@@ -2350,7 +2350,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
                 }
               },
-              "required" : [ "title", "first_name", "last_name" ],
+              "required" : [ "first_name", "last_name" ],
               "additionalProperties" : false
             }
           },
@@ -2533,7 +2533,7 @@
                   "$ref" : "#/definitions/tagsType"
                 }
               },
-              "required" : [ "title", "description", "web_page", "funding_details", "funding_codes" ],
+              "required" : [ "title" ],
               "additionalProperties" : false
             }
           },
@@ -2578,7 +2578,7 @@
               "additionalProperties" : false
             }
           },
-          "required" : [ "id", "type", "attributes" ],
+          "required" : [ "id", "type" ],
           "additionalProperties" : false
         }
       },
@@ -2703,6 +2703,9 @@
             "attributes" : {
               "type" : "object",
               "properties" : {
+                "avatar" : {
+                  "$ref" : "#/definitions/nullableUriString"
+                },
                 "title" : {
                   "$ref" : "#/definitions/nonEmptyString"
                 },
@@ -2722,7 +2725,7 @@
               "additionalProperties" : false
             }
           },
-          "required" : [ "id", "type", "attributes" ],
+          "required" : [ "id", "type" ],
           "additionalProperties" : false
         }
       },
@@ -2741,6 +2744,9 @@
             "attributes" : {
               "type" : "object",
               "properties" : {
+                "avatar" : {
+                  "$ref" : "#/definitions/nullableUriString"
+                },
                 "title" : {
                   "$ref" : "#/definitions/nonEmptyString"
                 },
@@ -2757,7 +2763,7 @@
                   "$ref" : "#/definitions/policy"
                 }
               },
-              "required" : [ "title", "description", "web_page", "wiki_page" ],
+              "required" : [ "title" ],
               "additionalProperties" : false
             }
           },
@@ -3065,7 +3071,7 @@
                   "$ref" : "#/definitions/policy"
                 }
               },
-              "required" : [ "title", "person_responsible_id" ],
+              "required" : [ "title" ],
               "additionalProperties" : false
             },
             "relationships" : {
@@ -3078,7 +3084,7 @@
                   "$ref" : "#/definitions/investigationSingletonReference"
                 }
               },
-              "required" : [ "creators", "investigation" ],
+              "required" : [ "investigation" ],
               "additionalProperties" : false
             }
           },
