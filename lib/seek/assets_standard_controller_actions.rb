@@ -81,6 +81,7 @@ module Seek
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|
             format.html { redirect_to item }
+            format.json { render json: item }
           end
         end
       else

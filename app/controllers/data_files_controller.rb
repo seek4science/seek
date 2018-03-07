@@ -173,7 +173,7 @@ class DataFilesController < ApplicationController
             assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
             update_assay_assets(@data_file, assay_ids, relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
-            format.json { render json: @data_file}
+            format.json { render json: @data_file }
           end
       end
       else
