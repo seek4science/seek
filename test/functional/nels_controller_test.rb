@@ -73,6 +73,15 @@ class NelsControllerTest < ActionController::TestCase
     assert_equal 2, JSON.parse(response.body).length
   end
 
+  test 'reports 500 error when loading projects' do
+    VCR.use_cassette('nels/get_projects_500') do
+      get :projects, assay_id: @assay.id, format: :json
+    end
+
+    assert_response :internal_server_error
+    assert_equal 'NeLS API Error', JSON.parse(response.body)['error']
+  end
+
   test 'can load datasets' do
     VCR.use_cassette('nels/get_datasets') do
       get :datasets, assay_id: @assay.id, format: :json, id: @project_id

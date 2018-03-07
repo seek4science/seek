@@ -7,6 +7,7 @@ class NelsController < ApplicationController
   before_filter :rest_client, except: :callback
 
   rescue_from RestClient::Unauthorized, :with => :unauthorized_response
+  rescue_from RestClient::InternalServerError, :with => :nels_error_response
 
   include Seek::BreadCrumbs
 
@@ -114,6 +115,11 @@ class NelsController < ApplicationController
                      message: 'Attempting to reauthenticate...',
                      url: @oauth_client.authorize_url }, status: :unauthorized
     end
+  end
+
+  def nels_error_response
+      render json: { error: 'NeLS API Error',
+                     message: 'An error occurred whilst accessing the NeLS API.' }, status: :internal_server_error
   end
 
 end
