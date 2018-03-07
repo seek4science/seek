@@ -1,6 +1,11 @@
 module ApiTestHelper
   include AuthenticatedTestHelper
 
+  def definitions_path
+    File.join(Rails.root, 'public', '2010', 'json', 'rest',
+              'definitions.json')
+  end
+
   def admin_login
     admin = Factory.create(:admin)
     @current_person = admin
@@ -47,6 +52,21 @@ module ApiTestHelper
     return to_patch
   end
 
+  def validate_json_against_fragment (json, fragment)
+    if File.readable?(definitions_path)
+      errors = JSON::Validator.fully_validate_json(definitions_path,
+                                                   json,
+                                                   {:fragment => fragment})
+      unless errors.empty?
+        msg = ""
+        errors.each do |e|
+          msg += e + "\n"
+        end
+        raise Minitest::Assertion, msg
+      end
+    end
+  end
+
   def test_create
     begin
       create_post_values
@@ -63,12 +83,16 @@ module ApiTestHelper
         skip
       end
 
+      validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz}Post"
+
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", @to_post
         #puts "returned response: ", response.body
         assert_response :success
       end
+
+      validate_json_against_fragment response.body, "#/definitions/#{@clz}Response"
 
       # content check
       h = JSON.parse(response.body)
@@ -164,11 +188,16 @@ module ApiTestHelper
     #puts "original: ", original
     #puts "to patch: ", @to_patch
     #update request
+
+    validate_json_against_fragment @to_patch.to_json, "#/definitions/#{@clz}Patch"
+
     assert_no_difference( "#{@clz.capitalize}.count") do
       patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
      # puts "response: ", response.body
       assert_response :success
     end
+
+    validate_json_against_fragment response.body, "#/definitions/#{@clz}Response"
 
     h = JSON.parse(response.body)
 
