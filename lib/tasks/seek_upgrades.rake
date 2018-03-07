@@ -19,6 +19,7 @@ namespace :seek do
     update_sample_resource_links
     move_site_credentials_to_settings
     reencrypt_settings
+    convert_organism_concept_uris
     merge_duplicate_organisms
   ]
 
@@ -163,6 +164,15 @@ namespace :seek do
     puts 'Done'
   end
 
+  task(convert_organism_concept_uris: :environment) do
+    Organism.all.each do |organism|
+      organism.convert_concept_uri
+      if organism.bioportal_concept && organism.bioportal_concept.changed?
+        organism.save(validate:false)
+      end
+    end
+  end
+
   task(:merge_duplicate_organisms, [:dry_run] => :environment) do |t,args|
     dry_run = (args.dry_run == 'true')
 
@@ -188,7 +198,7 @@ namespace :seek do
         disable_authorization_checks do
           duplicated = Organism.all.
               group_by { |o| o.ncbi_id }.
-              select { |ncbi_id, organisms| !ncbi_id.nil? && organisms.length > 1 }
+              select { |ncbi_id, organisms| !ncbi_id.nil? && ncbi_id!=0 && organisms.length > 1 }
 
           duplicated.each do |ncbi_id, organisms|
             sorted = organisms.sort_by(&:created_at)

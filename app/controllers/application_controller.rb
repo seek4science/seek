@@ -31,7 +31,6 @@ class ApplicationController < ActionController::Base
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
 
   before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
-  before_filter :write_api_enabled, only: [:update, :destroy, :create], if: :json_api_request?
   before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
   helper :all
@@ -553,16 +552,6 @@ class ApplicationController < ActionController::Base
                                                        :contributor_id] }])[:policy_attributes] || {}
   end
 
-  def write_api_enabled
-    controller_class = self.controller_name.classify
-    if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
-      return
-    end
-    if json_api_request? && Rails.env.production?
-      raise NotImplementedError
-    end
-  end
-
   def check_json_id_type
     begin
       raise ArgumentError.new('A POST/PUT request must have a data record complying with JSONAPI specs') if params[:data].nil?
@@ -589,60 +578,10 @@ class ApplicationController < ActionController::Base
   end
 
   def convert_json_params
-    params[controller_name.singularize.to_sym] =
-        ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-
-    organize_external_attributes_from_json
-    tweak_json_params
-    params.delete(:data)
-
-    params
-  end
-
-  # override in sub-classes
-  def tweak_json_params
-  end
-
-  # take out policies, annotations, etc(?) outside of the given object attributes
-  def organize_external_attributes_from_json
-    if params[:data] && params[:data][:attributes]
-      if params[:data][:attributes][:tags]
-        params[:data][:attributes][:tag_list] = params[:data][:attributes][:tags].join(', ')
-      end
-
-      if params[:data][:attributes].key?(:policy)
-        policy_attributes = params[:data][:attributes].delete(:policy)
-        policy_attributes[:access_type] = PolicyHelper::key_access_type(policy_attributes.delete(:access))
-        perms = {}
-        (policy_attributes.delete(:permissions) || []).each_with_index do |permission, index|
-          perms[index.to_s] = {
-              access_type: PolicyHelper::key_access_type(permission[:access]),
-              contributor_type: permission[:resource_type].singularize.classify,
-              contributor_id: permission[:resource_id],
-          }
-        end
-        policy_attributes[:permissions_attributes] = perms
-
-        params[:data][:attributes][:policy_attributes] = policy_attributes
-      end
-
-      [:tag_list, :expertise_list, :tool_list, :policy_attributes, :content_blobs].each do |key|
-        if params[:data][:attributes][key]
-          params[key] = params[:data][:attributes].delete(key)
-        end
-      end
-    end
-
-    type = controller_name.singularize.to_sym
-    if params[type]
-      [:creator_ids, :assay_ids, :publication_ids].each do |key|
-        params[key] = params[type].delete(key)
-      end
-    end
+    Seek::Api::ParameterConverter.new(controller_name).convert(params)
   end
 
   def json_api_request?
     request.format.json?
   end
-
 end
