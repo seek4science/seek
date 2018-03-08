@@ -61,9 +61,9 @@ class SopsController < ApplicationController
         format.html { redirect_to sop_path(@sop) }
         format.json { render json: @sop }
       else
-        format.html { 
-          render :action => "edit" 
-        }
+        format.html { render action: 'edit' }
+        format.json { render json: @sop, status: :unprocessable_entity,
+                             serializer: ActiveModel::Serializer::ErrorSerializer }
       end
     end
   end
