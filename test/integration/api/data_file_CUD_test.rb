@@ -127,4 +127,26 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     # Check the changed attributes and relationships
     hash_comparison(@to_patch['data'], h['data'])
   end
+
+  test 'returns sensible error objects' do
+    template_file = File.join(ApiTestHelper.template_dir, 'post_bad_data_file.json.erb')
+    template = ERB.new(File.read(template_file))
+    @to_post = JSON.parse(template.result(binding))
+
+    assert_no_difference("#{@clz.classify}.count") do
+      post "/#{@plural_clz}.json", @to_post
+      assert_response :unprocessable_entity
+    end
+
+    h = JSON.parse(response.body)
+    errors = h["errors"]
+    pp errors
+
+    assert errors.any?
+    assert_equal "can't be blank", fetch_errors(errors, '/data/attributes/projects')[0]['detail']
+    assert_equal "can't be blank", fetch_errors(errors, '/data/attributes/title')[0]['detail']
+    assert_equal "Sharing policy is invalid", fetch_errors(errors, '/data/attributes/policy.base')[0]['detail']
+    refute fetch_errors(errors, '/data/attributes/description').any?
+    refute fetch_errors(errors, '/data/attributes/potato').any?
+  end
 end

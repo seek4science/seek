@@ -247,4 +247,12 @@ module ApiTestHelper
       assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
     end
   end
+
+  ##
+  # Fetch errors with the given path from the given collection.
+  def fetch_errors(errors, path)
+    errors.select do |error|
+      error.try(:[], 'source').try(:[], 'pointer') == path
+    end
+  end
 end

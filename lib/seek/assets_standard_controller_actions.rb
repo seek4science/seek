@@ -94,8 +94,6 @@ module Seek
     end
 
     def update_sharing_policies(item)
-      Rails.logger.info("=====Policy=====")
-      Rails.logger.info(policy_params)
       item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
     end
 
