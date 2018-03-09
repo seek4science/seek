@@ -187,7 +187,7 @@ module ApiTestHelper
     validate_json_against_fragment @to_patch.to_json, "#/definitions/#{@clz}Patch"
 
     assert_no_difference( "#{@clz.classify}.count") do
-      patch "/#{@plural_clz}/#{the_id}.json", @to_patch
+      patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
       assert_response :success
     end
 
