@@ -87,8 +87,7 @@ module Seek
       else
         respond_to do |format|
           format.html { render action: 'new' }
-          format.json { render json: item, status: :unprocessable_entity,
-                               serializer: ActiveModel::Serializer::ErrorSerializer }
+          format.json { render json: json_api_errors(item), status: :unprocessable_entity }
         end
       end
     end

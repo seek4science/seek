@@ -62,8 +62,7 @@ class SopsController < ApplicationController
         format.json { render json: @sop }
       else
         format.html { render action: 'edit' }
-        format.json { render json: @sop, status: :unprocessable_entity,
-                             serializer: ActiveModel::Serializer::ErrorSerializer }
+        format.json { render json: json_api_errors(@sop), status: :unprocessable_entity }
       end
     end
   end

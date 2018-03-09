@@ -140,12 +140,13 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
 
     h = JSON.parse(response.body)
     errors = h["errors"]
-    pp errors
 
     assert errors.any?
-    assert_equal "can't be blank", fetch_errors(errors, '/data/attributes/projects')[0]['detail']
+    assert_equal "can't be blank", fetch_errors(errors, '/data/relationships/projects')[0]['detail']
     assert_equal "can't be blank", fetch_errors(errors, '/data/attributes/title')[0]['detail']
-    assert_equal "Sharing policy is invalid", fetch_errors(errors, '/data/attributes/policy.base')[0]['detail']
+    policy_errors = fetch_errors(errors, '/data/attributes/policy').map { |p| p['detail'] }
+    assert_includes policy_errors, "permissions contributor can't be blank"
+    assert_includes policy_errors, "permissions access_type can't be blank"
     refute fetch_errors(errors, '/data/attributes/description').any?
     refute fetch_errors(errors, '/data/attributes/potato').any?
   end

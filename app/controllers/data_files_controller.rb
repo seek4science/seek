@@ -179,8 +179,7 @@ class DataFilesController < ApplicationController
       else
         respond_to do |format|
           format.html { render action: 'new' }
-          format.json { render json: @data_file, status: :unprocessable_entity,
-                               serializer: ActiveModel::Serializer::ErrorSerializer }
+          format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
         end
       end
     else
@@ -220,8 +219,7 @@ class DataFilesController < ApplicationController
         format.json {render json: @data_file}
       else
         format.html { render action: 'edit' }
-        format.json { render json: @data_file, status: :unprocessable_entity,
-                             serializer: ActiveModel::Serializer::ErrorSerializer }
+        format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
       end
     end
   end
