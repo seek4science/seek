@@ -1,69 +1,30 @@
 require 'test_helper'
-require 'integration/api_integration_test_helper'
+require 'integration/api_test_helper'
 
 class InstitutionCUDTest < ActionDispatch::IntegrationTest
-  include ApiIntegrationTestHelper
+  include ApiTestHelper
 
   def setup
     admin_login
     @clz = "institution"
     @plural_clz = @clz.pluralize
 
-    load_mm_objects("institution")
-  end
-
-  def test_should_create_institution
-    #debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
-    ['min', 'max'].each do |m|
-      assert_difference('Institution.count') do
-          post "/institutions.json", @json_mm["#{m}"]
-          assert_response :success
-
-          get "/institutions/#{Institution.last.id}.json"
-          assert_response :success
-
-          check_attr_content(@json_mm["#{m}"], "post")
-      end
-    end
-  end
-
-  def test_should_update_institution
     inst = Factory(:institution)
-    remove_nil_values_before_update
-    ['min', 'max'].each do |m|
-      @json_mm["#{m}"]["data"]["id"] = "#{inst.id}"
-      patch "/institutions/#{inst.id}.json", @json_mm["#{m}"]
-      assert_response :success
+    @to_patch = load_template("patch_#{@clz}.json.erb", {id: inst.id})
 
-      get "/institutions/#{inst.id}.json"
-      assert_response :success
-      check_attr_content(@json_mm["#{m}"], "patch")
-    end
+    #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
+    @to_post = load_template("post_min_#{@clz}.json.erb", {title: "Post "+inst.title, country: inst.country})
+  end
+
+  def create_post_values
+      i = Factory(:institution)
+      @post_values = {title: "Post "+i.title, country: i.country}
   end
 
   def test_normal_user_cannot_create_institution
     user_login(Factory(:person))
     assert_no_difference('Institution.count') do
-      post "/institutions.json", @json_mm["min"]
-    end
-  end
-
-  def test_normal_user_cannot_update_institution
-    remove_nil_values_before_update
-    user_login(Factory(:person))
-    inst = Factory(:institution)
-    @json_mm["min"]["data"]["id"] = "#{inst.id}"
-    @json_mm["min"]["data"]["attributes"]["title"] = "updated institution"
-    patch "/institutions/#{inst.id}.json", @json_mm["min"]
-    assert_response :forbidden
-  end
-
-  def test_normal_user_cannot_delete_institution
-    user_login(Factory(:person))
-    inst = Factory(:institution)
-    assert_no_difference('Institution.count') do
-      delete "/institutions/#{inst.id}.json"
-      assert_response :forbidden
+      post "/institutions.json", @to_post
     end
   end
 

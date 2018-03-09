@@ -15,6 +15,7 @@ end
 
 Factory.define(:max_investigation, class: Investigation) do |f|
   f.title "A Maximal Investigation"
+  f.other_creators "Max Blumenthal, Ed Snowden"
   f.projects { [Factory.build(:project)] }
   f.description "Investigation of the Human Genome"
   f.studies {[Factory(:max_study, policy: Factory(:public_policy))]}

@@ -1758,7 +1758,7 @@ ActiveRecord::Schema.define(version: 20180207102508) do
   create_table "trash_records", force: :cascade do |t|
     t.string   "trashable_type", limit: 255
     t.integer  "trashable_id",   limit: 4
-    t.binary   "data",           limit: 65535
+    t.binary   "data",           limit: 16777215
     t.datetime "created_at"
   end
 
