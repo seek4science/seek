@@ -42,7 +42,6 @@ module Seek
 
     class BiomodelsSearchResult < Struct.new(:authors, :abstract, :title, :published_date, :publication_id, :publication_title, :model_id, :last_modification_date)
       include Seek::ExternalSearchResult
-      include Seek::BioExtension
 
       alias_attribute :id, :model_id
 

@@ -1,0 +1,25 @@
+<resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+  <creators>
+    <creator>
+      <creatorName>First, Last</creatorName>
+    </creator>
+  </creators>
+  <titles>
+    <title>For testing</title>
+  </titles>
+  <publisher>ABC</publisher>
+  <publicationYear>2013</publicationYear>
+  <subjects>
+    <subject>Assessment</subject>
+    <subject>Information Literacy</subject>
+    <subject>Engineering</subject>
+  </subjects>
+  <language>eng</language>
+  <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
+  <version>1</version>
+  <descriptions>
+    <description descriptionType="Abstract">
+      A test
+    </description>
+  </descriptions>
+</resource>

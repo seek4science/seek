@@ -14,7 +14,6 @@ class Person < ActiveRecord::Base
   before_destroy :clean_up_and_assign_permissions
 
   acts_as_notifiee
-  acts_as_annotatable name_field: :name
 
   validates_presence_of :email
 
@@ -44,7 +43,7 @@ class Person < ActiveRecord::Base
   has_many :favourite_groups, through: :favourite_group_memberships
 
   has_many :studies_for_person, as: :contributor, class_name: 'Study'
-  has_many :assays_for_person, foreign_key: :owner_id, class_name: 'Assay'
+  has_many :assays_for_person, foreign_key: :contributor_id, class_name: 'Assay'
   alias assays assays_for_person
   has_many :investigations_for_person, as: :contributor, class_name: 'Investigation'
 
@@ -55,6 +54,7 @@ class Person < ActiveRecord::Base
 
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
   has_many :created_data_files, through: :assets_creators, source: :asset, source_type: 'DataFile'
+  has_many :created_documents, through: :assets_creators, source: :asset, source_type: 'Document'
   has_many :created_models, through: :assets_creators, source: :asset, source_type: 'Model'
   has_many :created_sops, through: :assets_creators, source: :asset, source_type: 'Sop'
   has_many :created_publications, through: :assets_creators, source: :asset, source_type: 'Publication'
@@ -97,11 +97,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def guest_project_member?
-    project = Project.find_by_title('BioVeL Portal Guests')
-    !project.nil? && projects == [project]
-  end
-
   def projects_with_default_license
     projects.select(&:default_license)
   end
@@ -126,6 +121,10 @@ class Person < ActiveRecord::Base
 
   def email_uri
     URI.escape('mailto:' + email)
+  end
+
+  def mbox_sha1sum
+    Digest::SHA1.hexdigest(email_uri)
   end
 
   def studies
@@ -176,7 +175,7 @@ class Person < ActiveRecord::Base
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
-  RELATED_RESOURCE_TYPES = %i[data_files models sops presentations events publications investigations
+  RELATED_RESOURCE_TYPES = %i[data_files documents models sops presentations events publications investigations
                               studies assays].freeze
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
@@ -231,18 +230,6 @@ class Person < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def workflows
-    try(:user).try(:workflows) || []
-  end
-
-  def runs
-    try(:user).try(:taverna_player_runs) || []
-  end
-
-  def sweeps
-    try(:user).try(:sweeps) || []
   end
 
   def projects # ALL projects, former and current
@@ -315,8 +302,19 @@ class Person < ActiveRecord::Base
     memberships.collect(&:project_positions).flatten
   end
 
-  def assets
-    created_data_files | created_models | created_sops | created_publications | created_presentations
+  # all items, assets, ISA and samples that are linked to this person as a creator
+  def created_items
+    assets_creators.map(&:asset).uniq.compact
+  end
+
+  # all items, assets, ISA, samples and events that are linked to this person as a contributor
+  def contributed_items
+    assays = Assay.where(contributor_id: id) # assays contributor is not polymorphic
+    [Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
+      assets = type.where("contributor_type = 'Person' AND contributor_id=?",id)
+      assets |= type.where("contributor_type = 'User' AND contributor_id=?",user.id) unless user.nil?
+      assets
+    end.flatten.uniq.compact | assays
   end
 
   # can be edited by:
@@ -352,7 +350,7 @@ class Person < ActiveRecord::Base
     user.try(:is_admin?)
   end
 
-  def can_destroy?(user = User.current_user)
+  def can_delete?(user = User.current_user)
     can_manage? user
   end
 
@@ -382,20 +380,6 @@ class Person < ActiveRecord::Base
 
   def tools
     annotations_with_attribute('tool').collect(&:value)
-  end
-
-  # retrieve the items that this person is contributor (owner for assay)
-  def contributed_items
-    items = []
-    items |= assays
-    unless user.blank?
-      items |= user.assets
-      items |= user.presentations
-      items |= user.events
-      items |= user.investigations
-      items |= user.studies
-    end
-    items
   end
 
   def recent_activity(limit = 10)
@@ -476,7 +460,7 @@ class Person < ActiveRecord::Base
 
   # a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
   def first_person_admin_and_add_to_default_project
-    if Person.count == 0
+    if Person.count.zero?
       self.is_admin = true
       project = Project.first
       if project && project.institutions.any?

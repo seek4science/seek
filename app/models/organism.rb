@@ -3,17 +3,23 @@ class Organism < ActiveRecord::Base
 
   acts_as_favouritable
   grouped_pagination
+  acts_as_uniquely_identifiable
 
-  linked_to_bioportal :apikey=>Seek::Config.bioportal_api_key
-  
+  linked_to_bioportal apikey: Seek::Config.bioportal_api_key
+
   has_many :assay_organisms, inverse_of: :organism
   has_many :models
   has_many :assays, through: :assay_organisms, inverse_of: :organisms
-  has_many :strains, :dependent=>:destroy
+  has_many :strains, dependent: :destroy
+  has_many :samples, through: :strains
 
   has_and_belongs_to_many :projects
 
+  before_validation :convert_concept_uri
+
   validates_presence_of :title
+  validates :concept_uri, url: { allow_nil: true, allow_blank: true }
+  validates :concept_uri, ncbi_concept_uri: true, allow_blank: true
 
   validate do |organism|
     unless organism.bioportal_concept.nil? || organism.bioportal_concept.valid?
@@ -23,19 +29,19 @@ class Organism < ActiveRecord::Base
     end
   end
 
-  def can_delete? user=User.current_user
+  def can_delete?(user = User.current_user)
     !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
   end
 
-  def can_manage?
+  def can_manage?(_user = User.current_user)
     User.admin_logged_in?
   end
 
   def searchable_terms
     terms = [title]
     if concept
-      terms = terms | concept[:synonyms].collect{|s| s.gsub("\"","")} if concept[:synonyms]
-      terms = terms | concept[:definitions].collect{|s| s.gsub("\"","")} if concept[:definitions]
+      terms |= concept[:synonyms].collect { |s| s.delete('\""') } if concept[:synonyms]
+      terms |= concept[:definitions].collect { |s| s.delete('\""') } if concept[:definitions]
     end
     terms
   end
@@ -44,4 +50,25 @@ class Organism < ActiveRecord::Base
     User.admin_or_project_administrator_logged_in? || User.activated_programme_administrator_logged_in?
   end
 
+  # overides that from the bioportal gem, to always make sure it is based on http://purl.bioontology.org/ontology/NCBITAXON/
+  def ncbi_uri
+    return nil if ncbi_id.nil?
+    "http://purl.bioontology.org/ontology/NCBITAXON/#{ncbi_id}"
+  end
+
+  # converts the concept uri into a common form of http://purl.bioontology.org/ontology/NCBITAXON/<Number> if:
+  #   - it is just a number
+  #   - of the form NCBITaxon:<Number>
+  #   - a identifiers.org URI
+  # if it doesn't match these rules it is left as it is
+  def convert_concept_uri
+    case concept_uri
+    when /\A\d+\Z/
+      self.concept_uri = "http://purl.bioontology.org/ontology/NCBITAXON/#{concept_uri}"
+    when /\ANCBITaxon:\d+\Z/i
+      self.concept_uri = "http://purl.bioontology.org/ontology/NCBITAXON/#{concept_uri.gsub(/NCBITaxon:/i, '')}"
+    when /\Ahttps?:\/\/identifiers\.org\/taxonomy\/\d+\Z/i
+      self.concept_uri = "http://purl.bioontology.org/ontology/NCBITAXON/#{concept_uri.gsub(/https?:\/\/identifiers\.org\/taxonomy\//i, '')}"
+    end
+  end
 end

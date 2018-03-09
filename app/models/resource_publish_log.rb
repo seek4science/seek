@@ -21,8 +21,8 @@ class ResourcePublishLog < ActiveRecord::Base
 
   def self.requested_approval_assets_for(gatekeeper)
     # FIXME: write tests for this method.
-    requested_approval_logs = ResourcePublishLog.includes(:resource).where(['publish_state=? AND resource_type IN (?)',
-                                                                            WAITING_FOR_APPROVAL, publishable_resource_names])
+    requested_approval_logs = ResourcePublishLog.includes(:resource).where(['publish_state=?',
+                                                                            WAITING_FOR_APPROVAL])
     requested_approval_assets = requested_approval_logs.collect(&:resource).compact
     requested_approval_assets.reject!(&:is_published?)
     requested_approval_assets.select! { |asset| gatekeeper.is_asset_gatekeeper_of? asset }
@@ -30,14 +30,11 @@ class ResourcePublishLog < ActiveRecord::Base
   end
 
   def self.waiting_approval_assets_for(user)
-    waiting_approval_logs = ResourcePublishLog.includes(:resource).where(['publish_state=? AND resource_type IN (?) AND user_id=?',
-                                                                          WAITING_FOR_APPROVAL, publishable_resource_names, user.id])
+    waiting_approval_logs = ResourcePublishLog.includes(:resource).where(['publish_state=? AND user_id=?',
+                                                                          WAITING_FOR_APPROVAL, user.id])
     waiting_approval_assets = waiting_approval_logs.collect(&:resource).compact
     waiting_approval_assets.reject!(&:is_published?)
     waiting_approval_assets.uniq
   end
 
-  def self.publishable_resource_names
-    Seek::Util.publishable_types.collect(&:name)
-  end
 end

@@ -1,12 +1,9 @@
 # Methods added to this helper will be available to all templates in the application.
 # require_dependency File.join(Gem.loaded_specs['my_annotations'].full_gem_path,'lib','app','helpers','application_helper')
-require 'savage_beast/application_helper'
 require 'app_version'
 
 module ApplicationHelper
-  include SavageBeast::ApplicationHelper
   include FancyMultiselectHelper
-  include TavernaPlayer::RunsHelper
   include Recaptcha::ClientHelper
   include VersionHelper
 
@@ -76,7 +73,7 @@ module ApplicationHelper
   def persistent_resource_id(resource)
     url = polymorphic_url(resource)
     content_tag :p, class: :id do
-      content_tag(:label) do
+      content_tag(:strong) do
         "#{Seek::Config.application_name} ID: "
       end + ' ' + link_to(url, url)
     end
@@ -92,11 +89,11 @@ module ApplicationHelper
 
   def authorized_list(all_items, attribute, sort = true, max_length = 75, count_hidden_items = false)
     items = all_items.select(&:can_view?)
-    if Seek::Config.is_virtualliver
-      title_only_items = (all_items - items).select(&:title_is_public?)
-    else
-      title_only_items = []
-    end
+    title_only_items = if Seek::Config.is_virtualliver
+                         (all_items - items).select(&:title_is_public?)
+                       else
+                         []
+                       end
 
     if count_hidden_items
       original_size = all_items.size
@@ -117,7 +114,7 @@ module ApplicationHelper
       list += title_only_items.collect { |i| h(truncate(i.title, length: max_length)) }
       html << list.join(', ')
       if count_hidden_items && !hidden_items.empty?
-        text = items.size > 0 ? ' and ' : ''
+        text = !items.empty? ? ' and ' : ''
         text << "#{hidden_items.size} hidden #{hidden_items.size > 1 ? 'items' : 'item'}"
         html << hidden_items_html(hidden_items, text)
       end
@@ -137,7 +134,7 @@ module ApplicationHelper
 
   def hidden_item_contributor_links(hidden_items)
     contributor_links = []
-    hidden_items = hidden_items.select { |hi| !hi.contributing_user.try(:person).nil? }
+    hidden_items = hidden_items.reject { |hi| hi.contributing_user.try(:person).nil? }
     hidden_items.sort! { |a, b| a.contributing_user.person.name <=> b.contributing_user.person.name }
     hidden_items.each do |hi|
       contributor_person = hi.contributing_user.person
@@ -160,11 +157,11 @@ module ApplicationHelper
     list.each do |item|
       result << item
       next if item == list.last
-      if item == list[-2]
-        result << ' and '
-      else
-        result << seperator
-              end
+      result << if item == list[-2]
+                  ' and '
+                else
+                  seperator
+                        end
     end
     result
   end
@@ -240,13 +237,13 @@ module ApplicationHelper
   # if "caption" is nil, item.name will be used by default
   def list_item_with_icon(icon_type, item, caption, truncate_to, custom_tooltip = nil, size = nil)
     list_item = '<li>'
-    if icon_type.downcase == 'flag'
-      list_item += flag_icon(item.country)
-    elsif icon_type == 'data_file' || icon_type == 'sop'
-      list_item += file_type_icon(item)
-    else
-      list_item += image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, '', false, size)
-    end
+    list_item += if icon_type.casecmp('flag').zero?
+                   flag_icon(item.country)
+                 elsif icon_type == 'data_file' || icon_type == 'sop'
+                   file_type_icon(item)
+                 else
+                   image_tag_for_key(icon_type.downcase, nil, icon_type.camelize, nil, '', false, size)
+                 end
     item_caption = ' ' + (caption.blank? ? item.title : caption)
     list_item += link_to truncate(item_caption, length: truncate_to), url_for(item), 'data-tooltip' => tooltip(custom_tooltip.blank? ? item_caption : custom_tooltip)
     list_item += '</li>'
@@ -259,7 +256,7 @@ module ApplicationHelper
 
     if contributor.class.name == 'User'
       # this string will output " (you) " for current user next to the display name, when invoked with 'you_text == true'
-      you_string = (you_text && logged_in? && user.id == current_user.id) ? "<small style='vertical-align: middle; color: #666666; margin-left: 0.5em;'>(you)</small>" : ''
+      you_string = you_text && logged_in? && user.id == current_user.id ? "<small style='vertical-align: middle; color: #666666; margin-left: 0.5em;'>(you)</small>" : ''
       contributor_person = contributor.person
       contributor_name = h(contributor_person.name)
       contributor_url = person_path(contributor_person.id)
@@ -298,62 +295,14 @@ module ApplicationHelper
   end
 
   def page_title(controller_name, _action_name)
-    name = PAGE_TITLES[controller_name]
-    name ||= ''
-    name += ' (Development)' if Rails.env.development?
-    "The #{Seek::Config.application_name} " + name
-  end
-
-  def favourite_group_popup_link_action_new(resource_type = nil)
-    link_to_remote_redbox("Create new #{t('favourite_group')}",
-                          { url: main_app.new_favourite_group_url,
-                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
-                            with: "'resource_type=' + '#{resource_type}'" },
-                          #:style => options[:style],
-                          id: 'create_new_f_group_redbox',
-                          onclick: 'javascript: currentFavouriteGroupSettings = {};' # ,
-                         #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-                         #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-                         )
-  end
-
-  def favourite_group_popup_link_action_edit(resource_type = nil)
-    link_to_remote_redbox("Edit selected #{t('favourite_group')}",
-                          { url: main_app.edit_favourite_group_url,
-                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
-                            with: "'resource_type=' + '#{resource_type}' + '&id=' + selectedFavouriteGroup()" },
-                          #:style => options[:style],
-                          id: 'edit_existing_f_group_redbox',
-                          onclick: 'javascript: currentFavouriteGroupSettings = {};' # ,
-                         #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-                         #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-                         )
-  end
-
-  def workgroup_member_review_popup_link(resource_type = nil)
-    link_to_remote_redbox('<b>Review members, set individual<br/>permissions and add afterwards</b>'.html_safe,
-                          { url: main_app.review_work_group_url('type', 'id', 'access_type'),
-                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();",
-                            with: "'resource_type=' + '#{resource_type}'" },
-                          #:style => options[:style],
-                          id: 'review_work_group_redbox' # ,
-                         #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-                         #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-                         )
-  end
-
-  # the parameter must be the *standard* name of the whitelist or blacklist (depending on the link that needs to be produced)
-  # (standard names are defined in FavouriteGroup model)
-  def whitelist_blacklist_edit_popup_link(f_group_name)
-    link_to_remote_redbox('edit',
-                          { url: edit_favourite_group_url,
-                            failure: "alert('Sorry, an error has occurred.'); RedBox.close();" },
-                          #:style => options[:style],
-                          id: "#{f_group_name}_edit_redbox",
-                          onclick: 'javascript: currentFavouriteGroupSettings = {};' # ,
-                         #:alt => "Click to create a new favourite group (opens popup window)",#options[:tooltip_text],
-                         #:title => tooltip_title_attrib("Opens a popup window, where you can create a new favourite<br/>group, add people to it and set individual access rights.") }  #options[:tooltip_text]
-                         )
+    resource = resource_for_controller
+    if resource && resource.respond_to?(:title) && resource.title
+      h(resource.title)
+    elsif PAGE_TITLES[controller_name]
+      PAGE_TITLES[controller_name]
+    else
+      "The #{Seek::Config.application_name}"
+    end
   end
 
   def preview_permission_popup_link(resource)
@@ -409,8 +358,8 @@ module ApplicationHelper
     html.html_safe
   end
 
-  def toggle_appear_javascript(block_id)
-    "this.checked ? $j('##{block_id}').slideDown() : $j('##{block_id}').slideUp();".html_safe
+  def toggle_appear_javascript(block_id, reverse: false)
+    "#{reverse ? '!' : ''}this.checked ? $j('##{block_id}').slideDown() : $j('##{block_id}').slideUp();".html_safe
   end
 
   def folding_box(id, title, options = nil)
@@ -445,7 +394,7 @@ module ApplicationHelper
   end
 
   def translate_resource_type(resource_type)
-    I18n.t("#{resource_type.underscore}")
+    I18n.t(resource_type.underscore.to_s)
   end
 
   def add_return_to_search
@@ -484,8 +433,7 @@ module ApplicationHelper
       Project => "You cannot delete this #{I18n.t 'project'}. It may have people associated with it.",
       Institution => 'You cannot delete this Institution. It may have people associated with it.',
       SampleType => 'You cannot delete this Sample Type, it may have Samples associated with it or have another Sample Type linked to it',
-      SampleControlledVocab => 'You can delete this Controlled Vocabulary, it may be associated with a Sample Type'
-    }
+      SampleControlledVocab => 'You can delete this Controlled Vocabulary, it may be associated with a Sample Type' }
   end
 
   def unable_to_delete_text(model_item)
@@ -520,13 +468,13 @@ module ApplicationHelper
   def resource_count_stats
     klass = klass_from_controller(controller_name)
     full_total = klass.count
-    if klass.authorization_supported?
-      visible_total = klass.all_authorized_for('view').count
-    elsif klass.is_a?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
-      visible_total = 0
-    else
-      visible_total = klass.count
-    end
+    visible_total = if klass.authorization_supported?
+                      klass.all_authorized_for('view').count
+                    elsif klass.is_a?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
+                      0
+                    else
+                      klass.count
+                    end
     [visible_total, full_total]
   end
 
@@ -563,7 +511,7 @@ module ApplicationHelper
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
                   'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'biosamples' => 'Biosamples',
-                  'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }
+                  'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder

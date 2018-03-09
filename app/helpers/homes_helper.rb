@@ -19,6 +19,10 @@ module HomesHelper
     simple_format(auto_link(Seek::Config.imprint_description.html_safe, sanitize: false), {}, sanitize: false)
   end
 
+  def about_text
+    simple_format(auto_link(Seek::Config.about_page.html_safe, sanitize: false), {}, sanitize: false)
+  end
+
   def show_announcements?
     logged_in_and_registered? && Seek::Config.show_announcements
   end
@@ -104,8 +108,9 @@ module HomesHelper
         end
         break if selected_activity_logs.length >= number_of_item
       end
-      convert_logs_to_hash selected_activity_logs
+      return convert_logs_to_hash selected_activity_logs
     end
+    convert_logs_to_hash []
   end
 
   def recently_added_item_logs_hash(time = 1.month.ago, number_of_item = 10)
@@ -119,8 +124,9 @@ module HomesHelper
         end
         break if selected_activity_logs.length >= number_of_item
       end
-      convert_logs_to_hash selected_activity_logs
+      return convert_logs_to_hash selected_activity_logs
     end
+    convert_logs_to_hash []
   end
 
   def convert_logs_to_hash(logs)

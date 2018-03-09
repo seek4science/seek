@@ -1,0 +1,7 @@
+<% if collection.values.flatten.empty? %>
+  <span class="none_text">No invalid users or profiles found.</span>
+<% else %>
+  <%= render :partial => "admin/user_stats_list", :locals => { :title => "Duplicate profiles", :collection => collection[:duplicates]} %>
+  <%= render :partial => "admin/user_stats_list", :locals => { :title => "PAL flag/role mis-matches", :collection => collection[:pal_mismatch]} %>
+  <%= render :partial => "admin/user_stats_list", :locals => { :title => "Users without profiles", :collection => collection[:no_person], :action => "delete", :bulk_delete => true} %>
+<% end %>  

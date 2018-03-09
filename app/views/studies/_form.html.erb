@@ -69,20 +69,6 @@
 <% end %>
  or <%= cancel_button(@study.id ? study_path(@study.id) : studies_path) -%>
 
-<script>
-  var projectsLookup = <%= Hash[Investigation.all_authorized_for(:edit).map { |i| [i.id, i.projects.map { |p| { id: p.id, title: p.title } }] }].to_json.html_safe -%>;
-
-  $j(document).ready(function () {
-    $j('#study_investigation_id').change(function () {
-      Sharing.removeMandatoryProjectPermissions();
-      if ($j(this).val()) {
-        var projects = projectsLookup[parseInt($j(this).val())];
-        if (projects && projects.length) {
-          for (var i = 0; i < projects.length; i++) {
-            Sharing.addPermissionForProject(projects[i]);
-          }
-        }
-      }
-    });
-  });
-</script>
+<%= render partial: 'projects/implicit_project_selector', locals: { action: action,
+                                                                    select_id: '#study_investigation_id',
+                                                                    parents: Investigation.all_authorized_for(:edit) } %>

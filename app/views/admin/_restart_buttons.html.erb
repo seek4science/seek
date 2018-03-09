@@ -1,0 +1,50 @@
+<%= panel do %>
+    <div class="row">
+      <div class="col-sm-8">
+        <p>
+          When changing settings relating to SEEK services and features such as <strong>'search enabled'</strong> or
+          <strong>'events enabled'</strong>, or when changing code in production environment, you need to restart the server.
+          If deployed in production environment in conjunction with Passenger Phusion you can use this button,
+          otherwise you need to restart manually.
+          <%= button_to('Restart server', restart_server_admin_path,
+                        class: 'btn btn-danger', id: 'restart_server',
+                        data: { confirm: 'Are you sure you want to restart the server?', disable_with: 'Restarting...' }) %>
+        </p>
+
+        <p>
+          Some background tasks are running in different processes to the main server process,
+          for example to handle solr reindexing or send subscription emails.
+          When certain settings such as <strong>'search enabled'</strong>, or changing code,
+          you will need to restart these processes.
+          <%= button_to('Restart background tasks', restart_delayed_job_admin_path,
+                        class: 'btn btn-danger', id: 'restart_delayed_job',
+                        data: { confirm: 'Are you sure you want to restart the background tasks?', disable_with: 'Restarting...' }) %>
+        </p>
+      </div>
+
+      <div class="col-sm-4">
+        <h4>Background processes</h4>
+        <% begin %>
+            <% pids = delayed_job_pids %>
+            <% if pids.any? %>
+                <ol>
+                  <% pids.each do |pid| %>
+                      <li>
+                        <% if pid.running? %>
+                            <span class="text-success">Running</span>
+                            <span class="text-muted">(Process ID: <%= pid.pid -%>)</span>
+                        <% else %>
+                            <span class="text-warning">Not running</span>
+                        <% end %>
+                      </li>
+                  <% end %>
+                </ol>
+            <% else %>
+                <span class="none_text">No background processes running</span>
+            <% end %>
+        <% rescue Exception => e %>
+            <span class="text-danger">Unable to determine current status - <%= e.message %></span>
+        <% end %>
+      </div>
+    </div>
+<% end %>

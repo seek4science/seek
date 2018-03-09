@@ -88,7 +88,7 @@ module RelatedItemsHelper
 
     # Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
-      if limit && related[key][:items].size > limit && %w(Project Investigation Study Assay Person Specimen Sample Run Workflow Sweep).include?(resource.class.name)
+      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]
       end
@@ -99,17 +99,13 @@ module RelatedItemsHelper
 
   def relatable_types
     { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
-      'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
-      'Workflow' => {}, 'TavernaPlayer::Run' => {}, 'Sweep' => {}, 'Strain' => {}, 'Sample' => {}
-    }
+      'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Document' => {},
+      'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
+      'Strain' => {}, 'Sample' => {} }
   end
 
   def related_items_method(resource, item_type)
-    if item_type == 'TavernaPlayer::Run'
-      method_name = 'runs'
-    else
-      method_name = item_type.underscore.pluralize
-    end
+    method_name = item_type.underscore.pluralize
 
     if resource.respond_to? "related_#{method_name}"
       resource.send "related_#{method_name}"
@@ -124,6 +120,27 @@ module RelatedItemsHelper
     end
   end
 
+  def self.relations_methods
+    resource_klass = self.class
+    method_hash = {}
+    relatable_types.each_key do |item_type|
+      method_name = item_type.underscore.pluralize
+
+      if resource_klass.method_defined? "related_#{method_name}"
+        method_hash[item_type] = "related_#{method_name}"
+      elsif resource.respond_to? "related_#{method_name.singularize}"
+        method_hash[item_type] = "related_#{method_name.singularize}"
+      elsif resource.respond_to? method_name
+        method_hash[item_type] = method_name
+      elsif item_type != 'Person' && resource.respond_to?(method_name.singularize) # check is to avoid Person.person
+        method_hash[item_type] = method_name
+      else
+        []
+      end
+    end
+    method_hash
+  end
+
   def order_related_items(related)
     related.each do |_key, res|
       res[:items].sort! { |item, item2| item2.updated_at <=> item.updated_at }
@@ -132,10 +149,11 @@ module RelatedItemsHelper
 
   def authorize_related_items(related)
     related.each do |key, res|
+      res[:items] = [] if res[:items].nil?
       res[:items] = res[:items].uniq.compact
-      next if res[:items].empty?
+      next if res[:items].empty? || res[:items].nil?
       total_count = res[:items].size
-      if key == 'Project' || key == 'Institution'
+      if key == 'Project' || key == 'Institution' || key == 'SampleType'
         res[:hidden_count] = 0
       elsif key == 'Person'
         if Seek::Config.is_virtualliver && User.current_user.nil?
@@ -151,19 +169,21 @@ module RelatedItemsHelper
         res[:hidden_items] = total - res[:items]
       end
     end
-  end
+    end
 
   def collect_related_items(resource)
     related = relatable_types
     related.delete('Person') if resource.class == 'Person' # to avoid the same person showing up
 
+    answerable = {}
     related.each_key do |type|
       related[type][:items] = related_items_method(resource, type)
       related[type][:hidden_items] = []
       related[type][:hidden_count] = 0
       related[type][:extra_count] = 0
+      answerable[type] = !related[type][:items].nil?
     end
 
     related
   end
-end
+  end

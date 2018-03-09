@@ -48,19 +48,33 @@ module Seek
 
       # extra steps that cannot be easily handled by the csv template
       def additional_triples(rdf_graph)
-        if self.is_a?(Model) && self.contains_sbml?
+        if is_a?(Model) && contains_sbml?
           rdf_graph << [rdf_resource, JERMVocab.hasFormat, JERMVocab.SBML_format]
         end
         rdf_graph
       end
 
       def describe_type(rdf_graph)
-        it_is = JERMVocab.for_type self
-        unless it_is.nil?
+        unless rdf_type_entity_fragment.nil?
           resource = rdf_resource
-          rdf_graph << [resource, RDF.type, it_is]
+          rdf_graph << [resource, RDF.type, rdf_type_uri]
         end
         rdf_graph
+      end
+
+      # this is what is needed for the SEEK_ID term from JERM. It is essentially the same as the resource, but this method
+      # make the mappings clearer
+      def rdf_seek_id
+        rdf_resource.to_s
+      end
+
+      # the URI for the type of this object, for example http://jermontology.org/ontology/JERMOntology#Study for a Study
+      def rdf_type_uri
+        JERMVocab[rdf_type_entity_fragment]
+      end
+
+      def rdf_type_entity_fragment
+        JERMVocab.defined_types[self.class]
       end
 
       # the hash of namespace prefixes to pass to the RDF::Writer when generating the RDF
@@ -70,18 +84,18 @@ module Seek
           'dcterms' => RDF::DC.to_uri.to_s,
           'owl' => RDF::OWL.to_uri.to_s,
           'foaf' => RDF::FOAF.to_uri.to_s,
-          'sioc' => RDF::SIOC.to_uri.to_s,
+          'sioc' => RDF::SIOC.to_uri.to_s
         }
       end
 
       def create_rdf_generation_job(force = false, refresh_dependents = true)
-        unless !force && (changed - %w(updated_at last_used_at)).empty?
+        unless !force && (changed - %w[updated_at last_used_at]).empty?
           RdfGenerationJob.new(self, refresh_dependents).queue_job
         end
       end
 
       def remove_rdf
-        remove_rdf_from_repository if self.rdf_repository_configured?
+        remove_rdf_from_repository if rdf_repository_configured?
         delete_rdf_file
         refresh_dependents_rdf
       end
@@ -95,14 +109,13 @@ module Seek
       def dependent_items
         items = []
         # FIXME: this should go into a seperate mixin for active-record
-        methods = [:data_files, :sops, :models, :publications,
-                   :data_file_masters, :sop_masters, :model_masters,
-                   :assets,
-                   :assays, :studies, :investigations,
-                   :institutions, :creators, :owners, :owner, :contributors, :contributor, :projects, :events, :presentations, :compounds, :organisms, :strains
-                  ]
+        methods = %i[data_files sops models publications
+                     data_file_masters sop_masters model_masters
+                     assets
+                     assays studies investigations
+                     institutions creators owners owner contributors contributor projects events presentations compounds organisms strains]
         methods.each do |method|
-          next unless self.respond_to?(method)
+          next unless respond_to?(method)
           deps = Array(send(method))
           # resolve User back to Person
           deps = deps.collect { |dep| dep.is_a?(User) ? [dep, dep.person] : dep }.flatten.compact
@@ -111,7 +124,7 @@ module Seek
 
         items.compact.uniq
 
-        items |= related_items_from_sparql if self.rdf_repository_configured?
+        items |= related_items_from_sparql if rdf_repository_configured?
 
         items.compact.uniq
       end

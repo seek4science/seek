@@ -1,3 +1,4 @@
+# coding: utf-8
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
@@ -22,13 +23,20 @@ class ApplicationController < ActionController::Base
   around_filter :with_current_user
 
   rescue_from 'ActiveRecord::RecordNotFound', with: :render_not_found_error
+  rescue_from 'ActiveRecord::UnknownAttributeError', with: :render_unknown_attribute_error
+  rescue_from NotImplementedError, with: :render_not_implemented_error
 
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
+
+  before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
+  before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
+
   helper :all
 
   layout Seek::Config.main_layout
+
 
   def with_current_user
     User.with_current_user current_user do
@@ -63,6 +71,20 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
+  def api_version
+    @default = 1
+    version_re_arr = [/version=(?<v>.+?)/, /api.v(?<v>\d+?)\+json/]
+    version_re_arr.each do |re|
+      v_match = request.headers['Accept'].match(re)
+      if (v_match  != nil)
+        @version = v_match[:v]
+        break
+      end
+    end
+    @version ||= @default
+    puts "api version: ", @version
+  end
+
   def is_current_user_auth
     begin
       @user = User.where(['id = ?', current_user.try(:id)]).find(params[:id])
@@ -79,13 +101,17 @@ class ApplicationController < ActionController::Base
 
   def is_user_admin_auth
     unless User.admin_logged_in?
-      error('Admin rights required', 'is invalid (not admin)')
+      error('Admin rights required', 'is invalid (not admin)', :forbidden)
       return false
     end
     true
   end
 
   def can_manage_announcements?
+    admin_logged_in?
+  end
+
+  def admin_logged_in?
     User.admin_logged_in?
   end
 
@@ -145,7 +171,7 @@ class ApplicationController < ActionController::Base
   private
 
   def project_membership_required
-    unless User.logged_in_and_member? || User.admin_logged_in?
+    unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
       respond_to do |format|
         format.html do
@@ -163,7 +189,7 @@ class ApplicationController < ActionController::Base
             redirect_to path
           end
         end
-        format.json { render json: { status: 401, error_message: flash[:error] } }
+        format.json { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
       end
     end
   end
@@ -196,44 +222,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def error(notice, _message)
+  #_status is mostly important for the json responses, default is 400 (Bad Request)
+  def error(notice, _message, _status=400)
     flash[:error] = notice
-
     respond_to do |format|
       format.html { redirect_to root_url }
-      format.json { redirect_to root_url }
-    end
-  end
-
-  # required for the Savage Beast
-  def admin?
-    User.admin_logged_in?
-  end
-
-  def translate_action(action_name)
-    case action_name
-    when 'show', 'index', 'view', 'search', 'favourite', 'favourite_delete',
-          'comment', 'comment_delete', 'comments', 'comments_timeline', 'rate',
-          'tag', 'items', 'statistics', 'tag_suggestions', 'preview', 'runs', 'new_object_based_on_existing_one',
-          'samples_table'
-      'view'
-
-    when 'download', 'named_download', 'launch', 'submit_job', 'data', 'execute', 'plot', 'explore', 'visualise',
-          'export_as_xgmml', 'download_log', 'download_results', 'input', 'output', 'download_output', 'download_input',
-          'view_result', 'compare_versions', 'simulate'
-      'download'
-
-    when 'edit', 'new', 'create', 'update', 'new_version', 'create_version',
-          'destroy_version', 'edit_version', 'update_version', 'new_item',
-          'create_item', 'edit_item', 'update_item', 'quick_add', 'resolve_link', 'describe_ports'
-      'edit'
-
-    when 'destroy', 'destroy_item', 'cancel', 'destroy_samples_confirm'
-      'delete'
-
-    when 'manage', 'notification', 'read_interaction', 'write_interaction', 'report_problem', 'storage_report',
-          'select_sample_type', 'extraction_status', 'extract_samples', 'confirm_extraction', 'cancel_extraction'
-      'manage'
+      format.json {
+        render json: {"title": notice, "detail": _message}, status: _status
+      }
     end
   end
 
@@ -246,7 +242,7 @@ class ApplicationController < ActionController::Base
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render text: 'Not found', status: :not_found }
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-        format.json { render text: 'Not found', status: :not_found }
+        format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
     else
@@ -257,33 +253,35 @@ class ApplicationController < ActionController::Base
   # handles finding and authorizing an asset for all controllers that require authorization, and handling if the item cannot be found
   def find_and_authorize_requested_item
     name = controller_name.singularize
-    action = translate_action(action_name)
+    privilege = Seek::Permissions::Translator.translate(action_name)
 
-    return if action.nil?
+    return if privilege.nil?
 
     object = controller_name.classify.constantize.find(params[:id])
 
-    if is_auth?(object, action)
+    if is_auth?(object, privilege)
       eval "@#{name} = object"
       params.delete :policy_attributes unless object.can_manage?(current_user)
     else
       respond_to do |format|
         format.html do
-          case action
-          when 'publish', 'manage', 'edit', 'download', 'delete'
+          case privilege
+          when :publish, :manage, :edit, :download, :delete
             if current_user.nil?
-              flash[:error] = "You are not authorized to #{action} this #{name.humanize}, you may need to login first."
+              flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}, you may need to login first."
             else
-              flash[:error] = "You are not authorized to #{action} this #{name.humanize}."
+              flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
             redirect_to(eval("#{controller_name.singularize}_path(#{object.id})"))
           else
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
         end
-        format.rdf { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
-        format.xml { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
-        format.json { render text: "You may not #{action} #{name}:#{params[:id]}", status: :forbidden }
+        format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
+        format.json {
+          render json: {"title": "Forbidden", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}, status: :forbidden
+        }
       end
       return false
     end
@@ -306,16 +304,39 @@ class ApplicationController < ActionController::Base
 
       format.rdf { render text: 'Not found', status: :not_found }
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-      format.json { render text: 'Not found', status: :not_found }
+      format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
     end
     false
   end
 
-  def is_auth?(object, action)
-    if object.can_perform? action
+  def render_unknown_attribute_error(e)
+    respond_to do |format|
+      format.json {
+        render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
+      }
+      format.all {
+        render text: e.message, status: :unprocessable_entity
+      }
+    end
+  end
+
+  def render_not_implemented_error(e)
+    respond_to do |format|
+      format.json {
+        render json: {error: e.message, status: :not_implemented}, status: :not_implemented
+      }
+      format.all {
+        render text: e.message, status: :not_implemented
+      }
+    end
+  end
+
+
+  def is_auth?(object, privilege)
+    if object.can_perform?(privilege)
       true
-    elsif params[:code] && (action == 'view' || action == 'download')
-      object.auth_by_code? params[:code]
+    elsif params[:code] && [:view, :download].include?(privilege)
+      object.auth_by_code?(params[:code])
     else
       false
     end
@@ -343,22 +364,6 @@ class ApplicationController < ActionController::Base
                              activity_loggable: object,
                              user_agent: request.env['HTTP_USER_AGENT'])
         end
-      when 'sweeps', 'runs'
-        if %w(show update destroy download).include?(action)
-          ref = object.projects.first
-        elsif action == 'create'
-          ref = object.workflow
-        end
-
-        check_log_exists(action, controller_name, object)
-        ActivityLog.create(action: action,
-                           culprit: current_user,
-                           referenced: ref,
-                           controller_name: controller_name,
-                           activity_loggable: object,
-                           data: object.title,
-                           user_agent: request.env['HTTP_USER_AGENT'])
-        break
       when 'people', 'projects', 'institutions'
         if %w(show create update destroy).include?(action)
           ActivityLog.create(action: action,
@@ -528,6 +533,17 @@ class ApplicationController < ActionController::Base
     redirect_to signup_path if User.count == 0
   end
 
+  # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
+  # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
+  # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
+  # by steffen.brinkmann@h-its.org
+  # 2017-04-18
+#  def unescape_response()
+#    response_body[0].gsub!(/\\u([0-9a-z]{4})/) { |s|
+#      [$1.to_i(16)].pack("U")
+#    }
+#  end
+
   def policy_params
     params.slice(:policy_attributes).permit(
         policy_attributes: [:access_type,
@@ -536,4 +552,36 @@ class ApplicationController < ActionController::Base
                                                        :contributor_id] }])[:policy_attributes] || {}
   end
 
+  def check_json_id_type
+    begin
+      raise ArgumentError.new('A POST/PUT request must have a data record complying with JSONAPI specs') if params[:data].nil?
+      #type should always appear in POST or PUT requests
+      if params[:data][:type].nil?
+        raise ArgumentError.new('A POST/PUT request must specify a data:type')
+      elsif params[:data][:type] != params[:controller]
+        raise ArgumentError.new("The specified data:type does not match the URL's object (#{params[:data][:type]} vs. #{params[:controller]})")
+      end
+      #id should not appear on POST, but should be accurate IF it appears on PUT
+      case params[:action]
+        when "create"
+          if !params[:data][:id].nil?
+            raise ArgumentError.new('A POST request is not allowed to specify an id')
+          end
+        when "update"
+          if (!params[:data][:id].nil?) && (params[:id] != params[:data][:id])
+            raise ArgumentError.new('id specified by the PUT request does not match object-id in the JSON input')
+          end
+      end
+    rescue ArgumentError => e
+      render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
+    end
+  end
+
+  def convert_json_params
+    Seek::Api::ParameterConverter.new(controller_name).convert(params)
+  end
+
+  def json_api_request?
+    request.format.json?
+  end
 end

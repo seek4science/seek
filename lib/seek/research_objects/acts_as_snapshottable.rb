@@ -14,21 +14,16 @@ module Seek #:nodoc:
             text :doi do
               snapshots.map(&:doi).compact
             end
-          end
-
-          class_eval do
-            extend Seek::ResearchObjects::ActsAsSnapshottable::SingletonMethods
-          end
+          end if Seek::Config.solr_enabled
 
           include Seek::ResearchObjects::ActsAsSnapshottable::InstanceMethods
+
+          acts_as_doi_parent(child_accessor: :snapshots)
         end
 
         def is_snapshottable?
           include?(Seek::ResearchObjects::ActsAsSnapshottable::InstanceMethods)
         end
-      end
-
-      module SingletonMethods
       end
 
       module InstanceMethods
@@ -45,10 +40,6 @@ module Seek #:nodoc:
 
         def snapshot(number)
           snapshots.where(snapshot_number: number).first
-        end
-
-        def latest_citable_snapshot
-          snapshots.where('doi IS NOT NULL').last
         end
       end
     end

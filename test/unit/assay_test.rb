@@ -120,7 +120,7 @@ class AssayTest < ActiveSupport::TestCase
       assert assay.valid?
       refute_nil assay.assay_type_uri, 'uri should have been set to default in before_validation'
 
-      assay.assay_type_uri = 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics'
+      assay.assay_type_uri = 'http://jermontology.org/ontology/JERMOntology#Metabolomics'
 
       assert assay.valid?
 
@@ -132,10 +132,10 @@ class AssayTest < ActiveSupport::TestCase
       assert assay.valid?
       refute_nil assay.technology_type_uri, 'uri should have been set to default in before_validation'
 
-      assay.owner = nil
+      assay.contributor = nil
       assert !assay.valid?
 
-      assay.owner = people(:person_for_model_owner)
+      assay.contributor = people(:person_for_model_owner)
 
       # an modelling assay can be valid without a technology type, or organism
       assay.assay_class = assay_classes(:modelling_assay_class)
@@ -368,10 +368,10 @@ class AssayTest < ActiveSupport::TestCase
 
   def new_valid_assay
     Assay.new(title: 'test',
-              assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics',
-              technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography',
+              assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
+              technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
               study: studies(:metabolomics_study),
-              owner: people(:person_for_model_owner),
+              contributor: people(:person_for_model_owner),
               assay_class: assay_classes(:experimental_assay_class),
               policy: Factory(:private_policy)
              )
@@ -384,10 +384,10 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'assay type label from ontology or suggested assay type' do
-    assay = Factory(:experimental_assay, assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response')
+    assay = Factory(:experimental_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response')
     assert_equal 'Catabolic response', assay.assay_type_label
 
-    assay = Factory(:modelling_assay, assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Genome_scale')
+    assay = Factory(:modelling_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Genome_scale')
     assert_equal 'Genome scale', assay.assay_type_label
 
     suggested_at = Factory(:suggested_assay_type, label: 'new fluxomics')
@@ -400,7 +400,7 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'technology type label from ontology or suggested technology type' do
-    assay = Factory(:experimental_assay, technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding')
+    assay = Factory(:experimental_assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding')
     assert_equal 'Binding', assay.technology_type_label
 
     suggested_tt = Factory(:suggested_technology_type, label: 'new technology type')
@@ -507,5 +507,78 @@ class AssayTest < ActiveSupport::TestCase
 
     refute_includes assay.samples, sample3
     refute_includes assay.assets, sample3
+  end
+
+  test 'incoming and outgoing' do
+    assay = Factory(:assay)
+    df_in1 = Factory(:data_file,title:'in1')
+    df_in2 = Factory(:data_file,title:'in2')
+    sample_in1 = Factory(:sample,title:'sample_in1')
+
+    df_out1 = Factory(:data_file,title:'out1')
+    df_out2 = Factory(:data_file,title: 'out2')
+    sample_out1 = Factory(:sample, title: 'sample_out1')
+
+    df_nodir1 = Factory(:data_file)
+    sample_nodir1 = Factory(:sample)
+
+    df = Factory(:data_file)
+    AssayAsset.create assay: assay, asset: df_in1, direction: AssayAsset::Direction::INCOMING
+    AssayAsset.create assay: assay, asset: df_in2, direction: AssayAsset::Direction::INCOMING
+    AssayAsset.create assay: assay, asset: sample_in1, direction: AssayAsset::Direction::INCOMING
+
+    AssayAsset.create assay: assay, asset: df_out1, direction: AssayAsset::Direction::OUTGOING
+    AssayAsset.create assay: assay, asset: df_out2, direction: AssayAsset::Direction::OUTGOING
+    AssayAsset.create assay: assay, asset: sample_out1, direction: AssayAsset::Direction::OUTGOING
+
+    AssayAsset.create assay: assay, asset: df_nodir1, direction: AssayAsset::Direction::NODIRECTION
+    AssayAsset.create assay: assay, asset: sample_nodir1, direction: AssayAsset::Direction::NODIRECTION
+
+    #sanity check
+    assert_equal 5,assay.data_files.count
+    assert_equal 3,assay.samples.count
+
+    assert_equal [df_in1,df_in2,sample_in1],assay.incoming.sort_by(&:title)
+    assert_equal [df_out1,df_out2,sample_out1],assay.outgoing.sort_by(&:title)
+
+  end
+
+  test 'validation assets' do
+    assay = Factory(:assay)
+    df_1 = Factory(:data_file,title:'validation')
+    df_2 = Factory(:data_file,title:'not validation')
+
+    validation_type= RelationshipType.where(key:RelationshipType::VALIDATION).first || Factory(:validation_data_relationship_type)
+    AssayAsset.create assay: assay, asset: df_1, relationship_type: validation_type
+    AssayAsset.create assay: assay, asset: df_2
+
+    assert_equal 2,assay.data_files.count
+    assert_equal [df_1],assay.validation_assets
+  end
+
+  test 'simulation assets' do
+    assay = Factory(:assay)
+    df_1 = Factory(:data_file,title:'simulation')
+    df_2 = Factory(:data_file,title:'not simulation')
+
+    validation_type= RelationshipType.where(key:RelationshipType::SIMULATION).first || Factory(:simulation_data_relationship_type)
+    AssayAsset.create assay: assay, asset: df_1, relationship_type: validation_type
+    AssayAsset.create assay: assay, asset: df_2
+
+    assert_equal 2,assay.data_files.count
+    assert_equal [df_1],assay.simulation_assets
+  end
+
+  test 'construction assets' do
+    assay = Factory(:assay)
+    df_1 = Factory(:data_file,title:'construction')
+    df_2 = Factory(:data_file,title:'not construction')
+
+    validation_type= RelationshipType.where(key:RelationshipType::CONSTRUCTION).first || Factory(:construction_data_relationship_type)
+    AssayAsset.create assay: assay, asset: df_1, relationship_type: validation_type
+    AssayAsset.create assay: assay, asset: df_2
+
+    assert_equal 2,assay.data_files.count
+    assert_equal [df_1],assay.construction_assets
   end
 end

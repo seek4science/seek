@@ -80,10 +80,6 @@ class Mailer < ActionMailer::Base
          subject: "Welcome to #{Seek::Config.application_name}")
   end
 
-  def welcome_no_projects(user)
-    welcome(user) # the only difference is the view template, which is picked from the method name
-  end
-
   def contact_admin_new_user(params, user)
     new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
     @details = new_member_details.message
@@ -147,9 +143,9 @@ class Mailer < ActionMailer::Base
          subject: 'SEEK Configuration Email Test')
   end
 
-  def notify_user_projects_assigned(person)
+  def notify_user_projects_assigned(person,new_projects)
     @name = person.name
-    @projects = person.projects
+    @projects = new_projects
 
     mail(from: Seek::Config.noreply_sender,
          to: person.email_with_name,
@@ -184,17 +180,15 @@ class Mailer < ActionMailer::Base
     )
   end
 
-  def report_run_problem(person, run)
-    @person = person
-    @run = run
-    @error_outputs = run.outputs.select { |o| o.value_is_error? }
-
-    attachments['taverna_server_log.txt'] = File.read(run.log.path) unless run.log.path.nil?
-    attachments['portal_log.txt'] = run.failure_message unless run.failure_message.nil?
-
-    mail(:from=>Seek::Config.noreply_sender,
-         :to=>Seek::Config.support_email_address,
-         :subject=>"#{Seek::Config.application_name} user has reported a problem with a workflow run")
+  def request_membership(user, project, details)
+    @owners = project.project_administrators
+    @requester = user.person
+    @resource = project
+    @details = details
+    mail(from: Seek::Config.noreply_sender,
+         to: project.project_administrators.collect(&:email_with_name),
+         reply_to: user.person.email_with_name,
+         subject: "#{@requester.email_with_name} requested membership of project: #{@resource.title}")
   end
 
   private

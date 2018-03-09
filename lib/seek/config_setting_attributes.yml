@@ -1,8 +1,5 @@
 #keys that create the Seek::Config settings.
 #e.g. Seek::Config.home_description
-
-# N.B. Settings that require a conversion to integer should NOT be set here.
-# They should be set in config.rb, in the Config class.
 home_description:
 home_feeds_cache_timeout:
 events_enabled:
@@ -19,6 +16,7 @@ registration_disabled_description:
 activation_required_enabled:
 project_name:
 smtp:
+  encrypt: true
 default_pages:
 project_type:
 project_link:
@@ -61,7 +59,6 @@ organisms_enabled:
 models_enabled:
 assays_enabled:
 publications_enabled:
-forum_enabled:
 jerm_enabled:
 email_enabled:
 jws_enabled:
@@ -89,7 +86,6 @@ documentation_enabled:
 tagging_enabled:
 authorization_checks_enabled:
 magic_guest_enabled:
-workflows_enabled:
 programmes_enabled:
 assay_type_ontology_file:
 technology_type_ontology_file:
@@ -115,6 +111,7 @@ show_as_external_link_enabled:
 doi_minting_enabled:
 datacite_username:
 datacite_password:
+  encrypt: true
 datacite_url:
 doi_prefix:
 doi_suffix:
@@ -177,3 +174,9 @@ omniauth_user_activate:
 omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
+default_license:
+about_page_enabled:
+about_page:
+nels_enabled:
+nels_client_id:
+nels_client_secret:

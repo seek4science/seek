@@ -18,6 +18,7 @@ class AssaysControllerTest < ActionController::TestCase
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
+
   test 'modelling assay validates with schema' do
     df = Factory(:data_file, contributor: User.current_user.person)
     a = Factory(:modelling_assay, contributor: User.current_user.person)
@@ -56,7 +57,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /#{Seek::Config.application_name} #{I18n.t('assays.assay')}s.*/i, count: 1
+    assert_select 'title', text: I18n.t('assays.assay').pluralize, count: 1
   end
 
   test 'should show index' do
@@ -172,8 +173,8 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should show item' do
     assay = Factory(:experimental_assay, policy: Factory(:public_policy),
-                                         assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response',
-                                         technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding')
+                                         assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+                                         technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding')
     assert_difference('ActivityLog.count') do
       get :show, id: assay.id
     end
@@ -206,7 +207,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should show new' do
     # adding a suggested type tests the assay type tree handles inclusion of suggested type
-    Factory :suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Catabolic_response'
+    Factory :suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response'
     get :new
     assert_response :success
     assert_not_nil assigns(:assay)
@@ -275,23 +276,23 @@ class AssaysControllerTest < ActionController::TestCase
   test 'should create assay with ontology assay and tech type' do
     assert_difference('Assay.count') do
       post :create, assay: { title: 'test',
-                             technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography',
-                             assay_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics',
+                             technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
+                             assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
                              study_id: Factory(:study).id,
                              assay_class_id: Factory(:experimental_assay_class).id },
                     policy_attributes: valid_sharing
     end
     assert assigns(:assay)
     assay = assigns(:assay)
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography', assay.technology_type_uri
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics', assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics', assay.assay_type_uri
     assert_equal 'Gas chromatography', assay.technology_type_label
     assert_equal 'Metabolomics', assay.assay_type_label
   end
 
   test 'should create assay with suggested assay and tech type' do
-    assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics', label: 'fish')
-    tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
+    assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
+    tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
     assert_difference('Assay.count') do
       post :create, assay: { title: 'test',
                              technology_type_uri: tech_type.uri,
@@ -304,30 +305,57 @@ class AssaysControllerTest < ActionController::TestCase
     assay = assigns(:assay)
     assert_equal assay_type, assay.suggested_assay_type
     assert_equal tech_type, assay.suggested_technology_type
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography', assay.technology_type_uri
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics', assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics', assay.assay_type_uri
     assert_equal 'carrot', assay.technology_type_label
     assert_equal 'fish', assay.assay_type_label
   end
 
   test 'should update assay with suggested assay and tech type' do
     assay = Factory(:experimental_assay, contributor: User.current_user.person)
-    assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics', label: 'fish')
-    tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
+    assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
+    tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
 
     post :update, id: assay.id, assay: {
       technology_type_uri: tech_type.uri,
       assay_type_uri: assay_type.uri
-    },
-                  policy_attributes: valid_sharing
+    },policy_attributes: valid_sharing
 
     assay.reload
     assert_equal assay_type, assay.suggested_assay_type
     assert_equal tech_type, assay.suggested_technology_type
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography', assay.technology_type_uri
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Metabolomics', assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics', assay.assay_type_uri
     assert_equal 'fish', assay.assay_type_label
     assert_equal 'carrot', assay.technology_type_label
+  end
+
+  test 'should clear suggested assay and tech types when updating with a URI' do
+    suggested_assay_type = Factory(:suggested_assay_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics', label: 'fish')
+    suggested_tech_type = Factory(:suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography', label: 'carrot')
+    assay = Factory(:experimental_assay,
+                    assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics',
+                    technology_type_uri:'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
+                    suggested_assay_type:suggested_assay_type,
+                    suggested_technology_type:suggested_tech_type,
+                    contributor:User.current_user.person)
+
+    refute_nil assay.suggested_assay_type
+    refute_nil assay.suggested_technology_type
+    refute_nil assay.assay_type_uri
+    refute_nil assay.technology_type_uri
+
+    post :update, id: assay.id, assay: {
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Metabolomics'
+    },policy_attributes: valid_sharing
+
+    assay.reload
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Metabolomics',assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography',assay.technology_type_uri
+    assert_nil assay.suggested_assay_type
+    assert_nil assay.suggested_technology_type
+
   end
 
   test 'should delete assay with study' do
@@ -1125,8 +1153,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'label', text: /assay type/i
     assert_select 'select#assay_assay_type_uri' do
-      assert_select 'option[value=?]', 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', text: /Fluxomics/i
-      assert_select 'option[value=?]', 'http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle', text: /Cell cycle/i, count: 0
+      assert_select 'option[value=?]', 'http://jermontology.org/ontology/JERMOntology#Fluxomics', text: /Fluxomics/i
+      assert_select 'option[value=?]', 'http://jermontology.org/ontology/JERMOntology#Cell_cycle', text: /Cell cycle/i, count: 0
     end
   end
 
@@ -1135,8 +1163,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'label', text: /Biological problem addressed/i
     assert_select 'select#assay_assay_type_uri' do
-      assert_select 'option[value=?]', 'http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle', text: /Cell cycle/i
-      assert_select 'option[value=?]', 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', text: /Fluxomics/i, count: 0
+      assert_select 'option[value=?]', 'http://jermontology.org/ontology/JERMOntology#Cell_cycle', text: /Cell cycle/i
+      assert_select 'option[value=?]', 'http://jermontology.org/ontology/JERMOntology#Fluxomics', text: /Fluxomics/i, count: 0
     end
   end
 
@@ -1146,8 +1174,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'label', text: /assay type/i
     assert_select 'select#assay_assay_type_uri' do
-      assert_select 'option[value=?]', 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', text: /Fluxomics/i
-      assert_select 'option[value=?]', 'http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle', text: /Cell cycle/i, count: 0
+      assert_select 'option[value=?]', 'http://jermontology.org/ontology/JERMOntology#Fluxomics', text: /Fluxomics/i
+      assert_select 'option[value=?]', 'http://jermontology.org/ontology/JERMOntology#Cell_cycle', text: /Cell cycle/i, count: 0
     end
   end
 
@@ -1157,8 +1185,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'label', text: /Biological problem addressed/i
     assert_select 'select#assay_assay_type_uri' do
-      assert_select 'option[value=?]', 'http://www.mygrid.org.uk/ontology/JERMOntology#Cell_cycle', text: /Cell cycle/i
-      assert_select 'option[value=?]', 'http://www.mygrid.org.uk/ontology/JERMOntology#Fluxomics', text: /Fluxomics/i, count: 0
+      assert_select 'option[value=?]', 'http://jermontology.org/ontology/JERMOntology#Cell_cycle', text: /Cell cycle/i
+      assert_select 'option[value=?]', 'http://jermontology.org/ontology/JERMOntology#Fluxomics', text: /Fluxomics/i, count: 0
     end
   end
 
@@ -1339,5 +1367,158 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', assay_path(assay), text: assay.title
       assert_select 'a[href=?]', assay_path(assay2), text: assay2.title, count: 0
     end
+  end
+
+  test 'should show NeLS button for NeLS-enabled project' do
+    person = Factory(:person)
+    login_as(person.user)
+    project = person.projects.first
+    project.settings['nels_enabled'] = true
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    assay = Factory(:assay, contributor: person, study: study)
+
+    get :show, id: assay
+
+    assert_response :success
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 1
+  end
+
+  test 'should not show NeLS button for non-NeLS' do
+    person = Factory(:person)
+    login_as(person.user)
+    project = person.projects.first
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    assay = Factory(:assay, contributor: person, study: study)
+
+    get :show, id: assay
+
+    assert_response :success
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0
+  end
+
+  test 'should not show NeLS button for NeLS-enabled project to non-NeLS project member' do
+    nels_person = Factory(:person)
+    non_nels_person = Factory(:person)
+    login_as(non_nels_person.user)
+    nels_project = nels_person.projects.first
+    non_nels_project = non_nels_person.projects.first
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [non_nels_project.id, non_nels_project.id]))
+    assay = Factory(:assay, contributor: nels_person, study: study, policy: Factory(:policy, permissions: [
+        Factory(:permission, contributor: nels_project, access_type: Policy::MANAGING),
+        Factory(:permission, contributor: non_nels_project, access_type: Policy::MANAGING)]))
+
+    get :show, id: assay
+
+    assert_response :success
+    assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0 # But not browse NeLS
+  end
+
+  def edit_max_object(assay)
+    add_tags_to_test_object(assay)
+    add_creator_to_test_object(assay)
+
+    org = Factory(:organism)
+    assay.associate_organism(org)
+    assay.contributor = User.current_user.person
+    assay.save
+    login_as(User.current_user)
+
+  end
+
+  test 'add data file button' do
+    assay=Factory(:experimental_assay)
+    person = assay.contributor
+    login_as(person)
+    assert assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:1
+    end
+
+    assay=Factory(:modelling_assay,contributor:person)
+    assert assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:1
+    end
+
+    assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy))
+    assert assay.can_view?
+    refute assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]':assay.id),text:'Add Data file',count:0
+    end
+  end
+
+  test 'add model button' do
+    assay=Factory(:modelling_assay)
+    person = assay.contributor
+    login_as(person)
+    assert assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:1
+    end
+
+    assay=Factory(:modelling_assay,policy:Factory(:publicly_viewable_policy))
+    assert assay.can_view?
+    refute assay.can_edit?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:0
+    end
+
+    #shouldn't show for an experimental assay, even if editable
+    assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy),contributor:person)
+    assert assay.can_view?
+    assert assay.can_edit?
+    refute assay.is_modelling?
+    get :show,id:assay
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]':assay.id),text:'Add Model',count:0
+    end
+  end
+
+  test 'can delete an assay with subscriptions' do
+    assay = Factory(:assay, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    p = Factory(:person)
+    Factory(:subscription, person: assay.contributor, subscribable: assay)
+    Factory(:subscription, person: p, subscribable: assay)
+
+    login_as(assay.contributor)
+
+    assert_difference('Subscription.count', -2) do
+      assert_difference('Assay.count', -1) do
+        delete :destroy, id: assay.id
+      end
+    end
+
+    assert_redirected_to assays_path
+  end
+
+  test 'should associate document' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+    document = Factory(:document, contributor: person)
+    timestamp = assay.updated_at
+
+    assert_not_includes assay.documents, document
+
+    assert_difference('AssayAsset.count') do
+      put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_includes assigns(:assay).documents, document
+    assert_not_equal timestamp, assigns(:assay).updated_at
   end
 end

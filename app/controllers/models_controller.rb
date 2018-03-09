@@ -17,7 +17,7 @@ class ModelsController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
   include Bives
-  include Seek::DataciteDoi
+  include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
 
@@ -85,7 +85,7 @@ class ModelsController < ApplicationController
 
   def new_version
     if handle_upload_data
-      comments = params[:revision_comment]
+      comments = params[:revision_comments]
 
       respond_to do |format|
         create_new_version comments
@@ -236,11 +236,6 @@ class ModelsController < ApplicationController
     else
       flash[:error]="Unable to save new version"
     end
-  end
-
-  def translate_action action
-    action="view" if ["matching_data"].include?(action)
-    super action
   end
 
   def jws_enabled

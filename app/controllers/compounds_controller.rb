@@ -6,6 +6,7 @@ class CompoundsController < ApplicationController
   before_filter :find_all_compounds
 
   include Seek::FactorStudied
+  include Seek::BreadCrumbs
 
   def index
     respond_to do |format|
@@ -37,6 +38,7 @@ class CompoundsController < ApplicationController
              render :update do |page|
                if @compound.save
                   page.insert_html :before, "compound_rows",:partial=>"compound_row",:object=> @compound
+                  page.insert_html :before, "edit-compound-modals", :partial=>"edit_compound",:object=> @compound, as: 'compound'
                   page.visual_effect :highlight,"compound_row_#{@compound.id}"
                   # clear the _add_compound form
                   page[:add_compound_form].reset
@@ -81,8 +83,10 @@ class CompoundsController < ApplicationController
          @compound = new_or_update_synonyms @compound, compound_annotation
          render :update do |page|
            if @compound.save
-              page.visual_effect :fade,"edit_compound_#{@compound.id}"
+              page << "$j('#edit_compound_#{@compound.id}').modal('hide');"
               page.replace "compound_row_#{@compound.id}", :partial => 'compound_row', :object => @compound
+              page.replace "edit_compound_#{@compound.id}", :partial => 'edit_compound', :object => @compound, as: 'compound'
+              page.visual_effect :highlight,"compound_row_#{@compound.id}"
            else
               page.alert(@compound.errors.full_messages)
            end
@@ -133,7 +137,7 @@ class CompoundsController < ApplicationController
                page["#{params[:id]}_synonyms"].value = synonyms
                page["#{params[:id]}_chebi_ids"].value = chebi_ids
                page["#{params[:id]}_kegg_ids"].value = kegg_ids
-               page.visual_effect :highlight, "edit_compound_#{params[:id]}"
+               page.visual_effect :highlight, "edit_compound_body_#{params[:id]}"
              end
            else
              render :update do |page|

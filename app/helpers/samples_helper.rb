@@ -64,7 +64,7 @@ module SamplesHelper
   end
 
   def seek_sample_attribute_display(value)
-    sample = Sample.find_by_id(value)
+    sample = Sample.find_by_id(value['id'])
     if sample
       if sample.can_view?
         link_to sample.title, sample
@@ -72,15 +72,20 @@ module SamplesHelper
         content_tag :span, 'Hidden', class: 'none_text'
       end
     else
-      content_tag :span, 'Not found', class: 'none_text'
+      content_tag :span, value['title'], class: 'none_text'
     end
   end
 
   def default_attribute_display(attribute, options, sample, value)
-    if options[:link] && attribute.is_title
-      link_to(value, sample)
-    else
-      text_or_not_specified(value, auto_link: options[:link])
+    resolution = attribute.resolve (value)
+    if (resolution != nil)
+      link_to(value, resolution, target: :_blank)
+    else if options[:link] && attribute.is_title
+        link_to(value, sample)
+      else
+      
+        text_or_not_specified(value, auto_link: options[:link])
+      end
     end
   end
 

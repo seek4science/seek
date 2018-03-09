@@ -15,6 +15,15 @@
         <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
       </div>
 
+      <div class="form-group">
+        <div class='help-block'>Check this box if this data is the result of a model simulation</div>
+        <label>
+          <%= f.check_box :simulation_data %>
+          Model simulation data
+        </label>
+
+      </div>
+
       <%# only the owner should be able to change sharing permissions -%>
       <% if current_user_authorized_to_manage && !@data_file.openbis?-%>
           <%= render :partial => "projects/project_selector", :locals => {:resource => @data_file } %>
@@ -33,11 +42,13 @@
       <% end -%>
 
       <div>
+
         <%= preview_permission_popup_link(@data_file)-%>
         <%= f.submit "Update", :id => "data_file_submit_btn",
                      :onclick => "javascript: validateResourceFields(false, 'data_file', #{current_user_authorized_to_manage}); return(false);",
                      :class => 'btn btn-primary' -%>
         or <%= cancel_button(data_file_path(@data_file)) -%>
+
       </div>
     </div>
 <% end %>

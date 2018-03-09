@@ -3,9 +3,8 @@
 require 'seek/config'
 require 'seek/seek_render_override'
 
-SEEK::Application.configure do
+def load_seek_config_defaults!
   #Main settings
-
   Seek::Config.default :sycamore_enabled,false
   Seek::Config.default :events_enabled,true
   Seek::Config.default :jerm_enabled,false
@@ -46,7 +45,6 @@ SEEK::Application.configure do
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
   Seek::Config.default :delete_asset_version_enabled, false
-  Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
   Seek::Config.default :modelling_analysis_enabled,true
   Seek::Config.default :organisms_enabled,true
@@ -56,17 +54,16 @@ SEEK::Application.configure do
   Seek::Config.default :factors_studied_enabled,false
   Seek::Config.default :experimental_conditions_enabled,false
   Seek::Config.default :tagging_enabled, true
-  Seek::Config.default :workflows_enabled,false
   Seek::Config.default :assays_enabled,true
   Seek::Config.default :publications_enabled,true
   Seek::Config.default :authorization_checks_enabled, true
   Seek::Config.default :documentation_enabled,true
-  Seek::Config.default :assay_type_ontology_file, "JERM-RDFXML.owl"
-  Seek::Config.default :technology_type_ontology_file, "JERM-RDFXML.owl"
-  Seek::Config.default :modelling_analysis_type_ontology_file, "JERM-RDFXML.owl"
-  Seek::Config.default :assay_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type"
-  Seek::Config.default :technology_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type"
-  Seek::Config.default :modelling_analysis_type_base_uri,"http://www.mygrid.org.uk/ontology/JERMOntology#Model_analysis_type"
+  Seek::Config.default :assay_type_ontology_file, "JERM.rdf"
+  Seek::Config.default :technology_type_ontology_file, "JERM.rdf"
+  Seek::Config.default :modelling_analysis_type_ontology_file, "JERM.rdf"
+  Seek::Config.default :assay_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+  Seek::Config.default :technology_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Technology_type"
+  Seek::Config.default :modelling_analysis_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
   Seek::Config.default :profile_select_by_default,true
   Seek::Config.default :programmes_enabled, false
   Seek::Config.default :project_hierarchy_enabled, false
@@ -102,15 +99,11 @@ SEEK::Application.configure do
 
   #Imprint
   Settings.defaults[:imprint_enabled]= false
-  imprint_example = ''
-  File.open(Rails.root.join('config/default_data/imprint_example')) do |infile|
-    while (line = infile.gets)
-      imprint_example << line
-    end
-  end
+  Seek::Config.default :imprint_description, File.read(Rails.root.join('config/default_data/imprint_example'))
 
-  Seek::Config.default :imprint_description, imprint_example
-
+  #About page
+  Settings.defaults[:about_page_enabled]= false
+  Seek::Config.default :about_page, File.read(Rails.root.join('config/default_data/about_page_example'))
 
   #the maximum size, in Mb, for a spreadsheet file that can be extracted and explored
   Seek::Config.default :max_extractable_spreadsheet_size,10
@@ -121,7 +114,7 @@ SEEK::Application.configure do
   Seek::Config.default :is_virtualliver, false
 
 # Pagination
-  Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
+  Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest', :documents => 'latest'}
   Seek::Config.default :limit_latest,7
 
   Seek::Config.default :related_items_limit,5
@@ -207,4 +200,10 @@ SEEK::Application.configure do
   }
   Seek::Config.default :openbis_enabled,false
   Seek::Config.default :openbis_download_limit, 2.gigabytes
+
+  Seek::Config.default :default_license, 'CC-BY-4.0'
+end
+
+SEEK::Application.configure do
+  load_seek_config_defaults!
 end

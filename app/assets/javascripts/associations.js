@@ -54,7 +54,7 @@ Associations.List = function (template, element) {
 Associations.List.prototype.toggleEmptyListText = function () {
     var noText = $j('.no-item-text', this.element);
 
-    if(this.items.length === 0)
+    if (this.items.length === 0)
         noText.show();
     else
         noText.hide();
@@ -120,7 +120,7 @@ Associations.MultiList.prototype.add = function (association) {
 
 Associations.MultiList.prototype.removeAll = function () {
     for(var key in this.lists) {
-        if(this.lists.hasOwnProperty(key))
+        if (this.lists.hasOwnProperty(key))
             this.lists[key].removeAll();
     }
 };
@@ -142,7 +142,7 @@ Associations.Form.prototype.submit = function () {
     var commonFields = {};
     this.commonFieldElements.forEach(function (element) {
         var name = element.data('attributeName');
-        if(element.is('select')) {     //  <select> tags store both the value and the selected option's text
+        if (element.is('select')) {     //  <select> tags store both the value and the selected option's text
             commonFields[name] = { value: element.val(),
                 text: $j('option:selected', element).text() };
         } else {
@@ -156,22 +156,47 @@ Associations.Form.prototype.submit = function () {
         list.add(associationObject);
     });
 
-    if(this.afterSubmit)
+    if (this.afterSubmit)
         this.afterSubmit(this.selectedItems.length);
 
     this.reset();
 };
 
-Associations.filter = function (filterField) {
-    $j.ajax($j(filterField).data('filterUrl'), {
-            data: { filter: $j(filterField).val() },
+// Object to represent a set of fields that the user can change to filter a candidate list of associations
+Associations.FilterGroup = function (element, filterUrl) {
+    this.element = element;
+    this.filterUrl = filterUrl;
+    this.list = $j('[data-role="seek-association-candidate-list"]', $j(element));
+};
+
+Associations.FilterGroup.prototype.filter = function () {
+    var payload = {};
+
+    $j('[data-role="seek-association-filter-field"]:not(:checkbox)', this.element).each(function () {
+        var name = $j(this).data('attributeName');
+        payload[name] = $j(this).val();
+    });
+
+    $j('[data-role="seek-association-filter-field"]:checkbox', this.element).each(function () {
+        var name = $j(this).data('attributeName');
+        payload[name] = $j(this).is(':checked');
+    });
+
+    var self = this;
+    $j.ajax(self.filterUrl, {
+            data: payload,
             success: function (data) {
-                $j(filterField).siblings('[data-role="seek-association-candidate-list"]').html(data);
+                self.list.html(data);
             }
         }
     );
 };
 
+Associations.FilterGroup.prototype.reset = function () {
+    $j(':input[data-role="seek-association-filter-field"]:not(:checkbox)', this.element).val('');
+    $j(':input[data-role="seek-association-filter-field"]:checkbox', this.element).removeAttr('checked');
+    this.filter();
+};
 
 $j(document).ready(function () {
     // Markup
@@ -180,7 +205,7 @@ $j(document).ready(function () {
         var self = $j(this);
 
         var existingValues = $j('script[data-role="seek-existing-associations"]', self).html();
-        if(existingValues) {
+        if (existingValues) {
             JSON.parse(existingValues).forEach(function (value) {
                 list.add(value);
             });
@@ -195,7 +220,7 @@ $j(document).ready(function () {
         });
 
         var existingValues = $j('script[data-role="seek-existing-associations"]', self).html();
-        if(existingValues) {
+        if (existingValues) {
             JSON.parse(existingValues).forEach(function (value) {
                 multilist.add(value);
             });
@@ -218,7 +243,7 @@ $j(document).ready(function () {
 
         $j(element).on('click', '.selectable[data-role="seek-association-candidate"]', function () {
             $j(this).toggleClass('selected');
-            if(!$j(this).parents('[data-role="seek-association-candidate-list"]').data('multiple')) {
+            if (!$j(this).parents('[data-role="seek-association-candidate-list"]').data('multiple')) {
                 $j(this).siblings().removeClass('selected');
             }
 
@@ -241,24 +266,41 @@ $j(document).ready(function () {
         });
     });
 
-    $j('[data-role="seek-association-filter"]').keypress(function (e) {
-        if(e.keyCode == 13) {
-            e.preventDefault();
-        }
-    });
+    $j('[data-role="seek-association-filter-group"]').each(function () {
+        var filterGroup = new Associations.FilterGroup($j(this), $j(this).data('filterUrl'));
+        var self = $j(this);
 
-    $j('[data-role="seek-association-filter"]').keyup(function (e) {
-        // If more than two characters were entered, or the input was cleared, or the ENTER key was pressed..
-        var filterField = this;
-        if($j(filterField).val().length == 0 || $j(filterField).val().length >= 2 || e.keyCode == 13) {
-            Associations.filter(filterField);
-        }
-    });
+        // Strip the name of the element and store it as a data attribute, to stop it being submitted as a field in the
+        //  main form
+        $j('[data-role="seek-association-filter-field"]', self).each(function () {
+            $j(this).data('attributeName', this.name);
+            this.name = '';
+        });
 
-    // If no initial association candidates provided, make a filter call to get some.
-    $j('[data-role="seek-association-filter"]').each(function () {
-        var list = $j(this).siblings('[data-role="seek-association-candidate-list"]');
-        if($j.trim(list.html()) == '')
-            Associations.filter(this);
+        $j('[data-role="seek-association-filter-field"]:text', self).keypress(function (e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+            }
+        });
+
+        $j('[data-role="seek-association-filter-field"]:text', self).keyup(function (e) {
+            // If more than two characters were entered, or the input was cleared, or the ENTER key was pressed..
+            if ($j(this).val().length == 0 || $j(this).val().length >= 2 || e.keyCode == 13) {
+                filterGroup.filter();
+            }
+        });
+
+        // If a non-text field was changed, trigger the filter
+        $j('[data-role="seek-association-filter-field"]:not(:text)', self).change(function (e) {
+            filterGroup.filter();
+        });
+
+        // If no initial association candidates provided, make a filter call to get some.
+        if ($j.trim(filterGroup.list.html()) == '') {
+            filterGroup.filter();
+        }
+
+        // Bind the FilterGroup object to the element so it can be accessed externally
+        self.data('filterGroup', filterGroup);
     });
 });

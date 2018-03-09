@@ -9,7 +9,7 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
 
   test 'its only one parent is either from ontology or from suggested assay types' do
     # ontology parent
-    uri = 'http://www.mygrid.org.uk/ontology/JERMOntology#Gas_chromatography'
+    uri = 'http://jermontology.org/ontology/JERMOntology#Gas_chromatography'
     ontology_class = Seek::Ontologies::TechnologyTypeReader.instance.class_hierarchy.hash_by_uri[uri]
     tt = Factory :suggested_technology_type, ontology_uri: uri
     assert_equal 1, tt.parents.count
@@ -44,13 +44,13 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
   end
 
   test 'traverse hierarchy for parent' do
-    parent = Factory :suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding'
+    parent = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     child = Factory :suggested_technology_type, parent: parent, ontology_uri: nil
     child_child = Factory :suggested_technology_type, parent: child, ontology_uri: nil
     ontology_parent = parent.parent
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding', parent.ontology_uri
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding', child.ontology_uri
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding', child_child.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding', parent.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding', child.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding', child_child.ontology_uri
     assert_equal ontology_parent, parent.ontology_parent
     assert_equal ontology_parent, child.ontology_parent
     assert_equal ontology_parent, child_child.ontology_parent
@@ -100,14 +100,14 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
   end
 
   test 'parent cannot be self' do
-    child = Factory :suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding'
+    child = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     assert child.valid?
     child.parent = child
     refute child.valid?
   end
 
   test 'parent cannot be a child' do
-    top = Factory :suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding'
+    top = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     child1 = Factory :suggested_technology_type, parent: top
     child2 = Factory :suggested_technology_type, parent: child1
     child3 = Factory :suggested_technology_type, parent: child2
@@ -128,7 +128,7 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
   end
 
   test 'all children' do
-    top = Factory :suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding'
+    top = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     child1 = Factory :suggested_technology_type, parent: top
     child2 = Factory :suggested_technology_type, parent: child1
     child3 = Factory :suggested_technology_type, parent: child2
@@ -140,7 +140,7 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
   end
 
   test 'children' do
-    top = Factory :suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding'
+    top = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     child1 = Factory :suggested_technology_type, parent: top
     child2 = Factory :suggested_technology_type, parent: child1
     child3 = Factory :suggested_technology_type, parent: child2
@@ -152,7 +152,7 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
   end
 
   test 'update parent after destroy' do
-    top = Factory :suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding'
+    top = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     child1 = Factory :suggested_technology_type, parent: top
     child2 = Factory :suggested_technology_type, parent: child1
     child3 = Factory :suggested_technology_type, parent: child2
@@ -177,28 +177,76 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
   end
 
   test 'updates new parent ontology uri when deleting old parent' do
-    top = Factory :suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding'
+    top = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     child1 = Factory :suggested_technology_type, parent: top, ontology_uri: nil
     child2 = Factory :suggested_technology_type, parent: child1, ontology_uri: nil
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding', top.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding', top.ontology_uri
     assert_nil child1[:ontology_uri]
     assert_nil child2[:ontology_uri]
 
     top.destroy
     child1.reload
     child2.reload
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding', child1.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding', child1.ontology_uri
     assert_nil child2[:ontology_uri]
 
     # check it only affects the children when the item being destroyed hangs from an ontology term
-    top = Factory :suggested_technology_type, ontology_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding'
+    top = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     child1 = Factory :suggested_technology_type, parent: top, ontology_uri: nil
     child2 = Factory :suggested_technology_type, parent: child1, ontology_uri: nil
 
     child1.destroy
     top.reload
     child2.reload
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Binding', top.ontology_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding', top.ontology_uri
     assert_nil child2[:ontology_uri]
+  end
+
+  test 'updating a suggested tech type should update associated assays' do
+    type = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = Factory(:experimental_assay, suggested_technology_type: type)
+    assay2 = Factory(:experimental_assay, suggested_technology_type: type)
+
+    type.reload
+    assert_equal [assay, assay2].sort, type.assays.sort
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay2.technology_type_uri
+
+    Delayed::Job.destroy_all
+
+    type.ontology_uri = 'http://wibble.com/ontology#fish'
+
+    type.save!
+
+    assay.reload
+    assay2.reload
+
+    assert_equal 'http://wibble.com/ontology#fish', assay.technology_type_uri
+    assert_equal 'http://wibble.com/ontology#fish', assay2.technology_type_uri
+
+    # checks that rdf generation jobs have been created, to update the RDF for the assays
+    rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}
+    assert_equal 2,rdfjobs.count
+    assert_equal [assay,assay2].sort,rdfjobs.collect{|j| j.payload_object.item}.sort
+  end
+
+  test 'assay adopts ontology uri if suggested type destroyed' do
+    type = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    assay = Factory(:experimental_assay, suggested_technology_type: type)
+    type.reload
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.technology_type_uri
+
+    Delayed::Job.destroy_all
+
+    type.destroy
+    assay.reload
+
+    assert_nil assay.suggested_assay_type
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.technology_type_uri
+
+    # checks that rdf generation jobs have been created, to update the RDF for the assays
+    rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}
+    assert_equal 1,rdfjobs.count
+    assert_equal assay,rdfjobs.first.payload_object.item
   end
 end

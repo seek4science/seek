@@ -81,7 +81,13 @@ class Publication < ActiveRecord::Base
   end
 
   def doi_uri
-    "https://dx.doi.org/#{doi}" if doi
+    "https://doi.org/#{doi}" if doi
+  end
+
+  # Automatically extract the actual DOI if the user put in the full URL
+  def doi=(doi)
+    doi = doi.gsub(/(https?:\/\/)?(dx\.)?doi\.org\//,'') if doi
+    super(doi)
   end
 
   def default_policy
@@ -235,6 +241,14 @@ class Publication < ActiveRecord::Base
     end
   end
 
+  def has_doi?
+    self.doi.present?
+  end
+
+  def latest_citable_resource
+    self
+  end
+
   private
 
   def bio_reference
@@ -244,7 +258,7 @@ class Publication < ActiveRecord::Base
       # TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
       Bio::Reference.new({ title: title, journal: journal, abstract: abstract,
                            authors: publication_authors.map { |e| e.person ? [e.person.last_name, e.person.first_name].join(', ') : [e.last_name, e.first_name].join(', ') },
-                           year: published_date.year }.with_indifferent_access)
+                           year: published_date.try(:year) }.with_indifferent_access)
     end
   end
 

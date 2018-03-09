@@ -132,6 +132,36 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_redirected_to organism_path(assigns(:organism))
   end
 
+  test 'create organism with concept uri' do
+    login_as(:quentin)
+    assert_difference('Organism.count') do
+      post :create, organism: { title: 'An organism', concept_uri:'https://identifiers.org/taxonomy/9606' }
+    end
+    assert_not_nil assigns(:organism)
+
+    #uri is converted the taxonomy form
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/9606',assigns(:organism).concept_uri
+  end
+
+  #should convert to the purl version
+  test 'create organism with ncbi id number' do
+    login_as(:quentin)
+    assert_difference('Organism.count') do
+      post :create, organism: { title: 'An organism', concept_uri:'2222' }
+    end
+    assert_not_nil assigns(:organism)
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2222',assigns(:organism).concept_uri
+  end
+
+  #should convert to the purl version
+  test 'update organism with ncbi id number' do
+    login_as(:quentin)
+    org = Factory(:organism)
+    patch :update, id: org.id, organism: {concept_uri:'2222'}
+    assert_not_nil assigns(:organism)
+    assert_equal 'http://purl.bioontology.org/ontology/NCBITAXON/2222',assigns(:organism).concept_uri
+  end
+
   test 'project administrator can create new organism' do
     login_as(Factory(:project_administrator))
     assert_difference('Organism.count') do
@@ -284,4 +314,40 @@ class OrganismsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#resource-count-stats', count: 0
   end
+
+  test 'samples in related items' do
+    person = Factory(:person)
+    login_as(person.user)
+    sample_type = Factory(:strain_sample_type)
+    strain = Factory(:strain)
+    organism = strain.organism
+
+    sample = Sample.new(sample_type: sample_type, contributor: person, project_ids: [person.projects.first.id])
+    sample.set_attribute(:name, 'Strain sample')
+    sample.set_attribute(:seekstrain, strain.id)
+    sample.save!
+
+    get :show, id: organism
+
+    assert_response :success
+    assert_select 'div.related-items > ul > li > a', text: "Samples (1)"
+    assert_select 'div.related-items .tab-pane a[href=?]', sample_path(sample), text: /#{sample.title}/
+  end
+
+  test 'create multiple organisms with blank concept uri' do
+    login_as(Factory(:admin))
+    assert_difference('Organism.count') do
+      post :create, organism: { title: 'An organism', concept_uri:'' }
+    end
+    assert_not_nil assigns(:organism)
+    assert_nil assigns(:organism).concept_uri
+
+    assert_difference('Organism.count') do
+      post :create, organism: { title: 'An organism 2', concept_uri:'' }
+    end
+
+    refute_nil assigns(:organism)
+    assert_nil assigns(:organism).concept_uri
+  end
+
 end

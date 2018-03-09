@@ -26,14 +26,12 @@
     <% end %>
     <li><%= link_to t("sop").pluralize, sops_path %></li>
     <li><%= link_to "Publications", publications_path %></li>
+    <li><%= link_to t("document").pluralize, documents_path %></li>
 
     <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
     <li><%= link_to t("presentation").pluralize, presentations_path %></li>
     <% if Seek::Config.events_enabled %>
         <li><%= link_to t("event").pluralize, events_path %></li>
-    <% end %>
-    <% if Seek::Config.forum_enabled %>
-        <li><%= link_to "Forums", forums_path %></li>
     <% end %>
     <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
     <% if Seek::Config.samples_enabled %>

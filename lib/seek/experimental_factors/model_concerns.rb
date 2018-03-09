@@ -14,7 +14,6 @@ module Seek
         validates_presence_of :start_value, :unit, unless: proc { |fs| fs.measured_item.title == 'growth medium' || fs.measured_item.title == 'buffer' }, message: "^Value can't be a empty"
         validates_presence_of :links, if: proc { |fs| fs.measured_item.title == 'concentration' }, message: "^Substance can't be a empty"
 
-        acts_as_annotatable name_field: :title
       end
 
       def substances

@@ -1,0 +1,46 @@
+{
+  "data": {
+    "type": "investigations",
+    "attributes": {
+      "title": "A Maximal Investigation",
+      "policy": {
+        "access": "download",
+        "permissions": [
+          <% unless project_ids.nil? %>
+             <% policies = Array.new %>
+             <% for project_id in project_ids do %>
+              <% policies.push("{\"resource_id\": \"#{project_id}\",
+                                \"resource_type\": \"projects\",
+                                \"access\": \"manage\"}") %>
+             <% end %>
+              <%= policies.join(',') %>
+          <% end %>
+        ]
+      },
+      "description": "This is a more complex investigation",
+      "other_creators": "Max Blumenthal, Ed Snowden"
+    },
+    "relationships": {
+      <% unless project_ids.nil? %>
+       "projects": {
+       "data": [
+         <% projects = Array.new %>
+         <% for project_id in project_ids do %>
+            <% projects.push r.call("_related.json.erb",{:type => "projects",:id => project_id}) %>
+         <% end %>
+         <%= projects.join(',') %>
+         ]
+       }
+      <% end %>
+      <% unless creator_ids.nil? %>
+      ,"creators": {
+        "data": [
+          <% for creator_id in creator_ids do %>
+          <%= r.call("_related.json.erb",{:type => "people",:id => creator_id}) %>
+          <% end %>
+        ]
+      }
+      <% end %>
+    }
+  }
+}

@@ -12,9 +12,9 @@ GIT
 
 GIT
   remote: https://github.com/SysMO-DB/bioportal.git
-  revision: 27253aec409f64bc7a1cb812b20119a982026422
+  revision: 0f80b4281af3f71234a425d40981b1185a3e5d0b
   specs:
-    bioportal (2.3)
+    bioportal (3.0)
 
 GIT
   remote: https://github.com/SysMO-DB/convert_office.git
@@ -43,18 +43,6 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
-  remote: https://github.com/SysMO-DB/my_savage_beast.git
-  revision: 4ff41d5e7d1f17440240fe0886a7c9827f8f53c6
-  specs:
-    my_savage_beast (2.3)
-
-GIT
-  remote: https://github.com/SysMO-DB/redbox.git
-  revision: 494451d01aeeb70b186783d08b6b9aefcb537e98
-  specs:
-    redbox (1.0.4)
-
-GIT
   remote: https://github.com/SysMO-DB/white_list.git
   revision: 3f9798ec54f227e852b944bb14f6f90d05cde893
   specs:
@@ -78,27 +66,6 @@ GIT
   revision: e109ac6d8b102f7ecb65140c17d263b85e066870
   specs:
     search_biomodel (2.2.1)
-
-GIT
-  remote: https://github.com/myGrid/taverna-player.git
-  revision: db5dc649af7089d4a2d9acfb3579fb6f7c3dae68
-  branch: rails4-list-inputs
-  specs:
-    taverna-player (0.12.0)
-      coderay (~> 1.1)
-      daemons (~> 1.1.9)
-      delayed_job_active_record (~> 4.0)
-      jbuilder (~> 2.0)
-      jquery-rails (~> 3.0)
-      paperclip (~> 4.1)
-      pmrpc-rails (~> 1.0.0)
-      rails (~> 4.2.1)
-      rails_autolink (~> 1.1.0)
-      require_all (~> 1.3.1)
-      responders (~> 2.0)
-      rubyzip (~> 1.1.4)
-      t2-server (~> 1.3)
-      taverna-t2flow (~> 0.5.1)
 
 GIT
   remote: https://github.com/rails/prototype-rails
@@ -128,34 +95,39 @@ GEM
   remote: https://rails-assets.org/
   specs:
     RedCloth (4.2.9)
-    actionmailer (4.2.8)
-      actionpack (= 4.2.8)
-      actionview (= 4.2.8)
-      activejob (= 4.2.8)
+    actionmailer (4.2.9)
+      actionpack (= 4.2.9)
+      actionview (= 4.2.9)
+      activejob (= 4.2.9)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 1.0, >= 1.0.5)
-    actionpack (4.2.8)
-      actionview (= 4.2.8)
-      activesupport (= 4.2.8)
+    actionpack (4.2.9)
+      actionview (= 4.2.9)
+      activesupport (= 4.2.9)
       rack (~> 1.6)
       rack-test (~> 0.6.2)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (4.2.8)
-      activesupport (= 4.2.8)
+    actionview (4.2.9)
+      activesupport (= 4.2.9)
       builder (~> 3.1)
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    activejob (4.2.8)
-      activesupport (= 4.2.8)
+    active_model_serializers (0.10.6)
+      actionpack (>= 4.1, < 6)
+      activemodel (>= 4.1, < 6)
+      case_transform (>= 0.2)
+      jsonapi-renderer (>= 0.1.1.beta1, < 0.2)
+    activejob (4.2.9)
+      activesupport (= 4.2.9)
       globalid (>= 0.3.0)
-    activemodel (4.2.8)
-      activesupport (= 4.2.8)
+    activemodel (4.2.9)
+      activesupport (= 4.2.9)
       builder (~> 3.1)
-    activerecord (4.2.8)
-      activemodel (= 4.2.8)
-      activesupport (= 4.2.8)
+    activerecord (4.2.9)
+      activemodel (= 4.2.9)
+      activesupport (= 4.2.9)
       arel (~> 6.0)
     activerecord-session_store (1.0.0)
       actionpack (>= 4.0, < 5.1)
@@ -163,7 +135,7 @@ GEM
       multi_json (~> 1.11, >= 1.11.2)
       rack (>= 1.5.2, < 3)
       railties (>= 4.0, < 5.1)
-    activesupport (4.2.8)
+    activesupport (4.2.9)
       i18n (~> 0.7)
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
@@ -207,20 +179,21 @@ GEM
       sass (>= 3.3.4)
     breadcrumbs_on_rails (3.0.1)
     builder (3.2.3)
-    cancan (1.6.10)
+    case_transform (0.2)
+      activesupport
     citeproc (1.0.5)
       namae (~> 0.8)
     citeproc-ruby (1.1.6)
       citeproc (>= 1.0.4, < 2.0)
       csl (~> 1.4)
-    climate_control (0.1.0)
+    climate_control (0.2.0)
     cocaine (0.5.8)
       climate_control (>= 0.0.3, < 1.0)
     code_analyzer (0.4.7)
       sexp_processor
     codeclimate-engine-rb (0.4.0)
       virtus (~> 1.0)
-    coderay (1.1.1)
+    coderay (1.1.2)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.1.1)
@@ -240,12 +213,6 @@ GEM
     country_select (3.0.0)
       countries (~> 2.0)
       sort_alphabetical (~> 1.0)
-    coveralls (0.8.20)
-      json (>= 1.8, < 3)
-      simplecov (~> 0.14.1)
-      term-ansicolor (~> 1.3)
-      thor (~> 0.19.4)
-      tins (~> 1.6)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     csl (1.4.5)
@@ -265,7 +232,6 @@ GEM
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.3)
-    docile (1.1.5)
     docsplit (0.7.6)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
@@ -348,12 +314,14 @@ GEM
       multi_xml (>= 0.5.2)
     httpi (1.1.1)
       rack
-    i18n (0.8.1)
+    i18n (0.8.6)
     i18n_data (0.7.0)
     ice_nine (0.11.2)
     jbuilder (2.6.3)
       activesupport (>= 3.0.0, < 5.2)
       multi_json (~> 1.2)
+    jbuilder-json_api (1.0.0)
+      jbuilder (~> 2)
     jquery-rails (3.1.4)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
@@ -361,9 +329,13 @@ GEM
       jquery-rails
       railties (>= 3.1.0)
     json (1.8.6)
+    json-diff (0.4.1)
     json-ld (1.1.11.1)
       multi_json (~> 1.11)
       rdf (~> 1.1, >= 1.1.17, < 1.99)
+    json-schema (2.8.0)
+      addressable (>= 2.4)
+    jsonapi-renderer (0.1.3)
     kgio (2.11.0)
     latex-decode (0.2.2)
       unicode (~> 0.4)
@@ -409,7 +381,7 @@ GEM
       method_source
       rails (>= 4.0.0)
       rake
-    mail (2.6.4)
+    mail (2.6.6)
       mime-types (>= 1.16, < 4)
     mechanize (2.7.5)
       domain_name (~> 0.5, >= 0.5.1)
@@ -430,11 +402,11 @@ GEM
       fastimage (~> 2.1)
       nesty (~> 1.0)
       nokogiri (~> 1.7)
-    method_source (0.8.2)
+    method_source (0.9.0)
     mime-types (2.99.3)
     mimemagic (0.3.2)
-    mini_portile2 (2.1.0)
-    minitest (5.10.1)
+    mini_portile2 (2.3.0)
+    minitest (5.10.3)
     minitest-reporters (1.1.14)
       ansi
       builder
@@ -454,8 +426,8 @@ GEM
     net-http-persistent (2.9.4)
     net-ldap (0.16.0)
     netrc (0.11.0)
-    nokogiri (1.7.1)
-      mini_portile2 (~> 2.1.0)
+    nokogiri (1.8.1)
+      mini_portile2 (~> 2.3.0)
     nori (1.1.5)
     notiffany (0.1.1)
       nenv (~> 0.1)
@@ -473,11 +445,6 @@ GEM
     openseek-api (0.11.0)
       cocaine
     options (2.3.2)
-    paperclip (4.2.4)
-      activemodel (>= 3.2.0)
-      activesupport (>= 3.2.0)
-      cocaine (~> 0.5.5)
-      mime-types
     parser (2.4.0.0)
       ast (~> 2.2)
     passenger (5.1.2)
@@ -485,8 +452,6 @@ GEM
       rake (>= 0.8.1)
     path_expander (1.0.1)
     pg (0.20.0)
-    pmrpc-rails (1.0.1)
-      railties (>= 3.1.0)
     polyamorous (1.3.1)
       activerecord (>= 3.0)
     pothoven-attachment_fu (3.3.0)
@@ -495,10 +460,9 @@ GEM
     progress_bar (1.1.0)
       highline (~> 1.6)
       options (~> 2.3.0)
-    pry (0.10.4)
+    pry (0.11.3)
       coderay (~> 1.1.0)
-      method_source (~> 0.8.1)
-      slop (~> 3.4)
+      method_source (~> 0.9.0)
     pry-doc (0.10.0)
       pry (~> 0.9)
       yard (~> 0.9)
@@ -511,19 +475,21 @@ GEM
     pyu-ruby-sasl (0.0.3.3)
     quiet_assets (1.1.0)
       railties (>= 3.1, < 5.0)
-    rack (1.6.5)
+    rack (1.6.8)
+    rack-attack (5.0.1)
+      rack
     rack-test (0.6.3)
       rack (>= 1.0)
-    rails (4.2.8)
-      actionmailer (= 4.2.8)
-      actionpack (= 4.2.8)
-      actionview (= 4.2.8)
-      activejob (= 4.2.8)
-      activemodel (= 4.2.8)
-      activerecord (= 4.2.8)
-      activesupport (= 4.2.8)
+    rails (4.2.9)
+      actionmailer (= 4.2.9)
+      actionpack (= 4.2.9)
+      actionview (= 4.2.9)
+      activejob (= 4.2.9)
+      activemodel (= 4.2.9)
+      activerecord (= 4.2.9)
+      activesupport (= 4.2.9)
       bundler (>= 1.3.0, < 2.0)
-      railties (= 4.2.8)
+      railties (= 4.2.9)
       sprockets-rails
     rails-assets-bootstrap (3.3.7)
       rails-assets-jquery (>= 1.9.1, < 4)
@@ -564,9 +530,9 @@ GEM
       json
       require_all
       ruby-progressbar
-    railties (4.2.8)
-      actionpack (= 4.2.8)
-      activesupport (= 4.2.8)
+    railties (4.2.9)
+      actionpack (= 4.2.9)
+      activesupport (= 4.2.9)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rainbow (2.2.1)
@@ -578,8 +544,6 @@ GEM
       activesupport (>= 3.0)
       i18n
       polyamorous (~> 1.3)
-    ratom (0.9.0)
-      libxml-ruby (~> 2.6)
     rb-fsevent (0.9.8)
     rb-inotify (0.9.8)
       ffi (>= 0.5.0)
@@ -638,7 +602,7 @@ GEM
       rdf (~> 1.1, >= 1.1.10)
     rdf-xsd (1.1.5.1)
       rdf (~> 1.1, >= 1.1.9, < 1.99)
-    rdoc (5.1.0)
+    rdoc (6.0.0)
     recaptcha (4.1.0)
       json
     reek (4.6.1)
@@ -655,9 +619,9 @@ GEM
       netrc (~> 0.7)
     rfc-822 (0.4.1)
     rmagick (2.15.2)
-    ro-bundle (0.2.1)
+    ro-bundle (0.2.3)
       json (~> 1.8)
-      ucf (~> 2.0)
+      ucf (~> 2.0.1)
       uuid (~> 2.3)
     rsolr (1.1.2)
       builder (>= 2.1.2)
@@ -699,11 +663,11 @@ GEM
       ruby_parser (~> 3.8)
       virtus (~> 1.0)
     rubyntlm (0.3.4)
-    rubyzip (1.1.7)
+    rubyzip (1.2.1)
     safe_yaml (1.0.4)
-    sample-template-generator (0.3.3)
-      cocaine
-      rdoc
+    sample-template-generator (0.4.1)
+      cocaine (~> 0.5)
+      rdoc (~> 6.0)
     sass (3.4.23)
     sass-rails (5.0.6)
       railties (>= 4.0.0, < 6)
@@ -726,11 +690,6 @@ GEM
     simple-spreadsheet-extractor (0.15.2)
       libxml-ruby (~> 2.6)
       open4 (= 1.3.0)
-    simplecov (0.14.1)
-      docile (~> 1.1.0)
-      json (>= 1.8, < 3)
-      simplecov-html (~> 0.10.0)
-    simplecov-html (0.10.0)
     sixarm_ruby_unaccent (1.1.1)
     slop (3.6.0)
     sort_alphabetical (1.1.0)
@@ -767,31 +726,19 @@ GEM
     system (0.1.3)
       version (~> 1.0.0)
     systemu (2.6.5)
-    t2-server (1.3.0)
-      libxml-ruby (~> 2.6)
-      net-http-persistent (~> 2.6)
-      ratom (~> 0.9)
-      taverna-baclava (~> 1.0)
-    taverna-baclava (1.0.1)
-      builder (~> 3.0)
-    taverna-t2flow (0.5.1)
-      libxml-ruby (>= 1.1.4)
     teaspoon (1.1.5)
       railties (>= 3.2.5, < 6)
     teaspoon-mocha (2.3.3)
       teaspoon (>= 1.0.0)
-    term-ansicolor (1.6.0)
-      tins (~> 1.0)
     test_after_commit (1.1.0)
       activerecord (>= 3.2)
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.7)
-    tins (1.13.2)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)
-    ucf (2.0.0)
-      zip-container (~> 3.0.1)
+    ucf (2.0.1)
+      zip-container (~> 3.0.2)
     uglifier (3.2.0)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
@@ -811,6 +758,7 @@ GEM
     validate_url (1.0.2)
       activemodel (>= 3.0.0)
       addressable
+    vcr (2.9.3)
     version (1.0.0)
     virtus (1.0.5)
       axiom-types (~> 0.1)
@@ -829,15 +777,16 @@ GEM
     yaml_db (0.5.0)
       rails (>= 3.0, < 5.1)
       rake (>= 0.8.7)
-    yard (0.9.8)
-    zip-container (3.0.1)
-      rubyzip (~> 1.1.6)
+    yard (0.9.12)
+    zip-container (3.0.2)
+      rubyzip (~> 1.2.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   RedCloth (= 4.2.9)
+  active_model_serializers (~> 0.10.2)
   activerecord-session_store
   acts-as-taggable-on (= 3.0.1)
   acts_as_activity_logged!
@@ -848,12 +797,11 @@ DEPENDENCIES
   auto_strip_attributes
   bibtex-ruby (~> 4.4.2)
   bio (~> 1.5.1)
-  bioportal (>= 2.3)!
+  bioportal (>= 3.0)!
   bives
   bootstrap-sass
   breadcrumbs_on_rails
   bundler (>= 1.8.4)
-  cancan
   citeproc (~> 1.0.4)
   citeproc-ruby (~> 1.1.4)
   cocaine
@@ -861,7 +809,6 @@ DEPENDENCIES
   colorize (= 0.7.4)
   convert_office!
   country_select
-  coveralls
   csl-styles (~> 1.0.1.7)
   daemons
   database_cleaner
@@ -882,8 +829,11 @@ DEPENDENCIES
   handlebars_assets
   hpricot (~> 0.8.2)
   jbuilder (~> 2.0)
+  jbuilder-json_api
   jquery-rails (~> 3)
   jquery-ui-rails (~> 3)
+  json-diff
+  json-schema
   libxml-ruby (~> 2.8.0)
   linkeddata
   lograge
@@ -895,13 +845,11 @@ DEPENDENCIES
   minitest-reporters
   my_annotations!
   my_responds_to_parent!
-  my_savage_beast!
   mysql2
-  nokogiri
+  nokogiri (~> 1.8.1)
   omniauth (~> 1.3.1)
   omniauth-ldap (~> 1.0.5)
   openseek-api
-  paperclip (~> 4.2.0)
   passenger
   pg
   pothoven-attachment_fu
@@ -913,7 +861,8 @@ DEPENDENCIES
   psych
   puma
   quiet_assets
-  rails (~> 4.2.8)
+  rack-attack (~> 5.0.1)
+  rails (~> 4.2.9)
   rails-assets-bootstrap-multiselect (~> 0.9.13)!
   rails-assets-bootstrap-tagsinput (~> 0.8.0)!
   rails-assets-clipboard (~> 1.5.12)!
@@ -929,8 +878,8 @@ DEPENDENCIES
   rdf-virtuoso (>= 0.1.6)
   rdoc
   recaptcha (~> 4.1.0)
-  redbox!
   request-log-analyzer
+  responders (~> 2.0)
   rest-client
   rfc-822
   rmagick (= 2.15.2)
@@ -939,8 +888,7 @@ DEPENDENCIES
   rubocop
   ruby-prof (~> 0.15.9)
   rubycritic
-  rubyzip (~> 1.1.4)
-  sample-template-generator
+  sample-template-generator (~> 0.4)
   sass-rails
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
@@ -952,8 +900,6 @@ DEPENDENCIES
   sunspot_rails (~> 2.2.0)
   sunspot_solr (~> 2.2.0)
   system
-  taverna-player!
-  taverna-t2flow
   teaspoon
   teaspoon-mocha
   test_after_commit
@@ -961,6 +907,7 @@ DEPENDENCIES
   unicorn-rails
   uuid (~> 2.3)
   validate_url
+  vcr (~> 2.9)
   webmock
   white_list!
   white_list_formatted_content!
@@ -969,4 +916,4 @@ DEPENDENCIES
   zenodo-client!
 
 BUNDLED WITH
-   1.14.6
+   1.16.1

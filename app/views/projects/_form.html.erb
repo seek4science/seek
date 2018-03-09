@@ -45,7 +45,7 @@
     <%= render :partial => 'assets/license_selector', :locals => { :resource => @project, :label=>"Default License",:accessor=>:default_license } %>
 
     <%= folding_panel('Default Sharing Policy', false, id: 'sharing_form',
-                      help_text: "Here you can choose to configure a default sharing policy that is applied to new resources created as part of this project.") do %>
+                      help_text: "Here you can choose to configure a default sharing policy that is applied to new resources created as part of this #{t('project').downcase}.") do %>
         <% if @project.new_record? %>
             <div class="alert alert-warning">
               To configure a default sharing policy, please finish creating the project then visit the "Edit Project Details" page.
@@ -61,7 +61,7 @@
             </div>
 
             <div id="default-sharing-form" style="<%= show_or_hide_block(@project.use_default_policy) -%>;">
-              <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: @project.default_policy || Policy.default, projects: [@project] } %>
+              <%= render partial: 'sharing/permissions_table', locals: { object: @project, policy: @project.default_policy || Policy.default, projects: [@project], downloadable: true } %>
             </div>
         <% end %>
     <% end %>

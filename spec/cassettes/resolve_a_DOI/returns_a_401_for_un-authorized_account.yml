@@ -1,0 +1,40 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://test.datacite.org/mds/doi/10.5072/MY_TEST
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*; q=0.5, application/xml"
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+      Authorization:
+      - Basic aW52YWxpZDppbnZhbGlk
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Date:
+      - Tue, 04 Nov 2014 13:41:33 GMT
+      Cache-Control:
+      - private
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 UTC
+      Www-Authenticate:
+      - Basic realm="test.datacite.org/mds"
+      Content-Length:
+      - '15'
+      Content-Type:
+      - text/plain
+    body:
+      encoding: UTF-8
+      string: Bad credentials
+    http_version:
+  recorded_at: Tue, 04 Nov 2014 13:41:35 GMT
+recorded_with: VCR 2.9.3

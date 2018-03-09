@@ -19,7 +19,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def test_title
     get :index
-    assert_select 'title', text: /The Sysmo SEEK #{I18n.t('investigation').pluralize}.*/i, count: 1
+    assert_select 'title', text: I18n.t('investigation').pluralize, count: 1
   end
 
   test 'should show index' do
@@ -366,5 +366,113 @@ class InvestigationsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', investigation_path(investigation), text: investigation.title
       assert_select 'a[href=?]', investigation_path(investigation2), text: investigation2.title, count: 0
     end
+  end
+
+  test 'send publish approval request' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    investigation = Factory(:investigation, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:private_policy))
+    login_as(investigation.contributor)
+
+    refute investigation.can_view?(nil)
+
+    assert_enqueued_emails 1 do
+      put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::VISIBLE }
+    end
+
+    refute investigation.can_view?(nil)
+
+    assert_includes ResourcePublishLog.requested_approval_assets_for(gatekeeper), investigation
+  end
+
+  test 'dont send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do # They're the same for ISA things
+    gatekeeper = Factory(:asset_gatekeeper)
+    investigation = Factory(:investigation, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    login_as(investigation.contributor)
+
+    assert investigation.is_published?
+
+    assert_no_enqueued_emails do
+      put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
+    end
+
+    assert_empty ResourcePublishLog.requested_approval_assets_for(gatekeeper)
+  end
+
+  test 'can delete an investigation with subscriptions' do
+    i = Factory(:investigation, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    p = Factory(:person)
+    Factory(:subscription, person: i.contributor, subscribable: i)
+    Factory(:subscription, person: p, subscribable: i)
+
+    login_as(i.contributor)
+
+    assert_difference('Subscription.count', -2) do
+      assert_difference('Investigation.count', -1) do
+        delete :destroy, id: i.id
+      end
+    end
+
+    assert_redirected_to investigations_path
+  end
+
+  test 'shows how to create snapshot to get a citation' do
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), studies: [Factory(:study)])
+    login_as(investigation.contributor)
+
+    refute investigation.snapshots.any?
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', new_investigation_snapshot_path(investigation)
+  end
+
+  test 'shows how to publish investigation to get a citation' do
+    investigation = Factory(:investigation, policy: Factory(:private_policy), studies: [Factory(:study)])
+    login_as(investigation.contributor)
+
+    refute investigation.permitted_for_research_object?
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', check_related_items_investigation_path(investigation)
+  end
+
+  test 'shows how to get a citation for a snapshotted investigation' do
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), studies: [Factory(:study)])
+    login_as(investigation.contributor)
+    investigation.create_snapshot
+
+    assert investigation.permitted_for_research_object?
+    assert investigation.snapshots.any?
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions .alert p', text: /You have created 1 snapshot of this Investigation/
+    assert_select '#citation-instructions a[href=?]', '#snapshots'
+  end
+
+  test 'does not show how to get a citation if no manage permission' do
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), studies: [Factory(:study)])
+    person = Factory(:person)
+    login_as(person)
+    investigation.create_snapshot
+
+    assert investigation.permitted_for_research_object?
+    assert investigation.snapshots.any?
+    refute investigation.can_manage?(person.user)
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions', count: 0
+  end
+
+  def edit_max_object(investigation)
+    add_tags_to_test_object(investigation)
+    investigation.creators = [Factory(:person)]
+    investigation.save
   end
 end

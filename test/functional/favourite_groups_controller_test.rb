@@ -19,8 +19,7 @@ class FavouriteGroupsControllerTest < ActionController::TestCase
       post :create, favourite_group_name: name, favourite_group_members: {}.to_json, format: 'json'
     end
 
-    json_response = ActiveSupport::JSON.decode(@response.body)
-    assert_equal 422, json_response['status']
+    assert_response :unprocessable_entity
   end
 
   test 'update duplicate fails' do
@@ -36,7 +35,6 @@ class FavouriteGroupsControllerTest < ActionController::TestCase
 
     put :update, id: other_fav.id, favourite_group_name: name, favourite_group_members: {}.to_json, format: 'json'
 
-    json_response = ActiveSupport::JSON.decode(@response.body)
-    assert_equal 422, json_response['status']
+    assert_response :unprocessable_entity
   end
 end

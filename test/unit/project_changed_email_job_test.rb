@@ -36,7 +36,7 @@ class ProjectChangedEmailJobTest < ActiveSupport::TestCase
   test 'perform' do
     project = Factory(:project)
     job = ProjectChangedEmailJob.new(project)
-    assert_emails(1) do
+    assert_enqueued_emails(1) do
       job.perform
     end
   end

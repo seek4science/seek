@@ -1,8 +1,5 @@
 div.matching_items {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    margin-right: 1em;
-    margin-left: 1em;
+    margin: 0.5em 1em;
     width: auto;
 }
 

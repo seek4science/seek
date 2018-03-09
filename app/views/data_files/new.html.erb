@@ -22,6 +22,16 @@
         <%= text_area_tag 'data_file[description]', data_file_description_value, :class=>"form-control", :rows => 5 -%>
       </div>
 
+      <div class="form-group">
+        <% data_file_simulation_data_value = (params[:data_file].blank? || params[:data_file][:simulation_data].blank?) ? false : params[:data_file][:simulation_data] -%>
+        <div class='help-block'>Check this box if this data is the result of a model simulation</div>
+        <label>
+          <%= check_box_tag 'data_file[simulation_data]','1',data_file_simulation_data_value %>
+          Model simulation data
+        </label>
+      </div>
+
+
       <%= render :partial => "projects/project_selector", :locals => { :resource => @data_file, :allow_nil => Seek::Config.is_virtualliver } -%>
 
       <%= render :partial => "scales/scales_selector",:locals=>{:object=>@data_file} if show_scales?%>
@@ -40,8 +50,7 @@
 
       <div>
         <%= preview_permission_popup_link(@data_file)-%>
-        <%= submit_tag "Upload and Save",
-                       :id => "data_file_submit_btn",
+        <%= create_button :id => "data_file_submit_btn",
                        :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
                        :class => 'btn btn-primary'-%>
         or <%= cancel_button(data_files_path) -%>

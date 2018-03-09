@@ -13,7 +13,7 @@ class DataFile < ActiveRecord::Base
 
   acts_as_asset
 
-  include Seek::Dois::DoiGeneration
+  acts_as_doi_parent(child_accessor: :versions)
 
   scope :default_order, -> { order('title') }
 
@@ -26,6 +26,8 @@ class DataFile < ActiveRecord::Base
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
   scope :with_extracted_samples, -> { joins(:extracted_samples).uniq }
+
+  scope :simulation_data, -> {where(simulation_data:true)}
 
   explicit_versioning(version_column: 'version') do
     include Seek::Data::SpreadsheetExplorerRepresentation
@@ -101,7 +103,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def possible_sample_types
-    SampleType.sample_types_matching_content_blob(content_blob)
+    content_blob.present? ? SampleType.sample_types_matching_content_blob(content_blob) : []
   end
 
   # a simple container for handling the matching results returned from #matching_data_files
@@ -147,9 +149,25 @@ class DataFile < ActiveRecord::Base
 
   # Extracts samples using the given sample_type
   # Returns a list of extracted samples, including
-  def extract_samples(sample_type, confirm = false)
+  def extract_samples(sample_type, confirm = false, overwrite = false)
     samples = sample_type.build_samples_from_template(content_blob)
     extracted = []
+
+    # If the overwrite flag is set, find existing samples by their title and update their sample data.
+    if overwrite
+      samples = samples.map do |new_sample|
+        existing = extracted_samples.find_by_title(new_sample.title_from_data)
+
+        if existing
+          existing.data.clear
+          existing.data.mass_assign(new_sample.data, pre_process: false)
+          existing
+        else
+          new_sample
+        end
+      end
+    end
+
     samples.each do |sample|
       sample.project_ids = project_ids
       sample.contributor = contributor
@@ -159,6 +177,7 @@ class DataFile < ActiveRecord::Base
 
       extracted << sample
     end
+
     extracted
   end
 
@@ -183,4 +202,33 @@ class DataFile < ActiveRecord::Base
     super || openbis_size_download_restricted?
   end
 
+  def nels?
+    content_blob && content_blob.nels?
+  end
+
+  def openbis_dataset_json_details
+    return content_blob.openbis_dataset.json if openbis?
+    nil
+  end
+
+  # overides that from Seek::RDF::RdfGeneration, as simulation data needs to be #Simulation_data
+  def rdf_type_entity_fragment
+    if simulation_data
+      'Simulation_data'
+    else
+      super
+    end
+  end
+
+  # Copy the AssayAsset associations to each of the given resources (usually Samples).
+  # If an array of `assays` is specified (can be Assay objects or IDs), only copy associations to these assays.
+  def copy_assay_associations(resources, assays = nil)
+    resources.map do |resource|
+      aa = assay_assets
+      aa = assay_assets.where(assay: assays) if assays
+      aa.map do |aa|
+        AssayAsset.create(assay: aa.assay, direction: aa.direction, asset: resource)
+      end
+    end.flatten
+  end
 end

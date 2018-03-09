@@ -1,9 +1,24 @@
 <div id="add_compound">
-    <%= render :partial=>"add_compound" %>
+  <%= render partial: 'add_compound' %>
 </div>
-<ul id='compounds' class='compounds'>
-    <%= render :partial=>"compound_row_headings" %>
-    <div id="compound_rows">
-        <%= render :partial=>"compound_row",  :collection=>@compounds %>
-    </div>
-</ul>
+
+<table id='compounds' class="table">
+  <thead>
+  <tr>
+    <td id="compound_name">Compound Name</td>
+    <td id="synonyms">Synonyms</td>
+    <td id="sabiork_id">SabioRK ID</td>
+    <td id="chebi_ids">ChEBI IDs</td>
+    <td id="kegg_ids">KEGG IDs</td>
+    <td></td>
+    <td></td>
+  </tr>
+  </thead>
+  <tbody id="compound_rows">
+  <%= render partial: 'compound_row', collection: @compounds %>
+  </tbody>
+</table>
+<%# edit compound modals can't go in the table (can't have form tags in a table tag) %>
+<div id="edit-compound-modals">
+  <%= render partial: 'edit_compound', collection: @compounds, as: 'compound' %>
+</div>

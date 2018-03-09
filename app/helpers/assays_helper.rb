@@ -25,8 +25,13 @@ module AssaysHelper
   def list_assay_organisms(attribute, assay_organisms, html_options = {})
     result = "<p class='#{html_options[:class]}' id='#{html_options[:id]}'> <b>#{attribute}</b>: "
 
-    result += assay_organisms.collect { |ao| assay_organism_list_item(ao) }.join(', ').html_safe
-    result += '</p>'
+    result << if assay_organisms.any?
+                assay_organisms.collect { |ao| assay_organism_list_item(ao) }.join(', ').html_safe
+              else
+                content_tag(:span, 'No organisms', class: :none_text)
+              end
+
+    result << '</p>'
 
     result.html_safe
   end
@@ -37,16 +42,18 @@ module AssaysHelper
     blank = current_study.blank? ? 'Not specified' : nil
     disabled = current_study && !current_study.can_edit?
     form.select(:study_id, grouped_options_for_select(grouped_options, current_study.try(:id)),
-                { include_blank: blank }, class: 'form-control', disabled: disabled
-               ).html_safe
+                { include_blank: blank }, class: 'form-control', disabled: disabled).html_safe
   end
 
   # options for grouped_option_for_select, for building the select box for assay->study selection, grouped by investigation
   def grouped_options_for_study_selection(current_study)
     investigation_map = selectable_studies_mapped_to_investigation(current_study)
+    investigation_map.compact!
     investigation_map.keys.collect do |investigation|
-      title = investigation.can_view? ? h(investigation.title) : "#{t('investigation')} title is hidden"
-      [title, investigation_map[investigation].collect { |study| [h(study.title), study.id] }]
+      if investigation.present? then
+        title = investigation.can_view? ? h(investigation.title) : "#{t('investigation')} title is hidden"
+        [title, investigation_map[investigation].collect { |study| [h(study.title), study.id] }]
+      end
     end
   end
 
@@ -84,5 +91,11 @@ module AssaysHelper
     else
       'No direction'
     end
+  end
+
+  def show_nels_button?(assay)
+    current_user && current_user.person && assay.can_edit? &&
+        current_user.person.projects.any? { |p| p.settings['nels_enabled'] } &&
+        assay.projects.any? { |p| p.settings['nels_enabled'] }
   end
 end

@@ -17,7 +17,7 @@ module BootstrapHelper
 
   # A collapsible panel
   def folding_panel(title = nil, collapsed = false, options = {})
-    title += ' <span class="caret"></span>'.html_safe
+    title += " <span class=\"#{collapsed ? 'caret' : 'caret-up'}\"></span>".html_safe
 
     options[:collapsible] = true
     options[:heading_options] = merge_options({ :class => 'clickable collapsible', 'data-toggle' => 'collapse-next' }, options[:heading_options])
@@ -113,7 +113,7 @@ module BootstrapHelper
   def tags_input(name, existing_tags = [], options = {})
     options['data-role'] = 'seek-tagsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
-    options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
+    options.merge!(tags_input_typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
     text_field_tag(name, existing_tags.join(','), options)
   end
@@ -176,6 +176,32 @@ module BootstrapHelper
 
   private
 
+  def tags_input_typeahead_options(typeahead_opts)
+    options = typeahead_options(typeahead_opts)
+
+    original_opts = typeahead_opts.is_a?(TrueClass) ? {} : typeahead_opts
+
+    unless options.key?('data-typeahead-local-values')
+      unless options.key?('data-typeahead-prefetch-url')
+        options['data-typeahead-prefetch-url'] = if original_opts[:type]
+          latest_tags_path(type: original_opts[:type])
+        else
+          latest_tags_path
+        end
+      end
+
+      unless options.key?('data-typeahead-query-url')
+        options['data-typeahead-query-url'] = if original_opts[:type]
+          (query_tags_path(type: original_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
+        else
+          (query_tags_path + '?query=%QUERY').html_safe
+        end
+      end
+    end
+
+    options
+  end
+
   def typeahead_options(typeahead_opts)
     typeahead_opts = {} if typeahead_opts.is_a?(TrueClass)
     options = {}
@@ -184,22 +210,8 @@ module BootstrapHelper
     if typeahead_opts[:values]
       options['data-typeahead-local-values'] = typeahead_opts[:values].to_json
     else
-      options['data-typeahead-prefetch-url'] =
-          if typeahead_opts[:prefetch_url]
-            typeahead_opts[:prefetch_url]
-          elsif typeahead_opts[:type]
-            latest_tags_path(type: typeahead_opts[:type])
-          else
-            latest_tags_path
-          end
-      options['data-typeahead-query-url'] =
-          if typeahead_opts[:query_url]
-            typeahead_opts[:query_url]
-          elsif typeahead_opts[:type]
-            (query_tags_path(type: typeahead_opts[:type]) + '&query=%QUERY').html_safe # this is the only way i've found to stop rails escaping %QUERY into %25QUERY:
-          else
-            (query_tags_path + '?query=%QUERY').html_safe
-          end
+      options['data-typeahead-prefetch-url'] = typeahead_opts[:prefetch_url] if typeahead_opts[:prefetch_url]
+      options['data-typeahead-query-url'] = typeahead_opts[:query_url] if typeahead_opts[:query_url]
     end
 
     if typeahead_opts[:handlebars_template]

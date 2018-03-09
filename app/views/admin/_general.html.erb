@@ -1,0 +1,50 @@
+<div class="admin_tasks">
+  <div class="row">
+    <div class="col-sm-8">
+      <h4>Configuration</h4>
+      <ul>
+        <li>
+          <%= link_to "Enable/disable features", features_enabled_admin_path  %><br/>
+          <span class="subtle">Enable or disable individual SEEK features, services and integrations.</span>
+        </li>
+        <li>
+          <%= link_to "Branding and customization", rebrand_admin_path %><br/>
+          <span class="subtle">Customize text, names, links and images to suit your organization.</span>
+        </li>
+        <li>
+          <%= link_to "Settings", settings_admin_path %><br/>
+          <span class="subtle">Configure SEEK settings and properties, such as the default license and policy, the email used for DOI and PubMed etc.</span>
+        </li>
+        <li>
+          <%= link_to "Homepage settings", home_settings_admin_path  %><br/>
+          <span class="subtle">Set up the welcome message and description of your <%= t('project') %>, configure the news feeds.</span>
+        </li>
+        <li>
+          <%= link_to "Index page behaviour", pagination_admin_path %><br/>
+          <span class="subtle">Control whether individual index pages list all items, or just the latest.</span>
+        </li>
+      </ul>
+    </div>
+    <div class="col-sm-4">
+      <h4>Management</h4>
+      <ul>
+        <li><%= link_to 'Announcements', site_announcements_path -%></li>
+        <li><%= link_to 'Manage assay types', suggested_assay_types_path %></li>
+        <li><%= link_to 'Manage technology types', suggested_technology_types_path %></li>
+        <li><%= link_to 'Manage tags', tags_admin_path %></li>
+        <% if Seek::Config.project_hierarchy_enabled %>
+            <li><%= link_to 'Manage projects', manage_projects_path %></li>
+        <% end %>
+        <li><%= link_to 'Manage compounds', compounds_path %></li>
+      </ul>
+      <ul>
+        <li>
+          <%= link_to 'Register your SEEK installation', registration_form_admin_path %><br/>
+          <span class="subtle">This short registration form is entirely optional, but helps ensure continued funding and development of SEEK.</span>
+        </li>
+      </ul>
+
+      <%= render partial: 'admin/impersonate' if Seek::Config.admin_impersonation_enabled %>
+    </div>
+  </div>
+</div>

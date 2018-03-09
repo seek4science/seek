@@ -7,15 +7,7 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
   end
 
   def perform_job(endpoint)
-    if endpoint.test_authentication
-      endpoint.clear_cache
-      space = endpoint.space
-      if space
-        space.datasets.each do |dataset|
-          dataset.dataset_files if dataset
-        end
-      end
-    end
+    endpoint.refresh_metadata
   end
 
   def gather_items
@@ -53,7 +45,7 @@ class OpenbisEndpointCacheRefreshJob < SeekJob
   end
 
   def self.create_initial_jobs
-    OpenbisEndpoint.all.each(&:create_refresh_cache_job)
+    OpenbisEndpoint.all.each(&:create_refresh_metadata_job)
   end
 
   private

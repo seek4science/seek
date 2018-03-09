@@ -56,4 +56,5 @@ SEEK::Application.configure do
 
   # Uncomment this to raise exception on unpermitted params:
   # config.action_controller.action_on_unpermitted_parameters = :raise
+
 end

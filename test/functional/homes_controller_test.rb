@@ -21,7 +21,7 @@ class HomesControllerTest < ActionController::TestCase
   test 'test title' do
     login_as(:quentin)
     get :index
-    assert_select 'title', text: /The Sysmo SEEK.*/, count: 1
+    assert_select 'title', text: 'The Sysmo SEEK', count: 1
   end
 
   test 'correct response to unknown action' do
@@ -56,7 +56,7 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'should send feedback for anonymous user' do
     logout
-    assert_emails(0) do
+    assert_no_enqueued_emails do
       post :send_feedback, anon: false, details: 'test feedback', subject: 'test feedback'
     end
   end
@@ -129,21 +129,6 @@ class HomesControllerTest < ActionController::TestCase
     Factory(:user)
     get :index
     assert_response :success
-  end
-
-  test 'should hide the forum tab for unlogin user' do
-    logout
-    get :index
-    assert_response :success
-    assert_select 'a', text: /Forum/, count: 0
-  end
-
-  test 'should hide forum tab for logged in user' do
-    # this test may break if we re-enable forums - which is currently under question. If it does and we have re-enabled just change :count=>1
-    login_as(:quentin)
-    get :index
-    assert_response :success
-    assert_select 'a', text: /Forum/, count: 0
   end
 
   test 'should display home description' do
@@ -454,6 +439,26 @@ class HomesControllerTest < ActionController::TestCase
       get :index
       assert_response :success
       assert_select 'a.seek-homepage-button', count: 0
+    end
+  end
+
+  test 'can get imprint page' do
+    with_config_value :imprint_enabled, true do
+      with_config_value :imprint_description, '<h1>Hello World</h1>' do
+        get :imprint
+        assert_response :success
+        assert_select 'h1', text: 'Hello World'
+      end
+    end
+  end
+
+  test 'can get about page' do
+    with_config_value :about_page_enabled, true do
+      with_config_value :about_page, '<h1>Stuff</h1>' do
+        get :about
+        assert_response :success
+        assert_select 'h1', text: 'Stuff'
+      end
     end
   end
 

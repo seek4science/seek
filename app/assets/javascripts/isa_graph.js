@@ -7,6 +7,7 @@ var ISA = {
         nodeWidth: 200,
         nodeHeight: 65,
         fontSize: 16,
+        smallerFontSize: 15,
         color: '#323232',
         textMaxWidth: 195,
         backgroundImageSize: 50,
@@ -49,7 +50,9 @@ var ISA = {
                         'color': ISA.defaults.color,
                         'width': ISA.defaults.nodeWidth,
                         'height': ISA.defaults.nodeHeight,
-                        'font-size': ISA.defaults.fontSize,
+                        'font-size': function (el) {
+                            return el.data('name').length > 60 ? ISA.defaults.smallerFontSize : ISA.defaults.fontSize;
+                        },
                         'text-wrap': 'wrap',
                         'text-max-width': ISA.defaults.textMaxWidth,
                         'opacity': 0.6

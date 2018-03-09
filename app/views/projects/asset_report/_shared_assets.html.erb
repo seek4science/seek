@@ -28,7 +28,7 @@
   </p>
   <% @types.each do |type| -%>
       <%= render :partial=>"projects/asset_report/shared_assets_table",
-                 :locals=>{:type=>type,:items=>@semi_public_assets[type],:no_items_suffix=>"that are shared between projects, but not publicly"} -%>
+                 :locals=>{:type=>type,:items=>@semi_public_assets[type],:no_items_suffix=>"that are shared between #{t('project').downcase.pluralize}, but not publicly"} -%>
   <% end -%>
 </div>
 

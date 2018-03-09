@@ -43,8 +43,8 @@ class PersonalTagsTest < ActionController::TestCase
         assert_select 'a', text: 'spade', count: 0
       end
       assert_select 'p#tools' do
-        assert_select 'a[href=?]', show_ann_path(spade.value, type: 'tools'), text: 'spade', count: 1
-        assert_select 'a[href=?]', show_ann_path(fishing_tool.value, type: 'tools'), text: 'fishing', count: 1
+        assert_select 'a[href=?]', show_ann_path(spade.value, type: 'tool'), text: 'spade', count: 1
+        assert_select 'a[href=?]', show_ann_path(fishing_tool.value, type: 'tool'), text: 'fishing', count: 1
         assert_select 'a', text: 'bowling', count: 0
       end
     end

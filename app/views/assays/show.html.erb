@@ -27,12 +27,12 @@
               <%= @assay.assay_class.title -%>
             </p>
         <% end %>
-        <% if @assay.owner.can_view? %>
+        <% if @assay.contributor.can_view? %>
             <p class="id">
               <label>
                 <%= t('contributor').capitalize -%>:
               </label>
-              <%= link_to @assay.owner.name,@assay.owner -%>
+              <%= link_to @assay.contributor.name,@assay.contributor -%>
             </p>
         <% end %>
 
@@ -43,7 +43,7 @@
         </p>
         <p id="study">
           <b><%= t('study') %>: </b>
-          <%= studies_link_list [@assay.study] %>
+          <%= study_link(@assay.study) %>
         </p>
         <p id="assay_type">
           <b><%= assay_type_text -%>:</b>
@@ -99,7 +99,7 @@
   </div>
 
   <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @assay, :creators => (@assay.creators | [@assay.owner]).compact.uniq } %>
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @assay } %>
   </div>
 </div>
 

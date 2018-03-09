@@ -31,7 +31,6 @@ module Seek
         acts_as_scalable
         acts_as_authorized
         acts_as_uniquely_identifiable
-        acts_as_annotatable name_field: :title
         acts_as_favouritable
         acts_as_trashable
         grouped_pagination
@@ -100,7 +99,7 @@ module Seek
           is_downloadable? &&
           !(respond_to?(:extracted_samples) && extracted_samples.any?) &&
           !(respond_to?(:openbis?) && openbis?) &&
-          !(supports_doi? && is_any_doi_minted?)
+          !(supports_doi? && has_doi?)
       end
     end
   end

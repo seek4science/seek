@@ -25,6 +25,18 @@ class Subscription < ActiveRecord::Base
     project_subscription.try(:frequency) || fastest_related_project_subscription_frequency || slowest_fallback_related_frequency || "weekly"
   end
 
+  def can_delete?(user = User.current_user)
+    can_manage?(user) || subscribable.try(:can_delete?, user) || person.try(:can_be_administered_by?, user)
+  end
+
+  def can_edit?(user = User.current_user)
+    can_manage?(user)
+  end
+
+  def can_manage?(user = User.current_user)
+    user.try(:person) == person
+  end
+
   private
 
   #picks out the most frequent frequency that this person has for the projects related to this subscribable

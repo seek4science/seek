@@ -5,7 +5,7 @@ class SampleAttribute < ActiveRecord::Base
   #                :_destroy, :sample_type, :unit, :unit_id, :is_title, :template_column_index, :sample_controlled_vocab,
   #                :sample_controlled_vocab_id, :linked_sample_type_id
 
-  belongs_to :sample_attribute_type
+  belongs_to :sample_attribute_type, inverse_of: :sample_attributes
   belongs_to :sample_type, inverse_of: :sample_attributes
   belongs_to :unit
   belongs_to :sample_controlled_vocab, inverse_of: :sample_attributes
@@ -25,7 +25,7 @@ class SampleAttribute < ActiveRecord::Base
 
   scope :title_attributes, -> { where(is_title: true) }
 
-  delegate :controlled_vocab?, :seek_sample?, :seek_strain?, to: :sample_attribute_type, allow_nil: true
+  delegate :controlled_vocab?, :seek_sample?, :seek_strain?, :seek_resource?, to: :sample_attribute_type, allow_nil: true
 
   # to store that this attribute should be linked to the sample_type it is being assigned to, but needs to wait until the
   # sample type exists
@@ -44,7 +44,9 @@ class SampleAttribute < ActiveRecord::Base
 
   def validate_value?(value)
     return false if required? && value.blank?
-    (value.blank? && !required?) || sample_attribute_type.validate_value?(value, controlled_vocab: sample_controlled_vocab, linked_sample_type: linked_sample_type)
+    (value.blank? && !required?) || sample_attribute_type.validate_value?(value, required: required?,
+                                                                          controlled_vocab: sample_controlled_vocab,
+                                                                          linked_sample_type: linked_sample_type)
   end
 
   # The method name used to get this attribute via a method call
@@ -76,6 +78,15 @@ class SampleAttribute < ActiveRecord::Base
   # provides the hash that defines the column definition for template generation
   def template_column_definition
     { "#{title}" => controlled_vocab_labels }
+  end
+
+  def resolve(value)
+    if sample_attribute_type.resolution.present? && sample_attribute_type.regexp.present?
+      resolution = value.sub(Regexp.new(sample_attribute_type.regexp), sample_attribute_type.resolution)
+    else
+      resolution = nil
+    end
+    resolution
   end
 
   private
@@ -112,4 +123,5 @@ class SampleAttribute < ActiveRecord::Base
       errors.add(:sample_controlled_vocab, 'Linked Sample Type must be set if attribute type is SeekSample')
     end
   end
+
 end

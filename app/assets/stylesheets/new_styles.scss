@@ -490,6 +490,10 @@ img.avatar-corner-icon {
     border-right-width: 3px;
   }
 
+  .permission-column.hidden, .privilege-cell.hidden {
+    display: none;
+  }
+
   .permission-column {
     text-align: center;
     width: 7em;
@@ -506,16 +510,6 @@ img.avatar-corner-icon {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    .type-icon-wrapper {
-      width: 24px;
-      height: 24px;
-      display: inline-block;
-      text-align: center;
-    }
-    .type-icon {
-      max-width: 24px;
-      max-height: 24px;
-    }
   }
 
   .permission-row.mandatory {
@@ -583,4 +577,120 @@ a.remove-button {
   &:hover {
     text-decoration: none;
   }
+}
+
+#preview_permissions {
+  p.private {
+    color: $brand-danger;
+  }
+  p.public {
+    color: $brand-success;
+  }
+  ul {
+    list-style: none;
+    padding-left: 16px;
+  }
+}
+
+.type-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  text-align: center;
+}
+.type-icon {
+  max-width: 24px;
+  max-height: 24px;
+}
+
+div.popup-contributor {
+  width: 270px;
+  display: inline-block;
+  margin: 5px;
+  clear: both;
+
+  .favouritable {
+    float: left;
+    margin-right: 5px;
+    left: 0;
+    top: 0;
+  }
+
+  div.popup-contributor-name {
+    height: 3em;
+    display: table-cell;
+    vertical-align: middle;
+  }
+}
+
+.list_item {
+  .rli-head {
+    display: flex;
+  }
+
+  .list_item_title {
+    flex-grow: 1;
+    flex-shrink: 0;
+
+    img {
+      max-height: 34px;
+    }
+  }
+
+  .rli-project-list {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    flex-grow: 0;
+    margin-left: 3em;
+  }
+}
+
+#user-menu > .dropdown-menu {
+  @media (min-width: $screen-md-min) {
+    max-width: 24em;
+  }
+  li.project-item > a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+}
+
+.admin_tasks ul {
+  padding-left: 0.5em;
+}
+
+.type-tree {
+  ul {
+    background-image: url('tree/line.png');
+    background-repeat: repeat-y;
+    padding: 0;
+    margin: 0;
+  }
+  li {
+    padding-left: 24px;
+    line-height: 24px;
+    list-style: none;
+    background-image: url('tree/node.png');
+    background-repeat: no-repeat;
+    &.selected {
+      background-color: lightblue !important;
+    }
+    &:last-child {
+      background-image: url('tree/last_node.png');
+      background-color: $body-bg; /* This stops the <ul>'s background overlapping */
+    }
+  }
+}
+
+[data-role="seek-associations-list"] ul {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.disabled_icon.disabled {
+  pointer-events: inherit;
 }

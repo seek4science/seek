@@ -121,7 +121,7 @@ class TagsControllerTest < ActionController::TestCase
 
     get :latest, format: 'json'
     assert_response :success
-    assert_equal '[]', @response.body
+    assert_empty JSON.parse(@response.body)
   end
 
   test 'latest' do
@@ -132,7 +132,28 @@ class TagsControllerTest < ActionController::TestCase
 
     get :latest, format: 'json'
     assert_response :success
-    json = JSON.parse(@response.body)
-    assert_includes json, 'twinkle'
+    assert_includes JSON.parse(@response.body), 'twinkle'
+  end
+
+  test 'can query' do
+    p = Factory :person
+
+    df = Factory :data_file, contributor: p
+    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
+
+    get :query, format: 'json', query: 'twi'
+    assert_response :success
+    assert_includes JSON.parse(@response.body), 'twinkle'
+  end
+
+  test 'can handle empty response from query' do
+    p = Factory :person
+
+    df = Factory :data_file, contributor: p
+    tag = Factory :tag, value: 'twinkle', source: p.user, annotatable: df
+
+    get :query, format: 'json', query: 'zzzxxxyyyqqq'
+    assert_response :success
+    assert_empty JSON.parse(@response.body)
   end
 end

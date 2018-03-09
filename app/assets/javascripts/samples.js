@@ -12,6 +12,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
 
     var options = $j.extend({}, opts, {
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
+        "pageLength": 10,
         dom: 'lr<"samples-table-container"t>ip', // Needed to place the buttons
         "columnDefs": [{
             "targets": [ 0, 1 ],
@@ -72,6 +73,28 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
                             return '<a href="/strains/' + data.id + '">' + data.title + '</a>';
                         else
                             return '<span class="none_text">' + data.id + '</span>';
+                    } else {
+                        return '<span class="none_text">Not specified</span>';
+                    }
+                }
+            });
+        }
+        // SEEK sample columns
+        var seekSampleColumns = [];
+        $j('table thead th', selector).each(function (index, column) {
+            if($j(column).data('columnType') == 'SeekSample') {
+                seekSampleColumns.push(index);
+            }
+        });
+        if(seekSampleColumns.length > 0) {
+            options["columnDefs"].push({
+                "targets": seekSampleColumns,
+                "render": function (data, type, row) {
+                    if(data && data.id) {
+                        if (data.title)
+                            return '<a href="/samples/' + data.id + '">' + data.title + '</a>';
+                        else
+                            return '<span class="none_text">' + (data.id || data.title) + '</span>';
                     } else {
                         return '<span class="none_text">Not specified</span>';
                     }

@@ -33,12 +33,12 @@ class GroupMembership < ActiveRecord::Base
   def queue_update_auth_table
     people = [Person.find_by_id(person_id)]
     people << Person.find_by_id(@previous_person_id) unless @previous_person_id.blank?
-    if previous_changes.include?("time_left_at") && project
-      people = people | project.asset_housekeepers
+
+    AuthLookupUpdateJob.new.add_items_to_queue(people.compact.uniq)
+
+    if previous_changes.include?('time_left_at') && project
+      ProjectLeavingJob.new(person, project).queue_job(1, self.time_left_at || Time.now)
     end
-
-    AuthLookupUpdateJob.new.add_items_to_queue people.compact.uniq
-
   end
 
   #whether the person can remove this person from the project. If they are an administrator and related programme administrator they can, but otherwise they cannot remove themself.

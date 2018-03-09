@@ -19,4 +19,22 @@ class HelpHelperTest < ActionView::TestCase
     link = help_link :investigation_checksum, url_only: true
     assert_equal 'http://docs.seek4science.org/tech/investigation-checksum.html', link
   end
+
+  test 'include icon' do
+    link = help_link :investigation_checksum, include_icon: true
+    tag = HTML::Document.new(link).root.children.first
+    assert_equal 2,tag.children.count
+    assert_equal 'help_icon',tag.children.first['class']
+    assert_equal 'help', tag.children[1].content
+
+    link = help_link :investigation_checksum, include_icon: false
+    tag = HTML::Document.new(link).root.children.first
+    assert_equal 1,tag.children.count
+    assert_equal 'help', tag.children.first.content
+
+    link = help_link :investigation_checksum
+    tag = HTML::Document.new(link).root.children.first
+    assert_equal 1,tag.children.count
+    assert_equal 'help', tag.children.first.content
+  end
 end

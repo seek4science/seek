@@ -22,7 +22,7 @@ module Seek
           if !@type_class
             flash.now[:error] = "Unrecognised #{type_text}"
           elsif invalid_label?
-            flash.now[:notice] = "Undefined #{type_text} with label <b> #{params[:label]} </b>. Did you mean #{link_to_alternative}?".html_safe
+            flash.now[:notice] = "Undefined #{type_text} with label <b> #{h(params[:label])} </b>. Did you mean #{link_to_alternative}?".html_safe
             @type_class = nil
           end
         end
@@ -30,13 +30,13 @@ module Seek
         def find_ontology_type_class
           uri = params[:uri] || ontology_readers.first.default_parent_class_uri.to_s
           suggested_scheme = "suggested_#{controller_name.singularize}:"
-          if uri.start_with?(suggested_scheme)
-            @type_class = suggested_type_class.find(uri.gsub(suggested_scheme, ''))
-          else
-            @type_class = ontology_readers.map do |ontology_reader|
-              @type_class || ontology_reader.class_hierarchy.hash_by_uri[uri]
-            end.compact.first
-          end
+          @type_class = if uri.start_with?(suggested_scheme)
+                          suggested_type_class.find(uri.gsub(suggested_scheme, ''))
+                        else
+                          ontology_readers.map do |ontology_reader|
+                            @type_class || ontology_reader.class_hierarchy.hash_by_uri[uri]
+                          end.compact.first
+                        end
         end
 
         def find_and_authorize_assays
@@ -46,7 +46,7 @@ module Seek
         end
 
         def invalid_label?
-          !params[:label].blank? && params[:label].downcase != @type_class.label.downcase
+          !params[:label].blank? && !params[:label].casecmp(@type_class.label.downcase).zero?
         end
 
         def link_to_alternative

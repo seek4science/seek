@@ -10,19 +10,21 @@
     <%= item_description @display_data_file.description -%>
 
     <div class="row">
-      <div class="col-md-10">
+      <div class="col-md-12">
         <%= persistent_resource_id(@display_data_file) %>
         <% if @data_file.can_download? %>
             <% if @data_file.openbis? %>
                 <%= openbis_datafile_dataset(@data_file) %>
-            <% else %>
-                <%= render partial:'assets/fileinfo',object:@display_data_file.content_blob %>
+            <% elsif @display_data_file.content_blob.present? %>
+                <%= render partial:'assets/fileinfo', object: @display_data_file.content_blob %>
             <% end %>
         <% end %>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
 
         <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>
+
+        <%= render partial: 'nels/data_sheet', locals: { displayed_resource: @display_data_file } if @data_file.nels? %>
       </div>
     </div>
     <%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :deep => true, :include_parents => true} %>
@@ -32,6 +34,8 @@
     <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } %>
   </div>
 </div>
+
+<%= render :partial=>"data_files/studied_factors" if Seek::Config.factors_studied_enabled %>
 
 <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} %>
 

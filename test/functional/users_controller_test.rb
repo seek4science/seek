@@ -9,7 +9,7 @@ class UsersControllerTest < ActionController::TestCase
 
   def test_title
     get :new
-    assert_select 'title', text: /The Sysmo SEEK.*/, count: 1
+    assert_select 'title', text: 'Signup', count: 1
   end
 
   test 'cancel registration' do
@@ -215,24 +215,53 @@ class UsersControllerTest < ActionController::TestCase
   def test_update_password
     login_as :quentin
     u = users(:quentin)
-    post :update, id: u.id, user: { id: u.id, password: 'mmmmm', password_confirmation: 'mmmmm' }
+    pwd = 'b' * User::MIN_PASSWORD_LENGTH
+    post :update, id: u.id, user: { id: u.id, password: pwd, password_confirmation: pwd }
     assert_nil flash[:error]
-    assert User.authenticate('quentin', 'mmmmm')
+    assert User.authenticate('quentin', pwd)
   end
 
-  def admin_can_impersonate
+  test 'reset code cleared after updating password' do
+    user = Factory(:user)
+    user.reset_password
+    user.save!
+    login_as(user)
+    pwd = 'a' * User::MIN_PASSWORD_LENGTH
+    post :update, id: user.id, user: { id: user.id, password: pwd, password_confirmation: pwd }
+    user.reload
+    assert_nil user.reset_password_code
+    assert_nil user.reset_password_code_until
+  end
+
+  test 'admin can impersonate' do
     login_as :quentin
-    assert current_user, users(:quentin)
+    assert User.current_user, users(:quentin)
+
     get :impersonate, id: users(:aaron)
-    assert current_user, users(:aaron)
+
+    assert_redirected_to root_path
+    assert User.current_user, users(:aaron)
   end
 
-  def non_admin_cannot_impersonate
-    login_as :aaron
-    assert current_user, users(:aaron)
-    get :impersonate, id: users(:quentin)
+  test 'admin redirected back impersonating non-existent user' do
+    login_as :quentin
+    assert User.current_user, users(:quentin)
+
+    get :impersonate, id: (User.last.id + 1)
+
+    assert_redirected_to admin_path
+    assert User.current_user, users(:quentin)
     assert flash[:error]
-    assert current_user, users(:aaron)
+  end
+
+  test 'non admin cannot impersonate' do
+    login_as :aaron
+    assert User.current_user, users(:aaron)
+
+    get :impersonate, id: users(:quentin)
+
+    assert flash[:error]
+    assert User.current_user, users(:aaron)
   end
 
   test 'should handle no current_user when edit user' do
@@ -285,7 +314,8 @@ class UsersControllerTest < ActionController::TestCase
   protected
 
   def create_user(options = {})
+    pwd = 'a' * User::MIN_PASSWORD_LENGTH
     post :create, user: { login: 'quire', email: 'quire@example.com',
-                          password: 'quire', password_confirmation: 'quire' }.merge(options), person: { first_name: 'fred' }
+                          password: pwd, password_confirmation: pwd }.merge(options), person: { first_name: 'fred' }
   end
 end

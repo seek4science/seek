@@ -11,12 +11,25 @@ module Seek
       before_save :format_orcid
     end
 
+    # guidelines recommend that the id should be stored as a http:// link
     def orcid_uri
-      unless orcid.blank?
-        uri = orcid
-        uri = "http://orcid.org/#{uri}" unless uri.start_with?('http://orcid.org/')
-        uri
-      end
+      return if orcid.blank?
+      uri = orcid.gsub(%r{http(s)?\:\/\/orcid.org\/}, '')
+      "http://orcid.org/#{uri}"
+    end
+
+    # guidelines recommend that links should use https, yet the id stored as http
+    def orcid_https_uri
+      return if orcid.blank?
+      # orcid uri should ALWAYS be http://
+      orcid_uri.gsub('http', 'https')
+    end
+
+    # guidelines recommend that the id should be displayed without the protocol, i.e 'orcid.org/xxx-xxx'
+    def orcid_display_format
+      return if orcid.blank?
+      # orcid uri shoudl ALWAYS be http://
+      orcid_uri.gsub('http://', '')
     end
 
     def needs_orcid?

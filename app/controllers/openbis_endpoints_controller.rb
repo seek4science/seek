@@ -13,7 +13,7 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :project_can_admin?, except: [:browse, :add_dataset, :show_dataset_files, :show_items, :show_item_count]
   before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
   before_filter :get_endpoints, only: [:index, :browse]
-  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_browse_cache, :destroy]
+  before_filter :get_endpoint, only: [:add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh_metadata_store, :destroy]
 
   def index
     respond_with(@project, @openbis_endpoints)
@@ -61,8 +61,8 @@ class OpenbisEndpointsController < ApplicationController
     save_and_respond 'The space was successfully created.'
   end
 
-  def refresh_browse_cache
-    @openbis_endpoint.clear_cache if @openbis_endpoint.test_authentication
+  def refresh_metadata_store
+    @openbis_endpoint.refresh_metadata
     show_items
   end
 

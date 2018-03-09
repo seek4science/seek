@@ -3,8 +3,10 @@
 # Copyright (c) 2008-2009, University of Manchester, The European Bioinformatics
 # Institute (EMBL-EBI) and the University of Southampton.
 # See license.txt for details.
-
+require 'jbuilder'
+require 'jbuilder/json_api/version'
 module ApiHelper
+  #Jbuilder.include JsonAPI
   def xml_root_attributes
     { 'xmlns' => 'http://www.sysmo-db.org/2010/xml/rest',
       'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
@@ -49,17 +51,23 @@ module ApiHelper
   end
 
   def core_xlink(object, include_title = true)
-    if object.class.name.include?('::Version')
-      xlink = xlink_attributes(uri_for_object(object.parent, params: { version: object.version }))
-    else
-      xlink = xlink_attributes(uri_for_object(object))
-    end
+    xlink = if object.class.name.include?('::Version')
+              xlink_attributes(uri_for_object(object.parent, params: { version: object.version }))
+            else
+              xlink_attributes(uri_for_object(object))
+            end
 
     xlink['xlink:title'] = xlink_title(object) unless !include_title || display_name(object, false).nil?
     xlink['id'] = object.id
     xlink['uuid'] = object.uuid if object.respond_to?('uuid')
     xlink['resourceType'] = object.class.name.include?('::Version') ? object.parent.class.name : object.class.name
     xlink
+  end
+
+  def avatar_href_link(object)
+    uri = nil
+    uri = "/#{object.class.name.pluralize.underscore}/#{object.id}/avatars/#{object.avatar.id}" unless object.avatar.nil?
+    uri
   end
 
   # requires a slightly different handling to core_xlink because the route is nested
@@ -90,7 +98,7 @@ module ApiHelper
   def xlink_title(item, item_type_name = nil)
     case item
     when String
-      return item
+      item
     else
       if item_type_name.blank?
         item_type_name = case item
@@ -105,7 +113,7 @@ module ApiHelper
         end
       end
 
-      "#{display_name(item, false)}"
+      display_name(item, false).to_s
     end
   end
 
@@ -138,20 +146,26 @@ module ApiHelper
 
   def extended_xml(builder, object)
     submitter = determine_submitter object
-    builder.tag! 'submitter' do
-      api_partial(builder, submitter)
-    end if submitter
+    if submitter
+      builder.tag! 'submitter' do
+        api_partial(builder, submitter)
+      end
+    end
 
-    builder.tag! 'organisms' do
-      organisms = []
-      organisms = object.organisms if object.respond_to?('organisms')
-      organisms << object.organism if object.respond_to?('organism') && object.organism
-      api_partial_collection builder, organisms
-    end if object.respond_to?('organism') || object.respond_to?('organisms')
+    if object.respond_to?('organism') || object.respond_to?('organisms')
+      builder.tag! 'organisms' do
+        organisms = []
+        organisms = object.organisms if object.respond_to?('organisms')
+        organisms << object.organism if object.respond_to?('organism') && object.organism
+        api_partial_collection builder, organisms
+      end
+    end
 
-    builder.tag! 'creators' do
-      api_partial_collection builder, (object.creators || [])
-    end if !object.instance_of?(Publication) && object.respond_to?('creators')
+    if !object.instance_of?(Publication) && object.respond_to?('creators')
+      builder.tag! 'creators' do
+        api_partial_collection builder, (object.creators || [])
+      end
+    end
 
     if object.is_a?(Person) || object.is_a?(Project)
       unless hide_contact_details?(object)
@@ -160,19 +174,22 @@ module ApiHelper
         builder.tag! 'internal_webpage', object.internal_webpage if object.respond_to?('internal_webpage')
         builder.tag! 'phone', object.phone if object.respond_to?('phone')
       end
+      builder.tag! 'orcid', object.orcid_uri if object.respond_to?('orcid_uri')
     end
 
-    builder.tag! 'bioportal_concepts' do
-      concepts = []
-      concepts = object.bioportal_concepts if object.respond_to?('bioportal_concepts')
-      concept = object.bioportal_concept if object.respond_to?('bioportal_concept')
-      concepts.compact.each do |concept|
-        builder.tag! 'bioportal_concept' do
-          builder.tag! 'ontology_id', concept.ontology_id
-          builder.tag! 'concept_uri', concept.concept_uri
+    if object.respond_to?('bioportal_concept') || object.respond_to?('bioportal_concepts')
+      builder.tag! 'bioportal_concepts' do
+        concepts = []
+        concepts = object.bioportal_concepts if object.respond_to?('bioportal_concepts')
+        concept = object.bioportal_concept if object.respond_to?('bioportal_concept')
+        concepts.compact.each do |concept|
+          builder.tag! 'bioportal_concept' do
+            builder.tag! 'ontology_id', concept.ontology_id
+            builder.tag! 'concept_uri', concept.concept_uri
+          end
         end
       end
-    end if object.respond_to?('bioportal_concept') || object.respond_to?('bioportal_concepts')
+    end
 
     builder.tag! 'version', object.version if object.respond_to?('version')
     builder.tag! 'revision_comments', object.revision_comments if object.respond_to?('revision_comments')
@@ -218,7 +235,9 @@ module ApiHelper
 
   def policy_xml(builder, asset)
     policy = asset.policy
-    unless policy.nil?
+    if policy.nil?
+      builder.tag! 'policy', 'xsi:nil' => 'true'
+    else
       builder.tag! 'policy' do
         dc_core_xml builder, policy
         builder.tag! 'sharing_scope', policy.sharing_scope
@@ -226,7 +245,7 @@ module ApiHelper
         builder.tag! 'use_blacklist', policy.use_blacklist ? policy.use_blacklist : false
         builder.tag! 'use_whitelist', policy.use_whitelist ? policy.use_whitelist : false
         builder.tag! 'permissions' do
-          policy.permissions.select { |p| p.contributor_type != 'FavouriteGroup' }.each do |permission|
+          policy.permissions.reject { |p| p.contributor_type == 'FavouriteGroup' }.each do |permission|
             builder.tag! 'permission' do
               dc_core_xml builder, permission
               builder.tag! 'contributor', core_xlink(permission.contributor)
@@ -235,8 +254,6 @@ module ApiHelper
           end
         end
       end
-    else
-      builder.tag! 'policy', 'xsi:nil' => 'true'
     end
   end
 
@@ -263,6 +280,13 @@ module ApiHelper
     end
   end
 
+  def associated_resources(object)
+    associated_hash = get_related_resources(object)
+    to_ignore = ignore_associated_types.collect(&:name)
+    associated_hash.delete_if { |k, _v| to_ignore.include?(k) }
+    associated_hash
+  end
+
   def associated_resources_xml(builder, object)
     object = object.parent if object.class.name.include?('::Version')
     associated = get_related_resources(object)
@@ -283,7 +307,7 @@ module ApiHelper
 
   # types that should be ignored from the related resources. It may be desirable to add items in this list to the schema
   def ignore_associated_types
-    [Strain, TavernaPlayer::Run, Workflow, Sweep]
+    [Strain]
   end
 
   def generic_list_xml(builder, list, tag, attr = {})
@@ -356,4 +380,7 @@ module ApiHelper
       end
     end
   end
+
+
+
 end

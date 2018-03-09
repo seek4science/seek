@@ -1,11 +1,11 @@
 <% selected ||= nil %>
-<%= panel("Snapshots") do %>
+<%= panel('Snapshots', id: 'snapshots') do %>
     <% snapshots.order("created_at DESC").each do |snapshot| %>
         <div>
           <% if snapshot == selected %>
               <%= content_tag :strong, "Snapshot #{snapshot.snapshot_number}" %>
           <% else %>
-              <%= link_to "Snapshot #{snapshot.snapshot_number}", polymorphic_path([resource, snapshot]) %>
+              <%= snapshot_link(resource,snapshot) %>
           <% end %>
           <span class="subtle">(<%= date_as_string(snapshot.created_at) %>)</span>
           <% if snapshot.has_doi? %>

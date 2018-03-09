@@ -3,7 +3,7 @@ require 'test_helper'
 class SamplesReaderTest < ActiveSupport::TestCase
   def setup
     # need a string type registered
-    Factory(:string_sample_attribute_type, title: 'String')
+    create_sample_attribute_type
 
     @content_blob = Factory(:sample_type_template_content_blob)
     @content_blob2 = Factory(:sample_type_template_content_blob2)

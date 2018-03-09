@@ -1,0 +1,5 @@
+nels_enabled:
+site_username:
+  encrypt: true
+site_password:
+  encrypt: true

@@ -1,8 +1,6 @@
 // ...
 //= require jquery
 //= require jquery_no_conflict
-//= require taverna_player/application
-//= require savage_beast/application
 //= require prototype
 //= require prototype_ujs
 //= require prototype_patch
@@ -13,7 +11,6 @@
 //= require bootstrap
 //= require vue/vue
 //= require collapsible_panels
-//= require redbox
 //= require builder
 //= require application_shared
 //= require tagging

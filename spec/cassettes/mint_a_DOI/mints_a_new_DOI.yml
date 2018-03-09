@@ -1,0 +1,157 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://test.datacite.org/mds/doi
+    body:
+      encoding: UTF-8
+      string: |-
+        doi=10.5072/MY_TEST
+        url=https://seek.sysmo-db.org
+    headers:
+      Accept:
+      - "*/*; q=0.5, application/xml"
+      Accept-Encoding:
+      - gzip, deflate
+      Content-Type:
+      - text/plain;charset=UTF-8
+      Content-Length:
+      - '49'
+      User-Agent:
+      - Ruby
+      Authorization:
+      - Basic dGVzdDp0ZXN0
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Date:
+      - Tue, 04 Nov 2014 13:58:37 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Cache-Control:
+      - no-cache
+      - no-store
+      Location:
+      - https://test.datacite.org/mds/doi/10.5072/MY_TEST
+      Content-Type:
+      - application/xml;charset=UTF-8
+      Content-Length:
+      - '2'
+    body:
+      encoding: UTF-8
+      string: OK
+    http_version:
+  recorded_at: Tue, 04 Nov 2014 13:58:39 GMT
+- request:
+    method: get
+    uri: https://test.datacite.org/mds/doi/10.5072/MY_TEST
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*; q=0.5, application/xml"
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - Ruby
+      Authorization:
+      - Basic dGVzdDp0ZXN0
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Tue, 04 Nov 2014 13:33:23 GMT
+      Cache-Control:
+      - no-cache
+      - no-store
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Pragma:
+      - no-cache
+      Content-Type:
+      - application/xml;charset=UTF-8
+      Content-Length:
+      - '25'
+    body:
+      encoding: UTF-8
+      string: https://seek.sysmo-db.org
+    http_version:
+  recorded_at: Tue, 04 Nov 2014 13:33:26 GMT
+- request:
+    method: post
+    uri: https://test.datacite.org/mds/metadata
+    body:
+      encoding: UTF-8
+      string: |
+        <resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+        <identifier identifierType="DOI">10.5072/my_test</identifier>
+        <creators>
+        <creator>
+        <creatorName>First, Last</creatorName>
+        </creator>
+        </creators>
+        <titles>
+        <title>For testing</title>
+        </titles>
+        <publisher>ABC</publisher>
+        <publicationYear>2013</publicationYear>
+        <subjects>
+        <subject>Assessment</subject>
+        <subject>Information Literacy</subject>
+        <subject>Engineering</subject>
+        </subjects>
+        <language>eng</language>
+        <resourceType resourceTypeGeneral="Dataset">Dataset</resourceType>
+        <version>1</version>
+        <descriptions>
+        <description descriptionType="Abstract">
+        A test
+        </description>
+        </descriptions>
+        </resource>
+    headers:
+      Accept:
+      - "*/*; q=0.5, application/xml"
+      Accept-Encoding:
+      - gzip, deflate
+      Content-Type:
+      - application/xml;charset=UTF-8
+      Content-Length:
+      - '821'
+      User-Agent:
+      - Ruby
+      Authorization:
+      - Basic dGVzdDp0ZXN0
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Date:
+      - Tue, 04 Nov 2014 13:50:10 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Thu, 01 Jan 1970 00:00:00 GMT
+      Cache-Control:
+      - no-cache
+      - no-store
+      Location:
+      - https://test.datacite.org/mds/metadata/10.5072/my_test
+      Content-Type:
+      - application/xml;charset=UTF-8
+      Content-Length:
+      - '20'
+    body:
+      encoding: UTF-8
+      string: OK (10.5072/my_test)
+    http_version:
+  recorded_at: Tue, 04 Nov 2014 13:50:13 GMT
+recorded_with: VCR 2.9.3

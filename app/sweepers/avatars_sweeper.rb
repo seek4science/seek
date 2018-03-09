@@ -2,9 +2,8 @@
 # and open the template in the editor.
 
 class AvatarsSweeper < ActionController::Caching::Sweeper
-
   include CommonSweepers
-  
+
   observe Avatar
 
   def after_create(avatar)
@@ -21,7 +20,7 @@ class AvatarsSweeper < ActionController::Caching::Sweeper
 
   private
 
-  def expire_cache(avatar)
+  def expire_cache(_avatar)
     expire_all_favourite_fragments
   end
 end

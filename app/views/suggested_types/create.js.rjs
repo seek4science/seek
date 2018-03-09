@@ -1,0 +1,6 @@
+if @suggested_type.save
+
+  page.replace_html "assay_#{@suggested_type.term_type}_types_list".to_sym, :partial => "assays/ontology_with_suggested_types_selection_list", :locals => {:suggested_type => @suggested_type}
+else
+  page.alert("Something is wrong with the #{controller_name.singularize.humanize.downcase}. #{@suggested_type.errors.full_messages}")
+end

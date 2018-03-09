@@ -1,7 +1,9 @@
 module Seek
   module Openbis
+    # General behaviour for an entity in openBIS. Specific entities are defined as specialized subclasses
     class Entity
-      attr_reader :json, :modifier, :registration_date, :modification_date, :code, :perm_id, :registrator, :openbis_endpoint, :exception
+      attr_reader :json, :modifier, :registration_date, :modification_date, :code,
+                  :perm_id, :registrator, :openbis_endpoint, :exception
 
       def ==(other)
         perm_id == other.perm_id
@@ -9,12 +11,15 @@ module Seek
 
       def initialize(openbis_endpoint, perm_id = nil)
         @openbis_endpoint = openbis_endpoint
-        fail 'OpenbisEndpoint expected and required' unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
+        unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
+          raise 'OpenbisEndpoint expected and required'
+        end
+
         if perm_id
           begin
             json = query_application_server_by_perm_id(perm_id)
             unless json[json_key]
-              fail Seek::Openbis::EntityNotFoundException.new("Unable to find #{type_name} with perm id #{perm_id}")
+              raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
             end
             populate_from_json(json[json_key].first)
           rescue Fairdom::OpenbisApi::OpenbisQueryException => e
@@ -24,6 +29,10 @@ module Seek
       end
 
       def populate_from_json(json)
+        # for debug by TZ
+        # puts "Populates #{self.class} from json"
+        # puts json
+        # puts '-----'
         @json = json
         @modifier = json['modifier']
         @code = json['code']
@@ -59,7 +68,7 @@ module Seek
       end
 
       def cache_key(perm_id)
-        "#{openbis_endpoint.cache_key}/#{type_name}/#{Digest::SHA2.hexdigest(perm_id)}"
+        "#{type_name}/#{Digest::SHA2.hexdigest(perm_id)}"
       end
 
       def samples
@@ -92,22 +101,24 @@ module Seek
 
       def query_application_server_by_perm_id(perm_id = '')
         cached_query_by_perm_id(perm_id) do
-          application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'PermID', attributeValue: perm_id)
+          application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
+                                                  attribute: 'PermID', attributeValue: perm_id)
         end
       end
 
       def query_datastore_server_by_dataset_perm_id(perm_id = '')
         cached_query_by_perm_id(perm_id) do
-          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE', attribute: 'DataSetPermID', attributeValue: perm_id)
+          datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
+                                                attribute: 'DataSetPermID', attributeValue: perm_id)
         end
       end
 
       def cached_query_by_perm_id(perm_id)
-        fail 'Block required for doing query' unless block_given?
+        raise 'Block required for doing query' unless block_given?
         key = cache_key(perm_id)
-        Rails.logger.info("CACHE KEY = #{key}")
-        Rails.cache.fetch(key) do
-          Rails.logger.info("NO CACHE, FETCHING FROM SERVER #{perm_id}")
+        Rails.logger.info("OBIS CACHE KEY = #{key}")
+        openbis_endpoint.metadata_store.fetch(key) do
+          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{perm_id}")
           yield
         end
       end

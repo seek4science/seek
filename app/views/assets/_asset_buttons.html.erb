@@ -5,6 +5,10 @@
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
 
 <% if asset.is_a?(DataFile) %>
+    <% if asset.nels? %>
+        <%= button_link_to('Fetch sample metadata', 'download', retrieve_nels_sample_metadata_data_file_path(asset), method: :post) %>
+    <% end %>
+
     <% if asset.extracted_samples.any? %>
         <%= button_link_to("View samples", 'view_samples', data_file_samples_path(asset)) %>
     <% end %>
@@ -66,7 +70,7 @@
 
     <%= delete_icon(asset, current_user)%>
 
-    <% if asset.supports_doi? && asset.is_doiable?(display_asset.version) %>
+    <% if asset.supports_doi? && asset.is_published? && asset.can_manage? && display_asset.can_mint_doi? %>
         <li><%= image_tag_for_key('doi', polymorphic_path(asset, :action => 'mint_doi_confirm', :version => display_asset.version), nil,{},"Generate a DOI") -%></li>
     <% end %>
 <% end %>

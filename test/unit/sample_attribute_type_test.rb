@@ -117,6 +117,24 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     refute attribute.validate_value?('30 Feb 2015')
   end
 
+  test 'validate resolution' do
+    attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::STRING, regexp: '.*yyy')
+    assert attribute.validate_resolution
+
+    attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::STRING,
+                                        regexp: '.*yyy', resolution:'\\0')
+    assert attribute.validate_resolution
+
+    attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::STRING,
+                                        regexp: '.*yyy', resolution:'\\1')
+    assert attribute.validate_resolution
+
+    attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::STRING,
+                                        regexp: '.*yyy', resolution:'fred')
+    refute attribute.validate_resolution
+
+  end
+
   test 'validate text with newlines' do
     attribute = SampleAttributeType.new(title: 'fish', base_type: Seek::Samples::BaseType::TEXT)
 

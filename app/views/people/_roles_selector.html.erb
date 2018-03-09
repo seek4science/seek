@@ -30,7 +30,7 @@
   <div class='box_editing_inner'>
     <ul id='<%= ul_block %>'>
       <% if projects.empty? %>
-      <li id="no_projects_for_<%=role%>" class="none_text">No projects assigned</li>
+      <li id="no_projects_for_<%=role%>" class="none_text">No <%= t('project').downcase %> assigned</li>
       <% end -%>
       <% projects.each do |project| %>
           <li id="<%= role -%>_project_<%= project.id %>">

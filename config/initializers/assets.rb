@@ -41,10 +41,6 @@ Rails.application.config.assets.precompile += [
     'tablesorter/jquery-latest.js',
     'tablesorter/jquery.tablesorter.js',
 
-
-    'savage_beast/feed-icon.png',
-
-
     "prepended/*.css",
     "cytoscape_isa_graph.css",
     "data_tables.css",
@@ -55,7 +51,6 @@ Rails.application.config.assets.precompile += [
     "jquery.ui.resizable.css",
     "lightbox.css",
     "pdfjs/viewer.css",
-    "savage_beast/display.css",
     "scales/scales.css",
     "spreadsheet_explorer.css",
     "tablesorter/blue/tablesorter_blue.css",

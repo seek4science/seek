@@ -1,5 +1,6 @@
 module Seek
   module Openbis
+    # Represents an openBIS Sample entity
     class Zample < Entity
       attr_reader :sample_type, :experiment_id, :dataset_ids, :identifier, :properties
 

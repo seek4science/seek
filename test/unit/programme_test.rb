@@ -430,4 +430,27 @@ class ProgrammeTest < ActiveSupport::TestCase
       assert_equal 3, programme.send(type).count
     end
   end
+
+  test 'funding code' do
+    person = Factory(:person)
+    User.with_current_user person.user do
+      prog = Factory(:programme)
+      prog.funding_codes='fish'
+      assert_equal ['fish'],prog.funding_codes.sort
+      prog.save!
+      prog=Programme.find(prog.id)
+      assert_equal ['fish'],prog.funding_codes.sort
+
+      prog.funding_codes='1,2,3'
+      assert_equal ['1','2','3'],prog.funding_codes.sort
+      prog.save!
+      prog=Programme.find(prog.id)
+      assert_equal ['1','2','3'],prog.funding_codes.sort
+
+      prog.update_attribute(:funding_codes,'a,b')
+      assert_equal ['a','b'],prog.funding_codes.sort
+    end
+
+
+  end
 end

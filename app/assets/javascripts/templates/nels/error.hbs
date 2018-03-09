@@ -1,0 +1,11 @@
+<div class="alert alert-danger">
+    <h4>
+        Error - {{ responseJSON.error }}
+        {{#if status}}
+            ({{ status }})
+        {{/if}}
+    </h4>
+    {{#if responseJSON.message}}
+        <p>{{ responseJSON.message }}</p>
+    {{/if}}
+</div>

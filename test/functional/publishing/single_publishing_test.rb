@@ -225,7 +225,7 @@ class SinglePublishingTest < ActionController::TestCase
     params[:publish][df.class.name][df.id.to_s] = '1'
 
     assert_difference('ResourcePublishLog.count', 1) do
-      assert_emails 1 do
+      assert_enqueued_emails 1 do
         post :publish, params.merge(id: df.id)
       end
     end
@@ -266,7 +266,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     assert !non_owned_assets.empty?, 'There should be non manageable assets included in this test'
 
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       post :publish, params.merge(id: df)
     end
 
@@ -317,7 +317,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     assert !non_publishable_assets.empty?, 'There should be non publishable assets included in this test'
 
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       post :publish, params.merge(id: df)
     end
 

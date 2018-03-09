@@ -30,7 +30,7 @@ class LogPublishingTest < ActionController::TestCase
     sop, blob = valid_sop
     @controller = SopsController.new
     assert_difference ('ResourcePublishLog.count') do
-      post :create, sop: sop, content_blobs: [blob], policy_attributes: { access_type: Policy::VISIBLE }
+      post :create, sop: sop, content_blobs: [blob], policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -78,7 +78,7 @@ class LogPublishingTest < ActionController::TestCase
     assert sop.can_publish?
 
     assert_difference ('ResourcePublishLog.count') do
-      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::VISIBLE }
+      put :update, id: sop.id, sop: { title: sop.title }, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
     publish_log = ResourcePublishLog.last
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
@@ -124,7 +124,7 @@ class LogPublishingTest < ActionController::TestCase
     df = Factory(:data_file, project_ids: @gatekeeper.projects.collect(&:id))
 
     login_as(df.contributor)
-    put :update, id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::ACCESSIBLE }
 
     logout
 
@@ -150,7 +150,7 @@ class LogPublishingTest < ActionController::TestCase
     df = Factory(:data_file, project_ids: gatekeeper2.projects.collect(&:id))
 
     login_as(df.contributor)
-    put :update, id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::VISIBLE }
+    put :update, id: df.id, data_file: { title: df.title }, policy_attributes: { access_type: Policy::ACCESSIBLE }
 
     logout
 

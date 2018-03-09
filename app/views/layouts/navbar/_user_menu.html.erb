@@ -20,7 +20,7 @@
         <% unless current_person.projects.empty? %>
             <li role="presentation" class="dropdown-header"> My projects</li>
             <% current_person.projects.each do |project| %>
-                <li><%= link_to project.title, project_path(project) -%></li>
+                <li class="project-item"><%= link_to project.title, project_path(project), title: project.title -%></li>
             <% end %>
         <% end %>
 
@@ -33,7 +33,7 @@
           <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
           Drop below to save
         </div>
-        <% cache "favourites/user/#{current_user.id}" do -%>
+        <% cache "favourites/user/#{current_user.id}", skip_digest: true do -%>
             <div id="add-favourites-zone">
               <div id="favourite_list">
                 <%= render :partial=>"favourites/gadget_list" %>

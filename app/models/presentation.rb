@@ -50,6 +50,6 @@ class Presentation < ActiveRecord::Base
   end
 
   def is_in_isa_publishable?
-    false
+    true
   end
 end

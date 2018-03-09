@@ -16,7 +16,7 @@ module Seek
         content_type = nil
         content_length = nil
         begin
-          response = RestClient.head(url)
+          response = RestClient.head(url, accept: '*/*')
           if is_slideshare_url?
             content_type = 'text/html'
           else

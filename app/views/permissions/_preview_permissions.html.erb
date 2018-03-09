@@ -1,34 +1,11 @@
-<style>
-  #preview_permissions p.private {
-      color: red;
-      font-weight: bold;
-      margin-left: 1em;
-  }
-  #preview_permissions p.shared {
-      font-weight: bold;
-      margin-left: 1em;
-  }
-  #preview_permissions p.public{
-      color: green;
-      font-weight: bold;
-      margin-left: 1em;
-  }
-  #preview_permissions p.gatekeeper_notice{
-      color:red;
-      margin-left: 1em;
-  }
-  #preview_permissions p.permission{
-      margin-left: 1em;
-  }
-  #preview_permissions p.privileged_person{
-      margin-left: 1em;
-  }
-</style>
-
 <%
-   is_new_file = params[:is_new_file]
-   resource_name = params[:resource_name]
-   permissions, privileged_people = uniq_people_permissions_and_privileged_people(policy.permissions.to_a, privileged_people)
+  is_new_file = params[:is_new_file]
+  resource_name = params[:resource_name]
+  permissions, privileged_people = uniq_people_permissions_and_privileged_people(policy.permissions.to_a, privileged_people)
+  downloadable = resource_name.camelize.constantize.new.try(:is_downloadable?)
+  effective_permissions = permissions.reject { |p| p.access_type <= policy.access_type }
+  sorted_permissions = effective_permissions.sort_by { |p| Permission.precedence.index(p.contributor_type) }
+  grouped_contributors = group_by_access_type(sorted_permissions, privileged_people, downloadable)
 %>
 
 <div class="modal fade" id="preview_permissions" tabindex="-1" role="dialog" aria-labelledby="preview_permissions_title" aria-hidden="true">
@@ -39,14 +16,37 @@
         <h4 class="modal-title" id="preview_permissions_title">Preview of your sharing settings</h4>
       </div>
       <div class="modal-body">
+        <h3>Public Visibility</h3>
         <% if policy.access_type == Policy::NO_ACCESS %>
-            <%= policy_and_permissions_for_private_scope(permissions, privileged_people, resource_name) %>
+            <p class='private'>This <%= t(resource_name) -%> is <strong>hidden</strong> from public view.</p>
         <% else %>
-            <%= policy_and_permissions_for_public_scope(policy, permissions, privileged_people, resource_name, updated_can_publish_immediately, send_request_publish_approval) %>
+            <p class='public'>All visitors can <strong><%= Policy.get_access_type_wording(policy.access_type, downloadable).downcase -%></strong>.</p>
+            <% unless updated_can_publish_immediately %>
+                <div class='gatekeeper_notice alert alert-warning'>
+                  <% if send_request_publish_approval %>
+                      An email will be sent to the Gatekeepers of the <%= t('project').pluralize -%> associated with this <%= t(resource_name) -%> to ask for publishing approval. This <%= t(resource_name) -%> will not be published until one of the Gatekeepers has granted approval.
+                  <% else %>
+                      You requested the publishing approval from the Gatekeepers of the <%= t('project').pluralize -%> associated with this <%= t(resource_name) -%>, and it is waiting for the decision. This <%= t(resource_name) -%> will not be published until one of the Gatekeepers has granted approval.
+                  <% end %>
+                </div>
+            <% end %>
         <% end %>
 
-        <%= process_privileged_people(privileged_people, resource_name) %>
-
+        <% unless grouped_contributors.empty? %>
+            <h3>Additionally...</h3>
+            <% [Policy::MANAGING, Policy::EDITING, downloadable ? Policy::ACCESSIBLE : nil, Policy::VISIBLE].compact.each do |access_type| %>
+                <% if grouped_contributors[access_type].try(:any?) %>
+                    <div class="access-type-<%= PolicyHelper::access_type_key(access_type)-%>">
+                      <p>The following can <strong><%= Policy.get_access_type_wording(access_type, resource_name.camelize.constantize.new.try(:is_downloadable?)).downcase -%></strong></p>
+                      <ul>
+                        <% grouped_contributors[access_type].each do |contributor| %>
+                            <li><%= permission_title(contributor, member_prefix: true, icon: true) %></li>
+                        <% end %>
+                      </ul>
+                    </div>
+                <% end %>
+            <% end %>
+        <% end %>
       </div>
       <div class="modal-footer">
         <input class="btn btn-primary" type=button value='OK' style="width: 5em" onclick="createOrUpdateResource('<%= is_new_file -%>', '<%= resource_name -%>')">

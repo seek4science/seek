@@ -1,0 +1,124 @@
+{
+  "data": {
+    "id": "1039986486",
+    "type": "investigations",
+    "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
+      "other_creators": "Max Blumenthal, Ed Snowden",
+      "tags": ["Investigation-tag1", "Investigation-tag2", "Investigation-tag3", "Investigation-tag4", "Investigation-tag5"],
+      "title": "A Maximal Investigation",
+      "description": "Investigation of the Human Genome"
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "1039986701",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "701696858",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "701696858",
+            "type": "people"
+          },
+          {
+            "id": "1039986701",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1022250685",
+            "type": "projects"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "883654316",
+            "type": "data_files"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "1004285611",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "1055250468",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1055250468",
+            "type": "publications"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/investigations/1039986486"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

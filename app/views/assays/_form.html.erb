@@ -41,7 +41,7 @@
       <%= f.label "#{@assay_type_text.capitalize}" %>
       <%= create_suggested_type_popup_link @assay.assay_type_reader.ontology_term_type %>
       <div id="assay_<%= @assay.assay_type_reader.ontology_term_type %>_types_list">
-        <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay.assay_type_uri, {:class => "form-control"} %>
+        <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay, {:class => "form-control"} %>
       </div>
     </div>
   </div>
@@ -51,7 +51,7 @@
           <%= f.label "Technology type" %>
           <%= create_suggested_type_popup_link @assay.technology_type_reader.ontology_term_type %>
           <div id="assay_<%= @assay.technology_type_reader.ontology_term_type %>_types_list">
-            <%= technology_type_select_tag f, "technology_type_uri", @assay.technology_type_uri, {:class => "form-control"} %>
+            <%= technology_type_select_tag f, "technology_type_uri", @assay, {:class => "form-control"} %>
           </div>
         </div>
       </div>
@@ -97,7 +97,8 @@
                                                                   :has_direction => !@assay.is_modelling?} -%>
 
     <%= render :partial => "assets/associate_publication", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
-                                                                            :related_publications => @assay.publications} -%>
+                                                                        :related_publications => @assay.publications} -%>
+    <%= render :partial => "assets/associate_document",:locals=>{:f=>f, :resource => @assay} %>
 <% end -%>
 
 <%
@@ -114,20 +115,6 @@
 <% end %>
  or <%= cancel_button(@assay.id ? assay_path(@assay.id) : assays_path) -%>
 
-<script>
-  var projectsLookup = <%= Hash[Study.all_authorized_for(:edit).map { |s| [s.id, s.projects.map { |p| { id: p.id, title: p.title } }] }].to_json.html_safe -%>;
-
-  $j(document).ready(function () {
-    $j('#assay_study_id').change(function () {
-      Sharing.removeMandatoryProjectPermissions();
-      if ($j(this).val()) {
-        var projects = projectsLookup[parseInt($j(this).val())];
-        if (projects && projects.length) {
-          for (var i = 0; i < projects.length; i++) {
-            Sharing.addPermissionForProject(projects[i]);
-          }
-        }
-      }
-    });
-  });
-</script>
+<%= render partial: 'projects/implicit_project_selector', locals: { action: action,
+                                                                    select_id: '#assay_study_id',
+                                                                    parents: Study.all_authorized_for(:edit) } %>

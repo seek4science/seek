@@ -1,0 +1,28 @@
+<%
+  options = User.includes(:person).select(&:person).sort_by { |u| u.person.name }.collect { |u| [u.person.name, u.id] }
+-%>
+<h4>Act as another user</h4>
+
+<%= form_tag impersonate_users_path do %>
+    <div class="form-group form-inline">
+      <%= select_tag :id, options_for_select(options), autocomplete: 'off', prompt: 'Select user...',
+                     class: 'form-control' %>
+
+      <%= link_to 'Go', '#', class: 'btn btn-default', id: 'impersonate-btn' %>
+    </div>
+<% end %>
+
+<script>
+  $j('#impersonate-btn').click(function () {
+    var form = $j(this).parents('form');
+    if (!$j('#id').val() || $j('#id').val() === '') {
+      alert('Please select a user.');
+    } else {
+      if (confirm('This action will log you out. Are you sure you wish to continue?')) {
+        form.submit();
+      }
+    }
+
+    return false;
+  });
+</script>

@@ -53,6 +53,7 @@
     </p>
   </div>
 </div>
+<%= render :partial=>"general/isa_graph", :locals => {:root_item => @event, :deep => true, :include_parents => true} %>
 
 <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
 

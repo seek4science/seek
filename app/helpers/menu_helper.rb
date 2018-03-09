@@ -26,8 +26,7 @@ module MenuHelper
       ] },
       { title: t('menu.activities'), sections: [
         { controller: 'presentations', title: t('presentation').pluralize },
-        { controller: 'events', title: t('event').pluralize, hide: !Seek::Config.events_enabled },
-        { controller: 'forums', title: 'Forums', hide: !Seek::Config.forum_enabled }
+        { controller: 'events', title: t('event').pluralize, hide: !Seek::Config.events_enabled }
       ] }
     ]
 

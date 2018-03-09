@@ -3,8 +3,13 @@ require 'test_helper'
 class SamplesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
+  include RestTestCases
   include SharingFormTestHelper
   include HtmlHelper
+
+  def rest_api_test_object
+    @object = Factory(:sample, policy: Factory(:public_policy))
+  end
 
   test 'index' do
     Factory(:sample, policy: Factory(:public_policy))
@@ -554,6 +559,30 @@ class SamplesControllerTest < ActionController::TestCase
     assert_redirected_to root_path
     # job should have been triggered
     assert SampleTypeUpdateJob.new(type, false).exists?
+  end
+
+  test 'linked samples show up in related items, for both directions' do
+    person = Factory(:person)
+    login_as(person.user)
+
+    sample_type = Factory(:linked_optional_sample_type, project_ids: person.projects.map(&:id))
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type)
+
+    sample = Sample.create!(sample_type: sample_type, project_ids: person.projects.map(&:id),
+                            data: { title: 'Linking sample',
+                                    patient: linked_sample.id})
+
+    # For the sample containing the link
+    get :show, id: sample
+
+    assert_response :success
+    assert_select 'div.related-items a[href=?]', sample_path(linked_sample), text: /#{linked_sample.title}/
+
+    # For the sample being linked to
+    get :show, id: linked_sample
+
+    assert_response :success
+    assert_select 'div.related-items a[href=?]', sample_path(sample), text: /#{sample.title}/
   end
 
   private

@@ -114,21 +114,6 @@ function expandResourceListItemExpandableText(objectId){
     }
 }
 
-function toggleAuthorAvatarList(objectId){
-    div = $('authorAvatarList'+objectId)
-    link = $('authorAvatarListLink'+objectId)    
-    if (div.style.display == "none") { //EXPAND
-        link.innerHTML = "(Hide)";
-        div.style.display = "block";
-
-    }
-    else { //COLLAPSE
-      div.style.display = "none";
-      link.innerHTML = '(Show All)';
-    }
-}
-
-
 //http://snipplr.com/view.php?codeview&id=1384
 function insertAtCursor(myField, myValue) {
   myField = $(myField);
@@ -255,11 +240,17 @@ function digValue(object, path) {
 }
 
 (function ($) {
-  $.fn.spinner = function (action) {
+  $.fn.spinner = function (action, opts) {
+    var options = opts || {};
     if(action === 'add') {
       return this.each(function () {
         if(!$(this).data('spinnerElement')) {
-          var spinner = $('<%= image_tag("ajax-loader.gif").html_safe %>');
+          var spinner;
+          if (options.size == 'large') {
+            spinner = $('<%= image_tag("ajax-loader-large.gif").html_safe %>');
+          } else {
+            spinner = $('<%= image_tag("ajax-loader.gif").html_safe %>');
+          }
           $(this).append(spinner);
           $(this).data('spinnerElement', spinner);
         }
@@ -274,3 +265,11 @@ function digValue(object, path) {
     }
   };
 }( jQuery ));
+
+$j(document).ready(function () {
+  $j('.collapse').on('show.bs.collapse', function () {
+    $j(this).parent().find('.panel-heading .caret').removeClass('caret').addClass('caret-up');
+  }).on('hide.bs.collapse', function () {
+    $j(this).parent().find('.panel-heading .caret-up').removeClass('caret-up').addClass('caret');
+  });
+});

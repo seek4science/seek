@@ -107,4 +107,5 @@ class StudiedFactorTest < ActiveSupport::TestCase
       assert fs.substances.include? compound2
     end
   end
+
 end

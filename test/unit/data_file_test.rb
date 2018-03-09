@@ -220,7 +220,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'to rdf' do
-    df = Factory :data_file, assay_ids: [Factory(:assay, technology_type_uri: 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type').id, Factory(:assay).id]
+    df = Factory :data_file, assay_ids: [Factory(:assay, technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Technology_type').id, Factory(:assay).id]
     pub = Factory :publication
     Factory :relationship, subject: df, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub
     df.reload
@@ -298,7 +298,7 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'sample template?' do
-    Factory(:string_sample_attribute_type, title: 'String')
+    create_sample_attribute_type
 
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob), policy: Factory(:public_policy)
     refute data_file.sample_template?
@@ -383,5 +383,77 @@ class DataFileTest < ActiveSupport::TestCase
       refute df.openbis_size_download_restricted?
       refute df.download_disabled?
     end
+  end
+
+  test 'simulation data?' do
+    df = Factory(:data_file,simulation_data:true)
+    df2 = Factory(:data_file)
+
+    assert df.simulation_data?
+    refute df2.simulation_data?
+
+    assert_includes DataFile.simulation_data,df
+    refute_includes DataFile.simulation_data,df2
+  end
+
+  test 'can copy assay associations' do
+    df = Factory(:data_file)
+    aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING, asset: df)
+    aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING, asset: df)
+
+    s1 = Factory(:sample, originating_data_file: df)
+    s2 = Factory(:sample, originating_data_file: df)
+
+    assert_equal 2, df.extracted_samples.count
+
+    assert_difference('AssayAsset.count', 4) do # samples * assay_assets
+      df.copy_assay_associations(df.extracted_samples)
+    end
+
+    assert_equal df.assays.sort, s1.assays.sort
+    assert_equal df.assays.sort, s2.assays.sort
+
+    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
+    assert_equal aa2.direction, s1.assay_assets.where(assay_id: aa2.assay_id).first.direction
+  end
+
+  test 'can copy assay associations for selected assays' do
+    df = Factory(:data_file)
+    aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING, asset: df)
+    aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING, asset: df)
+
+    s1 = Factory(:sample, originating_data_file: df)
+    s2 = Factory(:sample, originating_data_file: df)
+
+    assert_equal 2, df.extracted_samples.count
+
+    assert_difference('AssayAsset.count', 2) do
+      df.copy_assay_associations(df.extracted_samples, [aa1.assay])
+    end
+
+    assert_equal [aa1.assay], s1.assays
+    assert_equal [aa1.assay], s2.assays
+
+    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
+  end
+
+  test 'can copy assay associations for selected assay IDs' do
+    df = Factory(:data_file)
+    aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING, asset: df)
+    aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING, asset: df)
+
+    s1 = Factory(:sample, originating_data_file: df)
+    s2 = Factory(:sample, originating_data_file: df)
+
+    assert_equal 2, df.extracted_samples.count
+
+    assert_difference('AssayAsset.count', 2) do
+      df.copy_assay_associations(df.extracted_samples, [aa1.assay_id])
+    end
+
+    assert_equal [aa1.assay], s1.assays
+    assert_equal [aa1.assay], s2.assays
+
+    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
   end
 end

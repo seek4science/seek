@@ -1,0 +1,9 @@
+<% selected_uri ||= nil
+   if @suggested_type
+     selected_uri ||= (@suggested_type.uri.blank? ? @suggested_type.default_parent_uri : @suggested_type.uri)
+   end
+%>
+<div class="type-tree">
+  <ul><%= ontology_editor_display(types, selected_uri) %></ul>
+  <em>* indicates a suggested term (not from the ontology)</em>
+</div>

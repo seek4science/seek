@@ -37,4 +37,5 @@ $j(document).ready(function () {
 
         $j(this).tagsinput(options);
     });
+
 });

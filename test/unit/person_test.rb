@@ -135,6 +135,34 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'contributed items' do
+    person = Factory(:person)
+    refute_nil person.user
+    df = Factory(:data_file, contributor: person)
+    as = Factory(:assay, contributor: person)
+    study = Factory(:study, contributor: person.user)
+
+    items = person.contributed_items
+
+    assert_equal 3, items.count
+    assert_includes items, df
+    assert_includes items, as
+    assert_includes items, study
+
+    person = Factory(:brand_new_person)
+    assert_nil person.user
+    df = Factory(:data_file, contributor: person)
+    as = Factory(:assay, contributor: person)
+    inv = Factory(:investigation, contributor: person)
+
+    items = person.contributed_items
+
+    assert_equal 3, items.count
+    assert_includes items, df
+    assert_includes items, as
+    assert_includes items, inv
+  end
+
   test 'orcid id validation' do
     p = Factory :person
     p.orcid = nil
@@ -150,6 +178,9 @@ class PersonTest < ActiveSupport::TestCase
     p.orcid = 'http://orcid.org/0000-0002-1694-233X'
     assert p.valid?
     p.orcid = 'http://orcid.org/0000-0003-2130-0865'
+    assert p.valid?
+
+    p.orcid = 'https://orcid.org/0000-0003-2130-0865'
     assert p.valid?
   end
 
@@ -167,6 +198,11 @@ class PersonTest < ActiveSupport::TestCase
       p.reload
       assert_equal 'http://orcid.org/0000-0002-1694-233X', p.orcid_uri
 
+      p.orcid = 'https://orcid.org/0000-0002-1694-233X'
+      p.save!
+      p.reload
+      assert_equal 'http://orcid.org/0000-0002-1694-233X', p.orcid_uri
+
       p.orcid = nil
       p.save!
       p.reload
@@ -179,9 +215,30 @@ class PersonTest < ActiveSupport::TestCase
     end
   end
 
+  test 'orcid https uri' do
+    p = Factory :person, orcid: 'http://orcid.org/0000-0003-2130-0865'
+    assert_equal 'https://orcid.org/0000-0003-2130-0865', p.orcid_https_uri
+
+    p = Factory :person
+    assert_nil p.orcid_https_uri
+  end
+
+  test 'orcid display format' do
+    p = Factory :person, orcid: 'http://orcid.org/0000-0003-2130-0865'
+    assert_equal 'orcid.org/0000-0003-2130-0865', p.orcid_display_format
+
+    p = Factory :person
+    assert_nil p.orcid_display_format
+  end
+
   test 'email uri' do
     p = Factory :person, email: 'sfkh^sd@weoruweoru.com'
     assert_equal 'mailto:sfkh%5Esd@weoruweoru.com', p.email_uri
+  end
+
+  test 'mbox_sha1sum' do
+    p = Factory :person, email: 'sfkh^sd@weoruweoru.com'
+    assert_equal '60f787c78d77437f192d8ebce5ee4ece7cbaaca6',p.mbox_sha1sum
   end
 
   test 'only first admin person' do
@@ -369,7 +426,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal 0, p.expertise.size
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
-          p.expertise = %w(golf fishing)
+          p.expertise = %w[golf fishing]
         end
       end
 
@@ -401,7 +458,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal 0, p.tools.size
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
-          p.tools = %w(golf fishing)
+          p.tools = %w[golf fishing]
         end
       end
 
@@ -430,14 +487,14 @@ class PersonTest < ActiveSupport::TestCase
   def test_removes_previously_assigned
     p = Factory :person
     User.with_current_user p.user do
-      p.tools = %w(one two)
+      p.tools = %w[one two]
       assert_equal 2, p.tools.size
       p.tools = ['three']
       assert_equal 1, p.tools.size
       assert_equal 'three', p.tools[0].text
 
       p = Factory :person
-      p.expertise = %w(aaa bbb)
+      p.expertise = %w[aaa bbb]
       assert_equal 2, p.expertise.size
       p.expertise = ['ccc']
       assert_equal 1, p.expertise.size
@@ -450,13 +507,13 @@ class PersonTest < ActiveSupport::TestCase
     User.with_current_user p.user do
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
-          p.tools = %w(golf fishing)
+          p.tools = %w[golf fishing]
         end
       end
 
       assert_difference('Annotation.count', 2) do
         assert_no_difference('TextValue.count') do
-          p.expertise = %w(golf fishing)
+          p.expertise = %w[golf fishing]
         end
       end
     end
@@ -481,7 +538,7 @@ class PersonTest < ActiveSupport::TestCase
   test 'not registered' do
     peeps = Person.not_registered
     assert_not_nil peeps
-    assert peeps.size > 0, 'There should be some userless people'
+    assert !peeps.empty?, 'There should be some userless people'
     assert_nil(peeps.find { |p| !p.user.nil? }, 'There should be no people with a non nil user')
 
     p = people(:three)
@@ -648,7 +705,7 @@ class PersonTest < ActiveSupport::TestCase
     p.save!
     assert_not_nil p.notifiee_info
     assert_difference('NotifieeInfo.count', -1) do
-      p.destroy
+      disable_authorization_checks { p.destroy }
     end
   end
 
@@ -657,7 +714,7 @@ class PersonTest < ActiveSupport::TestCase
     u = users(:quentin)
     assert_difference('Person.count', -1) do
       assert_difference('User.count', -1) do
-        p.destroy
+        disable_authorization_checks { p.destroy }
       end
     end
     assert_nil User.find_by_id(u.id)
@@ -665,7 +722,7 @@ class PersonTest < ActiveSupport::TestCase
     p = people(:random_userless_person)
     assert_difference('Person.count', -1) do
       assert_no_difference('User.count') do
-        p.destroy
+        disable_authorization_checks { p.destroy }
       end
     end
   end
@@ -784,7 +841,7 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   test 'add to project and institution subscribes to project' do
-    person = Factory (:brand_new_person)
+    person = Factory :brand_new_person
     inst = Factory(:institution)
     proj = Factory(:project)
 
@@ -1015,8 +1072,12 @@ class PersonTest < ActiveSupport::TestCase
     full_orcid = Factory :brand_new_person, email: 'FISH-sOup2@email.com',
                                             orcid: 'http://orcid.org/0000-0002-0048-3300'
 
+    https_orcid = Factory :brand_new_person, email: 'FISH-sOup3@email.com',
+                                             orcid: 'https://orcid.org/0000-0002-0048-3300'
+
     assert_equal 'http://orcid.org/0000-0002-0048-3300', semi_orcid.orcid
     assert_equal 'http://orcid.org/0000-0002-0048-3300', full_orcid.orcid
+    assert_equal 'http://orcid.org/0000-0002-0048-3300', https_orcid.orcid
   end
 
   test 'can flag has having left a project' do

@@ -16,8 +16,6 @@ class SampleType < ActiveRecord::Base
 
   include Seek::Taggable
 
-  acts_as_annotatable name_field: :title
-
   acts_as_uniquely_identifiable
 
   acts_as_favouritable

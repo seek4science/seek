@@ -1,5 +1,6 @@
 module Seek
   module Openbis
+    # Represents an openBIS DataSet file entity
     class DatasetFile < Entity
       attr_accessor :path, :size, :is_directory, :dataset_perm_id, :file_perm_id
 
@@ -36,7 +37,8 @@ module Seek
       end
 
       def download(dest)
-        datastore_server_download_instance.download(downloadType: 'file', permID: dataset_perm_id, source: path, dest: dest)
+        datastore_server_download_instance.download(downloadType: 'file', permID: dataset_perm_id,
+                                                    source: path, dest: dest)
       end
 
       def type_name

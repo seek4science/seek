@@ -29,8 +29,8 @@ class JsonMetaTest < ActiveSupport::TestCase
     assert_equal item.title, json['title']
     assert_equal 'my ro assay', json['description']
 
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Experimental_assay_type', json['assay_type_uri']
-    assert_equal 'http://www.mygrid.org.uk/ontology/JERMOntology#Technology_type', json['technology_type_uri']
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Experimental_assay_type', json['assay_type_uri']
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Technology_type', json['technology_type_uri']
 
     json_contributor = json['contributor']
     assert_equal contributor.name, json_contributor['name']
@@ -48,7 +48,7 @@ class JsonMetaTest < ActiveSupport::TestCase
     assert_empty json['contains']
 
     assert_equal '10.1111/ecog.01552', json['doi']
-    assert_equal 'https://dx.doi.org/10.1111/ecog.01552', json['doi_uri']
+    assert_equal 'https://doi.org/10.1111/ecog.01552', json['doi_uri']
     assert_nil json['pubmed_id']
     assert_nil json['pubmed_uri']
 

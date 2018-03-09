@@ -39,7 +39,7 @@ class UsersController < ApplicationController
     self.current_user = params[:activation_code].blank? ? false : User.find_by_activation_code(params[:activation_code])
     if logged_in? && !current_user.active?
       current_user.activate
-      Mailer.welcome(current_user).deliver_now
+      Mailer.welcome(current_user).deliver_later
       flash[:notice] = 'Registration complete and successfully activated!'
       redirect_to current_person
     else
@@ -49,21 +49,16 @@ class UsersController < ApplicationController
 
   def reset_password
     user = User.find_by_reset_password_code(params[:reset_code] || '')
-
     respond_to do |format|
       if user
         if user.reset_password_code_until && Time.now < user.reset_password_code_until
-          user.reset_password_code = nil
-          user.reset_password_code_until = nil
-          if user.save
-            self.current_user = user
-            if logged_in?
-              flash[:notice] = 'You can change your password here'
-              format.html { redirect_to(action: 'edit', id: user.id) }
-            else
-              flash[:error] = 'An unknown error has occurred. We are sorry for the inconvenience. You can request another password reset here.'
-              format.html { render action: 'forgot_password' }
-            end
+          self.current_user = user
+          if logged_in?
+            flash[:notice] = 'You can change your password here'
+            format.html { redirect_to(action: 'edit', id: user.id) }
+          else
+            flash[:error] = 'An unknown error has occurred. We are sorry for the inconvenience. You can request another password reset here.'
+            format.html { render action: 'forgot_password' }
           end
         else
           flash[:error] = 'Your password reset code has expired'
@@ -87,7 +82,7 @@ class UsersController < ApplicationController
           user.reset_password
 
           user.save!
-          Mailer.forgot_password(user).deliver_now if Seek::Config.email_enabled
+          Mailer.forgot_password(user).deliver_later if Seek::Config.email_enabled
           flash[:notice] = "Instructions on how to reset your password have been sent to #{user.person.email}"
           format.html { render action: 'forgot_password' }
         else
@@ -118,12 +113,14 @@ class UsersController < ApplicationController
 
     @user.attributes = user_params
 
+    @user.clear_reset_password_code if @user.reset_password_code
+
     respond_to do |format|
       if @user.save
         AuthLookupUpdateJob.new.add_items_to_queue(@user) if do_auth_update
         # user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
-          Mailer.signup(@user).deliver_now
+          Mailer.signup(@user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to action: 'activation_required' }
@@ -149,7 +146,7 @@ class UsersController < ApplicationController
   def resend_activation_email
     user = User.find(params[:id])
     if user && user.person && !user.active?
-      Mailer.signup(user).deliver_now
+      Mailer.signup(user).deliver_later
       flash[:notice] = "An email has been sent to user: #{user.person.name}"
     else
       flash[:notice] = 'No email sent. User was already activated.'
@@ -161,10 +158,14 @@ class UsersController < ApplicationController
   def activation_required; end
 
   def impersonate
-    user = User.find(params[:id])
-    self.current_user = user if user
-
-    redirect_to controller: 'homes', action: 'index'
+    user = User.find_by_id(params[:id])
+    if user
+      self.current_user = user
+      redirect_to root_path
+    else
+      flash[:error] = 'User not found'
+      redirect_to admin_path
+    end
   end
 
   private

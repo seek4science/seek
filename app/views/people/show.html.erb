@@ -11,13 +11,14 @@
 
     <div class="row">
       <div class="col-md-6">
+        <%= persistent_resource_id(@person) %>
         <p>
           <% locations = @person.locations -%>
           <% unless locations.empty? -%>
-              <b><%= pluralize(locations.length, "Location").split(" ")[1] -%>:</b>
-              <% locations.each do |location| -%>
-                  <%= flag_icon(location) + "&nbsp;".html_safe + link_to(location, country_path(location)) -%>
-                  <%= ", " unless location==locations.last -%>
+              <b><%= locations.length == 1 ? 'Location' : 'Locations' %>:</b>
+              <% locations.each do |location| %>
+                  <%= flag_icon(location) %>
+                  <%= link_to(location, country_path(location)) -%><%= ', ' unless location == locations.last -%>
               <% end -%>
           <% else -%>
               <b>Location:</b>
@@ -30,7 +31,7 @@
         </p>
         <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person} %>
         <p>
-          <b>ORCID Identifier:</b>
+          <b>ORCID:</b>
           <%= orcid_identifier(@person) -%>
         </p>
       </div>
@@ -41,10 +42,6 @@
               <span class='none_text'>Only shown to you and administrators</span>
             </p>
 
-            <p>
-              <b>Seek ID: </b>
-              <%= @person.id %>
-            </p>
             <% if !@person.user.nil? && @person.user.login %>
                 <p>
                   <b>Login name:</b>
@@ -70,11 +67,11 @@
 <div class="row">
   <% unless hide_contact_details?(@person) %>
       <div class="col-md-6">
-        <%= render :partial=>"people/contact_details" %>
+        <%= render :partial=>"contact_details" %>
       </div>
   <% end %>
   <div class="col-md-6">
-    <%= render :partial=>"people/project_positions", :locals=>{:editable=>false} %>
+    <%= render :partial=>"project_positions" %>
   </div>
 </div>
 <%= render :partial=>"people/project_subscriptions",:locals => {:person=>@person} if (mine?(@person) || current_user.try(:person).try(:is_admin?))  %>

@@ -1,9 +1,9 @@
 test:
   adapter: mysql2
   database: seek_test
-  username: travis
+  username: root
 
 production:
   adapter: mysql2
   database: seek_prod
-  username: travis
+  username: root

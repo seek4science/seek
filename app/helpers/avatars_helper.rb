@@ -37,7 +37,7 @@ module AvatarsHelper
     when 'person', 'institution', 'project', 'programme'
       avatar_according_to_user_upload(alternative, item, size, css_class)
     else
-      resource_avatar(item, alt: alt, class: css_class, style: "width: #{size}px; height: #{size}px")
+      resource_avatar(item, alt: alt, class: css_class)
     end
   end
 
@@ -79,7 +79,8 @@ module AvatarsHelper
 
     image_tag avatar_filename,
               alt: alt,
-              size: "#{size}x#{size}",
+              height: size,
+              'max-width': size,
               class: css_class,
               onclick: onclick_options
   end

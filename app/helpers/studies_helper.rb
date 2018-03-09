@@ -11,24 +11,19 @@ module StudiesHelper
 
   def sorted_measured_items
     items = MeasuredItem.all
-    items.sort { |a, b| a.title <=> b.title }
+    items.sort_by(&:title)
   end
 
-  def studies_link_list(studies, sorted = true)
-    # FIXME: make more generic and share with other model link list helper methods
-    return "<span class='none_text'>Not associated with any #{t('study').pluralize}</span>".html_safe if studies.empty?
-
-    result = ''
-    studies = studies.sort { |a, b| a.title <=> b.title } if sorted
-    studies.each do |study|
+  def study_link(study)
+    unless study.nil?
       if study.can_view?
-        result += link_to study.title.capitalize, study
+        link_to study.title, study
       else
-        result += hidden_items_html [study]
+        hidden_items_html [study]
       end
-      result += ' | ' unless studies.last == study
+    else
+      "<span class='none_text'>Not associated with a Study</span>".html_safe
     end
-    result.html_safe
   end
 
   def authorised_studies(projects = nil)

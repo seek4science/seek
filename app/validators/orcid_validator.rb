@@ -1,8 +1,7 @@
 class OrcidValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    unless value && valid_orcid_id?(value.gsub('http://orcid.org/', ''))
-      record.errors[attribute] << (options[:message] || "isn't a valid ORCID identifier")
-    end
+    return if value.nil? || valid_orcid_id?(value.gsub(%r{http(s)?\:\/\/orcid.org\/}, ''))
+    record.errors[attribute] << (options[:message] || "isn't a valid ORCID identifier")
   end
 
   private
@@ -10,7 +9,7 @@ class OrcidValidator < ActiveModel::EachValidator
   # checks the structure of the id, and whether is conforms to ISO/IEC 7064:2003
   def valid_orcid_id?(id)
     if id =~ /[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9,X]{4}/
-      id = id.gsub('-', '')
+      id = id.delete('-')
       id[15] == orcid_checksum(id)
     else
       false

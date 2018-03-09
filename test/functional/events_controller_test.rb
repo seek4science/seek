@@ -18,7 +18,7 @@ class EventsControllerTest < ActionController::TestCase
   def test_title
     get :index
     assert_response :success
-    assert_select 'title', text: /The Sysmo SEEK.*/, count: 1
+    assert_select 'title', text: /Events/, count: 1
   end
 
   test 'should show index' do
@@ -182,4 +182,5 @@ class EventsControllerTest < ActionController::TestCase
 
     assert_includes assigns(:event).data_files, data_file
   end
+
 end

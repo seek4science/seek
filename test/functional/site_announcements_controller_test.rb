@@ -60,7 +60,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     registered_receivers = Person.registered.select { |p| p.notifiee_info.try :receive_notifications? }
     assert registered_receivers.count >= 5
 
-    assert_emails(registered_receivers.count) do
+    assert_enqueued_emails(registered_receivers.count) do
       post :create, site_announcement: { title: 'fred', email_notification: true }
       site_announcement = assigns(:site_announcement)
       assert SendAnnouncementEmailsJob.new(site_announcement.id, 1).exists?
@@ -73,7 +73,7 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     person = Person.with_group.find { |p| p.notifiee_info.try :receive_notifications? }
     if person
       person.delete
-      assert_emails(NotifieeInfo.where(receive_notifications: true).count - 1) do
+      assert_enqueued_emails(NotifieeInfo.where(receive_notifications: true).count - 1) do
         post :create, site_announcement: { title: 'fred', email_notification: true }
       end
     end
