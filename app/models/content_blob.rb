@@ -231,15 +231,7 @@ class ContentBlob < ActiveRecord::Base
   private
 
   def remote_headers
-    if @headers
-      @headers
-    else
-      begin
-        remote_content_handler.info
-      rescue
-        {}
-      end
-    end
+    @headers ||= (remote_content_handler.info rescue {})
   end
 
   def dump_data_object_to_file

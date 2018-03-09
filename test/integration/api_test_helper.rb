@@ -1,12 +1,23 @@
 module ApiTestHelper
   include AuthenticatedTestHelper
 
+  def definitions_path
+    File.join(Rails.root, 'public', '2010', 'json', 'rest',
+              'definitions.json')
+  end
+
   def admin_login
     admin = Factory.create(:admin)
     @current_person = admin
     @current_user = admin.user
     # log in
     post '/session', login: @current_user.login, password: generate_user_password
+  end
+
+  def user_login(person)
+    @current_person = person
+    @current_user = person.user
+    post '/session', login: person.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH)
   end
 
   def self.template_dir
@@ -23,6 +34,15 @@ module ApiTestHelper
     template.result(namespace.instance_eval {binding})
   end
 
+  def load_template(erb_file, hash)
+    template_file = File.join(ApiTestHelper.template_dir, erb_file)
+    template = ERB.new(File.read(template_file))
+    namespace = OpenStruct.new(hash)
+    #puts template.result(namespace.instance_eval { binding })
+    json_obj = JSON.parse(template.result(namespace.instance_eval { binding }))
+    return json_obj
+  end
+
   def load_patch_template(hash)
     patch_file = File.join(Rails.root, 'test', 'fixtures',
                                      'files', 'json', 'templates', "patch_#{@clz}.json.erb")
@@ -32,73 +52,96 @@ module ApiTestHelper
     return to_patch
   end
 
-  # def user_login
-  #   User.current_user = Factory(:user, login: 'test')
-  #   post '/session', login: 'test', password: 'blah'
-  # end
-
-  #only in max object
-  # def edit_relationships
-  #   @json_mm['max']['data']['relationships'].each do |k,v|
-  #     obj = Factory(("#{k}".singularize).to_sym)
-  #     @json_mm['max']['data']['relationships'][k]['data'] = [].append({"id": "#{obj.id}", "type": "#{k}"})
-  #   end
-  # end
-
-
-  # def check_attr_content(to_post, action)
-  #   #check some of the content, h = the response hash after the post/patch action
-  #   h = JSON.parse(response.body)
-  #   h['data']['attributes'].delete("mbox_sha1sum")
-  #   h['data']['attributes'].delete("avatar")
-  #   h['data']['attributes'].each do |key, value|
-  #     next if (to_post['data']['attributes'][key].nil? && action=="patch")
-  #     if value.nil?
-  #       assert_nil to_post['data']['attributes'][key]
-  #     elsif value.kind_of?(Array)
-  #       assert_equal value, to_post['data']['attributes'][key].sort!
-  #     else
-  #       assert_equal value, to_post['data']['attributes'][key]
-  #     end
-  #   end
-  # end
-
-  # def check_relationships_content(m, action)
-  #   @to_post['data']['relationships'].each do |key, value|
-  #     assert_equal value, h['data']['relationships'][key]
-  #   end
-  # end ("#{m}_#{clz}").to_sym
+  def validate_json_against_fragment (json, fragment)
+    if File.readable?(definitions_path)
+      errors = JSON::Validator.fully_validate_json(definitions_path,
+                                                   json,
+                                                   {:fragment => fragment})
+      unless errors.empty?
+        msg = ""
+        errors.each do |e|
+          msg += e + "\n"
+        end
+        raise Minitest::Assertion, msg
+      end
+    end
+  end
 
   def test_create
-    if @to_post.blank?
-      skip
+    begin
+      create_post_values
+    rescue NameError
     end
 
-    # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
-    assert_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", @to_post
+    ['min','max'].each do |m|
+      if defined? @post_values
+        @to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
+      end
+      #puts "create, to_post #{m}", @to_post
 
-      assert_response :success
+      if @to_post.blank?
+        skip
+      end
+
+      validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz}Post"
+
+      # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
+      assert_difference("#{@clz.classify}.count") do
+        post "/#{@plural_clz}.json", @to_post
+        #puts "returned response: ", response.body
+        assert_response :success
+      end
+
+      validate_json_against_fragment response.body, "#/definitions/#{@clz}Response"
+
+      # content check
+      h = JSON.parse(response.body)
+
+      to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
+      hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
+
+      if @to_post['data'].has_key? 'relationships'
+        hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
+      end
+      begin
+        hash_comparison(populate_extra_attributes, h['data']['attributes'])
+        hash_comparison(populate_extra_relationships, h['data']['relationships'])
+      rescue NameError
+      end
+
     end
-
-    # check some of the content
-    h = JSON.parse(response.body)
-
-    hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes, h['data']['attributes'])
-
-    hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships, h['data']['relationships'])
   end
 
   def test_should_delete_object
-    obj = Factory(("#{@clz}").to_sym, contributor: @current_person)
+    begin
+      obj = Factory(("#{@clz}").to_sym, contributor: @current_person)
+    rescue NoMethodError
+      obj = Factory(("#{@clz}").to_sym)
+    end
     assert_difference ("#{@clz.classify.constantize}.count"), -1 do
       delete "/#{@plural_clz}/#{obj.id}.json"
       assert_response :success
     end
     get "/#{@plural_clz}/#{obj.id}.json"
     assert_response :not_found
+  end
+
+  def test_unauthorized_user_cannot_update
+    user_login(Factory(:person))
+    obj = object_with_private_policy
+    @to_post["data"]["id"] = "#{obj.id}"
+    @to_post["data"]["attributes"]["title"] = "updated by an unauthorized"
+    patch "/#{@plural_clz}/#{obj.id}.json", @to_post
+    assert_response :forbidden
+  end
+
+  def test_unauthorized_user_cannot_delete
+    user_login(Factory(:person))
+    obj = object_with_private_policy
+    assert_no_difference("#{@clz.classify.constantize}.count") do
+      delete "/#{@plural_clz}/#{obj.id}.json"
+      assert_response :forbidden
+    end
   end
 
   def test_create_should_error_on_given_id
@@ -135,44 +178,40 @@ module ApiTestHelper
   end
 
   def test_update
-    if @to_post.blank? then
-      skip
-    end
-    post "/#{@plural_clz}.json", @to_post
+    #fetch original object
+    obj_id = @to_patch['data']['id']
+    get "/#{@plural_clz}/#{obj_id}.json"
     assert_response :success
+    original = JSON.parse(response.body)
 
-    h = JSON.parse(response.body)
-    the_id = h['data']['id']
-
-    patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_#{@clz}.json.erb")
-    the_patch = ERB.new(File.read(patch_file))
-    namespace = OpenStruct.new(id: the_id)
-    @to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding } ) )
+    validate_json_against_fragment @to_patch.to_json, "#/definitions/#{@clz}Patch"
 
     assert_no_difference( "#{@clz.classify}.count") do
-      patch "/#{@plural_clz}/#{the_id}.json", @to_patch
+      patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
       assert_response :success
     end
 
+    validate_json_against_fragment response.body, "#/definitions/#{@clz}Response"
+
     h = JSON.parse(response.body)
 
+    to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
     # Check the changed attributes and relationships
     if @to_patch['data'].key?('attributes')
       hash_comparison(@to_patch['data']['attributes'], h['data']['attributes'])
     end
-
     if @to_patch['data'].key?('relationships')
       hash_comparison(@to_patch['data']['relationships'], h['data']['relationships'])
     end
 
     # Check the original, unchanged attributes and relationships
-    if @to_post['data'].key?('attributes') && @to_patch['data'].key?('attributes')
-      original_attributes = @to_post['data']['attributes'].except(*@to_patch['data']['attributes'].keys)
+    if original['data'].key?('attributes') && @to_patch['data'].key?('attributes')
+      original_attributes = original['data']['attributes'].except(*(to_ignore + @to_patch['data']['attributes'].keys))
       hash_comparison(original_attributes, h['data']['attributes'])
     end
 
-    if @to_post['data'].key?('relationships') && @to_patch['data'].key?('relationships')
-      original_relationships = @to_post['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
+    if original['data'].key?('relationships') && @to_patch['data'].key?('relationships')
+      original_relationships = original['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
       hash_comparison(original_relationships, h['data']['relationships'])
     end
   end
@@ -219,6 +258,7 @@ module ApiTestHelper
   # Compare `result` Hash against `source`.
   def hash_comparison(source, result)
     source.each do |key, value|
+      #puts "#{key}: #{value} <==> #{result[key]}"
       deep_comparison(value, result[key], key)
     end
   end
@@ -238,13 +278,18 @@ module ApiTestHelper
       sorted_source.each_with_index do |sub_value, index|
         deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
       end
-    elsif source.is_a?(Array)
-      sorted = result.sort
-      source.sort.each_with_index do |sub_value, index|
-        deep_comparison(sub_value, sorted[index], "#{key[index]}")
-      end
     else
       assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
     end
   end
+
+  def object_with_private_policy
+    begin
+      obj = Factory(("#{@clz}").to_sym, policy: Factory(:private_policy))
+    rescue NoMethodError
+      obj = Factory(("#{@clz}").to_sym)
+    end
+    obj
+  end
 end
+

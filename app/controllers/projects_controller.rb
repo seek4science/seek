@@ -354,17 +354,6 @@ class ProjectsController < ApplicationController
     params.require(:project).permit(permitted_params)
   end
 
-  def tweak_json_params
-    if params[:project][:programme_ids].present?
-      if params[:project][:programme_ids].empty?
-        params[:project][:programme_id] = nil
-      else
-        params[:project][:programme_id] = params[:project][:programme_ids][0]
-      end
-      params[:project].delete :programme_ids
-    end
-  end
-
   def add_and_remove_members_and_institutions
     groups_to_remove = params[:group_memberships_to_remove] || []
     people_and_institutions_to_add = params[:people_and_institutions_to_add] || []
