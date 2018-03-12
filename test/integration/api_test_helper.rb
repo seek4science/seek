@@ -196,6 +196,8 @@ module ApiTestHelper
     h = JSON.parse(response.body)
 
     to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
+    to_ignore << 'updated_at'
+
     # Check the changed attributes and relationships
     if @to_patch['data'].key?('attributes')
       hash_comparison(@to_patch['data']['attributes'], h['data']['attributes'])
