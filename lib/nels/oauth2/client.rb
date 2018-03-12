@@ -4,8 +4,6 @@ require 'rest-client'
 module Nels
   module Oauth2
     class Client
-      AUTH_ENDPOINT = 'https://test-fe.cbu.uib.no/oauth2/'
-
       def initialize(client_id, client_secret, redirect_uri, state)
         @client_id = client_id
         @client_secret = client_secret
@@ -14,7 +12,7 @@ module Nels
       end
 
       def authorize_url
-        url = URI::join(AUTH_ENDPOINT, 'authorize')
+        url = URI::join(Seek::Config.nels_oauth_url, 'authorize')
 
         url.query = {
             scope: 'user',
@@ -28,7 +26,7 @@ module Nels
       end
 
       def get_token(code)
-        url = URI::join(AUTH_ENDPOINT, 'token')
+        url = URI::join(Seek::Config.nels_oauth_url, 'token')
 
         body = {
             client_id: @client_id,
