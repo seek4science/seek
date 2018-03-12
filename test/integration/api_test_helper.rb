@@ -278,6 +278,8 @@ module ApiTestHelper
       sorted_source.each_with_index do |sub_value, index|
         deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
       end
+    elsif source.nil?
+      assert_nil result
     else
       assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
     end
