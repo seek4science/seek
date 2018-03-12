@@ -41,6 +41,12 @@
         {"type" : "null"}
       ]
     },
+    "nullableInteger" : {
+      "oneOf": [
+        {"type" : "integer"},
+        {"type" : "null"}
+      ]
+    },
     "versionNumber" : {
       "type" : "string",
       "minLength" : 1,
@@ -1550,6 +1556,9 @@
         "data" : {
           "type" : "object",
           "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
             "type" : {
               "$ref" : "#/definitions/dataFileType"
             },
@@ -3996,7 +4005,7 @@
           "$ref": "#/definitions/uriString"
         },
         "size": {
-          "type": "integer"
+          "$ref": "#/definitions/nullableInteger"
         }
       },
       "required": [
