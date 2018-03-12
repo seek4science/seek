@@ -1373,7 +1373,7 @@ class AssaysControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person.user)
     project = person.projects.first
-    project.settings['nels_enabled'] = true
+    project.settings['nels_allowed'] = true
     study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
     assay = Factory(:assay, contributor: person, study: study)
 
@@ -1387,7 +1387,7 @@ class AssaysControllerTest < ActionController::TestCase
     person = Factory(:person)
     login_as(person.user)
     project = person.projects.first
-    project.settings['nels_enabled'] = true
+    project.settings['nels_allowed'] = true
     study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
     assay = Factory(:assay, contributor: person, study: study)
 
