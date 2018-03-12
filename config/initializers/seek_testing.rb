@@ -103,6 +103,7 @@ SEEK::Application.configure do
       Settings.defaults[:default_all_visitors_access_type] = Policy::NO_ACCESS
       Settings.defaults[:openbis_enabled] = true
 
+      Settings.defaults[:nels_enabled] = true
       Settings.defaults[:nels_api_url] = 'https://test-fe.cbu.uib.no/nels-api'
       Settings.defaults[:nels_oauth_url] = 'https://test-fe.cbu.uib.no/oauth2'
       Settings.defaults[:nels_permalink_base] = 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml'
