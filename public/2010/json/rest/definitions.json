@@ -1572,7 +1572,6 @@
                   "$ref" : "#/definitions/policy"
                 }
               },
-              "required" : [ "title", "policy" ],
               "additionalProperties" : false
             },
             "relationships" : {
@@ -1594,11 +1593,10 @@
                   "$ref" : "#/definitions/eventReferencesList"
                 }
               },
-              "required" : [ "projects" ],
               "additionalProperties" : false
             }
           },
-          "required" : [ "type", "attributes", "relationships" ],
+          "required" : [ "id", "type" ],
           "additionalProperties" : false
         }
       },
