@@ -12,7 +12,7 @@ module Nels
       end
 
       def authorize_url
-        url = URI::join(Seek::Config.nels_oauth_url, 'authorize')
+        url = URI("#{Seek::Config.nels_oauth_url}/authorize")
 
         url.query = {
             scope: 'user',
@@ -26,7 +26,7 @@ module Nels
       end
 
       def get_token(code)
-        url = URI::join(Seek::Config.nels_oauth_url, 'token')
+        url = URI("#{Seek::Config.nels_oauth_url}/token")
 
         body = {
             client_id: @client_id,
