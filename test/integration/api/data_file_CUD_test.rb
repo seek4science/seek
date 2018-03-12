@@ -19,6 +19,9 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_data_file.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
+
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @current_person)
+    @to_patch = load_template("patch_#{@clz}.json.erb", {id: data_file.id})
   end
 
   def populate_extra_attributes

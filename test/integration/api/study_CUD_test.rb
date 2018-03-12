@@ -12,9 +12,7 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     @investigation = Factory(:investigation)
     @investigation.title = 'Fred'
 
-    study = Factory(:study, policy: Factory(:public_policy))
-    study.contributor = @current_user.person
-    study.save
+    study = Factory(:study, policy: Factory(:public_policy), contributor: @current_person)
 
     hash = {investigation_id: @investigation.id,
             r: ApiTestHelper.method(:render_erb) }
@@ -45,7 +43,6 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference('Study.count') do
       delete "/#{@plural_clz}/#{study.id}.json"
       assert_response :forbidden
-      puts response.body
     end
   end
 
