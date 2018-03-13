@@ -45,7 +45,7 @@ module ApiTestHelper
 
   def load_patch_template(hash)
     patch_file = File.join(Rails.root, 'test', 'fixtures',
-                                     'files', 'json', 'templates', "patch_#{@clz}.json.erb")
+                                     'files', 'json', 'templates', "patch_min_#{@clz}.json.erb")
     the_patch = ERB.new(File.read(patch_file))
     namespace = OpenStruct.new(hash)
     to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding }))
@@ -185,10 +185,9 @@ module ApiTestHelper
 
     ['min', 'max'].each do |m|
       if defined? @patch_values
-        puts @patch_values
         @to_patch = load_template("patch_#{m}_#{@clz}.json.erb", @patch_values)
       end
-      puts "create, to_patch #{m}", @to_patch
+      #puts "create, to_patch #{m}", @to_patch
 
       if @to_patch.blank?
         skip
@@ -198,14 +197,14 @@ module ApiTestHelper
       obj_id = @to_patch['data']['id']
       get "/#{@plural_clz}/#{obj_id}.json"
       assert_response :success
-      puts "after get: ", response.body
+      #puts "after get: ", response.body
       original = JSON.parse(response.body)
 
       validate_json_against_fragment @to_patch.to_json, "#/definitions/#{@clz.camelize(:lower)}Patch"
 
       assert_no_difference("#{@clz.classify}.count") do
         patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
-        puts "response body", response.body
+        #puts "response body", response.body
         assert_response :success
       end
 
@@ -231,7 +230,6 @@ module ApiTestHelper
       end
 
       if original['data'].key?('relationships') && @to_patch['data'].key?('relationships')
-        puts "original"
         original_relationships = original['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
         hash_comparison(original_relationships, h['data']['relationships'])
       end

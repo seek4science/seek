@@ -13,7 +13,6 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     @investigation.title = 'Fred'
 
     @study = Factory(:study, policy: Factory(:public_policy), contributor: @current_person)
-    puts "study project id ", @study.projects
     hash = {investigation_id: @investigation.id,
             r: ApiTestHelper.method(:render_erb) }
     @to_post = load_template("post_min_#{@clz}.json.erb", hash)

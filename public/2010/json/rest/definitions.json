@@ -1273,6 +1273,9 @@
                 },
                 "study" : {
                   "$ref" : "#/definitions/studySingletonReference"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "required" : [ "study" ],
@@ -1357,6 +1360,9 @@
                 },
                 "study" : {
                   "$ref" : "#/definitions/studySingletonReference"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "additionalProperties" : false
@@ -2040,6 +2046,9 @@
                 },
                 "projects" : {
                   "$ref" : "#/definitions/projectReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "additionalProperties" : false
@@ -2091,6 +2100,9 @@
                 },
                 "projects" : {
                   "$ref" : "#/definitions/projectReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "required" : [ "projects" ],
@@ -3156,6 +3168,9 @@
                 },
                 "investigation" : {
                   "$ref" : "#/definitions/investigationSingletonReference"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "required" : [ "investigation" ],
@@ -3216,6 +3231,9 @@
                 },
                 "investigation" : {
                   "$ref" : "#/definitions/investigationSingletonReference"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "additionalProperties" : false
