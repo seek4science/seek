@@ -219,7 +219,7 @@ module Seek
     end
 
     def smtp_settings(field)
-      smtp[field]
+      smtp[field.to_sym]
     end
 
     def set_smtp_settings(field, value)
@@ -232,10 +232,10 @@ module Seek
     end
 
     def default_page(controller)
-      if default_pages.key?(controller)
-        default_pages[controller]
+      if default_pages.key?(controller.to_sym)
+        default_pages[controller.to_sym]
       else
-        Settings.defaults['default_pages'][controller] || 'latest'
+        Settings.defaults['default_pages'][controller.to_sym] || 'latest'
       end
     end
 
@@ -332,7 +332,9 @@ module Seek
     end
 
     def merge!(var, value)
-      result = Settings.merge! var, value
+      # Initialize the hash from defaults if it does not exist yet in settings
+      Settings.global[var] = Settings.defaults[var.to_s] unless Settings.global.fetch(var)
+      result = Settings.merge!(var, value)
       send "#{var}_propagate" if respond_to? "#{var}_propagate"
       result
     end
