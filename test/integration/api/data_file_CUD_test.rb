@@ -21,7 +21,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @current_person)
-    @to_patch = load_template("patch_#{@clz}.json.erb", {id: data_file.id})
+    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: data_file.id})
   end
 
   def populate_extra_attributes
