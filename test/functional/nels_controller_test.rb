@@ -24,7 +24,7 @@ class NelsControllerTest < ActionController::TestCase
     login_as(person)
 
     assert assay.can_edit?(person)
-    refute assay.projects.any? { |p| p.settings['nels_enabled'] }
+    refute assay.projects.any? { |p| p.settings['nels_allowed'] }
 
     VCR.use_cassette('nels/get_user_info') do
       get :index, assay_id: assay.id
@@ -51,7 +51,7 @@ class NelsControllerTest < ActionController::TestCase
     login_as(person)
 
     refute @assay.can_edit?(person)
-    assert @assay.projects.any? { |p| p.settings['nels_enabled'] }
+    assert @assay.projects.any? { |p| p.settings['nels_allowed'] }
 
     VCR.use_cassette('nels/get_user_info') do
       get :index, assay_id: @assay.id

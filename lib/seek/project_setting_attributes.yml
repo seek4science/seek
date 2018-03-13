@@ -1,4 +1,4 @@
-nels_enabled:
+nels_allowed:
 site_username:
   encrypt: true
 site_password:

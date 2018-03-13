@@ -89,7 +89,7 @@ class NelsController < ApplicationController
       return false
     end
 
-    unless @assay.projects.any? { |p| p.settings['nels_enabled'] }
+    unless @assay.projects.any? { |p| p.settings['nels_allowed'] }
       flash[:error] = 'This assay is not associated with a NeLS-enabled project.'
       redirect_to @assay
       return false

@@ -779,13 +779,13 @@ class ProjectTest < ActiveSupport::TestCase
   test 'stores project settings' do
     project = Factory(:project)
 
-    assert_nil project.settings['nels_enabled']
+    assert_nil project.settings['nels_allowed']
 
     assert_difference('Settings.count') do
-      project.settings['nels_enabled'] = true
+      project.settings['nels_allowed'] = true
     end
 
-    assert project.settings['nels_enabled']
+    assert project.settings['nels_allowed']
   end
 
   test 'stores encrypted project settings' do
