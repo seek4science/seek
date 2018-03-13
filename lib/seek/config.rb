@@ -306,7 +306,7 @@ module Seek
 
     if Settings.table_exists?
       def get_value(setting, conversion = nil)
-        val = Settings.global[setting]
+        val = Settings.global[setting] || Settings.defaults[setting.to_s]
         val = val.send(conversion) if conversion && val
         val
       end
