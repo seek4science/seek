@@ -219,7 +219,7 @@ module Seek
     end
 
     def smtp_settings(field)
-      smtp[field.to_sym]
+      smtp[field]
     end
 
     def set_smtp_settings(field, value)
@@ -232,10 +232,10 @@ module Seek
     end
 
     def default_page(controller)
-      if default_pages.key?(controller.to_sym)
-        default_pages[controller.to_sym]
+      if default_pages.key?(controller)
+        default_pages[controller]
       else
-        Settings.defaults['default_pages'][controller.to_sym] || 'latest'
+        Settings.defaults['default_pages'][controller] || 'latest'
       end
     end
 
@@ -306,7 +306,12 @@ module Seek
 
     if Settings.table_exists?
       def get_value(setting, conversion = nil)
-        val = Settings.global[setting] || Settings.defaults[setting.to_s]
+        result = Settings.global.fetch(setting)
+        if result
+          val = result.value
+        else
+          val = Settings.defaults[setting.to_s]
+        end
         val = val.send(conversion) if conversion && val
         val
       end
