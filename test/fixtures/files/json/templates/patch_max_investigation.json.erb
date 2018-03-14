@@ -1,19 +1,20 @@
 {
   "data": {
     "type": "investigations",
+    "id": "<%=id%>",
     "attributes": {
       "title": "A Maximal Investigation",
       "policy": {
         "access": "download",
         "permissions": [
           <% unless project_ids.nil? %>
-             <% policies = Array.new %>
-             <% for project_id in project_ids do %>
-              <% policies.push("{\"resource_id\": \"#{project_id}\",
-                                \"resource_type\": \"projects\",
-                                \"access\": \"manage\"}") %>
-             <% end %>
-              <%= policies.join(',') %>
+          <% policies = Array.new %>
+          <% for project_id in project_ids do %>
+          <% policies.push("{\"resource_id\": \"#{project_id}\",
+                            \"resource_type\": \"projects\",
+                            \"access\": \"manage\"}") %>
+          <% end %>
+          <%= policies.join(',') %>
           <% end %>
         ]
       },
@@ -22,15 +23,15 @@
     },
     "relationships": {
       <% unless project_ids.nil? %>
-       "projects": {
-       "data": [
-         <% projects = Array.new %>
-         <% for project_id in project_ids do %>
-            <% projects.push r.call("_related.json.erb",{:type => "projects",:id => project_id}) %>
-         <% end %>
-         <%= projects.join(',') %>
-         ]
-       }
+      "projects": {
+        "data": [
+          <% projects = Array.new %>
+          <% for project_id in project_ids do %>
+          <% projects.push r.call("_related.json.erb",{:type => "projects",:id => project_id}) %>
+          <% end %>
+          <%= projects.join(',') %>
+        ]
+      }
       <% end %>
       ,
       "publications":{
@@ -42,7 +43,7 @@
         ]
       }
       <% unless creator_ids.nil? %>
-      ,"creators": {
+    ,"creators": {
         "data": [
           <% for creator_id in creator_ids do %>
           <%= r.call("_related.json.erb",{:type => "people",:id => creator_id}) %>

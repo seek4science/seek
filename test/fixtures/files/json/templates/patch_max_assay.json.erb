@@ -1,6 +1,7 @@
 {
   "data": {
     "type": "assays",
+    "id": "<%=id%>",
     "attributes": {
       "title": "A Maximal Assay",
       "assay_class": {
@@ -12,7 +13,11 @@
       "technology_type": {
         "uri": "http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq"
       },
-      "tags": ["Assay-tag1", "Assay-tag2", "Assay-tag3"],
+      "tags": [
+        "Assay-tag1",
+        "Assay-tag2",
+        "Assay-tag3"
+      ],
       "other_creators": "Anonymous creator",
       "description": "A Western Blot Assay",
       "policy": {
@@ -28,9 +33,8 @@
     },
     "relationships": {
       "study": {
-        "data":
-        {
-          "id": "<%=study_id%>",
+        "data": {
+          "id": "<%= study_id%>",
           "type": "studies"
         }
       },
@@ -40,10 +44,10 @@
             "id": "<%= Factory(:publication).id %>",
             "type": "publications"
           }
-        ]
+          ]
       }
-      <% unless creator_ids.nil? %>
-    ,"creators": {
+      <% unless creator_ids.nil? %>,
+      "creators": {
         "data": [
           <% for creator_id in creator_ids do %>
           <%= r.call("_related.json.erb",{:type => "people",:id => creator_id}) %>

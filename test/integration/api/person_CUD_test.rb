@@ -10,7 +10,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     @plural_clz = @clz.pluralize
 
     p = Factory(:person)
-    @to_patch = load_template("patch_#{@clz}.json.erb", {id: p.id})
+    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: p.id})
 
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
     @to_post = load_template("post_min_#{@clz}.json.erb", {first_name: "Post", last_name: p.last_name, email: p.email})

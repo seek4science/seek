@@ -15,20 +15,26 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     @max_project = Factory(:max_project)
     @max_project.title = 'Bert'
 
-    inv = Factory(:investigation, policy: Factory(:public_policy))
-    inv.contributor = @current_user.person
-    inv.save
+    @inv = Factory(:investigation, policy: Factory(:public_policy))
+    @inv.contributor = @current_user.person
+    @inv.save
 
     hash = {project_ids: [@min_project.id, @max_project.id],
             r: ApiTestHelper.method(:render_erb) }
     @to_post = load_template("post_min_#{@clz}.json.erb", hash)
-    @to_patch = load_template("patch_#{@clz}.json.erb", {id: inv.id})
   end
 
   def create_post_values
       @post_values = {project_ids:  [@min_project.id, @max_project.id],
                          creator_ids: [@current_user.person.id],
                          r: ApiTestHelper.method(:render_erb) }
+  end
+
+  def create_patch_values
+    @patch_values = {id: @inv.id,
+                     project_ids:  [@min_project.id, @max_project.id],
+                     creator_ids: [@current_user.person.id],
+                     r: ApiTestHelper.method(:render_erb) }
   end
 
   def populate_extra_relationships
