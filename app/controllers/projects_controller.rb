@@ -182,7 +182,7 @@ class ProjectsController < ApplicationController
         format.json { render json: @project }
       else
         format.html { render action: 'new' }
-        format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
       end
     end
   end
@@ -212,7 +212,7 @@ class ProjectsController < ApplicationController
           else
             format.html { render action: 'edit' }
             format.xml  { render xml: @project.errors, status: :unprocessable_entity }
-            format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
+            format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
           end
         end
       end
