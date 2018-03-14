@@ -17,6 +17,9 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_sop.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
+
+    sop = Factory(:sop, policy: Factory(:public_policy), contributor: @current_person)
+    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: sop.id})
   end
 
   def populate_extra_attributes

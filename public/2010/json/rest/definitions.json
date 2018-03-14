@@ -1523,7 +1523,7 @@
                   "$ref" : "#/definitions/contentBlobPlaceholdersList"
                 }
               },
-              "required" : [ "title", "policy" ],
+              "required" : [ "title", "policy", "content_blobs" ],
               "additionalProperties" : false
             },
             "relationships" : {
@@ -3024,6 +3024,120 @@
         }
       },
       "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
+    },
+    "sopPost" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "type" : {
+              "$ref" : "#/definitions/sopType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "content_blobs" : {
+                  "$ref" : "#/definitions/contentBlobPlaceholdersList"
+                }
+              },
+              "required" : [ "title", "policy", "content_blobs" ],
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "assays" : {
+                  "$ref" : "#/definitions/assayReferencesList"
+                }
+              },
+              "required" : [ "projects" ],
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "type", "attributes", "relationships" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
+    "sopPatch" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
+            "type" : {
+              "$ref" : "#/definitions/sopType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                }
+              },
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "assays" : {
+                  "$ref" : "#/definitions/assayReferencesList"
+                }
+              },
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "id", "type" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
       "additionalProperties" : false
     },
     "studyResponse" : {
