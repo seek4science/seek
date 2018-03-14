@@ -295,7 +295,6 @@ class ApplicationController < ActionController::Base
   end
 
   def render_not_found_error(e)
-    pp e
     respond_to do |format|
       format.html do
         User.with_current_user current_user do
