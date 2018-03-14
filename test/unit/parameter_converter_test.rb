@@ -93,7 +93,7 @@ class ParameterConverter < ActiveSupport::TestCase
         data: { attributes: { assay_class: { key: 'BANANANA' } } }
     )
 
-    exp_class_id = AssayClass.where(key: 'EXP').first.id
+    exp_class_id = AssayClass.where(key: 'EXP').first_or_create.id
     assert exp_class_id
 
     new_good_params = @converter.convert(params.dup)
