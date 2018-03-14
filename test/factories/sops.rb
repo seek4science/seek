@@ -141,4 +141,6 @@ Factory.define :mapping do |f|
   f.sabiork_id '4'
 end
 
-
+Factory.define(:api_pdf_sop, parent: :sop) do |f|
+  f.association :content_blob, factory: :blank_pdf_content_blob
+end

@@ -227,9 +227,7 @@ class ApplicationController < ActionController::Base
     flash[:error] = notice
     respond_to do |format|
       format.html { redirect_to root_url }
-      format.json {
-        render json: {"title": notice, "detail": _message}, status: _status
-      }
+      format.json { render json: { errors: [{ title: notice, detail: _message }] }, status:  _status }
     end
   end
 
@@ -242,7 +240,9 @@ class ApplicationController < ActionController::Base
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render text: 'Not found', status: :not_found }
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-        format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
+        format.json { render json: { errors: [{ title: 'Not found',
+                                                detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
+                             status: :not_found }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
     else
@@ -279,9 +279,9 @@ class ApplicationController < ActionController::Base
         end
         format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
-        format.json {
-          render json: {"title": "Forbidden", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}, status: :forbidden
-        }
+        format.json { render json: { errors: [{ title: 'Forbidden',
+                                                details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
+                             status: :forbidden }
       end
       return false
     end
@@ -294,7 +294,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def render_not_found_error
+  def render_not_found_error(e)
     respond_to do |format|
       format.html do
         User.with_current_user current_user do
@@ -304,33 +304,24 @@ class ApplicationController < ActionController::Base
 
       format.rdf { render text: 'Not found', status: :not_found }
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-      format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
+      format.json { render json: { errors: [{ title: 'Not found', detail: e.message }] }, status: :not_found }
     end
     false
   end
 
   def render_unknown_attribute_error(e)
     respond_to do |format|
-      format.json {
-        render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
-      }
-      format.all {
-        render text: e.message, status: :unprocessable_entity
-      }
+      format.json { render json: { errors: [{ title: 'Unknown attribute', details: e.message }] }, status: :unprocessable_entity }
+      format.all { render text: e.message, status: :unprocessable_entity }
     end
   end
 
   def render_not_implemented_error(e)
     respond_to do |format|
-      format.json {
-        render json: {error: e.message, status: :not_implemented}, status: :not_implemented
-      }
-      format.all {
-        render text: e.message, status: :not_implemented
-      }
+      format.json { render json: { errors: [{ title: 'Not implemented', details: e.message }] }, status: :not_implemented }
+      format.all { render text: e.message, status: :not_implemented }
     end
   end
-
 
   def is_auth?(object, privilege)
     if object.can_perform?(privilege)
@@ -583,5 +574,25 @@ class ApplicationController < ActionController::Base
 
   def json_api_request?
     request.format.json?
+  end
+
+  def json_api_errors(object)
+    hash = { errors: [] }
+    hash[:errors] = object.errors.map do |attribute, message|
+      segments = attribute.to_s.split('.')
+      attr = segments.first
+      if !['content_blobs', 'policy'].include?(attr) && object.class.reflect_on_association(attr)
+        base = '/data/relationships'
+      else
+        base = '/data/attributes'
+      end
+
+      {
+          source: { pointer: "#{base}/#{attr}" },
+          detail: "#{segments[1..-1].join(' ') + ' ' if segments.length > 1}#{message}"
+      }
+    end
+
+    hash
   end
 end

@@ -295,5 +295,13 @@ module ApiTestHelper
     end
     obj
   end
+
+  ##
+  # Fetch errors with the given path from the given collection.
+  def fetch_errors(errors, path)
+    errors.select do |error|
+      error.try(:[], 'source').try(:[], 'pointer') == path
+    end
+  end
 end
 

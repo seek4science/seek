@@ -173,17 +173,14 @@ class DataFilesController < ApplicationController
             assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
             update_assay_assets(@data_file, assay_ids, relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
-            format.json { render json: @data_file}
+            format.json { render json: @data_file }
           end
-      end
+        end
       else
         respond_to do |format|
-          format.html do
-            render action: 'new'
-          end
-          format.json {render json: "{}" } #fix
+          format.html { render action: 'new' }
+          format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
         end
-
       end
     else
       handle_upload_data_failure
@@ -221,10 +218,8 @@ class DataFilesController < ApplicationController
         format.html { redirect_to data_file_path(@data_file) }
         format.json {render json: @data_file}
       else
-        format.html do
-          render action: 'edit'
-        end
-        format.json {} #to be decided
+        format.html { render action: 'edit' }
+        format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
       end
     end
   end
