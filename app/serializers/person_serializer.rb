@@ -2,7 +2,8 @@ require 'digest/sha1'
 class PersonSerializer < AvatarObjSerializer
   attributes :title, :description,
              :first_name, :last_name,
-             :web_page, :orcid, :mbox_sha1sum
+             :web_page, :orcid, :mbox_sha1sum,
+             :phone, :skype_name
 
   attribute :expertise do
     serialize_annotations(object, context = 'expertise')

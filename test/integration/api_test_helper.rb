@@ -187,7 +187,7 @@ module ApiTestHelper
       if defined? @patch_values
         @to_patch = load_template("patch_#{m}_#{@clz}.json.erb", @patch_values)
       end
-      #puts "update, to_patch #{m}", @to_patch
+      puts "update, to_patch #{m}", @to_patch
 
       if @to_patch.blank?
         skip
@@ -204,7 +204,7 @@ module ApiTestHelper
 
       assert_no_difference("#{@clz.classify}.count") do
         patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
-        #puts "response body", response.body
+        puts "response body", response.body
         assert_response :success
       end
 
