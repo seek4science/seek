@@ -104,8 +104,8 @@ module ApiTestHelper
         hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
       end
       begin
-        hash_comparison(populate_extra_attributes, h['data']['attributes'])
-        hash_comparison(populate_extra_relationships, h['data']['relationships'])
+        hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
+        hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
       rescue NameError
       end
 
@@ -187,7 +187,7 @@ module ApiTestHelper
       if defined? @patch_values
         @to_patch = load_template("patch_#{m}_#{@clz}.json.erb", @patch_values)
       end
-      #puts "create, to_patch #{m}", @to_patch
+      #puts "update, to_patch #{m}", @to_patch
 
       if @to_patch.blank?
         skip
@@ -212,13 +212,22 @@ module ApiTestHelper
 
       h = JSON.parse(response.body)
 
+
+      #check the post-processed attributes and relationships
+      begin
+        hash_comparison(populate_extra_attributes(@to_patch), h['data']['attributes'])
+        hash_comparison(populate_extra_relationships(@to_patch), h['data']['relationships'])
+      rescue NameError
+      end
+
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
       to_ignore << 'updated_at'
 
       # Check the changed attributes and relationships
       if @to_patch['data'].key?('attributes')
-        hash_comparison(@to_patch['data']['attributes'], h['data']['attributes'])
+        hash_comparison(@to_patch['data']['attributes'].except(*to_ignore), h['data']['attributes'])
       end
+
       if @to_patch['data'].key?('relationships')
         hash_comparison(@to_patch['data']['relationships'], h['data']['relationships'])
       end
@@ -233,6 +242,7 @@ module ApiTestHelper
         original_relationships = original['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
         hash_comparison(original_relationships, h['data']['relationships'])
       end
+
     end
 
   end

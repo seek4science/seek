@@ -9,10 +9,8 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
     @clz = "person"
     @plural_clz = @clz.pluralize
 
-    p = Factory(:person)
-    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: p.id})
-
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
+    p = Factory(:person)
     @to_post = load_template("post_min_#{@clz}.json.erb", {first_name: "Post", last_name: p.last_name, email: p.email})
   end
 
@@ -21,19 +19,27 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
       @post_values = {first_name: "Post", last_name: p.last_name, email: "Post"+p.email}
   end
 
+  def create_patch_values
+    p = Factory(:person)
+    @patch_values = {id: p.id}
+  end
+
   # title cannot be POSTed or PATCHed
   # email and expertise/tool_list are not as are in the readAPI
   def ignore_non_read_or_write_attributes
-    ['title', 'email', 'expertise_list', 'tool_list']
+    ['title', 'email', 'expertise_list', 'tool_list', 'mbox_sha1sum']
   end
 
-  def populate_extra_attributes()
+  def populate_extra_attributes(hash)
     extra_attributes = {}
-    extra_attributes[:mbox_sha1sum] =  Digest::SHA1.hexdigest(URI.escape('mailto:' + @to_post['data']['attributes']['email']))
+    if  hash['data']['attributes'].has_key? 'email'
+      extra_attributes[:mbox_sha1sum] =  Digest::SHA1.hexdigest(URI.escape('mailto:' + hash['data']['attributes']['email']))
+    end
+
     #by construction, expertise & tools appear together IF they appear at all
-    if @to_post['data']['attributes'].has_key? 'expertise_list'
-      extra_attributes[:expertise] = @to_post['data']['attributes']['expertise_list'].split(', ')
-      extra_attributes[:tools] =  @to_post['data']['attributes']['tool_list'].split(', ')
+    if hash['data']['attributes'].has_key? 'expertise_list'
+      extra_attributes[:expertise] = hash['data']['attributes']['expertise_list'].split(', ')
+      extra_attributes[:tools] =  hash['data']['attributes']['tool_list'].split(', ')
     end
     extra_attributes.with_indifferent_access
   end
