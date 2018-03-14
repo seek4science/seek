@@ -24,7 +24,7 @@ class NelsControllerTest < ActionController::TestCase
     login_as(person)
 
     assert assay.can_edit?(person)
-    refute assay.projects.any? { |p| p.settings['nels_enabled'] }
+    refute assay.projects.any? { |p| p.settings['nels_allowed'] }
 
     VCR.use_cassette('nels/get_user_info') do
       get :index, assay_id: assay.id
@@ -34,12 +34,24 @@ class NelsControllerTest < ActionController::TestCase
     assert flash[:error].include?('NeLS-enabled')
   end
 
+  test 'cannot get browser if NeLS integration disabled' do
+    assert @assay.can_edit?(@user)
+    assert @assay.projects.any? { |p| p.settings['nels_enabled'] }
+
+    with_config_value(:nels_enabled, false) do
+      get :index, assay_id: @assay.id
+    end
+
+    assert_redirected_to @assay
+    assert flash[:error].include?('integration')
+  end
+
   test 'cannot get browser for assay without edit permissions' do
     person = Factory(:person)
     login_as(person)
 
     refute @assay.can_edit?(person)
-    assert @assay.projects.any? { |p| p.settings['nels_enabled'] }
+    assert @assay.projects.any? { |p| p.settings['nels_allowed'] }
 
     VCR.use_cassette('nels/get_user_info') do
       get :index, assay_id: @assay.id

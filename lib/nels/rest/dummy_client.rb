@@ -4,13 +4,10 @@ require 'uri'
 module Nels
   module Rest
     class DummyClient
-      BASE = 'https://test-fe.cbu.uib.no/nels-api'
+      attr_reader :access_token
 
-      attr_reader :base, :access_token
-
-      def initialize(access_token, base = BASE)
+      def initialize(access_token, base = nil)
         @access_token = access_token
-        @base = RestClient::Resource.new(base)
       end
 
       def user_info

@@ -83,7 +83,13 @@ class NelsController < ApplicationController
       return false
     end
 
-    unless @assay.projects.any? { |p| p.settings['nels_enabled'] }
+    unless Seek::Config.nels_enabled
+      flash[:error] = 'NeLS integration is not enabled on this SEEK instance.'
+      redirect_to @assay
+      return false
+    end
+
+    unless @assay.projects.any? { |p| p.settings['nels_allowed'] }
       flash[:error] = 'This assay is not associated with a NeLS-enabled project.'
       redirect_to @assay
       return false
