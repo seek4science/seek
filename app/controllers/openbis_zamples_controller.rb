@@ -100,8 +100,9 @@ class OpenbisZamplesController < ApplicationController
     end
 
     status = case @seek_type
-      when :assay then batch_register_assays(batch_ids, seek_parent_id)
-    end
+               when :assay then
+                 batch_register_assays(batch_ids, seek_parent_id)
+             end
 
     msg = "Registered all #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
     msg = "Registered #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
@@ -118,7 +119,7 @@ class OpenbisZamplesController < ApplicationController
     puts "SYNC OPT #{sync_options}"
     sync_options[:link_datasets] = '1' if sync_options[:link_dependent] == '1'
 
-    assay_params = {study_id: study_id}
+    assay_params = { study_id: study_id }
 
     registered = []
     failed = []
@@ -140,14 +141,14 @@ class OpenbisZamplesController < ApplicationController
 
     end
 
-    return {registred: registered, failed: failed, issues: issues}
+    return { registred: registered, failed: failed, issues: issues }
 
   end
 
   def do_assay_registration(asset, assay_params, sync_options, creator)
 
     issues = []
-    reg_status = {assay: nil, issues: issues}
+    reg_status = { assay: nil, issues: issues }
 
     if asset.seek_entity
       issues << 'Already registered as OpenBIS entity'
@@ -174,8 +175,6 @@ class OpenbisZamplesController < ApplicationController
 
     reg_status
   end
-
-
 
 
   def get_linked_to(assay)
@@ -212,8 +211,10 @@ class OpenbisZamplesController < ApplicationController
 
   def get_entity_types
     case @seek_type
-      when :assay then get_assay_types
-      else raise "Don't recognized obis types for seek: #{@seek_type}"
+      when :assay then
+        get_assay_types
+      else
+        raise "Don't recognized obis types for seek: #{@seek_type}"
     end
   end
 

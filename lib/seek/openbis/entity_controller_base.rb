@@ -11,6 +11,8 @@ module Seek
       def self.included(base)
         base.before_filter :get_endpoint
         base.before_filter :get_project
+        base.before_filter :project_member?, except: [:show_dataset_files]
+
         base.before_filter :get_entity, only: [:show, :edit, :register, :update]
         base.before_filter :prepare_asset, only: [:show, :edit, :register, :update]
       end
@@ -21,6 +23,13 @@ module Seek
 
       def get_project
         @project = @openbis_endpoint.project
+      end
+
+      def project_member?
+        unless @project.has_member?(User.current_user)
+          error('Must be a member of the project', 'No permission')
+          return false
+        end
       end
 
       def prepare_asset

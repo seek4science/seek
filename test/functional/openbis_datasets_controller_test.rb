@@ -13,7 +13,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     @user = Factory(:person)
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
-    @endpoint = Factory(:openbis_endpoint, project: Factory(:project))
+    @endpoint = Factory(:openbis_endpoint, project: @project)
     @dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
   end
 
@@ -216,6 +216,54 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
   end
 
   ## Batch register
+
+
+  ## permissions ##
+  test 'only project members can call actions' do
+
+    logout
+    get :index, openbis_endpoint_id: @endpoint.id
+    assert_response :redirect
+
+    get :edit, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    assert_response :redirect
+
+    assay = Factory :assay
+    sync_options = {}
+    batch_ids = ['20160210130454955-23', '20160215111736723-31']
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+
+    assert_response :redirect
+    assert_redirected_to :root
+
+    post :batch_register, openbis_endpoint_id: @endpoint.id,
+         seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids
+
+    assert_response :redirect
+    assert_redirected_to :root
+
+    login_as(@user)
+
+    get :index, openbis_endpoint_id: @endpoint.id
+    assert_response :success
+
+    get :edit, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    assert_response :success
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    assert_response :redirect
+    seek = assigns(:datafile)
+    assert_not_nil seek
+    assert_redirected_to seek
+
+
+    post :batch_register, openbis_endpoint_id: @endpoint.id,
+         seek_parent: assay.id, sync_options: sync_options, batch_ids: batch_ids
+    assert_response :success
+
+
+  end
 
   # unit like tests
 

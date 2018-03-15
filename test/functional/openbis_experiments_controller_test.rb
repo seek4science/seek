@@ -13,7 +13,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     @user = Factory(:person)
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
-    @endpoint = Factory(:openbis_endpoint, project: Factory(:project))
+    @endpoint = Factory(:openbis_endpoint, project: @project)
     @experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
 
     @controller = OpenbisExperimentsController.new
@@ -136,7 +136,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     refute @experiment.sample_ids.size < 2
     to_link = [@experiment.sample_ids[0]]
 
-    sync_options = { 'link_assays' => '0', 'linked_assays' =>  to_link}
+    sync_options = { 'link_assays' => '0', 'linked_assays' => to_link }
 
     post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
          study: { investigation_id: investigation.id },
@@ -226,7 +226,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     to_link_s = ['20171002172111346-37']
     to_link_d = ['20171002190934144-40']
-    sync_options = { 'link_datasets' => '0', 'linked_datasets' => to_link_d, 'linked_assays' => to_link_s}
+    sync_options = { 'link_datasets' => '0', 'linked_datasets' => to_link_d, 'linked_assays' => to_link_s }
 
     post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
          study: { investigation_id: investigation.id },
@@ -255,7 +255,6 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     assert_equal to_link_d.length, assay.data_files.length
 
   end
-
 
 
   test 'register remains on registration screen on errors' do
@@ -312,18 +311,18 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     login_as(@user)
     investigation = Factory :investigation
 
-    sync_options = {link_dependent: 'false'}
-    batch_ids = ["20171121153715264-58","20171121152132641-51"]
+    sync_options = { link_dependent: 'false' }
+    batch_ids = ["20171121153715264-58", "20171121152132641-51"]
 
     assert_difference('Study.count', 2) do
       assert_no_difference('Assay.count') do
-      assert_no_difference('DataFile.count') do
-        assert_difference('ExternalAsset.count', 2) do
+        assert_no_difference('DataFile.count') do
+          assert_difference('ExternalAsset.count', 2) do
 
-          post :batch_register, openbis_endpoint_id: @endpoint.id,
-               seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+            post :batch_register, openbis_endpoint_id: @endpoint.id,
+                 seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+          end
         end
-      end
       end
     end
 
@@ -343,12 +342,12 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     login_as(@user)
     investigation = Factory :investigation
 
-    sync_options = {link_dependent: 'false'}
-    batch_ids = ["20171121153715264-58","20171121152132641-51"]
+    sync_options = { link_dependent: 'false' }
+    batch_ids = ["20171121153715264-58", "20171121152132641-51"]
 
 
     post :batch_register, openbis_endpoint_id: @endpoint.id,
-                 seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+         seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
 
     assert_response :success
 
@@ -365,8 +364,8 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     login_as(@user)
     investigation = Factory :investigation
 
-    sync_options = {link_dependent: '1'}
-    batch_ids = ["20171121153715264-58","20171121152132641-51"]
+    sync_options = { link_dependent: '1' }
+    batch_ids = ["20171121153715264-58", "20171121152132641-51"]
 
     # 20171121152132641-51 2 samples, 20171121153715264-58 no samples
     # plus 2 fake assays for files
@@ -378,13 +377,13 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     assert_difference('Study.count', 2) do
       assert_difference('Assay.count', assays) do
-      assert_difference('DataFile.count', datasets) do
-        assert_difference('ExternalAsset.count', externals) do
+        assert_difference('DataFile.count', datasets) do
+          assert_difference('ExternalAsset.count', externals) do
 
-          post :batch_register, openbis_endpoint_id: @endpoint.id,
-               seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+            post :batch_register, openbis_endpoint_id: @endpoint.id,
+                 seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+          end
         end
-      end
       end
     end
 
@@ -474,6 +473,56 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     assert_equal "Updated sync of OpenBIS study: #{@experiment.perm_id}", flash[:notice]
   end
 
+  ## permissions ##
+  test 'only project members can call actions' do
+
+    logout
+    get :index, openbis_endpoint_id: @endpoint.id
+    assert_response :redirect
+
+    get :edit, openbis_endpoint_id: @endpoint.id, id: '20171121152132641-51'
+    assert_response :redirect
+
+    investigation = Factory :investigation
+    sync_options = {}
+    batch_ids = ["20171121153715264-58", "20171121152132641-51"]
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
+         study: { investigation_id: investigation.id },
+         sync_options: sync_options
+    assert_response :redirect
+    assert_redirected_to :root
+
+    post :batch_register, openbis_endpoint_id: @endpoint.id,
+         seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+    assert_response :redirect
+    assert_redirected_to :root
+
+    login_as(@user)
+
+    get :index, openbis_endpoint_id: @endpoint.id
+    assert_response :success
+
+    get :edit, openbis_endpoint_id: @endpoint.id, id: '20171121152132641-51'
+    assert_response :success
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id,
+         study: { investigation_id: investigation.id },
+         sync_options: sync_options
+    assert_response :redirect
+    seek = assigns(:study)
+    assert_not_nil seek
+    assert_redirected_to seek
+
+
+    post :batch_register, openbis_endpoint_id: @endpoint.id,
+         seek_parent: investigation.id, sync_options: sync_options, batch_ids: batch_ids
+    assert_response :success
+
+
+  end
+
+
   # unit like tests
 
   ## registration ##
@@ -532,7 +581,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     investigation = Factory :investigation
     study_params = { investigation_id: investigation.id }
 
-    sync_options = {link_assays: '1'}
+    sync_options = { link_assays: '1' }
 
     reg_status = @controller.do_study_registration(asset, study_params, sync_options, @user)
     assert reg_status
@@ -570,7 +619,6 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
   ## registration end ##
 
 
-
   test 'get_datasets_linked_to gets ids of openbis data sets' do
 
     util = Seek::Openbis::SeekUtil.new
@@ -579,7 +627,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
 
-    datafiles = datasets.map { |ds| util.createObisDataFile({}, @user,OpenbisExternalAsset.build(ds)) }
+    datafiles = datasets.map { |ds| util.createObisDataFile({}, @user, OpenbisExternalAsset.build(ds)) }
     assert_equal 3, datafiles.length
 
     disable_authorization_checks do
@@ -615,7 +663,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(["20171002172111346-37", "20171002172639055-39"])
 
-    assay_params = { study_id: study.id}
+    assay_params = { study_id: study.id }
     assays = zamples.map { |ds| util.createObisAssay(assay_params, @user, OpenbisExternalAsset.build(ds)) }
     assert_equal 2, assays.length
 

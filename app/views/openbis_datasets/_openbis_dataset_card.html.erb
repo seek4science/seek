@@ -8,36 +8,37 @@
   selected ||= []
   parentType ||= ''
   is_linked = linked.include?(entity.perm_id)
-  is_selected = selected.include?(entity.perm_id)
+  selected_include = selected.include?(entity.perm_id)
+  is_selected = selected_include
 %>
 
 <div class="col-md-3 openbis-card">
-   <div class='panel panel-default'>
-     <div class='openbis-card-heading'>
+  <div class='panel panel-default'>
+    <div class='openbis-card-heading'>
        <span>
         <%= entity.perm_id %>
        </span>
-     </div>
-     <div class='panel-body'>
-       <%= render partial:'openbis_common/obis_attr_list', locals: {entity: entity} %>
-       <%= render partial:'openbis_common/obis_prop_list', locals: {entity: entity} %>
-       <p class="list_item_attribute">
+    </div>
+    <div class='panel-body'>
+      <%= render partial: 'openbis_common/obis_attr_list', locals: { entity: entity } %>
+      <%= render partial: 'openbis_common/obis_prop_list', locals: { entity: entity } %>
+      <p class="list_item_attribute">
         <%= openbis_files_modal_link(entity) %>
-       </p>
-       <%= render partial:'openbis_common/registered_link_item', locals: {entity: entity} %>
-       <p class="list_item_attribute">
-           <%= link_to(entity.registered? ? 'Show/Update' : 'Show/Register', edit_openbis_endpoint_openbis_dataset_path(entity.openbis_endpoint, entity.perm_id)) %>
-       </p>
+      </p>
+      <%= render partial: 'openbis_common/registered_link_item', locals: { entity: entity } %>
+      <p class="list_item_attribute">
+        <%= link_to(entity.registered? ? 'Show/Update' : 'Show/Register', edit_openbis_endpoint_openbis_dataset_path(entity.openbis_endpoint, entity.perm_id)) %>
+      </p>
 
-       <% if linking_checkbox %>
-       <p class="list_item_attribute">
-         <%= check_box_tag('sync_options[linked_datasets][]', entity.perm_id, is_selected,
-                           disabled: is_linked, class: is_linked ? 'linked' : 'unlinked') %>
-         <%= label_tag(nil, is_linked ? "Already linked": "Register with #{parentType}" ) %>
-       </p>
-       <% end %>
-      <%= render partial: extra, locals: {entity: entity, extra_params: extra_params} if extra %>
-     </div>
-   </div>
+      <% if linking_checkbox %>
+          <p class="list_item_attribute">
+            <%= check_box_tag('sync_options[linked_datasets][]', entity.perm_id, is_selected,
+                              disabled: is_linked, class: is_linked ? 'linked' : 'unlinked') %>
+            <%= label_tag(nil, is_linked ? "Already linked" : "Register with #{parentType}") %>
+          </p>
+      <% end %>
+      <%= render partial: extra, locals: { entity: entity, extra_params: extra_params } if extra %>
+    </div>
+  </div>
 
 </div>

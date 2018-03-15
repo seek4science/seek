@@ -19,13 +19,13 @@
        </span>
     </div>
     <div class='panel-body'>
-      <%= render partial:'openbis_common/obis_attr_list', locals: {entity: entity} %>
-      <%= render partial:'openbis_common/obis_prop_list', locals: {entity: entity} %>
+      <%= render partial: 'openbis_common/obis_attr_list', locals: { entity: entity } %>
+      <%= render partial: 'openbis_common/obis_prop_list', locals: { entity: entity } %>
 
       <% if entity.dataset_ids %>
           <%= list_item_attribute('Datasets', text_or_not_specified(entity.dataset_ids.join(', '), none_text: 'None')) %>
       <% end %>
-      <%= render partial:'openbis_common/registered_link_item', locals: {entity: entity} %>
+      <%= render partial: 'openbis_common/registered_link_item', locals: { entity: entity } %>
 
       <%= link_to('Show/Register', edit_openbis_endpoint_openbis_zample_path(@openbis_endpoint, entity.perm_id, seek: seek_type)) %>
 
@@ -33,10 +33,10 @@
           <p class="list_item_attribute">
             <%= check_box_tag('sync_options[linked_assays][]', entity.perm_id, is_selected,
                               disabled: is_linked, class: is_linked ? 'linked' : 'unlinked') %>
-            <%= label_tag(nil, is_linked ? "Already linked": "Register with #{parentType}" ) %>
+            <%= label_tag(nil, is_linked ? "Already linked" : "Register with #{parentType}") %>
           </p>
       <% end %>
-      <%= render partial: extra, locals: {entity: entity, extra_params: extra_params} if extra %>
+      <%= render partial: extra, locals: { entity: entity, extra_params: extra_params } if extra %>
     </div>
   </div>
 

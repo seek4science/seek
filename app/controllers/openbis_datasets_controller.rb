@@ -106,7 +106,7 @@ class OpenbisDatasetsController < ApplicationController
   def batch_register_datasets(dataset_ids, assay_id)
 
     sync_options = {} # currently always empty
-    datafile_params = {assay_ids: assay_id}
+    datafile_params = { assay_ids: assay_id }
 
     registered = []
     failed = []
@@ -133,14 +133,14 @@ class OpenbisDatasetsController < ApplicationController
     #  data_files.each { |df| assay.associate(df) }
     #end
 
-    return {registred: registered, failed: failed, issues: issues}
+    return { registred: registered, failed: failed, issues: issues }
 
   end
 
   def do_datafile_registration(asset, datafile_params, sync_options, creator)
 
     issues = []
-    reg_status = {datafile: nil, issues: issues}
+    reg_status = { datafile: nil, issues: issues }
 
     if asset.seek_entity
       issues << 'Already registered as OpenBIS entity'
@@ -165,7 +165,6 @@ class OpenbisDatasetsController < ApplicationController
 
     reg_status
   end
-
 
 
   def get_entity(id = nil)

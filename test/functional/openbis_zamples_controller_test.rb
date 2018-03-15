@@ -13,7 +13,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     @user = Factory(:person)
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
-    @endpoint = Factory(:openbis_endpoint, project: Factory(:project))
+    @endpoint = Factory(:openbis_endpoint, project: @project)
     @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
   end
 
@@ -337,6 +337,57 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     assert_nil flash[:error]
     assert_equal "Updated sync of OpenBIS assay: #{@zample.perm_id}", flash[:notice]
+  end
+
+
+  ## permissions ##
+  test 'only project members can call actions' do
+
+    logout
+    get :index, openbis_endpoint_id: @endpoint.id
+    assert_response :redirect
+
+    get :edit, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37'
+    assert_response :redirect
+
+    study = Factory :study
+    sync_options = {}
+    batch_ids = ['20171002172111346-37', '20171002172639055-39']
+
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
+         assay: { study_id: study.id }, sync_options: sync_options
+
+    assert_response :redirect
+    assert_redirected_to :root
+
+    post :batch_register, openbis_endpoint_id: @endpoint.id,
+         seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+
+    assert_response :redirect
+    assert_redirected_to :root
+
+    login_as(@user)
+
+    get :index, openbis_endpoint_id: @endpoint.id
+    assert_response :success
+
+    get :edit, openbis_endpoint_id: @endpoint.id, id: '20171002172111346-37'
+    assert_response :success
+
+    post :register, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
+         assay: { study_id: study.id }, sync_options: sync_options
+    assert_response :redirect
+    seek = assigns(:assay)
+    assert_not_nil seek
+    assert_redirected_to seek
+
+
+    post :batch_register, openbis_endpoint_id: @endpoint.id,
+         seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+    assert_response :success
+
+
   end
 
   # unit like tests

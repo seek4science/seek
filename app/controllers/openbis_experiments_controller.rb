@@ -180,11 +180,6 @@ class OpenbisExperimentsController < ApplicationController
   end
 
 
-
-
-
-
-
   def get_zamples_linked_to(study)
     return [] unless study
 

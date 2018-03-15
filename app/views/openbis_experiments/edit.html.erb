@@ -18,9 +18,9 @@
         <% if not_registered %>
             <div class="form-group">
               <label>Register under Investigation </label><span class="required">*</span>
-              <%= render :partial=>"studies/investigation_list",
-                         :locals=>{:investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects},
-                                   :study => @study} %>
+              <%= render :partial => "studies/investigation_list",
+                         :locals => { :investigations => Investigation.all.select { |i| current_user.person.member_of? i.projects },
+                                      :study => @study } %>
             </div>
         <% else %>
             <div class="form-group">
@@ -63,7 +63,7 @@
                                      selected: @asset.sync_options[:linked_assays],
                                      parentType: 'study',
                                      linking_checkbox: true
-                                     } %>
+                           } %>
 
               </div>
             </div>
