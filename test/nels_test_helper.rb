@@ -6,7 +6,7 @@ module NelsTestHelper
     person = Factory(:person)
     @user = person.user
     @project = person.projects.first
-    @project.settings['nels_allowed'] = true
+    @project.settings['nels_enabled'] = true
     @nels_access_token = 'fake-access-token'
 
     @user.oauth_sessions.where(provider: 'NeLS').create(access_token: @nels_access_token, expires_at: 1.week.from_now)

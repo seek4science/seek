@@ -779,13 +779,23 @@ class ProjectTest < ActiveSupport::TestCase
   test 'stores project settings' do
     project = Factory(:project)
 
-    assert_nil project.settings['nels_allowed']
+    assert_nil project.settings['nels_enabled']
 
     assert_difference('Settings.count') do
-      project.settings['nels_allowed'] = true
+      project.settings['nels_enabled'] = true
     end
 
-    assert project.settings['nels_allowed']
+    assert project.settings['nels_enabled']
+  end
+
+  test 'does not use global defaults for project settings' do
+    project = Factory(:project)
+
+    assert Settings.defaults.key?('nels_enabled')
+
+    assert_nil Settings.for(project).fetch('nels_enabled')
+
+    assert_nil project.settings['nels_enabled']
   end
 
   test 'stores encrypted project settings' do

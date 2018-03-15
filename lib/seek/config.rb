@@ -306,7 +306,12 @@ module Seek
 
     if Settings.table_exists?
       def get_value(setting, conversion = nil)
-        val = Settings.global[setting]
+        result = Settings.global.fetch(setting)
+        if result
+          val = result.value
+        else
+          val = Settings.defaults[setting.to_s]
+        end
         val = val.send(conversion) if conversion && val
         val
       end
@@ -327,7 +332,9 @@ module Seek
     end
 
     def merge!(var, value)
-      result = Settings.merge! var, value
+      # Initialize the hash from defaults if it does not exist yet in settings
+      Settings.global[var] = Settings.defaults[var.to_s] unless Settings.global.fetch(var)
+      result = Settings.merge!(var, value)
       send "#{var}_propagate" if respond_to? "#{var}_propagate"
       result
     end
