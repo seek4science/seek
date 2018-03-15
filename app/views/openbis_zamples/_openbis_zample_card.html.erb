@@ -3,6 +3,13 @@
   extra ||= nil
   extra_params ||= nil
 
+  linking_checkbox ||= false
+  linked ||= []
+  selected ||= []
+  parentType ||= ''
+  is_linked = linked.include?(entity.perm_id)
+  is_selected = selected.include?(entity.perm_id)
+
 %>
 <div class="col-md-3 openbis-card">
   <div class='panel panel-default'>
@@ -21,6 +28,14 @@
       <%= render partial:'openbis_common/registered_link_item', locals: {entity: entity} %>
 
       <%= link_to('Show/Register', edit_openbis_endpoint_openbis_zample_path(@openbis_endpoint, entity.perm_id, seek: seek_type)) %>
+
+      <% if linking_checkbox %>
+          <p class="list_item_attribute">
+            <%= check_box_tag('sync_options[linked_assays][]', entity.perm_id, is_selected,
+                              disabled: is_linked, class: is_linked ? 'linked' : 'unlinked') %>
+            <%= label_tag(nil, is_linked ? "Already linked": "Register with #{parentType}" ) %>
+          </p>
+      <% end %>
       <%= render partial: extra, locals: {entity: entity, extra_params: extra_params} if extra %>
     </div>
   </div>

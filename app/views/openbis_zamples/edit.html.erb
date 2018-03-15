@@ -46,7 +46,13 @@
             <div class="panel-body">
               <div class='row' id="openbis-dataset-cards">
                 <%= render partial: 'openbis_datasets/openbis_dataset_card', collection: datasets,
-                           locals: { extra: 'openbis_zamples/dataset_linking_form', extra_params: @linked_to_assay } %>
+                           locals: {
+                               linked: @linked_to_assay,
+                               selected: @asset.sync_options[:linked_datasets],
+                               parentType: 'assay',
+                               linking_checkbox: true
+                           }
+                %>
 
               </div>
             </div>
