@@ -1,6 +1,16 @@
 module ApiTestHelper
   include AuthenticatedTestHelper
 
+  # Override me!
+  def populate_extra_attributes
+    {}.with_indifferent_access
+  end
+
+  # Override me!
+  def populate_extra_relationships
+    {}.with_indifferent_access
+  end
+
   def definitions_path
     File.join(Rails.root, 'public', '2010', 'json', 'rest',
               'definitions.json')
@@ -100,15 +110,12 @@ module ApiTestHelper
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
       hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
 
-      if @to_post['data'].has_key? 'relationships'
+      if @to_post['data'].has_key?('relationships')
         hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
       end
-      begin
-        hash_comparison(populate_extra_attributes, h['data']['attributes'])
-        hash_comparison(populate_extra_relationships, h['data']['relationships'])
-      rescue NameError
-      end
 
+      hash_comparison(populate_extra_attributes, h['data']['attributes'])
+      hash_comparison(populate_extra_relationships, h['data']['relationships'])
     end
   end
 

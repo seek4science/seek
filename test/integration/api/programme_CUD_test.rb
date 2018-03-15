@@ -17,18 +17,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_post_values
-      @post_values = {title: "Post programme"}
-  end
-
-  # funding_codes are an Array in the readAPI, but a comma-separated string in POST/PATCH
-  def ignore_non_read_or_write_attributes
-    ['funding_codes']
-  end
-
-  def populate_extra_attributes()
-    extra_attributes = {}
-    extra_attributes[:funding_codes] = @to_post['data']['attributes']['funding_codes'].split(", ")
-    extra_attributes.with_indifferent_access
+    @post_values = {title: "Post programme"}
   end
 
   #normal user without admin rights

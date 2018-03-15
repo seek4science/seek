@@ -22,10 +22,6 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: sop.id})
   end
 
-  def populate_extra_attributes
-    {}
-  end
-
   def populate_extra_relationships
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }

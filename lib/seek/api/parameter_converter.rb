@@ -58,6 +58,10 @@ module Seek
             value.join(', ')
           },
 
+          funding_codes: ->(value) {
+            value.join(', ')
+          },
+
           programme_ids: ->(value) {
             value.try(:first)
           }
