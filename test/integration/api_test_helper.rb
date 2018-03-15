@@ -289,11 +289,13 @@ module ApiTestHelper
   # `key` is used to generate meaningful failure messages if the assertion fails.
   def deep_comparison(source, result, key)
     if source.is_a?(Hash)
+      assert result.is_a?(Hash), "#{key} was not a Hash"
       source.each do |sub_key, sub_value|
         actual = result.try(:[], sub_key)
         deep_comparison(sub_value, actual, "#{key}[#{sub_key}]")
       end
     elsif source.is_a?(Array)
+      assert result.is_a?(Array), "#{key} was not an Array"
       sorted_result = result.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
       sorted_source = source.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
       sorted_source.each_with_index do |sub_value, index|

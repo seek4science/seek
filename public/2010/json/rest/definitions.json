@@ -164,6 +164,9 @@
         },
         "policy" : {
           "$ref" : "#/definitions/policy"
+        },
+        "other_creators" : {
+          "$ref" : "#/definitions/nullableNonEmptyString"
         }
       },
       "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at", "content_blobs" ],
@@ -1521,6 +1524,9 @@
                 },
                 "content_blobs" : {
                   "$ref" : "#/definitions/contentBlobPlaceholdersList"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
               "required" : [ "title", "policy", "content_blobs" ],
@@ -1585,6 +1591,9 @@
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
               "additionalProperties" : false
@@ -3055,6 +3064,9 @@
                 },
                 "content_blobs" : {
                   "$ref" : "#/definitions/contentBlobPlaceholdersList"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
               "required" : [ "title", "policy", "content_blobs" ],
@@ -3113,6 +3125,9 @@
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
               "additionalProperties" : false
