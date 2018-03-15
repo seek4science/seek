@@ -10,11 +10,13 @@ module Seek
       def createObisStudy(study_params, creator, obis_asset)
 
         experiment = obis_asset.content
+        openbis_endpoint = obis_asset.seek_service
 
         study_params[:title] ||= "OpenBIS #{experiment.perm_id}"
         study = Study.new(study_params)
-        study.contributor = creator
 
+        study.contributor = creator
+        study.policy = openbis_endpoint.policy.deep_copy
         study.external_asset = obis_asset
         study
       end
@@ -22,11 +24,14 @@ module Seek
       def createObisAssay(assay_params, creator, obis_asset)
 
         zample = obis_asset.content
+        openbis_endpoint = obis_asset.seek_service
+
         assay_params[:assay_class_id] ||= AssayClass.for_type("experimental").id
         assay_params[:title] ||= "OpenBIS #{zample.perm_id}"
         assay = Assay.new(assay_params)
-        assay.contributor = creator
 
+        assay.contributor = creator
+        assay.policy = openbis_endpoint.policy.deep_copy
         assay.external_asset = obis_asset
         assay
       end
@@ -40,8 +45,8 @@ module Seek
         datafile_params[:title] ||= "OpenBIS #{dataset.perm_id}"
         datafile_params[:license] ||= openbis_endpoint.project.default_license
         df = DataFile.new(datafile_params)
-        df.contributor = creator
 
+        df.contributor = creator
         df.policy = openbis_endpoint.policy.deep_copy
         df.external_asset = obis_asset
 
@@ -76,6 +81,7 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         }
         assay = Assay.new(assay_params)
         assay.contributor = study.contributor
+        assay.policy = study.policy.deep_copy
         assay.study = study
         assay.save!
         assay
