@@ -1,25 +1,24 @@
 require 'test_helper'
 require 'integration/api_test_helper'
 
-class DocumentCUDTest < ActionDispatch::IntegrationTest
+class PresentationCUDTest < ActionDispatch::IntegrationTest
   include ApiTestHelper
 
   def setup
     admin_login
-    @clz = 'document'
+    @clz = 'presentation'
     @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
-    investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
-    study = Factory(:study, investigation: investigation, contributor: @current_person)
-    @assay = Factory(:assay, study: study, contributor: @current_person)
     @creator = Factory(:person)
+    @publication = Factory(:publication, projects: [@project])
+    @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_max_document.json.erb')
+    template_file = File.join(ApiTestHelper.template_dir, 'post_max_presentation.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    document = Factory(:document, policy: Factory(:public_policy), contributor: @current_person)
-    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: document.id})
+    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: @current_person)
+    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: presentation.id})
   end
 
   def populate_extra_relationships
@@ -31,55 +30,55 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'can add content to API-created data file' do
-    doc = Factory(:api_pdf_document, contributor: @current_person)
+    pres = Factory(:api_pdf_presentation, contributor: @current_person)
 
-    assert doc.content_blob.no_content?
-    assert doc.can_download?(@current_user)
-    assert doc.can_edit?(@current_user)
+    assert pres.content_blob.no_content?
+    assert pres.can_download?(@current_user)
+    assert pres.can_edit?(@current_user)
 
-    original_md5 = doc.content_blob.md5sum
-    put document_content_blob_path(doc, doc.content_blob), nil,
+    original_md5 = pres.content_blob.md5sum
+    put presentation_content_blob_path(pres, pres.content_blob), nil,
         'Accept' => 'application/json',
         'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
 
     assert_response :success
-    blob = doc.content_blob.reload
+    blob = pres.content_blob.reload
     refute_equal original_md5, blob.reload.md5sum
     refute blob.no_content?
     assert blob.file_size > 0
   end
 
   test 'cannot add content to API-created data file without permission' do
-    doc = Factory(:api_pdf_document, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
+    pres = Factory(:api_pdf_presentation, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
 
-    assert doc.content_blob.no_content?
-    assert doc.can_download?(@current_user)
-    refute doc.can_edit?(@current_user)
+    assert pres.content_blob.no_content?
+    assert pres.can_download?(@current_user)
+    refute pres.can_edit?(@current_user)
 
-    put document_content_blob_path(doc, doc.content_blob), nil,
+    put presentation_content_blob_path(pres, pres.content_blob), nil,
         'Accept' => 'application/json',
         'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
 
     assert_response :forbidden
-    blob = doc.content_blob.reload
+    blob = pres.content_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
   end
 
   test 'cannot add content to API-created data file that already has content' do
-    doc = Factory(:document, contributor: @current_person)
+    pres = Factory(:presentation, contributor: @current_person)
 
-    refute doc.content_blob.no_content?
-    assert doc.can_download?(@current_user)
-    assert doc.can_edit?(@current_user)
+    refute pres.content_blob.no_content?
+    assert pres.can_download?(@current_user)
+    assert pres.can_edit?(@current_user)
 
-    original_md5 = doc.content_blob.md5sum
-    put document_content_blob_path(doc, doc.content_blob), nil,
+    original_md5 = pres.content_blob.md5sum
+    put presentation_content_blob_path(pres, pres.content_blob), nil,
         'Accept' => 'application/json',
         'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf'))
 
     assert_response :bad_request
-    blob = doc.content_blob.reload
+    blob = pres.content_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
   end
@@ -89,7 +88,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/txt_test.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_remote_document.json.erb')
+    template_file = File.join(ApiTestHelper.template_dir, 'post_remote_presentation.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
@@ -108,15 +107,15 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'can patch max data file' do
-    doc = Factory(:document, contributor: @current_person)
-    id = doc.id
+    pres = Factory(:presentation, contributor: @current_person)
+    id = pres.id
 
-    patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_max_document.json.erb")
+    patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_max_presentation.json.erb")
     the_patch = ERB.new(File.read(patch_file))
     @to_patch = JSON.parse(the_patch.result(binding))
 
     assert_no_difference( "#{@clz.classify}.count") do
-      patch "/#{@plural_clz}/#{doc.id}.json", @to_patch
+      patch "/#{@plural_clz}/#{pres.id}.json", @to_patch
       assert_response :success
     end
 
@@ -127,7 +126,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
 
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'
-    template_file = File.join(ApiTestHelper.template_dir, 'post_bad_document.json.erb')
+    template_file = File.join(ApiTestHelper.template_dir, 'post_bad_presentation.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 

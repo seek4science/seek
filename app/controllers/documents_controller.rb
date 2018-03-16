@@ -38,7 +38,7 @@ class DocumentsController < ApplicationController
 
   # PUT /documents/1
   def update
-    update_annotations(params[:tag_list], @document) if params[:tag_list]
+    update_annotations(params[:tag_list], @document) if params.key?(:tag_list)
     update_scales @document
 
     @document.attributes = document_params
@@ -51,7 +51,7 @@ class DocumentsController < ApplicationController
         update_assay_assets(@document,params[:assay_ids])
         flash[:notice] = "#{t('document')} metadata was successfully updated."
         format.html { redirect_to document_path(@document) }
-        format.json {render json: @document}
+        format.json { render json: @document }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@document), status: :unprocessable_entity }

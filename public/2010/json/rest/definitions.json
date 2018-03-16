@@ -2645,6 +2645,132 @@
       "required" : [ "data", "jsonapi" ],
       "additionalProperties" : false
     },
+    "presentationPost" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "type" : {
+              "$ref" : "#/definitions/presentationType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "content_blobs" : {
+                  "$ref" : "#/definitions/contentBlobPlaceholdersList"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "required" : [ "title", "policy", "content_blobs" ],
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "events" : {
+                  "$ref" : "#/definitions/eventReferencesList"
+                }
+              },
+              "required" : [ "projects" ],
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "type", "attributes", "relationships" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
+    "presentationPatch" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
+            "type" : {
+              "$ref" : "#/definitions/presentationType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "events" : {
+                  "$ref" : "#/definitions/eventReferencesList"
+                }
+              },
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "id", "type" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
     "programmeResponse" : {
       "type" : "object",
       "properties" : {
