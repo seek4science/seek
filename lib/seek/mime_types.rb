@@ -62,21 +62,21 @@ module Seek
     end
 
     def mime_map
-      @mime_map ||= MIME_MAP.merge(mime_magic_map) { |_ext, seek_value, _magic_value| seek_value }
+      @@mime_map ||= MIME_MAP.merge(mime_magic_map) { |_ext, seek_value, _magic_value| seek_value }
     end
 
     def mime_magic_map
-      return @mime_magic_map if defined? @mime_magic_map
-      @mime_magic_map = {}
+      return @@mime_magic_map if defined? @@mime_magic_map
+      @@mime_magic_map = {}
       MimeMagic::EXTENSIONS.each do |extension, mime|
         next unless found = MimeMagic.by_extension(extension)
-        @mime_magic_map[mime] = {}
-        @mime_magic_map[mime][:name] = found.comment
-        @mime_magic_map[mime][:icon_key] = "#{extension}_file"
-        @mime_magic_map[mime][:extensions] = ["#{extension}"]
+        @@mime_magic_map[mime] = {}
+        @@mime_magic_map[mime][:name] = found.comment
+        @@mime_magic_map[mime][:icon_key] = "#{extension}_file"
+        @@mime_magic_map[mime][:extensions] = ["#{extension}"]
       end
 
-      @mime_magic_map
+      @@mime_magic_map
     end
 
     protected
