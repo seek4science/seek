@@ -155,7 +155,8 @@ end
 
 group :test do
   gem 'test_after_commit'
-  gem 'ruby-prof', '~> 0.15.9'
+  gem 'ruby-prof', '>= 0.16.0'
+  gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest'
   gem 'minitest-reporters'
