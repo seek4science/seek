@@ -274,6 +274,9 @@
         },
         "policy" : {
           "$ref" : "#/definitions/policy"
+        },
+        "other_creators" : {
+          "$ref" : "#/definitions/nullableNonEmptyString"
         }
       },
       "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at", "content_blobs", "model_type", "model_format", "environment" ],
