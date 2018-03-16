@@ -32,7 +32,7 @@ Factory.define(:max_sop, class: Sop) do |f|
   f.after_create do |sop|
     sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
   end
-  f.other_creators = 'Blogs, Joe'
+  f.other_creators 'Blogs, Joe'
 end
 
 Factory.define(:doc_sop, parent: :sop) do |f|

@@ -44,7 +44,7 @@ Factory.define(:max_document, class: Document) do |f|
   f.after_create do |document|
     document.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: document, asset_version: document.version)
   end
-  f.other_creators = 'Blogs, Joe'
+  f.other_creators 'Blogs, Joe'
 end
 
 # Factory::Version

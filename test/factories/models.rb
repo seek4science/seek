@@ -31,7 +31,7 @@ Factory.define(:max_model, class: Model) do |f|
                                           asset: model,
                                           asset_version: model.version)] if model.content_blobs.blank?
   end
-  f.other_creators = 'Blogs, Joe'
+  f.other_creators 'Blogs, Joe'
 end
 
 Factory.define(:model_2_files, class: Model) do |f|
