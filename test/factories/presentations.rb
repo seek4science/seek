@@ -32,6 +32,7 @@ Factory.define(:max_presentation, class: Presentation) do |f|
   f.after_create do |presentation|
     presentation.content_blob = Factory.create(:min_content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
   end
+  f.other_creators = 'Blogs, Joe'
 end
 
 Factory.define(:ppt_presentation, parent: :presentation) do |f|
