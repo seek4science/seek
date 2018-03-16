@@ -47,6 +47,10 @@ Factory.define(:max_document, class: Document) do |f|
   f.other_creators 'Blogs, Joe'
 end
 
+Factory.define(:api_pdf_document, parent: :document) do |f|
+  f.association :content_blob, factory: :blank_pdf_content_blob
+end
+
 # Factory::Version
 Factory.define(:document_version, class: Document::Version) do |f|
   f.association :document
