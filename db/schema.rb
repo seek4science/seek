@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171006143805) do
+ActiveRecord::Schema.define(version: 20180316174049) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -971,14 +971,15 @@ ActiveRecord::Schema.define(version: 20171006143805) do
     t.string   "space_perm_id",         limit: 255
     t.string   "username",              limit: 255
     t.integer  "project_id",            limit: 4
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
     t.string   "dss_endpoint",          limit: 255
     t.string   "web_endpoint",          limit: 255
-    t.integer  "refresh_period_mins",   limit: 4,   default: 120
+    t.integer  "refresh_period_mins",   limit: 4,     default: 120
     t.integer  "policy_id",             limit: 4
     t.string   "encrypted_password",    limit: 255
     t.string   "encrypted_password_iv", limit: 255
+    t.text     "meta_config_json",      limit: 65535
   end
 
   create_table "organisms", force: :cascade do |t|

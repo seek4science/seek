@@ -319,7 +319,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint = Factory(:openbis_endpoint)
 
     zample = Seek::Openbis::Zample.new(endpoint, '20171002172111346-37')
-    options = {tomek: false}
+    options = { tomek: false }
 
     asset1 = OpenbisExternalAsset.build(zample, options)
 
@@ -448,7 +448,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint1.registered_assays.each do |e|
       assert e.is_a? Assay
     end
-    
+
     assert_equal 1, zample2.openbis_endpoint.registered_assays.count
 
   end
@@ -501,7 +501,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     Delayed::Job.destroy_all
     #assert_difference('Delayed::Job.count', 1) do
-      endpoint.refresh_metadata
+    endpoint.refresh_metadata
     #end
 
     refute endpoint.metadata_store.exist?(key)
@@ -519,7 +519,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     disable_authorization_checks do
       assert endpoint.save!
     end
-
 
 
     assets = []
@@ -546,7 +545,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal 10, endpoint.external_assets.count
 
     assert_equal 6, endpoint.due_to_refresh.count
-    assert_equal assets[2..7].map{|r| r.external_id}, endpoint.due_to_refresh.map{|r| r.external_id}
+    assert_equal assets[2..7].map { |r| r.external_id }, endpoint.due_to_refresh.map { |r| r.external_id }
 
 
   end
@@ -586,6 +585,107 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert assets[9].failed?
     assert assets[0].synchronized?
     assert assets[1].synchronized?
-    assets[2..8].each {|a| assert a.refresh?}
+    assets[2..8].each { |a| assert a.refresh? }
   end
+
+  test 'build_meta_config makes valid hash even on nil parameters' do
+    endpoint = Factory(:openbis_endpoint)
+    conf = endpoint.build_meta_config(nil, nil)
+    exp = { study_types: [], assay_types: [] }
+    assert_equal exp, conf
+
+    conf = endpoint.build_meta_config(['st1','st2'], ['a1'])
+    exp = { study_types: ['st1','st2'], assay_types: ['a1'] }
+    assert_equal exp, conf
+  end
+
+  test 'build_meta_config raise exception if not empty non-table parameters' do
+    endpoint = Factory(:openbis_endpoint)
+
+    assert_raise do
+      endpoint.build_meta_config('a', nil)
+    end
+    assert_raise do
+      endpoint.build_meta_config(nil, 'b')
+    end
+  end
+
+  test 'default_meta_config is set with standard OpenBIS ELN types' do
+    endpoint = Factory(:openbis_endpoint)
+    conf = endpoint.default_meta_config
+    exp = { study_types: ['DEFAULT_EXPERIMENT'], assay_types: ['EXPERIMENTAL_STEP'] }
+    assert_equal exp, conf
+  end
+
+  test 'add_meta_config sets default config on empty' do
+    endpoint = Factory(:openbis_endpoint)
+    endpoint.meta_config_json = nil
+
+    endpoint.add_meta_config
+    assert_equal endpoint.default_meta_config.to_json, endpoint.meta_config_json
+
+    endpoint.meta_config_json = '{}'
+    endpoint.add_meta_config
+    assert_equal '{}', endpoint.meta_config_json
+  end
+
+  test 'default config is added even if not set' do
+    endpoint = Factory(:openbis_endpoint)
+    assert_equal endpoint.default_meta_config.to_json, endpoint.meta_config_json
+  end
+
+  test 'meta_config is deserialized json verion' do
+    endpoint = Factory(:openbis_endpoint)
+    conf = { study_types: ['E1'], assay_types: ['A2'] }
+
+    endpoint.meta_config=conf
+    assert_same conf, endpoint.meta_config
+    assert_equal conf.to_json, endpoint.meta_config_json
+
+    disable_authorization_checks do
+      endpoint.save!
+    end
+
+    endpoint2 = OpenbisEndpoint.find(endpoint.id)
+    assert_not_same endpoint, endpoint2
+
+    assert_equal conf.to_json, endpoint2.meta_config_json
+    assert_equal conf, endpoint2.meta_config
+
+  end
+
+  test 'study_types gives default if not configured' do
+    endpoint = Factory(:openbis_endpoint)
+    assert_equal ['DEFAULT_EXPERIMENT'], endpoint.study_types
+  end
+
+  test 'study_types gives empty on missing' do
+    endpoint = Factory(:openbis_endpoint)
+    endpoint.meta_config = {}
+    assert_equal [], endpoint.study_types
+  end
+
+  test 'study_types gives what configured' do
+    endpoint = Factory(:openbis_endpoint)
+    endpoint.meta_config = {study_types: ['a']}
+    assert_equal ['a'], endpoint.study_types
+  end
+
+  test 'assay_types gives default if not configured' do
+    endpoint = Factory(:openbis_endpoint)
+    assert_equal ['EXPERIMENTAL_STEP'], endpoint.assay_types
+  end
+
+  test 'assay_types gives empty on missing' do
+    endpoint = Factory(:openbis_endpoint)
+    endpoint.meta_config = {}
+    assert_equal [], endpoint.assay_types
+  end
+
+  test 'assay_types gives what configured' do
+    endpoint = Factory(:openbis_endpoint)
+    endpoint.meta_config = {assay_types: ['a']}
+    assert_equal ['a'], endpoint.assay_types
+  end
+
 end

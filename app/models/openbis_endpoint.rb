@@ -18,6 +18,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   after_create :create_refresh_metadata_job
   after_destroy :clear_metadata_store, :remove_refresh_metadata_job
   after_initialize :default_policy, autosave: true
+  after_initialize :add_meta_config, autosave: true
 
 
 
@@ -112,6 +113,41 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def default_policy
     self.policy = Policy.default if new_record? && policy.nil?
+  end
+
+  def add_meta_config
+    self.meta_config= default_meta_config if meta_config_json.nil?
+  end
+
+  def default_meta_config
+    studies = ['DEFAULT_EXPERIMENT']
+    assays = ['EXPERIMENTAL_STEP']
+    build_meta_config(studies,assays)
+  end
+
+  def build_meta_config(studies, assays)
+    studies ||= []
+    assays ||= []
+    raise 'table with types names expected' unless (studies.is_a?(Array) && assays.is_a?(Array))
+    {study_types: studies, assay_types: assays}
+  end
+
+  def meta_config
+    @meta_config ||= self.meta_config_json ? JSON.parse(self.meta_config_json).symbolize_keys : {}
+    @meta_config
+  end
+
+  def meta_config=(config)
+    self.meta_config_json= config.to_json
+    @meta_config = config
+  end
+
+  def study_types
+    meta_config[:study_types] || []
+  end
+
+  def assay_types
+    meta_config[:assay_types] || []
   end
 
   # this is necessary for the sharing form to include the project by default
