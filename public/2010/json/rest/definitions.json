@@ -1862,6 +1862,9 @@
             "relationships" : {
               "type" : "object",
               "properties" : {
+                "submitter" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
                 "projects" : {
                   "$ref" : "#/definitions/projectReferencesList"
                 },

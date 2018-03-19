@@ -124,5 +124,12 @@ class BaseSerializer < SimpleBaseSerializer
     return respond_to_policy && respond_to_manage && can_manage
   end
 
-
+  def submitter
+    result = determine_submitter object
+    if result.blank?
+      return []
+    else
+      return [result]
+    end
+  end
 end
