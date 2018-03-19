@@ -1895,6 +1895,147 @@
       "required" : [ "data", "jsonapi" ],
       "additionalProperties" : false
     },
+    "eventPost" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "type" : {
+              "$ref" : "#/definitions/eventType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "url" : {
+                  "$ref" : "#/definitions/nullableUriString"
+                },
+                "address" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "city" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "country" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "start_date" : {
+                  "$ref" : "#/definitions/dateTimeString"
+                },
+                "end_date" : {
+                  "$ref" : "#/definitions/dateTimeString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                }
+              },
+              "required" : [ "title", "policy", "start_date" ],
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "data_files" : {
+                  "$ref" : "#/definitions/dataFileReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "presentations" : {
+                  "$ref" : "#/definitions/presentationReferencesList"
+                }
+              },
+              "required" : [ "projects" ],
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "type", "attributes", "relationships" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
+    "eventPatch" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
+            "type" : {
+              "$ref" : "#/definitions/eventType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "url" : {
+                  "$ref" : "#/definitions/nullableUriString"
+                },
+                "address" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "city" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "country" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "start_date" : {
+                  "$ref" : "#/definitions/dateTimeString"
+                },
+                "end_date" : {
+                  "$ref" : "#/definitions/dateTimeString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                }
+              },
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "data_files" : {
+                  "$ref" : "#/definitions/dataFileReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "presentations" : {
+                  "$ref" : "#/definitions/presentationReferencesList"
+                }
+              },
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "id", "type" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
     "institutionResponse" : {
       "type" : "object",
       "properties" : {
