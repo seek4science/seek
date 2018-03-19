@@ -109,24 +109,6 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     hash_comparison(populate_extra_relationships, h['data']['relationships'])
   end
 
-  test 'can patch max data file' do
-    df = Factory(:data_file, contributor: @current_person)
-    id = df.id
-
-    patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_max_data_file.json.erb")
-    the_patch = ERB.new(File.read(patch_file))
-    @to_patch = JSON.parse(the_patch.result(binding))
-
-    assert_no_difference( "#{@clz.classify}.count") do
-      patch "/#{@plural_clz}/#{df.id}.json", @to_patch
-      assert_response :success
-    end
-
-    h = JSON.parse(response.body)
-    # Check the changed attributes and relationships
-    hash_comparison(@to_patch['data'], h['data'])
-  end
-
   test 'returns sensible error objects' do
     template_file = File.join(ApiTestHelper.template_dir, 'post_bad_data_file.json.erb')
     template = ERB.new(File.read(template_file))

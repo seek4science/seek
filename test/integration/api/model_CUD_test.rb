@@ -131,24 +131,6 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     hash_comparison(populate_extra_relationships, h['data']['relationships'])
   end
 
-  test 'can patch max model' do
-    model = Factory(:model, contributor: @current_person)
-    id = model.id
-
-    patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_max_model.json.erb")
-    the_patch = ERB.new(File.read(patch_file))
-    @to_patch = JSON.parse(the_patch.result(binding))
-
-    assert_no_difference( "#{@clz.classify}.count") do
-      patch "/#{@plural_clz}/#{model.id}.json", @to_patch
-      assert_response :success
-    end
-
-    h = JSON.parse(response.body)
-    # Check the changed attributes and relationships
-    hash_comparison(@to_patch['data'], h['data'])
-  end
-
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'
     template_file = File.join(ApiTestHelper.template_dir, 'post_bad_model.json.erb')
