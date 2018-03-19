@@ -22,7 +22,7 @@ Factory.define(:max_event, class: Event) do |f|
   f.address 'Sofienstr 2'
   f.start_date "2017-01-01T00:20:00.000Z"
   f.end_date "2017-01-01T00:22:00.000Z"
-  f.projects { [Factory.build(:project)] }
+  f.projects { [Factory.build(:max_project)] }
   f.data_files {[Factory(:data_file, policy: Factory(:public_policy))]}
   f.publications {[Factory(:publication)]}
   f.presentations {[Factory(:presentation, policy: Factory(:public_policy))]}

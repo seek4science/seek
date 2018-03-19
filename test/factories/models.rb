@@ -21,8 +21,8 @@ end
 Factory.define(:max_model, class: Model) do |f|
   f.title 'A Maximal Model'
   f.description 'Hidden Markov Model'
-  f.projects { [Factory.build(:project)] }
-  f.assays {[Factory.build(:min_assay, policy: Factory(:public_policy))]}
+  f.projects { [Factory.build(:max_project)] }
+  f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |model|
     model.content_blobs = [Factory.create(:cronwright_model_content_blob,

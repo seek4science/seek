@@ -38,8 +38,8 @@ Factory.define(:max_document, class: Document) do |f|
   f.title 'A Maximal Document'
   f.description 'The important report we did for ~important-milestone~'
   f.policy { Factory(:downloadable_public_policy) }
-  f.projects { [Factory.build(:project)] }
-  f.assays {[Factory.build(:min_assay, policy: Factory(:public_policy))]}
+  f.projects { [Factory.build(:max_project)] }
+  f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |document|
     document.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: document, asset_version: document.version)
