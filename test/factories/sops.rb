@@ -32,6 +32,7 @@ Factory.define(:max_sop, class: Sop) do |f|
   f.after_create do |sop|
     sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
   end
+  f.other_creators 'Blogs, Joe'
 end
 
 Factory.define(:doc_sop, parent: :sop) do |f|
@@ -141,4 +142,6 @@ Factory.define :mapping do |f|
   f.sabiork_id '4'
 end
 
-
+Factory.define(:api_pdf_sop, parent: :sop) do |f|
+  f.association :content_blob, factory: :blank_pdf_content_blob
+end

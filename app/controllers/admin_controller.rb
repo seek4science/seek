@@ -94,6 +94,9 @@ class AdminController < ApplicationController
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id].try(:strip)
     Seek::Config.nels_client_secret = params[:nels_client_secret].try(:strip)
+    Seek::Config.nels_api_url = params[:nels_api_url].blank? ? nil : params[:nels_api_url].strip.chomp('/')
+    Seek::Config.nels_oauth_url = params[:nels_oauth_url].blank? ? nil : params[:nels_oauth_url].strip.chomp('/')
+    Seek::Config.nels_permalink_base = params[:nels_permalink_base].try(:strip)
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'

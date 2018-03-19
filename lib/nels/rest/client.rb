@@ -4,11 +4,10 @@ require 'uri'
 module Nels
   module Rest
     class Client
-      BASE = 'https://test-fe.cbu.uib.no/nels-api'
-
       attr_reader :base, :access_token
 
-      def initialize(access_token, base = BASE)
+      def initialize(access_token, base = nil)
+        base ||= Seek::Config.nels_api_url
         @access_token = access_token
         @base = RestClient::Resource.new(base)
       end

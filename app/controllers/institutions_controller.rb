@@ -57,7 +57,6 @@ class InstitutionsController < ApplicationController
   # POST /institutions
   # POST /institutions.xml
   def create
-
     @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
@@ -68,7 +67,7 @@ class InstitutionsController < ApplicationController
       else
         format.html { render action: 'new' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
-        format.json  { render json: @institution.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@institution), status: :unprocessable_entity }
       end
     end
   end
@@ -86,7 +85,7 @@ class InstitutionsController < ApplicationController
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
-        format.json { render json: @institution.errors, status: :unprocessable_entity}
+        format.json { render json: json_api_errors(@institution), status: :unprocessable_entity }
       end
     end
   end

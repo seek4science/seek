@@ -41,6 +41,12 @@
         {"type" : "null"}
       ]
     },
+    "nullableInteger" : {
+      "oneOf": [
+        {"type" : "integer"},
+        {"type" : "null"}
+      ]
+    },
     "versionNumber" : {
       "type" : "string",
       "minLength" : 1,
@@ -154,39 +160,13 @@
           "minLength" : 1
         },
         "content_blobs" : {
-          "type" : "array",
-          "minItems" : 0,
-          "uniqueItems" : true,
-          "items" : {
-            "properties" : {
-              "original_filename" : {
-                "$ref" : "#/definitions/nullableNonEmptyString"
-              },
-              "url" : {
-                "$ref" : "#/definitions/nullableUriString"
-              },
-              "md5sum" : {
-                "$ref" : "#/definitions/nullableNonEmptyString"
-              },
-              "sha1sum" : {
-                "$ref" : "#/definitions/nullableNonEmptyString"
-              },
-              "content_type" : {
-                "$ref" : "#/definitions/nullableNonEmptyString"
-              },
-              "link" : {
-                "$ref" : "#/definitions/uriString"
-              },
-              "size" : {
-                "type" : "integer"
-              }
-            },
-            "required" : [ "original_filename", "url", "md5sum", "sha1sum", "content_type", "link", "size" ],
-            "additionalProperties" : false
-          }
+          "$ref" : "#/definitions/contentBlobsList"
         },
         "policy" : {
           "$ref" : "#/definitions/policy"
+        },
+        "other_creators" : {
+          "$ref" : "#/definitions/nullableNonEmptyString"
         }
       },
       "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at", "content_blobs" ],
@@ -277,40 +257,11 @@
           "minLength" : 1
         },
         "updated_at" : {
-          "type" : "string",
-          "minLength" : 1
+          "type": "string",
+          "minLength": 1
         },
         "content_blobs" : {
-          "type" : "array",
-          "minItems" : 0,
-          "uniqueItems" : true,
-          "items" : {
-            "properties" : {
-              "original_filename" : {
-                "$ref" : "#/definitions/nullableNonEmptyString"
-              },
-              "url" : {
-                "$ref" : "#/definitions/nullableUriString"
-              },
-              "md5sum" : {
-                "$ref" : "#/definitions/nullableNonEmptyString"
-              },
-              "sha1sum" : {
-                "$ref" : "#/definitions/nullableNonEmptyString"
-              },
-              "content_type" : {
-                "$ref" : "#/definitions/nullableNonEmptyString"
-              },
-              "link" : {
-                "$ref" : "#/definitions/uriString"
-              },
-              "size" : {
-                "type" : "integer"
-              }
-            },
-            "required" : [ "original_filename", "url", "md5sum", "sha1sum", "content_type", "link", "size" ],
-            "additionalProperties" : false
-          }
+          "$ref" : "#/definitions/contentBlobsList"
         },
         "model_type": {
           "$ref": "#/definitions/nullableNonEmptyString"
@@ -323,6 +274,9 @@
         },
         "policy" : {
           "$ref" : "#/definitions/policy"
+        },
+        "other_creators" : {
+          "$ref" : "#/definitions/nullableNonEmptyString"
         }
       },
       "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at", "content_blobs", "model_type", "model_format", "environment" ],
@@ -1325,6 +1279,9 @@
                 },
                 "study" : {
                   "$ref" : "#/definitions/studySingletonReference"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "required" : [ "study" ],
@@ -1409,6 +1366,9 @@
                 },
                 "study" : {
                   "$ref" : "#/definitions/studySingletonReference"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "additionalProperties" : false
@@ -1538,6 +1498,138 @@
       "required" : [ "data", "jsonapi" ],
       "additionalProperties" : false
     },
+    "dataFilePost" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "type" : {
+              "$ref" : "#/definitions/dataFileType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "content_blobs" : {
+                  "$ref" : "#/definitions/contentBlobPlaceholdersList"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "required" : [ "title", "policy", "content_blobs" ],
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "assays" : {
+                  "$ref" : "#/definitions/assayReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "events" : {
+                  "$ref" : "#/definitions/eventReferencesList"
+                }
+              },
+              "required" : [ "projects" ],
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "type", "attributes", "relationships" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
+    "dataFilePatch" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
+            "type" : {
+              "$ref" : "#/definitions/dataFileType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "assays" : {
+                  "$ref" : "#/definitions/assayReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "events" : {
+                  "$ref" : "#/definitions/eventReferencesList"
+                }
+              },
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "id", "type" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
     "documentResponse" : {
       "type" : "object",
       "properties" : {
@@ -1599,6 +1691,126 @@
         }
       },
       "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
+    },
+    "documentPost" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "type" : {
+              "$ref" : "#/definitions/documentType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "content_blobs" : {
+                  "$ref" : "#/definitions/contentBlobPlaceholdersList"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "required" : [ "title", "policy", "content_blobs" ],
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "assays" : {
+                  "$ref" : "#/definitions/assayReferencesList"
+                }
+              },
+              "required" : [ "projects" ],
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "type", "attributes", "relationships" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
+    "documentPatch" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
+            "type" : {
+              "$ref" : "#/definitions/documentType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "assays" : {
+                  "$ref" : "#/definitions/assayReferencesList"
+                }
+              },
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "id", "type" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
       "additionalProperties" : false
     },
     "eventResponse" : {
@@ -1966,6 +2178,9 @@
                 },
                 "projects" : {
                   "$ref" : "#/definitions/projectReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "additionalProperties" : false
@@ -2017,6 +2232,9 @@
                 },
                 "projects" : {
                   "$ref" : "#/definitions/projectReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "required" : [ "projects" ],
@@ -2425,6 +2643,132 @@
         }
       },
       "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
+    },
+    "presentationPost" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "type" : {
+              "$ref" : "#/definitions/presentationType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "content_blobs" : {
+                  "$ref" : "#/definitions/contentBlobPlaceholdersList"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "required" : [ "title", "policy", "content_blobs" ],
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "events" : {
+                  "$ref" : "#/definitions/eventReferencesList"
+                }
+              },
+              "required" : [ "projects" ],
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "type", "attributes", "relationships" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
+    "presentationPatch" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
+            "type" : {
+              "$ref" : "#/definitions/presentationType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "events" : {
+                  "$ref" : "#/definitions/eventReferencesList"
+                }
+              },
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "id", "type" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
       "additionalProperties" : false
     },
     "programmeResponse" : {
@@ -2940,6 +3284,126 @@
       "required" : [ "data", "jsonapi" ],
       "additionalProperties" : false
     },
+    "sopPost" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "type" : {
+              "$ref" : "#/definitions/sopType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "content_blobs" : {
+                  "$ref" : "#/definitions/contentBlobPlaceholdersList"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "required" : [ "title", "policy", "content_blobs" ],
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "assays" : {
+                  "$ref" : "#/definitions/assayReferencesList"
+                }
+              },
+              "required" : [ "projects" ],
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "type", "attributes", "relationships" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
+    "sopPatch" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
+            "type" : {
+              "$ref" : "#/definitions/sopType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "tags" : {
+                  "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "title" : {
+                  "$ref" : "#/definitions/nonEmptyString"
+                },
+                "description" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "license" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "policy" : {
+                  "$ref" : "#/definitions/policy"
+                },
+                "other_creators" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                }
+              },
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "creators" : {
+                  "$ref" : "#/definitions/peopleReferenceList"
+                },
+                "projects" : {
+                  "$ref" : "#/definitions/projectReferencesList"
+                },
+                "assays" : {
+                  "$ref" : "#/definitions/assayReferencesList"
+                }
+              },
+              "additionalProperties" : false
+            }
+          },
+          "required" : [ "id", "type" ],
+          "additionalProperties" : false
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
     "studyResponse" : {
       "type" : "object",
       "properties" : {
@@ -3082,6 +3546,9 @@
                 },
                 "investigation" : {
                   "$ref" : "#/definitions/investigationSingletonReference"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "required" : [ "investigation" ],
@@ -3142,6 +3609,9 @@
                 },
                 "investigation" : {
                   "$ref" : "#/definitions/investigationSingletonReference"
+                },
+                "publications" : {
+                  "$ref" : "#/definitions/publicationReferencesList"
                 }
               },
               "additionalProperties" : false
@@ -3880,6 +4350,70 @@
           "type" : "string"
         }
       }
+    },
+    "contentBlobsList" : {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/contentBlob"
+      }
+    },
+    "contentBlobPlaceholdersList" : {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/contentBlobPlaceholder"
+      }
+    },
+    "contentBlobPlaceholder" : {
+      "properties": {
+        "original_filename": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "content_type": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        }
+      },
+      "required": [
+        "original_filename",
+        "content_type"
+      ],
+      "additionalProperties": false
+    },
+    "contentBlob" : {
+      "properties": {
+        "original_filename": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "url": {
+          "$ref": "#/definitions/nullableUriString"
+        },
+        "md5sum": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "sha1sum": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "content_type": {
+          "$ref": "#/definitions/nullableNonEmptyString"
+        },
+        "link": {
+          "$ref": "#/definitions/uriString"
+        },
+        "size": {
+          "$ref": "#/definitions/nullableInteger"
+        }
+      },
+      "required": [
+        "original_filename",
+        "url",
+        "md5sum",
+        "sha1sum",
+        "content_type",
+        "link",
+        "size"
+      ],
+      "additionalProperties": false
     }
   }
 }

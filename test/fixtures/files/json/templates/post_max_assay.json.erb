@@ -33,6 +33,14 @@
           "id": "<%=study_id%>",
           "type": "studies"
         }
+      },
+      "publications":{
+        "data": [
+          {
+            "id": "<%= Factory(:publication).id %>",
+            "type": "publications"
+          }
+        ]
       }
       <% unless creator_ids.nil? %>
     ,"creators": {

@@ -95,8 +95,9 @@ module AssaysHelper
   end
 
   def show_nels_button?(assay)
-    current_user && current_user.person && assay.can_edit? &&
-      current_user.person.projects.any? { |p| p.settings['nels_enabled'] } &&
-      assay.projects.any? { |p| p.settings['nels_enabled'] }
+    Seek::Config.nels_enabled &&
+        current_user && current_user.person && assay.can_edit? &&
+        current_user.person.projects.any? { |p| p.settings['nels_enabled'] } &&
+        assay.projects.any? { |p| p.settings['nels_enabled'] }
   end
 end

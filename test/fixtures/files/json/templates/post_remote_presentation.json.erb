@@ -1,0 +1,33 @@
+{
+  "data": {
+    "type": "presentations",
+    "attributes": {
+      "title": "A Remote Presentation",
+      "content_blobs": [
+        {
+          "url": "http://mockedlocation.com/txt_test.txt",
+          "original_filename": "txt_test.txt",
+          "content_type": "text/plain"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= @creator.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

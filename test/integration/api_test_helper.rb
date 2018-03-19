@@ -1,6 +1,16 @@
 module ApiTestHelper
   include AuthenticatedTestHelper
 
+  # Override me!
+  def populate_extra_attributes
+    {}.with_indifferent_access
+  end
+
+  # Override me!
+  def populate_extra_relationships
+    {}.with_indifferent_access
+  end
+
   def definitions_path
     File.join(Rails.root, 'public', '2010', 'json', 'rest',
               'definitions.json')
@@ -45,14 +55,14 @@ module ApiTestHelper
 
   def load_patch_template(hash)
     patch_file = File.join(Rails.root, 'test', 'fixtures',
-                                     'files', 'json', 'templates', "patch_#{@clz}.json.erb")
+                                     'files', 'json', 'templates', "patch_min_#{@clz}.json.erb")
     the_patch = ERB.new(File.read(patch_file))
     namespace = OpenStruct.new(hash)
     to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding }))
     return to_patch
   end
 
-  def validate_json_against_fragment (json, fragment)
+  def validate_json_against_fragment(json, fragment)
     if File.readable?(definitions_path)
       errors = JSON::Validator.fully_validate_json(definitions_path,
                                                    json,
@@ -83,7 +93,7 @@ module ApiTestHelper
         skip
       end
 
-      validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz}Post"
+      validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
 
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{@clz.classify}.count") do
@@ -92,7 +102,7 @@ module ApiTestHelper
         assert_response :success
       end
 
-      validate_json_against_fragment response.body, "#/definitions/#{@clz}Response"
+      validate_json_against_fragment response.body, "#/definitions/#{@clz.camelize(:lower)}Response"
 
       # content check
       h = JSON.parse(response.body)
@@ -100,15 +110,12 @@ module ApiTestHelper
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
       hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
 
-      if @to_post['data'].has_key? 'relationships'
+      if @to_post['data'].has_key?('relationships')
         hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
       end
-      begin
-        hash_comparison(populate_extra_attributes, h['data']['attributes'])
-        hash_comparison(populate_extra_relationships, h['data']['relationships'])
-      rescue NameError
-      end
 
+      hash_comparison(populate_extra_attributes, h['data']['attributes'])
+      hash_comparison(populate_extra_relationships, h['data']['relationships'])
     end
   end
 
@@ -178,42 +185,63 @@ module ApiTestHelper
   end
 
   def test_update
-    #fetch original object
-    obj_id = @to_patch['data']['id']
-    get "/#{@plural_clz}/#{obj_id}.json"
-    assert_response :success
-    original = JSON.parse(response.body)
+    begin
+      create_patch_values
+    rescue NameError
+    end
 
-    validate_json_against_fragment @to_patch.to_json, "#/definitions/#{@clz}Patch"
+    ['min', 'max'].each do |m|
+      if defined? @patch_values
+        @to_patch = load_template("patch_#{m}_#{@clz}.json.erb", @patch_values)
+      end
+      #puts "create, to_patch #{m}", @to_patch
 
-    assert_no_difference( "#{@clz.classify}.count") do
-      patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
+      if @to_patch.blank?
+        skip
+      end
+
+      #fetch original object
+      obj_id = @to_patch['data']['id']
+      get "/#{@plural_clz}/#{obj_id}.json"
       assert_response :success
+      #puts "after get: ", response.body
+      original = JSON.parse(response.body)
+
+      validate_json_against_fragment @to_patch.to_json, "#/definitions/#{@clz.camelize(:lower)}Patch"
+
+      assert_no_difference("#{@clz.classify}.count") do
+        patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
+        #puts "response body", response.body
+        assert_response :success
+      end
+
+      validate_json_against_fragment response.body, "#/definitions/#{@clz.camelize(:lower)}Response"
+
+      h = JSON.parse(response.body)
+
+      to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
+      to_ignore << 'updated_at'
+
+      # Check the changed attributes and relationships
+      if @to_patch['data'].key?('attributes')
+        hash_comparison(@to_patch['data']['attributes'], h['data']['attributes'])
+      end
+      if @to_patch['data'].key?('relationships')
+        hash_comparison(@to_patch['data']['relationships'], h['data']['relationships'])
+      end
+
+      # Check the original, unchanged attributes and relationships
+      if original['data'].key?('attributes') && @to_patch['data'].key?('attributes')
+        original_attributes = original['data']['attributes'].except(*(to_ignore + @to_patch['data']['attributes'].keys))
+        hash_comparison(original_attributes, h['data']['attributes'])
+      end
+
+      if original['data'].key?('relationships') && @to_patch['data'].key?('relationships')
+        original_relationships = original['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
+        hash_comparison(original_relationships, h['data']['relationships'])
+      end
     end
 
-    validate_json_against_fragment response.body, "#/definitions/#{@clz}Response"
-
-    h = JSON.parse(response.body)
-
-    to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes  :  []
-    # Check the changed attributes and relationships
-    if @to_patch['data'].key?('attributes')
-      hash_comparison(@to_patch['data']['attributes'], h['data']['attributes'])
-    end
-    if @to_patch['data'].key?('relationships')
-      hash_comparison(@to_patch['data']['relationships'], h['data']['relationships'])
-    end
-
-    # Check the original, unchanged attributes and relationships
-    if original['data'].key?('attributes') && @to_patch['data'].key?('attributes')
-      original_attributes = original['data']['attributes'].except(*(to_ignore + @to_patch['data']['attributes'].keys))
-      hash_comparison(original_attributes, h['data']['attributes'])
-    end
-
-    if original['data'].key?('relationships') && @to_patch['data'].key?('relationships')
-      original_relationships = original['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
-      hash_comparison(original_relationships, h['data']['relationships'])
-    end
   end
 
   def test_update_should_error_on_wrong_id
@@ -268,16 +296,20 @@ module ApiTestHelper
   # `key` is used to generate meaningful failure messages if the assertion fails.
   def deep_comparison(source, result, key)
     if source.is_a?(Hash)
+      assert result.is_a?(Hash), "#{key} was not a Hash"
       source.each do |sub_key, sub_value|
         actual = result.try(:[], sub_key)
         deep_comparison(sub_value, actual, "#{key}[#{sub_key}]")
       end
     elsif source.is_a?(Array)
+      assert result.is_a?(Array), "#{key} was not an Array"
       sorted_result = result.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
       sorted_source = source.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
       sorted_source.each_with_index do |sub_value, index|
         deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
       end
+    elsif source.nil?
+      assert_nil result
     else
       assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
     end
@@ -290,6 +322,14 @@ module ApiTestHelper
       obj = Factory(("#{@clz}").to_sym)
     end
     obj
+  end
+
+  ##
+  # Fetch errors with the given path from the given collection.
+  def fetch_errors(errors, path)
+    errors.select do |error|
+      error.try(:[], 'source').try(:[], 'pointer') == path
+    end
   end
 end
 

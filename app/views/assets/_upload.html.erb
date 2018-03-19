@@ -58,7 +58,7 @@ end
 
         <div class="row">
           <div class="col-sm-8">
-            <% if url_from_params && url_from_params.start_with?(Nels::Blob::NELS_BASE) %>
+            <% if Seek::Config.nels_enabled && url_from_params && url_from_params.start_with?(Seek::Config.nels_permalink_base) %>
                 <div class="form-group">
                   <%= text_field_tag 'content_blobs[][data_url]', url_from_params, id: 'data_url_field', class: 'form-control', readonly: :readonly -%>
                 </div>

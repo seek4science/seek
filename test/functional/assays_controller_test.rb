@@ -1383,6 +1383,22 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 1
   end
 
+  test 'should not show NeLS button if NeLS integration disabled' do
+    person = Factory(:person)
+    login_as(person.user)
+    project = person.projects.first
+    project.settings['nels_enabled'] = true
+    study = Factory(:study, investigation: Factory(:investigation, project_ids: [project.id]))
+    assay = Factory(:assay, contributor: person, study: study)
+
+    with_config_value(:nels_enabled, false) do
+      get :show, id: assay
+    end
+
+    assert_response :success
+    assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0
+  end
+
   test 'should not show NeLS button for non-NeLS' do
     person = Factory(:person)
     login_as(person.user)

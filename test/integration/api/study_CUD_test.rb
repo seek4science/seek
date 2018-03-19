@@ -12,22 +12,26 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     @investigation = Factory(:investigation)
     @investigation.title = 'Fred'
 
-    study = Factory(:study, policy: Factory(:public_policy))
-    study.contributor = @current_user.person
-    study.save
-
+    @study = Factory(:study, policy: Factory(:public_policy), contributor: @current_person)
     hash = {investigation_id: @investigation.id,
             r: ApiTestHelper.method(:render_erb) }
     @to_post = load_template("post_min_#{@clz}.json.erb", hash)
-
-    @to_patch = load_template("patch_#{@clz}.json.erb", {id: study.id})
   end
 
   def create_post_values
-      @post_values = {investigation_id: @investigation.id,
-                         person_id: @current_user.person.id,
-                         creator_ids: [@current_user.person.id],
-                         r: ApiTestHelper.method(:render_erb) }
+    @post_values = {investigation_id: @investigation.id,
+                    person_id: @current_user.person.id,
+                    creator_ids: [@current_user.person.id],
+                    r: ApiTestHelper.method(:render_erb) }
+  end
+
+  def create_patch_values
+    @patch_values = {id: @study.id,
+                     investigation_id: @study.investigation.id,
+                     person_id: @current_user.person.id,
+                     project_id: @study.projects.first.id,
+                     creator_ids: [@current_user.person.id],
+                     r: ApiTestHelper.method(:render_erb) }
   end
 
   def populate_extra_relationships
@@ -45,7 +49,6 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference('Study.count') do
       delete "/#{@plural_clz}/#{study.id}.json"
       assert_response :forbidden
-      puts response.body
     end
   end
 

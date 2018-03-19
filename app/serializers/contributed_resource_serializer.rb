@@ -43,6 +43,8 @@ class ContributedResourceSerializer < PCSSerializer
     blobs.map { |cb| convert_content_blob_to_json(cb) }
   end
 
+  attribute :other_creators
+
   def convert_content_blob_to_json(cb)
     path = polymorphic_path([cb.asset, cb])
     {

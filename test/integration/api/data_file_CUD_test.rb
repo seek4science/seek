@@ -19,10 +19,9 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_data_file.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
-  end
 
-  def populate_extra_attributes
-    {}
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @current_person)
+    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: data_file.id})
   end
 
   def populate_extra_relationships
@@ -126,5 +125,28 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     h = JSON.parse(response.body)
     # Check the changed attributes and relationships
     hash_comparison(@to_patch['data'], h['data'])
+  end
+
+  test 'returns sensible error objects' do
+    template_file = File.join(ApiTestHelper.template_dir, 'post_bad_data_file.json.erb')
+    template = ERB.new(File.read(template_file))
+    @to_post = JSON.parse(template.result(binding))
+
+    assert_no_difference("#{@clz.classify}.count") do
+      post "/#{@plural_clz}.json", @to_post
+      assert_response :unprocessable_entity
+    end
+
+    h = JSON.parse(response.body)
+    errors = h["errors"]
+
+    assert errors.any?
+    assert_equal "can't be blank", fetch_errors(errors, '/data/relationships/projects')[0]['detail']
+    assert_equal "can't be blank", fetch_errors(errors, '/data/attributes/title')[0]['detail']
+    policy_errors = fetch_errors(errors, '/data/attributes/policy').map { |p| p['detail'] }
+    assert_includes policy_errors, "permissions contributor can't be blank"
+    assert_includes policy_errors, "permissions access_type can't be blank"
+    refute fetch_errors(errors, '/data/attributes/description').any?
+    refute fetch_errors(errors, '/data/attributes/potato').any?
   end
 end

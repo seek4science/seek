@@ -10,25 +10,14 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     @plural_clz = @clz.pluralize
 
     p = Factory(:programme)
-    @to_patch = load_template("patch_#{@clz}.json.erb", {id: p.id})
+    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: p.id})
 
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
     @to_post = load_template("post_min_#{@clz}.json.erb", {title: "post programme"})
   end
 
   def create_post_values
-      @post_values = {title: "Post programme"}
-  end
-
-  # funding_codes are an Array in the readAPI, but a comma-separated string in POST/PATCH
-  def ignore_non_read_or_write_attributes
-    ['funding_codes']
-  end
-
-  def populate_extra_attributes()
-    extra_attributes = {}
-    extra_attributes[:funding_codes] = @to_post['data']['attributes']['funding_codes'].split(", ")
-    extra_attributes.with_indifferent_access
+    @post_values = {title: "Post programme"}
   end
 
   #normal user without admin rights

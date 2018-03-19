@@ -34,6 +34,18 @@ class NelsControllerTest < ActionController::TestCase
     assert flash[:error].include?('NeLS-enabled')
   end
 
+  test 'cannot get browser if NeLS integration disabled' do
+    assert @assay.can_edit?(@user)
+    assert @assay.projects.any? { |p| p.settings['nels_enabled'] }
+
+    with_config_value(:nels_enabled, false) do
+      get :index, assay_id: @assay.id
+    end
+
+    assert_redirected_to @assay
+    assert flash[:error].include?('integration')
+  end
+
   test 'cannot get browser for assay without edit permissions' do
     person = Factory(:person)
     login_as(person)
