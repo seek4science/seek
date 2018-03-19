@@ -15,6 +15,9 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
     @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
+    ModelType.where(title: 'Linear equations').first_or_create
+    ModelFormat.where(title: 'SBML').first_or_create
+    RecommendedModelEnvironment.where(title: 'JWS online').first_or_create
 
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_model.json.erb')
     template = ERB.new(File.read(template_file))
