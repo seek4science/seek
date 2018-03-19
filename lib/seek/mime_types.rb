@@ -56,9 +56,7 @@ module Seek
     end
 
     def mime_types_for_extension(extension)
-      mime_map.keys.select do |k|
-        mime_map[k][:extensions].include?(extension.try(:downcase))
-      end
+      extension_map[extension.try(:downcase)] || []
     end
 
     def mime_map
@@ -77,6 +75,21 @@ module Seek
       end
 
       @@mime_magic_map
+    end
+
+    # A map of MIME types for each extension
+    def extension_map
+      return @@extension_map if defined? @@extension_map
+      @@extension_map = {}.with_indifferent_access
+      mime_map.each do |key, value|
+        value[:extensions].each do |extension|
+          ext = extension.downcase
+          @@extension_map[ext] ||= []
+          @@extension_map[ext] << key
+        end
+      end
+
+      @@extension_map
     end
 
     protected
