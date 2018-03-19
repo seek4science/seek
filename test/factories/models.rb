@@ -118,6 +118,13 @@ Factory.define(:doc_model, parent: :model) do |f|
   end
 end
 
+Factory.define(:api_model, parent: :model) do |f|
+  f.after_create do |model|
+    model.content_blobs = [Factory.create(:blank_pdf_content_blob, asset: model, asset_version: model.version),
+                           Factory.create(:blank_xml_content_blob, asset: model, asset_version: model.version)]
+  end
+end
+
 # Model::Version
 Factory.define(:model_version, class: Model::Version) do |f|
   f.association :model

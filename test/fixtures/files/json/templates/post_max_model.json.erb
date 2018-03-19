@@ -1,0 +1,69 @@
+{
+  "data": {
+    "type": "models",
+    "attributes": {
+      "title": "A Maximal Model",
+      "description": "This is the description",
+      "tags": ["tag1", "tag2"],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "content_blobs": [
+        {
+          "original_filename": "docs.pdf",
+          "content_type": "application/pdf"
+        },
+        {
+          "original_filename": "the_model.xml",
+          "content_type": "application/xml"
+        }
+      ],
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource_id": "<%= @project.id %>",
+            "resource_type": "projects",
+            "access": "edit"
+          }
+        ]
+      },
+      "model_type": "Linear equations",
+      "model_format": "SBML",
+      "environment": "JWS Online"
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= @creator.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= @assay.id %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= @publication.id %>",
+            "type": "publications"
+          }
+        ]
+      }
+    }
+  }
+}

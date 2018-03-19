@@ -1,0 +1,60 @@
+{
+  "data": {
+    "type": "models",
+    "id": "<%= id %>",
+    "attributes": {
+      "title": "A Maximally Patched Model",
+      "description": "A report about the thing that happened",
+      "tags": ["tag1", "tag2", "tag3"],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource_id": "<%= @project.id %>",
+            "resource_type": "projects",
+            "access": "edit"
+          }
+        ]
+      },
+      "model_type": "Linear equations",
+      "model_format": "SBML",
+      "environment": "JWS Online"
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= @creator.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= @assay.id %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= @publication.id %>",
+            "type": "publications"
+          }
+        ]
+      }
+    }
+  }
+}

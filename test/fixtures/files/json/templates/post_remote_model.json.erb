@@ -1,0 +1,34 @@
+{
+  "data": {
+    "type": "models",
+    "attributes": {
+      "title": "A Remote Model",
+      "content_blobs": [
+        {
+          "url": "http://mockedlocation.com/txt_test.txt"
+        },
+        {
+          "url": "http://mockedlocation.com/model.xml"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= @creator.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

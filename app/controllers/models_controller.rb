@@ -204,10 +204,10 @@ class ModelsController < ApplicationController
 
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
+        format.json {render json: @model}
       else
-        format.html {
-          render :action => "edit"
-        }
+        format.html { render action: 'edit' }
+        format.json { render json: json_api_errors(@model), status: :unprocessable_entity }
       end
     end
   end
