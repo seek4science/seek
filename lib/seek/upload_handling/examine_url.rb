@@ -35,7 +35,7 @@ module Seek
         when 404
           @error = true
           @error_msg = 'Nothing can be found at that URL. Please check the address and try again'
-        when 700
+        when 490
           @error = true
           @error_msg = 'That URL is inaccessible. Please check the address and try again'
         else

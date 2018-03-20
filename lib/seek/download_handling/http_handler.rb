@@ -55,7 +55,7 @@ module Seek
             end
           end
         rescue PrivateAddressCheck::PrivateConnectionAttemptedError
-          code = 404
+          code = 490 # A made up error code to be handled internally by SEEK
         end
 
         file_name ||= determine_filename_from_url(@url)
