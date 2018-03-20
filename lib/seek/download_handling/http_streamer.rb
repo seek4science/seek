@@ -23,7 +23,7 @@ module Seek
       private
 
       def get_uri(uri, redirect_count, block)
-        PrivateAddressCheck.only_public_connections do
+        p = proc do
           Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
             http.request(Net::HTTP::Get.new(uri)) do |response|
               if response.code == '200'
@@ -35,6 +35,12 @@ module Seek
               end
             end
           end
+        end
+
+        if Seek::Config.allow_private_address_access
+          p.call
+        else
+          PrivateAddressCheck.only_public_connections { p.call }
         end
       end
 
