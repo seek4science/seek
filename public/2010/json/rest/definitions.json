@@ -107,6 +107,48 @@
       "required" : [ "base_url", "api_version" ],
       "additionalProperties" : false
     },
+    "policy" : {
+      "type" : "object",
+      "properties" : {
+        "access" : {
+          "$ref" : "#/definitions/accessType"
+        },
+        "permissions" : {
+          "type" : "array",
+          "minItems" : 0,
+          "uniqueItems" : true,
+          "items" : {
+            "properties" : {
+              "resource_type": {
+                "$ref": "#/definitions/nonEmptyString"
+              },
+              "resource_id": {
+                "$ref": "#/definitions/nonEmptyString"
+              },
+              "access": {
+                "$ref": "#/definitions/accessType"
+              }
+            },
+            "required" : [ "resource_type", "resource_id", "access" ],
+            "additionalProperties" : false
+          }
+          }
+        },
+      "required" : [ "access", "permissions"],
+      "additionalProperties" : false
+    },
+    "accessType" : {
+      "type": "string",
+      "minLength": 1,
+      "enum": ["manage", "edit", "download", "view", "no_access"
+      ]
+    },
+    "anyType" : {
+      "type" : "string",
+      "minLength" : 1,
+      "enum" : [ "assays", "content_blobs", "data_files", "documents", "events", "models", "organisms", "people", "presentations", "programmes", "projects", "publications", "sample_types", "sops", "studies" ]
+    },
+
     "contributedTypeAttributes" : {
       "type" : "object",
       "properties" : {
@@ -171,42 +213,6 @@
       },
       "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at", "content_blobs" ],
       "additionalProperties" : false
-    },
-    "policy" : {
-      "type" : "object",
-      "properties" : {
-        "access" : {
-          "$ref" : "#/definitions/accessType"
-        },
-        "permissions" : {
-          "type" : "array",
-          "minItems" : 0,
-          "uniqueItems" : true,
-          "items" : {
-            "properties" : {
-              "resource_type": {
-                "$ref": "#/definitions/nonEmptyString"
-              },
-              "resource_id": {
-                "$ref": "#/definitions/nonEmptyString"
-              },
-              "access": {
-                "$ref": "#/definitions/accessType"
-              }
-            },
-            "required" : [ "resource_type", "resource_id", "access" ],
-            "additionalProperties" : false
-          }
-          }
-        },
-      "required" : [ "access", "permissions"],
-      "additionalProperties" : false
-    },
-    "accessType" : {
-      "type": "string",
-      "minLength": 1,
-      "enum": ["manage", "edit", "download", "view", "no_access"
-      ]
     },
     "modelAttributes" : {
       "type" : "object",
@@ -281,11 +287,6 @@
       },
       "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at", "content_blobs", "model_type", "model_format", "environment" ],
       "additionalProperties" : false
-    },
-    "anyType" : {
-      "type" : "string",
-      "minLength" : 1,
-      "enum" : [ "assays", "content_blobs", "data_files", "documents", "events", "models", "organisms", "people", "presentations", "programmes", "projects", "publications", "sample_types", "sops", "studies" ]
     },
 
     "assayType" : {
