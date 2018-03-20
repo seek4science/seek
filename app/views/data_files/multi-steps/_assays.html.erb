@@ -17,7 +17,7 @@
 
       <%# New Assay %>
       <div role="tabpanel" class="tab-pane" id="new-assay">
-        <%= hidden_field_tag 'assay[assay_class_id]', @assay.assay_class_id %>
+        <%= hidden_field_tag 'assay[assay_class_id]', @assay.assay_class_id || AssayClass.experimental.id %>
         <div class="form-group">
           <label>
             <%= check_box_tag 'assay[create_assay]' %>
