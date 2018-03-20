@@ -29,7 +29,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     extra_relationships.with_indifferent_access
   end
 
-  test 'can add content to API-created data file' do
+  test 'can add content to API-created presentation' do
     pres = Factory(:api_pdf_presentation, contributor: @current_person)
 
     assert pres.content_blob.no_content?
@@ -48,7 +48,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     assert blob.file_size > 0
   end
 
-  test 'cannot add content to API-created data file without permission' do
+  test 'cannot add content to API-created presentation without permission' do
     pres = Factory(:api_pdf_presentation, policy: Factory(:public_download_and_no_custom_sharing)) # Created by someone who is not currently logged in
 
     assert pres.content_blob.no_content?
@@ -65,7 +65,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     assert blob.no_content?
   end
 
-  test 'cannot add content to API-created data file that already has content' do
+  test 'cannot add content to API-created presentation that already has content' do
     pres = Factory(:presentation, contributor: @current_person)
 
     refute pres.content_blob.no_content?
@@ -83,7 +83,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     assert blob.file_size > 0
   end
 
-  test 'can create data file with remote content' do
+  test 'can create presentation with remote content' do
     stub_request(:get, 'http://mockedlocation.com/txt_test.txt').to_return(body: File.new("#{Rails.root}/test/fixtures/files/txt_test.txt"),
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/txt_test.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
@@ -104,24 +104,6 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
 
     hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
     hash_comparison(populate_extra_relationships, h['data']['relationships'])
-  end
-
-  test 'can patch max data file' do
-    pres = Factory(:presentation, contributor: @current_person)
-    id = pres.id
-
-    patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_max_presentation.json.erb")
-    the_patch = ERB.new(File.read(patch_file))
-    @to_patch = JSON.parse(the_patch.result(binding))
-
-    assert_no_difference( "#{@clz.classify}.count") do
-      patch "/#{@plural_clz}/#{pres.id}.json", @to_patch
-      assert_response :success
-    end
-
-    h = JSON.parse(response.body)
-    # Check the changed attributes and relationships
-    hash_comparison(@to_patch['data'], h['data'])
   end
 
   test 'returns sensible error objects' do

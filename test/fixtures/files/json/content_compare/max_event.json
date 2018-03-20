@@ -18,6 +18,14 @@
       "end_date": "2017-01-01T00:22:00.000Z"
     },
     "relationships": {
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
       "projects": {
         "data": [
           {

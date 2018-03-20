@@ -64,6 +64,22 @@ module Seek
 
           programme_ids: ->(value) {
             value.try(:first)
+          },
+
+          model_type: ->(value) {
+            ModelType.find_by_title(value).try(:id)
+          },
+
+          model_format: ->(value) {
+            ModelFormat.find_by_title(value).try(:id)
+          },
+
+          environment: ->(value) {
+            RecommendedModelEnvironment.find_by_title(value).try(:id)
+          },
+
+          data_file_ids: ->(value) {
+            value.map { |i| { 'id' => i }.with_indifferent_access }
           }
       }.freeze
 
@@ -76,12 +92,16 @@ module Seek
           assay_class: :assay_class_id,
           assay_type: :assay_type_uri,
           technology_type: :technology_type_uri,
-          programme_ids: :programme_id
+          programme_ids: :programme_id,
+          model_type: :model_type_id,
+          model_format: :model_format_id,
+          environment: :recommended_environment_id,
+          data_file_ids: :data_files,
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
       ELEVATE = %i[assay_organism_ids tag_list expertise_list tool_list policy_attributes content_blobs
-       assay_ids related_publication_ids revision_comments creators].freeze
+       assay_ids related_publication_ids revision_comments creators data_files].freeze
 
       def initialize(controller_name)
         @controller_name = controller_name

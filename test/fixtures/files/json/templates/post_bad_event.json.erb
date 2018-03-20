@@ -1,0 +1,42 @@
+{
+  "data": {
+    "type": "events",
+    "attributes": {
+      "title": "",
+      "content_blobs": [
+        {
+          "original_filename": "a_pdf_file.pdf",
+          "content_type": "application/pdf"
+        }
+      ],
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource_id": "<%= Project.maximum(:id) + 10 %>",
+            "resource_type": "projects",
+            "access": "golf"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "abcdef",
+            "type": "people"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= Assay.maximum(:id) + 10 %>",
+            "type": "assays"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -48,22 +48,4 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     refute blob.no_content?
     assert blob.file_size > 0
   end
-
-  test 'can patch max sop' do
-    sop = Factory(:sop, contributor: @current_person)
-    id = sop.id
-
-    patch_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', "patch_max_sop.json.erb")
-    the_patch = ERB.new(File.read(patch_file))
-    @to_patch = JSON.parse(the_patch.result(binding))
-
-    assert_no_difference( "#{@clz.classify}.count") do
-      patch "/#{@plural_clz}/#{sop.id}.json", @to_patch
-      assert_response :success
-    end
-
-    h = JSON.parse(response.body)
-    # Check the changed attributes and relationships
-    hash_comparison(@to_patch['data'], h['data'])
-  end
 end

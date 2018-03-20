@@ -271,6 +271,11 @@ Factory.define(:blank_content_blob, class: ContentBlob) do |f|
 end
 
 Factory.define(:blank_pdf_content_blob, parent: :blank_content_blob) do |f|
-  f.original_filename 'sample-type-populated.xlsx'
-  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.original_filename 'a_pdf_file.pdf'
+  f.content_type 'application/pdf'
+end
+
+Factory.define(:blank_xml_content_blob, parent: :blank_content_blob) do |f|
+  f.original_filename 'model.xml'
+  f.content_type 'application/xml'
 end
