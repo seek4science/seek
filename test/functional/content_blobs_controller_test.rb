@@ -192,15 +192,20 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'examine url localhost' do
-    # Need to allow the request through so that `private_address_check` can catch it.
-    VCR.turned_off do
-      xml_http_request :get, :examine_url, data_url: 'http://localhost/secrets'
-      assert_response :success
-      assert @response.body.include?('URL is inaccessible')
-      assert @response.body.include?('disallow_copy_option();')
-      assert assigns(:error)
-      assert assigns(:error_msg)
-      refute assigns(:unauthorized)
+    begin
+      # Need to allow the request through so that `private_address_check` can catch it.
+      WebMock.allow_net_connect!
+      VCR.turned_off do
+        xml_http_request :get, :examine_url, data_url: 'http://localhost/secrets'
+        assert_response :success
+        assert @response.body.include?('URL is inaccessible')
+        assert @response.body.include?('disallow_copy_option();')
+        assert assigns(:error)
+        assert assigns(:error_msg)
+        refute assigns(:unauthorized)
+      end
+    ensure
+      WebMock.disable_net_connect!(allow_localhost: true)
     end
   end
 

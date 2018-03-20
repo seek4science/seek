@@ -769,17 +769,23 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test "won't retrieve remote content from internal network" do
-    VCR.turned_off do
-      assert PrivateAddressCheck.resolves_to_private_address?('localhost')
+    begin
+      # Need to allow the request through so that `private_address_check` can catch it.
+      WebMock.allow_net_connect!
+      VCR.turned_off do
+        assert PrivateAddressCheck.resolves_to_private_address?('localhost')
 
-      blob = Factory(:url_content_blob, url: 'http://localhost/secrets')
-      assert !blob.file_exists?
+        blob = Factory(:url_content_blob, url: 'http://localhost/secrets')
+        assert !blob.file_exists?
 
-      assert_raise PrivateAddressCheck::PrivateConnectionAttemptedError do
-        blob.retrieve
+        assert_raise PrivateAddressCheck::PrivateConnectionAttemptedError do
+          blob.retrieve
+        end
+
+        assert !blob.file_exists?
       end
-
-      assert !blob.file_exists?
+    ensure
+      WebMock.disable_net_connect!(allow_localhost: true)
     end
   end
 
