@@ -2,6 +2,49 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "Reusable definitions",
   "definitions": {
+    "error" : {
+      "type" : "object",
+      "properties" : {
+        "id": {
+          "type" : "string"
+        },
+        "status": {
+          "type" : "string"
+        },
+        "code": {
+          "type" : "string"
+        },
+        "title": {
+          "type" : "string"
+        },
+        "detail": {
+          "type" : "string"
+        },
+        "source": {
+          "type" : "object",
+          "properties" : {
+            "pointer" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "errors_array" : {
+      "type" : "array",
+      "minItems" : 0,
+      "items" : {
+        "$ref": "#/definitions/error"
+      }
+    },
+    "errors" : {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/errors_array"
+        }
+      }
+    },
     "dateTimeString" : {
       "type" : "string",
       "minLength" : 1,

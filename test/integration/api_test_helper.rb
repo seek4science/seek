@@ -131,6 +131,7 @@ module ApiTestHelper
     end
     get "/#{@plural_clz}/#{obj.id}.json"
     assert_response :not_found
+    validate_json_against_fragment response.body, '#/definitions/errors'
   end
 
   def test_unauthorized_user_cannot_update
@@ -140,6 +141,7 @@ module ApiTestHelper
     @to_post["data"]["attributes"]["title"] = "updated by an unauthorized"
     patch "/#{@plural_clz}/#{obj.id}.json", @to_post
     assert_response :forbidden
+    validate_json_against_fragment response.body, '#/definitions/errors'
   end
 
   def test_unauthorized_user_cannot_delete
@@ -148,6 +150,7 @@ module ApiTestHelper
     assert_no_difference("#{@clz.classify.constantize}.count") do
       delete "/#{@plural_clz}/#{obj.id}.json"
       assert_response :forbidden
+      validate_json_against_fragment response.body, '#/definitions/errors'
     end
   end
 
@@ -158,7 +161,8 @@ module ApiTestHelper
     assert_no_difference ("#{@clz.classify.constantize}.count") do
       post "/#{@plural_clz}.json", post_clone
       assert_response :unprocessable_entity
-      assert_match "A POST request is not allowed to specify an id", response.body
+      validate_json_against_fragment response.body, '#/definitions/errors'
+      assert_match 'A POST request is not allowed to specify an id', response.body
     end
   end
 
@@ -169,6 +173,7 @@ module ApiTestHelper
     assert_no_difference ("#{@clz.classify.constantize}.count") do
       post "/#{@plural_clz}.json", post_clone
       assert_response :unprocessable_entity
+      validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "The specified data:type does not match the URL's object (#{post_clone['data']['type']} vs. #{@plural_clz})", response.body
     end
   end
@@ -180,6 +185,7 @@ module ApiTestHelper
     assert_no_difference ("#{@clz.classify.constantize}.count") do
       post "/#{@plural_clz}.json", post_clone
       assert_response :unprocessable_entity
+      validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "A POST/PUT request must specify a data:type", response.body
     end
   end
@@ -252,6 +258,7 @@ module ApiTestHelper
     assert_no_difference ("#{@clz.classify.constantize}.count") do
       put "/#{@plural_clz}/#{obj.id}.json", to_patch
       assert_response :unprocessable_entity
+      validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "id specified by the PUT request does not match object-id in the JSON input", response.body
     end
   end
@@ -264,6 +271,7 @@ module ApiTestHelper
     assert_no_difference ("#{@clz.classify.constantize}.count") do
       put "/#{@plural_clz}/#{obj.id}.json", to_patch
       assert_response :unprocessable_entity
+      validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "The specified data:type does not match the URL's object (#{to_patch['data']['type']} vs. #{@plural_clz})", response.body
     end
   end
@@ -276,6 +284,7 @@ module ApiTestHelper
     assert_no_difference ("#{@clz.classify.constantize}.count") do
       put "/#{@plural_clz}/#{obj.id}.json", to_patch
       assert_response :unprocessable_entity
+      validate_json_against_fragment response.body, '#/definitions/errors'
       assert_match "A POST/PUT request must specify a data:type", response.body
     end
   end
