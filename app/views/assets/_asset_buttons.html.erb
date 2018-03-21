@@ -5,7 +5,7 @@
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => asset } -%>
 
 <% if asset.is_a?(DataFile) %>
-    <% if asset.content_blob.nels? %>
+    <% if asset.nels? %>
         <%= button_link_to('Fetch sample metadata', 'download', retrieve_nels_sample_metadata_data_file_path(asset), method: :post) %>
     <% end %>
 

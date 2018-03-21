@@ -182,3 +182,7 @@ about_page:
 nels_enabled:
 nels_client_id:
 nels_client_secret:
+nels_api_url:
+nels_oauth_url:
+nels_permalink_base:
+allow_private_address_access:

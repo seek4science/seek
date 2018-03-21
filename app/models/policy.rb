@@ -116,7 +116,7 @@ class Policy < ActiveRecord::Base
       if policy_params
         # Set attributes on the policy
         policy.access_type = policy_params[:access_type]
-        if policy.access_type > Policy::NO_ACCESS
+        if policy.access_type.nil? || policy.access_type > Policy::NO_ACCESS
           policy.sharing_scope = nil # This field should not be used anymore
         end
 
@@ -242,7 +242,7 @@ class Policy < ActiveRecord::Base
   end
 
   def public?
-    access_type > Policy::NO_ACCESS && sharing_scope != Policy::ALL_USERS
+    access_type && access_type > Policy::NO_ACCESS && sharing_scope != Policy::ALL_USERS
   end
 
   # return the hash: key is access_type, value is the array of people

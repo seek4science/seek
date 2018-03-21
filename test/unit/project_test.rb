@@ -788,6 +788,16 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.settings['nels_enabled']
   end
 
+  test 'does not use global defaults for project settings' do
+    project = Factory(:project)
+
+    assert Settings.defaults.key?('nels_enabled')
+
+    assert_nil Settings.for(project).fetch('nels_enabled')
+
+    assert_nil project.settings['nels_enabled']
+  end
+
   test 'stores encrypted project settings' do
     project = Factory(:project)
 

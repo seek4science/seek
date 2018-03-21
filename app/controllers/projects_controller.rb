@@ -182,7 +182,7 @@ class ProjectsController < ApplicationController
         format.json { render json: @project }
       else
         format.html { render action: 'new' }
-        format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
       end
     end
   end
@@ -212,7 +212,7 @@ class ProjectsController < ApplicationController
           else
             format.html { render action: 'edit' }
             format.xml  { render xml: @project.errors, status: :unprocessable_entity }
-            format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
+            format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
           end
         end
       end
@@ -352,17 +352,6 @@ class ProjectsController < ApplicationController
     end
 
     params.require(:project).permit(permitted_params)
-  end
-
-  def tweak_json_params
-    if params[:project][:programme_ids].present?
-      if params[:project][:programme_ids].empty?
-        params[:project][:programme_id] = nil
-      else
-        params[:project][:programme_id] = params[:project][:programme_ids][0]
-      end
-      params[:project].delete :programme_ids
-    end
   end
 
   def add_and_remove_members_and_institutions

@@ -45,6 +45,8 @@ class ContentBlob < ActiveRecord::Base
 
   delegate :read, :close, :rewind, :path, to: :file
 
+  CHUNK_SIZE = 2 ** 12
+
   acts_as_fleximage do
     image_directory Seek::Config.temporary_filestore_path + '/image_assets'
     use_creation_date_based_directories false
@@ -220,18 +222,14 @@ class ContentBlob < ActiveRecord::Base
     !remote_content_handler
   end
 
+  def no_content?
+    (!file_size || file_size == 0) && url.blank?
+  end
+
   private
 
   def remote_headers
-    if @headers
-      @headers
-    else
-      begin
-        remote_content_handler.info
-      rescue
-        {}
-      end
-    end
+    @headers ||= (remote_content_handler.info rescue {})
   end
 
   def dump_data_object_to_file
@@ -248,14 +246,16 @@ class ContentBlob < ActiveRecord::Base
     raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
     return unless @tmp_io_object
 
-    if @tmp_io_object.is_a?(StringIO)
-      @tmp_io_object.rewind
-      File.open(filepath, 'wb+') do |f|
-        f.write @tmp_io_object.read
-      end
-    else
+    if @tmp_io_object.respond_to?(:path)
       @tmp_io_object.flush if @tmp_io_object.respond_to? :flush
       FileUtils.mv @tmp_io_object.path, filepath
+    else
+      @tmp_io_object.rewind
+      File.open(filepath, 'wb+') do |f|
+        until (chunk = @tmp_io_object.read(CHUNK_SIZE)).nil?
+          f.write(chunk)
+        end
+      end
     end
     @tmp_io_object = nil
   end

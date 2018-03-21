@@ -81,7 +81,7 @@ class InvestigationsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :action => "new" }
-        format.json { render json: {error: @investigation.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@investigation), status: :unprocessable_entity }
       end
     end
 
@@ -121,7 +121,7 @@ class InvestigationsController < ApplicationController
           format.json {render json: @investigation}
         else
           format.html { render :action => "edit" }
-          format.json { render json: {error: @investigation.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+          format.json { render json: json_api_errors(@investigation), status: :unprocessable_entity }
         end
       end
   end

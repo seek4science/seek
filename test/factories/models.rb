@@ -31,6 +31,7 @@ Factory.define(:max_model, class: Model) do |f|
                                           asset: model,
                                           asset_version: model.version)] if model.content_blobs.blank?
   end
+  f.other_creators 'Blogs, Joe'
 end
 
 Factory.define(:model_2_files, class: Model) do |f|
@@ -114,6 +115,13 @@ end
 Factory.define(:doc_model, parent: :model) do |f|
   f.after_create do |model|
     model.content_blobs = [Factory.create(:doc_content_blob, asset: model, asset_version: model.version)]
+  end
+end
+
+Factory.define(:api_model, parent: :model) do |f|
+  f.after_create do |model|
+    model.content_blobs = [Factory.create(:blank_pdf_content_blob, asset: model, asset_version: model.version),
+                           Factory.create(:blank_xml_content_blob, asset: model, asset_version: model.version)]
   end
 end
 

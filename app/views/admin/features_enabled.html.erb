@@ -76,6 +76,12 @@
                                "NeLS enabled", "Whether support for #{t('project').pluralize} to connect to NeLS is enabled.",
                                onchange: toggle_appear_javascript('nels_block')) %>
     <div id="nels_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.nels_enabled -%>">
+      <%= admin_text_setting(:nels_api_url, Seek::Config.nels_api_url,
+                             'NeLS API endpoint', 'The base endpoint for the NeLS API that SEEK should connect to.') %>
+      <%= admin_text_setting(:nels_oauth_url, Seek::Config.nels_oauth_url,
+                             'NeLS OAuth endpoint', 'The base endpoint for the NeLS OAuth provider that SEEK will authenticate through when connecting to the NeLS API.') %>
+      <%= admin_text_setting(:nels_permalink_base, Seek::Config.nels_permalink_base,
+                             'NeLS Permalink Base', 'The base URL for permalinks that will be generated for NeLS datasets that are referred to from SEEK.') %>
       <%= admin_text_setting(:nels_client_id, Seek::Config.nels_client_id,
                              'NeLS OAuth client ID', 'The ID for this application to authenticate users through the NeLS OAuth provider.') %>
       <%= admin_text_setting(:nels_client_secret, Seek::Config.nels_client_secret,

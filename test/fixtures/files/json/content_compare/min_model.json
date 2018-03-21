@@ -27,7 +27,8 @@
       "content_blobs": null,
       "model_type": null,
       "model_format": null,
-      "environment": null
+      "environment": null,
+      "other_creators": null
     },
     "relationships": {
       "creators": {

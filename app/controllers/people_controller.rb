@@ -190,7 +190,7 @@ class PeopleController < ApplicationController
       else
         format.html { render redirect_action }
         format.xml { render xml: @person.errors, status: :unprocessable_entity }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
   end
@@ -228,7 +228,7 @@ class PeopleController < ApplicationController
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @person.errors, status: :unprocessable_entity }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
   end

@@ -142,14 +142,7 @@ class DataFilesController < ApplicationController
   end
 
   def create
-    if params[:data_file].blank? && !params[:datafile].blank?
-      params[:data_file] = params[:datafile]
-    end
-
-     if params.key?(:content)
-        params[:content_blobs] = params[:content]["data"] #Why a string?
-     end
-      @data_file = DataFile.new(data_file_params.except!(:content))
+    @data_file = DataFile.new(data_file_params)
 
     if handle_upload_data
       update_sharing_policies(@data_file)
@@ -180,17 +173,14 @@ class DataFilesController < ApplicationController
             assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
             update_assay_assets(@data_file, assay_ids, relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
-            format.json { render json: @data_file}
+            format.json { render json: @data_file }
           end
-      end
+        end
       else
         respond_to do |format|
-          format.html do
-            render action: 'new'
-          end
-          format.json {render json: "{}" } #fix
+          format.html { render action: 'new' }
+          format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
         end
-
       end
     else
       handle_upload_data_failure
@@ -209,13 +199,9 @@ class DataFilesController < ApplicationController
   end
 
   def update
-
-    if params[:data_file].empty? && !params[:datafile].empty?
-      params[:data_file] = params[:datafile]
-    end
     @data_file.attributes = data_file_params.except!(:content)
 
-    update_annotations(params[:tag_list], @data_file)
+    update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_scales @data_file
 
     respond_to do |format|
@@ -232,10 +218,8 @@ class DataFilesController < ApplicationController
         format.html { redirect_to data_file_path(@data_file) }
         format.json {render json: @data_file}
       else
-        format.html do
-          render action: 'edit'
-        end
-        format.json {} #to be decided
+        format.html { render action: 'edit' }
+        format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
       end
     end
   end

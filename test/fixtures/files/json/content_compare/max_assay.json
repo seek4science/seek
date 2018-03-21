@@ -15,6 +15,7 @@
         "Assay-tag4",
         "Assay-tag5"
       ],
+      "other_creators":  "Anonymous creator",
       "title": "A Maximal Assay",
       "description": "A Western Blot Assay",
       "assay_class": {

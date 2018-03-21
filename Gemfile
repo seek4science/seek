@@ -121,6 +121,8 @@ gem 'responders', '~> 2.0'
 
 gem 'rack-attack', '~> 5.0.1'
 
+gem 'private_address_check'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
@@ -155,7 +157,8 @@ end
 
 group :test do
   gem 'test_after_commit'
-  gem 'ruby-prof', '~> 0.15.9'
+  gem 'ruby-prof', '>= 0.16.0'
+  gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest'
   gem 'minitest-reporters'
