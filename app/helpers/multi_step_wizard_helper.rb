@@ -11,11 +11,19 @@ module MultiStepWizardHelper
       content_tag(:button,' ',class:'multi-step-end-icon')
   end
 
-  def multi_step_back_buttons
+  def multi_step_start_button
+    content_tag(:button,'Start',class:'multi-step-start-button btn btn-default')
+  end
+
+  def multi_step_end_button
+    content_tag(:button,'End',class:'multi-step-end-button btn btn-default')
+  end
+
+  def multi_step_back_button
     content_tag(:button,'Back',class:'multi-step-back-button btn btn-default')
   end
 
-  def multi_step_forward_buttons
+  def multi_step_forward_button
     content_tag(:button,'Next',class:'multi-step-next-button btn btn-primary')
   end
 

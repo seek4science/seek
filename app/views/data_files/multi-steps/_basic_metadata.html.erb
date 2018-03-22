@@ -18,6 +18,7 @@
   <%= render :seek_partial => "assets/select_tags", locals: {collapsed: true} if DataFile.is_taggable? %>
   <%= cancel_button(data_files_path) -%>
   <div class="multi-step-buttons">
-    <%= multi_step_forward_buttons %>
+    <%= multi_step_forward_button %>
+    <%= multi_step_end_button %>
   </div>
 </div>

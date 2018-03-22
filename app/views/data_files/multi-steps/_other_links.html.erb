@@ -7,12 +7,14 @@
     <%= render :partial => "assets/associate_event", :locals => {:resource => @data_file, collapsed: false} -%>
   <% end -%>
   <div class="multi-step-buttons">
-    <%= multi_step_back_buttons %>
+    <%= multi_step_start_button %>
+    <%= multi_step_back_button %>
+    <%= submit_tag "Create",
+                   :id => "data_file_submit_btn",
+                   :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
+                   :class => 'btn btn-primary' -%>
   </div>
-  <%= submit_tag "Create",
-                 :id => "data_file_submit_btn",
-                 :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
-                 :class => 'btn btn-primary' -%>
+
   <%= cancel_button(data_files_path) -%>
   <%= preview_permission_popup_link(@data_file) -%>
 </div>
