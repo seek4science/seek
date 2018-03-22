@@ -116,7 +116,7 @@ class PublicationsController < ApplicationController
         study_ids = params[:study_ids] || []
         assay_ids = params[:assay_ids] || []
         data_files = params[:data_files] || []
-        model_ids = params[:publication][:model_ids].reject(&:blank?) || []
+        model_ids = (params[:publication][:model_ids] || []).reject(&:blank?)
 
         create_or_update_associations investigation_ids, 'Investigation', 'view'
         create_or_update_associations study_ids, 'Study', 'view'
@@ -551,17 +551,25 @@ class PublicationsController < ApplicationController
   end
 
   def create_or_update_associations(asset_ids, asset_type, required_action)
+    puts "C"
+    puts "#{asset_type}"
+    pp asset_ids
     asset_ids.each do |id|
       asset = asset_type.constantize.find_by_id(id)
+      puts 'yep'
       if asset && asset.send("can_#{required_action}?")
+        puts 'yeppers'
         @publication.associate(asset)
       end
     end
+
+    pp @publication.investigations
     # Destroy asset relationship that aren't needed
     associate_relationships = Relationship.where(other_object_id: @publication.id, subject_type: asset_type)
     associate_relationships.each do |associate_relationship|
       asset = associate_relationship.subject
       if asset.send("can_#{required_action}?") && !asset_ids.include?(asset.id.to_s)
+        puts 'destroy'
         associate_relationship.destroy
       end
     end
