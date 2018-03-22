@@ -186,6 +186,7 @@ module AssetsHelper
   end
 
   def create_button(opts)
-    submit_tag('Upload and Save', opts.merge({ 'data-upload-button' => '' }))
+    text = opts.delete(:button_text) || 'Upload and Save'
+    submit_tag(text, opts.merge({ 'data-upload-button' => '' }))
   end
 end
