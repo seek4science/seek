@@ -38,7 +38,7 @@ class Settings < ActiveRecord::Base
   def self.destroy(var_name)
     var_name = var_name.to_s
     if self[var_name]
-      target(var_name).destroy
+      fetch(var_name).destroy
       true
     else
       raise SettingNotFound, "Setting variable \"#{var_name}\" not found"
@@ -57,18 +57,14 @@ class Settings < ActiveRecord::Base
 
   #get a setting value by [] notation
   def self.[](var_name)
-    if var = target(var_name)
-      var.value
-    else
-      defaults[var_name.to_s]
-    end
+    fetch(var_name).try(:value)
   end
 
   #set a setting value by [] notation
   def self.[]=(var_name, value)
     var_name = var_name.to_s
 
-    record = target(var_name) || new(var: var_name)
+    record = fetch(var_name) || new(var: var_name)
     record.value = value
     record.save!
 
@@ -109,7 +105,7 @@ class Settings < ActiveRecord::Base
     end
   end
 
-  def self.target(var_name)
+  def self.fetch(var_name)
     where(var: var_name.to_s).first
   end
 

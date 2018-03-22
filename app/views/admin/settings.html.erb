@@ -20,6 +20,9 @@
     <%= admin_checkbox_setting(:hide_details_enabled, 1, Seek::Config.hide_details_enabled,
                                "Hide contact details", "Hides email addresses, skype and internal web addresses.") %>
 
+    <%= admin_checkbox_setting(:allow_private_address_access, 1, Seek::Config.allow_private_address_access,
+                               "Allow private network address access", "Allow SEEK to access URLs that resolve to private network addresses, e.g. 127.0.0.1, 192.168.1.1, localhost, fd00::2") %>
+
     <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
                                "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
                                :onchange=>toggle_appear_javascript('cache_remote_block')) %>

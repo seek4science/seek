@@ -138,8 +138,7 @@ class AssaysController < ApplicationController
     else
       respond_to do |format|
         format.html { render :action => "new" }
-        format.json { render json: {error: @assay.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
-
+        format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
   end
@@ -165,7 +164,7 @@ class AssaysController < ApplicationController
         format.json {render json: @assay}
       else
         format.html { render :action => "edit" }
-        format.json { render json: {error: @assay.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
   end
