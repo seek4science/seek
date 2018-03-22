@@ -1,6 +1,5 @@
 <% @page_title ||= "New #{t('data_file')}" %>
 <h1><%= @page_title %></h1>
-<% all_institutions = Institution.order(:title) %>
 
 <%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
     <%= hidden_field_tag 'data_file[parent_name]', @data_file.parent_name%>
@@ -10,14 +9,11 @@
       <%= error_messages_for :data_file -%>
 
       <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
-
-
-
+      
       <div>
-        <%= preview_permission_popup_link(@data_file)-%>
         <%= create_button :id => "data_file_submit_btn",
-                       :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
-                       :class => 'btn btn-primary'-%>
+                          :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
+                          :class => 'btn btn-primary'-%>
         or <%= cancel_button(data_files_path) -%>
       </div>
     </div>
