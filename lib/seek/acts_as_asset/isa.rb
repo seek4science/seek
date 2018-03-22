@@ -9,14 +9,6 @@ module Seek
           people.compact.uniq
         end
 
-        def investigations
-          studies.map(&:investigation).uniq
-        end
-
-        def studies
-          assays.map(&:study).uniq
-        end
-
         def assay_type_titles
           assays.map { |at| at.try(:assay_type_label) }.compact
         end
@@ -29,8 +21,22 @@ module Seek
       module Associations
         extend ActiveSupport::Concern
         included do
-          has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id
-          has_many :assays, through: :assay_assets
+          unless reflect_on_association(:assays)
+            has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id
+            has_many :assays, through: :assay_assets
+          end
+
+          unless reflect_on_association(:studies)
+            def studies
+              assays.map(&:study).uniq
+            end
+          end
+
+          unless reflect_on_association(:investigations)
+            def investigations
+              studies.map(&:investigation).uniq
+            end
+          end
         end
       end
     end

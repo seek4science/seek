@@ -18,15 +18,19 @@ class Publication < ActiveRecord::Base
     end
   end
 
+  has_many :backwards_relationships, class_name: 'Relationship', as: :other_object, dependent: :destroy
+
+  has_many :data_files, through: :backwards_relationships, source: :subject, source_type: 'DataFile'
+  has_many :models, through: :backwards_relationships, source: :subject, source_type: 'Model'
+  has_many :assays, through: :backwards_relationships, source: :subject, source_type: 'Assay'
+  has_many :studies, through: :backwards_relationships, source: :subject, source_type: 'Study'
+  has_many :investigations, through: :backwards_relationships, source: :subject, source_type: 'Investigation'
+  has_many :presentations, through: :backwards_relationships, source: :subject, source_type: 'Presentation'
+
   acts_as_asset
 
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :persons, through: :publication_authors
-
-  has_many :backwards_relationships,
-           class_name: 'Relationship',
-           as: :other_object,
-           dependent: :destroy
 
   VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
@@ -166,20 +170,14 @@ class Publication < ActiveRecord::Base
     end
   end
 
-  has_many :data_files, through: :backwards_relationships, source: :subject, source_type: 'DataFile'
-  has_many :models, through: :backwards_relationships, source: :subject, source_type: 'Model'
-  has_many :assays, through: :backwards_relationships, source: :subject, source_type: 'Assay'
-  has_many :studies, through: :backwards_relationships, source: :subject, source_type: 'Study'
-  has_many :investigations, through: :backwards_relationships, source: :subject, source_type: 'Investigation'
-  has_many :presentations, through: :backwards_relationships, source: :subject, source_type: 'Presentation'
-
   def associate(item)
     clause = { subject_type: item.class.name,
                subject_id: item.id,
                predicate: Relationship::RELATED_TO_PUBLICATION,
                other_object_type: 'Publication',
                other_object_id: id }
-    Relationship.create(clause) unless Relationship.where(clause).any?
+
+    backwards_relationships.where(clause).first_or_create!
   end
 
   # includes those related directly, or through an assay
