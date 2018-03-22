@@ -41,6 +41,11 @@ Metadata for the uploaded file: <%= @data_file.content_blob.original_filename %>
 <script type="text/javascript">
   $j(document).ready(function(){
     $j('#data-file-modal').modal({backdrop: 'static', keyboard: false});
+
+    //these are to prevent the entire modal being closed, when these inner modals from the permission table are closed
+    $j('#add-project-permission-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
+    $j('#add-person-permission-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
+    
   });
 </script>
 
