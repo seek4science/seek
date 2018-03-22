@@ -58,5 +58,9 @@ $j(document).ready(function () {
         if (e.keyCode==37) {
             MultiStepWizard.prevStep();
         }
+
+        if (e.keyCode==35) {
+            MultiStepWizard.jumpToEnd();
+        }
     });
 });

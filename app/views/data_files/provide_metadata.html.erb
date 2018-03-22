@@ -1,5 +1,7 @@
 <%= javascript_include_tag :multi_step_wizard %>
-Content blob id: <%= @data_file.content_blob.id %>
+
+Metadata for the uploaded file: <%= @data_file.content_blob.original_filename %>
+
 <%= form_for(@data_file, url: {action: :create_metadata}) do |f| -%>
   <%= hidden_field_tag 'content_blob_id', @data_file.content_blob.id %>
   <div id='datafile-multi-set' class='multi-step'>
