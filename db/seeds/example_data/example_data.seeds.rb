@@ -1,9 +1,9 @@
 # Project, Institution, Workgroup
-project = Project.find_or_create_by_title('Default Project')
-institution = Institution.find_or_create_by_title('Default Institution', country: 'United Kingdom')
-workgroup = WorkGroup.find_or_create_by_project_id_and_institution_id(project.id, institution.id)
+project = Project.where(title: 'Default Project').first_or_create
+institution = Institution.where(title: 'Default Institution').first_or_create(country: 'United Kingdom')
+workgroup = WorkGroup.where(project_id: project.id, institution_id: institution.id).first_or_create
 
-admin_user = User.find_or_create_by_login(
+admin_user = User.where(login: 'admin').first_or_create(
   login: 'admin',
   email: 'admin@test1000.com',
   password: 'admin', password_confirmation: 'admin'
@@ -18,7 +18,7 @@ admin_person = admin_user.person
 admin_person.save
 puts 'Seeded 1 admin.'
 
-guest_user = User.find_or_create_by_login(
+guest_user = User.where(login: 'guest').first_or_create(
   login: 'guest',
   email: 'guest@test1000.com',
   password: 'guest', password_confirmation: 'guest'
