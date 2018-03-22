@@ -9,7 +9,7 @@
       <%= error_messages_for :data_file -%>
 
       <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
-      
+
       <div>
         <%= create_button :id => "data_file_submit_btn",
                           :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",

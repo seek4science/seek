@@ -1,11 +1,15 @@
+<%
+  new_assay_content_presented = !(@assay.title.blank? && @assay.description.blank?)
+%>
+
 <% if Seek::Config.assays_enabled %>
   <div class="panel panel-default">
     <ul class="nav nav-tabs" role="tablist">
       <li class="active">
-        <a href="#existing-assay" aria-controls="existing-assay" role="tab" data-toggle="tab">Existing assay</a>
+        <a href="#existing-assay" aria-controls="existing-assay" role="tab" data-toggle="tab" id="existing-assay-tab">Existing assay</a>
       </li>
       <li>
-        <a href="#new-assay" aria-controls="new-assay" role="tab" data-toggle="tab">New assay</a>
+        <a href="#new-assay" aria-controls="new-assay" role="tab" data-toggle="tab" id="new-assay-tab">New assay</a>
       </li>
     </ul>
     <div class="tab-content">
@@ -20,7 +24,7 @@
         <%= hidden_field_tag 'assay[assay_class_id]', @assay.assay_class_id || AssayClass.experimental.id %>
         <div class="form-group">
           <label>
-            <%= check_box_tag 'assay[create_assay]' %>
+            <%= check_box_tag 'assay[create_assay]','1',new_assay_content_presented %>
             Create a new Assay ?
           </label>
         </div>
@@ -59,3 +63,14 @@
     </div>
   </div>
 <% end %>
+
+<script type="application/javascript">
+
+$j(document).ready(function() {
+  <% if new_assay_content_presented %>
+    $j('#new-assay-tab').trigger('click');
+  <% end %>
+});
+
+
+</script>
