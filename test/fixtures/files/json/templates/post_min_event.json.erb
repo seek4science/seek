@@ -1,0 +1,19 @@
+{
+  "data": {
+    "type": "events",
+    "attributes": {
+      "title": "A Minimal Event",
+      "start_date": "2016-01-01T00:20:00.000Z"
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

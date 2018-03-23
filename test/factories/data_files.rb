@@ -32,6 +32,7 @@ Factory.define(:max_datafile, class: DataFile) do |f|
   f.after_create do |data_file|
     data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
   end
+  f.other_creators 'Blogs, Joe'
 end
 
 Factory.define(:rightfield_datafile, parent: :data_file) do |f|
@@ -90,4 +91,8 @@ Factory.define(:data_file_version_with_blob, parent: :data_file_version) do |f|
       data_file_version.content_blob.save
     end
   end
+end
+
+Factory.define(:api_pdf_data_file, parent: :data_file) do |f|
+  f.association :content_blob, factory: :blank_pdf_content_blob
 end

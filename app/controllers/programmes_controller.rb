@@ -48,7 +48,7 @@ class ProgrammesController < ApplicationController
         format.json {render json: @programme}
       else
         format.html { render action: 'new' }
-        format.json {render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+        format.json { render json: json_api_errors(@programme), status: :unprocessable_entity }
       end
     end
   end
@@ -65,7 +65,7 @@ class ProgrammesController < ApplicationController
         else
           format.html { render action: 'edit' }
           format.xml { render xml: @programme.errors, status: :unprocessable_entity }
-          format.json { render json: {error: @programme.errors, status: :forbidden}, status: :forbidden }
+          format.json { render json: json_api_errors(@programme), status: :unprocessable_entity }
         end
       end
     end

@@ -31,7 +31,6 @@ class ApplicationController < ActionController::Base
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
 
   before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
-  before_filter :write_api_enabled, only: [:update, :destroy, :create], if: :json_api_request?
   before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
   helper :all
@@ -228,9 +227,7 @@ class ApplicationController < ActionController::Base
     flash[:error] = notice
     respond_to do |format|
       format.html { redirect_to root_url }
-      format.json {
-        render json: {"title": notice, "detail": _message}, status: _status
-      }
+      format.json { render json: { errors: [{ title: notice, detail: _message }] }, status:  _status }
     end
   end
 
@@ -243,7 +240,9 @@ class ApplicationController < ActionController::Base
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render text: 'Not found', status: :not_found }
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-        format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
+        format.json { render json: { errors: [{ title: 'Not found',
+                                                detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
+                             status: :not_found }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
     else
@@ -280,9 +279,9 @@ class ApplicationController < ActionController::Base
         end
         format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
-        format.json {
-          render json: {"title": "Forbidden", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}, status: :forbidden
-        }
+        format.json { render json: { errors: [{ title: 'Forbidden',
+                                                details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
+                             status: :forbidden }
       end
       return false
     end
@@ -295,7 +294,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def render_not_found_error
+  def render_not_found_error(e)
     respond_to do |format|
       format.html do
         User.with_current_user current_user do
@@ -305,33 +304,24 @@ class ApplicationController < ActionController::Base
 
       format.rdf { render text: 'Not found', status: :not_found }
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-      format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
+      format.json { render json: { errors: [{ title: 'Not found', detail: e.message }] }, status: :not_found }
     end
     false
   end
 
   def render_unknown_attribute_error(e)
     respond_to do |format|
-      format.json {
-        render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
-      }
-      format.all {
-        render text: e.message, status: :unprocessable_entity
-      }
+      format.json { render json: { errors: [{ title: 'Unknown attribute', details: e.message }] }, status: :unprocessable_entity }
+      format.all { render text: e.message, status: :unprocessable_entity }
     end
   end
 
   def render_not_implemented_error(e)
     respond_to do |format|
-      format.json {
-        render json: {error: e.message, status: :not_implemented}, status: :not_implemented
-      }
-      format.all {
-        render text: e.message, status: :not_implemented
-      }
+      format.json { render json: { errors: [{ title: 'Not implemented', details: e.message }] }, status: :not_implemented }
+      format.all { render text: e.message, status: :not_implemented }
     end
   end
-
 
   def is_auth?(object, privilege)
     if object.can_perform?(privilege)
@@ -553,16 +543,6 @@ class ApplicationController < ActionController::Base
                                                        :contributor_id] }])[:policy_attributes] || {}
   end
 
-  def write_api_enabled
-    controller_class = self.controller_name.classify
-    if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
-      return
-    end
-    if json_api_request? && Rails.env.production?
-      raise NotImplementedError
-    end
-  end
-
   def check_json_id_type
     begin
       raise ArgumentError.new('A POST/PUT request must have a data record complying with JSONAPI specs') if params[:data].nil?
@@ -589,32 +569,30 @@ class ApplicationController < ActionController::Base
   end
 
   def convert_json_params
-    params[controller_name.singularize.to_sym] =
-        ActiveModelSerializers::Deserialization.jsonapi_parse(params)
-    params.delete(:data)
-
-    organize_external_attributes_from_json
-    tweak_json_params
-  end
-
-  # override in sub-classes
-  def tweak_json_params
-  end
-
-  # take out policies, annotations, etc(?) outside of the given object attributes
-  def organize_external_attributes_from_json
-    if (params[:data] && params[:data][:attributes])
-      [:tag_list, :expertise_list, :tool_list, :policy_attributes].each do |item|
-        if params[:data][:attributes][item]
-          params[item] = params[:data][:attributes][item]
-          params[:data][:attributes].delete item
-        end
-      end
-    end
+    Seek::Api::ParameterConverter.new(controller_name).convert(params)
   end
 
   def json_api_request?
     request.format.json?
   end
 
+  def json_api_errors(object)
+    hash = { errors: [] }
+    hash[:errors] = object.errors.map do |attribute, message|
+      segments = attribute.to_s.split('.')
+      attr = segments.first
+      if !['content_blobs', 'policy'].include?(attr) && object.class.reflect_on_association(attr)
+        base = '/data/relationships'
+      else
+        base = '/data/attributes'
+      end
+
+      {
+          source: { pointer: "#{base}/#{attr}" },
+          detail: "#{segments[1..-1].join(' ') + ' ' if segments.length > 1}#{message}"
+      }
+    end
+
+    hash
+  end
 end

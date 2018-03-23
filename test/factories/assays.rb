@@ -63,6 +63,7 @@ end
 Factory.define(:max_assay, class: Assay) do |f|
   f.title "A Maximal Assay"
   f.description "A Western Blot Assay"
+  f.other_creators "Anonymous creator"
   f.association :assay_class, factory: :experimental_assay_class
   f.study { Factory(:study, policy: Factory(:public_policy), investigation: Factory(:investigation, policy: Factory(:public_policy))) }
   f.association :contributor,  factory: :person

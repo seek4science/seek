@@ -81,20 +81,18 @@ module Seek
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|
             format.html { redirect_to item }
+            format.json { render json: item }
           end
         end
       else
         respond_to do |format|
-          format.html do
-            render action: 'new'
-          end
+          format.html { render action: 'new' }
+          format.json { render json: json_api_errors(item), status: :unprocessable_entity }
         end
       end
     end
 
     def update_sharing_policies(item)
-      Rails.logger.info("=====Policy=====")
-      Rails.logger.info(policy_params)
       item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
     end
 
@@ -119,25 +117,6 @@ module Seek
       return false unless item.respond_to?(:parent_name) && !item.parent_name.blank?
       render partial: 'assets/back_to_fancy_parent', locals: { child: item, parent_name: item.parent_name }
       true
-    end
-
-    def tweak_json_params
-      content_blob_param = nil
-      comments_param = nil
-      params.each do | key, v |
-        if (v.is_a?(Hash)) && (v.key? (:content_blobs))
-          content_blob_param = v[:content_blobs]
-        end
-        if (v.is_a?(Hash)) && (v.key? (:revision_comments))
-          comments_param = v[:revision_comments]
-        end
-      end
-      if content_blob_param.present?
-        params[:content_blobs] = content_blob_param
-      end
-      if comments_param.present?
-        params[:revision_comments] = comments_param
-      end
     end
   end
 end

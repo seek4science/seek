@@ -34,7 +34,8 @@
           "link": "http://localhost:3000/data_files/883654268/content_blobs/1050452533",
           "size": 8827
         }
-      ]
+      ],
+      "other_creators": null
     },
     "relationships": {
       "creators": {

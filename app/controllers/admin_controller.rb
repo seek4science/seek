@@ -94,6 +94,9 @@ class AdminController < ApplicationController
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id].try(:strip)
     Seek::Config.nels_client_secret = params[:nels_client_secret].try(:strip)
+    Seek::Config.nels_api_url = params[:nels_api_url].blank? ? nil : params[:nels_api_url].strip.chomp('/')
+    Seek::Config.nels_oauth_url = params[:nels_oauth_url].blank? ? nil : params[:nels_oauth_url].strip.chomp('/')
+    Seek::Config.nels_permalink_base = params[:nels_permalink_base].try(:strip)
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
@@ -211,6 +214,7 @@ class AdminController < ApplicationController
     Seek::Config.permissions_popup = params[:permissions_popup]
     Seek::Config.auth_lookup_update_batch_size = params[:auth_lookup_update_batch_size]
 
+    Seek::Config.allow_private_address_access = string_to_boolean params[:allow_private_address_access]
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
     Seek::Config.max_cachable_size = params[:max_cachable_size]
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]

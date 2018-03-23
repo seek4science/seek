@@ -52,7 +52,8 @@
       ],
       "model_type": "Ordinary differentail equations",
       "model_format": "SBML",
-      "environment": "JWS Online"
+      "environment": "JWS Online",
+      "other_creators" : "Blogs, Joe"
     },
     "relationships": {
       "creators": {
