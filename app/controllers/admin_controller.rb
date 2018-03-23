@@ -214,6 +214,7 @@ class AdminController < ApplicationController
     Seek::Config.permissions_popup = params[:permissions_popup]
     Seek::Config.auth_lookup_update_batch_size = params[:auth_lookup_update_batch_size]
 
+    Seek::Config.allow_private_address_access = string_to_boolean params[:allow_private_address_access]
     Seek::Config.cache_remote_files = string_to_boolean params[:cache_remote_files]
     Seek::Config.max_cachable_size = params[:max_cachable_size]
     Seek::Config.hard_max_cachable_size = params[:hard_max_cachable_size]

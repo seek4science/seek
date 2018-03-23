@@ -121,6 +121,8 @@ gem 'responders', '~> 2.0'
 
 gem 'rack-attack', '~> 5.0.1'
 
+gem 'private_address_check'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do

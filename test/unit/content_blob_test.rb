@@ -3,8 +3,10 @@ require 'docsplit'
 require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
 require 'minitest/mock'
 require 'time_test_helper'
+require 'private_address_check'
 
 class ContentBlobTest < ActiveSupport::TestCase
+
   include NelsTestHelper
 
   fixtures :content_blobs
@@ -764,6 +766,27 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob.retrieve
     assert blob.file_exists?
     assert_equal 5000, blob.file_size
+  end
+
+  test "won't retrieve remote content from internal network" do
+    begin
+      # Need to allow the request through so that `private_address_check` can catch it.
+      WebMock.allow_net_connect!
+      VCR.turned_off do
+        assert PrivateAddressCheck.resolves_to_private_address?('localhost')
+
+        blob = Factory(:url_content_blob, url: 'http://localhost/secrets')
+        assert !blob.file_exists?
+
+        assert_raise PrivateAddressCheck::PrivateConnectionAttemptedError do
+          blob.retrieve
+        end
+
+        assert !blob.file_exists?
+      end
+    ensure
+      WebMock.disable_net_connect!(allow_localhost: true)
+    end
   end
 
   test 'is_text?' do
