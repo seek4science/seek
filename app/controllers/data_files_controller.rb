@@ -199,8 +199,6 @@ class DataFilesController < ApplicationController
   end
 
   def update
-    @data_file.attributes = data_file_params.except!(:content)
-
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_scales @data_file
 
