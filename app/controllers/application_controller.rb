@@ -564,7 +564,8 @@ class ApplicationController < ActionController::Base
           end
       end
     rescue ArgumentError => e
-      render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
+      output = "{\"errors\" : [{\"detail\" : \"#{e.message}\"}]}"
+      render plain: output, status: :unprocessable_entity
     end
   end
 
