@@ -9,12 +9,18 @@ module Seek
           assay.assay_type_uri = assay_type_uri
           assay.technology_type_uri = technology_type_uri
           assay.study = study if study
+          assay.associate(sop) if sop
         end
       end
 
       def study
         id = seek_id_by_type(Study)
         Study.find_by_id(id) if id
+      end
+
+      def sop
+        id = seek_id_by_type(Sop)
+        Sop.find_by_id(id) if id
       end
 
       def title

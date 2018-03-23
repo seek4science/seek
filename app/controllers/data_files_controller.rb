@@ -162,8 +162,15 @@ class DataFilesController < ApplicationController
   def create_metadata
     @data_file = DataFile.new(data_file_params)
     assay_params = data_file_assay_params
+    sop_id = assay_params.delete(:sop_id)
     create_new_assay = assay_params.delete(:create_assay)
     @assay = Assay.new(assay_params)
+    if (sop_id)
+      sop = Sop.find_by_id(sop_id)
+      if sop && sop.can_view?
+        @assay.associate(sop)
+      end
+    end
 
     update_sharing_policies(@data_file)
 
@@ -515,7 +522,7 @@ class DataFilesController < ApplicationController
   end
 
   def data_file_assay_params
-    params.fetch(:assay,{}).permit(:title, :description, :assay_class_id, :study_id, :assay_type_uri,:technology_type_uri, :create_assay)
+    params.fetch(:assay,{}).permit(:title, :description, :assay_class_id, :study_id, :sop_id,:assay_type_uri,:technology_type_uri, :create_assay)
   end
 
   def oauth_client

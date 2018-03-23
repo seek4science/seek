@@ -104,7 +104,37 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
     assert_equal study, assay.study
+    assert_empty assay.sops
   end
+
+  test 'initialise assay from template with sop' do
+    blob = Factory(:rightfield_base_sample_template_with_assay_with_sop)
+    data_file = DataFile.new(content_blob: blob)
+
+    study = Factory(:study, id: 9999)
+    assert_equal 9999, study.id
+
+    project = Factory(:project, id: 9999)
+    assert_equal 9999, project.id
+
+    sop = Factory(:sop,id:9999)
+    assert_equal 9999, sop.id
+
+    data_file.populate_metadata_from_template
+
+    assay = data_file.initialise_assay_from_template
+    refute_nil assay
+
+    assert_equal 'My Assay Title', assay.title
+    assert_equal 'My Assay Description', assay.description
+    # assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
+    # assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
+    assert_equal study, assay.study
+
+
+    assert_equal [sop],assay.assay_assets.collect(&:asset)
+  end
+
 
   test 'assay from template without study' do
     blob = Factory(:rightfield_base_sample_template_with_assay_no_study)
