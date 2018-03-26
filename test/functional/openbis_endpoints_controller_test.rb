@@ -63,7 +63,9 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
               username: 'fred',
               password: 'secret',
               refresh_period_mins: '123',
-              space_perm_id: 'space-id'
+              space_perm_id: 'space-id',
+              study_types: 'ST1, ST2',
+              assay_types: 'ASSAY, DEFAULT'
             },
                       policy_attributes: policy_attributes
       end
@@ -87,6 +89,10 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       assert_equal permission.policy_id, ep.policy_id
       assert_equal permission.access_type, Policy::ACCESSIBLE
     end
+
+    assert_equal ['ST1', 'ST2'], ep.study_types
+    assert_equal ['ASSAY', 'DEFAULT'], ep.assay_types
+
   end
 
   test 'update' do
@@ -106,7 +112,9 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
           username: 'fred',
           password: 'secret',
           refresh_period_mins: '123',
-          space_perm_id: 'space-id'
+          space_perm_id: 'space-id',
+          study_types: 'ST, ST2',
+          assay_types: 'ASSAY, ASS'
         },
                  policy_attributes: policy_attributes
 
@@ -129,6 +137,10 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       assert_equal permission.policy_id, ep.policy_id
       assert_equal permission.access_type, Policy::ACCESSIBLE
     end
+
+    assert_equal ['ST', 'ST2'], ep.study_types
+    assert_equal ['ASSAY', 'ASS'], ep.assay_types
+
   end
 
   test 'add dataset' do
@@ -440,5 +452,29 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     post :refresh_metadata_store, id:endpoint.id,project_id: @project.id
     assert_response :success
     assert assigns(:openbis_endpoint)
+  end
+
+  test 'parses string with code names using , and white spaces as separators' do
+    controller = OpenbisEndpointsController.new
+
+    input = nil
+    names = controller.parse_code_names(input)
+    assert_equal [], names
+
+    input = ''
+    names = controller.parse_code_names(input)
+    assert_equal [], names
+
+    input = ' '
+    names = controller.parse_code_names(input)
+    assert_equal [], names
+
+    input = ' N1, N2
+, name
+  name2, again N1
+'
+    names = controller.parse_code_names(input)
+    assert_equal ['N1', 'N2', 'NAME', 'NAME2', 'AGAIN'], names
+
   end
 end

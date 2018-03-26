@@ -589,24 +589,24 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'build_meta_config makes valid hash even on nil parameters' do
-    endpoint = Factory(:openbis_endpoint)
-    conf = endpoint.build_meta_config(nil, nil)
+    #endpoint = Factory(:openbis_endpoint)
+    conf = OpenbisEndpoint.build_meta_config(nil, nil)
     exp = { study_types: [], assay_types: [] }
     assert_equal exp, conf
 
-    conf = endpoint.build_meta_config(['st1','st2'], ['a1'])
+    conf = OpenbisEndpoint.build_meta_config(['st1','st2'], ['a1'])
     exp = { study_types: ['st1','st2'], assay_types: ['a1'] }
     assert_equal exp, conf
   end
 
   test 'build_meta_config raise exception if not empty non-table parameters' do
-    endpoint = Factory(:openbis_endpoint)
+    #endpoint = Factory(:openbis_endpoint)
 
     assert_raise do
-      endpoint.build_meta_config('a', nil)
+      OpenbisEndpoint.build_meta_config('a', nil)
     end
     assert_raise do
-      endpoint.build_meta_config(nil, 'b')
+      OpenbisEndpoint.build_meta_config(nil, 'b')
     end
   end
 

@@ -122,10 +122,10 @@ class OpenbisEndpoint < ActiveRecord::Base
   def default_meta_config
     studies = ['DEFAULT_EXPERIMENT']
     assays = ['EXPERIMENTAL_STEP']
-    build_meta_config(studies,assays)
+    self.class.build_meta_config(studies,assays)
   end
 
-  def build_meta_config(studies, assays)
+  def self.build_meta_config(studies, assays)
     studies ||= []
     assays ||= []
     raise 'table with types names expected' unless (studies.is_a?(Array) && assays.is_a?(Array))
