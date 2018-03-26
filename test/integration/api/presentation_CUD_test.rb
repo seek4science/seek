@@ -17,7 +17,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: @current_person)
+    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: presentation.id})
   end
 

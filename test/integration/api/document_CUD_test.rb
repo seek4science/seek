@@ -18,7 +18,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    document = Factory(:document, policy: Factory(:public_policy), contributor: @current_person)
+    document = Factory(:document, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: document.id})
   end
 
