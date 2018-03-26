@@ -164,6 +164,9 @@ class DataFilesController < ApplicationController
     assay_params = data_file_assay_params
     sop_id = assay_params.delete(:sop_id)
     create_new_assay = assay_params.delete(:create_assay)
+
+    update_sharing_policies(@data_file)
+
     @assay = Assay.new(assay_params)
     if (sop_id)
       sop = Sop.find_by_id(sop_id)
@@ -171,8 +174,7 @@ class DataFilesController < ApplicationController
         @assay.associate(sop)
       end
     end
-
-    update_sharing_policies(@data_file)
+    @assay.policy = @data_file.policy.deep_copy if create_new_assay
 
     filter_associated_projects(@data_file)
 
