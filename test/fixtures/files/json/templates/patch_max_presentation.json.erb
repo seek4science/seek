@@ -1,0 +1,57 @@
+{
+  "data": {
+    "type": "presentations",
+    "id": "<%= id %>",
+    "attributes": {
+      "title": "A Maximally Patched Presentation",
+      "description": "Presenting the research about the thing",
+      "tags": ["tag1", "tag2", "tag3"],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource_id": "<%= @project.id %>",
+            "resource_type": "projects",
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= @creator.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= @publication.id %>",
+            "type": "publications"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "<%= @event.id %>",
+            "type": "events"
+          }
+        ]
+      }
+    }
+  }
+}

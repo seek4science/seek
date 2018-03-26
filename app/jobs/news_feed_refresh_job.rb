@@ -1,5 +1,7 @@
 class NewsFeedRefreshJob < SeekJob
-  FEEDS = [:news]
+  include PeriodicRegularSeekJob
+
+  FEEDS = [:news].freeze
 
   def perform_job(_) # ArgumentError thrown if this isn't present
     Seek::FeedReader.clear_cache
@@ -7,10 +9,6 @@ class NewsFeedRefreshJob < SeekJob
     FEEDS.each do |feed|
       Seek::FeedReader.fetch_feeds_for_category(feed) # Rebuilds caches
     end
-  end
-
-  def follow_on_job?
-    true
   end
 
   def default_priority
@@ -30,17 +28,7 @@ class NewsFeedRefreshJob < SeekJob
     [nil]
   end
 
-  # overidden to ignore_locked false by default
-  def exists?(ignore_locked = false)
-    super(ignore_locked)
-  end
-
-  # overidden to ignore_locked false by default
-  def count(ignore_locked = false)
-    super(ignore_locked)
-  end
-
   def self.create_initial_job
-    self.new.queue_job
+    new.queue_job
   end
 end

@@ -15,32 +15,31 @@ module RightField
   end
 
   def generate_rightfield_rdf datafile
-    cmd = invoke_command datafile
+    Rails.cache.fetch(datafile.content_blob.filepath) do
+      cmd = invoke_command datafile
 
-    output = ""
+      output = ""
 
-    status = Open4::popen4(cmd) do |pid, stdin, stdout, stderr|
-      while ((line = stdout.gets) != nil) do
-        output << line
+      status = Open4::popen4(cmd) do |pid, stdin, stdout, stderr|
+        while ((line = stdout.gets) != nil) do
+          output << line
+        end
+        stdout.close
+
+        stderr.close
       end
-      stdout.close
 
-      stderr.close
+      if status.to_i != 0
+        #error message is coming out through stdout rather than stderr due to log4j configuration.
+        raise Exception.new(output)
+      end
+
+      output.strip
     end
-
-    if status.to_i != 0
-      #error message is coming out through stdout rather than stderr due to log4j configuration.
-      raise Exception.new(output)
-    end
-
-    output.strip
   end
 
   def generate_rightfield_rdf_graph datafile
     rdf = generate_rightfield_rdf datafile
-    f=Tempfile.new("rdf")
-    f.write(rdf)
-    f.flush
     graph = RDF::Graph.new
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       reader.each_statement do |stmt|

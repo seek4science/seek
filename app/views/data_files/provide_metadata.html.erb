@@ -1,0 +1,59 @@
+<%= javascript_include_tag :multi_step_wizard %>
+<style>
+  .modal {
+    overflow-y:auto;
+  }
+</style>
+
+<div class="modal" tabindex="-1" role="dialog" id="data-file-modal">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <h4>Metadata for the uploaded file: <em><%= @data_file.content_blob.original_filename %></em></h4>
+        </div>
+      </div>
+      <div class="modal-body">
+        <%= form_for(@data_file, url: {action: :create_metadata}) do |f| -%>
+            <%= hidden_field_tag 'content_blob_id', @data_file.content_blob.id %>
+            <div id='datafile-multi-set' class='multi-step'>
+              <div class="asset_form">
+                <%= error_messages_for :data_file -%>
+
+                <div id='step-1' class='multi-step-block'>
+                  <%= render partial: 'data_files/multi-steps/basic_metadata',locals:{f: f} %>
+                </div>
+
+                <div id='step-2' class='multi-step-block multi-step-datafile-block'>
+                  <%= render partial: 'data_files/multi-steps/license_and_permissions',locals:{f: f} %>
+                </div>
+
+                <div id='step-3' class='multi-step-block multi-step-datafile-block'>
+                  <%= render partial: 'data_files/multi-steps/assays',locals:{f: f} %>
+                </div>
+
+                <div id='step-4' class='multi-step-block multi-step-datafile-block'>
+                  <%= render partial: 'data_files/multi-steps/other_links',locals:{f: f} %>
+                </div>
+
+              </div>
+            </div>
+        <% end -%>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $j(document).ready(function(){
+    $j('#data-file-modal').modal({backdrop: 'static', keyboard: false});
+
+    //these are to prevent the entire modal being closed, when these inner modals from the permission table are closed
+    $j('#add-project-permission-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
+    $j('#add-person-permission-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
+
+  });
+</script>
+
+
+

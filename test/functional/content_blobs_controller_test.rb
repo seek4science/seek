@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'minitest/mock'
+require 'private_address_check'
 
 class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
@@ -72,7 +73,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     json = JSON.parse(response.body)
     refute_nil json['data']
     refute_nil json['data']['meta']
-    assert_equal ['api_version','base_url','uuid'], json['data']['meta'].keys.sort
+    assert_equal ['api_version','base_url','created','modified','uuid'], json['data']['meta'].keys.sort
   end
 
   def test_response_code_for_not_available
@@ -188,6 +189,42 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert assigns(:warning_msg)
     refute assigns(:error)
     refute assigns(:error_msg)
+  end
+
+  test 'examine url localhost' do
+    begin
+      # Need to allow the request through so that `private_address_check` can catch it.
+      WebMock.allow_net_connect!
+      VCR.turned_off do
+        xml_http_request :get, :examine_url, data_url: 'http://localhost/secrets'
+        assert_response :success
+        assert @response.body.include?('URL is inaccessible')
+        assert @response.body.include?('disallow_copy_option();')
+        assert assigns(:error)
+        assert assigns(:error_msg)
+        refute assigns(:unauthorized)
+      end
+    ensure
+      WebMock.disable_net_connect!(allow_localhost: true)
+    end
+  end
+
+  test 'examine url local network' do
+    begin
+      # Need to allow the request through so that `private_address_check` can catch it.
+      WebMock.allow_net_connect!
+      VCR.turned_off do
+        xml_http_request :get, :examine_url, data_url: 'http://192.168.0.1/config'
+        assert_response :success
+        assert @response.body.include?('URL is inaccessible')
+        assert @response.body.include?('disallow_copy_option();')
+        assert assigns(:error)
+        assert assigns(:error_msg)
+        refute assigns(:unauthorized)
+      end
+    ensure
+      WebMock.disable_net_connect!(allow_localhost: true)
+    end
   end
 
   test 'should find_and_auth_asset for download' do

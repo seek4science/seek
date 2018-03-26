@@ -1,0 +1,62 @@
+{
+  "data": {
+    "type": "events",
+    "id": "<%= id %>",
+    "attributes": {
+      "title": "A Maximally Patched Event",
+      "description": "A thing happening",
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource_id": "<%= @project.id %>",
+            "resource_type": "projects",
+            "access": "edit"
+          }
+        ]
+      },
+      "url": "http://www.example.com/events/123",
+      "address": "Sofienstr 2",
+      "city": "Heidelberg",
+      "country": "Germany",
+      "start_date": "2017-01-01T00:20:00.000Z",
+      "end_date": "2017-01-01T00:22:00.000Z"
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "<%= @data_file.id %>",
+            "type": "data_files"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "<%= @presentation.id %>",
+            "type": "presentations"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= @publication.id %>",
+            "type": "publications"
+          }
+        ]
+      }
+    }
+  }
+}

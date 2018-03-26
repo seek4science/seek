@@ -47,8 +47,7 @@ class SopsController < ApplicationController
 
   # PUT /sops/1
   def update
-    update_annotations(params[:tag_list], @sop)
-    update_scales @sop
+    update_annotations(params[:tag_list], @sop) if params.key?(:tag_list)
 
     @sop.attributes = sop_params
 
@@ -60,11 +59,10 @@ class SopsController < ApplicationController
         update_assay_assets(@sop,params[:assay_ids])
         flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }
-
+        format.json { render json: @sop }
       else
-        format.html { 
-          render :action => "edit" 
-        }
+        format.html { render action: 'edit' }
+        format.json { render json: json_api_errors(@sop), status: :unprocessable_entity }
       end
     end
   end

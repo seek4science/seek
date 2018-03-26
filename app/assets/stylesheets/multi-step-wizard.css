@@ -1,0 +1,16 @@
+.multi-step-buttons {
+    float:right;
+}
+
+.multi-step-block {
+    display:none;
+}
+
+.multi-step-block > .panel {
+    padding: 1em;
+}
+
+
+
+
+

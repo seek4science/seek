@@ -39,7 +39,7 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
 
   def populate_extra_relationships
     person_id = @current_user.person.id
-    investigation = @min_study.investigation
+    investigation = @study.investigation
     investigation_id = investigation.id
     project_id = investigation.projects[0].id
 
