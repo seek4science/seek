@@ -113,11 +113,9 @@ module ApiTestHelper
       if @to_post['data'].has_key?('relationships')
         hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
       end
-      begin
-        hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
-        hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
-      rescue NameError, ArgumentError
-      end
+
+      hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
+      hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
     end
   end
 
@@ -202,7 +200,6 @@ module ApiTestHelper
       if defined? @patch_values
         @to_patch = load_template("patch_#{m}_#{@clz}.json.erb", @patch_values)
       end
-      puts "update, to_patch #{m}", @to_patch
 
       if @to_patch.blank?
         skip
@@ -219,7 +216,6 @@ module ApiTestHelper
 
       assert_no_difference("#{@clz.classify}.count") do
         patch "/#{@plural_clz}/#{obj_id}.json", @to_patch
-        puts "response body", response.body
         assert_response :success
       end
 
@@ -227,13 +223,9 @@ module ApiTestHelper
 
       h = JSON.parse(response.body)
 
-
       #check the post-processed attributes and relationships
-      begin
-        hash_comparison(populate_extra_attributes(@to_patch), h['data']['attributes'])
-        hash_comparison(populate_extra_relationships(@to_patch), h['data']['relationships'])
-      rescue NameError, ArgumentError
-      end
+      hash_comparison(populate_extra_attributes(@to_patch), h['data']['attributes'])
+      hash_comparison(populate_extra_relationships(@to_patch), h['data']['relationships'])
 
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
       to_ignore << 'updated_at'
@@ -257,9 +249,7 @@ module ApiTestHelper
         original_relationships = original['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
         hash_comparison(original_relationships, h['data']['relationships'])
       end
-
     end
-
   end
 
   def test_update_should_error_on_wrong_id
@@ -307,7 +297,7 @@ module ApiTestHelper
   # Compare `result` Hash against `source`.
   def hash_comparison(source, result)
     source.each do |key, value|
-      puts "#{key}: #{value} <==> #{result[key]}"
+      # puts "#{key}: #{value} <==> #{result[key]}"
       deep_comparison(value, result[key], key)
     end
   end
@@ -324,6 +314,7 @@ module ApiTestHelper
       end
     elsif source.is_a?(Array)
       assert result.is_a?(Array), "#{key} was not an Array"
+      assert_equal source.length, result.length, "#{key} length of #{result.length} was not equal to #{source.length}"
       sorted_result = result.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
       sorted_source = source.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
       sorted_source.each_with_index do |sub_value, index|
