@@ -15,11 +15,11 @@ module Seek
       end
 
       def title
-        value_for_property_and_index(:title, 0)
+        value_for_property_and_index(:title, :literal, 0)
       end
 
       def description
-        value_for_property_and_index(:description, 0)
+        value_for_property_and_index(:description, :literal, 0)
       end
     end
   end

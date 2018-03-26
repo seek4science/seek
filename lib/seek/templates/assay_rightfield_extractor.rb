@@ -24,19 +24,19 @@ module Seek
       end
 
       def title
-        value_for_property_and_index(:title, 1)
+        value_for_property_and_index(:title, :literal, 1)
       end
 
       def description
-        value_for_property_and_index(:description, 1)
+        value_for_property_and_index(:description, :literal, 1)
       end
 
       def assay_type_uri
-        value_for_property_and_index(:hasType, 0)
+        value_for_property_and_index(:hasType, :term_uri, 0)
       end
 
       def technology_type_uri
-        value_for_property_and_index(:hasType, 1)
+        value_for_property_and_index(:hasType, :term_uri, 1)
       end
     end
   end

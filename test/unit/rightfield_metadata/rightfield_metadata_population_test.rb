@@ -127,8 +127,8 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
     assert_equal 'My Assay Title', assay.title
     assert_equal 'My Assay Description', assay.description
-    # assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
-    # assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
     assert_equal study, assay.study
 
 
