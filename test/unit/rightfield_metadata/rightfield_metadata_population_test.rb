@@ -132,6 +132,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
     assert_equal study, assay.study
 
 
+    assert_equal [sop],assay.sops
     assert_equal [sop],assay.assay_assets.collect(&:asset)
   end
 

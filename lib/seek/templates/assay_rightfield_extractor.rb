@@ -9,7 +9,7 @@ module Seek
           assay.assay_type_uri = assay_type_uri
           assay.technology_type_uri = technology_type_uri
           assay.study = study if study
-          assay.associate(sop) if sop
+          assay.sops << sop if sop
         end
       end
 
