@@ -31,8 +31,8 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
   def populate_extra_relationships(hash=nil)
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
-    extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
-                                            { id: @creator.id.to_s, type: 'people' }] }
+    extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' }]}
+                                            #{ id: @creator.id.to_s, type: 'people' }] }
     extra_relationships.with_indifferent_access
   end
 

@@ -23,17 +23,6 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     @patch_values = {id: p.id}
   end
 
-  # funding_codes are an Array in the readAPI, but a comma-separated string in POST/PATCH
-  def ignore_non_read_or_write_attributes
-    ['funding_codes']
-  end
-
-  def populate_extra_attributes(hash)
-    extra_attributes = {}
-    extra_attributes[:funding_codes] = hash['data']['attributes']['funding_codes'].split(", ")
-    extra_attributes.with_indifferent_access
-  end
-
   #normal user without admin rights
   def test_user_can_create_programme
     a_person = Factory(:person)

@@ -116,7 +116,7 @@ module ApiTestHelper
       begin
         hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
         hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
-      rescue NameError
+      rescue NameError, ArgumentError
       end
     end
   end
@@ -232,7 +232,7 @@ module ApiTestHelper
       begin
         hash_comparison(populate_extra_attributes(@to_patch), h['data']['attributes'])
         hash_comparison(populate_extra_relationships(@to_patch), h['data']['relationships'])
-      rescue NameError
+      rescue NameError, ArgumentError
       end
 
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
@@ -307,7 +307,7 @@ module ApiTestHelper
   # Compare `result` Hash against `source`.
   def hash_comparison(source, result)
     source.each do |key, value|
-      #puts "#{key}: #{value} <==> #{result[key]}"
+      puts "#{key}: #{value} <==> #{result[key]}"
       deep_comparison(value, result[key], key)
     end
   end
