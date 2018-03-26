@@ -172,8 +172,9 @@ class DataFilesController < ApplicationController
     @data_file.content_blob = blob
 
     # FIXME: clunky
+    update_annotations(params[:tag_list], @data_file)
+
     if valid_blob && (!create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)) && @data_file.save && blob.save
-      update_annotations(params[:tag_list], @data_file)
       update_scales @data_file
 
       update_relationships(@data_file, params)
@@ -208,8 +209,8 @@ class DataFilesController < ApplicationController
     if handle_upload_data
       update_sharing_policies(@data_file)
 
+      update_annotations(params[:tag_list], @data_file)
       if @data_file.save
-        update_annotations(params[:tag_list], @data_file)
         update_scales @data_file
 
         create_content_blobs
@@ -251,11 +252,7 @@ class DataFilesController < ApplicationController
   end
 
   def update
-    if params[:data_file].empty? && !params[:datafile].empty?
-      params[:data_file] = params[:datafile]
-    end	
     @data_file.assign_attributes(data_file_params)
-
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_scales @data_file
 

@@ -4,23 +4,18 @@ module Seek
 
     included do
       extend ClassMethods
-      acts_as_annotatable name_field: :title
+      acts_as_seek_annotatable name_field: :title
+      has_annotations :tags
     end
 
     def is_taggable?
       self.class.is_taggable?
     end
 
-    # tag_as_user_with_params
-    def tag_annotations_as_user(annotations, attr = 'tag', owner = User.current_user)
-      tags = resolve_tags(annotations)
-      tag_as_user_with(tags, attr, owner)
-    end
-
     # tag_with_params
-    def tag_annotations(annotations, attr = 'tag', owner = User.current_user)
+    def tag_annotations(annotations, attr = 'tag', owner = User.current_user, owned_tags_only = false)
       tags = resolve_tags(annotations)
-      tag_with(tags, attr, owner)
+      tag_with(tags, attr, owner, owned_tags_only)
     end
 
     def resolve_tags(annotations)
@@ -31,80 +26,30 @@ module Seek
       end
     end
 
-    def resolve_tags_from_params(_annotations)
-      tags = []
-
-      selected_key = "#{attr}_autocompleter_selected_ids".to_sym
-      unrecognized_key = "#{attr}_autocompleter_unrecognized_items".to_sym
-
-      unless params[selected_key].nil?
-        Array(params[selected_key]).each do |selected_id|
-          tag = TextValue.find(selected_id)
-          tags << tag.text
-        end
-      end
-
-      unless params[unrecognized_key].nil?
-        Array(params[unrecognized_key]).each do |item|
-          tags << item
-        end
-      end
-
-      tags << params[:annotation][:value] if params[:annotation] && params[:annotation][:value]
-
-      tags
-    end
-
-    def tag_as_user_with(tags, attr = 'tag', owner = User.current_user)
-      tag_with tags, attr, owner, true
-    end
-
     # returns true or false to indicate the tags have changed
     def tag_with(tags, attr = 'tag', owner = User.current_user, owned_tags_only = false)
-      tags = Array(tags)
-      # FIXME: yuck! - this is required so that self has an id and can be assigned to an Annotation.annotatable
-      return if new_record? && !save
+      values_to_add = Array(tags).uniq(&:downcase).compact
 
-      current = annotations_with_attribute(attr)
-      original = current
-      current = current.select { |c| c.source == owner } if owned_tags_only
-      for_removal = []
-      current.each do |cur|
-        for_removal << cur unless tags.include?(cur.value.text)
-      end
+      existing = annotations_with_attribute(attr)
+      existing = existing.select { |t| t.source == owner } if owned_tags_only
 
-      tags.each do |tag|
-        exists = TextValue.where('lower(text) = ?', tag.downcase)
-        # text_value exists for this attr
-        if !exists.empty?
-
-          # isn't already used as an annotation for this entity
-          if owned_tags_only
-            matching = Annotation.for_annotatable(self.class.name, id).with_attribute_name(attr).by_source(owner.class.name, owner.id).select { |a| a.value.text.casecmp(tag.downcase).zero? }
-          else
-            matching = Annotation.for_annotatable(self.class.name, id).with_attribute_name(attr).select { |a| a.value.text.casecmp(tag.downcase).zero? }
-          end
-
-          if matching.empty?
-            annotation = Annotation.new(source: owner,
-                                        annotatable: self,
-                                        attribute_name: attr,
-                                        value: exists.first)
-            annotation.save!
-          end
+      tags_removed = false
+      existing.each do |tag|
+        index = values_to_add.index { |v| v.casecmp(tag.value.text) == 0 }
+        if index
+          values_to_add.delete_at(index)
         else
-          annotation = Annotation.new(source: owner,
-                                      annotatable: self,
-                                      attribute_name: attr,
-                                      value: tag)
-          annotation.save!
+          tags_removed = true
+          tag.mark_for_destruction
         end
       end
-      for_removal.each(&:destroy)
-      # return if the annotations have changed. just use the text to avoid issues with ID's changing
-      original = original.collect { |a| a.value.text }.sort
-      new = annotations_with_attribute(attr).collect { |a| a.value.text }.sort
-      original != new
+
+      values_to_add.each do |value|
+        text_value = TextValue.where('lower(text) = ?', value.downcase).first_or_initialize(text: value)
+        annotations.build(source: owner, attribute_name: attr, value: text_value)
+      end
+
+      values_to_add.any? || tags_removed
     end
 
     def searchable_tags

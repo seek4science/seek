@@ -427,6 +427,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
           p.expertise = %w[golf fishing]
+          p.save!
         end
       end
 
@@ -437,6 +438,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', -1) do
         assert_no_difference('TextValue.count') do
           p.expertise = ['golf']
+          p.save!
         end
       end
 
@@ -447,6 +449,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count') do
         assert_no_difference('TextValue.count') do
           p2.expertise = ['golf']
+          p2.save!
         end
       end
     end
@@ -459,6 +462,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
           p.tools = %w[golf fishing]
+          p.save!
         end
       end
 
@@ -469,6 +473,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', -1) do
         assert_no_difference('TextValue.count') do
           p.tools = ['golf']
+          p.save!
         end
       end
 
@@ -479,6 +484,7 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count') do
         assert_no_difference('TextValue.count') do
           p2.tools = ['golf']
+          p2.save!
         end
       end
     end

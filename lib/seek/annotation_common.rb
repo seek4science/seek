@@ -56,7 +56,7 @@ module Seek
     # to the current user - it doesn't affect other peoples tags for that item.
     def update_owned_annotations(entity, owner, attr, annotations)
       unless owner.nil?
-        entity.tag_annotations_as_user(annotations, attr, owner)
+        entity.tag_annotations(annotations, attr, owner, true)
         expire_annotation_fragments(attr) if immediately_clear_tag_cloud?
       end
     end

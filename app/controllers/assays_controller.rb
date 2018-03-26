@@ -114,8 +114,8 @@ class AssaysController < ApplicationController
     update_assay_organisms @assay, params
     @assay.contributor=current_person
     update_sharing_policies @assay
-    update_annotations(params[:tag_list], @assay) #this saves the assay
-    update_scales @assay
+    update_annotations(params[:tag_list], @assay)
+    update_scales @assay #this saves the assay
 
     a = @assay.present?
     b = @assay.save
