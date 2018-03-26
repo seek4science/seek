@@ -32,7 +32,6 @@ module Seek
     def setup_new_asset
       item = class_for_controller_name.new
       item.parent_name = params[:parent_name] if item.respond_to?(:parent_name)
-      item.is_with_sample = params[:is_with_sample] if item.respond_to?(:is_with_sample)
       set_shared_item_variable(item)
       @content_blob = ContentBlob.new
       @page_title = params[:page_title]

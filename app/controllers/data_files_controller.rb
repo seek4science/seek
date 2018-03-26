@@ -93,13 +93,6 @@ class DataFilesController < ApplicationController
             new_f.save
           end
           flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
-          if @data_file.is_with_sample?
-            bio_samples = @data_file.bio_samples_population @data_file.samples.first.institution_id if @data_file.samples.first
-            unless bio_samples.errors.blank?
-              flash[:notice] << '<br/> However, Sample database population failed.'
-              flash[:error] = bio_samples.errors.html_safe
-            end
-          end
         else
           flash[:error] = 'Unable to save newflash[:error] version'
         end
@@ -228,15 +221,6 @@ class DataFilesController < ApplicationController
         else
           respond_to do |format|
             flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-            # parse the data file if it is with sample data
-            if @data_file.is_with_sample
-              bio_samples = @data_file.bio_samples_population params[:institution_id]
-
-              unless  bio_samples.errors.blank?
-                flash[:notice] << '<br/> However, Sample database population failed.'
-                flash[:error] = bio_samples.errors.html_safe
-              end
-            end
             # the assay_id param can also contain the relationship type
             assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
             update_assay_assets(@data_file, assay_ids, relationship_types)

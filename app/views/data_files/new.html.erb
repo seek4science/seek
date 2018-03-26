@@ -3,7 +3,6 @@
 
 <%= form_tag({:action => :create_content_blob}, :multipart => true) do -%>
     <%= hidden_field_tag 'data_file[parent_name]', @data_file.parent_name%>
-    <%= hidden_field_tag 'data_file[is_with_sample]', @data_file.is_with_sample%>
 
     <div class="asset_form">
       <%= error_messages_for :data_file -%>
