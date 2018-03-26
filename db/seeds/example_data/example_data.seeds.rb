@@ -6,13 +6,13 @@ workgroup = WorkGroup.where(project_id: project.id, institution_id: institution.
 admin_user = User.where(login: 'admin').first_or_create(
   login: 'admin',
   email: 'admin@test1000.com',
-  password: 'admin', password_confirmation: 'admin'
+  password: 'adminadmin', password_confirmation: 'adminadmin'
 )
 
 # Admin and guest
 admin_user.activate
-admin_user.person ||= Person.create(first_name: 'Admin', last_name: 'User', email: 'admin@test1000.com')
-admin_user.save
+admin_user.build_person(first_name: 'Admin', last_name: 'User', email: 'admin@test1000.com') unless admin_user.person
+admin_user.save!
 admin_user.person.work_groups << workgroup
 admin_person = admin_user.person
 admin_person.save
@@ -21,11 +21,11 @@ puts 'Seeded 1 admin.'
 guest_user = User.where(login: 'guest').first_or_create(
   login: 'guest',
   email: 'guest@test1000.com',
-  password: 'guest', password_confirmation: 'guest'
+  password: 'guestguest', password_confirmation: 'guestguest'
 )
 guest_user.activate
-guest_user.person ||= Person.create(first_name: 'Guest', last_name: 'User', email: 'guest@example.com')
-guest_user.save
+guest_user.build_person(first_name: 'Guest', last_name: 'User', email: 'guest@example.com') unless guest_user.person
+guest_user.save!
 guest_user.person.work_groups << workgroup
 guest_person = guest_user.person
 guest_person.save
@@ -226,5 +226,5 @@ Seek::Config.doi_prefix = '10.5072'
 Seek::Config.doi_suffix = 'seek.5'
 puts 'Finish configuration'
 puts 'Please visit admin site for further configuration, e.g. site_base_host, pubmed_api_email, crossref_api_email, bioportal_api_key, email, doi, admin email'
-puts 'Admin account: username admin, password admin. You might want to change admin password.'
+puts 'Admin account: username admin, password adminadmin. You might want to change admin password.'
 puts 'Then make sure solr, workers are running'
