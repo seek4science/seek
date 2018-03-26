@@ -2,12 +2,12 @@ module ApiTestHelper
   include AuthenticatedTestHelper
 
   # Override me!
-  def populate_extra_attributes
+  def populate_extra_attributes(hash = nil)
     {}.with_indifferent_access
   end
 
   # Override me!
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     {}.with_indifferent_access
   end
 

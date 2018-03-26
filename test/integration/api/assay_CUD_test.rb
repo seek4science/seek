@@ -37,7 +37,7 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
                      r: ApiTestHelper.method(:render_erb) }
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     person_id = @current_user.person.id
     investigation = @study.investigation
     investigation_id = investigation.id
