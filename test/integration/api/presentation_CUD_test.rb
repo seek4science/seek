@@ -17,11 +17,11 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: @current_person)
+    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: presentation.id})
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
     extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },

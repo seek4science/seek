@@ -20,11 +20,15 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @current_person)
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: data_file.id})
   end
 
-  def populate_extra_relationships
+  def populate_extra_attributes(hash=nil)
+    {}
+  end
+
+  def populate_extra_relationships(hash=nil)
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
     extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },

@@ -1,0 +1,24 @@
+<div class="panel panel-default">
+  <div class="form-group">
+    <label>Title <span class="required">*</span></label>
+    <%= f.text_field :title, :class => "form-control" -%>
+  </div>
+  <div class="form-group">
+    <label>Description</label>
+    <%= f.text_area :description, :class => "form-control", :rows => 5 -%>
+  </div>
+  <div class="form-group">
+    <div class='help-block'>Check this box if this data is the result of a model simulation</div>
+    <label>
+      <%= f.check_box :simulation_data %>
+      Model simulation data
+    </label>
+  </div>
+  <%= render :partial => "projects/project_selector", locals: {resource: @data_file, allow_nil: Seek::Config.is_virtualliver} -%>
+  <%= render :seek_partial => "assets/select_tags", locals: {collapsed: true} if DataFile.is_taggable? %>
+  <%= cancel_button(data_files_path) -%>
+  <div class="multi-step-buttons">
+    <%= multi_step_forward_button %>
+    <%= multi_step_end_button %>
+  </div>
+</div>

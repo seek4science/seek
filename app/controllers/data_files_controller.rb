@@ -11,7 +11,7 @@ class DataFilesController < ApplicationController
   include Seek::AssetsCommon
 
   before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
   before_filter :find_display_asset, only: [:show, :explore, :download, :matching_models]
   skip_before_filter :verify_authenticity_token, only: [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
@@ -22,6 +22,8 @@ class DataFilesController < ApplicationController
   before_filter :oauth_client, only: :retrieve_nels_sample_metadata
   before_filter :nels_oauth_session, only: :retrieve_nels_sample_metadata
   before_filter :rest_client, only: :retrieve_nels_sample_metadata
+
+  before_filter :login_required, only: [:create, :create_content_blob, :create_metadata]
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -48,6 +50,22 @@ class DataFilesController < ApplicationController
         @data_file.extracted_samples.destroy_all
       end
       super
+    end
+  end
+
+  def create_content_blob
+    @data_file=DataFile.new
+    respond_to do |format|
+      if handle_upload_data
+        create_content_blobs
+        @data_file.populate_metadata_from_template
+        @assay=@data_file.initialise_assay_from_template
+        session[:uploaded_content_blob_id] = @data_file.content_blob.id
+        format.html {render :provide_metadata}
+      else
+        session.delete(:uploaded_content_blob_id)
+        format.html {render action: :new}
+      end
     end
   end
 
@@ -141,6 +159,65 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def create_metadata
+    @data_file = DataFile.new(data_file_params)
+    assay_params = data_file_assay_params
+    sop_id = assay_params.delete(:sop_id)
+    create_new_assay = assay_params.delete(:create_assay)
+
+    update_sharing_policies(@data_file)
+
+    @assay = Assay.new(assay_params)
+    if (sop_id)
+      sop = Sop.find_by_id(sop_id)
+      if sop && sop.can_view?
+        @assay.associate(sop)
+      end
+    end
+    @assay.policy = @data_file.policy.deep_copy if create_new_assay
+
+    filter_associated_projects(@data_file)
+
+    # associate_content_blob
+    blob_id = params[:content_blob_id]
+
+    #check it matches that previously uploaded and recorded on the session
+    valid_blob = (blob_id == session[:uploaded_content_blob_id].to_s)
+
+    blob = ContentBlob.find(blob_id)
+    @data_file.content_blob = blob
+
+    # FIXME: clunky
+    if valid_blob && (!create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)) && @data_file.save && blob.save
+      update_annotations(params[:tag_list], @data_file)
+      update_scales @data_file
+
+      update_relationships(@data_file, params)
+
+      session.delete(:uploaded_content_blob_id)
+
+      respond_to do |format|
+        flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
+        # parse the data file if it is with sample data
+
+        # the assay_id param can also contain the relationship type
+        assay_ids, _relationship_types = determine_related_assay_ids_and_relationship_types(params)
+        assay_ids = [@assay.id.to_s] if create_new_assay
+        update_assay_assets(@data_file, assay_ids)
+        format.html { redirect_to data_file_path(@data_file) }
+        format.json { render json: @data_file }
+      end
+
+    else
+      @data_file.errors[:base]="The file uploaded doesn't match" unless valid_blob
+      respond_to do |format|
+        format.html do
+          render :provide_metadata, status: :unprocessable_entity
+        end
+      end
+    end
+  end
+
   def create
     @data_file = DataFile.new(data_file_params)
 
@@ -199,6 +276,9 @@ class DataFilesController < ApplicationController
   end
 
   def update
+    if params[:data_file].empty? && !params[:datafile].empty?
+      params[:data_file] = params[:datafile]
+    end	
     @data_file.assign_attributes(data_file_params)
 
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
@@ -441,6 +521,10 @@ class DataFilesController < ApplicationController
     params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,
                                       :parent_name, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+  end
+
+  def data_file_assay_params
+    params.fetch(:assay,{}).permit(:title, :description, :assay_class_id, :study_id, :sop_id,:assay_type_uri,:technology_type_uri, :create_assay)
   end
 
   def oauth_client

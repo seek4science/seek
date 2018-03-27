@@ -393,7 +393,7 @@ class ApplicationController < ActionController::Base
                              data: activity_loggable.title)
         end
       when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
-        action = 'create' if action == 'upload_for_tool'
+        action = 'create' if action == 'upload_for_tool' || action == 'create_metadata'
         action = 'update' if action == 'new_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)

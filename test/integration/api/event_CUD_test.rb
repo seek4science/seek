@@ -22,7 +22,7 @@ class EventCUDTest < ActionDispatch::IntegrationTest
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: event.id})
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
     extra_relationships.with_indifferent_access

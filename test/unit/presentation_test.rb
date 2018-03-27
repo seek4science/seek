@@ -60,21 +60,4 @@ class PresentationTest < ActiveSupport::TestCase
     assert_not_nil presentation.uuid
   end
 
-  test 'is restorable after destroy' do
-    pre = Factory :presentation, policy: Factory(:all_sysmo_viewable_policy), title: 'is it restorable?'
-    blob_path = pre.content_blob.filepath
-    User.current_user = pre.contributor
-    assert_difference('Presentation.count', -1) do
-      pre.destroy
-    end
-    assert_nil Presentation.find_by_title 'is it restorable?'
-    assert_difference('Presentation.count', 1) do
-      disable_authorization_checks { Presentation.restore_trash!(pre.id) }
-    end
-    pre = Presentation.find_by_title('is it restorable?')
-    refute_nil pre
-    refute_nil pre.content_blob
-    assert_equal blob_path, pre.content_blob.filepath
-    assert File.exist?(blob_path)
-  end
 end

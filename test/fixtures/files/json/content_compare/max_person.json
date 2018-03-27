@@ -8,6 +8,8 @@
       "description": "A person with all possible details",
       "first_name": "Maximilian",
       "last_name": "Maxi-Mum",
+      "phone": "34-167-552266",
+      "skype_name": "myskypename",
       "web_page": "http://www.website.com",
       "orcid": "http://orcid.org/0000-0001-9842-9718",
       "mbox_sha1sum": "88c4af0911164449f30870c60d161fddda8f9771",

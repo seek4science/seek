@@ -2748,6 +2748,12 @@
                 },
                 "tools" : {
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "phone" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "skype_name" : {
+                   "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
               "required" : [ "title", "first_name", "last_name", "mbox_sha1sum" ],
@@ -2851,6 +2857,12 @@
                 },
                 "tools" : {
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "phone" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "skype_name" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
               "additionalProperties" : false
@@ -2898,6 +2910,12 @@
                 },
                 "tools" : {
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "phone" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "skype_name" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
               "required" : [ "first_name", "last_name" ],

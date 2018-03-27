@@ -9,9 +9,6 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     @clz = "project"
     @plural_clz = @clz.pluralize
 
-    p = Factory(:project)
-    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: p.id})
-
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
     @to_post = load_template("post_min_#{@clz}.json.erb", {title: "Post Project" })
   end
@@ -20,7 +17,13 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
       @post_values = {title: "Post Project"}
   end
 
-   def test_should_create_project_with_hierarchy
+  def create_patch_values
+    p = Factory(:project)
+    pr = Factory(:person)
+    @patch_values = {id: p.id, person_id: pr.id}
+  end
+
+  def test_should_create_project_with_hierarchy
     parent = Factory(:project, title: 'Test Parent')
     @to_post['data']['attributes']['title'] = 'test project hierarchy'
     @to_post['data']['attributes']['parent_id'] = parent.id

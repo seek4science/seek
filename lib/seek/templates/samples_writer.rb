@@ -24,7 +24,7 @@ module Seek
 
       # this is the path the base template, that contains the rightfield metadata sheet
       def base_template_path
-        File.join(Rails.root,'config','default_data','base-samples-template.xlsx')
+        File.join(Rails.root, 'config', 'default_data', 'base-samples-template.xlsx')
       end
 
       def define_columns

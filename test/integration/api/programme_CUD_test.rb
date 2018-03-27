@@ -9,15 +9,18 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     @clz = "programme"
     @plural_clz = @clz.pluralize
 
-    p = Factory(:programme)
-    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: p.id})
-
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
+    p = Factory(:programme)
     @to_post = load_template("post_min_#{@clz}.json.erb", {title: "post programme"})
   end
 
   def create_post_values
-    @post_values = {title: "Post programme"}
+      @post_values = {title: "Post programme"}
+  end
+
+  def create_patch_values
+    p = Factory(:programme)
+    @patch_values = {id: p.id}
   end
 
   #normal user without admin rights

@@ -37,12 +37,21 @@ module AssaysHelper
   end
 
   # the selection dropdown box for selecting the study for an assay
-  def assay_study_selection(current_study, form)
+  def assay_study_selection(element_name, current_study)
     grouped_options = grouped_options_for_study_selection(current_study)
     blank = current_study.blank? ? 'Not specified' : nil
     disabled = current_study && !current_study.can_edit?
-    form.select(:study_id, grouped_options_for_select(grouped_options, current_study.try(:id)),
-                { include_blank: blank }, class: 'form-control', disabled: disabled).html_safe
+    options = grouped_options_for_select(grouped_options, current_study.try(:id))
+    select_tag(element_name, options,
+               class: 'form-control', include_blank: blank, disabled: disabled).html_safe
+  end
+
+  # a lightway way to select a SOP - specifically for the assay creation during data file creation
+  def assay_sop_selection(element_name, current_sop)
+    sops =authorised_sops(User.current_user.person.projects)
+    options = options_from_collection_for_select(sops, :id,:title, current_sop.try(:id))
+    select_tag(element_name, options,
+               class: 'form-control', include_blank: true).html_safe
   end
 
   # options for grouped_option_for_select, for building the select box for assay->study selection, grouped by investigation

@@ -37,17 +37,12 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
                      r: ApiTestHelper.method(:render_erb) }
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     person_id = @current_user.person.id
-    investigation = @study.investigation
-    investigation_id = investigation.id
-    project_id = investigation.projects[0].id
 
     extra_relationships = {}
-    extra_relationships[:submitter] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships[:people] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships[:projects] = JSON.parse "{\"data\" : [{\"id\" : \"#{project_id}\", \"type\" : \"projects\"}]}"
-    extra_relationships[:investigation] = JSON.parse "{\"data\" : {\"id\" : \"#{investigation_id}\", \"type\" : \"investigations\"}}"
+    extra_relationships[:submitter] = { data: [{ id: person_id.to_s, type: 'people' }] }
+    extra_relationships[:people] = { data: [{ id: person_id.to_s, type: 'people' }] }
     extra_relationships.with_indifferent_access
   end
 

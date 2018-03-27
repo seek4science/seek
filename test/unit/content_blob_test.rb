@@ -2,6 +2,7 @@ require 'test_helper'
 require 'docsplit'
 require 'seek/download_handling/http_streamer' # Needed to load exceptions that are tested later
 require 'minitest/mock'
+require 'time_test_helper'
 require 'private_address_check'
 
 class ContentBlobTest < ActiveSupport::TestCase
@@ -193,11 +194,10 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   def test_uuid
-    pic = content_blobs(:picture_blob)
-    blob = ContentBlob.new(data: pic.data_io_object.read, original_filename: 'piccy.jpg')
+    blob = Factory(:content_blob)
     blob.save!
     assert_not_nil blob.uuid
-    assert_not_nil ContentBlob.find(blob.id).uuid
+    assert_equal blob.uuid, ContentBlob.find(blob.id).uuid
   end
 
   def data_for_test(filename)
@@ -817,12 +817,69 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'raises 404 when nels sample metadata missing' do
     setup_nels_for_units
 
-    blob = ContentBlob.create(url: "https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404")
+    blob = ContentBlob.create(url: 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=404')
 
     assert_raises(RestClient::ResourceNotFound) do
       VCR.use_cassette('nels/missing_sample_metadata') do
         blob.retrieve_from_nels(@nels_access_token)
       end
     end
+  end
+
+  test 'added timestamps' do
+    t1 = 1.day.ago
+    blob = nil
+    pretend_now_is(t1) do
+      blob = Factory(:content_blob)
+      assert_equal t1.to_s, blob.created_at.to_s
+      assert_equal t1.to_s, blob.updated_at.to_s
+    end
+
+    t2 = 1.hour.ago
+    pretend_now_is(t2) do
+      blob.content_type = 'text/xml'
+      blob.save!
+      assert_equal t2.to_s, blob.updated_at.to_s
+    end
+  end
+
+  test 'deletes image files after destroy' do
+    blob = Factory(:image_content_blob)
+    filepath = blob.file_path
+    refute_nil filepath
+    assert File.exist?(filepath)
+    assert_difference('ContentBlob.count', -1) do
+      blob.destroy
+    end
+    refute File.exist?(filepath)
+  end
+
+  test 'deletes files after destroy' do
+    blob = Factory(:spreadsheet_content_blob)
+    filepath = blob.file_path
+    refute_nil filepath
+    assert File.exist?(filepath)
+    assert_difference('ContentBlob.count', -1) do
+      blob.destroy
+    end
+    refute File.exist?(filepath)
+  end
+
+  test 'deletes converted files after destroy' do
+    blob = Factory(:doc_content_blob)
+    pdf_path = blob.filepath('pdf')
+    txt_path = blob.filepath('txt')
+
+    # pretend the conversion has taken place
+    FileUtils.touch(pdf_path)
+    FileUtils.touch(txt_path)
+
+    assert File.exist?(pdf_path)
+    assert File.exist?(txt_path)
+    assert_difference('ContentBlob.count', -1) do
+      blob.destroy
+    end
+    refute File.exist?(pdf_path)
+    refute File.exist?(txt_path)
   end
 end
