@@ -7,7 +7,17 @@
       "title": "Updated Project",
       "description": "with a new description!",
       "web_page": "http://www.taverna.org.uk",
-      "wiki_page": "http://www.mygrid.org.uk"
+      "wiki_page": "http://www.mygrid.org.uk",
+      "default_policy": {
+        "access": "manage",
+        "permissions": [
+          {
+            "resource_id": "<%= Factory(:person).id %>",
+            "resource_type": "people",
+            "access": "manage"
+          }
+        ]
+      }
     }
   }
 }

@@ -192,7 +192,7 @@ class ProjectsController < ApplicationController
   def update
     update_params = project_params
 
-    if @project.present? && !json_api_request?
+    if @project.present?
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end
 
