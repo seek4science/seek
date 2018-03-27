@@ -83,6 +83,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
         'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
 
     assert_response :forbidden
+    validate_json_against_fragment response.body, '#/definitions/errors'
     blob = pdf_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -103,6 +104,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
         'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
 
     assert_response :bad_request
+    validate_json_against_fragment response.body, '#/definitions/errors'
     blob = pdf_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
@@ -143,6 +145,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference("#{@clz.classify}.count") do
       post "/#{@plural_clz}.json", @to_post
       assert_response :unprocessable_entity
+      validate_json_against_fragment response.body, '#/definitions/errors'
     end
 
     h = JSON.parse(response.body)

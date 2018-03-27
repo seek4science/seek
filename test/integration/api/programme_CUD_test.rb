@@ -56,6 +56,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
      assert_no_difference('Programme.count', -1) do
        delete "/programmes/#{prog.id}.json"
        assert_response :forbidden
+       validate_json_against_fragment response.body, '#/definitions/errors'
      end
 
      #no projects ==> can delete
@@ -68,5 +69,6 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
 
      get "/programmes/#{prog.id}.json"
      assert_response :not_found
+     validate_json_against_fragment response.body, '#/definitions/errors'
    end
 end

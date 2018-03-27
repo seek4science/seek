@@ -59,6 +59,7 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
       assert_no_difference('Assay.count') do
         delete "/#{@plural_clz}/#{a.id}.json"
         assert_response :forbidden
+        validate_json_against_fragment response.body, '#/definitions/errors'
       end
     end
   end
