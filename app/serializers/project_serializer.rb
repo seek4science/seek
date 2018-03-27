@@ -7,7 +7,7 @@ class ProjectSerializer < AvatarObjSerializer
   attribute :default_policy, if: :show_default_policy?
 
   def default_policy
-    self.convert_policy object.default_policy
+    BaseSerializer.convert_policy object.default_policy
   end
 
   has_many :organisms,  include_data: true
