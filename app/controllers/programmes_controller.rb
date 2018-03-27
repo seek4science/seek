@@ -22,9 +22,6 @@ class ProgrammesController < ApplicationController
   respond_to :html, :json
 
   def create
-    #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
-    funding_codes = params[:programme].delete(:funding_codes)
-
     @programme = Programme.new(programme_params)
 
     respond_to do |format|
@@ -40,10 +37,6 @@ class ProgrammesController < ApplicationController
             Mailer.delay.programme_activation_required(@programme,current_person)
           end
         end
-        begin
-        @programme.update_attribute(:funding_codes,funding_codes)
-        rescue
-        end
         format.html {respond_with(@programme)}
         format.json {render json: @programme}
       else
@@ -55,7 +48,7 @@ class ProgrammesController < ApplicationController
 
   def update
     update_params = programme_params
-   respond_to do |format|
+    respond_to do |format|
       if @programme.present?
         if @programme.update_attributes(update_params)
           flash[:notice] = "The #{t('programme').capitalize} was successfully updated"
