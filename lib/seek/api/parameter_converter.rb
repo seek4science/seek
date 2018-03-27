@@ -81,12 +81,15 @@ module Seek
           data_file_ids: ->(value) {
             value.map { |i| { 'id' => i }.with_indifferent_access }
           }
-      }.freeze
+      }
+      CONVERSIONS[:default_policy] = CONVERSIONS[:policy]
+      CONVERSIONS.freeze
 
-      # Parameters to rename
+          # Parameters to rename
       RENAME = {
           tags: :tag_list,
           policy: :policy_attributes,
+          default_policy: :policy_attributes,
           creator_ids: :creators,
           publication_ids: :related_publication_ids,
           assay_class: :assay_class_id,
@@ -97,14 +100,17 @@ module Seek
           model_format: :model_format_id,
           environment: :recommended_environment_id,
           data_file_ids: :data_files,
+          sop_ids: :assay_sop_ids,
+          organism_ids: :assay_organism_ids,
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
       ELEVATE = %i[assay_organism_ids tag_list expertise_list tool_list policy_attributes content_blobs
-       assay_ids related_publication_ids revision_comments creators data_files].freeze
+       assay_ids related_publication_ids revision_comments creators data_files assay_sop_ids document_ids model_ids].freeze
 
       def initialize(controller_name)
         @controller_name = controller_name
+
       end
 
       def convert(parameters)

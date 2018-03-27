@@ -30,8 +30,9 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_patch_values
+    @study = @assay.study
     @patch_values = {id: @assay.id,
-                     study_id: @assay.study.id,
+                     study_id: @study.id,
                      project_id: Factory(:project).id,
                      creator_ids: [@current_user.person.id],
                      r: ApiTestHelper.method(:render_erb) }
@@ -43,6 +44,8 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: person_id.to_s, type: 'people' }] }
     extra_relationships[:people] = { data: [{ id: person_id.to_s, type: 'people' }] }
+    extra_relationships[:investigation] = { data: { id: @study.investigation.id.to_s, type: 'investigations' } }
+
     extra_relationships.with_indifferent_access
   end
 

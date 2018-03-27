@@ -1379,6 +1379,21 @@
                 },
                 "publications" : {
                   "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "data_files" : {
+                  "$ref" : "#/definitions/dataFileReferencesList"
+                },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
+                "models" : {
+                  "$ref" : "#/definitions/modelReferencesList"
+                },
+                "sops" : {
+                  "$ref" : "#/definitions/sopReferencesList"
+                },
+                "organisms" : {
+                  "$ref" : "#/definitions/organismReferencesList"
                 }
               },
               "required" : [ "study" ],
@@ -1466,6 +1481,21 @@
                 },
                 "publications" : {
                   "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "data_files" : {
+                  "$ref" : "#/definitions/dataFileReferencesList"
+                },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
+                "models" : {
+                  "$ref" : "#/definitions/modelReferencesList"
+                },
+                "sops" : {
+                  "$ref" : "#/definitions/sopReferencesList"
+                },
+                "organisms" : {
+                  "$ref" : "#/definitions/organismReferencesList"
                 }
               },
               "additionalProperties" : false

@@ -2,7 +2,7 @@
   "data": {
     "type": "assays",
     "attributes": {
-      "title": "A Maximal Assay",
+      "title": "A Maximal experimental Assay",
       "assay_class": {
         "key": "EXP"
       },
@@ -39,6 +39,46 @@
           {
             "id": "<%= Factory(:publication).id %>",
             "type": "publications"
+          }
+        ]
+      },
+      "organisms":{
+        "data": [
+          {
+            "id": "<%= Factory(:organism).id %>",
+            "type": "organisms"
+          }
+        ]
+      },
+      "sops":{
+        "data": [
+          {
+            "id": "<%= Factory(:sop, policy: Factory(:public_policy)).id %>",
+            "type": "sops"
+          }
+        ]
+      },
+      "models":{
+        "data": [
+          {
+            "id": "<%= Factory(:model, policy: Factory(:public_policy)).id %>",
+            "type": "models"
+          }
+        ]
+      },
+      "data_files":{
+        "data": [
+          {
+            "id": "<%= Factory(:data_file, policy: Factory(:public_policy)).id %>",
+            "type": "data_files"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "<%= Factory(:document, policy: Factory(:public_policy)).id %>",
+            "type": "documents"
           }
         ]
       }
