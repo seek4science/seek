@@ -9,14 +9,18 @@ module Seek
       entity = controller_name.classify.constantize.find(params[:id])
       if entity.can_view?
         update_owned_annotations(entity, current_user, 'tag', params[:tag_list])
-        eval("@#{controller_name.singularize} = entity")
-        render :update do |page|
-          refresh_tag_cloud(entity, page)
+        if entity.save
+          eval("@#{controller_name.singularize} = entity")
+          render :update do |page|
+            refresh_tag_cloud(entity, page)
 
-          handle_clearing_tag_cloud(page)
+            handle_clearing_tag_cloud(page)
 
-          page.visual_effect :highlight, 'tag_cloud'
-          page.visual_effect :highlight, 'sidebar_tag_cloud'
+            page.visual_effect :highlight, 'tag_cloud'
+            page.visual_effect :highlight, 'sidebar_tag_cloud'
+          end
+        else
+          render nothing: true, status: 400
         end
       else
         render nothing: true, status: 400

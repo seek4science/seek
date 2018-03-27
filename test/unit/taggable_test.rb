@@ -33,7 +33,7 @@ class TaggableTest < ActiveSupport::TestCase
         p.save!
       end
     end
-    assert_equal %w(golf fishing).sort, p.expertise.collect(&:text).sort
+    assert_equal %w(golf fishing).sort, p.expertise.sort
   end
 
   test 'tag_with on new object' do
@@ -94,7 +94,7 @@ class TaggableTest < ActiveSupport::TestCase
       end
     end
 
-    assert_equal %w(golf fishing).sort, p.expertise.collect(&:text).sort
+    assert_equal %w(golf fishing).sort, p.expertise.sort
   end
 
   test 'tag_with changed response' do
