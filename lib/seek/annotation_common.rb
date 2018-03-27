@@ -43,7 +43,7 @@ module Seek
     # New tags are assigned to the owner, which defaults to the current user.
     def update_annotations(param, entity, attr = 'tag', owner = User.current_user)
       unless owner.nil?
-        entity.tag_annotations(param, attr)
+        entity.add_annotations(param, attr)
         if immediately_clear_tag_cloud?
           expire_annotation_fragments(attr)
         else
@@ -56,7 +56,7 @@ module Seek
     # to the current user - it doesn't affect other peoples tags for that item.
     def update_owned_annotations(entity, owner, attr, annotations)
       unless owner.nil?
-        entity.tag_annotations(annotations, attr, owner, true)
+        entity.add_annotations(annotations, attr, owner, true)
         expire_annotation_fragments(attr) if immediately_clear_tag_cloud?
       end
     end

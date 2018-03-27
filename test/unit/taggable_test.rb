@@ -82,14 +82,14 @@ class TaggableTest < ActiveSupport::TestCase
     assert_equal %w(golf).sort, tags
   end
 
-  test 'tag_annotations' do
+  test 'add_annotations' do
     p = Factory :person
     User.current_user = p.user
     assert_equal 0, p.expertise.size
     assert_difference('Annotation.count', 2) do
       assert_difference('TextValue.count', 2) do
         params = { expertise_list: 'golf,fishing' }
-        p.tag_annotations params[:expertise_list], 'expertise'
+        p.add_annotations params[:expertise_list], 'expertise'
         p.save!
       end
     end
