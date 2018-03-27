@@ -1,6 +1,4 @@
-<%
-  new_assay_content_presented = !(@assay.title.blank? && @assay.description.blank?)
-%>
+
 
 <% if Seek::Config.assays_enabled %>
   <div class="panel panel-default">
@@ -24,7 +22,7 @@
         <%= hidden_field_tag 'assay[assay_class_id]', @assay.assay_class_id || AssayClass.experimental.id %>
         <div class="form-group">
           <label>
-            <%= check_box_tag 'assay[create_assay]','1',new_assay_content_presented %>
+            <%= check_box_tag 'assay[create_assay]','1',@create_new_assay %>
             Create a new Assay ?
           </label>
         </div>
@@ -59,8 +57,8 @@
           </div>
         </div>
         <div class="alert alert-warning">
-          The new <%= t('assay') %> will adopt the same sharing permissions defined for the <%= t('data_file') %>, but
-          which can be independently changed afterwards.
+          The new <%= t('assay') %> will adopt the same sharing permissions defined for the <%= t('data_file') %>,
+          which can be changed independently afterwards.
         </div>
       </div>
     </div>
@@ -77,7 +75,7 @@
 <script type="application/javascript">
 
 $j(document).ready(function() {
-  <% if new_assay_content_presented %>
+  <% if @create_new_assay %>
     $j('#new-assay-tab').trigger('click');
   <% end %>
 });
