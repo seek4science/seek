@@ -8,7 +8,7 @@
       "description": null,
       "web_page": null,
       "wiki_page": null,
-      "license": "CC-BY-4.0"
+      "default_license": "CC-BY-4.0"
     },
     "relationships": {
       "organisms": {
