@@ -313,7 +313,6 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         end
 
         assay_codes = openbis_endpoint.assay_types
-        puts "UTIL assay_types codes #{assay_codes}"
         types.concat(Seek::Openbis::EntityType.SampleType(openbis_endpoint).find_by_codes(assay_codes)) unless assay_codes.empty?
 
         types

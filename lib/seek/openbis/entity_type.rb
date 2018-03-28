@@ -85,11 +85,6 @@ module Seek
         cache_option = refresh ? { force: true } : nil
 
         json = query_application_server_by_code(codes.join(","), cache_option)
-        puts "XXXXXXXXX
-        #{json.to_json}
-XXX SIZE
-        #{json[json_key].length}
-"
         construct_from_json(json, entity_type)
       end
 

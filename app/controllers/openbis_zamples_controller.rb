@@ -221,10 +221,8 @@ class OpenbisZamplesController < ApplicationController
 
 
   def get_assay_types
-    puts "--------GET_ASSAY_TYPE"
     @entity_types = seek_util.assay_types(@openbis_endpoint)
     @entity_types_codes = @entity_types.map { |t| t.code }
-    puts "TYPES CODES: #{@entity_types_codes}"
     @entity_type_options = @entity_types_codes + [Seek::Openbis::ALL_ASSAYS, Seek::Openbis::ALL_TYPES]
   end
 
