@@ -28,6 +28,9 @@ class Publication < ActiveRecord::Base
            as: :other_object,
            dependent: :destroy
 
+  has_many :presentations,through: :backwards_relationships, source: :subject, source_type:'Presentation'
+
+
   VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
   # Note that the PubMed regex deliberately does not allow versions
@@ -186,9 +189,9 @@ class Publication < ActiveRecord::Base
     backwards_relationships.select { |a| a.subject_type == 'Investigation' }.collect(&:subject)
   end
 
-  def presentations
-    backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
-  end
+  # def presentations
+  #   backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
+  # end
 
   def associate(item)
     clause = { subject_type: item.class.name,
