@@ -11,6 +11,11 @@
       "funding_codes": ["DFG"]
     },
     "relationships": {
+      "administrators": {
+        "data": [
+          {"id": "73", "type": "people"}
+        ]
+      },
       "people": {
         "data": [
           {"id": "1039986529", "type": "people"},
