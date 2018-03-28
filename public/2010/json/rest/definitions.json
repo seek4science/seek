@@ -3222,6 +3222,9 @@
             "relationships" : {
               "type" : "object",
               "properties" : {
+                "administrators" : {
+                "$ref" : "#/definitions/peopleReferenceList"
+                },
                 "people" : {
                   "$ref" : "#/definitions/peopleReferenceList"
                 },
@@ -3312,6 +3315,14 @@
               },
               "required" : [ "title" ],
               "additionalProperties" : false
+            },
+            "relationships": {
+              "administrators" : {
+                "$ref" : "#/definitions/peopleReferenceList"
+              },
+              "projects" : {
+                "$ref" : "#/definitions/projectReferencesList"
+              }
             }
           },
           "required" : [ "type", "attributes" ],
@@ -3353,6 +3364,14 @@
                 }
               },
               "additionalProperties" : false
+            },
+            "relationships": {
+              "administrators" : {
+                "$ref" : "#/definitions/peopleReferenceList"
+              },
+              "projects" : {
+                "$ref" : "#/definitions/projectReferencesList"
+              }
             }
           },
           "required" : [ "id", "type" ],
