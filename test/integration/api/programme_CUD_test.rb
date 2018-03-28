@@ -15,7 +15,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_post_values
-      @post_values = {title: "Post programme"}
+      @post_values = {title: "Post programme", admin_id: @current_person.id}
   end
 
   def create_patch_values
