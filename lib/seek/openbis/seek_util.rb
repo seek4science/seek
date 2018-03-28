@@ -299,15 +299,24 @@ the original OpenBIS experiment. Its content and linked data files will be updat
             .select { |s| types.include? s.type_code }
       end
 
-      def assay_types(openbis_endpoint)
+      def assay_types(openbis_endpoint, use_semantic = false)
 
-        semantic = Seek::Openbis::SemanticAnnotation.new
 
-        semantic.predicateAccessionId = 'is_a'
-        semantic.descriptorAccessionId = 'assay'
+        types = []
+        if use_semantic
+          semantic = Seek::Openbis::SemanticAnnotation.new
 
-        Seek::Openbis::EntityType.SampleType(openbis_endpoint).find_by_semantic(semantic)
+          semantic.predicateAccessionId = 'is_a'
+          semantic.descriptorAccessionId = 'assay'
 
+          types.concat Seek::Openbis::EntityType.SampleType(openbis_endpoint).find_by_semantic(semantic)
+        end
+
+        assay_codes = openbis_endpoint.assay_types
+        puts "UTIL assay_types codes #{assay_codes}"
+        types.concat(Seek::Openbis::EntityType.SampleType(openbis_endpoint).find_by_codes(assay_codes)) unless assay_codes.empty?
+
+        types
       end
 
       def dataset_types(openbis_endpoint)
@@ -316,7 +325,8 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
       def study_types(openbis_endpoint)
 
-        study_codes = ['DEFAULT_EXPERIMENT']
+        study_codes = openbis_endpoint.study_types
+        return [] if study_codes.empty?
 
         Seek::Openbis::EntityType.ExperimentType(openbis_endpoint).find_by_codes(study_codes)
 

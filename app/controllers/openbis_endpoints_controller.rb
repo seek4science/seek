@@ -35,8 +35,6 @@ class OpenbisEndpointsController < ApplicationController
 
   def update
     @openbis_endpoint.update_attributes(openbis_endpoint_params)
-    @openbis_endpoint.meta_config= openbis_endpoint_metaconfig
-
     save_and_respond 'The space was successfully updated.'
   end
 
@@ -63,7 +61,6 @@ class OpenbisEndpointsController < ApplicationController
 
   def create
     @openbis_endpoint = @project.openbis_endpoints.build(openbis_endpoint_params)
-    @openbis_endpoint.meta_config= openbis_endpoint_metaconfig
     save_and_respond 'The space was successfully created.'
   end
 
@@ -120,26 +117,13 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
-  def parse_code_names(names)
-
-    names ||= ''
-    names.upcase.split(/[,\s]/)
-        .select {|w| !w.empty?}
-        .uniq
-  end
-
-  def openbis_endpoint_metaconfig
-    studies = parse_code_names(params.require(:openbis_endpoint)[:study_types])
-    assays = parse_code_names(params.require(:openbis_endpoint)[:assay_types])
-
-    OpenbisEndpoint.build_meta_config(studies,assays)
-  end
 
   private
 
   def openbis_endpoint_params
     params.require(:openbis_endpoint).permit(:project_id, :web_endpoint, :as_endpoint, :dss_endpoint,
-                                             :username, :password, :refresh_period_mins, :space_perm_id)
+                                             :username, :password, :refresh_period_mins, :space_perm_id,
+                                             :study_types, :assay_types)
   end
 
   ### Filters

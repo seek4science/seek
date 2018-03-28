@@ -5,7 +5,7 @@ module Seek
       attr_reader :json, :modification_date, :code, :description,
                   :perm_id, :openbis_endpoint, :entity_type, :exception
 
-      @@TYPES = ['Sample','DataSet','Experiment']
+      @@TYPES = ['Sample', 'DataSet', 'Experiment']
 
       def self.SampleType(openbis_endpoint, code = nil, refresh = false)
         EntityType.new(openbis_endpoint, 'Sample', code, refresh)
@@ -73,19 +73,23 @@ module Seek
         construct_from_json(json, entity_type)
       end
 
-      def find_by_semantic(semantic,refresh = false)
+      def find_by_semantic(semantic, refresh = false)
         cache_option = refresh ? { force: true } : nil
 
-        json = query_application_server_by_semantic(semantic,cache_option)
+        json = query_application_server_by_semantic(semantic, cache_option)
         # puts json.to_json
         construct_from_json(json, entity_type)
       end
 
-      def find_by_codes(codes,refresh = false)
+      def find_by_codes(codes, refresh = false)
         cache_option = refresh ? { force: true } : nil
 
-        json = query_application_server_by_code(codes.join(","),cache_option)
-        # puts json.to_json
+        json = query_application_server_by_code(codes.join(","), cache_option)
+        puts "XXXXXXXXX
+        #{json.to_json}
+XXX SIZE
+        #{json[json_key].length}
+"
         construct_from_json(json, entity_type)
       end
 
@@ -95,7 +99,6 @@ module Seek
           self.class.new(openbis_endpoint, entity_type).populate_from_json(element)
         end.sort_by(&:code)
       end
-
 
 
       def cache_key(code)
@@ -130,7 +133,7 @@ module Seek
       def query_application_server_by_semantic(semantic, cache_option = nil)
         cache_code = type_name+':'+semantic.to_json
         # puts cache_code
-        query = {entityType: type_name, queryType: 'SEMANTIC'}
+        query = { entityType: type_name, queryType: 'SEMANTIC' }
         query[:predicateOntologyId] = semantic.predicateOntologyId if semantic.predicateOntologyId
         query[:predicateOntologyVersion] = semantic.predicateOntologyVersion if semantic.predicateOntologyVersion
         query[:predicateAccessionId] = semantic.predicateAccessionId if semantic.predicateAccessionId

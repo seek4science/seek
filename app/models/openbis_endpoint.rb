@@ -18,8 +18,9 @@ class OpenbisEndpoint < ActiveRecord::Base
   after_create :create_refresh_metadata_job
   after_destroy :clear_metadata_store, :remove_refresh_metadata_job
   after_initialize :default_policy, autosave: true
-  after_initialize :add_meta_config, autosave: true
 
+  after_initialize :add_meta_config, autosave: true
+  before_save :meta_config_to_json
 
 
   def self.can_create?
@@ -83,11 +84,11 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def registered_assays
-    Assay.joins(:external_asset).where(external_assets: {seek_service_id: id, seek_service_type: self.class})
+    Assay.joins(:external_asset).where(external_assets: { seek_service_id: id, seek_service_type: self.class })
   end
 
   def registered_datasets
-    DataFile.joins(:external_asset).where(external_assets: {seek_service_id: id, seek_service_type: self.class})
+    DataFile.joins(:external_asset).where(external_assets: { seek_service_id: id, seek_service_type: self.class })
   end
 
   def clear_metadata_store
@@ -116,39 +117,51 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def add_meta_config
-    self.meta_config= default_meta_config if meta_config_json.nil?
+    self.meta_config = self.class.default_meta_config if new_record? && meta_config_json.nil? && @meta_config.nil?
   end
 
-  def default_meta_config
+  def self.default_meta_config
     studies = ['DEFAULT_EXPERIMENT']
     assays = ['EXPERIMENTAL_STEP']
-    self.class.build_meta_config(studies,assays)
+    build_meta_config(studies, assays)
   end
 
   def self.build_meta_config(studies, assays)
     studies ||= []
     assays ||= []
     raise 'table with types names expected' unless (studies.is_a?(Array) && assays.is_a?(Array))
-    {study_types: studies, assay_types: assays}
+    { study_types: studies, assay_types: assays }
   end
 
-  def meta_config
-    @meta_config ||= self.meta_config_json ? JSON.parse(self.meta_config_json).symbolize_keys : {}
-    @meta_config
-  end
+  def parse_code_names(names)
 
-  def meta_config=(config)
-    self.meta_config_json= config.to_json
-    @meta_config = config
+    names ||= ''
+    names.upcase
+        .split(/[,\s]/)
+        .reject { |w| w.empty? }
+        .uniq
   end
 
   def study_types
     meta_config[:study_types] || []
   end
 
+  def study_types=(types)
+    types = parse_code_names(types) if types.is_a? String
+    raise 'table with types names expected' unless types.is_a? Array
+    meta_config[:study_types] = types
+  end
+
   def assay_types
     meta_config[:assay_types] || []
   end
+
+  def assay_types=(types)
+    types = parse_code_names(types) if types.is_a? String
+    raise 'table with types names expected' unless types.is_a? Array
+    meta_config[:assay_types] = types
+  end
+
 
   # this is necessary for the sharing form to include the project by default
   def projects
@@ -169,6 +182,24 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def due_to_refresh
     old = DateTime.now - refresh_period_mins.minutes
-    external_assets.synchronized.where("synchronized_at < ?",old)
+    external_assets.synchronized.where("synchronized_at < ?", old)
   end
+
+
+  private
+
+  def meta_config_to_json
+    self.meta_config_json = @meta_config.to_json if @meta_config # update only if local variable set
+  end
+
+  def meta_config
+    @meta_config ||= self.meta_config_json ? JSON.parse(self.meta_config_json).symbolize_keys : { study_types: [], assay_types: [] }
+    @meta_config
+  end
+
+  def meta_config=(config)
+    # self.meta_config_json = config.to_json
+    @meta_config = config
+  end
+
 end

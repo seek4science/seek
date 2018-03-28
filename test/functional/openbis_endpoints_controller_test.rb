@@ -57,17 +57,17 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       assert_difference('Delayed::Job.count') do
         post :create, project_id: @project.id, openbis_endpoint:
             {
-              as_endpoint: 'http://as.com',
-              dss_endpoint: 'http://dss.com',
-              web_endpoint: 'http://web.com',
-              username: 'fred',
-              password: 'secret',
-              refresh_period_mins: '123',
-              space_perm_id: 'space-id',
-              study_types: 'ST1, ST2',
-              assay_types: 'ASSAY, DEFAULT'
+                as_endpoint: 'http://as.com',
+                dss_endpoint: 'http://dss.com',
+                web_endpoint: 'http://web.com',
+                username: 'fred',
+                password: 'secret',
+                refresh_period_mins: '123',
+                space_perm_id: 'space-id',
+                study_types: 'ST1, ST2',
+                assay_types: 'ASSAY, DEFAULT'
             },
-                      policy_attributes: policy_attributes
+             policy_attributes: policy_attributes
       end
     end
     assert assigns(:openbis_endpoint)
@@ -106,17 +106,17 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     put :update, id: ep.id, project_id: @project.id, openbis_endpoint:
         {
-          as_endpoint: 'http://as.com',
-          dss_endpoint: 'http://dss.com',
-          web_endpoint: 'http://web.com',
-          username: 'fred',
-          password: 'secret',
-          refresh_period_mins: '123',
-          space_perm_id: 'space-id',
-          study_types: 'ST, ST2',
-          assay_types: 'ASSAY, ASS'
+            as_endpoint: 'http://as.com',
+            dss_endpoint: 'http://dss.com',
+            web_endpoint: 'http://web.com',
+            username: 'fred',
+            password: 'secret',
+            refresh_period_mins: '123',
+            space_perm_id: 'space-id',
+            study_types: 'ST, ST2',
+            assay_types: 'ASSAY, ASS'
         },
-                 policy_attributes: policy_attributes
+        policy_attributes: policy_attributes
 
     assert assigns(:openbis_endpoint)
     ep = assigns(:openbis_endpoint)
@@ -313,20 +313,20 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     project = person.projects.first
     post :fetch_spaces, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble'
+         dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+         web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+         username: 'wibble',
+         password: 'wobble'
     assert_response :redirect
     refute @response.body.include?('API-SPACE')
 
     # none project member cannot
     project = Factory(:project)
     post :fetch_spaces, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble'
+         dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+         web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+         username: 'wibble',
+         password: 'wobble'
     assert_response :redirect
     refute @response.body.include?('API-SPACE')
   end
@@ -366,11 +366,11 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     # none project member cannot
     project = Factory(:project)
     get :test_endpoint, project_id: project.id, as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-                        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-                        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-                        username: 'wibble',
-                        password: 'wobble',
-                        format: :json
+        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+        username: 'wibble',
+        password: 'wobble',
+        format: :json
     assert_response :redirect
     refute @response.body.include?('true')
   end
@@ -449,32 +449,10 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'refresh metadata store' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
-    post :refresh_metadata_store, id:endpoint.id,project_id: @project.id
+    post :refresh_metadata_store, id: endpoint.id, project_id: @project.id
     assert_response :success
     assert assigns(:openbis_endpoint)
   end
 
-  test 'parses string with code names using , and white spaces as separators' do
-    controller = OpenbisEndpointsController.new
 
-    input = nil
-    names = controller.parse_code_names(input)
-    assert_equal [], names
-
-    input = ''
-    names = controller.parse_code_names(input)
-    assert_equal [], names
-
-    input = ' '
-    names = controller.parse_code_names(input)
-    assert_equal [], names
-
-    input = ' N1, N2
-, name
-  name2, again N1
-'
-    names = controller.parse_code_names(input)
-    assert_equal ['N1', 'N2', 'NAME', 'NAME2', 'AGAIN'], names
-
-  end
 end

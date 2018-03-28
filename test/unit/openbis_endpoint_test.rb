@@ -589,18 +589,16 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'build_meta_config makes valid hash even on nil parameters' do
-    #endpoint = Factory(:openbis_endpoint)
     conf = OpenbisEndpoint.build_meta_config(nil, nil)
     exp = { study_types: [], assay_types: [] }
     assert_equal exp, conf
 
-    conf = OpenbisEndpoint.build_meta_config(['st1','st2'], ['a1'])
-    exp = { study_types: ['st1','st2'], assay_types: ['a1'] }
+    conf = OpenbisEndpoint.build_meta_config(['st1', 'st2'], ['a1'])
+    exp = { study_types: ['st1', 'st2'], assay_types: ['a1'] }
     assert_equal exp, conf
   end
 
   test 'build_meta_config raise exception if not empty non-table parameters' do
-    #endpoint = Factory(:openbis_endpoint)
 
     assert_raise do
       OpenbisEndpoint.build_meta_config('a', nil)
@@ -610,65 +608,114 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     end
   end
 
-  test 'default_meta_config is set with standard OpenBIS ELN types' do
-    endpoint = Factory(:openbis_endpoint)
-    conf = endpoint.default_meta_config
+  test 'default_meta_config contains standard OpenBIS ELN types' do
+    conf = OpenbisEndpoint.default_meta_config
     exp = { study_types: ['DEFAULT_EXPERIMENT'], assay_types: ['EXPERIMENTAL_STEP'] }
     assert_equal exp, conf
   end
 
-  test 'add_meta_config sets default config on empty' do
-    endpoint = Factory(:openbis_endpoint)
-    endpoint.meta_config_json = nil
+  test 'add_meta_config sets default config for new entry' do
 
-    endpoint.add_meta_config
-    assert_equal endpoint.default_meta_config.to_json, endpoint.meta_config_json
+    project = Factory(:project)
+    endpoint = OpenbisEndpoint.new project: project, username: 'fred', password: '12345',
+                                   web_endpoint: 'http://my-openbis.org/openbis',
+                                   as_endpoint: 'http://my-openbis.org/openbis',
+                                   dss_endpoint: 'http://my-openbis.org/openbis',
+                                   space_perm_id: 'mmmm',
+                                   refresh_period_mins: 60
 
-    endpoint.meta_config_json = '{}'
-    endpoint.add_meta_config
-    assert_equal '{}', endpoint.meta_config_json
-  end
 
-  test 'default config is added even if not set' do
-    endpoint = Factory(:openbis_endpoint)
-    assert_equal endpoint.default_meta_config.to_json, endpoint.meta_config_json
-  end
-
-  test 'meta_config is deserialized json verion' do
-    endpoint = Factory(:openbis_endpoint)
-    conf = { study_types: ['E1'], assay_types: ['A2'] }
-
-    endpoint.meta_config=conf
-    assert_same conf, endpoint.meta_config
-    assert_equal conf.to_json, endpoint.meta_config_json
+    refute endpoint.study_types.empty?
+    refute endpoint.assay_types.empty?
+    refute endpoint.meta_config_json
 
     disable_authorization_checks do
       endpoint.save!
     end
 
-    endpoint2 = OpenbisEndpoint.find(endpoint.id)
-    assert_not_same endpoint, endpoint2
+    assert endpoint.meta_config_json
 
-    assert_equal conf.to_json, endpoint2.meta_config_json
-    assert_equal conf, endpoint2.meta_config
+    # passing the content for init
+    endpoint = OpenbisEndpoint.new project: project, username: 'fred', password: '12345',
+                                   web_endpoint: 'http://my-openbis.org/openbis1',
+                                   as_endpoint: 'http://my-openbis.org/openbis1',
+                                   dss_endpoint: 'http://my-openbis.org/openbis1',
+                                   space_perm_id: 'mmmm',
+                                   refresh_period_mins: 60,
+                                   meta_config_json: '{}'
+
+    assert endpoint.meta_config_json
+    assert endpoint.study_types.empty?
+    assert endpoint.assay_types.empty?
+  end
+
+  test 'meta_config is serialized to json before saving' do
+    endpoint = Factory(:openbis_endpoint)
+    endpoint.study_types = ['ST1']
+    endpoint.assay_types = []
+
+    exp = { study_types: ['ST1'], assay_types: [] }.to_json
+    assert_not_equal exp, endpoint.meta_config_json
+
+    disable_authorization_checks do
+      endpoint.save!
+    end
+
+    assert_equal exp, endpoint.meta_config_json
+
+    endpoint = OpenbisEndpoint.find(endpoint.id)
+    assert_equal ['ST1'], endpoint.study_types
+    assert_equal [], endpoint.assay_types
+
 
   end
 
-  test 'study_types gives default if not configured' do
+  test 'study_types gives default for new record configured' do
     endpoint = Factory(:openbis_endpoint)
     assert_equal ['DEFAULT_EXPERIMENT'], endpoint.study_types
   end
 
-  test 'study_types gives empty on missing' do
+  test 'study_types can be set as string' do
     endpoint = Factory(:openbis_endpoint)
-    endpoint.meta_config = {}
-    assert_equal [], endpoint.study_types
+    exp = ['S1', 'S2']
+    endpoint.study_types=' S1 S2'
+
+    assert_equal exp, endpoint.study_types
+
+    disable_authorization_checks do
+      endpoint.save!
+    end
+    endpoint1 = OpenbisEndpoint.find(endpoint.id)
+    assert_not_same endpoint, endpoint1
+    assert_equal exp, endpoint1.study_types
+
   end
 
-  test 'study_types gives what configured' do
+  test 'study_types can be set as array' do
     endpoint = Factory(:openbis_endpoint)
-    endpoint.meta_config = {study_types: ['a']}
-    assert_equal ['a'], endpoint.study_types
+    exp = ['S1', 'S2']
+    endpoint.study_types = exp
+
+    assert_equal exp, endpoint.study_types
+
+    disable_authorization_checks do
+      endpoint.save!
+    end
+    endpoint1 = OpenbisEndpoint.find(endpoint.id)
+    assert_not_same endpoint, endpoint1
+    assert_equal exp, endpoint1.study_types
+  end
+
+  test 'study_types are read from meta_config' do
+    endpoint = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: '12345',
+                                   web_endpoint: 'http://my-openbis.org/openbis1',
+                                   as_endpoint: 'http://my-openbis.org/openbis1',
+                                   dss_endpoint: 'http://my-openbis.org/openbis1',
+                                   space_perm_id: 'mmmm',
+                                   refresh_period_mins: 60,
+                                   meta_config_json: { study_types: ['S'], assay_types: [] }.to_json
+
+    assert_equal ['S'], endpoint.study_types
   end
 
   test 'assay_types gives default if not configured' do
@@ -676,16 +723,71 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert_equal ['EXPERIMENTAL_STEP'], endpoint.assay_types
   end
 
-  test 'assay_types gives empty on missing' do
+  test 'assay_types can be set as string' do
     endpoint = Factory(:openbis_endpoint)
-    endpoint.meta_config = {}
-    assert_equal [], endpoint.assay_types
+    exp = ['A1', 'A2']
+    endpoint.assay_types=' A1, A2'
+
+    assert_equal exp, endpoint.assay_types
+
+    disable_authorization_checks do
+      endpoint.save!
+    end
+    endpoint1 = OpenbisEndpoint.find(endpoint.id)
+    assert_not_same endpoint, endpoint1
+    assert_equal exp, endpoint1.assay_types
+
   end
 
-  test 'assay_types gives what configured' do
+  test 'assay_types can be set as array' do
     endpoint = Factory(:openbis_endpoint)
-    endpoint.meta_config = {assay_types: ['a']}
-    assert_equal ['a'], endpoint.assay_types
+    exp = ['A1', 'A2']
+    endpoint.assay_types = exp
+
+    assert_equal exp, endpoint.assay_types
+
+    disable_authorization_checks do
+      endpoint.save!
+    end
+    endpoint1 = OpenbisEndpoint.find(endpoint.id)
+    assert_not_same endpoint, endpoint1
+    assert_equal exp, endpoint1.assay_types
+  end
+
+  test 'assay_types are read from meta_config' do
+    endpoint = OpenbisEndpoint.new project: Factory(:project), username: 'fred', password: '12345',
+                                   web_endpoint: 'http://my-openbis.org/openbis1',
+                                   as_endpoint: 'http://my-openbis.org/openbis1',
+                                   dss_endpoint: 'http://my-openbis.org/openbis1',
+                                   space_perm_id: 'mmmm',
+                                   refresh_period_mins: 60,
+                                   meta_config_json: { study_types: ['S'], assay_types: ['A'] }.to_json
+
+    assert_equal ['A'], endpoint.assay_types
+  end
+
+  test 'parses string with code names using , and white spaces as separators' do
+    endpoint = Factory(:openbis_endpoint)
+
+    input = nil
+    names = endpoint.parse_code_names(input)
+    assert_equal [], names
+
+    input = ''
+    names = endpoint.parse_code_names(input)
+    assert_equal [], names
+
+    input = ' '
+    names = endpoint.parse_code_names(input)
+    assert_equal [], names
+
+    input = ' N1, N2
+, name
+  name2, again N1
+'
+    names = endpoint.parse_code_names(input)
+    assert_equal ['N1', 'N2', 'NAME', 'NAME2', 'AGAIN'], names
+
   end
 
 end
