@@ -3394,6 +3394,9 @@
                 },
                 "default_policy" : {
                   "$ref" : "#/definitions/policy"
+                },
+                "default_license" : {
+                  "$ref" : "#/definitions/nullableLicense"
                 }
               },
               "required" : [ "title", "description", "web_page", "wiki_page" ],
@@ -3497,9 +3500,20 @@
                 },
                 "default_policy" : {
                   "$ref" : "#/definitions/policy"
+                },
+                "default_license" : {
+                  "$ref" : "#/definitions/nullableLicense"
                 }
               },
               "additionalProperties" : false
+            },
+            "relationships": {
+              "programmes" : {
+                "$ref" : "#/definitions/programmeReferencesList"
+              },
+              "organisms": {
+                "$ref": "#/definitions/organismReferencesList"
+              }
             }
           },
           "required" : [ "id", "type" ],
@@ -3538,10 +3552,21 @@
                 },
                 "default_policy" : {
                   "$ref" : "#/definitions/policy"
+                },
+                "default_license" : {
+                  "$ref" : "#/definitions/nullableLicense"
                 }
               },
               "required" : [ "title" ],
               "additionalProperties" : false
+            },
+            "relationships": {
+              "programmes" : {
+                "$ref" : "#/definitions/programmeReferencesList"
+              },
+              "organisms": {
+                "$ref": "#/definitions/organismReferencesList"
+              }
             }
           },
           "required" : [ "type", "attributes" ],
