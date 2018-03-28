@@ -83,6 +83,10 @@ class OpenbisEndpoint < ActiveRecord::Base
     DataFile.all.select { |df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url) }
   end
 
+  def registered_studies
+    Study.joins(:external_asset).where(external_assets: { seek_service_id: id, seek_service_type: self.class })
+  end
+
   def registered_assays
     Assay.joins(:external_asset).where(external_assets: { seek_service_id: id, seek_service_type: self.class })
   end

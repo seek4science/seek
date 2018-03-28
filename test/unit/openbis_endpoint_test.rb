@@ -453,6 +453,47 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   end
 
+  test 'registered_studies gives own entries registered in seek as studies' do
+    endpoint1 = Factory :openbis_endpoint
+
+    endpoint2 = Factory :openbis_endpoint
+
+    disable_authorization_checks do
+      assert endpoint1.save
+      assert endpoint2.save
+    end
+
+
+    e1 = Seek::Openbis::Experiment.new(endpoint1, '20171121152132641-51')
+    asset1 = OpenbisExternalAsset.build(e1)
+    st1 = Factory :study
+    asset1.seek_entity = st1
+    assert asset1.save
+
+    e2 = Seek::Openbis::Experiment.new(endpoint2, '20171121152132641-51')
+    asset2 = OpenbisExternalAsset.build(e2)
+    st2 = Factory :study
+    asset2.seek_entity = st2
+    assert asset2.save
+
+    e3 = Seek::Openbis::Experiment.new(endpoint1, '20171121153715264-58')
+    asset3 = OpenbisExternalAsset.build(e3)
+    st3 = Factory :study
+    asset3.seek_entity = st3
+    assert asset3.save
+
+    assert_equal 3, OpenbisExternalAsset.count
+
+    assert_equal 2, endpoint1.registered_studies.count
+
+    endpoint1.registered_studies.each do |e|
+      assert e.is_a? Study
+    end
+
+    assert_equal 1, endpoint2.registered_studies.count
+
+  end
+
   def zample_for_id(permId = nil, endpoint = nil)
 
     endpoint ||= Factory :openbis_endpoint
