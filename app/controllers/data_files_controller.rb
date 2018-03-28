@@ -54,7 +54,7 @@ class DataFilesController < ApplicationController
   end
 
   def create_content_blob
-    @data_file=DataFile.new
+    @data_file = DataFile.new
     respond_to do |format|
       if handle_upload_data
         create_content_blobs
@@ -62,19 +62,37 @@ class DataFilesController < ApplicationController
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)
-        format.html {render action: :new}
+        format.html { render action: :new }
       end
     end
   end
 
   def rightfield_extraction_ajax
-    @data_file=DataFile.new
-    @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
-    @data_file.populate_metadata_from_template
-    @assay=@data_file.initialise_assay_from_template
-    @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
+    @data_file = DataFile.new
+    error_msg = nil
+    begin
+      if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
+        @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
+        @data_file.populate_metadata_from_template
+        @assay = @data_file.initialise_assay_from_template
+        @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
+      else
+        error_msg = "The file that was request to be processed doesn't match that which had been uploaded"
+      end
+    rescue Exception => e
+      ExceptionNotifier.notify_exception(e, data: {
+          message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
+          current_logged_in_user: current_user
+      })
+      error_msg = e.message
+    end
+
     respond_to do |format|
-      format.js { render :provide_metadata, status: :ok }
+      if error_msg
+        format.js { render text: error_msg, status: :unprocessable_entity }
+      else
+        format.js { render :provide_metadata, status: :ok }
+      end
     end
   end
 

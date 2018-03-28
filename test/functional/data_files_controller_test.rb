@@ -2824,15 +2824,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
-  test 'create content blob extracts from template' do
+  test 'rightfield extraction extracts from template' do
     person = Factory(:person)
     login_as(person)
-    file = ActionDispatch::Http::UploadedFile.new(filename: 'template.xlsx',
-                                           content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                           tempfile: fixture_file_upload('files/populated_templates/populated-base-samples-template-with-assay.xlsx'))
-    assert_difference('ContentBlob.count') do
-      post :create_content_blob, content_blobs: [{data:file}]
-    end
+    content_blob = Factory(:rightfield_base_sample_template_with_assay)
+
+    session[:uploaded_content_blob_id] = content_blob.id.to_s
+
+    post :rightfield_extraction_ajax, content_blob_id:content_blob.id.to_s,format:'js'
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -3405,11 +3404,16 @@ class DataFilesControllerTest < ActionController::TestCase
     logout
   end
 
-  # registers a new content blob, and results in the metadata form HTML in the response
+  # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
+  # this replicates the old behaviour and result of calling #new
   def register_content_blob
+
     blob = {data: file_for_upload}
     assert_difference('ContentBlob.count') do
       post :create_content_blob, content_blobs: [blob]
     end
+    content_blob_id = assigns(:data_file).content_blob.id
+    session[:uploaded_content_blob_id] = content_blob_id.to_s
+    post :rightfield_extraction_ajax,content_blob_id:content_blob_id.to_s,format:'js'
   end
 end
