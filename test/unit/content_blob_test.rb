@@ -644,6 +644,28 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert_equal 500, blob.file_size
   end
 
+  test 'calculates checksums of remote content' do
+    stub_request(:head, 'http://www.abc.com').to_return(
+        headers: { content_length: nil, content_type: 'text/plain' }, status: 200
+    )
+    stub_request(:get, 'http://www.abc.com').to_return(
+        body: File.new("#{Rails.root}/test/fixtures/files/checksums.txt"),
+        headers: { content_type: 'text/plain' }, status: 200)
+
+    blob = Factory(:url_content_blob)
+    blob.save
+    blob.reload
+    assert !blob.file_exists?
+    assert blob.md5sum.blank?
+    assert blob.sha1sum.blank?
+
+    blob.retrieve
+
+    assert blob.reload.file_exists?
+    assert_equal 'd41d8cd98f00b204e9800998ecf8427e', blob.md5sum
+    assert_equal 'da39a3ee5e6b4b0d3255bfef95601890afd80709', blob.sha1sum
+  end
+
   test 'can retrieve remote content' do
     stub_request(:head, 'http://www.abc.com').to_return(
       headers: { content_length: nil, content_type: 'text/plain' }, status: 200
