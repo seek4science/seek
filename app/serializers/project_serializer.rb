@@ -2,7 +2,7 @@ class ProjectSerializer < AvatarObjSerializer
 
   # class ProjectSerializer < ActiveModel::Serializer
   attributes :title, :description,
-             :web_page, :wiki_page
+             :web_page, :wiki_page, :default_license
 
   attribute :default_policy, if: :show_default_policy?
 

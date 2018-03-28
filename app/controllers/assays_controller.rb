@@ -168,7 +168,7 @@ class AssaysController < ApplicationController
   end
 
   def update_assay_organisms assay,params
-    organisms             = params[:assay_organism_ids] || []
+    organisms             = params[:assay_organism_ids] || params[:assay][:organism_ids] || []
     assay.assay_organisms = []
     Array(organisms).each do |text|
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
