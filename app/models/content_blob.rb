@@ -9,7 +9,6 @@ class ContentBlob < ActiveRecord::Base
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
   include Seek::UrlValidation
-  include Seek::Data::Checksums
   prepend Seek::Openbis::Blob
   prepend Nels::Blob
 
@@ -45,6 +44,8 @@ class ContentBlob < ActiveRecord::Base
   validate :original_filename_or_url
 
   delegate :read, :close, :rewind, :path, to: :file
+
+  include Seek::Data::Checksums
 
   CHUNK_SIZE = 2 ** 12
 
