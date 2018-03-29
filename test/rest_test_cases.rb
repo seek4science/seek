@@ -197,7 +197,7 @@ module RestTestCases
     end
 
     diff.delete_if {
-        |el| el["path"] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum|project_id/
+        |el| el["path"] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|md5sum|sha1sum|project_id|position_id/
     }
 
 
