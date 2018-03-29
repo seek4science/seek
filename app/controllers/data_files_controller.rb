@@ -11,7 +11,7 @@ class DataFilesController < ApplicationController
   include Seek::AssetsCommon
 
   before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob, :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax]
   before_filter :find_display_asset, only: [:show, :explore, :download, :matching_models]
   skip_before_filter :verify_authenticity_token, only: [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
@@ -23,7 +23,7 @@ class DataFilesController < ApplicationController
   before_filter :nels_oauth_session, only: :retrieve_nels_sample_metadata
   before_filter :rest_client, only: :retrieve_nels_sample_metadata
 
-  before_filter :login_required, only: [:create, :create_content_blob, :create_metadata]
+  before_filter :login_required, only: [:create, :create_content_blob, :create_metadata, :rightfield_extraction_ajax]
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -54,18 +54,44 @@ class DataFilesController < ApplicationController
   end
 
   def create_content_blob
-    @data_file=DataFile.new
+    @data_file = DataFile.new
     respond_to do |format|
       if handle_upload_data
         create_content_blobs
-        @data_file.populate_metadata_from_template
-        @assay=@data_file.initialise_assay_from_template
-        @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
-        format.html {render :provide_metadata}
+        format.html {}
       else
         session.delete(:uploaded_content_blob_id)
-        format.html {render action: :new}
+        format.html { render action: :new }
+      end
+    end
+  end
+
+  def rightfield_extraction_ajax
+    @data_file = DataFile.new
+    error_msg = nil
+    begin
+      if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
+        @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
+        @data_file.populate_metadata_from_template
+        @assay = @data_file.initialise_assay_from_template
+        @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
+      else
+        error_msg = "The file that was request to be processed doesn't match that which had been uploaded"
+      end
+    rescue Exception => e
+      ExceptionNotifier.notify_exception(e, data: {
+          message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
+          current_logged_in_user: current_user
+      })
+      error_msg = e.message
+    end
+
+    respond_to do |format|
+      if error_msg
+        format.js { render text: error_msg, status: :unprocessable_entity }
+      else
+        format.js { render :provide_metadata, status: :ok }
       end
     end
   end
