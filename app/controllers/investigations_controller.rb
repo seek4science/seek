@@ -61,7 +61,7 @@ class InvestigationsController < ApplicationController
     update_sharing_policies @investigation
     update_relationships(@investigation, params)
 
-    if @investigation.present? && @investigation.save
+    if @investigation.save
        update_scales(@investigation)
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}

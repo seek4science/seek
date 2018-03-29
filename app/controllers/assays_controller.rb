@@ -142,15 +142,15 @@ class AssaysController < ApplicationController
   def update
     set_assay_organisms_from_json if json_api_request?
 
+    @assay.assign_attributes(assay_params)
     update_assay_organisms @assay, params
     update_annotations(params[:tag_list], @assay)
-    update_scales @assay
-    @assay.update_attributes(assay_params)
     update_sharing_policies @assay
     update_relationships(@assay, params)
 
     respond_to do |format|
       if @assay.save           #should use params (e.g. for creators to be updated)
+        update_scales @assay
         update_assets_linked_to_assay @assay, params
         @assay.save!
 

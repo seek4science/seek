@@ -47,10 +47,8 @@ class SopsController < ApplicationController
 
   # PUT /sops/1
   def update
-    update_annotations(params[:tag_list], @sop) if params.key?(:tag_list)
-
     @sop.attributes = sop_params
-
+    update_annotations(params[:tag_list], @sop) if params.key?(:tag_list)
     update_sharing_policies @sop
     update_relationships(@sop,params)
 

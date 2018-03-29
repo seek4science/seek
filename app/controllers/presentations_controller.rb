@@ -38,20 +38,17 @@ class PresentationsController < ApplicationController
  # PUT /presentations/1
   # PUT /presentations/1.xml
   def update
-    update_annotations(params[:tag_list], @presentation) if params.key?(:tag_list)
-    update_scales @presentation
-
     @presentation.attributes = presentation_params
-
+    update_annotations(params[:tag_list], @presentation) if params.key?(:tag_list)
     update_sharing_policies @presentation
     update_relationships(@presentation,params)
 
-    assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @presentation.save
-
+        update_scales @presentation
 
         # Update new assay_asset
+        assay_ids = params[:assay_ids] || []
         Assay.find(assay_ids).each do |assay|
           if assay.can_edit?
             assay.relate(@presentation)

@@ -103,7 +103,7 @@ class StudiesController < ApplicationController
     update_sharing_policies @study
     update_relationships(@study, params)
     ### TO DO: what about validation of person responsible? is it already included (for json?)
-    if @study.present? && @study.save
+    if @study.save
       update_scales @study
 
       if @study.new_link_from_assay == 'true'

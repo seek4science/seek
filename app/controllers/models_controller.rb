@@ -189,17 +189,14 @@ class ModelsController < ApplicationController
   # PUT /models/1
   # PUT /models/1.xml
   def update
-    update_annotations(params[:tag_list], @model)
-    update_scales @model
-
     @model.attributes = model_params
-
+    update_annotations(params[:tag_list], @model)
     update_sharing_policies @model
     update_relationships(@model, params)
 
     respond_to do |format|
       if @model.save
-
+        update_scales @model
         update_assay_assets(@model, params[:assay_ids])
 
         flash[:notice] = "#{t('model')} metadata was successfully updated."

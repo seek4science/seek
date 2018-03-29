@@ -38,16 +38,14 @@ class DocumentsController < ApplicationController
 
   # PUT /documents/1
   def update
-    update_annotations(params[:tag_list], @document) if params.key?(:tag_list)
-    update_scales @document
-
     @document.attributes = document_params
-
+    update_annotations(params[:tag_list], @document) if params.key?(:tag_list)
     update_sharing_policies @document
     update_relationships(@document,params)
 
     respond_to do |format|
       if @document.save
+        update_scales @document
         update_assay_assets(@document,params[:assay_ids])
         flash[:notice] = "#{t('document')} metadata was successfully updated."
         format.html { redirect_to document_path(@document) }
