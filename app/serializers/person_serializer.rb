@@ -16,8 +16,8 @@ class PersonSerializer < AvatarObjSerializer
     positions = []
     object.group_memberships.each do |gm|
       gm.project_positions.each do |pos|
-        positions.append({ project_id: gm.project.id,
-                    position_id:  pos.id,
+        positions.append({ project_id: gm.project.id.to_s,
+                    position_id:  pos.id.to_s,
                     position_name: pos.name })
       end
     end

@@ -21,7 +21,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   def create_patch_values
     p = Factory(:person)
-    @patch_values = {id: p.id}
+    @patch_values = {id: p.id, project_id: p.group_memberships.first.project.id}
   end
 
   # title cannot be POSTed or PATCHed
