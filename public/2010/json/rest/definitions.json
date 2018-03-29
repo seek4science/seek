@@ -2976,6 +2976,9 @@
                 },
                 "skype_name" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "project_positions" :{
+                  "$ref" : "#/definitions/nullableProjectPositionsList"
                 }
               },
               "additionalProperties" : false
