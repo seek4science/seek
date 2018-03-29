@@ -17,4 +17,4 @@ For an example of SEEK please visit our [Demo](http://demo.seek4science.org).
 
 ## Getting SEEK
 
-To find out how to install SEEK on your own machine, or install as a Virtual Machine, please go to [Getting SEEK](get-seek.html)
+To find out how to install SEEK on your own machine, or install SEEK as a Virtual Machine, please go to [Getting SEEK](get-seek.html)
