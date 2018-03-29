@@ -52,10 +52,10 @@ class SopsController < ApplicationController
     @sop.attributes = sop_params
 
     update_sharing_policies @sop
+    update_relationships(@sop,params)
 
     respond_to do |format|
       if @sop.save
-        update_relationships(@sop,params)
         update_assay_assets(@sop,params[:assay_ids])
         flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }

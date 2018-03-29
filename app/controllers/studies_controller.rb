@@ -70,11 +70,11 @@ class StudiesController < ApplicationController
     @study = Study.find(params[:id])
     @study.attributes = study_params
     update_sharing_policies @study
+    update_relationships(@study, params)
 
     respond_to do |format|
       if @study.save
         update_scales @study
-        update_relationships(@study, params)
 
         flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
@@ -101,10 +101,10 @@ class StudiesController < ApplicationController
   def create
     @study = Study.new(study_params)
     update_sharing_policies @study
+    update_relationships(@study, params)
     ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.present? && @study.save
       update_scales @study
-      update_relationships(@study, params)
 
       if @study.new_link_from_assay == 'true'
         render partial: 'assets/back_to_singleselect_parent', locals: { child: @study, parent: 'assay' }

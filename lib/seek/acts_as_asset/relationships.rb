@@ -26,7 +26,8 @@ module Seek
           has_many :relationships,
                    class_name: 'Relationship',
                    as: :subject,
-                   dependent: :destroy
+                   dependent: :destroy,
+                   autosave: true
 
           has_many :attributions,
                    -> { where(predicate: Relationship::ATTRIBUTED_TO) },

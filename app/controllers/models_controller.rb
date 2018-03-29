@@ -195,11 +195,11 @@ class ModelsController < ApplicationController
     @model.attributes = model_params
 
     update_sharing_policies @model
+    update_relationships(@model, params)
 
     respond_to do |format|
       if @model.save
 
-        update_relationships(@model, params)
         update_assay_assets(@model, params[:assay_ids])
 
         flash[:notice] = "#{t('model')} metadata was successfully updated."

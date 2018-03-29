@@ -24,7 +24,8 @@ module Seek
           has_many :relationships,
                    class_name: 'Relationship',
                    as: :subject,
-                   dependent: :destroy
+                   dependent: :destroy,
+                   autosave: true
 
           has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
           has_many :creators, -> { order('assets_creators.id') }, class_name: 'Person', through: :assets_creators, after_remove: :update_timestamp, after_add: :update_timestamp

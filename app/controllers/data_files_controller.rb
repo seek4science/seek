@@ -173,11 +173,11 @@ class DataFilesController < ApplicationController
 
     # FIXME: clunky
     update_annotations(params[:tag_list], @data_file)
+    update_relationships(@data_file, params)
 
     if valid_blob && (!create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)) && @data_file.save && blob.save
       update_scales @data_file
 
-      update_relationships(@data_file, params)
 
       session.delete(:uploaded_content_blob_id)
 
@@ -210,12 +210,12 @@ class DataFilesController < ApplicationController
       update_sharing_policies(@data_file)
 
       update_annotations(params[:tag_list], @data_file)
+      update_relationships(@data_file, params)
+
       if @data_file.save
         update_scales @data_file
 
         create_content_blobs
-
-        update_relationships(@data_file, params)
 
         if !@data_file.parent_name.blank?
           render partial: 'assets/back_to_fancy_parent', locals: { child: @data_file, parent_name: @data_file.parent_name, is_not_fancy: true }
@@ -255,13 +255,11 @@ class DataFilesController < ApplicationController
     @data_file.assign_attributes(data_file_params)
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_scales @data_file
+    update_sharing_policies @data_file
+    update_relationships(@data_file, params)
 
     respond_to do |format|
-      update_sharing_policies @data_file
-
       if @data_file.save
-        update_relationships(@data_file, params)
-
         # the assay_id param can also contain the relationship type
         assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
         update_assay_assets(@data_file, assay_ids, relationship_types)

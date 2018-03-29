@@ -44,12 +44,12 @@ class PresentationsController < ApplicationController
     @presentation.attributes = presentation_params
 
     update_sharing_policies @presentation
+    update_relationships(@presentation,params)
 
     assay_ids = params[:assay_ids] || []
     respond_to do |format|
       if @presentation.save
 
-        update_relationships(@presentation,params)
 
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|

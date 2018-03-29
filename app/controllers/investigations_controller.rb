@@ -59,10 +59,10 @@ class InvestigationsController < ApplicationController
   def create
     @investigation = Investigation.new(investigation_params)
     update_sharing_policies @investigation
+    update_relationships(@investigation, params)
 
     if @investigation.present? && @investigation.save
        update_scales(@investigation)
-       update_relationships(@investigation, params)
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
@@ -110,20 +110,20 @@ class InvestigationsController < ApplicationController
     @investigation=Investigation.find(params[:id])
     @investigation.attributes = investigation_params
     update_sharing_policies @investigation
+    update_relationships(@investigation, params)
 
-      respond_to do |format|
-        if @investigation.save
-          update_scales(@investigation)
-          update_relationships(@investigation, params)
+    respond_to do |format|
+      if @investigation.save
+        update_scales(@investigation)
 
-          flash[:notice] = "#{t('investigation')} was successfully updated."
-          format.html { redirect_to(@investigation) }
-          format.json {render json: @investigation}
-        else
-          format.html { render :action => "edit" }
-          format.json { render json: json_api_errors(@investigation), status: :unprocessable_entity }
-        end
+        flash[:notice] = "#{t('investigation')} was successfully updated."
+        format.html { redirect_to(@investigation) }
+        format.json {render json: @investigation}
+      else
+        format.html { render :action => "edit" }
+        format.json { render json: json_api_errors(@investigation), status: :unprocessable_entity }
       end
+    end
   end
 
   private

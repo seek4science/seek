@@ -23,13 +23,13 @@ module Seek
     end
 
     def update_relationships(asset, params)
-      Relationship.create_or_update_attributions(asset, params[:attributions])
+      Relationship.set_attributions(asset, params[:attributions])
 
       # update related publications
       publication_params = (params[:related_publication_ids] || []).collect do |id|
         ['Publication', id.split(',').first]
       end
-      Relationship.create_or_update_attributions(asset, publication_params, Relationship::RELATED_TO_PUBLICATION)
+      Relationship.set_attributions(asset, publication_params, Relationship::RELATED_TO_PUBLICATION)
     end
 
     def update_assay_assets(asset, assay_ids, relationship_type_titles = nil)

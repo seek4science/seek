@@ -112,10 +112,11 @@ class SamplesController < ApplicationController
   end
 
   def update_sample_with_params
-    @sample.update_attributes(sample_params(@sample.sample_type))
+    @sample.attributes = sample_params(@sample.sample_type)
     update_sharing_policies @sample
     update_annotations(params[:tag_list], @sample)
     update_relationships(@sample, params)
+    @sample.save
   end
 
   def find_index_assets

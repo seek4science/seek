@@ -118,12 +118,11 @@ class AssaysController < ApplicationController
     update_scales @assay #this saves the assay
 
     a = @assay.present?
+    update_relationships(@assay, params)
     b = @assay.save
 
     if a && b
       update_assets_linked_to_assay @assay, params
-      update_relationships(@assay, params)
-
       #required to trigger the after_save callback after the assets have been associated
       @assay.save
       if @assay.create_from_asset =="true"
@@ -151,12 +150,11 @@ class AssaysController < ApplicationController
     update_scales @assay
     @assay.update_attributes(assay_params)
     update_sharing_policies @assay
+    update_relationships(@assay, params)
 
     respond_to do |format|
       if @assay.save           #should use params (e.g. for creators to be updated)
         update_assets_linked_to_assay @assay, params
-        update_relationships(@assay, params)
-
         @assay.save!
 
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
