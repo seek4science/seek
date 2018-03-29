@@ -116,12 +116,9 @@ class AssaysController < ApplicationController
     update_sharing_policies @assay
     update_annotations(params[:tag_list], @assay)
     update_scales @assay #this saves the assay
-
-    a = @assay.present?
     update_relationships(@assay, params)
-    b = @assay.save
 
-    if a && b
+    if @assay.save
       update_assets_linked_to_assay @assay, params
       #required to trigger the after_save callback after the assets have been associated
       @assay.save
