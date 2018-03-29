@@ -23,10 +23,11 @@ class Publication < ActiveRecord::Base
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :persons, through: :publication_authors
 
-  has_many :backwards_relationships,
+  has_many :inverse_relationships,
            class_name: 'Relationship',
            as: :other_object,
-           dependent: :destroy
+           dependent: :destroy,
+           inverse_of: :other_object
 
   VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
@@ -167,27 +168,27 @@ class Publication < ActiveRecord::Base
   end
 
   def data_files
-    backwards_relationships.select { |a| a.subject_type == 'DataFile' }.collect(&:subject)
+    inverse_relationships.select { |a| a.subject_type == 'DataFile' }.collect(&:subject)
   end
 
   def models
-    backwards_relationships.select { |a| a.subject_type == 'Model' }.collect(&:subject)
+    inverse_relationships.select { |a| a.subject_type == 'Model' }.collect(&:subject)
   end
 
   def assays
-    backwards_relationships.select { |a| a.subject_type == 'Assay' }.collect(&:subject)
+    inverse_relationships.select { |a| a.subject_type == 'Assay' }.collect(&:subject)
   end
 
   def studies
-    backwards_relationships.select { |a| a.subject_type == 'Study' }.collect(&:subject)
+    inverse_relationships.select { |a| a.subject_type == 'Study' }.collect(&:subject)
   end
 
   def investigations
-    backwards_relationships.select { |a| a.subject_type == 'Investigation' }.collect(&:subject)
+    inverse_relationships.select { |a| a.subject_type == 'Investigation' }.collect(&:subject)
   end
 
   def presentations
-    backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
+    inverse_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
   end
 
   def associate(item)

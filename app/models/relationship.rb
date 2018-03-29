@@ -11,10 +11,10 @@
 
 class Relationship < ActiveRecord::Base
 
-  validates_presence_of :subject_id, :other_object_id
+  validates_presence_of :subject, :other_object
   
-  belongs_to :subject , :polymorphic => true
-  belongs_to :other_object, :polymorphic => true
+  belongs_to :subject , polymorphic: true, inverse_of: :relationships
+  belongs_to :other_object, polymorphic: true, inverse_of: :inverse_relationships
 
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :subject
