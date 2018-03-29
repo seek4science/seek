@@ -7,7 +7,7 @@
 creators ||= nil
 title ||= "#{t('contributor').capitalize} and #{t('creator').capitalize.pluralize}"
 contributor = resource.contributor.try(:person)
-creators ||= resource.creators.reject { |c| c == contributor }
+creators ||= resource.creators.reject { |c| c == contributor || c == contributor.person }
 %>
 
 <%= panel(title, :help_text => "These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its contributors.") do %>
