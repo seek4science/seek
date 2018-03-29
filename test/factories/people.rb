@@ -23,6 +23,7 @@ Factory.define(:max_person, class: Person) do |f|
   f.created_publications {[Factory(:publication)]}
   f.created_documents {[Factory(:public_document)]}
   f.association :user, factory: :activated_user
+  f.group_memberships { [Factory.build(:group_membership)] }
 end
 
 Factory.define(:brand_new_person, class: Person) do |f|

@@ -77,6 +77,33 @@
         "$ref" : "#/definitions/nonEmptyString"
       }
     },
+    "projectPosition": {
+      "type" : "object",
+      "properties" : {
+        "project_id": {
+          "type": "string"
+        },
+        "position_id": {
+          "type": "string"
+        },
+        "project_name": {
+          "type": "string"
+        }
+      }
+    },
+    "nonEmptyProjectPositionsList": {
+      "type" : "array",
+      "minItems" : 1,
+      "items" : {
+        "$ref" : "#/definitions/projectPosition"
+      }
+    },
+    "nullableProjectPositionsList":{
+      "oneOf": [
+        {"$ref" : "#/definitions/nonEmptyProjectPositionsList"},
+        {"type" : "null"}
+      ]
+    },
     "nullableNonEmptyStringList" : {
       "oneOf": [
         {"$ref" : "#/definitions/nonEmptyStringList"},
@@ -2837,6 +2864,9 @@
                 },
                 "skype_name" : {
                    "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "project_positions" :{
+                  "$ref" : "#/definitions/nullableProjectPositionsList"
                 }
               },
               "required" : [ "title", "first_name", "last_name", "mbox_sha1sum" ],

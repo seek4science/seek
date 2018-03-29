@@ -12,6 +12,18 @@ class PersonSerializer < AvatarObjSerializer
     serialize_annotations(object, context = 'tool')
   end
 
+  attribute :project_positions do
+    positions = []
+    object.group_memberships.each do |gm|
+      gm.project_positions.each do |pos|
+        positions.append({ project_id: gm.project.id,
+                    position_id:  pos.id,
+                    position_name: pos.name })
+      end
+    end
+    positions
+  end
+
   has_many :projects
   has_many :institutions
   has_many :investigations
