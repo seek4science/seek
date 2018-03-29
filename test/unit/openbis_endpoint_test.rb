@@ -76,14 +76,35 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'validates uniqueness' do
     endpoint = Factory(:openbis_endpoint)
-    endpoint2 = Factory.build(:openbis_endpoint)
-    assert endpoint.valid? # different project
-    endpoint2 = Factory.build(:openbis_endpoint, project: endpoint.project)
+
+    endpoint2 = OpenbisEndpoint.new project: Factory(:project),
+                                    username: endpoint.username,
+                                    password: endpoint.password,
+                                    web_endpoint: endpoint.web_endpoint,
+                                    as_endpoint: endpoint.as_endpoint,
+                                    dss_endpoint: endpoint.dss_endpoint,
+                                    space_perm_id: endpoint.space_perm_id,
+                                    refresh_period_mins: endpoint.refresh_period_mins
+
+    assert endpoint2.valid? # different project
+
+    endpoint2 = OpenbisEndpoint.new project: endpoint.project,
+                                    username: endpoint.username,
+                                    password: endpoint.password,
+                                    web_endpoint: endpoint.web_endpoint,
+                                    as_endpoint: endpoint.as_endpoint,
+                                    dss_endpoint: endpoint.dss_endpoint,
+                                    space_perm_id: endpoint.space_perm_id,
+                                    refresh_period_mins: endpoint.refresh_period_mins
+
     refute endpoint2.valid?
+
     endpoint2.as_endpoint = 'http://fish.com'
     assert endpoint2.valid?
+
     endpoint2.as_endpoint = endpoint.as_endpoint
     refute endpoint2.valid?
+
     endpoint2.dss_endpoint = 'http://fish.com'
     assert endpoint2.valid?
   end
@@ -262,6 +283,22 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     refute endpoint.metadata_store.exist?(key)
   end
 
+  test 'clears metadata store on details update' do
+    endpoint = Factory(:openbis_endpoint)
+    key = endpoint.space.cache_key(endpoint.space_perm_id)
+    assert endpoint.metadata_store.exist?(key)
+
+
+    disable_authorization_checks do
+      assert endpoint.save
+      assert endpoint.metadata_store.exist?(key)
+
+      endpoint.username = endpoint.username+'2'
+      assert endpoint.save
+      refute endpoint.metadata_store.exist?(key)
+    end
+  end
+
   test 'create_refresh_metadata_job' do
     endpoint = Factory(:openbis_endpoint)
     Delayed::Job.destroy_all
@@ -275,22 +312,37 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
   end
 
-  test 'create job on creation' do
+  test 'create_sync_metadata_job' do
+    endpoint = Factory(:openbis_endpoint)
+    Delayed::Job.destroy_all
+    refute OpenbisSyncJob.new(endpoint).exists?
+    assert_difference('Delayed::Job.count', 1) do
+      endpoint.create_sync_metadata_job
+    end
+    assert_no_difference('Delayed::Job.count') do
+      endpoint.create_sync_metadata_job
+    end
+    assert OpenbisSyncJob.new(endpoint).exists?
+  end
+
+  test 'create jobs on creation' do
     Delayed::Job.destroy_all
     endpoint = Factory(:openbis_endpoint)
     assert OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
+    assert OpenbisSyncJob.new(endpoint).exists?
   end
 
-  test 'job destroyed on delete' do
+  test 'jobs destroyed on delete' do
     Delayed::Job.destroy_all
     pa = Factory(:project_administrator)
     endpoint = Factory(:openbis_endpoint, project: pa.projects.first)
-    assert_difference('Delayed::Job.count', -1) do
+    assert_difference('Delayed::Job.count', -2) do
       User.with_current_user(pa.user) do
         endpoint.destroy
       end
     end
     refute OpenbisEndpointCacheRefreshJob.new(endpoint).exists?
+    refute OpenbisSyncJob.new(endpoint).exists?
   end
 
   test 'encrypted password' do
@@ -524,7 +576,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   # it should actually test for synchronization but I don't know how to achieve it
   # needs OpenBIS mock that can be set to return particular values
-  test 'refresh_metadata clears store, marks for refresh and adds sync job' do
+  test 'refresh_metadata cleanups store, marks for refresh and adds sync job' do
     endpoint = Factory(:openbis_endpoint)
 
     dataset = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
@@ -532,20 +584,60 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     asset.synchronized_at = DateTime.now - 1.days
     assert asset.save
 
-    key = 'TZ'
     store = endpoint.metadata_store
-    store.fetch(key) do
-      'Tomek'
-    end
+    key1 = 'stays'
+    store.fetch(key1) { 'Tomek' }
 
-    assert_equal 'Tomek', store.fetch(key)
+    key2 = 'goes'
+    store.fetch(key2, { expires_in: 0.1.seconds }) { 'Marek' }
 
-    Delayed::Job.destroy_all
+    assert_equal 'Tomek', store.fetch(key1)
+    assert_equal 'Marek', store.fetch(key2)
+
+    sleep(0.2.seconds)
+
+    #Delayed::Job.destroy_all
     #assert_difference('Delayed::Job.count', 1) do
     endpoint.refresh_metadata
     #end
 
-    refute endpoint.metadata_store.exist?(key)
+    assert endpoint.metadata_store.exist?(key1)
+    refute endpoint.metadata_store.exist?(key2)
+
+    asset.reload
+    assert asset.refresh?
+
+    assert OpenbisSyncJob.new(endpoint).exists?
+
+  end
+
+  test 'force_refresh_metadata clears store, marks all for refresh' do
+    endpoint = Factory(:openbis_endpoint)
+
+    dataset = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
+    asset = OpenbisExternalAsset.build(dataset)
+    asset.synchronized_at = DateTime.now
+    assert asset.save
+
+    store = endpoint.metadata_store
+    key1 = 'stays'
+    store.fetch(key1) { 'Tomek' }
+
+    key2 = 'goes'
+    store.fetch(key2, { expires_in: 0.1.seconds }) { 'Marek' }
+
+    assert_equal 'Tomek', store.fetch(key1)
+    assert_equal 'Marek', store.fetch(key2)
+
+
+    #Delayed::Job.destroy_all
+    #assert_difference('Delayed::Job.count', 1) do
+    endpoint.force_refresh_metadata
+    #end
+
+    refute endpoint.metadata_store.exist?(key1)
+    refute endpoint.metadata_store.exist?(key2)
+
     asset.reload
     assert asset.refresh?
 
@@ -627,6 +719,42 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert assets[0].synchronized?
     assert assets[1].synchronized?
     assets[2..8].each { |a| assert a.refresh? }
+  end
+
+  test 'mark_all_for_refresh sets sync status for all synchronized to refresh' do
+
+    endpoint = Factory(:openbis_endpoint)
+    endpoint.refresh_period_mins = 80
+    disable_authorization_checks do
+      assert endpoint.save!
+    end
+
+    assets = []
+    (0..9).each do |i|
+
+      asset = ExternalAsset.new
+      asset.seek_service = endpoint
+      asset.external_service = endpoint.web_endpoint
+      asset.external_id = i
+      asset.sync_state = :synchronized
+      asset.synchronized_at= DateTime.now - i.hours
+      assert asset.save
+      assets << asset
+    end
+
+
+    assets[9].sync_state = :failed
+    assets[9].save
+
+    endpoint.reload
+    assert_equal 10, endpoint.external_assets.count
+
+    endpoint.mark_all_for_refresh
+
+    assets.each &:reload
+
+    assert assets[9].failed?
+    assets[0..8].each { |a| assert a.refresh? }
   end
 
   test 'build_meta_config makes valid hash even on nil parameters' do

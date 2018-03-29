@@ -84,6 +84,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     assert endpoint2.save
     assert_equal 2, OpenbisEndpoint.count
 
+    Delayed::Job.destroy_all
     assert_difference('Delayed::Job.count', 2) do
       OpenbisSyncJob.create_initial_jobs
     end

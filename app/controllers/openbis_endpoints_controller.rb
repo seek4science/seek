@@ -66,12 +66,12 @@ class OpenbisEndpointsController < ApplicationController
 
   def refresh
     # puts "\n\n\n\nrefreshing metatdata"
-    @openbis_endpoint.refresh_metadata
+    @openbis_endpoint.force_refresh_metadata
     redirect_to @openbis_endpoint
   end
 
   def refresh_metadata_store
-    @openbis_endpoint.refresh_metadata
+    @openbis_endpoint.force_refresh_metadata
     show_items
   end
 

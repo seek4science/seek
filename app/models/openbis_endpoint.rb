@@ -15,12 +15,13 @@ class OpenbisEndpoint < ActiveRecord::Base
   validates :space_perm_id, uniqueness: { scope: %i[dss_endpoint as_endpoint space_perm_id project_id],
                                           message: 'the endpoints and the space must be unique for this project' }
 
-  after_create :create_refresh_metadata_job
-  after_destroy :clear_metadata_store, :remove_refresh_metadata_job
-  after_initialize :default_policy, autosave: true
+  after_create :create_refresh_metadata_job, :create_sync_metadata_job
+  after_destroy :remove_refresh_metadata_job, :remove_sync_metadata_job, :clear_metadata_store
 
+  after_initialize :default_policy, autosave: true
   after_initialize :add_meta_config, autosave: true
   before_save :meta_config_to_json
+  before_save :clear_metadata_if_changed
 
 
   def self.can_create?
@@ -62,13 +63,26 @@ class OpenbisEndpoint < ActiveRecord::Base
     if test_authentication
       Rails.logger.info("REFRESHING METADATA FOR Openbis Space #{id}")
 
-      clear_metadata_store
-      #reindex_entities
+      # only cleans the expired
+      cleanup_metadata_store
       mark_for_refresh
-      OpenbisSyncJob.new(self).queue_job
+      # job could be removed if there was nothing to sync
+      # OpenbisSyncJob.new(self).queue_job
     else
       Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not refreshing METADATA")
     end
+  end
+
+  def force_refresh_metadata
+    if test_authentication
+      Rails.logger.info("FORCING REFRESHING METADATA FOR Openbis Space #{id}")
+
+      clear_metadata_store
+      mark_all_for_refresh
+    else
+      Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not forcing refreshing METADATA")
+    end
+
   end
 
   #def reindex_entities
@@ -96,12 +110,23 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def clear_metadata_store
-    if test_authentication
-      Rails.logger.info("CLEARING METADATA STORE FOR Openbis Space #{id}")
-      metadata_store.clear
-    else
-      Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not deleting METADATA STORE")
-    end
+    # we clear it no matter what as metadata are stored in the ExternalAssets
+    metadata_store.clear
+
+    # if test_authentication
+    #   Rails.logger.info("CLEARING METADATA STORE FOR Openbis Space #{id}")
+    #   metadata_store.clear
+    # else
+    #   Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not deleting METADATA STORE")
+    # end
+  end
+
+  def clear_metadata_if_changed
+    clear_metadata_store if changed?
+  end
+
+  def cleanup_metadata_store
+    metadata_store.cleanup
   end
 
   def create_refresh_metadata_job
@@ -110,6 +135,14 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def remove_refresh_metadata_job
     OpenbisEndpointCacheRefreshJob.new(self).delete_jobs
+  end
+
+  def create_sync_metadata_job
+    OpenbisSyncJob.new(self).queue_job
+  end
+
+  def remove_sync_metadata_job
+    OpenbisSyncJob.new(self).delete_jobs
   end
 
   def associated_content_blobs
@@ -178,6 +211,10 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def metadata_store
     @metadata_store ||= Seek::Openbis::OpenbisMetadataStore.new(self)
+  end
+
+  def mark_all_for_refresh
+    external_assets.synchronized.update_all(sync_state: ExternalAsset.sync_states[:refresh])
   end
 
   def mark_for_refresh

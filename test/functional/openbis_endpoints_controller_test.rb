@@ -54,7 +54,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
                           permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
 
     assert_difference('OpenbisEndpoint.count') do
-      assert_difference('Delayed::Job.count') do
+      assert_difference('Delayed::Job.count', 2) do
         post :create, project_id: @project.id, openbis_endpoint:
             {
                 as_endpoint: 'http://as.com',
@@ -446,13 +446,34 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
   end
 
-  test 'refresh metadata store' do
+  test 'refresh_metadata_store' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
+    endpoint.metadata_store.fetch('K') { 'V' }
+    assert endpoint.metadata_store.exist? 'K'
+
     post :refresh_metadata_store, id: endpoint.id, project_id: @project.id
     assert_response :success
-    assert assigns(:openbis_endpoint)
+    endpoint = assigns(:openbis_endpoint)
+    assert endpoint
+
+    refute endpoint.metadata_store.exist? 'K'
+
   end
 
+  test 'refresh' do
+    login_as(@project_administrator)
+    endpoint = Factory(:openbis_endpoint, project: @project)
+    endpoint.metadata_store.fetch('K') { 'V' }
+    assert endpoint.metadata_store.exist? 'K'
+
+    post :refresh, id: endpoint.id
+    assert_redirected_to endpoint
+    endpoint = assigns(:openbis_endpoint)
+    assert endpoint
+
+    refute endpoint.metadata_store.exist? 'K'
+
+  end
 
 end
