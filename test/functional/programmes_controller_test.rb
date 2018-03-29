@@ -805,5 +805,9 @@ class ProgrammesControllerTest < ActionController::TestCase
     end
     Factory :funding_code, value: 'DFG', annotatable: programme
     add_avatar_to_test_object(programme)
+    person = Factory(:person)
+    login_as(person)
+    person.is_programme_administrator = true, programme
+    disable_authorization_checks { person.save! }
   end
 end

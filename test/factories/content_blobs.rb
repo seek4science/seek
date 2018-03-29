@@ -265,6 +265,12 @@ Factory.define(:rightfield_base_sample_template_with_assay_no_df_metadata, paren
   f.data { File.new("#{Rails.root}/test/fixtures/files/populated_templates/populated-base-samples-template-with-assay-no-df-title.xlsx", 'rb').read }
 end
 
+Factory.define(:rightfield_base_sample_template_with_assay_with_sop, parent: :content_blob) do |f|
+  f.original_filename 'populated-base-samples-template-with-assay-and-sop.xlsx'
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/populated_templates/populated-base-samples-template-with-assay-and-sop.xlsx", 'rb').read }
+end
+
 Factory.define(:blank_content_blob, class: ContentBlob) do |f|
   f.url nil
   f.data nil

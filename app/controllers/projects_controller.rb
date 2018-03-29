@@ -188,9 +188,7 @@ class ProjectsController < ApplicationController
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
-    if !json_api_request?
-      @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
-    end
+    @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
     begin
       respond_to do |format|

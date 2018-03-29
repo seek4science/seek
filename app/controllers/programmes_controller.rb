@@ -63,7 +63,6 @@ class ProgrammesController < ApplicationController
 
   def handle_administrators
     params[:programme][:administrator_ids] = params[:programme][:administrator_ids].split(',')
-
     prevent_removal_of_self_as_programme_administrator
   end
 
@@ -170,7 +169,7 @@ class ProgrammesController < ApplicationController
   private
 
   def programme_params
-    handle_administrators if params[:programme][:administrator_ids]
+    handle_administrators if params[:programme][:administrator_ids] && !(params[:programme][:administrator_ids].is_a? Array)
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { administrator_ids: [] },

@@ -2824,15 +2824,14 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
-  test 'create content blob extracts from template' do
+  test 'rightfield extraction extracts from template' do
     person = Factory(:person)
     login_as(person)
-    file = ActionDispatch::Http::UploadedFile.new(filename: 'template.xlsx',
-                                           content_type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                                           tempfile: fixture_file_upload('files/populated_templates/populated-base-samples-template-with-assay.xlsx'))
-    assert_difference('ContentBlob.count') do
-      post :create_content_blob, content_blobs: [{data:file}]
-    end
+    content_blob = Factory(:rightfield_base_sample_template_with_assay)
+
+    session[:uploaded_content_blob_id] = content_blob.id.to_s
+
+    post :rightfield_extraction_ajax, content_blob_id:content_blob.id.to_s,format:'js'
 
     assert_response :success
     assert data_file = assigns(:data_file)
@@ -3097,6 +3096,8 @@ class DataFilesControllerTest < ActionController::TestCase
     assay_class = AssayClass.experimental
     study = Factory(:study,investigation:Factory(:investigation,projects:[project]), contributor:person)
     assert study.can_edit?
+    sop = Factory(:sop,projects:[project],contributor:person)
+    assert sop.can_view?
 
     params = {data_file: {
         title: 'Small File',
@@ -3107,6 +3108,7 @@ class DataFilesControllerTest < ActionController::TestCase
         title: 'my wonderful assay',
         description: 'assay description',
         study_id: study.id,
+        sop_id: sop.id,
         assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
         technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     },
@@ -3117,7 +3119,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('DataFile.count') do
         assert_difference('Assay.count') do
-          assert_difference('AssayAsset.count') do
+          assert_difference('AssayAsset.count',2) do
             post :create_metadata, params
           end
         end
@@ -3134,6 +3136,85 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [project],assay.projects
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',assay.assay_type_uri
     assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding',assay.technology_type_uri
+    assert_equal [sop],assay.sops
+  end
+
+  test 'new assay adopts datafile policy' do
+    person = Factory(:person)
+    manager = Factory(:person)
+    other_project = Factory(:project)
+    login_as(person)
+
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+
+    project = person.projects.last
+    assay_class = AssayClass.experimental
+    study = Factory(:study,investigation:Factory(:investigation,projects:[project]), contributor:person)
+    assert study.can_edit?
+
+    sharing = {
+        access_type: Policy::PRIVATE,
+        permissions_attributes: {
+            '0' => {
+                contributor_type: 'Person',
+                contributor_id: manager.id,
+                access_type: Policy::MANAGING
+            },
+            '1' => {
+                contributor_type: 'Project',
+                contributor_id: other_project.id,
+                access_type: Policy::VISIBLE
+            }
+        }
+    }
+
+    params = {data_file: {
+        title: 'Small File',
+        project_ids: [project.id]
+    }, assay: {
+        create_assay: true,
+        assay_class_id: assay_class.id,
+        title: 'my wonderful assay',
+        description: 'assay description',
+        study_id: study.id,
+        sop_id: nil,
+        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+    },
+              policy_attributes: sharing,
+              content_blob_id: blob.id.to_s
+    }
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('Assay.count') do
+          assert_difference('Policy.count',2) do
+            assert_difference('Permission.count',4) do
+              post :create_metadata, params
+            end
+          end
+        end
+      end
+    end
+
+    assert (df = assigns(:data_file))
+    assert_equal Policy::PRIVATE,df.policy.access_type
+    assert_equal 2,df.policy.permissions.count
+    assert_equal manager,df.policy.permissions[0].contributor
+    assert_equal Policy::MANAGING,df.policy.permissions[0].access_type
+    assert_equal other_project,df.policy.permissions[1].contributor
+    assert_equal Policy::VISIBLE,df.policy.permissions[1].access_type
+
+    assay = df.assays.first
+    refute_equal df.policy.id,assay.policy.id
+    assert_equal Policy::PRIVATE,assay.policy.access_type
+    assert_equal 2,assay.policy.permissions.count
+    assert_equal manager,assay.policy.permissions[0].contributor
+    assert_equal Policy::MANAGING,assay.policy.permissions[0].access_type
+    assert_equal other_project,assay.policy.permissions[1].contributor
+    assert_equal Policy::VISIBLE,assay.policy.permissions[1].access_type
+
   end
 
   test 'create metadata with new assay fails if study not editable' do
@@ -3323,11 +3404,16 @@ class DataFilesControllerTest < ActionController::TestCase
     logout
   end
 
-  # registers a new content blob, and results in the metadata form HTML in the response
+  # registers a new content blob, and triggers the javascript 'rightfield_extraction_ajax' call, and results in the metadata form HTML in the response
+  # this replicates the old behaviour and result of calling #new
   def register_content_blob
+
     blob = {data: file_for_upload}
     assert_difference('ContentBlob.count') do
       post :create_content_blob, content_blobs: [blob]
     end
+    content_blob_id = assigns(:data_file).content_blob.id
+    session[:uploaded_content_blob_id] = content_blob_id.to_s
+    post :rightfield_extraction_ajax,content_blob_id:content_blob_id.to_s,format:'js'
   end
 end

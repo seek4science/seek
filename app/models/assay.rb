@@ -90,8 +90,7 @@ class Assay < ActiveRecord::Base
       assay_asset = assay_assets.detect { |aa| aa.asset == asset }
 
       if assay_asset.nil?
-        assay_asset = AssayAsset.new
-        assay_asset.assay = self
+        assay_asset = assay_assets.build
       end
 
       assay_asset.asset = asset

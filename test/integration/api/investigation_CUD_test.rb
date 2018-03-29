@@ -37,7 +37,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
                      r: ApiTestHelper.method(:render_erb) }
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     person_id = @current_user.person.id
     extra_relationships = {}
     extra_relationships[:submitter] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
@@ -50,6 +50,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference('Investigation.count') do
       delete "/#{@plural_clz}/#{inv.id}.json"
       assert_response :forbidden
+      validate_json_against_fragment response.body, '#/definitions/errors'
     end
   end
 

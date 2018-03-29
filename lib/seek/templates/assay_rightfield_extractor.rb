@@ -9,6 +9,7 @@ module Seek
           assay.assay_type_uri = assay_type_uri
           assay.technology_type_uri = technology_type_uri
           assay.study = study if study
+          assay.sops << sop if sop
         end
       end
 
@@ -17,20 +18,25 @@ module Seek
         Study.find_by_id(id) if id
       end
 
+      def sop
+        id = seek_id_by_type(Sop)
+        Sop.find_by_id(id) if id
+      end
+
       def title
-        value_for_property_and_index(:title, 1)
+        value_for_property_and_index(:title, :literal, 1)
       end
 
       def description
-        value_for_property_and_index(:description, 1)
+        value_for_property_and_index(:description, :literal, 1)
       end
 
       def assay_type_uri
-        value_for_property_and_index(:hasType, 0)
+        value_for_property_and_index(:hasType, :term_uri, 0)
       end
 
       def technology_type_uri
-        value_for_property_and_index(:hasType, 1)
+        value_for_property_and_index(:hasType, :term_uri, 1)
       end
     end
   end
