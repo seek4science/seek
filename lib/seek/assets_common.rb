@@ -30,9 +30,6 @@ module Seek
         ['Publication', id.split(',').first]
       end
       Relationship.create_or_update_attributions(asset, publication_params, Relationship::RELATED_TO_PUBLICATION)
-
-      # Add creators
-      AssetsCreator.add_or_update_creator_list(asset, params[:creators])
     end
 
     def update_assay_assets(asset, assay_ids, relationship_type_titles = nil)

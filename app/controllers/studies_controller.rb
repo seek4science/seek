@@ -170,6 +170,6 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
-                                  :other_creators, :create_from_asset, :new_link_from_assay)
+                                  :other_creators, :create_from_asset, :new_link_from_assay, { creator_ids: [] })
   end
 end

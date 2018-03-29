@@ -32,10 +32,6 @@ module Seek
             end
           },
 
-          creator_ids: ->(value) {
-            value.map { |id| ['', id.to_i] }.to_json
-          },
-
           publication_ids: ->(value) {
             value.map { |id| "#{id}," }
           },
@@ -87,7 +83,6 @@ module Seek
       RENAME = {
           tags: :tag_list,
           policy: :policy_attributes,
-          creator_ids: :creators,
           publication_ids: :related_publication_ids,
           assay_class: :assay_class_id,
           assay_type: :assay_type_uri,
@@ -101,7 +96,7 @@ module Seek
 
       # Parameters to "elevate" out of params[bla] to the top-level.
       ELEVATE = %i[assay_organism_ids tag_list expertise_list tool_list policy_attributes content_blobs
-       assay_ids related_publication_ids revision_comments creators data_files].freeze
+       assay_ids related_publication_ids revision_comments data_files].freeze
 
       def initialize(controller_name)
         @controller_name = controller_name

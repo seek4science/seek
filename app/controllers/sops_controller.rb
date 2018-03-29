@@ -71,7 +71,8 @@ class SopsController < ApplicationController
 
   def sop_params
     params.require(:sop).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
-                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+                                { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                { creator_ids: [] })
   end
 
   alias_method :asset_params, :sop_params
