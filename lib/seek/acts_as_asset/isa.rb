@@ -30,7 +30,24 @@ module Seek
         extend ActiveSupport::Concern
         included do
           has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id
-          has_many :assays, through: :assay_assets
+          has_many :assays, through: :assay_assets, inverse_of: table_name.to_sym
+
+          def assay_assets_attributes= attributes
+            self.assay_assets.reset
+
+            new_assay_assets = []
+
+            attributes.each do |attrs|
+              existing = self.assay_assets.detect { |aa| aa.assay_id == attrs[:assay_id] }
+              if existing
+                new_assay_assets << existing.tap { |e| e.assign_attributes(attrs) }
+              else
+                new_assay_assets << self.assay_assets.build(attrs)
+              end
+            end
+
+            self.assay_assets = new_assay_assets
+          end
         end
       end
     end
