@@ -263,9 +263,6 @@ class DataFilesController < ApplicationController
         else
           respond_to do |format|
             flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-            # the assay_id param can also contain the relationship type
-            assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
-            update_assay_assets(@data_file, assay_ids, relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
             format.json { render json: @data_file }
           end
@@ -293,18 +290,13 @@ class DataFilesController < ApplicationController
   end
 
   def update
-    @data_file.assign_attributes(data_file_params)
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_sharing_policies @data_file
     update_relationships(@data_file, params)
 
     respond_to do |format|
-      if @data_file.save
+      if @data_file.update_attributes(data_file_params)
         update_scales @data_file
-        # the assay_id param can also contain the relationship type
-        assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
-        update_assay_assets(@data_file, assay_ids, relationship_types)
-
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
         format.json {render json: @data_file}

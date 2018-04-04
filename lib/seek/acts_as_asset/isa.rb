@@ -38,11 +38,14 @@ module Seek
             new_assay_assets = []
 
             attributes.each do |attrs|
-              existing = self.assay_assets.detect { |aa| aa.assay_id == attrs[:assay_id] }
+              existing = self.assay_assets.detect { |aa| aa.assay_id.to_s == attrs['assay_id'] }
               if existing
                 new_assay_assets << existing.tap { |e| e.assign_attributes(attrs) }
               else
-                new_assay_assets << self.assay_assets.build(attrs)
+                assay = Assay.find_by_id(attrs['assay_id'])
+                if assay && assay.can_edit?
+                  new_assay_assets << self.assay_assets.build(attrs)
+                end
               end
             end
 

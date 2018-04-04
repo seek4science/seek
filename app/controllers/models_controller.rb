@@ -189,16 +189,13 @@ class ModelsController < ApplicationController
   # PUT /models/1
   # PUT /models/1.xml
   def update
-    @model.attributes = model_params
     update_annotations(params[:tag_list], @model)
     update_sharing_policies @model
     update_relationships(@model, params)
 
     respond_to do |format|
-      if @model.save
+      if @model.update_attributes(model_params)
         update_scales @model
-        update_assay_assets(@model, params[:assay_ids])
-
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
         format.json {render json: @model}

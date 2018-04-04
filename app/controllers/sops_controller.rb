@@ -47,14 +47,12 @@ class SopsController < ApplicationController
 
   # PUT /sops/1
   def update
-    @sop.attributes = sop_params
     update_annotations(params[:tag_list], @sop) if params.key?(:tag_list)
     update_sharing_policies @sop
     update_relationships(@sop,params)
 
     respond_to do |format|
-      if @sop.save
-        update_assay_assets(@sop,params[:assay_ids])
+      if @sop.update_attributes(sop_params)
         flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }
         format.json { render json: @sop }

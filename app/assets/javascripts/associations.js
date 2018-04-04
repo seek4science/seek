@@ -43,12 +43,15 @@ function nestedOptionsFromJSONArray(array,prompt_option_text) {
 var Associations = {};
 
 // Object to control a list of existing associations
-Associations.List = function (template, element) {
+Associations.List = function (template, element, options) {
     this.template = template;
     this.element = element;
     this.element.data('associationList', this);
     this.listElement = $j('ul', this.element);
     this.items = [];
+    options = options || {};
+    this.onAdd = options.onAdd || function () {};
+    this.onRemove = options.onRemove || function () {};
 };
 
 Associations.List.prototype.toggleEmptyListText = function () {
@@ -63,13 +66,27 @@ Associations.List.prototype.toggleEmptyListText = function () {
 Associations.List.prototype.add = function (association) {
     this.items.push(new Associations.ListItem(this, association));
     this.toggleEmptyListText();
+    this.onAdd(association);
 };
 
 Associations.List.prototype.remove = function (listItem) {
     var index = this.items.indexOf(listItem);
-    if (index > -1)
+    if (index > -1) {
+        var item = this.items[index];
         this.items.splice(index, 1);
+        this.onRemove(item);
+    }
     this.toggleEmptyListText();
+};
+
+Associations.List.prototype.exists = function (itemOrFunction) {
+    if (typeof itemOrFunction === 'function') {
+        return this.items.some(function (item) {
+            return itemOrFunction(item.data);
+        })
+    } else {
+        return this.items.includes(itemOrFunction);
+    }
 };
 
 Associations.List.prototype.removeAll = function () {
