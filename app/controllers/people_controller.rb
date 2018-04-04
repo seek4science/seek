@@ -47,6 +47,10 @@ class PeopleController < ApplicationController
       @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
     end
 
+    if (request.format == 'json' && params[:page].nil?)
+      params[:page] = 'all'
+    end
+
     if @people
       @people = @people.select(&:can_view?).reject { |p| p.projects.empty? }
     else
