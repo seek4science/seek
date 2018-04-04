@@ -2373,9 +2373,6 @@
             "attributes" : {
               "type" : "object",
               "properties" : {
-                "tags" : {
-                  "$ref" : "#/definitions/nullableNonEmptyStringList"
-                },
                 "title" : {
                   "$ref" : "#/definitions/nonEmptyString"
                 },
@@ -3943,9 +3940,6 @@
             "attributes" : {
               "type" : "object",
               "properties" : {
-                "tags" : {
-                  "$ref" : "#/definitions/nullableNonEmptyStringList"
-                },
                 "title" : {
                   "$ref" : "#/definitions/nonEmptyString"
                 },

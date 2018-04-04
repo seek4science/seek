@@ -471,7 +471,6 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(investigation)
-    add_tags_to_test_object(investigation)
     investigation.creators = [Factory(:person)]
     investigation.save
   end
