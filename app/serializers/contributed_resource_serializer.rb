@@ -3,6 +3,10 @@ class ContributedResourceSerializer < PCSSerializer
 
   attribute :version, key: :latest_version
 
+  attribute :tags do
+    serialize_annotations(object)
+  end
+
   attribute :versions do
     versions_data = []
     object.versions.each do |v|

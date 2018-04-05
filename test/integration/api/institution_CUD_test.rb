@@ -24,6 +24,18 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
     @patch_values = {id: i.id}
   end
 
+  def ignore_non_read_or_write_attributes
+    ['country_code']
+  end
+
+  def populate_extra_attributes(hash)
+    extra_attributes = {}
+    if hash['data']['attributes'].has_key? 'country'
+      extra_attributes[:country_code] = CountryCodes.code(hash['data']['attributes']['country'])
+    end
+    extra_attributes.with_indifferent_access
+  end
+
   def test_normal_user_cannot_create_institution
     user_login(Factory(:person))
     assert_no_difference('Institution.count') do

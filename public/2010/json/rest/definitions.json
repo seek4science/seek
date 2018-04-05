@@ -170,6 +170,17 @@
         {"type" : "null"}
       ]
     },
+    "countryCodeString" : {
+      "minLength" : 2,
+      "maxLength" : 2,
+      "type" : "string"
+    },
+    "nullableCountryCodeString" : {
+      "oneOf": [
+        {"$ref" : "#/definitions/countryCodeString"},
+        {"type" : "null"}
+      ]
+    },
     "versionNumber" : {
       "type" : "string",
       "minLength" : 1,
@@ -2217,6 +2228,9 @@
                 "country" : {
                   "$ref" : "#/definitions/nullableCountryString"
                 },
+                "country_code": {
+                  "$ref" : "#/definitions/nullableCountryCodeString"
+                },
                 "city" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
@@ -2359,9 +2373,6 @@
             "attributes" : {
               "type" : "object",
               "properties" : {
-                "tags" : {
-                  "$ref" : "#/definitions/nullableNonEmptyStringList"
-                },
                 "title" : {
                   "$ref" : "#/definitions/nonEmptyString"
                 },
@@ -3929,9 +3940,6 @@
             "attributes" : {
               "type" : "object",
               "properties" : {
-                "tags" : {
-                  "$ref" : "#/definitions/nullableNonEmptyStringList"
-                },
                 "title" : {
                   "$ref" : "#/definitions/nonEmptyString"
                 },
