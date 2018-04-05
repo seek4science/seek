@@ -237,7 +237,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.models, m
 
-    put :update, id: m, model: { title: m.title }, assay_ids: [new_assay.id.to_s]
+    put :update, id: m, model: { title: m.title, assay_assets_attributes: [{ assay_id: new_assay.id.to_s }] }
 
     assert_redirected_to model_path(m)
     m.reload
@@ -300,7 +300,10 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assay = assays(:modelling_assay)
     assert_difference('Model.count') do
-      post :create, model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, assay_ids: [assay.id.to_s]
+      assert_difference('AssayAsset.count') do
+        post :create, model: valid_model.merge(assay_assets_attributes: [{ assay_id: assay.id}]),
+             content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+      end
     end
 
     assert_redirected_to model_path(assigns(:model))

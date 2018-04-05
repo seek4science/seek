@@ -196,7 +196,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     refute_includes new_assay.data_files, d
     assert_difference('ActivityLog.count') do
-      put :update, id: d, data_file: { title: d.title }, assay_ids: [new_assay.id.to_s]
+      put :update, id: d, data_file: { title: d.title, assay_assets_attributes: [{ assay_id: new_assay.id.to_s }] }
     end
 
     assert_redirected_to data_file_path(d)
@@ -370,7 +370,8 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_difference('DataFile.count') do
         assert_difference('DataFile::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [assay.id.to_s]
+            post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
+                 content_blobs: [blob], policy_attributes: valid_sharing
           end
         end
       end
@@ -2635,8 +2636,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('DataFile.count') do
       assert_no_difference('ContentBlob.count') do
-        post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing,
-             assay_ids: [assay.id]
+        post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
+             content_blobs: [blob], policy_attributes: valid_sharing
+
       end
     end
 
