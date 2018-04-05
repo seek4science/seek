@@ -17,7 +17,7 @@ class AssaySerializer < PCSSerializer
   end
 
   attribute :tags do
-    serialize_annotations(object)
+    serialize_annotations(object, context = 'tag')
   end
 
   has_many :organisms
