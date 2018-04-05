@@ -33,13 +33,13 @@ class Assay < ActiveRecord::Base
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
-  has_many :assay_assets, dependent: :destroy
+  has_many :assay_assets, dependent: :destroy, inverse_of: :assay
 
-  has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile', inverse_of: :assays
-  has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop', inverse_of: :assays
-  has_many :models, through: :assay_assets, source: :asset, source_type: 'Model', inverse_of: :assays
-  has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample', inverse_of: :assays
-  has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document', inverse_of: :assays
+  has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile'
+  has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop'
+  has_many :models, through: :assay_assets, source: :asset, source_type: 'Model'
+  has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample'
+  has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document'
 
   has_one :investigation, through: :study
 

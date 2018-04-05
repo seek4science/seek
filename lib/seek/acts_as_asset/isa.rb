@@ -29,8 +29,8 @@ module Seek
       module Associations
         extend ActiveSupport::Concern
         included do
-          has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id
-          has_many :assays, through: :assay_assets, inverse_of: table_name.to_sym
+          has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id, inverse_of: :asset
+          has_many :assays, through: :assay_assets
 
           def assay_assets_attributes= attributes
             self.assay_assets.reset
