@@ -370,8 +370,7 @@ class PublicationsController < ApplicationController
 
   def publication_params
     params.require(:publication).permit(:pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,
-                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] },
-                                        { assay_assets_attributes: [:assay_id] })
+                                        :published_date, :bibtex_file, { project_ids: [] }, { event_ids: [] })
   end
 
   # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side

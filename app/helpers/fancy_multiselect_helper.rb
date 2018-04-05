@@ -44,7 +44,7 @@ module FancyMultiselectHelper
     {
       intro: "The following #{association.to_s.singularize.humanize.pluralize.downcase} are associated with this #{object_type_text.downcase}:",
       default_choice_text: "Select #{association.to_s.singularize.humanize} ...",
-      name: "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
+      name: options[:top_level_params] ? "#{association.to_s.singularize}_ids" : "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
       possibilities: nil,
       unscoped_possibilities: [],
       value_method: :id,
