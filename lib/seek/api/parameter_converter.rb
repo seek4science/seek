@@ -100,7 +100,7 @@ module Seek
           environment: :recommended_environment_id,
           data_file_ids: :data_files,
           sop_ids: :assay_sop_ids,
-          assay_ids: :assay_asset_attributes,
+          assay_ids: :assay_assets_attributes,
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
