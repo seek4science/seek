@@ -703,11 +703,10 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
     # This will be slow!
 
-    # 3 for events 'fancy_multiselect'
-    assert_equal 3, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
-    # 8 = 2 each for investigations, studies, assays, models (using bespoke association forms) - datafiles loaded asynchronously
-    # plus an extra 2 for the study optgroups in the assay association
-    assert_equal 10, response.body.scan('\u003cscript\u003ealert(\"xss\")\u003c/script\u003e \u0026').count
+    # 6 = 3 each for events and assays via 'fancy_multiselect'
+    assert_equal 6, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
+    # 6 = 2 each for investigations, studies, models (using bespoke association forms) - datafiles loaded asynchronously
+    assert_equal 6, response.body.scan('\u003cscript\u003ealert(\"xss\")\u003c/script\u003e \u0026').count
   end
 
   test 'programme publications through nested routing' do
