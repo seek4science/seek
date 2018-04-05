@@ -32,30 +32,6 @@ module Seek
       Relationship.set_attributions(asset, publication_params, Relationship::RELATED_TO_PUBLICATION)
     end
 
-    def update_assay_assets(asset, assay_ids, relationship_type_titles = nil)
-      assay_ids ||= []
-      relationship_type_titles ||= Array.new(assay_ids.size)
-      create_assay_assets(asset, assay_ids, relationship_type_titles)
-      destroy_redundant_assay_assets(asset, assay_ids)
-    end
-
-    def destroy_redundant_assay_assets(asset, assay_ids)
-      asset.assay_assets.each do |assay_asset|
-        if assay_asset.assay.can_edit? && !assay_ids.include?(assay_asset.assay_id.to_s)
-          AssayAsset.destroy(assay_asset.id)
-        end
-      end
-    end
-
-    def create_assay_assets(asset, assay_ids, relationship_type_titles)
-      assay_ids.each.with_index do |assay_id, index|
-        if (assay = Assay.find(assay_id)).can_edit?
-          relationship = RelationshipType.find_by_title(relationship_type_titles[index])
-          assay.associate(asset, relationship: relationship)
-        end
-      end
-    end
-
     def request_resource
       resource = class_for_controller_name.find(params[:id])
       details = params[:details]

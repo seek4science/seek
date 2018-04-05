@@ -2903,9 +2903,9 @@ class DataFilesControllerTest < ActionController::TestCase
     params = {data_file: {
         title: 'Small File',
         project_ids: [project.id],
+        assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
-              content_blob_id: blob.id.to_s,
-              assay_ids:[assay.id]
+       content_blob_id: blob.id.to_s
     }
 
     assert_difference('ActivityLog.count') do
@@ -2937,9 +2937,9 @@ class DataFilesControllerTest < ActionController::TestCase
     params = {data_file: {
         title: 'Small File',
         project_ids: [project.id],
+        assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
-        content_blob_id: blob.id.to_s,
-        assay_ids:[assay.id]
+       content_blob_id: blob.id.to_s
     }
 
     assert_difference('ActivityLog.count') do

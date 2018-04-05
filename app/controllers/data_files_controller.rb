@@ -213,17 +213,13 @@ class DataFilesController < ApplicationController
     # FIXME: clunky
     if valid_blob && (!@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)) && @data_file.save && blob.save
       update_scales @data_file
+      @data_file.assays << @assay if @create_new_assay
 
       session.delete(:uploaded_content_blob_id)
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
         # parse the data file if it is with sample data
-
-        # the assay_id param can also contain the relationship type
-        assay_ids, _relationship_types = determine_related_assay_ids_and_relationship_types(params)
-        assay_ids = [@assay.id.to_s] if @create_new_assay
-        update_assay_assets(@data_file, assay_ids)
         format.html { redirect_to data_file_path(@data_file) }
         format.json { render json: @data_file }
       end
@@ -276,17 +272,6 @@ class DataFilesController < ApplicationController
     else
       handle_upload_data_failure
     end
-  end
-
-  def determine_related_assay_ids_and_relationship_types(params)
-    assay_ids = []
-    relationship_types = []
-    (params[:assay_ids] || []).each do |assay_type_text|
-      assay_id, relationship_type = assay_type_text.split(',')
-      assay_ids << assay_id
-      relationship_types << relationship_type
-    end
-    [assay_ids, relationship_types]
   end
 
   def update
