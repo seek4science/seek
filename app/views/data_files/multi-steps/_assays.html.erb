@@ -1,0 +1,84 @@
+
+
+<% if Seek::Config.assays_enabled %>
+  <div class="panel panel-default">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="active">
+        <a href="#existing-assay" aria-controls="existing-assay" role="tab" data-toggle="tab" id="existing-assay-tab">Existing assay</a>
+      </li>
+      <li>
+        <a href="#new-assay" aria-controls="new-assay" role="tab" data-toggle="tab" id="new-assay-tab">New assay</a>
+      </li>
+    </ul>
+    <div class="tab-content">
+
+      <%# Existing Assay %>
+      <div role="tabpanel" class="tab-pane active" id="existing-assay">
+        <%= render :partial => "assays/associate_assays", locals: {resource: @data_file, collapsed: false} %>
+      </div>
+
+      <%# New Assay %>
+      <div role="tabpanel" class="tab-pane" id="new-assay">
+        <%= hidden_field_tag 'assay[assay_class_id]', @assay.assay_class_id || AssayClass.experimental.id %>
+        <div class="form-group">
+          <label>
+            <%= check_box_tag 'assay[create_assay]','1',@create_new_assay %>
+            Create a new Assay ?
+          </label>
+        </div>
+        <div class="form-group">
+          <label>Title <span class="required">*</span></label>
+          <%= text_field_tag 'assay[title]', @assay.title, :class => "form-control" %>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <%= text_area_tag 'assay[description]', @assay.description, :class => "form-control", :rows => 5 %>
+        </div>
+        <div class="form-group">
+          <label>Study</label>
+          <%= assay_study_selection('assay[study_id]', @assay.study) %>
+        </div>
+        <div class="form-group">
+          <label>SOP</label>
+          <%= assay_sop_selection('assay[sop_id]', @assay.sops.first) %>
+        </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label>Experimental assay type</label>
+              <%= assay_type_select_tag "assay[assay_type_uri]", @assay.is_modelling?, @assay, {:class => "form-control"} %>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label>Technology type</label>
+              <%= technology_type_select_tag "assay[technology_type_uri]", @assay, {:class => "form-control"} %>
+            </div>
+          </div>
+        </div>
+        <div class="alert alert-warning">
+          The new <%= t('assay') %> will adopt the same sharing permissions defined for the <%= t('data_file') %>,
+          which can be changed independently afterwards.
+        </div>
+      </div>
+    </div>
+    <%= cancel_button(data_files_path) -%>
+    <div class="multi-step-buttons">
+      <%= multi_step_start_button %>
+      <%= multi_step_back_button %>
+      <%= multi_step_forward_button %>
+      <%= multi_step_end_button %>
+    </div>
+  </div>
+<% end %>
+
+<script type="application/javascript">
+
+$j(document).ready(function() {
+  <% if @create_new_assay %>
+    $j('#new-assay-tab').trigger('click');
+  <% end %>
+});
+
+
+</script>

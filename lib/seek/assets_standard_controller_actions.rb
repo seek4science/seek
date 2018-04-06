@@ -32,7 +32,6 @@ module Seek
     def setup_new_asset
       item = class_for_controller_name.new
       item.parent_name = params[:parent_name] if item.respond_to?(:parent_name)
-      item.is_with_sample = params[:is_with_sample] if item.respond_to?(:is_with_sample)
       set_shared_item_variable(item)
       @content_blob = ContentBlob.new
       @page_title = params[:page_title]
@@ -92,6 +91,11 @@ module Seek
       end
     end
 
+    #makes sure the asset it only associated with projects that match the current user
+    def filter_associated_projects(asset,user=User.current_user)
+      asset.projects = asset.projects & user.person.projects
+    end
+
     def update_sharing_policies(item)
       item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
     end
@@ -106,9 +110,7 @@ module Seek
     def create_asset(item)
       update_sharing_policies item
       update_annotations(params[:tag_list], item)
-      update_scales item
       update_relationships(item, params)
-      update_assay_assets(item, params[:assay_ids])
       build_model_image item, model_image_params if item.is_a?(Model) && model_image_present?
       item
     end

@@ -2,7 +2,6 @@ var data_files_assets=new Array();
 var samples_assets=new Array();
 var organisms = new Array();
 var assays_array = new Array();
-var id_rel_array = new Array();
 
 
 function addNewInvestigation(new_investigation) {
@@ -209,7 +208,6 @@ function addOrganism(title,id,strain_info,strain_id,culture_growth,t_id,t_title)
        organisms.push([title,id,strain_info,strain_id,culture_growth,t_id,t_title]);
        updateOrganisms();
     }
-
 }
 
 function addSelectedOrganism() {

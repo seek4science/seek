@@ -467,15 +467,21 @@ img.avatar-corner-icon {
 
   .name-column {
     border: none;
+  }
+  .name-column, .name-cell {
+    max-width: 200px;
     width: 200px;
 
     @media (min-width: $screen-sm-min) and (max-width: $screen-sm-max) {
+      max-width: 250px;
       width: 250px;
     }
     @media (min-width: $screen-md-min) and (max-width: $screen-md-max) {
+      max-width: 400px;
       width: 300px;
     }
     @media (min-width: $screen-lg-min) {
+      max-width: 600px;
       width: 400px;
     }
   }

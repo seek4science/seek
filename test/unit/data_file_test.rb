@@ -147,29 +147,6 @@ class DataFileTest < ActiveSupport::TestCase
     assert_not_nil ContentBlob.find(cb.id)
   end
 
-  test 'is restorable after destroy' do
-    df = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy), title: 'is it restorable?'
-    User.current_user = df.contributor
-    assert_difference('DataFile.count', -1) do
-      df.destroy
-    end
-    assert_nil DataFile.find_by_title 'is it restorable?'
-    assert_difference('DataFile.count', 1) do
-      disable_authorization_checks { DataFile.restore_trash!(df.id) }
-    end
-    assert_not_nil DataFile.find_by_title 'is it restorable?'
-  end
-
-  test 'failing to delete (due to can_not_delete) still creates trash' do
-    df = Factory :data_file, policy: Factory(:private_policy), contributor: Factory(:user)
-    User.with_current_user Factory(:user) do
-      assert_no_difference('DataFile.count') do
-        df.destroy
-      end
-      assert_not_nil DataFile.restore_trash(df.id)
-    end
-  end
-
   test 'test uuid generated' do
     x = data_files(:private_data_file)
     assert_nil x.attributes['uuid']

@@ -47,6 +47,10 @@ class PeopleController < ApplicationController
       @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
     end
 
+    if (request.format == 'json' && params[:page].nil?)
+      params[:page] = 'all'
+    end
+
     if @people
       @people = @people.select(&:can_view?).reject { |p| p.projects.empty? }
     else
@@ -217,8 +221,6 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       if @person.update_attributes(person_params) && set_group_membership_project_position_ids(@person, params)
-        @person.save # this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
-        @person.touch # this makes sure any caches based on the cache key are invalided where the person would not normally be updated, such as changing disciplines or tags
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml  { head :ok }
@@ -258,16 +260,32 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_group_membership_project_position_ids(person, params)
-    prefix = 'group_membership_role_ids_'
+  def set_group_membership_from_api_params(person,params)
     person.group_memberships.each do |gr|
-      key = prefix + gr.id.to_s
-      gr.project_positions.clear
-      next unless params[key.to_sym]
-      params[key.to_sym].each do |r|
-        r = ProjectPosition.find(r)
-        gr.project_positions << r
+      #gr.project_positions.clear ???
+      params[:person][:project_positions].each do |pos|
+        if (gr.project.id.to_s == pos[:project_id].to_s)
+          r = ProjectPosition.find(pos[:position_id])
+          gr.project_positions << r
+        end
       end
+    end
+  end
+
+  def set_group_membership_project_position_ids(person, params)
+    if params[:person][:project_positions].nil?
+      prefix = 'group_membership_role_ids_'
+      person.group_memberships.each do |gr|
+        key = prefix + gr.id.to_s
+        gr.project_positions.clear
+        next unless params[key.to_sym]
+        params[key.to_sym].each do |r|
+          r = ProjectPosition.find(r)
+          gr.project_positions << r
+        end
+      end
+    else
+      set_group_membership_from_api_params(person, params)
     end
   end
 
@@ -350,8 +368,8 @@ class PeopleController < ApplicationController
   end
 
   def set_tools_and_expertise(person, params)
-    exp_changed = person.tag_annotations(params[:expertise_list], 'expertise') if params[:expertise_list]
-    tools_changed = person.tag_annotations(params[:tool_list], 'tool') if params[:tool_list]
+    exp_changed = person.add_annotations(params[:expertise_list], 'expertise') if params[:expertise_list]
+    tools_changed = person.add_annotations(params[:tool_list], 'tool') if params[:tool_list]
     if immediately_clear_tag_cloud?
       expire_annotation_fragments('expertise') if exp_changed
       expire_annotation_fragments('tool') if tools_changed

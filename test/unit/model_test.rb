@@ -82,12 +82,6 @@ class ModelTest < ActiveSupport::TestCase
     assert !model.is_jws_supported?
     assert !model.contains_jws_dat?
 
-    # should also be able to handle versions
-    model = models(:teusink).latest_version
-    assert model.contains_sbml?
-    assert model.is_jws_supported?
-    assert !model.contains_jws_dat?
-
     model = Factory(:teusink_jws_model).latest_version
     assert !model.contains_sbml?
     assert model.is_jws_supported?
@@ -102,6 +96,23 @@ class ModelTest < ActiveSupport::TestCase
     assert !model.contains_sbml?
     assert !model.is_jws_supported?
     assert !model.contains_jws_dat?
+
+    # should also be able to handle new versions
+    model = Factory(:non_sbml_xml_model)
+    assert !model.contains_sbml?
+    assert !model.is_jws_supported?
+
+    disable_authorization_checks {
+      assert model.save_as_new_version
+      model.content_blobs = [Factory(:teusink_model_content_blob, asset: model, asset_version: model.version)]
+      model.save
+    }
+    model.reload
+    assert_equal 2,model.version
+    assert model.contains_sbml?
+    assert model.is_jws_supported?
+    assert !model.contains_jws_dat?
+
   end
 
   test 'assay association' do
@@ -237,34 +248,6 @@ class ModelTest < ActiveSupport::TestCase
       end
       assert_not_nil ContentBlob.find(cb.id)
     end
-  end
-
-  test 'is restorable after destroy' do
-    model = Factory :model, policy: Factory(:all_sysmo_viewable_policy), title: 'is it restorable?'
-    User.with_current_user model.contributor do
-      assert_difference('Model.count', -1) do
-        model.destroy
-      end
-    end
-    assert_nil Model.find_by_title 'is it restorable?'
-    assert_difference('Model.count', 1) do
-      disable_authorization_checks { Model.restore_trash!(model.id) }
-    end
-    assert_not_nil Model.find_by_title 'is it restorable?'
-  end
-
-  test 'failing to delete due to can_delete still creates trash' do
-    user = Factory :user
-    contributor = Factory :person
-    model = Factory :model, policy: Factory(:private_policy), contributor: contributor
-    User.with_current_user user do
-      assert !model.can_delete?
-      assert_no_difference('Model.count') do
-        model.destroy
-      end
-    end
-
-    assert_not_nil Model.restore_trash(model.id)
   end
 
   test 'test uuid generated' do

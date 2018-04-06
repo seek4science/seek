@@ -11,6 +11,7 @@ require 'seek/acts_as_fleximage_extension'
 require 'seek/acts_as_favouritable'
 require 'seek/acts_as_asset/acts_as_asset'
 require 'seek/acts_as_cached_tree'
+require 'seek/acts_as_annotatable_extensions'
 require 'seek/permissions/authorization_enforcement'
 require 'seek/permissions/acts_as_authorized'
 require 'seek/doi/acts_as_doi_parent'
@@ -28,7 +29,6 @@ require 'seek/breadcrumbs'
 require 'string_extension'
 require 'recaptcha'
 require 'acts_as_list'
-require 'acts_as_trashable'
 require 'will_paginate'
 require 'responds_to_parent'
 require 'pothoven-attachment_fu'
@@ -87,6 +87,7 @@ SEEK::Application.configure do
       SendPeriodicEmailsJob.create_initial_jobs
       NewsFeedRefreshJob.create_initial_job
       OpenbisEndpointCacheRefreshJob.create_initial_jobs
+      ContentBlobCleanerJob.create_initial_job
     end
   rescue Exception=>e
     Rails.logger.error "Error creating default delayed jobs - #{e.message}"

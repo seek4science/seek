@@ -179,7 +179,7 @@ class SopsControllerTest < ActionController::TestCase
 
     refute_includes new_assay.sops, s
 
-    put :update, id: s.id, sop: { title: s.title }, assay_ids: [new_assay.id.to_s]
+    put :update, id: s.id, sop: { title: s.title, assay_assets_attributes: [{ assay_id: new_assay.id }] }
 
     assert_redirected_to sop_path(s)
 
@@ -197,7 +197,8 @@ class SopsControllerTest < ActionController::TestCase
     assay = assays(:assay_can_edit_by_my_first_sop_owner1)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [assay.id.to_s]
+        post :create, sop: sop.merge(assay_assets_attributes: [{ assay_id: assay.id }]),
+             content_blobs: [blob], policy_attributes: valid_sharing
       end
     end
 

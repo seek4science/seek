@@ -114,16 +114,11 @@ class AssaysController < ApplicationController
     update_assay_organisms @assay, params
     @assay.contributor=current_person
     update_sharing_policies @assay
-    update_annotations(params[:tag_list], @assay) #this saves the assay
-    update_scales @assay
+    update_annotations(params[:tag_list], @assay)
+    update_relationships(@assay, params)
 
-    a = @assay.present?
-    b = @assay.save
-
-    if a && b
+    if @assay.save
       update_assets_linked_to_assay @assay, params
-      update_relationships(@assay, params)
-
       #required to trigger the after_save callback after the assets have been associated
       @assay.save
       if @assay.create_from_asset =="true"
@@ -144,19 +139,15 @@ class AssaysController < ApplicationController
   end
 
   def update
-    set_assay_organisms_from_json if json_api_request?
-
+    @assay.assign_attributes(assay_params)
     update_assay_organisms @assay, params
     update_annotations(params[:tag_list], @assay)
-    update_scales @assay
-    @assay.update_attributes(assay_params)
     update_sharing_policies @assay
+    update_relationships(@assay, params)
 
     respond_to do |format|
-      if @assay.save           #should use params (e.g. for creators to be updated)
+      if @assay.save
         update_assets_linked_to_assay @assay, params
-        update_relationships(@assay, params)
-
         @assay.save!
 
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
@@ -170,7 +161,7 @@ class AssaysController < ApplicationController
   end
 
   def update_assay_organisms assay,params
-    organisms             = params[:assay_organism_ids] || []
+    organisms             = params[:assay_organism_ids] || params[:assay][:organism_ids] || []
     assay.assay_organisms = []
     Array(organisms).each do |text|
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
@@ -184,6 +175,7 @@ class AssaysController < ApplicationController
     model_ids             = params[:assay][:model_ids] || []
     data_files            = params[:data_files] || []
     samples               = params[:samples] || []
+    document_ids          = params[:document_ids] || []
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     data_files.each do |data_file|
@@ -199,6 +191,10 @@ class AssaysController < ApplicationController
     Array(sop_ids).reject(&:blank?).each do |id|
       s = Sop.find(id)
       assay_assets_to_keep << assay.associate(s) if s.can_view?
+    end
+    Array(document_ids).each do |id|
+      d = Document.find(id)
+      assay_assets_to_keep << assay.associate(d) if d.can_view?
     end
     samples.each do |sample|
       s = Sample.find(sample[:id])
@@ -230,16 +226,9 @@ class AssaysController < ApplicationController
 
   private
 
-  def set_assay_organisms_from_json
-    if !(params[:assay][:assay_organism_ids].nil?)
-      params[:assay_organism_ids] = params[:assay][:assay_organism_ids]
-      params[:assay].delete :assay_organism_ids
-    end
-  end
-
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, { sop_ids: [] },
                                   :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset,
-                                  { document_ids: []})
+                                  { document_ids: []}, { creator_ids: [] }, { scales: [] })
   end
 end

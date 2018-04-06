@@ -4,6 +4,7 @@ module Seek
       base.before_filter :add_breadcrumbs
     end
 
+    # FIXME: badly needs refactoring, this code is wrong in so many ways:
     def add_breadcrumbs
       # Home
       add_breadcrumb 'Home', :root_path
@@ -40,40 +41,44 @@ module Seek
       elsif controller_name == 'nels'
         add_index_breadcrumb 'assays'
         add_show_breadcrumb @assay
-      elsif %w(compounds suggested_assay_types suggested_technology_types site_announcements).include?(controller_name)
+      elsif %w[compounds suggested_assay_types suggested_technology_types site_announcements].include?(controller_name)
         add_index_breadcrumb('admin', 'Administration')
       end
 
       # Index
       case controller_name
-        when 'studied_factors'
-          add_index_breadcrumb(controller_name, 'Factors studied Index')
-        when 'admin'
-          add_index_breadcrumb(controller_name, 'Administration')
-        when 'site_announcements'
-          add_index_breadcrumb(controller_name, 'Announcements')
-        when 'suggested_assay_types'
-          add_index_breadcrumb(controller_name, 'Assay types')
-        when 'suggested_technology_types'
-          add_index_breadcrumb(controller_name, 'Technology types')
-        else
-          add_index_breadcrumb(controller_name)
+      when 'studied_factors'
+        add_index_breadcrumb(controller_name, 'Factors studied Index')
+      when 'admin'
+        add_index_breadcrumb(controller_name, 'Administration')
+      when 'site_announcements'
+        add_index_breadcrumb(controller_name, 'Announcements')
+      when 'suggested_assay_types'
+        add_index_breadcrumb(controller_name, 'Assay types')
+      when 'suggested_technology_types'
+        add_index_breadcrumb(controller_name, 'Technology types')
+      else
+        add_index_breadcrumb(controller_name)
       end
       resource = eval('@' + controller_name.singularize) || try_block { controller_name.singularize.camelize.constantize.find_by_id(params[:id]) }
 
       add_show_breadcrumb resource if resource && resource.respond_to?(:new_record?) && !resource.new_record?
 
       unless action_name == 'index' || action_name == 'show'
-        if action_name == 'new_object_based_on_existing_one'
-          add_breadcrumb "New #{controller_name.humanize.singularize.downcase} based on this one", url_for(controller: controller_name, action: action_name, id: resource.try(:id))
+        case action_name
+        when 'new_object_based_on_existing_one'
+          breadcrumb_name = "New #{controller_name.humanize.singularize.downcase} based on this one"
+        when 'create_content_blob'
+          breadcrumb_name = "New #{controller_name.humanize.singularize.downcase} details"
         else
-          if resource.nil?
-            url = url_for(controller: controller_name, action: action_name)
-          else
-            url = url_for(controller: controller_name, action: action_name, id: resource.try(:id))
-          end
-          add_breadcrumb "#{action_name.capitalize.humanize}", url
+          breadcrumb_name = action_name.capitalize.humanize
         end
+        url = if resource.nil?
+                url_for(controller: controller_name, action: action_name)
+              else
+                url_for(controller: controller_name, action: action_name, id: resource.try(:id))
+              end
+        add_breadcrumb breadcrumb_name, url
       end
     end
 
@@ -84,7 +89,7 @@ module Seek
 
     def add_show_breadcrumb(resource, breadcrumb_name = nil)
       unless resource.is_a?(ProjectFolder)
-        breadcrumb_name ||= "#{resource.respond_to?(:title) ? resource.title : resource.id}"
+        breadcrumb_name ||= (resource.respond_to?(:title) ? resource.title : resource.id).to_s
         add_breadcrumb breadcrumb_name, url_for(controller: resource.class.name.underscore.pluralize, action: 'show', id: resource.id)
       end
     end

@@ -33,7 +33,7 @@ class Assay < ActiveRecord::Base
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
-  has_many :assay_assets, dependent: :destroy
+  has_many :assay_assets, dependent: :destroy, inverse_of: :assay
 
   has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile'
   has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop'
@@ -90,8 +90,7 @@ class Assay < ActiveRecord::Base
       assay_asset = assay_assets.detect { |aa| aa.asset == asset }
 
       if assay_asset.nil?
-        assay_asset = AssayAsset.new
-        assay_asset.assay = self
+        assay_asset = assay_assets.build
       end
 
       assay_asset.asset = asset

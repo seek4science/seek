@@ -20,11 +20,11 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @current_person)
+    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
     @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: data_file.id})
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash=nil)
     extra_relationships = {}
     extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
     extra_relationships[:people] = { data: [{ id: @current_person.id.to_s, type: 'people' },
@@ -63,6 +63,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
         'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf'))
 
     assert_response :forbidden
+    validate_json_against_fragment response.body, '#/definitions/errors'
     blob = df.content_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -81,6 +82,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
         'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf'))
 
     assert_response :bad_request
+    validate_json_against_fragment response.body, '#/definitions/errors'
     blob = df.content_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
@@ -110,6 +112,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'returns sensible error objects' do
+    skip 'Errors are a WIP'
     template_file = File.join(ApiTestHelper.template_dir, 'post_bad_data_file.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
@@ -117,6 +120,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference("#{@clz.classify}.count") do
       post "/#{@plural_clz}.json", @to_post
       assert_response :unprocessable_entity
+      validate_json_against_fragment response.body, '#/definitions/errors'
     end
 
     h = JSON.parse(response.body)

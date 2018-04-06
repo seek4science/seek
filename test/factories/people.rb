@@ -11,6 +11,8 @@ Factory.define(:max_person, class: Person) do |f|
   f.web_page "http://www.website.com"
   f.orcid "https://orcid.org/0000-0001-9842-9718"
   f.email "maximal_person@email.com"
+  f.phone "34-167-552266"
+  f.skype_name "myskypename"
   f.investigations_for_person {[Factory(:investigation, policy: Factory(:public_policy))]}
   f.studies_for_person {[Factory(:study, policy: Factory(:public_policy))]}
   f.assays_for_person {[Factory(:assay, policy: Factory(:public_policy))]}
@@ -21,6 +23,7 @@ Factory.define(:max_person, class: Person) do |f|
   f.created_publications {[Factory(:publication)]}
   f.created_documents {[Factory(:public_document)]}
   f.association :user, factory: :activated_user
+  f.group_memberships { [Factory.build(:group_membership)] }
 end
 
 Factory.define(:brand_new_person, class: Person) do |f|

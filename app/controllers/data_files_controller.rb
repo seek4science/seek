@@ -11,7 +11,7 @@ class DataFilesController < ApplicationController
   include Seek::AssetsCommon
 
   before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob, :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax]
   before_filter :find_display_asset, only: [:show, :explore, :download, :matching_models]
   skip_before_filter :verify_authenticity_token, only: [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
@@ -22,6 +22,8 @@ class DataFilesController < ApplicationController
   before_filter :oauth_client, only: :retrieve_nels_sample_metadata
   before_filter :nels_oauth_session, only: :retrieve_nels_sample_metadata
   before_filter :rest_client, only: :retrieve_nels_sample_metadata
+
+  before_filter :login_required, only: [:create, :create_content_blob, :create_metadata, :rightfield_extraction_ajax]
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -48,6 +50,49 @@ class DataFilesController < ApplicationController
         @data_file.extracted_samples.destroy_all
       end
       super
+    end
+  end
+
+  def create_content_blob
+    @data_file = DataFile.new
+    respond_to do |format|
+      if handle_upload_data
+        create_content_blobs
+        session[:uploaded_content_blob_id] = @data_file.content_blob.id
+        format.html {}
+      else
+        session.delete(:uploaded_content_blob_id)
+        format.html { render action: :new }
+      end
+    end
+  end
+
+  def rightfield_extraction_ajax
+    @data_file = DataFile.new
+    error_msg = nil
+    begin
+      if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
+        @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
+        @data_file.populate_metadata_from_template
+        @assay = @data_file.initialise_assay_from_template
+        @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
+      else
+        error_msg = "The file that was request to be processed doesn't match that which had been uploaded"
+      end
+    rescue Exception => e
+      ExceptionNotifier.notify_exception(e, data: {
+          message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
+          current_logged_in_user: current_user
+      })
+      error_msg = e.message
+    end
+
+    respond_to do |format|
+      if error_msg
+        format.js { render text: error_msg, status: :unprocessable_entity }
+      else
+        format.js { render :provide_metadata, status: :ok }
+      end
     end
   end
 
@@ -134,28 +179,83 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def create_metadata
+    @data_file = DataFile.new(data_file_params)
+    assay_params = data_file_assay_params
+    sop_id = assay_params.delete(:sop_id)
+    @create_new_assay = assay_params.delete(:create_assay)
+
+    update_sharing_policies(@data_file)
+
+    @assay = Assay.new(assay_params)
+    if (sop_id)
+      sop = Sop.find_by_id(sop_id)
+      if sop && sop.can_view?
+        @assay.sops << sop
+      end
+    end
+    @assay.policy = @data_file.policy.deep_copy if @create_new_assay
+
+    filter_associated_projects(@data_file)
+
+    # associate_content_blob
+    blob_id = params[:content_blob_id]
+
+    #check it matches that previously uploaded and recorded on the session
+    valid_blob = (blob_id == session[:uploaded_content_blob_id].to_s)
+
+    blob = ContentBlob.find(blob_id)
+    @data_file.content_blob = blob
+
+    update_annotations(params[:tag_list], @data_file)
+    update_relationships(@data_file, params)
+
+    # FIXME: clunky
+    if valid_blob && (!@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)) && @data_file.save && blob.save
+      @data_file.assays << @assay if @create_new_assay
+
+      session.delete(:uploaded_content_blob_id)
+
+      respond_to do |format|
+        flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
+        # parse the data file if it is with sample data
+        format.html { redirect_to data_file_path(@data_file) }
+        format.json { render json: @data_file }
+      end
+
+    else
+      @data_file.errors[:base]="The file uploaded doesn't match" unless valid_blob
+
+      # this helps trigger the complete validation error messages, as not both may be validated in a single action
+      # - want the avoid the user fixing one set of validation only to be presented with a new set
+      @assay.valid? if @create_new_assay
+      @data_file.valid? if valid_blob
+
+      respond_to do |format|
+        format.html do
+          render :provide_metadata, status: :unprocessable_entity
+        end
+      end
+    end
+  end
+
   def create
     @data_file = DataFile.new(data_file_params)
 
     if handle_upload_data
       update_sharing_policies(@data_file)
 
+      update_annotations(params[:tag_list], @data_file)
+      update_relationships(@data_file, params)
+
       if @data_file.save
-        update_annotations(params[:tag_list], @data_file)
-        update_scales @data_file
-
         create_content_blobs
-
-        update_relationships(@data_file, params)
 
         if !@data_file.parent_name.blank?
           render partial: 'assets/back_to_fancy_parent', locals: { child: @data_file, parent_name: @data_file.parent_name, is_not_fancy: true }
         else
           respond_to do |format|
             flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-            # the assay_id param can also contain the relationship type
-            assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
-            update_assay_assets(@data_file, assay_ids, relationship_types)
             format.html { redirect_to data_file_path(@data_file) }
             format.json { render json: @data_file }
           end
@@ -171,33 +271,13 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def determine_related_assay_ids_and_relationship_types(params)
-    assay_ids = []
-    relationship_types = []
-    (params[:assay_ids] || []).each do |assay_type_text|
-      assay_id, relationship_type = assay_type_text.split(',')
-      assay_ids << assay_id
-      relationship_types << relationship_type
-    end
-    [assay_ids, relationship_types]
-  end
-
   def update
-    @data_file.attributes = data_file_params.except!(:content)
-
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
-    update_scales @data_file
+    update_sharing_policies @data_file
+    update_relationships(@data_file, params)
 
     respond_to do |format|
-      update_sharing_policies @data_file
-
-      if @data_file.save
-        update_relationships(@data_file, params)
-
-        # the assay_id param can also contain the relationship type
-        assay_ids, relationship_types = determine_related_assay_ids_and_relationship_types(params)
-        update_assay_assets(@data_file, assay_ids, relationship_types)
-
+      if @data_file.update_attributes(data_file_params)
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
         format.json {render json: @data_file}
@@ -424,7 +504,13 @@ class DataFilesController < ApplicationController
   def data_file_params
     params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,
                                       :parent_name, { event_ids: [] },
-                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] })
+                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
+                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
+                                      { scales: [] })
+  end
+
+  def data_file_assay_params
+    params.fetch(:assay,{}).permit(:title, :description, :assay_class_id, :study_id, :sop_id,:assay_type_uri,:technology_type_uri, :create_assay)
   end
 
   def oauth_client

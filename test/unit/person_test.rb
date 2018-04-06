@@ -402,7 +402,7 @@ class PersonTest < ActiveSupport::TestCase
     Factory :expertise, value: 'golf', annotatable: p
     Factory :tool, value: 'sbml', annotatable: p
     assert_equal 1, p.expertise.size
-    assert_equal 'golf', p.expertise[0].text
+    assert_equal 'golf', p.expertise[0]
   end
 
   def test_tools
@@ -417,7 +417,7 @@ class PersonTest < ActiveSupport::TestCase
     Factory :tool, value: 'sbml', annotatable: p
     Factory :expertise, value: 'fishing', annotatable: p
     assert_equal 1, p.tools.size
-    assert_equal 'sbml', p.tools[0].text
+    assert_equal 'sbml', p.tools[0]
   end
 
   def test_assign_expertise
@@ -427,26 +427,29 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
           p.expertise = %w[golf fishing]
+          p.save!
         end
       end
 
       assert_equal 2, p.expertise.size
-      assert p.expertise.collect(&:text).include?('golf')
-      assert p.expertise.collect(&:text).include?('fishing')
+      assert p.expertise.include?('golf')
+      assert p.expertise.include?('fishing')
 
       assert_difference('Annotation.count', -1) do
         assert_no_difference('TextValue.count') do
           p.expertise = ['golf']
+          p.save!
         end
       end
 
       assert_equal 1, p.expertise.size
-      assert_equal 'golf', p.expertise[0].text
+      assert_equal 'golf', p.expertise[0]
 
       p2 = Factory :person
       assert_difference('Annotation.count') do
         assert_no_difference('TextValue.count') do
           p2.expertise = ['golf']
+          p2.save!
         end
       end
     end
@@ -459,26 +462,29 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
           p.tools = %w[golf fishing]
+          p.save!
         end
       end
 
       assert_equal 2, p.tools.size
-      assert p.tools.collect(&:text).include?('golf')
-      assert p.tools.collect(&:text).include?('fishing')
+      assert p.tools.include?('golf')
+      assert p.tools.include?('fishing')
 
       assert_difference('Annotation.count', -1) do
         assert_no_difference('TextValue.count') do
           p.tools = ['golf']
+          p.save!
         end
       end
 
       assert_equal 1, p.tools.size
-      assert_equal 'golf', p.tools[0].text
+      assert_equal 'golf', p.tools[0]
 
       p2 = Factory :person
       assert_difference('Annotation.count') do
         assert_no_difference('TextValue.count') do
           p2.tools = ['golf']
+          p2.save!
         end
       end
     end
@@ -491,14 +497,14 @@ class PersonTest < ActiveSupport::TestCase
       assert_equal 2, p.tools.size
       p.tools = ['three']
       assert_equal 1, p.tools.size
-      assert_equal 'three', p.tools[0].text
+      assert_equal 'three', p.tools[0]
 
       p = Factory :person
       p.expertise = %w[aaa bbb]
       assert_equal 2, p.expertise.size
       p.expertise = ['ccc']
       assert_equal 1, p.expertise.size
-      assert_equal 'ccc', p.expertise[0].text
+      assert_equal 'ccc', p.expertise[0]
     end
   end
 
@@ -508,12 +514,14 @@ class PersonTest < ActiveSupport::TestCase
       assert_difference('Annotation.count', 2) do
         assert_difference('TextValue.count', 2) do
           p.tools = %w[golf fishing]
+          p.save!
         end
       end
 
       assert_difference('Annotation.count', 2) do
         assert_no_difference('TextValue.count') do
           p.expertise = %w[golf fishing]
+          p.save!
         end
       end
     end

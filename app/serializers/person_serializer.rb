@@ -2,13 +2,26 @@ require 'digest/sha1'
 class PersonSerializer < AvatarObjSerializer
   attributes :title, :description,
              :first_name, :last_name,
-             :web_page, :orcid, :mbox_sha1sum
+             :web_page, :orcid, :mbox_sha1sum,
+             :phone, :skype_name
 
   attribute :expertise do
     serialize_annotations(object, context = 'expertise')
   end
   attribute :tools do
     serialize_annotations(object, context = 'tool')
+  end
+
+  attribute :project_positions do
+    positions = []
+    object.group_memberships.each do |gm|
+      gm.project_positions.each do |pos|
+        positions.append({ project_id: gm.project.id.to_s,
+                    position_id:  pos.id.to_s,
+                    position_name: pos.name })
+      end
+    end
+    positions
   end
 
   has_many :projects

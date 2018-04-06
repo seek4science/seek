@@ -2,6 +2,49 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "Reusable definitions",
   "definitions": {
+    "error" : {
+      "type" : "object",
+      "properties" : {
+        "id": {
+          "type" : "string"
+        },
+        "status": {
+          "type" : "string"
+        },
+        "code": {
+          "type" : "string"
+        },
+        "title": {
+          "type" : "string"
+        },
+        "detail": {
+          "type" : "string"
+        },
+        "source": {
+          "type" : "object",
+          "properties" : {
+            "pointer" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "errors_array" : {
+      "type" : "array",
+      "minItems" : 0,
+      "items" : {
+        "$ref": "#/definitions/error"
+      }
+    },
+    "errors" : {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "$ref": "#/definitions/errors_array"
+        }
+      }
+    },
     "dateTimeString" : {
       "type" : "string",
       "minLength" : 1,
@@ -17,12 +60,49 @@
         {"type" : "null"}
       ]
     },
+    "otherCreatorsString": {
+      "type" : "string",
+      "minLength" : 1
+    },
+    "nullableOtherCreatorsString" : {
+      "oneOf": [
+        {"$ref" : "#/definitions/otherCreatorsString"},
+        {"type" : "null"}
+      ]
+    },
     "nonEmptyStringList" : {
       "type" : "array",
       "minItems" : 1,
       "items" : {
         "$ref" : "#/definitions/nonEmptyString"
       }
+    },
+    "projectPosition": {
+      "type" : "object",
+      "properties" : {
+        "project_id": {
+          "type": "string"
+        },
+        "position_id": {
+          "type": "string"
+        },
+        "project_name": {
+          "type": "string"
+        }
+      }
+    },
+    "nonEmptyProjectPositionsList": {
+      "type" : "array",
+      "minItems" : 1,
+      "items" : {
+        "$ref" : "#/definitions/projectPosition"
+      }
+    },
+    "nullableProjectPositionsList":{
+      "oneOf": [
+        {"$ref" : "#/definitions/nonEmptyProjectPositionsList"},
+        {"type" : "null"}
+      ]
     },
     "nullableNonEmptyStringList" : {
       "oneOf": [
@@ -44,6 +124,60 @@
     "nullableInteger" : {
       "oneOf": [
         {"type" : "integer"},
+        {"type" : "null"}
+      ]
+    },
+    "license" : {
+      "type" : "string",
+      "minLength" : 1
+    },
+    "nullableLicense" : {
+      "oneOf": [
+        {"$ref" : "#/definitions/license"},
+        {"type" : "null"}
+      ]
+    },
+    "md5sumString" : {
+      "type" : "string",
+      "minLength" : 32,
+      "maxLength" : 32,
+      "pattern" : "[0-9a-f]{32}"
+    },
+    "nullableMd5sumString" : {
+      "oneOf": [
+        {"$ref" : "#/definitions/md5sumString"},
+        {"type" : "null"}
+      ]
+    },
+    "sha1sumString" : {
+      "type" : "string",
+      "minLength" : 5,
+      "maxLength" : 40,
+      "pattern" : "[0-9a-f]{5,40}"
+    },
+    "nullableSha1sumString" : {
+      "oneOf": [
+        {"$ref" : "#/definitions/sha1sumString"},
+        {"type" : "null"}
+      ]
+    },
+    "countryString" : {
+      "type" : "string"
+    },
+    "nullableCountryString" : {
+      "oneOf": [
+        {"$ref" : "#/definitions/countryString"},
+        {"type" : "null"}
+      ]
+    },
+    "countryCodeString" : {
+      "minLength" : 2,
+      "maxLength" : 2,
+      "type" : "string"
+    },
+    "nullableCountryCodeString" : {
+      "oneOf": [
+        {"$ref" : "#/definitions/countryCodeString"},
         {"type" : "null"}
       ]
     },
@@ -162,7 +296,7 @@
           "$ref" : "#/definitions/nullableNonEmptyString"
         },
         "license" : {
-          "$ref" : "#/definitions/nullableNonEmptyString"
+          "$ref" : "#/definitions/nullableLicense"
         },
         "latest_version" : {
           "type" : "number"
@@ -194,11 +328,11 @@
           "$ref" : "#/definitions/nullableNonEmptyString"
         },
         "created_at" : {
-          "type" : "string",
+          "type" : "dateTimeString",
           "minLength" : 1
         },
         "updated_at" : {
-          "type" : "string",
+          "type" : "dateTimeString",
           "minLength" : 1
         },
         "content_blobs" : {
@@ -208,7 +342,7 @@
           "$ref" : "#/definitions/policy"
         },
         "other_creators" : {
-          "$ref" : "#/definitions/nullableNonEmptyString"
+          "$ref" : "#/definitions/nullableOtherCreatorsString"
         }
       },
       "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at", "content_blobs" ],
@@ -227,7 +361,7 @@
           "$ref" : "#/definitions/nullableNonEmptyString"
         },
         "license" : {
-          "$ref" : "#/definitions/nullableNonEmptyString"
+          "$ref" : "#/definitions/nullableLicense"
         },
         "latest_version" : {
           "type" : "number"
@@ -259,11 +393,11 @@
           "$ref" : "#/definitions/nullableNonEmptyString"
         },
         "created_at" : {
-          "type" : "string",
+          "type" : "dateTimeString",
           "minLength" : 1
         },
         "updated_at" : {
-          "type": "string",
+          "type": "dateTimeString",
           "minLength": 1
         },
         "content_blobs" : {
@@ -282,7 +416,7 @@
           "$ref" : "#/definitions/policy"
         },
         "other_creators" : {
-          "$ref" : "#/definitions/nullableNonEmptyString"
+          "$ref" : "#/definitions/nullableOtherCreatorsString"
         }
       },
       "required" : [ "title", "license", "latest_version", "versions", "version", "created_at", "updated_at", "content_blobs", "model_type", "model_format", "environment" ],
@@ -1100,7 +1234,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "assay_class" : {
                   "type" : "object",
@@ -1233,7 +1367,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "assay_class" : {
                   "type" : "object",
@@ -1283,6 +1417,21 @@
                 },
                 "publications" : {
                   "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "data_files" : {
+                  "$ref" : "#/definitions/dataFileReferencesList"
+                },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
+                "models" : {
+                  "$ref" : "#/definitions/modelReferencesList"
+                },
+                "sops" : {
+                  "$ref" : "#/definitions/sopReferencesList"
+                },
+                "organisms" : {
+                  "$ref" : "#/definitions/organismReferencesList"
                 }
               },
               "required" : [ "study" ],
@@ -1321,7 +1470,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "assay_class" : {
                   "type" : "object",
@@ -1370,6 +1519,21 @@
                 },
                 "publications" : {
                   "$ref" : "#/definitions/publicationReferencesList"
+                },
+                "data_files" : {
+                  "$ref" : "#/definitions/dataFileReferencesList"
+                },
+                "documents" : {
+                  "$ref" : "#/definitions/documentReferencesList"
+                },
+                "models" : {
+                  "$ref" : "#/definitions/modelReferencesList"
+                },
+                "sops" : {
+                  "$ref" : "#/definitions/sopReferencesList"
+                },
+                "organisms" : {
+                  "$ref" : "#/definitions/organismReferencesList"
                 }
               },
               "additionalProperties" : false
@@ -1404,10 +1568,10 @@
                   "$ref" : "#/definitions/nullableUriString"
                 },
                 "md5sum" : {
-                  "$ref" : "#/definitions/nonEmptyString"
+                  "$ref" : "#/definitions/md5sumString"
                 },
                 "sha1sum" : {
-                  "$ref" : "#/definitions/nonEmptyString"
+                  "$ref" : "#/definitions/sha1sumString"
                 },
                 "content_type" : {
                   "$ref" : "#/definitions/contentBlobType"
@@ -1521,7 +1685,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
@@ -1530,7 +1694,7 @@
                   "$ref" : "#/definitions/contentBlobPlaceholdersList"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 }
               },
               "required" : [ "title", "policy", "content_blobs" ],
@@ -1591,13 +1755,13 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 }
               },
               "additionalProperties" : false
@@ -1716,7 +1880,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
@@ -1725,7 +1889,7 @@
                   "$ref" : "#/definitions/contentBlobPlaceholdersList"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 }
               },
               "required" : [ "title", "policy", "content_blobs" ],
@@ -1780,13 +1944,13 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 }
               },
               "additionalProperties" : false
@@ -1845,7 +2009,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "country" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableCountryString"
                 },
                 "start_date" : {
                   "$ref" : "#/definitions/dateTimeString"
@@ -1927,7 +2091,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "country" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableCountryString"
                 },
                 "start_date" : {
                   "$ref" : "#/definitions/dateTimeString"
@@ -2000,7 +2164,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "country" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableCountryString"
                 },
                 "start_date" : {
                   "$ref" : "#/definitions/dateTimeString"
@@ -2062,7 +2226,10 @@
                   "$ref" : "#/definitions/nonEmptyString"
                 },
                 "country" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableCountryString"
+                },
+                "country_code": {
+                  "$ref" : "#/definitions/nullableCountryCodeString"
                 },
                 "city" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
@@ -2126,7 +2293,7 @@
                   "$ref" : "#/definitions/nonEmptyString"
                 },
                 "country" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableCountryString"
                 },
                 "city" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
@@ -2170,7 +2337,7 @@
                   "$ref" : "#/definitions/nonEmptyString"
                 },
                 "country" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableCountryString"
                 },
                 "city" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
@@ -2206,9 +2373,6 @@
             "attributes" : {
               "type" : "object",
               "properties" : {
-                "tags" : {
-                  "$ref" : "#/definitions/nullableNonEmptyStringList"
-                },
                 "title" : {
                   "$ref" : "#/definitions/nonEmptyString"
                 },
@@ -2216,8 +2380,8 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
-                },
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
+               },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
                 }
@@ -2307,7 +2471,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
@@ -2360,7 +2524,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
@@ -2478,7 +2642,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
@@ -2487,7 +2651,7 @@
                   "$ref" : "#/definitions/contentBlobPlaceholdersList"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "model_type": {
                   "$ref": "#/definitions/nullableNonEmptyString"
@@ -2554,13 +2718,13 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "model_type": {
                   "$ref": "#/definitions/nullableNonEmptyString"
@@ -2698,13 +2862,22 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "mbox_sha1sum" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableSha1sumString"
                 },
                 "expertise" : {
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
                 },
                 "tools" : {
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "phone" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "skype_name" : {
+                   "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "project_positions" :{
+                  "$ref" : "#/definitions/nullableProjectPositionsList"
                 }
               },
               "required" : [ "title", "first_name", "last_name", "mbox_sha1sum" ],
@@ -2808,6 +2981,15 @@
                 },
                 "tools" : {
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "phone" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "skype_name" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "project_positions" :{
+                  "$ref" : "#/definitions/nullableProjectPositionsList"
                 }
               },
               "additionalProperties" : false
@@ -2855,6 +3037,12 @@
                 },
                 "tools" : {
                   "$ref" : "#/definitions/nullableNonEmptyStringList"
+                },
+                "phone" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
+                },
+                "skype_name" : {
+                  "$ref" : "#/definitions/nullableNonEmptyString"
                 }
               },
               "required" : [ "first_name", "last_name" ],
@@ -2956,7 +3144,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
@@ -2965,7 +3153,7 @@
                   "$ref" : "#/definitions/contentBlobPlaceholdersList"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 }
               },
               "required" : [ "title", "policy", "content_blobs" ],
@@ -3023,13 +3211,13 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 }
               },
               "additionalProperties" : false
@@ -3078,6 +3266,9 @@
             "relationships" : {
               "type" : "object",
               "properties" : {
+                "administrators" : {
+                "$ref" : "#/definitions/peopleReferenceList"
+                },
                 "people" : {
                   "$ref" : "#/definitions/peopleReferenceList"
                 },
@@ -3168,6 +3359,14 @@
               },
               "required" : [ "title" ],
               "additionalProperties" : false
+            },
+            "relationships": {
+              "administrators" : {
+                "$ref" : "#/definitions/peopleReferenceList"
+              },
+              "projects" : {
+                "$ref" : "#/definitions/projectReferencesList"
+              }
             }
           },
           "required" : [ "type", "attributes" ],
@@ -3209,6 +3408,14 @@
                 }
               },
               "additionalProperties" : false
+            },
+            "relationships": {
+              "administrators" : {
+                "$ref" : "#/definitions/peopleReferenceList"
+              },
+              "projects" : {
+                "$ref" : "#/definitions/projectReferencesList"
+              }
             }
           },
           "required" : [ "id", "type" ],
@@ -3250,6 +3457,9 @@
                 },
                 "default_policy" : {
                   "$ref" : "#/definitions/policy"
+                },
+                "default_license" : {
+                  "$ref" : "#/definitions/nullableLicense"
                 }
               },
               "required" : [ "title", "description", "web_page", "wiki_page" ],
@@ -3353,9 +3563,20 @@
                 },
                 "default_policy" : {
                   "$ref" : "#/definitions/policy"
+                },
+                "default_license" : {
+                  "$ref" : "#/definitions/nullableLicense"
                 }
               },
               "additionalProperties" : false
+            },
+            "relationships": {
+              "programmes" : {
+                "$ref" : "#/definitions/programmeReferencesList"
+              },
+              "organisms": {
+                "$ref": "#/definitions/organismReferencesList"
+              }
             }
           },
           "required" : [ "id", "type" ],
@@ -3394,10 +3615,21 @@
                 },
                 "default_policy" : {
                   "$ref" : "#/definitions/policy"
+                },
+                "default_license" : {
+                  "$ref" : "#/definitions/nullableLicense"
                 }
               },
               "required" : [ "title" ],
               "additionalProperties" : false
+            },
+            "relationships": {
+              "programmes" : {
+                "$ref" : "#/definitions/programmeReferencesList"
+              },
+              "organisms": {
+                "$ref": "#/definitions/organismReferencesList"
+              }
             }
           },
           "required" : [ "type", "attributes" ],
@@ -3595,7 +3827,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
@@ -3604,7 +3836,7 @@
                   "$ref" : "#/definitions/contentBlobPlaceholdersList"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 }
               },
               "required" : [ "title", "policy", "content_blobs" ],
@@ -3659,13 +3891,13 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "license" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableLicense"
                 },
                 "policy" : {
                   "$ref" : "#/definitions/policy"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 }
               },
               "additionalProperties" : false
@@ -3708,9 +3940,6 @@
             "attributes" : {
               "type" : "object",
               "properties" : {
-                "tags" : {
-                  "$ref" : "#/definitions/nullableNonEmptyStringList"
-                },
                 "title" : {
                   "$ref" : "#/definitions/nonEmptyString"
                 },
@@ -3721,7 +3950,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "person_responsible_id" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
@@ -3815,7 +4044,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "person_responsible_id" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
@@ -3879,7 +4108,7 @@
                   "$ref" : "#/definitions/nullableNonEmptyString"
                 },
                 "other_creators" : {
-                  "$ref" : "#/definitions/nullableNonEmptyString"
+                  "$ref" : "#/definitions/nullableOtherCreatorsString"
                 },
                 "person_responsible_id" : {
                   "$ref" : "#/definitions/nullableNonEmptyString"
@@ -4678,10 +4907,10 @@
           "$ref": "#/definitions/nullableUriString"
         },
         "md5sum": {
-          "$ref": "#/definitions/nullableNonEmptyString"
+          "$ref": "#/definitions/nullableMd5sumString"
         },
         "sha1sum": {
-          "$ref": "#/definitions/nullableNonEmptyString"
+          "$ref": "#/definitions/nullableSha1sumString"
         },
         "content_type": {
           "$ref": "#/definitions/nullableNonEmptyString"

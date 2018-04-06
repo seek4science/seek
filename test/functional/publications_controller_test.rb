@@ -702,7 +702,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_not_includes response.body, '<script>alert("xss")</script>', 'Unescaped <script> tag detected'
     # This will be slow!
 
-    # 6 = 3 each for for events and models 'fancy_multiselect'
+    # 6 = 3 each for for events, assays and models 'fancy_multiselect'
     assert_equal 6, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
     # 6 = 2 each for investigations, studies, assays (using bespoke association forms) - datafiles loaded asynchronously
     # plus an extra 2 for the study optgroups in the assay association

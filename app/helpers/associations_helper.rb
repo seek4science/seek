@@ -70,14 +70,15 @@ module AssociationsHelper
     end.to_json
   end
 
-  def associations_json_from_assay_assets(assay_assets)
+  def associations_json_from_assay_assets(assay_assets, extra_data = {})
     assay_assets.map do |aa|
       hash = { title: aa.asset.title, id: aa.asset_id,
+               assay: { id: aa.assay_id, title: aa.assay.title },
                direction: { value: aa.direction, text: direction_name(aa.direction) }
-      }
+      }.reverse_merge(extra_data)
       if aa.relationship_type
         hash[:relationship_type] = { value: aa.relationship_type.id,
-                                         text: aa.relationship_type.title }
+                                     text: aa.relationship_type.title }
       end
 
       hash

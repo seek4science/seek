@@ -4,9 +4,48 @@
     "attributes": {
       "avatar": null,
       "title": "<%= title %> Max",
-       "description": "A Taverna project",
+      "description": "A Taverna project",
       "web_page": "http://www.taverna.org.uk",
-      "wiki_page": "http://www.mygrid.org.uk"
+      "wiki_page": "http://www.mygrid.org.uk",
+      "default_license": "Other (Open)",
+      "default_policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource_id": "<%= Factory(:person).id %>",
+            "resource_type": "people",
+            "access": "manage"
+          },
+          {
+            "resource_id": "<%= Factory(:project).id %>",
+            "resource_type": "projects",
+            "access": "download"
+          },
+          {
+            "resource_id": "<%= Factory(:institution).id %>",
+            "resource_type": "institutions",
+            "access": "view"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "programmes": {
+        "data": [
+          {
+            "id": "<%= Factory(:programme).id %>",
+            "type": "programmes"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+          {
+            "id": "<%= Factory(:organism).id %>",
+            "type": "organisms"
+          }
+        ]
+      }
     }
   }
 }

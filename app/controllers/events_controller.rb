@@ -52,15 +52,15 @@ class EventsController < ApplicationController
   end
 
   def handle_update_or_create(is_new)
+    @event.attributes = event_params
     @new = is_new
+
     data_files = params.delete(:data_files) || []
     data_files.map! { |d| d['id'] }
     @event.data_files = DataFile.find(data_files)
 
     publication_ids = params.delete(:related_publication_ids) || []
     @event.publications = Publication.find(publication_ids)
-
-    @event.attributes = event_params
 
     update_sharing_policies @event
 

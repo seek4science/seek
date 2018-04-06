@@ -20,13 +20,11 @@ module Seek
         add = scales - self.scales
 
         add.each do |scale|
-          annotation = Annotation.new(
+          self.annotations.build(
             source: source,
-            annotatable: self,
             attribute_name: 'scale',
             value: scale
           )
-          annotation.save
         end
 
         scale_annotations = annotations_with_attribute('scale')
@@ -39,6 +37,13 @@ module Seek
 
       def scales
         annotations_with_attribute('scale', true).collect(&:value).sort_by(&:pos)
+      end
+
+      def scale_extra_params=(params_array)
+        params_array.each do |json|
+          data = JSON.parse(json)
+          attach_additional_scale_info data['scale_id'], param: data['param'], unit: data['unit']
+        end
       end
 
       private
@@ -57,15 +62,12 @@ module Seek
     module WithParamsInstanceMethods
       def attach_additional_scale_info(scale_id, other_info = {}, source = User.current_user)
         other_info[:scale_id] = scale_id.to_s
-        value = TextValue.new
-        value.text = other_info.to_json
-        annotation = Annotation.new(
+
+        self.annotations.build(
           source: source,
-          annotatable: self,
           attribute_name: 'additional_scale_info',
-          value: value
+          value: other_info.to_json
         )
-        annotation.save
       end
 
       def fetch_additional_scale_info(scale_id)

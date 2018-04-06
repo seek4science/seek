@@ -30,24 +30,22 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
   end
 
   def create_patch_values
+    @study = @assay.study
     @patch_values = {id: @assay.id,
-                     study_id: @assay.study.id,
+                     study_id: @study.id,
                      project_id: Factory(:project).id,
                      creator_ids: [@current_user.person.id],
                      r: ApiTestHelper.method(:render_erb) }
   end
 
-  def populate_extra_relationships
+  def populate_extra_relationships(hash = nil)
     person_id = @current_user.person.id
-    investigation = @study.investigation
-    investigation_id = investigation.id
-    project_id = investigation.projects[0].id
 
     extra_relationships = {}
-    extra_relationships[:submitter] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships[:people] = JSON.parse "{\"data\" : [{\"id\" : \"#{person_id}\", \"type\" : \"people\"}]}"
-    extra_relationships[:projects] = JSON.parse "{\"data\" : [{\"id\" : \"#{project_id}\", \"type\" : \"projects\"}]}"
-    extra_relationships[:investigation] = JSON.parse "{\"data\" : {\"id\" : \"#{investigation_id}\", \"type\" : \"investigations\"}}"
+    extra_relationships[:submitter] = { data: [{ id: person_id.to_s, type: 'people' }] }
+    extra_relationships[:people] = { data: [{ id: person_id.to_s, type: 'people' }] }
+    extra_relationships[:investigation] = { data: { id: @study.investigation.id.to_s, type: 'investigations' } }
+
     extra_relationships.with_indifferent_access
   end
 
@@ -59,6 +57,7 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
       assert_no_difference('Assay.count') do
         delete "/#{@plural_clz}/#{a.id}.json"
         assert_response :forbidden
+        validate_json_against_fragment response.body, '#/definitions/errors'
       end
     end
   end

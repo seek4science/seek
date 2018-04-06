@@ -101,12 +101,12 @@ class BaseSerializer < SimpleBaseSerializer
                   end
   end
 
-  def self.convert_policy policy
+  def BaseSerializer.convert_policy policy
     { 'access' => (PolicyHelper::access_type_key policy.access_type),
-      'permissions' => (self.permits policy)}
+      'permissions' => (BaseSerializer.permits policy)}
   end
 
-  def self.permits policy
+  def BaseSerializer.permits policy
     result = []
     policy.permissions.each do |p|
       result.append ({'resource_type' => p.contributor_type.downcase.pluralize,
