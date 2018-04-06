@@ -115,7 +115,6 @@ class AssaysController < ApplicationController
     @assay.contributor=current_person
     update_sharing_policies @assay
     update_annotations(params[:tag_list], @assay)
-    update_scales @assay #this saves the assay
     update_relationships(@assay, params)
 
     if @assay.save
@@ -148,7 +147,6 @@ class AssaysController < ApplicationController
 
     respond_to do |format|
       if @assay.save
-        update_scales @assay
         update_assets_linked_to_assay @assay, params
         @assay.save!
 
@@ -231,6 +229,6 @@ class AssaysController < ApplicationController
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
                                   :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset,
-                                  { document_ids: []}, { creator_ids: [] })
+                                  { document_ids: []}, { creator_ids: [] }, { scales: [] })
   end
 end

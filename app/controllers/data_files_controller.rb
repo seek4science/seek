@@ -212,7 +212,6 @@ class DataFilesController < ApplicationController
 
     # FIXME: clunky
     if valid_blob && (!@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)) && @data_file.save && blob.save
-      update_scales @data_file
       @data_file.assays << @assay if @create_new_assay
 
       session.delete(:uploaded_content_blob_id)
@@ -250,8 +249,6 @@ class DataFilesController < ApplicationController
       update_relationships(@data_file, params)
 
       if @data_file.save
-        update_scales @data_file
-
         create_content_blobs
 
         if !@data_file.parent_name.blank?
@@ -281,7 +278,6 @@ class DataFilesController < ApplicationController
 
     respond_to do |format|
       if @data_file.update_attributes(data_file_params)
-        update_scales @data_file
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
         format.json {render json: @data_file}
@@ -509,7 +505,8 @@ class DataFilesController < ApplicationController
     params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,
                                       :parent_name, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] })
+                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
+                                      { scales: [] })
   end
 
   def data_file_assay_params

@@ -45,8 +45,6 @@ class PresentationsController < ApplicationController
 
     respond_to do |format|
       if @presentation.save
-        update_scales @presentation
-
         # Update new assay_asset
         assay_ids = params[:assay_ids] || []
         Assay.find(assay_ids).each do |assay|

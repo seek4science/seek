@@ -29,20 +29,6 @@ module Seek
 
     protected
 
-    def update_scales(entity)
-      scale_ids = params[:scale_ids]
-      return if entity.new_record? && !entity.save
-      entity.scales = scale_ids
-      update_scales_with_params entity unless params[:scale_ids_and_params].nil?
-    end
-
-    def update_scales_with_params(entity)
-      params[:scale_ids_and_params].each do |json|
-        json = JSON.parse(json)
-        entity.attach_additional_scale_info json['scale_id'], param: json['param'], unit: json['unit']
-      end
-    end
-
     # Updates all annotations as the owner of the entity, using the parameters passed through the web interface Any tags that do not match those passed in are removed as a tagging for this item.
     # New tags are assigned to the owner, which defaults to the current user.
     def update_annotations(param, entity, attr = 'tag', owner = User.current_user)

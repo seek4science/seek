@@ -110,7 +110,6 @@ module Seek
     def create_asset(item)
       update_sharing_policies item
       update_annotations(params[:tag_list], item)
-      update_scales item
       update_relationships(item, params)
       build_model_image item, model_image_params if item.is_a?(Model) && model_image_present?
       item

@@ -62,7 +62,6 @@ class InvestigationsController < ApplicationController
     update_relationships(@investigation, params)
 
     if @investigation.save
-       update_scales(@investigation)
        if @investigation.new_link_from_study=="true"
           render :partial => "assets/back_to_singleselect_parent",:locals => {:child=>@investigation,:parent=>"study"}
        else
@@ -114,8 +113,6 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       if @investigation.save
-        update_scales(@investigation)
-
         flash[:notice] = "#{t('investigation')} was successfully updated."
         format.html { redirect_to(@investigation) }
         format.json {render json: @investigation}
@@ -130,7 +127,8 @@ class InvestigationsController < ApplicationController
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
-                                          :create_from_asset, :new_link_from_study, { creator_ids: [] })
+                                          :create_from_asset, :new_link_from_study, { creator_ids: [] },
+                                          { scales: [] })
   end
 
 end

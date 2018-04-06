@@ -253,14 +253,14 @@ class ModelsControllerTest < ActionController::TestCase
     model_params = valid_model
 
     assert_difference('Model.count') do
-      post :create, model: model_params, scale_ids: [scale1.id.to_s, scale2.id.to_s], content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+      post :create, model: model_params.merge(scales: [scale1.id.to_s, scale2.id.to_s]), content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m
     assert_equal [scale1, scale2], m.scales
     scale3 = Factory(:scale)
 
-    put :update, id: m.id, model: { title: m.title }, scale_ids: [scale3.id.to_s]
+    put :update, id: m.id, model: { title: m.title, scales: [scale3.id.to_s] }
     m = assigns(:model)
     assert_equal [scale3], m.scales
   end
@@ -273,8 +273,13 @@ class ModelsControllerTest < ActionController::TestCase
                             "{\"scale_id\":\"#{scale2.id}\",\"param\":\"carrot\",\"unit\":\"cm\"}",
                             "{\"scale_id\":\"#{scale1.id}\",\"param\":\"soup\",\"unit\":\"minute\"}"]
 
+    model_and_scale_params = model_params.merge(
+                   scale_extra_params: scale_ids_and_params,
+                   scales: [scale1.id.to_s, scale2.id.to_s]
+    )
+
     assert_difference('Model.count') do
-      post :create, model: model_params, scale_ids: [scale1.id.to_s, scale2.id.to_s], scale_ids_and_params: scale_ids_and_params, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
+      post :create, model: model_and_scale_params, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing
     end
     m = assigns(:model)
     assert_not_nil m

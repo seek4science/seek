@@ -74,8 +74,6 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       if @study.save
-        update_scales @study
-
         flash[:notice] = "#{t('study')} was successfully updated."
         format.html { redirect_to(@study) }
         format.json {render json: @study}
@@ -104,8 +102,6 @@ class StudiesController < ApplicationController
     update_relationships(@study, params)
     ### TO DO: what about validation of person responsible? is it already included (for json?)
     if @study.save
-      update_scales @study
-
       if @study.new_link_from_assay == 'true'
         render partial: 'assets/back_to_singleselect_parent', locals: { child: @study, parent: 'assay' }
       else
@@ -170,6 +166,7 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
-                                  :other_creators, :create_from_asset, :new_link_from_assay, { creator_ids: [] })
+                                  :other_creators, :create_from_asset, :new_link_from_assay, { creator_ids: [] },
+                                  { scales: [] })
   end
 end

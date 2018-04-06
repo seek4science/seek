@@ -195,7 +195,6 @@ class ModelsController < ApplicationController
 
     respond_to do |format|
       if @model.update_attributes(model_params)
-        update_scales @model
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
         format.json {render json: @model}
@@ -273,7 +272,8 @@ class ModelsController < ApplicationController
                                   :model_type_id, :model_format_id, :recommended_environment_id, :organism_id,
                                   :other_creators,
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                  { creator_ids: [] }, { assay_assets_attributes: [:assay_id] })
+                                  { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                  { scale_extra_params: [] })
   end
 
   alias_method :asset_params, :model_params
