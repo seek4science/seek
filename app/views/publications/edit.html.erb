@@ -29,7 +29,8 @@
 
     <%= render :partial => "assets/associate_study", :locals=>{:resource => @publication} -%>
 
-    <%= fancy_multiselect @publication, :assays, { hidden: @publication.assays.empty?, other_projects_checkbox: true, top_level_params: true } %>
+    <%= fancy_multiselect @publication, :assays, { hidden: @publication.assays.empty?, other_projects_checkbox: true,
+                                                   name: 'assay_ids' } %>
 
     <%= render :partial => "assets/associate_data_file", :locals=>{:resource => @publication} -%>
 
