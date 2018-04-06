@@ -40,18 +40,18 @@ class ScalableTest < ActiveSupport::TestCase
     @model.save
     assert_no_difference('Annotation.count') do
       @model.scales = [@medium_scale.id]
+      @model.save!
     end
-    @model.save
     assert_equal [@medium_scale], @model.scales
     assert_difference('Annotation.count', 1) do
       @model.scales = [@medium_scale.id, @large_scale.id]
+      @model.save!
     end
-    @model.save
     assert_equal [@medium_scale, @large_scale], @model.scales
     assert_difference('Annotation.count', -2) do
       @model.scales = []
+      @model.save!
     end
-    @model.save
     assert_equal [], @model.scales
   end
 
@@ -65,6 +65,7 @@ class ScalableTest < ActiveSupport::TestCase
   test 'attaching and fetching additional info' do
     @model.scales = [@small_scale]
     @model.attach_additional_scale_info @small_scale.id, param: 'fish', unit: 'meter'
+    @model.save!
     info = @model.fetch_additional_scale_info(@small_scale.id)
     assert_equal 1, info.length
     info = info.first
@@ -81,6 +82,7 @@ class ScalableTest < ActiveSupport::TestCase
     @model.scales = [@small_scale]
     @model.attach_additional_scale_info @small_scale.id, param: 'fish', unit: 'meter'
     @model.attach_additional_scale_info @small_scale.id, param: 'soup', unit: 'cm'
+    @model.save!
     info = @model.fetch_additional_scale_info(@small_scale.id)
     assert_equal 2, info.count
     info.sort! { |a, b| a['param'] <=> b['param'] }
