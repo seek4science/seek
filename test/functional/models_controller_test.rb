@@ -374,11 +374,12 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
         post :create, model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+
+        assert_redirected_to model_path(assigns(:model))
       end
     end
 
     model = assigns(:model)
-    assert_redirected_to model_path(model)
     assert_equal 'file_picture.png', model.model_image.original_filename
     assert_equal 'image/png', model.model_image.content_type
   end
@@ -388,11 +389,12 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
         post :create, model: valid_model, content_blobs: [], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+
+        assert_redirected_to model_path(assigns(:model))
       end
     end
 
     model = assigns(:model)
-    assert_redirected_to model_path(model)
     assert_equal 'Test', model.title
   end
 
@@ -412,11 +414,10 @@ class ModelsControllerTest < ActionController::TestCase
              content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
              revision_comments: 'This is a new revision',
              model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+
+        assert_redirected_to model_path(assigns(:model))
       end
     end
-
-    assert_redirected_to model_path(m)
-    assert assigns(:model)
 
     m = Model.find(m.id)
     assert_equal 2, m.versions.size

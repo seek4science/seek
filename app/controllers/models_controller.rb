@@ -243,11 +243,10 @@ class ModelsController < ApplicationController
 
   def build_model_image model_object, params_model_image
     # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
-    @model_image = ModelImage.new(params_model_image)
-    @model_image.model_id = model_object.id
-    @model_image.content_type = params_model_image[:image_file].content_type
-    @model_image.original_filename = params_model_image[:image_file].original_filename
-    model_object.model_image = @model_image
+    @model_image = model_object.build_model_image(params_model_image.merge(
+        model: model_object,
+        content_type: params_model_image[:image_file].content_type,
+        original_filename: params_model_image[:image_file].original_filename))
   end
 
   def find_xgmml_doc model
