@@ -92,6 +92,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     end
 
     assert df.content_blob
+    puts df.title
   end
 
   test 'uri_for_content_blob follows expected pattern' do
