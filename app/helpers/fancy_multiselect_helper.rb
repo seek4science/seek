@@ -42,6 +42,7 @@ module FancyMultiselectHelper
       name: "#{object.class.name.underscore}[#{association.to_s.singularize}_ids]",
       possibilities: nil,
       unscoped_possibilities: [],
+      group_options_by: nil,
       value_method: :id,
       text_method: :title,
       with_new_link: false,

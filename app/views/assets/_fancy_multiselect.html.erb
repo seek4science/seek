@@ -1,16 +1,27 @@
 <%
-   selected ||= nil
-   default_choice = [default_choice_text, 0]
-   collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
-   possibilities_collection_id = "possible_#{collection_id}"
-   possibilities_options ||= {}
-   possibilities_options.merge!(:class => 'form-control')
-   title ||= association_text.pluralize
-   title += '<span class="required">*</span>'.html_safe if required
+  selected ||= nil
+  default_choice = [default_choice_text, 0]
+  collection_id = name.to_s.gsub(']','').gsub(/[^-a-zA-Z0-9:.]/, "_")
+  possibilities_collection_id = "possible_#{collection_id}"
+  possibilities_options ||= {}
+  possibilities_options.merge!(:class => 'form-control')
+  title ||= association_text.pluralize
+  title += '<span class="required">*</span>'.html_safe if required
 
-   if with_new_link
-     new_association_path = eval "new_#{association.to_s.singularize}_path(:parent_name=>'#{controller_name.underscore.singularize}')"
-   end
+  if with_new_link
+    new_association_path = eval "new_#{association.to_s.singularize}_path(:parent_name=>'#{controller_name.underscore.singularize}')"
+  end
+
+  group_options_by ||= nil
+  p = ->(o) { [truncate(o.send(text_method), length: 120), o.send(value_method)] }
+
+  if group_options_by
+    select_options = grouped_options_for_select(possibilities.group_by(&group_options_by).each { |_, v| v.map!(&p) })
+    unscoped_select_options = grouped_options_for_select(unscoped_possibilities.group_by(&group_options_by).each { |_, v| v.map!(&p) })
+  else
+    select_options = options_for_select(possibilities.map(&p))
+    unscoped_select_options = options_for_select(unscoped_possibilities.map(&p))
+  end
 %>
 
 <%= folding_panel(title, hidden, :id => "add_#{association}_form",
@@ -30,9 +41,7 @@
               </p>
           <% end  %>
           <div class="form-group">
-            <%= select_tag possibilities_collection_id,
-                           options_for_select([default_choice]|possibilities.collect{|o| [truncate(o.send(text_method), :length=>120), o.send(value_method)]}),
-                           possibilities_options -%>
+            <%= select_tag possibilities_collection_id, select_options, possibilities_options -%>
           </div>
           <%# This ensures that the parameter is always sent, even when nothing is selected.
         It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
@@ -49,9 +58,7 @@
                                 :onchange => "swapSelectListContents('possible_#{object_type.underscore}_#{association.to_s.singularize}_ids','alternative_#{association.to_s.singularize}_ids');",
                                 :style => "margin-top:0.5em;" -%>
               Associate <%= association_text.pluralize -%> from other <%= t('project').pluralize -%>?
-              <%= select_tag "alternative_#{association.to_s.singularize}_ids",
-                             options_for_select([["Select #{association_text} ...", 0]]|unscoped_possibilities.collect { |o| [truncate(o.send(text_method), :length => 120), o.id] }),
-                             :style => 'display:none;' -%>
+              <%= select_tag "alternative_#{association.to_s.singularize}_ids", unscoped_select_options, style: 'display: none;' %>
           <% end %>
         </div>
 
