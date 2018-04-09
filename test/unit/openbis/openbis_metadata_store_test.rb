@@ -51,11 +51,12 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
   end
 
   test 'cleanup cleans only expired' do
-    # skip 'It is a long cache test to test expiration, only used during development'
+     skip 'It is a long cache test to test expiration, only used during development'
 
     openbis_endpoint = Factory(:openbis_endpoint)
     openbis_endpoint.refresh_period_mins = 1
-    store = openbis_endpoint.metadata_store
+
+    store = Seek::Openbis::OpenbisMetadataStore.new(openbis_endpoint)
 
     # works on new as well
     store.cleanup
@@ -79,7 +80,8 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
 
     openbis_endpoint = Factory(:openbis_endpoint)
     openbis_endpoint.refresh_period_mins = 1
-    store = openbis_endpoint.metadata_store
+    store = Seek::Openbis::OpenbisMetadataStore.new(openbis_endpoint)
+
 
     assert_equal 'v1', store.fetch('k1') { 'v1' }
 

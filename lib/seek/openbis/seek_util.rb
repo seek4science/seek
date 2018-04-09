@@ -12,10 +12,7 @@ module Seek
         experiment = obis_asset.content
         openbis_endpoint = obis_asset.seek_service
 
-        title = "OpenBIS #{experiment.code}"
-        title = "#{experiment.properties['NAME']} "+title if experiment.properties && experiment.properties['NAME']
-
-        study_params[:title] ||= title ## "OpenBIS #{experiment.perm_id}"
+        study_params[:title] ||= extract_title(experiment) ## "OpenBIS #{experiment.perm_id}"
         study = Study.new(study_params)
 
         study.contributor = creator
@@ -29,11 +26,8 @@ module Seek
         zample = obis_asset.content
         openbis_endpoint = obis_asset.seek_service
 
-        title = "OpenBIS #{zample.code}"
-        title = "#{zample.properties['NAME']} "+title if zample.properties && zample.properties['NAME']
-
         assay_params[:assay_class_id] ||= AssayClass.for_type("experimental").id
-        assay_params[:title] ||= title ## "OpenBIS #{zample.perm_id}"
+        assay_params[:title] ||= extract_title(zample) ## "OpenBIS #{zample.perm_id}"
         assay = Assay.new(assay_params)
 
         assay.contributor = creator
@@ -47,10 +41,8 @@ module Seek
         dataset = obis_asset.content
         openbis_endpoint = obis_asset.seek_service
 
-        title = "OpenBIS #{dataset.code}"
-        title = "#{dataset.properties['NAME']} "+title if dataset.properties && dataset.properties['NAME']
         datafile_params[:projects] = [openbis_endpoint.project]
-        datafile_params[:title] ||= title
+        datafile_params[:title] ||= extract_title(dataset)
         datafile_params[:license] ||= openbis_endpoint.project.default_license
         df = DataFile.new(datafile_params)
 
@@ -63,6 +55,15 @@ module Seek
                                              make_local_copy: false,
                                              external_link: true, original_filename: "openbis-#{dataset.perm_id}")
         df
+      end
+
+      def extract_title(entity)
+
+        title = "OpenBIS #{entity.code}"
+        if entity.properties && entity.properties['NAME']
+          title = entity.properties['NAME'] + ' ' + title
+        end
+        title
       end
 
       def uri_for_content_blob(obis_asset)

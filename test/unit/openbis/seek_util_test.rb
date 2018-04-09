@@ -7,6 +7,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
     @endpoint = Factory(:openbis_endpoint)
+    @endpoint.assay_types = ['TZ_FAIR_ASSAY'] # EXPERIMENTAL_STEP
     @util = Seek::Openbis::SeekUtil.new
     @study = Factory :study #studies(:junk_study)
     @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
@@ -45,7 +46,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     end
 
 
-    assert_equal "OpenBIS #{experiment.perm_id}", study.title
+    assert_equal "#{experiment.properties['NAME']} OpenBIS #{experiment.code}", study.title
     assert_equal @creator, study.contributor
     assert_same asset, study.external_asset
     assert_equal investigation, study.investigation
@@ -69,7 +70,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     end
 
 
-    assert_equal "OpenBIS #{@zample.perm_id}", assay.title
+    assert_equal "#{@zample.properties['NAME']} OpenBIS #{@zample.code}", assay.title
     assert_equal @creator, assay.contributor
     assert_same asset, assay.external_asset
   end
@@ -92,7 +93,23 @@ class SeekUtilTest < ActiveSupport::TestCase
     end
 
     assert df.content_blob
-    puts df.title
+  end
+
+  test 'extract title includes name from property if present' do
+    dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+    refute dataset.properties['NAME']
+    title = @util.extract_title(dataset)
+
+    assert_equal "OpenBIS 20160210130454955-23", title
+
+    dataset.properties['NAME'] = "TOM"
+    title = @util.extract_title(dataset)
+    assert_equal "TOM OpenBIS 20160210130454955-23", title
+
+    assert_equal 'Tomek First', @zample.properties['NAME']
+    title = @util.extract_title(@zample)
+    assert_equal "Tomek First OpenBIS TZ3", title
+
   end
 
   test 'uri_for_content_blob follows expected pattern' do
@@ -857,6 +874,8 @@ class SeekUtilTest < ActiveSupport::TestCase
     ids = ["20171002172111346-37", "20171002172639055-39", "20171121152441898-53"]
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(ids)
 
+    @endpoint.assay_types = ['TZ_FAIR_ASSAY']
+    #, EXPERIMENTAL_STEP
     corr = @util.filter_assay_like_zamples(zamples, @endpoint)
     assert_equal 2, corr.length
     assert_equal ["20171002172111346-37", "20171002172639055-39"], corr.map(&:perm_id)
@@ -965,6 +984,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   test 'assay_types gives types configured as assays in the endpoint' do
 
+    @endpoint.assay_types = 'EXPERIMENTAL_STEP'
     refute @endpoint.assay_types.empty?
     types = @util.assay_types(@endpoint, false)
     assert types
@@ -979,6 +999,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   test 'assay_types merges annotated and configured in endpoint' do
 
+    @endpoint.assay_types = 'EXPERIMENTAL_STEP'
     refute @endpoint.assay_types.empty?
     types = @util.assay_types(@endpoint, true)
     assert types

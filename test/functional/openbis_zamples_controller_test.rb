@@ -14,6 +14,8 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
     @endpoint = Factory(:openbis_endpoint, project: @project)
+    @endpoint.assay_types = ['TZ_FAIR_ASSAY','EXPERIMENTAL_STEP']
+    @endpoint.save!
     @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
   end
 
@@ -112,7 +114,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(assay)
 
     assert assay.persisted?
-    assert_equal 'OpenBIS 20171002172111346-37', assay.title
+    assert_equal 'Tomek First OpenBIS TZ3', assay.title
 
     assert assay.external_asset.persisted?
 
@@ -140,7 +142,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(assay)
 
     assert assay.persisted?
-    assert_equal 'OpenBIS 20171002172111346-37', assay.title
+    assert_equal "#{@zample.properties['NAME']} OpenBIS #{@zample.code}", assay.title
 
     assert assay.external_asset.persisted?
 

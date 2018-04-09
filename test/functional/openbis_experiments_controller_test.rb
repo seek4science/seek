@@ -14,6 +14,8 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
     @endpoint = Factory(:openbis_endpoint, project: @project)
+    @endpoint.assay_types = ['TZ_FAIR_ASSAY', 'EXPERIMENTAL_STEP']
+    @endpoint.save!
     @experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
 
     @controller = OpenbisExperimentsController.new
@@ -118,7 +120,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     assert_redirected_to study_path(study)
 
     assert study.persisted?
-    assert_equal 'OpenBIS 20171121152132641-51', study.title
+    assert_equal "#{@experiment.properties['NAME']} OpenBIS #{@experiment.code}", study.title
 
     assert study.external_asset.persisted?
 
@@ -148,7 +150,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     assert_redirected_to study_path(study)
 
     assert study.persisted?
-    assert_equal 'OpenBIS 20171121152132641-51', study.title
+    assert_equal "#{@experiment.properties['NAME']} OpenBIS #{@experiment.code}", study.title
 
     assert study.external_asset.persisted?
 
@@ -575,7 +577,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
   test 'do_assay_registration creates study links assays if sync_option says so' do
 
 
-    asset = asset = OpenbisExternalAsset.build(@experiment)
+    asset = OpenbisExternalAsset.build(@experiment)
     refute asset.seek_entity
 
     investigation = Factory :investigation
