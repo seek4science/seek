@@ -14,7 +14,8 @@ module Seek
 
     module InstanceMethods
       def scales=(scales, source = User.current_user)
-        scales = resolve_types(scales)
+        # handles scales passed as Id's, invalid or blank ids, or a single item
+        scales = Array(scales).map { |scale| scale.is_a?(Scale) ? scale : Scale.find_by_id(scale) }.compact
 
         remove = self.scales - scales
         add = scales - self.scales
@@ -44,18 +45,6 @@ module Seek
           data = JSON.parse(json)
           attach_additional_scale_info data['scale_id'], param: data['param'], unit: data['unit']
         end
-      end
-
-      private
-
-      # handles scales passed as Id's, invalid or blank ids, or a single item
-      def resolve_types(scales)
-        scales = Array(scales).collect do |scale|
-          if scale.is_a?(Numeric) || scale.is_a?(String)
-            scale = Scale.find_by_id(scale)
-          end
-          scale
-        end.compact
       end
     end
 
