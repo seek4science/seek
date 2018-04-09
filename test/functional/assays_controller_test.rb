@@ -1529,12 +1529,45 @@ class AssaysControllerTest < ActionController::TestCase
 
     assert_not_includes assay.documents, document
 
-    assert_difference('AssayAsset.count') do
+    assert_difference('AssayAsset.count', 1) do
       put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
     end
 
     assert_redirected_to assay_path(assay)
     assert_includes assigns(:assay).documents, document
     assert_not_equal timestamp, assigns(:assay).updated_at
+  end
+
+  test 'should not associate private document' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+    document = Factory(:document, policy: Factory(:private_policy))
+
+    assert_not_includes assay.documents, document
+    refute document.can_view?(person.user)
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: assay, assay: { title: assay.title, document_ids: [document.id] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_not_includes assigns(:assay).documents, document
+  end
+
+  test 'should disassociate document' do
+    person = Factory(:person)
+    login_as(person)
+    document = Factory(:document, contributor: person)
+    assay = Factory(:assay, contributor: person, documents: [document])
+
+    assert_includes assay.documents, document
+
+    assert_difference('AssayAsset.count', -1) do
+      put :update, id: assay, assay: { title: assay.title, document_ids: [] }
+    end
+
+    assert_redirected_to assay_path(assay)
+    assert_not_includes assigns(:assay).documents, document
   end
 end

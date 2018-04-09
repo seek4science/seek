@@ -105,7 +105,7 @@ module Seek
 
       # Parameters to "elevate" out of params[bla] to the top-level.
       ELEVATE = %i[tag_list expertise_list tool_list policy_attributes content_blobs
-       related_publication_ids revision_comments data_files assay_sop_ids document_ids model_ids].freeze
+       related_publication_ids revision_comments data_files assay_sop_ids model_ids].freeze
 
       def initialize(controller_name)
         @controller_name = controller_name
