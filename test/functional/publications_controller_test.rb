@@ -703,7 +703,8 @@ class PublicationsControllerTest < ActionController::TestCase
     # This will be slow!
 
     # 9 = 3 each for for events, assays and models 'fancy_multiselect'
-    assert_equal 9, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
+    # plus an extra 2 for the study optgroups in the assay association
+    assert_equal 11, response.body.scan('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt; &amp;').count
     # 4 = 2 each for investigations, studies (using bespoke association forms) - datafiles loaded asynchronously
     assert_equal 4, response.body.scan('\u003cscript\u003ealert(\"xss\")\u003c/script\u003e \u0026').count
   end
