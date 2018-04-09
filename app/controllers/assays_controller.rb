@@ -175,7 +175,6 @@ class AssaysController < ApplicationController
     data_files            = params[:data_files] || []
     model_ids             = params[:model_ids] || []
     samples               = params[:samples] || []
-    document_ids          = params[:document_ids] || []
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     data_files.each do |data_file|
@@ -191,10 +190,6 @@ class AssaysController < ApplicationController
     Array(sop_ids).each do |id|
       s = Sop.find(id)
       assay_assets_to_keep << assay.associate(s) if s.can_view?
-    end
-    Array(document_ids).each do |id|
-      d = Document.find(id)
-      assay_assets_to_keep << assay.associate(d) if d.can_view?
     end
     samples.each do |sample|
       s = Sample.find(sample[:id])
@@ -227,8 +222,10 @@ class AssaysController < ApplicationController
   private
 
   def assay_params
-    params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
-                                  :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset,
-                                  { document_ids: []}, { creator_ids: [] }, { scales: [] })
+    params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
+                                  :license, :other_creators, :create_from_asset, { document_ids: []}, { creator_ids: [] },
+                                  { scales: [] }).tap do |params|
+      params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if params.key?(:document_ids)
+    end
   end
 end
