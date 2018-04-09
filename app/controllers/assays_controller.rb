@@ -139,14 +139,13 @@ class AssaysController < ApplicationController
   end
 
   def update
-    @assay.assign_attributes(assay_params)
     update_assay_organisms @assay, params
     update_annotations(params[:tag_list], @assay)
     update_sharing_policies @assay
     update_relationships(@assay, params)
 
     respond_to do |format|
-      if @assay.save
+      if @assay.update_attributes(assay_params)
         update_assets_linked_to_assay @assay, params
         @assay.save!
 
@@ -171,8 +170,6 @@ class AssaysController < ApplicationController
   end
 
   def update_assets_linked_to_assay assay,params
-    sop_ids               = params[:assay][:sop_ids] || []
-    model_ids             = params[:assay][:model_ids] || []
     data_files            = params[:data_files] || []
     samples               = params[:samples] || []
 
@@ -183,21 +180,13 @@ class AssaysController < ApplicationController
                                               relationship: RelationshipType.find_by_id(data_file[:relationship_type])
       ) if d.can_view?
     end
-    Array(model_ids).reject(&:blank?).each do |id|
-      m = Model.find(id)
-      assay_assets_to_keep << assay.associate(m) if m.can_view?
-    end
-    Array(sop_ids).reject(&:blank?).each do |id|
-      s = Sop.find(id)
-      assay_assets_to_keep << assay.associate(s) if s.can_view?
-    end
     samples.each do |sample|
       s = Sample.find(sample[:id])
       assay_assets_to_keep << assay.associate(s, :direction => sample[:direction]) if s.can_view?
     end
     #Destroy AssayAssets that aren't needed
     (assay.assay_assets - assay_assets_to_keep.compact).each do |a|
-      unless a.asset_type == 'Document' # These are cleaned up automatically
+      if a.asset_type == 'Sample' || a.asset_type == 'DataFile' # Other assay assets are cleaned up automatically
         a.destroy
       end
     end
@@ -224,9 +213,10 @@ class AssaysController < ApplicationController
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
                                   :license, :other_creators, :create_from_asset, { document_ids: []}, { creator_ids: [] },
-                                  { scales: [] }, { sop_ids: [] }).tap do |params|
+                                  { scales: [] }, { sop_ids: [] }, { model_ids: [] }).tap do |params|
       params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if params.key?(:document_ids)
       params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if params.key?(:sop_ids)
+      params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if params.key?(:model_ids)
     end
   end
 end

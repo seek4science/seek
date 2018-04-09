@@ -4,7 +4,7 @@ class AssayAsset < ActiveRecord::Base
 
   belongs_to :relationship_type
 
-  before_save :check_version
+  before_save :set_version
 
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :assay
@@ -16,11 +16,10 @@ class AssayAsset < ActiveRecord::Base
   scope :simulation, -> { joins(:relationship_type).where('relationship_types.key = ?', RelationshipType::SIMULATION) }
   scope :construction, -> { joins(:relationship_type).where('relationship_types.key = ?', RelationshipType::CONSTRUCTION) }
 
-  def check_version
-    return unless asset.respond_to?(:latest_version)
-    if version.nil? && !asset.nil? && (asset.class.name.end_with?('::Version') || (!asset.latest_version.nil? && asset.latest_version.class.name.end_with?('::Version')))
-      self.version = asset.version
-    end
+  def set_version
+    return if destroyed?
+    return unless asset && asset.respond_to?(:latest_version) && asset.latest_version
+    self.version = asset.version
   end
 
   def incoming_direction?
