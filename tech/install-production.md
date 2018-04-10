@@ -82,7 +82,7 @@ First you need to setup [Passenger Phusion](https://www.phusionpassenger.com/)
     bundle exec passenger-install-apache2-module
 
 This will compile a module for Apache, and at the end present you with some
-lines that need adding to /etc/apache2/http.conf. These will look something
+lines that need adding to /etc/apache2/apache2.conf. These will look something
 like the following, but the paths will most likely be different:
 
     LoadModule passenger_module /home/www-data/.rvm/gems/ruby-2.2.7/gems/passenger-5.1.2/buildout/apache2/mod_passenger.so
