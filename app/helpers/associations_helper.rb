@@ -64,9 +64,9 @@ module AssociationsHelper
     content_tag(:button, text, options)
   end
 
-  def associations_json_from_relationship(related_items)
+  def associations_json_from_relationship(related_items, extra_data = {})
     related_items.map do |item|
-      { title: item.title, id: item.id }
+      { title: item.title, id: item.id }.reverse_merge(extra_data)
     end.to_json
   end
 

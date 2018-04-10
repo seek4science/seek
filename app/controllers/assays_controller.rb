@@ -118,9 +118,6 @@ class AssaysController < ApplicationController
     update_relationships(@assay, params)
 
     if @assay.save
-      update_assets_linked_to_assay @assay, params
-      #required to trigger the after_save callback after the assets have been associated
-      @assay.save
       if @assay.create_from_asset =="true"
         render :action => :update_assays_list
       else
@@ -146,9 +143,6 @@ class AssaysController < ApplicationController
 
     respond_to do |format|
       if @assay.update_attributes(assay_params)
-        update_assets_linked_to_assay @assay, params
-        @assay.save!
-
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
         format.json {render json: @assay}
@@ -166,29 +160,6 @@ class AssaysController < ApplicationController
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
       culture_growth=CultureGrowthType.find_by_title(culture_growth_type_text)
       assay.associate_organism(o_id, strain_id, culture_growth,t_id,t_title)
-    end
-  end
-
-  def update_assets_linked_to_assay assay,params
-    data_files            = params[:data_files] || []
-    samples               = params[:samples] || []
-
-    assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
-    data_files.each do |data_file|
-      d = DataFile.find(data_file[:id])
-      assay_assets_to_keep << assay.associate(d, direction: data_file[:direction],
-                                              relationship: RelationshipType.find_by_id(data_file[:relationship_type])
-      ) if d.can_view?
-    end
-    samples.each do |sample|
-      s = Sample.find(sample[:id])
-      assay_assets_to_keep << assay.associate(s, :direction => sample[:direction]) if s.can_view?
-    end
-    #Destroy AssayAssets that aren't needed
-    (assay.assay_assets - assay_assets_to_keep.compact).each do |a|
-      if a.asset_type == 'Sample' || a.asset_type == 'DataFile' # Other assay assets are cleaned up automatically
-        a.destroy
-      end
     end
   end
 
@@ -213,7 +184,10 @@ class AssaysController < ApplicationController
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
                                   :license, :other_creators, :create_from_asset, { document_ids: []}, { creator_ids: [] },
-                                  { scales: [] }, { sop_ids: [] }, { model_ids: [] }).tap do |params|
+                                  { scales: [] }, { sop_ids: [] }, { model_ids: [] },
+                                  { samples_attributes: [:asset_id, :direction] },
+                                  { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
+                                  ).tap do |params|
       params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if params.key?(:document_ids)
       params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if params.key?(:sop_ids)
       params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if params.key?(:model_ids)

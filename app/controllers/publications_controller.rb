@@ -121,7 +121,7 @@ class PublicationsController < ApplicationController
         create_or_update_associations investigation_ids, 'Investigation', 'view'
         create_or_update_associations study_ids, 'Study', 'view'
         create_or_update_associations assay_ids, 'Assay', 'edit'
-        create_or_update_associations data_files.map { |df| df['id'] }, 'DataFile', 'view'
+        create_or_update_associations data_files.map { |df| df['asset_id'] }, 'DataFile', 'view'
         create_or_update_associations model_ids, 'Model', 'view'
 
         # Create policy if not present (should be)

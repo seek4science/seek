@@ -5,7 +5,7 @@
         <input type="hidden" name="{{type}}[assay_assets_attributes][][direction]" value="{{direction.value}}"/>
     {{/if}}
     {{#if relationship_type}}
-        <input type="hidden" name="{{type}}[assay_assets_attributes][][relationship_type]" value="{{relationship_type.value}}"/>
+        <input type="hidden" name="{{type}}[assay_assets_attributes][][relationship_type_id]" value="{{relationship_type.value}}"/>
         <small>({{relationship_type.text}})</small>
     {{/if}}
     <a class="remove-association clickable" title="Remove assay">&times;</a>

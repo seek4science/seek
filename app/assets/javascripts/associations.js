@@ -64,6 +64,9 @@ Associations.List.prototype.toggleEmptyListText = function () {
 };
 
 Associations.List.prototype.add = function (association) {
+    if (this.element.data('fieldName')) {
+        association.fieldName = this.element.data('fieldName');
+    }
     this.items.push(new Associations.ListItem(this, association));
     this.toggleEmptyListText();
     this.onAdd(association);

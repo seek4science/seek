@@ -188,4 +188,35 @@ class Assay < ActiveRecord::Base
   def rdf_type_entity_fragment
     { 'EXP' => 'Experimental_assay', 'MODEL' => 'Modelling_analysis' }[assay_class.key]
   end
+
+  def samples_attributes= attributes
+    set_assay_assets_for('Sample', attributes)
+  end
+
+  def data_files_attributes= attributes
+    set_assay_assets_for('DataFile', attributes)
+  end
+
+  private
+
+  def set_assay_assets_for(type, attributes)
+    type_assay_assets, other_assay_assets = self.assay_assets.partition { |aa| aa.asset_type == type }
+    new_type_assay_assets = []
+
+    attributes.each do |attrs|
+      attrs.merge!(asset_type: type)
+      existing = type_assay_assets.detect { |aa| aa.asset_id.to_s == attrs['asset_id'] }
+      if existing
+        new_type_assay_assets << existing.tap { |e| e.assign_attributes(attrs) }
+      else
+        aa = self.assay_assets.build(attrs)
+        if aa.asset && aa.asset.can_view?
+          new_type_assay_assets << aa
+        end
+      end
+    end
+
+    self.assay_assets = (other_assay_assets + new_type_assay_assets)
+    self.assay_assets
+  end
 end
