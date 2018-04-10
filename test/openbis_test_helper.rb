@@ -45,6 +45,10 @@ module Fairdom
         dir = File.join(Rails.root, 'test', 'fixtures', 'files', 'mocking', 'openbis')
         File.join(dir, name)
       end
+
+      def mocked?
+        true
+      end
     end
   end
 end

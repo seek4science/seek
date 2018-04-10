@@ -34,32 +34,4 @@ class AssaysHelperTest < ActionView::TestCase
     end
   end
 
-  test 'external_asset_details shows warnings on empty or unknown' do
-    p1 = Factory :person
-    a1 = Factory :assay, contributor: p1, policy: Factory(:downloadable_public_policy)
-
-    res = external_asset_details(a1)
-    assert_match /No external asset/, res
-
-    a1.build_external_asset
-    assert a1.external_asset
-
-    res = external_asset_details(a1)
-    assert_match /Unsupported external asset ExternalAsset/, res
-  end
-
-  test 'external_asset_details renders partial for openbis' do
-    a1 = Assay.new # new so it the external wont be saved to file
-
-    zample = Factory :openbis_zample
-
-    external = OpenbisExternalAsset.build(zample)
-    a1.external_asset = external
-
-    res = external_asset_details(a1)
-    assert_match /id="openbis-details"/, res
-    assert_equal '20171002172111346-37', zample.perm_id
-    assert_match /20171002172111346-37/, res
-
-  end
 end

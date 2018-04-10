@@ -8,6 +8,7 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
     @store = @openbis_endpoint.metadata_store
   end
 
+
   test 'endpoint key' do
     key = @store.send(:endpoint_key)
     # changed as the same cache should be used between updates
@@ -51,12 +52,11 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
   end
 
   test 'cleanup cleans only expired' do
-     skip 'It is a long cache test to test expiration, only used during development'
 
+    # making fresh so it wont have content
     openbis_endpoint = Factory(:openbis_endpoint)
-    openbis_endpoint.refresh_period_mins = 1
-
-    store = Seek::Openbis::OpenbisMetadataStore.new(openbis_endpoint)
+    assert 122 > openbis_endpoint.refresh_period_mins
+    store = openbis_endpoint.metadata_store
 
     # works on new as well
     store.cleanup
@@ -67,30 +67,34 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
     store.cleanup
     assert store.exist?('k1')
 
-    sleep(65.seconds)
-    assert_equal 'v2', store.fetch('k2') { 'v2' }
-    store.cleanup
-    refute store.exist?('k1')
-    assert store.exist?('k2')
+    # sleep(65.seconds)
+    travel 122.minutes do
+      assert_equal 'v2', store.fetch('k2') { 'v2' }
+      store.cleanup
+      refute store.exist?('k1')
+      assert store.exist?('k2')
+    end
+
 
   end
 
   test 'automaticaly expires entries' do
-    skip 'It is a long cache test to test expiration, only used during development'
-
+    # making fresh so it wont have content
     openbis_endpoint = Factory(:openbis_endpoint)
-    openbis_endpoint.refresh_period_mins = 1
-    store = Seek::Openbis::OpenbisMetadataStore.new(openbis_endpoint)
+    assert 122 > openbis_endpoint.refresh_period_mins
+    store = openbis_endpoint.metadata_store
 
 
     assert_equal 'v1', store.fetch('k1') { 'v1' }
 
     assert_equal 'v1', store.fetch('k1') { 'v2' }
 
-    sleep(65.seconds)
-    assert_equal 'v3', store.fetch('k2') { 'v3' }
-    assert_equal 'v2a', store.fetch('k1') { 'v2a' }
-    assert_equal 'v3', store.fetch('k2') { 'v4' }
+    travel 122.minutes do
+      assert_equal 'v3', store.fetch('k2') { 'v3' }
+      assert_equal 'v2a', store.fetch('k1') { 'v2a' }
+      assert_equal 'v3', store.fetch('k2') { 'v4' }
+    end
+
 
 
   end

@@ -4,8 +4,14 @@ require 'openbis_test_helper'
 
 class EntityTypeTest < ActiveSupport::TestCase
 
-  def setup
+  # run test only if connected to real server as I did not not want to make so many mocked queries for
+  # a client that needs to change.
+  # other tests may have already mock the calls
+  def self.mocked?
+    Fairdom::OpenbisApi::ApplicationServerQuery.method_defined? :mocked?
+  end
 
+  def setup
     @openbis_endpoint = OpenbisEndpoint.new project: Factory(:project), username: 'seek', password: 'seek',
                                     web_endpoint: 'https://127.0.0.1:8443/openbis/openbis',
                                     as_endpoint: 'https://127.0.0.1:8443/openbis/openbis',
@@ -17,11 +23,26 @@ class EntityTypeTest < ActiveSupport::TestCase
 
   end
 
+  def test_warn_on_mocked_tests
+    skip 'EntityType tests skipped as mocked query detected' if EntityTypeTest.mocked?
+    assert true
+  end
+
+  #test 'check if mock present' do
+  #  skip 'only to check if the mocked? implementation works'
+  #  refute self.class.mocked?
+  #  mock_openbis_calls
+  #  assert self.class.mocked?
+  #end
+
+
   test 'setup work' do
     assert @openbis_endpoint.test_authentication
   end
 
   test 'SampleType by code' do
+    return if EntityTypeTest.mocked?
+
     code = 'TZ_ASSAY'
     type = Seek::Openbis::EntityType.SampleType(@openbis_endpoint, code, true)
     assert type
@@ -32,6 +53,8 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'SampleType all' do
+    return if EntityTypeTest.mocked?
+
     types = Seek::Openbis::EntityType.SampleType(@openbis_endpoint).all(true)
     assert types
     assert_equal 25, types.size
@@ -41,6 +64,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'SampleType by semantic annotation' do
+    return if EntityTypeTest.mocked?
     semantic = Seek::Openbis::SemanticAnnotation.new
 
     semantic.predicateAccessionId = 'po_acc_t'
@@ -71,6 +95,8 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'Samples can be found by types codes' do
+    return if EntityTypeTest.mocked?
+
     codes = ['TZ_ASSAY']
 
     zamples = Seek::Openbis::Zample.new(@openbis_endpoint).find_by_type_codes(codes)
@@ -89,6 +115,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'All samples can be found' do
+    return if EntityTypeTest.mocked?
 
     zamples = Seek::Openbis::Zample.new(@openbis_endpoint).all
     assert zamples
@@ -97,6 +124,8 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'DataSetType by code' do
+    return if EntityTypeTest.mocked?
+
     code = 'TZ_FAIR'
     type = Seek::Openbis::EntityType.DataSetType(@openbis_endpoint, code, true)
     assert type
@@ -107,6 +136,8 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'DatasetType all' do
+    return if EntityTypeTest.mocked?
+
     types = Seek::Openbis::EntityType.DataSetType(@openbis_endpoint).all(true)
     assert types
     assert_equal 7, types.size
@@ -116,6 +147,8 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'DataSets can be found by types codes' do
+    return if EntityTypeTest.mocked?
+
     codes = ['TZ_FAIR']
 
     sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_type_codes(codes)
@@ -134,6 +167,8 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'ExperimentType by code' do
+    return if EntityTypeTest.mocked?
+
     code = 'DEFAULT_EXPERIMENT'
     type = Seek::Openbis::EntityType.ExperimentType(@openbis_endpoint, code, true)
     assert type
@@ -144,6 +179,8 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'ExperimentType all' do
+    return if EntityTypeTest.mocked?
+
     types = Seek::Openbis::EntityType.ExperimentType(@openbis_endpoint).all(true)
     assert types
     assert_equal 6, types.size
@@ -153,6 +190,8 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'ExperimentType by codes' do
+    return if EntityTypeTest.mocked?
+
     codes = ['DEFAULT_EXPERIMENT','MATERIALS']
     types = Seek::Openbis::EntityType.ExperimentType(@openbis_endpoint).find_by_codes(codes,true)
     assert types
@@ -163,6 +202,8 @@ class EntityTypeTest < ActiveSupport::TestCase
   end
 
   test 'Experiment can be found by types codes' do
+    return if EntityTypeTest.mocked?
+
     codes = ['DEFAULT_EXPERIMENT']
 
     sets = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
