@@ -19,7 +19,11 @@ class OpenbisExternalAsset < ExternalAsset
   end
 
   def self.extract_external_service(openbis_entity)
-    openbis_entity.openbis_endpoint.web_endpoint
+    # not using web_point so that the url can be update upon migration. Endpoind ID should be unique and
+    # stay between calls
+
+    # openbis_entity.openbis_endpoint.web_endpoint
+    openbis_entity.openbis_endpoint.id
   end
 
   def populate_from_obis(openbis_entity, sync_options)

@@ -140,12 +140,20 @@ class ExternalAssetTest < ActiveSupport::TestCase
     asset1 = ExternalAsset.new({external_service: 'OpenBIS', external_id: '24'})
     opt = {tomek: 2}
     asset1.sync_options = opt
-    refute asset1.sync_options_json
+
+    #refute asset1.sync_options_json
 
     assert asset1.save
-    assert_equal '{"tomek":2}', asset1.sync_options_json
+    #assert_equal '{"tomek":2}', asset1.sync_options_json
 
-    asset1.sync_options = nil
+    #asset1.sync_options = nil
+    asset2 = ExternalAsset.find(asset1.id)
+    assert_equal opt, asset2.sync_options
+
+    opt = {}
+    asset1.sync_options = opt
+    assert asset1.save
+
     asset2 = ExternalAsset.find(asset1.id)
     assert_equal opt, asset2.sync_options
 

@@ -3,8 +3,7 @@ class ExternalAsset < ActiveRecord::Base
   self.inheritance_column = 'class_type'
   attr_accessor :sync_options, :content_changed
 
-
-  enum sync_state: [ :synchronized, :refresh, :failed ]
+  enum sync_state: [:synchronized, :refresh, :failed]
 
 
   belongs_to :seek_entity, polymorphic: true
@@ -48,8 +47,8 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def serialize_content(content_object)
-    return content_object.json if (defined? content_object.json) &&  content_object.json.is_a?(String)
-    return content_object.json.to_json if (defined? content_object.json) &&  content_object.json.is_a?(Hash)
+    return content_object.json if (defined? content_object.json) && content_object.json.is_a?(String)
+    return content_object.json.to_json if (defined? content_object.json) && content_object.json.is_a?(Hash)
     return content_object.to_json if defined? content_object.to_json
     raise 'Not implemented json serialization for external content'
   end
@@ -103,7 +102,7 @@ class ExternalAsset < ActiveRecord::Base
   def init_content_holder()
     if content_blob.nil?
       build_content_blob({
-                             url: (external_service ? external_service: '') + '#' + external_id,
+                             url: (external_service ? external_service : '') + '#' + external_id,
                              content_type: 'application/json',
                              original_filename: external_id,
                              make_local_copy: false,
@@ -115,8 +114,9 @@ class ExternalAsset < ActiveRecord::Base
     content_blob.save! unless content_blob.nil?
   end
 
+
   def options_to_json
-    self.sync_options_json = @sync_options ? @sync_options.to_json : {}.to_json
+    self.sync_options_json = @sync_options ? @sync_options.to_json : nil
   end
 
   def options_from_json
@@ -134,4 +134,7 @@ class ExternalAsset < ActiveRecord::Base
   def search_terms
     []
   end
+
+
+
 end

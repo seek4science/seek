@@ -22,7 +22,8 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert_equal '20171002172111346-37', asset.external_id
 
     #'https://openbis-api.fair-dom.org/openbis',
-    assert_equal @endpoint.web_endpoint, asset.external_service
+    #assert_equal @endpoint.web_endpoint, asset.external_service
+    assert_equal "#{@endpoint.id}", asset.external_service
     assert_equal '2017-10-02T18:09:34+00:00', asset.external_mod_stamp
 
     assert_equal 'Seek::Openbis::Zample', asset.external_type
@@ -67,7 +68,9 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert_equal '20160210130454955-23', asset.external_id
 
     #'https://openbis-api.fair-dom.org/openbis'
-    assert_equal @endpoint.web_endpoint, asset.external_service
+    #assert_equal @endpoint.web_endpoint, asset.external_service
+
+    assert_equal "#{@endpoint.id}", asset.external_service
     assert_equal '2016-02-10T12:04:55+00:00', asset.external_mod_stamp
 
     assert_equal 'Seek::Openbis::Dataset', asset.external_type
@@ -92,7 +95,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 
     refute OpenbisExternalAsset.registered?(zample)
 
-    asset = OpenbisExternalAsset.new({external_service: zample.openbis_endpoint.web_endpoint, external_id: zample.perm_id})
+    asset = OpenbisExternalAsset.new({external_service: zample.openbis_endpoint.id, external_id: zample.perm_id})
     assert asset.save
 
     assert OpenbisExternalAsset.registered?(zample)
@@ -107,7 +110,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
       OpenbisExternalAsset.find_by_entity(zample)
     }
 
-    asset = OpenbisExternalAsset.new({external_service: zample.openbis_endpoint.web_endpoint, external_id: zample.perm_id})
+    asset = OpenbisExternalAsset.new({external_service: zample.openbis_endpoint.id, external_id: zample.perm_id})
     assert asset.save
 
     assert OpenbisExternalAsset.find_by_entity(zample)

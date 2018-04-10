@@ -20,6 +20,7 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   after_initialize :default_policy, autosave: true
   after_initialize :add_meta_config, autosave: true
+
   before_save :meta_config_to_json
   before_save :clear_metadata_if_changed
 
