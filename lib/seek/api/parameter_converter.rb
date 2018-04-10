@@ -106,9 +106,9 @@ module Seek
       ELEVATE = %i[tag_list expertise_list tool_list policy_attributes content_blobs
        related_publication_ids revision_comments].freeze
 
-      def initialize(controller_name)
+      def initialize(controller_name, options = {})
         @controller_name = controller_name
-
+        @options = options
       end
 
       def convert(parameters)
@@ -135,7 +135,7 @@ module Seek
 
       def convert_parameters
         attributes.each do |key, value|
-          unless (conversion = CONVERSIONS[key.to_sym]).nil?
+          unless (conversion = CONVERSIONS[key.to_sym]).nil? || exclude?(:convert, key)
             attributes[key] = conversion.call(value)
           end
         end
@@ -143,7 +143,7 @@ module Seek
 
       def rename_parameters
         RENAME.each do |key, new_key|
-          if attributes.key?(key)
+          if attributes.key?(key) && !exclude?(:rename, key)
             attributes[new_key] = attributes.delete(key)
           end
         end
@@ -151,7 +151,7 @@ module Seek
 
       def elevate_parameters
         ELEVATE.each do |key|
-          if attributes.key?(key)
+          if attributes.key?(key) && !exclude?(:elevate, key)
             @parameters[key] = attributes.delete(key)
           end
         end
@@ -159,6 +159,11 @@ module Seek
 
       def attributes
         @parameters[@controller_name.singularize.to_sym] || {}
+      end
+
+      def exclude?(type, key)
+        (@options[:skip] || []).include?(key.to_sym) ||
+        (@options["skip_#{type}".to_sym] || []).include?(key.to_sym)
       end
     end
   end
