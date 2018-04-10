@@ -370,7 +370,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     login_as(p.contributor)
     # add association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: [{ id: df.id.to_s }]
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: [{ asset_id: df.id.to_s }]
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -382,7 +382,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert df.publications.include?(p)
 
     # remove association
-    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_file_ids: []
+    put :update, id: p, publication: { abstract: p.abstract }, author: {}, data_files: []
 
     assert_redirected_to publication_path(p)
     p.reload
@@ -511,7 +511,7 @@ class PublicationsControllerTest < ActionController::TestCase
   test 'should keep model and data associations after update' do
     p = publications(:pubmed_2)
     put :update, id: p, publication: { abstract: p.abstract, model_ids: p.models.collect { |m| m.id.to_s } },
-        author: {}, assay_ids: [], data_files: p.data_files.map { |df| { id: df.id } }
+        author: {}, assay_ids: [], data_files: p.data_files.map { |df| { asset_id: df.id } }
 
     assert_redirected_to publication_path(p)
     p.reload

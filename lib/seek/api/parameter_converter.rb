@@ -75,7 +75,7 @@ module Seek
           },
 
           data_file_ids: ->(value) {
-            value.map { |i| { 'id' => i }.with_indifferent_access }
+            value.map { |i| { 'asset_id' => i }.with_indifferent_access }
           },
 
           assay_ids: ->(value) {
@@ -98,13 +98,13 @@ module Seek
           model_type: :model_type_id,
           model_format: :model_format_id,
           environment: :recommended_environment_id,
-          data_file_ids: :data_files,
+          data_file_ids: :data_files_attributes,
           assay_ids: :assay_assets_attributes,
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.
       ELEVATE = %i[tag_list expertise_list tool_list policy_attributes content_blobs
-       related_publication_ids revision_comments data_files].freeze
+       related_publication_ids revision_comments].freeze
 
       def initialize(controller_name)
         @controller_name = controller_name

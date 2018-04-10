@@ -142,7 +142,7 @@ class AssaysControllerTest < ActionController::TestCase
     sleep(1)
     assert_difference('ActivityLog.count') do
       put :update, id: assay,
-                   assay: { data_file_attributes: [{ asset_id: df.id, relationship_type: RelationshipType.find_by_title('Test data').id }], title: assay.title }
+                   assay: { data_file_attributes: [{ asset_id: df.id, relationship_type_id: RelationshipType.find_by_title('Test data').id }], title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
@@ -742,9 +742,9 @@ class AssaysControllerTest < ActionController::TestCase
             study_id: studies(:metabolomics_study).id,
             assay_class_id: assay_classes(:modelling_assay_class).id,
             sop_ids: ["#{sop.id}"],
-            model_ids: ["#{model.id}"]
-          }, policy_attributes: valid_sharing,
-                        data_files: [{ id: datafile.id, relationship_type: rel.id }]
+            model_ids: ["#{model.id}"],
+            data_files_attributes: [{ asset_id: datafile.id, relationship_type_id: rel.id }]
+          }, policy_attributes: valid_sharing
         end
       end
     end
@@ -755,7 +755,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal 1, df_json.length
     assert_equal datafile.title, df_json[0]['title']
     assert_equal datafile.id, df_json[0]['id']
-    assert_equal rel.id.to_s, df_json[0]['relationship_type']['value']
+    assert_equal rel.id, df_json[0]['relationship_type']['value']
   end
 
   test 'should create with associated model sop data file and publication' do
@@ -777,9 +777,9 @@ class AssaysControllerTest < ActionController::TestCase
                 study_id: study.id,
                 assay_class_id: assay_classes(:modelling_assay_class).id,
                 sop_ids: ["#{sop.id}"],
-                model_ids: ["#{model.id}"]
+                model_ids: ["#{model.id}"],
+                data_files_attributes: [{ asset_id: df.id, relationship_type_id: rel.id }]
             },
-                 data_files: [{ id: df.id, relationship_type: rel.id }],
                  related_publication_ids: ["#{pub.id}"],
                  policy_attributes: valid_sharing # default policy is nil in VLN
           end
@@ -825,8 +825,8 @@ class AssaysControllerTest < ActionController::TestCase
                                            assay_class_id: assay_classes(:modelling_assay_class).id,
                                            sop_ids: ["#{sop.id}"],
                                            model_ids: ["#{model.id}"],
-          },
-              data_files: [{ id: datafile.id, relationship_type: rel.id }]
+                                           data_files_attributes: [{ asset_id: datafile.id, relationship_type_id: rel.id }]
+          }
         end
       end
     end
@@ -837,7 +837,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_equal 1, df_json.length
     assert_equal datafile.title, df_json[0]['title']
     assert_equal datafile.id, df_json[0]['id']
-    assert_equal rel.id.to_s, df_json[0]['relationship_type']['value']
+    assert_equal rel.id, df_json[0]['relationship_type']['value']
   end
 
   def check_fixtures_for_authorization_of_sops_and_datafiles_links
