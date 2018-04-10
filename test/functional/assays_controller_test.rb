@@ -97,7 +97,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert assigns(:assay)
 
     assay.reload
-    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset_id = sop.id }
+    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset == sop }
     assert_equal sop.version, stored_sop_assay_asset.version
 
     login_as sop.contributor
@@ -105,13 +105,12 @@ class AssaysControllerTest < ActionController::TestCase
     login_as(:model_owner)
 
     assert_difference('ActivityLog.count') do
-      put :update, id: assay, assay: { sop_ids: [Sop.first.id, sop.id], title: assay.title }
+      put :update, id: assay, assay: { sop_ids: [sop.id], title: assay.title }
       assert_redirected_to assay_path(assay)
     end
 
     assay.reload
-    stored_sop_assay_asset = assay.assay_assets.detect { |aa| aa.asset_id = sop.id }
-    assert_equal sop.version, stored_sop_assay_asset.version
+    assert_equal sop.version, stored_sop_assay_asset.reload.version
   end
 
   test 'should update timestamp when associating sop' do
@@ -143,8 +142,7 @@ class AssaysControllerTest < ActionController::TestCase
     sleep(1)
     assert_difference('ActivityLog.count') do
       put :update, id: assay,
-                   data_files: [{ id: df.id, relationship_type: RelationshipType.find_by_title('Test data').id }],
-                   assay: { title: assay.title }
+                   assay: { data_file_attributes: [{ asset_id: df.id, relationship_type: RelationshipType.find_by_title('Test data').id }], title: assay.title }
     end
 
     assert_redirected_to assay_path(assay)
