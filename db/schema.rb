@@ -691,8 +691,6 @@ ActiveRecord::Schema.define(version: 20180410093814) do
     t.datetime "updated_at"
   end
 
-
-
   create_table "genes", force: :cascade do |t|
     t.string   "title",       limit: 255
     t.string   "symbol",      limit: 255
