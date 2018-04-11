@@ -3415,5 +3415,6 @@ class DataFilesControllerTest < ActionController::TestCase
     content_blob_id = assigns(:data_file).content_blob.id
     session[:uploaded_content_blob_id] = content_blob_id.to_s
     post :rightfield_extraction_ajax,content_blob_id:content_blob_id.to_s,format:'js'
+    get :provide_metadata
   end
 end
