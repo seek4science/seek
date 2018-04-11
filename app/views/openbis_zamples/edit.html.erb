@@ -17,7 +17,7 @@
         <% if not_registered %>
             <div class="form-group">
               <label>Register under Study </label><span class="required">*</span>
-              <%= assay_study_selection(@assay.study, ff) %>
+              <%= assay_study_selection('assay[study_id]', @assay.study) %>
             </div>
         <% else %>
             <div class="form-group">

@@ -13,7 +13,7 @@
         <%= form_for(Assay.new) do |f| %>
             <div class="form-group">
               <label>Register under Study </label><span class="required">*</span>
-              <%= assay_study_selection(nil, f) %>
+              <%= assay_study_selection('assay[study_id]', nil) %>
             </div>
             <div class="form-group">
               <%= check_box_tag('link_dependent', 1, true) %>

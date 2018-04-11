@@ -90,6 +90,14 @@ GIT
       json (~> 1.8)
       rest-client (~> 1.7)
 
+GIT
+  remote: https://github.com/tzielins/openseek-api-gem
+  revision: 6559fd86feadbfabd4382c27f4a86d916fd903a4
+  ref: 6559fd86feadbfabd4382c27f4a86d916fd903a4
+  specs:
+    openseek-api (0.14.0)
+      cocaine
+
 GEM
   remote: https://rubygems.org/
   remote: https://rails-assets.org/
@@ -444,8 +452,6 @@ GEM
       pyu-ruby-sasl (~> 0.0.3.2)
       rubyntlm (~> 0.3.4)
     open4 (1.3.0)
-    openseek-api (0.11.0)
-      cocaine
     options (2.3.2)
     parser (2.4.0.0)
       ast (~> 2.2)
@@ -841,6 +847,7 @@ DEPENDENCIES
   libxml-ruby (~> 2.8.0)
   linkeddata
   lograge
+  loofah
   magic_lamp
   mechanize
   metainspector
@@ -853,7 +860,7 @@ DEPENDENCIES
   nokogiri (~> 1.8.1)
   omniauth (~> 1.3.1)
   omniauth-ldap (~> 1.0.5)
-  openseek-api
+  openseek-api!
   passenger
   pg
   pothoven-attachment_fu

@@ -48,7 +48,7 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
     endpoint = MockEndpoint.new
     @job = OpenbisEndpointCacheRefreshJob.new(endpoint)
     @job.perform_job(endpoint)
-    assert_equal 1,  endpoint.refreshed
+    assert_equal 1, endpoint.refreshed
   end
 
   test 'create_initial_jobs creates jobs for each endpoint' do

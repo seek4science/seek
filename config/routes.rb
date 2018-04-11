@@ -362,7 +362,7 @@ SEEK::Application.routes.draw do
   # to be removed as STI does not work in too many places
   # resources :openbis_assays, controller: 'assays', type: 'OpenbisAssay'
 
-   ### ASSAY AND TECHNOLOGY TYPES ###
+  ### ASSAY AND TECHNOLOGY TYPES ###
 
   resources :suggested_assay_types
   resources :suggested_modelling_analysis_types, :path => :suggested_assay_types, :controller => :suggested_assay_types
@@ -690,7 +690,7 @@ SEEK::Application.routes.draw do
       get :mint_doi_confirm
       get :isa_children
     end
-    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+    resources :people, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :only => [:index]
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###

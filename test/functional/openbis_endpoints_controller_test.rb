@@ -371,7 +371,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
         username: 'wibble',
         password: 'wobble',
         format: :json
-    assert_response :redirect
+    assert_response 400
     refute @response.body.include?('true')
   end
 
@@ -449,7 +449,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'refresh metadata store' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
-    post :refresh_metadata_store, id:endpoint.id,project_id: @project.id
+    post :refresh_metadata_store, id: endpoint.id, project_id: @project.id
     assert_response :success
     assert assigns(:openbis_endpoint)
   end

@@ -164,4 +164,3 @@ openbis_assay1:
   contributor: person_for_model_owner
   assay_class: experimental_assay_class
   policy: policy_for_viewable_data_file
-  class_type: OpenbisAssay
