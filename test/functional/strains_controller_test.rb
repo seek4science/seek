@@ -6,7 +6,7 @@ class StrainsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include RestTestCases
   include RdfTestCases
-  include GeneralAuthorizationTestCases
+#  include GeneralAuthorizationTestCases
 
   def setup
     login_as :owner_of_fully_public_policy
@@ -239,7 +239,7 @@ class StrainsControllerTest < ActionController::TestCase
   test 'should create log and send email to gatekeeper when request to publish a strain' do
     strain_in_gatekept_project = { title: 'Test', project_ids: [Factory(:asset_gatekeeper).projects.first.id], organism_id: Factory(:organism).id }
     assert_difference ('ResourcePublishLog.count') do
-      assert_emails 1 do
+      assert_enqueued_emails 1 do
         post :create, strain: strain_in_gatekept_project, policy_attributes: { access_type: Policy::VISIBLE }
       end
     end

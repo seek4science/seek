@@ -11,10 +11,6 @@ class ProgrammesControllerTest < ActionController::TestCase
     Factory(:programme)
   end
 
-  test 'test rdf dummy' do
-    test_get_rdf
-  end
-
   # for now just admins can create programmes, later we will change this
   test 'new page accessible admin' do
     login_as(Factory(:admin))
@@ -801,5 +797,17 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_redirected_to prog
 
     assert_equal 0, assigns(:programme).funding_codes.length
+  end
+
+  def edit_max_object(programme)
+    for i in 1..5 do
+      Factory(:person).add_to_project_and_institution(programme.projects.first, Factory(:institution))
+    end
+    Factory :funding_code, value: 'DFG', annotatable: programme
+    add_avatar_to_test_object(programme)
+    person = Factory(:person)
+    login_as(person)
+    person.is_programme_administrator = true, programme
+    disable_authorization_checks { person.save! }
   end
 end

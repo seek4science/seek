@@ -875,6 +875,46 @@
     </xsd:sequence>
   </xsd:complexType>
 
+  <xsd:element name="documents" type="Documents"></xsd:element>
+  <xsd:element name="document" type="Document"></xsd:element>
+
+  <xsd:complexType name="Document">
+    <xsd:complexContent>
+      <xsd:extension base="AssetType">
+        <xsd:sequence>
+          <xsd:element name="associated" type="AssociatedItems"
+                       minOccurs="1" maxOccurs="1"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="Documents">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalIndex">
+        <xsd:sequence>
+          <xsd:element name="parameters" type="Parameters"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+          <xsd:element name="statistics" type="PagedStatistics"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+          <xsd:element name="items" type="DocumentItems" maxOccurs="1"
+                       minOccurs="1"></xsd:element>
+          <xsd:element name="related" type="xsd:anyType"
+                       minOccurs="0" maxOccurs="1">
+          </xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="DocumentItems">
+    <xsd:sequence>
+      <xsd:element name="document" type="AssetItem" maxOccurs="unbounded"
+                   minOccurs="0"></xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
 
   <xsd:element name="institution" type="Institution"></xsd:element>
   <xsd:element name="institutions" type="Institutions"></xsd:element>
@@ -1323,15 +1363,28 @@
 
   <xsd:complexType name="OrganismItems">
     <xsd:sequence>
-      <xsd:element name="organism" type="MinimalType"
+      <xsd:element name="organism" type="OrganismItem"
                    maxOccurs="unbounded" minOccurs="0"></xsd:element>
     </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="OrganismItem">
+    <xsd:complexContent>
+      <xsd:extension base="MinimalType">
+        <xsd:sequence>
+          <xsd:element name="uuid" type="xsd:string" minOccurs="1"
+                       maxOccurs="1"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
   </xsd:complexType>
 
   <xsd:complexType name="Organism">
     <xsd:complexContent>
       <xsd:extension base="MinimalType">
         <xsd:sequence>
+          <xsd:element name="uuid" type="xsd:string" minOccurs="1"
+                       maxOccurs="1"></xsd:element>
           <xsd:element name="bioportal_concepts" type="BioportalConcepts"
                        minOccurs="1" maxOccurs="1"></xsd:element>
           <xsd:element name="strains" type="StrainItems"
@@ -1388,6 +1441,8 @@
       <xsd:enumeration value="Events"></xsd:enumeration>
       <xsd:enumeration value="DataFile"></xsd:enumeration>
       <xsd:enumeration value="DataFiles"></xsd:enumeration>
+      <xsd:enumeration value="Document"></xsd:enumeration>
+      <xsd:enumeration value="Documents"></xsd:enumeration>
       <xsd:enumeration value="Presentation"></xsd:enumeration>
       <xsd:enumeration value="Presentations"></xsd:enumeration>
       <xsd:enumeration value="Assay"></xsd:enumeration>
@@ -1421,6 +1476,7 @@
     <xsd:all>
       <xsd:element name="assays" type="AssociatedAssays" minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="data_files" type="AssociatedDataFiles" minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="documents" type="AssociatedDocuments" minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="events" type="AssociatedEvents" minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="institutions" type="AssociatedInstitutions" minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="investigations" type="AssociatedInvestigations" minOccurs="0" maxOccurs="1"></xsd:element>
@@ -1548,6 +1604,17 @@
         <xsd:sequence>
           <xsd:element name="model" type="ResourceLink"
                        minOccurs="0" maxOccurs="unbounded"></xsd:element>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="AssociatedDocuments">
+    <xsd:complexContent>
+      <xsd:extension base="AssociatedLinks">
+        <xsd:sequence>
+          <xsd:element name="document" type="ResourceLink" minOccurs="0"
+                       maxOccurs="unbounded"></xsd:element>
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>

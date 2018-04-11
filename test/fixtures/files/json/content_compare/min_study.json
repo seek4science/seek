@@ -1,0 +1,85 @@
+{
+  "data": {
+    "id": "1039986486",
+    "type": "studies",
+    "attributes": {
+      "policy":
+      {
+        "access":"no_access",
+        "permissions":[]
+      },
+      "title": "A Minimal Study",
+      "description": null,
+      "experimentalists": null,
+      "other_creators": null,
+      "person_responsible_id": null
+    },
+    "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "1039986548",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "1039986548",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1022250702",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigation": {
+        "data":
+          {
+            "id": "973654814",
+            "type": "investigations"
+          }
+      },
+      "assays": {
+        "data": []
+      },
+      "data_files": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "sops": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "documents": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/studies/1039986486"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

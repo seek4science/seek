@@ -1,6 +1,6 @@
 module Seek
   module EnabledFeaturesFilter
-    FEATURES = [:models, :biosamples, :organisms, :events, :documentation, :workflows, :programmes, :assays, :publications, :samples, :openbis]
+    FEATURES = [:models, :biosamples, :organisms, :events, :documentation, :programmes, :assays, :publications, :samples, :openbis]
 
     def feature_enabled?(feature)
       feature = feature.to_s
@@ -14,8 +14,7 @@ module Seek
           }
           format.xml { render text: '<error>'+"#{feature.capitalize} are disabled"+'</error>', status: :unprocessable_entity }
           format.json {
-            errors = [{"title": "#{feature.capitalize} are disabled", "status": :unprocessable_entity}]
-            render json: JSONAPI::Serializer.serialize_errors(errors), status: :unprocessable_entity
+            render json: {"title": "#{feature.capitalize} are disabled"}, status: :unprocessable_entity
           }
         end
 

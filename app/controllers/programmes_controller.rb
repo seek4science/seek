@@ -24,7 +24,6 @@ class ProgrammesController < ApplicationController
   def create
     #because setting tags does an unfortunate save, these need to be updated separately to avoid a permissions to edit error
     funding_codes = params[:programme].delete(:funding_codes)
-
     @programme = Programme.new(programme_params)
 
     respond_to do |format|
@@ -48,7 +47,7 @@ class ProgrammesController < ApplicationController
         format.json {render json: @programme}
       else
         format.html { render action: 'new' }
-        format.json {render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity}
+        format.json { render json: json_api_errors(@programme), status: :unprocessable_entity }
       end
     end
   end
@@ -65,7 +64,7 @@ class ProgrammesController < ApplicationController
         else
           format.html { render action: 'edit' }
           format.xml { render xml: @programme.errors, status: :unprocessable_entity }
-          format.json { render json: {error: @programme.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+          format.json { render json: json_api_errors(@programme), status: :unprocessable_entity }
         end
       end
     end
@@ -73,7 +72,6 @@ class ProgrammesController < ApplicationController
 
   def handle_administrators
     params[:programme][:administrator_ids] = params[:programme][:administrator_ids].split(',')
-
     prevent_removal_of_self_as_programme_administrator
   end
 
@@ -162,7 +160,7 @@ class ProgrammesController < ApplicationController
   def inactive_view_allowed?
     return true if @programme.is_activated? || User.admin_logged_in?
     unless result=(User.logged_in_and_registered? && @programme.programme_administrators.include?(current_person))
-      error("This programme is not activated and cannot be viewed", "cannot view (not activated)")
+      error("This programme is not activated and cannot be viewed", "cannot view (not activated)", :forbidden)
     end
     result
   end
@@ -180,7 +178,7 @@ class ProgrammesController < ApplicationController
   private
 
   def programme_params
-    handle_administrators if params[:programme][:administrator_ids]
+    handle_administrators if params[:programme][:administrator_ids] && !(params[:programme][:administrator_ids].is_a? Array)
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { administrator_ids: [] },

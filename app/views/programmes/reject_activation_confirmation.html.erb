@@ -6,7 +6,7 @@
   The <%= t('programme') %> will not be automatically deleted, but will remain in its inactive state. You can delete the <%= t('programme') %> from its administration options.
 </p>
 
-<%= form_for(@programme, url:{action: 'reject_activation'}) do |f| %>
+<%= form_for(@programme, url:{action: 'reject_activation'}, method: :put) do |f| %>
     <div class="form-group">
       <%= f.label "Reason"-%>
       <%= f.text_area :activation_rejection_reason, :class=>"form-control" -%>

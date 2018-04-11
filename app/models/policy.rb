@@ -19,6 +19,7 @@ class Policy < ActiveRecord::Base
   alias_attribute :title, :name
 
   after_commit :queue_update_auth_table
+  after_commit :queue_rdf_generation_job
   before_save :update_timestamp_if_permissions_change
 
   def update_timestamp_if_permissions_change
@@ -26,8 +27,15 @@ class Policy < ActiveRecord::Base
   end
 
   def queue_update_auth_table
-    unless (previous_changes.keys - ['updated_at']).empty?
-      AuthLookupUpdateJob.new.add_items_to_queue(assets) unless assets.empty?
+    unless (previous_changes.keys - ['updated_at']).empty? || assets.empty?
+      AuthLookupUpdateJob.new.add_items_to_queue(assets)
+    end
+  end
+
+  def queue_rdf_generation_job
+    supported_assets = assets.select(&:rdf_supported?)
+    unless (previous_changes.keys - ['updated_at']).empty? || supported_assets.empty?
+      supported_assets.each { |asset| RdfGenerationJob.new(asset).queue_job }
     end
   end
 
@@ -108,7 +116,7 @@ class Policy < ActiveRecord::Base
       if policy_params
         # Set attributes on the policy
         policy.access_type = policy_params[:access_type]
-        if policy.access_type > Policy::NO_ACCESS
+        if policy.access_type.nil? || policy.access_type > Policy::NO_ACCESS
           policy.sharing_scope = nil # This field should not be used anymore
         end
 
@@ -234,7 +242,7 @@ class Policy < ActiveRecord::Base
   end
 
   def public?
-    access_type > Policy::NO_ACCESS
+    access_type && access_type > Policy::NO_ACCESS && sharing_scope != Policy::ALL_USERS
   end
 
   # return the hash: key is access_type, value is the array of people
@@ -468,5 +476,15 @@ class Policy < ActiveRecord::Base
 
   def self.max_public_access_type
     Policy::ACCESSIBLE
+  end
+
+  # utility to get all items associated with this policy.
+  def associated_items
+    types = (Seek::Util.authorized_types + [OpenbisEndpoint])
+    items = types.collect do |type|
+      type.where(policy_id: id)
+    end
+    items |= Project.where(default_policy_id: id)
+    items.flatten.compact.uniq
   end
 end

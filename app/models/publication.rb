@@ -28,6 +28,9 @@ class Publication < ActiveRecord::Base
            as: :other_object,
            dependent: :destroy
 
+  has_many :presentations,through: :backwards_relationships, source: :subject, source_type:'Presentation'
+
+
   VALID_DOI_REGEX = /\A(10[.][0-9]{4,}(?:[.][0-9]+)*\/(?:(?!["&\'<>])\S)+)\z/
   VALID_PUBMED_REGEX = /\A(([1-9])([0-9]{0,7}))\z/
   # Note that the PubMed regex deliberately does not allow versions
@@ -81,12 +84,12 @@ class Publication < ActiveRecord::Base
   end
 
   def doi_uri
-    "https://dx.doi.org/#{doi}" if doi
+    "https://doi.org/#{doi}" if doi
   end
 
   # Automatically extract the actual DOI if the user put in the full URL
   def doi=(doi)
-    doi = doi.gsub(/(https?:\/\/)?dx\.doi\.org\//,'') if doi
+    doi = doi.gsub(/(https?:\/\/)?(dx\.)?doi\.org\//,'') if doi
     super(doi)
   end
 
@@ -186,9 +189,9 @@ class Publication < ActiveRecord::Base
     backwards_relationships.select { |a| a.subject_type == 'Investigation' }.collect(&:subject)
   end
 
-  def presentations
-    backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
-  end
+  # def presentations
+  #   backwards_relationships.select { |a| a.subject_type == 'Presentation' }.collect(&:subject)
+  # end
 
   def associate(item)
     clause = { subject_type: item.class.name,
@@ -251,11 +254,12 @@ class Publication < ActiveRecord::Base
     author_names
   end
 
-  # those displayed on the right. We don't want authors listed as creators here (OPSK-1247). Changing .creators breaks behaviour when editing
-  def displayed_creators
-    [contributor].compact.map do |creator|
-      creator.is_a?(User) ? creator.person : creator
-    end
+  def has_doi?
+    self.doi.present?
+  end
+
+  def latest_citable_resource
+    self
   end
 
   private
@@ -267,7 +271,7 @@ class Publication < ActiveRecord::Base
       # TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
       Bio::Reference.new({ title: title, journal: journal, abstract: abstract,
                            authors: publication_authors.map { |e| e.person ? [e.person.last_name, e.person.first_name].join(', ') : [e.last_name, e.first_name].join(', ') },
-                           year: published_date.year }.with_indifferent_access)
+                           year: published_date.try(:year) }.with_indifferent_access)
     end
   end
 

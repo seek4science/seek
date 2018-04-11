@@ -7,6 +7,7 @@ gem 'rdoc'
 gem 'mysql2'
 gem 'pg'
 gem 'sqlite3'
+
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
@@ -14,11 +15,10 @@ gem 'libxml-ruby', '~>2.8.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '4.2.9'
 gem 'simple-spreadsheet-extractor', '~>0.15.2'
-gem 'sample-template-generator'
+gem 'sample-template-generator', '~>0.4'
 gem 'rmagick', '2.15.2'
 gem 'rest-client'
 gem 'factory_girl', '2.6.4'
-gem 'rubyzip', '~> 1.1.4'
 gem 'bio', '~> 1.5.1'
 gem 'sunspot_rails', '~>2.2.0'
 gem 'sunspot_solr', '~>2.2.0'
@@ -38,6 +38,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
 gem 'json-schema'
+gem 'json-diff'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
@@ -53,7 +54,7 @@ gem 'will_paginate', '~> 3.0.4'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri'
+gem 'nokogiri', '~> 1.8.1'
 gem 'rdf-virtuoso', '>=0.1.6'
 gem 'cocaine'
 gem 'colorize', '0.7.4'
@@ -65,14 +66,10 @@ gem "attr_encrypted", "~> 3.0.0"
 # gem for BiVeS and BudHat
 gem 'bives'
 
-# 4.3 starts giving a deprecation warning about rails 3 unsupported
-gem 'paperclip', '~>4.2.0'
-
 # Linked to SysMO Git repositories
 gem 'gibberish', git: 'https://github.com/SysMO-DB/gibberish.git'
 gem 'white_list', git: 'https://github.com/SysMO-DB/white_list.git'
 gem 'white_list_formatted_content', git: 'https://github.com/SysMO-DB/white_list_formatted_content.git'
-gem 'my_savage_beast', git: 'https://github.com/SysMO-DB/my_savage_beast.git'
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
 gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'acts_as_activity_logged', git: 'https://github.com/SysMO-DB/acts_as_activity_logged.git'
@@ -84,8 +81,6 @@ gem 'search_biomodel', '2.2.1', git: 'https://github.com/myGrid/search_biomodel.
 gem 'my_annotations', git: 'https://github.com/myGrid/annotations.git', branch: 'rails4.2'
 
 
-gem 'taverna-t2flow'
-gem 'taverna-player', git: 'https://github.com/myGrid/taverna-player.git', branch: 'rails4-list-inputs'
 gem 'jquery-rails', '~> 3'
 gem 'jquery-ui-rails', '~>3'
 gem 'recaptcha', '~> 4.1.0'
@@ -125,8 +120,12 @@ gem 'coffee-rails', '~> 4.1.0'
 
 # Rails 4 upgrade
 gem 'activerecord-session_store'
-# gem 'protected_attributes' # Delete me after refactoring
 gem 'rails-observers'
+gem 'responders', '~> 2.0'
+
+gem 'rack-attack', '~> 5.0.1'
+
+gem 'private_address_check'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
@@ -162,11 +161,11 @@ end
 
 group :test do
   gem 'test_after_commit'
-  gem 'ruby-prof', '~> 0.15.9'
+  gem 'ruby-prof', '>= 0.16.0'
+  gem 'test-prof'
   gem 'rails-perftest'
   gem 'minitest'
   gem 'minitest-reporters'
-  gem 'coveralls', require: false
   gem 'sunspot_matchers'
   gem 'database_cleaner'
   gem 'vcr', '~> 2.9'

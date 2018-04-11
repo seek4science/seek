@@ -4,7 +4,7 @@
 
 ## License
 
-Copyright © 2009-2017, University of Manchester and HITS gGmbH
+Copyright © 2009-2018, University of Manchester and HITS gGmbH
 
 [BSD 3-clause](BSD-LICENSE)
 
@@ -56,14 +56,6 @@ In general :
 For more details on how and what you can contribute to SEEK please visit [Contributing](http://docs.seek4science.org/contributing.html)
 
 
-## Credit
 
-SEEK is developed using the [RubyMine IDE](http://www.jetbrains.com/ruby/), for which we are provided a free open source license by [JetBrains](https://www.jetbrains.com/).
-
-[![JetBrains](/app/assets/images/logos/icon_jetbrains.png)](https://www.jetbrains.com/)   [![RubyMine](/app/assets/images/logos/icon_rubymine.png)](http://www.jetbrains.com/ruby/)
-
-
-
-Please check our [CREDITS](http://docs.seek4science.org/credits.html) for additional credits and acknowledgements
 
 

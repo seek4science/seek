@@ -56,9 +56,7 @@ ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_d
 
 puts "Seeded measured items"
 
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "units")
 
-puts "Seeded units"
 
 ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "project_positions")
 

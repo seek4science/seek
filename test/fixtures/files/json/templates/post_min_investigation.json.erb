@@ -1,0 +1,21 @@
+{
+  "data": {
+    "type": "investigations",
+    "attributes": {
+      "title": "A Minimal Investigation"
+    },
+    "relationships": {
+      <% unless project_ids.nil? %>
+       "projects": {
+       "data": [
+         <% projects = Array.new %>
+         <% for project_id in project_ids do %>
+           <% projects.push r.call("_related.json.erb",{:type => "projects",:id => project_id}) %>
+        <% end %>
+         <%= projects.join(',') %>
+       ]
+      }
+      <% end %>
+    }
+  }
+}

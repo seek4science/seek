@@ -1,51 +1,82 @@
 class ContributedResourceSerializer < PCSSerializer
-  attributes :title, :description, :version, :license
-  attribute :latest_version do
-    if object.latest_version.nil?
-      latest = {}
-    else
-      latest = { title: object.latest_version.title,
-               description: object.latest_version.description,
-               version: object.latest_version.version,
-               revision_comments: object.latest_version.revision_comments,
-               # template_id: object.latest_version.template_id         #  ==>  only in DataFile
-               # template_name: object.latest_version.template_name,
-               # is_with_sample: object.latest_version.is_with_sample,
-               # doi: object.latest_version.doi,                        #  ==> does not exist in presentation
-               license: object.latest_version.license,
-               uuid: object.latest_version.uuid,
-               created_at: object.latest_version.created_at,
-               updated_at: object.latest_version.updated_at
-             }
-    end
+  attributes :title, :description, :license
 
-    latest
+  attribute :version, key: :latest_version
+
+  attribute :tags do
+    serialize_annotations(object)
+  end
+
+  attribute :versions do
+    versions_data = []
+    object.versions.each do |v|
+      path = polymorphic_path(object, version: v.version)
+      versions_data.append(version: v.version,
+                           revision_comments: v.revision_comments.presence,
+                           url: "#{base_url}#{path}")
+    end
+    versions_data
+  end
+
+  attribute :version do
+    version_number
+  end
+
+  attribute :revision_comments do
+    get_version.revision_comments.presence
+  end
+
+  attribute :created_at do
+    get_version.created_at
+  end
+  attribute :updated_at do
+    get_version.updated_at
   end
 
   attribute :content_blobs do
-    blobs = []
-    if defined?(object.content_blobs)
-      object.content_blobs.each do |cb|
-        blobs.append(make_cb_attribute(cb))
-      end
-    elsif defined?(object.content_blob)
-      blobs.append(make_cb_attribute(object.content_blob))
-     # blobs.append(object.content_blob)
+    requested_version = get_version
+
+    if requested_version.respond_to?(:content_blobs)
+      blobs = requested_version.content_blobs
+    elsif requested_version.respond_to?(:content_blob)
+      blobs = [requested_version.content_blob].compact
+    else
+      blobs = []
     end
-    blobs
+
+    blobs.map { |cb| convert_content_blob_to_json(cb) }
   end
 
-  #leaving out asset_id, asset_type, asset_version, sha1sum, md5sum
-  def make_cb_attribute(cb)
+  attribute :other_creators
+
+  def convert_content_blob_to_json(cb)
+    path = polymorphic_path([cb.asset, cb])
     {
-        content_blob_id: cb.id.to_s,
-        original_filename: cb.original_filename,
-        content_type: cb.content_type,
-        is_webpage: cb.is_webpage,
-        external_link: cb.external_link,
-        file_size: cb.file_size,
-        url: cb.url,
-        uuid: cb.uuid
+      original_filename: cb.original_filename,
+      url: cb.url,
+      md5sum: cb.md5sum,
+      sha1sum: cb.sha1sum,
+      content_type: cb.content_type,
+      link: "#{base_url}#{path}",
+      size: cb.file_size
     }
+  end
+
+  def self_link
+    if version_number
+      polymorphic_path(object, version: version_number)
+    else
+      polymorphic_path(object)
+    end
+  end
+
+  def get_version
+    object.find_version(version_number)
+  end
+
+  private
+
+  def version_number
+    @scope[:requested_version] || object.try(:version)
   end
 end

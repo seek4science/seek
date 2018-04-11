@@ -17,7 +17,7 @@ class ModelsController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::BreadCrumbs
   include Bives
-  include Seek::DataciteDoi
+  include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
 
@@ -85,7 +85,7 @@ class ModelsController < ApplicationController
 
   def new_version
     if handle_upload_data
-      comments = params[:revision_comment]
+      comments = params[:revision_comments]
 
       respond_to do |format|
         create_new_version comments
@@ -204,10 +204,10 @@ class ModelsController < ApplicationController
 
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
+        format.json {render json: @model}
       else
-        format.html {
-          render :action => "edit"
-        }
+        format.html { render action: 'edit' }
+        format.json { render json: json_api_errors(@model), status: :unprocessable_entity }
       end
     end
   end

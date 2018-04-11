@@ -26,7 +26,7 @@
    content_grid_size += 1 if avatar_partial.blank?
    content_grid_size += 2 if actions_partial.blank?
 
-   title_options = [Sweep, TavernaPlayer::Run].include?(resource.class) ? {:options => {:include_avatar => false}} : {}
+   title_options = {}
 %>
 
 <div class="panel panel-default <%= access_based_css_class%>">

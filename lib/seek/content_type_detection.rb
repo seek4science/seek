@@ -61,10 +61,6 @@ module Seek
       check_content(blob, '<graph') && check_content(blob, '<node')
     end
 
-    def is_pdf?(blob = self)
-      mime_extensions(blob.content_type).include?('pdf')
-    end
-
     def is_image?(blob = self)
       blob.content_type.try(:split, '/').try(:first) == 'image'
     end
@@ -90,11 +86,8 @@ module Seek
     end
 
     def is_viewable_format?(blob = self)
-      if Seek::Config.pdf_conversion_enabled
-        is_text?(blob) || is_image_viewable?(blob) || is_pdf_viewable?(blob)
-      else
-        is_text?(blob) || is_image_viewable?(blob) || is_pdf?(blob)
-      end
+      is_text?(blob) || is_image_viewable?(blob) || is_pdf?(blob) ||
+          (Seek::Config.pdf_conversion_enabled && is_pdf_viewable?(blob) && Seek::Config.soffice_available?)
     end
 
     def is_content_viewable?(blob = self)

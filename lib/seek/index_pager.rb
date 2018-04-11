@@ -11,19 +11,22 @@ module Seek
           params[:page] = 'all'
         else
           params[:page] ||= Seek::Config.default_page(controller)
+          objects = model_class.paginate_after_fetch(objects, page: params[:page],
+                                                     latest_limit: Seek::Config.limit_latest
+          ) unless objects.respond_to?('page_totals')
         end
-        objects = model_class.paginate_after_fetch(objects, page: params[:page],
-                                                            latest_limit: Seek::Config.limit_latest
-                                                  ) unless objects.respond_to?('page_totals')
         instance_variable_set("@#{controller}", objects)
       end
       respond_to do |format|
         format.html
         format.xml
-        format.json {render json: objects,
-                            each_serializer: ActiveModel::Serializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host
-                            }}
+        format.json  do sorted_objects = objects.sort { |x, y| x.id <=> y.id }
+          render json: sorted_objects,
+                            each_serializer: SkeletonSerializer,
+                            meta: {:base_url =>   Seek::Config.site_base_host,
+                                   :api_version => ActiveModel::Serializer.config.api_version
+                            }
+          end
       end
     end
 

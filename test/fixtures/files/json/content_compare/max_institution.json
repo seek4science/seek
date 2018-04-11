@@ -1,0 +1,48 @@
+{
+  "data": {
+    "id": "545947389",
+    "type": "institutions",
+    "attributes": {
+      "avatar": "/institutions/980191581/avatars/38",
+      "title": "A Maximal Institution",
+      "country": "United Kingdom",
+      "country_code": "gb",
+      "city": "Manchester",
+      "address": "Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom",
+      "web_page": "http://www.mib.ac.uk/"
+    },
+    "relationships": {
+      "people": {
+        "data": [
+          {"id": "1039987197", "type": "people"},
+          {"id": "1039987197", "type": "people"},
+          {"id": "1039987197", "type": "people"},
+          {"id": "1039987197", "type": "people"},
+          {"id": "1039987197", "type": "people"}
+        ]
+      },
+      "projects": {
+        "data": [
+          {"id": "1022251405", "type": "projects"},
+          {"id": "1022251406", "type": "projects"},
+          {"id": "1022251407", "type": "projects"},
+          {"id": "1022251408", "type": "projects"},
+          {"id": "1022251409", "type": "projects"}
+        ]
+      }
+    },
+    "links": {
+      "self": "/institutions/545947389"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

@@ -3,8 +3,8 @@ module Seek
     class JERMVocab < RDF::Vocabulary('http://jermontology.org/ontology/JERMOntology#')
       # these are explicitly defined, to prevent the undercores being changed to camelCase
       property :NCBI_ID
-      property :Experimental_assay_type
-      property :Model_analysis_type
+      property :Experimental_assay
+      property :Modelling_analysis
       property :seekID
       property :Factors_studied
       property :Gas_flow
@@ -13,6 +13,7 @@ module Seek
       property :Growth_medium_composition
       property :Optical_density_600
       property :Simulation_data
+      property :Data_sample
 
       # returns the correct Class IRI according to the instance 'type' - or nil if its not recognised
       def self.for_type(type)
@@ -34,7 +35,8 @@ module Seek
           Publication => :Publication,
           Strain => :Strain,
           Compound => :Compound,
-          StudiedFactor => :Factors_studied }
+          StudiedFactor => :Factors_studied,
+          Sample => :Data_sample}
       end
 
       # this is the class fragment according to the measured item title

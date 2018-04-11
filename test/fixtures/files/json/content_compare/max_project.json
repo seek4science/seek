@@ -1,0 +1,126 @@
+{
+  "data": {
+    "id": "927855014",
+    "type": "projects",
+    "attributes": {
+      "avatar": "/projects/1039986998/avatars/13",
+      "title": "A Maximal Project",
+      "description": "A Taverna project",
+      "web_page": "http://www.taverna.org.uk",
+      "wiki_page": "http://www.mygrid.org.uk",
+      "default_license": "Other (Open)"
+    },
+    "relationships": {
+      "organisms": {
+        "data": []
+      },
+      "people": {
+        "data": [
+          {"id": "1039987197", "type": "people"},
+          {"id": "1039987197", "type": "people"},
+          {"id": "1039987197", "type": "people"},
+          {"id": "1039987197", "type": "people"},
+          {"id": "1039987197", "type": "people"}
+        ]
+      },
+      "institutions": {
+        "data": [
+          {"id": "1022251405", "type": "institutions"},
+          {"id": "1022251406", "type": "institutions"},
+          {"id": "1022251407", "type": "institutions"},
+          {"id": "1022251408", "type": "institutions"},
+          {"id": "1022251409", "type": "institutions"}
+        ]
+      },
+      "programmes": {
+        "data": [
+          {
+            "id": "78",
+            "type": "programmes"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [{
+          "id": "980191497",
+          "type": "investigations"
+        }]
+      },
+      "studies": {
+        "data": [{
+          "id": "980191497",
+          "type": "studies"
+        }]
+      },
+      "assays": {
+        "data": [{
+          "id": "980191497",
+          "type": "assays"
+        }]
+      },
+      "data_files": {
+        "data": [{
+          "id": "980191497",
+          "type": "data_files"
+        }]
+      },
+      "models": {
+        "data": [{
+          "id": "980191497",
+          "type": "models"
+        }]
+      },
+      "sops": {
+        "data": [{
+          "id": "980191497",
+          "type": "sops"
+        }]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "events"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/projects/927855014"
+    },
+    "meta": {
+      "created": "2017-10-06T09:53:31.000Z",
+      "modified": "2017-10-06T09:53:31.000Z",
+      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.1"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

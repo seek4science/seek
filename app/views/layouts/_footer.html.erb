@@ -1,6 +1,6 @@
-<% logged_in?? cache_name = "footer" : cache_name = "footer1" %>
+<% logged_in?? cache_name = 'footer' : cache_name = 'footer1' %>
 
-<% cache cache_name do -%>
+<% cache cache_name, skip_digest: true do -%>
     <div id="ft">
       <div class="container">
         <div id="seek-credit">
@@ -25,7 +25,7 @@
           <% end %>
         </div>
         <div class="ft-info">
-          Copyright &copy; 2008 - 2017
+          Copyright &copy; 2008 - 2018
           <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %> and
           <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
           <% if Seek::Config.copyright_addendum_enabled  %>

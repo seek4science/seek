@@ -38,16 +38,17 @@ class PeopleController < ApplicationController
   # GET /people.xml
   def index
     if params[:discipline_id]
-      @discipline = Discipline.find(params[:discipline_id])
-      # FIXME: strips out the disciplines that don't match
-      @people = Person.where(['disciplines.id=?', @discipline.id]).includes(:disciplines)
-      # need to reload the people to get their full discipline list - otherwise only get those matched above. Must be a better solution to this
-      @people.each(&:reload)
+      @discipline = Discipline.find_by_id(params[:discipline_id])
+      @people = @discipline.try(:people) || []
     elsif params[:project_position_id]
       @project_position = ProjectPosition.find(params[:project_position_id])
       @people = Person.includes(:group_memberships)
       # FIXME: this needs double checking, (a) not sure its right, (b) can be paged when using find.
       @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
+    end
+
+    if (request.format == 'json' && params[:page].nil?)
+      params[:page] = 'all'
     end
 
     if @people
@@ -73,8 +74,9 @@ class PeopleController < ApplicationController
       format.html # index.html.erb
       format.xml
       format.json  { render json: @people,
-                            each_serializer: ActiveModel::Serializer,
-                            meta: {:base_url =>   Seek::Config.site_base_host
+                            each_serializer: SkeletonSerializer,
+                            meta: {:base_url =>   Seek::Config.site_base_host,
+                                   :api_version => ActiveModel::Serializer.config.api_version
                             } }
     end
   end
@@ -181,7 +183,7 @@ class PeopleController < ApplicationController
           format.xml { render xml: @person, status: :created, location: @person }
           format.json {render json: @person, status: :created, location: @person }
         else
-          Mailer.signup(current_user).deliver_now
+          Mailer.signup(current_user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
@@ -190,18 +192,18 @@ class PeopleController < ApplicationController
       else
         format.html { render redirect_action }
         format.xml { render xml: @person.errors, status: :unprocessable_entity }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
   end
 
   def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(params, current_user).deliver_now
+    Mailer.contact_admin_new_user(params, current_user).deliver_later
 
     # send mail to project managers
     project_administrators = project_administrators_of_selected_projects params[:projects]
     project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_now
+      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_later
     end
   end
 
@@ -228,7 +230,7 @@ class PeopleController < ApplicationController
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @person.errors, status: :unprocessable_entity }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
   end
@@ -239,13 +241,15 @@ class PeopleController < ApplicationController
     had_no_projects = @person.work_groups.empty?
 
     respond_to do |format|
+      previous_projects = @person.projects
       if @person.update_attributes(administer_person_params)
+        new_projects = @person.projects - previous_projects
         set_project_related_roles(@person)
 
         @person.save # this seems to be required to get the tags to be set correctly - update_attributes alone doesn't [SYSMO-158]
         @person.touch
-        if Seek::Config.email_enabled && @person.user && had_no_projects && !@person.work_groups.empty? && @person != current_person
-          Mailer.notify_user_projects_assigned(@person).deliver_now
+        if Seek::Config.email_enabled && @person.user && new_projects.any? && @person != current_person
+          Mailer.notify_user_projects_assigned(@person,new_projects).deliver_later
         end
 
         flash[:notice] = 'Person was successfully updated.'
@@ -258,16 +262,32 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_group_membership_project_position_ids(person, params)
-    prefix = 'group_membership_role_ids_'
+  def set_group_membership_from_api_params(person,params)
     person.group_memberships.each do |gr|
-      key = prefix + gr.id.to_s
-      gr.project_positions.clear
-      next unless params[key.to_sym]
-      params[key.to_sym].each do |r|
-        r = ProjectPosition.find(r)
-        gr.project_positions << r
+      #gr.project_positions.clear ???
+      params[:person][:project_positions].each do |pos|
+        if (gr.project.id.to_s == pos[:project_id].to_s)
+          r = ProjectPosition.find(pos[:position_id])
+          gr.project_positions << r
+        end
       end
+    end
+  end
+
+  def set_group_membership_project_position_ids(person, params)
+    if params[:person][:project_positions].nil?
+      prefix = 'group_membership_role_ids_'
+      person.group_memberships.each do |gr|
+        key = prefix + gr.id.to_s
+        gr.project_positions.clear
+        next unless params[key.to_sym]
+        params[key.to_sym].each do |r|
+          r = ProjectPosition.find(r)
+          gr.project_positions << r
+        end
+      end
+    else
+      set_group_membership_from_api_params(person, params)
     end
   end
 
@@ -332,7 +352,7 @@ class PeopleController < ApplicationController
 
   def person_params
     params.require(:person).permit(:first_name, :last_name, :orcid, :description, :email, :web_page, :phone,
-                                   :skype_name, { discipline_ids: [] },
+                                   :skype_name, { discipline_ids: [] }, { expertise: [] }, { tools: [] },
                                    project_subscriptions_attributes: %i[id project_id _destroy frequency])
   end
 
@@ -350,8 +370,8 @@ class PeopleController < ApplicationController
   end
 
   def set_tools_and_expertise(person, params)
-    exp_changed = person.tag_annotations(params[:expertise_list], 'expertise')
-    tools_changed = person.tag_annotations(params[:tool_list], 'tool')
+    exp_changed = person.tag_annotations(params[:expertise_list], 'expertise') if params[:expertise_list]
+    tools_changed = person.tag_annotations(params[:tool_list], 'tool') if params[:tool_list]
     if immediately_clear_tag_cloud?
       expire_annotation_fragments('expertise') if exp_changed
       expire_annotation_fragments('tool') if tools_changed

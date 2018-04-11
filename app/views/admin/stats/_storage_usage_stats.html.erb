@@ -1,7 +1,7 @@
 
 <%
   programmes = Programme.all.sort_by(&:total_asset_size).reverse
-  projects_with_programme = Project.where('programme_id IS NULL').sort_by(&:total_asset_size).reverse
+  projects_without_programme = Project.where('programme_id IS NULL').sort_by(&:total_asset_size).reverse
 %>
 
 
@@ -40,7 +40,7 @@
 
 <% end %>
 
-<% unless projects_with_programme.empty? %>
+<% unless projects_without_programme.empty? %>
     <h4>Stand alone <%= t('project').pluralize %></h4>
     <table id="storage-stats">
       <thead>
@@ -48,7 +48,7 @@
       <th class='storage-size'>Usage</th>
       </thead>
       <tbody>
-      <% projects_with_programme.each do |project| %>
+      <% projects_without_programme.each do |project| %>
           <tr>
             <td>
               <%= link_to(h(project.title), project) %>

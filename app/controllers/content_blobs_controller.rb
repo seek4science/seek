@@ -1,10 +1,27 @@
 class ContentBlobsController < ApplicationController
-  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download]
-  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download]
+  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show update]
+  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
   before_filter :set_asset_version, only: %i[get_pdf download]
+
+  skip_before_filter :check_json_id_type, only: [:update]
 
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
+
+  def update
+    if @content_blob.no_content?
+      @content_blob.tmp_io_object = request.body
+      @content_blob.save
+      @asset.touch
+      respond_to do |format|
+        format.all { render text: @content_blob.file_size, status: :ok }
+      end
+    else
+      respond_to do |format|
+        format.json { render json: {}, status: :bad_request }
+      end
+    end
+  end
 
   def view_content
     if @content_blob.is_text?
@@ -23,6 +40,15 @@ class ContentBlobsController < ApplicationController
     @pdf_url = pdf_url
     respond_to do |format|
       format.html { render layout: false }
+    end
+  end
+
+  def show
+    respond_to do |format|
+      format.json { render json: @content_blob }
+      format.html { render text: 'Format not supported', status: :not_acceptable }
+      format.xml { render text: 'Format not supported', status: :not_acceptable }
+      format.rdf { render text: 'Format not supported', status: :not_acceptable }
     end
   end
 
@@ -107,26 +133,25 @@ class ContentBlobsController < ApplicationController
       pdf_filename = @content_blob.original_filename
     else
       pdf_filepath = @content_blob.filepath('pdf')
-      @content_blob.convert_to_pdf(filepath, pdf_filepath)
-
-      if File.exist?(pdf_filepath)
-        pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename)) + '.pdf'
-      else
-        raise Exception, "Couldn't find converted PDF file."
+      unless File.exist?(pdf_filepath)
+        if Seek::Config.soffice_available?
+          @content_blob.convert_to_pdf(filepath, pdf_filepath)
+          raise "Couldn't find converted PDF file." unless File.exist?(pdf_filepath) # If conversion didn't work somehow?
+        else
+          raise 'Cannot convert PDF - soffice not running'
+        end
       end
+
+      pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename)) + '.pdf'
     end
 
-    send_file pdf_filepath,
-              filename: pdf_filename,
-              type: 'application/pdf',
-              disposition: 'attachment'
+    send_file pdf_filepath, filename: pdf_filename, type: 'application/pdf', disposition: 'attachment'
 
     headers['Content-Length'] = File.size(pdf_filepath).to_s
   end
 
   def get_file_from_jerm
     project = @asset_version.projects.first
-    project.decrypt_credentials
     downloader = Jerm::DownloaderFactory.create project.title
     resource_type = @asset_version.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
     begin
@@ -140,43 +165,62 @@ class ContentBlobsController < ApplicationController
   def find_and_authorize_associated_asset
     asset = asset_object
     if asset
-      if asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))
+      if asset.can_edit? || (action_name != 'update' && (asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))))
         @asset = asset
       else
         respond_to do |format|
           flash[:error] = 'You are not authorized to perform this action'
           format.html { redirect_to asset }
+          format.json do
+            render json: { "title": 'Forbidden',
+                           "detail": "You are not authorized to download the asset linked to content_blob:#{params[:id]}" },
+                   status: :forbidden
+          end
         end
         return false
+      end
+    else
+      flash[:error] = 'The asset could not be found'
+      respond_to do |format|
+        format.json do
+          render json: { "title": 'Not found',
+                         "detail": 'The asset could not be found' }, status: :not_found
+        end
+        format.html { redirect_to root_url }
       end
     end
   end
 
   def asset_object
-    if params[:data_file_id]
-      DataFile.find(params[:data_file_id])
-    elsif params[:model_id]
-      Model.find(params[:model_id])
-    elsif params[:sop_id]
-      Sop.find(params[:sop_id])
-    elsif params[:presentation_id]
-      Presentation.find(params[:presentation_id])
-    elsif params[:sample_type_id]
-      SampleType.find(params[:sample_type_id])
-    else
-      ContentBlob.find(params[:id]).asset
+    params.each do |param, value|
+      if param.end_with?('_id')
+        begin
+          c = param.chomp('_id').classify.constantize
+        rescue NameError
+        else
+          if c.method_defined?(:content_blob) || c.method_defined?(:content_blobs)
+            return c.find_by_id(value)
+          end
+        end
+      end
     end
-  rescue ActiveRecord::RecordNotFound
-    error('Unable to find the asset', 'is invalid')
-    return false
+
+    nil # If nothing found
   end
 
   def find_and_authorize_content_blob
     content_blob = content_blob_object
-    if content_blob.asset.id == @asset.id
+    if content_blob && content_blob.asset == @asset
       @content_blob = content_blob
     else
-      error('You are not authorized to see this content blob', 'is invalid')
+      flash[:error] = 'The blob was not found, or is not associated with this asset'
+      respond_to do |format|
+        format.json do
+          render json: { "title": 'Not found',
+                         "detail": 'The content blob was not found, or not related to the asset' }, status: :not_found
+        end
+        format.html { redirect_to root_url }
+      end
       return false
     end
   end
@@ -184,8 +228,7 @@ class ContentBlobsController < ApplicationController
   def content_blob_object
     ContentBlob.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    error('Unable to find content blob', 'is invalid')
-    return false
+    nil
   end
 
   def set_asset_version

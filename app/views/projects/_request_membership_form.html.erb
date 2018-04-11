@@ -1,0 +1,36 @@
+<%= modal(id: 'request-membership-dialog', size: 'm') do %>
+    <%= modal_header("Request #{t('project')} membership") %>
+    <%= modal_body do %>
+        <div class="form-group">
+          <%= form_tag(polymorphic_url(project, :action => :request_membership),method: :post,id: 'request-membership-form') do -%>
+
+              <p>
+                An email will be sent to <%= join_with_and(project.project_administrators.collect{|m| h(m.name)}) -%> to let them know of your interest.<br/>
+                Please provide some extra information you feel may be useful to your request.
+              </p>
+              <p>
+                <%=  text_area_tag :details,'',:rows=>10,class: 'form-control' %>
+              </p>
+              <p>
+                <em>A request can only be made once every <%= (MessageLog::RECENT_PERIOD / 3600).to_i %> hours</em>
+              </p>
+          <% end -%>
+        </div>
+    <% end %>
+    <%= modal_footer do %>
+        <button id='submit_request_membership' type="button" class="btn btn-primary">Send</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <% end %>
+<% end %>
+
+<script type="application/javascript">
+    $j(document).ready(function () {
+
+        $j('#submit_request_membership').click(function () {
+           $j('form#request-membership-form').submit();
+        });
+    });
+
+</script>
+
+

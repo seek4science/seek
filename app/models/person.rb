@@ -54,6 +54,7 @@ class Person < ActiveRecord::Base
 
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
   has_many :created_data_files, through: :assets_creators, source: :asset, source_type: 'DataFile'
+  has_many :created_documents, through: :assets_creators, source: :asset, source_type: 'Document'
   has_many :created_models, through: :assets_creators, source: :asset, source_type: 'Model'
   has_many :created_sops, through: :assets_creators, source: :asset, source_type: 'Sop'
   has_many :created_publications, through: :assets_creators, source: :asset, source_type: 'Publication'
@@ -96,11 +97,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def guest_project_member?
-    project = Project.find_by_title('BioVeL Portal Guests')
-    !project.nil? && projects == [project]
-  end
-
   def projects_with_default_license
     projects.select(&:default_license)
   end
@@ -125,6 +121,10 @@ class Person < ActiveRecord::Base
 
   def email_uri
     URI.escape('mailto:' + email)
+  end
+
+  def mbox_sha1sum
+    Digest::SHA1.hexdigest(email_uri)
   end
 
   def studies
@@ -175,7 +175,7 @@ class Person < ActiveRecord::Base
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
-  RELATED_RESOURCE_TYPES = %i[data_files models sops presentations events publications investigations
+  RELATED_RESOURCE_TYPES = %i[data_files documents models sops presentations events publications investigations
                               studies assays].freeze
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
@@ -230,18 +230,6 @@ class Person < ActiveRecord::Base
         end
       end
     end
-  end
-
-  def workflows
-    try(:user).try(:workflows) || []
-  end
-
-  def runs
-    try(:user).try(:taverna_player_runs) || []
-  end
-
-  def sweeps
-    try(:user).try(:sweeps) || []
   end
 
   def projects # ALL projects, former and current
@@ -322,7 +310,7 @@ class Person < ActiveRecord::Base
   # all items, assets, ISA, samples and events that are linked to this person as a contributor
   def contributed_items
     assays = Assay.where(contributor_id: id) # assays contributor is not polymorphic
-    [Study, Investigation, DataFile, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
+    [Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
       assets = type.where("contributor_type = 'Person' AND contributor_id=?",id)
       assets |= type.where("contributor_type = 'User' AND contributor_id=?",user.id) unless user.nil?
       assets
@@ -362,7 +350,7 @@ class Person < ActiveRecord::Base
     user.try(:is_admin?)
   end
 
-  def can_destroy?(user = User.current_user)
+  def can_delete?(user = User.current_user)
     can_manage? user
   end
 
@@ -467,22 +455,6 @@ class Person < ActiveRecord::Base
 
     group_memberships << membership
   end
-
-  #   def json_api_attrs (options = {})
-  #     attrs = []
-  #     attrs += %w(title id first_name last_name description phone email skype_name web_page) # if %i(user admin).include?options[:access_level]
-  # #    attrs += %w(real_price in_stock) if options[:access_level] == :admin
-  #     attrs
-  #   end
-  #
-  #   def json_api_relations (options = {})
-  #      ## TO DO: Why don't data files and other asset types work here? a person can have data files...
-  #       %w(avatar assays institutions investigations presentations projects studies ) #get_related_resources(self))
-  #   end
-  #
-  #   def json_api_meta (options = {})
-  #     { uuid: self.uuid, created: self.created_at, modified: self.updated_at }
-  #   end
 
   private
 

@@ -1,5 +1,5 @@
 class AssaySerializer < PCSSerializer
-  attributes :title, :description
+  attributes :title, :description, :other_creators
   attribute :assay_class do
     { title: object.assay_class.title,
       key: object.assay_class.key,
@@ -16,19 +16,20 @@ class AssaySerializer < PCSSerializer
       uri: object.technology_type_uri }
   end
 
-  has_many :organisms, include_data:true
-  has_many :assay_organisms, include_data:true
+  attribute :tags do
+    serialize_annotations(object)
+  end
+
+  has_many :organisms
+  # has_many :assay_organisms
 
   has_many :people
   has_many :projects
-  has_many :institutions
-  has_many :investigations
-  has_many :studies
+  has_one :investigation
+  has_one :study
   has_many :data_files
   has_many :models
   has_many :sops
   has_many :publications
-  has_many :strains
-  has_many :samples
-
+  has_many :documents
 end

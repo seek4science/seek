@@ -13,7 +13,7 @@ module Seek
       end
 
       def generate
-        Seek::SampleTemplates.generate(sheet_name, sheet_index, define_columns, tmp_file)
+        Seek::SampleTemplates.generate(sheet_name, sheet_index, define_columns, base_template_path, tmp_file)
         create_content_blob(template_blob_attributes)
         sample_attributes.each_with_index do |attribute, index|
           attribute.update_attributes(template_column_index: index + 1)
@@ -21,6 +21,11 @@ module Seek
       end
 
       private
+
+      # this is the path the base template, that contains the rightfield metadata sheet
+      def base_template_path
+        File.join(Rails.root, 'config', 'default_data', 'base-samples-template.xlsx')
+      end
 
       def define_columns
         sample_attributes.collect(&:template_column_definition)

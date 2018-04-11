@@ -40,9 +40,11 @@
    else
      add_new_assay_title = ""
    end
+
+  collapsed = associated_assays.blank? && params[:assay_ids].blank? if collapsed.nil?
 %>
 
-<%= folding_panel(assay_class_text, associated_assays.blank?, :body_options => {:id => 'associate_assay_fold_content'},
+<%= folding_panel(assay_class_text, collapsed, :body_options => {:id => 'associate_assay_fold_content'},
                   :help_text => "Here you can associate #{assay_class_text} in SEEK to this #{resource_text}. You can only associate #{assay_class_text} you are authorized to edit.") do %>
     <div class="row">
       <div class="col-md-8">

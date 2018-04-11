@@ -16,7 +16,7 @@
         <% unless @publication.doi.nil? %>
           <p>
             <strong>DOI:</strong>
-            <%= link_to @publication.doi, @publication.doi_uri, { :target => "_blank" } %>
+            <%= doi_link(@publication.doi, { :target => "_blank" }) %>
           </p>
         <% end %>
 
@@ -60,7 +60,7 @@
     <%= render :partial => "general/isa_graph", :locals => { :root_item => @publication, :deep => true, :include_parents => true } %>
   </div>
   <div class="col-md-3 col-sm-4">
-    <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @publication, :authors_title=>"Creator",creators:@publication.displayed_creators } -%>
+    <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @publication, :authors_title=>"Creator", creators: []} -%>
   </div>
 </div>
 

@@ -19,6 +19,14 @@ module Seek
         suggested_technology_type.try(:label) || technology_type_reader.class_hierarchy.hash_by_uri[technology_type_uri].try(:label)
       end
 
+      def assay_type_uri
+        suggested_assay_type.try(:ontology_uri) || super
+      end
+
+      def technology_type_uri
+        suggested_technology_type.try(:ontology_uri) || super
+      end
+
       def assay_type_reader
         if is_modelling?
           Seek::Ontologies::ModellingAnalysisTypeReader.instance
@@ -45,9 +53,12 @@ module Seek
           id = uri.split(':')[1]
           suggested = suggested_key.classify.constantize.find(id)
           send("#{suggested_key}=", suggested)
-          send("#{type}_uri=", suggested.ontology_uri)
           true
         else
+          # clear any previous suggested type, but only if it hasn't already been been changed (due to the recursive nature of <type>_uri= being recalled)
+          unless changes.keys.include?("#{suggested_key}_id")
+            send("#{suggested_key}=", nil)
+          end
           false
         end
       end

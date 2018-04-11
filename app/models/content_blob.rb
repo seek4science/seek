@@ -9,8 +9,8 @@ class ContentBlob < ActiveRecord::Base
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
   include Seek::UrlValidation
-  include Seek::Data::Checksums
   prepend Seek::Openbis::Blob
+  prepend Nels::Blob
 
   belongs_to :asset, polymorphic: true
 
@@ -36,12 +36,18 @@ class ContentBlob < ActiveRecord::Base
   before_save :check_version
   before_save :calculate_file_size
   after_create :create_retrieval_job
+  before_save :clear_sample_type_matches
+  after_destroy :delete_converted_files
 
   has_many :worksheets, inverse_of: :content_blob, dependent: :destroy
 
   validate :original_filename_or_url
 
   delegate :read, :close, :rewind, :path, to: :file
+
+  include Seek::Data::Checksums
+
+  CHUNK_SIZE = 2 ** 12
 
   acts_as_fleximage do
     image_directory Seek::Config.temporary_filestore_path + '/image_assets'
@@ -102,15 +108,16 @@ class ContentBlob < ActiveRecord::Base
   def show_as_external_link?
     return false if custom_integration? || url.blank?
     return true if unhandled_url_scheme?
-    no_local_copy =  !file_exists?
-    html_content =  is_webpage? || content_type == 'text/html'
+    no_local_copy = !file_exists?
+    html_content = is_webpage? || content_type == 'text/html'
     show_as_link = Seek::Config.show_as_external_link_enabled ? no_local_copy : html_content
     show_as_link
   end
   # include all image types
 
   def cache_key
-    "#{super}-#{sha1sum}"
+    base = new_record? ? "#{model_name.cache_key}/new" : "#{model_name.cache_key}/#{id}"
+    "#{base}-#{sha1sum}"
   end
 
   # returns an IO Object to the data content, or nil if the data file doesn't exist.
@@ -148,12 +155,12 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def dump_data_to_file
-    fail Exception.new('You cannot define both :data content and a :tmp_io_object') unless @data.nil? || @tmp_io_object.nil?
+    raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
     check_uuid
-    unless @tmp_io_object.nil?
-      dump_tmp_io_object_to_file
-    else
+    if @tmp_io_object.nil?
       dump_data_object_to_file
+    else
+      dump_tmp_io_object_to_file
     end
   end
 
@@ -197,7 +204,7 @@ class ContentBlob < ActiveRecord::Base
 
   def url_search_terms
     if url
-      url_ignore_terms = %w(http https www com co org uk de)
+      url_ignore_terms = %w[http https www com co org uk de]
       url_search_terms = [url, url.split(/\W+/)].flatten - url_ignore_terms
     else
       url_search_terms = []
@@ -205,9 +212,9 @@ class ContentBlob < ActiveRecord::Base
     url_search_terms
   end
 
-  #whether this content blob represents a custom integration, such as integrated with openBIS
+  # whether this content blob represents a custom integration, such as integrated with openBIS
   def custom_integration?
-    openbis?
+    openbis? || nels?
   end
 
   def is_downloadable?
@@ -218,18 +225,14 @@ class ContentBlob < ActiveRecord::Base
     !remote_content_handler
   end
 
+  def no_content?
+    (!file_size || file_size == 0) && url.blank?
+  end
+
   private
 
   def remote_headers
-    if @headers
-      @headers
-    else
-      begin
-        remote_content_handler.info
-      rescue
-        {}
-      end
-    end
+    @headers ||= (remote_content_handler.info rescue {})
   end
 
   def dump_data_object_to_file
@@ -243,29 +246,29 @@ class ContentBlob < ActiveRecord::Base
   end
 
   def dump_tmp_io_object_to_file
-    fail Exception.new('You cannot define both :data content and a :tmp_io_object') unless @data.nil? || @tmp_io_object.nil?
+    raise Exception, 'You cannot define both :data content and a :tmp_io_object' unless @data.nil? || @tmp_io_object.nil?
     return unless @tmp_io_object
 
-    if @tmp_io_object.is_a?(StringIO)
-      @tmp_io_object.rewind
-      File.open(filepath, 'wb+') do |f|
-        f.write @tmp_io_object.read
-      end
-    else
+    if @tmp_io_object.respond_to?(:path)
       @tmp_io_object.flush if @tmp_io_object.respond_to? :flush
       FileUtils.mv @tmp_io_object.path, filepath
+    else
+      @tmp_io_object.rewind
+      File.open(filepath, 'wb+') do |f|
+        until (chunk = @tmp_io_object.read(CHUNK_SIZE)).nil?
+          f.write(chunk)
+        end
+      end
     end
     @tmp_io_object = nil
   end
 
   def calculate_file_size
-    if file_exists?
-      self.file_size = File.size(filepath)
-    elsif url
-      self.file_size = remote_headers[:file_size]
-    else
-      self.file_size = nil
-    end
+    self.file_size = if file_exists?
+                       File.size(filepath)
+                     elsif url
+                       remote_headers[:file_size]
+                     end
   end
 
   def create_retrieval_job
@@ -277,12 +280,22 @@ class ContentBlob < ActiveRecord::Base
   def remote_content_handler
     return nil unless valid_url?(url)
     case URI(url).scheme
-      when 'ftp'
-        Seek::DownloadHandling::FTPHandler.new(url)
-      when 'http', 'https'
-        Seek::DownloadHandling::HTTPHandler.new(url)
-      else
-        nil
+    when 'ftp'
+      Seek::DownloadHandling::FTPHandler.new(url)
+    when 'http', 'https'
+      Seek::DownloadHandling::HTTPHandler.new(url)
+      end
+  end
+
+  def clear_sample_type_matches
+    Rails.cache.delete_matched("st-match-#{id}*") if changed?
+  end
+
+  # cleans up any files converted to txt or pdf, if they exist
+  def delete_converted_files
+    %w[pdf txt].each do |format|
+      path = filepath(format)
+      FileUtils.rm(path) if File.exist?(path)
     end
   end
 end

@@ -39,7 +39,6 @@ module Seek
       assay_ids ||= []
       relationship_type_titles ||= Array.new(assay_ids.size)
       create_assay_assets(asset, assay_ids, relationship_type_titles)
-
       destroy_redundant_assay_assets(asset, assay_ids)
     end
 
@@ -64,7 +63,7 @@ module Seek
       resource = class_for_controller_name.find(params[:id])
       details = params[:details]
       mail = Mailer.request_resource(current_user, resource, details)
-      mail.deliver_now
+      mail.deliver_later
 
       render :update do |page|
         html = "An email has been sent on your behalf to <b>#{resource.managers_names}</b> requesting the file <b>#{h(resource.title)}</b>."

@@ -43,7 +43,7 @@
         </p>
         <p id="study">
           <b><%= t('study') %>: </b>
-          <%= studies_link_list [@assay.study] %>
+          <%= study_link(@assay.study) %>
         </p>
         <p id="assay_type">
           <b><%= assay_type_text -%>:</b>

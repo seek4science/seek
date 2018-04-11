@@ -172,8 +172,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'build from template' do
-    default_type = SampleAttributeType.default
-    default_type ||= Factory(:string_sample_attribute_type, title: 'String')
+    default_type = create_sample_attribute_type
 
     sample_type = SampleType.new title: 'from template', project_ids: @project_ids
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
@@ -201,8 +200,7 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   # a less clean template, to check it takes the last sample sheet, and handles irregular columns
   test 'build from template2' do
-    default_type = SampleAttributeType.default
-    default_type ||= Factory(:string_sample_attribute_type, title: 'String')
+    default_type = create_sample_attribute_type
 
     sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob2)
@@ -269,7 +267,7 @@ class SampleTypeTest < ActiveSupport::TestCase
     non_template1 = Factory(:rightfield_content_blob)
     non_template2 = Factory(:binary_content_blob)
 
-    Factory(:string_sample_attribute_type, title: 'String')
+    create_sample_attribute_type
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
@@ -281,13 +279,12 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'sample_types_matching_content_blob' do
-    Factory(:string_sample_attribute_type, title: 'String')
+    create_sample_attribute_type
     sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     disable_authorization_checks { sample_type.save! }
 
-    Factory(:string_sample_attribute_type, title: 'String')
     sample_type2 = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
     sample_type2.content_blob = Factory(:sample_type_template_content_blob2)
     sample_type2.build_attributes_from_template
@@ -301,7 +298,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'build samples from template' do
-    Factory(:string_sample_attribute_type, title: 'String')
+    create_sample_attribute_type
     sample_type = SampleType.new title: 'from template', project_ids: @project_ids
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
@@ -323,7 +320,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   test 'dependant destroy content blob' do
     with_config_value :project_admin_sample_type_restriction, false do
       User.with_current_user(@person.user) do
-        Factory(:string_sample_attribute_type, title: 'String')
+        create_sample_attribute_type
         sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: @project_ids
         sample_type.content_blob = Factory(:sample_type_template_content_blob)
         sample_type.build_attributes_from_template

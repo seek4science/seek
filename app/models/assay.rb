@@ -42,6 +42,7 @@ class Assay < ActiveRecord::Base
   has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop'
   has_many :models, through: :assay_assets, source: :asset, source_type: 'Model'
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample'
+  has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document'
 
   has_one :investigation, through: :study
   has_one :external_asset, as: :seek_entity, dependent: :destroy
@@ -93,8 +94,7 @@ class Assay < ActiveRecord::Base
       assay_asset = assay_assets.detect { |aa| aa.asset == asset }
 
       if assay_asset.nil?
-        assay_asset = AssayAsset.new
-        assay_asset.assay = self
+        assay_asset = assay_assets.build
       end
 
       assay_asset.asset = asset
@@ -114,7 +114,7 @@ class Assay < ActiveRecord::Base
   end
 
   def assets
-    data_files + models + sops + publications + samples
+    data_files + models + sops + publications + samples + documents
   end
 
   def incoming
@@ -189,7 +189,7 @@ class Assay < ActiveRecord::Base
 
   # overides that from Seek::RDF::RdfGeneration, as Assay entity depends upon the AssayClass (modelling, or experimental) of the Assay
   def rdf_type_entity_fragment
-    { 'EXP' => 'Experimental_assay_type', 'MODEL' => 'Model_analysis_type' }[assay_class.key]
+    { 'EXP' => 'Experimental_assay', 'MODEL' => 'Modelling_analysis' }[assay_class.key]
   end
 
   def external_asset_search_terms

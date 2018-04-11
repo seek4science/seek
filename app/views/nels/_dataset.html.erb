@@ -1,0 +1,23 @@
+<h2><%= @dataset['name'] -%> <small><%= @dataset['type'] -%></small></h2>
+<p><%= @dataset['description'] %></p>
+<% if @dataset['owner_name'].present? %>
+    <strong>Owner:</strong> <%= @dataset['owner_name'] %><br/>
+<% end %>
+<% if (time = Time.parse(@dataset['creation_date']) rescue nil).present? %>
+    <strong>Created:</strong> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span><br/>
+<% end %>
+<br/>
+<h5>Subtypes</h5>
+<ul class="list-group">
+  <% @dataset['subtypes'].each do |subtype| %>
+      <li class="list-group-item">
+        <%= form_tag(register_assay_nels_path(params[:assay_id]), method: :post) do %>
+            <%= hidden_field_tag('project_id', params[:project_id]) %>
+            <%= hidden_field_tag('dataset_id', params[:dataset_id]) %>
+            <%= hidden_field_tag('subtype_name', subtype['type']) %>
+            <%= subtype['type'] %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
+            <%= submit_tag('Register', class: 'btn btn-primary btn-xs pull-right') %>
+        <% end %>
+      </li>
+  <% end %>
+</ul>

@@ -48,7 +48,7 @@ module Seek
 
     # Get the appropriate file icon for the MIME type
     def mime_icon_url(mime)
-      icon_filename_for_key(mime_icon_key(mime))
+      icon_filename_for_key(mime_icon_key(mime)) || icon_filename_for_key('misc_file')
     end
 
     def mime_extensions(mime)
@@ -56,26 +56,40 @@ module Seek
     end
 
     def mime_types_for_extension(extension)
-      mime_map.keys.select do |k|
-        mime_map[k][:extensions].include?(extension.try(:downcase))
-      end
+      extension_map[extension.try(:downcase)] || []
     end
 
     def mime_map
-      MIME_MAP.merge(mime_magic_map) { |_ext, seek_value, _magic_value| seek_value }
+      @@mime_map ||= MIME_MAP.merge(mime_magic_map) { |_ext, seek_value, _magic_value| seek_value }
     end
 
     def mime_magic_map
-      mime_magic_map = {}
+      return @@mime_magic_map if defined? @@mime_magic_map
+      @@mime_magic_map = {}
       MimeMagic::EXTENSIONS.each do |extension, mime|
         next unless found = MimeMagic.by_extension(extension)
-        mime_magic_map[mime] = {}
-        mime_magic_map[mime][:name] = found.comment
-        mime_magic_map[mime][:icon_key] = "#{extension}_file"
-        mime_magic_map[mime][:extensions] = ["#{extension}"]
+        @@mime_magic_map[mime] = {}
+        @@mime_magic_map[mime][:name] = found.comment
+        @@mime_magic_map[mime][:icon_key] = "#{extension}_file"
+        @@mime_magic_map[mime][:extensions] = ["#{extension}"]
       end
 
-      mime_magic_map
+      @@mime_magic_map
+    end
+
+    # A map of MIME types for each extension
+    def extension_map
+      return @@extension_map if defined? @@extension_map
+      @@extension_map = {}.with_indifferent_access
+      mime_map.each do |key, value|
+        value[:extensions].each do |extension|
+          ext = extension.downcase
+          @@extension_map[ext] ||= []
+          @@extension_map[ext] << key
+        end
+      end
+
+      @@extension_map
     end
 
     protected

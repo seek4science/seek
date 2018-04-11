@@ -1,1 +1,6 @@
-<%= fancy_multiselect resource, :events,{:hidden=> resource.events.blank? ? true : false, :other_projects_checkbox => true}%>
+<%
+  collapsed = resource.events.blank? ? true : false if collapsed.nil?
+%>
+
+
+<%= fancy_multiselect resource, :events,{:hidden=> collapsed, :other_projects_checkbox => true}%>

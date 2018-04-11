@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class PresentationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
@@ -213,17 +214,35 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should be able to view ms/open office ppt content' do
-    ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-    assert ms_ppt_presentation.content_blob.is_content_viewable?
-    get :show, id: ms_ppt_presentation.id
-    assert_response :success
-    assert_select 'a', text: /View content/, count: 1
+    Seek::Config.stub(:soffice_available?, true) do
+      ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+      assert ms_ppt_presentation.content_blob.is_content_viewable?
+      get :show, id: ms_ppt_presentation.id
+      assert_response :success
+      assert_select 'a', text: /View content/, count: 1
 
-    openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-    assert openoffice_ppt_presentation.content_blob.is_content_viewable?
-    get :show, id: openoffice_ppt_presentation.id
-    assert_response :success
-    assert_select 'a', text: /View content/, count: 1
+      openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+      assert openoffice_ppt_presentation.content_blob.is_content_viewable?
+      get :show, id: openoffice_ppt_presentation.id
+      assert_response :success
+      assert_select 'a', text: /View content/, count: 1
+    end
+  end
+
+  test 'should not be able to view ms/open office ppt content if soffice not available' do
+    Seek::Config.stub(:soffice_available?, false) do
+      ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+      refute ms_ppt_presentation.content_blob.is_content_viewable?
+      get :show, id: ms_ppt_presentation.id
+      assert_response :success
+      assert_select 'span.disabled-button', text: /View content/, count: 1
+
+      openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+      refute openoffice_ppt_presentation.content_blob.is_content_viewable?
+      get :show, id: openoffice_ppt_presentation.id
+      assert_response :success
+      assert_select 'span.disabled-button', text: /View content/, count: 1
+    end
   end
 
   test 'should display the file icon according to version' do
@@ -329,4 +348,10 @@ class PresentationsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', presentation_path(presentation2), text: presentation2.title, count: 0
     end
   end
+
+  def edit_max_object(presentation)
+    add_tags_to_test_object(presentation)
+    add_creator_to_test_object(presentation)
+  end
+
 end

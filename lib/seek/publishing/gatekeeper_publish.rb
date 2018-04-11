@@ -50,7 +50,7 @@ module Seek
           requesters_items_comments.keys.each do |requester_id|
             requester = Person.find_by_id(requester_id)
             begin
-              Mailer.gatekeeper_approval_feedback(requester, @gatekeeper, requesters_items_comments[requester_id]).deliver_now
+              Mailer.gatekeeper_approval_feedback(requester, @gatekeeper, requesters_items_comments[requester_id]).deliver_later
             rescue Exception => e
               Rails.logger.error("Error sending gatekeeper approval feedback email to the requester #{requester.name}- #{e.message}")
             end
@@ -64,7 +64,7 @@ module Seek
           requesters_items_comments.keys.each do |requester_id|
             requester = Person.find_by_id(requester_id)
             begin
-              Mailer.gatekeeper_reject_feedback(requester, @gatekeeper, requesters_items_comments[requester_id]).deliver_now
+              Mailer.gatekeeper_reject_feedback(requester, @gatekeeper, requesters_items_comments[requester_id]).deliver_later
             rescue Exception => e
               Rails.logger.error("Error sending gatekeeper reject feedback email to the requester #{requester.name}- #{e.message}")
             end

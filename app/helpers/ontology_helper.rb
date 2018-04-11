@@ -1,16 +1,16 @@
 module OntologyHelper
-  def assay_type_select_tag(form, is_modelling, element_id, selected_uri, html_options = {})
+  def assay_type_select_tag(element_name, is_modelling, assay, html_options = {})
     type = is_modelling ? 'modelling_analysis' : 'assay'
-    ontology_select_tag form, type, element_id, selected_uri, html_options
+
+    ontology_select_tag element_name, type, selected_assay_type_uri(assay), html_options
   end
 
-  def technology_type_select_tag(form, element_id, selected_uri, html_options = {})
-    ontology_select_tag form, 'technology', element_id, selected_uri, html_options
+  def technology_type_select_tag(element_name, assay, html_options = {})
+    ontology_select_tag element_name, 'technology', selected_technology_type_uri(assay), html_options
   end
 
-  def ontology_select_tag(form, type, element_id, selected_uri, html_options = {})
-    options = ontology_select_options(type)
-    form.select element_id, options, { selected: selected_uri }, html_options
+  def ontology_select_tag(element_name, type, selected_uri, html_options = {})
+    ontology_selection_list([type], element_name, selected_uri, {}, html_options)
   end
 
   # ontology select tag when form is unavailable
@@ -87,13 +87,23 @@ module OntologyHelper
   end
 
   def child_type_links(children, type)
-    unless children.empty?
+    if children.empty?
+      content_tag :span, 'No child terms', class: 'none_text'
+    else
       children.map do |child|
         n = Assay.authorize_asset_collection(child.assays, 'view').count
         link_to_ontology_term(child, "#{child.label} (#{n})", type, class: 'child_term')
       end.join(' | ').html_safe
-    else
-      content_tag :span, 'No child terms', class: 'none_text'
     end
+  end
+
+  # the assay type selected in the dropdown box. If there is a suggested type applied, then uri is based on that type and id
+  def selected_assay_type_uri(assay)
+    assay.suggested_assay_type ? "suggested_assay_type:#{assay.suggested_assay_type.id}" : assay.assay_type_uri
+  end
+
+  # the technology type selected in the dropdown box. If there is a suggested type applied, then uri is based on that type and id
+  def selected_technology_type_uri(assay)
+    assay.suggested_technology_type ? "suggested_technology_type:#{assay.suggested_technology_type.id}" : assay.technology_type_uri
   end
 end

@@ -17,7 +17,7 @@ class PresentationsController < ApplicationController
 
   def new_version
     if handle_upload_data
-      comments=params[:revision_comment]
+      comments=params[:revision_comments]
 
       respond_to do |format|
         if @presentation.save_as_new_version(comments)
@@ -38,7 +38,7 @@ class PresentationsController < ApplicationController
  # PUT /presentations/1
   # PUT /presentations/1.xml
   def update
-    update_annotations(params[:tag_list], @presentation)
+    update_annotations(params[:tag_list], @presentation) if params.key?(:tag_list)
     update_scales @presentation
 
     @presentation.attributes = presentation_params
@@ -51,8 +51,6 @@ class PresentationsController < ApplicationController
 
         update_relationships(@presentation,params)
 
-        flash[:notice] = "#{t('presentation')} metadata was successfully updated."
-        format.html { redirect_to presentation_path(@presentation) }
         # Update new assay_asset
         Assay.find(assay_ids).each do |assay|
           if assay.can_edit?
@@ -66,10 +64,12 @@ class PresentationsController < ApplicationController
             AssayAsset.destroy(assay_asset.id)
           end
         end
+        flash[:notice] = "#{t('presentation')} metadata was successfully updated."
+        format.html { redirect_to presentation_path(@presentation) }
+        format.json { render json: @presentation }
       else
-        format.html {
-          render :action => "edit"
-        }
+        format.html { render action: 'edit' }
+        format.json { render json: json_api_errors(@presentation), status: :unprocessable_entity }
       end
     end
   end

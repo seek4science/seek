@@ -113,6 +113,7 @@ class PublicationsController < ApplicationController
     assay_ids = params[:assay_ids] || []
     data_files = params[:data_files] || []
     model_ids = params[:model_ids] || []
+    presentation_ids = params[:publication][:presentation_ids] || []
 
     respond_to do |format|
       if valid && @publication.update_attributes(publication_params)
@@ -126,6 +127,8 @@ class PublicationsController < ApplicationController
         create_or_update_associations data_files, 'DataFile', 'view'
 
         create_or_update_associations model_ids, 'Model', 'view'
+
+        create_or_update_associations presentation_ids, 'Presentation', 'view'
 
         # Create policy if not present (should be)
         if @publication.policy.nil?
@@ -158,6 +161,7 @@ class PublicationsController < ApplicationController
   def fetch_preview
     # trim the PubMed or Doi Id
     params[:key] = params[:key].strip unless params[:key].blank?
+
     @publication = Publication.new(publication_params)
     key = params[:key]
     protocol = params[:protocol]

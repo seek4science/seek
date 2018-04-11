@@ -160,7 +160,6 @@ module Seek
 
     def download_jerm_asset
       project = @asset_version.projects.first
-      project.decrypt_credentials
       downloader = Jerm::DownloaderFactory.create project.title
       resource_type = @asset_version.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
       begin
@@ -170,7 +169,7 @@ module Seek
                   type: data_hash[:content_type] || @content_blob.content_type,
                   disposition: 'attachment'
       rescue Seek::DownloadException, Jerm::JermException, SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH => de
-        puts "Unable to fetch from remote: #{de.message}"
+        Rails.logger.info("Unable to fetch from remote: #{de.message}")
         if @content_blob.file_exists?
           send_file @content_blob.filepath,
                     filename: @content_blob.original_filename,

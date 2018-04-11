@@ -1,219 +1,280 @@
 #encoding: utf-8
+
 litre:
   symbol: L
   comment: litre
-  order: 1
+  order: 10
 
 millilitre:
   symbol: mL
   comment: millilitre
-  order: 2
+  order: 20
 
 microlitre:
   symbol: µL
   comment: microlitre
-  order: 3
+  order: 30
 
 gram:
   symbol: g
   comment: gram
-  order: 4
+  order: 40
 
 miligram:
   symbol: mg
   comment: milligram
-  order: 5
+  order: 50
 
 microgram:
   symbol: µg
   comment: microgram
-  order: 6
+  order: 60
 
-mpicogram:
+nanogram:
+  symbol: ng
+  comment: nanogram
+  order: 70
+
+picogram:
   symbol: pg
-  comment: mpicogram
-  order: 7
+  comment: picogram
+  order: 80
 
 mol:
   symbol: mol
   comment: amount of substance
-  order: 8
+  order: 90
 
 M:
   symbol: M
   comment: concentration per litre of corresponding comparment
-  order: 9
+  order: 100
 
 mM:
   symbol: mM
   comment: concentration per litre of corresponding comparment
-  order: 10
+  order: 110
 
 muM:
   symbol: µM
   comment: concentration per litre of corresponding comparment
-  order: 11
+  order: 120
 
 pM:
   symbol: pM
   comment: concentration per litre of corresponding comparment
-  order: 12
+  order: 130
 
 grams_per_litre:
   symbol: g/L
   comment: concentration per litre of corresponding comparment
-  order: 13
+  order: 140
 
 g/g_DW:
   symbol: g/g_DW
   comment: specific concentration per gram of dry weigh biomass
   factors_studied: false
-  order: 14
+  order: 150
 
 mg/g_DW:
   symbol: mg/g_DW
   comment: specific concentration per gram of dry weigh biomass
   factors_studied: false
-  order: 15
+  order: 160
 
 muMol-g_DW:
   symbol: muMol/g_DW
   comment: specific concentration per gram of dry weigh biomass
   factors_studied: false
-  order: 16
+  order: 170
 
 mmol/g_DW:
   symbol: mmol/g_DW
   comment: specific concentration per gram of dry weigh biomass
   factors_studied: false
-  order: 17
+  order: 180
 
 µmol/L_CV:
   symbol: µmol/L_CV
   comment: specific concentration per litre of cytoplasmic volume
   factors_studied: false
-  order: 18
+  order: 190
 
 mmol/L_CV:
   symbol: mmol/L_CV
   comment: specific concentration per litre of cytoplasmic volume
   factors_studied: false
-  order: 19
+  order: 200
 
 µmol/(g_DW*min):
   symbol: µmol/(g_DW*min)
   comment: specific rate per gram of dry weigh biomass
   factors_studied: false
-  order: 20
+  order: 210
+
+mmol/L:
+  symbol: mmol/L
+  comment: specific concentration per litre
+  factors_studied: false
+  order: 220
+
+µmol/L:
+  symbol: µmol/L
+  comment: specific concentration per litre
+  factors_studied: false
+  order: 230
+
+mg/ml:
+  symbol: mg/ml
+  comment: concentration - milligram per millilitre
+  factors_studied: false
+  order: 240
+
+µg/ml:
+  symbol: µg/ml
+  comment: concentration - microgram per milliltre
+  factors_studied: false
+  order: 250
+
+µg/µl:
+  symbol: µg/µl
+  comment: concentration - microgram per microlitre
+  factors_studied: false
+  order: 260
+
+L/min:
+  symbol: L/min
+  comment: flow rate
+  order: 270
+
+mL/min:
+  symbol: mL/min
+  comment: flow rate
+  order: 280
+
+CFU:
+  symbol: CFU
+  comment: colony forming units
+  factors_studied: false
+  order: 290
+
+CFU/g:
+  symbol: CFU/g
+  comment: colony forming units per gram
+  factors_studied: false
+  order: 300
+
+CFU/ml:
+  symbol: CFU/ml
+  comment: colony forming units per millilitre
+  factors_studied: false
+  order: 310
 
 seconds:
   title: second
   symbol: s
   comment: time
-  order: 21
+  order: 320
 
 minutes:
   title: minute
   symbol: min
   comment: time
-  order: 22
+  order: 330
 
 hour:
   title: hour
   symbol: h
   comment: time
-  order: 23
+  order: 340
 
 day:
   title: day
   symbol: d
   comment: time
-  order: 24
+  order: 350
 
 week:
   title: week
   symbol: wk
   comment: time
-  order: 25
+  order: 360
 
 month:
   title: month
   symbol: mo
   comment: time
-  order: 26
+  order: 370
 
 year:
   title: year
   symbol: yr
   comment: time
-  order: 27
-
+  order: 380
 
 hour-1:
   symbol: h-1
   comment: rate
   factors_studied: false
-  order: 28
+  order: 390
 
 min-1:
   symbol: min-1
   comment: rate
   factors_studied: false
-  order: 29
+  order: 400
 
 sec-1:
   symbol: sec-1
   comment: rate
   factors_studied: false
-  order: 30
-
-L/min:
-  symbol: L/min
-  comment: flow rate
-  order: 31
-
-mL/min:
-  symbol: mL/min
-  comment: flow rate
-  order: 32
+  order: 410
 
 metre:
+  title: meter
   symbol: m
   comment: metre
   factors_studied: false
-  order: 33
+  order: 420
+
+centimeter:
+  title: centimeter
+  symbol: cm
+  comment: centimeter
+  order: 430
 
 µm:
+  title: micrometer
   symbol: µm
   comment: micrometer
-  order: 34
+  order: 440
 
 celcius:
   symbol: °C
   comment: Celcius
-  order: 35
+  order: 450
 
 bar:
   symbol: bar
   comment: headspace pressure
-  order: 36
+  order: 460
 
 rpm:
   symbol: rpm
   comment: revolutions per minute
-  order: 37
+  order: 470
 
 percent:
   symbol: "%"
   comment: percentage
-  order: 38
+  order: 480
 
 a.u.:
   symbol: a.u.
   comment: arbitrary units
-  order: 39
+  order: 490
 
 dimensionless:
   symbol: dimensionless
   comment: dimensionless
-  order: 40
+  order: 500

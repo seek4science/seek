@@ -2,16 +2,20 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <%= render :partial=>"assets/resource_list_item_contributor_and_creators",:object=>resource -%>
+    <%= render partial:"assets/resource_list_item_contributor_and_creators",object:resource %>
     <div class="hidden-xs">
-        <%= list_item_optional_attribute "#{t('model')} type", resource.model_type.try(:title) %>
-        <%= list_item_optional_attribute "#{t('model')} format", resource.model_format.try(:title) %>
+      <%= list_item_optional_attribute "#{t('model')} type", resource.model_type.try(:title) %>
+      <%= list_item_optional_attribute "#{t('model')} format", resource.model_format.try(:title) %>
+      <%= list_item_optional_attribute "Environment", resource.recommended_environment.try(:title) %>
+      <%= list_item_doi(resource) %>
     </div>
   </div>
 
   <div class="col-sm-6 hidden-xs">
     <%= list_item_optional_attribute "Organism", resource.organism.try(:title), resource.organism %>
-    <%= list_item_optional_attribute "Environment", resource.recommended_environment.try(:title) %>
+    <%= list_item_authorized_list resource.investigations, t('investigation').pluralize, true, 50, true %>
+    <%= list_item_authorized_list resource.studies, t('study').pluralize, true, 50, true %>
+    <%= list_item_authorized_list resource.assays, t('assays.modelling_analysis').pluralize, true, 50, true %>
   </div>
 </div>
 

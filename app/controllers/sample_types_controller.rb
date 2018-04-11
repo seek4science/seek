@@ -18,7 +18,8 @@ class SampleTypesController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      format.json {render json: @sample_type}
+      # format.json {render json: @sample_type}
+      format.json {render json: :not_implemented, status: :not_implemented }
     end
   end
 

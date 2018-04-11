@@ -1,6 +1,9 @@
 module Seek
   module Samples
     class SampleData < HashWithIndifferentAccess
+
+      attr_accessor :sample_type
+
       def initialize(sample_type = nil, json = nil)
         if sample_type
           @sample_type = sample_type
@@ -13,14 +16,17 @@ module Seek
       end
 
       # Pre-processes the value before setting
+      alias_method :orig_set_value, :[]=
+
       def []=(key, value)
         super(key, pre_process_value(key, value))
       end
 
-      # Mass pre-processes values provided as a hash
-      def mass_assign(hash)
+      # Mass assign values provided as a hash. Pre-processes by default, but can be avoided by passing `pre_process: false`
+      def mass_assign(hash, pre_process: true)
+        method = pre_process ? :[]= : :orig_set_value
         hash.each do |key, value|
-          self[key] = value
+          self.send(method, key, value)
         end
       end
 

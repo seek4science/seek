@@ -20,7 +20,6 @@ class InstitutionsController < ApplicationController
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.rdf { render template: 'rdf/show' }
       format.xml
       # format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
       #format.json { render json: @institution } #normal json
@@ -58,7 +57,6 @@ class InstitutionsController < ApplicationController
   # POST /institutions
   # POST /institutions.xml
   def create
-
     @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
@@ -69,7 +67,7 @@ class InstitutionsController < ApplicationController
       else
         format.html { render action: 'new' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
-        format.json  { render json: @institution.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@institution), status: :unprocessable_entity }
       end
     end
   end
@@ -87,7 +85,7 @@ class InstitutionsController < ApplicationController
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
-        format.json { render json: @institution.errors, status: :unprocessable_entity}
+        format.json { render json: json_api_errors(@institution), status: :unprocessable_entity }
       end
     end
   end
@@ -115,7 +113,7 @@ class InstitutionsController < ApplicationController
   def editable_by_user
     @institution = Institution.find(params[:id])
     unless User.admin_logged_in? || @institution.can_be_edited_by?(current_user)
-      error('Insufficient privileges', 'is invalid (insufficient_privileges)')
+      error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
   end

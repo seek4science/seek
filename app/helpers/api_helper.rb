@@ -307,7 +307,7 @@ module ApiHelper
 
   # types that should be ignored from the related resources. It may be desirable to add items in this list to the schema
   def ignore_associated_types
-    [Strain, TavernaPlayer::Run, Workflow, Sweep]
+    [Strain]
   end
 
   def generic_list_xml(builder, list, tag, attr = {})

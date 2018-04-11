@@ -60,7 +60,7 @@ module RelatedItemsHelper
   def resource_type_tab_title(resource_type)
     "#{resource_type[:visible_resource_type]} "\
         "(#{(resource_type[:items].length + resource_type[:extra_count])}" +
-        ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : '') + ')'
+      ((resource_type[:hidden_count]) > 0 ? "+#{resource_type[:hidden_count]}" : '') + ')'
   end
 
   def ordered_keys(resource_hash)
@@ -88,7 +88,7 @@ module RelatedItemsHelper
 
     # Limit items viewable, and put the excess count in extra_count
     related.each_key do |key|
-      if limit && related[key][:items].size > limit && %w(Project Investigation Study Assay Person Specimen Sample Run Workflow Sweep).include?(resource.class.name)
+      if limit && related[key][:items].size > limit && %w[Project Investigation Study Assay Person Specimen Sample].include?(resource.class.name)
         related[key][:extra_count] = related[key][:items].size - limit
         related[key][:items] = related[key][:items][0...limit]
       end
@@ -98,18 +98,14 @@ module RelatedItemsHelper
   end
 
   def relatable_types
-    {'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
-     'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
-     'Workflow' => {}, 'TavernaPlayer::Run' => {}, 'Sweep' => {}, 'Strain' => {}, 'Sample' => {}
-    }
+    { 'Person' => {}, 'Project' => {}, 'Institution' => {}, 'Investigation' => {},
+      'Study' => {}, 'Assay' => {}, 'DataFile' => {}, 'Document' => {},
+      'Model' => {}, 'Sop' => {}, 'Publication' => {}, 'Presentation' => {}, 'Event' => {},
+      'Strain' => {}, 'Sample' => {} }
   end
 
   def related_items_method(resource, item_type)
-    if item_type == 'TavernaPlayer::Run'
-      method_name = 'runs'
-    else
-      method_name = item_type.underscore.pluralize
-    end
+    method_name = item_type.underscore.pluralize
 
     if resource.respond_to? "related_#{method_name}"
       resource.send "related_#{method_name}"
@@ -128,11 +124,7 @@ module RelatedItemsHelper
     resource_klass = self.class
     method_hash = {}
     relatable_types.each_key do |item_type|
-      if item_type == 'TavernaPlayer::Run'
-        method_name = 'runs'
-      else
-        method_name = item_type.underscore.pluralize
-      end
+      method_name = item_type.underscore.pluralize
 
       if resource_klass.method_defined? "related_#{method_name}"
         method_hash[item_type] = "related_#{method_name}"
@@ -157,13 +149,11 @@ module RelatedItemsHelper
 
   def authorize_related_items(related)
     related.each do |key, res|
-      if res[:items].nil?
-        res[:items] = []
-      end
+      res[:items] = [] if res[:items].nil?
       res[:items] = res[:items].uniq.compact
       next if res[:items].empty? || res[:items].nil?
       total_count = res[:items].size
-      if key == 'Project' || key == 'Institution' || key == 'Sample'
+      if key == 'Project' || key == 'Institution' || key == 'SampleType'
         res[:hidden_count] = 0
       elsif key == 'Person'
         if Seek::Config.is_virtualliver && User.current_user.nil?
@@ -181,19 +171,19 @@ module RelatedItemsHelper
     end
     end
 
-    def collect_related_items(resource)
-      related = relatable_types
-      related.delete('Person') if resource.class == 'Person' # to avoid the same person showing up
+  def collect_related_items(resource)
+    related = relatable_types
+    related.delete('Person') if resource.class == 'Person' # to avoid the same person showing up
 
-      answerable = {}
-      related.each_key do |type|
-        related[type][:items] = related_items_method(resource, type)
-        related[type][:hidden_items] = []
-        related[type][:hidden_count] = 0
-        related[type][:extra_count] = 0
-        answerable[type] = !related[type][:items].nil?
-      end
-
-      related
+    answerable = {}
+    related.each_key do |type|
+      related[type][:items] = related_items_method(resource, type)
+      related[type][:hidden_items] = []
+      related[type][:hidden_count] = 0
+      related[type][:extra_count] = 0
+      answerable[type] = !related[type][:items].nil?
     end
+
+    related
+  end
   end

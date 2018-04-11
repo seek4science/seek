@@ -72,9 +72,10 @@ module Seek
 
     def self.rdf_capable_types
       cache('rdf_capable_types') do
-        persistent_classes.select do |c|
+        types = persistent_classes.select do |c|
           c.included_modules.include?(Seek::Rdf::RdfGeneration)
         end
+        types - [Sample] # SAMPLE is not yet fully supported
       end
     end
 
@@ -94,7 +95,7 @@ module Seek
 
     def self.inline_viewable_content_types
       # FIXME: needs to be discovered rather than hard-code classes here
-      [DataFile, Model, Presentation, Sop]
+      [DataFile, Document, Model, Presentation, Sop]
     end
 
     def self.multi_files_asset_types
@@ -147,8 +148,11 @@ module Seek
 
     def self.cache(name, &block)
       @@cache ||= {}
-      @@cache = {} if Rails.env.development? # Don't use caching in development mode
-      @@cache[name] ||= block.call
+      if Rails.env.development? # Don't use caching in development mode
+        block.call
+      else
+        @@cache[name] ||= block.call
+      end
     end
   end
 end

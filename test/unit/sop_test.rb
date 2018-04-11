@@ -184,32 +184,6 @@ class SopTest < ActiveSupport::TestCase
     assert_not_nil ContentBlob.find(cb.id)
   end
 
-  test 'is restorable after destroy' do
-    sop = Factory :sop, policy: Factory(:all_sysmo_viewable_policy), title: 'is it restorable?'
-    blob_path = sop.content_blob.filepath
-    User.current_user = sop.contributor
-    assert_difference('Sop.count', -1) do
-      sop.destroy
-    end
-    assert_nil Sop.find_by_title 'is it restorable?'
-    assert_difference('Sop.count', 1) do
-      disable_authorization_checks { Sop.restore_trash!(sop.id) }
-    end
-    sop = Sop.find_by_title('is it restorable?')
-    refute_nil sop
-    refute_nil sop.content_blob
-    assert_equal blob_path, sop.content_blob.filepath
-    assert File.exist?(blob_path)
-  end
-
-  test 'failing to delete due to can_delete still creates trash' do
-    sop = Factory :sop, policy: Factory(:private_policy)
-    assert_no_difference('Sop.count') do
-      sop.destroy
-    end
-    assert_not_nil Sop.restore_trash(sop.id)
-  end
-
   test 'test uuid generated' do
     x = sops(:my_first_sop)
     assert_nil x.attributes['uuid']

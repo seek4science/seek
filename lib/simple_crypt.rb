@@ -5,7 +5,7 @@ require 'yaml'
 require 'openssl'
 require 'digest/sha1'
 
-
+# TODO: Remove me in 1.7
 module SimpleCrypt
 
   def encrypt object,key

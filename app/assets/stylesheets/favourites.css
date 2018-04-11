@@ -46,3 +46,7 @@ ul.favourites li {
 #add-favourites-zone {
     max-height: 30em;    
 }
+
+#favourite_list img {
+    max-height:40px;
+}

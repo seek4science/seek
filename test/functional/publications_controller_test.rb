@@ -262,6 +262,16 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_match(/.*url.*/, response.body)
   end
 
+  test 'should export pre-print publication as bibtex' do
+    publication_formatter_mock
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: pre_print_publication_for_export_tests, format: 'bibtex'
+    end
+    assert_response :success
+    assert_match(/.*author.*/, response.body)
+    assert_match(/.*title.*/, response.body)
+  end
+
   test 'should export publication as embl' do
     publication_formatter_mock
     with_config_value :pubmed_api_email, 'fred@email.com' do
@@ -471,6 +481,36 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_equal 0, p.studies.count
     assert_equal 0, study.publications.count
+  end
+
+  test 'associates presentations' do
+    p = Factory(:publication)
+    presentation = Factory(:presentation, policy: Factory(:all_sysmo_viewable_policy))
+    assert !p.presentations.include?(presentation)
+    assert !presentation.publications.include?(p)
+
+    login_as(p.contributor)
+    # add association
+    put :update, id: p, publication: { abstract: p.abstract, presentation_ids:[presentation.id.to_s] }, author: {}
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    presentation.reload
+
+    assert_equal 1, p.presentations.count
+
+    assert p.presentations.include?(presentation)
+    assert presentation.publications.include?(p)
+
+    # remove association
+    put :update, id: p, publication: { abstract: p.abstract, presentation_ids:[] }, author: {}
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    presentation.reload
+
+    assert_equal 0, p.presentations.count
+    assert_equal 0, presentation.publications.count
   end
 
   test 'do not associate assays unauthorized for edit' do
@@ -772,7 +812,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_difference('Publication.count') do
       post :create, publication: { project_ids: ['', project.id.to_s],
-                                   doi: 'http://dx.doi.org/10.5072/abcd',
+                                   doi: 'https://doi.org/10.5072/abcd',
                                    title: 'Cool stuff',
                                    publication_authors: ['', User.current_user.person.name],
                                    abstract: 'We did stuff',
@@ -784,6 +824,23 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal '10.5072/abcd', assigns(:publication).doi
   end
 
+  def edit_max_object(pub)
+    assay = Factory(:assay, policy: Factory(:public_policy))
+    study = Factory(:study, policy: Factory(:public_policy))
+    inv = Factory(:investigation, policy: Factory(:public_policy))
+    df = Factory(:data_file, policy: Factory(:public_policy))
+    model = Factory(:model, policy: Factory(:public_policy))
+    pr = Factory(:presentation, policy: Factory(:public_policy))
+
+    pub.associate(assay)
+    pub.associate(study)
+    pub.associate(inv)
+    pub.associate(df)
+    pub.associate(model)
+    pub.associate(pr)
+
+  end
+
   private
 
   def publication_for_export_tests
@@ -791,5 +848,13 @@ class PublicationsControllerTest < ActionController::TestCase
                           abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
                           published_date: 5.days.ago.to_s(:db),
                           pubmed_id: 5)
+  end
+
+  def pre_print_publication_for_export_tests
+    Factory(:publication, title: 'A paper on blabla',
+                          abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
+                          pubmed_id: nil,
+                          publication_authors: [Factory(:publication_author),
+                                                Factory(:publication_author)])
   end
 end

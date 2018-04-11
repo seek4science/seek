@@ -1,27 +1,20 @@
 class BaseSerializer < SimpleBaseSerializer
   include ApiHelper
+  include PolicyHelper
   include RelatedItemsHelper
+  include Rails.application.routes.url_helpers
 
-  # has_many :people
-  # has_many :projects
-  # has_many :institutions
-  # has_many :investigations
-  # has_many :studies
-  # has_many :assays
-  # has_many :data_files
-  # has_many :models
-  # has_many :sops
-  # has_many :publications
-  # has_many :presentations
-  # has_many :events
-  # has_many :strains
-  # has_many :samples
+  attribute :policy, if: :show_policy?
+
+  def policy
+    BaseSerializer.convert_policy object.policy
+  end
 
   def associated(name)
     unless @associated[name].blank?
-      @associated[name][:items]
-    else
-      nil
+      items = @associated[name][:items]
+      items = items.sort_by(&:id) unless items.blank?
+      items
     end
   end
 
@@ -73,55 +66,70 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Event')
   end
 
-  def strains
-    associated('Strain')
+  def documents
+    associated('Document')
   end
-
-  def samples
-    associated('Sample')
-  end
-
 
   def self_link
-    #{base_url}//#{type}/#{id}
-    "/#{type}/#{object.id}"
+    polymorphic_path(object)
   end
 
   def _links
-      {self: self_link}
-      end
+    { self: self_link }
+  end
 
-  #avoid dash-erizing attribute names
+  # avoid dash-erizing attribute names
   def format_name(attribute_name)
     attribute_name.to_s
   end
 
   def _meta
-    #content-blob doesn't have timestamps
-    if object.respond_to?('created_at')
-      created = object.created_at
-      updated = object.updated_at
-    end
-    if object.respond_to?('uuid')
-      uuid = object.uuid
-    end
-    {
-        created: created || "",
-        modified: updated || "",
-        uuid: uuid || "",
-        base_url: base_url
-    }
+    meta = super
+    meta[:uuid] = object.uuid if object.respond_to?('uuid')
+    meta[:base_url] = base_url
+    meta
   end
 
   def initialize(object, options = {})
     super
 
-    #access related resources with proper authorization & ignore version subclass
-    if (object.class.to_s.include?("::Version"))
-      @associated = associated_resources(object.parent)
-    else
-      @associated = associated_resources(object)
-    end
+    # access related resources with proper authorization & ignore version subclass
+    @associated = if object.class.to_s.include?('::Version')
+                    associated_resources(object.parent)
+                  else
+                    associated_resources(object)
+                  end
   end
 
+  def BaseSerializer.convert_policy policy
+    { 'access' => (PolicyHelper::access_type_key policy.access_type),
+      'permissions' => (BaseSerializer.permits policy)}
+  end
+
+  def BaseSerializer.permits policy
+    result = []
+    policy.permissions.each do |p|
+      result.append ({'resource_type' => p.contributor_type.downcase.pluralize,
+                      'resource_id' => p.contributor_id.to_s,
+                      'access' => (PolicyHelper::access_type_key p.access_type) } )
+    end
+    return result
+  end
+
+  def show_policy?
+    respond_to_manage = object.respond_to?('can_manage?')
+    respond_to_policy = object.respond_to?('policy')
+    current_user = User.current_user
+    can_manage = object.can_manage?(current_user)
+    return respond_to_policy && respond_to_manage && can_manage
+  end
+
+  def submitter
+    result = determine_submitter object
+    if result.blank?
+      return []
+    else
+      return [result]
+    end
+  end
 end

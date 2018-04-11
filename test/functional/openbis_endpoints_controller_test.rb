@@ -360,7 +360,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
             username: 'wibble',
             password: 'wobble' },
         format: :json
-    assert_response :redirect
+    assert_response 400
     refute @response.body.include?('true')
 
     # none project member cannot
@@ -446,34 +446,11 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
   end
 
-  test 'refresh_metadata_store' do
+  test 'refresh metadata store' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
-    endpoint.metadata_store.fetch('K') { 'V' }
-    assert endpoint.metadata_store.exist? 'K'
-
-    post :refresh_metadata_store, id: endpoint.id, project_id: @project.id
+    post :refresh_metadata_store, id:endpoint.id,project_id: @project.id
     assert_response :success
-    endpoint = assigns(:openbis_endpoint)
-    assert endpoint
-
-    refute endpoint.metadata_store.exist? 'K'
-
+    assert assigns(:openbis_endpoint)
   end
-
-  test 'refresh' do
-    login_as(@project_administrator)
-    endpoint = Factory(:openbis_endpoint, project: @project)
-    endpoint.metadata_store.fetch('K') { 'V' }
-    assert endpoint.metadata_store.exist? 'K'
-
-    post :refresh, id: endpoint.id
-    assert_redirected_to endpoint
-    endpoint = assigns(:openbis_endpoint)
-    assert endpoint
-
-    refute endpoint.metadata_store.exist? 'K'
-
-  end
-
 end

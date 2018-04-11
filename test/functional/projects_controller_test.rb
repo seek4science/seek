@@ -84,6 +84,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to project
     assert project.default_policy
     assert project.use_default_policy
+    assert_nil project.default_policy.sharing_scope
   end
 
   test 'create project with programme' do
@@ -1066,18 +1067,24 @@ class ProjectsControllerTest < ActionController::TestCase
     new_institution = Factory(:institution)
     new_person = Factory(:person)
     new_person2 = Factory(:person)
+    new_person3 = Factory(:person)
 
-    assert_no_difference('GroupMembership.count') do # 2 deleted, 2 added
+    assert_difference('GroupMembership.count',1) do # 2 deleted, 3 added
       assert_no_difference('WorkGroup.count') do # 1 empty group will be deleted, 1 will be added
-        post :update_members,
-             id: project,
-             group_memberships_to_remove: [group_membership.id, group_membership2.id],
-             people_and_institutions_to_add: [{ 'person_id' => new_person.id, 'institution_id' => new_institution.id }.to_json, { 'person_id' => new_person2.id, 'institution_id' => new_institution.id }.to_json]
-        assert_redirected_to project_path(project)
-        assert_nil flash[:error]
-        refute_nil flash[:notice]
+        assert_enqueued_emails(3) do
+          post :update_members,
+               id: project,
+               group_memberships_to_remove: [group_membership.id, group_membership2.id],
+               people_and_institutions_to_add: [{ 'person_id' => new_person.id, 'institution_id' => new_institution.id }.to_json,
+                                                { 'person_id' => new_person2.id, 'institution_id' => new_institution.id }.to_json,
+                                                { 'person_id' => new_person3.id, 'institution_id' => new_institution.id }.to_json]
+        end
       end
     end
+
+    assert_redirected_to project_path(project)
+    assert_nil flash[:error]
+    refute_nil flash[:notice]
 
     assert_includes project.institutions, new_institution
     assert_includes project.people, new_person
@@ -1471,7 +1478,85 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
+  test 'request membership' do
+    project = Factory(:project_administrator).projects.first #needs a project admin
+    person = Factory(:person)
+    login_as(person)
+    assert_enqueued_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+
+    end
+    assert_redirected_to(project)
+    refute_nil flash[:notice]
+    log = MessageLog.last
+    assert_equal project,log.resource
+    assert_equal person,log.sender
+    assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST,log.message_type
+
+    logout
+    login_as(project.project_administrators.first)
+
+    assert_no_enqueued_emails  do
+      assert_no_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+    end
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+    project=Factory(:project)
+    assert_empty(project.people)
+    assert_no_enqueued_emails  do
+      assert_no_difference('MessageLog.count') do
+        post :request_membership, id:project,details:'blah blah'
+      end
+    end
+    assert_redirected_to :root
+    refute_nil flash[:error]
+
+  end
+
+  test 'can remove members with project subscriptions' do
+    proj_admin = Factory(:project_administrator)
+    project = proj_admin.projects.first
+    login_as(proj_admin)
+
+    wg = Factory(:work_group, project: project)
+    group_membership = Factory(:group_membership, work_group: wg)
+    person = Factory(:person, group_memberships: [group_membership])
+
+    data_file = Factory(:data_file, projects: [project], contributor: person,
+                        policy: Factory(:policy, access_type: Policy::NO_ACCESS,
+                                        permissions: [Factory(:permission,
+                                                              contributor: project,
+                                                              access_type: Policy::VISIBLE)]))
+    refute data_file.can_delete?(proj_admin)
+    refute person.can_delete?(proj_admin)
+    subscription = Factory(:subscription, subscribable: data_file, person: person, project_subscription: person.project_subscriptions.first)
+
+    assert_difference('ProjectSubscription.count', -1) do
+      assert_difference('Subscription.count', -1) do
+          post :update_members, id: project,
+               group_memberships_to_remove: [group_membership.id],
+               people_and_institutions_to_add: []
+          assert_redirected_to project_path(project)
+          assert_nil flash[:error]
+          refute_nil flash[:notice]
+      end
+    end
+  end
+
   private
+
+  def edit_max_object(project)
+    for i in 1..5 do
+      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+    end
+    project.programme_id = (Factory(:programme)).id
+    add_avatar_to_test_object(project)
+  end
 
   def valid_project
     { title: 'a title' }

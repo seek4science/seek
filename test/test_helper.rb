@@ -1,8 +1,5 @@
 ENV['RAILS_ENV'] ||= 'test'
 
-require 'coveralls'
-Coveralls.wear!('rails')
-
 require File.expand_path(File.dirname(__FILE__) + '/../config/environment')
 require 'rails/test_help'
 
@@ -18,8 +15,12 @@ require 'tmpdir'
 require 'authenticated_test_helper'
 require 'mock_helper'
 require 'html_helper'
+require 'nels_test_helper'
+require 'upload_helper'
+require 'password_helper'
 require 'minitest/reporters'
 require 'minitest'
+require 'ostruct'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
 
@@ -33,6 +34,9 @@ module ActionView
     end
   end
 end
+
+include UploadHelper
+include PasswordHelper
 
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
@@ -127,6 +131,11 @@ class ActiveSupport::TestCase
     Factory(:admin, first_name: 'default admin')
   end
 
+  # At least one sample attribute type is needed for building sample types from spreadsheets
+  def create_sample_attribute_type
+    Factory(:string_sample_attribute_type)
+  end
+
   def clear_rails_cache
     Rails.cache.clear
     Seek::Config.clear_temporary_filestore
@@ -136,6 +145,24 @@ class ActiveSupport::TestCase
     User.current_user = nil
   end
 
+  def add_avatar_to_test_object(obj)
+    obj.avatar = Factory(:avatar, owner: obj)
+    obj.save
+  end
+
+  def add_tags_to_test_object(obj)
+    name = obj.class.to_s
+    #for i in 1..5 do
+    [1,2,3,4,5].each do |i|
+      tag = Factory :tag, value: "#{name}-tag#{i}", source: User.current_user, annotatable: obj
+      obj.reload
+    end
+  end
+
+  def add_creator_to_test_object(obj)
+    obj.creators = [Factory(:person)]
+    obj.save
+  end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded
@@ -216,7 +243,7 @@ class ActiveSupport::TestCase
     path
   end
 
-  def assert_emails(n)
+  def assert_enqueued_emails(n)
     assert_difference 'ActionMailer::Base.deliveries.size', n do
       yield
     end
@@ -224,6 +251,18 @@ class ActiveSupport::TestCase
 
   def assert_no_emails
     assert_no_difference 'ActionMailer::Base.deliveries.size' do
+      yield
+    end
+  end
+
+  def assert_enqueued_emails(n)
+    assert_difference(-> { ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j.fetch(:job) == ActionMailer::DeliveryJob }.count }, n) do
+      yield
+    end
+  end
+
+  def assert_no_enqueued_emails
+    assert_no_difference(-> { ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j.fetch(:job) == ActionMailer::DeliveryJob }.count }) do
       yield
     end
   end
@@ -243,4 +282,9 @@ end
 # Load seed data
 # load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
 
-WebMock.disable_net_connect!(allow_localhost: true)
+VCR.configure do |config|
+  config.cassette_library_dir = 'test/vcr_cassettes'
+  config.hook_into :webmock
+end
+
+WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time

@@ -145,17 +145,34 @@ module AssetsHelper
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})
     download_button = icon_link_to('Download', 'download', download_path, opts)
     link_button_or_nil = link_url ? icon_link_to('External Link', 'external_link', link_url, opts.merge(target: 'blank')) : nil
-    return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ? download_button : link_button_or_nil if asset.respond_to?(:content_blobs)
-    return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob) && !asset.content_blob.nil?
+
+    # TODO maybe not needed as now openbis datafiles always have content blob
     return download_button if asset.respond_to?(:external_asset) && !asset.external_asset.nil?
+    if asset.respond_to?(:content_blobs)
+      if asset.content_blobs.detect { |blob| !blob.show_as_external_link? }
+        download_button
+      else
+        link_button_or_nil
+      end
+    elsif asset.respond_to?(:content_blob) && asset.content_blob.present?
+      if asset.content_blob.nels?
+        icon_link_to('Open in NeLS', 'external_link', link_url, opts.merge(target: 'blank'))
+      elsif asset.content_blob.show_as_external_link?
+        link_button_or_nil
+      else
+        download_button
+      end
+    else
+      nil
+    end
   end
 
   def view_content_button(asset)
     render partial: 'assets/view_content', locals: { content_blob: asset.single_content_blob, button_style: true }
   end
 
-  def doi_link(doi)
-    link_to doi, "https://dx.doi.org/#{doi}"
+  def doi_link(doi, opts = { target: '_blank' })
+    link_to(doi, "https://doi.org/#{doi}", opts) + content_tag(:span, '', class: :doi_icon)
   end
 
   def sharing_text(item)
@@ -169,5 +186,10 @@ module AssetsHelper
       sharing_text = "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
     end
     sharing_text.html_safe
+  end
+
+  def create_button(opts)
+    text = opts.delete(:button_text) || 'Upload and Save'
+    submit_tag(text, opts.merge({ 'data-upload-button' => '' }))
   end
 end

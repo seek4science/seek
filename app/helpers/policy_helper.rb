@@ -180,19 +180,22 @@ module PolicyHelper
     end
   end
 
-  def access_type_key(access_type)
-    case access_type
-      when Policy::MANAGING
-        'manage'
-      when Policy::EDITING
-        'edit'
-      when Policy::ACCESSIBLE
-        'download'
-      when Policy::VISIBLE
-        'view'
-      when Policy::NO_ACCES
-        'no_access'
-    end
+  ACCESS_TYPE_MAP = {
+      Policy::MANAGING => 'manage',
+      Policy::EDITING => 'edit',
+      Policy::ACCESSIBLE => 'download',
+      Policy::VISIBLE => 'view',
+      Policy::NO_ACCESS => 'no_access'
+  }
+
+  INVERSE_ACCESS_TYPE_MAP = ACCESS_TYPE_MAP.invert
+
+  def self.access_type_key(access_type)
+    ACCESS_TYPE_MAP[access_type]
+  end
+
+  def self.key_access_type(key)
+    INVERSE_ACCESS_TYPE_MAP[key.to_s]
   end
 
 end

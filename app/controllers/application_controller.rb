@@ -10,7 +10,6 @@ class ApplicationController < ActionController::Base
   include Recaptcha::Verify
 
   include CommonSweepers
-  @is_json = false
 
   before_filter :log_extra_exception_data
 
@@ -30,12 +29,9 @@ class ApplicationController < ActionController::Base
   before_filter :project_membership_required, only: [:create, :new]
 
   before_filter :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
-  before_filter :set_is_json   #, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :check_illegal_id, :only=>[:create]
-  # after_filter :unescape_response
 
-  before_filter :write_api_enabled, :only=>[:edit, :update, :destroy, :create, :new]
-  before_filter :convert_json_params, :only=>[:edit, :update, :destroy, :create, :new]
+  before_filter :check_json_id_type, only: [:create, :update], if: :json_api_request?
+  before_filter :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
 
   helper :all
 
@@ -75,10 +71,6 @@ class ApplicationController < ActionController::Base
     request.host_with_port
   end
 
-  def set_is_json
-    @is_json = (request.format.json?)
-  end
-
   def api_version
     @default = 1
     version_re_arr = [/version=(?<v>.+?)/, /api.v(?<v>\d+?)\+json/]
@@ -109,13 +101,17 @@ class ApplicationController < ActionController::Base
 
   def is_user_admin_auth
     unless User.admin_logged_in?
-      error('Admin rights required', 'is invalid (not admin)')
+      error('Admin rights required', 'is invalid (not admin)', :forbidden)
       return false
     end
     true
   end
 
   def can_manage_announcements?
+    admin_logged_in?
+  end
+
+  def admin_logged_in?
     User.admin_logged_in?
   end
 
@@ -175,7 +171,7 @@ class ApplicationController < ActionController::Base
   private
 
   def project_membership_required
-    unless User.logged_in_and_member? || User.admin_logged_in?
+    unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
       respond_to do |format|
         format.html do
@@ -226,18 +222,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def error(notice, _message)
+  #_status is mostly important for the json responses, default is 400 (Bad Request)
+  def error(notice, _message, _status=400)
     flash[:error] = notice
-
     respond_to do |format|
       format.html { redirect_to root_url }
-      format.json { redirect_to root_url }
+      format.json { render json: { errors: [{ title: notice, detail: _message }] }, status:  _status }
     end
-  end
-
-  # required for the Savage Beast
-  def admin?
-    User.admin_logged_in?
   end
 
   # handles finding an asset, and responding when it cannot be found. If it can be found the item instance is set (e.g. @project for projects_controller)
@@ -249,7 +240,9 @@ class ApplicationController < ActionController::Base
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render text: 'Not found', status: :not_found }
         format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-        format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
+        format.json { render json: { errors: [{ title: 'Not found',
+                                                detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
+                             status: :not_found }
         format.html { redirect_to eval "#{controller_name}_path" }
       end
     else
@@ -286,9 +279,9 @@ class ApplicationController < ActionController::Base
         end
         format.rdf { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
         format.xml { render text: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
-        format.json {
-          render json: {"title": "Forbidden", "detail": "You may not #{privilege} #{name}:#{params[:id]}"}, status: :forbidden
-        }
+        format.json { render json: { errors: [{ title: 'Forbidden',
+                                                details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
+                             status: :forbidden }
       end
       return false
     end
@@ -301,7 +294,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def render_not_found_error
+  def render_not_found_error(e)
     respond_to do |format|
       format.html do
         User.with_current_user current_user do
@@ -311,33 +304,24 @@ class ApplicationController < ActionController::Base
 
       format.rdf { render text: 'Not found', status: :not_found }
       format.xml { render text: '<error>404 Not found</error>', status: :not_found }
-      format.json { render json: {"title": "Not found", status: :not_found}, status: :not_found }
+      format.json { render json: { errors: [{ title: 'Not found', detail: e.message }] }, status: :not_found }
     end
     false
   end
 
   def render_unknown_attribute_error(e)
     respond_to do |format|
-      format.json {
-        render json: {error: e.message, status: :unprocessable_entity}, status: :unprocessable_entity
-      }
-      format.all {
-        render text: e.message, status: :unprocessable_entity
-      }
+      format.json { render json: { errors: [{ title: 'Unknown attribute', details: e.message }] }, status: :unprocessable_entity }
+      format.all { render text: e.message, status: :unprocessable_entity }
     end
   end
 
   def render_not_implemented_error(e)
     respond_to do |format|
-      format.json {
-        render json: {error: e.message, status: :not_implemented}, status: :not_implemented
-      }
-      format.all {
-        render text: e.message, status: :not_implemented
-      }
+      format.json { render json: { errors: [{ title: 'Not implemented', details: e.message }] }, status: :not_implemented }
+      format.all { render text: e.message, status: :not_implemented }
     end
   end
-
 
   def is_auth?(object, privilege)
     if object.can_perform?(privilege)
@@ -371,22 +355,6 @@ class ApplicationController < ActionController::Base
                              activity_loggable: object,
                              user_agent: request.env['HTTP_USER_AGENT'])
         end
-      when 'sweeps', 'runs'
-        if %w(show update destroy download).include?(action)
-          ref = object.projects.first
-        elsif action == 'create'
-          ref = object.workflow
-        end
-
-        check_log_exists(action, controller_name, object)
-        ActivityLog.create(action: action,
-                           culprit: current_user,
-                           referenced: ref,
-                           controller_name: controller_name,
-                           activity_loggable: object,
-                           data: object.title,
-                           user_agent: request.env['HTTP_USER_AGENT'])
-        break
       when 'people', 'projects', 'institutions'
         if %w(show create update destroy).include?(action)
           ActivityLog.create(action: action,
@@ -425,7 +393,7 @@ class ApplicationController < ActionController::Base
                              data: activity_loggable.title)
         end
       when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } # TODO: Find a nicer way of doing this...
-        action = 'create' if action == 'upload_for_tool'
+        action = 'create' if action == 'upload_for_tool' || action == 'create_metadata'
         action = 'update' if action == 'new_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)
@@ -556,17 +524,6 @@ class ApplicationController < ActionController::Base
     redirect_to signup_path if User.count == 0
   end
 
-  def check_illegal_id
-    begin
-      Rails.logger.info("checking illegal ID")
-      if !params[:id].nil?
-        raise ArgumentError.new('A POST request is not allowed to specify an id')
-      end
-    rescue ArgumentError => e
-      render json: {error: e.message, status: :forbidden}, status: :forbidden
-    end
-  end
-
   # Non-ascii-characters are escaped, even though the response is utf-8 encoded.
   # This method will convert the escape sequences back to characters, i.e.: "\u00e4" -> "ä" etc.
   # from https://stackoverflow.com/questions/5123993/json-encoding-wrongly-escaped-rails-3-ruby-1-9-2
@@ -586,59 +543,57 @@ class ApplicationController < ActionController::Base
                                                        :contributor_id] }])[:policy_attributes] || {}
   end
 
-  def write_api_enabled
-    controller_class = self.controller_name.classify
-    if ["FavouriteGroup", "ProjectFolder", "Policy"].include? controller_class
-      return
-    end
-    if @is_json && !Rails.env.development?
-      raise NotImplementedError
+  def check_json_id_type
+    begin
+      raise ArgumentError.new('A POST/PUT request must have a data record complying with JSONAPI specs') if params[:data].nil?
+      #type should always appear in POST or PUT requests
+      if params[:data][:type].nil?
+        raise ArgumentError.new('A POST/PUT request must specify a data:type')
+      elsif params[:data][:type] != params[:controller]
+        raise ArgumentError.new("The specified data:type does not match the URL's object (#{params[:data][:type]} vs. #{params[:controller]})")
+      end
+      #id should not appear on POST, but should be accurate IF it appears on PUT
+      case params[:action]
+        when "create"
+          if !params[:data][:id].nil?
+            raise ArgumentError.new('A POST request is not allowed to specify an id')
+          end
+        when "update"
+          if (!params[:data][:id].nil?) && (params[:id] != params[:data][:id])
+            raise ArgumentError.new('id specified by the PUT request does not match object-id in the JSON input')
+          end
+      end
+    rescue ArgumentError => e
+      output = "{\"errors\" : [{\"detail\" : \"#{e.message}\"}]}"
+      render plain: output, status: :unprocessable_entity
     end
   end
 
   def convert_json_params
-   if @is_json
-      organize_external_attributes_from_json
-      hacked_params = flatten_relationships(params)
-      # params[controller_name.classify.underscore.to_sym] = causes the openbis endpoint test to fail, so reversing to former working code
-      params[controller_name.classify.downcase.to_sym] =
-          ActiveModelSerializers::Deserialization.jsonapi_parse(hacked_params)
-
-    end
+    Seek::Api::ParameterConverter.new(controller_name).convert(params)
   end
 
-  # take out policies, annotations, etc(?) outside of the given object attributes
-  def organize_external_attributes_from_json
-    if (params[:data] && params[:data][:attributes])
-      [:tag_list, :expertise_list, :tool_list, :policy_attributes].each do |item|
-        if params[:data][:attributes][item]
-          params[item] = params[:data][:attributes][item]
-          params[:data][:attributes].delete item
-        end
+  def json_api_request?
+    request.format.json?
+  end
+
+  def json_api_errors(object)
+    hash = { errors: [] }
+    hash[:errors] = object.errors.map do |attribute, message|
+      segments = attribute.to_s.split('.')
+      attr = segments.first
+      if !['content_blobs', 'policy'].include?(attr) && object.class.reflect_on_association(attr)
+        base = '/data/relationships'
+      else
+        base = '/data/attributes'
       end
-    end
-  end
 
-  def flatten_relationships(original_params)
-    replacements = {}
-    begin
-      rels = original_params[:data][:relationships]
-      assoc = rels[:associated]
-      assoc_relationships = assoc[:data]
-      assoc_relationships.each do |assoc_rel|
-        the_type = assoc_rel["type"]
-        the_id = assoc_rel["id"]
-        if !replacements.key?(the_type)
-          replacements[the_type] = {}
-          replacements[the_type][:data] = []
-        end
-        replacements[the_type][:data].push({:type => the_type, :id => the_id})
-      end
-      rels.delete(:associated)
-      original_params[:data][:relationships].merge!(ActionController::Parameters.new(replacements))
-    rescue Exception
+      {
+          source: { pointer: "#{base}/#{attr}" },
+          detail: "#{segments[1..-1].join(' ') + ' ' if segments.length > 1}#{message}"
+      }
     end
-    original_params
-  end
 
+    hash
+  end
 end
