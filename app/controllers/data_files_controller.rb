@@ -11,7 +11,8 @@ class DataFilesController < ApplicationController
   include Seek::AssetsCommon
 
   before_filter :find_assets, only: [:index]
-  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob, :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax]
+  before_filter :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
+                                                             :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_filter :find_display_asset, only: [:show, :explore, :download, :matching_models]
   skip_before_filter :verify_authenticity_token, only: [:upload_for_tool, :upload_from_email]
   before_filter :xml_login_only, only: [:upload_for_tool, :upload_from_email]
@@ -23,7 +24,7 @@ class DataFilesController < ApplicationController
   before_filter :nels_oauth_session, only: :retrieve_nels_sample_metadata
   before_filter :rest_client, only: :retrieve_nels_sample_metadata
 
-  before_filter :login_required, only: [:create, :create_content_blob, :create_metadata, :rightfield_extraction_ajax]
+  before_filter :login_required, only: [:create, :create_content_blob, :create_metadata, :rightfield_extraction_ajax, :provide_metadata]
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
@@ -53,6 +54,13 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def provide_metadata
+    @data_file ||= session[:processed_datafile]
+    @assay ||= session[:processed_assay]
+    @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
+
+  end
+
   def create_content_blob
     @data_file = DataFile.new
     respond_to do |format|
@@ -75,7 +83,8 @@ class DataFilesController < ApplicationController
         @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
         @data_file.populate_metadata_from_template
         @assay = @data_file.initialise_assay_from_template
-        @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
+        session[:processed_datafile]=@data_file
+        session[:processed_assay]=@assay
       else
         error_msg = "The file that was request to be processed doesn't match that which had been uploaded"
       end
@@ -91,7 +100,7 @@ class DataFilesController < ApplicationController
       if error_msg
         format.js { render text: error_msg, status: :unprocessable_entity }
       else
-        format.js { render :provide_metadata, status: :ok }
+        format.js { render text: 'done', status: :ok }
       end
     end
   end
