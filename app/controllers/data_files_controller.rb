@@ -424,10 +424,10 @@ class DataFilesController < ApplicationController
         @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
         @data_file.populate_metadata_from_template
         @assay = @data_file.initialise_assay_from_template
-        session[:processed_datafile]=@data_file
-        session[:processed_assay]=@assay
+        session[:processed_datafile] = @data_file
+        session[:processed_assay] = @assay
       else
-        raise("The file that was request to be processed doesn't match that which had been uploaded")
+        error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
     rescue Exception => e
       ExceptionNotifier.notify_exception(e, data: {
@@ -446,7 +446,8 @@ class DataFilesController < ApplicationController
     end
   end
 
-  # Displays the form Wizard for providing the metadata
+  # Displays the form Wizard for providing the metadata for both the data file, and possibly related Assay
+  # if not already provided and available, it will use those that had previously been populated through RightField extraction
   def provide_metadata
     @data_file ||= session[:processed_datafile]
     @assay ||= session[:processed_assay]
@@ -466,27 +467,28 @@ class DataFilesController < ApplicationController
     update_sharing_policies(@data_file)
 
     @assay = Assay.new(assay_params)
-    if (sop_id)
+    if sop_id
       sop = Sop.find_by_id(sop_id)
-      if sop && sop.can_view?
-        @assay.sops << sop
-      end
+      @assay.sops << sop if sop && sop.can_view?
     end
     @assay.policy = @data_file.policy.deep_copy if @create_new_assay
 
     filter_associated_projects(@data_file)
 
-    # associate_content_blob
-    blob_id = params[:content_blob_id]
+    # check the content blob id matches that previously uploaded and recorded on the session
+    all_valid = uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
 
-    #check it matches that previously uploaded and recorded on the session
-    valid_blob = (blob_id == session[:uploaded_content_blob_id].to_s)
-
-    blob = ContentBlob.find(blob_id)
+    #associate the content blob with the data file
+    blob = ContentBlob.find(params[:content_blob_id])
     @data_file.content_blob = blob
 
-    # FIXME: clunky
-    if valid_blob && (!@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)) && @data_file.save && blob.save
+    # if creating a new assay, check it is valid and the associated study is editable
+    all_valid = all_valid && !@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)
+
+    # check the datafile can be saved, and also the content blob can be saved
+    all_valid = all_valid && @data_file.save && blob.save
+
+    if all_valid
       update_annotations(params[:tag_list], @data_file)
       update_scales @data_file
 
@@ -507,12 +509,12 @@ class DataFilesController < ApplicationController
       end
 
     else
-      @data_file.errors[:base]="The file uploaded doesn't match" unless valid_blob
+      @data_file.errors[:base] = "The file uploaded doesn't match" unless uploaded_blob_matches
 
       # this helps trigger the complete validation error messages, as not both may be validated in a single action
       # - want the avoid the user fixing one set of validation only to be presented with a new set
       @assay.valid? if @create_new_assay
-      @data_file.valid? if valid_blob
+      @data_file.valid? if uploaded_blob_matches
 
       respond_to do |format|
         format.html do
