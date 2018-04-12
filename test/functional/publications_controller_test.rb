@@ -483,6 +483,36 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_equal 0, study.publications.count
   end
 
+  test 'associates presentations' do
+    p = Factory(:publication)
+    presentation = Factory(:presentation, policy: Factory(:all_sysmo_viewable_policy))
+    assert !p.presentations.include?(presentation)
+    assert !presentation.publications.include?(p)
+
+    login_as(p.contributor)
+    # add association
+    put :update, id: p, publication: { abstract: p.abstract, presentation_ids:[presentation.id.to_s] }, author: {}
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    presentation.reload
+
+    assert_equal 1, p.presentations.count
+
+    assert p.presentations.include?(presentation)
+    assert presentation.publications.include?(p)
+
+    # remove association
+    put :update, id: p, publication: { abstract: p.abstract, presentation_ids:[] }, author: {}
+
+    assert_redirected_to publication_path(p)
+    p.reload
+    presentation.reload
+
+    assert_equal 0, p.presentations.count
+    assert_equal 0, presentation.publications.count
+  end
+
   test 'do not associate assays unauthorized for edit' do
     p = publications(:taverna_paper_pubmed)
     original_assay = assays(:assay_with_a_publication)
