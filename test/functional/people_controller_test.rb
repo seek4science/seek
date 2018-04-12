@@ -705,6 +705,31 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select '#project-positions li img[src*=?]', role_image(:project_administrator), count: 1
   end
 
+  test 'should show manage project button in role list' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.last
+    login_as(project_administrator)
+
+    assert project.can_be_administered_by?(project_administrator.user)
+
+    get :show, id: project_administrator
+
+    assert_select '#project-positions a[href=?]', edit_project_path(project)
+  end
+
+  test 'should show manage project button in role list if no permission' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.last
+    person = Factory(:person)
+    login_as(person)
+
+    refute project.can_be_administered_by?(person.user)
+
+    get :show, id: project_administrator
+
+    assert_select '#project-positions a[href=?]', edit_project_path(project), count: 0
+  end
+
   test 'should have project administrator icon on people index page' do
     6.times do
       Factory(:project_administrator)

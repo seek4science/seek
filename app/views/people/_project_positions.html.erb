@@ -6,6 +6,9 @@
 <% if memberships.any? %>
   <%= panel("#{t('project')} roles", id: 'project-positions') do %>
     <% memberships.each do |membership| %>
+      <% if membership.project.can_be_administered_by?(current_user) %>
+        <%= button_link_to('Manage', 'manage', edit_project_path(membership.project), class: 'btn-xs pull-right') -%>
+      <% end %>
       <% positions = membership.project_positions %>
       <% roles = (project_roles[membership.project] || []) %>
       <%= membership_link(membership) %>
