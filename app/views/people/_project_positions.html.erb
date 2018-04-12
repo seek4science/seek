@@ -1,35 +1,32 @@
 <%
-  memberships = @person.group_memberships
-  memberships_with_positions = memberships.select{|m| m.project_positions.any?}
-  memberships_without_positions = memberships - memberships_with_positions
+  project_roles = @person.project_roles
+  memberships = @person.group_memberships.includes(:project, :project_positions)
 %>
 
 <% if memberships.any? %>
-    <%
-      positions = {}
-      memberships_with_positions.each do |membership|
-        membership.project_positions.each do |position|
-          positions[position] ||= []
-          positions[position] << membership
-        end
-      end
-    %>
-    <%= panel("#{t('project')} positions", id: 'project-positions') do %>
-        <% positions.keys.each do |position| %>
-            <p>
+  <%= panel("#{t('project')} roles", id: 'project-positions') do %>
+    <% memberships.each do |membership| %>
+      <% positions = membership.project_positions %>
+      <% roles = (project_roles[membership.project] || []) %>
+      <%= membership_link(membership) %>
 
-                <label><%= position.name %>:</label>
-                <%= membership_list(positions[position]) %>
-
-
-            </p>
-        <% end %>
-        <% if memberships_without_positions.any? %>
-            <p>
-                <label>Other <%= t('project').pluralize %>:</label>
-                <%= membership_list(memberships_without_positions) %>
-            </p>
-        <% end %>
-
+      <% if positions.any? || roles.any? %>
+        <ul>
+          <% roles.each do |role| %>
+            <li class="role">
+              <%= seek_role_icon(role, 16, 'data-tooltip' => nil) -%>
+              <%= role.humanize %>
+            </li>
+          <% end %>
+          <% positions.each do |position| %>
+            <li><%= position.name.humanize %></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <ul>
+          <li>Member</li>
+        </ul>
+      <% end %>
     <% end %>
+  <% end %>
 <% end %>

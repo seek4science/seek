@@ -278,7 +278,6 @@ class Person < ActiveRecord::Base
     Person.count == 1 && [self] == Person.all && Person.first.is_admin?
   end
 
-  # the roles defined within the project
   def project_positions
     project_positions = []
     group_memberships.each do |gm|

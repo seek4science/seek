@@ -170,6 +170,13 @@ module Seek
           end
           update_column :roles_mask, new_mask
         end
+
+        def project_roles
+          map = admin_defined_role_projects.includes(:project).group_by(&:project)
+          map.each do |project, project_roles|
+            map[project] = project_roles.map { |project_role| project_role.roles }.flatten
+          end
+        end
       end
     end
   end
