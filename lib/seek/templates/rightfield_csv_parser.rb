@@ -31,12 +31,12 @@ module Seek
 
       def index_for_value_type(type)
         case type
-          when :literal
-            TEXT_INDEX
-          when :term_uri
-            RESOURCE_URI_INDEX
-          else
-            raise "Unrecognised type #{type}"
+        when :literal
+          TEXT_INDEX
+        when :term_uri
+          RESOURCE_URI_INDEX
+        else
+          raise "Unrecognised type #{type}"
         end
       end
     end
