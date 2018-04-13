@@ -1,0 +1,5 @@
+data:
+  type: institutions
+  attributes:
+    title: Some other university
+    country: FR
