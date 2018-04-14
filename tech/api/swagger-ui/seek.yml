@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   version: '0.2'
   title: 'JSON API to FAIRDOM SEEK '
-host: testing.sysmo-db.org
+host: www.fairdomhub.org
 basePath: /
 schemes:
   - https
