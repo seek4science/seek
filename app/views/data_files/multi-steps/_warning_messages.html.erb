@@ -4,9 +4,9 @@
   <ul>
 <% warnings.each do |warning| %>
     <li>
-      <%= warning.text %>
+      <%= h(warning.text) %>
       <% unless warning.value.blank? %>
-        - <em><%= warning.value %></em>
+        - <em><%= h(warning.value) %></em>
       <% end %>
     </li>
 

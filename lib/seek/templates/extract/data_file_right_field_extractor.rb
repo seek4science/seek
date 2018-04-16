@@ -13,7 +13,7 @@ module Seek
         end
 
         def assay
-          item_for_type(Assay)
+          item_for_type(Assay,'edit')
         end
 
         def title

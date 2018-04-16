@@ -10,18 +10,25 @@ module Seek
             assay.description = description
             assay.assay_type_uri = assay_type_uri
             assay.technology_type_uri = technology_type_uri
-            assay.study = study if study
             assay.sops << sop if sop
+            if study
+              assay.study = study
+            else
+              add_warning("You are trying to create a new Assay, but no valid #{I18n.t('study')} has been specified",
+                          nil)
+
+            end
+
           end
           @warnings
         end
 
         def study
-          item_for_type(Study)
+          item_for_type(Study, 'edit')
         end
 
         def sop
-          item_for_type(Sop)
+          item_for_type(Sop, 'view')
         end
 
         def title
