@@ -5,9 +5,7 @@ module Seek
       class RightfieldExtractor
         include RightField
 
-        attr_reader :parser, :warnings
-
-        delegate :value_for_property_and_index, :values_for_property, to: :parser
+        delegate :value_for_property_and_index, :values_for_property, to: :@parser
 
         def initialize(source_data_file, warnings = Warnings.new)
           @parser = RightfieldCSVParser.new(generate_rightfield_csv(source_data_file))
@@ -42,9 +40,13 @@ module Seek
           URI.parse(uri).host == URI.parse(Seek::Config.site_base_host).host
         end
 
-        def add_warning(item, text, value)
+        def add_warning(text, value)
+          item = target.class.name.underscore
           @warnings.add(item, text, value)
         end
+
+        # the target item, passed into the concrete subclass. This is currently either an Assay or DataFile to be populated
+        attr_reader :target
       end
     end
   end

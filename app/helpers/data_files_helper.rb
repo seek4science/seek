@@ -16,4 +16,10 @@ module DataFilesHelper
 
     [left, right]
   end
+
+  def extraction_warnings_messages_for warnings
+    if warnings && warnings.any?
+      render partial: 'data_files/multi-steps/warning_messages',locals:{warnings:warnings}
+    end
+  end
 end

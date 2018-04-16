@@ -4,6 +4,7 @@ module Seek
       # populates an Assay with the metadata that can be found in a Rightfield Template
       class AssayRightfieldExtractor < RightfieldExtractor
         def populate(assay)
+          @target = assay
           unless title.blank?
             assay.title = title
             assay.description = description

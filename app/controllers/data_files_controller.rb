@@ -422,10 +422,12 @@ class DataFilesController < ApplicationController
     begin
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
         @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
-        @data_file.populate_metadata_from_template
-        @assay = @data_file.initialise_assay_from_template
+        @warnings = @data_file.populate_metadata_from_template
+        @assay, warnings = @data_file.initialise_assay_from_template
+        @warnings.merge(warnings)
         session[:processed_datafile] = @data_file
         session[:processed_assay] = @assay
+        session[:processing_warnings] = @warnings
       else
         error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
@@ -451,6 +453,7 @@ class DataFilesController < ApplicationController
   def provide_metadata
     @data_file ||= session[:processed_datafile]
     @assay ||= session[:processed_assay]
+    @warnings ||= session[:processing_warnings] || []
     @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
     respond_to do |format|
       format.html {}

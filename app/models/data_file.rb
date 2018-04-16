@@ -237,7 +237,7 @@ class DataFile < ActiveRecord::Base
     if contains_extractable_spreadsheet?
       Seek::Templates::Extract::DataFileRightFieldExtractor.new(self).populate(self)
     else
-      []
+      Set.new
     end
 
   end
@@ -248,7 +248,7 @@ class DataFile < ActiveRecord::Base
       warnings = Seek::Templates::Extract::AssayRightfieldExtractor.new(self).populate(assay)
       return assay, warnings
     else
-      return assay, []
+      return assay, Set.new
     end
 
   end

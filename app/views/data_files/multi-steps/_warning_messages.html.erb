@@ -1,0 +1,17 @@
+<div class='alert alert-warning'>
+  <h2>RightField extraction warnings</h2>
+  <p>There were some issues detected during the extraction that are not critical, but you should be aware of:</p>
+  <ul>
+<% warnings.each do |warning| %>
+    <li>
+      (<%= t(warning.item) %>)
+      <%= warning.text %>
+      <% unless warning.value.blank? %>
+        - <%= warning.value %>
+      <% end %>
+
+    </li>
+
+<% end %>
+  </ul>
+</div>
