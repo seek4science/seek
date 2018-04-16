@@ -687,7 +687,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have asset housekeeper role on person show page' do
     asset_housekeeper = Factory(:asset_housekeeper)
     get :show, id: asset_housekeeper
-    assert_select '#project-roles li img[src*=?]', role_image(:asset_housekeeper), count: 1
+    assert_select '#project-roles h3 img[src*=?]', role_image(:asset_housekeeper), count: 1
   end
 
   test 'should have asset housekeeper icon on people index page' do
@@ -702,32 +702,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have project administrator role on person show page' do
     project_administrator = Factory(:project_administrator)
     get :show, id: project_administrator
-    assert_select '#project-roles li img[src*=?]', role_image(:project_administrator), count: 1
-  end
-
-  test 'should show manage project button in role list' do
-    project_administrator = Factory(:project_administrator)
-    project = project_administrator.projects.last
-    login_as(project_administrator)
-
-    assert project.can_be_administered_by?(project_administrator.user)
-
-    get :show, id: project_administrator
-
-    assert_select '#project-roles a[href=?]', edit_project_path(project)
-  end
-
-  test 'should show manage project button in role list if no permission' do
-    project_administrator = Factory(:project_administrator)
-    project = project_administrator.projects.last
-    person = Factory(:person)
-    login_as(person)
-
-    refute project.can_be_administered_by?(person.user)
-
-    get :show, id: project_administrator
-
-    assert_select '#project-positions a[href=?]', edit_project_path(project), count: 0
+    assert_select '#project-roles h3 img[src*=?]', role_image(:project_administrator), count: 1
   end
 
   test 'should have project administrator icon on people index page' do
@@ -1182,7 +1157,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have gatekeeper role on person show page' do
     gatekeeper = Factory(:asset_gatekeeper)
     get :show, id: gatekeeper
-    assert_select '#project-roles li img[src*=?]', role_image(:asset_gatekeeper), count: 1
+    assert_select '#project-roles h3 img[src*=?]', role_image(:asset_gatekeeper), count: 1
   end
 
   test 'should have gatekeeper icon on people index page' do

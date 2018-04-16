@@ -1,39 +1,22 @@
-<%
-  project_roles = person.project_roles
-  memberships = person.group_memberships.includes(:project)
-  memberships = memberships.sort_by do |m|
-    roles = (project_roles[m.project] || [])
-    if roles.include?('project_administrator')
-      10
-    else
-      roles.length
-    end
-  end.reverse
-
-  max_visible ||= 8
-  visible_memberships = memberships[0...max_visible] || []
-  hidden_memberships = memberships[max_visible..-1] || []
+<% roles_map = person.roles_for_projects
 %>
 <%= modal(id: 'project-roles', size: 'lg', class: 'text-left') do %>
   <%= modal_header("#{t('project')} roles") %>
   <%= modal_body do %>
-    <% visible_memberships.each do |membership| %>
-      <%= render partial: 'people/project_role_details', locals: { membership: membership,
-                                                                   roles: (project_roles[membership.project] || []) } %>
-    <% end %>
-    <% if hidden_memberships.any? %>
-      <div style="display: none" id="hidden-project-roles">
-        <% hidden_memberships.each do |membership| %>
-          <%= render partial: 'people/project_role_details', locals: { membership: membership,
-                                                                       roles: (project_roles[membership.project] || []) } %>
+    <% if roles_map.keys.any? %>
+      <% roles_map.each do |role, projects| %>
+        <% if projects.any? %>
+          <h3>
+            <%= seek_role_icon(role, 32, 'data-tooltip' => nil) -%>
+            <%= role.humanize %>
+          </h3>
+
+          <ul>
+            <% projects.each do |project| %>
+              <li><%= link_to(project.title, project) %></li>
+            <% end %>
+          </ul>
         <% end %>
-      </div>
-    <% end %>
-    <% if hidden_memberships.any? %>
-      <%= modal_footer do %>
-        <a href="#" onclick="$j('#hidden-project-roles').fadeIn(); $j(this).hide(); return false;" class="pull-right">
-          Show <%= hidden_memberships.count-%> more
-        </a>
       <% end %>
     <% end %>
   <% end %>

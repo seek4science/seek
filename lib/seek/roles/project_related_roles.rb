@@ -177,6 +177,17 @@ module Seek
             map[project] = project_roles.map { |project_role| project_role.roles }.flatten
           end
         end
+
+        def roles_for_projects
+          {}.tap do |map|
+            admin_defined_role_projects.includes(:project).each do |project_role|
+              project_role.roles.each do |role|
+                map[role] ||= []
+                map[role] << project_role.project
+              end
+            end
+          end
+        end
       end
     end
   end
