@@ -1,36 +1,35 @@
 <%
-  project_roles = @person.project_roles
-  memberships = @person.group_memberships.includes(:project, :project_positions)
-  memberships = memberships.sort_by do |m|
-    roles = (project_roles[m.project] || [])
-    if roles.include?('project_administrator')
-      10
-    else
-      roles.length
-    end
-  end.reverse
-
-  max_visible ||= 5
-  visible_memberships = memberships[0...max_visible] || []
-  hidden_memberships = memberships[max_visible..-1] || []
+  memberships = @person.group_memberships
+  memberships_with_positions = memberships.select{|m| m.project_positions.any?}
+  memberships_without_positions = memberships - memberships_with_positions
 %>
 
 <% if memberships.any? %>
-  <%= panel("#{t('project')} positions and roles", id: 'project-positions') do %>
-    <% visible_memberships.each do |membership| %>
-      <%= render partial: 'people/membership_details', locals: { membership: membership,
-                                                                 roles: (project_roles[membership.project] || []) } %>
-    <% end %>
-    <% if hidden_memberships.any? %>
-      <div style="display: none" id="hidden-project-positions">
-        <% hidden_memberships.each do |membership| %>
-          <%= render partial: 'people/membership_details', locals: { membership: membership,
-                                                                     roles: (project_roles[membership.project] || []) } %>
+    <%
+      positions = {}
+      memberships_with_positions.each do |membership|
+        membership.project_positions.each do |position|
+          positions[position] ||= []
+          positions[position] << membership
+        end
+      end
+    %>
+    <%= panel("#{t('project')} positions", id: 'project-positions') do %>
+        <% positions.keys.each do |position| %>
+            <p>
+
+                <label><%= position.name %>:</label>
+                <%= membership_list(positions[position]) %>
+
+
+            </p>
         <% end %>
-      </div>
-      <a href="#" onclick="$j('#hidden-project-positions').slideDown(); $j(this).hide(); return false;" class="pull-right">
-        Show <%= hidden_memberships.count-%> more
-      </a>
+        <% if memberships_without_positions.any? %>
+            <p>
+                <label>Other <%= t('project').pluralize %>:</label>
+                <%= membership_list(memberships_without_positions) %>
+            </p>
+        <% end %>
+
     <% end %>
-  <% end %>
 <% end %>
