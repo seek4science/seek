@@ -9,22 +9,21 @@ module Seek
           @warnings = Set.new
         end
 
-        def add(item, text, value)
-          self << Warning.new(item, text, value)
+        def add(text, value)
+          self << Warning.new(text, value)
         end
 
         # A Warning, that contains the item warned about and some text describing the problem
         class Warning
-          attr_reader :item, :text, :value
+          attr_reader :text, :value
 
-          def initialize(item, text, value)
-            @item = item
+          def initialize(text, value)
             @text = text
             @value = value
           end
 
           def ==(other)
-            other.item == item && other.text == text && other.value == value
+            other.text == text && other.value == value
           end
 
           def eql?(other)
@@ -32,7 +31,7 @@ module Seek
           end
 
           def hash
-            item.hash ^ text.hash ^ value.hash
+            text.hash ^ value.hash
           end
         end
       end

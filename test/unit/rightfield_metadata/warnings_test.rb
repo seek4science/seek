@@ -7,36 +7,30 @@ class WarningsTest < ActiveSupport::TestCase
 
   test 'add' do
     assert_equal 0, @warnings.count
-    @warnings.add('1', 'a', 'aa')
-    @warnings.add('2', 'b', 'bb')
+    @warnings.add('a', 'aa')
+    @warnings.add('b', 'bb')
     assert_equal 2, @warnings.count
 
     # rejects duplicates
-    @warnings.add('2', 'b', 'bb')
+    @warnings.add('b', 'bb')
     assert_equal 2, @warnings.count
   end
 
   test 'warning equality' do
-    a = Seek::Templates::Extract::Warnings::Warning.new('a', 'aa', 'aaa')
-    a2 = Seek::Templates::Extract::Warnings::Warning.new('a', 'aa', 'aaa')
+    a = Seek::Templates::Extract::Warnings::Warning.new('aa', 'aaa')
+    a2 = Seek::Templates::Extract::Warnings::Warning.new('aa', 'aaa')
 
     assert a == a2
     assert a.eql? a2
     refute a.equal? a2
 
-    b = Seek::Templates::Extract::Warnings::Warning.new('b', 'aa', 'aaa')
+    b = Seek::Templates::Extract::Warnings::Warning.new('bb', 'aaa')
 
     refute a == b
     refute a.eql?(b)
     refute a.equal?(b)
 
-    b = Seek::Templates::Extract::Warnings::Warning.new('a', 'bb', 'aaa')
-
-    refute a == b
-    refute a.eql?(b)
-    refute a.equal?(b)
-
-    b = Seek::Templates::Extract::Warnings::Warning.new('a', 'aa', 'bbb')
+    b = Seek::Templates::Extract::Warnings::Warning.new('aa', 'bbb')
 
     refute a == b
     refute a.eql?(b)
@@ -47,23 +41,23 @@ class WarningsTest < ActiveSupport::TestCase
   end
 
   test 'iterate' do
-    @warnings.add('1', 'a', 'aa')
-    @warnings.add('2', 'b', 'bb')
-    @warnings.add('3', 'c', 'cc')
+    @warnings.add('a', 'aa')
+    @warnings.add('b', 'bb')
+    @warnings.add('c', 'cc')
 
     result = []
     @warnings.each do |warning|
-      result << [warning.item, warning.text, warning.value]
+      result << [warning.text, warning.value]
     end
 
-    assert_equal [%w[1 a aa], %w[2 b bb], %w[3 c cc]], result
+    assert_equal [%w[a aa], %w[b bb], %w[c cc]], result
   end
 
   test 'merge' do
-    @warnings.add('1', 'a', 'aa')
+    @warnings.add('a', 'aa')
     warnings2 = Seek::Templates::Extract::Warnings.new
-    warnings2.add('1', 'a', 'aa')
-    warnings2.add('2', 'b', 'bb')
+    warnings2.add('a', 'aa')
+    warnings2.add('b', 'bb')
 
     @warnings.merge(warnings2)
 
@@ -71,16 +65,16 @@ class WarningsTest < ActiveSupport::TestCase
 
     result = []
     @warnings.each do |warning|
-      result << [warning.item, warning.text, warning.value]
+      result << [warning.text, warning.value]
     end
 
-    assert_equal [%w[1 a aa], %w[2 b bb]], result
+    assert_equal [%w[a aa], %w[b bb]], result
   end
 
   test 'any? and empty?' do
     assert @warnings.empty?
     refute @warnings.any?
-    @warnings.add('1', 'a', 'aa')
+    @warnings.add('a', 'aa')
     refute @warnings.empty?
     assert @warnings.any?
   end
