@@ -20,10 +20,16 @@ module Seek
 
         def item_for_type(type)
           uri = seek_uri_by_type(type)
+          item = nil
           if uri && verify_uri_for_host(uri, type)
             id = uri.split('/').last
-            type.find_by_id(id)
+            item = type.find_by_id(id)
+            if !item
+              type_name = I18n.t(type.name.underscore)
+              add_warning("No item could found in the database for the #{type_name}",uri)
+            end
           end
+          item
         end
 
         def seek_uri_by_type(type)
@@ -32,12 +38,20 @@ module Seek
 
         def seek_id_uris
           values_for_property(:seekID, :literal).select do |uri|
-            uri =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
+            valid = uri =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
+            unless valid || uri.blank?
+              add_warning("A SEEK ID was found that is not a valid URI",uri)
+            end
+            valid
           end
         end
 
-        def verify_uri_for_host(uri, _type)
-          URI.parse(uri).host == URI.parse(Seek::Config.site_base_host).host
+        def verify_uri_for_host(uri, type)
+          valid = URI.parse(uri).host == URI.parse(Seek::Config.site_base_host).host
+          unless valid
+            add_warning("The ID for the #{I18n.t(type.name.underscore)} does not match this instance of SEEK",uri)
+          end
+          valid
         end
 
         def add_warning(text, value)

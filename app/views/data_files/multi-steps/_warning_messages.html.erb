@@ -4,12 +4,10 @@
   <ul>
 <% warnings.each do |warning| %>
     <li>
-      (<%= t(warning.item) %>)
       <%= warning.text %>
       <% unless warning.value.blank? %>
-        - <%= warning.value %>
+        - <em><%= warning.value %></em>
       <% end %>
-
     </li>
 
 <% end %>
