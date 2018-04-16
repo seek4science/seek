@@ -5,36 +5,45 @@ module Seek
       class RightfieldExtractor
         include RightField
 
-        attr_reader :parser
+        attr_reader :parser, :warnings
 
         delegate :value_for_property_and_index, :values_for_property, to: :parser
 
-        def initialize(source_data_file)
+        def initialize(source_data_file, warnings = Warnings.new)
           @parser = RightfieldCSVParser.new(generate_rightfield_csv(source_data_file))
+          @warnings = warnings
         end
 
         private
 
         def project
-          id = seek_id_by_type(Project)
-          Project.find_by_id(id) if id
+          item_for_type(Project)
         end
 
-        def seek_id_by_type(type)
-          uri = seek_id_uris.find { |id| id.include?("/#{type.name.tableize}/") }
-          uri.split('/').last if uri
+        def item_for_type(type)
+          uri = seek_uri_by_type(type)
+          if uri && verify_uri_for_host(uri, type)
+            id = uri.split('/').last
+            type.find_by_id(id)
+          end
+        end
+
+        def seek_uri_by_type(type)
+          seek_id_uris.find { |id| id.include?("/#{type.name.tableize}/") }
         end
 
         def seek_id_uris
           values_for_property(:seekID, :literal).select do |uri|
             uri =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
-          end.select do |uri|
-            uri_matches_host?(uri) # reject those that don't match the configured host
           end
         end
 
-        def uri_matches_host?(uri)
+        def verify_uri_for_host(uri, _type)
           URI.parse(uri).host == URI.parse(Seek::Config.site_base_host).host
+        end
+
+        def add_warning(item, text, value)
+          @warnings.add(item, text, value)
         end
       end
     end

@@ -12,16 +12,15 @@ module Seek
             assay.study = study if study
             assay.sops << sop if sop
           end
+          @warnings
         end
 
         def study
-          id = seek_id_by_type(Study)
-          Study.find_by_id(id) if id
+          item_for_type(Study)
         end
 
         def sop
-          id = seek_id_by_type(Sop)
-          Sop.find_by_id(id) if id
+          item_for_type(Sop)
         end
 
         def title

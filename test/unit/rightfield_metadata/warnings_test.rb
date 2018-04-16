@@ -76,4 +76,12 @@ class WarningsTest < ActiveSupport::TestCase
 
     assert_equal [%w[1 a aa], %w[2 b bb]], result
   end
+
+  test 'any? and empty?' do
+    assert @warnings.empty?
+    refute @warnings.any?
+    @warnings.add('1', 'a', 'aa')
+    refute @warnings.empty?
+    assert @warnings.any?
+  end
 end

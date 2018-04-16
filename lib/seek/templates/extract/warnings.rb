@@ -3,7 +3,7 @@ module Seek
     module Extract
       # Set based construct for collecting together extraction warnings
       class Warnings
-        delegate :<<, :each, :count, :merge, to: :@warnings
+        delegate :<<, :each, :count, :merge, :empty?, :any?, to: :@warnings
 
         def initialize
           @warnings = Set.new
