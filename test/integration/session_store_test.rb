@@ -18,7 +18,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
 
-    pretend_now_is(80.minutes.from_now) do
+    pretend_now_is(120.minutes.from_now) do
       get "/data_files/#{df.id}"
       assert_response :forbidden
     end
