@@ -65,7 +65,7 @@ class NelsController < ApplicationController
 
     title = [dataset['name'], params[:subtype_name]].reject(&:blank?).join(' - ')
 
-    @content_blob = ContentBlob.create(url: url)
+    @content_blob = ContentBlob.create(url: url.chomp)
     @data_file = DataFile.new(title: title)
     @data_file.content_blob = @content_blob
     @data_file.projects = @assay.projects
@@ -114,7 +114,7 @@ class NelsController < ApplicationController
   end
 
   def rest_client
-    client_class = Nels::Rest::DummyClient
+    client_class = Nels::Rest::Client
     @rest_client = client_class.new(@oauth_session.access_token)
   end
 
