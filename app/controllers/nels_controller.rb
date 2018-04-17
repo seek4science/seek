@@ -70,6 +70,7 @@ class NelsController < ApplicationController
     @data_file.content_blob = @content_blob
     @data_file.projects = @assay.projects
 
+    session[:uploaded_content_blob_id] = @content_blob.id
     session[:processed_datafile] = @data_file
     session[:processed_assay] = Assay.new
 
@@ -113,7 +114,7 @@ class NelsController < ApplicationController
   end
 
   def rest_client
-    client_class = Nels::Rest::Client
+    client_class = Nels::Rest::DummyClient
     @rest_client = client_class.new(@oauth_session.access_token)
   end
 
