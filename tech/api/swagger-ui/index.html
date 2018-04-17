@@ -36,6 +36,8 @@
 
     <script src="./swagger-ui-bundle.js"> </script>
     <script src="./swagger-ui-standalone-preset.js"> </script>
+    <script src="./disable-authorize.js"> </script>
+
     <script>
     window.onload = function() {
 
@@ -48,8 +50,10 @@
           SwaggerUIBundle.presets.apis,
           SwaggerUIStandalonePreset
         ],
+        supportedSubmitMethods: [],
         plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
+      SwaggerUIBundle.plugins.DownloadUrl,
+    DisableAuthorizePlugin,
         ],
         layout: "StandaloneLayout"
       })
