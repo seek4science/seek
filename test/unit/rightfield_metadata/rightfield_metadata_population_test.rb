@@ -161,6 +161,42 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
       assert_equal [sop], assay.sops
       assert_equal [sop], assay.assay_assets.collect(&:asset)
+
+      assert_empty warnings
+    end
+  end
+
+  test 'detect attempt to create duplicate assay' do
+    User.with_current_user(@user) do
+      blob = Factory(:rightfield_base_sample_template_with_assay)
+      data_file = DataFile.new(content_blob: blob)
+
+      study = Factory(:study, id: 9999, contributor: @person)
+      assert_equal 9999, study.id
+
+      duplicate_assay = Factory(:assay,title:'My Assay Title',study:study,contributor:@person)
+
+      project = Factory(:project, id: 9999)
+      assert_equal 9999, project.id
+      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.save!
+
+      data_file.populate_metadata_from_template
+
+      assay, warnings = data_file.initialise_assay_from_template
+      refute_nil assay
+
+      assert_equal 'My Assay Title', assay.title
+      assert_equal 'My Assay Description', assay.description
+      assert_equal 'http://jermontology.org/ontology/JERMOntology#Catabolic_response', assay.assay_type_uri
+      assert_equal 'http://jermontology.org/ontology/JERMOntology#2-hybrid_system', assay.technology_type_uri
+      assert_equal study, assay.study
+
+      assert_equal 1, warnings.count
+      text = []
+      warnings.each{|w| text << w.text}
+      assert_equal 'You are wanting to create a new Assay, but an existing Assay is found with the same title and Study',text[0]
+
     end
   end
 
