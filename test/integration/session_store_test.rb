@@ -7,7 +7,7 @@ class SessionStoreTest < ActionDispatch::IntegrationTest
   end
 
   test 'should timeout after 1 hour' do
-    assert_equal 15.minutes, Rails.application.config.session_options[:expire_after]
+    assert_equal 1.hour, Rails.application.config.session_options[:expire_after]
     df = Factory :data_file, contributor: User.current_user
     User.current_user = nil
     get "/data_files/#{df.id}"
