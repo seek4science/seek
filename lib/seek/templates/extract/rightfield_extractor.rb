@@ -17,10 +17,12 @@ module Seek
 
         private
 
+        attr_reader :warnings
+
         def project
           project = item_for_type(Project)
           if project && !current_user.person.member_of?(project)
-            add_warning(Warnings::NOT_A_PROJECT_MEMBER, project.rdf_seek_id)
+            add_warning(:not_a_project_member, project.rdf_seek_id)
             project = nil
           end
           project
@@ -28,18 +30,23 @@ module Seek
 
         def item_for_type(type, permission_to_check = 'view')
           uri = seek_uri_by_type(type)
+          item = item_for_uri(type, uri)
+          if item && item.authorization_supported? && !item.authorized_for_action(current_user, permission_to_check)
+            add_warning(
+              :no_permission,
+              uri, [permission_to_check, type]
+            )
+            item = nil
+          end
+          item
+        end
+
+        def item_for_uri(type, uri)
           item = nil
           if uri && verify_uri_for_host(uri, type)
             id = uri.split('/').last
             item = type.find_by_id(id)
-            add_warning(Warnings::NOT_IN_DB, uri, type) unless item
-          end
-          if item && item.authorization_supported? && !item.authorized_for_action(current_user, permission_to_check)
-            add_warning(
-              Warnings::NO_PERMISSION,
-              uri, [permission_to_check, type]
-            )
-            item = nil
+            add_warning(:not_in_db, uri, type) unless item
           end
           item
         end
@@ -52,7 +59,7 @@ module Seek
           values_for_property(:seekID, :literal).select do |uri|
             valid = uri =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
             unless valid || uri.blank?
-              add_warning(Warnings::ID_NOT_A_VALID_URI, uri)
+              add_warning(:id_not_a_valid_uri, uri)
             end
             valid
           end
@@ -60,12 +67,12 @@ module Seek
 
         def verify_uri_for_host(uri, type)
           valid = URI.parse(uri).host == URI.parse(Seek::Config.site_base_host).host
-          add_warning(Warnings::ID_NOT_MATCH_HOST, uri, type) unless valid
+          add_warning(:id_not_match_host, uri, type) unless valid
           valid
         end
 
         def add_warning(problem, value, extra_info = nil)
-          @warnings.add(problem, value, extra_info)
+          warnings.add(problem, value, extra_info)
         end
       end
     end

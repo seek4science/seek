@@ -5,14 +5,6 @@ module Seek
       class Warnings
         delegate :<<, :each, :count, :merge, :empty?, :any?, to: :@warnings
 
-        NO_PERMISSION = 1
-        NOT_A_PROJECT_MEMBER = 2
-        NOT_IN_DB = 3
-        ID_NOT_A_VALID_URI = 4
-        ID_NOT_MATCH_HOST = 5
-        NO_STUDY = 6
-        DUPLICATE_ASSAY = 7
-
         def initialize
           @warnings = Set.new
         end
@@ -28,10 +20,14 @@ module Seek
           # extra information that can help provide the text
           attr_reader :extra_info
 
+          VALID_PROBLEMS = %i[no_permission not_a_project_member not_in_db id_not_a_valid_match id_not_match_host no_study duplicate_assay].freeze
+
           def initialize(problem, value, extra_info)
             @value = value
             @problem = problem
             @extra_info = extra_info
+            check_problem
+
           end
 
           def ==(other)
@@ -44,6 +40,12 @@ module Seek
 
           def hash
             problem.hash ^ value.hash ^ extra_info.hash
+          end
+
+          private
+
+          def check_problem
+            raise("#{problem} is not a valid warning problem - valid options are: #{VALID_PROBLEMS.join(', ')}") unless VALID_PROBLEMS.include?(problem)
           end
         end
       end

@@ -5,23 +5,26 @@ module Seek
       class AssayRightfieldExtractor < RightfieldExtractor
         def populate(assay)
           unless title.blank?
-            assay.title = title
-            assay.description = description
-            assay.assay_type_uri = assay_type_uri
-            assay.technology_type_uri = technology_type_uri
-            assay.sops << sop if sop
-            if study
-              assay.study = study
-              check_for_duplicate_assay(assay)
-            else
-              add_warning(Warnings::NO_STUDY, nil)
-            end
-
+            populate_assay(assay)
+            check_for_duplicate_assay(assay)
           end
-          @warnings
+          warnings
         end
 
         private
+
+        def populate_assay(assay)
+          assay.title = title
+          assay.description = description
+          assay.assay_type_uri = assay_type_uri
+          assay.technology_type_uri = technology_type_uri
+          assay.sops << sop if sop
+          if study
+            assay.study = study
+          else
+            add_warning(:no_study, nil)
+          end
+        end
 
         def study
           item_for_type(Study, 'edit')
@@ -50,7 +53,7 @@ module Seek
         def check_for_duplicate_assay(assay)
           if !assay.title.blank? && assay.study
             dup_assay = assay.study.assays.where(title: assay.title).first
-            add_warning(Warnings::DUPLICATE_ASSAY, nil, dup_assay) if dup_assay
+            add_warning(:duplicate_assay, nil, dup_assay) if dup_assay
           end
         end
       end

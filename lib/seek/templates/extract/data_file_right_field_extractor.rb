@@ -8,7 +8,7 @@ module Seek
           data_file.description = description
           data_file.projects = [project] if project
           assay.associate(data_file) if assay
-          @warnings
+          warnings
         end
 
         def assay

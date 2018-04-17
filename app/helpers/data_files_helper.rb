@@ -26,20 +26,20 @@ module DataFilesHelper
   def extraction_warning_message(warning)
     extra_info = warning.extra_info
     case warning.problem
-    when Seek::Templates::Extract::Warnings::NO_PERMISSION
+    when :no_permission
       # [0] is the action, and [1] is the class of the object
       "You do not have permission to #{extra_info[0]} the #{t(extra_info[1].name.underscore)}"
-    when Seek::Templates::Extract::Warnings::NOT_A_PROJECT_MEMBER
+    when :not_a_project_member
       "You are not a member of the #{t('project')} provided, so cannot link to it."
-    when Seek::Templates::Extract::Warnings::NOT_IN_DB
+    when :not_in_db
       "No item could be found in the database for the #{t(extra_info.name.underscore)} SEEK ID provided"
-    when Seek::Templates::Extract::Warnings::ID_NOT_A_VALID_URI
+    when :id_not_a_valid_uri
       'A SEEK ID was provided which is no a valid URI'
-    when Seek::Templates::Extract::Warnings::ID_NOT_MATCH_HOST
+    when :id_not_match_host
       "The SEEK ID provided for the #{t(extra_info.name.underscore)} does not match this instance of SEEK"
-    when Seek::Templates::Extract::Warnings::NO_STUDY
+    when :no_study
       "You are trying to create a new #{t('assay')}, but no valid #{t('study')} has been provided"
-    when Seek::Templates::Extract::Warnings::DUPLICATE_ASSAY
+    when :duplicate_assay
       dup_assay_link = link_to(h(extra_info.title), extra_info, target: :_blank)
       "You are wanting to create a new #{t('assay')}, but an existing #{t('assay')} is found with the same title and #{t('study')} (#{dup_assay_link})".html_safe
     else

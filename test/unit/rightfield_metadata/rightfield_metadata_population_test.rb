@@ -195,7 +195,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
       assert_equal 1, warnings.count
       problems = []
       warnings.each { |w| problems << w.problem }
-      assert_equal Seek::Templates::Extract::Warnings::DUPLICATE_ASSAY, problems[0]
+      assert_equal :duplicate_assay, problems[0]
     end
   end
 
