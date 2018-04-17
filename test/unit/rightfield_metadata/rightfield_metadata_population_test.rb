@@ -174,7 +174,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
       study = Factory(:study, id: 9999, contributor: @person)
       assert_equal 9999, study.id
 
-      duplicate_assay = Factory(:assay,title:'My Assay Title',study:study,contributor:@person)
+      duplicate_assay = Factory(:assay, title: 'My Assay Title', study: study, contributor: @person)
 
       project = Factory(:project, id: 9999)
       assert_equal 9999, project.id
@@ -193,10 +193,9 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
       assert_equal study, assay.study
 
       assert_equal 1, warnings.count
-      text = []
-      warnings.each{|w| text << w.text}
-      assert_equal 'You are wanting to create a new Assay, but an existing Assay is found with the same title and Study',text[0]
-
+      problems = []
+      warnings.each { |w| problems << w.problem }
+      assert_equal Seek::Templates::Extract::Warnings::DUPLICATE_ASSAY, problems[0]
     end
   end
 

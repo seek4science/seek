@@ -1,36 +1,44 @@
 require 'test_helper'
 
 class WarningsTest < ActiveSupport::TestCase
+  include Seek::Templates::Extract
+
   def setup
     @warnings = Seek::Templates::Extract::Warnings.new
   end
 
   test 'add' do
     assert_equal 0, @warnings.count
-    @warnings.add('a', 'aa')
-    @warnings.add('b', 'bb')
+    @warnings.add(Warnings::NO_PERMISSION, 'aa', 'aaa')
+    @warnings.add(Warnings::NO_STUDY, 'bb', 'bbb')
     assert_equal 2, @warnings.count
 
     # rejects duplicates
-    @warnings.add('b', 'bb')
+    @warnings.add(Warnings::NO_STUDY, 'bb', 'bbb')
     assert_equal 2, @warnings.count
   end
 
   test 'warning equality' do
-    a = Seek::Templates::Extract::Warnings::Warning.new('aa', 'aaa')
-    a2 = Seek::Templates::Extract::Warnings::Warning.new('aa', 'aaa')
+    a = Warnings::Warning.new(Warnings::NO_PERMISSION, 'aa', 'extra')
+    a2 = Warnings::Warning.new(Warnings::NO_PERMISSION, 'aa', 'extra')
 
     assert a == a2
     assert a.eql? a2
     refute a.equal? a2
 
-    b = Seek::Templates::Extract::Warnings::Warning.new('bb', 'aaa')
+    b = Warnings::Warning.new(Warnings::NOT_IN_DB, 'aa', 'extra')
 
     refute a == b
     refute a.eql?(b)
     refute a.equal?(b)
 
-    b = Seek::Templates::Extract::Warnings::Warning.new('aa', 'bbb')
+    b = Warnings::Warning.new(Warnings::NO_PERMISSION, 'bb', 'extra')
+
+    refute a == b
+    refute a.eql?(b)
+    refute a.equal?(b)
+
+    b = Warnings::Warning.new(Warnings::NO_PERMISSION, 'aa', 'extra different')
 
     refute a == b
     refute a.eql?(b)
@@ -41,23 +49,23 @@ class WarningsTest < ActiveSupport::TestCase
   end
 
   test 'iterate' do
-    @warnings.add('a', 'aa')
-    @warnings.add('b', 'bb')
-    @warnings.add('c', 'cc')
+    @warnings.add(Warnings::NO_PERMISSION, 'a', 'aa')
+    @warnings.add(Warnings::NO_PERMISSION, 'b', 'bb')
+    @warnings.add(Warnings::DUPLICATE_ASSAY, 'c', 'cc')
 
     result = []
     @warnings.each do |warning|
-      result << [warning.text, warning.value]
+      result << [warning.problem, warning.value, warning.extra_info]
     end
 
-    assert_equal [%w[a aa], %w[b bb], %w[c cc]], result
+    assert_equal [[Warnings::NO_PERMISSION, 'a', 'aa'], [Warnings::NO_PERMISSION, 'b', 'bb'], [Warnings::DUPLICATE_ASSAY, 'c', 'cc']], result
   end
 
   test 'merge' do
-    @warnings.add('a', 'aa')
+    @warnings.add(Warnings::DUPLICATE_ASSAY, 'a', 'aa')
     warnings2 = Seek::Templates::Extract::Warnings.new
-    warnings2.add('a', 'aa')
-    warnings2.add('b', 'bb')
+    warnings2.add(Warnings::DUPLICATE_ASSAY, 'a', 'aa')
+    warnings2.add(Warnings::DUPLICATE_ASSAY, 'b', 'bb')
 
     @warnings.merge(warnings2)
 
@@ -65,16 +73,16 @@ class WarningsTest < ActiveSupport::TestCase
 
     result = []
     @warnings.each do |warning|
-      result << [warning.text, warning.value]
+      result << [warning.problem, warning.value, warning.extra_info]
     end
 
-    assert_equal [%w[a aa], %w[b bb]], result
+    assert_equal [[Warnings::DUPLICATE_ASSAY, 'a', 'aa'], [Warnings::DUPLICATE_ASSAY, 'b', 'bb']], result
   end
 
   test 'any? and empty?' do
     assert @warnings.empty?
     refute @warnings.any?
-    @warnings.add('a', 'aa')
+    @warnings.add(Warnings::DUPLICATE_ASSAY, 'aa')
     refute @warnings.empty?
     assert @warnings.any?
   end

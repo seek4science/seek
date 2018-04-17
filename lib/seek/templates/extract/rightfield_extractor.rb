@@ -20,7 +20,7 @@ module Seek
         def project
           project = item_for_type(Project)
           if project && !current_user.person.member_of?(project)
-            add_warning("You are not a member of the #{I18n.t('project')} specified", project.title)
+            add_warning(Warnings::NOT_A_PROJECT_MEMBER, project)
             project = nil
           end
           project
@@ -32,15 +32,12 @@ module Seek
           if uri && verify_uri_for_host(uri, type)
             id = uri.split('/').last
             item = type.find_by_id(id)
-            unless item
-              type_name = I18n.t(type.name.underscore)
-              add_warning("No item could found in the database for the #{type_name}", uri)
-            end
+            add_warning(Warnings::NOT_IN_DB, uri, type) unless item
           end
           if item && item.authorization_supported? && !item.authorized_for_action(current_user, permission_to_check)
             add_warning(
-              "You do no have permission to #{permission_to_check} the #{I18n.t(type.name.underscore)}",
-              uri
+              Warnings::NO_PERMISSION,
+              uri, [permission_to_check, type]
             )
             item = nil
           end
@@ -55,7 +52,7 @@ module Seek
           values_for_property(:seekID, :literal).select do |uri|
             valid = uri =~ URI::DEFAULT_PARSER.regexp[:ABS_URI]
             unless valid || uri.blank?
-              add_warning('A SEEK ID was found that is not a valid URI', uri)
+              add_warning(Warnings::ID_NOT_A_VALID_URI, uri)
             end
             valid
           end
@@ -63,14 +60,12 @@ module Seek
 
         def verify_uri_for_host(uri, type)
           valid = URI.parse(uri).host == URI.parse(Seek::Config.site_base_host).host
-          unless valid
-            add_warning("The SEEK ID for the #{I18n.t(type.name.underscore)} does not match this instance of SEEK", uri)
-          end
+          add_warning(Warnings::ID_NOT_MATCH_HOST, uri, type) unless valid
           valid
         end
 
-        def add_warning(text, value)
-          @warnings.add(text, value)
+        def add_warning(problem, value, extra_info = nil)
+          @warnings.add(problem, value, extra_info)
         end
       end
     end
