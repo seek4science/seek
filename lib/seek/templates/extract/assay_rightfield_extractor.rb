@@ -14,8 +14,7 @@ module Seek
               assay.study = study
               check_for_duplicate_assay(assay)
             else
-              add_warning(Warnings::NO_STUDY, assay,
-                          nil)
+              add_warning(Warnings::NO_STUDY, nil)
             end
 
           end
@@ -51,7 +50,7 @@ module Seek
         def check_for_duplicate_assay(assay)
           if !assay.title.blank? && assay.study
             dup_assay = assay.study.assays.where(title: assay.title).first
-            add_warning(Warnings::DUPLICATE_ASSAY, dup_assay) if dup_assay
+            add_warning(Warnings::DUPLICATE_ASSAY, nil, dup_assay) if dup_assay
           end
         end
       end

@@ -20,7 +20,7 @@ module Seek
         def project
           project = item_for_type(Project)
           if project && !current_user.person.member_of?(project)
-            add_warning(Warnings::NOT_A_PROJECT_MEMBER, project)
+            add_warning(Warnings::NOT_A_PROJECT_MEMBER, project.rdf_seek_id)
             project = nil
           end
           project

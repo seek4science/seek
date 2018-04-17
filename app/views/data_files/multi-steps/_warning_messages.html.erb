@@ -1,10 +1,11 @@
 <div class='alert alert-warning'>
   <h2>RightField extraction warnings</h2>
   <p>There were some issues detected during the extraction that are not critical, but you should be aware of:</p>
+  <br/>
   <ul>
 <% warnings.each do |warning| %>
     <li>
-      <%= h(warning.text) %>
+      <%= extraction_warning_message(warning) %>
       <% unless warning.value.blank? %>
         - <em><%= h(warning.value) %></em>
       <% end %>
