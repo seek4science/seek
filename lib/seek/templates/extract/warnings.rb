@@ -13,21 +13,22 @@ module Seek
           self << Warning.new(problem, value, extra_info)
         end
 
-        # A Warning, that contains the type of problem, the value, and any extra info that helps construct a useful message
+        # A Warning, that contains the type of problem, the value,
+        # and any extra info that helps construct a useful message
         class Warning
           attr_reader :problem, :value
 
           # extra information that can help provide the text
           attr_reader :extra_info
 
-          VALID_PROBLEMS = %i[no_permission not_a_project_member not_in_db id_not_a_valid_match id_not_match_host no_study duplicate_assay].freeze
+          VALID_PROBLEMS = %i[no_permission not_a_project_member not_in_db
+                              id_not_a_valid_match id_not_match_host no_study duplicate_assay].freeze
 
           def initialize(problem, value, extra_info)
             @value = value
             @problem = problem
             @extra_info = extra_info
             check_problem
-
           end
 
           def ==(other)
@@ -45,7 +46,8 @@ module Seek
           private
 
           def check_problem
-            raise("#{problem} is not a valid warning problem - valid options are: #{VALID_PROBLEMS.join(', ')}") unless VALID_PROBLEMS.include?(problem)
+            return if VALID_PROBLEMS.include?(problem)
+            raise("#{problem} is not a valid warning problem - valid options are: #{VALID_PROBLEMS.join(', ')}")
           end
         end
       end
