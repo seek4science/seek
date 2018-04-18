@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class NelsIntegrationTest < ActionDispatch::IntegrationTest
+  fixtures :assay_classes
+
   include MockHelper
   include NelsTestHelper
   include HtmlHelper

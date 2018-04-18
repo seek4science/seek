@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class NelsControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
   include NelsTestHelper
 
