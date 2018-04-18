@@ -35,7 +35,7 @@
           <%= text_area_tag 'assay[description]', @assay.description, :class => "form-control", :rows => 5 %>
         </div>
         <div class="form-group">
-          <label>Study</label>
+          <label>Study <span class="required">*</span></label>
           <%= assay_study_selection('assay[study_id]', @assay.study) %>
         </div>
         <div class="form-group">
