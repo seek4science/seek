@@ -132,7 +132,7 @@ module RestTestCases
       item = Factory itemname.to_sym, policy: Factory(:private_policy)
       logout
 
-      get :show, rest_show_url_options(object).merge(id: item.id, format: format)
+      get :show, rest_show_url_options.merge(id: item.id, format: format)
       assert_response :forbidden
     end
   end
