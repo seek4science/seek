@@ -130,9 +130,10 @@ module RestTestCases
     if clz.respond_to?(:authorization_supported?) && clz.authorization_supported?
       itemname = @controller.controller_name.singularize.underscore
       item = Factory itemname.to_sym, policy: Factory(:private_policy)
+      url_opts = rest_show_url_options.merge(id: item.id, format: format)
       logout
 
-      get :show, rest_show_url_options.merge(id: item.id, format: format)
+      get :show, url_opts
       assert_response :forbidden
     end
   end
@@ -152,9 +153,11 @@ module RestTestCases
     id = 9999
     id += 1 until clz.find_by_id(id).nil?
 
+    url_opts = rest_show_url_options.merge(id: id, format: format)
+
     logout
 
-    get :show, rest_show_url_options.merge(id: id, format: format)
+    get :show, url_opts
     assert_response :not_found
   end
 
