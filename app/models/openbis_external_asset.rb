@@ -95,12 +95,14 @@ class OpenbisExternalAsset < ExternalAsset
         .scrub!(:prune).to_text.strip
   end
 
-  def fetch_externally
-    seek_util.fetch_current_entity_version(self)
-  end
+  #
+  #def fetch_externally
+  #  seek_util.fetch_current_entity_version(self)
+  #end
+  #
 
-  def seek_util
-    @seek_util ||= Seek::Openbis::SeekUtil.new
-  end
+  #def seek_util
+  #  @seek_util ||= Seek::Openbis::SeekUtil.new
+  #end
 
 end

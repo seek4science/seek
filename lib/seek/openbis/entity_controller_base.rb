@@ -13,8 +13,14 @@ module Seek
         base.before_filter :get_project
         base.before_filter :project_member?, except: [:show_dataset_files]
 
-        base.before_filter :get_entity, only: [:show, :edit, :register, :update]
-        base.before_filter :prepare_asset, only: [:show, :edit, :register, :update]
+        base.before_filter :get_entity, only: [:show, :edit, :register, :update, :refresh]
+        base.before_filter :prepare_asset, only: [:show, :edit, :register, :update, :refresh]
+      end
+
+      def refresh
+        puts "REFRESH"
+        redirect_to @asset
+        #redirect_to @asset.seek_entity
       end
 
       def get_endpoint

@@ -213,6 +213,112 @@ class SeekUtilTest < ActiveSupport::TestCase
     end
   end
 
+  test 'sync_asset_content refreshes dataset content and set sync status' do
+
+    dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+    dataset2 = Seek::Openbis::Dataset.new(@endpoint, '20160215111736723-31')
+
+    asset = OpenbisExternalAsset.build(dataset1)
+    asset.synchronized_at = DateTime.now - 1.days
+    asset.external_id = dataset2.perm_id
+    asset.seek_entity = Factory :data_file
+
+    assert_not_equal dataset2.perm_id, asset.content.perm_id
+
+    asset.sync_state = :refresh
+    assert asset.save
+
+    refute asset.synchronized?
+    @util.sync_asset_content(asset)
+
+    asset.reload
+
+    assert asset.synchronized?
+    assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
+    assert_equal dataset2.perm_id, asset.content.perm_id
+  end
+
+  test 'sync_asset_content refreshes zample content and set sync status' do
+
+    asset = OpenbisExternalAsset.build(@zample)
+    asset.synchronized_at = DateTime.now - 1.days
+    asset.external_id = '20171002172639055-39'
+    asset.seek_entity = Factory :assay
+
+    assert_not_equal '20171002172639055-39', asset.content.perm_id
+
+    asset.sync_state = :refresh
+    assert asset.save
+
+    refute asset.synchronized?
+    @util.sync_asset_content(asset)
+
+    asset.reload
+
+    assert asset.synchronized?
+    assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
+    assert_equal '20171002172639055-39', asset.content.perm_id
+  end
+
+  test 'sync_asset_content sets error on failure' do
+
+    dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+
+    asset = OpenbisExternalAsset.build(dataset1)
+    asset.synchronized_at = DateTime.now - 1.days
+    d = asset.synchronized_at
+    asset.external_id = 'missing_id'
+    asset.seek_entity = Factory :data_file
+
+    asset.sync_state = :refresh
+    assert asset.save
+
+    refute asset.failed?
+    refute asset.err_msg
+    @util.sync_asset_content(asset)
+
+    asset = OpenbisExternalAsset.find(asset.id)
+    asset.reload
+
+    assert asset.failed?
+    assert asset.err_msg
+    assert_equal d.to_date, asset.synchronized_at.to_date
+  end
+
+  test 'sync_asset_content queues index job if content changed' do
+
+    dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
+    dataset2 = Seek::Openbis::Dataset.new(@endpoint, '20160215111736723-31')
+
+    data_file = Factory :data_file
+    asset = OpenbisExternalAsset.build(dataset1)
+    asset.synchronized_at = DateTime.now - 1.days
+    asset.external_id = dataset2.perm_id
+
+    asset.seek_entity = data_file
+
+    assert_not_equal dataset2.perm_id, asset.content.perm_id
+
+    assert asset.save
+
+    Delayed::Job.destroy_all
+    ReindexingQueue.destroy_all
+    assert_difference('Delayed::Job.count', 1) do
+      @util.sync_asset_content(asset)
+    end
+    assert ReindexingQueue.exists?(item: data_file)
+
+    asset.reload
+    Delayed::Job.destroy_all
+    ReindexingQueue.destroy_all
+    assert_no_difference('Delayed::Job.count') do
+      # same content no change
+      @util.sync_asset_content(asset)
+    end
+    refute ReindexingQueue.exists?(item: data_file)
+  end
+
+
   test 'sync_external_asset refreshes dataset content and set sync status' do
 
     dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')

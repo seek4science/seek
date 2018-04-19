@@ -37,13 +37,13 @@ class ExternalAsset < ActiveRecord::Base
 
     self.synchronized_at = DateTime.now
     self.sync_state = :synchronized
+    self.err_msg=nil
     self.external_mod_stamp = extract_mod_stamp(content_object)
     self.version = self.version ? self.version+1 : 1
 
   end
 
   def content
-    synchronize_content unless synchronized?
     load_local_content unless @local_content
     @local_content
   end
@@ -63,22 +63,6 @@ class ExternalAsset < ActiveRecord::Base
 
   def load_local_content
     @local_content = deserialize_content(local_content_json)
-  end
-
-  def synchronize_content
-    obj = fetch_externally
-    if obj
-      self.content = obj
-    else
-      self.sync_state = :failed
-    end
-
-    save!
-
-  end
-
-  def fetch_externally
-    raise 'Remote sync not implemented'
   end
 
   def extract_mod_stamp(content_object)

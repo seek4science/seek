@@ -340,18 +340,22 @@ class ExternalAssetTest < ActiveSupport::TestCase
 
   test 'setting content object updates state' do
     asset1 = ExternalAsset.new({ external_service: 'OpenBIS', external_id: '24' })
+    asset1.err_msg= 'Wrong'
+    asset1.sync_state = :failed
 
+    refute asset1.synchronized?
     obj = { key: 123 }
     asset1.content = obj
 
     assert asset1.synchronized_at
     assert_equal 'synchronized', asset1.sync_state
     assert asset1.synchronized?
-    assert_equal 1, asset1.version
+    refute asset1.err_msg
 
+    assert_equal 1, asset1.version
     assert_same obj, asset1.content
     assert asset1.save
-    # assert_equal '{"key":123}', asset1.local_content_json
+    assert_equal '{"key":123}', asset1.send(:local_content_json)
 
   end
 
@@ -370,6 +374,7 @@ class ExternalAssetTest < ActiveSupport::TestCase
   end
 
   test 'accessing content triggers not implemented fetching if state is not synchronized' do
+    skip 'Remote fetching now is done explicit by controller or background job'
     asset1 = ExternalAsset.new({ external_service: 'OpenBIS', external_id: '24' })
 
     obj = { "tomek" => 'yes' }
@@ -380,43 +385,23 @@ class ExternalAssetTest < ActiveSupport::TestCase
       assert_equal obj, asset1.content
     end
 
-
   end
 
-  class ExternalWithRemote < ExternalAsset
-
-    attr_accessor :expected, :expected_date
-
-    def extract_mod_stamp(content_object)
-      @expected_date
-    end
-
-    def fetch_externally
-      @expected
-    end
-
-  end
-
-  test 'accessing content triggers fetching if state is not synchronized' do
-    asset1 = ExternalWithRemote.new({ external_service: 'OpenBIS', external_id: '24' })
-
-    asset1.expected = { "remote" => 'yes' }
-    asset1.expected_date = '12345'
-    obj = { "tomek" => 'no' }
+  test 'accessing content just gives local json if state is not synchronized' do
+    asset1 = ExternalAsset.new({ external_service: 'OpenBIS', external_id: '24' })
+    obj = { "tomek" => 'yes' }
     asset1.content = obj
+    assert asset1.save
+
+    asset1 = ExternalAsset.find(asset1.id)
+    asset1.reload
+
     asset1.sync_state = :refresh
-
-    obj = asset1.content
-    assert_equal '12345', asset1.external_mod_stamp
-    assert_equal asset1.expected, obj
-    assert asset1.synchronized?
-
-    asset1.expected = { "hope" => 'yes' }
-    asset1.sync_state = :failed
-    assert_equal asset1.expected, asset1.content
-    assert asset1.synchronized?
+    assert_equal obj, asset1.content
 
   end
+
+
 
 
 end

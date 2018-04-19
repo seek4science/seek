@@ -98,15 +98,35 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         assay
       end
 
-      def sync_external_asset(obis_asset)
+      def sync_asset_content(obis_asset)
 
-        entity = fetch_current_entity_version(obis_asset)
+        begin
+          entity = fetch_current_entity_version(obis_asset)
+          entity.prefetch_files if entity.is_a? Seek::Openbis::Dataset
+          obis_asset.content=entity
+        rescue Exception => exception
+          obis_asset.sync_state = :failed
+          obis_asset.err_msg = sync_err_to_msg(exception, obis_asset)
+        end
 
-        obis_asset.content=entity
-        # saving automatically triggers reindexing
+        # saving automatically triggers reindexing if needed
         obis_asset.save!
 
-        # TODO maybe depended should be followed first (before the saving and indexing )in case of errors?
+      end
+
+      def sync_err_to_msg(exception, obis_asset)
+        Rails.logger.error("Cannot sync #{obis_asset.external_type} #{obis_asset.external_id}")
+        Rails.logger.error(exception)
+        puts "#{exception.class}"
+        puts "#{exception}"
+        exception.to_s
+      end
+
+      def sync_external_asset(obis_asset)
+
+        sync_asset_content(obis_asset)
+        raise "Sync failed: #{obis_asset.err_msg}" if obis_asset.failed?
+
         errs = []
         errs = follow_dependent(obis_asset) if should_follow_dependent(obis_asset)
         raise errs.join(', ') unless errs.empty?
