@@ -39,6 +39,8 @@ module Seek
       def createObisDataFile(datafile_params, creator, obis_asset)
 
         dataset = obis_asset.content
+        # files are prefetched so the details are available even if OBis is down
+        dataset.prefetch_files
         openbis_endpoint = obis_asset.seek_service
 
         datafile_params[:projects] = [openbis_endpoint.project]

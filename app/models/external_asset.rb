@@ -14,6 +14,7 @@ class ExternalAsset < ActiveRecord::Base
   validates :external_id, uniqueness: { scope: :external_service }
   validates :external_service, uniqueness: { scope: :external_id }
 
+  before_save :content_to_json
   before_save :save_content_blob
   before_save :options_to_json
 
@@ -32,7 +33,8 @@ class ExternalAsset < ActiveRecord::Base
     self.content_changed = detect_change(content_object, json)
 
     @local_content = content_object
-    self.local_content_json = json
+    @needs_serialization = true # serialization is postponed in case content would change externaly
+
     self.synchronized_at = DateTime.now
     self.sync_state = :synchronized
     self.external_mod_stamp = extract_mod_stamp(content_object)
@@ -50,6 +52,7 @@ class ExternalAsset < ActiveRecord::Base
     return content_object.json if (defined? content_object.json) && content_object.json.is_a?(String)
     return content_object.json.to_json if (defined? content_object.json) && content_object.json.is_a?(Hash)
     return content_object.to_json if defined? content_object.to_json
+    return content_object if content_object.is_a?(String)
     raise 'Not implemented json serialization for external content'
   end
 
@@ -86,18 +89,12 @@ class ExternalAsset < ActiveRecord::Base
     external_mod_stamp != extract_mod_stamp(content_object)
   end
 
-  def local_content_json=(content)
-    raise 'Content must be a String' unless content.is_a? String
-    init_content_holder
-    content_blob.data = content
+  def content_to_json
+    self.local_content_json= serialize_content(@local_content) if @needs_serialization
+
   end
 
-  def local_content_json
-    return nil if (content_blob.nil? || content_blob.new_record?)
-    ans = content_blob.read
-    content_blob.rewind
-    ans
-  end
+
 
   def init_content_holder()
     if content_blob.nil?
@@ -124,7 +121,7 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def needs_reindexing
-    content_changed || external_mod_stamp_changed?
+    content_changed || external_mod_stamp_changed? || new_record?
   end
 
   def trigger_reindexing
@@ -135,6 +132,19 @@ class ExternalAsset < ActiveRecord::Base
     []
   end
 
+  protected
 
+  def local_content_json=(content)
+    raise 'Content must be a String' unless content.is_a? String
+    init_content_holder
+    content_blob.data = content
+  end
+
+  def local_content_json
+    return nil if (content_blob.nil? || content_blob.new_record?)
+    ans = content_blob.read
+    content_blob.rewind
+    ans
+  end
 
 end

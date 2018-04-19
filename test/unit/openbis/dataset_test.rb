@@ -171,4 +171,62 @@ class DatasetTest < ActiveSupport::TestCase
     assert_nil dataset2.registered_as
 
   end
+
+  test 'construct_files_from_json makes DataFiles from json hash' do
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
+    files_json = []
+
+    files = dataset.construct_files_from_json(files_json)
+    assert_equal [], files
+
+    txt = '[
+{"path":"","filePermId":"20160210130454955-23#","dataset":"20160210130454955-23","isDirectory":true,"fileLength":0},
+{"path":"original","filePermId":"20160210130454955-23#original","dataset":"20160210130454955-23","isDirectory":true,"fileLength":0},
+{"path":"original/DEFAULT","filePermId":"20160210130454955-23#original/DEFAULT","dataset":"20160210130454955-23","isDirectory":true,"fileLength":0},
+{"path":"original/DEFAULT/Stanford_et_al-2015-Molecular_Systems_Biology.pdf","filePermId":"20160210130454955-23#original/DEFAULT/Stanford_et_al-2015-Molecular_Systems_Biology.pdf","dataset":"20160210130454955-23","isDirectory":false,"fileLength":430028},
+{"path":"original/DEFAULT/fairdom-logo-compact.svg","filePermId":"20160210130454955-23#original/DEFAULT/fairdom-logo-compact.svg","dataset":"20160210130454955-23","isDirectory":false,"fileLength":9142}
+]'
+    files_json = JSON.parse txt
+    files = dataset.construct_files_from_json(files_json)
+
+    assert_equal 5, files.size
+  end
+
+  test 'populate_from_json uses serialized data_files if present' do
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
+    refute dataset.json['dataset_files']
+    assert_equal 1, dataset.dataset_file_count
+
+    json = dataset.json.clone
+    txt = '[
+{"path":"","filePermId":"20160210130454955-23#","dataset":"20160210130454955-23","isDirectory":true,"fileLength":0},
+{"path":"original","filePermId":"20160210130454955-23#original","dataset":"20160210130454955-23","isDirectory":true,"fileLength":0},
+{"path":"original/DEFAULT","filePermId":"20160210130454955-23#original/DEFAULT","dataset":"20160210130454955-23","isDirectory":true,"fileLength":0},
+{"path":"original/DEFAULT/Stanford_et_al-2015-Molecular_Systems_Biology.pdf","filePermId":"20160210130454955-23#original/DEFAULT/Stanford_et_al-2015-Molecular_Systems_Biology.pdf","dataset":"20160210130454955-23","isDirectory":false,"fileLength":2000},
+{"path":"original/DEFAULT/fairdom-logo-compact.svg","filePermId":"20160210130454955-23#original/DEFAULT/fairdom-logo-compact.svg","dataset":"20160210130454955-23","isDirectory":false,"fileLength":500}
+]'
+    files_json = JSON.parse txt
+    json['dataset_files'] = files_json
+
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint).populate_from_json(json)
+    assert_equal 2, dataset.dataset_file_count
+    assert_equal 2500, dataset.size
+
+  end
+
+  test 'prefetch_files queries for files and sets them in object and json' do
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
+    json = dataset.json.clone
+    json['dataset_files'] = []
+
+    dataset = Seek::Openbis::Dataset.new(@openbis_endpoint).populate_from_json(json)
+    assert_equal [], dataset.dataset_files
+    assert_equal [], dataset.json['dataset_files']
+
+    dataset.prefetch_files
+    refute dataset.dataset_files.empty?
+    refute dataset.json['dataset_files'].empty?
+    assert_equal 3, dataset.dataset_files.size
+    dataset.json['dataset_files'].each { |f| assert f}
+  end
 end

@@ -19,6 +19,7 @@ module Seek
       end
 
       def populate_from_json(json)
+        @json = json
         @path = json['path']
         @dataset_perm_id = json['dataset']
         @file_perm_id = json['filePermId']

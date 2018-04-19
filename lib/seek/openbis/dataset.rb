@@ -5,12 +5,19 @@ module Seek
       attr_reader :dataset_type, :experiment_id, :sample_ids, :properties
 
       def populate_from_json(json)
-        @properties = json['properties']
+        @properties = json['properties'] || {}
         @properties.delete_if { |key, _value| key == '@type' }
         @dataset_type = json['dataset_type']
         @experiment_id = json['experiment']
-        @sample_ids = json['samples'].last
+        @sample_ids = json['samples'] ? json['samples'].last : nil
+        @dataset_files = construct_files_from_json(json['dataset_files']) if json['dataset_files']
         super(json)
+      end
+
+      def construct_files_from_json(files_json)
+        files_json
+            .map { |json| Seek::Openbis::DatasetFile.new(openbis_endpoint).populate_from_json(json) }
+            .sort_by(&:path)
       end
 
       def dataset_type_text
@@ -39,6 +46,12 @@ module Seek
         dataset_type_text
       end
 
+      def prefetch_files
+        @dataset_files = Seek::Openbis::DatasetFile.new(openbis_endpoint).find_by_dataset_perm_id(perm_id)
+        json['dataset_files'] = @dataset_files.map(&:json)
+        @dataset_files
+      end
+
       def dataset_files
         @dataset_files ||= Seek::Openbis::DatasetFile.new(openbis_endpoint).find_by_dataset_perm_id(perm_id)
       end
@@ -47,8 +60,6 @@ module Seek
         dataset_files.reject(&:is_directory)
       end
 
-      # FIMXE: we can speed things up and get this directly from the first API call rather than
-      #   fetching the datasets, only getting the datasets on demand
       def dataset_file_count
         dataset_files_no_directories.count
       end
@@ -95,7 +106,6 @@ module Seek
         end
         df
       end
-
 
 
       def content_blob_uri

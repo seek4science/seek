@@ -92,7 +92,16 @@ class SeekUtilTest < ActiveSupport::TestCase
       end
     end
 
+    # content blob is created as there are many SEEK code which assuems cb are present in assets
     assert df.content_blob
+
+    # check if datafiles have been prefetched before saving df
+    df = DataFile.find(df.id)
+    df.reload
+
+    dataset = df.external_asset.content
+    assert dataset
+    assert 3, dataset.json['dataset_files'].size
   end
 
   test 'extract title includes name from property if present' do

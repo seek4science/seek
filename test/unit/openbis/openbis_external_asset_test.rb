@@ -38,7 +38,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert asset.save
 
     assert asset.sync_options_json
-    assert asset.local_content_json
+    assert asset.send(:local_content_json)
     assert_same zample, asset.content
   end
 
@@ -85,7 +85,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert asset.save
 
     assert asset.sync_options_json
-    assert asset.local_content_json
+    assert asset.send(:local_content_json)
     assert_same entity, asset.content
   end
 
@@ -99,6 +99,22 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert asset.save
 
     assert OpenbisExternalAsset.registered?(zample)
+
+  end
+
+  test 'needs_reindexing is always true for new record' do
+
+    asset = OpenbisExternalAsset.new
+    assert asset.needs_reindexing
+
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+    options = {tomek: false}
+    asset = OpenbisExternalAsset.build(zample, options)
+
+    assert asset.needs_reindexing
+
+    asset.content = zample
+    assert asset.needs_reindexing
 
   end
 
