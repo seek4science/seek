@@ -1,0 +1,35 @@
+{
+  "data": {
+    "id": "1050453203",
+    "type": "content_blobs",
+    "attributes": {
+      "original_filename": "min file",
+      "url": null,
+      "md5sum": "726de0a3f94d65056b909b9736e10349",
+      "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+      "content_type": null,
+      "size": 8
+    },
+    "relationships": {
+      "asset": {
+        "data": {
+          "id": "1055250739",
+          "type": "sops"
+        }
+      }
+    },
+    "links": {
+      "self": "/sops/1055250739/content_blobs/1050453203"
+    },
+    "meta": {
+      "created": "2018-04-18T14:24:16.000Z",
+      "modified": "2018-04-18T14:24:16.000Z",
+      "api_version": "0.1",
+      "uuid": "18dd0e40-2542-0136-c088-0800279c491a",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

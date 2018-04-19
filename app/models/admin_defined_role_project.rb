@@ -11,6 +11,10 @@ class AdminDefinedRoleProject < ActiveRecord::Base
   after_commit :queue_update_auth_table, :if=>:persisted?
   before_destroy :queue_update_auth_table
 
+  def roles
+    Seek::Roles::Roles.instance.role_names_for_mask(role_mask)
+  end
+
   private
 
   def queue_update_auth_table

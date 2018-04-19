@@ -854,6 +854,28 @@
         "$ref" : "#/definitions/anySkeleton"
       }
     },
+    "anyReference" : {
+      "properties" : {
+        "id" : {
+          "$ref" : "#/definitions/nonEmptyString"
+        },
+        "type" : {
+          "$ref" : "#/definitions/anyType"
+        }
+      },
+      "required" : [ "id", "type" ],
+      "additionalProperties" : false
+    },
+    "anySingletonReference" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "$ref" : "#/definitions/anyReference"
+        }
+      },
+      "required" : [ "data" ],
+      "additionalProperties" : false
+    },
     "assayReference" : {
       "properties" : {
         "id" : {
@@ -4932,6 +4954,70 @@
         "size"
       ],
       "additionalProperties": false
+    },
+    "contentBlobResponse" : {
+      "type" : "object",
+      "properties" : {
+        "data" : {
+          "type" : "object",
+          "properties" : {
+            "id" : {
+              "$ref" : "#/definitions/nonEmptyString"
+            },
+            "type" : {
+              "$ref" : "#/definitions/contentBlobType"
+            },
+            "attributes" : {
+              "type" : "object",
+              "properties" : {
+                "original_filename": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "url": {
+                  "$ref": "#/definitions/nullableUriString"
+                },
+                "md5sum": {
+                  "$ref": "#/definitions/nullableMd5sumString"
+                },
+                "sha1sum": {
+                  "$ref": "#/definitions/nullableSha1sumString"
+                },
+                "content_type": {
+                  "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "size": {
+                  "$ref": "#/definitions/nullableInteger"
+                }
+              },
+              "required": ["original_filename", "url", "md5sum", "sha1sum", "content_type", "size"],
+              "additionalProperties" : false
+            },
+            "relationships" : {
+              "type" : "object",
+              "properties" : {
+                "asset" : {
+                  "$ref" : "#/definitions/anySingletonReference"
+                }
+              },
+              "required" : [ "asset" ],
+              "additionalProperties" : false
+            },
+            "links" : {
+              "$ref" : "#/definitions/linksType"
+            },
+            "meta" : {
+              "$ref" : "#/definitions/metaType"
+            }
+          },
+          "required" : [ "id", "type", "attributes", "relationships", "links", "meta" ],
+          "additionalProperties" : false
+        },
+        "jsonapi" : {
+          "$ref" : "#/definitions/JsonApiVersion"
+        }
+      },
+      "required" : [ "data", "jsonapi" ],
+      "additionalProperties" : false
     }
   }
 }
