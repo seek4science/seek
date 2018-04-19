@@ -28,16 +28,16 @@ var MultiStepWizard = {
     numberOfSteps:function() {
       return $j('.multi-step-block').length;
     },
-    renderProgressBlobs: function() {
+    renderProgressIndicators: function() {
         var n = MultiStepWizard.numberOfSteps();
 
-        $j('.multi-step-progress-blobs').each(function (index) {
+        $j('.multi-step-progress-indicator').each(function (index) {
             for (var i=0;i<n;i++) {
                 if (i == index) {
-                    $j(this).append($j("<span/>").attr({class:'glyphicon glyphicon-apple'}));
+                    $j(this).append($j("<span/>").attr({class:'multi-step-progress-indicator-icon'}));
                 }
                 else {
-                    $j(this).append($j("<span/>").attr({class:'glyphicon glyphicon-apple'}).css({opacity:0.2}));
+                    $j(this).append($j("<span/>").attr({class:'multi-step-progress-indicator-icon'}).css({opacity:0.2}));
                 }
 
             }
@@ -49,7 +49,7 @@ var MultiStepWizard = {
 $j(document).ready(function () {
     MultiStepWizard.jumpToStep(1);
 
-    MultiStepWizard.renderProgressBlobs();
+    MultiStepWizard.renderProgressIndicators();
 
     $j('.multi-step-next-button').click(function () {
         MultiStepWizard.nextStep();
