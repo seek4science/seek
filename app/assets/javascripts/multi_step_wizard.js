@@ -24,11 +24,32 @@ var MultiStepWizard = {
     lastStep: function() {
         var lastId = $j('.multi-step-block').map(function(){return this.id}).toArray().sort().last();
         return lastId.gsub('step-','');
+    },
+    numberOfSteps:function() {
+      return $j('.multi-step-block').length;
+    },
+    renderProgressIndicators: function() {
+        var n = MultiStepWizard.numberOfSteps();
+
+        $j('.multi-step-progress-indicator').each(function (index) {
+            for (var i=0;i<n;i++) {
+                if (i == index) {
+                    $j(this).append($j("<span/>").attr({class:'multi-step-progress-indicator-icon'}));
+                }
+                else {
+                    $j(this).append($j("<span/>").attr({class:'multi-step-progress-indicator-icon'}).css({opacity:0.2}));
+                }
+
+            }
+        });
     }
+
 };
 
 $j(document).ready(function () {
     MultiStepWizard.jumpToStep(1);
+
+    MultiStepWizard.renderProgressIndicators();
 
     $j('.multi-step-next-button').click(function () {
         MultiStepWizard.nextStep();

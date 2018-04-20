@@ -42,5 +42,5 @@
 *= require openbis
 *= require eonasdan-bootstrap-datetimepicker
 *= require cytoscape_isa_graph
-*= require multi-step-wizard.css
+*= require multi-step-wizard.css.erb
 */
