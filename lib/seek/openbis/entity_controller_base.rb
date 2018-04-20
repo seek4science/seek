@@ -13,7 +13,7 @@ module Seek
         base.before_filter :get_project
         base.before_filter :project_member?, except: [:show_dataset_files]
 
-        base.before_filter :get_entity, only: [:show, :edit, :register, :update, :refresh]
+        base.before_filter :check_entity, only: [:show, :edit, :register, :update, :refresh]
         base.before_filter :prepare_asset, only: [:show, :edit, :register, :update, :refresh]
       end
 
@@ -22,9 +22,19 @@ module Seek
 
         seek_util.sync_asset_content(@asset)
 
-        flash[:error] = @asset.err_msg if @asset.failed?
+        flash[:error] = "OBis synchronization failed: #{@asset.err_msg}" if @asset.failed?
         flash[:notice] = 'Updated OpenBis content' if @asset.synchronized?
         redirect_to action: 'edit'
+      end
+
+      def check_entity
+        begin
+          get_entity
+        rescue Exception => e
+          msg = seek_util.extract_err_message(e)
+          flash[:error] = "Cannot access OBis: #{msg}"
+          redirect_back # fallback_location: @project
+        end
       end
 
       def get_endpoint

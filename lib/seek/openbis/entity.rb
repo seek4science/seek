@@ -18,15 +18,21 @@ module Seek
         if perm_id
 
           cache_option = refresh ? { force: true } : nil
-          begin
+
+          #no more rescu, it was a mess, should propagete from constructor
+          #begin
             json = query_application_server_by_perm_id(perm_id, cache_option)
             unless json[json_key]
               raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
             end
+            unless json[json_key].size == 1
+              raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}, got #{json[json_key].size} hits"
+            end
             populate_from_json(json[json_key].first)
-          rescue Fairdom::OpenbisApi::OpenbisQueryException => e
-            @exception = e
-          end
+          #rescue Fairdom::OpenbisApi::OpenbisQueryException => e
+          #  puts "FAIR E: #{e}"
+          #  @exception = e
+          #end
         end
       end
 
@@ -35,6 +41,7 @@ module Seek
         puts "Populates #{self.class} from json:"
         puts json
         puts '-----'
+        raise "Cannot Populates #{self.class} from empty json" if json.nil? || json.empty?
         @json = json
         @modifier = json['modifier']
         @code = json['code']

@@ -29,7 +29,46 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
       asset.external_service = @endpoint.web_endpoint
       asset.external_id = i
       asset.sync_state = :refresh
-      asset.synchronized_at= DateTime.now - (i*10).minutes
+      asset.synchronized_at= DateTime.now - (i*20).minutes
+      assert asset.save
+      assets << asset
+    end
+
+
+    assets[8].sync_state = :synchronized
+    assets[8].save
+
+    @endpoint.reload
+    assert_equal 10, @endpoint.external_assets.count
+    assert_equal 3, @batch_size
+
+    needs = @job.needs_refresh.to_a
+    assert needs
+    #puts needs.map {|e| e.external_id}
+    assert_equal 3, needs.length
+    assert_equal [assets[9], assets[7], assets[6]], needs
+
+    (0..8).each do |i|
+      assets[i].synchronized_at= DateTime.now
+      assets[i].save
+    end
+
+    needs = @job.needs_refresh.to_a
+    assert_equal [assets[9]], needs
+  end
+
+  test 'needs_refresh gives priority to marked for refresh over the failed ones' do
+
+    assert @endpoint.save
+    assets = []
+    (1..10).each do |i|
+
+      asset = ExternalAsset.new
+      asset.seek_service = @endpoint
+      asset.external_service = @endpoint.web_endpoint
+      asset.external_id = i
+      asset.sync_state = :refresh
+      asset.synchronized_at= DateTime.now - (i*20).minutes
       assert asset.save
       assets << asset
     end
@@ -49,15 +88,15 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     assert needs
     #puts needs.map {|e| e.external_id}
     assert_equal 3, needs.length
-    assert_equal [assets[9], assets[7], assets[6]], needs
+    assert_equal [assets[9], assets[6], assets[5]], needs
 
-    (0..8).each do |i|
-      assets[i].synchronized_at= DateTime.now
+    (0..7).each do |i|
+      assets[i].sync_state = :failed
       assets[i].save
     end
 
     needs = @job.needs_refresh.to_a
-    assert_equal [assets[9]], needs
+    assert_equal [assets[9], assets[7], assets[6]], needs
   end
 
   test 'follow_on_delay gives one second if some work left or endpoint default otherwise' do
@@ -125,7 +164,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     refute zample.dataset_ids.empty?
 
-    asset = OpenbisExternalAsset.build(zample, {link_datasets: '1'})
+    asset = OpenbisExternalAsset.build(zample, { link_datasets: '1' })
     asset.seek_entity = assay
     asset.synchronized_at = DateTime.now - 1.days
     asset.sync_state = :refresh

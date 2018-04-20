@@ -11,11 +11,16 @@ class OpenbisSyncJob < SeekJob
     puts "performing sync job on #{obis_asset}"
     Rails.logger.info "performing sync job on #{obis_asset}"
 
+    errs = []
     obis_asset.reload
-    seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
-    if obis_asset.err_msg
-      puts "Sync failed #{obis_asset.err_msg}"
-      Rails.logger.error "Sync failed #{obis_asset.err_msg}"
+
+    errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
+
+    unless errs.empty?
+      msg = "Sync issues for #{obis_asset.id}\n #{errs.join(',\n')}"
+      puts msg
+      Rails.logger.error msg
+
     end
   end
 
@@ -60,13 +65,13 @@ class OpenbisSyncJob < SeekJob
 
     old = DateTime.now - service.refresh_period_mins.minutes
     service.external_assets.where("synchronized_at < ? AND sync_state != ?", old, ExternalAsset.sync_states[:synchronized])
-        .order(:synchronized_at)
+        .order(:sync_state, :synchronized_at)
         .limit(@batch_size)
 
   end
 
   def self.create_initial_jobs
-    OpenbisEndpoint.all.each {|point| OpenbisSyncJob.new(point).queue_job}
+    OpenbisEndpoint.all.each { |point| OpenbisSyncJob.new(point).queue_job }
   end
 
   def seek_util

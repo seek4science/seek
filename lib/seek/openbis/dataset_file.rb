@@ -38,8 +38,18 @@ module Seek
       end
 
       def download(dest)
-        datastore_server_download_instance.download(downloadType: 'file', permID: dataset_perm_id,
+        begin
+          datastore_server_download_instance.download(downloadType: 'file', permID: dataset_perm_id,
                                                     source: path, dest: dest)
+
+        rescue Fairdom::OpenbisApi::OpenbisQueryException => e
+          if e.message && e.message.include?('Unknown data set')
+            raise Seek::Openbis::EntityNotFoundException, "Unable to find dataset with perm id #{dataset_perm_id}"
+          else
+            raise e
+          end
+        end
+
       end
 
       def type_name

@@ -107,11 +107,12 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
         begin
           entity = fetch_current_entity_version(obis_asset)
+          puts "GOT ENTITY: #{entity} id #{entity.perm_id} \n #{entity.json}...."
           entity.prefetch_files if entity.is_a? Seek::Openbis::Dataset
           obis_asset.content=entity
         rescue Exception => exception
           obis_asset.sync_state = :failed
-          obis_asset.err_msg = sync_err_to_msg(exception, obis_asset)
+          obis_asset.err_msg = handle_sync_err(exception, obis_asset)
         end
 
         # saving automatically triggers reindexing if needed
@@ -119,22 +120,38 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
       end
 
-      def sync_err_to_msg(exception, obis_asset)
+      def handle_sync_err(exception, obis_asset)
         Rails.logger.error("Cannot sync #{obis_asset.external_type} #{obis_asset.external_id}")
+        Rails.logger.error(exception.class)
         Rails.logger.error(exception)
-        puts "#{exception.class}"
-        puts "#{exception}"
-        exception.to_s
+
+        extract_err_message(exception)
+      end
+
+      def extract_err_message(exception)
+        if exception.is_a? Fairdom::OpenbisApi::OpenbisQueryException
+          return 'Cannot connect to the OpenBIS server' if exception.message && exception.message.include?('java.net.ConnectException')
+          return 'Cannot access OpenBIS: Invalid username or password' if exception.message && exception.message.include?('Invalid username or password')
+        end
+
+        msg = exception.to_s
+        msg = exception.class.to_s unless msg
+        msg = msg.slice(0,250) if msg.length > 250
+        msg
+
       end
 
       def sync_external_asset(obis_asset)
 
         sync_asset_content(obis_asset)
-        raise "Sync failed: #{obis_asset.err_msg}" if obis_asset.failed?
+
+        return ["Sync failed: #{obis_asset.err_msg}"] if obis_asset.failed?
+        # raise "Sync failed: #{obis_asset.err_msg}" if obis_asset.failed?
 
         errs = []
         errs = follow_dependent(obis_asset) if should_follow_dependent(obis_asset)
-        raise errs.join(', ') unless errs.empty?
+        #raise errs.join(', ') unless errs.empty?
+        errs
 
       end
 

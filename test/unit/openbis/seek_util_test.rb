@@ -2,7 +2,6 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class SeekUtilTest < ActiveSupport::TestCase
-  #fixtures :studies
 
   def setup
     mock_openbis_calls
