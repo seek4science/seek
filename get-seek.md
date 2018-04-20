@@ -8,7 +8,7 @@ redirect_from: "/get_seek.html"
 
 SEEK is open source software, and is distributed under a [BSD License](https://github.com/seek4science/seek/blob/master/BSD-LICENSE). The source code is all available on [GitHub](https://github.com/seek4science/seek).
 
-If you do not want to install your own version of SEEK, you can register to use the [FAIRDOMHub](http:fairdomhub.org), a version of SEEK which is hosted by [FAIRDOM](http://fair-dom.org) for general community use.
+If you do not want to install your own version of SEEK, you can register to use the [FAIRDOMHub](https://fairdomhub.org), a version of SEEK which is hosted by [FAIRDOM](https://fair-dom.org) for general community use.
 
 ## Changes
 
