@@ -69,6 +69,34 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   end
 
+  test 'refresh updates content with fetched version and redirects' do
+    login_as(@user)
+
+    fake = Seek::Openbis::Dataset.new(@endpoint, '20160215111736723-31')
+    assert_not_equal fake.perm_id, @dataset.perm_id
+
+    old = DateTime.now - 1.days
+    asset = OpenbisExternalAsset.build(@dataset)
+    asset.content=fake
+    asset.synchronized_at = old
+    assert asset.save
+
+    # just a paranoid check, in case future implementation will mess up with setting stamps and content
+    asset = OpenbisExternalAsset.find(asset.id)
+    assert_equal fake.perm_id, asset.content.perm_id
+    assert_equal old.to_date, asset.synchronized_at.to_date
+
+    get :refresh, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+
+    assert_response :redirect
+    assert_redirected_to edit_openbis_endpoint_openbis_dataset_path
+
+    asset = OpenbisExternalAsset.find(asset.id)
+    assert_equal @dataset.perm_id, asset.content.perm_id
+    assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
+
+  end
+
   ## Register ##
 
   test 'register registers new DataFile' do

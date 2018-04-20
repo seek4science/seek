@@ -237,14 +237,17 @@ SEEK::Application.routes.draw do
   resources :openbis_endpoints do
     get :refresh, on: :member
     resources :openbis_experiments do
+      get :refresh, on: :member
       post :register, on: :member
       post :batch_register, on: :collection
     end
     resources :openbis_zamples do
+      get :refresh, on: :member
       post :register, on: :member
       post :batch_register, on: :collection
     end
     resources :openbis_datasets do
+      get :refresh, on: :member
       post :register, on: :member
       post :batch_register, on: :collection
     end

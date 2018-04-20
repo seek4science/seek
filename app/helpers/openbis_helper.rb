@@ -1,4 +1,3 @@
-
 module OpenbisHelper
 
   def can_browse_openbis?(project, user = User.current_user)
@@ -26,7 +25,10 @@ module OpenbisHelper
       render partial: 'data_files/openbis/dataset_error'
     else
       #render partial: 'data_files/openbis/dataset', locals: { dataset: dataset, data_file: data_file }
-      render partial: 'openbis_datasets/openbis_dataset_panel', locals: { entity: dataset, modal_files: true, edit_button: true }
+      asset = data_file.external_asset
+      render partial: 'openbis_datasets/openbis_dataset_panel',
+             locals: { entity: dataset, modal_files: true, edit_button: true,
+                       sync_at: asset.synchronized_at, err_msg: asset.err_msg }
     end
   end
 
@@ -34,10 +36,12 @@ module OpenbisHelper
   def external_asset_details(seekobj)
     return 'No external asset'.html_safe unless seekobj.external_asset
 
-    entity = seekobj.external_asset.content
+    asset = seekobj.external_asset
+    entity = asset.content
 
-    if seekobj.external_asset.is_a?(OpenbisExternalAsset) then
-      return render :partial => 'openbis_common/openbis_entity_panel', :object => entity, locals: {edit_button: true}
+    if asset.is_a?(OpenbisExternalAsset) then
+      return render partial: 'openbis_common/openbis_entity_panel', object: entity,
+                    locals: { edit_button: true, sync_at: asset.synchronized_at, err_msg: asset.err_msg}
     end
 
     "Unsupported external asset #{seekobj.external_asset.class}".html_safe
@@ -66,11 +70,11 @@ module OpenbisHelper
     files_text = "#{file_count} File".pluralize(file_count)
 
     link = link_to(files_text, '#', class: 'view-files-link',
-                     'data-toggle' => 'modal',
-        'data-target' => "#openbis-file-view",
-        'data-perm-id' => "#{dataset.perm_id}",
-        'data-project-id' => "#{project.id}",
-        'data-endpoint-id' => "#{openbis_endpoint.id}")
+                   'data-toggle' => 'modal',
+                   'data-target' => "#openbis-file-view",
+                   'data-perm-id' => "#{dataset.perm_id}",
+                   'data-project-id' => "#{project.id}",
+                   'data-endpoint-id' => "#{openbis_endpoint.id}")
   end
 
   class StatefulWordTrimmer
@@ -125,7 +129,7 @@ module OpenbisHelper
 
     def initialize
       @direction = :top_down
-      @style_attrs = ['class','style']
+      @style_attrs = ['class', 'style']
     end
 
     def scrub(node)

@@ -4,22 +4,32 @@
   modal_files ||= false
   edit_button = false ## always at this moment as far nothing to do at the edit screen ||= false
   modal_files = false ## lets overwrite it for a moment
+  sync_at ||= nil
+  err_msg ||= nil
 %>
 
-<%= render :partial => 'openbis_common/openbis_entity_panel', :object => entity %>
+<%= render :partial => 'openbis_common/openbis_entity_panel', :object => entity,
+           locals: {sync_at: sync_at, err_msg: err_msg} %>
 
-<%= render :partial => 'openbis_common/files_view_modal', locals: {parent_id: '#openbis-files-details'} if modal_files %>
+<%= render :partial => 'openbis_common/files_view_modal', locals: { parent_id: '#openbis-files-details' } if modal_files %>
 
 <div class="panel panel-default" id="openbis-files-details">
   <div class="panel-body">
 
-      <div class="col-md-10">
-        <% if modal_files %>
+    <div class="col-md-10">
+      <% if modal_files %>
           <label>Files: </label> <%= openbis_files_modal_link(entity) %>
-        <% else %>
-          <%= render partial:'openbis_datasets/openbis_dataset_files_list', locals: {dataset: entity, data_file: data_file} %>
-        <% end %>
+      <% else %>
+          <%= render partial: 'openbis_datasets/openbis_dataset_files_list', locals: { dataset: entity, data_file: data_file } %>
+      <% end %>
+    </div>
+
+    <div class="col-md-10">
+      <hr>
+      <div class="form-group">
+        <%= button_link_to('Refresh content', 'refresh', refresh_openbis_endpoint_openbis_dataset_path(entity.openbis_endpoint, id: entity.perm_id)) %>
       </div>
+    </div>
 
   </div>
 </div>

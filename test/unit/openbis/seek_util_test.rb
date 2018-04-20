@@ -390,6 +390,8 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset.sync_options = { link_datasets: '1' }
     asset.sync_state = :refresh
     asset.seek_entity = assay
+    #need to save to have the assay to asset link updated
+    assert asset.save
 
     @util.sync_external_asset(asset)
 
@@ -411,6 +413,8 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset.sync_options = { link_datasets: '0' }
     asset.sync_state = :refresh
     asset.seek_entity = assay
+    #need to save to have the assay to asset link updated
+    assert asset.save
 
     @util.sync_external_asset(asset)
 
@@ -432,6 +436,9 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset = OpenbisExternalAsset.build(@experiment)
     asset.sync_options = { link_datasets: '0' }
     asset.seek_entity = study
+    #need to save to have the assay to asset link updated
+    assert asset.save
+
 
     @util.sync_external_asset(asset)
 
@@ -454,6 +461,8 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset = OpenbisExternalAsset.build(@experiment)
     asset.sync_options = { link_datasets: '1' }
     asset.seek_entity = study
+    #need to save to have the assay to asset link updated
+    assert asset.save
 
     @util.sync_external_asset(asset)
 

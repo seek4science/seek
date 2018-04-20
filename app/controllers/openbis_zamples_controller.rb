@@ -4,6 +4,9 @@ class OpenbisZamplesController < ApplicationController
 
   before_filter :get_seek_type
 
+
+
+
   def index
     @entity_type = params[:entity_type] || Seek::Openbis::ALL_ASSAYS
     get_entity_types

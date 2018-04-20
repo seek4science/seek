@@ -1,6 +1,7 @@
 <%= render :partial => 'openbis_common/errors_panel' %>
 
-<%= render :partial => 'openbis_common/openbis_entity_panel', :object => @entity %>
+<%= render partial: 'openbis_common/openbis_entity_panel', object: @entity,
+           locals: {sync_at: @asset.synchronized_at, err_msg: @asset.err_msg} %>
 
 <%= render :partial => 'openbis_common/files_view_modal' %>
 
@@ -35,6 +36,7 @@
 
         <div class="form-group">
           <%= submit_tag(not_registered ? 'Register' : 'Update', class: 'btn btn-primary') %>
+          <%= button_link_to('Refresh content', 'refresh', refresh_openbis_endpoint_openbis_zample_path(@openbis_endpoint, id: zample.perm_id)) %>
         </div>
 
         <div id="linked_entities">

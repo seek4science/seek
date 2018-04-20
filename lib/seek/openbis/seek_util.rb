@@ -36,6 +36,11 @@ module Seek
         assay
       end
 
+      def createDataFileFromObisSet(dataset, creator)
+        obis_asset = OpenbisExternalAsset.find_or_create_by_entity(dataset)
+        createObisDataFile({}, creator, obis_asset)
+      end
+
       def createObisDataFile(datafile_params, creator, obis_asset)
 
         dataset = obis_asset.content
@@ -110,7 +115,7 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         end
 
         # saving automatically triggers reindexing if needed
-        obis_asset.save!
+        obis_asset.save! unless obis_asset.new_record?
 
       end
 

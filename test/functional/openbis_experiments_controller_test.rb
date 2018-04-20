@@ -100,6 +100,34 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
   end
 
+  test 'refresh updates content with fetched version and redirects' do
+    login_as(@user)
+
+    fake = Seek::Openbis::Experiment.new(@endpoint, '20171121153715264-58')
+    assert_not_equal fake.perm_id, @experiment.perm_id
+
+    old = DateTime.now - 1.days
+    asset = OpenbisExternalAsset.build(@experiment)
+    asset.content=fake
+    asset.synchronized_at = old
+    assert asset.save
+
+    # just a paranoid check, in case future implementation will mess up with setting stamps and content
+    asset = OpenbisExternalAsset.find(asset.id)
+    assert_equal fake.perm_id, asset.content.perm_id
+    assert_equal old.to_date, asset.synchronized_at.to_date
+
+    get :refresh, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id
+
+    assert_response :redirect
+    assert_redirected_to edit_openbis_endpoint_openbis_experiment_path
+
+    asset = OpenbisExternalAsset.find(asset.id)
+    assert_equal @experiment.perm_id, asset.content.perm_id
+    assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
+
+  end
+
   ## Register ##
 
   test 'register registers new Study with linked Assays' do

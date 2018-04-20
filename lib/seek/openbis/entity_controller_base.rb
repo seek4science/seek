@@ -18,9 +18,13 @@ module Seek
       end
 
       def refresh
-        puts "REFRESH"
-        redirect_to @asset
-        #redirect_to @asset.seek_entity
+        puts "------------\nREFRESH\n---------"
+
+        seek_util.sync_asset_content(@asset)
+
+        flash[:error] = @asset.err_msg if @asset.failed?
+        flash[:notice] = 'Updated OpenBis content' if @asset.synchronized?
+        redirect_to action: 'edit'
       end
 
       def get_endpoint
@@ -58,7 +62,7 @@ module Seek
       def get_sync_options(hash = nil)
         hash ||= params
         hash.fetch(:sync_options, {}).permit(:link_datasets, :link_assays, :link_dependent,
-                                             {linked_datasets: []}, {linked_assays: []})
+                                             { linked_datasets: [] }, { linked_assays: [] })
       end
 
       def back_to_index

@@ -14,7 +14,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
     @endpoint = Factory(:openbis_endpoint, project: @project)
-    @endpoint.assay_types = ['TZ_FAIR_ASSAY','EXPERIMENTAL_STEP']
+    @endpoint.assay_types = ['TZ_FAIR_ASSAY', 'EXPERIMENTAL_STEP']
     @endpoint.save!
     @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
   end
@@ -93,6 +93,34 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert assigns(:asset)
     assert assigns(:entity)
     assert assigns(:linked_to_assay)
+
+  end
+
+  test 'refresh updates content with fetched version and redirects' do
+    login_as(@user)
+
+    fake = Seek::Openbis::Zample.new(@endpoint, '20171002172639055-39')
+    assert_not_equal fake.perm_id, @zample.perm_id
+
+    old = DateTime.now - 1.days
+    asset = OpenbisExternalAsset.build(@zample)
+    asset.content=fake
+    asset.synchronized_at = old
+    assert asset.save
+
+    # just a paranoid check, in case future implementation will mess up with setting stamps and content
+    asset = OpenbisExternalAsset.find(asset.id)
+    assert_equal fake.perm_id, asset.content.perm_id
+    assert_equal old.to_date, asset.synchronized_at.to_date
+
+    get :refresh, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id
+
+    assert_response :redirect
+    assert_redirected_to edit_openbis_endpoint_openbis_zample_path
+
+    asset = OpenbisExternalAsset.find(asset.id)
+    assert_equal @zample.perm_id, asset.content.perm_id
+    assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
 
   end
 
@@ -193,7 +221,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     login_as(@user)
     study = Factory :study
 
-    sync_options = {link_dependent: 'false'}
+    sync_options = { link_dependent: 'false' }
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
 
     assert_difference('Assay.count', 2) do
@@ -221,15 +249,15 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     login_as(@user)
     study = Factory :study
 
-    sync_options = {link_dependent: '1'}
+    sync_options = { link_dependent: '1' }
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
 
     assert_difference('Assay.count', 2) do
       assert_difference('DataFile.count', 3) do
         assert_difference('ExternalAsset.count', 5) do
 
-        post :batch_register, openbis_endpoint_id: @endpoint.id,
-             seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+          post :batch_register, openbis_endpoint_id: @endpoint.id,
+               seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
         end
       end
     end
@@ -249,11 +277,11 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     login_as(@user)
     study = Factory :study
 
-    sync_options = {link_dependent: 'false'}
+    sync_options = { link_dependent: 'false' }
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
 
     post :batch_register, openbis_endpoint_id: @endpoint.id,
-               seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+         seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
 
     assert_response :success
 
@@ -491,7 +519,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   ## registration end ##
 
 
-
   test 'get_linked_to gets ids of openbis data sets' do
     controller = OpenbisZamplesController.new
     util = Seek::Openbis::SeekUtil.new
@@ -499,7 +526,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_equal [], controller.get_linked_to(nil)
 
     datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
-    datafiles = datasets.map { |ds| util.createObisDataFile({},@user,OpenbisExternalAsset.build(ds)) }
+    datafiles = datasets.map { |ds| util.createObisDataFile({}, @user, OpenbisExternalAsset.build(ds)) }
     assert_equal 3, datafiles.length
 
     disable_authorization_checks do
