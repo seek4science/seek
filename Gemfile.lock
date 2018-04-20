@@ -187,8 +187,8 @@ GEM
       citeproc (>= 1.0.4, < 2.0)
       csl (~> 1.4)
     climate_control (0.2.0)
-    cocaine (0.5.8)
-      climate_control (>= 0.0.3, < 1.0)
+    cocaine (0.6.0)
+      terrapin (= 0.6.0)
     code_analyzer (0.4.7)
       sexp_processor
     codeclimate-engine-rb (0.4.0)
@@ -605,7 +605,7 @@ GEM
       rdf (~> 1.1, >= 1.1.10)
     rdf-xsd (1.1.5.1)
       rdf (~> 1.1, >= 1.1.9, < 1.99)
-    rdoc (6.0.0)
+    rdoc (6.0.3)
     recaptcha (4.1.0)
       json
     reek (4.6.1)
@@ -668,7 +668,7 @@ GEM
     rubyntlm (0.3.4)
     rubyzip (1.2.1)
     safe_yaml (1.0.4)
-    sample-template-generator (0.4.1)
+    sample-template-generator (0.5.0)
       cocaine (~> 0.5)
       rdoc (~> 6.0)
     sass (3.4.23)
@@ -733,6 +733,8 @@ GEM
       railties (>= 3.2.5, < 6)
     teaspoon-mocha (2.3.3)
       teaspoon (>= 1.0.0)
+    terrapin (0.6.0)
+      climate_control (>= 0.0.3, < 1.0)
     test-prof (0.4.8)
     test_after_commit (1.1.0)
       activerecord (>= 3.2)
@@ -893,7 +895,7 @@ DEPENDENCIES
   rubocop
   ruby-prof (>= 0.16.0)
   rubycritic
-  sample-template-generator (~> 0.4)
+  sample-template-generator (~> 0.5)
   sass-rails
   savon (= 1.1.0)
   search_biomodel (= 2.2.1)!
