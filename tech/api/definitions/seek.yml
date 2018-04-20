@@ -17,12 +17,68 @@ security:
   - basicAuth: []
 tags:
   - name: search
-  - name: yellow pages
-  - name: experiments
+
+  - name: institutions
+  - name: people
+  - name: programmes
+  - name: projects
+  
+  - name: investigations
+  - name: studies
+  - name: assays
+  
   - name: assets
   - name: activities
   - name: samples
-  - name: all
+
+  - name: dataFiles
+  - name: documents
+  - name: models
+  - name: publications
+  - name: sops
+
+  - name: events
+  - name: presentations
+
+  - name: organisms
+  - name: sampleTypes
+  
+x-tagGroups:
+  - name: Search
+    tags:
+      - search
+
+  - name: Yellow Pages
+    tags:
+      - institutions
+      - people
+      - programmes
+      - projects
+
+  - name: Experiments
+    tags:
+      - investigations
+      - studies
+      - assays
+
+  - name: Assets
+    tags:
+      - dataFiles
+      - documents
+      - models
+      - publications
+      - sops
+
+  - name: Activities
+    tags:
+      - events
+      - presentations
+      
+  - name: Samples
+    tags:
+      - organisms
+      - sampleTypes
+      
 paths:
   /search:
     parameters:
@@ -66,7 +122,6 @@ paths:
         url: 'http://docs.seek4science.org/tech/install.html'
       tags:
         - search
-        - all
       responses:
         '200':
           description: OK
@@ -77,8 +132,7 @@ paths:
       operationId: listAssays
       description: List references to the assays that are visible to the authenticated user
       tags:
-        - experiments
-        - all
+        - assays
       responses:
         '200':
           description: OK
@@ -88,8 +142,7 @@ paths:
       operationId: createAssay
       description: Create an assay containing the data sent
       tags:
-        - experiments
-        - all
+        - assays
       parameters:
         - in: body
           name: assay
@@ -115,8 +168,7 @@ paths:
       operationId: readAssay
       description: Return the specified assay
       tags:
-        - experiments
-        - all
+        - assays
       responses:
         '200':
           description: OK
@@ -126,8 +178,7 @@ paths:
       operationId: updateAssay
       description: Patch the specified assay with the specified information
       tags:
-        - experiments
-        - all
+        - assays
       parameters:
         - in: body
           name: assay
@@ -145,8 +196,7 @@ paths:
       operationId: deleteAssay
       description: Delete the specified assay
       tags:
-        - experiments
-        - all
+        - assays
       responses:
         '200':
           description: OK
@@ -156,8 +206,7 @@ paths:
     get:
       operationId: listDataFiles
       tags:
-        - assets
-        - all
+        - dataFiles
       responses:
         '200':
           description: OK
@@ -166,8 +215,7 @@ paths:
     post:
       operationId: createDataFile
       tags:
-        - assets
-        - all
+        - dataFiles
       responses:
         '501':
           description: Not implemented
@@ -189,8 +237,7 @@ paths:
           type: integer
           default: 2
       tags:
-        - assets
-        - all
+        - dataFiles
       responses:
         '200':
           description: OK
@@ -199,16 +246,14 @@ paths:
     patch:
       operationId: updateDataFile
       tags:
-        - assets
-        - all
+        - dataFiles
       responses:
         '501':
           description: Not implemented
     delete:
       operationId: deleteDataFile
       tags:
-        - assets
-        - all
+        - dataFiles
       responses:
         '200':
           description: OK
@@ -241,8 +286,7 @@ paths:
       produces:
         - '*/*'
       tags:
-        - assets
-        - all
+        - dataFiles
       responses:
         '200':
           description: Success
@@ -265,8 +309,7 @@ paths:
       produces:
         - '*/*'
       tags:
-        - assets
-        - all
+        - dataFiles
       responses:
         '200':
           description: Success
@@ -274,8 +317,7 @@ paths:
     get:
       operationId: listDocuments
       tags:
-        - assets
-        - all
+        - documents
       responses:
         '200':
           description: OK
@@ -284,8 +326,7 @@ paths:
     post:
       operationId: createDocument
       tags:
-        - assets
-        - all
+        - documents
       responses:
         '501':
           description: Not implemented
@@ -300,8 +341,7 @@ paths:
     get:
       operationId: readDocument
       tags:
-        - assets
-        - all
+        - documents
       responses:
         '200':
           description: OK
@@ -310,16 +350,14 @@ paths:
     patch:
       operationId: updateDocument
       tags:
-        - assets
-        - all
+        - documents
       responses:
         '501':
           description: Not implemented
     delete:
       operationId: deleteDocument
       tags:
-        - assets
-        - all
+        - documents
       responses:
         '200':
           description: OK
@@ -329,8 +367,7 @@ paths:
     get:
       operationId: listEvents
       tags:
-        - activities
-        - all
+        - events
       responses:
         '200':
           description: OK
@@ -339,8 +376,7 @@ paths:
     post:
       operationId: createEvent
       tags:
-        - activities
-        - all
+        - events
       responses:
         '501':
           description: Not implemented
@@ -355,8 +391,7 @@ paths:
     get:
       operationId: readEvent
       tags:
-        - activities
-        - all
+        - events
       responses:
         '200':
           description: OK
@@ -365,16 +400,14 @@ paths:
     patch:
       operationId: updateEvent
       tags:
-        - activities
-        - all
+        - events
       responses:
         '501':
           description: Not implemented
     delete:
       operationId: deleteEvent
       tags:
-        - activities
-        - all
+        - events
       responses:
         '200':
           description: OK
@@ -384,8 +417,7 @@ paths:
     get:
       operationId: listInstitutions
       tags:
-        - yellow pages
-        - all
+        - institutions
       responses:
         '200':
           description: OK
@@ -395,8 +427,7 @@ paths:
       operationId: createInstitution
       description: Create an institution containing the data sent
       tags:
-        - yellow pages
-        - all
+        - institutions
       parameters:
         - in: body
           name: institution
@@ -435,8 +466,7 @@ paths:
     get:
       operationId: readInstitution
       tags:
-        - yellow pages
-        - all
+        - institutions
       responses:
         '200':
           description: OK
@@ -463,8 +493,7 @@ paths:
           schema:
             $ref: '#/definitions/institutionPatch'
       tags:
-        - yellow pages
-        - all
+        - institutions
       responses:
         '200':
           description: OK
@@ -489,8 +518,7 @@ paths:
     delete:
       operationId: deleteInstitution
       tags:
-        - yellow pages
-        - all
+        - institutions
       responses:
         '200':
           description: OK
@@ -512,8 +540,7 @@ paths:
     get:
       operationId: listInvestigations
       tags:
-        - experiments
-        - all
+        - investigations
       responses:
         '200':
           description: OK
@@ -523,8 +550,7 @@ paths:
       operationId: createInvestigation
       description: Create an investigation containing the data sent
       tags:
-        - experiments
-        - all
+        - investigations
       parameters:
         - in: body
           name: investigation
@@ -559,8 +585,7 @@ paths:
     get:
       operationId: readInvestigation
       tags:
-        - experiments
-        - all
+        - investigations
       responses:
         '200':
           description: OK
@@ -575,8 +600,7 @@ paths:
           schema:
             $ref: '#/definitions/investigationPatch'
       tags:
-        - experiments
-        - all
+        - investigations
       responses:
         '200':
           description: OK
@@ -601,8 +625,7 @@ paths:
     delete:
       operationId: deleteInvestigation
       tags:
-        - experiments
-        - all
+        - investigations
       responses:
         '200':
           description: OK
@@ -612,8 +635,7 @@ paths:
     get:
       operationId: listModels
       tags:
-        - assets
-        - all
+        - models
       responses:
         '200':
           description: OK
@@ -622,8 +644,7 @@ paths:
     post:
       operationId: createModel
       tags:
-        - assets
-        - all
+        - models
       responses:
         '501':
           description: Not implemented
@@ -645,8 +666,7 @@ paths:
           type: integer
           default: 2
       tags:
-        - assets
-        - all
+        - models
       responses:
         '200':
           description: OK
@@ -655,16 +675,14 @@ paths:
     patch:
       operationId: updateModel
       tags:
-        - assets
-        - all
+        - models
       responses:
         '501':
           description: Not implemented
     delete:
       operationId: deleteModel
       tags:
-        - assets
-        - all
+        - models
       responses:
         '200':
           description: OK
@@ -687,8 +705,7 @@ paths:
     get:
       operationId: readModelContent
       tags:
-        - assets
-        - all
+        - models
       responses:
         '200':
           description: Success
@@ -698,8 +715,7 @@ paths:
     get:
       operationId: listOrganisms
       tags:
-        - samples
-        - all
+        - organisms
       responses:
         '200':
           description: OK
@@ -708,8 +724,7 @@ paths:
     post:
       operationId: createOrganism
       tags:
-        - samples
-        - all
+        - organisms
       responses:
         '501':
           description: Not implemented
@@ -724,8 +739,7 @@ paths:
     get:
       operationId: readOrganism
       tags:
-        - samples
-        - all
+        - organisms
       responses:
         '200':
           description: OK
@@ -734,16 +748,14 @@ paths:
     patch:
       operationId: updateOrganism
       tags:
-        - samples
-        - all
+        - organisms
       responses:
         '501':
           description: Not implemented
     delete:
       operationId: deleteOrganism
       tags:
-        - samples
-        - all
+        - organisms
       responses:
         '200':
           description: OK
@@ -753,8 +765,7 @@ paths:
     get:
       operationId: listPeople
       tags:
-        - yellow pages
-        - all
+        - people
       responses:
         '200':
           description: OK
@@ -764,8 +775,7 @@ paths:
       operationId: createPerson
       description: Create a person containing the data sent
       tags:
-        - yellow pages
-        - all
+        - people
       parameters:
         - in: body
           name: person
@@ -800,8 +810,7 @@ paths:
     get:
       operationId: readPerson
       tags:
-        - yellow pages
-        - all
+        - people
       responses:
         '200':
           description: OK
@@ -832,8 +841,7 @@ paths:
           schema:
             $ref: '#/definitions/personPatch'
       tags:
-        - yellow pages
-        - all
+        - people
       responses:
         '200':
           description: OK
@@ -858,8 +866,7 @@ paths:
     delete:
       operationId: deletePerson
       tags:
-        - yellow pages
-        - all
+        - people
       responses:
         '200':
           description: OK
@@ -881,8 +888,7 @@ paths:
     get:
       operationId: listPresentations
       tags:
-        - activities
-        - all
+        - presentations
       responses:
         '200':
           description: OK
@@ -891,8 +897,7 @@ paths:
     post:
       operationId: createPresentation
       tags:
-        - activities
-        - all
+        - presentations
       responses:
         '501':
           description: Not implemented
@@ -914,8 +919,7 @@ paths:
           type: integer
           default: 1
       tags:
-        - activities
-        - all
+        - presentations
       responses:
         '200':
           description: OK
@@ -924,16 +928,14 @@ paths:
     patch:
       operationId: updatePresentation
       tags:
-        - activities
-        - all
+        - presentations
       responses:
         '501':
           description: Not implemented
     delete:
       operationId: deletePresentation
       tags:
-        - activities
-        - all
+        - presentations
       responses:
         '200':
           description: OK
@@ -956,8 +958,7 @@ paths:
     get:
       operationId: readPresentationContent
       tags:
-        - activities
-        - all
+        - presentations
       responses:
         '200':
           description: Success
@@ -967,8 +968,7 @@ paths:
     get:
       operationId: listProgrammes
       tags:
-        - yellow pages
-        - all
+        - programmes
       responses:
         '200':
           description: OK
@@ -978,8 +978,7 @@ paths:
       operationId: createProgramme
       description: Create a programme containing the data sent
       tags:
-        - yellow pages
-        - all
+        - programmes
       parameters:
         - in: body
           name: programme
@@ -1014,8 +1013,7 @@ paths:
     get:
       operationId: readProgramme
       tags:
-        - yellow pages
-        - all
+        - programmes
       responses:
         '200':
           description: OK
@@ -1046,8 +1044,7 @@ paths:
           schema:
             $ref: '#/definitions/programmePatch'
       tags:
-        - yellow pages
-        - all
+        - programmes
       responses:
         '200':
           description: OK
@@ -1072,8 +1069,7 @@ paths:
     delete:
       operationId: deleteProgramme
       tags:
-        - yellow pages
-        - all
+        - programmes
       responses:
         '200':
           description: OK
@@ -1095,8 +1091,7 @@ paths:
     get:
       operationId: listProjects
       tags:
-        - yellow pages
-        - all
+        - projects
       responses:
         '200':
           description: OK
@@ -1106,8 +1101,7 @@ paths:
       operationId: createProject
       description: Create a project containing the data sent
       tags:
-        - yellow pages
-        - all
+        - projects
       parameters:
         - in: body
           name: project
@@ -1142,8 +1136,7 @@ paths:
     get:
       operationId: readProject
       tags:
-        - yellow pages
-        - all
+        - projects
       responses:
         '200':
           description: OK
@@ -1174,8 +1167,7 @@ paths:
           schema:
             $ref: '#/definitions/projectPatch'
       tags:
-        - yellow pages
-        - all
+        - projects
       responses:
         '200':
           description: OK
@@ -1200,8 +1192,7 @@ paths:
     delete:
       operationId: deleteProject
       tags:
-        - yellow pages
-        - all
+        - projects
       responses:
         '200':
           description: OK
@@ -1223,8 +1214,7 @@ paths:
     get:
       operationId: listPublications
       tags:
-        - assets
-        - all
+        - publications
       responses:
         '200':
           description: OK
@@ -1233,8 +1223,7 @@ paths:
     post:
       operationId: createPublication
       tags:
-        - assets
-        - all
+        - publications
       responses:
         '501':
           description: Not implemented
@@ -1249,8 +1238,7 @@ paths:
     get:
       operationId: readPublication
       tags:
-        - assets
-        - all
+        - publications
       responses:
         '200':
           description: OK
@@ -1259,16 +1247,14 @@ paths:
     patch:
       operationId: updatePublication
       tags:
-        - assets
-        - all
+        - publications
       responses:
         '501':
           description: Not implemented
     delete:
       operationId: deletePublication
       tags:
-        - assets
-        - all
+        - publications
       responses:
         '200':
           description: OK
@@ -1278,8 +1264,7 @@ paths:
     get:
       operationId: listSampleTypes
       tags:
-        - samples
-        - all
+        - sampleTypes
       responses:
         '200':
           description: OK
@@ -1289,8 +1274,7 @@ paths:
     get:
       operationId: listSops
       tags:
-        - assets
-        - all
+        - sops
       responses:
         '200':
           description: OK
@@ -1299,8 +1283,7 @@ paths:
     post:
       operationId: createSop
       tags:
-        - assets
-        - all
+        - sops
       responses:
         '501':
           description: Not implemented
@@ -1322,8 +1305,7 @@ paths:
           type: integer
           default: 1
       tags:
-        - assets
-        - all
+        - sops
       responses:
         '200':
           description: OK
@@ -1332,16 +1314,14 @@ paths:
     patch:
       operationId: updateSop
       tags:
-        - assets
-        - all
+        - sops
       responses:
         '501':
           description: Not implemented
     delete:
       operationId: deleteSop
       tags:
-        - assets
-        - all
+        - sops
       responses:
         '200':
           description: OK
@@ -1364,8 +1344,7 @@ paths:
     get:
       operationId: readSopContent
       tags:
-        - assets
-        - all
+        - sops
       responses:
         '200':
           description: Success
@@ -1375,8 +1354,7 @@ paths:
     get:
       operationId: listStudies
       tags:
-        - experiments
-        - all
+        - studies
       responses:
         '200':
           description: OK
@@ -1386,8 +1364,7 @@ paths:
       operationId: createStudy
       description: Create a study containing the data sent
       tags:
-        - experiments
-        - all
+        - studies
       parameters:
         - in: body
           name: study
@@ -1422,8 +1399,7 @@ paths:
     get:
       operationId: readStudy
       tags:
-        - experiments
-        - all
+        - studies
       responses:
         '200':
           description: OK
@@ -1433,8 +1409,7 @@ paths:
       operationId: updateStudy
       description: Update the study with the data sent
       tags:
-        - experiments
-        - all
+        - studies
       parameters:
         - in: body
           name: study
@@ -1465,8 +1440,7 @@ paths:
     delete:
       operationId: deleteStudy
       tags:
-        - experiments
-        - all
+        - studies
       responses:
         '200':
           description: OK
