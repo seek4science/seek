@@ -62,16 +62,25 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def refresh_metadata
     if test_authentication
-      Rails.logger.info("REFRESHING METADATA FOR Openbis Space #{id}")
-
-      # only cleans the expired
-      cleanup_metadata_store
-      mark_for_refresh
-      # job could be removed if there was nothing to sync
-      # OpenbisSyncJob.new(self).queue_job
+      Rails.logger.info("REFRESHING METADATA FOR Openbis Space #{id} passed authentication")
     else
-      Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not refreshing METADATA")
+      Rails.logger.info("Authentication test for Openbis Space #{id} failed when refreshing METADATA")
     end
+
+    # as content stays in external_asset we can still clean the cache and mark items for refresh
+
+
+    # only cleans the expired from cache
+    cleanup_metadata_store
+    mark_for_refresh
+
+    # job could be removed if there was nothing to sync
+    OpenbisSyncJob.new(self).queue_job
+
+    #else
+    #  Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not refreshing METADATA")
+    #end
+    self
   end
 
   def force_refresh_metadata

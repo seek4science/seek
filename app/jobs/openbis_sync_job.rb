@@ -13,6 +13,10 @@ class OpenbisSyncJob < SeekJob
 
     obis_asset.reload
     seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
+    if obis_asset.err_msg
+      puts "Sync failed #{obis_asset.err_msg}"
+      Rails.logger.error "Sync failed #{obis_asset.err_msg}"
+    end
   end
 
   def gather_items

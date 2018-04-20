@@ -41,7 +41,7 @@ module OpenbisHelper
 
     if asset.is_a?(OpenbisExternalAsset) then
       return render partial: 'openbis_common/openbis_entity_panel', object: entity,
-                    locals: { edit_button: true, sync_at: asset.synchronized_at, err_msg: asset.err_msg}
+                    locals: { edit_button: true, sync_at: asset.synchronized_at, err_msg: asset.err_msg }
     end
 
     "Unsupported external asset #{seekobj.external_asset.class}".html_safe
