@@ -49,6 +49,7 @@ x-tagGroups:
       - search
 
   - name: Yellow Pages
+    description: Some description
     tags:
       - institutions
       - people
