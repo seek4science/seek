@@ -174,6 +174,7 @@ omniauth_user_activate:
 omniauth_providers:
 openbis_enabled:
 openbis_download_limit:
+openbis_debug:
 default_license:
 about_page_enabled:
 about_page:

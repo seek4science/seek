@@ -20,8 +20,8 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def register
-    puts 'register called'
-    puts params
+    puts 'register called' if DEBUG
+    puts params if DEBUG
 
     if @asset.seek_entity
       flash[:error] = 'Already registered as OpenBIS entity'
@@ -53,8 +53,8 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def update
-    puts 'update called'
-    puts params
+    puts 'update called' if DEBUG
+    puts params if DEBUG
 
     @assay = @asset.seek_entity
 
@@ -87,7 +87,6 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def batch_register
-    puts params
 
     batch_ids = params[:batch_ids] || []
     seek_parent_id = params[:seek_parent]
@@ -119,7 +118,6 @@ class OpenbisZamplesController < ApplicationController
   def batch_register_assays(zample_ids, study_id)
 
     sync_options = get_sync_options
-    puts "SYNC OPT #{sync_options}"
     sync_options[:link_datasets] = '1' if sync_options[:link_dependent] == '1'
 
     assay_params = { study_id: study_id }
@@ -208,7 +206,6 @@ class OpenbisZamplesController < ApplicationController
       @entities = Seek::Openbis::Zample.new(@openbis_endpoint).all
     else
       codes = @entity_type == Seek::Openbis::ALL_ASSAYS ? @entity_types_codes : [@entity_type]
-      puts "FIND CODES: #{codes}"
       @entities = Seek::Openbis::Zample.new(@openbis_endpoint).find_by_type_codes(codes)
     end
   end

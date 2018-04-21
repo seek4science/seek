@@ -4,6 +4,7 @@ module Seek
 
     class SeekUtil
 
+      DEBUG = Seek::Config.openbis_debug ? true : false
 
       FAKE_FILE_ASSAY_NAME = 'OpenBIS FILES'.freeze
 
@@ -107,7 +108,6 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
         begin
           entity = fetch_current_entity_version(obis_asset)
-          puts "GOT ENTITY: #{entity} id #{entity.perm_id} \n #{entity.json}...."
           entity.prefetch_files if entity.is_a? Seek::Openbis::Dataset
           obis_asset.content=entity
         rescue Exception => exception

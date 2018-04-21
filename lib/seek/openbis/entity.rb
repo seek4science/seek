@@ -5,6 +5,9 @@ module Seek
       attr_reader :json, :modifier, :registration_date, :modification_date, :code,
                   :perm_id, :registrator, :openbis_endpoint, :exception
 
+      # debug is with puts so it can be easily seen on tests screens
+      DEBUG = Seek::Config.openbis_debug ? true : false
+
       def ==(other)
         perm_id == other.perm_id
       end
@@ -19,8 +22,6 @@ module Seek
 
           cache_option = refresh ? { force: true } : nil
 
-          #no more rescu, it was a mess, should propagete from constructor
-          #begin
             json = query_application_server_by_perm_id(perm_id, cache_option)
             unless json[json_key]
               raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
@@ -29,18 +30,14 @@ module Seek
               raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}, got #{json[json_key].size} hits"
             end
             populate_from_json(json[json_key].first)
-          #rescue Fairdom::OpenbisApi::OpenbisQueryException => e
-          #  puts "FAIR E: #{e}"
-          #  @exception = e
-          #end
         end
       end
 
       def populate_from_json(json)
-        # for debug by TZ
-        puts "Populates #{self.class} from json:"
-        puts json
-        puts '-----'
+        # for development by TZ
+        puts "Populates #{self.class} from json:" if DEBUG
+        puts json  if DEBUG
+        puts '-----'  if DEBUG
         raise "Cannot Populates #{self.class} from empty json" if json.nil? || json.empty?
         @json = json
         @modifier = json['modifier']
@@ -55,7 +52,6 @@ module Seek
       def all(refresh = false)
         cache_option = refresh ? { force: true } : nil
         json = query_application_server_for_all(cache_option)
-        # puts json.to_json
         construct_from_json(json)
       end
 
@@ -162,9 +158,9 @@ module Seek
       def cached_query_by_perm_id(perm_id, cache_option = nil)
         raise 'Block required for doing query' unless block_given?
         key = cache_key(perm_id,)
-        Rails.logger.info("OBIS CACHE KEY = #{key}")
+        Rails.logger.info("OBIS CACHE KEY = #{key}") if DEBUG
         openbis_endpoint.metadata_store.fetch(key, cache_option) do
-          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{perm_id}")
+          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{perm_id}") if DEBUG
           yield
         end
       end
@@ -172,9 +168,9 @@ module Seek
       def cached_query_by_type_codes(codes_str, cache_option = nil)
         raise 'Block required for doing query' unless block_given?
         key = cache_key("TYPE_CODES:#{codes_str}")
-        Rails.logger.info("OBIS CACHE KEY = #{key}")
+        Rails.logger.info("OBIS CACHE KEY = #{key}") if DEBUG
         openbis_endpoint.metadata_store.fetch(key, cache_option) do
-          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{codes_str}")
+          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{codes_str}") if DEBUG
           yield
         end
       end

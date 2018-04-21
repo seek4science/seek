@@ -21,6 +21,11 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert @creator
   end
 
+  test 'openbis_debug is defined in config' do
+    # puts Seek::Config.openbis_debug
+    assert_not_nil Seek::Config.openbis_debug
+  end
+
   test 'creates valid study with external_asset that can be saved' do
 
     investigation = Factory(:investigation)

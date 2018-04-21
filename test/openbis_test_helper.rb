@@ -33,6 +33,10 @@ end
 module Fairdom
   module OpenbisApi
     module MockedQuery
+
+      # debug is with puts so it can be easily seen on tests screens
+      DEBUG = Seek::Config.openbis_debug ? true : false
+
       def query(options)
         path = mock_file_path(options)
         response = File.open(path).read
@@ -41,7 +45,7 @@ module Fairdom
 
       def mock_file_path(options)
         name = Digest::SHA2.hexdigest(options.inspect) + '.json'
-        puts "Mock query, File: #{name} #{options}"
+        puts "Mock query, File: #{name} #{options}" if DEBUG
         dir = File.join(Rails.root, 'test', 'fixtures', 'files', 'mocking', 'openbis')
         File.join(dir, name)
       end
@@ -98,6 +102,9 @@ module Fairdom
   module OpenbisApi
     module ExplicitMockedQuery
 
+      # debug is with puts so it can be easily seen on tests screens
+      DEBUG = Seek::Config.openbis_debug ? true : false
+
       @@hits = {}
 
       def self.set_hit(id, val)
@@ -113,14 +120,12 @@ module Fairdom
       end
 
       def query(options)
-        puts "Explicit mocked query: #{options}"
+        puts "Explicit mocked query: #{options}" if DEBUG
         id = options[:attributeValue]
-        #raise "Cannot find id (attributeValue) in query: #{options}" unless id
         return file_query(options) unless id
 
         res = Fairdom::OpenbisApi::ExplicitMockedQuery.get_hit(id)
-        #raise "Not set mocked value for id: #{id}" unless res
-        puts "Not set mocked value for id: #{id}" unless res
+        puts "Not set mocked value for id: #{id}" if DEBUG && !(res)
         res ? res : file_query(options)
       end
 
@@ -132,7 +137,7 @@ module Fairdom
 
       def mock_file_path(options)
         name = Digest::SHA2.hexdigest(options.inspect) + '.json'
-        puts "Mock query, File: #{name} #{options}"
+        puts "Mock query, File: #{name} #{options}" if DEBUG
         dir = File.join(Rails.root, 'test', 'fixtures', 'files', 'mocking', 'openbis')
         File.join(dir, name)
       end

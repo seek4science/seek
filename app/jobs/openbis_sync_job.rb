@@ -2,13 +2,16 @@
 class OpenbisSyncJob < SeekJob
   attr_accessor :openbis_endpoint_id
 
+  # debug is with puts so it can be easily seen on tests screens
+  DEBUG = Seek::Config.openbis_debug ? true : false
+
   def initialize(openbis_endpoint, batch_size = 10)
     @openbis_endpoint_id = openbis_endpoint.id
     @batch_size = batch_size || 10
   end
 
   def perform_job(obis_asset)
-    puts "performing sync job on #{obis_asset}"
+    puts "performing sync job on #{obis_asset}" if DEBUG
     Rails.logger.info "performing sync job on #{obis_asset}"
 
     errs = []
@@ -18,7 +21,7 @@ class OpenbisSyncJob < SeekJob
 
     unless errs.empty?
       msg = "Sync issues for #{obis_asset.id}\n #{errs.join(',\n')}"
-      puts msg
+      puts msg if DEBUG
       Rails.logger.error msg
 
     end

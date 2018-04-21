@@ -5,6 +5,9 @@ module Seek
       attr_reader :json, :modification_date, :code, :description,
                   :perm_id, :openbis_endpoint, :entity_type, :exception
 
+      # debug is with puts so it can be easily seen on tests screens
+      DEBUG = Seek::Config.openbis_debug ? true : false
+
       @@TYPES = ['Sample', 'DataSet', 'Experiment']
 
       def self.SampleType(openbis_endpoint, code = nil, refresh = false)
@@ -56,9 +59,9 @@ module Seek
 
       def populate_from_json(json)
         # for debug by TZ
-        puts "Populates #{self.class} #{@entity_type} from json:"
-        puts json
-        puts '-----'
+        puts "Populates #{self.class} #{@entity_type} from json:" if DEBUG
+        puts json if DEBUG
+        puts '-----' if DEBUG
         @json = json
         @code = json['code']
         @description = json['description']
@@ -77,7 +80,6 @@ module Seek
         cache_option = refresh ? { force: true } : nil
 
         json = query_application_server_by_semantic(semantic, cache_option)
-        # puts json.to_json
         construct_from_json(json, entity_type)
       end
 
@@ -127,7 +129,6 @@ module Seek
 
       def query_application_server_by_semantic(semantic, cache_option = nil)
         cache_code = type_name+':'+semantic.to_json
-        # puts cache_code
         query = { entityType: type_name, queryType: 'SEMANTIC' }
         query[:predicateOntologyId] = semantic.predicateOntologyId if semantic.predicateOntologyId
         query[:predicateOntologyVersion] = semantic.predicateOntologyVersion if semantic.predicateOntologyVersion
@@ -135,7 +136,6 @@ module Seek
         query[:descriptorOntologyId] = semantic.descriptorOntologyId if semantic.descriptorOntologyId
         query[:descriptorOntologyVersion] = semantic.descriptorOntologyVersion if semantic.descriptorOntologyVersion
         query[:descriptorAccessionId] = semantic.descriptorAccessionId if semantic.descriptorAccessionId
-        # puts query
 
         cached_query_by_code(cache_code, cache_option) do
           application_server_query_instance.query(query)
@@ -145,9 +145,9 @@ module Seek
       def cached_query_by_code(code, cache_option = nil)
         raise 'Block required for doing query' unless block_given?
         key = cache_key(code)
-        Rails.logger.info("OBIS CACHE KEY = #{key}")
+        Rails.logger.info("OBIS CACHE KEY = #{key}") if DEBUG
         openbis_endpoint.metadata_store.fetch(key, cache_option) do
-          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{code}")
+          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{code}") if DEBUG
           yield
         end
       end

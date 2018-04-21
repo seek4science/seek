@@ -16,8 +16,8 @@ class OpenbisExperimentsController < ApplicationController
   end
 
   def register
-    puts 'register called'
-    puts params
+    puts 'register called' if DEBUG
+    puts params if DEBUG
 
     if @asset.seek_entity
       flash[:error] = 'Already registered as OpenBIS entity'
@@ -25,7 +25,6 @@ class OpenbisExperimentsController < ApplicationController
     end
 
     sync_options = get_sync_options
-    puts sync_options
     study_params = params.require(:study).permit(:investigation_id)
 
     reg_info = do_study_registration(@asset, study_params, sync_options, current_person)
@@ -51,8 +50,8 @@ class OpenbisExperimentsController < ApplicationController
   end
 
   def update
-    puts 'update called'
-    puts params
+    puts 'update called' if DEBUG
+    puts params if DEBUG
 
     @study = @asset.seek_entity
 
@@ -87,7 +86,6 @@ class OpenbisExperimentsController < ApplicationController
   end
 
   def batch_register
-    puts params
 
     batch_ids = params[:batch_ids] || []
     seek_parent_id = params[:seek_parent]
@@ -118,7 +116,6 @@ class OpenbisExperimentsController < ApplicationController
   def batch_register_studies(experiment_ids, investigation_id)
 
     sync_options = get_sync_options
-    puts "SYNC OPT #{sync_options}"
     sync_options[:link_datasets] = '1' if sync_options[:link_dependent] == '1'
     sync_options[:link_assays] = '1' if sync_options[:link_dependent] == '1'
 

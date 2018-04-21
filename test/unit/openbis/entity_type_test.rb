@@ -43,7 +43,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   test 'SampleType by code' do
     return if EntityTypeTest.mocked?
 
-    code = 'TZ_ASSAY'
+    code = 'EXPERIMENTAL_STEP'
     type = Seek::Openbis::EntityType.SampleType(@openbis_endpoint, code, true)
     assert type
     assert_equal code, type.code
@@ -126,7 +126,7 @@ class EntityTypeTest < ActiveSupport::TestCase
   test 'DataSetType by code' do
     return if EntityTypeTest.mocked?
 
-    code = 'TZ_FAIR'
+    code = 'RAW_DATA'
     type = Seek::Openbis::EntityType.DataSetType(@openbis_endpoint, code, true)
     assert type
     assert_equal code, type.code

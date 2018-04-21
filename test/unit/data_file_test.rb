@@ -367,9 +367,12 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'openbis download restricted' do
+    mock_openbis_calls
     df = openbis_linked_data_file
-    assert df.content_blob.openbis_dataset.size < 600.kilobytes
-    assert df.content_blob.openbis_dataset.size > 100.kilobytes
+    #assert df.content_blob.openbis_dataset.size < 600.kilobytes
+    #assert df.content_blob.openbis_dataset.size > 100.kilobytes
+    assert df.external_asset.content.size < 600.kilobytes
+    assert df.external_asset.content.size > 100.kilobytes
 
     with_config_value :openbis_download_limit,100.kilobytes do
       assert df.openbis_size_download_restricted?

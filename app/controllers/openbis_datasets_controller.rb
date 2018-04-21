@@ -4,7 +4,7 @@ class OpenbisDatasetsController < ApplicationController
 
 
   def index
-    puts "---\nINDEX\n#{params}"
+    puts "---\nINDEX\n#{params}" if DEBUG
     @entity_type = params[:entity_type] || Seek::Openbis::ALL_DATASETS
     get_entity_types
     get_entities
@@ -16,8 +16,8 @@ class OpenbisDatasetsController < ApplicationController
   end
 
   def register
-    puts 'register called'
-    puts params
+    puts 'register called' if DEBUG
+    puts params if DEBUG
 
 
     if @asset.seek_entity
@@ -46,8 +46,8 @@ class OpenbisDatasetsController < ApplicationController
   end
 
   def update
-    puts 'update called'
-    puts params
+    puts 'update called' if DEBUG
+    puts params if DEBUG
 
     @datafile = @asset.seek_entity
 
@@ -77,7 +77,6 @@ class OpenbisDatasetsController < ApplicationController
   end
 
   def batch_register
-    puts params
 
     batch_ids = params[:batch_ids] || []
     seek_parent_id = params[:seek_parent]

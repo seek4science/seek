@@ -8,6 +8,9 @@ module Seek
 
     module EntityControllerBase
 
+      # debug is with puts so it can be easily seen on tests screens
+      DEBUG = Seek::Config.openbis_debug ? true : false
+
       def self.included(base)
         base.before_filter :get_endpoint
         base.before_filter :get_project
@@ -18,7 +21,7 @@ module Seek
       end
 
       def refresh
-        puts "------------\nREFRESH\n---------"
+        puts "------------\nREFRESH\n---------" if DEBUG
 
         seek_util.sync_asset_content(@asset)
 

@@ -77,21 +77,22 @@ class OpenbisEndpoint < ActiveRecord::Base
     # job could be removed if there was nothing to sync
     OpenbisSyncJob.new(self).queue_job
 
-    #else
-    #  Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not refreshing METADATA")
-    #end
     self
   end
 
   def force_refresh_metadata
     if test_authentication
-      Rails.logger.info("FORCING REFRESHING METADATA FOR Openbis Space #{id}")
+      Rails.logger.info("FORCING REFRESHING METADATA FOR Openbis Space #{id} passed authentication")
+    else
+      Rails.logger.info("Authentication test for Openbis Space #{id} failed, when forcing refreshing METADATA")
+    end
+
+    # as content stays in external_asset we can still clean the cache and mark items for refresh
 
       clear_metadata_store
       mark_all_for_refresh
-    else
-      Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not forcing refreshing METADATA")
-    end
+
+    self
 
   end
 
@@ -123,12 +124,6 @@ class OpenbisEndpoint < ActiveRecord::Base
     # we clear it no matter what as metadata are stored in the ExternalAssets
     metadata_store.clear
 
-    # if test_authentication
-    #   Rails.logger.info("CLEARING METADATA STORE FOR Openbis Space #{id}")
-    #   metadata_store.clear
-    # else
-    #   Rails.logger.info("Authentication test for Openbis Space #{id} failed, so not deleting METADATA STORE")
-    # end
   end
 
   def clear_metadata_if_changed
