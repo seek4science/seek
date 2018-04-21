@@ -19,6 +19,7 @@ tags:
   - name: search
 
   - name: institutions
+    description: All about institutions
   - name: people
   - name: programmes
   - name: projects
