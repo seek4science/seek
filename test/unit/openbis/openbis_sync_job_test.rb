@@ -6,7 +6,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
 
-    @batch_size = 3;
+    @batch_size = 3
     #@endpoint = Factory(:openbis_endpoint)
     @endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
     @job = OpenbisSyncJob.new(@endpoint, @batch_size)
@@ -18,130 +18,163 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     assert @job
   end
 
-  test 'needs_refresh gives oldest entries not synchronized yet and over the deadline' do
+  test 'checking that asset.save need to be followed by touch to update timestamp even if content not changed' do
 
-    assert @endpoint.save
+    asset = ExternalAsset.new
+    asset.seek_service = @endpoint
+    asset.external_service = @endpoint.web_endpoint
+    asset.external_id = 2
+    asset.sync_state = :refresh
+    asset.synchronized_at= DateTime.now - 20.minutes
+    assert asset.save
+    asset.reload
+
+    mod = asset.updated_at
+
+    asset = ExternalAsset.find(asset.id)
+    assert_equal mod, asset.updated_at
+
+    travel 1.seconds do
+      asset.sync_state = :failed
+      assert asset.save
+
+      assert mod < asset.updated_at
+      asset = ExternalAsset.find(asset.id)
+      assert mod < asset.updated_at
+
+      mod = asset.updated_at
+      travel 1.seconds do
+        #update with same value
+        asset.sync_state = :failed
+        assert asset.save
+
+        assert mod == asset.updated_at
+        asset.touch
+        asset = ExternalAsset.find(asset.id)
+        assert mod < asset.updated_at
+
+        mod = asset.updated_at
+        travel 1.seconds do
+          assert asset.save
+
+          assert mod == asset.updated_at
+          asset.touch
+          asset = ExternalAsset.find(asset.id)
+          assert mod < asset.updated_at
+
+          mod = asset.updated_at
+        end
+      end
+    end
+
+
+  end
+
+  test 'need_sync gives not synchronized entries due to refresh sorted by last change (see bussiness rule)' do
+
+    # bussines rule
+    # - status different form synchronized
+    # - synchronized_at before Now- endpoint refresh
+    # - last update before Now - endpont_refresh/2 (to prevent constant checking of failed entries)
+
+    @endpoint.refresh_period_mins = 121
+    disable_authorization_checks do
+      assert @endpoint.save
+    end
+
     assets = []
-    (1..10).each do |i|
 
+    # those should be skipped as not overdue for refresh
+    (0..4).each do |i|
       asset = ExternalAsset.new
       asset.seek_service = @endpoint
       asset.external_service = @endpoint.web_endpoint
       asset.external_id = i
       asset.sync_state = :refresh
-      asset.synchronized_at= DateTime.now - (i*20).minutes
-      assert asset.save
+      asset.synchronized_at= DateTime.now
+      travel (-5-i).days do
+        assert asset.save
+      end
       assets << asset
     end
 
-
-    assets[8].sync_state = :synchronized
-    assets[8].save
+    (5..9).each do |i|
+      asset = ExternalAsset.new
+      asset.seek_service = @endpoint
+      asset.external_service = @endpoint.web_endpoint
+      asset.external_id = i
+      asset.sync_state = :refresh
+      #this one should be skipped
+      asset.sync_state = :synchronized if i == 8
+      asset.synchronized_at= DateTime.now - 1.days
+      travel (-i).hours do
+        assert asset.save
+      end
+      assets << asset
+    end
 
     @endpoint.reload
     assert_equal 10, @endpoint.external_assets.count
     assert_equal 3, @batch_size
 
-    needs = @job.needs_refresh.to_a
+    needs = @job.need_sync.to_a
     assert needs
-    #puts needs.map {|e| e.external_id}
+
     assert_equal 3, needs.length
     assert_equal [assets[9], assets[7], assets[6]], needs
 
-    (0..8).each do |i|
-      assets[i].synchronized_at= DateTime.now
-      assets[i].save
-    end
+    # reset update_at stamp so they willl be too fresh to be returned
+    assets[9].touch
+    assets[6].touch
+    assets[5].touch
 
-    needs = @job.needs_refresh.to_a
-    assert_equal [assets[9]], needs
+    needs = @job.need_sync.to_a
+    assert_equal [assets[7]], needs
   end
 
-  test 'needs_refresh gives priority to marked for refresh over the failed ones' do
+  test 'need_sync gives priority to refresh over failed' do
 
-    assert @endpoint.save
+    # bussines rule
+    # - status different form synchronized
+    # - synchronized_at before Now- endpoint refresh
+    # - last update before Now - endpont_refresh/2 (to prevent constant checking of failed entries)
+
+    @endpoint.refresh_period_mins = 121
+    disable_authorization_checks do
+      assert @endpoint.save
+    end
+
     assets = []
-    (1..10).each do |i|
 
+    (0..5).each do |i|
       asset = ExternalAsset.new
       asset.seek_service = @endpoint
       asset.external_service = @endpoint.web_endpoint
       asset.external_id = i
-      asset.sync_state = :refresh
-      asset.synchronized_at= DateTime.now - (i*20).minutes
-      assert asset.save
+      asset.sync_state = :failed
+      #this one should be first
+      asset.sync_state = :refresh if i == 2
+      asset.synchronized_at= DateTime.now - 1.days
+      travel (-2-i).hours do
+        assert asset.save
+      end
       assets << asset
     end
 
-
-    assets[8].sync_state = :synchronized
-    assets[8].save
-
-    assets[7].sync_state = :failed
-    assets[7].save
-
     @endpoint.reload
-    assert_equal 10, @endpoint.external_assets.count
+    assert_equal 6, @endpoint.external_assets.count
     assert_equal 3, @batch_size
 
-    needs = @job.needs_refresh.to_a
+    needs = @job.need_sync.to_a
     assert needs
-    #puts needs.map {|e| e.external_id}
+
     assert_equal 3, needs.length
-    assert_equal [assets[9], assets[6], assets[5]], needs
+    assert_equal [assets[2], assets[5], assets[4]], needs
 
-    (0..7).each do |i|
-      assets[i].sync_state = :failed
-      assets[i].save
-    end
-
-    needs = @job.needs_refresh.to_a
-    assert_equal [assets[9], assets[7], assets[6]], needs
   end
 
-  test 'errorfree_needs_refresh gives oldest entries marked as refresh and over the deadline' do
 
-    assert @endpoint.save
-    assets = []
-    (1..10).each do |i|
-
-      asset = ExternalAsset.new
-      asset.seek_service = @endpoint
-      asset.external_service = @endpoint.web_endpoint
-      asset.external_id = i
-      asset.sync_state = :refresh
-      asset.synchronized_at= DateTime.now - (i*20).minutes
-      assert asset.save
-      assets << asset
-    end
-
-
-    assets[8].sync_state = :synchronized
-    assets[8].save
-
-    assets[7].sync_state = :failed
-    assets[7].save
-
-    @endpoint.reload
-    assert_equal 10, @endpoint.external_assets.count
-    assert_equal 3, @batch_size
-
-    needs = @job.needs_refresh.to_a
-    assert needs
-    #puts needs.map {|e| e.external_id}
-    assert_equal 3, needs.length
-    assert_equal [assets[9], assets[6], assets[5]], needs
-
-    (0..8).each do |i|
-      assets[i].synchronized_at= DateTime.now
-      assets[i].save
-    end
-
-    needs = @job.needs_refresh.to_a
-    assert_equal [assets[9]], needs
-  end
-
-  test 'follow_on_delay gives one second if marked refresh left or endpoint default otherwise' do
+  test 'follow_on_delay gives 5 second if marked refresh left or endpoint default otherwise' do
 
     assert @endpoint.save
 
@@ -152,28 +185,12 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     asset.external_service = @endpoint.web_endpoint
     asset.external_id = 1
     asset.sync_state = :refresh
-    asset.synchronized_at= DateTime.now - 100.minutes
-    assert asset.save
+    asset.synchronized_at= DateTime.now - (@endpoint.refresh_period_mins+5).minutes
+    travel -(@endpoint.refresh_period_mins+5).minutes do
+      assert asset.save
+    end
 
-    assert_equal 1.seconds, @job.follow_on_delay
-
-  end
-
-  test 'follow_on_delay gives 5 minutes if only failed left or endpoint default otherwise' do
-
-    assert @endpoint.save
-
-    assert_equal @endpoint.refresh_period_mins.minutes, @job.follow_on_delay
-
-    asset = ExternalAsset.new
-    asset.seek_service = @endpoint
-    asset.external_service = @endpoint.web_endpoint
-    asset.external_id = 1
-    asset.sync_state = :failed
-    asset.synchronized_at= DateTime.now - 100.minutes
-    assert asset.save
-
-    assert_equal 5.minutes, @job.follow_on_delay
+    assert_equal 5.seconds, @job.follow_on_delay
 
   end
 
@@ -240,6 +257,82 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
     refute assay.data_files.empty?
     assert_equal zample.dataset_ids.length, assay.data_files.length
+  end
+
+  test 'perfom_job always update mod stamp even if no content change' do
+
+    assay = Factory :assay
+
+    # normal sample
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+
+    asset = OpenbisExternalAsset.build(zample, {})
+    asset.seek_entity = assay
+    asset.synchronized_at = DateTime.now - 1.days
+    asset.sync_state = :synchronized
+
+    assert asset.save
+
+    travel 1.second do
+      mod = asset.updated_at
+      @job.perform_job(asset)
+      asset.reload
+      assert mod < asset.updated_at
+
+      travel 1.second do
+        mod = asset.updated_at
+        @job.perform_job(asset)
+        asset.reload
+        assert mod < asset.updated_at
+      end
+    end
+
+  end
+
+  test 'perfom_job always update mod stamp even if on errors' do
+
+    assay = Factory :assay
+
+    # normal sample
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+    json = zample.json.clone
+    json['permId'] = 'XXX'
+
+    # now the sample cannot be found
+    zample = Seek::Openbis::Zample.new(@endpoint).populate_from_json(json)
+
+    # checking if fetching sample gives error
+    begin
+      t = Seek::Openbis::Zample.new(@endpoint, zample.perm_id)
+      refute t
+    rescue Exception => e
+      assert e
+    end
+    asset = OpenbisExternalAsset.build(zample, {})
+    asset.seek_entity = assay
+    asset.synchronized_at = DateTime.now - 1.days
+    asset.sync_state = :failed
+
+    assert asset.save
+
+    travel 1.second do
+      mod = asset.updated_at
+      @job.perform_job(asset)
+      asset.reload
+      assert asset.failed?
+      assert asset.err_msg
+      assert mod < asset.updated_at
+
+      travel 1.second do
+        mod = asset.updated_at
+        @job.perform_job(asset)
+        asset.reload
+        assert asset.failed?
+        assert asset.err_msg
+        assert mod < asset.updated_at
+      end
+    end
+
   end
 
   test 'seek_util created only once' do

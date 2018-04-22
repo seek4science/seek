@@ -18,6 +18,8 @@ class OpenbisSyncJob < SeekJob
     obis_asset.reload
 
     errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
+    # allwyas touch asset so its updated_at stamp is modified as it is used for queuing entiries
+    obis_asset.touch
 
     if errs.empty?
       Rails.logger.info "successful obis sync of OBisAsset:#{obis_asset.id} perm_id: #{obis_asset.external_id}" if DEBUG
@@ -29,8 +31,7 @@ class OpenbisSyncJob < SeekJob
   end
 
   def gather_items
-    # TODO what to do with failed, we dont won't the same failed blocking the queue but rather moved to the end
-    needs_refresh.to_a
+    need_sync.to_a
   end
 
   def allow_duplicate_jobs?
@@ -42,9 +43,9 @@ class OpenbisSyncJob < SeekJob
   end
 
   def follow_on_delay
-    return 1.seconds if errorfree_needs_refresh.count > 0
-    # if they failed once they will fail if checked too soon
-    return 5.minutes if needs_refresh.count > 0
+    needed = need_sync.count
+    Rails.logger.info "OBis syn will follow with #{needed} items"
+    return 1.seconds if need_sync.count > 0
 
     if endpoint
       endpoint.refresh_period_mins.minutes
@@ -54,6 +55,7 @@ class OpenbisSyncJob < SeekJob
   end
 
   def follow_on_job?
+    Rails.logger.info "Follow? count #{count} #{count(true)}"
     true && endpoint #don't follow on if the endpoint no longer exists
   end
 
@@ -67,28 +69,22 @@ class OpenbisSyncJob < SeekJob
     super(ignore_locked)
   end
 
-  def needs_refresh
-    service = endpoint # to prevent multiple callas
+  def need_sync
+    service = endpoint # to prevent multiple calls
 
     old = DateTime.now - service.refresh_period_mins.minutes
-    service.external_assets.where("synchronized_at < ? AND sync_state != ?", old, ExternalAsset.sync_states[:synchronized])
-        .order(:sync_state, :synchronized_at)
+    too_fresh = DateTime.now - (service.refresh_period_mins / 2).minutes
+
+    service.external_assets.where('synchronized_at < ? AND updated_at < ? AND sync_state != ?', old, too_fresh, ExternalAsset.sync_states[:synchronized])
+        .order(:sync_state, :updated_at)
         .limit(@batch_size)
 
   end
 
-  def errorfree_needs_refresh
-    service = endpoint # to prevent multiple callas
-
-    old = DateTime.now - service.refresh_period_mins.minutes
-    service.external_assets.where("synchronized_at < ? AND sync_state = ?", old, ExternalAsset.sync_states[:refresh])
-        .order(:synchronized_at)
-        .limit(@batch_size)
-
-  end
 
   def self.create_initial_jobs
-    OpenbisEndpoint.all.each { |point| OpenbisSyncJob.new(point).queue_job }
+    OpenbisEndpoint.all.each(&:create_sync_metadata_job)
+    # OpenbisEndpoint.all.each { |point| OpenbisSyncJob.new(point).queue_job }
   end
 
   def seek_util

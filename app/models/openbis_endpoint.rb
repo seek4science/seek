@@ -75,7 +75,8 @@ class OpenbisEndpoint < ActiveRecord::Base
     mark_for_refresh
 
     # job could be removed if there was nothing to sync
-    OpenbisSyncJob.new(self).queue_job
+    # syncJob = OpenbisSyncJob.new(self)
+    # syncJob.queue_job unless syncJob.exists?
 
     self
   end

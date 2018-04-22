@@ -86,6 +86,7 @@ SEEK::Application.configure do
       SendPeriodicEmailsJob.create_initial_jobs
       NewsFeedRefreshJob.create_initial_job
       OpenbisEndpointCacheRefreshJob.create_initial_jobs
+      OpenbisSyncJob.create_initial_jobs
       ContentBlobCleanerJob.create_initial_job
     end
   rescue Exception=>e
