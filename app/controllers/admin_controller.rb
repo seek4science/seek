@@ -513,10 +513,10 @@ class AdminController < ApplicationController
   def execute_command(command)
     return nil if Rails.env.test?
     begin
-      cl = Cocaine::CommandLine.new(command)
+      cl = Terrapin::CommandLine.new(command)
       cl.run
       return nil
-    rescue Cocaine::CommandNotFoundError => e
+    rescue Terrapin::CommandNotFoundError => e
       return 'The command to restart the background tasks could not be found!'
     rescue => e
       error = e.message
@@ -528,7 +528,7 @@ class AdminController < ApplicationController
     if error.blank?
       flash[:notice] = "The #{process} was restarted"
     else
-      flash[:error] = "There is a problem with restarting the #{process}. #{error.gsub('Cocaine::', '')}"
+      flash[:error] = "There is a problem with restarting the #{process}. #{error.gsub('Terrapin::', '')}"
     end
     redirect_to action: :show
   end
