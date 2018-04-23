@@ -285,6 +285,52 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_match(/.*XX.*/, response.body)
   end
 
+  test 'should handle bad response from efetch during export' do
+    stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
+        .with(body: { 'db' => 'pubmed', 'email' => '(fred@email.com)', 'id' => '404', 'retmode' => 'text', 'rettype' => 'medline', 'tool' => 'bioruby' },
+              headers: { 'Accept' => '*/*',
+                         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+                         'Content-Length' => '87',
+                         'Content-Type' => 'application/x-www-form-urlencoded',
+                         'User-Agent' => 'Ruby' })
+        .to_return(status: 200, body: '')
+
+    pub = Factory(:publication, title: 'A paper on blabla',
+                      abstract: 'WORD ' * 20,
+                      published_date: 5.days.ago.to_s(:db),
+                      pubmed_id: 404)
+
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: pub, format: 'enw'
+    end
+
+    assert_redirected_to pub
+    assert_includes flash[:error], 'There was a problem communicating with PubMed to generate the requested ENW'
+  end
+
+  test 'should handle timeout from efetch during export' do
+    stub_request(:post, 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi')
+        .with(body: { 'db' => 'pubmed', 'email' => '(fred@email.com)', 'id' => '999', 'retmode' => 'text', 'rettype' => 'medline', 'tool' => 'bioruby' },
+              headers: { 'Accept' => '*/*',
+                         'Accept-Encoding' => 'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+                         'Content-Length' => '87',
+                         'Content-Type' => 'application/x-www-form-urlencoded',
+                         'User-Agent' => 'Ruby' })
+        .to_timeout
+
+    pub = Factory(:publication, title: 'A paper on blabla',
+                  abstract: 'WORD ' * 20,
+                  published_date: 5.days.ago.to_s(:db),
+                  pubmed_id: 999)
+
+    with_config_value :pubmed_api_email, 'fred@email.com' do
+      get :show, id: pub, format: 'enw'
+    end
+
+    assert_redirected_to pub
+    assert_includes flash[:error], 'There was a problem communicating with PubMed to generate the requested ENW'
+  end
+
   test 'should filter publications by projects_id for export' do
     # project without publications
     get :export, query: { projects_id_in: [projects(:sysmo_project).id + 1] }
