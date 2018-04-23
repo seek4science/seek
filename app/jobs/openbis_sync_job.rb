@@ -17,7 +17,7 @@ class OpenbisSyncJob < SeekJob
     errs = []
     obis_asset.reload
 
-    errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
+    #errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
     # allwyas touch asset so its updated_at stamp is modified as it is used for queuing entiries
     obis_asset.touch
 
