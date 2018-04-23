@@ -1,12 +1,11 @@
 # job to periodically clear and refresh the cache
 class OpenbisFakeJob < SeekJob
-  attr_accessor :openbis_endpoint_id
 
   # debug is with puts so it can be easily seen on tests screens
   DEBUG = true
 
-  def initialize(openbis_endpoint, batch_size = 10)
-    @openbis_endpoint_id = openbis_endpoint.id
+  def initialize(name, batch_size = 10)
+    @name = name
     @batch_size = batch_size || 10
   end
 
@@ -46,7 +45,7 @@ class OpenbisFakeJob < SeekJob
   end
 
   def follow_on_job?
-    true && endpoint #don't follow on if the endpoint no longer exists
+    true 
   end
 
   # overidden to ignore_locked false by default
@@ -89,12 +88,9 @@ class OpenbisFakeJob < SeekJob
 
 
   def self.create_initial_jobs
-    OpenbisEndpoint.all.each { |point| OpenbisFakeJob.new(point).queue_job }
+    OpenbisFakeJob.new('fake1').queue_job
   end
 
   private
 
-  def endpoint
-    @endpoint ||= OpenbisEndpoint.find_by_id(openbis_endpoint_id)
-  end
 end

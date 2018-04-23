@@ -1,20 +1,15 @@
 require 'test_helper'
-require 'openbis_test_helper'
 
 class OpenbisFakeJobTest < ActiveSupport::TestCase
 
   def setup
-    mock_openbis_calls
 
     @batch_size = 3
-    #@endpoint = Factory(:openbis_endpoint)
-    @endpoint = Factory(:openbis_endpoint, refresh_period_mins: 60)
-    @job = OpenbisFakeJob.new(@endpoint, @batch_size)
+    @job = OpenbisFakeJob.new('fakish', @batch_size)
     Delayed::Job.destroy_all # avoids jobs created from the after_create callback, this is tested for OpenbisEndpoint
   end
 
   test 'setup' do
-    assert @endpoint
     assert @job
   end
 
