@@ -174,7 +174,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
   end
 
 
-  test 'follow_on_delay gives 5 second if marked refresh left or endpoint default otherwise' do
+  test 'follow_on_delay gives 1 second if marked refresh left or endpoint default otherwise' do
 
     assert @endpoint.save
 
@@ -190,7 +190,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
       assert asset.save
     end
 
-    assert_equal 5.seconds, @job.follow_on_delay
+    assert_equal 1.seconds, @job.follow_on_delay
 
   end
 

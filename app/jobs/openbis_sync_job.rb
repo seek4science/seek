@@ -5,9 +5,9 @@ class OpenbisSyncJob < SeekJob
   # debug is with puts so it can be easily seen on tests screens
   DEBUG = Seek::Config.openbis_debug ? true : false
 
-  def initialize(openbis_endpoint, batch_size = 10)
+  def initialize(openbis_endpoint, batch_size = 20)
     @openbis_endpoint_id = openbis_endpoint.id
-    @batch_size = batch_size || 10
+    @batch_size = batch_size || 20
   end
 
   def perform_job(obis_asset)
