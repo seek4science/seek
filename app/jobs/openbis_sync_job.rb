@@ -17,7 +17,7 @@ class OpenbisSyncJob < SeekJob
     errs = []
     obis_asset.reload
 
-    #errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
+    errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
     # allwyas touch asset so its updated_at stamp is modified as it is used for queuing entiries
     obis_asset.touch
 
@@ -44,7 +44,7 @@ class OpenbisSyncJob < SeekJob
 
   def follow_on_delay
     needed = need_sync.count
-    Rails.logger.info "OBis syn will follow with #{needed} items"
+    Rails.logger.info "OBis syn will follow with #{needed} items" if DEBUG
     return 1.seconds if need_sync.count > 0
 
     if endpoint
@@ -55,8 +55,8 @@ class OpenbisSyncJob < SeekJob
   end
 
   def follow_on_job?
-    Rails.logger.info "Follow? count #{count} #{count(true)}"
-    true && endpoint #don't follow on if the endpoint no longer exists
+    Rails.logger.info "Follow? count #{count} #{count(true)}" if DEBUG
+    (count(true) < 1) && endpoint #don't follow on if the endpoint no longer exists
   end
 
   # overidden to ignore_locked false by default
