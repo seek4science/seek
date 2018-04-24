@@ -968,6 +968,14 @@ class SopsControllerTest < ActionController::TestCase
     add_creator_to_test_object(sop)
   end
 
+  test 'should show sop as RDF' do
+    sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
+
+    get :show, id: sop, format: :rdf
+
+    assert_response :success
+  end
+
   private
 
   def doi_citation_mock
