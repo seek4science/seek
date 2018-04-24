@@ -29,6 +29,7 @@ class OpenbisFakeJob < SeekJob
   end
 
   def gather_items
+    # Rails.logger.info "Before job\n#{ObjectSpace.count_objects}"
     assets_and_assays
   end
 
@@ -45,7 +46,8 @@ class OpenbisFakeJob < SeekJob
   end
 
   def follow_on_job?
-    true 
+    # Rails.logger.info "After job\n#{ObjectSpace.count_objects}"
+    true
   end
 
   # overidden to ignore_locked false by default
