@@ -30,7 +30,7 @@ gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
 #gem 'openseek-api'
-gem 'openseek-api', git: 'https://github.com/tzielins/openseek-api-gem', ref: '7c6822fe542efc9b580ee572147b4aed3314e364'
+gem 'openseek-api', git: 'https://github.com/tzielins/openseek-api-gem', ref: '45dd072411572792d62814cc333363e12c1c019b'
 # for fancy content escaping in openbis
 gem 'loofah'
 

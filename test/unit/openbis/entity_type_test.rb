@@ -57,14 +57,15 @@ class EntityTypeTest < ActiveSupport::TestCase
 
     types = Seek::Openbis::EntityType.SampleType(@openbis_endpoint).all(true)
     assert types
-    assert_equal 25, types.size
+    assert_equal 24, types.size
 
     codes = types.map { |t| t.code}
-    assert_includes codes, 'TZ_ASSAY'
+    assert_includes codes, 'BACTERIA'
   end
 
   test 'SampleType by semantic annotation' do
     return if EntityTypeTest.mocked?
+    skip 'Semantic annotations are not currently available in OBIS production releases'
     semantic = Seek::Openbis::SemanticAnnotation.new
 
     semantic.predicateAccessionId = 'po_acc_t'
@@ -97,16 +98,16 @@ class EntityTypeTest < ActiveSupport::TestCase
   test 'Samples can be found by types codes' do
     return if EntityTypeTest.mocked?
 
-    codes = ['TZ_ASSAY']
+    codes = ['EXPERIMENTAL_STEP']
 
     zamples = Seek::Openbis::Zample.new(@openbis_endpoint).find_by_type_codes(codes)
     assert zamples
-    assert_equal 2, zamples.size
+    assert_equal 6, zamples.size
 
-    codes = ['TZ_ASSAY','STORAGE']
+    codes = ['EXPERIMENTAL_STEP','STORAGE']
     zamples = Seek::Openbis::Zample.new(@openbis_endpoint).find_by_type_codes(codes)
     assert zamples
-    assert_equal 4, zamples.size
+    assert_equal 8, zamples.size
 
     codes = ['TZ_MISSING_TYPE']
     zamples = Seek::Openbis::Zample.new(@openbis_endpoint).find_by_type_codes(codes)
@@ -119,7 +120,7 @@ class EntityTypeTest < ActiveSupport::TestCase
 
     zamples = Seek::Openbis::Zample.new(@openbis_endpoint).all
     assert zamples
-    assert_equal 16, zamples.size
+    assert_equal 11, zamples.size
 
   end
 
@@ -140,25 +141,25 @@ class EntityTypeTest < ActiveSupport::TestCase
 
     types = Seek::Openbis::EntityType.DataSetType(@openbis_endpoint).all(true)
     assert types
-    assert_equal 7, types.size
+    assert_equal 6, types.size
 
     codes = types.map { |t| t.code}
-    assert_includes codes, 'TZ_FAIR'
+    assert_includes codes, 'RAW_DATA'
   end
 
   test 'DataSets can be found by types codes' do
     return if EntityTypeTest.mocked?
 
-    codes = ['TZ_FAIR']
+    codes = ['RAW_DATA']
 
     sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_type_codes(codes)
     assert sets
-    assert_equal 7, sets.size
+    assert_equal 4, sets.size
 
-    codes = ['TZ_FAIR','UNKNOWN']
+    codes = ['RAW_DATA','ANALYZED_DATA']
     sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_type_codes(codes)
     assert sets
-    assert_equal 8, sets.size
+    assert_equal 6, sets.size
 
     codes = ['TZ_MISSING_TYPE']
     sets = Seek::Openbis::Dataset.new(@openbis_endpoint).find_by_type_codes(codes)
@@ -208,12 +209,12 @@ class EntityTypeTest < ActiveSupport::TestCase
 
     sets = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
     assert sets
-    assert_equal 4, sets.size
+    assert_equal 2, sets.size
 
     codes = ['DEFAULT_EXPERIMENT','MATERIALS']
     sets = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
     assert sets
-    assert_equal 16, sets.size
+    assert_equal 14, sets.size
 
     codes = ['TZ_MISSING_TYPE']
     sets = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
