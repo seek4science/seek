@@ -143,6 +143,8 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
   end
 
+# TZ adding is handled by datasets_controller
+=begin
   test 'add dataset' do
     disable_authorization_checks do
       @project.update_attributes(default_license: 'wibble')
@@ -203,6 +205,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
       refute_nil flash[:error]
     end
   end
+=end
 
   test 'browse' do
     # project admin can browse
@@ -449,8 +452,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'refresh metadata store' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
-    post :refresh_metadata_store, id: endpoint.id, project_id: @project.id
-    assert_response :success
-    assert assigns(:openbis_endpoint)
+    post :refresh, id: endpoint.id
+    assert_redirected_to endpoint
   end
 end

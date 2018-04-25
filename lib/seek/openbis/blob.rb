@@ -4,23 +4,31 @@ module Seek
     # FIXME: wanted to call ContentBlob but rails loader didn't like it and got confused
     # ... over the model ContentBlob disregarding the namespacing. Need to investigate why?
     module Blob
+
+
       # NOTE: the fact is it prepended rather than included seems to prevent the use of Concern's which
       # doesn't handle prepend
+      # TZ no more need for scoping on ContentBlob should rather start in Assay, DataFile etc
+=begin
       def self.prepended(base)
         base.class_eval do
           scope :for_openbis_endpoint, (->(endpoint) { where("url LIKE 'openbis:#{endpoint.id}%'") })
         end
       end
+=end
 
       def openbis?
-        url && valid_url?(url) && URI.parse(url).scheme == 'openbis' && url.split(':').count == 4
+        return asset.openbis? if asset && asset.respond_to?(:openbis?)
+        false
+        # url && valid_url?(url) && URI.parse(url).scheme == 'openbis' && url.split(':').count == 4
       end
 
       def openbis_dataset
         return nil unless openbis?
-        parts = url.split(':')
-        endpoint = OpenbisEndpoint.find(parts[1])
-        Seek::Openbis::Dataset.new(endpoint, parts[3])
+        #parts = url.split(':')
+        #endpoint = OpenbisEndpoint.find(parts[1])
+        #Seek::Openbis::Dataset.new(endpoint, parts[3])
+        asset.openbis_dataset
       end
 
       def search_terms

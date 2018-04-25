@@ -80,6 +80,7 @@ module Seek
         "openbis2:#{openbis_endpoint.id}/#{entity.class.name}/#{entity.perm_id}"
       end
 
+      # that can be used for migration from first release of OBIS integration
       def legacy_uri_for_content_blob(dataset)
         openbis_endpoint = dataset.openbis_endpoint
         "openbis:#{openbis_endpoint.id}:dataset:#{dataset.perm_id}"

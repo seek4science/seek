@@ -3,7 +3,7 @@ module Seek
     # General behaviour for an entity in openBIS. Specific entities are defined as specialized subclasses
     class Entity
       attr_reader :json, :modifier, :registration_date, :modification_date, :code,
-                  :perm_id, :registrator, :openbis_endpoint, :exception
+                  :perm_id, :registrator, :openbis_endpoint
 
       # debug is with puts so it can be easily seen on tests screens
       DEBUG = Seek::Config.openbis_debug ? true : false
@@ -86,10 +86,7 @@ module Seek
       end
 
       def samples
-        unless @samples
-          @samples = Seek::Openbis::Zample.new(openbis_endpoint).find_by_perm_ids(sample_ids)
-        end
-        @samples
+        @samples ||= Seek::Openbis::Zample.new(openbis_endpoint).find_by_perm_ids(sample_ids)
       end
 
       def datasets
@@ -101,21 +98,24 @@ module Seek
         dataset_ids.count
       end
 
-      def error_occurred?
-        !exception.nil?
-      end
-
       def registered?
-        return true if OpenbisExternalAsset.registered?(self)
-        ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing').any?
+        OpenbisExternalAsset.registered?(self)
+
+        #return true if OpenbisExternalAsset.registered?(self)
+        #ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing').any?
+
       end
 
       def registered_as
-        asset = OpenbisExternalAsset.find_by_entity(self) if OpenbisExternalAsset.registered?(self)
-        return asset.seek_entity if asset
+        begin
+          OpenbisExternalAsset.find_by_entity(self).seek_entity
+        rescue ActiveRecord::RecordNotFound => e
+          nil
+        end
 
-        blob = ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing')
-        blob.any? ? blob.first.asset : nil
+        # the original code
+        #blob = ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing')
+        #blob.any? ? blob.first.asset : nil
       end
 
       protected

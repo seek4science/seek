@@ -319,14 +319,33 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'openbis?' do
+    mock_openbis_calls
+
     stub_request(:head, 'http://www.abc.com').to_return(
       headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
 
     refute Factory(:data_file).openbis?
     refute Factory(:data_file, content_blob: Factory(:url_content_blob)).openbis?
-    assert Factory(:data_file, content_blob: Factory(:url_content_blob, url: 'openbis:1:dataset:2222')).openbis?
+
+    # old openbis integration entry
+    refute Factory(:data_file, content_blob: Factory(:url_content_blob, url: 'openbis:1:dataset:2222')).openbis?
+    assert openbis_linked_data_file.openbis?
   end
 
+  test 'openbis_dataset' do
+    mock_openbis_calls
+
+    assert_nil Factory(:data_file).openbis_dataset
+    ds = openbis_linked_data_file.openbis_dataset
+
+    assert ds
+    assert ds.is_a? Seek::Openbis::Dataset
+    assert ds.perm_id
+
+  end
+
+  # DataFile no longers knows how to create openbis, it is other way arround
+=begin
   test 'build from openbis' do
     mock_openbis_calls
     User.with_current_user(Factory(:person).user) do
@@ -365,6 +384,7 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal Policy::NO_ACCESS, permission.access_type
     end
   end
+=end
 
   test 'openbis download restricted' do
     mock_openbis_calls

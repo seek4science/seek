@@ -80,6 +80,8 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'creates valid datafile with dependent external_assed that can be saved' do
+
+    @endpoint.project.update_attributes(default_license: 'wibble')
     dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
     assert dataset
 
@@ -89,6 +91,8 @@ class SeekUtilTest < ActiveSupport::TestCase
     df = @util.createObisDataFile(params, @user, asset)
 
     assert df.valid?
+    assert df.openbis?
+    assert_equal 'wibble', df.license
 
     assert_difference('DataFile.count') do
       assert_difference('ExternalAsset.count') do
@@ -96,8 +100,15 @@ class SeekUtilTest < ActiveSupport::TestCase
       end
     end
 
-    # content blob is created as there are many SEEK code which assuems cb are present in assets
+    # content blob is created as acording to logs there was SEEK code which assumes blobs presence in all assets
+    # dont know seek enough to find all those places
     assert df.content_blob
+    assert_equal "openbis2:#{@endpoint.id}/Seek::Openbis::Dataset/20160210130454955-23", df.content_blob.url
+    assert df.content_blob.valid?
+    assert df.content_blob.openbis?
+    assert df.content_blob.custom_integration?
+    assert df.content_blob.external_link?
+    refute df.content_blob.show_as_external_link?
 
     # check if datafiles have been prefetched before saving df
     df = DataFile.find(df.id)
@@ -150,13 +161,13 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     new_uri = @util.uri_for_content_blob(asset)
     old_uri = @util.legacy_uri_for_content_blob(dataset)
-    ds_uri = dataset.content_blob_uri
+    #ds_uri = dataset.content_blob_uri
 
     assert_not_equal new_uri, old_uri
-    assert_not_equal new_uri, ds_uri
+    #assert_not_equal new_uri, ds_uri
 
     assert_not_equal URI.parse(new_uri).scheme, URI.parse(old_uri).scheme
-    assert_not_equal URI.parse(new_uri).scheme, URI.parse(ds_uri).scheme
+    #assert_not_equal URI.parse(new_uri).scheme, URI.parse(ds_uri).scheme
 
   end
 
@@ -169,7 +180,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal expected, val
 
     #puts dataset.content_blob_uri
-    assert_equal dataset.content_blob_uri, val
+    #assert_equal dataset.content_blob_uri, val
 
   end
 

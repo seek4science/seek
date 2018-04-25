@@ -34,7 +34,7 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def can_delete?(user = User.current_user)
-    can_edit?(user) && associated_content_blobs.empty?
+    can_edit?(user) && external_assets.empty?
   end
 
   def test_authentication
@@ -151,9 +151,6 @@ class OpenbisEndpoint < ActiveRecord::Base
     OpenbisSyncJob.new(self).delete_jobs
   end
 
-  def associated_content_blobs
-    ContentBlob.for_openbis_endpoint(self)
-  end
 
   def default_policy
     self.policy = Policy.default if new_record? && policy.nil?

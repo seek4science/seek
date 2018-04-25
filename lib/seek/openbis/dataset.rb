@@ -96,6 +96,10 @@ module Seek
         Rails.logger.info("Deleting #{dest_folder}")
       end
 
+      # That is original Stuart's code that was based on purely on ContentBlob
+      # Commented out not deleted in case it is needed for migration from first implementation to new one
+
+=begin
       def create_seek_datafile
         raise 'Already registered' if registered?
         df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}",
@@ -111,6 +115,7 @@ module Seek
       def content_blob_uri
         "openbis:#{openbis_endpoint.id}:dataset:#{perm_id}"
       end
+=end
 
       private
 

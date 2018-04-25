@@ -35,7 +35,7 @@
          <% if dataset.registered? %>
              Already registered
          <% else %>
-             <%= link_to('Register with SEEK', add_dataset_project_openbis_endpoint_path(@project, openbis_endpoint, dataset_perm_id: dataset.perm_id), method: :post) %>
+             link_to('Register with SEEK', add_dataset_project_openbis_endpoint_path(@project, openbis_endpoint, dataset_perm_id: dataset.perm_id), method: :post)
          <% end %>
        </p>
      </div>

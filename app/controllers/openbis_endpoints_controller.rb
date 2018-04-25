@@ -7,11 +7,11 @@ class OpenbisEndpointsController < ApplicationController
 
   before_filter :openbis_enabled?
 
-  before_filter :get_endpoint, only: [:show, :add_dataset, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh, :refresh_metadata_store, :destroy]
+  before_filter :get_endpoint, only: [:show, :show_item_count, :show_items, :edit, :update, :show_dataset_files, :refresh, :refresh_metadata_store, :destroy]
   before_filter :get_project
   before_filter :project_required, except: [:show_dataset_files]
   before_filter :project_member?, except: [:show_dataset_files]
-  before_filter :project_can_admin?, except: [:browse, :add_dataset, :show_dataset_files, :show_items, :show_item_count]
+  before_filter :project_can_admin?, except: [:browse, :show_dataset_files, :show_items, :show_item_count]
   before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
   before_filter :get_endpoints, only: [:index, :browse]
 
@@ -48,12 +48,6 @@ class OpenbisEndpointsController < ApplicationController
     end
   end
 
-  def add_dataset
-    perm_id = params[:dataset_perm_id]
-    fail 'No perm_id passed' unless perm_id
-    @data_file = DataFile.build_from_openbis(@openbis_endpoint, params[:dataset_perm_id])
-    redirect_to @data_file if @data_file.save
-  end
 
   def browse
     respond_with(@project, @openbis_endpoints)
@@ -69,16 +63,14 @@ class OpenbisEndpointsController < ApplicationController
     redirect_to @openbis_endpoint
   end
 
-  def refresh_metadata_store
-    @openbis_endpoint.force_refresh_metadata
-    show_items
-  end
+
 
   ## AJAX calls
 
   def show_dataset_files
+    puts "\n\n\nENDPOINT CONTROLLER show datasets"
     if @data_file
-      dataset = @data_file.openbis_data_set
+      dataset = @data_file.openbis_dataset
     else
       dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, params[:perm_id])
     end
@@ -89,6 +81,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def test_endpoint
+    puts "\n\n\nENDPOINT CONTROLLER test endpoint"
     endpoint = OpenbisEndpoint.new(openbis_endpoint_params)
     result = endpoint.test_authentication
 
@@ -98,6 +91,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def fetch_spaces
+    puts "\n\n\nENDPOINT CONTROLLER fetch spaces"
     endpoint = OpenbisEndpoint.new(openbis_endpoint_params)
     respond_to do |format|
       format.html { render partial: 'available_spaces', locals: { endpoint: endpoint } }
@@ -105,12 +99,15 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def show_item_count
+    puts "\n\n\nENDPOINT CONTROLLER show item count"
     respond_to do |format|
       format.html { render(text: "#{@openbis_endpoint.space.dataset_count} DataSets found") }
     end
   end
 
   def show_items
+    puts "\n\n\nENDPOINT CONTROLLER show items"
+
     respond_to do |format|
       format.html { render(partial: 'show_items_for_space', locals: { openbis_endpoint: @openbis_endpoint }) }
     end
@@ -161,6 +158,8 @@ class OpenbisEndpointsController < ApplicationController
   # whether the dataset files can be shown. Depends on whether viewing a data file or now.
   # if data_file_id is present then the access controls on that data file is checked, otherwise needs to be a project member
   def authorise_show_dataset_files
+    puts "\n\n\nENDPOINT CONTROLLER authorise_show_dataset_files"
+
     @data_file = DataFile.find_by_id(params[:data_file_id])
     if @data_file
       unless @data_file.can_download?

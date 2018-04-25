@@ -192,34 +192,17 @@ class DataFile < ActiveRecord::Base
     external_asset ? external_asset.search_terms : []
   end
 
-  #creates a new DataFile that registers an openBIS dataset
-  def self.build_from_openbis(openbis_endpoint,dataset_perm_id)
-    dataset = Seek::Openbis::Dataset.new(openbis_endpoint,dataset_perm_id)
-    # df=dataset.create_seek_datafile
-    # df.policy=openbis_endpoint.policy.deep_copy
-    # df
-    build_from_openbis_dataset(dataset)
-  end
-
-  #creates a new DataFile that registers an openBIS dataset
-  def self.build_from_openbis_dataset(dataset)
-    df=dataset.create_seek_datafile
-    df.policy=dataset.openbis_endpoint.policy.deep_copy
-    df
-  end
-
   #indicates that this is an openBIS based DataFile
   def openbis?
-    return true if external_asset.is_a? OpenbisExternalAsset
-    content_blob && content_blob.openbis?
+    external_asset.is_a? OpenbisExternalAsset
   end
 
-  def openbis_data_set
-    external_asset.is_a?(OpenbisExternalAsset) ? external_asset.content : content_blob.openbis_dataset
+  def openbis_dataset
+    openbis? ? external_asset.content : nil
   end
 
   def openbis_size_download_restricted?
-    openbis? && openbis_data_set.size > Seek::Config.openbis_download_limit
+    openbis? && openbis_dataset.size > Seek::Config.openbis_download_limit
   end
 
   def download_disabled?
@@ -231,8 +214,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def openbis_dataset_json_details
-    return content_blob.openbis_dataset.json if openbis?
-    nil
+    openbis? ? openbis_dataset.json : nil
   end
 
   # overides that from Seek::RDF::RdfGeneration, as simulation data needs to be #Simulation_data

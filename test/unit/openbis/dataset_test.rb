@@ -126,6 +126,8 @@ class DatasetTest < ActiveSupport::TestCase
 
   end
 
+  # Test for original Stuart's code, I left to in case it has to be compared with new one
+=begin
   test 'create datafile' do
     User.current_user = Factory(:person).user
     @openbis_endpoint.project.update_attributes(default_license: 'wibble')
@@ -151,11 +153,13 @@ class DatasetTest < ActiveSupport::TestCase
     refute normal.content_blob.openbis?
     refute normal.content_blob.custom_integration?
   end
+=end
 
   test 'registered?' do
-    blob = openbis_linked_content_blob('20160210130454955-23', @openbis_endpoint)
     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
     dataset2 = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160215111736723-31')
+
+    assert OpenbisExternalAsset.build(dataset).save
 
     assert dataset.registered?
     refute dataset2.registered?
@@ -166,7 +170,9 @@ class DatasetTest < ActiveSupport::TestCase
     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
     dataset2 = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160215111736723-31')
 
-    datafile = DataFile.build_from_openbis(@openbis_endpoint, dataset.perm_id)
+    datafile = Seek::Openbis::SeekUtil.new.createDataFileFromObisSet(dataset,nil)
+    assert datafile.save
+
     assert_equal datafile, dataset.registered_as
     assert_nil dataset2.registered_as
 

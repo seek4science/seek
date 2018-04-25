@@ -194,9 +194,6 @@ SEEK::Application.routes.draw do
     resources :people,:institutions,:assays,:studies,:investigations,:models,:sops,:data_files,:presentations,
               :publications,:events,:samples,:specimens,:strains,:search, :only=>[:index]
     resources :openbis_endpoints do
-      member do
-        post :add_dataset
-      end
       collection do
         get :test_endpoint
         get :fetch_spaces
@@ -204,13 +201,6 @@ SEEK::Application.routes.draw do
         get :show_items
         get :show_dataset_files
         get :browse
-        post :refresh_metadata_store
-      end
-      resources :openbis_zamples do
-        post :register, on: :member
-      end
-      resources :openbis_datasets do
-        post :register, on: :member
       end
     end
     resources :avatars do
