@@ -2,6 +2,9 @@ swagger: '2.0'
 info:
   version: '0.2'
   title: 'JSON API to FAIRDOM SEEK '
+  x-logo:
+    url: 'https://fairdomhub.org/assets/seek-new-full-a62bea4ae0b7163ea6471db30c9836cd5d4a2d9d4878df077c9add8a30d396ec.svg'
+    backgroundColor: '#FFFFFF'
 host: www.fairdomhub.org
 basePath: /
 schemes:
@@ -17,32 +20,60 @@ security:
   - basicAuth: []
 tags:
   - name: search
-
+    description:
+      $ref: ../descriptions/search.md
   - name: institutions
-    description: All about institutions
+    description:
+      $ref: ../descriptions/institutions.md
   - name: people
+    description:
+      $ref: ../descriptions/people.md
   - name: programmes
+    description:
+      $ref: ../descriptions/programmes.md
   - name: projects
+    description:
+      $ref: ../descriptions/projects.md
   
   - name: investigations
+    description:
+      $ref: ../descriptions/investigations.md
   - name: studies
+    description:
+      $ref: ../descriptions/studies.md
   - name: assays
+    description:
+      $ref: ../descriptions/assays.md
   
-  - name: assets
-  - name: activities
-  - name: samples
-
   - name: dataFiles
+    description:
+      $ref: ../descriptions/dataFiles.md
   - name: documents
+    description:
+      $ref: ../descriptions/documents.md
   - name: models
+    description:
+      $ref: ../descriptions/models.md
   - name: publications
+    description:
+      $ref: ../descriptions/publications.md
   - name: sops
+    description:
+      $ref: ../descriptions/sops.md
 
   - name: events
+    description:
+      $ref: ../descriptions/events.md
   - name: presentations
+    description:
+      $ref: ../descriptions/presentations.md
 
   - name: organisms
+    description:
+      $ref: ../descriptions/organisms.md
   - name: sampleTypes
+    description:
+      $ref: ../descriptions/sampleTypes.md
   
 x-tagGroups:
   - name: Search
@@ -50,7 +81,6 @@ x-tagGroups:
       - search
 
   - name: Yellow Pages
-    description: Some description
     tags:
       - institutions
       - people
@@ -119,9 +149,6 @@ paths:
         * of the specified type
         * that are visible to the authenticated user, and
         * contain the specified test
-      externalDocs:
-        description: something
-        url: 'http://docs.seek4science.org/tech/install.html'
       tags:
         - search
       responses:
@@ -132,7 +159,9 @@ paths:
   /assays:
     get:
       operationId: listAssays
-      description: List references to the assays that are visible to the authenticated user
+#      description: List references to the assays that are visible to the authenticated user
+      description:
+        $ref: ../descriptions/listAssays.md
       tags:
         - assays
       responses:
@@ -140,9 +169,13 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/assaysResponse'
+          examples:
+            application/json:
+              $ref: ../examples/assaysResponse.yml
     post:
       operationId: createAssay
-      description: Create an assay containing the data sent
+      description:
+        $ref: ../descriptions/createAssay.md
       tags:
         - assays
       parameters:
@@ -153,9 +186,11 @@ paths:
             $ref: '#/definitions/assayPost'
       responses:
         '200':
-          description: OK
           schema:
             $ref: '#/definitions/assayResponse'
+          examples:
+            application/json:
+              $ref: ../examples/assayPostResponse.yml
         '501':
           description: Not implemented
   '/assays/{id}':
@@ -166,25 +201,16 @@ paths:
         description: 'The assay to be fetched, updated or deleted'
         type: integer
         default: 267
-    get:
-      operationId: readAssay
-      description: Return the specified assay
-      tags:
-        - assays
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/assayResponse'
     patch:
       operationId: updateAssay
-      description: Patch the specified assay with the specified information
+      description:
+        $ref: ../descriptions/updateAssay.md
       tags:
         - assays
       parameters:
         - in: body
           name: assay
-          description: The assay to create.
+          description: The assay to patch
           schema:
             $ref: '#/definitions/assayPatch'
       responses:
@@ -192,11 +218,29 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/assayResponse'
+          examples:
+            application/json:
+              $ref: ../examples/assayPatchResponse.yml
         '501':
           description: Not implemented
+    get:
+      operationId: readAssay
+      description:
+        $ref: ../descriptions/readAssay.md
+      tags:
+        - assays
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/assayResponse'
+          examples:
+            application/json:
+              $ref: ../examples/assayResponse.yml
     delete:
       operationId: deleteAssay
-      description: Delete the specified assay
+      description:
+        $ref: ../descriptions/deleteAssay.md
       tags:
         - assays
       responses:
@@ -207,6 +251,8 @@ paths:
   /data_files:
     get:
       operationId: listDataFiles
+      description:
+        $ref: ../descriptions/listDataFiles.md
       tags:
         - dataFiles
       responses:
@@ -214,8 +260,13 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dataFilesResponse'
+          examples:
+            application/json:
+              $ref: ../examples/dataFilesResponse.yml
     post:
       operationId: createDataFile
+      description:
+        $ref: ../descriptions/createDataFile.md
       tags:
         - dataFiles
       responses:
@@ -231,6 +282,8 @@ paths:
         default: 1152
     get:
       operationId: readDataFile
+      description:
+        $ref: ../descriptions/readDataFile.md
       parameters:
         - name: version
           in: query
@@ -247,6 +300,8 @@ paths:
             $ref: '#/definitions/dataFileResponse'
     patch:
       operationId: updateDataFile
+      description:
+        $ref: ../descriptions/updateDataFile.md
       tags:
         - dataFiles
       responses:
@@ -254,6 +309,8 @@ paths:
           description: Not implemented
     delete:
       operationId: deleteDataFile
+      description:
+        $ref: ../descriptions/deleteDataFile.md
       tags:
         - dataFiles
       responses:
@@ -264,6 +321,8 @@ paths:
   '/data_files/{id}/content_blobs/{blob_id}':
     put:
       operationId: updateDataFileContent
+#      description:
+#        $ref: ../descriptions/updateDataFileContent.md
       parameters:
         - name: id
           in: path
@@ -308,6 +367,8 @@ paths:
         default: 1831
     get:
       operationId: readDataFileContent
+#      description:
+#        $ref: ../descriptions/readDataFileContent.md
       produces:
         - '*/*'
       tags:
@@ -318,6 +379,8 @@ paths:
   /documents:
     get:
       operationId: listDocuments
+      description:
+        $ref: ../descriptions/listDocuments.md
       tags:
         - documents
       responses:
@@ -327,9 +390,19 @@ paths:
             $ref: '#/definitions/documentsResponse'
     post:
       operationId: createDocument
+      description:
+        $ref: ../descriptions/createDocument.md
       tags:
         - documents
+      parameters:
+        - in: body
+          name: document
+          description: The document to create.
+          schema:
+            $ref: '#/definitions/documentPost'
       responses:
+        '200':
+          description: OK
         '501':
           description: Not implemented
   '/documents/{id}':
@@ -342,6 +415,8 @@ paths:
         default: 1152
     get:
       operationId: readDocument
+      description:
+        $ref: ../descriptions/readDocument.md
       tags:
         - documents
       responses:
@@ -351,13 +426,27 @@ paths:
             $ref: '#/definitions/documentResponse'
     patch:
       operationId: updateDocument
+      description:
+        $ref: ../descriptions/updateDocument.md
       tags:
         - documents
+      parameters:
+        - in: body
+          name: document
+          description: The document to patch.
+          schema:
+            $ref: '#/definitions/documentPost'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/documentResponse'
         '501':
           description: Not implemented
     delete:
       operationId: deleteDocument
+      description:
+        $ref: ../descriptions/deleteDocument.md
       tags:
         - documents
       responses:
@@ -368,6 +457,8 @@ paths:
   /events:
     get:
       operationId: listEvents
+      description:
+        $ref: ../descriptions/listEvents.md
       tags:
         - events
       responses:
@@ -377,9 +468,21 @@ paths:
             $ref: '#/definitions/eventsResponse'
     post:
       operationId: createEvent
+      description:
+        $ref: ../descriptions/createEvent.md
       tags:
         - events
+      parameters:
+        - in: body
+          name: sop
+          description: The event to create.
+          schema:
+            $ref: '#/definitions/eventPost'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/eventResponse'
         '501':
           description: Not implemented
   '/events/{id}':
@@ -392,6 +495,8 @@ paths:
         default: 75
     get:
       operationId: readEvent
+      description:
+        $ref: ../descriptions/readEvent.md
       tags:
         - events
       responses:
@@ -401,13 +506,27 @@ paths:
             $ref: '#/definitions/eventResponse'
     patch:
       operationId: updateEvent
+      description:
+        $ref: ../descriptions/updateEvent.md
       tags:
         - events
+      parameters:
+        - in: body
+          name: sop
+          description: The event to update.
+          schema:
+            $ref: '#/definitions/eventPatch'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/eventResponse'
         '501':
           description: Not implemented
     delete:
       operationId: deleteEvent
+      description:
+        $ref: ../descriptions/deleteEvent.md
       tags:
         - events
       responses:
@@ -418,6 +537,8 @@ paths:
   /institutions:
     get:
       operationId: listInstitutions
+      description:
+        $ref: ../descriptions/listInstitutions.md
       tags:
         - institutions
       responses:
@@ -427,7 +548,8 @@ paths:
             $ref: '#/definitions/institutionsResponse'
     post:
       operationId: createInstitution
-      description: Create an institution containing the data sent
+      description:
+        $ref: ../descriptions/createInstitution.md
       tags:
         - institutions
       parameters:
@@ -467,6 +589,8 @@ paths:
         default: 142
     get:
       operationId: readInstitution
+      description:
+        $ref: ../descriptions/readInstitution.md
       tags:
         - institutions
       responses:
@@ -488,6 +612,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     patch:
       operationId: updateInstitution
+      description:
+        $ref: ../descriptions/updateInstitution.md
       parameters:
         - in: body
           name: institution
@@ -519,6 +645,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     delete:
       operationId: deleteInstitution
+      description:
+        $ref: ../descriptions/deleteInstitution.md
       tags:
         - institutions
       responses:
@@ -541,6 +669,8 @@ paths:
   /investigations:
     get:
       operationId: listInvestigations
+      description:
+        $ref: ../descriptions/listInvestigations.md
       tags:
         - investigations
       responses:
@@ -550,7 +680,8 @@ paths:
             $ref: '#/definitions/investigationsResponse'
     post:
       operationId: createInvestigation
-      description: Create an investigation containing the data sent
+      description:
+        $ref: ../descriptions/createInvestigation.md
       tags:
         - investigations
       parameters:
@@ -586,6 +717,8 @@ paths:
         default: 56
     get:
       operationId: readInvestigation
+      description:
+        $ref: ../descriptions/readInvestigation.md
       tags:
         - investigations
       responses:
@@ -595,6 +728,8 @@ paths:
             $ref: '#/definitions/investigationResponse'
     patch:
       operationId: updateInvestigation
+      description:
+        $ref: ../descriptions/updateInvestigation.md
       parameters:
         - in: body
           name: investigation
@@ -626,6 +761,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     delete:
       operationId: deleteInvestigation
+      description:
+        $ref: ../descriptions/deleteInvestigation.md
       tags:
         - investigations
       responses:
@@ -636,6 +773,8 @@ paths:
   /models:
     get:
       operationId: listModels
+      description:
+        $ref: ../descriptions/listModels.md
       tags:
         - models
       responses:
@@ -645,9 +784,21 @@ paths:
             $ref: '#/definitions/modelsResponse'
     post:
       operationId: createModel
+      description:
+        $ref: ../descriptions/createModel.md
       tags:
         - models
+      parameters:
+        - in: body
+          name: model
+          description: The model to create.
+          schema:
+            $ref: '#/definitions/modelPost'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/modelResponse'
         '501':
           description: Not implemented
   '/models/{id}':
@@ -660,6 +811,8 @@ paths:
         default: 139
     get:
       operationId: readModel
+      description:
+        $ref: ../descriptions/readModel.md
       parameters:
         - name: version
           in: query
@@ -676,13 +829,27 @@ paths:
             $ref: '#/definitions/modelResponse'
     patch:
       operationId: updateModel
+      description:
+        $ref: ../descriptions/updateModel.md
       tags:
         - models
+      parameters:
+        - in: body
+          name: model
+          description: The model to patch.
+          schema:
+            $ref: '#/definitions/modelPatch'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/modelResponse'
         '501':
           description: Not implemented
     delete:
       operationId: deleteModel
+      description:
+        $ref: ../descriptions/deleteModel.md
       tags:
         - models
       responses:
@@ -706,6 +873,8 @@ paths:
         default: 1850
     get:
       operationId: readModelContent
+#      description:
+#        $ref: ../descriptions/readModelContent.md
       tags:
         - models
       responses:
@@ -716,6 +885,8 @@ paths:
   /organisms:
     get:
       operationId: listOrganisms
+      description:
+        $ref: ../descriptions/listOrganisms.md
       tags:
         - organisms
       responses:
@@ -725,9 +896,21 @@ paths:
             $ref: '#/definitions/organismsResponse'
     post:
       operationId: createOrganism
+      description:
+        $ref: ../descriptions/createOrganism.md
       tags:
         - organisms
+      parameters:
+        - in: body
+          name: organism
+          description: The organism to create.
+          schema:
+            $ref: '#/definitions/sopPost'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/organismResponse'
         '501':
           description: Not implemented
   '/organisms/{id}':
@@ -740,6 +923,8 @@ paths:
         default: 1933753696
     get:
       operationId: readOrganism
+      description:
+        $ref: ../descriptions/readOrganism.md
       tags:
         - organisms
       responses:
@@ -749,13 +934,27 @@ paths:
             $ref: '#/definitions/organismResponse'
     patch:
       operationId: updateOrganism
+      description:
+        $ref: ../descriptions/updateOrganism.md
       tags:
         - organisms
+      parameters:
+        - in: body
+          name: organism
+          description: The organism to update.
+          schema:
+            $ref: '#/definitions/sopPatch'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/organismResponse'
         '501':
           description: Not implemented
     delete:
       operationId: deleteOrganism
+      description:
+        $ref: ../descriptions/deleteOrganism.md
       tags:
         - organisms
       responses:
@@ -766,6 +965,8 @@ paths:
   /people:
     get:
       operationId: listPeople
+      description:
+        $ref: ../descriptions/listPeople.md
       tags:
         - people
       responses:
@@ -775,7 +976,8 @@ paths:
             $ref: '#/definitions/peopleResponse'
     post:
       operationId: createPerson
-      description: Create a person containing the data sent
+      description:
+        $ref: ../descriptions/createPerson.md
       tags:
         - people
       parameters:
@@ -811,6 +1013,8 @@ paths:
         default: 433
     get:
       operationId: readPerson
+      description:
+        $ref: ../descriptions/readPerson.md
       tags:
         - people
       responses:
@@ -836,6 +1040,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     patch:
       operationId: updatePerson
+      description:
+        $ref: ../descriptions/updatePerson.md
       parameters:
         - in: body
           name: person
@@ -867,6 +1073,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     delete:
       operationId: deletePerson
+      description:
+        $ref: ../descriptions/deletePerson.md
       tags:
         - people
       responses:
@@ -889,6 +1097,8 @@ paths:
   /presentations:
     get:
       operationId: listPresentations
+      description:
+        $ref: ../descriptions/listPresentations.md
       tags:
         - presentations
       responses:
@@ -898,9 +1108,21 @@ paths:
             $ref: '#/definitions/presentationsResponse'
     post:
       operationId: createPresentation
+      description:
+        $ref: ../descriptions/createPresentation.md
       tags:
         - presentations
+      parameters:
+        - in: body
+          name: presentation
+          description: The presentation to create.
+          schema:
+            $ref: '#/definitions/presentationPost'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/presentationResponse'
         '501':
           description: Not implemented
   '/presentations/{id}':
@@ -913,6 +1135,8 @@ paths:
         default: 253
     get:
       operationId: readPresentation
+      description:
+        $ref: ../descriptions/readPresentation.md
       parameters:
         - name: version
           in: query
@@ -929,13 +1153,27 @@ paths:
             $ref: '#/definitions/presentationResponse'
     patch:
       operationId: updatePresentation
+      description:
+        $ref: ../descriptions/updatePresentation.md
       tags:
         - presentations
+      parameters:
+        - in: body
+          name: presentation
+          description: The presentation to update.
+          schema:
+            $ref: '#/definitions/presentationPatch'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/presentationResponse'
         '501':
           description: Not implemented
     delete:
       operationId: deletePresentation
+      description:
+        $ref: ../descriptions/deletePresentation.md
       tags:
         - presentations
       responses:
@@ -959,6 +1197,8 @@ paths:
         default: 3215
     get:
       operationId: readPresentationContent
+#      description:
+#        $ref: ../descriptions/readPresentationContent.md
       tags:
         - presentations
       responses:
@@ -969,6 +1209,8 @@ paths:
   /programmes:
     get:
       operationId: listProgrammes
+      description:
+        $ref: ../descriptions/listProgrammes.md
       tags:
         - programmes
       responses:
@@ -978,7 +1220,8 @@ paths:
             $ref: '#/definitions/programmesResponse'
     post:
       operationId: createProgramme
-      description: Create a programme containing the data sent
+      description:
+        $ref: ../descriptions/createProgramme.md
       tags:
         - programmes
       parameters:
@@ -1014,6 +1257,8 @@ paths:
         default: 3
     get:
       operationId: readProgramme
+      description:
+        $ref: ../descriptions/readProgramme.md
       tags:
         - programmes
       responses:
@@ -1039,6 +1284,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     patch:
       operationId: updateProgramme
+      description:
+        $ref: ../descriptions/updateProgramme.md
       parameters:
         - in: body
           name: programme
@@ -1070,6 +1317,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     delete:
       operationId: deleteProgramme
+      description:
+        $ref: ../descriptions/deleteProgramme.md
       tags:
         - programmes
       responses:
@@ -1092,6 +1341,8 @@ paths:
   /projects:
     get:
       operationId: listProjects
+      description:
+        $ref: ../descriptions/listProjects.md
       tags:
         - projects
       responses:
@@ -1101,7 +1352,8 @@ paths:
             $ref: '#/definitions/projectsResponse'
     post:
       operationId: createProject
-      description: Create a project containing the data sent
+      description:
+        $ref: ../descriptions/createProject.md
       tags:
         - projects
       parameters:
@@ -1137,6 +1389,8 @@ paths:
         default: 17
     get:
       operationId: readProject
+      description:
+        $ref: ../descriptions/readProject.md
       tags:
         - projects
       responses:
@@ -1162,6 +1416,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     patch:
       operationId: updateProject
+      description:
+        $ref: ../descriptions/updateProject.md
       parameters:
         - in: body
           name: project
@@ -1193,6 +1449,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     delete:
       operationId: deleteProject
+      description:
+        $ref: ../descriptions/deleteProject.md
       tags:
         - projects
       responses:
@@ -1215,6 +1473,8 @@ paths:
   /publications:
     get:
       operationId: listPublications
+      description:
+        $ref: ../descriptions/listPublications.md
       tags:
         - publications
       responses:
@@ -1224,9 +1484,21 @@ paths:
             $ref: '#/definitions/publicationsResponse'
     post:
       operationId: createPublication
+      description:
+        $ref: ../descriptions/createPublication.md
       tags:
         - publications
+      parameters:
+        - in: body
+          name: publication
+          description: The publication to create.
+          schema:
+            $ref: '#/definitions/sopPost'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/publicationResponse'
         '501':
           description: Not implemented
   '/publications/{id}':
@@ -1239,6 +1511,8 @@ paths:
         default: 240
     get:
       operationId: readPublication
+      description:
+        $ref: ../descriptions/readPublication.md
       tags:
         - publications
       responses:
@@ -1248,13 +1522,27 @@ paths:
             $ref: '#/definitions/publicationResponse'
     patch:
       operationId: updatePublication
+      description:
+        $ref: ../descriptions/updatePublication.md
       tags:
         - publications
+      parameters:
+        - in: body
+          name: publication
+          description: The publication to update.
+          schema:
+            $ref: '#/definitions/sopPatch'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/publicationResponse'
         '501':
           description: Not implemented
     delete:
       operationId: deletePublication
+      description:
+        $ref: ../descriptions/deletePublication.md
       tags:
         - publications
       responses:
@@ -1265,6 +1553,8 @@ paths:
   /sample_types:
     get:
       operationId: listSampleTypes
+      description:
+        $ref: ../descriptions/listSampleTypes.md
       tags:
         - sampleTypes
       responses:
@@ -1275,6 +1565,8 @@ paths:
   /sops:
     get:
       operationId: listSops
+      description:
+        $ref: ../descriptions/listSops.md
       tags:
         - sops
       responses:
@@ -1284,9 +1576,21 @@ paths:
             $ref: '#/definitions/sopsResponse'
     post:
       operationId: createSop
+      description:
+        $ref: ../descriptions/createSop.md
       tags:
         - sops
+      parameters:
+        - in: body
+          name: sop
+          description: The sop to create.
+          schema:
+            $ref: '#/definitions/sopPost'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/sopResponse'
         '501':
           description: Not implemented
   '/sops/{id}':
@@ -1299,6 +1603,8 @@ paths:
         default: 203
     get:
       operationId: readSop
+      description:
+        $ref: ../descriptions/readSop.md
       parameters:
         - name: version
           in: query
@@ -1315,13 +1621,27 @@ paths:
             $ref: '#/definitions/sopResponse'
     patch:
       operationId: updateSop
+      description:
+        $ref: ../descriptions/updateSop.md
       tags:
         - sops
+      parameters:
+        - in: body
+          name: sop
+          description: The sop to update.
+          schema:
+            $ref: '#/definitions/sopPatch'
       responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/sopResponse'
         '501':
           description: Not implemented
     delete:
       operationId: deleteSop
+      description:
+        $ref: ../descriptions/deleteSop.md
       tags:
         - sops
       responses:
@@ -1345,6 +1665,8 @@ paths:
         default: 1806
     get:
       operationId: readSopContent
+#      description:
+#        $ref: ../descriptions/readSopContent.md
       tags:
         - sops
       responses:
@@ -1355,6 +1677,8 @@ paths:
   /studies:
     get:
       operationId: listStudies
+      description:
+        $ref: ../descriptions/listStudies.md
       tags:
         - studies
       responses:
@@ -1364,7 +1688,8 @@ paths:
             $ref: '#/definitions/studiesResponse'
     post:
       operationId: createStudy
-      description: Create a study containing the data sent
+      description:
+        $ref: ../descriptions/createStudy.md
       tags:
         - studies
       parameters:
@@ -1400,6 +1725,8 @@ paths:
         default: 138
     get:
       operationId: readStudy
+      description:
+        $ref: ../descriptions/readStudy.md
       tags:
         - studies
       responses:
@@ -1409,7 +1736,8 @@ paths:
             $ref: '#/definitions/studyResponse'
     patch:
       operationId: updateStudy
-      description: Update the study with the data sent
+      description:
+        $ref: ../descriptions/updateStudy.md
       tags:
         - studies
       parameters:
@@ -1441,6 +1769,8 @@ paths:
             $ref: '#/definitions/not_implemented'
     delete:
       operationId: deleteStudy
+      description:
+        $ref: ../descriptions/deleteStudy.md
       tags:
         - studies
       responses:
@@ -2508,8 +2838,6 @@ definitions:
       - links
       - meta
     additionalProperties: false
-    example:
-      $ref: 'http://docs.seek4science.org/tech/api/examples/searchResponse.yaml'
   assayResponse:
     type: object
     properties:
