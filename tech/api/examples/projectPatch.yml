@@ -1,0 +1,32 @@
+data:
+  attributes:
+    avatar: null
+    default_license: Other (Open)
+    default_policy:
+      access: no_access
+      permissions:
+      - access: manage
+        resource_id: '706'
+        resource_type: people
+      - access: download
+        resource_id: '963'
+        resource_type: projects
+      - access: view
+        resource_id: '729'
+        resource_type: institutions
+    description: with a new description!
+    title: Updated Project
+    web_page: http://www.taverna.org.uk
+    wiki_page: http://www.mygrid.org.uk
+  id: '960'
+  relationships:
+    organisms:
+      data:
+      - id: '5'
+        type: organisms
+    programmes:
+      data:
+      - id: '2'
+        type: programmes
+  type: projects
+

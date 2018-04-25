@@ -1,0 +1,31 @@
+data:
+  attributes:
+    avatar: null
+    default_license: Other (Open)
+    default_policy:
+      access: no_access
+      permissions:
+      - access: manage
+        resource_id: '683'
+        resource_type: people
+      - access: download
+        resource_id: '931'
+        resource_type: projects
+      - access: view
+        resource_id: '705'
+        resource_type: institutions
+    description: A Taverna project
+    title: Post Project Max
+    web_page: http://www.taverna.org.uk
+    wiki_page: http://www.mygrid.org.uk
+  relationships:
+    organisms:
+      data:
+      - id: '4'
+        type: organisms
+    programmes:
+      data:
+      - id: '1'
+        type: programmes
+  type: projects
+

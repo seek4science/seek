@@ -1,0 +1,37 @@
+data:
+  attributes:
+    content_blobs:
+    - content_type: application/pdf
+      original_filename: a_pdf_file.pdf
+    description: This is the description
+    license: CC-BY-4.0
+    other_creators: John Smith, Jane Smith
+    policy:
+      access: download
+      permissions:
+      - access: edit
+        resource_id: '615'
+        resource_type: projects
+    tags:
+    - tag1
+    - tag2
+    title: A Maximal Presentation
+  relationships:
+    creators:
+      data:
+      - id: '461'
+        type: people
+    events:
+      data:
+      - id: '21'
+        type: events
+    projects:
+      data:
+      - id: '615'
+        type: projects
+    publications:
+      data:
+      - id: '26'
+        type: publications
+  type: presentations
+

@@ -1,0 +1,42 @@
+data:
+  attributes:
+    content_blobs:
+    - content_type: application/pdf
+      original_filename: docs.pdf
+    - content_type: application/xml
+      original_filename: the_model.xml
+    description: This is the description
+    environment: JWS Online
+    license: CC-BY-4.0
+    model_format: SBML
+    model_type: Linear equations
+    other_creators: John Smith, Jane Smith
+    policy:
+      access: download
+      permissions:
+      - access: edit
+        resource_id: '1063'
+        resource_type: projects
+    tags:
+    - tag1
+    - tag2
+    title: A Maximal Model
+  relationships:
+    assays:
+      data:
+      - id: '105'
+        type: assays
+    creators:
+      data:
+      - id: '771'
+        type: people
+    projects:
+      data:
+      - id: '1063'
+        type: projects
+    publications:
+      data:
+      - id: '45'
+        type: publications
+  type: models
+

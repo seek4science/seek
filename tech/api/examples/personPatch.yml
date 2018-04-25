@@ -1,0 +1,23 @@
+data:
+  attributes:
+    description: A person with all possible details
+    email: patched@email.com
+    expertise:
+    - modeling
+    - programming
+    first_name: Patched
+    last_name: Name
+    orcid: http://orcid.org/0000-0001-9842-9718
+    phone: 34-167-552266
+    project_positions:
+    - position_id: '1'
+      project_id: '1958'
+    skype_name: patchedSkype
+    tools:
+    - CeriusII
+    - Gromacs
+    - Python
+    web_page: http://www.website.com
+  id: '1324'
+  type: people
+

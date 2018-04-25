@@ -1,0 +1,22 @@
+data:
+  attributes:
+    description: A very exciting programme
+    funding_codes:
+    - BMBF
+    - DFG
+    funding_details: Someone is funding this for me
+    title: Post programme Max
+    web_page: http://www.synbiochem.co.uk
+  relationships:
+    administrators:
+      data:
+      - id: '714'
+        type: people
+      - id: '715'
+        type: people
+    projects:
+      data:
+      - id: '977'
+        type: projects
+  type: programmes
+

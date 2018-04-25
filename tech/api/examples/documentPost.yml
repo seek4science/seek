@@ -1,0 +1,33 @@
+data:
+  attributes:
+    content_blobs:
+    - content_type: application/pdf
+      original_filename: a_pdf_file.pdf
+    description: This is the description
+    license: CC-BY-4.0
+    other_creators: John Smith, Jane Smith
+    policy:
+      access: download
+      permissions:
+      - access: edit
+        resource_id: '868'
+        resource_type: projects
+    tags:
+    - tag1
+    - tag2
+    title: A Maximal Document
+  relationships:
+    assays:
+      data:
+      - id: '89'
+        type: assays
+    creators:
+      data:
+      - id: '640'
+        type: people
+    projects:
+      data:
+      - id: '868'
+        type: projects
+  type: documents
+

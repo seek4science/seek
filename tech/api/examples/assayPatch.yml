@@ -1,0 +1,57 @@
+data:
+  attributes:
+    assay_class:
+      key: EXP
+    assay_type:
+      uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
+    description: A Western Blot Assay
+    other_creators: Anonymous creator
+    policy:
+      access: download
+      permissions:
+      - access: manage
+        resource_id: '536'
+        resource_type: projects
+    tags:
+    - Assay-tag1
+    - Assay-tag2
+    - Assay-tag3
+    technology_type:
+      uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+    title: A Maximal Assay
+  id: '73'
+  relationships:
+    creators:
+      data:
+      - id: '397'
+        type: people
+    data_files:
+      data:
+      - id: '32'
+        type: data_files
+    documents:
+      data:
+      - id: '5'
+        type: documents
+    models:
+      data:
+      - id: '7'
+        type: models
+    organisms:
+      data:
+      - id: '3'
+        type: organisms
+    publications:
+      data:
+      - id: '21'
+        type: publications
+    sops:
+      data:
+      - id: '25'
+        type: sops
+    study:
+      data:
+        id: '92'
+        type: studies
+  type: assays
+
