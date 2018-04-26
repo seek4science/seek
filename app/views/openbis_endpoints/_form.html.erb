@@ -74,6 +74,7 @@
 <script>
 
   function testEndpoint() {
+      console.log("Test endpoint",$j('input.login-credential').serialize());
     $j.ajax('<%= test_endpoint_project_openbis_endpoints_path(@project) %>', {
           data: $j('input.login-credential').serialize(),
           success: function (data) {
@@ -95,6 +96,7 @@
   }
 
   function fetchSpaces() {
+      console.log("Fetch spacis",$j('input.login-credential').serialize());
     $j.ajax('<%= fetch_spaces_project_openbis_endpoints_path(@project) %>', {
       data: $j('input.login-credential').serialize(),
       success: function (html) {

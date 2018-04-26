@@ -197,9 +197,6 @@ SEEK::Application.routes.draw do
       collection do
         get :test_endpoint
         get :fetch_spaces
-        get :show_item_count
-        get :show_items
-        get :show_dataset_files
         get :browse
       end
     end
@@ -225,6 +222,8 @@ SEEK::Application.routes.draw do
   end
 
   resources :openbis_endpoints do
+    get :test_endpoint, on: :member
+    get :fetch_spaces, on: :member
     get :refresh, on: :member
     resources :openbis_experiments do
       get :refresh, on: :member
@@ -239,6 +238,7 @@ SEEK::Application.routes.draw do
     resources :openbis_datasets do
       get :refresh, on: :member
       post :register, on: :member
+      get :show_dataset_files, on: :member
       post :batch_register, on: :collection
     end
   end

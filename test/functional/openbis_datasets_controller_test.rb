@@ -293,6 +293,99 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
   end
 
+  test 'show dataset files' do
+
+    login_as(@user)
+    get :show_dataset_files, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+
+    assert_response :success
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
+
+    logout
+
+    another_person = Factory(:person)
+    login_as(another_person)
+    get :show_dataset_files, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
+    assert_response :redirect
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
+
+  end
+
+  # Original stuart test with access tests
+=begin
+  test 'show dataset files' do
+
+    # without a datafile, only project member can view
+    person = Factory(:person)
+    another_person = Factory(:person)
+
+    login_as(person)
+
+    project = person.projects.first
+    endpoint = Factory(:openbis_endpoint, project: project)
+    get :show_dataset_files, id: endpoint.id, project_id: project.id, perm_id: '20160210130454955-23'
+    assert_response :success
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
+
+    logout
+    login_as(another_person)
+    get :show_dataset_files, id: endpoint.id, project_id: project.id, perm_id: '20160210130454955-23'
+    assert_response :redirect
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
+
+    logout
+    login_as(person)
+
+    # now with a datafile, accessible to all
+    df = openbis_linked_data_file(User.current_user, endpoint)
+    disable_authorization_checks do
+      df.policy = Factory(:public_policy)
+      df.save!
+    end
+    assert df.can_download?
+    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    assert_response :success
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
+
+    logout
+    login_as(another_person)
+    assert df.can_download?
+    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    assert_response :success
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
+
+    logout
+    assert df.can_download?
+    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    assert_response :success
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
+
+    # not accessible if df is not downloadable
+    disable_authorization_checks do
+      df.policy = Factory(:private_policy)
+      df.save!
+    end
+
+    refute df.can_download?
+    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    assert_response :redirect
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
+
+    logout
+    login_as(another_person)
+    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    assert_response :redirect
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
+
+    logout
+    login_as(person)
+    assert df.can_download?
+    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
+    assert_response :success
+    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
+  end
+=end
+
   # unit like tests
 
 end

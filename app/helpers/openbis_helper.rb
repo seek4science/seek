@@ -59,7 +59,6 @@ module OpenbisHelper
   def openbis_files_modal_link(dataset)
 
     openbis_endpoint = dataset.openbis_endpoint
-    project = openbis_endpoint.project
     file_count=dataset.dataset_file_count
     files_text = "#{file_count} File".pluralize(file_count)
 
@@ -67,7 +66,6 @@ module OpenbisHelper
                    'data-toggle' => 'modal',
                    'data-target' => "#openbis-file-view",
                    'data-perm-id' => "#{dataset.perm_id}",
-                   'data-project-id' => "#{project.id}",
                    'data-endpoint-id' => "#{openbis_endpoint.id}")
   end
 

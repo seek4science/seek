@@ -14,10 +14,10 @@ module Seek
       def self.included(base)
         base.before_filter :get_endpoint
         base.before_filter :get_project
-        base.before_filter :project_member?, except: [:show_dataset_files]
+        base.before_filter :project_member?
 
-        base.before_filter :check_entity, only: [:show, :edit, :register, :update, :refresh]
-        base.before_filter :prepare_asset, only: [:show, :edit, :register, :update, :refresh]
+        base.before_filter :check_entity, only: [:show, :edit, :register, :update, :refresh, :show_dataset_files]
+        base.before_filter :prepare_asset, only: [:show, :edit, :register, :update, :refresh, :show_dataset_files]
       end
 
       def refresh
