@@ -79,6 +79,13 @@ class OpenbisEndpointCacheRefreshJobTest < ActiveSupport::TestCase
     end
     assert OpenbisEndpointCacheRefreshJob.new(endpoint1).exists?
     assert OpenbisEndpointCacheRefreshJob.new(endpoint2).exists?
+
+
+    Seek::Config.openbis_enabled = false
+    Delayed::Job.destroy_all
+    assert_no_difference('Delayed::Job.count') do
+      OpenbisEndpointCacheRefreshJob.create_initial_jobs
+    end
   end
 
   class MockEndpoint

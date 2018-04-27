@@ -56,6 +56,7 @@ class OpenbisSyncJob < SeekJob
 
   def follow_on_job?
     Rails.logger.info "Follow? count #{count} #{count(true)}" if DEBUG
+    return false unless Seek::Config.openbis_enabled && Seek::Config.openbis_autosync
     (count(true) < 1) && endpoint #don't follow on if the endpoint no longer exists
   end
 
@@ -83,6 +84,7 @@ class OpenbisSyncJob < SeekJob
 
 
   def self.create_initial_jobs
+    return unless Seek::Config.openbis_enabled && Seek::Config.openbis_autosync
     OpenbisEndpoint.all.each(&:create_sync_metadata_job)
     # OpenbisEndpoint.all.each { |point| OpenbisSyncJob.new(point).queue_job }
   end

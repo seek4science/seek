@@ -194,6 +194,36 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
   end
 
+  test 'follow_on_job? checks for unsynchronized and global config' do
+
+    assert @endpoint.save
+
+    assert_equal @endpoint.refresh_period_mins.minutes, @job.follow_on_delay
+
+    asset = ExternalAsset.new
+    asset.seek_service = @endpoint
+    asset.external_service = @endpoint.web_endpoint
+    asset.external_id = 1
+    asset.sync_state = :refresh
+    asset.synchronized_at= DateTime.now - (@endpoint.refresh_period_mins+5).minutes
+    travel -(@endpoint.refresh_period_mins+5).minutes do
+      assert asset.save
+    end
+
+    assert Seek::Config.openbis_enabled
+    assert Seek::Config.openbis_autosync
+
+    assert @job.follow_on_job?
+
+    Seek::Config.openbis_autosync=false
+    refute @job.follow_on_job?
+
+    Seek::Config.openbis_autosync=true
+    Seek::Config.openbis_enabled=false
+    refute @job.follow_on_job?
+
+  end
+
   test 'create initial jobs creates jobs for each endpoint' do
     endpoint2 = Factory(:openbis_endpoint, refresh_period_mins: 60, space_perm_id: 'API-SPACE2')
 
@@ -207,6 +237,13 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
     assert OpenbisSyncJob.new(@endpoint).exists?
     assert OpenbisSyncJob.new(endpoint2).exists?
+
+    Seek::Config.openbis_autosync=false
+    Delayed::Job.destroy_all
+    assert_no_difference('Delayed::Job.count') do
+      OpenbisSyncJob.create_initial_jobs
+    end
+
 
   end
 
