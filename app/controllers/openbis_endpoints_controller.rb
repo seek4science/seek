@@ -12,7 +12,7 @@ class OpenbisEndpointsController < ApplicationController
   before_filter :project_required
   before_filter :project_member?
   before_filter :project_can_admin?, except: [:browse]
-  before_filter :get_endpoints, only: [:index, :browse]
+  before_filter :get_endpoints, only: [:index, :show, :browse]
 
   def index
     respond_with(@project, @openbis_endpoints)

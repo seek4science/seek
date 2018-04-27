@@ -14,8 +14,19 @@
           <%= image(:openbis, :width => '75px') %>
         </p>
 
+        <script>
+          function changeEndpoint(tag) {
+            tag.form.action = tag.form.action +'/'+tag.value;
+            tag.form.submit();
+          }
+        </script>
+        <%= form_tag({controller:'openbis_endpoints'}, {method: 'get'} ) do %>
+            <div class="form-group"><label>Endpoint:</label>
+              <%= select_tag :openbis_endpoint, options_for_select(@openbis_endpoints.map{ |e| [e.title, e.id]}, @openbis_endpoint.id),
+                             id: 'openbis_endpoint', class: 'form-control1', :onchange => 'javascript:changeEndpoint(this);' %></div>
+        <% end %>
+
         <div class="form-group"><label>Project:</label> <%= @project.title %></div>
-        <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
         <div class="form-group"><label>Registered Studies:</label> <%= @openbis_endpoint.registered_studies.count %>
         </div>
         <div class="form-group"><label>Registered Assays:</label> <%= @openbis_endpoint.registered_assays.count %></div>
