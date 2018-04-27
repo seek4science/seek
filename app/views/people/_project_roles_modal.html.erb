@@ -1,0 +1,23 @@
+<% roles_map = person.roles_for_projects
+%>
+<%= modal(id: 'project-roles', size: 'lg', class: 'text-left') do %>
+  <%= modal_header("#{t('project')} roles") %>
+  <%= modal_body do %>
+    <% if roles_map.keys.any? %>
+      <% roles_map.each do |role, projects| %>
+        <% if projects.any? %>
+          <h3>
+            <%= seek_role_icon(role, 32, 'data-tooltip' => nil) -%>
+            <%= role.humanize %>
+          </h3>
+
+          <ul>
+            <% projects.each do |project| %>
+              <li><%= link_to(project.title, project) %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

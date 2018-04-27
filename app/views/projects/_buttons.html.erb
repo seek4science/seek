@@ -22,25 +22,20 @@
     </span>
 <% end -%>
 
-
 <%= admin_dropdown do %>
-    <% if mine?(item) || item.can_be_edited_by?(current_user) -%>
-
-        <li><%= image_tag_for_key('edit', edit_project_path(item), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
-
-        <% if item.try(:can_be_administered_by?, current_user) -%>
-            <li><%= image_tag_for_key "group_edit", admin_members_project_path(item), "Administer", nil, "Administer #{t('project')} members" -%></li>
-            <li><%= image_tag_for_key "group_edit", admin_member_roles_project_path(item), "Administer", nil, "Administer #{t('project')} members roles" -%></li>
-            <% if OpenbisEndpoint.can_create? %>
-                <li><%= image_tag_for_key :openbis_square, project_openbis_endpoints_path(item), "Administer", {}, "Administer openBIS",false,16 -%></li>
-            <% end %>
-        <% end -%>
-        <% if admin_logged_in? -%>
-            <%= delete_icon(item,current_user) %>
-        <% end -%>
-
+  <% if mine?(item) || item.can_be_edited_by?(current_user) -%>
+    <% if item.try(:can_be_administered_by?, current_user) -%>
+      <li><%= image_tag_for_key('manage', edit_project_path(item), "Manage #{t('project')}", nil, "Manage #{t('project')}") -%></li>
+      <li><%= image_tag_for_key "group_edit", admin_members_project_path(item), "Administer", nil, "Administer #{t('project')} members" -%></li>
+      <li><%= image_tag_for_key "group_edit", admin_member_roles_project_path(item), "Administer", nil, "Administer #{t('project')} members roles" -%></li>
+      <% if OpenbisEndpoint.can_create? %>
+        <li><%= image_tag_for_key :openbis_square, project_openbis_endpoints_path(item), "Administer", {}, "Administer openBIS",false,16 -%></li>
+      <% end %>
+    <% else %>
+      <li><%= image_tag_for_key('edit', edit_project_path(item), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
     <% end -%>
+    <% if admin_logged_in? -%>
+      <%= delete_icon(item,current_user) %>
+    <% end -%>
+  <% end -%>
 <% end -%>
-
-
-

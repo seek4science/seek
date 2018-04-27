@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class NelsControllerTest < ActionController::TestCase
-
   include AuthenticatedTestHelper
   include NelsTestHelper
 
@@ -110,5 +109,25 @@ class NelsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select 'li.list-group-item', count: 2
+  end
+
+  test 'can register data' do
+    @assay.investigation.projects << Factory(:project)
+    project_ids = @assay.reload.project_ids
+
+    assert_no_difference('DataFile.count') do
+      assert_difference('ContentBlob.count', 1) do
+        VCR.use_cassette('nels/get_dataset') do
+          VCR.use_cassette('nels/get_persistent_url') do
+            post :register, assay_id: @assay.id, project_id: @project_id, dataset_id: @dataset_id, subtype_name: @subtype
+
+            assert_redirected_to provide_metadata_data_files_path(assay_ids: [@assay.id], project_ids: project_ids)
+
+            assert_equal 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml?ref=xMTEyMzEyMjoxMTIzNTI4OnJlYWRz',
+                         assigns(:data_file).content_blob.url
+          end
+        end
+      end
+    end
   end
 end

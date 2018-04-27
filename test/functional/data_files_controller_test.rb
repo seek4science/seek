@@ -3,6 +3,7 @@ require 'libxml'
 require 'openbis_test_helper'
 
 class DataFilesControllerTest < ActionController::TestCase
+
   fixtures :all
 
   include AuthenticatedTestHelper
@@ -18,6 +19,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
+    login_as(:datafile_owner) unless User.current_user #by TZ for some reason depending on tets order user was no longer logged
     @object = data_files(:picture)
     @object.tag_with 'tag1'
     @object
@@ -3407,12 +3409,13 @@ class DataFilesControllerTest < ActionController::TestCase
   # this replicates the old behaviour and result of calling #new
   def register_content_blob
 
-    blob = { data: file_for_upload }
+    blob = {data: file_for_upload}
     assert_difference('ContentBlob.count') do
       post :create_content_blob, content_blobs: [blob]
     end
     content_blob_id = assigns(:data_file).content_blob.id
     session[:uploaded_content_blob_id] = content_blob_id.to_s
-    post :rightfield_extraction_ajax, content_blob_id: content_blob_id.to_s, format: 'js'
+    post :rightfield_extraction_ajax,content_blob_id:content_blob_id.to_s,format:'js'
+    get :provide_metadata
   end
 end
