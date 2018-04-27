@@ -10,6 +10,15 @@ Factory.define(:min_content_blob, class: ContentBlob) do |f|
   f.sequence(:uuid) { UUID.generate }
   f.data 'Min Data'
   f.original_filename 'min file'
+  f.asset { Factory(:pdf_sop, policy: Factory(:downloadable_public_policy)) }
+end
+
+Factory.define(:min_contentblob, parent: :min_content_blob) {}
+
+Factory.define(:max_contentblob, parent: :min_content_blob) do |f|
+  f.url 'http://example.com/remote.txt'
+  f.file_size 8
+  f.content_type 'text/plain'
 end
 
 Factory.define(:url_content_blob, parent: :content_blob) do |f|

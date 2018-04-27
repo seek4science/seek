@@ -13,9 +13,7 @@
   <p class="text-right small">Error: <span id="error-message"/></p>
 </div>
 
-<div id="datafile-wizard-form">
 
-</div>
 
 <script type="application/javascript">
 
@@ -30,13 +28,12 @@
         });
 
         request.done(function (data) {
-            $j('#datafile-wizard-form').html(data);
+            window.location='<%= provide_metadata_data_files_path %>'
         }).fail(function (jqXHR, textStatus,errorThrown) {
+            $j('#in-progress').hide();
             $j('#response-error').show();
             $j('#error-message').html(jqXHR.responseText);
-        }).always(function () {
-            $j('#in-progress').hide();
-        });
+        })
     });
 
 </script>

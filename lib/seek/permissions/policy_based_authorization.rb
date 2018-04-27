@@ -36,6 +36,7 @@ module Seek
             def can_#{action}? user = User.current_user
               authorized_for_#{action}?(user) && state_allows_#{action}?(user)
             end
+
             def authorized_for_#{action}? user = User.current_user
                 return true if new_record?
                 user_id = user.nil? ? 0 : user.id

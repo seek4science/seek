@@ -684,10 +684,10 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to :root
   end
 
-  test 'should have asset housekeeper icon on person show page' do
+  test 'should have asset housekeeper role on person show page' do
     asset_housekeeper = Factory(:asset_housekeeper)
     get :show, id: asset_housekeeper
-    assert_select 'img[src*=?]', role_image(:asset_housekeeper), count: 1
+    assert_select '#project-roles h3 img[src*=?]', role_image(:asset_housekeeper), count: 1
   end
 
   test 'should have asset housekeeper icon on people index page' do
@@ -699,10 +699,10 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select 'img[src*=?]', role_image(:asset_housekeeper), count: asset_housekeeper_number
   end
 
-  test 'should have project administrator icon on person show page' do
+  test 'should have project administrator role on person show page' do
     project_administrator = Factory(:project_administrator)
     get :show, id: project_administrator
-    assert_select 'img[src*=?]', role_image(:project_administrator), count: 1
+    assert_select '#project-roles h3 img[src*=?]', role_image(:project_administrator), count: 1
   end
 
   test 'should have project administrator icon on people index page' do
@@ -1154,10 +1154,10 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_asset_gatekeeper?(work_group.project)
   end
 
-  test 'should have gatekeeper icon on person show page' do
+  test 'should have gatekeeper role on person show page' do
     gatekeeper = Factory(:asset_gatekeeper)
     get :show, id: gatekeeper
-    assert_select 'img[src*=?]', role_image(:asset_gatekeeper), count: 1
+    assert_select '#project-roles h3 img[src*=?]', role_image(:asset_gatekeeper), count: 1
   end
 
   test 'should have gatekeeper icon on people index page' do
@@ -1801,6 +1801,14 @@ class PeopleControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to people_path
+  end
+
+  test 'should show project position on person show page' do
+    pos = Factory(:project_position, name: 'Barista')
+    project_administrator = Factory(:project_administrator)
+    project_administrator.group_memberships.last.project_positions = [pos]
+    get :show, id: project_administrator
+    assert_select '#project-positions label', text: /#{pos.name}/, count: 1
   end
 
   def edit_max_object(person)

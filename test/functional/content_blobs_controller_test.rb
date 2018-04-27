@@ -14,7 +14,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   # Is this still needed?
   def rest_api_test_object
-    Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    Factory(:pdf_sop, policy: Factory(:downloadable_public_policy)).content_blob
+  end
+
+  def rest_show_url_options(object = rest_api_test_object)
+    { sop_id: object.asset_id }
   end
 
   test 'should resolve to json' do
@@ -62,37 +66,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   def test_index_json
     # nothing to do, no indexes for content blobs
-  end
-
-  def test_show_json(object = rest_api_test_object)
-    get :show, id: object.content_blob, sop_id: object, format: 'json'
-
-    perform_jsonapi_checks
-
-    #check meta doesn't include created_at and updated_at
-    json = JSON.parse(response.body)
-    refute_nil json['data']
-    refute_nil json['data']['meta']
-    assert_equal ['api_version','base_url','created','modified','uuid'], json['data']['meta'].keys.sort
-  end
-
-  def test_response_code_for_not_available
-    sop = rest_api_test_object
-    id = 9999
-    id += 1 until ContentBlob.find_by_id(id).nil?
-
-    # blob not found
-    get :show, sop_id: sop.id, id: id, format: 'json'
-    assert_response :not_found
-
-    # asset not found
-    id += 1 until Sop.find_by_id(id).nil?
-    get :show, sop_id: id, id: sop.content_blob.id, format: 'json'
-    assert_response :not_found
-
-    # asset not found for blob
-    get :show, sop_id: Factory(:sop, policy: Factory(:public_policy)), id: sop.content_blob.id, format: 'json'
-    assert_response :not_found
   end
 
   test 'examine url to file' do
