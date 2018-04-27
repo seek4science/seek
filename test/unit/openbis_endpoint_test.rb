@@ -4,6 +4,7 @@ require 'openbis_test_helper'
 class OpenbisEndpointTest < ActiveSupport::TestCase
   def setup
     mock_openbis_calls
+    @seek_util = Seek::Openbis::SeekUtil.new
   end
 
   test 'validation' do
@@ -184,13 +185,15 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     # cannot delete if linked
     # first check another linked endpoint doesn't prevent delete
-    refute_nil openbis_linked_content_blob('20160210130454955-23')
+    df = openbis_linked_data_file(person)
+    assert_not_equal df.openbis_dataset.openbis_endpoint, ep
+
     assert ep.can_delete?(pa.user)
     User.with_current_user(pa.user) do
       assert ep.can_delete?
     end
 
-    refute_nil openbis_linked_content_blob('20160210130454955-23', ep)
+    refute_nil openbis_linked_data_file(person, ep)
     refute ep.can_delete?(pa.user)
     User.with_current_user(pa.user) do
       refute ep.can_delete?
@@ -416,11 +419,11 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
       assert endpoint2.save
     end
 
-    datafile1 = Seek::Openbis::Dataset.new(endpoint1, '20160210130454955-23').create_seek_datafile
+    datafile1 = @seek_util.createDataFileFromObisSet(Seek::Openbis::Dataset.new(endpoint1, '20160210130454955-23'), nil)
     assert datafile1.save
-    datafile2 = Seek::Openbis::Dataset.new(endpoint1, '20160215111736723-31').create_seek_datafile
+    datafile2 = @seek_util.createDataFileFromObisSet(Seek::Openbis::Dataset.new(endpoint1, '20160215111736723-31'), nil)
     assert datafile2.save
-    datafile3 = Seek::Openbis::Dataset.new(endpoint2, '20160210130454955-23').create_seek_datafile
+    datafile3 = @seek_util.createDataFileFromObisSet( Seek::Openbis::Dataset.new(endpoint2, '20160210130454955-23'), nil)
     assert datafile3.save
 
     df = endpoint1.registered_datafiles

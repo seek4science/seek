@@ -104,9 +104,10 @@ class OpenbisEndpoint < ActiveRecord::Base
   #end
 
   def registered_datafiles
-    # ugly will scan all content blobs from data files
-    url = "openbis:#{id}"
-    DataFile.all.select { |df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url) }
+    # It used to be like this
+    #url = "openbis:#{id}"
+    #DataFile.all.select { |df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url) }
+    registered_datasets
   end
 
   def registered_studies
