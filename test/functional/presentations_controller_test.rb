@@ -12,6 +12,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
+    login_as Factory(:user) unless User.current_user #by TZ even if setup sets the users sometimes it is not present during rest tests
     @object = Factory :presentation, contributor: User.current_user
     @object.tag_with 'tag1'
     @object
