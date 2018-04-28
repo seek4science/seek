@@ -340,17 +340,21 @@ the original OpenBIS experiment. Its content and linked data files will be updat
       def extract_requested_assays(entity, sync_options)
 
         sample_ids = (sync_options[:link_assays] == '1') ? entity.sample_ids : (sync_options[:linked_assays] || []) & entity.sample_ids
-        zamples = Seek::Openbis::Zample.new(entity.openbis_endpoint).find_by_perm_ids(sample_ids)
+        candidates = Seek::Openbis::Zample.new(entity.openbis_endpoint).find_by_perm_ids(sample_ids)
 
-        zamples = filter_assay_like_zamples(zamples, entity.openbis_endpoint) if (sync_options[:link_assays] == '1')
-        zamples
+        zamples = []
+        zamples.concat(filter_assay_like_zamples(candidates, entity.openbis_endpoint)) if sync_options[:link_assays] == '1'
+        zamples.concat(candidates.select { |s| sync_options[:linked_assays].include? s.perm_id}) if sync_options[:linked_assays]
+        zamples.uniq
       end
 
       def filter_assay_like_zamples(zamples, openbis_endpoint)
+        # could have use the types codes directly but in theory
+        # it can use semantic anotiations so there must be a query to OpenBIS
+        # hance the types will be returned not just string
         types = assay_types(openbis_endpoint).map(&:code)
 
-        zamples
-            .select { |s| types.include? s.type_code }
+        zamples.select { |s| types.include? s.type_code }
       end
 
       def assay_types(openbis_endpoint, use_semantic = false)
@@ -368,7 +372,6 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
         assay_codes = openbis_endpoint.assay_types
         types.concat(Seek::Openbis::EntityType.SampleType(openbis_endpoint).find_by_codes(assay_codes)) unless assay_codes.empty?
-
         types
       end
 

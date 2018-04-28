@@ -144,13 +144,13 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     val = @util.uri_for_content_blob(asset)
     assert URI.parse(val)
-    puts val
+    # puts val
     assert_equal expected, val
 
     asset = OpenbisExternalAsset.build(@zample)
     expected = "openbis2:#{@endpoint.id}/Seek::Openbis::Zample/#{@zample.perm_id}"
     val = @util.uri_for_content_blob(asset)
-    puts val
+    # puts val
     assert_equal expected, val
 
   end
@@ -698,7 +698,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal study2, assay2.study
 
     assay2.valid?
-    puts assay2.errors.full_messages
+    # puts assay2.errors.full_messages
 
     disable_authorization_checks do
       assert assay2.save
@@ -1018,9 +1018,14 @@ class SeekUtilTest < ActiveSupport::TestCase
     corr = @util.filter_assay_like_zamples(zamples, @endpoint)
     assert_equal 2, corr.length
     assert_equal ["20171002172111346-37", "20171002172639055-39"], corr.map(&:perm_id)
+
+    @endpoint.assay_types = 'TZ_FAIR_ASSAY EXPERIMENTAL_STEP'
+    corr = @util.filter_assay_like_zamples(zamples, @endpoint)
+    assert_equal 3, corr.length
+    assert_equal ["20171121152441898-53","20171002172111346-37", "20171002172639055-39"], corr.map(&:perm_id)
   end
 
-  test 'extract_requested_zamples gives all assay-like zamples if linked is selected' do
+  test 'extract_requested_assays gives all assay-like zamples if linked is selected' do
 
     assert_equal 2, @experiment.sample_ids.length
     sync_options = {}
@@ -1035,7 +1040,30 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   end
 
-  test 'extract_requested_zamples gives only selected zamples that belongs to exp' do
+  test 'extract_requested_assays gives explicit selected non-assay-like zamples even if link selected' do
+
+    @experiment.openbis_endpoint.assay_types = []
+
+    assert_equal 2, @experiment.sample_ids.length
+    sync_options = {link_assays: '1'}
+
+    assert_equal [], @util.extract_requested_assays(@experiment, sync_options)
+
+    sync_options = { link_assays: '1', linked_assays: ['123', @experiment.sample_ids[0]]  }
+    assert_equal [@experiment.sample_ids[0]], @util.extract_requested_assays(@experiment, sync_options).map(&:perm_id)
+
+    #can have multiple
+    sync_options = { link_assays: '1', linked_assays: [@experiment.sample_ids[0], @experiment.sample_ids[1]]  }
+    assert_equal [@experiment.sample_ids[0], @experiment.sample_ids[1]], @util.extract_requested_assays(@experiment, sync_options).map(&:perm_id)
+
+    #no duplicates
+    @experiment.openbis_endpoint.assay_types = "TZ_FAIR_ASSAY"
+    sync_options = { link_assays: '1', linked_assays: ['123', @experiment.sample_ids[0]]  }
+    assert_equal @experiment.sample_ids, @util.extract_requested_assays(@experiment, sync_options).map(&:perm_id)
+
+  end
+
+  test 'extract_requested_assays gives only selected zamples that belongs to exp' do
 
 
     sync_options = {}
