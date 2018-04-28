@@ -186,8 +186,9 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   test 'should_follow_depended gives false on datafile or nil' do
 
+    sync_options = {new_arrivals: '1'}
     dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
-    asset = OpenbisExternalAsset.build(dataset)
+    asset = OpenbisExternalAsset.build(dataset, sync_options)
 
     refute @util.should_follow_dependent(asset)
 
@@ -198,9 +199,9 @@ class SeekUtilTest < ActiveSupport::TestCase
 
   end
 
-  test 'should_follow gives true if part of assay or study' do
+  test 'should_follow gives true if entity registered as assay or study and new_arrivals' do
 
-    sync_options = {}
+    sync_options = {new_arrivals: '1'}
     asset = OpenbisExternalAsset.build(@zample, sync_options)
 
     refute @util.should_follow_dependent(asset)
@@ -211,6 +212,26 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset = OpenbisExternalAsset.build(@experiment, sync_options)
     asset.seek_entity = Factory :study
     assert @util.should_follow_dependent(asset)
+
+  end
+
+  test 'should_follow gives false if new_arrivals not set or config_disabled' do
+
+    sync_options = {new_arrivals: '1', link_datasets: '1'}
+    asset = OpenbisExternalAsset.build(@zample, sync_options)
+    asset.seek_entity = Factory :assay
+
+    assert @util.should_follow_dependent(asset)
+
+    Seek::Config.openbis_check_new_arrivals = false
+    refute @util.should_follow_dependent(asset)
+
+    Seek::Config.openbis_check_new_arrivals = true
+    assert @util.should_follow_dependent(asset)
+
+    sync_options = {new_arrivals: false, link_datasets: '1'}
+    asset.sync_options = sync_options
+    refute @util.should_follow_dependent(asset)
 
   end
 
@@ -402,7 +423,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert assay.data_files.empty?
 
     asset = OpenbisExternalAsset.build(@zample)
-    asset.sync_options = { link_datasets: '1' }
+    asset.sync_options = { link_datasets: '1', new_arrivals: '1' }
     asset.sync_state = :refresh
     asset.seek_entity = assay
     #need to save to have the assay to asset link updated
@@ -474,7 +495,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert study.related_data_files.empty?
 
     asset = OpenbisExternalAsset.build(@experiment)
-    asset.sync_options = { link_datasets: '1' }
+    asset.sync_options = { link_datasets: '1', new_arrivals: '1' }
     asset.seek_entity = study
     #need to save to have the assay to asset link updated
     assert asset.save
@@ -486,12 +507,45 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal 1, study.assays.size # the fake files assay
     assert_equal @experiment.dataset_ids.size, study.related_data_files.size
 
-    asset.sync_options = { link_datasets: '1', linked_assays: @experiment.sample_ids }
+    asset.sync_options = { link_datasets: '1', linked_assays: @experiment.sample_ids, new_arrivals: '1' }
     @util.sync_external_asset(asset)
 
     study.reload
     assert_equal @experiment.sample_ids.size+1, study.assays.size # one extra for linking datasets
     assert_equal @experiment.dataset_ids.size, study.related_data_files.size
+
+  end
+
+  test 'sync_external_asset does not to study if new_arrivals not set' do
+
+    refute @experiment.dataset_ids.empty?
+    refute @experiment.sample_ids.empty?
+
+    study = Factory :study
+
+    assert study.assays.empty?
+    assert study.related_data_files.empty?
+
+    asset = OpenbisExternalAsset.build(@experiment)
+    asset.sync_options = { link_datasets: '1', link_assays: '1' }
+    asset.seek_entity = study
+    #need to save to have the assay to asset link updated
+    assert asset.save
+
+    @util.sync_external_asset(asset)
+
+    study.reload
+    assert asset.synchronized?
+    assert_equal 0, study.assays.size # even no fake files assay
+    assert_equal 0, study.related_data_files.size
+
+    refute @experiment.sample_ids.empty?
+    asset.sync_options = { link_datasets: '1', linked_assays: @experiment.sample_ids }
+    @util.sync_external_asset(asset)
+
+    study.reload
+    assert_equal 0, study.assays.size # even no fake files assay
+    assert_equal 0, study.related_data_files.size
 
   end
 

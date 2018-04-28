@@ -17,9 +17,18 @@
             </div>
             <div class="form-group">
               <%= check_box_tag('link_dependent', 1, true) %>
-              <%= label_tag('link_dependent', 'Automatically register all dependent enties') %>
-              <div class="help-block">All dependent recognized OpenBis entities (e.g. DataSets) will be registered and linked during
-                periodical synchronization
+              <%= label_tag('link_dependent', 'Automatically register dependent datasets') %>
+              <div class="help-block">
+                OpenBis entities that can be recognized as DataSets will be also registered
+              </div>
+            </div>
+            <div class="form-group">
+              <%= check_box_tag('new_arrivals', 1, false) %>
+              <%= label_tag('new_arrivals', 'Periodically check for new datasets') %>
+              <div class="help-block">
+                During periodic synchronization new OpenBIS datasets will be linked
+                (it only works if automatic registration is selected).
+                Use with caution, leave it if you don't expect new entries as it has significant performance impact.
               </div>
             </div>
         <% end %>
@@ -39,6 +48,7 @@
         if ($j('#new_assay select').val() > 0) {
             $j('#seek_parent').val($j('#new_assay select').val());
             $j('#sync_options_link_dependent').val($j('#link_dependent').prop("checked") ? '1' : undefined);
+            $j('#sync_options_new_arrivals').val($j('#new_arrivals').prop("checked") ? '1' : undefined);
             $j('#openbis_batch_parent-view').modal('hide');
             if($j('#batch_form input:checkbox:checked').length > 0) {
                 $j('#batch_form').submit();

@@ -32,19 +32,28 @@
 
         <div class="form-group">
           <%= check_box_tag('sync_options[link_datasets]', 1, @asset.sync_options[:link_datasets] == '1') %>
-          <%= label_tag('sync_options[link_datasets]', 'Automatically register all dependent datasets') %>
-          <div class="help-block">Dependent datasets will be registered and linked with this study and sub assays during
-            synchronization
+          <%= label_tag('sync_options[link_datasets]', 'Automatically register dependent datasets') %>
+          <div class="help-block">Dependent datasets will be registered and linked with this study
           </div>
         </div>
 
         <div class="form-group">
           <%= check_box_tag('sync_options[link_assays]', 1, @asset.sync_options[:link_assays] == '1') %>
-          <%= label_tag('sync_options[link_assays]', 'Automatically register dependent assays') %>
-          <div class="help-block">Objects marked as Assay will be registered and linked with this study during
-            synchronization
+          <%= label_tag('sync_options[link_assays]', 'Automatically recognize dependent assays') %>
+          <div class="help-block">OpenBis objects that can be recognized as Assays will be also registered
           </div>
         </div>
+
+        <div class="form-group">
+          <%= check_box_tag('sync_options[new_arrivals]', 1, @asset.sync_options[:new_arrivals] == '1') %>
+          <%= label_tag('sync_options[new_arrivals]', 'Periodically check for new entries') %>
+          <div class="help-block">
+            During periodic synchronization new OpenBIS datasets and assays will be linked
+            (it only works if automatic recognition is selected).
+            Use with caution, leave it if you don't expect new entries as it has significant performance impact.
+          </div>
+        </div>
+
 
         <div class="form-group">
           <%= submit_tag(not_registered ? 'Register' : 'Update', class: 'btn btn-primary') %>

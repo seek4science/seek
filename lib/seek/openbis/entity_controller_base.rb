@@ -74,7 +74,7 @@ module Seek
 
       def get_sync_options(hash = nil)
         hash ||= params
-        hash.fetch(:sync_options, {}).permit(:link_datasets, :link_assays, :link_dependent,
+        hash.fetch(:sync_options, {}).permit(:link_datasets, :link_assays, :link_dependent, :new_arrivals,
                                              { linked_datasets: [] }, { linked_assays: [] })
       end
 

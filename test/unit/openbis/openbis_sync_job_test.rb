@@ -278,7 +278,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     refute zample.dataset_ids.empty?
 
-    asset = OpenbisExternalAsset.build(zample, { link_datasets: '1' })
+    asset = OpenbisExternalAsset.build(zample, { link_datasets: '1', new_arrivals: '1' })
     asset.seek_entity = assay
     asset.synchronized_at = DateTime.now - 1.days
     asset.sync_state = :refresh

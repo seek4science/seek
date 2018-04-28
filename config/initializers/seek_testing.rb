@@ -105,6 +105,7 @@ SEEK::Application.configure do
       Settings.defaults[:openbis_enabled] = true
       Settings.defaults[:openbis_debug] = false
       Settings.defaults[:openbis_autosync] = true
+      Settings.defaults[:openbis_check_new_arrivals] = true
 
       Settings.defaults[:nels_enabled] = true
       Settings.defaults[:nels_api_url] = 'https://test-fe.cbu.uib.no/nels-api'

@@ -176,6 +176,7 @@ openbis_enabled:
 openbis_download_limit:
 openbis_debug:
 openbis_autosync:
+openbis_check_new_arrivals:
 default_license:
 about_page_enabled:
 about_page:

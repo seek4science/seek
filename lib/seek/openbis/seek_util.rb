@@ -158,6 +158,8 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
       def should_follow_dependent(obis_asset)
 
+        return false unless Seek::Config.openbis_check_new_arrivals
+        return false unless obis_asset.sync_options[:new_arrivals]
         return false unless obis_asset.seek_entity
         return true if obis_asset.seek_entity.is_a? Assay
         return true if obis_asset.seek_entity.is_a? Study
