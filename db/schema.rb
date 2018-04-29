@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180419180203) do
+ActiveRecord::Schema.define(version: 20180429151412) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string   "action",                 limit: 255
@@ -685,6 +685,7 @@ ActiveRecord::Schema.define(version: 20180419180203) do
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.string   "err_msg",            limit: 255
+    t.integer  "failures",           limit: 4,     default: 0
   end
 
   add_index "external_assets", ["external_id", "external_service"], name: "external_assets_by_external_id", unique: true, using: :btree

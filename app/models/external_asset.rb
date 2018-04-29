@@ -3,7 +3,7 @@ class ExternalAsset < ActiveRecord::Base
   self.inheritance_column = 'class_type'
   attr_accessor :sync_options, :content_changed
 
-  enum sync_state: [:synchronized, :refresh, :failed]
+  enum sync_state: [:synchronized, :refresh, :failed, :fatal]
 
 
   belongs_to :seek_entity, polymorphic: true
@@ -38,6 +38,7 @@ class ExternalAsset < ActiveRecord::Base
     self.synchronized_at = DateTime.now
     self.sync_state = :synchronized
     self.err_msg=nil
+    self.failures=0
     self.external_mod_stamp = extract_mod_stamp(content_object)
     self.version = self.version ? self.version+1 : 1
 
@@ -46,6 +47,12 @@ class ExternalAsset < ActiveRecord::Base
   def content
     load_local_content unless @local_content
     @local_content
+  end
+
+  def add_failure(msg)
+    self.sync_state = :failed unless self.fatal?
+    self.failures += 1
+    self.err_msg = msg || 'No message'
   end
 
   def serialize_content(content_object)
@@ -77,7 +84,6 @@ class ExternalAsset < ActiveRecord::Base
     self.local_content_json= serialize_content(@local_content) if @needs_serialization
 
   end
-
 
 
   def init_content_holder()

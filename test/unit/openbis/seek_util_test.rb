@@ -296,7 +296,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal '20171002172639055-39', asset.content.perm_id
   end
 
-  test 'sync_asset_content sets error on failure' do
+  test 'sync_asset_content increses failures and sets error message on failure' do
 
     dataset1 = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
 
@@ -307,6 +307,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset.seek_entity = Factory :data_file
 
     asset.sync_state = :refresh
+    asset.failures = 1
     assert asset.save
 
     refute asset.failed?
@@ -318,6 +319,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     assert asset.failed?
     assert asset.err_msg
+    assert_equal 2, asset.failures
     assert_equal d.to_date, asset.synchronized_at.to_date
   end
 

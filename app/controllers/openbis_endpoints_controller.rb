@@ -7,7 +7,7 @@ class OpenbisEndpointsController < ApplicationController
 
   before_filter :openbis_enabled?
 
-  before_filter :get_endpoint, only: [:show, :edit, :update, :refresh, :destroy]
+  before_filter :get_endpoint, only: [:show, :edit, :update, :refresh, :destroy, :reset_fatals]
   before_filter :get_project
   before_filter :project_required
   before_filter :project_member?
@@ -63,6 +63,10 @@ class OpenbisEndpointsController < ApplicationController
   end
 
 
+  def reset_fatals
+    @openbis_endpoint.reset_fatal_assets
+    redirect_to @openbis_endpoint
+  end
 
 
 

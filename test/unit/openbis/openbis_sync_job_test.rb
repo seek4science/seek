@@ -73,9 +73,10 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
   test 'need_sync gives not synchronized entries due to refresh sorted by last change (see bussiness rule)' do
 
     # bussines rule
-    # - status different form synchronized
-    # - synchronized_at before Now- endpoint refresh
-    # - last update before Now - endpont_refresh/2 (to prevent constant checking of failed entries)
+    # - status refresh or failed
+    # - synchronized_at before (Now - endpoint refresh)
+    # - for failed: last update before (Now - endpont_refresh/2) to prevent constant checking of failed entries)
+    # - fatal not returned
 
     @endpoint.refresh_period_mins = 121
     disable_authorization_checks do
@@ -123,13 +124,11 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     assert_equal 3, needs.length
     assert_equal [assets[9], assets[7], assets[6]], needs
 
-    # reset update_at stamp so they willl be too fresh to be returned
+    # reset update_at stamp so they will be reordered
     assets[9].touch
-    assets[6].touch
-    assets[5].touch
 
     needs = @job.need_sync.to_a
-    assert_equal [assets[7]], needs
+    assert_equal [assets[7], assets[6], assets[5]], needs
   end
 
   test 'need_sync gives priority to refresh over failed' do
@@ -173,6 +172,51 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
   end
 
+  test 'need_sync ignores fatal or synchronized' do
+
+    # bussines rule
+    # - status different form synchronized
+    # - synchronized_at before Now- endpoint refresh
+    # - last update before Now - endpont_refresh/2 (to prevent constant checking of failed entries)
+
+    @endpoint.refresh_period_mins = 121
+    disable_authorization_checks do
+      assert @endpoint.save
+    end
+
+    asset = ExternalAsset.new
+    asset.seek_service = @endpoint
+    asset.external_service = @endpoint.web_endpoint
+    asset.external_id = 1
+    asset.synchronized_at= DateTime.now - 1.days
+
+    asset.sync_state = :fatal
+    travel (-1).days do
+      assert asset.save
+    end
+
+    needs = @job.need_sync.to_a
+    assert needs
+    assert needs.empty?
+
+    asset.sync_state = :synchronized
+    travel (-1).days do
+      assert asset.save
+    end
+
+    needs = @job.need_sync.to_a
+    assert needs
+    assert needs.empty?
+
+    asset.sync_state = :failed
+    travel (-1).days do
+      assert asset.save
+    end
+
+    needs = @job.need_sync.to_a
+    assert needs
+    assert_equal [asset], needs
+  end
 
   test 'follow_on_delay gives 1 second if marked refresh left or endpoint default otherwise' do
 
@@ -326,7 +370,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
 
   end
 
-  test 'perfom_job always update mod stamp even if on errors' do
+  test 'perfom_job always update mod stamp even if errors' do
 
     assay = Factory :assay
 
@@ -371,6 +415,75 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     end
 
   end
+
+  test 'perfom_job sets fatal if failures larger than threshold' do
+
+    assay = Factory :assay
+
+    # normal sample
+    zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
+    json = zample.json.clone
+    json['permId'] = 'XXX'
+
+    # now the sample cannot be found
+    zample = Seek::Openbis::Zample.new(@endpoint).populate_from_json(json)
+
+    # checking if fetching sample gives error
+    begin
+      t = Seek::Openbis::Zample.new(@endpoint, zample.perm_id)
+      refute t
+    rescue Exception => e
+      assert e
+    end
+
+    asset = OpenbisExternalAsset.build(zample, {})
+    asset.seek_entity = assay
+    asset.synchronized_at = DateTime.now - 1.days
+    asset.sync_state = :failed
+    asset.failures = @job.failure_threshold
+
+    assert asset.save
+
+    @job.perform_job(asset)
+    asset.reload
+
+    assert asset.fatal?
+    assert asset.err_msg.start_with? 'Stopped sync: '
+
+  end
+
+
+  test 'failure_threshold can be reached in about two day' do
+    disable_authorization_checks do
+      @endpoint.refresh_period_mins = 60
+      @endpoint.save!
+      @job = OpenbisSyncJob.new(@endpoint, @batch_size)
+      thresh = @job.failure_threshold
+      assert 48 <= thresh
+      assert 49 >= thresh
+      assert thresh*@endpoint.refresh_period_mins >= (48*60)
+      assert thresh*@endpoint.refresh_period_mins <= (49*60)
+
+      @endpoint.refresh_period_mins = 125
+      @endpoint.save!
+      @job = OpenbisSyncJob.new(@endpoint, @batch_size)
+      thresh = @job.failure_threshold
+      assert thresh*@endpoint.refresh_period_mins >= (47*60)
+      assert thresh*@endpoint.refresh_period_mins <= (49*60)
+    end
+  end
+
+  test 'failure_threshold is at least 3' do
+    disable_authorization_checks do
+      @endpoint.refresh_period_mins = 60*50
+      @endpoint.save!
+      @job = OpenbisSyncJob.new(@endpoint, @batch_size)
+      thresh = @job.failure_threshold
+      assert thresh >= 3
+    end
+
+  end
+
 
   test 'seek_util created only once' do
     assert_same @job.seek_util, @job.seek_util

@@ -225,6 +225,7 @@ SEEK::Application.routes.draw do
     get :test_endpoint, on: :member
     get :fetch_spaces, on: :member
     get :refresh, on: :member
+    get :reset_fatals, on: :member
     resources :openbis_experiments do
       get :refresh, on: :member
       post :register, on: :member

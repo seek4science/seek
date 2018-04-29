@@ -214,6 +214,50 @@ class ExternalAssetTest < ActiveSupport::TestCase
     asset1.save
   end
 
+  test 'setting content clears failures and err_msg' do
+    asset = ExternalAsset.new({ external_service: 'OpenBIS', external_id: '23' })
+    asset.content = {bla: 1}
+    asset.err_msg = 'What'
+    asset.failures+=1
+    assert asset.save
+    asset.reload
+    assert_equal 1, asset.failures
+    assert_equal 'What', asset.err_msg
+
+    asset.content = {bla: 1}
+    assert_equal 0, asset.failures
+    refute asset.err_msg
+    assert asset.synchronized?
+
+  end
+
+  test 'add_failure increases count and sets errors' do
+    asset = ExternalAsset.new({ external_service: 'OpenBIS', external_id: '23' })
+    assert_equal 0, asset.failures
+
+    asset.add_failure 'Blew off'
+
+    assert asset.failed?
+    assert_equal 1, asset.failures
+    assert_equal 'Blew off', asset.err_msg
+
+  end
+
+  test 'add_failure preserves fatal status' do
+    asset = ExternalAsset.new({ external_service: 'OpenBIS', external_id: '23' })
+    asset.sync_state= :fatal
+
+    assert_equal 0, asset.failures
+    assert asset.fatal?
+    asset.add_failure 'Blew off'
+
+    assert asset.fatal?
+    refute asset.failed?
+    assert_equal 1, asset.failures
+    assert_equal 'Blew off', asset.err_msg
+
+  end
+
 
   test 'extract_mod_stamp gives object hash' do
 

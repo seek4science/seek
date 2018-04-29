@@ -333,4 +333,33 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     post :refresh, id: endpoint.id
     assert_redirected_to endpoint
   end
+
+  test 'reset_fatal clears fatal stamps and marks for refresh' do
+    login_as(@project_administrator)
+
+    ep = Factory(:openbis_endpoint, project: @project)
+    @zample = Seek::Openbis::Zample.new(ep, '20171002172111346-37')
+    asset = OpenbisExternalAsset.build(@zample)
+
+    #should ignore that
+    asset.sync_state = :failed
+    assert asset.save
+    get :reset_fatals, id: ep.id
+    assert_redirected_to ep
+    asset.reload
+    assert asset.failed?
+    refute asset.fatal?
+
+    asset.sync_state = :fatal
+    assert asset.save
+
+    get :reset_fatals, id: ep.id
+    assert_redirected_to ep
+    asset.reload
+    refute asset.fatal?
+    assert asset.refresh?
+
+
+
+  end
 end

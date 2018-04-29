@@ -112,8 +112,7 @@ the original OpenBIS experiment. Its content and linked data files will be updat
           entity.prefetch_files if entity.is_a? Seek::Openbis::Dataset
           obis_asset.content=entity
         rescue Exception => exception
-          obis_asset.sync_state = :failed
-          obis_asset.err_msg = handle_sync_err(exception, obis_asset)
+          obis_asset.add_failure handle_sync_err(exception, obis_asset)
         end
 
         # saving automatically triggers reindexing if needed

@@ -18,8 +18,17 @@ class OpenbisSyncJob < SeekJob
     obis_asset.reload
 
     errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
-    # allwyas touch asset so its updated_at stamp is modified as it is used for queuing entiries
-    obis_asset.touch
+
+    if (obis_asset.failed? && obis_asset.failures > failure_threshold)
+      obis_asset.sync_state = :fatal
+      obis_asset.err_msg = 'Stopped sync: '+ obis_asset.err_msg
+      obis_asset.save
+      Rails.logger.error "Marked OBisAsset:#{obis_asset.id} perm_id: #{obis_asset.external_id} as fatal no more sync"
+    else
+      # allways touch asset so its updated_at stamp is modified as it is used for queuing entiries
+      obis_asset.touch
+    end
+
 
     if errs.empty?
       Rails.logger.info "successful obis sync of OBisAsset:#{obis_asset.id} perm_id: #{obis_asset.external_id}" if DEBUG
@@ -71,17 +80,34 @@ class OpenbisSyncJob < SeekJob
   end
 
   def need_sync
+
+    # bussines rule
+    # - status refresh or failed
+    # - synchronized_at before (Now - endpoint refresh)
+    # - for failed: last update before (Now - endpoint_refresh/2) to prevent constant checking of failed entries)
+    # - fatal not returned
+
     service = endpoint # to prevent multiple calls
 
     old = DateTime.now - service.refresh_period_mins.minutes
     too_fresh = DateTime.now - (service.refresh_period_mins / 2).minutes
 
-    service.external_assets.where('synchronized_at < ? AND updated_at < ? AND sync_state != ?', old, too_fresh, ExternalAsset.sync_states[:synchronized])
+    service.external_assets
+        .where('synchronized_at < ? AND (sync_state = ? OR (updated_at < ? AND sync_state =?))',
+               old, ExternalAsset.sync_states[:refresh], too_fresh, ExternalAsset.sync_states[:failed])
         .order(:sync_state, :updated_at)
         .limit(@batch_size)
 
+      #service.external_assets.where('synchronized_at < ? AND updated_at < ? AND sync_state != ?', old, too_fresh, ExternalAsset.sync_states[:synchronized])
+      #    .order(:sync_state, :updated_at)
+      #    .limit(@batch_size)
   end
 
+
+  def failure_threshold
+    t = (2.days / endpoint.refresh_period_mins.minutes).to_i
+    t < 3 ? 3 : t
+  end
 
   def self.create_initial_jobs
     return unless Seek::Config.openbis_enabled && Seek::Config.openbis_autosync

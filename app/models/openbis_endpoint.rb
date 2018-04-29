@@ -230,6 +230,9 @@ class OpenbisEndpoint < ActiveRecord::Base
     external_assets.synchronized.where("synchronized_at < ?", old)
   end
 
+  def reset_fatal_assets
+    external_assets.fatal.update_all(sync_state: ExternalAsset.sync_states[:refresh])
+  end
 
   private
 
