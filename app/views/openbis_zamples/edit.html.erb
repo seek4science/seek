@@ -35,8 +35,10 @@
         </div>
 
         <div class="form-group">
-          <%= check_box_tag('sync_options[new_arrivals]', 1, @asset.sync_options[:new_arrivals] == '1') %>
-          <%= label_tag('sync_options[new_arrivals]', 'Periodically check for new datasets') %>
+          <%= check_box_tag('sync_options[new_arrivals]', 1, @asset.sync_options[:new_arrivals] == '1', disabled: disable_new_arrivals) %>
+          <%= label_tag('sync_options[new_arrivals]', "Periodically check for new datasets #{'(disabled by admin)' if disable_new_arrivals}") %>
+          <%# to preserve the option if disabled in configuration but previously set, ok maybe it is not needed??? %>
+          <%= hidden_field_tag('sync_options[new_arrivals]', @asset.sync_options[:new_arrivals]) if disable_new_arrivals %>
           <div class="help-block">
             During periodic synchronization new OpenBIS datasets will be linked
             (it only works if automatic registration is selected).

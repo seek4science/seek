@@ -17,6 +17,10 @@ module OpenbisHelper
     end
   end
 
+  def disable_new_arrivals
+    !Seek::Config.openbis_check_new_arrivals
+  end
+
   def openbis_datafile_dataset(data_file)
       #render partial: 'data_files/openbis/dataset', locals: { dataset: dataset, data_file: data_file }
       dataset = data_file.openbis_dataset

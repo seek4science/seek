@@ -23,8 +23,8 @@
               </div>
             </div>
             <div class="form-group">
-              <%= check_box_tag('new_arrivals', 1, false) %>
-              <%= label_tag('new_arrivals', 'Periodically check for new datasets') %>
+              <%= check_box_tag('new_arrivals', 1, false, disabled: disable_new_arrivals) %>
+              <%= label_tag('new_arrivals', "Periodically check for new datasets #{' (disabled by admin)' if disable_new_arrivals}") %>
               <div class="help-block">
                 During periodic synchronization new OpenBIS datasets will be linked
                 (it only works if automatic registration is selected).
