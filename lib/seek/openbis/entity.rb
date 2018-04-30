@@ -83,7 +83,6 @@ module Seek
       end
 
       def vetted_properties
-        puts "VETTED:\n#{vet_properties(self.properties)}"
         vet_properties(self.properties)
       end
 
