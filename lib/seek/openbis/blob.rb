@@ -52,13 +52,18 @@ module Seek
 
         return [] unless dataset
 
+        terms = []
+        # no longer needed, those will come in DataFile from external_asset
+=begin
         terms = [dataset.perm_id, dataset.dataset_type_code, dataset.dataset_type_description,
                  dataset.experiment_id, dataset.registrator, dataset.modifier, dataset.code]
 
         if dataset.properties
           terms |= dataset.properties.map { |key, value| [value, "#{key}:#{value}"]}.flatten
         end
+=end
 
+        # I left files names in case they are relevant to content blob indexing
         terms | dataset.dataset_files_no_directories.collect do |file|
           [file.perm_id, file.path, file.filename]
         end.flatten.uniq

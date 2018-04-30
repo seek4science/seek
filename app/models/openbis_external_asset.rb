@@ -69,12 +69,10 @@ class OpenbisExternalAsset < ExternalAsset
     terms = [entity.perm_id, entity.type_code, entity.type_description,
              entity.registrator, entity.modifier, entity.code]
 
-    if entity.properties
-      terms |= entity.properties.map  do |key, value|
-        value = removeTAGS(value)
-        [value, "#{key}:#{value}"]
-      end.flatten
-    end
+    terms |= entity.vetted_properties.map  do |key, value|
+      value = removeTAGS(value)
+      [value, "#{key}:#{value}"]
+    end.flatten
 
     if entity.is_a? Seek::Openbis::Dataset
 
@@ -88,6 +86,8 @@ class OpenbisExternalAsset < ExternalAsset
 
     terms.uniq
   end
+
+
 
   def removeTAGS(text)
     Loofah.fragment(text)

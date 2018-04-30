@@ -53,16 +53,19 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
     assert_empty blob.url_search_terms, 'url search terms should be empty'
     terms = blob.search_terms
 
-    assert_includes terms, 'TEST_DATASET_TYPE'
     assert_includes terms, 'original/autumn.jpg'
-    assert_includes terms, '20151216143716562-2'
-    assert_includes terms, 'for api test'
     assert_includes terms, 'autumn.jpg'
-    assert_includes terms, 'apiuser'
 
+    #thoes will be indexed in datafile
+=begin
     # values form openbis parametes as welss as key:value pairs
+    assert_includes terms, 'for api test'
+    assert_includes terms, 'apiuser'
+    assert_includes terms, 'TEST_DATASET_TYPE'
+    assert_includes terms, '20151216143716562-2'
     assert_includes terms, 'DataFile_3'
     assert_includes terms, 'SEEK_DATAFILE_ID:DataFile_3'
+=end
 
   end
 end

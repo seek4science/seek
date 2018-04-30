@@ -2,7 +2,7 @@ module Seek
   module Openbis
     # Represents an openBIS Experiment entity
     class Experiment < Entity
-      attr_reader :experiment_type, :experiment_id, :sample_ids, :identifier, :dataset_ids, :properties
+      attr_reader :experiment_type, :experiment_id, :sample_ids, :identifier, :dataset_ids
 
       def populate_from_json(json)
         @properties = json['properties'] || {}

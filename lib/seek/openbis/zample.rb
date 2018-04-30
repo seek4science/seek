@@ -2,7 +2,7 @@ module Seek
   module Openbis
     # Represents an openBIS Sample entity
     class Zample < Entity
-      attr_reader :sample_type, :experiment_id, :dataset_ids, :identifier, :properties
+      attr_reader :sample_type, :experiment_id, :dataset_ids, :identifier
 
       def populate_from_json(json)
         @properties = json['properties'] || {}

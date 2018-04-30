@@ -3,7 +3,7 @@ module Seek
     # General behaviour for an entity in openBIS. Specific entities are defined as specialized subclasses
     class Entity
       attr_reader :json, :modifier, :registration_date, :modification_date, :code,
-                  :perm_id, :registrator, :openbis_endpoint
+                  :perm_id, :registrator, :openbis_endpoint, :properties
 
       # debug is with puts so it can be easily seen on tests screens
       DEBUG = Seek::Config.openbis_debug ? true : false
@@ -14,6 +14,7 @@ module Seek
 
       def initialize(openbis_endpoint, perm_id = nil, refresh = false)
         @openbis_endpoint = openbis_endpoint
+        @properties = {}
         unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
           raise 'OpenbisEndpoint expected and required'+ "Got #{@openbis_endpoint} #{@openbis_endpoint.class}"
         end
@@ -79,6 +80,22 @@ module Seek
 
       def comment
         properties['COMMENT'] || ''
+      end
+
+      def vetted_properties
+        puts "VETTED:\n#{vet_properties(self.properties)}"
+        vet_properties(self.properties)
+      end
+
+      def vet_properties(hash)
+        return {} unless hash
+
+        hash.reject do |k, v|
+          next(true) if v.nil?
+          next(true) if k == 'ANNOTATIONS_STATE' || k == :ANNOTATIONS_STATE
+          next(true) if (k == 'XMLCOMMENTS' || k == :XMLCOMMENTS) && !(v.start_with?('<'))
+          false
+        end
       end
 
       def cache_key(perm_id)

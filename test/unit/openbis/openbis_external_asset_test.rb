@@ -15,7 +15,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
   test 'builds from Zample' do
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
-    options = {tomek: false}
+    options = { tomek: false }
     asset = OpenbisExternalAsset.build(zample, options)
 
     assert_equal @endpoint, asset.seek_service
@@ -30,7 +30,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert asset.synchronized_at
     assert_equal 'synchronized', asset.sync_state
     assert asset.synchronized?
-    assert_equal  options, asset.sync_options
+    assert_equal options, asset.sync_options
     assert_equal 1, asset.version
 
     refute asset.sync_options_json
@@ -61,7 +61,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
   test 'builds from Dataset' do
 
     entity = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
-    options = {tomek: false}
+    options = { tomek: false }
     asset = OpenbisExternalAsset.build(entity, options)
 
     assert_equal @endpoint, asset.seek_service
@@ -77,7 +77,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert asset.synchronized_at
     assert_equal 'synchronized', asset.sync_state
     assert asset.synchronized?
-    assert_equal  options, asset.sync_options
+    assert_equal options, asset.sync_options
     assert_equal 1, asset.version
 
     refute asset.sync_options_json
@@ -95,7 +95,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 
     refute OpenbisExternalAsset.registered?(zample)
 
-    asset = OpenbisExternalAsset.new({external_service: zample.openbis_endpoint.id, external_id: zample.perm_id})
+    asset = OpenbisExternalAsset.new({ external_service: zample.openbis_endpoint.id, external_id: zample.perm_id })
     assert asset.save
 
     assert OpenbisExternalAsset.registered?(zample)
@@ -108,7 +108,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert asset.needs_reindexing
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
-    options = {tomek: false}
+    options = { tomek: false }
     asset = OpenbisExternalAsset.build(zample, options)
 
     assert asset.needs_reindexing
@@ -122,11 +122,11 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
 
-    assert_raises( ActiveRecord::RecordNotFound ) {
+    assert_raises(ActiveRecord::RecordNotFound) {
       OpenbisExternalAsset.find_by_entity(zample)
     }
 
-    asset = OpenbisExternalAsset.new({external_service: zample.openbis_endpoint.id, external_id: zample.perm_id})
+    asset = OpenbisExternalAsset.new({ external_service: zample.openbis_endpoint.id, external_id: zample.perm_id })
     assert asset.save
 
     assert OpenbisExternalAsset.find_by_entity(zample)
@@ -180,8 +180,8 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 
     terms = asset.search_terms
 
-    goals = terms.select {|t| t.start_with? 'EXPERIMENTAL_GOALS'} .first
-    comments = terms.select {|t| t.start_with? 'XMLCOMMENTS'} .first
+    goals = terms.select { |t| t.start_with? 'EXPERIMENTAL_GOALS' }.first
+    comments = terms.select { |t| t.start_with? 'XMLCOMMENTS' }.first
     assert goals
     assert comments
     #puts goals
@@ -234,9 +234,11 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 
     text = ' temp < 3 C but > 2'
     res = asset.removeTAGS(text)
-    puts res
+    # puts res
     exp = 'temp &lt; 3 C but &gt; 2'
     assert_equal exp, res
 
   end
+
+
 end
