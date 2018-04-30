@@ -29,9 +29,10 @@ gem 'prototype-rails', git: 'https://github.com/rails/prototype-rails', branch: 
 gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
+
 #gem 'openseek-api'
-gem 'openseek-api', git: 'https://github.com/tzielins/openseek-api-gem', ref: '3fa7e0c649b8d766ef65da0d9c77df2c0dc4193f'
-# for fancy content escaping in openbis
+gem 'openseek-api', git: 'https://github.com/tzielins/openseek-api-gem', ref: '361acee4d223dd1229b15d433beb2cd33124c74c'
+# for fancy content escaping in openbis integration
 gem 'loofah'
 
 gem 'jbuilder', '~> 2.0'

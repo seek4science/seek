@@ -79,6 +79,8 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     asset = OpenbisExternalAsset.build(@dataset)
     asset.content=fake
     asset.synchronized_at = old
+    df = Factory :data_file
+    asset.seek_entity = df
     assert asset.save
 
     # just a paranoid check, in case future implementation will mess up with setting stamps and content
@@ -89,7 +91,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     get :refresh, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
 
     assert_response :redirect
-    assert_redirected_to edit_openbis_endpoint_openbis_dataset_path
+    assert_redirected_to df
 
     asset = OpenbisExternalAsset.find(asset.id)
     assert_equal @dataset.perm_id, asset.content.perm_id

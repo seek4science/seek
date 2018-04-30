@@ -214,7 +214,7 @@ class EntityTypeTest < ActiveSupport::TestCase
     codes = ['DEFAULT_EXPERIMENT','MATERIALS']
     sets = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
     assert sets
-    assert_equal 14, sets.size
+    assert_equal 15, sets.size
 
     codes = ['TZ_MISSING_TYPE']
     sets = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)

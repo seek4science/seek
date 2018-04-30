@@ -110,6 +110,8 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     asset = OpenbisExternalAsset.build(@experiment)
     asset.content=fake
     asset.synchronized_at = old
+    st = Factory :study
+    asset.seek_entity = st
     assert asset.save
 
     # just a paranoid check, in case future implementation will mess up with setting stamps and content
@@ -120,7 +122,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     get :refresh, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id
 
     assert_response :redirect
-    assert_redirected_to edit_openbis_endpoint_openbis_experiment_path
+    assert_redirected_to st
 
     asset = OpenbisExternalAsset.find(asset.id)
     assert_equal @experiment.perm_id, asset.content.perm_id
