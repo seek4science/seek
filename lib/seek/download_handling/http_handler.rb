@@ -17,6 +17,7 @@ module Seek
       def info
         content_type = nil
         content_length = nil
+        file_name = nil
         code = nil
         p = proc do
           begin

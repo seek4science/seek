@@ -42,7 +42,18 @@ class PublicationsController < ApplicationController
       format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @publication}
-      format.any( *Publication::EXPORT_TYPES.keys ) { send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}" }
+      format.any( *Publication::EXPORT_TYPES.keys ) do
+        begin
+          send_data @publication.export(request.format.to_sym), type: request.format.to_sym, filename: "#{@publication.title}.#{request.format.to_sym}"
+        rescue StandardError => exception
+          if Seek::Config.exception_notification_enabled
+            ExceptionNotifier.notify_exception(exception, data: { message: "Error exporting publication as #{request.format}" })
+          end
+
+          flash[:error] = "There was a problem communicating with PubMed to generate the requested #{request.format.to_sym.to_s.upcase}."
+          redirect_to @publication
+        end
+      end
     end
   end
 

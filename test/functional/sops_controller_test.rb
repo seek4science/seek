@@ -1018,6 +1018,58 @@ class SopsControllerTest < ActionController::TestCase
     assert_select '#citation-instructions', count: 0
   end
 
+  test 'content blob filename precedence should take user input first' do
+    stub_request(:any, 'http://example.com/url_filename.txt')
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    blob = { data_url: 'http://example.com/url_filename.txt', original_filename: 'user_filename.txt' }
+
+    assert_difference('Sop.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+
+        assert_equal 'user_filename.txt', assigns(:sop).content_blob.original_filename
+      end
+    end
+  end
+
+  test 'content blob filename precedence should take server filename second' do
+    stub_request(:any, 'http://example.com/url_filename.txt')
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    blob = { data_url: 'http://example.com/url_filename.txt' }
+
+    assert_difference('Sop.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+
+        assert_equal 'server_filename.txt', assigns(:sop).content_blob.original_filename
+      end
+    end
+  end
+
+  test 'content blob filename precedence should take URL filename last' do
+    stub_request(:any, 'http://example.com/url_filename.txt').to_return(body: 'hi')
+    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    blob = { data_url: 'http://example.com/url_filename.txt' }
+
+    assert_difference('Sop.count') do
+      assert_difference('ContentBlob.count') do
+        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
+
+        assert_equal 'url_filename.txt', assigns(:sop).content_blob.original_filename
+      end
+    end
+  end
+
+  test 'should show sop as RDF' do
+    sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
+
+    get :show, id: sop, format: :rdf
+
+    assert_response :success
+  end
+
   private
 
   def doi_citation_mock

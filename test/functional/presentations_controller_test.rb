@@ -350,6 +350,14 @@ class PresentationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'should return 406 when showing presentation as RDF' do
+    presentation = Factory :ppt_presentation, contributor: User.current_user
+
+    get :show, id: presentation, format: :rdf
+
+    assert_response :not_acceptable
+  end
+
   def edit_max_object(presentation)
     add_tags_to_test_object(presentation)
     add_creator_to_test_object(presentation)
