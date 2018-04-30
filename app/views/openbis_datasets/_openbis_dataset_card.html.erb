@@ -34,7 +34,13 @@
           <p class="list_item_attribute">
             <%= check_box_tag('sync_options[linked_datasets][]', entity.perm_id, is_selected,
                               disabled: is_linked, class: is_linked ? 'linked' : 'unlinked') %>
-            <%= label_tag(nil, is_linked ? "Already linked" : "Register with #{parentType}") %>
+            <%# to preserve the manualy selected when already linked, so that tick box is selected between updates %>
+            <%= hidden_field_tag('sync_options[linked_datasets][]', entity.perm_id) if is_selected && is_linked %>
+            <%= label_tag(nil, if is_linked then
+                                 is_selected ? 'manually linked' : 'automatically linked'
+                               else
+                                 "Register with #{parentType}"
+                               end) %>
           </p>
       <% end %>
       <%= render partial: extra, locals: { entity: entity, extra_params: extra_params } if extra %>
