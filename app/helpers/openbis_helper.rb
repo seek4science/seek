@@ -27,6 +27,7 @@ module OpenbisHelper
       asset = data_file.external_asset
       render partial: 'openbis_datasets/openbis_dataset_panel',
              locals: { entity: dataset, modal_files: true, edit_button: true,
+                       can_edit: data_file.can_edit?,
                        sync_at: asset.synchronized_at, err_msg: asset.err_msg }
   end
 
@@ -39,7 +40,8 @@ module OpenbisHelper
 
     if asset.is_a?(OpenbisExternalAsset) then
       return render partial: 'openbis_common/openbis_entity_panel', object: entity,
-                    locals: { edit_button: true, sync_at: asset.synchronized_at, err_msg: asset.err_msg }
+                    locals: { can_edit: seekobj.can_edit?, edit_button: true,
+                              sync_at: asset.synchronized_at, err_msg: asset.err_msg }
     end
 
     "Unsupported external asset #{seekobj.external_asset.class}".html_safe
@@ -55,6 +57,21 @@ module OpenbisHelper
     end
     if entity.is_a? Seek::Openbis::Experiment
       return edit_openbis_endpoint_openbis_experiment_path openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
+    end
+
+    'Unsupported'
+  end
+
+  def openbis_entity_sync_path(entity)
+
+    if entity.is_a? Seek::Openbis::Zample
+      return refresh_openbis_endpoint_openbis_zample_path openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
+    end
+    if entity.is_a? Seek::Openbis::Dataset
+      return refresh_openbis_endpoint_openbis_dataset_path openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
+    end
+    if entity.is_a? Seek::Openbis::Experiment
+      return refresh_openbis_endpoint_openbis_experiment_path openbis_endpoint_id: entity.openbis_endpoint, id: entity.perm_id
     end
 
     'Unsupported'

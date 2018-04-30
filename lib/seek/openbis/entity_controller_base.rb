@@ -27,7 +27,7 @@ module Seek
 
         flash[:error] = "OBis synchronization failed: #{@asset.err_msg}" if @asset.failed?
         flash[:notice] = 'Updated OpenBis content' if @asset.synchronized?
-        redirect_to action: 'edit'
+        redirect_to @asset.seek_entity #action: 'edit'
       end
 
       def check_entity

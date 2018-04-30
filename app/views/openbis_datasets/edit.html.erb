@@ -28,7 +28,7 @@
 
       <div class="form-group">
         <%= submit_tag(not_registered ? 'Register': 'Update', class: 'btn btn-primary') %>
-        <%= button_link_to('Refresh content', 'refresh', refresh_openbis_endpoint_openbis_dataset_path(@openbis_endpoint, id: @entity.perm_id)) %>
+        <%# button_link_to('Refresh content', 'refresh', refresh_openbis_endpoint_openbis_dataset_path(@openbis_endpoint, id: @entity.perm_id)) %>
       </div>
 
     <% end %>

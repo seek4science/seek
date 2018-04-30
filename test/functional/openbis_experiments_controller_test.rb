@@ -436,6 +436,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     exstudy = Factory :study
     asset = OpenbisExternalAsset.build(@experiment)
+    asset.synchronized_at = DateTime.now - 2.days
     exstudy.external_asset = asset
     assert asset.save
     assert exstudy.save
@@ -444,6 +445,7 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
 
     sync_options = { link_assays: '1' }
     assert_not_equal sync_options, asset.sync_options
+    assert_not_equal DateTime.now.to_date, asset.synchronized_at.to_date
 
     post :update, openbis_endpoint_id: @endpoint.id, id: @experiment.perm_id, sync_options: sync_options
 
@@ -457,7 +459,8 @@ class OpenbisExperimentsControllerTest < ActionController::TestCase
     assert_equal sync_options, asset.sync_options
     assert_not_equal last_mod, asset.updated_at
 
-    # TODO how to test for content update (or lack of it depends on decided semantics)
+    # testing content update just by synchronized stamp
+    assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
 
 
     last_mod = exstudy.updated_at

@@ -165,9 +165,12 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     exdatafile = Factory :data_file
     asset = OpenbisExternalAsset.build(@dataset)
+    asset.synchronized_at = DateTime.now - 2.days
     exdatafile.external_asset = asset
     assert asset.save
     assert exdatafile.save
+
+    assert_not_equal DateTime.now.to_date, asset.synchronized_at.to_date
 
     post :update, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
 
@@ -181,7 +184,8 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     asset.reload
     assert_not_equal last_mod, asset.updated_at
 
-    # TODO how to test for content update (or lack of it depends on decided simantics)
+    # testing content update just by synchronized stamp
+    assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
 
 
     last_mod = exdatafile.updated_at

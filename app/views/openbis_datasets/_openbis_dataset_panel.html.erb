@@ -6,10 +6,11 @@
   modal_files = false ## lets overwrite it for a moment
   sync_at ||= nil
   err_msg ||= nil
+  can_edit ||= false
 %>
 
 <%= render :partial => 'openbis_common/openbis_entity_panel', :object => entity,
-           locals: {sync_at: sync_at, err_msg: err_msg} %>
+           locals: {can_edit: can_edit, sync_at: sync_at, err_msg: err_msg} %>
 
 <%= render :partial => 'openbis_common/files_view_modal', locals: { parent_id: '#openbis-files-details' } if modal_files %>
 
@@ -22,13 +23,6 @@
       <% else %>
           <%= render partial: 'openbis_datasets/openbis_dataset_files_list', locals: { dataset: entity, data_file: data_file } %>
       <% end %>
-    </div>
-
-    <div class="col-md-10">
-      <hr>
-      <div class="form-group">
-        <%= button_link_to('Refresh content', 'refresh', refresh_openbis_endpoint_openbis_dataset_path(entity.openbis_endpoint, id: entity.perm_id)) %>
-      </div>
     </div>
 
   </div>
