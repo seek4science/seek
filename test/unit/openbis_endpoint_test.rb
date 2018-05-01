@@ -291,12 +291,11 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     key = endpoint.space.cache_key(endpoint.space_perm_id)
     assert endpoint.metadata_store.exist?(key)
 
-
     disable_authorization_checks do
       assert endpoint.save
       assert endpoint.metadata_store.exist?(key)
 
-      endpoint.username = endpoint.username+'2'
+      endpoint.username = endpoint.username + '2'
       assert endpoint.save
       refute endpoint.metadata_store.exist?(key)
     end
@@ -370,7 +369,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'follows external_assets' do
-
     endpoint = Factory(:openbis_endpoint)
 
     zample = Seek::Openbis::Zample.new(endpoint, '20171002172111346-37')
@@ -383,7 +381,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     endpoint2 = Factory(:openbis_endpoint, refresh_period_mins: 60, web_endpoint: 'https://openbis-api.fair-dom.org/openbis2', space_perm_id: 'API-SPACE2')
 
-
     zample2 = Seek::Openbis::Zample.new(endpoint2, '20171002172111346-37')
     asset3 = OpenbisExternalAsset.build(zample2, options)
 
@@ -394,9 +391,14 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint.reload
     endpoint2.reload
 
-    assert_equal [asset1, asset2], endpoint.external_assets.to_ary
-    assert_equal [asset3], endpoint2.external_assets.to_ary
+    e1ass = endpoint.external_assets.to_ary
+    assert_equal 2, e1ass.length
+    assert e1ass.include? asset1
+    assert e1ass.include? asset2
 
+    # such comparision does not work on postgress different ordering
+    # assert_equal [asset1, asset2], endpoint.external_assets.to_ary
+    assert_equal [asset3], endpoint2.external_assets.to_ary
   end
 
   test 'registered_datafiles finds only own datafiles' do
@@ -423,7 +425,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert datafile1.save
     datafile2 = @seek_util.createDataFileFromObisSet(Seek::Openbis::Dataset.new(endpoint1, '20160215111736723-31'), nil)
     assert datafile2.save
-    datafile3 = @seek_util.createDataFileFromObisSet( Seek::Openbis::Dataset.new(endpoint2, '20160210130454955-23'), nil)
+    datafile3 = @seek_util.createDataFileFromObisSet(Seek::Openbis::Dataset.new(endpoint2, '20160210130454955-23'), nil)
     assert datafile3.save
 
     df = endpoint1.registered_datafiles
@@ -451,7 +453,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     asset1.seek_entity = df1
     assert asset1.save
 
-    set2= Seek::Openbis::Dataset.new(endpoint1, '20160215111736723-31')
+    set2 = Seek::Openbis::Dataset.new(endpoint1, '20160215111736723-31')
     asset2 = OpenbisExternalAsset.build(set2)
     df2 = Factory :data_file
     asset2.seek_entity = df2
@@ -505,7 +507,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     end
 
     assert_equal 1, zample2.openbis_endpoint.registered_assays.count
-
   end
 
   test 'registered_studies gives own entries registered in seek as studies' do
@@ -517,7 +518,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
       assert endpoint1.save
       assert endpoint2.save
     end
-
 
     e1 = Seek::Openbis::Experiment.new(endpoint1, '20171121152132641-51')
     asset1 = OpenbisExternalAsset.build(e1)
@@ -546,22 +546,20 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     end
 
     assert_equal 1, endpoint2.registered_studies.count
-
   end
 
   def zample_for_id(permId = nil, endpoint = nil)
-
     endpoint ||= Factory :openbis_endpoint
 
     json = JSON.parse(
-        '
+      '
 {"identifier":"\/API-SPACE\/TZ3","modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser",
 "code":"TZ3","modifier":"apiuser","permId":"20171002172111346-37",
 "registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40","20171004182824553-41"]
 ,"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
 '
     )
-    json["permId"] = permId if permId
+    json['permId'] = permId if permId
     Seek::Openbis::Zample.new(endpoint).populate_from_json(json)
   end
 
@@ -592,17 +590,17 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     store.fetch(key1) { 'Tomek' }
 
     key2 = 'goes'
-    store.fetch(key2, { expires_in: 0.1.seconds }) { 'Marek' }
+    store.fetch(key2, expires_in: 0.1.seconds) { 'Marek' }
 
     assert_equal 'Tomek', store.fetch(key1)
     assert_equal 'Marek', store.fetch(key2)
 
     sleep(0.2.seconds)
 
-    #Delayed::Job.destroy_all
-    #assert_difference('Delayed::Job.count', 1) do
+    # Delayed::Job.destroy_all
+    # assert_difference('Delayed::Job.count', 1) do
     endpoint.refresh_metadata
-    #end
+    # end
 
     assert endpoint.metadata_store.exist?(key1)
     refute endpoint.metadata_store.exist?(key2)
@@ -611,7 +609,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert asset.refresh?
 
     assert OpenbisSyncJob.new(endpoint).exists?
-
   end
 
   test 'force_refresh_metadata clears store, marks all for refresh' do
@@ -627,16 +624,15 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     store.fetch(key1) { 'Tomek' }
 
     key2 = 'goes'
-    store.fetch(key2, { expires_in: 0.1.seconds }) { 'Marek' }
+    store.fetch(key2, expires_in: 0.1.seconds) { 'Marek' }
 
     assert_equal 'Tomek', store.fetch(key1)
     assert_equal 'Marek', store.fetch(key2)
 
-
-    #Delayed::Job.destroy_all
-    #assert_difference('Delayed::Job.count', 1) do
+    # Delayed::Job.destroy_all
+    # assert_difference('Delayed::Job.count', 1) do
     endpoint.force_refresh_metadata
-    #end
+    # end
 
     refute endpoint.metadata_store.exist?(key1)
     refute endpoint.metadata_store.exist?(key2)
@@ -645,31 +641,26 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     assert asset.refresh?
 
     assert OpenbisSyncJob.new(endpoint).exists?
-
   end
 
   test 'due_to_refresh gives synchronized assets with elapsed synchronization time' do
-
     endpoint = Factory(:openbis_endpoint)
     endpoint.refresh_period_mins = 80
     disable_authorization_checks do
       assert endpoint.save!
     end
 
-
     assets = []
     (0..9).each do |i|
-
       asset = ExternalAsset.new
       asset.seek_service = endpoint
       asset.external_service = endpoint.web_endpoint
       asset.external_id = i
       asset.sync_state = :synchronized
-      asset.synchronized_at= DateTime.now - i.hours
+      asset.synchronized_at = DateTime.now - i.hours
       assert asset.save
       assets << asset
     end
-
 
     assets[9].sync_state = :refresh
     assets[9].save
@@ -680,14 +671,15 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint.reload
     assert_equal 10, endpoint.external_assets.count
 
-    assert_equal 6, endpoint.due_to_refresh.count
-    assert_equal assets[2..7].map { |r| r.external_id }, endpoint.due_to_refresh.map { |r| r.external_id }
+    due = endpoint.due_to_refresh.to_a
+    assert_equal 6, due.count
+    # that does not work on postgres as different ordering
+    # assert_equal assets[2..7].map { |r| r.external_id }, endpoint.due_to_refresh.map { |r| r.external_id }
 
-
+    assets[2..7].each { |a| assert due.include?(a) }
   end
 
   test 'mark_for_refresh sets sync status for all due to refresh' do
-
     endpoint = Factory(:openbis_endpoint)
     endpoint.refresh_period_mins = 80
     disable_authorization_checks do
@@ -696,17 +688,15 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     assets = []
     (0..9).each do |i|
-
       asset = ExternalAsset.new
       asset.seek_service = endpoint
       asset.external_service = endpoint.web_endpoint
       asset.external_id = i
       asset.sync_state = :synchronized
-      asset.synchronized_at= DateTime.now - i.hours
+      asset.synchronized_at = DateTime.now - i.hours
       assert asset.save
       assets << asset
     end
-
 
     assets[9].sync_state = :failed
     assets[9].save
@@ -725,7 +715,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'mark_all_for_refresh sets sync status for all synchronized to refresh' do
-
     endpoint = Factory(:openbis_endpoint)
     endpoint.refresh_period_mins = 80
     disable_authorization_checks do
@@ -734,17 +723,15 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
     assets = []
     (0..9).each do |i|
-
       asset = ExternalAsset.new
       asset.seek_service = endpoint
       asset.external_service = endpoint.web_endpoint
       asset.external_id = i
       asset.sync_state = :synchronized
-      asset.synchronized_at= DateTime.now - i.hours
+      asset.synchronized_at = DateTime.now - i.hours
       assert asset.save
       assets << asset
     end
-
 
     assets[9].sync_state = :failed
     assets[9].save
@@ -765,13 +752,12 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     exp = { study_types: [], assay_types: [] }
     assert_equal exp, conf
 
-    conf = OpenbisEndpoint.build_meta_config(['st1', 'st2'], ['a1'])
-    exp = { study_types: ['st1', 'st2'], assay_types: ['a1'] }
+    conf = OpenbisEndpoint.build_meta_config(%w[st1 st2], ['a1'])
+    exp = { study_types: %w[st1 st2], assay_types: ['a1'] }
     assert_equal exp, conf
   end
 
   test 'build_meta_config raise exception if not empty non-table parameters' do
-
     assert_raise do
       OpenbisEndpoint.build_meta_config('a', nil)
     end
@@ -787,7 +773,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   end
 
   test 'add_meta_config sets default config for new entry' do
-
     project = Factory(:project)
     endpoint = OpenbisEndpoint.new project: project, username: 'fred', password: '12345',
                                    web_endpoint: 'http://my-openbis.org/openbis',
@@ -795,7 +780,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
                                    dss_endpoint: 'http://my-openbis.org/openbis',
                                    space_perm_id: 'mmmm',
                                    refresh_period_mins: 60
-
 
     refute endpoint.study_types.empty?
     refute endpoint.assay_types.empty?
@@ -838,8 +822,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint = OpenbisEndpoint.find(endpoint.id)
     assert_equal ['ST1'], endpoint.study_types
     assert_equal [], endpoint.assay_types
-
-
   end
 
   test 'study_types gives default for new record configured' do
@@ -849,8 +831,8 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'study_types can be set as string' do
     endpoint = Factory(:openbis_endpoint)
-    exp = ['S1', 'S2']
-    endpoint.study_types=' S1 S2'
+    exp = %w[S1 S2]
+    endpoint.study_types = ' S1 S2'
 
     assert_equal exp, endpoint.study_types
 
@@ -860,12 +842,11 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint1 = OpenbisEndpoint.find(endpoint.id)
     assert_not_same endpoint, endpoint1
     assert_equal exp, endpoint1.study_types
-
   end
 
   test 'study_types can be set as array' do
     endpoint = Factory(:openbis_endpoint)
-    exp = ['S1', 'S2']
+    exp = %w[S1 S2]
     endpoint.study_types = exp
 
     assert_equal exp, endpoint.study_types
@@ -897,8 +878,8 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'assay_types can be set as string' do
     endpoint = Factory(:openbis_endpoint)
-    exp = ['A1', 'A2']
-    endpoint.assay_types=' A1, A2'
+    exp = %w[A1 A2]
+    endpoint.assay_types = ' A1, A2'
 
     assert_equal exp, endpoint.assay_types
 
@@ -908,12 +889,11 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     endpoint1 = OpenbisEndpoint.find(endpoint.id)
     assert_not_same endpoint, endpoint1
     assert_equal exp, endpoint1.assay_types
-
   end
 
   test 'assay_types can be set as array' do
     endpoint = Factory(:openbis_endpoint)
-    exp = ['A1', 'A2']
+    exp = %w[A1 A2]
     endpoint.assay_types = exp
 
     assert_equal exp, endpoint.assay_types
@@ -958,8 +938,6 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
   name2, again N1
 '
     names = endpoint.parse_code_names(input)
-    assert_equal ['N1', 'N2', 'NAME', 'NAME2', 'AGAIN'], names
-
+    assert_equal %w[N1 N2 NAME NAME2 AGAIN], names
   end
-
 end
