@@ -16,8 +16,8 @@ module Seek
 
       def construct_files_from_json(files_json)
         files_json
-            .map { |json| Seek::Openbis::DatasetFile.new(openbis_endpoint).populate_from_json(json) }
-            .sort_by(&:path)
+          .map { |json| Seek::Openbis::DatasetFile.new(openbis_endpoint).populate_from_json(json) }
+          .sort_by(&:path)
       end
 
       def dataset_type_text
@@ -99,27 +99,23 @@ module Seek
       # That is original Stuart's code that was based on purely on ContentBlob
       # Commented out not deleted in case it is needed for migration from first implementation to new one
 
-=begin
-      def create_seek_datafile
-        raise 'Already registered' if registered?
-        df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}",
-                          license: openbis_endpoint.project.default_license)
-        if df.save
-          df.content_blob = ContentBlob.create(url: content_blob_uri, make_local_copy: false,
-                                               external_link: false, original_filename: "openbis-#{perm_id}")
-        end
-        df
-      end
-
-
-      def content_blob_uri
-        "openbis:#{openbis_endpoint.id}:dataset:#{perm_id}"
-      end
-=end
+      #       def create_seek_datafile
+      #         raise 'Already registered' if registered?
+      #         df = DataFile.new(projects: [openbis_endpoint.project], title: "OpenBIS #{perm_id}",
+      #                           license: openbis_endpoint.project.default_license)
+      #         if df.save
+      #           df.content_blob = ContentBlob.create(url: content_blob_uri, make_local_copy: false,
+      #                                                external_link: false, original_filename: "openbis-#{perm_id}")
+      #         end
+      #         df
+      #       end
+      #
+      #
+      #       def content_blob_uri
+      #         "openbis:#{openbis_endpoint.id}:dataset:#{perm_id}"
+      #       end
 
       private
-
-
     end
   end
 end

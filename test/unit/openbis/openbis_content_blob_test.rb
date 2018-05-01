@@ -9,7 +9,8 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
 
   test 'openbis?' do
     stub_request(:head, 'http://www.abc.com').to_return(
-      headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
+      headers: { content_length: 500, content_type: 'text/plain' }, status: 200
+    )
 
     refute Factory(:txt_content_blob).openbis?
     refute Factory(:binary_content_blob).openbis?
@@ -30,7 +31,7 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'openbis? handles bad url' do
-    blob = Factory(:url_content_blob,url:'http://url with spaces/another space.doc')
+    blob = Factory(:url_content_blob, url: 'http://url with spaces/another space.doc')
     refute blob.openbis?
   end
 
@@ -46,7 +47,6 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'search terms' do
-
     df = openbis_linked_data_file
     blob = df.content_blob
 
@@ -56,16 +56,13 @@ class OpenbisContentBlobTest < ActiveSupport::TestCase
     assert_includes terms, 'original/autumn.jpg'
     assert_includes terms, 'autumn.jpg'
 
-    #thoes will be indexed in datafile
-=begin
-    # values form openbis parametes as welss as key:value pairs
-    assert_includes terms, 'for api test'
-    assert_includes terms, 'apiuser'
-    assert_includes terms, 'TEST_DATASET_TYPE'
-    assert_includes terms, '20151216143716562-2'
-    assert_includes terms, 'DataFile_3'
-    assert_includes terms, 'SEEK_DATAFILE_ID:DataFile_3'
-=end
-
+    # thoes will be indexed in datafile
+    #     # values form openbis parametes as welss as key:value pairs
+    #     assert_includes terms, 'for api test'
+    #     assert_includes terms, 'apiuser'
+    #     assert_includes terms, 'TEST_DATASET_TYPE'
+    #     assert_includes terms, '20151216143716562-2'
+    #     assert_includes terms, 'DataFile_3'
+    #     assert_includes terms, 'SEEK_DATAFILE_ID:DataFile_3'
   end
 end

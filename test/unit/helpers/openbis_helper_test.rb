@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class OpenbisHelperTest < ActionView::TestCase
-
   test 'external_asset_details shows warnings on empty or unknown' do
     p1 = Factory :person
     a1 = Factory :assay, contributor: p1, policy: Factory(:downloadable_public_policy)
@@ -28,18 +27,15 @@ class OpenbisHelperTest < ActionView::TestCase
     assert_match /id="openbis-details"/, res
     assert_equal '20171002172111346-37', zample.perm_id
     assert_match /20171002172111346-37/, res
-
   end
 
-
   test 'openbis_rich_content_sanitizer works' do
-
     txt = 'no html to 1234567 cuttted'
-    cleaned = openbis_rich_content_sanitizer(txt,15).to_s
+    cleaned = openbis_rich_content_sanitizer(txt, 15).to_s
 
     exp = 'no html to 1234567 ...'
 
-    assert_equal exp,cleaned
+    assert_equal exp, cleaned
     assert cleaned.html_safe?
 
     txt = '
@@ -48,13 +44,13 @@ class OpenbisHelperTest < ActionView::TestCase
 <ul> <li class="top">first list</li><li>second</li></ul>
 </div></body></html>'
 
-    cleaned = openbis_rich_content_sanitizer(txt,15).to_s
+    cleaned = openbis_rich_content_sanitizer(txt, 15).to_s
 
     exp = '<div>
 <div>text in div</div><p>para ...</p>
 </div>'
 
-    assert_equal exp,cleaned
+    assert_equal exp, cleaned
     assert cleaned.html_safe?
 
     cleaned = openbis_rich_content_sanitizer(txt).to_s
@@ -71,9 +67,8 @@ class OpenbisHelperTest < ActionView::TestCase
 </ul>
 </div>'
 
-    assert_equal exp,cleaned
+    assert_equal exp, cleaned
     assert cleaned.html_safe?
-
   end
 
   test 'StylingScrubber removes class and style attr' do
@@ -105,7 +100,6 @@ class OpenbisHelperTest < ActionView::TestCase
     res = trimmer.trim(txt)
     assert_equal '', res
     assert trimmer.trimmed
-
   end
 
   test 'TextTrimmingScrubber trims html if text nodes exceed limit' do
@@ -122,7 +116,4 @@ class OpenbisHelperTest < ActionView::TestCase
 </ul><p>12</p><ul><li>34 ...</li></ul>
 </div>', res
   end
-
-
-
 end

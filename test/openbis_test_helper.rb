@@ -33,7 +33,6 @@ end
 module Fairdom
   module OpenbisApi
     module MockedQuery
-
       # debug is with puts so it can be easily seen on tests screens
       DEBUG = Seek::Config.openbis_debug ? true : false
 
@@ -94,15 +93,14 @@ def openbis_linked_data_file(user = User.current_user, endpoint = nil)
 end
 
 #
-#def openbis_linked_content_blob(perm_id = '20160210130454955-23', endpoint = nil)
+# def openbis_linked_content_blob(perm_id = '20160210130454955-23', endpoint = nil)
 #  endpoint ||= Factory(:openbis_endpoint)
 #  Factory(:url_content_blob, make_local_copy: false, url: "openbis:#{endpoint.id}:dataset:#{perm_id}")
-#end
+# end
 
 module Fairdom
   module OpenbisApi
     module ExplicitMockedQuery
-
       # debug is with puts so it can be easily seen on tests screens
       DEBUG = Seek::Config.openbis_debug ? true : false
 
@@ -126,7 +124,7 @@ module Fairdom
         return file_query(options) unless id
 
         res = Fairdom::OpenbisApi::ExplicitMockedQuery.get_hit(id)
-        puts "Not set mocked value for id: #{id}" if DEBUG && !(res)
+        puts "Not set mocked value for id: #{id}" if DEBUG && !res
         res ? res : file_query(options)
       end
 
@@ -142,7 +140,6 @@ module Fairdom
         dir = File.join(Rails.root, 'test', 'fixtures', 'files', 'mocking', 'openbis')
         File.join(dir, name)
       end
-
     end
   end
 end

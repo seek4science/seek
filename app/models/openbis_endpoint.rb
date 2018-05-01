@@ -24,7 +24,6 @@ class OpenbisEndpoint < ActiveRecord::Base
   before_save :meta_config_to_json
   before_save :clear_metadata_if_changed
 
-
   def self.can_create?
     User.logged_in_and_member? && User.current_user.is_admin_or_project_administrator? && Seek::Config.openbis_enabled
   end
@@ -69,7 +68,6 @@ class OpenbisEndpoint < ActiveRecord::Base
 
     # as content stays in external_asset we can still clean the cache and mark items for refresh
 
-
     # only cleans the expired from cache
     cleanup_metadata_store
     mark_for_refresh
@@ -90,23 +88,22 @@ class OpenbisEndpoint < ActiveRecord::Base
 
     # as content stays in external_asset we can still clean the cache and mark items for refresh
 
-      clear_metadata_store
-      mark_all_for_refresh
+    clear_metadata_store
+    mark_all_for_refresh
 
     self
-
   end
 
-  #def reindex_entities
+  # def reindex_entities
   #  # ugly should reindex only those that have changed
   #  datafiles = registered_datafiles
   #  ReindexingJob.new.add_items_to_queue datafiles unless datafiles.empty?
-  #end
+  # end
 
   def registered_datafiles
     # It used to be like this
-    #url = "openbis:#{id}"
-    #DataFile.all.select { |df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url) }
+    # url = "openbis:#{id}"
+    # DataFile.all.select { |df| df.content_blob && df.content_blob.url && df.content_blob.url.start_with?(url) }
     registered_datasets
   end
 
@@ -125,7 +122,6 @@ class OpenbisEndpoint < ActiveRecord::Base
   def clear_metadata_store
     # we clear it no matter what as metadata are stored in the ExternalAssets
     metadata_store.clear
-
   end
 
   def clear_metadata_if_changed
@@ -152,7 +148,6 @@ class OpenbisEndpoint < ActiveRecord::Base
     OpenbisSyncJob.new(self).delete_jobs
   end
 
-
   def default_policy
     self.policy = Policy.default if new_record? && policy.nil?
   end
@@ -170,17 +165,16 @@ class OpenbisEndpoint < ActiveRecord::Base
   def self.build_meta_config(studies, assays)
     studies ||= []
     assays ||= []
-    raise 'table with types names expected' unless (studies.is_a?(Array) && assays.is_a?(Array))
+    raise 'table with types names expected' unless studies.is_a?(Array) && assays.is_a?(Array)
     { study_types: studies, assay_types: assays }
   end
 
   def parse_code_names(names)
-
     names ||= ''
     names.upcase
-        .split(/[,\s]/)
-        .reject { |w| w.empty? }
-        .uniq
+         .split(/[,\s]/)
+         .reject(&:empty?)
+         .uniq
   end
 
   def study_types
@@ -202,7 +196,6 @@ class OpenbisEndpoint < ActiveRecord::Base
     raise 'table with types names expected' unless types.is_a? Array
     meta_config[:assay_types] = types
   end
-
 
   # this is necessary for the sharing form to include the project by default
   def projects
@@ -227,7 +220,7 @@ class OpenbisEndpoint < ActiveRecord::Base
 
   def due_to_refresh
     old = DateTime.now - refresh_period_mins.minutes
-    external_assets.synchronized.where("synchronized_at < ?", old)
+    external_assets.synchronized.where('synchronized_at < ?', old)
   end
 
   def reset_fatal_assets
@@ -241,13 +234,9 @@ class OpenbisEndpoint < ActiveRecord::Base
   end
 
   def meta_config
-    @meta_config ||= self.meta_config_json ? JSON.parse(self.meta_config_json).symbolize_keys : { study_types: [], assay_types: [] }
+    @meta_config ||= meta_config_json ? JSON.parse(meta_config_json).symbolize_keys : { study_types: [], assay_types: [] }
     @meta_config
   end
 
-  def meta_config=(config)
-    # self.meta_config_json = config.to_json
-    @meta_config = config
-  end
-
+  attr_writer :meta_config
 end

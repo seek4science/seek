@@ -8,7 +8,7 @@ module Seek
       # debug is with puts so it can be easily seen on tests screens
       DEBUG = Seek::Config.openbis_debug ? true : false
 
-      @@TYPES = ['Sample', 'DataSet', 'Experiment']
+      @@TYPES = %w[Sample DataSet Experiment]
 
       def self.SampleType(openbis_endpoint, code = nil, refresh = false)
         EntityType.new(openbis_endpoint, 'Sample', code, refresh)
@@ -54,7 +54,7 @@ module Seek
       end
 
       def type_name
-        @entity_type+'Type'
+        @entity_type + 'Type'
       end
 
       def populate_from_json(json)
@@ -86,7 +86,7 @@ module Seek
       def find_by_codes(codes, refresh = false)
         cache_option = refresh ? { force: true } : nil
 
-        json = query_application_server_by_code(codes.join(","), cache_option)
+        json = query_application_server_by_code(codes.join(','), cache_option)
         construct_from_json(json, entity_type)
       end
 
@@ -96,7 +96,6 @@ module Seek
           self.class.new(openbis_endpoint, entity_type).populate_from_json(element)
         end.sort_by(&:code)
       end
-
 
       def cache_key(code)
         "#{type_name}/#{Digest::SHA2.hexdigest(code)}"
@@ -115,7 +114,7 @@ module Seek
       private
 
       def query_application_server_for_all(cache_option = nil)
-        cached_query_by_code('ALL:'+type_name, cache_option) do
+        cached_query_by_code('ALL:' + type_name, cache_option) do
           application_server_query_instance.query(entityType: type_name, queryType: 'ALL')
         end
       end
@@ -128,7 +127,7 @@ module Seek
       end
 
       def query_application_server_by_semantic(semantic, cache_option = nil)
-        cache_code = type_name+':'+semantic.to_json
+        cache_code = type_name + ':' + semantic.to_json
         query = { entityType: type_name, queryType: 'SEMANTIC' }
         query[:predicateOntologyId] = semantic.predicateOntologyId if semantic.predicateOntologyId
         query[:predicateOntologyVersion] = semantic.predicateOntologyVersion if semantic.predicateOntologyVersion
@@ -155,7 +154,6 @@ module Seek
       def application_server_query_instance
         Fairdom::OpenbisApi::ApplicationServerQuery.new(openbis_endpoint.as_endpoint, openbis_endpoint.session_token)
       end
-
     end
   end
 end

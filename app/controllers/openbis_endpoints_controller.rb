@@ -7,19 +7,18 @@ class OpenbisEndpointsController < ApplicationController
 
   before_filter :openbis_enabled?
 
-  before_filter :get_endpoint, only: [:show, :edit, :update, :refresh, :destroy, :reset_fatals]
+  before_filter :get_endpoint, only: %i[show edit update refresh destroy reset_fatals]
   before_filter :get_project
   before_filter :project_required
   before_filter :project_member?
   before_filter :project_can_admin?, except: [:browse]
-  before_filter :get_endpoints, only: [:index, :show, :browse]
+  before_filter :get_endpoints, only: %i[index show browse]
 
   def index
     respond_with(@project, @openbis_endpoints)
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @openbis_endpoint = OpenbisEndpoint.new
@@ -46,8 +45,6 @@ class OpenbisEndpointsController < ApplicationController
       end
     end
   end
-
-
   def browse
     respond_with(@project, @openbis_endpoints)
   end
@@ -62,16 +59,12 @@ class OpenbisEndpointsController < ApplicationController
     redirect_to @openbis_endpoint
   end
 
-
   def reset_fatals
     @openbis_endpoint.reset_fatal_assets
     redirect_to @openbis_endpoint
   end
 
-
-
   def test_endpoint
-    puts "\n\n\nENDPOINT CONTROLLER test endpoint"
     endpoint = OpenbisEndpoint.new(openbis_endpoint_params)
     result = endpoint.test_authentication
 
@@ -81,13 +74,11 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def fetch_spaces
-    puts "\n\n\nENDPOINT CONTROLLER fetch spaces"
     endpoint = OpenbisEndpoint.new(openbis_endpoint_params)
     respond_to do |format|
       format.html { render partial: 'available_spaces', locals: { endpoint: endpoint } }
     end
   end
-
 
   private
 
@@ -119,20 +110,16 @@ class OpenbisEndpointsController < ApplicationController
   def project_can_admin?
     unless @project.can_be_administered_by?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)')
-      return false
+      false
     end
   end
 
   def project_member?
     unless @project.has_member?(User.current_user)
       error('Must be a member of the project', 'No permission')
-      return false
+      false
     end
-  end
-
-
-
-  # overides the after_filter callback from application_controller, as the behaviour needs to be
+  end  # overides the after_filter callback from application_controller, as the behaviour needs to be
   # slightly different
   def log_event
     action = action_name.downcase

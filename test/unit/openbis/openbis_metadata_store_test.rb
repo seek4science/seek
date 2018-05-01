@@ -2,12 +2,10 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class OpenbisMetadataStoreTest < ActiveSupport::TestCase
-
   def setup
     @openbis_endpoint = Factory(:openbis_endpoint)
     @store = @openbis_endpoint.metadata_store
   end
-
 
   test 'endpoint key' do
     key = @store.send(:endpoint_key)
@@ -17,18 +15,19 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
 
     # needs to handle new_record? case
     ep = OpenbisEndpoint.new(
-        as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-        dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-        web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-        username: 'wibble',
-        password: 'wobble')
+      as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+      dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+      web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+      username: 'wibble',
+      password: 'wobble'
+    )
     key = ep.metadata_store.send(:endpoint_key)
     assert_equal 'new/919e25e0023c0973c8025bd5c7aa3852ba3f8e94c2b5af29fed7bd073890cd62', key
   end
 
   test 'filestore_path' do
     path = @store.send(:filestore_path)
-    key = @store.send(:endpoint_key) #this value already tested
+    key = @store.send(:endpoint_key) # this value already tested
     assert_equal File.join(Rails.root, 'tmp/testing-filestore/openbis-metadata', key), path
   end
 
@@ -52,7 +51,6 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
   end
 
   test 'cleanup cleans only expired' do
-
     # making fresh so it wont have content
     openbis_endpoint = Factory(:openbis_endpoint)
     assert 122 > openbis_endpoint.refresh_period_mins
@@ -74,8 +72,6 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
       refute store.exist?('k1')
       assert store.exist?('k2')
     end
-
-
   end
 
   test 'automaticaly expires entries' do
@@ -83,7 +79,6 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
     openbis_endpoint = Factory(:openbis_endpoint)
     assert 122 > openbis_endpoint.refresh_period_mins
     store = openbis_endpoint.metadata_store
-
 
     assert_equal 'v1', store.fetch('k1') { 'v1' }
 
@@ -94,8 +89,5 @@ class OpenbisMetadataStoreTest < ActiveSupport::TestCase
       assert_equal 'v2a', store.fetch('k1') { 'v2a' }
       assert_equal 'v3', store.fetch('k2') { 'v4' }
     end
-
-
-
   end
 end

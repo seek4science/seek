@@ -8,7 +8,7 @@ module Seek
 
       def initialize(endpoint)
         @endpoint = endpoint
-        options = {expires_in: endpoint.refresh_period_mins.minutes}
+        options = { expires_in: endpoint.refresh_period_mins.minutes }
         @cache = ActiveSupport::Cache::FileStore.new(filestore_path, options)
       end
 
@@ -16,9 +16,9 @@ module Seek
       def clear
         # TODO: this is rather brutal, in future need to be able to revert
         Rails.logger.info("Clearing OpenbisMedataStore at #{filestore_path}")
-        #cache.delete_matched(/.*/)
+        # cache.delete_matched(/.*/)
         # need to add an entry to empty cache otherwise the clear failes on unexisting deak
-        cache.fetch('fake') {''} unless File.exist?(cache.cache_path)
+        cache.fetch('fake') { '' } unless File.exist?(cache.cache_path)
         cache.clear
       end
 
@@ -39,7 +39,7 @@ module Seek
 
       def endpoint_key
         if endpoint.new_record? # required to handle fetching spaces during the endpoint creation
-          str="#{endpoint.cache_key}-#{endpoint.space_perm_id}"
+          str = "#{endpoint.cache_key}-#{endpoint.space_perm_id}"
           str << "-#{endpoint.as_endpoint}-#{endpoint.dss_endpoint}-#{endpoint.username}"
           "new/#{Digest::SHA2.hexdigest(str)}"
         else

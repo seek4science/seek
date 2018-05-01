@@ -2,18 +2,15 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class OpenbisExternalAssetTest < ActiveSupport::TestCase
-
   def setup
     mock_openbis_calls
     @endpoint = Factory(:openbis_endpoint)
 
     @asset = OpenbisExternalAsset.new
     @asset.seek_service = @endpoint
-
   end
 
   test 'builds from Zample' do
-
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
     options = { tomek: false }
     asset = OpenbisExternalAsset.build(zample, options)
@@ -21,9 +18,9 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert_equal @endpoint, asset.seek_service
     assert_equal '20171002172111346-37', asset.external_id
 
-    #'https://openbis-api.fair-dom.org/openbis',
-    #assert_equal @endpoint.web_endpoint, asset.external_service
-    assert_equal "#{@endpoint.id}", asset.external_service
+    # 'https://openbis-api.fair-dom.org/openbis',
+    # assert_equal @endpoint.web_endpoint, asset.external_service
+    assert_equal @endpoint.id.to_s, asset.external_service
     assert_equal '2017-10-02T18:09:34+00:00', asset.external_mod_stamp
 
     assert_equal 'Seek::Openbis::Zample', asset.external_type
@@ -43,10 +40,8 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
   end
 
   test 'deserializes Zample from content' do
-
-
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
-    @asset.external_type = "#{zample.class}"
+    @asset.external_type = zample.class.to_s
     json = @asset.serialize_content zample
     assert json
 
@@ -54,12 +49,9 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert entity
     assert_equal Seek::Openbis::Zample, entity.class
     assert_equal zample, entity
-
-
   end
 
   test 'builds from Dataset' do
-
     entity = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
     options = { tomek: false }
     asset = OpenbisExternalAsset.build(entity, options)
@@ -67,10 +59,10 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     assert_equal @endpoint, asset.seek_service
     assert_equal '20160210130454955-23', asset.external_id
 
-    #'https://openbis-api.fair-dom.org/openbis'
-    #assert_equal @endpoint.web_endpoint, asset.external_service
+    # 'https://openbis-api.fair-dom.org/openbis'
+    # assert_equal @endpoint.web_endpoint, asset.external_service
 
-    assert_equal "#{@endpoint.id}", asset.external_service
+    assert_equal @endpoint.id.to_s, asset.external_service
     assert_equal '2016-02-10T12:04:55+00:00', asset.external_mod_stamp
 
     assert_equal 'Seek::Openbis::Dataset', asset.external_type
@@ -90,20 +82,17 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
   end
 
   test 'registered? works' do
-
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
 
     refute OpenbisExternalAsset.registered?(zample)
 
-    asset = OpenbisExternalAsset.new({ external_service: zample.openbis_endpoint.id, external_id: zample.perm_id })
+    asset = OpenbisExternalAsset.new(external_service: zample.openbis_endpoint.id, external_id: zample.perm_id)
     assert asset.save
 
     assert OpenbisExternalAsset.registered?(zample)
-
   end
 
   test 'needs_reindexing is always true for new record' do
-
     asset = OpenbisExternalAsset.new
     assert asset.needs_reindexing
 
@@ -115,26 +104,22 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 
     asset.content = zample
     assert asset.needs_reindexing
-
   end
 
   test 'find_by_entity works' do
-
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
 
-    assert_raises(ActiveRecord::RecordNotFound) {
+    assert_raises(ActiveRecord::RecordNotFound) do
       OpenbisExternalAsset.find_by_entity(zample)
-    }
+    end
 
-    asset = OpenbisExternalAsset.new({ external_service: zample.openbis_endpoint.id, external_id: zample.perm_id })
+    asset = OpenbisExternalAsset.new(external_service: zample.openbis_endpoint.id, external_id: zample.perm_id)
     assert asset.save
 
     assert OpenbisExternalAsset.find_by_entity(zample)
-
   end
 
   test 'find_or_create_by_entity finds or creates' do
-
     zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
 
     asset = OpenbisExternalAsset.find_or_create_by_entity(zample)
@@ -155,7 +140,6 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
   end
 
   test 'openbis_search_terms' do
-
     dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
 
     asset = OpenbisExternalAsset.build(dataset)
@@ -171,7 +155,6 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     # values form openbis parametes as well as key:value pairs
     assert_includes terms, 'DataFile_3'
     assert_includes terms, 'SEEK_DATAFILE_ID:DataFile_3'
-
   end
 
   test 'openbis_search_terms simplifies rich text content' do
@@ -184,8 +167,8 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     comments = terms.select { |t| t.start_with? 'XMLCOMMENTS' }.first
     assert goals
     assert comments
-    #puts goals
-    #puts comments
+    # puts goals
+    # puts comments
 
     refute goals.include? 'body'
     refute goals.include? '<body>'
@@ -195,7 +178,6 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
   end
 
   test 'removeTAGS cleans html tags' do
-
     experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
     asset = OpenbisExternalAsset.build(experiment)
 
@@ -209,11 +191,9 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     # puts res
     exp = 'In Arabidopsis thaliana, many circadian clock-associated genes have been identified.'
     assert_equal exp, res
-
   end
 
   test 'removeTAGS cleans xml coments' do
-
     experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
     asset = OpenbisExternalAsset.build(experiment)
 
@@ -221,14 +201,12 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
 <root><commentEntry date=\"1511277676686\" person=\"seek\">My first comment</commentEntry></root>
 '
     res = asset.removeTAGS(text)
-    #puts res
+    # puts res
     exp = 'My first comment'
     assert_equal exp, res
-
   end
 
   test 'removeTAGS escapes <> in text' do
-
     experiment = Seek::Openbis::Experiment.new(@endpoint, '20171121152132641-51')
     asset = OpenbisExternalAsset.build(experiment)
 
@@ -237,8 +215,5 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     # puts res
     exp = 'temp &lt; 3 C but &gt; 2'
     assert_equal exp, res
-
   end
-
-
 end

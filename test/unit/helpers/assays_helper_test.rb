@@ -33,5 +33,4 @@ class AssaysHelperTest < ActionView::TestCase
       assert_equal [a1], assays
     end
   end
-
 end

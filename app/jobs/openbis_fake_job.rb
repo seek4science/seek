@@ -1,6 +1,5 @@
-# job to periodically clear and refresh the cache
+# job to periodically fetch assets to potentially create mem leak
 class OpenbisFakeJob < SeekJob
-
   # debug is with puts so it can be easily seen on tests screens
   DEBUG = true
 
@@ -42,7 +41,7 @@ class OpenbisFakeJob < SeekJob
   end
 
   def follow_on_delay
-    return 1.seconds
+    1.seconds
   end
 
   def follow_on_job?
@@ -61,38 +60,30 @@ class OpenbisFakeJob < SeekJob
   end
 
   def assets_and_assays
-
     rnd_assets.to_a | rnd_assays.to_a
   end
 
   def rnd_assets
-
-    first = DataFile.first.id+1
+    first = DataFile.first.id + 1
     last = DataFile.last.id + 1
     partition = rand(first..last)
 
     DataFile.where('id < ?', partition)
-        .limit(@batch_size)
-
+            .limit(@batch_size)
   end
 
-
   def rnd_assays
-
-    first = Assay.first.id+1
-    last =Assay.last.id + 1
+    first = Assay.first.id + 1
+    last = Assay.last.id + 1
     partition = rand(first..last)
 
     Assay.where('id < ?', partition)
-        .limit(@batch_size)
-
+         .limit(@batch_size)
   end
-
 
   def self.create_initial_jobs
     OpenbisFakeJob.new('fake1').queue_job
   end
 
   private
-
 end

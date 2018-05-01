@@ -1,6 +1,5 @@
-# job to periodically clear and refresh the cache
+# job to periodically call GC and prints heap stats
 class OpenbisGarbageJob < SeekJob
-
   # debug is with puts so it can be easily seen on tests screens
   DEBUG = true
 
@@ -9,7 +8,7 @@ class OpenbisGarbageJob < SeekJob
     @delay = delay
   end
 
-  def perform_job(item)
+  def perform_job(_item)
     Rails.logger.info "Before GC job\n#{ObjectSpace.count_objects}"
     Rails.logger.info "Before GC stats\n#{GC.stat}"
 
@@ -17,7 +16,6 @@ class OpenbisGarbageJob < SeekJob
 
     Rails.logger.info "After GC job\n#{ObjectSpace.count_objects}"
     Rails.logger.info "After GC stats\n#{GC.stat}"
-
   end
 
   def gather_items
@@ -33,19 +31,16 @@ class OpenbisGarbageJob < SeekJob
   end
 
   def follow_on_delay
-    return @delay.minutes
+    @delay.minutes
   end
 
   def follow_on_job?
     true
   end
 
-
-
   def self.create_initial_jobs
     OpenbisGarbageJob.new('GC1').queue_job
   end
 
   private
-
 end

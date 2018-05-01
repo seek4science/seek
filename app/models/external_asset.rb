@@ -1,10 +1,10 @@
+# Represents content from External Service like for example OpenBIS
+# it provides basic features for tracking state, errors, and serialization
 class ExternalAsset < ActiveRecord::Base
-
   self.inheritance_column = 'class_type'
   attr_accessor :sync_options, :content_changed
 
-  enum sync_state: [:synchronized, :refresh, :failed, :fatal]
-
+  enum sync_state: %i[synchronized refresh failed fatal]
 
   belongs_to :seek_entity, polymorphic: true
   belongs_to :seek_service, polymorphic: true
@@ -37,11 +37,10 @@ class ExternalAsset < ActiveRecord::Base
 
     self.synchronized_at = DateTime.now
     self.sync_state = :synchronized
-    self.err_msg=nil
-    self.failures=0
+    self.err_msg = nil
+    self.failures = 0
     self.external_mod_stamp = extract_mod_stamp(content_object)
-    self.version = self.version ? self.version+1 : 1
-
+    self.version = version ? version + 1 : 1
   end
 
   def content
@@ -50,7 +49,7 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def add_failure(msg)
-    self.sync_state = :failed unless self.fatal?
+    self.sync_state = :failed unless fatal?
     self.failures += 1
     self.err_msg = msg || 'No message'
   end
@@ -73,27 +72,24 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def extract_mod_stamp(content_object)
-    content_object.nil? ? '-1' : "#{content_object.hash}"
+    content_object.nil? ? '-1' : content_object.hash.to_s
   end
 
-  def detect_change(content_object, object_json)
+  def detect_change(content_object, _object_json)
     external_mod_stamp != extract_mod_stamp(content_object)
   end
 
   def content_to_json
-    self.local_content_json= serialize_content(@local_content) if @needs_serialization
-
+    self.local_content_json = serialize_content(@local_content) if @needs_serialization
   end
 
-
-  def init_content_holder()
+  def init_content_holder
     if content_blob.nil?
-      build_content_blob({
-                             url: (external_service ? external_service : '') + '#' + external_id,
-                             content_type: 'application/json',
-                             original_filename: external_id,
-                             make_local_copy: false,
-                             external_link: false })
+      build_content_blob(url: (external_service ? external_service : '') + '#' + external_id,
+                         content_type: 'application/json',
+                         original_filename: external_id,
+                         make_local_copy: false,
+                         external_link: false)
     end
   end
 
@@ -101,13 +97,12 @@ class ExternalAsset < ActiveRecord::Base
     content_blob.save! unless content_blob.nil?
   end
 
-
   def options_to_json
     self.sync_options_json = @sync_options ? @sync_options.to_json : nil
   end
 
   def options_from_json
-    @sync_options = self.sync_options_json ? JSON.parse(self.sync_options_json).symbolize_keys : {}
+    @sync_options = sync_options_json ? JSON.parse(sync_options_json).symbolize_keys : {}
   end
 
   def needs_reindexing
@@ -131,10 +126,9 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def local_content_json
-    return nil if (content_blob.nil? || content_blob.new_record?)
+    return nil if content_blob.nil? || content_blob.new_record?
     ans = content_blob.read
     content_blob.rewind
     ans
   end
-
 end

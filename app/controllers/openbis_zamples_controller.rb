@@ -1,18 +1,15 @@
+# Controller that handles OpenBIS Objects(Samples), currently they can only be mapped as Assays
+# TODO map them as SOP, maybe Studies
 class OpenbisZamplesController < ApplicationController
-
   include Seek::Openbis::EntityControllerBase
 
   before_filter :get_seek_type
-
-
-
 
   def index
     @entity_type = params[:entity_type] || Seek::Openbis::ALL_ASSAYS
     get_entity_types
     get_entities
   end
-
 
   def edit
     @assay = @asset.seek_entity || Assay.new
@@ -63,9 +60,8 @@ class OpenbisZamplesController < ApplicationController
       return redirect_to @assay
     end
 
-
     @asset.sync_options = get_sync_options
-    @asset.content = @entity #or maybe we should not update, but that is what the user saw on the screen
+    @asset.content = @entity # or maybe we should not update, but that is what the user saw on the screen
 
     # separate saving of external_asset as the save on parent does not fails if the child was not saved correctly
     unless @asset.save
@@ -79,44 +75,40 @@ class OpenbisZamplesController < ApplicationController
 
     errs = seek_util.follow_assay_dependent(@assay)
     flash_issues(errs)
-    # TODO should the assay be saved as well???
+    # TODO: should the assay be saved as well???
 
     flash[:notice] = "Updated sync of OpenBIS assay: #{@entity.perm_id}"
     redirect_to @assay
-
   end
 
   def batch_register
-
     batch_ids = params[:batch_ids] || []
     seek_parent_id = params[:seek_parent]
 
     if batch_ids.empty?
-      flash[:error] = 'Select entities first';
+      flash[:error] = 'Select entities first'
       return back_to_index
     end
 
     unless seek_parent_id
-      flash[:error] = 'Select parent for new elements';
+      flash[:error] = 'Select parent for new elements'
       return back_to_index
     end
 
     status = case @seek_type
-               when :assay then
-                 batch_register_assays(batch_ids, seek_parent_id)
+             when :assay then
+               batch_register_assays(batch_ids, seek_parent_id)
              end
 
     msg = "Registered all #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
     msg = "Registered #{status[:registred].size} #{@seek_type.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
-    flash[:notice] = msg;
+    flash[:notice] = msg
     flash_issues(status[:issues])
 
-    return back_to_index
-
+    back_to_index
   end
 
   def batch_register_assays(zample_ids, study_id)
-
     sync_options = get_sync_options
     sync_options[:link_datasets] = '1' if sync_options[:link_dependent] == '1'
 
@@ -127,27 +119,23 @@ class OpenbisZamplesController < ApplicationController
     issues = []
 
     zample_ids.each do |id|
-
       get_entity(id)
       prepare_asset
 
       # params must be clones so not to be shared
       reg_info = do_assay_registration(@asset, assay_params.clone, sync_options, current_person)
-      if (reg_info[:assay])
+      if reg_info[:assay]
         registered << id
       else
         failed << id
       end
       issues << "Openbis #{id}: " + reg_info[:issues].join('; ') unless reg_info[:issues].empty?
-
     end
 
-    return { registred: registered, failed: failed, issues: issues }
-
+    { registred: registered, failed: failed, issues: issues }
   end
 
   def do_assay_registration(asset, assay_params, sync_options, creator)
-
     issues = []
     reg_status = { assay: nil, issues: issues }
 
@@ -160,7 +148,7 @@ class OpenbisZamplesController < ApplicationController
 
     # separate testing of external_asset as the save on parent does not fails if the child was not saved correctly
     unless asset.valid?
-      issues.concat asset.errors.full_messages()
+      issues.concat asset.errors.full_messages
       return reg_status
     end
 
@@ -171,33 +159,19 @@ class OpenbisZamplesController < ApplicationController
       issues.concat(errs) if errs
       reg_status[:assay] = assay
     else
-      issues.concat assay.errors.full_messages()
+      issues.concat assay.errors.full_messages
     end
 
     reg_status
   end
 
-
   def get_linked_to(assay)
     return [] unless assay
     assay.data_files.select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
-        .map { |df| df.external_asset.external_id }
+         .map { |df| df.external_asset.external_id }
   end
 
-
   def get_entity(id = nil)
-
-    # sample = Seek::Openbis::Zample.new(@openbis_endpoint)
-    # json = JSON.parse(
-    #        '
-    # {"identifier":"\/API-SPACE\/TZ3","modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser",
-    # "code":"TZ3","modifier":"apiuser","permId":"20171002172111346-37",
-    # "registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40","20171004182824553-41"]
-    # ,"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
-    # '
-    #    )
-    # @zample = sample.populate_from_json(json)
-
     @entity = Seek::Openbis::Zample.new(@openbis_endpoint, id ? id : params[:id])
   end
 
@@ -212,17 +186,16 @@ class OpenbisZamplesController < ApplicationController
 
   def get_entity_types
     case @seek_type
-      when :assay then
-        get_assay_types
-      else
-        raise "Don't recognized obis types for seek: #{@seek_type}"
+    when :assay then
+      get_assay_types
+    else
+      raise "Don't recognized obis types for seek: #{@seek_type}"
     end
   end
 
-
   def get_assay_types
     @entity_types = seek_util.assay_types(@openbis_endpoint)
-    @entity_types_codes = @entity_types.map { |t| t.code }
+    @entity_types_codes = @entity_types.map(&:code)
     @entity_type_options = @entity_types_codes + [Seek::Openbis::ALL_ASSAYS, Seek::Openbis::ALL_TYPES]
   end
 

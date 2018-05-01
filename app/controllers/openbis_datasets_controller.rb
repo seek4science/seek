@@ -1,10 +1,11 @@
-class OpenbisDatasetsController < ApplicationController
 
+# Controller that handles registration/display of OpenBIS datasets as DataFile
+class OpenbisDatasetsController < ApplicationController
   include Seek::Openbis::EntityControllerBase
 
   # it was like this in Stuart code, but if one can see the dataset why it should not see list
   # of its files even if it was registered as another private DataFile?
-  #before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
+  # before_filter :authorise_show_dataset_files, only: [:show_dataset_files]
 
   def index
     puts "---\nINDEX\n#{params}" if DEBUG
@@ -13,7 +14,6 @@ class OpenbisDatasetsController < ApplicationController
     get_entities
   end
 
-
   def edit
     @datafile = @asset.seek_entity || DataFile.new
   end
@@ -21,7 +21,6 @@ class OpenbisDatasetsController < ApplicationController
   def register
     puts 'register called' if DEBUG
     puts params if DEBUG
-
 
     if @asset.seek_entity
       flash[:error] = 'Already registered as OpenBIS entity'
@@ -61,7 +60,7 @@ class OpenbisDatasetsController < ApplicationController
 
     # currently no sync options
     # @asset.sync_options = get_sync_options
-    @asset.content = @entity #or maybe we should not update, but that is what the user saw on the screen
+    @asset.content = @entity # or maybe we should not update, but that is what the user saw on the screen
 
     # separate saving of external_asset as the save on parent does not fails if the child was not saved correctly
     unless @asset.save
@@ -70,27 +69,23 @@ class OpenbisDatasetsController < ApplicationController
       return render action: 'edit'
     end
 
-
-    # TODO should the datafile be saved as well???
-
+    # TODO: should the datafile be saved as well???
 
     flash[:notice] = "Updated sync of OpenBIS datafile: #{@entity.perm_id}"
     redirect_to @datafile
-
   end
 
   def batch_register
-
     batch_ids = params[:batch_ids] || []
     seek_parent_id = params[:seek_parent]
 
     if batch_ids.empty?
-      flash[:error] = 'Select datasets first';
+      flash[:error] = 'Select datasets first'
       return back_to_index
     end
 
     unless seek_parent_id
-      flash[:error] = 'Select parent assay for new elements';
+      flash[:error] = 'Select parent assay for new elements'
       return back_to_index
     end
 
@@ -98,15 +93,13 @@ class OpenbisDatasetsController < ApplicationController
 
     msg = "Registered all #{status[:registred].size} #{'datafile'.to_s.pluralize(status[:registred].size)}" if status[:failed].empty?
     msg = "Registered #{status[:registred].size} #{'datafile'.to_s.pluralize(status[:registred].size)} failed: #{status[:failed].size}" unless status[:failed].empty?
-    flash[:notice] = msg;
+    flash[:notice] = msg
 
     flash_issues(status[:issues])
-    return back_to_index
-
+    back_to_index
   end
 
   def batch_register_datasets(dataset_ids, assay_id)
-
     sync_options = {} # currently always empty
     datafile_params = { assay_ids: assay_id }
 
@@ -115,32 +108,28 @@ class OpenbisDatasetsController < ApplicationController
     issues = []
 
     dataset_ids.each do |id|
-
       get_entity(id)
       prepare_asset
 
       # have to clone params so the titles and such won't be overwritten
       reg_info = do_datafile_registration(@asset, datafile_params.clone, sync_options, current_person)
-      if (reg_info[:datafile])
+      if reg_info[:datafile]
         registered << id
       else
         failed << id
       end
       issues << "Openbis #{id}: " + reg_info[:issues].join('; ') unless reg_info[:issues].empty?
-
     end
 
     #
-    #unless data_files.empty?
+    # unless data_files.empty?
     #  data_files.each { |df| assay.associate(df) }
-    #end
+    # end
 
-    return { registred: registered, failed: failed, issues: issues }
-
+    { registred: registered, failed: failed, issues: issues }
   end
 
   def do_datafile_registration(asset, datafile_params, sync_options, creator)
-
     issues = []
     reg_status = { datafile: nil, issues: issues }
 
@@ -153,7 +142,7 @@ class OpenbisDatasetsController < ApplicationController
 
     # separate testing of external_asset as the save on parent does not fails if the child was not saved correctly
     unless asset.valid?
-      issues.concat asset.errors.full_messages()
+      issues.concat asset.errors.full_messages
       return reg_status
     end
 
@@ -162,19 +151,17 @@ class OpenbisDatasetsController < ApplicationController
     if datafile.save
       reg_status[:datafile] = datafile
     else
-      issues.concat datafile.errors.full_messages()
+      issues.concat datafile.errors.full_messages
     end
 
     reg_status
   end
-
 
   def get_entity(id = nil)
     @entity = Seek::Openbis::Dataset.new(@openbis_endpoint, id ? id : params[:id])
   end
 
   def get_entities
-
     if Seek::Openbis::ALL_DATASETS == @entity_type
       @entities = Seek::Openbis::Dataset.new(@openbis_endpoint).all
     else
@@ -189,14 +176,13 @@ class OpenbisDatasetsController < ApplicationController
 
   def get_dataset_types
     @entity_types = seek_util.dataset_types(@openbis_endpoint)
-    @entity_types_codes = @entity_types.map { |t| t.code }
+    @entity_types_codes = @entity_types.map(&:code)
     @entity_type_options = @entity_types_codes + [Seek::Openbis::ALL_DATASETS]
   end
 
   ## AJAX calls
 
   def show_dataset_files
-
     respond_to do |format|
       format.html { render(partial: 'openbis_dataset_files_list', locals: { dataset: @entity, data_file: @asset.seek_entity }) }
     end
@@ -207,21 +193,18 @@ class OpenbisDatasetsController < ApplicationController
   # it only lists it does not download!!!
 
   # whether the dataset files can be shown. Depends on whether viewing a data file or now.
-=begin
-  # if data_file_id is present then the access controls on that data file is checked, otherwise needs to be a project member
-  def authorise_show_dataset_files
-    puts "\n\n\nENDPOINT CONTROLLER authorise_show_dataset_files"
-
-    @datafile = @asset.seek_entity
-    if @data_file
-      unless @data_file.can_download?
-        error('DataFile cannot be accessed', 'No permission')
-        return false
-      end
-    else
-      project_member?
-    end
-  end
-=end
-
+  #   # if data_file_id is present then the access controls on that data file is checked, otherwise needs to be a project member
+  #   def authorise_show_dataset_files
+  #     puts "\n\n\nENDPOINT CONTROLLER authorise_show_dataset_files"
+  #
+  #     @datafile = @asset.seek_entity
+  #     if @data_file
+  #       unless @data_file.can_download?
+  #         error('DataFile cannot be accessed', 'No permission')
+  #         return false
+  #       end
+  #     else
+  #       project_member?
+  #     end
+  #   end
 end

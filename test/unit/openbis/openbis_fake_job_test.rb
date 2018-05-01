@@ -3,7 +3,6 @@ require 'test_helper'
 class OpenbisFakeJobTest < ActiveSupport::TestCase
 
   def setup
-
     @batch_size = 3
     @job = OpenbisFakeJob.new('fakish', @batch_size)
     Delayed::Job.destroy_all # avoids jobs created from the after_create callback, this is tested for OpenbisEndpoint

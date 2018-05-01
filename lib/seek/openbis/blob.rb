@@ -4,18 +4,14 @@ module Seek
     # FIXME: wanted to call ContentBlob but rails loader didn't like it and got confused
     # ... over the model ContentBlob disregarding the namespacing. Need to investigate why?
     module Blob
-
-
       # NOTE: the fact is it prepended rather than included seems to prevent the use of Concern's which
       # doesn't handle prepend
       # TZ no more need for scoping on ContentBlob should rather start in Assay, DataFile etc
-=begin
-      def self.prepended(base)
-        base.class_eval do
-          scope :for_openbis_endpoint, (->(endpoint) { where("url LIKE 'openbis:#{endpoint.id}%'") })
-        end
-      end
-=end
+      #       def self.prepended(base)
+      #         base.class_eval do
+      #           scope :for_openbis_endpoint, (->(endpoint) { where("url LIKE 'openbis:#{endpoint.id}%'") })
+      #         end
+      #       end
 
       def openbis?
         return asset.openbis? if asset && asset.respond_to?(:openbis?)
@@ -25,9 +21,9 @@ module Seek
 
       def openbis_dataset
         return nil unless openbis?
-        #parts = url.split(':')
-        #endpoint = OpenbisEndpoint.find(parts[1])
-        #Seek::Openbis::Dataset.new(endpoint, parts[3])
+        # parts = url.split(':')
+        # endpoint = OpenbisEndpoint.find(parts[1])
+        # Seek::Openbis::Dataset.new(endpoint, parts[3])
         asset.openbis_dataset
       end
 
@@ -54,14 +50,12 @@ module Seek
 
         terms = []
         # no longer needed, those will come in DataFile from external_asset
-=begin
-        terms = [dataset.perm_id, dataset.dataset_type_code, dataset.dataset_type_description,
-                 dataset.experiment_id, dataset.registrator, dataset.modifier, dataset.code]
-
-        if dataset.properties
-          terms |= dataset.properties.map { |key, value| [value, "#{key}:#{value}"]}.flatten
-        end
-=end
+        #         terms = [dataset.perm_id, dataset.dataset_type_code, dataset.dataset_type_description,
+        #                  dataset.experiment_id, dataset.registrator, dataset.modifier, dataset.code]
+        #
+        #         if dataset.properties
+        #           terms |= dataset.properties.map { |key, value| [value, "#{key}:#{value}"]}.flatten
+        #         end
 
         # I left files names in case they are relevant to content blob indexing
         terms | dataset.dataset_files_no_directories.collect do |file|

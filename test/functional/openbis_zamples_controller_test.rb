@@ -14,7 +14,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     @user.add_to_project_and_institution(@project, @user.institutions.first)
     assert @user.save
     @endpoint = Factory(:openbis_endpoint, project: @project)
-    @endpoint.assay_types = ['TZ_FAIR_ASSAY', 'EXPERIMENTAL_STEP']
+    @endpoint.assay_types = %w[TZ_FAIR_ASSAY EXPERIMENTAL_STEP]
     @endpoint.save!
     @zample = Seek::Openbis::Zample.new(@endpoint, '20171002172111346-37')
   end
@@ -69,16 +69,15 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_equal 8, assigns(:entities).size
   end
 
-
   test 'index renders parents details' do
     login_as(@user)
     get :index, openbis_endpoint_id: @endpoint.id, seek: :assay
 
     assert_response :success
-    assert_select "div label", "Project:"
-    assert_select "div.form-group", /#{@endpoint.project.title}/
-    assert_select "div label", "Endpoint:"
-    assert_select "div.form-group", /#{@endpoint.title}/
+    assert_select 'div label', 'Project:'
+    assert_select 'div.form-group', /#{@endpoint.project.title}/
+    assert_select 'div label', 'Endpoint:'
+    assert_select 'div.form-group', /#{@endpoint.title}/
     # assert_select "div", "Endpoint: #{@endpoint.id}"
     # assert_select "div", "Samples: 2"
     assert_select '#openbis-zamples-cards div.openbis-card', count: 2
@@ -93,7 +92,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert assigns(:asset)
     assert assigns(:entity)
     assert assigns(:linked_to_assay)
-
   end
 
   test 'refresh updates content with fetched version and redirects' do
@@ -104,7 +102,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     old = DateTime.now - 1.days
     asset = OpenbisExternalAsset.build(@zample)
-    asset.content=fake
+    asset.content = fake
     asset.synchronized_at = old
     as = Factory :assay
     asset.seek_entity = as
@@ -123,7 +121,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     asset = OpenbisExternalAsset.find(asset.id)
     assert_equal @zample.perm_id, asset.content.perm_id
     assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
-
   end
 
   ## Register ##
@@ -136,8 +133,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     sync_options = { 'link_datasets' => '1' }
 
     post :register, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
-         assay: { study_id: study.id }, sync_options: sync_options
-
+                    assay: { study_id: study.id }, sync_options: sync_options
 
     assay = assigns(:assay)
     assert_not_nil assay
@@ -164,8 +160,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     sync_options = { 'link_datasets' => '0', 'linked_datasets' => to_link }
 
     post :register, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
-         assay: { study_id: study.id }, sync_options: sync_options
-
+                    assay: { study_id: study.id }, sync_options: sync_options
 
     assay = assigns(:assay)
     assert_not_nil assay
@@ -178,7 +173,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     assay.reload
     assert_equal to_link.size, assay.data_files.size
-
   end
 
   test 'register remains on registration screen on errors' do
@@ -194,8 +188,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     assert assigns(:reasons)
     assert assigns(:error_msg)
-    assert_select "div.alert-danger", /Could not register OpenBIS assay/
-
+    assert_select 'div.alert-danger', /Could not register OpenBIS assay/
   end
 
   test 'register does not create assay if zample already registered but redirects to it' do
@@ -213,13 +206,11 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_redirected_to assay_path(existing)
 
     assert_equal 'Already registered as OpenBIS entity', flash[:error]
-
   end
 
   ## Batch register ##
 
   test 'batch registers multiple Assays' do
-
     login_as(@user)
     study = Factory :study
 
@@ -229,9 +220,8 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_difference('Assay.count', 2) do
       assert_no_difference('DataFile.count') do
         assert_difference('ExternalAsset.count', 2) do
-
           post :batch_register, openbis_endpoint_id: @endpoint.id,
-               seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+                                seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
         end
       end
     end
@@ -243,11 +233,9 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     study.reload
     assert_equal batch_ids.size, study.assays.size
-
   end
 
   test 'batch registers multiple Assays and follows datasets' do
-
     login_as(@user)
     study = Factory :study
 
@@ -257,9 +245,8 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_difference('Assay.count', 2) do
       assert_difference('DataFile.count', 3) do
         assert_difference('ExternalAsset.count', 5) do
-
           post :batch_register, openbis_endpoint_id: @endpoint.id,
-               seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+                                seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
         end
       end
     end
@@ -271,11 +258,9 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     study.reload
     assert_equal batch_ids.size, study.assays.size
-
   end
 
   test 'batch register independently names them' do
-
     login_as(@user)
     study = Factory :study
 
@@ -283,7 +268,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
 
     post :batch_register, openbis_endpoint_id: @endpoint.id,
-         seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+                          seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
 
     assert_response :success
 
@@ -291,9 +276,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_equal batch_ids.size, study.assays.size
     titles = study.assays.map(&:title).uniq
     assert_equal batch_ids.size, titles.size
-
   end
-
 
   ## END --- Batch register  ##
 
@@ -308,7 +291,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert asset.save
     assert exassay.save
     refute @zample.dataset_ids.empty?
-
 
     sync_options = { link_datasets: '1' }
     assert_not_equal sync_options, asset.sync_options
@@ -328,7 +310,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
     # testing content update just by synchronized stamp
     assert_equal DateTime.now.to_date, asset.synchronized_at.to_date
-
 
     last_mod = exassay.updated_at
     assay.reload
@@ -357,7 +338,7 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_not_equal sync_options, asset.sync_options
 
     post :update, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
-         sync_options: sync_options
+                  sync_options: sync_options
 
     assay = assigns(:assay)
     assert_not_nil assay
@@ -374,10 +355,8 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_equal "Updated sync of OpenBIS assay: #{@zample.perm_id}", flash[:notice]
   end
 
-
   ## permissions ##
   test 'only project members can call actions' do
-
     logout
     get :index, openbis_endpoint_id: @endpoint.id
     assert_response :redirect
@@ -389,15 +368,14 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     sync_options = {}
     batch_ids = ['20171002172111346-37', '20171002172639055-39']
 
-
     post :register, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
-         assay: { study_id: study.id }, sync_options: sync_options
+                    assay: { study_id: study.id }, sync_options: sync_options
 
     assert_response :redirect
     assert_redirected_to :root
 
     post :batch_register, openbis_endpoint_id: @endpoint.id,
-         seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+                          seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
 
     assert_response :redirect
     assert_redirected_to :root
@@ -411,25 +389,21 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     assert_response :success
 
     post :register, openbis_endpoint_id: @endpoint.id, id: @zample.perm_id,
-         assay: { study_id: study.id }, sync_options: sync_options
+                    assay: { study_id: study.id }, sync_options: sync_options
     assert_response :redirect
     seek = assigns(:assay)
     assert_not_nil seek
     assert_redirected_to seek
 
-
     post :batch_register, openbis_endpoint_id: @endpoint.id,
-         seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
+                          seek: :assay, seek_parent: study.id, sync_options: sync_options, batch_ids: batch_ids
     assert_response :success
-
-
   end
 
   # unit like tests
 
   ## registration ##
   test 'do_assay_registration creates assay from sample and returns status info' do
-
     controller = OpenbisZamplesController.new
 
     asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
@@ -450,7 +424,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   end
 
   test 'do_assay_registration sets issues on errors if not recovable' do
-
     controller = OpenbisZamplesController.new
 
     exassay = Factory :assay
@@ -476,7 +449,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   end
 
   test 'do_assay_registration creates assay links datasets if sync_option says so' do
-
     controller = OpenbisZamplesController.new
 
     asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
@@ -499,7 +471,6 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
   end
 
   test 'do_assay_registration creates assay links selected datasets' do
-
     controller = OpenbisZamplesController.new
 
     asset = OpenbisExternalAsset.find_or_create_by_entity(@zample)
@@ -523,19 +494,18 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
 
   ## registration end ##
 
-
   test 'get_linked_to gets ids of openbis data sets' do
     controller = OpenbisZamplesController.new
     util = Seek::Openbis::SeekUtil.new
 
     assert_equal [], controller.get_linked_to(nil)
 
-    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(["20171002172401546-38", "20171002190934144-40", "20171004182824553-41"])
+    datasets = Seek::Openbis::Dataset.new(@endpoint).find_by_perm_ids(['20171002172401546-38', '20171002190934144-40', '20171004182824553-41'])
     datafiles = datasets.map { |ds| util.createObisDataFile({}, @user, OpenbisExternalAsset.build(ds)) }
     assert_equal 3, datafiles.length
 
     disable_authorization_checks do
-      datafiles.each { |df| df.save! }
+      datafiles.each(&:save!)
     end
 
     normaldf = Factory :data_file
@@ -550,7 +520,5 @@ class OpenbisZamplesControllerTest < ActionController::TestCase
     linked = controller.get_linked_to assay
     assert_equal 2, linked.length
     assert_equal ['20171004182824553-41', '20171002190934144-40'], linked
-
   end
-
 end

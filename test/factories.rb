@@ -31,24 +31,25 @@ Factory.define(:openbis_endpoint) do |f|
   f.sequence(:web_endpoint) { |nr| "https://openbis-api.fair-dom.org/openbis#{nr}" }
   f.username 'apiuser'
   f.password 'apiuser'
-  #f.sequence(:space_perm_id) { |nr| "API-SPACE#{nr}" }
-  f.sequence(:space_perm_id) { |nr| "API-SPACE" }
+  # f.sequence(:space_perm_id) { |nr| "API-SPACE#{nr}" }
+  f.sequence(:space_perm_id) { |_nr| 'API-SPACE' }
   f.association :project, factory: :project
 end
 
 FactoryGirl.define do
   factory :openbis_zample,  class: Seek::Openbis::Zample do
-
     json = JSON.parse(
-        '
+      '
 {"identifier":"\/API-SPACE\/TZ3","modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser",
 "code":"TZ3","modifier":"apiuser","permId":"20171002172111346-37",
-"registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40","20171004182824553-41"]
-,"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
+"registrationDate":"2017-10-02 16:21:11.346421","datasets":["20171002172401546-38","20171002190934144-40",
+"20171004182824553-41"]
+,"sample_type":{"code":"TZ_FAIR_ASSAY","description":"For testing sample\/assay mapping with full metadata"},
+"properties":{"DESCRIPTION":"Testing sample assay with a dataset. Zielu","NAME":"Tomek First"},"tags":[]}
 '
     )
 
-    initialize_with { Seek::Openbis::Zample.new(Factory :openbis_endpoint).populate_from_json(json) }
+    initialize_with { Seek::Openbis::Zample.new(Factory(:openbis_endpoint)).populate_from_json(json) }
     # skipping save as not implemented
     to_create { |instance| instance }
   end
