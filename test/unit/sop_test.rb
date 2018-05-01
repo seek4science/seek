@@ -207,4 +207,20 @@ class SopTest < ActiveSupport::TestCase
     sop_without_contributor = Factory :sop, contributor: nil
     assert_nil sop_without_contributor.contributing_user
   end
+
+  test 'new version sets appropriate contributor' do
+    user = Factory(:person).user
+    sop = Factory(:sop, policy: Factory(:public_policy))
+    User.current_user = user
+
+    assert_not_equal user, sop.contributor
+
+    assert_difference('Sop::Version.count') do
+      sop.save_as_new_version
+    end
+
+    version = sop.reload.versions.last
+    assert_equal user, version.contributor
+    assert_not_equal user, sop.contributor
+  end
 end
