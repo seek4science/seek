@@ -1,0 +1,3 @@
+{"datasets":[
+  {"dataset_type":{"code":"TZ_FAIR_TEST","description":"For testing API with full metadata"},"modificationDate":"2017-10-02 18:09:34.311665","registerator":"apiuser","code":"20171002190934144-40","modifier":"apiuser","permId":"20171002190934144-40","registrationDate":"2017-10-02 18:09:34.311665","sample":"20171002172111346-37","properties":{"DESCRIPTION":"For sample with multiple files","NAME":"Second File"},"samples":["20171002172111346-37"],"tags":[]}
+]}

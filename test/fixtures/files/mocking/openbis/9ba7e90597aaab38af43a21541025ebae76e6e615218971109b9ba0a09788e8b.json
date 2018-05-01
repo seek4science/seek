@@ -1,0 +1,10 @@
+{"experiments":[
+  {"identifier":"/SEEK/NOLIMS/E1","registerator":"seek","code":"E1","modifier":"seek",
+    "permId":"20171121153715264-58","project":"20171121153623652-57","datasets":["20171121153803289-59"],
+    "experiment_type":{"code":"DEFAULT_EXPERIMENT","description":"Default Experiment"},"samples":[],"tags":[],
+    "modificationDate":"2017-11-21 15:38:03.521909","registrationDate":"2017-11-21 15:37:15.264151",
+    "properties":{"XMLCOMMENTS":"<root>\n  <commentEntry date=\"1511278635287\" person=\"seek\"/>\n</root>\n","FINISHED_FLAG":"false","SHOW_IN_PROJECT_OVERVIEW":"false","NAME":"Traditional experiment"}}
+
+
+
+]}

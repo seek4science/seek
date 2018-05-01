@@ -13,6 +13,14 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     @project = @project_administrator.projects.first
   end
 
+  test 'show' do
+    ep = Factory(:openbis_endpoint, project: @project)
+    login_as(@project_administrator)
+
+    get :show, id: ep.id
+    assert_response :success
+  end
+
   test 'destroy' do
     ep = Factory(:openbis_endpoint, project: @project)
     login_as(@project_administrator)
@@ -45,7 +53,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
                           permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
 
     assert_difference('OpenbisEndpoint.count') do
-      assert_difference('Delayed::Job.count') do
+      assert_difference('Delayed::Job.count', 2) do
         post :create, project_id: @project.id, openbis_endpoint:
             {
               as_endpoint: 'http://as.com',
@@ -54,7 +62,9 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
               username: 'fred',
               password: 'secret',
               refresh_period_mins: '123',
-              space_perm_id: 'space-id'
+              space_perm_id: 'space-id',
+              study_types: 'ST1, ST2',
+              assay_types: 'ASSAY, DEFAULT'
             },
                       policy_attributes: policy_attributes
       end
@@ -74,10 +84,13 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     ep.policy.permissions.each do |permission|
       assert_equal permission.contributor_type, 'Project'
-      assert_equal @project.id, (permission.contributor_id)
+      assert_equal @project.id, permission.contributor_id
       assert_equal permission.policy_id, ep.policy_id
       assert_equal permission.access_type, Policy::ACCESSIBLE
     end
+
+    assert_equal %w[ST1 ST2], ep.study_types
+    assert_equal %w[ASSAY DEFAULT], ep.assay_types
   end
 
   test 'update' do
@@ -97,7 +110,9 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
           username: 'fred',
           password: 'secret',
           refresh_period_mins: '123',
-          space_perm_id: 'space-id'
+          space_perm_id: 'space-id',
+          study_types: 'ST, ST2',
+          assay_types: 'ASSAY, ASS'
         },
                  policy_attributes: policy_attributes
 
@@ -116,72 +131,76 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     ep.policy.permissions.each do |permission|
       assert_equal permission.contributor_type, 'Project'
-      assert_equal @project.id, (permission.contributor_id)
+      assert_equal @project.id, permission.contributor_id
       assert_equal permission.policy_id, ep.policy_id
       assert_equal permission.access_type, Policy::ACCESSIBLE
     end
+
+    assert_equal %w[ST ST2], ep.study_types
+    assert_equal %w[ASSAY ASS], ep.assay_types
   end
 
-  test 'add dataset' do
-    disable_authorization_checks do
-      @project.update_attributes(default_license: 'wibble')
-    end
-    endpoint = Factory(:openbis_endpoint, project: @project, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: @project)]))
-    perm_id = '20160210130454955-23'
-    login_as(@project_administrator)
-    assert_difference('DataFile.count') do
-      assert_difference('ActivityLog.count') do
-        post :add_dataset, id: endpoint.id, project_id: @project.id, dataset_perm_id: perm_id
-        assert_nil flash[:error]
-      end
-    end
-    data_file = assigns(:data_file)
-    data_file = DataFile.find(data_file.id)
-    assert_redirected_to data_file
-    assert_equal '20160210130454955-23', data_file.content_blob.openbis_dataset.perm_id
-    assert_equal 'wibble', data_file.license
-
-    refute_equal data_file.policy, endpoint.policy
-    assert_equal endpoint.policy.access_type, data_file.policy.access_type
-    assert_equal 1, data_file.policy.permissions.length
-    permission = data_file.policy.permissions.first
-    assert_equal @project, permission.contributor
-    assert_equal Policy::NO_ACCESS, permission.access_type
-
-    log = ActivityLog.last
-    assert_equal 'create', log.action
-    assert_equal data_file, log.activity_loggable
-    assert_equal @project_administrator.user, log.culprit
-    assert_equal endpoint, log.referenced
-  end
-
-
-  test 'add dataset permissions' do
-    # already tests for project admin in test add dataset
-
-    # project member
-    person = Factory(:person)
-    project = person.projects.first
-    endpoint = Factory(:openbis_endpoint, project: project)
-    perm_id = '20160210130454955-23'
-    login_as(person)
-    assert_difference('DataFile.count') do
-      post :add_dataset, id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id
-      assert_nil flash[:error]
-    end
-
-    logout
-
-    # none project member
-    person = Factory(:person)
-    endpoint = Factory(:openbis_endpoint, project: Factory(:project))
-    perm_id = '20160210130454955-23'
-    login_as(person)
-    assert_no_difference('DataFile.count') do
-      post :add_dataset, id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id
-      refute_nil flash[:error]
-    end
-  end
+  # TZ adding is handled by datasets_controller
+  #   test 'add dataset' do
+  #     disable_authorization_checks do
+  #       @project.update_attributes(default_license: 'wibble')
+  #     end
+  #     endpoint = Factory(:openbis_endpoint, project: @project, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: @project)]))
+  #     perm_id = '20160210130454955-23'
+  #     login_as(@project_administrator)
+  #     assert_difference('DataFile.count') do
+  #       assert_difference('ActivityLog.count') do
+  #         post :add_dataset, id: endpoint.id, project_id: @project.id, dataset_perm_id: perm_id
+  #         assert_nil flash[:error]
+  #       end
+  #     end
+  #     data_file = assigns(:data_file)
+  #     data_file = DataFile.find(data_file.id)
+  #     assert_redirected_to data_file
+  #     assert_equal '20160210130454955-23', data_file.content_blob.openbis_dataset.perm_id
+  #     assert_equal 'wibble', data_file.license
+  #
+  #     refute_equal data_file.policy, endpoint.policy
+  #     assert_equal endpoint.policy.access_type, data_file.policy.access_type
+  #     assert_equal 1, data_file.policy.permissions.length
+  #     permission = data_file.policy.permissions.first
+  #     assert_equal @project, permission.contributor
+  #     assert_equal Policy::NO_ACCESS, permission.access_type
+  #
+  #     log = ActivityLog.last
+  #     assert_equal 'create', log.action
+  #     assert_equal data_file, log.activity_loggable
+  #     assert_equal @project_administrator.user, log.culprit
+  #     assert_equal endpoint, log.referenced
+  #   end
+  #
+  #
+  #   test 'add dataset permissions' do
+  #     # already tests for project admin in test add dataset
+  #
+  #     # project member
+  #     person = Factory(:person)
+  #     project = person.projects.first
+  #     endpoint = Factory(:openbis_endpoint, project: project)
+  #     perm_id = '20160210130454955-23'
+  #     login_as(person)
+  #     assert_difference('DataFile.count') do
+  #       post :add_dataset, id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id
+  #       assert_nil flash[:error]
+  #     end
+  #
+  #     logout
+  #
+  #     # none project member
+  #     person = Factory(:person)
+  #     endpoint = Factory(:openbis_endpoint, project: Factory(:project))
+  #     perm_id = '20160210130454955-23'
+  #     login_as(person)
+  #     assert_no_difference('DataFile.count') do
+  #       post :add_dataset, id: endpoint.id, project_id: project.id, dataset_perm_id: perm_id
+  #       refute_nil flash[:error]
+  #     end
+  #   end
 
   test 'browse' do
     # project admin can browse
@@ -218,68 +237,16 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'show items' do
-    login_as(@project_administrator)
-    endpoint = Factory(:openbis_endpoint, project: @project)
-    get :show_items, project_id: @project.id, id: endpoint.id
-    assert_response :success
-
-    logout
-
-    # normal project member can access
-    person = Factory(:person)
-
-    login_as(person)
-
-    project = person.projects.first
-    endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_items, project_id: project.id, id: endpoint.id
-    assert_response :success
-
-    # none project member cannot
-    project = Factory(:project)
-    endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_items, project_id: project.id, id: endpoint.id
-    assert_response :redirect
-  end
-
-  test 'show item count' do
-    login_as(@project_administrator)
-    endpoint = Factory(:openbis_endpoint, project: @project)
-    get :show_item_count, project_id: @project.id, id: endpoint.id
-    assert_response :success
-    assert_equal '8 DataSets found', @response.body
-
-    logout
-
-    # normal project member can access
-    person = Factory(:person)
-
-    login_as(person)
-
-    project = person.projects.first
-    endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_item_count, project_id: project.id, id: endpoint.id
-    assert_response :success
-    assert_equal '8 DataSets found', @response.body
-
-    # none project member cannot
-    project = Factory(:project)
-    endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_item_count, project_id: project.id, id: endpoint.id
-    assert_response :redirect
-    refute_equal '8 DataSets found', @response.body
-  end
-
   test 'fetch spaces' do
     login_as(@project_administrator)
     post :fetch_spaces, project_id: @project.id,
-         openbis_endpoint: {
-             as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-             dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-             web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-             username: 'wibble',
-             password: 'wobble' }
+                        openbis_endpoint: {
+                          as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+                          dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+                          web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+                          username: 'wibble',
+                          password: 'wobble'
+                        }
     assert_response :success
     assert @response.body.include?('API-SPACE')
 
@@ -313,13 +280,14 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   test 'test endpoint' do
     login_as(@project_administrator)
     get :test_endpoint, project_id: @project.id,
-        openbis_endpoint: {
-            as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-            dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-            web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-            username: 'wibble',
-            password: 'wobble' },
-        format: :json
+                        openbis_endpoint: {
+                          as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+                          dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+                          web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+                          username: 'wibble',
+                          password: 'wobble'
+                        },
+                        format: :json
     assert_response :success
     assert @response.body.include?('true')
 
@@ -332,13 +300,14 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
 
     project = person.projects.first
     get :test_endpoint, project_id: project.id,
-        openbis_endpoint: {
-            as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
-            dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
-            web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
-            username: 'wibble',
-            password: 'wobble' },
-        format: :json
+                        openbis_endpoint: {
+                          as_endpoint: 'https://openbis-api.fair-dom.org/openbis/openbis',
+                          dss_endpoint: 'https://openbis-api.fair-dom.org/datastore_server',
+                          web_endpoint: 'https://openbis-api.fair-dom.org/openbis',
+                          username: 'wibble',
+                          password: 'wobble'
+                        },
+                        format: :json
     assert_response 400
     refute @response.body.include?('true')
 
@@ -354,82 +323,36 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     refute @response.body.include?('true')
   end
 
-  test 'show dataset files' do
-    # without a datafile, only project member can view
-    person = Factory(:person)
-    another_person = Factory(:person)
-
-    login_as(person)
-
-    project = person.projects.first
-    endpoint = Factory(:openbis_endpoint, project: project)
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, perm_id: '20160210130454955-23'
-    assert_response :success
-    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
-
-    logout
-    login_as(another_person)
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, perm_id: '20160210130454955-23'
-    assert_response :redirect
-    assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
-
-    logout
-    login_as(person)
-
-    # now with a datafile, accessible to all
-    df = openbis_linked_data_file(User.current_user, endpoint)
-    disable_authorization_checks do
-      df.policy = Factory(:public_policy)
-      df.save!
-    end
-    assert df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
-    assert_response :success
-    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
-
-    logout
-    login_as(another_person)
-    assert df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
-    assert_response :success
-    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
-
-    logout
-    assert df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
-    assert_response :success
-    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
-
-    # not accessible if df is not downloadable
-    disable_authorization_checks do
-      df.policy = Factory(:private_policy)
-      df.save!
-    end
-
-    refute df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
-    assert_response :redirect
-    assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
-
-    logout
-    login_as(another_person)
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
-    assert_response :redirect
-    assert_select 'td.filename', text: 'original/autumn.jpg', count: 0
-
-    logout
-    login_as(person)
-    assert df.can_download?
-    get :show_dataset_files, id: endpoint.id, project_id: project.id, data_file_id: df.id
-    assert_response :success
-    assert_select 'td.filename', text: 'original/autumn.jpg', count: 1
-  end
-
   test 'refresh metadata store' do
     login_as(@project_administrator)
     endpoint = Factory(:openbis_endpoint, project: @project)
-    post :refresh_metadata_store, id:endpoint.id,project_id: @project.id
-    assert_response :success
-    assert assigns(:openbis_endpoint)
+    post :refresh, id: endpoint.id
+    assert_redirected_to endpoint
+  end
+
+  test 'reset_fatal clears fatal stamps and marks for refresh' do
+    login_as(@project_administrator)
+
+    ep = Factory(:openbis_endpoint, project: @project)
+    @zample = Seek::Openbis::Zample.new(ep, '20171002172111346-37')
+    asset = OpenbisExternalAsset.build(@zample)
+
+    # should ignore that
+    asset.sync_state = :failed
+    assert asset.save
+    get :reset_fatals, id: ep.id
+    assert_redirected_to ep
+    asset.reload
+    assert asset.failed?
+    refute asset.fatal?
+
+    asset.sync_state = :fatal
+    assert asset.save
+
+    get :reset_fatals, id: ep.id
+    assert_redirected_to ep
+    asset.reload
+    refute asset.fatal?
+    assert asset.refresh?
   end
 end

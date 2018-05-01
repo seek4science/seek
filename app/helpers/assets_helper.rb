@@ -145,6 +145,9 @@ module AssetsHelper
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})
     download_button = icon_link_to('Download', 'download', download_path, opts)
     link_button_or_nil = link_url ? icon_link_to('External Link', 'external_link', link_url, opts.merge(target: 'blank')) : nil
+
+    # TODO maybe not needed as now openbis datafiles always have content blob
+    return download_button if asset.respond_to?(:external_asset) && !asset.external_asset.nil?
     if asset.respond_to?(:content_blobs)
       if asset.content_blobs.detect { |blob| !blob.show_as_external_link? }
         download_button

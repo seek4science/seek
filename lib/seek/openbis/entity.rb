@@ -3,36 +3,43 @@ module Seek
     # General behaviour for an entity in openBIS. Specific entities are defined as specialized subclasses
     class Entity
       attr_reader :json, :modifier, :registration_date, :modification_date, :code,
-                  :perm_id, :registrator, :openbis_endpoint, :exception
+                  :perm_id, :registrator, :openbis_endpoint, :properties
+
+      # debug is with puts so it can be easily seen on tests screens
+      DEBUG = Seek::Config.openbis_debug ? true : false
 
       def ==(other)
         perm_id == other.perm_id
       end
 
-      def initialize(openbis_endpoint, perm_id = nil)
+      def initialize(openbis_endpoint, perm_id = nil, refresh = false)
         @openbis_endpoint = openbis_endpoint
+        @properties = {}
         unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
-          raise 'OpenbisEndpoint expected and required'
+          raise 'OpenbisEndpoint expected and required' + "Got #{@openbis_endpoint} #{@openbis_endpoint.class}"
         end
 
         if perm_id
-          begin
-            json = query_application_server_by_perm_id(perm_id)
-            unless json[json_key]
-              raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
-            end
-            populate_from_json(json[json_key].first)
-          rescue Fairdom::OpenbisApi::OpenbisQueryException => e
-            @exception = e
+
+          cache_option = refresh ? { force: true } : nil
+
+          json = query_application_server_by_perm_id(perm_id, cache_option)
+          unless json[json_key]
+            raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
           end
+          unless json[json_key].size == 1
+            raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}, got #{json[json_key].size} hits"
+          end
+          populate_from_json(json[json_key].first)
         end
       end
 
       def populate_from_json(json)
-        # for debug by TZ
-        # puts "Populates #{self.class} from json"
-        # puts json
-        # puts '-----'
+        # for development by TZ
+        puts "Populates #{self.class} from json:" if DEBUG
+        puts json if DEBUG
+        puts '-----'  if DEBUG
+        raise "Cannot Populates #{self.class} from empty json" if json.nil? || json.empty?
         @json = json
         @modifier = json['modifier']
         @code = json['code']
@@ -43,8 +50,9 @@ module Seek
         self
       end
 
-      def all
-        json = query_application_server_by_perm_id
+      def all(refresh = false)
+        cache_option = refresh ? { force: true } : nil
+        json = query_application_server_for_all(cache_option)
         construct_from_json(json)
       end
 
@@ -63,8 +71,30 @@ module Seek
         construct_from_json(json)
       end
 
+      def find_by_type_codes(codes, refresh = false)
+        return [] if codes.empty?
+        cache_option = refresh ? { force: true } : nil
+        json = query_application_server_by_type_codes(codes, cache_option)
+        construct_from_json(json)
+      end
+
       def comment
         properties['COMMENT'] || ''
+      end
+
+      def vetted_properties
+        vet_properties(properties)
+      end
+
+      def vet_properties(hash)
+        return {} unless hash
+
+        hash.reject do |k, v|
+          next(true) if v.nil?
+          next(true) if k == 'ANNOTATIONS_STATE' || k == :ANNOTATIONS_STATE
+          next(true) if (k == 'XMLCOMMENTS' || k == :XMLCOMMENTS) && !v.start_with?('<')
+          false
+        end
       end
 
       def cache_key(perm_id)
@@ -72,10 +102,7 @@ module Seek
       end
 
       def samples
-        unless @samples
-          @samples = Seek::Openbis::Zample.find_by_perm_ids(sample_ids)
-        end
-        @samples
+        @samples ||= Seek::Openbis::Zample.new(openbis_endpoint).find_by_perm_ids(sample_ids)
       end
 
       def datasets
@@ -87,8 +114,21 @@ module Seek
         dataset_ids.count
       end
 
-      def error_occurred?
-        !exception.nil?
+      def registered?
+        OpenbisExternalAsset.registered?(self)
+
+        # return true if OpenbisExternalAsset.registered?(self)
+        # ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing').any?
+      end
+
+      def registered_as
+        OpenbisExternalAsset.find_by_entity(self).seek_entity
+      rescue ActiveRecord::RecordNotFound => e
+        nil
+
+        # the original code
+        # blob = ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing')
+        # blob.any? ? blob.first.asset : nil
       end
 
       protected
@@ -99,26 +139,51 @@ module Seek
 
       private
 
-      def query_application_server_by_perm_id(perm_id = '')
-        cached_query_by_perm_id(perm_id) do
+      def query_application_server_by_perm_id(perm_id = '', cache_option = nil)
+        cached_query_by_perm_id(perm_id, cache_option) do
           application_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
                                                   attribute: 'PermID', attributeValue: perm_id)
         end
       end
 
-      def query_datastore_server_by_dataset_perm_id(perm_id = '')
-        cached_query_by_perm_id(perm_id) do
+      def query_application_server_for_all(cache_option = nil)
+        cached_query_by_perm_id('ALL:' + type_name, cache_option) do
+          application_server_query_instance.query(entityType: type_name, queryType: 'ALL')
+        end
+      end
+
+      def query_application_server_by_type_codes(codes, cache_option = nil)
+        codes_str = codes.join(',')
+
+        cached_query_by_type_codes(codes_str, cache_option) do
+          application_server_query_instance.query(entityType: type_name, queryType: 'TYPE',
+                                                  typeCodes: codes_str)
+        end
+      end
+
+      def query_datastore_server_by_dataset_perm_id(perm_id = '', cache_option = nil)
+        cached_query_by_perm_id(perm_id, cache_option) do
           datastore_server_query_instance.query(entityType: type_name, queryType: 'ATTRIBUTE',
                                                 attribute: 'DataSetPermID', attributeValue: perm_id)
         end
       end
 
-      def cached_query_by_perm_id(perm_id)
+      def cached_query_by_perm_id(perm_id, cache_option = nil)
         raise 'Block required for doing query' unless block_given?
         key = cache_key(perm_id)
-        Rails.logger.info("OBIS CACHE KEY = #{key}")
-        openbis_endpoint.metadata_store.fetch(key) do
-          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{perm_id}")
+        Rails.logger.info("OBIS CACHE KEY = #{key}") if DEBUG
+        openbis_endpoint.metadata_store.fetch(key, cache_option) do
+          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{perm_id}") if DEBUG
+          yield
+        end
+      end
+
+      def cached_query_by_type_codes(codes_str, cache_option = nil)
+        raise 'Block required for doing query' unless block_given?
+        key = cache_key("TYPE_CODES:#{codes_str}")
+        Rails.logger.info("OBIS CACHE KEY = #{key}") if DEBUG
+        openbis_endpoint.metadata_store.fetch(key, cache_option) do
+          Rails.logger.info("OBIS NO CACHE, FETCHING FROM SERVER #{codes_str}") if DEBUG
           yield
         end
       end

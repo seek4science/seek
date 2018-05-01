@@ -1,0 +1,133 @@
+<%= render :partial => 'openbis_common/errors_panel' %>
+
+<%= render partial: 'openbis_common/openbis_entity_panel', object: @entity,
+           locals: {sync_at: @asset.synchronized_at, err_msg: @asset.err_msg} %>
+
+<%= render :partial => 'openbis_common/files_view_modal' %>
+
+<%
+  entity = @entity
+  datasets = entity.datasets
+  zamples = entity.samples
+  not_registered = @study.new_record?
+%>
+
+
+
+<%= form_tag({ controller: "openbis_experiments", action: not_registered ? 'register' : 'update', id: entity.perm_id }, { method: 'post' }) do |f| %>
+    <%= form_for @study do |ff| %> <%# HACK to be able to render study form using the existing helpers%>
+        <% if not_registered %>
+            <div class="form-group">
+              <label>Register under Investigation </label><span class="required">*</span>
+              <%= render :partial => "studies/investigation_list",
+                         :locals => { :investigations => Investigation.all.select { |i| current_user.person.member_of? i.projects },
+                                      :study => @study } %>
+            </div>
+        <% else %>
+            <div class="form-group">
+              <label>Registered as Study:</label>
+              <%= link_to "#{@study.title}", study_path(@study) %>
+            </div>
+        <% end %>
+
+        <div class="form-group">
+          <%= check_box_tag('sync_options[link_datasets]', 1, @asset.sync_options[:link_datasets] == '1') %>
+          <%= label_tag('sync_options[link_datasets]', 'Automatically register dependent datasets') %>
+          <div class="help-block">Dependent datasets will be registered and linked with this study
+          </div>
+        </div>
+
+        <div class="form-group">
+          <%= check_box_tag('sync_options[link_assays]', 1, @asset.sync_options[:link_assays] == '1') %>
+          <%= label_tag('sync_options[link_assays]', 'Automatically recognize dependent assays') %>
+          <div class="help-block">OpenBis objects that can be recognized as Assays will be also registered
+          </div>
+        </div>
+
+        <div class="form-group">
+          <%= check_box_tag('sync_options[new_arrivals]', 1, @asset.sync_options[:new_arrivals] == '1', disabled: disable_new_arrivals) %>
+          <%= label_tag('sync_options[new_arrivals]', "Periodically check for new entries #{'(disabled by admin)' if disable_new_arrivals}") %>
+          <%# to preserve the option if disabled in configuration but previously set, ok maybe it is not needed??? %>
+          <%= hidden_field_tag('sync_options[new_arrivals]', @asset.sync_options[:new_arrivals]) if disable_new_arrivals %>
+          <div class="help-block">
+            During periodic synchronization new OpenBIS datasets and assays will be linked
+            (it only works if automatic recognition is selected).
+            Use with caution, leave it if you don't expect new entries as it has significant performance impact.
+          </div>
+        </div>
+
+
+        <div class="form-group">
+          <%= submit_tag(not_registered ? 'Register' : 'Update', class: 'btn btn-primary') %>
+          <%# button_link_to('Refresh content', 'refresh', refresh_openbis_endpoint_openbis_experiment_path(@openbis_endpoint, id: entity.perm_id)) %>
+        </div>
+
+        <div id="linked_entities">
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <%= is_nil_or_empty?(zamples) ? 'No dependent Objects(Samples)' : 'Dependent Objects(Samples)' %>
+            </div>
+            <div class="panel-body">
+              <div class='row' id="openbis-zample-cards">
+                <%= render partial: 'openbis_zamples/openbis_zample_card', collection: zamples,
+                           locals: { seek_type: :assay,
+                                     linked: @zamples_linked_to_study,
+                                     selected: @asset.sync_options[:linked_assays],
+                                     parentType: 'study',
+                                     linking_checkbox: true
+                           } %>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <%= is_nil_or_empty?(datasets) ? 'No dependent Datasets' : 'Dependent Datasets' %>
+            </div>
+            <div class="panel-body">
+              <div class='row' id="openbis-dataset-cards">
+                <%= render partial: 'openbis_datasets/openbis_dataset_card', collection: datasets,
+                           locals: {
+                               linked: @datasets_linked_to_study,
+                               selected: @asset.sync_options[:linked_datasets],
+                               parentType: 'study',
+                               linking_checkbox: true
+                           } %>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+    <% end %>
+<% end %>
+
+
+<script>
+
+    function disableLinkedInput(value) {
+        if (value) {
+            $j('#linked_entities input').prop("disabled", true);
+        } else {
+            $j('#linked_entities input.unlinked').prop("disabled", false);
+        }
+    }
+
+    $j('#link_datasets').change(function () {
+        // console.log("Check changed: "+this.checked);
+        /*if (this.checked) {
+            $j('#linked_entities input').prop("disabled", true);
+        } else {
+            $j('#linked_entities input.unlinked').prop("disabled", false);
+        }*/
+        disableLinkedInput(this.checked);
+    });
+
+    $j(document).ready(function () {
+        disableLinkedInput($j('#link_datasets').prop("checked"));
+    });
+
+</script>

@@ -22,6 +22,8 @@ class Study < ActiveRecord::Base
 
   belongs_to :investigation
   has_many :assays
+  has_one :external_asset, as: :seek_entity, dependent: :destroy
+
   belongs_to :person_responsible, :class_name => "Person"
 
   validates :investigation, :presence => { message: "Investigation is blank or invalid" }
@@ -56,4 +58,9 @@ class Study < ActiveRecord::Base
 
     return new_object
   end
+
+  def external_asset_search_terms
+    external_asset ? external_asset.search_terms : []
+  end
+
 end

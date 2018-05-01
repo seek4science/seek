@@ -1,0 +1,105 @@
+<%= render :partial => 'openbis_common/errors_panel' %>
+
+<%= render partial: 'openbis_common/openbis_entity_panel', object: @entity,
+           locals: {sync_at: @asset.synchronized_at, err_msg: @asset.err_msg} %>
+
+<%= render :partial => 'openbis_common/files_view_modal' %>
+
+<%
+  zample = @entity
+  datasets = zample.datasets
+  not_registered = @assay.new_record?
+%>
+
+
+
+<%= form_tag({ controller: "openbis_zamples", action: not_registered ? 'register' : 'update', id: zample.perm_id }, { method: 'post' }) do |f| %>
+    <%= form_for @assay do |ff| %> <%# HACK to be able to render study form using the existing helpers%>
+        <% if not_registered %>
+            <div class="form-group">
+              <label>Register under Study </label><span class="required">*</span>
+              <%= assay_study_selection('assay[study_id]', @assay.study) %>
+            </div>
+        <% else %>
+            <div class="form-group">
+              <label>Registered as Assay:</label>
+              <%= link_to "#{@assay.title}", assay_path(@assay) %>
+            </div>
+        <% end %>
+        <div class="form-group">
+          <%= check_box_tag('sync_options[link_datasets]', 1, @asset.sync_options[:link_datasets] == '1') %>
+          <%= label_tag('sync_options[link_datasets]', 'Automatically register dependent datasets') %>
+          <div class="help-block">
+            OpenBis entities that can be recognized as DataSets will be also registered
+          </div>
+        </div>
+
+        <div class="form-group">
+          <%= check_box_tag('sync_options[new_arrivals]', 1, @asset.sync_options[:new_arrivals] == '1', disabled: disable_new_arrivals) %>
+          <%= label_tag('sync_options[new_arrivals]', "Periodically check for new datasets #{'(disabled by admin)' if disable_new_arrivals}") %>
+          <%# to preserve the option if disabled in configuration but previously set, ok maybe it is not needed??? %>
+          <%= hidden_field_tag('sync_options[new_arrivals]', @asset.sync_options[:new_arrivals]) if disable_new_arrivals %>
+          <div class="help-block">
+            During periodic synchronization new OpenBIS datasets will be linked
+            (it only works if automatic registration is selected).
+            Use with caution, leave it if you don't expect new entries as it has significant performance impact.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <%= submit_tag(not_registered ? 'Register' : 'Update', class: 'btn btn-primary') %>
+          <%# button_link_to('Refresh content', 'refresh', refresh_openbis_endpoint_openbis_zample_path(@openbis_endpoint, id: zample.perm_id)) %>
+        </div>
+
+        <div id="linked_entities">
+
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <%= is_nil_or_empty?(datasets) ? 'No dependent Datasets' : 'Dependent Datasets' %>
+            </div>
+            <div class="panel-body">
+              <div class='row' id="openbis-dataset-cards">
+                <%= render partial: 'openbis_datasets/openbis_dataset_card', collection: datasets,
+                           locals: {
+                               linked: @linked_to_assay,
+                               selected: @asset.sync_options[:linked_datasets],
+                               parentType: 'assay',
+                               linking_checkbox: true
+                           }
+                %>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+    <% end %>
+<% end %>
+
+
+<script>
+
+    function disableLinkedInput(value) {
+        if (value) {
+            $j('#linked_entities input').prop("disabled", true);
+        } else {
+            $j('#linked_entities input.unlinked').prop("disabled", false);
+        }
+    }
+
+    $j('#link_datasets').change(function () {
+        // console.log("Check changed: "+this.checked);
+        /*if (this.checked) {
+            $j('#linked_entities input').prop("disabled", true);
+        } else {
+            $j('#linked_entities input.unlinked').prop("disabled", false);
+        }*/
+        disableLinkedInput(this.checked);
+    });
+
+    $j(document).ready(function () {
+        disableLinkedInput($j('#link_datasets').prop("checked"));
+    });
+
+</script>

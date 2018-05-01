@@ -12,6 +12,8 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
+    # by TZ even if setup sets the users sometimes it is not present during rest tests
+    login_as Factory(:user) unless User.current_user
     @object = Factory :presentation, contributor: User.current_user
     @object.tag_with 'tag1'
     @object
@@ -26,8 +28,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'can create with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
     presentation_attrs = Factory.attributes_for(:presentation,
-                                                project_ids: [Factory(:project).id]
-                                               )
+                                                project_ids: [Factory(:project).id])
 
     assert_difference 'Presentation.count' do
       post :create, presentation: presentation_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing
@@ -163,17 +164,17 @@ class PresentationsControllerTest < ActionController::TestCase
 
     presentation.reload
 
-    assert_equal %w(golf sparrow), presentation.annotations.collect { |a| a.value.text }.sort
+    assert_equal %w[golf sparrow], presentation.annotations.collect { |a| a.value.text }.sort
     assert_equal [], presentation.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
-    assert_equal %w(golf sparrow), presentation.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
+    assert_equal %w[golf sparrow], presentation.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
 
     xml_http_request :post, :update_annotations_ajax, id: presentation, tag_list: "soup,#{golf.value.text}"
 
     presentation.reload
 
-    assert_equal %w(golf soup sparrow), presentation.annotations.collect { |a| a.value.text }.uniq.sort
-    assert_equal %w(golf soup), presentation.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
-    assert_equal %w(golf sparrow), presentation.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
+    assert_equal %w[golf soup sparrow], presentation.annotations.collect { |a| a.value.text }.uniq.sort
+    assert_equal %w[golf soup], presentation.annotations.select { |a| a.source == p.user }.collect { |a| a.value.text }.sort
+    assert_equal %w[golf sparrow], presentation.annotations.select { |a| a.source == p2.user }.collect { |a| a.value.text }.sort
   end
 
   test 'should download Presentation from standard route' do
@@ -186,7 +187,7 @@ class PresentationsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal pres, al.activity_loggable
-    assert_equal "attachment; filename=\"ppt_presentation.ppt\"", @response.header['Content-Disposition']
+    assert_equal 'attachment; filename="ppt_presentation.ppt"', @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-powerpoint', @response.header['Content-Type']
     assert_equal '82432', @response.header['Content-Length']
   end
@@ -361,5 +362,4 @@ class PresentationsControllerTest < ActionController::TestCase
     add_tags_to_test_object(presentation)
     add_creator_to_test_object(presentation)
   end
-
 end
