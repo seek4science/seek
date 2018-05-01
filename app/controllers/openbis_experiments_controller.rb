@@ -15,9 +15,6 @@ class OpenbisExperimentsController < ApplicationController
   end
 
   def register
-    puts 'register called' if DEBUG
-    puts params if DEBUG
-
     if @asset.seek_entity
       flash[:error] = 'Already registered as OpenBIS entity'
       return redirect_to @asset.seek_entity
@@ -28,8 +25,9 @@ class OpenbisExperimentsController < ApplicationController
 
     reg_info = do_study_registration(@asset, study_params, sync_options, current_person)
 
-    @study = reg_info[:study]
-    issues = reg_info[:issues]
+    @study = reg_info.study
+    issues = reg_info.issues
+    @newly_created = reg_info.created
 
     unless @study
       @reasons = issues
@@ -137,11 +135,10 @@ class OpenbisExperimentsController < ApplicationController
   end
 
   def do_study_registration(asset, study_params, sync_options, creator)
-    issues = []
-    reg_status = { study: nil, issues: issues }
+    reg_status = Seek::Openbis::RegistrationInfo.new
 
     if asset.seek_entity
-      issues << 'Already registered as OpenBIS entity'
+      reg_status.add_issues 'Already registered as OpenBIS entity'
       return reg_status
     end
 
@@ -156,11 +153,10 @@ class OpenbisExperimentsController < ApplicationController
     study = seek_util.createObisStudy(study_params, creator, asset)
 
     if study.save
-      errs = seek_util.follow_study_dependent(study)
-      issues.concat(errs) if errs
-      reg_status[:study] = study
+      reg_status.study = study
+      reg_status.merge seek_util.follow_study_dependent(study)
     else
-      issues.concat study.errors.full_messages
+      reg_status.add_issues study.errors.full_messages
     end
 
     reg_status

@@ -119,7 +119,9 @@ class OpenbisEndpointsController < ApplicationController
       error('Must be a member of the project', 'No permission')
       false
     end
-  end  # overides the after_filter callback from application_controller, as the behaviour needs to be
+  end
+
+  # overides the after_filter callback from application_controller, as the behaviour needs to be
   # slightly different
   def log_event
     action = action_name.downcase

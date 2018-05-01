@@ -528,11 +528,12 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset.seek_entity = assay
     asset.save!
 
-    errs = @util.follow_dependent(asset)
-    assert_equal [], errs
+    reg_info = @util.follow_dependent(asset)
+    assert_equal [], reg_info.issues
 
     refute assay.data_files.empty?
     assert_equal @zample.dataset_ids.length, assay.data_files.length
+    assert_equal @zample.dataset_ids.length, reg_info.created.length
   end
 
   ## --------- linking datasets to assay ---------- ##
@@ -551,13 +552,18 @@ class SeekUtilTest < ActiveSupport::TestCase
     df1 = @util.createObisDataFile({}, @user, OpenbisExternalAsset.build(datasets[0]))
     assert df1.save
 
+    reg_info = nil
     assert_difference('AssayAsset.count', 3) do
       assert_difference('DataFile.count', 2) do
         assert_difference('ExternalAsset.count', 2) do
-          assert_equal [], @util.associate_data_sets(assay, datasets)
+          reg_info = @util.associate_data_sets(assay, datasets)
         end
       end
     end
+
+    assert_equal [], reg_info.issues
+    assert_equal 2, reg_info.created.count
+    reg_info.created.each { |d| assert d.is_a?(DataFile)}
 
     assay.reload
     assert_equal 4, assay.data_files.length
@@ -573,13 +579,17 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     data_sets_ids = ['20171002172401546-38', '20171002190934144-40', '20171004182824553-41']
 
+    reg_info = nil
     assert_difference('AssayAsset.count', 3) do
       assert_difference('DataFile.count', 3) do
         assert_difference('ExternalAsset.count', 3) do
-          assert_equal [], @util.associate_data_sets_ids(assay, data_sets_ids, @endpoint)
+          reg_info = @util.associate_data_sets_ids(assay, data_sets_ids, @endpoint)
         end
       end
     end
+
+    assert_equal [], reg_info.issues
+    assert_equal 3, reg_info.created.count
 
     assay.reload
     assert_equal 4, assay.data_files.length
@@ -596,13 +606,14 @@ class SeekUtilTest < ActiveSupport::TestCase
     zamples = Seek::Openbis::Zample.new(@endpoint).find_by_perm_ids(['20171002172111346-37', '20171002172639055-39'])
     assert_equal 2, zamples.length
 
+    reg_info = nil
     sync_options = {}
 
     assert_difference('Assay.count', 2) do
       assert_difference('AssayAsset.count', 0) do
         assert_difference('DataFile.count', 0) do
           assert_difference('ExternalAsset.count', 2) do
-            assert_equal [], @util.associate_zamples_as_assays(study, zamples, sync_options)
+            reg_info = @util.associate_zamples_as_assays(study, zamples, sync_options)
           end
         end
       end
@@ -610,6 +621,9 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     study.reload
     assert_equal 2, study.assays.count
+    assert_equal 2, reg_info.created.count
+    assert_equal [], reg_info.issues
+
   end
 
   test 'associate_zamples_as_assays links datafiles to assays under the study if selected so' do
@@ -626,12 +640,13 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert ds_count > 0
 
     sync_options = { link_datasets: '1' }
+    reg_info = nil
 
     assert_difference('Assay.count', 2) do
       assert_difference('AssayAsset.count', ds_count) do
         assert_difference('DataFile.count', ds_count) do
           assert_difference('ExternalAsset.count', 2 + ds_count) do
-            assert_equal [], @util.associate_zamples_as_assays(study, zamples, sync_options)
+            reg_info = @util.associate_zamples_as_assays(study, zamples, sync_options)
           end
         end
       end
@@ -640,6 +655,9 @@ class SeekUtilTest < ActiveSupport::TestCase
     study.reload
     assert_equal 2, study.assays.count
     assert_equal ds_count, study.related_data_files.count
+
+    assert_equal 2+ds_count, reg_info.created.count
+    assert_equal [], reg_info.issues
   end
 
   test 'associate_zamples_as_assays reports issues if zample already registered but not as assay' do
@@ -657,18 +675,20 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert ea.save
 
     sync_options = {}
-    issues = []
+    reg_info = nil
     assert_difference('Assay.count', 1) do
       assert_difference('AssayAsset.count', 0) do
         assert_difference('DataFile.count', 0) do
           assert_difference('ExternalAsset.count', 1) do
-            issues = @util.associate_zamples_as_assays(study, zamples, sync_options)
+            reg_info = @util.associate_zamples_as_assays(study, zamples, sync_options)
           end
         end
       end
     end
 
-    refute issues.empty?
+    refute reg_info.issues.empty?
+    assert_equal 1, reg_info.created.count
+
     study.reload
     assert_equal 1, study.assays.count
   end
@@ -698,18 +718,20 @@ class SeekUtilTest < ActiveSupport::TestCase
     end
 
     sync_options = {}
-    issues = []
+    reg_info = nil
     assert_difference('Assay.count', 1) do
       assert_difference('AssayAsset.count', 0) do
         assert_difference('DataFile.count', 0) do
           assert_difference('ExternalAsset.count', 1) do
-            issues = @util.associate_zamples_as_assays(study, zamples, sync_options)
+            reg_info = @util.associate_zamples_as_assays(study, zamples, sync_options)
           end
         end
       end
     end
 
-    refute issues.empty?
+    refute reg_info.issues.empty?
+    assert_equal 1, reg_info.created.count
+
     study.reload
     assert_equal 1, study.assays.count
 
@@ -740,12 +762,12 @@ class SeekUtilTest < ActiveSupport::TestCase
     end
 
     sync_options = { edin: 1 }
-    issues = []
+    reg_info = nil
     assert_difference('Assay.count', 1) do
-      issues = @util.associate_zamples_as_assays(study, zamples, sync_options)
+      reg_info = @util.associate_zamples_as_assays(study, zamples, sync_options)
     end
 
-    assert issues.empty?
+    assert reg_info.issues.empty?
     study.reload
 
     assay2 = study.assays.first
@@ -766,9 +788,10 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     # no linking
     sync_options = {}
-    issues = @util.follow_study_dependent_assays(@experiment, study, sync_options)
+    reg_info = @util.follow_study_dependent_assays(@experiment, study, sync_options)
 
-    assert_equal [], issues
+    assert_equal [], reg_info.issues
+    assert_equal [], reg_info.created
 
     study.reload
     assert study.assays.empty?
@@ -776,9 +799,10 @@ class SeekUtilTest < ActiveSupport::TestCase
     # automated assays linking
     assert(@experiment.sample_ids.length > 1)
     sync_options = { link_assays: '1' }
-    issues = @util.follow_study_dependent_assays(@experiment, study, sync_options)
+    reg_info = @util.follow_study_dependent_assays(@experiment, study, sync_options)
 
-    assert_equal [], issues
+    assert_equal [], reg_info.issues
+    assert_equal @experiment.sample_ids.length, reg_info.created.length
 
     study.reload
     assert_equal @experiment.sample_ids.length, study.assays.count
@@ -791,9 +815,10 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     # selected assays
     sync_options = { linked_assays: [@experiment.sample_ids[0]] }
-    issues = @util.follow_study_dependent_assays(@experiment, study, sync_options)
+    reg_info = @util.follow_study_dependent_assays(@experiment, study, sync_options)
 
-    assert_equal [], issues
+    assert_equal [], reg_info.issues
+    assert_equal 1, reg_info.created.length
 
     study.reload
     assert_equal 1, study.assays.count
@@ -806,9 +831,9 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     # automated assays linking
     sync_options = { link_assays: '1' }
-    issues = @util.follow_study_dependent_assays(@experiment, study, sync_options)
+    reg_info =  @util.follow_study_dependent_assays(@experiment, study, sync_options)
 
-    assert_equal [], issues
+    assert_equal [], reg_info.issues
 
     study.reload
     assert_equal @experiment.sample_ids.length, study.assays.count
@@ -828,23 +853,26 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     sync_options = {}
 
-    issues = @util.follow_study_dependent_datafiles(@experiment, study, sync_options)
+    reg_info = @util.follow_study_dependent_datafiles(@experiment, study, sync_options)
 
-    assert_equal [], issues
+    assert_equal [], reg_info.issues
+    assert_equal [], reg_info.created
 
     study.reload
     assert study.assays.empty?
     assert study.related_data_files.empty?
 
     sync_options = { link_datasets: '1' }
-    issues = @util.follow_study_dependent_datafiles(@experiment, study, sync_options)
+    reg_info = @util.follow_study_dependent_datafiles(@experiment, study, sync_options)
 
-    assert_equal [], issues
+    assert_equal [], reg_info.issues
+    assert_equal @experiment.dataset_ids.length + 1, reg_info.created.count
 
     study.reload
     assert_equal @experiment.dataset_ids.length, study.related_data_files.count
     assert_equal 'OpenBIS FILES', study.assays.first!.title
     assert_equal @experiment.dataset_ids.length, study.assays.first!.data_files.count
+    assert reg_info.created.include? study.assays.first!
   end
 
   test 'follow_study_dependent_datafiles registers selected datafiles under fake assay if said so' do
@@ -854,9 +882,10 @@ class SeekUtilTest < ActiveSupport::TestCase
     refute @experiment.dataset_ids.empty?
 
     sync_options = { linked_datasets: [@experiment.dataset_ids[1]] }
-    issues = @util.follow_study_dependent_datafiles(@experiment, study, sync_options)
+    reg_info = @util.follow_study_dependent_datafiles(@experiment, study, sync_options)
 
-    assert_equal [], issues
+    assert_equal [], reg_info.issues
+    assert_equal 1+1, reg_info.created.count
 
     study.reload
     assert_equal 1, study.related_data_files.count
@@ -870,9 +899,9 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert @experiment.dataset_ids.size > 1
 
     sync_options = { link_datasets: '1' }
-    issues = @util.follow_study_dependent_datafiles(@experiment, study, sync_options)
+    reg_info = @util.follow_study_dependent_datafiles(@experiment, study, sync_options)
 
-    assert_equal [], issues
+    assert_equal [], reg_info.issues
 
     study.reload
     assert_equal @experiment.dataset_ids.length, study.related_data_files.count
@@ -897,9 +926,10 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert assay.data_files.empty?
     refute @zample.dataset_ids.empty?
 
-    issues = @util.follow_assay_dependent(assay)
-    assert issues.empty?
+    reg_info = @util.follow_assay_dependent(assay)
+    assert reg_info.issues.empty?
 
+    assert_equal @zample.dataset_ids.count, reg_info.created.count
     assert_equal @zample.dataset_ids.count, assay.data_files.count
   end
 
@@ -914,8 +944,9 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert assay.save
     assert assay.data_files.empty?
 
-    issues = @util.follow_assay_dependent(assay)
-    assert issues.empty?
+    reg_info = @util.follow_assay_dependent(assay)
+    assert reg_info.issues.empty?
+    assert_equal 1, reg_info.created.count
 
     assert_equal 1, assay.data_files.count
   end
@@ -930,8 +961,8 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert assay.data_files.empty?
     assert @zample.dataset_ids.size > 1
 
-    issues = @util.follow_assay_dependent(assay)
-    assert issues.empty?
+    reg_info = @util.follow_assay_dependent(assay)
+    assert reg_info.issues.empty?
 
     assert_equal @zample.dataset_ids.size, assay.data_files.size
     titles = assay.data_files.map(&:title).uniq
@@ -1141,5 +1172,86 @@ class SeekUtilTest < ActiveSupport::TestCase
     codes = types.map(&:code)
     assert_equal 7, codes.size
     assert_includes codes, 'TZ_FAIR'
+  end
+
+  test 'validate_expected_seek_type issues warnings if mismatch' do
+
+    df1 = Factory :data_file
+    df2 = Factory :data_file
+    assay = Factory :assay
+
+    a1 = OpenbisExternalAsset.new
+    a1.seek_entity = df1
+
+    a2 = OpenbisExternalAsset.new
+    a2.seek_entity = df2
+
+    a3 = OpenbisExternalAsset.new
+    a3.seek_entity = assay
+
+    a4 = OpenbisExternalAsset.new
+
+    collection = []
+    type = DataFile
+
+    assert_equal [], @util.validate_expected_seek_type(collection,type)
+
+    collection = [a4]
+    assert_equal [], @util.validate_expected_seek_type(collection,type)
+
+    collection = [a1, a4, a2]
+    assert_equal [], @util.validate_expected_seek_type(collection,type)
+
+    collection = [a3]
+    assert_equal 1, @util.validate_expected_seek_type(collection,type).count
+    assert_equal ["#{a3.id} already registered as Assay #{assay.id}"],
+                 @util.validate_expected_seek_type(collection,type)
+
+    type = Assay
+    assert_equal 0, @util.validate_expected_seek_type(collection,type).count
+
+    collection = [a1,a2,a3,a4]
+    type = Assay
+    assert_equal 2, @util.validate_expected_seek_type(collection,type).count
+  end
+
+  test 'validate_study_relationship issues warnings if mismatch' do
+
+    study1 = Factory :study
+    study2 = Factory :study
+
+    as1 = Factory(:assay)
+    as1.study = study1
+    a1 = OpenbisExternalAsset.new(external_service: 1, external_id: 1)
+    a1.seek_entity = as1
+    as1.external_asset = a1
+
+    as2 = Factory(:assay)
+    as2.study = study1
+    a2 = OpenbisExternalAsset.new(external_service: 1, external_id: 2)
+    a2.seek_entity = as2
+    as2.external_asset = a2
+
+    as3 = Factory(:assay)
+    as3.study = study2
+    a3 = OpenbisExternalAsset.new(external_service: 1, external_id: 3)
+    a3.seek_entity = as3
+    as3.external_asset = a3
+
+
+    collection = []
+    assert_equal [], @util.validate_study_relationship(collection,study1)
+
+    collection = [as1, as2]
+    assert_equal [], @util.validate_study_relationship(collection,study1)
+
+    collection = [as3]
+    assert_equal 1, @util.validate_study_relationship(collection,study1).count
+    assert_equal ["#{a3.external_id} already registered under different Study #{study2.id}"],
+                 @util.validate_study_relationship(collection,study1)
+
+    collection = [as1, as3, as2]
+    assert_equal 2, @util.validate_study_relationship(collection,study2).count
+
   end
 end

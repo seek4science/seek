@@ -20,21 +20,23 @@ module Seek
       end
 
       def refresh
-        puts "------------\nREFRESH\n---------" if DEBUG
-
         seek_util.sync_asset_content(@asset)
 
         flash[:error] = "OBis synchronization failed: #{@asset.err_msg}" if @asset.failed?
         flash[:notice] = 'Updated OpenBis content' if @asset.synchronized?
-        redirect_to @asset.seek_entity # action: 'edit'
+        redirect_to @asset.seek_entity
       end
 
       def check_entity
         get_entity
-      rescue Exception => e
+      rescue => e
         msg = seek_util.extract_err_message(e)
         flash[:error] = "Cannot access OBis: #{msg}"
         redirect_back # fallback_location: @project
+      end
+
+      def newly_created
+        @newly_created ||= []
       end
 
       def get_endpoint
@@ -46,10 +48,9 @@ module Seek
       end
 
       def project_member?
-        unless @project.has_member?(User.current_user)
-          error('Must be a member of the project', 'No permission')
-          false
-        end
+        return true if @project.has_member?(User.current_user)
+        error('Must be a member of the project', 'No permission')
+        false
       end
 
       def prepare_asset
@@ -78,6 +79,25 @@ module Seek
       def back_to_index
         index
         render action: 'index'
+      end
+
+      # overides the after_filter callback from application_controller,
+      # as the behaviour needs to be slightly different (based on Sturat's code)
+      def log_event
+        action = action_name.downcase
+        return unless %w[register update batch_register].include? action
+
+        User.with_current_user current_user do
+          newly_created.each do |seek|
+            ActivityLog.create(action: 'create',
+                               culprit: current_user,
+                               controller_name: controller_name,
+                               activity_loggable: seek,
+                               data: seek.title,
+                               user_agent: request.env['HTTP_USER_AGENT'],
+                               referenced: @openbis_endpoint)
+          end
+        end
       end
     end
   end
