@@ -1,73 +1,61 @@
 ---
 data:
-  id: '138'
+  id: '227'
   type: studies
   attributes:
-    tags: 
-    title: Model analysis
-    description: 
-    experimentalists: 
-    person_responsible_id: '411'
+    policy:
+      access: download
+      permissions:
+      - resource_type: projects
+        resource_id: '1777'
+        access: view
+    title: A Maximal Study
+    description: The Study of many things
+    experimentalists: Wet lab people
+    other_creators: Marie Curie
+    person_responsible_id: '1161'
   relationships:
     creators:
-      data: []
+      data:
+      - id: '1161'
+        type: people
     submitter:
       data:
-      - id: '411'
+      - id: '1161'
         type: people
     people:
       data:
-      - id: '411'
+      - id: '1161'
         type: people
     projects:
       data:
-      - id: '17'
+      - id: '1777'
         type: projects
     investigation:
       data:
-        id: '56'
+        id: '272'
         type: investigations
     assays:
-      data:
-      - id: '294'
-        type: assays
-      - id: '295'
-        type: assays
-      - id: '296'
-        type: assays
+      data: []
     data_files:
-      data:
-      - id: '1213'
-        type: data_files
-      - id: '1214'
-        type: data_files
+      data: []
     models:
-      data:
-      - id: '144'
-        type: models
-      - id: '175'
-        type: models
-      - id: '176'
-        type: models
-      - id: '177'
-        type: models
-      - id: '179'
-        type: models
+      data: []
     sops:
       data: []
     publications:
       data:
-      - id: '240'
+      - id: '66'
         type: publications
-      - id: '268'
-        type: publications
+    documents:
+      data: []
   links:
-    self: "/studies/138"
+    self: "/studies/227"
   meta:
-    created: '2015-07-01T08:14:11.000Z'
-    modified: '2015-07-01T08:14:11.000Z'
+    created: '2018-04-27T14:39:15.000Z'
+    modified: '2018-04-27T14:39:20.814Z'
     api_version: '0.1'
-    uuid: 29af988a-9b3b-4ce3-a42d-1bebf0c4cbe1
-    base_url: https://fairdomhub.org
+    uuid: aedad830-2c56-0136-ec2f-08002734982f
+    base_url: http://localhost:3000
 jsonapi:
   version: '1.0'

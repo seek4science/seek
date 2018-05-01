@@ -1,61 +1,87 @@
 ---
 data:
-  id: '267'
+  id: '54'
   type: assays
   attributes:
-    tags: 
-    title: Culturing and synchronisation of P. falciparum
-    description: 
+    policy:
+      access: download
+      permissions:
+      - resource_type: projects
+        resource_id: '442'
+        access: manage
+    title: A Maximal experimental Assay
+    description: A Western Blot Assay
+    other_creators: Anonymous creator
     assay_class:
-      title: Experimental Assay
+      title: Experimental assay
       key: EXP
-      description: 
+      description: An experimental assay class description
     assay_type:
-      label: Experimental Assay Type
-      uri: http://jermontology.org/ontology/JERMOntology#Experimental_assay_type
+      label: 
+      uri: http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics
     technology_type:
-      label: Technology Type
-      uri: http://jermontology.org/ontology/JERMOntology#Technology_type
+      label: 
+      uri: http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq
+    tags:
+    - Assay-tag1
+    - Assay-tag2
+    - Assay-tag3
   relationships:
     creators:
-      data: []
+      data:
+      - id: '287'
+        type: people
     submitter:
       data:
-      - id: '411'
+      - id: '287'
         type: people
     organisms:
-      data: []
+      data:
+      - id: '3'
+        type: organisms
     people:
       data:
-      - id: '411'
+      - id: '287'
         type: people
     projects:
       data:
-      - id: '17'
+      - id: '436'
         type: projects
     investigation:
       data:
-        id: '56'
+        id: '66'
         type: investigations
     study:
       data:
-        id: '118'
+        id: '66'
         type: studies
     data_files:
-      data: []
+      data:
+      - id: '16'
+        type: data_files
     models:
-      data: []
+      data:
+      - id: '5'
+        type: models
     sops:
-      data: []
+      data:
+      - id: '4'
+        type: sops
     publications:
-      data: []
+      data:
+      - id: '16'
+        type: publications
+    documents:
+      data:
+      - id: '32'
+        type: documents
   links:
-    self: "/assays/267"
+    self: "/assays/54"
   meta:
-    created: '2014-08-15T13:01:52.000Z'
-    modified: '2017-11-08T14:21:08.000Z'
+    created: '2018-04-27T14:27:53.800Z'
+    modified: '2018-04-27T14:27:54.372Z'
     api_version: '0.1'
-    uuid: 510b329d-1628-4e19-9ecb-4efd8966baa6
-    base_url: https://fairdomhub.org
+    uuid: 18867f90-2c55-0136-ec2f-08002734982f
+    base_url: http://localhost:3000
 jsonapi:
   version: '1.0'

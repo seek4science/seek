@@ -1,40 +1,50 @@
 ---
 data:
-  id: '75'
+  id: '3'
   type: events
   attributes:
-    title: CropClock Kick-off Meeting, November 2014
-    description: "The kickoff meeting of CropClock team took place in November 12,
-      2014 at the Max Plank Institute (MPIPZ, http://www.mpipz.mpg.de/en), Kologne,
-      Germany. The goal for this meeting was for the members of the various teams
-      to get acquainted with each other’s expertise and to discuss the following items:
-      1) Logistics about the project start,  2) Data that need to be shared,  3) Matlab
-      code that needs to shared among the teams. \r\nThe initial plan of action for
-      data sharing was also laid out."
-    url: http://www.mpipz.mpg.de/en
-    address: 
-    city: Kologne
+    policy:
+      access: view
+      permissions:
+      - resource_type: projects
+        resource_id: '242'
+        access: edit
+    title: A Maximal Event
+    description: This is the description
+    url: http://www.example.com/events/123
+    address: Sofienstr 2
+    city: Heidelberg
     country: Germany
-    start_date: '2014-11-12T00:00:00.000Z'
-    end_date: '2014-11-12T00:00:00.000Z'
+    start_date: '2017-01-01T00:20:00.000Z'
+    end_date: '2017-01-01T00:22:00.000Z'
   relationships:
+    submitter:
+      data:
+      - id: '177'
+        type: people
     projects:
       data:
-      - id: '26'
+      - id: '242'
         type: projects
     data_files:
-      data: []
+      data:
+      - id: '4'
+        type: data_files
     publications:
-      data: []
+      data:
+      - id: '4'
+        type: publications
     presentations:
-      data: []
+      data:
+      - id: '1'
+        type: presentations
   links:
-    self: "/events/75"
+    self: "/events/3"
   meta:
-    created: '2017-04-24T09:49:00.000Z'
-    modified: '2017-04-26T07:43:42.000Z'
+    created: '2018-04-27T14:25:05.300Z'
+    modified: '2018-04-27T14:25:05.300Z'
     api_version: '0.1'
-    uuid: 2adac480-0b01-0135-8501-549f350973c0
-    base_url: https://fairdomhub.org
+    uuid: b410eb70-2c54-0136-ec2f-08002734982f
+    base_url: http://localhost:3000
 jsonapi:
   version: '1.0'

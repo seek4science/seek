@@ -1,9 +1,16 @@
 swagger: '2.0'
 info:
-  version: '0.2'
-  title: 'JSON API to FAIRDOM SEEK '
+  version: '0.1'
+  title: 'JSON API to FAIRDOM SEEK'
+  license:
+    name: 'The 3-Clause BSD License'
+    url: 'https://opensource.org/licenses/BSD-3-Clause'
+  contact:
+    name: SEEK support
+    url: http://groups.google.com/group/seek4science
+    email: support@fair-dom.org
   x-logo:
-    url: 'https://fairdomhub.org/assets/seek-new-full-a62bea4ae0b7163ea6471db30c9836cd5d4a2d9d4878df077c9add8a30d396ec.svg'
+    url: './definitions/seek.png'
     backgroundColor: '#FFFFFF'
 host: www.fairdomhub.org
 basePath: /
@@ -19,6 +26,27 @@ securityDefinitions:
 security:
   - basicAuth: []
 tags:
+  - name: list
+    description:
+      $ref: ../descriptions/list.md
+    x-traitTag: true
+  - name: create
+    description:
+      $ref: ../descriptions/create.md
+    x-traitTag: true
+  - name: read
+    description:
+      $ref: ../descriptions/read.md
+    x-traitTag: true
+  - name: update
+    description:
+      $ref: ../descriptions/update.md
+    x-traitTag: true
+  - name: delete
+    description:
+      $ref: ../descriptions/delete.md
+    x-traitTag: true
+
   - name: search
     description:
       $ref: ../descriptions/search.md
@@ -76,6 +104,14 @@ tags:
       $ref: ../descriptions/sampleTypes.md
   
 x-tagGroups:
+  - name: operation types
+    tags:
+      - list
+      - create
+      - read
+      - update
+      - delete
+
   - name: Search
     tags:
       - search
@@ -111,6 +147,59 @@ x-tagGroups:
       - organisms
       - sampleTypes
       
+x-types:
+  ListTypeT: &ListType
+    '501':
+      description: Not implemented
+
+  CreateTypeT: &CreateType
+    '400':
+      description: Bad request
+      schema:
+        $ref: '#/definitions/bad_request'
+    '403':
+      description: Forbidden
+      schema:
+        $ref: '#/definitions/forbidden'
+    '422':
+      description: Unprocessable entity
+      schema:
+        $ref: '#/definitions/unprocessable_entity'
+    
+  ReadTypeT: &ReadType
+    '403':
+      description: Forbidden
+      schema:
+        $ref: '#/definitions/forbidden'
+    '404':
+      description: Not found
+      schema:
+        $ref: '#/definitions/not_found'
+
+  UpdateTypeT: &UpdateType
+    '403':
+      description: Forbidden
+      schema:
+        $ref: '#/definitions/forbidden'
+    '404':
+      description: Not found
+      schema:
+        $ref: '#/definitions/not_found'
+    '422':
+      description: Unprocessable entity
+      schema:
+       $ref: '#/definitions/unprocessable_entity'
+
+  DeleteTypeT: &DeleteType
+    '403':
+      description: Forbidden
+      schema:
+        $ref: '#/definitions/forbidden'
+    '404':
+      description: Not found
+      schema:
+        $ref: '#/definitions/not_found'
+
 paths:
   /search:
     parameters:
@@ -144,11 +233,8 @@ paths:
         default: data_files
     get:
       operationId: search
-      description: |
-        Search for resources
-        * of the specified type
-        * that are visible to the authenticated user, and
-        * contain the specified test
+      description:
+        $ref: ../descriptions/searchOperation.md
       tags:
         - search
       responses:
@@ -156,6 +242,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/searchResponse'
+          examples:
+            application/json:
+              $ref: ../examples/searchResponse.yml
   /assays:
     get:
       operationId: listAssays
@@ -163,6 +252,7 @@ paths:
       description:
         $ref: ../descriptions/listAssays.md
       tags:
+        - list
         - assays
       responses:
         '200':
@@ -172,11 +262,13 @@ paths:
           examples:
             application/json:
               $ref: ../examples/assaysResponse.yml
+        <<: *ListType
     post:
       operationId: createAssay
       description:
         $ref: ../descriptions/createAssay.md
       tags:
+        - create
         - assays
       parameters:
         - in: body
@@ -185,14 +277,14 @@ paths:
           schema:
             $ref: '#/definitions/assayPost'
       responses:
-        '200':
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/assayResponse'
           examples:
             application/json:
-              $ref: ../examples/assayPostResponse.yml
-        '501':
-          description: Not implemented
+              $ref: '../examples/assayPostResponse.yml'
+        <<: *CreateType
   '/assays/{id}':
     parameters:
       - name: id
@@ -206,6 +298,7 @@ paths:
       description:
         $ref: ../descriptions/updateAssay.md
       tags:
+        - update
         - assays
       parameters:
         - in: body
@@ -221,13 +314,13 @@ paths:
           examples:
             application/json:
               $ref: ../examples/assayPatchResponse.yml
-        '501':
-          description: Not implemented
+        <<: *UpdateType
     get:
       operationId: readAssay
       description:
         $ref: ../descriptions/readAssay.md
       tags:
+        - read
         - assays
       responses:
         '200':
@@ -237,23 +330,27 @@ paths:
           examples:
             application/json:
               $ref: ../examples/assayResponse.yml
+        <<: *ReadType
     delete:
       operationId: deleteAssay
       description:
         $ref: ../descriptions/deleteAssay.md
       tags:
+        - delete
         - assays
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
+        <<: *DeleteType
   /data_files:
     get:
       operationId: listDataFiles
       description:
         $ref: ../descriptions/listDataFiles.md
       tags:
+        - list
         - dataFiles
       responses:
         '200':
@@ -263,15 +360,23 @@ paths:
           examples:
             application/json:
               $ref: ../examples/dataFilesResponse.yml
+        <<: *ListType
     post:
       operationId: createDataFile
       description:
         $ref: ../descriptions/createDataFile.md
       tags:
+        - create
         - dataFiles
       responses:
-        '501':
-          description: Not implemented
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/dataFileResponse'
+          examples:
+            application/json:
+              $ref: '../examples/dataFilePostResponse.yml'
+        <<: *CreateType
   '/data_files/{id}':
     parameters:
       - name: id
@@ -292,32 +397,52 @@ paths:
           type: integer
           default: 2
       tags:
+        - read
         - dataFiles
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/dataFileResponse'
+          examples:
+            application/json:
+              $ref: ../examples/dataFileResponse.yml
+        <<: *ReadType
     patch:
       operationId: updateDataFile
       description:
         $ref: ../descriptions/updateDataFile.md
       tags:
+        - update
         - dataFiles
+      parameters:
+        - in: body
+          name: data file
+          description: The data file to patch
+          schema:
+            $ref: '#/definitions/dataFilePatch'
       responses:
-        '501':
-          description: Not implemented
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/dataFileResponse'
+          examples:
+            application/json:
+              $ref: ../examples/dataFilePatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deleteDataFile
       description:
         $ref: ../descriptions/deleteDataFile.md
       tags:
+        - delete
         - dataFiles
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
+        <<: *DeleteType
   '/data_files/{id}/content_blobs/{blob_id}':
     put:
       operationId: updateDataFileContent
@@ -347,6 +472,7 @@ paths:
       produces:
         - '*/*'
       tags:
+        - update
         - dataFiles
       responses:
         '200':
@@ -372,27 +498,32 @@ paths:
       produces:
         - '*/*'
       tags:
+        - read
         - dataFiles
       responses:
         '200':
           description: Success
+        <<: *ReadType
   /documents:
     get:
       operationId: listDocuments
       description:
         $ref: ../descriptions/listDocuments.md
       tags:
+        - list
         - documents
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/documentsResponse'
+        <<: *ListType
     post:
       operationId: createDocument
       description:
         $ref: ../descriptions/createDocument.md
       tags:
+        - create
         - documents
       parameters:
         - in: body
@@ -401,10 +532,12 @@ paths:
           schema:
             $ref: '#/definitions/documentPost'
       responses:
-        '200':
-          description: OK
-        '501':
-          description: Not implemented
+        '201':
+          description: Created
+          examples:
+            application/json:
+              $ref: ../examples/documentPostResponse.yml
+        <<: *CreateType
   '/documents/{id}':
     parameters:
       - name: id
@@ -418,59 +551,69 @@ paths:
       description:
         $ref: ../descriptions/readDocument.md
       tags:
+        - read
         - documents
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/documentResponse'
+        <<: *ReadType
     patch:
       operationId: updateDocument
       description:
         $ref: ../descriptions/updateDocument.md
       tags:
+        - update
         - documents
       parameters:
         - in: body
           name: document
           description: The document to patch.
           schema:
-            $ref: '#/definitions/documentPost'
+            $ref: '#/definitions/documentPatch'
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/documentResponse'
-        '501':
-          description: Not implemented
+          examples:
+            application/json:
+              $ref: ../examples/documentPatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deleteDocument
       description:
         $ref: ../descriptions/deleteDocument.md
       tags:
+        - delete
         - documents
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
+        <<: *DeleteType
   /events:
     get:
       operationId: listEvents
       description:
         $ref: ../descriptions/listEvents.md
       tags:
+        - list
         - events
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/eventsResponse'
+        <<: *ListType
     post:
       operationId: createEvent
       description:
         $ref: ../descriptions/createEvent.md
       tags:
+        - create
         - events
       parameters:
         - in: body
@@ -479,12 +622,14 @@ paths:
           schema:
             $ref: '#/definitions/eventPost'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/eventResponse'
-        '501':
-          description: Not implemented
+          examples:
+            application/json:
+              $ref: ../examples/eventPostResponse.yml
+        <<: *CreateType
   '/events/{id}':
     parameters:
       - name: id
@@ -498,17 +643,20 @@ paths:
       description:
         $ref: ../descriptions/readEvent.md
       tags:
+        - read
         - events
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/eventResponse'
+        <<: *ReadType
     patch:
       operationId: updateEvent
       description:
         $ref: ../descriptions/updateEvent.md
       tags:
+        - update
         - events
       parameters:
         - in: body
@@ -521,36 +669,43 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/eventResponse'
-        '501':
-          description: Not implemented
+          examples:
+            application/json:
+              $ref: ../examples/eventPatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deleteEvent
       description:
         $ref: ../descriptions/deleteEvent.md
       tags:
+        - delete
         - events
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
+        <<: *DeleteType
   /institutions:
     get:
       operationId: listInstitutions
       description:
         $ref: ../descriptions/listInstitutions.md
       tags:
+        - list
         - institutions
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/institutionsResponse'
+        <<: *ListType
     post:
       operationId: createInstitution
       description:
         $ref: ../descriptions/createInstitution.md
       tags:
+        - create
         - institutions
       parameters:
         - in: body
@@ -563,22 +718,10 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/institutionResponse'
-        '400':
-          description: Bad request
-          schema:
-            $ref: '#/definitions/bad_request'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: ../examples/institutionPostResponse.yml
+        <<: *CreateType
   '/institutions/{id}':
     parameters:
       - name: id
@@ -592,24 +735,14 @@ paths:
       description:
         $ref: ../descriptions/readInstitution.md
       tags:
+        - read
         - institutions
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/institutionResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+        <<: *ReadType
     patch:
       operationId: updateInstitution
       description:
@@ -621,57 +754,38 @@ paths:
           schema:
             $ref: '#/definitions/institutionPatch'
       tags:
+        - update
         - institutions
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/institutionResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: ../examples/institutionPatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deleteInstitution
       description:
         $ref: ../descriptions/deleteInstitution.md
       tags:
+        - delete
         - institutions
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+        <<: *DeleteType
+
   /investigations:
     get:
       operationId: listInvestigations
       description:
         $ref: ../descriptions/listInvestigations.md
       tags:
+        - list
         - investigations
       responses:
         '200':
@@ -683,6 +797,7 @@ paths:
       description:
         $ref: ../descriptions/createInvestigation.md
       tags:
+        - create
         - investigations
       parameters:
         - in: body
@@ -691,10 +806,13 @@ paths:
           schema:
             $ref: '#/definitions/investigationPost'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/investigationResponse'
+          examples:
+            application/json:
+              $ref: ../examples/investigationPostResponse.yml
         '403':
           description: Forbidden
           schema:
@@ -703,10 +821,6 @@ paths:
           description: Unprocessable entity
           schema:
             $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
   '/investigations/{id}':
     parameters:
       - name: id
@@ -720,6 +834,7 @@ paths:
       description:
         $ref: ../descriptions/readInvestigation.md
       tags:
+        - read
         - investigations
       responses:
         '200':
@@ -737,12 +852,16 @@ paths:
           schema:
             $ref: '#/definitions/investigationPatch'
       tags:
+        - update
         - investigations
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/investigationResponse'
+          examples:
+            application/json:
+              $ref: ../examples/investigationPatchResponse.yml
         '403':
           description: Forbidden
           schema:
@@ -755,15 +874,12 @@ paths:
           description: Unprocessable entity
           schema:
             $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
     delete:
       operationId: deleteInvestigation
       description:
         $ref: ../descriptions/deleteInvestigation.md
       tags:
+        - delete
         - investigations
       responses:
         '200':
@@ -776,6 +892,7 @@ paths:
       description:
         $ref: ../descriptions/listModels.md
       tags:
+        - list
         - models
       responses:
         '200':
@@ -787,6 +904,7 @@ paths:
       description:
         $ref: ../descriptions/createModel.md
       tags:
+        - create
         - models
       parameters:
         - in: body
@@ -795,12 +913,13 @@ paths:
           schema:
             $ref: '#/definitions/modelPost'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/modelResponse'
-        '501':
-          description: Not implemented
+          examples:
+            application/json:
+              $ref: ../examples/modelPostResponse.yml
   '/models/{id}':
     parameters:
       - name: id
@@ -821,6 +940,7 @@ paths:
           type: integer
           default: 2
       tags:
+        - read
         - models
       responses:
         '200':
@@ -832,6 +952,7 @@ paths:
       description:
         $ref: ../descriptions/updateModel.md
       tags:
+        - update
         - models
       parameters:
         - in: body
@@ -844,13 +965,15 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/modelResponse'
-        '501':
-          description: Not implemented
+          examples:
+            application/json:
+              $ref: ../examples/modelPatchResponse.yml
     delete:
       operationId: deleteModel
       description:
         $ref: ../descriptions/deleteModel.md
       tags:
+        - delete
         - models
       responses:
         '200':
@@ -876,6 +999,7 @@ paths:
 #      description:
 #        $ref: ../descriptions/readModelContent.md
       tags:
+        - read
         - models
       responses:
         '200':
@@ -888,31 +1012,13 @@ paths:
       description:
         $ref: ../descriptions/listOrganisms.md
       tags:
+        - list
         - organisms
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/organismsResponse'
-    post:
-      operationId: createOrganism
-      description:
-        $ref: ../descriptions/createOrganism.md
-      tags:
-        - organisms
-      parameters:
-        - in: body
-          name: organism
-          description: The organism to create.
-          schema:
-            $ref: '#/definitions/sopPost'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/organismResponse'
-        '501':
-          description: Not implemented
   '/organisms/{id}':
     parameters:
       - name: id
@@ -926,59 +1032,33 @@ paths:
       description:
         $ref: ../descriptions/readOrganism.md
       tags:
+        - read
         - organisms
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/organismResponse'
-    patch:
-      operationId: updateOrganism
-      description:
-        $ref: ../descriptions/updateOrganism.md
-      tags:
-        - organisms
-      parameters:
-        - in: body
-          name: organism
-          description: The organism to update.
-          schema:
-            $ref: '#/definitions/sopPatch'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/organismResponse'
-        '501':
-          description: Not implemented
-    delete:
-      operationId: deleteOrganism
-      description:
-        $ref: ../descriptions/deleteOrganism.md
-      tags:
-        - organisms
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/ok'
   /people:
     get:
       operationId: listPeople
       description:
         $ref: ../descriptions/listPeople.md
       tags:
+        - list
         - people
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/peopleResponse'
+        <<: *ListType
     post:
       operationId: createPerson
       description:
         $ref: ../descriptions/createPerson.md
       tags:
+        - create
         - people
       parameters:
         - in: body
@@ -988,21 +1068,13 @@ paths:
             $ref: '#/definitions/personPost'
       responses:
         '201':
-          description: OK
+          description: Created
           schema:
             $ref: '#/definitions/personResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: '../examples/personPostResponse.yml'
+        <<: *CreateType
   '/people/{id}':
     parameters:
       - name: id
@@ -1016,28 +1088,14 @@ paths:
       description:
         $ref: ../descriptions/readPerson.md
       tags:
+        - read
         - people
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/personResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+        <<: *ReadType
     patch:
       operationId: updatePerson
       description:
@@ -1049,68 +1107,50 @@ paths:
           schema:
             $ref: '#/definitions/personPatch'
       tags:
+        - update
         - people
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/personResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: ../examples/personPatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deletePerson
       description:
         $ref: ../descriptions/deletePerson.md
       tags:
+        - delete
         - people
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+        <<: *DeleteType
   /presentations:
     get:
       operationId: listPresentations
       description:
         $ref: ../descriptions/listPresentations.md
       tags:
+        - list
         - presentations
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/presentationsResponse'
+        <<: *ListType
     post:
       operationId: createPresentation
       description:
         $ref: ../descriptions/createPresentation.md
       tags:
+        - create
         - presentations
       parameters:
         - in: body
@@ -1119,12 +1159,14 @@ paths:
           schema:
             $ref: '#/definitions/presentationPost'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/presentationResponse'
-        '501':
-          description: Not implemented
+          examples:
+            application/json:
+              $ref: '../examples/presentationPostResponse.yml'
+        <<: *CreateType
   '/presentations/{id}':
     parameters:
       - name: id
@@ -1145,17 +1187,20 @@ paths:
           type: integer
           default: 1
       tags:
+        - read
         - presentations
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/presentationResponse'
+        <<: *ReadType
     patch:
       operationId: updatePresentation
       description:
         $ref: ../descriptions/updatePresentation.md
       tags:
+        - update
         - presentations
       parameters:
         - in: body
@@ -1168,19 +1213,23 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/presentationResponse'
-        '501':
-          description: Not implemented
+          examples:
+            application/json:
+              $ref: ../examples/presentationPatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deletePresentation
       description:
         $ref: ../descriptions/deletePresentation.md
       tags:
+        - delete
         - presentations
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
+        <<: *DeleteType
   '/presentations/{id}/content_blobs/{blob_id}/download':
     parameters:
       - name: id
@@ -1200,29 +1249,34 @@ paths:
 #      description:
 #        $ref: ../descriptions/readPresentationContent.md
       tags:
+        - read
         - presentations
       responses:
         '200':
           description: Success
           schema:
             type: file
+        <<: *ReadType
   /programmes:
     get:
       operationId: listProgrammes
       description:
         $ref: ../descriptions/listProgrammes.md
       tags:
+        - list
         - programmes
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/programmesResponse'
+        <<: *ListType
     post:
       operationId: createProgramme
       description:
         $ref: ../descriptions/createProgramme.md
       tags:
+        - create
         - programmes
       parameters:
         - in: body
@@ -1231,22 +1285,14 @@ paths:
           schema:
             $ref: '#/definitions/programmePost'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/programmeResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: '../examples/programmePostResponse.yml'
+        <<: *CreateType
   '/programmes/{id}':
     parameters:
       - name: id
@@ -1260,28 +1306,14 @@ paths:
       description:
         $ref: ../descriptions/readProgramme.md
       tags:
+        - read
         - programmes
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/programmeResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+        <<: *ReadType
     patch:
       operationId: updateProgramme
       description:
@@ -1293,68 +1325,50 @@ paths:
           schema:
             $ref: '#/definitions/programmePatch'
       tags:
+        - update
         - programmes
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/programmeResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: ../examples/programmePatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deleteProgramme
       description:
         $ref: ../descriptions/deleteProgramme.md
       tags:
+        - delete
         - programmes
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+        <<: *DeleteType
   /projects:
     get:
       operationId: listProjects
       description:
         $ref: ../descriptions/listProjects.md
       tags:
+        - list
         - projects
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/projectsResponse'
+        <<: *ListType
     post:
       operationId: createProject
       description:
         $ref: ../descriptions/createProject.md
       tags:
+        - create
         - projects
       parameters:
         - in: body
@@ -1363,22 +1377,14 @@ paths:
           schema:
             $ref: '#/definitions/projectPost'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/projectResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: '../examples/projectPostResponse.yml'
+        <<: *CreateType
   '/projects/{id}':
     parameters:
       - name: id
@@ -1392,28 +1398,14 @@ paths:
       description:
         $ref: ../descriptions/readProject.md
       tags:
+        - read
         - projects
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/projectResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+        <<: *ReadType
     patch:
       operationId: updateProject
       description:
@@ -1425,82 +1417,44 @@ paths:
           schema:
             $ref: '#/definitions/projectPatch'
       tags:
+        - update
         - projects
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/projectResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: ../examples/projectPatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deleteProject
       description:
         $ref: ../descriptions/deleteProject.md
       tags:
+        - delete
         - projects
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+        <<: *DeleteType
   /publications:
     get:
       operationId: listPublications
       description:
         $ref: ../descriptions/listPublications.md
       tags:
+        - list
         - publications
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/publicationsResponse'
-    post:
-      operationId: createPublication
-      description:
-        $ref: ../descriptions/createPublication.md
-      tags:
-        - publications
-      parameters:
-        - in: body
-          name: publication
-          description: The publication to create.
-          schema:
-            $ref: '#/definitions/sopPost'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/publicationResponse'
-        '501':
-          description: Not implemented
+        <<: *ListType
   '/publications/{id}':
     parameters:
       - name: id
@@ -1514,71 +1468,48 @@ paths:
       description:
         $ref: ../descriptions/readPublication.md
       tags:
+        - read
         - publications
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/publicationResponse'
-    patch:
-      operationId: updatePublication
-      description:
-        $ref: ../descriptions/updatePublication.md
-      tags:
-        - publications
-      parameters:
-        - in: body
-          name: publication
-          description: The publication to update.
-          schema:
-            $ref: '#/definitions/sopPatch'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/publicationResponse'
-        '501':
-          description: Not implemented
-    delete:
-      operationId: deletePublication
-      description:
-        $ref: ../descriptions/deletePublication.md
-      tags:
-        - publications
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/ok'
+        <<: *ReadType
   /sample_types:
     get:
       operationId: listSampleTypes
       description:
         $ref: ../descriptions/listSampleTypes.md
       tags:
+        - list
         - sampleTypes
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/sampleTypesResponse'
+        <<: *ListType
   /sops:
     get:
       operationId: listSops
       description:
         $ref: ../descriptions/listSops.md
       tags:
+        - list
         - sops
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/sopsResponse'
+        <<: *ListType
     post:
       operationId: createSop
       description:
         $ref: ../descriptions/createSop.md
       tags:
+        - create
         - sops
       parameters:
         - in: body
@@ -1587,12 +1518,14 @@ paths:
           schema:
             $ref: '#/definitions/sopPost'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/sopResponse'
-        '501':
-          description: Not implemented
+          examples:
+            application/json:
+              $ref: '../examples/sopPostResponse.yml'
+        <<: *CreateType
   '/sops/{id}':
     parameters:
       - name: id
@@ -1613,17 +1546,20 @@ paths:
           type: integer
           default: 1
       tags:
+        - read
         - sops
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/sopResponse'
+        <<: *ReadType
     patch:
       operationId: updateSop
       description:
         $ref: ../descriptions/updateSop.md
       tags:
+        - update
         - sops
       parameters:
         - in: body
@@ -1636,19 +1572,23 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/sopResponse'
-        '501':
-          description: Not implemented
+          examples:
+            application/json:
+              $ref: ../examples/sopPatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deleteSop
       description:
         $ref: ../descriptions/deleteSop.md
       tags:
+        - delete
         - sops
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
+        <<: *DeleteType
   '/sops/{id}/content_blobs/{blob_id}/download':
     parameters:
       - name: id
@@ -1668,29 +1608,34 @@ paths:
 #      description:
 #        $ref: ../descriptions/readSopContent.md
       tags:
+        - read
         - sops
       responses:
         '200':
           description: Success
           schema:
             type: file
+        <<: *ReadType
   /studies:
     get:
       operationId: listStudies
       description:
         $ref: ../descriptions/listStudies.md
       tags:
+        - list
         - studies
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/studiesResponse'
+        <<: *ListType
     post:
       operationId: createStudy
       description:
         $ref: ../descriptions/createStudy.md
       tags:
+        - create
         - studies
       parameters:
         - in: body
@@ -1699,22 +1644,14 @@ paths:
           schema:
             $ref: '#/definitions/studyPost'
       responses:
-        '200':
-          description: OK
+        '201':
+          description: Created
           schema:
             $ref: '#/definitions/studyResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: '../examples/studyPostResponse.yml'
+        <<: *CreateType
   '/studies/{id}':
     parameters:
       - name: id
@@ -1728,17 +1665,20 @@ paths:
       description:
         $ref: ../descriptions/readStudy.md
       tags:
+        - read
         - studies
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/studyResponse'
+        <<: *ReadType
     patch:
       operationId: updateStudy
       description:
         $ref: ../descriptions/updateStudy.md
       tags:
+        - update
         - studies
       parameters:
         - in: body
@@ -1751,33 +1691,23 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/studyResponse'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
+          examples:
+            application/json:
+              $ref: ../examples/studyPatchResponse.yml
+        <<: *UpdateType
     delete:
       operationId: deleteStudy
       description:
         $ref: ../descriptions/deleteStudy.md
       tags:
+        - delete
         - studies
       responses:
         '200':
           description: OK
           schema:
             $ref: '#/definitions/ok'
+        <<: *DeleteType
         '403':
           description: Forbidden
           schema:
@@ -1786,10 +1716,6 @@ paths:
           description: Not found
           schema:
             $ref: '#/definitions/not_found'
-        '501':
-          description: Not Implemented
-          schema:
-            $ref: '#/definitions/not_implemented'
 definitions:
   error:
     type: object
@@ -1827,16 +1753,16 @@ definitions:
     type: string
     minLength: 1
   nullableNonEmptyString:
-    type: string
-    minLength: 1
+    allOf:
+      - $ref: '#/definitions/nonEmptyString'
     x-nullable: true
   otherCreatorsString:
     type: string
     minLength: 1
   nullableOtherCreatorsString:
-    oneOf:
+    allOf:
       - $ref: '#/definitions/otherCreatorsString'
-      - type: 'null'
+    x-nullable: true
   nonEmptyStringList:
     type: array
     minItems: 1
@@ -1863,9 +1789,9 @@ definitions:
     items:
       $ref: '#/definitions/projectPosition'
   nullableProjectPositionsList:
-    oneOf:
+    allOf:
       - $ref: '#/definitions/nonEmptyProjectPositionsList'
-      - type: 'null'
+    x-nullable: true
   uriString:
     type: string
     minLength: 1
@@ -1882,41 +1808,41 @@ definitions:
     type: string
     minLength: 1
   nullableLicense:
-    oneOf:
+    allOf:
       - $ref: '#/definitions/license'
-      - type: 'null'
+    x-nullable: true
   md5sumString:
     type: string
     minLength: 32
     maxLength: 32
     pattern: '[0-9a-f]{32}'
   nullableMd5sumString:
-    oneOf:
+    allOf:
       - $ref: '#/definitions/md5sumString'
-      - type: 'null'
+    x-nullable: true
   sha1sumString:
     type: string
     minLength: 5
     maxLength: 40
     pattern: '[0-9a-f]{5,40}'
   nullableSha1sumString:
-    oneOf:
+    allOf:
       - $ref: '#/definitions/sha1sumString'
-      - type: 'null'
+    x-nullable: true
   countryString:
     type: string
   nullableCountryString:
-    oneOf:
+    allOf:
       - $ref: '#/definitions/countryString'
-      - type: 'null'
+    x-nullable: true
   countryCodeString:
     minLength: 2
     maxLength: 2
     type: string
   nullableCountryCodeString:
-    oneOf:
+    allOf:
       - $ref: '#/definitions/countryCodeString'
-      - type: 'null'
+    x-nullable: true
   versionNumber:
     type: string
     minLength: 1
@@ -3040,6 +2966,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/assayPost.yml'
   assayPatch:
     type: object
     properties:
@@ -3115,6 +3043,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/assayPatch.yml'
   getContentBlobsResponse:
     type: object
     properties:
@@ -3277,6 +3207,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/dataFilePost.yml'
   dataFilePatch:
     type: object
     properties:
@@ -3324,6 +3256,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/dataFilePatch.yml'
   documentResponse:
     type: object
     properties:
@@ -3433,6 +3367,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/documentPost.yml'
   documentPatch:
     type: object
     properties:
@@ -3476,6 +3412,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/documentPatch.yml'
   eventResponse:
     type: object
     properties:
@@ -3606,6 +3544,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/eventPost.yml'
   eventPatch:
     type: object
     properties:
@@ -3657,6 +3597,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/eventPatch.yml'
   institutionResponse:
     type: object
     properties:
@@ -3721,7 +3663,7 @@ definitions:
       - jsonapi
     additionalProperties: false
     example:
-      $ref: 'http://docs.seek4science.org/tech/api/examples/institutionResponse.yaml'
+      $ref: '../examples/institutionResponse.yml'
   institutionPost:
     type: object
     properties:
@@ -3755,7 +3697,7 @@ definitions:
       - data
     additionalProperties: false
     example:
-      $ref: 'http://docs.seek4science.org/tech/api/examples/institutionPost.yaml'
+      $ref: '../examples/institutionPost.yml'
   institutionPatch:
     type: object
     properties:
@@ -3789,7 +3731,7 @@ definitions:
       - data
     additionalProperties: false
     example:
-      $ref: 'http://docs.seek4science.org/tech/api/examples/institutionPatch.yaml'
+      $ref: '../examples/institutionPatch.yml'
   investigationResponse:
     type: object
     properties:
@@ -3911,6 +3853,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/investigationPatch.yml'
   investigationPost:
     type: object
     properties:
@@ -3955,6 +3899,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/investigationPost.yml'
   modelResponse:
     type: object
     properties:
@@ -4072,6 +4018,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/modelPost.yml'
   modelPatch:
     type: object
     properties:
@@ -4123,6 +4071,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/modelPatch.yml'
   organismResponse:
     type: object
     properties:
@@ -4284,7 +4234,7 @@ definitions:
       - jsonapi
     additionalProperties: false
     example:
-      $ref: 'http://docs.seek4science.org/tech/api/examples/personResponse.yaml' 
+      $ref: '../examples/personResponse.yml' 
   personPatch:
     type: object
     properties:
@@ -4329,7 +4279,7 @@ definitions:
       - data
     additionalProperties: false
     example:
-      $ref: 'http://docs.seek4science.org/tech/api/examples/personPatch.yaml'
+      $ref: '../examples/personPatch.yml'
   personPost:
     type: object
     properties:
@@ -4373,7 +4323,7 @@ definitions:
       - data
     additionalProperties: false
     example:
-      $ref: 'http://docs.seek4science.org/tech/api/examples/personPost.yaml'
+      $ref: '../examples/personPost.yml'
   presentationResponse:
     type: object
     properties:
@@ -4488,6 +4438,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/presentationPost.yml'
   presentationPatch:
     type: object
     properties:
@@ -4533,6 +4485,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/presentationPatch.yml'
   programmeResponse:
     type: object
     properties:
@@ -4647,6 +4601,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/programmePost.yml'
   programmePatch:
     type: object
     properties:
@@ -4685,6 +4641,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/programmePatch.yml'
   projectResponse:
     type: object
     properties:
@@ -4825,6 +4783,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/projectPatch.yml'
   projectPost:
     type: object
     properties:
@@ -4867,6 +4827,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/projectPost.yml'
   publicationResponse:
     type: object
     properties:
@@ -5070,6 +5032,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/sopPost.yml'
   sopPatch:
     type: object
     properties:
@@ -5113,6 +5077,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/sopPatch.yml'
   studyResponse:
     type: object
     properties:
@@ -5246,6 +5212,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/studyPost.yml'
   studyPatch:
     type: object
     properties:
@@ -5291,6 +5259,8 @@ definitions:
     required:
       - data
     additionalProperties: false
+    example:
+      $ref: '../examples/studyPatch.yml'
   assaysResponse:
     type: object
     properties:
@@ -5446,7 +5416,7 @@ definitions:
       - meta
     additionalProperties: false
     example:
-      $ref: 'http://docs.seek4science.org/tech/api/examples/institutionsResponse.yaml'
+      $ref: '../examples/institutionsResponse.yml'
   investigationSkeleton:
     properties:
       id:
@@ -5616,7 +5586,7 @@ definitions:
       - meta
     additionalProperties: false
     example:
-      $ref: 'http://docs.seek4science.org/tech/api/examples/peopleResponse.yaml'
+      $ref: '../examples/peopleResponse.yml'
   presentationSkeleton:
     properties:
       id:

@@ -1,35 +1,35 @@
+---
 data:
+  type: events
   attributes:
-    address: Sofienstr 2
-    city: Heidelberg
-    country: Germany
+    title: A Maximal Event
     description: This is the description
-    end_date: '2017-01-01T00:22:00.000Z'
     policy:
       access: view
       permissions:
-      - access: edit
-        resource_id: '1972'
+      - resource_id: '242'
         resource_type: projects
-    start_date: '2017-01-01T00:20:00.000Z'
-    title: A Maximal Event
+        access: edit
     url: http://www.example.com/events/123
+    address: Sofienstr 2
+    city: Heidelberg
+    country: Germany
+    start_date: '2017-01-01T00:20:00.000Z'
+    end_date: '2017-01-01T00:22:00.000Z'
   relationships:
+    projects:
+      data:
+      - id: '242'
+        type: projects
     data_files:
       data:
-      - id: '61'
+      - id: '4'
         type: data_files
     presentations:
       data:
-      - id: '41'
+      - id: '1'
         type: presentations
-    projects:
-      data:
-      - id: '1972'
-        type: projects
     publications:
       data:
-      - id: '86'
+      - id: '4'
         type: publications
-  type: events
-

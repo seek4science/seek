@@ -1,10 +1,10 @@
+---
 data:
+  type: institutions
+  id: '1094'
   attributes:
-    address: NoName street 23
-    city: Heidelberg
-    country: Germany
     title: Patched institution
     web_page: http://my.Institution.com
-  id: '289'
-  type: institutions
-
+    country: Germany
+    city: Heidelberg
+    address: NoName street 23

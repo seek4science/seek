@@ -1,8 +1,8 @@
 ---
 data:
-  type: presentations
+  type: data_files
   attributes:
-    title: A Maximal Presentation
+    title: A Maximal Data File
     description: This is the description
     tags:
     - tag1
@@ -15,23 +15,27 @@ data:
     policy:
       access: download
       permissions:
-      - resource_id: '1836'
+      - resource_id: '2058'
         resource_type: projects
         access: edit
   relationships:
     creators:
       data:
-      - id: '1206'
+      - id: '1369'
         type: people
     projects:
       data:
-      - id: '1836'
+      - id: '2058'
         type: projects
+    assays:
+      data:
+      - id: '186'
+        type: assays
     publications:
       data:
-      - id: '71'
+      - id: '87'
         type: publications
     events:
       data:
-      - id: '54'
+      - id: '70'
         type: events

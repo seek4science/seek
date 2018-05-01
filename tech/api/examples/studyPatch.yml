@@ -1,29 +1,29 @@
+---
 data:
+  type: studies
+  id: '227'
   attributes:
+    title: A Maximal Study
     description: The Study of many things
     experimentalists: Wet lab people
+    person_responsible_id: '1161'
     other_creators: Marie Curie
-    person_responsible_id: '603'
     policy:
       access: download
       permissions:
-      - access: view
-        resource_id: '817'
+      - resource_id: '1777'
         resource_type: projects
-    title: A Maximal Study
-  id: '124'
+        access: view
   relationships:
-    creators:
-      data:
-      - id: '603'
-        type: people
     investigation:
       data:
-        id: '134'
+        id: '272'
         type: investigations
     publications:
       data:
-      - id: '40'
+      - id: '66'
         type: publications
-  type: studies
-
+    creators:
+      data:
+      - id: '1161'
+        type: people

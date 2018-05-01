@@ -1,20 +1,20 @@
+---
 data:
+  id: '18'
+  type: programmes
   attributes:
+    title: Changed title
     description: A very exciting programme patched!
+    web_page: http://www.synbiochem.co.uk
+    funding_details: Someone ELSE is funding this for me
     funding_codes:
     - AVH
-    funding_details: Someone ELSE is funding this for me
-    title: Changed title
-    web_page: http://www.synbiochem.co.uk
-  id: '19'
   relationships:
-    administrators:
-      data:
-      - id: '738'
-        type: people
     projects:
       data:
-      - id: '1016'
+      - id: '731'
         type: projects
-  type: programmes
-
+    administrators:
+      data:
+      - id: '510'
+        type: people

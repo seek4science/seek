@@ -1,25 +1,27 @@
+---
 data:
-  id: '70'
+  id: '1094'
   type: institutions
   attributes:
     avatar: 
-    title: Some university
-    country: FR
-    city: 
-    address: 
-    web_page: 
+    title: Patched institution
+    country: Germany
+    country_code: de
+    city: Heidelberg
+    address: NoName street 23
+    web_page: http://my.Institution.com
   relationships:
     people:
       data: []
     projects:
       data: []
   links:
-    self: "/institutions/70"
+    self: "/institutions/1094"
   meta:
-    created: '2018-04-12T09:46:10.695Z'
-    modified: '2018-04-12T09:46:10.695Z'
+    created: '2018-04-27T14:38:21.000Z'
+    modified: '2018-04-27T14:38:23.245Z'
     api_version: '0.1'
-    uuid: 414f8a70-2064-0136-17ed-54bed9b4c528
-    base_url: https://testing.sysmo-db.org
+    uuid: 8e95da20-2c56-0136-ec2f-08002734982f
+    base_url: http://localhost:3000
 jsonapi:
   version: '1.0'

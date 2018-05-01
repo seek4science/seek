@@ -1,26 +1,27 @@
 ---
 data:
-  id: '75'
+  id: '14'
   type: events
   attributes:
-    title: CropClock Kick-off Meeting, November 2014
-    description: "The kickoff meeting of CropClock team took place in November 12,
-      2014 at the Max Plank Institute (MPIPZ, http://www.mpipz.mpg.de/en), Kologne,
-      Germany. The goal for this meeting was for the members of the various teams
-      to get acquainted with each other’s expertise and to discuss the following items:
-      1) Logistics about the project start,  2) Data that need to be shared,  3) Matlab
-      code that needs to shared among the teams. \r\nThe initial plan of action for
-      data sharing was also laid out."
-    url: http://www.mpipz.mpg.de/en
+    policy:
+      access: manage
+      permissions: []
+    title: An Event
+    description: A thing that will happen
+    url: 
     address: 
-    city: Kologne
-    country: Germany
-    start_date: '2014-11-12T00:00:00.000Z'
-    end_date: '2014-11-12T00:00:00.000Z'
+    city: 
+    country: 
+    start_date: '2018-04-27T14:24:49.000Z'
+    end_date: '2018-04-28T14:24:49.000Z'
   relationships:
+    submitter:
+      data:
+      - id: '205'
+        type: people
     projects:
       data:
-      - id: '26'
+      - id: '310'
         type: projects
     data_files:
       data: []
@@ -29,12 +30,12 @@ data:
     presentations:
       data: []
   links:
-    self: "/events/75"
+    self: "/events/14"
   meta:
-    created: '2017-04-24T09:49:00.000Z'
-    modified: '2017-04-26T07:43:42.000Z'
+    created: '2018-04-27T14:25:29.000Z'
+    modified: '2018-04-27T14:25:30.000Z'
     api_version: '0.1'
-    uuid: 2adac480-0b01-0135-8501-549f350973c0
-    base_url: https://fairdomhub.org
+    uuid: c2d344b0-2c54-0136-ec2f-08002734982f
+    base_url: http://localhost:3000
 jsonapi:
   version: '1.0'

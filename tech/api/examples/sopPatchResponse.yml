@@ -1,75 +1,67 @@
 ---
 data:
-  id: '203'
+  id: '49'
   type: sops
   attributes:
-    tags: 
-    title: Validation experiments
-    description: SOP for the determination of external metabolites (Glc, Pyr, Gly,
-      Lac) in intact trophozoite incubations, and for the determination of intracellular
-      metabolite concentrations.
+    policy:
+      access: manage
+      permissions: []
+    title: This Sop
+    description: Protocol
     license: 
     latest_version: 1
+    tags: 
     versions:
     - version: 1
       revision_comments: 
-      url: https://fairdomhub.org/sops/203?version=1
-    version: '1'
+      url: http://localhost:3000/sops/49?version=1
+    version: 1
     revision_comments: 
-    created_at: '2014-08-15T13:00:40.000Z'
-    updated_at: '2015-04-17T10:27:22.000Z'
+    created_at: '2018-04-27T14:42:16.000Z'
+    updated_at: '2018-04-27T14:42:21.000Z'
     content_blobs:
-    - original_filename: Validation SOP.docx
+    - original_filename: file-97
       url: 
-      md5sum: 80afdbcc9064a4f96eb2e8cbec138d70
-      sha1sum: b46118506c779972df036e0f7233b9cd3995bf50
-      content_type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
-      link: https://fairdomhub.org/sops/203/content_blobs/1806
-      size: 154968
+      md5sum: 479e5c9c6807e8de11ab91b273c0eae7
+      sha1sum: 2977f9e45eb27e83c8389ea18e663ab7d840b19c
+      content_type: application/pdf
+      link: http://localhost:3000/sops/49/content_blobs/296
+      size: 10
+    other_creators: 
   relationships:
     creators:
       data:
-      - id: '411'
-        type: people
-      - id: '49'
+      - id: '1333'
         type: people
     submitter:
       data:
-      - id: '411'
+      - id: '1332'
         type: people
     people:
       data:
-      - id: '49'
+      - id: '1332'
         type: people
-      - id: '411'
+      - id: '1333'
         type: people
     projects:
       data:
-      - id: '17'
+      - id: '2010'
         type: projects
     investigations:
-      data:
-      - id: '56'
-        type: investigations
+      data: []
     studies:
-      data:
-      - id: '119'
-        type: studies
+      data: []
     assays:
-      data:
-      - id: '260'
-        type: assays
-      - id: '266'
-        type: assays
+      data: []
     publications:
       data: []
   links:
-    self: "/sops/203?version=1"
+    self: "/sops/49?version=1"
   meta:
-    created: '2014-08-15T13:00:40.000Z'
-    modified: '2015-04-17T10:27:22.000Z'
+    created: '2018-04-27T14:42:15.000Z'
+    modified: '2018-04-27T14:42:17.000Z'
     api_version: '0.1'
-    uuid: 90825ba2-b548-49e0-9215-a8c3ba19ee4b
-    base_url: https://fairdomhub.org
+    uuid: 1a593b30-2c57-0136-ec2f-08002734982f
+    base_url: http://localhost:3000
 jsonapi:
   version: '1.0'

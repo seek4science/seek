@@ -1,47 +1,56 @@
 ---
 data:
-  id: '253'
+  id: '36'
   type: presentations
   attributes:
-    tags: 
-    title: Data and model Management in Systems Biology
-    description: Presentation at the 10th anniversary of SABIO-RK, Heidelberg 2016
-    license: 
+    policy:
+      access: download
+      permissions:
+      - resource_type: projects
+        resource_id: '1836'
+        access: edit
+    title: A Maximal Presentation
+    description: This is the description
+    license: CC-BY-4.0
     latest_version: 1
+    tags:
+    - tag1
+    - tag2
     versions:
     - version: 1
       revision_comments: 
-      url: https://fairdomhub.org/presentations/253?version=1
-    version: '1'
+      url: http://localhost:3000/presentations/36?version=1
+    version: 1
     revision_comments: 
-    created_at: '2016-05-31T09:08:57.000Z'
-    updated_at: '2016-06-01T20:19:00.000Z'
+    created_at: '2018-04-27T14:40:02.000Z'
+    updated_at: '2018-04-27T14:40:02.000Z'
     content_blobs:
-    - original_filename: data-and-model-management-in-systems-biology
-      url: https://www.slideshare.net/dagwa/data-and-model-management-in-systems-biology
-      md5sum: 1173007d7340ce19abbe015ffb9881f0
-      sha1sum: 9a72a5bfa4b73d2aa5ee7a02024ad45cadcc9cd5
-      content_type: text/html
-      link: https://fairdomhub.org/presentations/253/content_blobs/2505
-      size: 157861
+    - original_filename: a_pdf_file.pdf
+      url: 
+      md5sum: 
+      sha1sum: 
+      content_type: application/pdf
+      link: http://localhost:3000/presentations/36/content_blobs/264
+      size: 
+    other_creators: John Smith, Jane Smith
   relationships:
     creators:
       data:
-      - id: '600'
+      - id: '1206'
         type: people
     submitter:
       data:
-      - id: '600'
+      - id: '1205'
         type: people
     people:
       data:
-      - id: '600'
+      - id: '1205'
+        type: people
+      - id: '1206'
         type: people
     projects:
       data:
-      - id: '35'
-        type: projects
-      - id: '49'
+      - id: '1836'
         type: projects
     investigations:
       data: []
@@ -50,16 +59,20 @@ data:
     assays:
       data: []
     publications:
-      data: []
+      data:
+      - id: '71'
+        type: publications
     events:
-      data: []
+      data:
+      - id: '54'
+        type: events
   links:
-    self: "/presentations/253?version=1"
+    self: "/presentations/36?version=1"
   meta:
-    created: '2016-05-31T09:08:57.000Z'
-    modified: '2016-06-01T20:19:00.000Z'
+    created: '2018-04-27T14:40:02.790Z'
+    modified: '2018-04-27T14:40:03.363Z'
     api_version: '0.1'
-    uuid: 3acc9170-093d-0134-4373-549f350973c0
-    base_url: https://fairdomhub.org
+    uuid: caf4e8a0-2c56-0136-ec2f-08002734982f
+    base_url: http://localhost:3000
 jsonapi:
   version: '1.0'
