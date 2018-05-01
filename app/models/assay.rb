@@ -51,6 +51,8 @@ class Assay < ActiveRecord::Base
 
   before_validation :default_assay_and_technology_type
 
+  enforce_authorization_on_association :study, :view
+
   # a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
 
