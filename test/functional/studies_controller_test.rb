@@ -567,4 +567,75 @@ class StudiesControllerTest < ActionController::TestCase
 
     assert_redirected_to studies_path
   end
+
+  test 'cannot create with link to investigation in another project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:another_person.projects,policy:Factory(:publicly_viewable_policy))
+    assert investigation.can_view?
+    assert_empty person.projects & investigation.projects
+    assert_no_difference('Study.count') do
+      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test 'cannot create with hidden investigation in same project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:person.projects,policy:Factory(:private_policy))
+    refute investigation.can_view?
+    refute_empty person.projects & investigation.projects
+
+    assert_no_difference('Study.count') do
+      post :create, study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing
+    end
+    assert_response :unprocessable_entity
+  end
+
+  test 'cannot update with link to investigation in another project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:another_person.projects,policy:Factory(:publicly_viewable_policy))
+    study = Factory(:study,contributor:person,investigation:Factory(:investigation,contributor:person,projects:person.projects))
+
+    assert investigation.can_view?
+    assert_empty person.projects & investigation.projects
+
+    refute_equal investigation,study.investigation
+
+
+    put :update,id:study.id,study:{investigation_id:investigation.id}
+
+    assert_response :unprocessable_entity
+    study.reload
+    refute_equal investigation,study.investigation
+  end
+
+  test 'cannot update with link to hidden investigation in same project' do
+    person = Factory(:person)
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+    login_as(person)
+    investigation = Factory(:investigation,contributor:another_person,projects:person.projects,policy:Factory(:private_policy))
+    study = Factory(:study,contributor:person,investigation:Factory(:investigation,contributor:person,projects:person.projects))
+
+    refute investigation.can_view?
+    refute_empty person.projects & investigation.projects
+    refute_equal investigation,study.investigation
+
+    put :update,id:study.id,study:{investigation_id:investigation.id}
+
+    assert_response :unprocessable_entity
+    study.reload
+    refute_equal investigation,study.investigation
+  end
+
+
 end
