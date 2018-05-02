@@ -81,46 +81,48 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
   end
 
   # assay must be editable
-  test 'datafile linked to assay' do
+  test 'assets linked to assay' do
     User.with_current_user(@user) do
 
-      good_assay = Factory(:assay,contributor:@person)
-      bad_assay = Factory(:assay,policy:Factory(:publicly_viewable_policy))
+      [:data_file,:model,:sop, :sample, :document].each do |asset_type|
+        good_assay = Factory(:assay,contributor:@person)
+        bad_assay = Factory(:assay,policy:Factory(:publicly_viewable_policy))
 
-      assert good_assay.can_edit?
-      refute bad_assay.can_edit?
-      assert bad_assay.can_view? #check is can actually be viewed
+        assert good_assay.can_edit?
+        refute bad_assay.can_edit?
+        assert bad_assay.can_view? #check is can actually be viewed
 
-      asset = Factory(:data_file,contributor:@person)
-      assert asset.can_edit?
-      assert_empty asset.assays
+        asset = Factory(asset_type,contributor:@person)
+        assert asset.can_edit?
+        assert_empty asset.assays
 
-      asset.assay_assets.build(assay:good_assay)
-      assert asset.save
-      asset.reload
-      assert_equal [good_assay],asset.assays
-
-      asset = Factory(:data_file,contributor:@person)
-      assert asset.can_edit?
-      assert_empty asset.assays
-
-      asset.assay_assets.build(assay:bad_assay)
-      refute asset.save
-      asset.reload
-      assert_empty asset.assays
-
-      #check it only checks new links
-      disable_authorization_checks do
-        asset = Factory(:data_file,contributor:@person)
-        asset.assay_assets.build(assay:bad_assay)
+        asset.assay_assets.build(assay:good_assay)
         assert asset.save
-      end
+        asset.reload
+        assert_equal [good_assay],asset.assays
 
-      assert_equal [bad_assay],asset.assays
-      asset.assay_assets.build(assay:good_assay)
-      assert asset.save
-      asset.reload
-      assert_equal [good_assay, bad_assay].sort,asset.assays.sort
+        asset = Factory(asset_type,contributor:@person)
+        assert asset.can_edit?
+        assert_empty asset.assays
+
+        asset.assay_assets.build(assay:bad_assay)
+        refute asset.save
+        asset.reload
+        assert_empty asset.assays
+
+        #check it only checks new links
+        disable_authorization_checks do
+          asset = Factory(asset_type,contributor:@person)
+          asset.assay_assets.build(assay:bad_assay)
+          assert asset.save
+        end
+
+        assert_equal [bad_assay],asset.assays
+        asset.assay_assets.build(assay:good_assay)
+        assert asset.save
+        asset.reload
+        assert_equal [good_assay, bad_assay].sort,asset.assays.sort
+      end
 
     end
   end
