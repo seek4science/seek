@@ -12,7 +12,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
 
   end
 
-  # study must be viewable and belong to the same project as the current user
+  # Assay->Study - study must be viewable and belong to the same project as the current user
   test 'assay linked to study' do
     User.with_current_user(@user) do
       assay = Factory(:assay,contributor:@person)
@@ -46,7 +46,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
     end
   end
 
-  # investigation must be viewable and belong to the same project as the current user
+  # Study->Investigation investigation must be viewable and belong to the same project as the current user
   test 'study linked to investigation' do
     User.with_current_user(@user) do
       study = Factory(:study,contributor:@person)
@@ -80,7 +80,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
     end
   end
 
-  # assay must be editable
+  # Asset->Assay - assay must be editable
   test 'assets linked to assay' do
     User.with_current_user(@user) do
 
@@ -124,6 +124,44 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
         assert_equal [good_assay, bad_assay].sort,asset.assays.sort
       end
 
+    end
+  end
+
+  # Assay->Asset - asset must be viewable
+  test 'assays linked to assets' do
+    User.with_current_user(@user) do
+      [:data_file,:model,:sop, :sample, :document].each do |asset_type|
+        good_asset = Factory(asset_type,policy:Factory(:publicly_viewable_policy), contributor:Factory(:person))
+        bad_asset = Factory(asset_type,policy:Factory(:private_policy), contributor:Factory(:person))
+
+        assert good_asset.can_view?
+        refute bad_asset.can_view?
+
+        assay = Factory(:assay,contributor:@person)
+        assert assay.can_edit?
+
+        assay.assay_assets.create(asset:good_asset)
+        assert assay.save
+        assay.reload
+        assert_equal [good_asset],assay.assets
+
+        assay.assay_assets.create(asset:bad_asset)
+        refute assay.save
+        assay.reload
+        assert_empty assay.assets
+
+        #check it only checks new links
+        disable_authorization_checks do
+          assay = Factory(:assay,contributor:@person)
+          assay.assay_assets.create(asset:bad_asset)
+          assert assay.save
+        end
+
+        assay.assay_assets.create(asset:good_asset)
+        assert assay.save
+        assay.reload
+        assert_equal [good_asset, bad_asset].sort,assay.assets.sort
+      end
     end
   end
 
