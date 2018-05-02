@@ -1070,6 +1070,74 @@ class SopsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'when updating, assay linked to must be editable' do
+    person = Factory(:person)
+    login_as(person)
+    sop = Factory(:sop,contributor:person,projects:person.projects)
+    assert sop.can_edit?
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+
+    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+
+    study = Factory(:study, contributor:person, investigation:investigation)
+
+    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
+    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+
+    assert good_assay.can_edit?
+    refute bad_assay.can_edit?
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: sop.id, sop: { title: sop.title }, assay_ids: [bad_assay.id.to_s]
+    end
+    assert_response :unprocessable_entity
+    sop.reload
+    assert_empty sop.assays
+
+    assert_difference('AssayAsset.count') do
+      put :update, id: sop.id, sop: { title: sop.title }, assay_ids: [good_assay.id.to_s]
+    end
+    sop.reload
+    assert_equal [good_assay], sop.assays
+
+  end
+
+  test 'when creating, assay linked to must be editable' do
+    person = Factory(:person)
+    login_as(person)
+
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+
+    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+
+    study = Factory(:study, contributor:person, investigation:investigation)
+
+    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
+    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+
+    assert good_assay.can_edit?
+    refute bad_assay.can_edit?
+
+    sop, blob = valid_sop
+
+    assert_no_difference('AssayAsset.count') do
+      post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [bad_assay.id.to_s]
+    end
+    assert_response :unprocessable_entity
+
+    sop, blob = valid_sop
+
+    assert_difference('AssayAsset.count') do
+      post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+    end
+    sop = assigns(:sop)
+    assert_equal [good_assay],sop.assays
+  end
+
   private
 
   def doi_citation_mock
