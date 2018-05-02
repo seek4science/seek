@@ -26,6 +26,9 @@ class Study < ActiveRecord::Base
 
   validates :investigation, :presence => { message: "Investigation is blank or invalid" }
 
+  enforce_authorization_on_association :investigation, :view
+  validate ->(s) { errors.add(:investigation, 'must be associated with one of your projects.') unless (s.investigation.projects - s.contributor.person.projects).empty? }
+
   ["data_file","sop","model","document"].each do |type|
     eval <<-END_EVAL
       def #{type}_versions

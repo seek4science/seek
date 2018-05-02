@@ -33,7 +33,7 @@ class Assay < ActiveRecord::Base
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
-  has_many :assay_assets, dependent: :destroy
+  has_many :assay_assets, dependent: :destroy, autosave: true # change this to validate: true in the future
 
   has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile'
   has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop'
@@ -53,6 +53,9 @@ class Assay < ActiveRecord::Base
 
   # a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
+
+  enforce_authorization_on_association :study, :view
+  validate ->(a) { errors.add(:study, 'must be associated with one of your projects.') unless (a.study.projects - a.contributor.person.projects).empty? }
 
   def project_ids
     projects.map(&:id)

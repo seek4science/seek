@@ -8,38 +8,40 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
     @person = Factory(:person)
     @user = @person.user
     @project = @person.projects.first
+    @another_person = Factory(:person_not_in_project)
+    @another_person.add_to_project_and_institution(@project, @person.institutions.first)
   end
 
   # Assay->Study - study must be viewable and belong to the same project as the current user
   test 'assay linked to study' do
     User.with_current_user(@user) do
-      assay = Factory(:assay, contributor: @person)
-      good_study = Factory(:study, contributor: @person, investigation: Factory(:investigation, projects: [@project]))
-      bad_study1 = Factory(:study, contributor: Factory(:person), investigation: Factory(:investigation, projects: [@project]))
-      bad_study2 = Factory(:study, contributor: Factory(:person), policy: Factory(:public_policy))
+      investigation = Factory(:investigation, contributor: @person, projects:[@project])
+      good_study = Factory(:study, contributor: @person, investigation: investigation)
+      assay = Factory(:assay, contributor: @person, study: good_study)
+      not_visible_study = Factory(:study, contributor: @another_person, investigation: investigation)
+      not_in_project_study = Factory(:study, contributor: Factory(:person), policy: Factory(:public_policy))
 
       assert good_study.can_view?
       assert good_study.projects.include?(@project)
 
-      refute bad_study1.can_view?
-      assert bad_study1.projects.include?(@project)
+      refute not_visible_study.can_view?
+      assert not_visible_study.projects.include?(@project)
 
-      assert bad_study2.can_view?
-      refute bad_study2.projects.include?(@project)
+      assert not_in_project_study.can_view?
+      refute not_in_project_study.projects.include?(@project)
+
+      assay.study = not_visible_study
+      refute assay.save
+
+      assay.study = not_in_project_study
+      refute assay.save
 
       assay.study = good_study
-
       assert assay.save
 
-      assay.study = bad_study1
-      refute assay.save
-
-      assay.study = bad_study2
-      refute assay.save
-
       # check it saves with the study already linked
-      assay = Factory(:assay, study: bad_study1, contributor: @person)
-      assay.title = 'fish'
+      assay = Factory(:assay, study: not_visible_study, contributor: @person, policy: Factory(:public_policy))
+      assay.title='fish'
       assert assay.save
     end
   end
@@ -47,33 +49,33 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
   # Study->Investigation investigation must be viewable and belong to the same project as the current user
   test 'study linked to investigation' do
     User.with_current_user(@user) do
-      study = Factory(:study, contributor: @person)
-      good_inv = Factory(:investigation, contributor: @person, projects: [@project])
-      bad_inv1 = Factory(:investigation, contributor: Factory(:person), projects: [@project])
-      bad_inv2 = Factory(:investigation, contributor: Factory(:person), policy: Factory(:public_policy))
+      study = Factory(:study,contributor:@person)
+      good_inv = Factory(:investigation, contributor:@person,projects:[@project])
+      not_visible_inv = Factory(:investigation, contributor: @another_person, projects:[@project])
+      not_in_project_inv = Factory(:investigation, contributor: Factory(:person),policy:Factory(:public_policy))
 
       assert good_inv.can_view?
       assert good_inv.projects.include?(@project)
 
-      refute bad_inv1.can_view?
-      assert bad_inv1.projects.include?(@project)
+      refute not_visible_inv.can_view?
+      assert not_visible_inv.projects.include?(@project)
 
-      assert bad_inv2.can_view?
-      refute bad_inv2.projects.include?(@project)
+      assert not_in_project_inv.can_view?
+      refute not_in_project_inv.projects.include?(@project)
 
       study.investigation = good_inv
 
       assert study.save
 
-      study.investigation = bad_inv1
+      study.investigation = not_visible_inv
       refute study.save
 
-      study.investigation = bad_inv2
+      study.investigation = not_in_project_inv
       refute study.save
 
       # check it saves with the study already linked
-      study = Factory(:study, contributor: @person, investigation: bad_inv1)
-      study.title = 'fish'
+      study = Factory(:study,contributor:@person, investigation: not_visible_inv)
+      study.title='fish'
       assert study.save
     end
   end
@@ -82,12 +84,12 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
   test 'assets linked to assay' do
     User.with_current_user(@user) do
       %i[data_file model sop sample document].each do |asset_type|
-        good_assay = Factory(:assay, contributor: @person)
-        bad_assay = Factory(:assay, policy: Factory(:publicly_viewable_policy))
+        good_assay = Factory(:assay,contributor:@person)
+        not_editable_assay = Factory(:assay,policy:Factory(:publicly_viewable_policy))
 
         assert good_assay.can_edit?
-        refute bad_assay.can_edit?
-        assert bad_assay.can_view? # check is can actually be viewed
+        refute not_editable_assay.can_edit?
+        assert not_editable_assay.can_view? #check is can actually be viewed
 
         asset = Factory(asset_type, contributor: @person)
         assert asset.can_edit?
@@ -102,7 +104,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
         assert asset.can_edit?
         assert_empty asset.assays
 
-        asset.assay_assets.create(assay: bad_assay)
+        asset.assay_assets.build(assay: not_editable_assay)
         refute asset.save
         asset.reload
         assert_empty asset.assays
@@ -110,15 +112,15 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
         # check it only checks new links
         disable_authorization_checks do
           asset = Factory(asset_type, contributor: @person)
-          asset.assay_assets.create(assay: bad_assay)
+          asset.assay_assets.create(assay: not_editable_assay)
           assert asset.save
         end
 
-        assert_equal [bad_assay], asset.assays
+        assert_equal [not_editable_assay], asset.assays
         asset.assay_assets.build(assay: good_assay)
         assert asset.save
         asset.reload
-        assert_equal [good_assay, bad_assay].sort, asset.assays.sort
+        assert_equal [good_assay, not_editable_assay].sort, asset.assays.sort
       end
     end
   end
@@ -144,7 +146,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
         assay.assay_assets.create(asset: bad_asset)
         refute assay.save
         assay.reload
-        assert_empty assay.assets
+        assert_equal [good_asset], assay.assets
 
         # check it only checks new links
         disable_authorization_checks do

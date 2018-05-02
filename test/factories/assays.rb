@@ -36,7 +36,9 @@ Factory.define(:assay_base, class: Assay) do |f|
   f.sequence(:title) { |n| "An Assay #{n}" }
   f.sequence(:description) { |n| "Assay description #{n}" }
   f.association :contributor, factory: :person
-  f.association :study
+  f.after_build do |a|
+    a.study ||= Factory(:study, contributor: a.contributor)
+  end
 end
 
 Factory.define(:modelling_assay, parent: :assay_base) do |f|

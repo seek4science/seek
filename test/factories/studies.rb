@@ -1,8 +1,10 @@
 # Study
 Factory.define(:study) do |f|
   f.sequence(:title) { |n| "Study#{n}" }
-  f.association :investigation
   f.association :contributor, factory: :person
+  f.after_build do |s|
+    s.investigation ||= Factory(:investigation, contributor: s.contributor)
+  end
 end
 
 Factory.define(:min_study, class: Study) do |f|

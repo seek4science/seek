@@ -81,7 +81,13 @@ module Seek
               next unless respond_to?(association)
               action = self.class.associations_and_actions_to_be_enforced[association]
               auth_method = "can_#{self.class.associations_and_actions_to_be_enforced[association]}?"
-              Array(send(association)).each do |item|
+              reflection = self.class.reflections[association.to_s]
+              if !reflection.belongs_to? || changes.key?(reflection.foreign_key) || new_record?
+                items = Array(send(association))
+              else
+                items = []
+              end
+              items.each do |item|
                 next unless item.respond_to?(auth_method) && !item.send(auth_method)
                 result = false
                 errors.add(:base, "You do not have permission to #{action} #{item.class.name.underscore.humanize}-#{item.id}")
