@@ -96,7 +96,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
         assert asset.can_edit?
         assert_empty asset.assays
 
-        asset.assay_assets.build(assay:good_assay)
+        asset.assay_assets.create(assay:good_assay)
         assert asset.save
         asset.reload
         assert_equal [good_assay],asset.assays
@@ -105,7 +105,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
         assert asset.can_edit?
         assert_empty asset.assays
 
-        asset.assay_assets.build(assay:bad_assay)
+        asset.assay_assets.create(assay:bad_assay)
         refute asset.save
         asset.reload
         assert_empty asset.assays
@@ -113,7 +113,7 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
         #check it only checks new links
         disable_authorization_checks do
           asset = Factory(asset_type,contributor:@person)
-          asset.assay_assets.build(assay:bad_assay)
+          asset.assay_assets.create(assay:bad_assay)
           assert asset.save
         end
 
