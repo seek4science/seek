@@ -528,7 +528,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     asset.seek_entity = assay
     asset.save!
 
-    reg_info = @util.follow_dependent(asset)
+    reg_info = @util.follow_dependent_from_asset(asset)
     assert_equal [], reg_info.issues
 
     refute assay.data_files.empty?
@@ -563,7 +563,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     assert_equal [], reg_info.issues
     assert_equal 2, reg_info.created.count
-    reg_info.created.each { |d| assert d.is_a?(DataFile)}
+    reg_info.created.each { |d| assert d.is_a?(DataFile) }
 
     assay.reload
     assert_equal 4, assay.data_files.length
@@ -623,7 +623,6 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal 2, study.assays.count
     assert_equal 2, reg_info.created.count
     assert_equal [], reg_info.issues
-
   end
 
   test 'associate_zamples_as_assays links datafiles to assays under the study if selected so' do
@@ -656,7 +655,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     assert_equal 2, study.assays.count
     assert_equal ds_count, study.related_data_files.count
 
-    assert_equal 2+ds_count, reg_info.created.count
+    assert_equal 2 + ds_count, reg_info.created.count
     assert_equal [], reg_info.issues
   end
 
@@ -831,7 +830,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     # automated assays linking
     sync_options = { link_assays: '1' }
-    reg_info =  @util.follow_study_dependent_assays(@experiment, study, sync_options)
+    reg_info = @util.follow_study_dependent_assays(@experiment, study, sync_options)
 
     assert_equal [], reg_info.issues
 
@@ -885,7 +884,7 @@ class SeekUtilTest < ActiveSupport::TestCase
     reg_info = @util.follow_study_dependent_datafiles(@experiment, study, sync_options)
 
     assert_equal [], reg_info.issues
-    assert_equal 1+1, reg_info.created.count
+    assert_equal 1 + 1, reg_info.created.count
 
     study.reload
     assert_equal 1, study.related_data_files.count
@@ -1175,7 +1174,6 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'validate_expected_seek_type issues warnings if mismatch' do
-
     df1 = Factory :data_file
     df2 = Factory :data_file
     assay = Factory :assay
@@ -1194,29 +1192,28 @@ class SeekUtilTest < ActiveSupport::TestCase
     collection = []
     type = DataFile
 
-    assert_equal [], @util.validate_expected_seek_type(collection,type)
+    assert_equal [], @util.validate_expected_seek_type(collection, type)
 
     collection = [a4]
-    assert_equal [], @util.validate_expected_seek_type(collection,type)
+    assert_equal [], @util.validate_expected_seek_type(collection, type)
 
     collection = [a1, a4, a2]
-    assert_equal [], @util.validate_expected_seek_type(collection,type)
+    assert_equal [], @util.validate_expected_seek_type(collection, type)
 
     collection = [a3]
-    assert_equal 1, @util.validate_expected_seek_type(collection,type).count
+    assert_equal 1, @util.validate_expected_seek_type(collection, type).count
     assert_equal ["#{a3.id} already registered as Assay #{assay.id}"],
-                 @util.validate_expected_seek_type(collection,type)
+                 @util.validate_expected_seek_type(collection, type)
 
     type = Assay
-    assert_equal 0, @util.validate_expected_seek_type(collection,type).count
+    assert_equal 0, @util.validate_expected_seek_type(collection, type).count
 
-    collection = [a1,a2,a3,a4]
+    collection = [a1, a2, a3, a4]
     type = Assay
-    assert_equal 2, @util.validate_expected_seek_type(collection,type).count
+    assert_equal 2, @util.validate_expected_seek_type(collection, type).count
   end
 
   test 'validate_study_relationship issues warnings if mismatch' do
-
     study1 = Factory :study
     study2 = Factory :study
 
@@ -1238,20 +1235,18 @@ class SeekUtilTest < ActiveSupport::TestCase
     a3.seek_entity = as3
     as3.external_asset = a3
 
-
     collection = []
-    assert_equal [], @util.validate_study_relationship(collection,study1)
+    assert_equal [], @util.validate_study_relationship(collection, study1)
 
     collection = [as1, as2]
-    assert_equal [], @util.validate_study_relationship(collection,study1)
+    assert_equal [], @util.validate_study_relationship(collection, study1)
 
     collection = [as3]
-    assert_equal 1, @util.validate_study_relationship(collection,study1).count
+    assert_equal 1, @util.validate_study_relationship(collection, study1).count
     assert_equal ["#{a3.external_id} already registered under different Study #{study2.id}"],
-                 @util.validate_study_relationship(collection,study1)
+                 @util.validate_study_relationship(collection, study1)
 
     collection = [as1, as3, as2]
-    assert_equal 2, @util.validate_study_relationship(collection,study2).count
-
+    assert_equal 2, @util.validate_study_relationship(collection, study2).count
   end
 end

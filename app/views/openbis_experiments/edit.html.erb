@@ -72,7 +72,7 @@
               <div class='row' id="openbis-zample-cards">
                 <%= render partial: 'openbis_zamples/openbis_zample_card', collection: zamples,
                            locals: { seek_type: :assay,
-                                     linked: @zamples_linked_to_study,
+                                     linked: @zamples_linked_to,
                                      selected: @asset.sync_options[:linked_assays],
                                      parentType: 'study',
                                      linking_checkbox: true
@@ -90,7 +90,7 @@
               <div class='row' id="openbis-dataset-cards">
                 <%= render partial: 'openbis_datasets/openbis_dataset_card', collection: datasets,
                            locals: {
-                               linked: @datasets_linked_to_study,
+                               linked: @datasets_linked_to,
                                selected: @asset.sync_options[:linked_datasets],
                                parentType: 'study',
                                linking_checkbox: true

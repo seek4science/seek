@@ -45,6 +45,7 @@ class OpenbisEndpointsController < ApplicationController
       end
     end
   end
+
   def browse
     respond_with(@project, @openbis_endpoints)
   end

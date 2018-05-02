@@ -104,7 +104,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
 
-    datafile = assigns(:datafile)
+    datafile = assigns(:seek_entity)
     assert_not_nil datafile
     assert_redirected_to data_file_path(datafile)
 
@@ -117,7 +117,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     assert_equal @dataset, datafile.external_asset.content
 
     assert_nil flash[:error]
-    assert_equal "Registered OpenBIS dataset: #{@dataset.perm_id}", flash[:notice]
+    assert_equal "Registered OpenBIS DataSet #{@dataset.perm_id} as DataFile", flash[:notice]
   end
 
   test 'register registers new DataFile under Assay if passed' do
@@ -128,7 +128,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id,
                     data_file: { assay_ids: assay.id }
 
-    datafile = assigns(:datafile)
+    datafile = assigns(:seek_entity)
     assert_not_nil datafile
     assert_redirected_to data_file_path(datafile)
 
@@ -153,7 +153,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(existing)
 
-    assert_equal 'Already registered as OpenBIS entity', flash[:error]
+    assert_equal 'OpenBIS entity already registered in Seek', flash[:error]
   end
 
   ## Update ###
@@ -171,7 +171,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     post :update, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
 
-    datafile = assigns(:datafile)
+    datafile = assigns(:seek_entity)
     assert_not_nil datafile
     assert_equal exdatafile, datafile
     assert_redirected_to data_file_path(datafile)
@@ -189,7 +189,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     assert_equal last_mod.to_a, datafile.updated_at.to_a
 
     assert_nil flash[:error]
-    assert_equal "Updated sync of OpenBIS datafile: #{@dataset.perm_id}", flash[:notice]
+    assert_equal "Updated registration of DataSet #{@dataset.perm_id}", flash[:notice]
   end
 
   ## Batch register ##
@@ -211,7 +211,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
     assert_response :success
     puts flash[:error]
     refute flash[:error]
-    assert_equal "Registered all #{batch_ids.size} datafiles", flash[:notice]
+    assert_equal "Registered all #{batch_ids.size} OpenBIS entities", flash[:notice]
 
     assay.reload
     assert_equal batch_ids.size, assay.data_files.size
@@ -272,7 +272,7 @@ class OpenbisDatasetsControllerTest < ActionController::TestCase
 
     post :register, openbis_endpoint_id: @endpoint.id, id: @dataset.perm_id
     assert_response :redirect
-    seek = assigns(:datafile)
+    seek = assigns(:seek_entity)
     assert_not_nil seek
     assert_redirected_to seek
 

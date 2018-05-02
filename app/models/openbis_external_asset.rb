@@ -42,6 +42,15 @@ class OpenbisExternalAsset < ExternalAsset
     self.content = openbis_entity
     self
   end
+
+  def entity
+    content
+  end
+
+  def perm_id
+    external_id
+  end
+
   def extract_mod_stamp(openbis_entity)
     openbis_entity.modification_date.to_s
   end

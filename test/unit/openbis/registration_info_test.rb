@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class RegistrationInfoTest < ActiveSupport::TestCase
-
   def setup
     @reg_info = Seek::Openbis::RegistrationInfo.new
   end
@@ -32,16 +31,15 @@ class RegistrationInfoTest < ActiveSupport::TestCase
     @reg_info.merge(other)
 
     assert_equal [study, df, assay], @reg_info.created
-    assert_equal ['err1', 'err2'], @reg_info.issues
-
+    assert_equal %w[err1 err2], @reg_info.issues
   end
 
   test 'add_issues adds' do
-    val = @reg_info.add_issues ['b', 'c']
+    val = @reg_info.add_issues %w[b c]
     assert_same val, @reg_info
-    assert_equal ['b','c'], @reg_info.issues
+    assert_equal %w[b c], @reg_info.issues
     @reg_info.add_issues 'a'
-    assert_equal ['b','c', 'a'], @reg_info.issues
+    assert_equal %w[b c a], @reg_info.issues
   end
 
   test 'add_created adds' do
@@ -52,5 +50,4 @@ class RegistrationInfoTest < ActiveSupport::TestCase
     @reg_info.add_created [Factory(:data_file), Factory(:data_file)]
     assert_equal 3, @reg_info.created.count
   end
-
 end

@@ -91,7 +91,8 @@ module Seek
         assay_params = { assay_class_id: AssayClass.for_type('experimental').id,
                          title: FAKE_FILE_ASSAY_NAME,
                          description: 'Automatically generated assay to host openbis files that are linked to
-the original OpenBIS experiment. Its content and linked data files will be updated by the system if automatic synchronization was selected.' }
+the original OpenBIS experiment. Its content and linked data files will be updated by the system
+if automatic synchronization was selected.' }
         assay = Assay.new(assay_params)
         assay.contributor = study.contributor
         assay.policy = study.policy.deep_copy
@@ -105,7 +106,7 @@ the original OpenBIS experiment. Its content and linked data files will be updat
           entity = fetch_current_entity_version(obis_asset)
           entity.prefetch_files if entity.is_a? Seek::Openbis::Dataset
           obis_asset.content = entity
-        rescue Exception => exception
+        rescue => exception
           obis_asset.add_failure handle_sync_err(exception, obis_asset)
         end
 
@@ -140,8 +141,7 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         # raise "Sync failed: #{obis_asset.err_msg}" if obis_asset.failed?
 
         errs = []
-        errs = follow_dependent(obis_asset) if should_follow_dependent(obis_asset)
-        # raise errs.join(', ') unless errs.empty?
+        errs = follow_dependent_from_asset(obis_asset).issues if should_follow_dependent(obis_asset)
         errs
       end
 
@@ -158,10 +158,15 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         obis_asset.external_type.constantize.new(obis_asset.seek_service, obis_asset.external_id, true)
       end
 
-      def follow_dependent(obis_asset)
-        return follow_study_dependent(obis_asset.seek_entity) if obis_asset.seek_entity.is_a? Study
-        return follow_assay_dependent(obis_asset.seek_entity) if obis_asset.seek_entity.is_a? Assay
-        raise "Not supported openbis following of #{obis_asset.seek_entity.class} from #{obis_asset}"
+      def follow_dependent_from_asset(obis_asset)
+        follow_dependent_from_seek(obis_asset.seek_entity)
+      end
+
+      def follow_dependent_from_seek(seek_entity)
+        return follow_study_dependent(seek_entity) if seek_entity.is_a? Study
+        return follow_assay_dependent(seek_entity) if seek_entity.is_a? Assay
+        return Seek::Openbis::RegistrationInfo.new if seek_entity.is_a? DataFile
+        raise "Not supported openbis following of #{seek_entity.class}"
       end
 
       def follow_study_dependent(study)
@@ -222,17 +227,17 @@ the original OpenBIS experiment. Its content and linked data files will be updat
 
         # new_assays
         external_assets
-            .select { |es| es.seek_entity.nil? }
-            .map do |es|
-              es.sync_options = sync_options.clone
-              createObisAssay(assay_params.clone, contributor, es)
+          .select { |es| es.seek_entity.nil? }
+          .map do |es|
+          es.sync_options = sync_options.clone
+          createObisAssay(assay_params.clone, contributor, es)
         end
-            .each do |df|
-              if df.save
-                reg_info.add_created df
-              else
-                reg_info.add_issues df.errors.full_messages
-              end
+          .each do |df|
+          if df.save
+            reg_info.add_created df
+          else
+            reg_info.add_issues df.errors.full_messages
+          end
         end
 
         assays = existing_assays + reg_info.created
@@ -275,17 +280,14 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         associate_data_sets(assay, data_sets)
       end
 
-
-
       def associate_data_sets(assay, data_sets)
         reg_info = Seek::Openbis::RegistrationInfo.new
         return reg_info if data_sets.empty?
 
-
         external_assets = data_sets.map { |ds| OpenbisExternalAsset.find_or_create_by_entity(ds) }
 
         # warn about non datafiles
-        reg_info.add_issues validate_expected_seek_type(external_assets,DataFile)
+        reg_info.add_issues validate_expected_seek_type(external_assets, DataFile)
 
         existing_files = external_assets.select { |es| es.seek_entity.is_a? DataFile }
                                         .map(&:seek_entity)
@@ -294,8 +296,8 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         datafile_params = {}
         contributor = assay.contributor
         new_files = external_assets
-                        .select { |es| es.seek_entity.nil? }
-                        .map { |es| createObisDataFile(datafile_params.clone, contributor, es) }
+                    .select { |es| es.seek_entity.nil? }
+                    .map { |es| createObisDataFile(datafile_params.clone, contributor, es) }
 
         new_files.each do |df|
           if df.save
@@ -311,22 +313,18 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         reg_info
       end
 
-
       def validate_expected_seek_type(collection, type)
         # warn about wrong type
         collection.reject { |es| es.seek_entity.nil? || es.seek_entity.is_a?(type) }
-            .map { |es| "#{es.external_id} already registered as #{es.seek_entity.class} #{es.seek_entity.id}" }
+                  .map { |es| "#{es.external_id} already registered as #{es.seek_entity.class} #{es.seek_entity.id}" }
       end
 
       def validate_study_relationship(collection, study)
         # warn about already linked somewhere else
         collection
-            .reject { |es| es.study.id == study.id }
-            .map { |es| "#{es.external_asset.external_id} already registered under different Study #{es.study.id}" }
+          .reject { |es| es.study.id == study.id }
+          .map { |es| "#{es.external_asset.external_id} already registered under different Study #{es.study.id}" }
       end
-
-
-
 
       def extract_requested_sets(entity, sync_options)
         return entity.dataset_ids if sync_options[:link_datasets] == '1'
@@ -334,7 +332,8 @@ the original OpenBIS experiment. Its content and linked data files will be updat
       end
 
       def extract_requested_assays(entity, sync_options)
-        sample_ids = sync_options[:link_assays] == '1' ? entity.sample_ids : (sync_options[:linked_assays] || []) & entity.sample_ids
+        sample_ids = sync_options[:link_assays] == '1' ? entity.sample_ids :
+                         (sync_options[:linked_assays] || []) & entity.sample_ids
         candidates = Seek::Openbis::Zample.new(entity.openbis_endpoint).find_by_perm_ids(sample_ids)
 
         zamples = []
@@ -364,7 +363,9 @@ the original OpenBIS experiment. Its content and linked data files will be updat
         end
 
         assay_codes = openbis_endpoint.assay_types
-        types.concat(Seek::Openbis::EntityType.SampleType(openbis_endpoint).find_by_codes(assay_codes)) unless assay_codes.empty?
+        unless assay_codes.empty?
+          types.concat(Seek::Openbis::EntityType.SampleType(openbis_endpoint).find_by_codes(assay_codes))
+        end
         types
       end
 

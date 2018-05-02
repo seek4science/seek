@@ -13,8 +13,10 @@ class OpenbisSyncJob < SeekJob
   end
 
   def perform_job(obis_asset)
-    puts "starting obis sync of #{obis_asset.class}:#{obis_asset.id} perm_id: #{obis_asset.external_id}" if DEBUG
-    Rails.logger.info "starting obis sync of #{obis_asset.class}:#{obis_asset.id} perm_id: #{obis_asset.external_id}" if DEBUG
+    if DEBUG
+      puts "starting obis sync of #{obis_asset.class}:#{obis_asset.id} perm_id: #{obis_asset.external_id}"
+      Rails.logger.info "starting obis sync of #{obis_asset.class}:#{obis_asset.id} perm_id: #{obis_asset.external_id}"
+    end
 
     errs = []
     obis_asset.reload
@@ -97,10 +99,6 @@ class OpenbisSyncJob < SeekJob
                   old, ExternalAsset.sync_states[:refresh], too_fresh, ExternalAsset.sync_states[:failed])
            .order(:sync_state, :updated_at)
            .limit(@batch_size)
-
-    # service.external_assets.where('synchronized_at < ? AND updated_at < ? AND sync_state != ?', old, too_fresh, ExternalAsset.sync_states[:synchronized])
-    #    .order(:sync_state, :updated_at)
-    #    .limit(@batch_size)
   end
 
   def failure_threshold
