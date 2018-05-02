@@ -1610,4 +1610,57 @@ class AssaysControllerTest < ActionController::TestCase
     refute_equal study,assay.study
   end
 
+  test 'cannot update and link to none visible SOP' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay,contributor:person)
+    assert assay.can_edit?
+
+    good_sop = Factory(:sop,policy:Factory(:publicly_viewable_policy))
+    bad_sop = Factory(:sop,policy:Factory(:private_policy))
+    assert good_sop.can_view?
+    refute bad_sop.can_view?
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: assay, assay_sop_ids: [bad_sop.id], assay: { title: assay.title }
+    end
+    assert_response :unprocessable_entity
+    assay.reload
+    assert_empty assay.sops
+
+    assert_difference('AssayAsset.count') do
+      put :update, id: assay, assay_sop_ids: [good_sop.id], assay: { title: assay.title }
+    end
+    assay.reload
+    assert_equal [good_sop],assay.sops
+
+  end
+
+  test 'cannot create and link to none visible SOP' do
+    person = Factory(:person)
+    login_as(person)
+
+    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+    study = Factory(:study, investigation:investigation,policy:Factory(:publicly_viewable_policy) )
+
+
+    good_sop = Factory(:sop,policy:Factory(:publicly_viewable_policy))
+    bad_sop = Factory(:sop,policy:Factory(:private_policy))
+    assert good_sop.can_view?
+    refute bad_sop.can_view?
+
+    assert_no_difference('AssayAsset.count') do
+      post :create, assay_sop_ids: [bad_sop.id], assay: { title: 'testing', assay_class_id:AssayClass.experimental.id, study_id:study.id },policy_attributes: valid_sharing
+    end
+    assert_response :unprocessable_entity
+
+
+    assert_difference('AssayAsset.count') do
+      post :create, assay_sop_ids: [good_sop.id], assay: { title: 'testing', assay_class_id:AssayClass.experimental.id,study_id:study.id },policy_attributes: valid_sharing
+    end
+    assay = assigns(:assay)
+    assert_equal [good_sop],assay.sops
+
+  end
+
 end
