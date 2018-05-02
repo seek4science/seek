@@ -3260,6 +3260,74 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :unprocessable_entity
   end
 
+  test 'when updating, assay linked to must be editable' do
+    person = Factory(:person)
+    login_as(person)
+    data_file = Factory(:data_file,contributor:person,projects:person.projects)
+    assert data_file.can_edit?
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+
+    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+
+    study = Factory(:study, contributor:person, investigation:investigation)
+
+    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
+    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+
+    assert good_assay.can_edit?
+    refute bad_assay.can_edit?
+
+    assert_no_difference('AssayAsset.count') do
+      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [bad_assay.id.to_s]
+    end
+    assert_response :unprocessable_entity
+    data_file.reload
+    assert_empty data_file.assays
+
+    assert_difference('AssayAsset.count') do
+      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [good_assay.id.to_s]
+    end
+    data_file.reload
+    assert_equal [good_assay], data_file.assays
+
+  end
+
+  test 'when creating, assay linked to must be editable' do
+    person = Factory(:person)
+    login_as(person)
+
+    another_person = Factory(:person)
+    another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
+    another_person.save!
+
+    investigation = Factory(:investigation,contributor:person,projects:person.projects)
+
+    study = Factory(:study, contributor:person, investigation:investigation)
+
+    good_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:editing_public_policy))
+    bad_assay = Factory(:assay,study_id:study.id,contributor:another_person,policy:Factory(:publicly_viewable_policy))
+
+    assert good_assay.can_edit?
+    refute bad_assay.can_edit?
+
+    data_file, blob = valid_data_file
+
+    assert_no_difference('AssayAsset.count') do
+      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [bad_assay.id.to_s]
+    end
+    assert_response :unprocessable_entity
+
+    data_file, blob = valid_data_file
+
+    assert_difference('AssayAsset.count') do
+      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+    end
+    data_file = assigns(:data_file)
+    assert_equal [good_assay],data_file.assays
+  end
+
   def edit_max_object(df)
     add_tags_to_test_object(df)
     add_creator_to_test_object(df)
