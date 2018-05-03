@@ -167,8 +167,8 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
     User.with_current_user(@user) do
       other_project = Factory(:project)
       %i[data_file model sop sample document].each do |asset_type|
-        good_asset = Factory.build(asset_type, projects: [@project])
-        bad_asset = Factory.build(asset_type, projects: [other_project])
+        good_asset = Factory.build(asset_type, contributor: User.current_user, projects: [@project])
+        bad_asset = Factory.build(asset_type, contributor: User.current_user, projects: [other_project])
 
         assert good_asset.save
         refute bad_asset.save
@@ -180,8 +180,8 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
     User.with_current_user(@user) do
       other_project = Factory(:project)
 
-      good_inv = Factory.build(:investigation, projects: [@project])
-      bad_inv = Factory.build(:investigation, projects: [other_project])
+      good_inv = Factory.build(:investigation, contributor: User.current_user, projects: [@project])
+      bad_inv = Factory.build(:investigation, contributor: User.current_user, projects: [other_project])
 
       assert good_inv.save
       refute bad_inv.save
