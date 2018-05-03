@@ -419,14 +419,16 @@ class SampleTest < ActiveSupport::TestCase
     assay = Factory(:assay)
     study = assay.study
     investigation = study.investigation
-    sample = Factory(:sample)
+    sample = Factory(:sample, policy: Factory(:publicly_viewable_policy))
 
     assert_empty sample.assays
     assert_empty sample.studies
     assert_empty sample.investigations
 
-    assay.associate(sample)
-    assay.save!
+    User.with_current_user(assay.contributor.user) do
+      assay.associate(sample)
+      assay.save!
+    end
     sample.reload
 
     assert_equal [assay], sample.assays
@@ -438,7 +440,9 @@ class SampleTest < ActiveSupport::TestCase
     assay = Factory(:assay)
     sample = Factory(:sample, policy: Factory(:public_policy))
     assert_difference('AssayAsset.count', 1) do
-      assay.associate(sample)
+      User.with_current_user(assay.contributor.user) do
+        assay.associate(sample)
+      end
     end
     assay.save!
     sample.reload
