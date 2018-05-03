@@ -20,8 +20,8 @@ class SubscriptionTest < ActiveSupport::TestCase
     p2 = Factory :person
     sop = Factory :sop
     sop2 = Factory :sop
-    assay = Factory :sop
-    assay2 = Factory :sop
+    assay = Factory :assay
+    assay2 = Factory :assay
     Factory :subscription, person: p, subscribable: sop
     Factory :subscription, person: p2, subscribable: sop
     Factory :subscription, person: p, subscribable: sop2
