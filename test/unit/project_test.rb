@@ -22,19 +22,19 @@ class ProjectTest < ActiveSupport::TestCase
   test 'to_rdf' do
     object = Factory :project, web_page: 'http://www.sysmo-db.org',
                                organisms: [Factory(:organism), Factory(:organism)]
-    Factory :data_file, projects: [object]
-    Factory :data_file, projects: [object]
-    Factory :model, projects: [object]
-    Factory :sop, projects: [object]
-    Factory :presentation, projects: [object]
-    i = Factory :investigation, projects: [object]
-    s = Factory :study, investigation: i
-    Factory :assay, study: s
-    wg = Factory :work_group, project: object
-    Factory :group_membership, work_group: wg, person: Factory(:person)
+    person = Factory(:person,project:object)
+    Factory :data_file, projects: [object], contributor:person
+    Factory :data_file, projects: [object], contributor:person
+    Factory :model, projects: [object], contributor:person
+    Factory :sop, projects: [object], contributor:person
+    Factory :presentation, projects: [object], contributor:person
+    i = Factory :investigation, projects: [object], contributor:person
+    s = Factory :study, investigation: i, contributor:person
+    Factory :assay, study: s, contributor:person
+
 
     object.reload
-    assert !object.people.empty?
+    refute object.people.empty?
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
