@@ -460,7 +460,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     end
   end
 
-  test 'seek_util created only once' do
-    assert_same @job.seek_util, @job.seek_util
-  end
+  #test 'seek_util created only once' do
+  #  assert_same @job.seek_util, @job.seek_util
+  #end
 end

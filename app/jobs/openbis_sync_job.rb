@@ -123,12 +123,16 @@ class OpenbisSyncJob < SeekJob
   end
 
   def seek_util
-    @seek_util ||= Seek::Openbis::SeekUtil.new
+    # looks like local variables are wrote to yaml and becomes job parameter
+    # @seek_util ||= Seek::Openbis::SeekUtil.new
+    Seek::Openbis::SeekUtil.new
   end
 
   private
 
   def endpoint
-    @endpoint ||= OpenbisEndpoint.find_by_id(openbis_endpoint_id)
+    # looks like local variables are wrote to yaml and becomes job parameter
+    # @endpoint ||= OpenbisEndpoint.find_by_id(openbis_endpoint_id)
+    OpenbisEndpoint.find_by_id(openbis_endpoint_id)
   end
 end
