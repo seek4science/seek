@@ -36,11 +36,12 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'assay association' do
-    User.with_current_user Factory(:user) do
-      datafile = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy)
-      assay = assays(:modelling_assay_with_data_and_relationship)
+    person = Factory(:person)
+    User.with_current_user person.user do
+      datafile = Factory :data_file, contributor:person
+      assay = Factory :assay, contributor:person
       relationship = relationship_types(:validation_data)
-      assay_asset = assay_assets(:metabolomics_assay_asset1)
+      assay_asset = AssayAsset.new
       assert_not_equal assay_asset.asset, datafile
       assert_not_equal assay_asset.assay, assay
       assay_asset.asset = datafile
@@ -374,63 +375,80 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'can copy assay associations' do
-    df = Factory(:data_file)
-    aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING, asset: df)
-    aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING, asset: df)
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      df = Factory(:data_file, contributor:person)
 
-    s1 = Factory(:sample, originating_data_file: df)
-    s2 = Factory(:sample, originating_data_file: df)
+      aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING,
+                    asset: df, assay:Factory(:assay, contributor:person))
+      aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
+                    asset: df, assay:Factory(:assay, contributor:person))
 
-    assert_equal 2, df.extracted_samples.count
+      s1 = Factory(:sample, originating_data_file: df, contributor:person)
+      s2 = Factory(:sample, originating_data_file: df, contributor:person)
 
-    assert_difference('AssayAsset.count', 4) do # samples * assay_assets
-      df.copy_assay_associations(df.extracted_samples)
+      assert_equal 2, df.extracted_samples.count
+
+      assert_difference('AssayAsset.count', 4) do # samples * assay_assets
+        df.copy_assay_associations(df.extracted_samples)
+      end
+
+      assert_equal df.assays.sort, s1.assays.sort
+      assert_equal df.assays.sort, s2.assays.sort
+
+      assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
+      assert_equal aa2.direction, s1.assay_assets.where(assay_id: aa2.assay_id).first.direction
     end
-
-    assert_equal df.assays.sort, s1.assays.sort
-    assert_equal df.assays.sort, s2.assays.sort
-
-    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
-    assert_equal aa2.direction, s1.assay_assets.where(assay_id: aa2.assay_id).first.direction
   end
 
   test 'can copy assay associations for selected assays' do
-    df = Factory(:data_file)
-    aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING, asset: df)
-    aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING, asset: df)
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      df = Factory(:data_file,contributor:person)
+      aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING,
+                    asset: df,  assay:Factory(:assay, contributor:person))
+      aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
+                    asset: df,  assay:Factory(:assay, contributor:person))
 
-    s1 = Factory(:sample, originating_data_file: df)
-    s2 = Factory(:sample, originating_data_file: df)
+      s1 = Factory(:sample, originating_data_file: df,contributor:person)
+      s2 = Factory(:sample, originating_data_file: df,contributor:person)
 
-    assert_equal 2, df.extracted_samples.count
+      assert_equal 2, df.extracted_samples.count
 
-    assert_difference('AssayAsset.count', 2) do
-      df.copy_assay_associations(df.extracted_samples, [aa1.assay])
+      assert_difference('AssayAsset.count', 2) do
+        df.copy_assay_associations(df.extracted_samples, [aa1.assay])
+      end
+
+      assert_equal [aa1.assay], s1.assays
+      assert_equal [aa1.assay], s2.assays
+
+      assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
     end
 
-    assert_equal [aa1.assay], s1.assays
-    assert_equal [aa1.assay], s2.assays
-
-    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
   end
 
   test 'can copy assay associations for selected assay IDs' do
-    df = Factory(:data_file)
-    aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING, asset: df)
-    aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING, asset: df)
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      df = Factory(:data_file,contributor:person)
+      aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING,
+                    asset: df, assay:Factory(:assay, contributor:person))
+      aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
+                    asset: df, assay:Factory(:assay, contributor:person))
 
-    s1 = Factory(:sample, originating_data_file: df)
-    s2 = Factory(:sample, originating_data_file: df)
+      s1 = Factory(:sample, originating_data_file: df, contributor:person)
+      s2 = Factory(:sample, originating_data_file: df, contributor:person)
 
-    assert_equal 2, df.extracted_samples.count
+      assert_equal 2, df.extracted_samples.count
 
-    assert_difference('AssayAsset.count', 2) do
-      df.copy_assay_associations(df.extracted_samples, [aa1.assay_id])
+      assert_difference('AssayAsset.count', 2) do
+        df.copy_assay_associations(df.extracted_samples, [aa1.assay_id])
+      end
+
+      assert_equal [aa1.assay], s1.assays
+      assert_equal [aa1.assay], s2.assays
+
+      assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
     end
-
-    assert_equal [aa1.assay], s1.assays
-    assert_equal [aa1.assay], s2.assays
-
-    assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
   end
 end
