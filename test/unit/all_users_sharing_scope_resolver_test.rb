@@ -131,8 +131,10 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
 
   test 'existing permission same project higher access_type' do
     # should update the permission to give the higher access
-    project = Factory(:project)
+    person = Factory(:person)
+    project = person.projects.first
     investigation = Factory(:investigation,
+                            contributor: person,
                             policy: Factory(:policy,
                                             access_type: Policy::ACCESSIBLE,
                                             sharing_scope: Policy::ALL_USERS,
@@ -162,8 +164,10 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
 
   test 'existing permission same project lower access_type' do
     # should keep the existing higher access
-    project = Factory(:project)
+    person = Factory(:person)
+    project = person.projects.first
     investigation = Factory(:investigation,
+                            contributor: person,
                             policy: Factory(:policy,
                                             access_type: Policy::VISIBLE,
                                             sharing_scope: Policy::ALL_USERS,
