@@ -1,0 +1,12 @@
+<%
+  unless entity.vetted_properties.empty?
+%>
+    <div class="row" id="openbis-details-properties">
+      <% entity.vetted_properties.each do |key, value| %>
+          <div class="col-md-5 simple-formating">
+            <label><%= key %>: </label> <%= openbis_rich_content_sanitizer(value) %>
+          </div>
+      <% end %>
+
+    </div>
+<% end %>

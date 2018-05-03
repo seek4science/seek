@@ -7,9 +7,11 @@ class DataFile < ActiveRecord::Base
   attr_accessor :parent_name
 
   # searchable must come before acts_as_asset call
-  searchable(auto_index: false) do
-    text :spreadsheet_annotation_search_fields, :fs_search_fields
-  end if Seek::Config.solr_enabled
+  if Seek::Config.solr_enabled
+    searchable(auto_index: false) do
+      text :spreadsheet_annotation_search_fields, :fs_search_fields
+    end
+  end
 
   acts_as_asset
 
@@ -20,14 +22,15 @@ class DataFile < ActiveRecord::Base
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
 
-  has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+  has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+  has_one :external_asset, as: :seek_entity, dependent: :destroy
 
-  has_many :studied_factors, -> (r) { where('studied_factors.data_file_version =?', r.version) }
+  has_many :studied_factors, ->(r) { where('studied_factors.data_file_version =?', r.version) }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
   scope :with_extracted_samples, -> { joins(:extracted_samples).uniq }
 
-  scope :simulation_data, -> {where(simulation_data:true)}
+  scope :simulation_data, -> { where(simulation_data: true) }
 
   explicit_versioning(version_column: 'version') do
     include Seek::Data::SpreadsheetExplorerRepresentation
@@ -35,14 +38,18 @@ class DataFile < ActiveRecord::Base
     acts_as_versioned_resource
     acts_as_favouritable
 
-    has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
-            :primary_key => :data_file_id,:foreign_key => :asset_id
+    has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
+            primary_key: :data_file_id, foreign_key: :asset_id
 
-    has_many :studied_factors, -> (r) { where('studied_factors.data_file_version = ?', r.version) },
+    has_many :studied_factors, ->(r) { where('studied_factors.data_file_version = ?', r.version) },
              primary_key: 'data_file_id', foreign_key: 'data_file_id'
 
     def relationship_type(assay)
       parent.relationship_type(assay)
+    end
+
+    def external_asset
+      parent.external_asset if parent.respond_to?(:external_asset)
     end
   end
 
@@ -57,16 +64,15 @@ class DataFile < ActiveRecord::Base
       []
     end
 
-    def event_ids=(_events_ids)
-    end
+    def event_ids=(_events_ids); end
   end
 
   def included_to_be_copied?(symbol)
     case symbol.to_s
-      when 'activity_logs', 'versions', 'attributions', 'relationships', 'inverse_relationships', 'annotations'
-        return false
-      else
-        return true
+    when 'activity_logs', 'versions', 'attributions', 'relationships', 'inverse_relationships', 'annotations'
+      return false
+    else
+      true
     end
   end
 
@@ -90,7 +96,7 @@ class DataFile < ActiveRecord::Base
     if content_blob
       content_blob.worksheets.each do |ws|
         ws.cell_ranges.each do |cell_range|
-          annotations = annotations | cell_range.annotations.collect{|a| a.value.text}
+          annotations |= cell_range.annotations.collect { |a| a.value.text }
         end
       end
     end
@@ -99,6 +105,7 @@ class DataFile < ActiveRecord::Base
 
   # FIXME: bad name, its not whether it IS a template, but whether it originates from a template
   def sample_template?
+    return false if external_asset.is_a? OpenbisExternalAsset
     possible_sample_types.any?
   end
 
@@ -117,25 +124,22 @@ class DataFile < ActiveRecord::Base
       search_terms = spreadsheet_annotation_search_fields | content_blob_search_terms | fs_search_fields | searchable_tags
       # make the array uniq! case-insensistive whilst mainting the original case
       dc = []
-      search_terms = search_terms.inject([]) do |r, v|
+      search_terms = search_terms.each_with_object([]) do |v, r|
         unless dc.include?(v.downcase)
           r << v
           dc << v.downcase
         end
-        r
       end
       search_terms.each do |key|
         key = Seek::Search::SearchTermFilter.filter(key)
-        unless key.blank?
-          Model.search do |query|
-            query.keywords key, fields: [:model_contents_for_search, :description, :searchable_tags]
-          end.hits.each do |hit|
-            unless hit.score.nil?
-              results[hit.primary_key] ||= ModelMatchResult.new([], 0, hit.primary_key)
-              results[hit.primary_key].search_terms << key
-              results[hit.primary_key].score += hit.score
-            end
-          end
+        next if key.blank?
+        Model.search do |query|
+          query.keywords key, fields: %i[model_contents_for_search description searchable_tags]
+        end.hits.each do |hit|
+          next if hit.score.nil?
+          results[hit.primary_key] ||= ModelMatchResult.new([], 0, hit.primary_key)
+          results[hit.primary_key].search_terms << key
+          results[hit.primary_key].score += hit.score
         end
       end
     end
@@ -172,7 +176,7 @@ class DataFile < ActiveRecord::Base
       sample.project_ids = project_ids
       sample.contributor = contributor
       sample.originating_data_file = self
-      sample.policy = self.policy
+      sample.policy = policy
       sample.save if sample.valid? && confirm
 
       extracted << sample
@@ -181,21 +185,21 @@ class DataFile < ActiveRecord::Base
     extracted
   end
 
-  #creates a new DataFile that registers an openBIS dataset
-  def self.build_from_openbis(openbis_endpoint,dataset_perm_id)
-    dataset = Seek::Openbis::Dataset.new(openbis_endpoint,dataset_perm_id)
-    df=dataset.create_seek_datafile
-    df.policy=openbis_endpoint.policy.deep_copy
-    df
+  def external_asset_search_terms
+    external_asset ? external_asset.search_terms : []
   end
 
-  #indicates that this is an openBIS based DataFile
+  # indicates that this is an openBIS based DataFile
   def openbis?
-    content_blob && content_blob.openbis?
+    external_asset.is_a? OpenbisExternalAsset
+  end
+
+  def openbis_dataset
+    openbis? ? external_asset.content : nil
   end
 
   def openbis_size_download_restricted?
-    openbis? && content_blob.openbis_dataset.size>Seek::Config.openbis_download_limit
+    openbis? && openbis_dataset.size > Seek::Config.openbis_download_limit
   end
 
   def download_disabled?
@@ -207,8 +211,7 @@ class DataFile < ActiveRecord::Base
   end
 
   def openbis_dataset_json_details
-    return content_blob.openbis_dataset.json if openbis?
-    nil
+    openbis? ? openbis_dataset.json : nil
   end
 
   # overides that from Seek::RDF::RdfGeneration, as simulation data needs to be #Simulation_data
@@ -233,13 +236,11 @@ class DataFile < ActiveRecord::Base
   end
 
   def populate_metadata_from_template
-
     if contains_extractable_spreadsheet?
       Seek::Templates::Extract::DataFileRightFieldExtractor.new(self).populate(self)
     else
       Set.new
     end
-
   end
 
   def initialise_assay_from_template
@@ -250,8 +251,5 @@ class DataFile < ActiveRecord::Base
     else
       return assay, Set.new
     end
-
   end
-
-
 end

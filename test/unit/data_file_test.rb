@@ -319,58 +319,100 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'openbis?' do
+    mock_openbis_calls
+
     stub_request(:head, 'http://www.abc.com').to_return(
-      headers: { content_length: 500, content_type: 'text/plain' }, status: 200)
+      headers: { content_length: 500, content_type: 'text/plain' }, status: 200
+    )
 
     refute Factory(:data_file).openbis?
     refute Factory(:data_file, content_blob: Factory(:url_content_blob)).openbis?
-    assert Factory(:data_file, content_blob: Factory(:url_content_blob, url: 'openbis:1:dataset:2222')).openbis?
+
+    # old openbis integration entry
+    refute Factory(:data_file, content_blob: Factory(:url_content_blob, url: 'openbis:1:dataset:2222')).openbis?
+    assert openbis_linked_data_file.openbis?
   end
 
-  test 'build from openbis' do
+  test 'openbis_dataset' do
     mock_openbis_calls
-    User.with_current_user(Factory(:person).user) do
-      permission_project = Factory(:project)
-      endpoint = Factory(:openbis_endpoint, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: permission_project)]))
-      assert_equal 1, endpoint.policy.permissions.count
-      df = DataFile.build_from_openbis(endpoint, '20160210130454955-23')
-      refute_nil df
-      assert df.openbis?
-      assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23", df.content_blob.url
-      refute_equal df.policy, endpoint.policy
-      assert_equal endpoint.policy.access_type, df.policy.access_type
-      assert_equal 1, df.policy.permissions.length
-      permission = df.policy.permissions.first
-      assert_equal permission_project, permission.contributor
-      assert_equal Policy::NO_ACCESS, permission.access_type
-    end
+
+    assert_nil Factory(:data_file).openbis_dataset
+    ds = openbis_linked_data_file.openbis_dataset
+
+    assert ds
+    assert ds.is_a? Seek::Openbis::Dataset
+    assert ds.perm_id
   end
+
+  # DataFile no longers knows how to create openbis, it is other way arround
+  #   test 'build from openbis' do
+  #     mock_openbis_calls
+  #     User.with_current_user(Factory(:person).user) do
+  #       permission_project = Factory(:project)
+  #       endpoint = Factory(:openbis_endpoint,
+  # policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: permission_project)]))
+  #       assert_equal 1, endpoint.policy.permissions.count
+  #       df = DataFile.build_from_openbis(endpoint, '20160210130454955-23')
+  #       refute_nil df
+  #       assert df.openbis?
+  #       assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23", df.content_blob.url
+  #       refute_equal df.policy, endpoint.policy
+  #       assert_equal endpoint.policy.access_type, df.policy.access_type
+  #       assert_equal 1, df.policy.permissions.length
+  #       permission = df.policy.permissions.first
+  #       assert_equal permission_project, permission.contributor
+  #       assert_equal Policy::NO_ACCESS, permission.access_type
+  #     end
+  #   end
+  #
+  #   test 'build from openbis_dataset' do
+  #     mock_openbis_calls
+  #     User.with_current_user(Factory(:person).user) do
+  #       permission_project = Factory(:project)
+  #       endpoint = Factory(:openbis_endpoint, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: permission_project)]))
+  #       assert_equal 1, endpoint.policy.permissions.count
+  #       dataset = Seek::Openbis::Dataset.new(endpoint, '20160210130454955-23')
+  #       df = DataFile.build_from_openbis_dataset(dataset)
+  #       refute_nil df
+  #       assert df.openbis?
+  #       assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23", df.content_blob.url
+  #       refute_equal df.policy, endpoint.policy
+  #       assert_equal endpoint.policy.access_type, df.policy.access_type
+  #       assert_equal 1, df.policy.permissions.length
+  #       permission = df.policy.permissions.first
+  #       assert_equal permission_project, permission.contributor
+  #       assert_equal Policy::NO_ACCESS, permission.access_type
+  #     end
+  #   end
 
   test 'openbis download restricted' do
+    mock_openbis_calls
     df = openbis_linked_data_file
-    assert df.content_blob.openbis_dataset.size < 600.kilobytes
-    assert df.content_blob.openbis_dataset.size > 100.kilobytes
+    # assert df.content_blob.openbis_dataset.size < 600.kilobytes
+    # assert df.content_blob.openbis_dataset.size > 100.kilobytes
+    assert df.external_asset.content.size < 600.kilobytes
+    assert df.external_asset.content.size > 100.kilobytes
 
-    with_config_value :openbis_download_limit,100.kilobytes do
+    with_config_value :openbis_download_limit, 100.kilobytes do
       assert df.openbis_size_download_restricted?
       assert df.download_disabled?
     end
 
-    with_config_value :openbis_download_limit,600.kilobytes do
+    with_config_value :openbis_download_limit, 600.kilobytes do
       refute df.openbis_size_download_restricted?
       refute df.download_disabled?
     end
   end
 
   test 'simulation data?' do
-    df = Factory(:data_file,simulation_data:true)
+    df = Factory(:data_file, simulation_data: true)
     df2 = Factory(:data_file)
 
     assert df.simulation_data?
     refute df2.simulation_data?
 
-    assert_includes DataFile.simulation_data,df
-    refute_includes DataFile.simulation_data,df2
+    assert_includes DataFile.simulation_data, df
+    refute_includes DataFile.simulation_data, df2
   end
 
   test 'can copy assay associations' do

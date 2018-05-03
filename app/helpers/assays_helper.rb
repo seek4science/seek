@@ -48,8 +48,8 @@ module AssaysHelper
 
   # a lightway way to select a SOP - specifically for the assay creation during data file creation
   def assay_sop_selection(element_name, current_sop)
-    sops =authorised_sops(User.current_user.person.projects)
-    options = options_from_collection_for_select(sops, :id,:title, current_sop.try(:id))
+    sops = authorised_sops(User.current_user.person.projects)
+    options = options_from_collection_for_select(sops, :id, :title, current_sop.try(:id))
     select_tag(element_name, options,
                class: 'form-control', include_blank: true).html_safe
   end
@@ -59,7 +59,7 @@ module AssaysHelper
     investigation_map = selectable_studies_mapped_to_investigation(current_study)
     investigation_map.compact!
     investigation_map.keys.collect do |investigation|
-      if investigation.present? then
+      if investigation.present?
         title = investigation.can_view? ? h(investigation.title) : "#{t('investigation')} title is hidden"
         [title, investigation_map[investigation].collect { |study| [h(study.title), study.id] }]
       end
@@ -77,6 +77,14 @@ module AssaysHelper
       investigation_map[study.investigation] << study
     end
     investigation_map
+  end
+
+  def assay_selection(project, form)
+    assays = authorised_assays(project)
+
+    options = assays.collect { |a| [a.title, a.id] }
+    form.select(:assay_ids, options,
+                { include_blank: 'Not specified' }, class: 'form-control').html_safe
   end
 
   def authorised_assays(projects = nil, action = 'edit')
@@ -104,8 +112,8 @@ module AssaysHelper
 
   def show_nels_button?(assay)
     Seek::Config.nels_enabled &&
-        current_user && current_user.person && assay.can_edit? &&
-        current_user.person.projects.any? { |p| p.settings['nels_enabled'] } &&
-        assay.projects.any? { |p| p.settings['nels_enabled'] }
+      current_user && current_user.person && assay.can_edit? &&
+      current_user.person.projects.any? { |p| p.settings['nels_enabled'] } &&
+      assay.projects.any? { |p| p.settings['nels_enabled'] }
   end
 end

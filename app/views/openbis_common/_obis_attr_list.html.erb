@@ -1,0 +1,10 @@
+
+<%= list_item_attribute('Code', text_or_not_specified(entity.code)) %>
+<%= list_item_attribute('Type Code', text_or_not_specified(entity.type_code)) %>
+<%# list_item_attribute('Type', text_or_not_specified(entity.type_description)) %>
+
+<%= list_item_attribute('Registrator', text_or_not_specified(entity.registrator)) %>
+<%= list_item_attribute('Modifier', text_or_not_specified(entity.modifier)) %>
+
+<%= list_item_attribute('Registered', text_or_not_specified(date_as_string(entity.registration_date, true))) %>
+<%= list_item_attribute('Modified', text_or_not_specified(date_as_string(entity.modification_date, true))) %>

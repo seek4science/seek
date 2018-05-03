@@ -1,0 +1,64 @@
+<div class="modal" role="dialog" tabindex="-1" id="openbis_batch_parent-view" size="xl"
+     data-role="modal_openbis_batch_parent" style="display: none;">
+
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title">Select parent for registration</h4>
+      </div>
+
+      <div class="modal-body">
+
+        <%= form_for(Assay.new) do |f| %>
+            <div class="form-group">
+              <label>Register under Study </label><span class="required">*</span>
+              <%= assay_study_selection('assay[study_id]', nil) %>
+            </div>
+            <div class="form-group">
+              <%= check_box_tag('link_dependent', 1, true) %>
+              <%= label_tag('link_dependent', 'Automatically register dependent datasets') %>
+              <div class="help-block">
+                OpenBis entities that can be recognized as DataSets will be also registered
+              </div>
+            </div>
+            <div class="form-group">
+              <%= check_box_tag('new_arrivals', 1, false, disabled: disable_new_arrivals) %>
+              <%= label_tag('new_arrivals', "Periodically check for new datasets #{' (disabled by admin)' if disable_new_arrivals}") %>
+              <div class="help-block">
+                During periodic synchronization new OpenBIS datasets will be linked
+                (it only works if automatic registration is selected).
+                Use with caution, leave it if you don't expect new entries as it has significant performance impact.
+              </div>
+            </div>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+        <button class="btn btn-primary" onclick="set_registration_parameters()">Register selected</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+    function set_registration_parameters() {
+
+        if ($j('#new_assay select').val() > 0) {
+            $j('#seek_parent').val($j('#new_assay select').val());
+            $j('#sync_options_link_dependent').val($j('#link_dependent').prop("checked") ? '1' : undefined);
+            $j('#sync_options_new_arrivals').val($j('#new_arrivals').prop("checked") ? '1' : undefined);
+            $j('#openbis_batch_parent-view').modal('hide');
+            if($j('#batch_form input:checkbox:checked').length > 0) {
+                $j('#batch_form').submit();
+            } else {
+                alert('First select elements for batch registration');
+            }
+        } else {
+            alert('Select the parent element');
+        }
+    }
+
+
+</script>
