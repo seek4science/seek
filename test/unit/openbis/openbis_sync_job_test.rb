@@ -3,6 +3,7 @@ require 'openbis_test_helper'
 
 class OpenbisSynJobTest < ActiveSupport::TestCase
   def setup
+    Factory :experimental_assay_class
     mock_openbis_calls
 
     @batch_size = 3
@@ -183,7 +184,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     asset.synchronized_at = DateTime.now - 1.days
 
     asset.sync_state = :fatal
-    travel -1.days do
+    travel(-1.days) do
       assert asset.save
     end
 
@@ -221,7 +222,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     asset.external_id = 1
     asset.sync_state = :refresh
     asset.synchronized_at = DateTime.now - (@endpoint.refresh_period_mins + 5).minutes
-    travel -(@endpoint.refresh_period_mins + 5).minutes do
+    travel(-(@endpoint.refresh_period_mins + 5).minutes) do
       assert asset.save
     end
 
@@ -366,7 +367,7 @@ class OpenbisSynJobTest < ActiveSupport::TestCase
     begin
       t = Seek::Openbis::Zample.new(@endpoint, zample.perm_id)
       refute t
-    rescue Exception => e
+    rescue => e
       assert e
     end
     asset = OpenbisExternalAsset.build(zample, {})

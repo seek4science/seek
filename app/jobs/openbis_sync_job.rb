@@ -23,16 +23,26 @@ class OpenbisSyncJob < SeekJob
 
     errs = seek_util.sync_external_asset(obis_asset) unless obis_asset.synchronized?
 
-    if obis_asset.failed? && obis_asset.failures > failure_threshold
-      obis_asset.sync_state = :fatal
-      obis_asset.err_msg = 'Stopped sync: ' + obis_asset.err_msg
-      obis_asset.save
-      Rails.logger.error "Marked OBisAsset:#{obis_asset.id} perm_id: #{obis_asset.external_id} as fatal no more sync"
+    if obis_asset.failed?
+      handle_sync_failure obis_asset
     else
-      # allways touch asset so its updated_at stamp is modified as it is used for queuing entiries
+      # always touch asset so its updated_at stamp is modified as it is used for queuing entiries
       obis_asset.touch
     end
 
+    print_sync_status(obis_asset, errs)
+  end
+
+  def handle_sync_failure(obis_asset)
+    return if obis_asset.failures <= failure_threshold
+
+    obis_asset.sync_state = :fatal
+    obis_asset.err_msg = 'Stopped sync: ' + obis_asset.err_msg
+    obis_asset.save
+    Rails.logger.error "Marked OBisAsset:#{obis_asset.id} perm_id: #{obis_asset.external_id} as fatal no more sync"
+  end
+
+  def print_sync_status(obis_asset, errs)
     if errs.empty?
       Rails.logger.info "successful obis sync of OBisAsset:#{obis_asset.id} perm_id: #{obis_asset.external_id}" if DEBUG
     else

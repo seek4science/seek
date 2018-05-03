@@ -8,12 +8,10 @@ module Seek
 
       def scrub(node)
         case node.name
-          when 'commententry' then node.name = 'p'
-          when 'root' then node.name = 'div'
+        when 'commententry' then node.name = 'p'
+        when 'root' then node.name = 'div'
         end
       end
-
     end
-
   end
 end

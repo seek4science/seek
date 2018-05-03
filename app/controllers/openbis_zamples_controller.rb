@@ -55,7 +55,14 @@ class OpenbisZamplesController < ApplicationController
   end
 
   def seek_type
-    type = params[:seek] || :assay
-    @seek_type = type.to_sym
+    # a bit complex but warned about conversion form unsafe string
+    valid_values = ['assay']
+    valid_values.each do |v|
+      if v == params[:seek]
+        @seek_type = v.to_sym
+        break
+      end
+    end
+    @seek_type ||= :assay
   end
 end

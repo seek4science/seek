@@ -43,9 +43,8 @@ module Seek
       rescue Fairdom::OpenbisApi::OpenbisQueryException => e
         if e.message && e.message.include?('Unknown data set')
           raise Seek::Openbis::EntityNotFoundException, "Unable to find dataset with perm id #{dataset_perm_id}"
-        else
-          raise e
         end
+        raise e
       end
 
       def type_name

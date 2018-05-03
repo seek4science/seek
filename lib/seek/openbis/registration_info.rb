@@ -14,17 +14,17 @@ module Seek
 
       def assay=(obj)
         @assay = obj
-        self.primary= obj
+        self.primary = obj
       end
 
       def study=(obj)
         @study = obj
-        self.primary= obj
+        self.primary = obj
       end
 
       def datafile=(obj)
         @datafile = obj
-        self.primary= obj
+        self.primary = obj
       end
 
       def primary=(obj)

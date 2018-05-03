@@ -13,33 +13,42 @@ module Seek
       end
 
       def initialize(openbis_endpoint, perm_id = nil, refresh = false)
-        @openbis_endpoint = openbis_endpoint
-        @properties = {}
-        unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
-          raise 'OpenbisEndpoint expected and required' + "Got #{@openbis_endpoint} #{@openbis_endpoint.class}"
+        unless openbis_endpoint && openbis_endpoint.is_a?(OpenbisEndpoint)
+          raise 'OpenbisEndpoint expected and required' + "Got #{openbis_endpoint} #{openbis_endpoint.class}"
         end
 
-        if perm_id
+        @openbis_endpoint = openbis_endpoint
+        @properties = {}
 
-          cache_option = refresh ? { force: true } : nil
+        fetch_from_server(perm_id, refresh) if perm_id
+      end
 
-          json = query_application_server_by_perm_id(perm_id, cache_option)
-          unless json[json_key]
-            raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
-          end
-          unless json[json_key].size == 1
-            raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}, got #{json[json_key].size} hits"
-          end
-          populate_from_json(json[json_key].first)
+      def fetch_from_server(perm_id, refresh)
+        return unless perm_id
+
+        cache_option = refresh ? { force: true } : nil
+
+        json = query_application_server_by_perm_id(perm_id, cache_option)
+        check_json_response(json, perm_id)
+        populate_from_json(json[json_key].first)
+      end
+
+      def check_json_response(json, perm_id)
+        unless json[json_key]
+          raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with perm id #{perm_id}"
+        end
+        unless json[json_key].size == 1
+          msg = "Unable to find #{type_name} with perm id #{perm_id}, got #{json[json_key].size} hits"
+          raise Seek::Openbis::EntityNotFoundException, msg
         end
       end
 
       def populate_from_json(json)
+        raise "Cannot Populates #{self.class} from empty json" if json.nil? || json.empty?
         # for development by TZ
         puts "Populates #{self.class} from json:" if DEBUG
         puts json if DEBUG
-        puts '-----'  if DEBUG
-        raise "Cannot Populates #{self.class} from empty json" if json.nil? || json.empty?
+        puts '-----' if DEBUG
         @json = json
         @modifier = json['modifier']
         @code = json['code']
@@ -91,8 +100,8 @@ module Seek
 
         hash.reject do |k, v|
           next(true) if v.nil?
-          next(true) if k == 'ANNOTATIONS_STATE' || k == :ANNOTATIONS_STATE
-          next(true) if (k == 'XMLCOMMENTS' || k == :XMLCOMMENTS) && !v.start_with?('<')
+          next(true) if k.to_sym == :ANNOTATIONS_STATE
+          next(true) if k.to_sym == :XMLCOMMENTS && !v.start_with?('<')
           false
         end
       end
@@ -117,16 +126,15 @@ module Seek
       def registered?
         OpenbisExternalAsset.registered?(self)
 
-        # return true if OpenbisExternalAsset.registered?(self)
         # ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing').any?
       end
 
       def registered_as
         OpenbisExternalAsset.find_by_entity(self).seek_entity
-      rescue ActiveRecord::RecordNotFound => e
+      rescue ActiveRecord::RecordNotFound
         nil
 
-        # the original code
+        # the original Stuart's code (maybe needed to upgrade)
         # blob = ContentBlob.where(url: defined?(content_blob_uri) ? content_blob_uri : 'missing')
         # blob.any? ? blob.first.asset : nil
       end

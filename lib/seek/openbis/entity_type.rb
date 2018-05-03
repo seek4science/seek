@@ -3,7 +3,7 @@ module Seek
     # General behaviour for an entity type in openBIS.
     class EntityType
       attr_reader :json, :modification_date, :code, :description,
-                  :perm_id, :openbis_endpoint, :entity_type, :exception
+                  :perm_id, :openbis_endpoint, :entity_type
 
       # debug is with puts so it can be easily seen on tests screens
       DEBUG = Seek::Config.openbis_debug ? true : false
@@ -27,29 +27,36 @@ module Seek
       end
 
       def initialize(openbis_endpoint, entity_type, code = nil, refresh = false)
-        @openbis_endpoint = openbis_endpoint
-        @entity_type = entity_type
-
-        unless @openbis_endpoint && @openbis_endpoint.is_a?(OpenbisEndpoint)
+        unless openbis_endpoint && openbis_endpoint.is_a?(OpenbisEndpoint)
           raise 'OpenbisEndpoint expected and required'
         end
 
-        unless @@TYPES.include? @entity_type
-          raise "Unsupported type: #{@entity_type}"
+        unless @@TYPES.include? entity_type
+          raise "Unsupported type: #{entity_type}"
         end
 
-        if code
+        @openbis_endpoint = openbis_endpoint
+        @entity_type = entity_type
 
-          cache_option = refresh ? { force: true } : nil
-          begin
-            json = query_application_server_by_code(code, cache_option)
-            unless json[json_key]
-              raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with code #{code}"
-            end
-            populate_from_json(json[json_key].first)
-          rescue Fairdom::OpenbisApi::OpenbisQueryException => e
-            @exception = e
-          end
+        fetch_from_server(code, refresh) if code
+      end
+
+      def fetch_from_server(code, refresh)
+        return unless code
+
+        cache_option = refresh ? { force: true } : nil
+        json = query_application_server_by_code(code, cache_option)
+        check_json_response(json, code)
+        populate_from_json(json[json_key].first)
+      end
+
+      def check_json_response(json, code)
+        unless json[json_key]
+          raise Seek::Openbis::EntityNotFoundException, "Unable to find #{type_name} with code #{code}"
+        end
+        unless json[json_key].size == 1
+          msg = "Unable to find #{type_name} with code #{code}, got #{json[json_key].size} hits"
+          raise Seek::Openbis::EntityNotFoundException, msg
         end
       end
 
@@ -99,10 +106,6 @@ module Seek
 
       def cache_key(code)
         "#{type_name}/#{Digest::SHA2.hexdigest(code)}"
-      end
-
-      def error_occurred?
-        !exception.nil?
       end
 
       protected

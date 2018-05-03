@@ -59,7 +59,7 @@ class ExternalAsset < ActiveRecord::Base
     return content_object.json.to_json if (defined? content_object.json) && content_object.json.is_a?(Hash)
     return content_object.to_json if defined? content_object.to_json
     return content_object if content_object.is_a?(String)
-    raise 'Not implemented json serialization for external content'
+    raise "Not implemented json serialization for external content class #{content_object.class}"
   end
 
   def deserialize_content(serial)
@@ -84,13 +84,12 @@ class ExternalAsset < ActiveRecord::Base
   end
 
   def init_content_holder
-    if content_blob.nil?
-      build_content_blob(url: (external_service ? external_service : '') + '#' + external_id,
-                         content_type: 'application/json',
-                         original_filename: external_id,
-                         make_local_copy: false,
-                         external_link: false)
-    end
+    return unless content_blob.nil?
+    build_content_blob(url: (external_service ? external_service : '') + '#' + external_id,
+                       content_type: 'application/json',
+                       original_filename: external_id,
+                       make_local_copy: false,
+                       external_link: false)
   end
 
   def save_content_blob

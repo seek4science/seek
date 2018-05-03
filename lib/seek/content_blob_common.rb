@@ -51,7 +51,7 @@ module Seek
           dataset.download(dest_folder, zip_name, asset.title.underscore)
           send_file zip_name, filename: "#{dataset.perm_id}.zip", type: 'application/octet-stream', disposition: 'attachment'
         end
-      rescue Exception => e
+      rescue => e
         redirect_on_error(asset, "Cannot download file: #{e.message}")
       end
     end

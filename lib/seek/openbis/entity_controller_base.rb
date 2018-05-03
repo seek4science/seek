@@ -191,32 +191,22 @@ module Seek
       end
 
       def zamples_linked_to(seek)
-        @zamples_linked_to = []
+        assays = []
+        assays = seek.assays if seek.is_a? Study
 
-        if seek.is_a? Study
-          @zamples_linked_to = seek.assays
-                                   .select { |a| a.external_asset.is_a?(OpenbisExternalAsset) }
-                                   .map { |a| a.external_asset.external_id }
-        end
-
-        @zamples_linked_to
+        @zamples_linked_to = assays
+                             .select { |a| a.external_asset.is_a?(OpenbisExternalAsset) }
+                             .map { |a| a.external_asset.external_id }
       end
 
       def datasets_linked_to(seek)
-        @datasets_linked_to = []
+        data_files = []
+        data_files = seek.related_data_files if seek.is_a? Study
+        data_files = seek.data_files if seek.is_a? Assay
 
-        if seek.is_a? Study
-          @datasets_linked_to = seek.related_data_files
-                                    .select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
-                                    .map { |df| df.external_asset.external_id }
-        end
-
-        if seek.is_a? Assay
-          @datasets_linked_to = seek.data_files
-                                    .select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
-                                    .map { |df| df.external_asset.external_id }
-        end
-        @datasets_linked_to
+        @datasets_linked_to = data_files
+                              .select { |df| df.external_asset.is_a?(OpenbisExternalAsset) }
+                              .map { |df| df.external_asset.external_id }
       end
 
       def project_member?

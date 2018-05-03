@@ -1,3 +1,4 @@
+# helper methods shared between OpenBIS related screens
 module OpenbisHelper
   def can_browse_openbis?(project, user = User.current_user)
     Seek::Config.openbis_enabled && project.has_member?(user) && project.openbis_endpoints.any?
@@ -78,13 +79,15 @@ module OpenbisHelper
     file_count = dataset.dataset_file_count
     files_text = "#{file_count} File".pluralize(file_count)
 
-    link = link_to(files_text, '#', class: 'view-files-link',
-                                    'data-toggle' => 'modal',
-                                    'data-target' => '#openbis-file-view',
-                                    'data-perm-id' => dataset.perm_id.to_s,
-                                    'data-endpoint-id' => openbis_endpoint.id.to_s)
+    link_to(files_text, '#', class: 'view-files-link',
+                             'data-toggle' => 'modal',
+                             'data-target' => '#openbis-file-view',
+                             'data-perm-id' => dataset.perm_id.to_s,
+                             'data-endpoint-id' => openbis_endpoint.id.to_s)
   end
 
+  # trims text content to a given limit, preserving the whole words.
+  # it counts size over multiple calls, so trims the total text length not for each call
   class StatefulWordTrimmer
     attr_reader :trimmed
 
@@ -111,6 +114,9 @@ module OpenbisHelper
     end
   end
 
+  # thml sanitizer that trims htlm content to a given lenght. Once the total text legth reach limit
+  # the content of followin html nodes is ignored. That way the display text is limited but no problem with
+  # invalid not closed html tags
   class TextTrimmingScrubber < Loofah::Scrubber
     def initialize(limit)
       @direction = :top_down
@@ -128,6 +134,7 @@ module OpenbisHelper
     end
   end
 
+  # html sanitizer that removes styling elements
   class StylingScrubber < Loofah::Scrubber
     def initialize
       @direction = :top_down

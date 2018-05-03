@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class OpenbisFakeJobTest < ActiveSupport::TestCase
-
   def setup
     @batch_size = 3
     @job = OpenbisFakeJob.new('fakish', @batch_size)
@@ -20,7 +19,6 @@ class OpenbisFakeJobTest < ActiveSupport::TestCase
     assert set.length <= @batch_size
     refute set.empty?
     assert set.first.is_a? Assay
-
   end
 
   test 'rnd_asset gives a DataFile' do
@@ -31,7 +29,6 @@ class OpenbisFakeJobTest < ActiveSupport::TestCase
     assert set.length <= @batch_size
     refute set.empty?
     assert set.first.is_a? DataFile
-
   end
 
   test 'assets_and_assets contains both' do
@@ -40,8 +37,8 @@ class OpenbisFakeJobTest < ActiveSupport::TestCase
     set = @job.assets_and_assays
 
     assert set.is_a? Array
-    refute set.select { |e| e.is_a? Assay}.empty?
-    refute set.select { |e| e.is_a? DataFile}.empty?
+    refute set.select { |e| e.is_a? Assay }.empty?
+    refute set.select { |e| e.is_a? DataFile }.empty?
   end
 
   test 'performs job on assay' do
@@ -52,5 +49,4 @@ class OpenbisFakeJobTest < ActiveSupport::TestCase
     assay.reload
     assert_not_equal mod, assay.updated_at
   end
-
 end

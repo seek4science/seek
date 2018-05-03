@@ -2,7 +2,6 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class SeekUtilTest < ActiveSupport::TestCase
-  #fixtures :all
 
   def setup
     Factory :experimental_assay_class

@@ -18,7 +18,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    login_as(:datafile_owner) unless User.current_user # by TZ for some reason depending on tets order user was no longer logged
+    # by TZ for some reason depending on tets order user was no longer logged
+    login_as(:datafile_owner) unless User.current_user
     @object = data_files(:picture)
     @object.tag_with 'tag1'
     @object

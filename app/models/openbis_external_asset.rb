@@ -31,12 +31,12 @@ class OpenbisExternalAsset < ExternalAsset
     end
 
     openbis_endpoint = openbis_entity.openbis_endpoint
-    sync_options = {} unless sync_options
+    sync_options ||= {}
 
     self.seek_service = openbis_endpoint
     self.external_service = self.class.extract_external_service(openbis_entity)
     self.external_id = openbis_entity.perm_id
-    self.external_type = (openbis_entity.class).to_s
+    self.external_type = openbis_entity.class.to_s
     self.sync_options = sync_options
 
     self.content = openbis_entity
@@ -74,36 +74,30 @@ class OpenbisExternalAsset < ExternalAsset
     terms = [entity.perm_id, entity.type_code, entity.type_description,
              entity.registrator, entity.modifier, entity.code]
 
-    terms |= entity.vetted_properties.map  do |key, value|
-      value = removeTAGS(value)
-      [value, "#{key}:#{value}"]
-    end.flatten
+    terms |= properties_terms(entity)
 
-    if entity.is_a? Seek::Openbis::Dataset
-
-      terms |= entity.dataset_files_no_directories.collect do |file|
-        # files dont have permid [file.perm_id, file.path, file.filename]
-        [file.path, file.filename]
-      end.flatten
-
-    end
+    terms |= datafiles_terms(entity) if entity.is_a? Seek::Openbis::Dataset
 
     terms.uniq
   end
 
-  def removeTAGS(text)
+  def properties_terms(entity)
+    entity.vetted_properties.map do |key, value|
+      value = remove_tags(value)
+      [value, "#{key}:#{value}"]
+    end.flatten
+  end
+
+  def datafiles_terms(entity)
+    entity.dataset_files_no_directories.collect do |file|
+      # files dont have permid [file.perm_id, file.path, file.filename]
+      [file.path, file.filename]
+    end.flatten
+  end
+
+  def remove_tags(text)
     Loofah.fragment(text)
           .scrub!(Seek::Openbis::ObisCommentScrubber.new)
           .scrub!(:prune).to_text.strip
   end
-
-  #
-  # def fetch_externally
-  #  seek_util.fetch_current_entity_version(self)
-  # end
-  #
-
-  # def seek_util
-  #  @seek_util ||= Seek::Openbis::SeekUtil.new
-  # end
 end

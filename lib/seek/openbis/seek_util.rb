@@ -129,7 +129,7 @@ if automatic synchronization was selected.' }
         end
 
         msg = exception.to_s
-        msg = exception.class.to_s unless msg
+        msg ||= exception.class.to_s
         msg = msg.slice(0, 250) if msg.length > 250
         msg
       end
@@ -229,16 +229,16 @@ if automatic synchronization was selected.' }
         external_assets
           .select { |es| es.seek_entity.nil? }
           .map do |es|
-          es.sync_options = sync_options.clone
-          createObisAssay(assay_params.clone, contributor, es)
-        end
-          .each do |df|
-          if df.save
-            reg_info.add_created df
-          else
-            reg_info.add_issues df.errors.full_messages
+            es.sync_options = sync_options.clone
+            createObisAssay(assay_params.clone, contributor, es)
           end
-        end
+          .each do |df|
+            if df.save
+              reg_info.add_created df
+            else
+              reg_info.add_issues df.errors.full_messages
+            end
+          end
 
         assays = existing_assays + reg_info.created
 
@@ -332,9 +332,14 @@ if automatic synchronization was selected.' }
       end
 
       def extract_requested_assays(entity, sync_options)
-        sample_ids = sync_options[:link_assays] == '1' ? entity.sample_ids :
-                         (sync_options[:linked_assays] || []) & entity.sample_ids
-        candidates = Seek::Openbis::Zample.new(entity.openbis_endpoint).find_by_perm_ids(sample_ids)
+        if sync_options[:link_assays] == '1'
+          sample_ids = entity.sample_ids
+        else
+          sample_ids = (sync_options[:linked_assays] || []) & entity.sample_ids
+        end
+
+        candidates = Seek::Openbis::Zample.new(entity.openbis_endpoint)
+                         .find_by_perm_ids(sample_ids)
 
         zamples = []
         zamples.concat(filter_assay_like_zamples(candidates, entity.openbis_endpoint)) if sync_options[:link_assays] == '1'

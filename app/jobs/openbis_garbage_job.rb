@@ -9,12 +9,12 @@ class OpenbisGarbageJob < SeekJob
   end
 
   def perform_job(_item)
-    Rails.logger.info "Before GC job\n#{ObjectSpace.count_objects}"
+    Rails.logger.info "Before GC job ObjectSpace\n#{ObjectSpace.count_objects}"
     Rails.logger.info "Before GC stats\n#{GC.stat}"
 
     GC.start
 
-    Rails.logger.info "After GC job\n#{ObjectSpace.count_objects}"
+    Rails.logger.info "After GC job  ObjectSpace\n#{ObjectSpace.count_objects}"
     Rails.logger.info "After GC stats\n#{GC.stat}"
   end
 
@@ -41,6 +41,4 @@ class OpenbisGarbageJob < SeekJob
   def self.create_initial_jobs
     OpenbisGarbageJob.new('GC1').queue_job
   end
-
-  private
 end

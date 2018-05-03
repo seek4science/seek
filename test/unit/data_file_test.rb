@@ -349,7 +349,8 @@ class DataFileTest < ActiveSupport::TestCase
   #     mock_openbis_calls
   #     User.with_current_user(Factory(:person).user) do
   #       permission_project = Factory(:project)
-  #       endpoint = Factory(:openbis_endpoint, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: permission_project)]))
+  #       endpoint = Factory(:openbis_endpoint,
+  # policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: permission_project)]))
   #       assert_equal 1, endpoint.policy.permissions.count
   #       df = DataFile.build_from_openbis(endpoint, '20160210130454955-23')
   #       refute_nil df

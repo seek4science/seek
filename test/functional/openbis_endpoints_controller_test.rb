@@ -146,7 +146,8 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   #     disable_authorization_checks do
   #       @project.update_attributes(default_license: 'wibble')
   #     end
-  #     endpoint = Factory(:openbis_endpoint, project: @project, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: @project)]))
+  #     endpoint = Factory(:openbis_endpoint, project: @project,
+  # policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: @project)]))
   #     perm_id = '20160210130454955-23'
   #     login_as(@project_administrator)
   #     assert_difference('DataFile.count') do

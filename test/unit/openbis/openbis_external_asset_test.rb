@@ -187,7 +187,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
  <li style="weight: bold;">In Arabidopsis thaliana, many circadian clock-associated genes have been identified.</li>
 </ul></body>
 '
-    res = asset.removeTAGS(text)
+    res = asset.remove_tags(text)
     # puts res
     exp = 'In Arabidopsis thaliana, many circadian clock-associated genes have been identified.'
     assert_equal exp, res
@@ -200,7 +200,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     text = '
 <root><commentEntry date=\"1511277676686\" person=\"seek\">My first comment</commentEntry></root>
 '
-    res = asset.removeTAGS(text)
+    res = asset.remove_tags(text)
     # puts res
     exp = 'My first comment'
     assert_equal exp, res
@@ -211,7 +211,7 @@ class OpenbisExternalAssetTest < ActiveSupport::TestCase
     asset = OpenbisExternalAsset.build(experiment)
 
     text = ' temp < 3 C but > 2'
-    res = asset.removeTAGS(text)
+    res = asset.remove_tags(text)
     # puts res
     exp = 'temp &lt; 3 C but &gt; 2'
     assert_equal exp, res

@@ -1,7 +1,6 @@
 # job to periodically fetch assets to potentially create mem leak
 class OpenbisFakeJob < SeekJob
-  # debug is with puts so it can be easily seen on tests screens
-  DEBUG = true
+  DEBUG = false
 
   def initialize(name, batch_size = 10)
     @name = name
@@ -11,20 +10,13 @@ class OpenbisFakeJob < SeekJob
   def perform_job(item)
     Rails.logger.info "starting fake job of #{item.class}:#{item.id}" if DEBUG
 
-    errs = []
     item.reload
 
-    del = item.title.length.even? ? 0.1 : 0.5
-    sleep del
+    sleep item.title.length.even? ? 0.1 : 0.5
 
     item.touch
 
-    if errs.empty?
-      Rails.logger.info "successful fake job of #{item.class}:#{item.id}" if DEBUG
-    else
-      msg = "Sync issues fake job of #{item.class}:#{item.id}\n#{errs.join(',\n')}"
-      Rails.logger.error msg
-    end
+    Rails.logger.info "successful fake job of #{item.class}:#{item.id}" if DEBUG
   end
 
   def gather_items
@@ -84,6 +76,4 @@ class OpenbisFakeJob < SeekJob
   def self.create_initial_jobs
     OpenbisFakeJob.new('fake1').queue_job
   end
-
-  private
 end
