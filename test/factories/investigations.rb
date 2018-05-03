@@ -3,7 +3,7 @@ Factory.define(:investigation, class: Investigation) do |f|
   f.sequence(:title) { |n| "Investigation#{n}" }
   f.association :contributor, factory: :person
   f.after_build do |p|
-    p.projects = [p.contributor.projects.first] if p.projects.empty?
+    p.projects = [p.contributor.person.projects.first] if p.projects.empty?
   end
 end
 

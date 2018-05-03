@@ -138,28 +138,20 @@ class PersonTest < ActiveSupport::TestCase
   test 'contributed items' do
     person = Factory(:person)
     refute_nil person.user
-    df = Factory(:data_file, contributor: person)
-    as = Factory(:assay, contributor: person)
-    study = Factory(:study, contributor: person.user)
+    assert_empty person.contributed_items
+
+    df = Factory(:data_file, contributor: person.user)
+    inv = Factory(:investigation, contributor:person.user)
+    study = Factory(:study, contributor: person.user,investigation:inv)
+    as = Factory(:assay, contributor: person,study:study)
+
 
     items = person.contributed_items
 
-    assert_equal 3, items.count
+    assert_equal 4, items.count
     assert_includes items, df
     assert_includes items, as
     assert_includes items, study
-
-    person = Factory(:brand_new_person)
-    assert_nil person.user
-    df = Factory(:data_file, contributor: person)
-    as = Factory(:assay, contributor: person)
-    inv = Factory(:investigation, contributor: person)
-
-    items = person.contributed_items
-
-    assert_equal 3, items.count
-    assert_includes items, df
-    assert_includes items, as
     assert_includes items, inv
   end
 
@@ -811,15 +803,15 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal [assay1, assay2].sort, person.related_assays.sort
   end
 
-  test 'get the correct investigations and studides' do
+  test 'get the correct investigations and studies' do
     p = Factory(:person)
     u = p.user
 
     inv1 = Factory(:investigation, contributor: p)
     inv2 = Factory(:investigation, contributor: u)
 
-    study1 = Factory(:study, contributor: p)
-    study2 = Factory(:study, contributor: u)
+    study1 = Factory(:study, contributor: p, investigation:inv1)
+    study2 = Factory(:study, contributor: u, investigation:inv2)
     p = Person.find(p.id)
 
     assert_equal [study1, study2], p.studies.sort_by(&:id)
