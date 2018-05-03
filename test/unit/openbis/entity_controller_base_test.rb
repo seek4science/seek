@@ -47,14 +47,14 @@ class EntityControllerBaseTest < ActionController::TestCase
 
     linked = @controller.datasets_linked_to assay
     assert_equal 2, linked.length
-    assert_equal ['20171004182824553-41', '20171002190934144-40'], linked
+    assert_equal ['20171004182824553-41', '20171002190934144-40'].sort, linked.sort
 
     study = assay.study
     assert study
 
     linked = @controller.datasets_linked_to study
     assert_equal 2, linked.length
-    assert_equal ['20171004182824553-41', '20171002190934144-40'], linked
+    assert_equal ['20171004182824553-41', '20171002190934144-40'].sort, linked.sort
   end
 
   test 'get_zamples_linked_to gets ids of openbis zamples' do
@@ -87,6 +87,6 @@ class EntityControllerBaseTest < ActionController::TestCase
 
     linked = @controller.zamples_linked_to study
     assert_equal 2, linked.length
-    assert_equal ['20171002172111346-37', '20171002172639055-39'], linked
+    assert_equal ['20171002172111346-37', '20171002172639055-39'].sort, linked.sort
   end
 end
