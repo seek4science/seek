@@ -2782,9 +2782,10 @@ class DataFilesControllerTest < ActionController::TestCase
     Factory(:string_sample_attribute_type, title: 'String')
 
     data_file = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                        policy: Factory(:private_policy), contributor: person.user)
-    assay_asset1 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::INCOMING)
-    assay_asset2 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::OUTGOING)
+                        policy: Factory(:private_policy), contributor: person)
+
+    assay_asset1 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::INCOMING,assay:Factory(:assay,contributor:person))
+    assay_asset2 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::OUTGOING,assay:Factory(:assay,contributor:person))
 
     sample_type = SampleType.new(title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id])
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
@@ -3095,7 +3096,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     project = person.projects.last
     assay_class = AssayClass.experimental
-    study = Factory(:study,investigation:Factory(:investigation,projects:[project]), contributor:person)
+    study = Factory(:study,investigation:Factory(:investigation,contributor:person), contributor:person)
     assert study.can_edit?
     sop = Factory(:sop,projects:[project],contributor:person)
     assert sop.can_view?
@@ -3151,7 +3152,8 @@ class DataFilesControllerTest < ActionController::TestCase
 
     project = person.projects.last
     assay_class = AssayClass.experimental
-    study = Factory(:study,investigation:Factory(:investigation,projects:[project]), contributor:person)
+    investigation = Factory(:investigation,projects:[project], contributor:person)
+    study = Factory(:study,investigation:investigation, contributor:person)
     assert study.can_edit?
 
     sharing = {
@@ -3221,7 +3223,9 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'create metadata with new assay fails if study not editable' do
     person = Factory(:person)
     project = person.projects.last
-    study = Factory(:study,investigation:Factory(:investigation,projects:[project]))
+    another_person = Factory(:person,project:project)
+    investigation = Factory(:investigation,projects:[project],contributor:another_person)
+    study = Factory(:study, contributor:another_person,investigation:investigation)
 
     login_as(person)
 
