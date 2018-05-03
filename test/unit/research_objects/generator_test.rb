@@ -1,8 +1,8 @@
 require 'test_helper'
 
 class GeneratorTest < ActiveSupport::TestCase
+
   test 'generate for investigation' do
-    User.current_user = Factory(:person).user
     filename = 'robundle.zip'
 
     Dir.mktmpdir do |dir|
@@ -100,20 +100,24 @@ class GeneratorTest < ActiveSupport::TestCase
 
     @assay_asset5.asset.save! # this seems to be required to save the model_image and record its association.
 
-    inv = Factory(:investigation, policy: Factory(:public_policy))
-    study = Factory(:study, policy: Factory(:public_policy), investigation: inv)
+    contributor = Factory(:person)
+
+    inv = Factory(:investigation, policy: Factory(:public_policy),contributor:contributor)
+    study = Factory(:study, policy: Factory(:public_policy), investigation: inv, contributor:contributor)
 
     expassay = Factory(:experimental_assay,
                        assay_assets: [assay_asset1, assay_asset2, assay_asset3, assay_asset4],
                        policy: Factory(:public_policy),
-                       study: study)
+                       study: study,
+                       contributor:contributor)
 
     Factory :relationship, subject: expassay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication)
 
     Factory(:experimental_assay,
             assay_assets: [@assay_asset5, @assay_asset6],
             policy: Factory(:public_policy),
-            study: study)
+            study: study,
+            contributor:contributor)
     inv
   end
 end
