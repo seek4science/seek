@@ -404,10 +404,12 @@ class ProgrammeTest < ActiveSupport::TestCase
     projects = FactoryGirl.create_list(:project, 3)
     programme = Factory(:programme, projects: projects)
 
+
     projects.each do |project|
-      i = Factory(:investigation, projects: [project])
-      s = Factory(:study, investigation: i)
-      a = Factory(:assay, study: s)
+      contributor = Factory(:person,project:project)
+      i = Factory(:investigation, projects: [project], contributor:contributor)
+      s = Factory(:study, investigation: i, contributor:contributor)
+      a = Factory(:assay, study: s, contributor:contributor)
       project.reload # Can't find investigations of second project if this isn't here!
       assert_includes project.investigations, i
       assert_includes project.studies, s
@@ -416,7 +418,7 @@ class ProgrammeTest < ActiveSupport::TestCase
       assert_includes programme.studies, s
       assert_includes programme.assays, a
       [:data_files, :models, :sops, :presentations, :events, :publications].each do |type|
-        item = Factory(type.to_s.singularize.to_sym, projects: [project])
+        item = Factory(type.to_s.singularize.to_sym, projects: [project], contributor:contributor)
         assert_includes project.send(type), item, "Project related #{type} didn't include item"
         assert_includes programme.send(type), item, "Programme related #{type} didn't include item"
       end
