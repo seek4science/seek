@@ -165,12 +165,13 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'set_default_subscriptions when a study is created' do
-    proj = Factory(:project)
+    person = Factory(:person)
+    proj = person.projects.first
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
-    investigation = Factory(:investigation, projects: [proj])
-    study = Factory(:study, investigation: investigation, policy: Factory(:public_policy))
+    investigation = Factory(:investigation, contributor: person, projects: [proj])
+    study = Factory(:study, contributor: person, investigation: investigation, policy: Factory(:public_policy))
 
     assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
     assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
@@ -184,13 +185,16 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'update subscriptions when changing a study associated to an assay' do
-    proj = Factory(:project)
+    person = Factory(:person)
+    proj = person.projects.first
+    project2 = Factory(:project)
+    person.add_to_project_and_institution(project2, Factory(:institution))
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
-    investigation = Factory(:investigation, projects: [proj])
-    study = Factory(:study, investigation: investigation)
-    assay = Factory(:assay, study: study, policy: Factory(:public_policy))
+    assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+    study = assay.study
+    investigation = assay.investigation
 
     assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
     assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
@@ -206,7 +210,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
 
     # changing study
-    assay.study = Factory(:study)
+    assay.study = Factory(:study, contributor: person, investigation: Factory(:investigation, contributor: person, projects: [project2]))
     disable_authorization_checks { assay.save }
 
     RemoveSubscriptionsForItemJob.new(assay, assay.projects).exists?
@@ -329,12 +333,17 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should remove subscriptions when updating the projects associating to an investigation' do
-    proj = Factory(:project)
+    person = Factory(:person)
+    proj = person.projects.first
+    project2 = Factory(:project)
+    person.add_to_project_and_institution(project2, Factory(:institution))
+
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
-    investigation = Factory(:investigation, projects: [proj])
-    study = Factory(:study, investigation: investigation)
-    assay = Factory(:assay, study: study, policy: Factory(:public_policy))
+
+    assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+    study = assay.study
+    investigation = assay.investigation
 
     assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
     assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
@@ -348,10 +357,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert assay.subscribed?(current_person)
 
     # changing projects associated with the investigation
-    updated_project = Factory(:project)
     investigation.reload
     disable_authorization_checks do
-      investigation.projects = [updated_project]
+      investigation.projects = [project2]
       investigation.save
     end
 
@@ -370,12 +378,16 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should add subscriptions when updating the projects associating to an investigation' do
-    proj = Factory(:project)
+    person = Factory(:person)
+    proj = person.projects.first
+    project2 = Factory(:project)
+    person.add_to_project_and_institution(project2, Factory(:institution))
+
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
-    investigation = Factory(:investigation, projects: [Factory(:project)])
-    study = Factory(:study, investigation: investigation)
-    assay = Factory(:assay, study: study, policy: Factory(:public_policy))
+    investigation = Factory(:investigation, contributor: person, projects: [project2])
+    study = Factory(:study, contributor: person, investigation: investigation)
+    assay = Factory(:assay, contributor: person, study: study, policy: Factory(:public_policy))
 
     assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
     assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
@@ -407,12 +419,17 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should remove subscriptions for a study and an assay associated with this study when updating the investigation associating with this study' do
-    proj = Factory(:project)
+    person = Factory(:person)
+    proj = person.projects.first
+    project2 = Factory(:project)
+    person.add_to_project_and_institution(project2, Factory(:institution))
+
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
-    investigation = Factory(:investigation, projects: [proj])
-    study = Factory(:study, investigation: investigation)
-    assay = Factory(:assay, study: study, policy: Factory(:public_policy))
+
+    assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+    study = assay.study
+    investigation = assay.investigation
 
     assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
     assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
@@ -427,7 +444,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     # changing investigation associated with the study
     study.reload
-    new_investigation = Factory(:investigation)
+    new_investigation = Factory(:investigation, contributor: person, projects: [project2])
     disable_authorization_checks do
       study.investigation = new_investigation
       study.save
@@ -448,12 +465,17 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should add subscriptions for a study and an assay associated with this study when updating the investigation associating with this study' do
-    proj = Factory(:project)
+    person = Factory(:person)
+    proj = person.projects.first
+    project2 = Factory(:project)
+    person.add_to_project_and_institution(project2, Factory(:institution))
+
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
-    investigation = Factory(:investigation, projects: [proj])
-    study = Factory(:study, investigation: Factory(:investigation))
-    assay = Factory(:assay, study: study, policy: Factory(:public_policy))
+
+    investigation = Factory(:investigation, contributor: person, projects: [proj])
+    study = Factory(:study, contributor: person, investigation: Factory(:investigation, contributor: person, projects: [project2]))
+    assay = Factory(:assay, contributor: person, study: study, policy: Factory(:public_policy))
 
     assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
     assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
