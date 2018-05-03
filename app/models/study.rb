@@ -24,10 +24,9 @@ class Study < ActiveRecord::Base
   has_many :assays
   belongs_to :person_responsible, :class_name => "Person"
 
-  validates :investigation, :presence => { message: "Investigation is blank or invalid" }
+  validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 
   enforce_authorization_on_association :investigation, :view
-  validate ->(s) { errors.add(:investigation, 'must be associated with one of your projects.') unless (s.investigation.projects - s.contributor.person.projects).empty? }
 
   ["data_file","sop","model","document"].each do |type|
     eval <<-END_EVAL

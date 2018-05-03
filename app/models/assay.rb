@@ -45,9 +45,9 @@ class Assay < ActiveRecord::Base
 
   validates_presence_of :assay_type_uri
   validates_presence_of :technology_type_uri, unless: :is_modelling?
-  validates_presence_of :study, message: ' must be selected and valid'
   validates_presence_of :contributor
   validates_presence_of :assay_class
+  validates :study, presence: { message: ' must be selected and valid' }, projects: true
 
   before_validation :default_assay_and_technology_type
 
@@ -55,7 +55,6 @@ class Assay < ActiveRecord::Base
   attr_reader :pending_related_assets
 
   enforce_authorization_on_association :study, :view
-  validate ->(a) { errors.add(:study, 'must be associated with one of your projects.') unless (a.study.projects - a.contributor.person.projects).empty? }
 
   def project_ids
     projects.map(&:id)
