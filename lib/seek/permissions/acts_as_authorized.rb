@@ -19,10 +19,10 @@ module Seek #:nodoc:
               true
             end
           END_EVAL
+        end
 
-          def can_perform?(action, *args)
-            send "can_#{action}?", *args
-          end
+        def can_perform?(action, *args)
+          send "can_#{action}?", *args
         end
 
         def authorization_supported?
