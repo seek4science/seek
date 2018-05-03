@@ -48,7 +48,7 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test 'assay association' do
-    document = Factory(:document)
+    document = Factory(:document, policy: Factory(:publicly_viewable_policy))
     assay = assays(:modelling_assay_with_data_and_relationship)
     assay_asset = assay_assets(:metabolomics_assay_asset1)
     assert_not_equal assay_asset.asset, document
