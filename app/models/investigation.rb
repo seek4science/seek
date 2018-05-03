@@ -10,8 +10,7 @@ class Investigation < ActiveRecord::Base
 
   has_many :assays, through: :studies
 
-  validates :projects, presence: true
-  validate ->(i) { errors.add(:base, 'Can only associate projects you are a member of.') unless (i.projects - i.contributor.person.projects).empty? }
+  validates :projects, presence: true, projects: { self: true }
 
   def state_allows_delete?(*args)
     studies.empty? && super
