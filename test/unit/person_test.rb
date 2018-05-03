@@ -153,6 +153,23 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes items, as
     assert_includes items, study
     assert_includes items, inv
+
+    person = Factory(:person_in_project)
+    assert_nil person.user
+
+    assert_empty person.contributed_items
+
+    df = Factory(:data_file, contributor: person)
+    inv = Factory(:investigation, contributor:person)
+    study = Factory(:study, contributor: person,investigation:inv)
+    as = Factory(:assay, contributor: person,study:study)
+
+    items = person.contributed_items
+
+    assert_equal 4, items.count
+    assert_includes items, df
+    assert_includes items, as
+    assert_includes items, inv
   end
 
   test 'orcid id validation' do
