@@ -8,14 +8,17 @@ class AssayFolderTest < ActiveSupport::TestCase
   end
 
   test 'assay folders' do
-    public_assay = Factory(:experimental_assay, policy: Factory(:public_policy))
-    viewable_assay = Factory(:experimental_assay, policy: Factory(:publicly_viewable_policy))
-    private_assay  = Factory(:experimental_assay, policy: Factory(:private_policy))
+    someone_else = Factory(:person, project: @project)
+    public_assay = Factory(:experimental_assay, contributor: someone_else, policy: Factory(:public_policy))
+    viewable_assay = Factory(:experimental_assay, contributor: someone_else, policy: Factory(:publicly_viewable_policy))
+    private_assay  = Factory(:experimental_assay, contributor: someone_else, policy: Factory(:private_policy))
     my_private_assay = Factory(:experimental_assay, contributor: @user.person, policy: Factory(:private_policy))
 
-    [public_assay, viewable_assay, private_assay, my_private_assay].each do |a|
-      a.study.investigation.projects = [@project]
-      a.study.investigation.save!
+    disable_authorization_checks do
+      [public_assay, viewable_assay, private_assay, my_private_assay].each do |a|
+        a.study.investigation.projects = [@project]
+        a.study.investigation.save!
+      end
     end
 
     assert public_assay.can_edit?
