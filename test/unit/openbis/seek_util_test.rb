@@ -2,7 +2,10 @@ require 'test_helper'
 require 'openbis_test_helper'
 
 class SeekUtilTest < ActiveSupport::TestCase
+  #fixtures :all
+
   def setup
+    Factory :experimental_assay_class
     mock_openbis_calls
     @endpoint = Factory(:openbis_endpoint)
     @endpoint.assay_types = ['TZ_FAIR_ASSAY'] # EXPERIMENTAL_STEP

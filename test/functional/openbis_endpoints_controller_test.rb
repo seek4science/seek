@@ -7,6 +7,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
+    Factory :experimental_assay_class
     mock_openbis_calls
     Factory(:person)
     @project_administrator = Factory(:project_administrator)

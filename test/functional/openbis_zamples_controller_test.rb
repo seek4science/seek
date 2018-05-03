@@ -1,12 +1,14 @@
 require 'test_helper'
 require 'openbis_test_helper'
 
-include SharingFormTestHelper
+#include SharingFormTestHelper
 
 class OpenbisZamplesControllerTest < ActionController::TestCase
+  #fixtures :all
   include AuthenticatedTestHelper
 
   def setup
+    Factory :experimental_assay_class
     mock_openbis_calls
     @project_administrator = Factory(:project_administrator)
     @project = @project_administrator.projects.first
