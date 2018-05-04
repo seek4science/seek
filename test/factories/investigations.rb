@@ -10,9 +10,8 @@ end
 Factory.define(:min_investigation, class: Investigation) do |f|
   f.title "A Minimal Investigation"
   f.after_build do |i|
-    project = Factory(:min_project)
-    i.contributor ||= Factory(:person, project: project)
-    i.projects = [project] if i.projects.empty?
+    i.contributor ||= Factory(:person)
+    i.projects = [i.contributor.person.projects.first] if i.projects.empty?
   end
 end
 
