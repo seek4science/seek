@@ -1,1 +1,1 @@
-This is a studies description
+A **Study** is a series of experiments (or **Assays**) which can be combined to answer a particular biological question. These experiments might be a series of the same type of **Assay** (for example, microarrays for different conditions), or they may be a collection of different types of **Assay** (e.g. a combination of array and mass spec measurements).

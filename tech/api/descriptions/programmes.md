@@ -1,1 +1,1 @@
-This is a programmes description
+**Programmes** are an umbrella group for one or more **Projects**. They are usually, but not always, associated with a particular funded piece of research.

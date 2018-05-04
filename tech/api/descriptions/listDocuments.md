@@ -1,3 +1,1 @@
-The **listDocuments** operation returns a JSON object containing a list of all the
-Documents to which the authenticated user has
-access.
+The **listDocuments** operation returns a JSON object containing a list of all the Documents to which the authenticated user has accesss.

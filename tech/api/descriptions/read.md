@@ -1,5 +1,4 @@
-A **Read** operation will return information about the
-instance identified, provided the authenticated user has access to it.
+A **Read** operation will return information about the instance identified, provided the authenticated user has access to it.
 
 The **Read** operation returns a JSON object representing the instance.
 

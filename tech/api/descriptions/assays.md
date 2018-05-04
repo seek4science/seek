@@ -1,1 +1,1 @@
-This is a assays description
+An **Assay** describes a particular experiment. It allows you to associate **DataFiles**, **SOPs** and **Models** together as well as describing the type of **Assay** and any technology required to perform the experiment.

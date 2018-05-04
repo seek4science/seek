@@ -1,7 +1,23 @@
 swagger: '2.0'
 info:
-  version: '0.2'
-  title: 'JSON API to FAIRDOM SEEK '
+  version: '0.1'
+  title: JSON API to FAIRDOM SEEK
+  license:
+    name: The 3-Clause BSD License
+    url: https://opensource.org/licenses/BSD-3-Clause
+  contact:
+    name: SEEK support
+    url: http://groups.google.com/group/seek4science
+    email: support@fair-dom.org
+  description: |-
+    The JSON API to FAIRDOM SEEK is a [JSON API](http://jsonapi.org)
+    specification describing how to read and write to a SEEK instance.
+
+    The API is defined in the [OpenAPI
+    specification](https://swagger.io/specification) currently in [version
+    2](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
+
+    Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/hleonov/ipython_for_SEEK-API).
   x-logo:
     url: ./definitions/seek.png
     backgroundColor: '#FFFFFF'
@@ -16,12 +32,23 @@ produces:
 securityDefinitions:
   basicAuth:
     type: basic
+    description: |-
+      The JSON API uses [Basic access
+      authentication](https://en.wikipedia.org/wiki/Basic_access_authentication)
+      where the *username* and *password* correspond to a registered user on
+      the SEEK that is being accessed.
+
+      The **List** and **Read** API calls may be used without authentication. In
+      that case, they will only list, or allow reading of, publicly viewable
+      objects.
 security:
 - basicAuth: []
 tags:
 - name: list
-  description: |
-    This is about list operations
+  description: |-
+    **List** operations return a JSON object containing a list of all the
+    objects of the specified class to which the authenticated user has
+    access.
 
     Success response codes:
     * 200 OK
@@ -30,7 +57,12 @@ tags:
   x-traitTag: true
 - name: create
   description: |
-    This is about create operations
+    A **Create** operation creates a new instance of the specified
+    class. The instance is populated with the content of the body of the
+    API call.
+
+    The **Create** call returns a JSON object representing the newly
+    created instance.
 
     Success response codes:
     * 201 Created
@@ -42,9 +74,13 @@ tags:
   x-traitTag: true
 - name: read
   description: |
-    This is about read operations
+    A **Read** operation will return information about the
+    instance identified, provided the authenticated user has access to it.
+
+    The **Read** operation returns a JSON object representing the instance.
 
     Success response codes:
+
     * 200 OK
 
     Error response codes:
@@ -53,7 +89,9 @@ tags:
   x-traitTag: true
 - name: update
   description: |
-    This is about update operations
+    An **Update** operation will modify the information held about the
+    specified instance. This operation is only available if the
+    authenticated user has access to the object.
 
     Success response codes:
     * 200 OK
@@ -65,7 +103,7 @@ tags:
   x-traitTag: true
 - name: delete
   description: |
-    This is about delete operations
+    A **Delete** operation will delete the specified instance, if the authenticated user has sufficient access to it.
 
     Success response codes:
     * 200 OK
@@ -257,7 +295,8 @@ paths:
     get:
       operationId: search
       description: |
-        Search for resources
+        **search** returns a list of references to resources
+
         * of the specified type
         * that are visible to the authenticated user, and
         * contain the specified test
@@ -293,9 +332,10 @@ paths:
   /assays:
     get:
       operationId: listAssays
-#      description: List references to the assays that are visible to the authenticated user
-      description: |-
-        This is a listAssays description
+      description: |
+        The **listAssays** operation returns a JSON object containing a list of all the
+        Assays to which the authenticated user has
+        access.
       tags:
       - list
       - assays
@@ -333,8 +373,12 @@ paths:
                 api_version: '0.1'
     post:
       operationId: createAssay
-      description: |-
-        This is a createAssay description
+      description: |
+        A **createAssay** operation creates a new instance of an Assay. The
+        instance is populated with the content of the body of the API call.
+
+        The **createAssay** operation returns a JSON object representing the newly
+        created Assay.
       tags:
       - create
       - assays
@@ -448,8 +492,10 @@ paths:
       default: 267
     patch:
       operationId: updateAssay
-      description: |-
-        This is a updateAssay description
+      description: |
+        An **updateAssay** operation will modify the information held about the specified Assay. This operation is only available if the authenticated user has access to the Assay.
+
+        The **updateAssay** operation returns a JSON object representing the modified Assay.
       tags:
       - update
       - assays
@@ -555,8 +601,11 @@ paths:
                 version: '1.0'
     get:
       operationId: readAssay
-      description: |-
-        This is a readAssay description
+      description: |
+        A **readAssay** operation will return information about the
+        Assay identified, provided the authenticated user has access to it.
+
+        The **readAssay** operation returns a JSON object representing the Assay.
       tags:
       - read
       - assays
@@ -630,8 +679,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteAssay
-      description: |-
-        This is a deleteAssay description
+      description: |
+        A **deleteAssay** operation will delete the specified Assay, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - assays
@@ -644,8 +693,10 @@ paths:
   /data_files:
     get:
       operationId: listDataFiles
-      description: |-
-        This is a listDatafiles description
+      description: |
+        The **listDataFiles** operation returns a JSON object containing a list of all the
+        DataFiles to which the authenticated user has
+        access.
       tags:
       - list
       - dataFiles
@@ -689,8 +740,12 @@ paths:
                 api_version: '0.1'
     post:
       operationId: createDataFile
-      description: |-
-        This is a createDatafile description
+      description: |
+        A **createDataFile** operation creates a new instance of a DataFile. The
+        instance is populated with the content of the body of the API call.
+
+        The **createDataFile** operation returns a JSON object representing the newly
+        created DataFile.
       tags:
       - create
       - dataFiles
@@ -795,8 +850,11 @@ paths:
       default: 1152
     get:
       operationId: readDataFile
-      description: |-
-        This is a readDatafile description
+      description: |
+        A **readDataFile** operation will return information about the
+        DataFile identified, provided the authenticated user has access to it.
+
+        The **readDataFile** operation returns a JSON object representing the DataFile.
       parameters:
       - name: version
         in: query
@@ -893,8 +951,10 @@ paths:
                 version: '1.0'
     patch:
       operationId: updateDataFile
-      description: |-
-        This is a updateDatafile description
+      description: |
+        An **updateDataFile** operation will modify the information held about the specified DataFile. This operation is only available if the authenticated user has access to the DataFile.
+
+        The **updateDataFile** operation returns a JSON object representing the modified DataFile.
       tags:
       - update
       - dataFiles
@@ -982,8 +1042,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteDataFile
-      description: |-
-        This is a deleteDatafile description
+      description: |
+        A **deleteDataFile** operation will delete the specified DataFile, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - dataFiles
@@ -1057,8 +1117,10 @@ paths:
   /documents:
     get:
       operationId: listDocuments
-      description: |-
-        This is a listDocuments description
+      description: |
+        The **listDocuments** operation returns a JSON object containing a list of all the
+        Documents to which the authenticated user has
+        access.
       tags:
       - list
       - documents
@@ -1068,10 +1130,28 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/documentsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1'
+                type: documents
+                attributes:
+                  title: OpenAPI Specification | Swagger
+                links:
+                  self: /documents/1
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://testing.sysmo-db.org
+                api_version: '0.1'
     post:
       operationId: createDocument
-      description: |-
-        This is a createDocument description
+      description: |
+        A **createDocument** operation creates a new instance of a Document. The
+        instance is populated with the content of the body of the API call.
+
+        The **createDocument** operation returns a JSON object representing the newly
+        created Document
       tags:
       - create
       - documents
@@ -1174,8 +1254,11 @@ paths:
       default: 1152
     get:
       operationId: readDocument
-      description: |-
-        This is a readDocument description
+      description: |
+        A **readDocument** operation will return information about the
+        Document identified, provided the authenticated user has access to it.
+
+        The **readDocument** operation returns a JSON object representing the Document.
       tags:
       - read
       - documents
@@ -1187,8 +1270,10 @@ paths:
             $ref: '#/definitions/documentResponse'
     patch:
       operationId: updateDocument
-      description: |-
-        This is a updateDocument description
+      description: |
+        An **updateDocument** operation will modify the information held about the specified Document. This operation is only available if the authenticated user has access to the Document.
+
+        The **updateDocument** operation returns a JSON object representing the modified Document.
       tags:
       - update
       - documents
@@ -1274,8 +1359,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteDocument
-      description: |-
-        This is a deleteDocument description
+      description: |
+        A **deleteDocument** operation will delete the specified Document, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - documents
@@ -1288,8 +1373,10 @@ paths:
   /events:
     get:
       operationId: listEvents
-      description: |-
-        This is a listEvents description
+      description: |
+        The **listEvents** operations return a JSON object containing a list of all the
+        Events to which the authenticated user has
+        access.
       tags:
       - list
       - events
@@ -1299,10 +1386,46 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/eventsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1'
+                type: events
+                attributes:
+                  title: SysMO Conference 2011
+                links:
+                  self: /events/1
+              - id: '2'
+                type: events
+                attributes:
+                  title: 'All Hands SySMO PALs  meeting '
+                links:
+                  self: /events/2
+              - id: '4'
+                type: events
+                attributes:
+                  title: SilicoTryp student & post-doc meeting
+                links:
+                  self: /events/4
+              - id: '5'
+                type: events
+                attributes:
+                  title: Bacell-meeting 1109-Groningen
+                links:
+                  self: /events/5
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
     post:
       operationId: createEvent
-      description: |-
-        This is a createEvent description
+      description: |
+        A **createEvent** operation creates a new instance of an Event. The
+        instance is populated with the content of the body of the API call.
+
+        The **createEvent** operation returns a JSON object representing the newly
+        created Event
       tags:
       - create
       - events
@@ -1379,8 +1502,11 @@ paths:
       default: 75
     get:
       operationId: readEvent
-      description: |-
-        This is a readEvent description
+      description: |
+        A **readEvent** operation will return information about the
+        Event identified, provided the authenticated user has access to it.
+
+        The **readEvent** operation returns a JSON object representing the Event.
       tags:
       - read
       - events
@@ -1392,8 +1518,10 @@ paths:
             $ref: '#/definitions/eventResponse'
     patch:
       operationId: updateEvent
-      description: |-
-        This is a updateEvent description
+      description: |
+        An **updateEvent** operation will modify the information held about the specified Event. This operation is only available if the authenticated user has access to the Event.
+
+        The **updateEvent** operation returns a JSON object representing the modified Event.
       tags:
       - update
       - events
@@ -1453,8 +1581,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteEvent
-      description: |-
-        This is a deleteEvent description
+      description: |
+        A **deleteEvent** operation will delete the specified Event, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - events
@@ -1467,8 +1595,10 @@ paths:
   /institutions:
     get:
       operationId: listInstitutions
-      description: |-
-        This is a listInstitutions description
+      description: |
+        The **listInstitutions** operation returns a JSON object containing a list of all the
+        Institutions to which the authenticated user has
+        access.
       tags:
       - list
       - institutions
@@ -1478,10 +1608,40 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/institutionsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1'
+                type: institutions
+                attributes:
+                  title: Institute of Physiology Academy of Sciences
+                links:
+                  self: /institutions/1
+              - id: '2'
+                type: institutions
+                attributes:
+                  title: Autonomous University of Barcelona
+                links:
+                  self: /institutions/2
+              - id: '3'
+                type: institutions
+                attributes:
+                  title: CSIC Granada
+                  links:
+                  self: /institutions/3
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
     post:
       operationId: createInstitution
-      description: |-
-        This is a createInstitution description
+      description: |
+        A **createInstitution** operation creates a new instance of an Institution. The
+        instance is populated with the content of the body of the API call.
+
+        The **createInstitution** operation returns a JSON object representing the newly
+        created Institution
       tags:
       - create
       - institutions
@@ -1537,8 +1697,11 @@ paths:
       default: 142
     get:
       operationId: readInstitution
-      description: |-
-        This is a readInstitution description
+      description: |
+        A **readInstitution** operation will return information about the
+        Institution identified, provided the authenticated user has access to it.
+
+        The **readInstitution** operation returns a JSON object representing the Institution.
       tags:
       - read
       - institutions
@@ -1548,10 +1711,39 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/institutionResponse'
+          examples:
+            application/json:
+              data:
+                id: '70'
+                type: institutions
+                attributes:
+                  avatar:
+                  title: Some university
+                  country: FR
+                  city:
+                  address:
+                  web_page:
+                relationships:
+                  people:
+                    data: []
+                  projects:
+                    data: []
+                links:
+                  self: /institutions/70
+                meta:
+                  created: '2018-04-12T09:46:10.695Z'
+                  modified: '2018-04-12T09:46:10.695Z'
+                  api_version: '0.1'
+                  uuid: 414f8a70-2064-0136-17ed-54bed9b4c528
+                  base_url: https://testing.sysmo-db.org
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updateInstitution
-      description: |-
-        This is a updateInstitution description
+      description: |
+        An **updateInstitution** operation will modify the information held about the specified Institution. This operation is only available if the authenticated user has access to the Institution.
+
+        The **updateInstitution** operation returns a JSON object representing the modified Institution.
       parameters:
       - in: body
         name: institution
@@ -1597,8 +1789,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteInstitution
-      description: |-
-        This is a deleteInstitution description
+      description: |
+        A **deleteInstitution** operation will delete the specified Institution, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - institutions
@@ -1612,20 +1804,55 @@ paths:
   /investigations:
     get:
       operationId: listInvestigations
-      description: |-
-        This is a listInvestigations description
+      description: |
+        The **listInvestigations** operation returns a JSON object containing a list of all the
+        Investigations to which the authenticated user has
+        access.
       tags:
       - list
       - investigations
       responses:
+        <<: *ListType
         '200':
           description: OK
           schema:
             $ref: '#/definitions/investigationsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1'
+                type: investigations
+                attributes:
+                  title: Creating data sheet template for 'omics data
+                links:
+                  self: /investigations/1
+              - id: '2'
+                type: investigations
+                attributes:
+                  title: The transition from growing to non-growing Bacillus subtilis
+                    cells
+                links:
+                  self: /investigations/2
+              - id: '3'
+                type: investigations
+                attributes:
+                  title: Systems Biology of Clostridium acetobutylicum - a possible
+                    answer to dwindling crude oil reserves
+                links:
+                  self: /investigations/3
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
     post:
       operationId: createInvestigation
-      description: |-
-        This is a createInvestigation description
+      description: |
+        A **createInvestigation** operation creates a new instance of an Investigation. The
+        instance is populated with the content of the body of the API call.
+
+        The **createInvestigation** operation returns a JSON object representing the newly
+        created Investigation.
       tags:
       - create
       - investigations
@@ -1636,6 +1863,7 @@ paths:
         schema:
           $ref: '#/definitions/investigationPost'
       responses:
+        <<: *CreateType
         '201':
           description: Created
           schema:
@@ -1703,14 +1931,6 @@ paths:
                   base_url: http://localhost:3000
               jsonapi:
                 version: '1.0'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
   /investigations/{id}:
     parameters:
     - name: id
@@ -1721,20 +1941,26 @@ paths:
       default: 56
     get:
       operationId: readInvestigation
-      description: |-
-        This is a readInvestigation description
+      description: |
+        A **readInvestigation** operation will return information about the
+        Investigation identified, provided the authenticated user has access to it.
+
+        The **readInvestigation** operation returns a JSON object representing the Investigation.
       tags:
       - read
       - investigations
       responses:
+        <<: *ReadType
         '200':
           description: OK
           schema:
             $ref: '#/definitions/investigationResponse'
     patch:
       operationId: updateInvestigation
-      description: |-
-        This is a updateInvestigation description
+      description: |
+        An **updateInvestigation** operation will modify the information held about the specified Investigation. This operation is only available if the authenticated user has access to the Investigation.
+
+        The **updateInvestigation** operation returns a JSON object representing the modified Investigation.
       parameters:
       - in: body
         name: investigation
@@ -1745,6 +1971,7 @@ paths:
       - update
       - investigations
       responses:
+        <<: *UpdateType
         '200':
           description: OK
           schema:
@@ -1812,26 +2039,15 @@ paths:
                   base_url: http://localhost:3000
               jsonapi:
                 version: '1.0'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
-        '422':
-          description: Unprocessable entity
-          schema:
-            $ref: '#/definitions/unprocessable_entity'
     delete:
       operationId: deleteInvestigation
-      description: |-
-        This is a deleteInvestigation description
+      description: |
+        A **deleteInvestigation** operation will delete the specified Investigation, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - investigations
       responses:
+        <<: *DeleteType
         '200':
           description: OK
           schema:
@@ -1839,20 +2055,61 @@ paths:
   /models:
     get:
       operationId: listModels
-      description: |-
-        This is a listModels description
+      description: |
+        The **listModels** operation returns a JSON object containing a list of all the
+        Models to which the authenticated user has
+        access.
       tags:
       - list
       - models
       responses:
+        <<: *ListType
         '200':
           description: OK
           schema:
             $ref: '#/definitions/modelsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '16'
+                type: models
+                attributes:
+                  title: Basic kinetic model of Escherichia coli's electron transport
+                    chain (ETC)
+                links:
+                  self: /models/16
+              - id: '18'
+                type: models
+                attributes:
+                  title: Development of agent-based models describing the response
+                    of Escherichia coli to changes in oxygen availability
+                links:
+                  self: /models/18
+              - id: '20'
+                type: models
+                attributes:
+                  title: sigB-response_starvation_shakeflask
+                links:
+                  self: /models/20
+              - id: '21'
+                type: models
+                attributes:
+                  title: Model for ED pathway in Sulfolobus solfataricus
+                links:
+                  self: /models/21
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
     post:
       operationId: createModel
-      description: |-
-        This is a createModel description
+      description: |
+        A **createModel** operation creates a new instance of a Model. The
+        instance is populated with the content of the body of the API call.
+
+        The **createModel** operation returns a JSON object representing the newly
+        created Model.
       tags:
       - create
       - models
@@ -1863,6 +2120,7 @@ paths:
         schema:
           $ref: '#/definitions/modelPost'
       responses:
+        <<: *CreateType
         '201':
           description: Created
           schema:
@@ -1968,8 +2226,11 @@ paths:
       default: 139
     get:
       operationId: readModel
-      description: |-
-        This is a readModel description
+      description: |
+        A **readModel** operation will return information about the
+        Model identified, provided the authenticated user has access to it.
+
+        The **readModel** operation returns a JSON object representing the Model.
       parameters:
       - name: version
         in: query
@@ -1981,14 +2242,17 @@ paths:
       - read
       - models
       responses:
+        <<: *ReadType
         '200':
           description: OK
           schema:
             $ref: '#/definitions/modelResponse'
     patch:
       operationId: updateModel
-      description: |-
-        This is a updateModel description
+      description: |
+        An **updateModel** operation will modify the information held about the specified Model. This operation is only available if the authenticated user has access to the Model.
+
+        The **updateModel** operation returns a JSON object representing the modified Model.
       tags:
       - update
       - models
@@ -1999,6 +2263,7 @@ paths:
         schema:
           $ref: '#/definitions/modelPatch'
       responses:
+        <<: *UpdateType
         '200':
           description: OK
           schema:
@@ -2076,12 +2341,13 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteModel
-      description: |-
-        This is a deleteModel description
+      description: |
+        A **deleteModel** operation will delete the specified Model, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - models
       responses:
+        <<: *DeleteType
         '200':
           description: OK
           schema:
@@ -2115,16 +2381,51 @@ paths:
   /organisms:
     get:
       operationId: listOrganisms
-      description: |-
-        This is a listOrganisms description
+      description: |
+        The **listOrganisms** operation returns a JSON object containing a list of all the
+        Organisms to which the authenticated user has
+        access.
       tags:
       - list
       - organisms
       responses:
+        <<: *ListType
         '200':
           description: OK
           schema:
             $ref: '#/definitions/organismsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1933753700'
+                type: organisms
+                attributes:
+                  title: Acidithiobacillus caldus
+                links:
+                  self: /organisms/1933753700
+              - id: '1933753714'
+                type: organisms
+                attributes:
+                  title: Arabidopsis thaliana
+                links:
+                  self: /organisms/1933753714
+              - id: '1933753716'
+                type: organisms
+                attributes:
+                  title: Arabidopsis thaliana
+                links:
+                  self: /organisms/1933753716
+              - id: '1933753708'
+                type: organisms
+                attributes:
+                  title: Bacillus methanolicus
+                links:
+                  self: /organisms/1933753708
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
   /organisms/{id}:
     parameters:
     - name: id
@@ -2135,12 +2436,16 @@ paths:
       default: 1933753696
     get:
       operationId: readOrganism
-      description: |-
-        This is a readOrganism description
+      description: |
+        A **readOrganism** operation will return information about the
+        Organism identified, provided the authenticated user has access to it.
+
+        The **readOrganism** operation returns a JSON object representing the Organism.
       tags:
       - read
       - organisms
       responses:
+        <<: *ReadType
         '200':
           description: OK
           schema:
@@ -2148,8 +2453,10 @@ paths:
   /people:
     get:
       operationId: listPeople
-      description: |-
-        This is a listPeople description
+      description: |
+        The **listPeople** operation returns a JSON object containing a list of all the
+        People to which the authenticated user has
+        access.
       tags:
       - list
       - people
@@ -2159,10 +2466,40 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/peopleResponse'
+          examples:
+            application/json:
+              data:
+              - id: '364'
+                type: people
+                attributes:
+                  title: Hadas Leonov
+                links:
+                  self: /people/364
+              - id: '321'
+                type: people
+                attributes:
+                  title: Finn Bacall
+                links:
+                  self: /people/321
+              - id: '134'
+                type: people
+                attributes:
+                  title: Stuart Owen
+                links:
+                  self: /people/134
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://testing.sysmo-db.org
+                api_version: '0.1'
     post:
       operationId: createPerson
-      description: |-
-        This is a createPerson description
+      description: |
+        A **createPerson** operation creates a new instance of a Person. The
+        instance is populated with the content of the body of the API call.
+
+        The **createPerson** operation returns a JSON object representing the newly
+        created Person.
       tags:
       - create
       - people
@@ -2247,8 +2584,11 @@ paths:
       default: 433
     get:
       operationId: readPerson
-      description: |-
-        This is a readPerson description
+      description: |
+        A **readPerson** operation will return information about the
+        Person identified, provided the authenticated user has access to it.
+
+        The **readPerson** operation returns a JSON object representing the Person.
       tags:
       - read
       - people
@@ -2258,10 +2598,153 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/personResponse'
+          examples:
+            application/json:
+              id: '132'
+              type: people
+              attributes:
+                avatar: /people/132/avatars/4
+                title: Katy Wolstencroft
+                description: I am a Research Fellow at the University of Manchester,
+                  working in Bioinformatics and Computer Science. I am also a guest
+                  researcher at the Vrije Universiteit.My research interests include
+                  scientific workflows, semantic discovery, and applying ontology
+                  technologies to biological data
+                first_name: Katy
+                last_name: Wolstencroft
+                web_page:
+                orcid:
+                mbox_sha1sum: 3dabdf312876f4b139507ce80b36e872e10164ae
+                phone: '48229'
+                skype_name:
+                expertise:
+                - Biochemistry
+                - Bioinformatics
+                - Data Management
+                tools:
+                - Data Management
+                - Databases
+                - Ontologies
+                - Taverna
+                - Transcriptomics
+                - Web services
+                - Workflows
+                project_positions:
+              relationships:
+                projects:
+                  data:
+                  - id: '12'
+                    type: projects
+                  - id: '15'
+                    type: projects
+                institutions:
+                  data:
+                  - id: '7'
+                    type: institutions
+                  - id: '62'
+                    type: institutions
+                investigations:
+                  data:
+                  - id: '2'
+                    type: investigations
+                  - id: '4'
+                    type: investigations
+                studies:
+                  data:
+                  - id: '4'
+                    type: studies
+                  - id: '7'
+                    type: studies
+                assays:
+                  data:
+                  - id: '2'
+                    type: assays
+                  - id: '3'
+                    type: assays
+                  - id: '4'
+                    type: assays
+                  - id: '6'
+                    type: assays
+                  - id: '10'
+                    type: assays
+                  - id: '11'
+                    type: assays
+                  - id: '12'
+                    type: assays
+                  - id: '13'
+                    type: assays
+                data_files:
+                  data:
+                  - id: '4'
+                    type: data_files
+                  - id: '5'
+                    type: data_files
+                  - id: '6'
+                    type: data_files
+                  - id: '8'
+                    type: data_files
+                  - id: '15'
+                    type: data_files
+                  - id: '17'
+                    type: data_files
+                models:
+                  data:
+                  - id: '19'
+                    type: models
+                  - id: '20'
+                    type: models
+                sops:
+                  data:
+                  - id: '13'
+                    type: sops
+                  - id: '15'
+                    type: sops
+                publications:
+                  data:
+                  - id: '3'
+                    type: publications
+                  - id: '5'
+                    type: publications
+                  - id: '7'
+                    type: publications
+                  - id: '9'
+                    type: publications
+                  - id: '11'
+                    type: publications
+                  - id: '13'
+                    type: publications
+                  - id: '14'
+                    type: publications
+                  - id: '15'
+                    type: publications
+                  - id: '34'
+                    type: publications
+                  - id: '38'
+                    type: publications
+                  - id: '39'
+                    type: publications
+                presentations:
+                  data:
+                  - id: '7'
+                    type: presentations
+                events:
+                  data: []
+                documents:
+                  data: []
+              links:
+                self: /people/132
+              meta:
+                created: '2009-01-15T12:24:02.000Z'
+                modified: '2014-04-09T11:24:47.000Z'
+                api_version: '0.1'
+                uuid: 7989c509-5ac4-47bf-b161-30193b131379
+                base_url: https://testing.sysmo-db.org
     patch:
       operationId: updatePerson
-      description: |-
-        This is a updatePerson description
+      description: |
+        An **updatePerson** operation will modify the information held about the specified Person. This operation is only available if the authenticated user has access to the Person.
+
+        The **updatePerson** operation returns a JSON object representing the modified Person.
       parameters:
       - in: body
         name: person
@@ -2345,8 +2828,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deletePerson
-      description: |-
-        This is a deletePerson description
+      description: |
+        A **deletePerson** operation will delete the specified Person, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - people
@@ -2359,8 +2842,10 @@ paths:
   /presentations:
     get:
       operationId: listPresentations
-      description: |-
-        This is a listPresentations description
+      description: |
+        The **listPresentations** operation returns a JSON object containing a list of all the
+        Presentations to which the authenticated user has
+        access.
       tags:
       - list
       - presentations
@@ -2370,10 +2855,45 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/presentationsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '2'
+                type: presentations
+                attributes:
+                  title: 'Feed-back regulation of the anabolic (ProB) and osmoadaptive
+                    (ProJ) glutamate kinases: predicted role of a flexible protein
+                    loop.'
+                links:
+                  self: /presentations/2
+              - id: '3'
+                type: presentations
+                attributes:
+                  title: 'Balancing the osmotic gradient: adaptation of the cytoplasmic
+                    solute pool via de novo synthesis and compatible solute uptake
+                    in response to hyper-osmolarity.'
+                links:
+                  self: /presentations/3
+              - id: '4'
+                type: presentations
+                attributes:
+                  title: Towards system understanding of B. subtilis - integrating
+                    fluxes and cellular components under salt stress
+                links:
+                  self: /presentations/4
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
     post:
       operationId: createPresentation
-      description: |-
-        This is a createPresentation description
+      description: |
+        A **createPresentation** operation creates a new instance of a Presentation. The
+        instance is populated with the content of the body of the API call.
+
+        The **createPresentation** operation returns a JSON object representing the newly
+        created Presentation.
       tags:
       - create
       - presentations
@@ -2478,8 +2998,11 @@ paths:
       default: 253
     get:
       operationId: readPresentation
-      description: |-
-        This is a readPresentation description
+      description: |
+        A **readPresentation** operation will return information about the
+        Presentation identified, provided the authenticated user has access to it.
+
+        The **readPresentation** operation returns a JSON object representing the Presentation.
       parameters:
       - name: version
         in: query
@@ -2498,8 +3021,10 @@ paths:
             $ref: '#/definitions/presentationResponse'
     patch:
       operationId: updatePresentation
-      description: |-
-        This is a updatePresentation description
+      description: |
+        An **updatePresentation** operation will modify the information held about the specified Presentation. This operation is only available if the authenticated user has access to the Presentation.
+
+        The **updatePresentation** operation returns a JSON object representing the modified Presentation.
       tags:
       - update
       - presentations
@@ -2587,8 +3112,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deletePresentation
-      description: |-
-        This is a deletePresentation description
+      description: |
+        A **deletePresentation** operation will delete the specified Presentation, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - presentations
@@ -2628,8 +3153,10 @@ paths:
   /programmes:
     get:
       operationId: listProgrammes
-      description: |-
-        This is a listProgrammes description
+      description: |
+        The **listProgrammes** operation returns a JSON object containing a list of all the
+        Programmes to which the authenticated user has
+        access.
       tags:
       - list
       - programmes
@@ -2639,10 +3166,40 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/programmesResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1'
+                type: programmes
+                attributes:
+                  title: SysMO
+                links:
+                  self: /programmes/1
+              - id: '2'
+                type: programmes
+                attributes:
+                  title: e:Bio
+                links:
+                  self: /programmes/2
+              - id: '3'
+                type: programmes
+                attributes:
+                  title: 'SARCHI: Mechanistic modelling of health and epidemiology'
+                links:
+                  self: /programmes/3
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
     post:
       operationId: createProgramme
-      description: |-
-        This is a createProgramme description
+      description: |
+        A **createProgramme** operation creates a new instance of a Programme. The
+        instance is populated with the content of the body of the API call.
+
+        The **createProgramme** operation returns a JSON object representing the newly
+        created Programme.
       tags:
       - create
       - programmes
@@ -2727,8 +3284,11 @@ paths:
       default: 3
     get:
       operationId: readProgramme
-      description: |-
-        This is a readProgramme description
+      description: |
+        A **readProgramme** operation will return information about the
+        Programme identified, provided the authenticated user has access to it.
+
+        The **readProgramme** operation returns a JSON object representing the Programme.
       tags:
       - read
       - programmes
@@ -2740,8 +3300,10 @@ paths:
             $ref: '#/definitions/programmeResponse'
     patch:
       operationId: updateProgramme
-      description: |-
-        This is a updateProgramme description
+      description: |
+        An **updateProgramme** operation will modify the information held about the specified Programme. This operation is only available if the authenticated user has access to the Programme.
+
+        The **updateProgramme** operation returns a JSON object representing the modified Programme.
       parameters:
       - in: body
         name: programme
@@ -2815,8 +3377,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteProgramme
-      description: |-
-        This is a deleteProgramme description
+      description: |
+        A **deleteProgramme** operation will delete the specified Programme, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - programmes
@@ -2829,8 +3391,10 @@ paths:
   /projects:
     get:
       operationId: listProjects
-      description: |-
-        This is a listProjects description
+      description: |
+        The **listProjects** operation returns a JSON object containing a list of all the
+        Projects to which the authenticated user has
+        access.
       tags:
       - list
       - projects
@@ -2840,10 +3404,656 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/projectsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1'
+                type: projects
+                attributes:
+                  title: BaCell-SysMO
+                links:
+                  self: /projects/1
+              - id: '2'
+                type: projects
+                attributes:
+                  title: COSMIC
+                links:
+                  self: /projects/2
+              - id: '3'
+                type: projects
+                attributes:
+                  title: SUMO
+                links:
+                  self: /projects/3
+              - id: '4'
+                type: projects
+                attributes:
+                  title: KOSMOBAC
+                links:
+                  self: /projects/4
+              - id: '5'
+                type: projects
+                attributes:
+                  title: SysMO-LAB
+                links:
+                  self: /projects/5
+              - id: '6'
+                type: projects
+                attributes:
+                  title: PSYSMO
+                links:
+                  self: /projects/6
+              - id: '7'
+                type: projects
+                attributes:
+                  title: SCaRAB
+                links:
+                  self: /projects/7
+              - id: '8'
+                type: projects
+                attributes:
+                  title: MOSES
+                links:
+                  self: /projects/8
+              - id: '9'
+                type: projects
+                attributes:
+                  title: TRANSLUCENT
+                links:
+                  self: /projects/9
+              - id: '10'
+                type: projects
+                attributes:
+                  title: STREAM
+                links:
+                  self: /projects/10
+              - id: '11'
+                type: projects
+                attributes:
+                  title: SulfoSys
+                links:
+                  self: /projects/11
+              - id: '12'
+                type: projects
+                attributes:
+                  title: SysMO DB
+                links:
+                  self: /projects/12
+              - id: '13'
+                type: projects
+                attributes:
+                  title: SysMO Funders
+                links:
+                  self: /projects/13
+              - id: '14'
+                type: projects
+                attributes:
+                  title: SilicoTryp
+                links:
+                  self: /projects/14
+              - id: '15'
+                type: projects
+                attributes:
+                  title: Noisy-Strep
+                links:
+                  self: /projects/15
+              - id: '16'
+                type: projects
+                attributes:
+                  title: SulfoSys - Biotec
+                links:
+                  self: /projects/16
+              - id: '17'
+                type: projects
+                attributes:
+                  title: Whole body modelling of glucose metabolism in malaria patients
+                links:
+                  self: /projects/17
+              - id: '18'
+                type: projects
+                attributes:
+                  title: Manchester Institute for Biotechnology
+                links:
+                  self: /projects/18
+              - id: '19'
+                type: projects
+                attributes:
+                  title: FAIRDOM
+                links:
+                  self: /projects/19
+              - id: '20'
+                type: projects
+                attributes:
+                  title: SysVirDrug
+                links:
+                  self: /projects/20
+              - id: '21'
+                type: projects
+                attributes:
+                  title: SysMilk
+                links:
+                  self: /projects/21
+              - id: '22'
+                type: projects
+                attributes:
+                  title: SysMetEx
+                links:
+                  self: /projects/22
+              - id: '23'
+                type: projects
+                attributes:
+                  title: MetApp
+                links:
+                  self: /projects/23
+              - id: '24'
+                type: projects
+                attributes:
+                  title: IMOMESIC
+                links:
+                  self: /projects/24
+              - id: '25'
+                type: projects
+                attributes:
+                  title: WineSys
+                links:
+                  self: /projects/25
+              - id: '26'
+                type: projects
+                attributes:
+                  title: CropClock
+                links:
+                  self: /projects/26
+              - id: '27'
+                type: projects
+                attributes:
+                  title: ICYSB 2015 - International Practical Course in Systems Biology
+                links:
+                  self: /projects/27
+              - id: '28'
+                type: projects
+                attributes:
+                  title: Embryonic bodies derived cell types
+                links:
+                  self: /projects/28
+              - id: '29'
+                type: projects
+                attributes:
+                  title: SYSTERACT
+                links:
+                  self: /projects/29
+              - id: '30'
+                type: projects
+                attributes:
+                  title: XyloCut
+                links:
+                  self: /projects/30
+              - id: '31'
+                type: projects
+                attributes:
+                  title: RootBook
+                links:
+                  self: /projects/31
+              - id: '32'
+                type: projects
+                attributes:
+                  title: ROBUSTYEAST
+                links:
+                  self: /projects/32
+              - id: '33'
+                type: projects
+                attributes:
+                  title: LEANPROT
+                links:
+                  self: /projects/33
+              - id: '34'
+                type: projects
+                attributes:
+                  title: GenoSysFat
+                links:
+                  self: /projects/34
+              - id: '35'
+                type: projects
+                attributes:
+                  title: de.NBI-SysBio
+                links:
+                  self: /projects/35
+              - id: '36'
+                type: projects
+                attributes:
+                  title: ExtremoPharm
+                links:
+                  self: /projects/36
+              - id: '37'
+                type: projects
+                attributes:
+                  title: ZucAt
+                links:
+                  self: /projects/37
+              - id: '38'
+                type: projects
+                attributes:
+                  title: DigiSal
+                links:
+                  self: /projects/38
+              - id: '39'
+                type: projects
+                attributes:
+                  title: Molecular Systems Biology
+                links:
+                  self: /projects/39
+              - id: '40'
+                type: projects
+                attributes:
+                  title: Early Metabolic Injury (LiSyM-EMI - Pillar I)
+                links:
+                  self: /projects/40
+              - id: '41'
+                type: projects
+                attributes:
+                  title: Chronic Liver Disease Progression (LiSyM-DP - Pillar II)
+                links:
+                  self: /projects/41
+              - id: '42'
+                type: projects
+                attributes:
+                  title: Regeneration and Repair in Acute-on-Chronic Liver Failure
+                    (LiSyM-ACLF - Pillar III)
+                links:
+                  self: /projects/42
+              - id: '43'
+                type: projects
+                attributes:
+                  title: LiSyM Core Infrastructure and Management (LiSyM-PD)
+                links:
+                  self: /projects/43
+              - id: '44'
+                type: projects
+                attributes:
+                  title: Liver Function Diagnostics (LiSyM-LiFuDi - Pillar IV)
+                links:
+                  self: /projects/44
+              - id: '45'
+                type: projects
+                attributes:
+                  title: Model Guided Pharmacotherapy In Chronic Liver Disease (LiSyM-MGP)
+                links:
+                  self: /projects/45
+              - id: '46'
+                type: projects
+                attributes:
+                  title: Multi-Scale Models for Personalized Liver Function Tests
+                    (LiSyM-MM-PLF)
+                links:
+                  self: /projects/46
+              - id: '47'
+                type: projects
+                attributes:
+                  title: The Hedgehog Signalling Pathway (LiSyM-JGMMS)
+                links:
+                  self: /projects/47
+              - id: '48'
+                type: projects
+                attributes:
+                  title: Molecular Steatosis - Imaging & Modeling (LiSyM-MSIM)
+                links:
+                  self: /projects/48
+              - id: '49'
+                type: projects
+                attributes:
+                  title: Kinetics on the move - Workshop 2016
+                links:
+                  self: /projects/49
+              - id: '50'
+                type: projects
+                attributes:
+                  title: Example use cases
+                links:
+                  self: /projects/50
+              - id: '51'
+                type: projects
+                attributes:
+                  title: FAIRDOM user meeting
+                links:
+                  self: /projects/51
+              - id: '52'
+                type: projects
+                attributes:
+                  title: ErasysApp Funders
+                links:
+                  self: /projects/52
+              - id: '53'
+                type: projects
+                attributes:
+                  title: HUMET Startup
+                links:
+                  self: /projects/53
+              - id: '54'
+                type: projects
+                attributes:
+                  title: SBEpo - Systems Biology of Erythropoietin
+                links:
+                  self: /projects/54
+              - id: '55'
+                type: projects
+                attributes:
+                  title: INBioPharm
+                links:
+                  self: /projects/55
+              - id: '56'
+                type: projects
+                attributes:
+                  title: HYp - Spatiotemporal analysis of hypersensitive response
+                    to Potato virus Y in potato
+                links:
+                  self: /projects/56
+              - id: '57'
+                type: projects
+                attributes:
+                  title: pISA-tree
+                links:
+                  self: /projects/57
+              - id: '58'
+                type: projects
+                attributes:
+                  title: EmPowerPutida
+                links:
+                  self: /projects/58
+              - id: '59'
+                type: projects
+                attributes:
+                  title: Millar group
+                links:
+                  self: /projects/59
+              - id: '60'
+                type: projects
+                attributes:
+                  title: Systems toxicology of Atlantic cod
+                links:
+                  self: /projects/60
+              - id: '61'
+                type: projects
+                attributes:
+                  title: Systo models
+                links:
+                  self: /projects/61
+              - id: '62'
+                type: projects
+                attributes:
+                  title: Service to Milano-Bicocca with respect to their ATP-ROS model
+                    (Active NOW)
+                links:
+                  self: /projects/62
+              - id: '63'
+                type: projects
+                attributes:
+                  title: 'M4 service for Milano: ATP model'
+                links:
+                  self: /projects/63
+              - id: '64'
+                type: projects
+                attributes:
+                  title: Make Me My Model
+                links:
+                  self: /projects/64
+              - id: '65'
+                type: projects
+                attributes:
+                  title: Service to University of Lisbon (Portugal) with respect to
+                    their CFTR maturation model (Active NOW)
+                links:
+                  self: /projects/65
+              - id: '66'
+                type: projects
+                attributes:
+                  title: "Service to LCSB (Luxembourg)  with respect to ROS management\
+                    \ in Parkinson\xE2\u20AC\u2122s disease and cancer model (Active\
+                    \ NOW)"
+                links:
+                  self: /projects/66
+              - id: '67'
+                type: projects
+                attributes:
+                  title: Service to URV Tarragona, Spain with respect to their Safety
+                    Assessment of Endocrine Disrupting Chemicals model (Active NOW)
+                links:
+                  self: /projects/67
+              - id: '68'
+                type: projects
+                attributes:
+                  title: "Service to Universidade Cat\xC3\xB3lica Portugues with respect\
+                    \ to their Molecular Insight into Autism Spectrum Disorder (ASD)\
+                    \ model (Active NOW)"
+                links:
+                  self: /projects/68
+              - id: '69'
+                type: projects
+                attributes:
+                  title: Service to Slovenia with respect to their Protease signaling
+                    network in neurodegeneration model (Active NOW)
+                links:
+                  self: /projects/69
+              - id: '70'
+                type: projects
+                attributes:
+                  title: 'Service to University of Duisburg- Essen (Germany): with
+                    respect to their The Yin-Yang of Metabolism; Endometatoxicity
+                    (YYME) model (Active NOW)'
+                links:
+                  self: /projects/70
+              - id: '71'
+                type: projects
+                attributes:
+                  title: 'Service to Sheffield University (UK): with respect to Mitochondrial
+                    perfect adaptation model (Active NOW)'
+                links:
+                  self: /projects/71
+              - id: '72'
+                type: projects
+                attributes:
+                  title: 'Service to Sanquin (Amsterdam): with respect to Modelling
+                    of acute and chronic inflammation (Prospective)'
+                links:
+                  self: /projects/72
+              - id: '73'
+                type: projects
+                attributes:
+                  title: 'Service to Munich (Germany): with respect toCharged peptide
+                    to charged membrane binding model (Prospective)'
+                links:
+                  self: /projects/73
+              - id: '74'
+                type: projects
+                attributes:
+                  title: MycoSynVac - Engineering Mycoplasma pneumoniae as a broad-spectrum
+                    animal vaccine
+                links:
+                  self: /projects/74
+              - id: '75'
+                type: projects
+                attributes:
+                  title: SEEK tutorial for DigiSal
+                links:
+                  self: /projects/75
+              - id: '76'
+                type: projects
+                attributes:
+                  title: Training Hunfeld
+                links:
+                  self: /projects/76
+              - id: '77'
+                type: projects
+                attributes:
+                  title: WG Infrastructure for Translational Research
+                links:
+                  self: /projects/77
+              - id: '78'
+                type: projects
+                attributes:
+                  title: CausalDB
+                links:
+                  self: /projects/78
+              - id: '80'
+                type: projects
+                attributes:
+                  title: WURSynBio
+                links:
+                  self: /projects/80
+              - id: '81'
+                type: projects
+                attributes:
+                  title: Colosys
+                links:
+                  self: /projects/81
+              - id: '83'
+                type: projects
+                attributes:
+                  title: MS_DILI
+                links:
+                  self: /projects/83
+              - id: '84'
+                type: projects
+                attributes:
+                  title: Glycon proposal preparation
+                links:
+                  self: /projects/84
+              - id: '85'
+                type: projects
+                attributes:
+                  title: TID - Dynamics of tolerant potato-potato virus Y interaction
+                links:
+                  self: /projects/85
+              - id: '86'
+                type: projects
+                attributes:
+                  title: BioZEment 2.0
+                links:
+                  self: /projects/86
+              - id: '87'
+                type: projects
+                attributes:
+                  title: SAFE-Aqua
+                links:
+                  self: /projects/87
+              - id: '88'
+                type: projects
+                attributes:
+                  title: 'PHYTOCAL: Phytochrome Control of Resource Allocation and
+                    Growth in Arabidopsis and in Brassicaceae crops'
+                links:
+                  self: /projects/88
+              - id: '90'
+                type: projects
+                attributes:
+                  title: COMBINE Multicellular Modelling
+                links:
+                  self: /projects/90
+              - id: '91'
+                type: projects
+                attributes:
+                  title: FAIRDOM & LiSyM & de.NBI Data Structuring Training
+                links:
+                  self: /projects/91
+              - id: '92'
+                type: projects
+                attributes:
+                  title: TiMet
+                links:
+                  self: /projects/92
+              - id: '93'
+                type: projects
+                attributes:
+                  title: OXYMOD
+                links:
+                  self: /projects/93
+              - id: '95'
+                type: projects
+                attributes:
+                  title: POP - the Parameter Optimisation Problem
+                links:
+                  self: /projects/95
+              - id: '96'
+                type: projects
+                attributes:
+                  title: Tobacco as sustainable production platform of the natural
+                    biopolymer cyanophycin as co-product to oil and protein
+                links:
+                  self: /projects/96
+              - id: '97'
+                type: projects
+                attributes:
+                  title: Test
+                links:
+                  self: /projects/97
+              - id: '98'
+                type: projects
+                attributes:
+                  title: Mathematical modelling of the antibiotic-induced morphological
+                    transition of Pseudomonas aeruginosa
+                links:
+                  self: /projects/98
+              - id: '99'
+                type: projects
+                attributes:
+                  title: MESI-STRAT
+                links:
+                  self: /projects/99
+              - id: '100'
+                type: projects
+                attributes:
+                  title: INCOME
+                links:
+                  self: /projects/100
+              - id: '101'
+                type: projects
+                attributes:
+                  title: Multiscale modelling of state transitions in the host-microbiome-brain
+                    network
+                links:
+                  self: /projects/101
+              - id: '102'
+                type: projects
+                attributes:
+                  title: Crossover Research 2.0
+                links:
+                  self: /projects/102
+              - id: '103'
+                type: projects
+                attributes:
+                  title: NTNU Health Druglogics
+                links:
+                  self: /projects/103
+              - id: '104'
+                type: projects
+                attributes:
+                  title: ROS detailed model for MSB manucript
+                links:
+                  self: /projects/104
+              - id: '105'
+                type: projects
+                attributes:
+                  title: BESTER
+                links:
+                  self: /projects/105
+              - id: '106'
+                type: projects
+                attributes:
+                  title: SUSPHIRE - Sustainable Bioproduction of Pheromones for Insect
+                    Pest Control in Agriculture
+                links:
+                  self: /projects/106
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
     post:
       operationId: createProject
-      description: |-
-        This is a createProject description
+      description: |
+        A **createProject** operation creates a new instance of a Project. The
+        instance is populated with the content of the body of the API call.
+
+        The **createProject** operation returns a JSON object representing the newly
+        created Project.
       tags:
       - create
       - projects
@@ -2936,8 +4146,11 @@ paths:
       default: 17
     get:
       operationId: readProject
-      description: |-
-        This is a readProject description
+      description: |
+        A **readProject** operation will return information about the
+        Project identified, provided the authenticated user has access to it.
+
+        The **readProject** operation returns a JSON object representing the Project.
       tags:
       - read
       - projects
@@ -2949,8 +4162,10 @@ paths:
             $ref: '#/definitions/projectResponse'
     patch:
       operationId: updateProject
-      description: |-
-        This is a updateProject description
+      description: |
+        An **updateProject** operation will modify the information held about the specified Project. This operation is only available if the authenticated user has access to the Project.
+
+        The **updateProject** operation returns a JSON object representing the modified Project.
       parameters:
       - in: body
         name: project
@@ -3035,8 +4250,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteProject
-      description: |-
-        This is a deleteProject description
+      description: |
+        A **deleteProject** operation will delete the specified Project, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - projects
@@ -3049,8 +4264,10 @@ paths:
   /publications:
     get:
       operationId: listPublications
-      description: |-
-        This is a listPublications description
+      description: |
+        The **listPublications** operation returns a JSON object containing a list of all the
+        Publications to which the authenticated user has
+        access.
       tags:
       - list
       - publications
@@ -3060,6 +4277,49 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/publicationsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1'
+                type: publications
+                attributes:
+                  title: Quantitative proteomic analysis of Sulfolobus solfataricus
+                    membrane proteins
+                links:
+                  self: /publications/1
+              - id: '2'
+                type: publications
+                attributes:
+                  title: Genome-scale reconstruction and analysis of the Pseudomonas
+                    putida KT2440 metabolic network facilitates applications in biotechnology
+                links:
+                  self: /publications/2
+              - id: '4'
+                type: publications
+                attributes:
+                  title: Functional analysis of new transporters involved in stress
+                    tolerance inPseudomonas putidaDOT-T1E
+                links:
+                  self: /publications/4
+              - id: '5'
+                type: publications
+                attributes:
+                  title: Identification and characterization of the PhhR regulon inPseudomonas
+                    putida
+                links:
+                  self: /publications/5
+              - id: '7'
+                type: publications
+                attributes:
+                  title: Metabolic modeling and analysis of the metabolic switch in
+                    Streptomyces coelicolor
+                links:
+                  self: /publications/7
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
   /publications/{id}:
     parameters:
     - name: id
@@ -3070,8 +4330,11 @@ paths:
       default: 240
     get:
       operationId: readPublication
-      description: |-
-        This is a readPublication description
+      description: |
+        A **readPublication** operation will return information about the
+        Publication identified, provided the authenticated user has access to it.
+
+        The **readPublication** operation returns a JSON object representing the Publication.
       tags:
       - read
       - publications
@@ -3084,8 +4347,10 @@ paths:
   /sample_types:
     get:
       operationId: listSampleTypes
-      description: |-
-        This is a listSampletypes description
+      description: |
+        The **listSampleTypes** operation returns a JSON object containing a list of all the
+        SampleTypes to which the authenticated user has
+        access.
       tags:
       - list
       - sampleTypes
@@ -3095,11 +4360,51 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/sampleTypesResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1'
+                type: sample_types
+                attributes:
+                  title: SysMO Biosample
+                links:
+                  self: /sample_types/1
+              - id: '2'
+                type: sample_types
+                attributes:
+                  title: YEAST_chemostat_steady_state_culture
+                links:
+                  self: /sample_types/2
+              - id: '3'
+                type: sample_types
+                attributes:
+                  title: chemostat_yeast_anaerobic
+                links:
+                  self: /sample_types/3
+              - id: '4'
+                type: sample_types
+                attributes:
+                  title: test for SysMetEx1
+                links:
+                  self: /sample_types/4
+              - id: '8'
+                type: sample_types
+                attributes:
+                  title: SysMetEx_Cell_Culture
+                links:
+                  self: /sample_types/8
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
   /sops:
     get:
       operationId: listSops
-      description: |-
-        This is a listSops description
+      description: |
+        The **listSops** operation returns a JSON object containing a list of all the
+        SOPs to which the authenticated user has
+        access.
       tags:
       - list
       - sops
@@ -3109,10 +4414,48 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/sopsResponse'
+          examples:
+            application/json:
+              data:
+              - id: '4'
+                type: sops
+                attributes:
+                  title: Fluorescent probe labeling for microarrays
+                links:
+                  self: /sops/4
+              - id: '5'
+                type: sops
+                attributes:
+                  title: Guidelines for Writing Standard Operating Procedures (SOP)
+                links:
+                  self: /sops/5
+              - id: '16'
+                type: sops
+                attributes:
+                  title: Flash-labeling of tetra-cyc-modified proteins in E.coli
+                links:
+                  self: /sops/16
+              - id: '17'
+                type: sops
+                attributes:
+                  title: Measuring the mobility of soluble and aggergating protein
+                    using fluorescence recovery after photobleaching (FRAP) in normal
+                    and osmotically stressed cells.
+                links:
+                  self: /sops/17
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
     post:
       operationId: createSop
-      description: |-
-        This is a createSop description
+      description: |
+        A **createSop** operation creates a new instance of a SOP. The
+        instance is populated with the content of the body of the API call.
+
+        The **createSop** operation returns a JSON object representing the newly
+        created SOP.
       tags:
       - create
       - sops
@@ -3217,8 +4560,11 @@ paths:
       default: 203
     get:
       operationId: readSop
-      description: |-
-        This is a readSop description
+      description: |
+        A **readSop** operation will return information about the
+        Sop identified, provided the authenticated user has access to it.
+
+        The **readSop** operation returns a JSON object representing the Sop.
       parameters:
       - name: version
         in: query
@@ -3237,8 +4583,10 @@ paths:
             $ref: '#/definitions/sopResponse'
     patch:
       operationId: updateSop
-      description: |-
-        This is a updateSop description
+      description: |
+        An **updateSop** operation will modify the information held about the specified Sop. This operation is only available if the authenticated user has access to the Sop.
+
+        The **updateSop** operation returns a JSON object representing the modified Sop.
       tags:
       - update
       - sops
@@ -3324,8 +4672,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteSop
-      description: |-
-        This is a deleteSop description
+      description: |
+        A **deleteSop** operation will delete the specified Sop, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - sops
@@ -3365,8 +4713,10 @@ paths:
   /studies:
     get:
       operationId: listStudies
-      description: |-
-        This is a listStudies description
+      description: |
+        The **listStudies** operation returns a JSON object containing a list of all the
+        Studies to which the authenticated user has
+        access.
       tags:
       - list
       - studies
@@ -3376,10 +4726,40 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/studiesResponse'
+          examples:
+            application/json:
+              data:
+              - id: '1'
+                type: studies
+                attributes:
+                  title: Creating template for metabolomics data
+                links:
+                  self: /studies/1
+              - id: '2'
+                type: studies
+                attributes:
+                  title: Biphase Batch Fermentation(2009/02/04)
+                links:
+                  self: /studies/2
+              - id: '3'
+                type: studies
+                attributes:
+                  title: Investigation of different pH values for metabolic shift
+                links:
+                  self: /studies/3
+              jsonapi:
+                version: '1.0'
+              meta:
+                base_url: https://fairdomhub.org
+                api_version: '0.1'
     post:
       operationId: createStudy
-      description: |-
-        This is a createStudy description
+      description: |
+        A **createStudy** operation creates a new instance of a Study. The
+        instance is populated with the content of the body of the API call.
+
+        The **createStudy** operation returns a JSON object representing the newly
+        created Study.
       tags:
       - create
       - studies
@@ -3467,8 +4847,11 @@ paths:
       default: 138
     get:
       operationId: readStudy
-      description: |-
-        This is a readStudy description
+      description: |
+        A **readStudy** operation will return information about the
+        Study identified, provided the authenticated user has access to it.
+
+        The **readStudy** operation returns a JSON object representing the Study.
       tags:
       - read
       - studies
@@ -3480,8 +4863,10 @@ paths:
             $ref: '#/definitions/studyResponse'
     patch:
       operationId: updateStudy
-      description: |-
-        This is a updateStudy description
+      description: |
+        An **updateStudy** operation will modify the information held about the specified Study. This operation is only available if the authenticated user has access to the Study.
+
+        The **updateStudy** operation returns a JSON object representing the modified Study.
       tags:
       - update
       - studies
@@ -3561,8 +4946,8 @@ paths:
                 version: '1.0'
     delete:
       operationId: deleteStudy
-      description: |-
-        This is a deleteStudy description
+      description: |
+        A **deleteStudy** operation will delete the specified Study, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - studies
@@ -3572,14 +4957,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-        '403':
-          description: Forbidden
-          schema:
-            $ref: '#/definitions/forbidden'
-        '404':
-          description: Not found
-          schema:
-            $ref: '#/definitions/not_found'
 definitions:
   error:
     type: object
@@ -5751,32 +7128,6 @@ definitions:
     - data
     - jsonapi
     additionalProperties: false
-    example:
-      data:
-        id: '70'
-        type: institutions
-        attributes:
-          avatar:
-          title: Some university
-          country: FR
-          city:
-          address:
-          web_page:
-        relationships:
-          people:
-            data: []
-          projects:
-            data: []
-        links:
-          self: /institutions/70
-        meta:
-          created: '2018-04-12T09:46:10.695Z'
-          modified: '2018-04-12T09:46:10.695Z'
-          api_version: '0.1'
-          uuid: 414f8a70-2064-0136-17ed-54bed9b4c528
-          base_url: https://testing.sysmo-db.org
-      jsonapi:
-        version: '1.0'
   institutionPost:
     type: object
     properties:
@@ -6466,145 +7817,6 @@ definitions:
     - data
     - jsonapi
     additionalProperties: false
-    example:
-      id: '132'
-      type: people
-      attributes:
-        avatar: /people/132/avatars/4
-        title: Katy Wolstencroft
-        description: I am a Research Fellow at the University of Manchester, working
-          in Bioinformatics and Computer Science. I am also a guest researcher at
-          the Vrije Universiteit.My research interests include scientific workflows,
-          semantic discovery, and applying ontology technologies to biological data
-        first_name: Katy
-        last_name: Wolstencroft
-        web_page:
-        orcid:
-        mbox_sha1sum: 3dabdf312876f4b139507ce80b36e872e10164ae
-        phone: '48229'
-        skype_name:
-        expertise:
-        - Biochemistry
-        - Bioinformatics
-        - Data Management
-        tools:
-        - Data Management
-        - Databases
-        - Ontologies
-        - Taverna
-        - Transcriptomics
-        - Web services
-        - Workflows
-        project_positions:
-      relationships:
-        projects:
-          data:
-          - id: '12'
-            type: projects
-          - id: '15'
-            type: projects
-        institutions:
-          data:
-          - id: '7'
-            type: institutions
-          - id: '62'
-            type: institutions
-        investigations:
-          data:
-          - id: '2'
-            type: investigations
-          - id: '4'
-            type: investigations
-        studies:
-          data:
-          - id: '4'
-            type: studies
-          - id: '7'
-            type: studies
-        assays:
-          data:
-          - id: '2'
-            type: assays
-          - id: '3'
-            type: assays
-          - id: '4'
-            type: assays
-          - id: '6'
-            type: assays
-          - id: '10'
-            type: assays
-          - id: '11'
-            type: assays
-          - id: '12'
-            type: assays
-          - id: '13'
-            type: assays
-        data_files:
-          data:
-          - id: '4'
-            type: data_files
-          - id: '5'
-            type: data_files
-          - id: '6'
-            type: data_files
-          - id: '8'
-            type: data_files
-          - id: '15'
-            type: data_files
-          - id: '17'
-            type: data_files
-        models:
-          data:
-          - id: '19'
-            type: models
-          - id: '20'
-            type: models
-        sops:
-          data:
-          - id: '13'
-            type: sops
-          - id: '15'
-            type: sops
-        publications:
-          data:
-          - id: '3'
-            type: publications
-          - id: '5'
-            type: publications
-          - id: '7'
-            type: publications
-          - id: '9'
-            type: publications
-          - id: '11'
-            type: publications
-          - id: '13'
-            type: publications
-          - id: '14'
-            type: publications
-          - id: '15'
-            type: publications
-          - id: '34'
-            type: publications
-          - id: '38'
-            type: publications
-          - id: '39'
-            type: publications
-        presentations:
-          data:
-          - id: '7'
-            type: presentations
-        events:
-          data: []
-        documents:
-          data: []
-      links:
-        self: /people/132
-      meta:
-        created: '2009-01-15T12:24:02.000Z'
-        modified: '2014-04-09T11:24:47.000Z'
-        api_version: '0.1'
-        uuid: 7989c509-5ac4-47bf-b161-30193b131379
-        base_url: https://testing.sysmo-db.org
   personPatch:
     type: object
     properties:
@@ -8047,31 +9259,6 @@ definitions:
     - jsonapi
     - meta
     additionalProperties: false
-    example:
-      data:
-      - id: '1'
-        type: institutions
-        attributes:
-          title: Institute of Physiology Academy of Sciences
-        links:
-          self: /institutions/1
-      - id: '2'
-        type: institutions
-        attributes:
-          title: Autonomous University of Barcelona
-        links:
-          self: /institutions/2
-      - id: '3'
-        type: institutions
-        attributes:
-          title: CSIC Granada
-          links:
-          self: /institutions/3
-      jsonapi:
-        version: '1.0'
-      meta:
-        base_url: https://fairdomhub.org
-        api_version: '0.1'
   investigationSkeleton:
     properties:
       id:
@@ -8240,31 +9427,6 @@ definitions:
     - jsonapi
     - meta
     additionalProperties: false
-    example:
-      data:
-      - id: '364'
-        type: people
-        attributes:
-          title: Hadas Leonov
-        links:
-          self: /people/364
-      - id: '321'
-        type: people
-        attributes:
-          title: Finn Bacall
-        links:
-          self: /people/321
-      - id: '134'
-        type: people
-        attributes:
-          title: Stuart Owen
-        links:
-          self: /people/134
-      jsonapi:
-        version: '1.0'
-      meta:
-        base_url: https://testing.sysmo-db.org
-        api_version: '0.1'
   presentationSkeleton:
     properties:
       id:

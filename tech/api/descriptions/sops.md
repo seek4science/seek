@@ -1,1 +1,1 @@
-This is a sops description
+**SOPs** are standard operating procedures which describe the protocol required to reproduce an **Assay**. They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). Relevant **SOPs** can be linked directly to the **Assay**.
