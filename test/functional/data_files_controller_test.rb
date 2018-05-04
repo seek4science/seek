@@ -3288,7 +3288,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     #assert_response :unprocessable_entity
-    # 
+    #
     data_file.reload
     assert_empty data_file.assays
 
