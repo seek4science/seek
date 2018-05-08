@@ -1,8 +1,12 @@
 # Presentation
 Factory.define(:presentation) do |f|
   f.sequence(:title) { |n| "A Presentation #{n}" }
-  f.projects { [Factory.build(:project)] }
   f.association :contributor, factory: :person
+
+  f.after_build do |presentation|
+    presentation.projects = [presentation.contributor.person.projects.first] if presentation.projects.empty?
+  end
+
   f.after_create do |presentation|
     if presentation.content_blob.blank?
       presentation.content_blob = Factory.create(:content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)

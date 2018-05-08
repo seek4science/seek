@@ -1,8 +1,11 @@
 # Document
 Factory.define(:document) do |f|
   f.title 'This Document'
-  f.projects { [Factory.build(:project)] }
   f.association :contributor, factory: :person
+
+  f.after_build do |document|
+    document.projects = [document.contributor.person.projects.first] if document.projects.empty?
+  end
 
   f.after_create do |document|
     if document.content_blob.blank?
