@@ -66,7 +66,9 @@ class SubscriptionTest < ActiveSupport::TestCase
 
   test 'subscribers with a frequency of immediate are sent emails when activity is logged' do
     proj = Factory(:project)
-    s = Factory(:subscribable, projects: [Factory(:project), proj], policy: Factory(:public_policy))
+    person = Factory(:person,project:proj)
+    person.add_to_project_and_institution(Factory(:project),Factory(:institution))
+    s = Factory(:subscribable, projects: person.projects, policy: Factory(:public_policy), contributor:person)
 
     disable_authorization_checks do
       current_person.project_subscriptions.create project: proj, frequency: 'immediately'
@@ -93,8 +95,9 @@ class SubscriptionTest < ActiveSupport::TestCase
 
   test 'subscribers without a frequency of immediate are not sent emails when activity is logged' do
     proj = Factory(:project)
+    person = Factory(:person,project:proj)
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
-    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy))
+    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
     disable_authorization_checks { s.subscribe }
 
     assert_no_emails do
@@ -103,12 +106,13 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'subscribers are not sent emails for items they cannot view' do
-    proj = Factory(:project)
+    person = Factory(:person)
+    proj = person.projects.first
     current_person.project_subscriptions.create project: proj, frequency: 'immediately'
-    s = Factory(:subscribable, policy: Factory(:private_policy), contributor: Factory(:user), projects: [proj])
+    s = Factory(:subscribable, policy: Factory(:private_policy), contributor: person, projects: [proj])
 
     assert_no_emails do
-      User.with_current_user(s.contributor) do
+      User.with_current_user(person) do
         al = Factory(:activity_log, activity_loggable: s, action: 'update')
         SendImmediateEmailsJob.new(al.id).perform
       end
@@ -124,8 +128,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert !current_person.receive_notifications?
 
     proj = Factory(:project)
+    person = Factory(:person,project:proj)
     current_person.project_subscriptions.create project: proj, frequency: 'immediately'
-    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy))
+    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
     disable_authorization_checks { s.subscribe }
 
     assert_no_emails do
@@ -137,7 +142,8 @@ class SubscriptionTest < ActiveSupport::TestCase
   test 'subscribers who are not registered dont receive emails' do
     person = Factory(:person_in_project)
     proj = Factory(:project)
-    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy))
+    other_person = Factory(:person,project:proj)
+    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:other_person)
 
     disable_authorization_checks do
       person.project_subscriptions.create project: proj, frequency: 'immediately'
@@ -151,11 +157,11 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'set_default_subscriptions when one item is created' do
-    proj = Factory(:project)
+    proj = current_person.projects.first
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
-    s = Factory(:subscribable, projects: [Factory(:project), proj], policy: Factory(:public_policy))
+    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:current_person)
     assert SetSubscriptionsForItemJob.new(s, s.projects).exists?
     SetSubscriptionsForItemJob.new(s, s.projects).perform
 
@@ -223,9 +229,10 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'subscribe to all the items in a project when subscribing to that project' do
-    proj = Factory(:project)
-    s1 = Factory(:subscribable, projects: [Factory(:project), proj], policy: Factory(:public_policy))
-    s2 = Factory(:subscribable, projects: [Factory(:project), proj], policy: Factory(:public_policy))
+    person = Factory(:person)
+    proj = person.projects.first
+    s1 = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
+    s2 = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:person)
 
     assert !s1.subscribed?(current_person)
     assert !s2.subscribed?(current_person)
@@ -243,10 +250,10 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should update subscription when changing the project associated with the item and a person did not subscribe to this project' do
-    proj = Factory(:project)
+    proj = current_person.projects.first
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
-    projects = [Factory(:project), proj]
-    s = Factory(:subscribable, projects: projects, policy: Factory(:public_policy))
+    projects = [proj]
+    s = Factory(:subscribable, projects: projects, policy: Factory(:public_policy), contributor:current_person)
 
     assert SetSubscriptionsForItemJob.new(s, s.projects).exists?
     SetSubscriptionsForItemJob.new(s, s.projects).perform
@@ -257,6 +264,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     # changing projects associated with the item
     updated_project = Factory(:project)
+    current_person.add_to_project_and_institution(updated_project,Factory(:institution))
 
     disable_authorization_checks do
       s.projects = [updated_project]
@@ -265,9 +273,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     s.reload
 
     assert RemoveSubscriptionsForItemJob.new(s, [projects.first]).exists?
-    assert RemoveSubscriptionsForItemJob.new(s, [projects[1]]).exists?
     RemoveSubscriptionsForItemJob.new(s, [projects.first]).perform
-    RemoveSubscriptionsForItemJob.new(s, [projects[1]]).perform
 
     assert SetSubscriptionsForItemJob.new(s, [updated_project]).exists?
     SetSubscriptionsForItemJob.new(s, [updated_project]).perform
@@ -276,7 +282,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal updated_project, s.projects.first
 
     # should no longer subscribe to this item because of changing project
-    assert !s.subscribed?(current_person)
+    refute s.subscribed?(current_person)
   end
 
   test 'should update subscription when associating the project to the item and a person subscribed to this project' do
