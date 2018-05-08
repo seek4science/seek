@@ -166,12 +166,12 @@ class AssociationPermissionsTest < ActiveSupport::TestCase
   test 'must be in project when creating an asset' do
     good_results = []
     bad_results = []
-    types = %i[data_file model sop presentation sample document]
+    types = %i[investigation data_file model sop presentation sample document]
     User.with_current_user(@user) do
       other_project = Factory(:project)
       types.each do |asset_type|
-        good_asset = Factory.build(asset_type, contributor: User.current_user, projects: [@project])
-        bad_asset = Factory.build(asset_type, contributor: User.current_user, projects: [other_project])
+        good_asset = Factory.build(asset_type, contributor: User.current_user.person, projects: [@project])
+        bad_asset = Factory.build(asset_type, contributor: User.current_user.person, projects: [other_project])
 
         good_results << asset_type unless good_asset.save
         bad_results << asset_type if bad_asset.save
