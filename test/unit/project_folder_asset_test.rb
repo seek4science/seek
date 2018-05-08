@@ -3,7 +3,8 @@ require 'test_helper'
 class ProjectFolderAssetTest < ActiveSupport::TestCase
   test 'associations' do
     pf = Factory :project_folder
-    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project]
+    person = Factory(:person,project:pf.project)
+    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project], contributor:person
     pfa = ProjectFolderAsset.create asset: sop, project_folder: pf
     pfa.save!
     pfa.reload
@@ -20,7 +21,8 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
 
   test 'dependents destroyed' do
     pf = Factory :project_folder
-    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project]
+    person = Factory(:person,project:pf.project)
+    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project], contributor: person
     pfa = ProjectFolderAsset.create asset: sop, project_folder: pf
 
     assert_difference('ProjectFolderAsset.count', -1) do
@@ -29,7 +31,8 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     end
 
     pf = Factory :project_folder
-    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project]
+    person = Factory(:person,project:pf.project)
+    sop = Factory :sop, policy: Factory(:public_policy), projects: [pf.project], contributor:person
     pfa = ProjectFolderAsset.create asset: sop, project_folder: pf
 
     assert_difference('ProjectFolderAsset.count', -1) do
