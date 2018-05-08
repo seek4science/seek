@@ -1,8 +1,12 @@
 # Sop
 Factory.define(:sop) do |f|
   f.title 'This Sop'
-  f.projects { [Factory.build(:project)] }
   f.association :contributor, factory: :person
+
+
+  f.after_build do |sop|
+    sop.projects = [sop.contributor.person.projects.first] if sop.projects.empty?
+  end
 
   f.after_create do |sop|
     if sop.content_blob.blank?
