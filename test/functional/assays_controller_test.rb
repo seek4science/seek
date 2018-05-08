@@ -18,7 +18,6 @@ class AssaysControllerTest < ActionController::TestCase
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
-
   test 'modelling assay validates with schema' do
     df = Factory(:data_file, contributor: User.current_user.person)
     a = Factory(:modelling_assay, contributor: User.current_user.person)
@@ -1458,10 +1457,6 @@ class AssaysControllerTest < ActionController::TestCase
 
     org = Factory(:organism)
     assay.associate_organism(org)
-    assay.contributor = User.current_user.person
-    assay.save
-    login_as(User.current_user)
-
   end
 
   test 'add data file button' do

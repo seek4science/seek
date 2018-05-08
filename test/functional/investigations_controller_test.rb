@@ -491,6 +491,6 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def edit_max_object(investigation)
     investigation.creators = [Factory(:person)]
-    investigation.save
+    investigation.save!
   end
 end

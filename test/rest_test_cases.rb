@@ -293,18 +293,20 @@ module RestTestCases
   #check if this current controller type doesn't support read
   def check_for_501_read_return
     clz = @controller.controller_name.classify.constantize.to_s
-    return %w[Sample SampleType Strain].include?(clz)
+    %w[Sample SampleType Strain].include?(clz)
   end
 
   #check if this current controller type doesn't support index
   def check_for_501_index_return
     clz = @controller.controller_name.classify.constantize.to_s
-    return %w[Sample Strain].include?(clz)
+    %w[Sample Strain].include?(clz)
   end
 
   # m corresponds to 'min'/'max'
   def get_test_object(m)
-    clz = @controller.controller_name.classify.downcase
-    return Factory(("#{m}_#{clz}").to_sym)
+    type = @controller.controller_name.classify
+    opts = type.constantize.method_defined?(:policy) ? { policy: Factory(:publicly_viewable_policy) } : {}
+
+    Factory(("#{m}_#{type.downcase}").to_sym, opts)
   end
 end
