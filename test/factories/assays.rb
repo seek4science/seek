@@ -61,7 +61,7 @@ Factory.define(:min_assay, class: Assay) do |f|
   f.association :assay_class, factory: :experimental_assay_class
   f.association :contributor,  factory: :person
   f.after_build do |a|
-    a.study ||= Factory(:study, contributor: a.contributor)
+    a.study ||= Factory(:min_study, contributor: a.contributor, policy: a.policy.try(:deep_copy))
   end
 end
 

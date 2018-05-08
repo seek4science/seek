@@ -13,17 +13,18 @@ Factory.define(:max_person, class: Person) do |f|
   f.email "maximal_person@email.com"
   f.phone "34-167-552266"
   f.skype_name "myskypename"
-  f.investigations_for_person {[Factory(:investigation, policy: Factory(:public_policy))]}
-  f.studies_for_person {[Factory(:study, policy: Factory(:public_policy))]}
-  f.assays_for_person {[Factory(:assay, policy: Factory(:public_policy))]}
-  f.created_sops {[Factory(:sop, policy: Factory(:public_policy))]}
-  f.created_models {[Factory(:model, policy: Factory(:public_policy))]}
-  f.created_presentations {[Factory(:presentation, policy: Factory(:public_policy))]}
-  f.created_data_files {[Factory(:data_file, policy: Factory(:public_policy))]}
-  f.created_publications {[Factory(:publication)]}
-  f.created_documents {[Factory(:public_document)]}
   f.association :user, factory: :activated_user
   f.group_memberships { [Factory.build(:group_membership)] }
+  f.after_create do |p|
+    p.assays_for_person = [Factory(:min_assay, contributor: p, policy: Factory(:public_policy))]
+    p.created_sops = [Factory(:sop, contributor: p, policy: Factory(:public_policy))]
+    p.created_models = [Factory(:model, contributor: p, policy: Factory(:public_policy))]
+    p.created_presentations = [Factory(:presentation, contributor: p, policy: Factory(:public_policy))]
+    p.created_data_files = [Factory(:data_file, contributor: p, policy: Factory(:public_policy))]
+    p.created_publications = [Factory(:publication, contributor: p)]
+    p.created_documents = [Factory(:public_document, contributor: p)]
+    p.reload
+  end
 end
 
 Factory.define(:brand_new_person, class: Person) do |f|

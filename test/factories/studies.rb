@@ -3,7 +3,7 @@ Factory.define(:study) do |f|
   f.sequence(:title) { |n| "Study#{n}" }
   f.association :contributor, factory: :person
   f.after_build do |s|
-    s.investigation ||= Factory(:investigation, contributor: s.contributor)
+    s.investigation ||= Factory(:investigation, contributor: s.contributor, policy: s.policy.try(:deep_copy))
   end
 end
 
@@ -11,7 +11,7 @@ Factory.define(:min_study, class: Study) do |f|
   f.title "A Minimal Study"
   f.association :contributor, factory: :person
   f.after_build do |s|
-    s.investigation ||= Factory(:investigation, contributor: s.contributor)
+    s.investigation ||= Factory(:min_investigation, contributor: s.contributor, policy: s.policy.try(:deep_copy))
   end
 end
 
