@@ -67,8 +67,10 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
   test 'perform' do
     User.current_user = Factory(:user)
     proj = Factory(:project)
-    s1 = Factory(:subscribable, projects: [Factory(:project), proj], policy: Factory(:public_policy))
-    s2 = Factory(:subscribable, projects: [Factory(:project), proj], policy: Factory(:public_policy))
+    person = Factory(:person,project:proj)
+    person.add_to_project_and_institution(Factory(:project), Factory(:institution))
+    s1 = Factory(:subscribable, projects: person.projects, policy: Factory(:public_policy), contributor:person)
+    s2 = Factory(:subscribable, projects: person.projects, policy: Factory(:public_policy), contributor:person)
 
     a_person = Factory(:person)
     assert !s1.subscribed?(a_person)
