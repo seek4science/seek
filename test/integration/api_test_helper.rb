@@ -106,7 +106,6 @@ module ApiTestHelper
 
       # content check
       h = JSON.parse(response.body)
-
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
       hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
 
@@ -205,6 +204,11 @@ module ApiTestHelper
         skip
       end
 
+      if (m == 'max')
+        s = "/home/alson/#{@clz}Patch.yml"
+        File.write(s, @to_patch.to_yaml)
+      end
+
       #fetch original object
       obj_id = @to_patch['data']['id']
       get "/#{@plural_clz}/#{obj_id}.json"
@@ -222,6 +226,12 @@ module ApiTestHelper
       validate_json_against_fragment response.body, "#/definitions/#{@clz.camelize(:lower)}Response"
 
       h = JSON.parse(response.body)
+
+      if (m == 'max')
+        s = "/home/alson/#{@clz}PatchResponse.yml"
+        File.write(s, h.to_yaml)
+      end
+
 
       #check the post-processed attributes and relationships
       hash_comparison(populate_extra_attributes(@to_patch), h['data']['attributes'])
