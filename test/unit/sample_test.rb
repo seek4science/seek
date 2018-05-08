@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
+
   test 'validation' do
     sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
@@ -379,8 +380,10 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'projects' do
-    sample = Factory(:sample)
+    person = Factory(:person)
+    sample = Factory(:sample, contributor:person)
     project = Factory(:project)
+    person.add_to_project_and_institution(project,person.institutions.first)
     sample.update_attributes(project_ids: [project.id])
     disable_authorization_checks { sample.save! }
     sample.reload
