@@ -1,8 +1,12 @@
 # DataFile
 Factory.define(:data_file) do |f|
   f.sequence(:title) { |n| "A Data File_#{n}" }
-  f.projects { [Factory.build(:project)] }
   f.association :contributor, factory: :person
+
+  f.after_build do |df|
+    df.projects = [df.contributor.person.projects.first] if df.projects.empty?
+  end
+
   f.after_create do |data_file|
     if data_file.content_blob.blank?
       data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
