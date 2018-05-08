@@ -4,8 +4,9 @@ class AssetsHelperTest < ActionView::TestCase
   def setup
     User.destroy_all
     assert User.all.blank?
-    @user = Factory :user
+
     @project = Factory :project
+    @user = Factory(:person,project:@project).user
   end
 
   test 'authorised assets' do
@@ -61,41 +62,46 @@ class AssetsHelperTest < ActionView::TestCase
   end
 
   def check_expected_authorised
-    User.current_user = @user
-    authorised = authorised_assets Sop
-    assert_equal 4, authorised.count
-    assert_equal %w(A B D E), authorised.collect(&:title).sort
+    User.with_current_user(@user) do
+      authorised = authorised_assets Sop
+      assert_equal 4, authorised.count
+      assert_equal %w(A B D E), authorised.collect(&:title).sort
 
-    authorised = authorised_assets Sop, @project
-    assert_equal 1, authorised.count
-    assert_equal 'A', authorised.first.title
+      authorised = authorised_assets Sop, @project
 
-    authorised = authorised_assets Sop, @user.person.projects
-    assert_equal 1, authorised.count
-    assert_equal 'E', authorised.first.title
+      assert_equal 2, authorised.count
+      assert_equal %w(B D), authorised.collect(&:title).sort
 
-    authorised = authorised_assets Sop, nil, 'manage'
-    assert_equal 3, authorised.count
-    assert_equal %w(A B D), authorised.collect(&:title).sort
+      authorised = authorised_assets Sop, Factory(:project)
+      assert_empty authorised
 
-    User.current_user = nil
-    authorised = authorised_assets Sop
-    assert_equal 3, authorised.count
-    assert_equal %w(A D E), authorised.collect(&:title).sort
+      authorised = authorised_assets Sop, nil, 'manage'
+      assert_equal 3, authorised.count
+      assert_equal %w(A B D), authorised.collect(&:title).sort
+    end
 
-    User.current_user = Factory(:user)
-    authorised = authorised_assets DataFile, nil, 'download'
-    assert_equal 2, authorised.count
-    assert_equal %w(A B), authorised.collect(&:title).sort
 
-    authorised = authorised_assets DataFile, @project, 'download'
-    assert_equal 1, authorised.count
-    assert_equal ['B'], authorised.collect(&:title)
+    User.with_current_user(nil) do
+      authorised = authorised_assets Sop
+      assert_equal 3, authorised.count
+      assert_equal %w(A D E), authorised.collect(&:title).sort
 
-    User.current_user = nil
-    authorised = authorised_assets DataFile
-    assert_equal 2, authorised.count
-    assert_equal %w(A B), authorised.collect(&:title).sort
+      authorised = authorised_assets DataFile
+      assert_equal 2, authorised.count
+      assert_equal %w(A B), authorised.collect(&:title).sort
+    end
+
+    User.with_current_user(Factory(:user)) do
+      authorised = authorised_assets DataFile, nil, 'download'
+      assert_equal 2, authorised.count
+      assert_equal %w(A B), authorised.collect(&:title).sort
+
+      authorised = authorised_assets DataFile, @project, 'download'
+      assert_equal 1, authorised.count
+      assert_equal ['B'], authorised.collect(&:title)
+    end
+
+
   end
 
   private
@@ -105,7 +111,7 @@ class AssetsHelperTest < ActionView::TestCase
   end
 
   def create_a_bunch_of_assets
-    other_user = Factory :user
+    other_person = Factory :person
     disable_authorization_checks do
       Sop.delete_all
       DataFile.delete_all
@@ -113,14 +119,14 @@ class AssetsHelperTest < ActionView::TestCase
     assert Sop.all.blank?
     assert DataFile.all.blank?
     assets = []
-    assets << Factory(:sop, title: 'A', contributor: other_user, policy: Factory(:public_policy), projects: [@project])
-    assets << Factory(:sop, title: 'B', contributor: @user, policy: Factory(:private_policy))
-    assets << Factory(:sop, title: 'C', contributor: other_user, policy: Factory(:private_policy))
-    assets << Factory(:sop, title: 'D', contributor: @user, policy: Factory(:publicly_viewable_policy))
-    assets << Factory(:sop, title: 'E', contributor: other_user, policy: Factory(:publicly_viewable_policy), projects: @user.person.projects)
+    assets << Factory(:sop, title: 'A', contributor: other_person, policy: Factory(:public_policy))
+    assets << Factory(:sop, title: 'B', contributor: @user.person, policy: Factory(:private_policy))
+    assets << Factory(:sop, title: 'C', contributor: other_person, policy: Factory(:private_policy))
+    assets << Factory(:sop, title: 'D', contributor: @user.person, policy: Factory(:publicly_viewable_policy))
+    assets << Factory(:sop, title: 'E', contributor: other_person, policy: Factory(:publicly_viewable_policy))
 
     assets << Factory(:data_file, title: 'A', contributor: @user, policy: Factory(:downloadable_public_policy))
-    assets << Factory(:data_file, title: 'B', contributor: other_user, policy: Factory(:downloadable_public_policy), projects: [@project, Factory(:project)])
+    assets << Factory(:data_file, title: 'B', contributor: other_person, policy: Factory(:downloadable_public_policy), projects: [@project, Factory(:project)])
     assets
   end
 end
