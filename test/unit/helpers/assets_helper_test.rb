@@ -98,7 +98,7 @@ class AssetsHelperTest < ActionView::TestCase
 
       authorised = authorised_assets DataFile, @project, 'download'
       assert_equal 1, authorised.count
-      assert_equal ['B'], authorised.collect(&:title)
+      assert_equal ['A'], authorised.collect(&:title)
     end
 
 
@@ -125,8 +125,8 @@ class AssetsHelperTest < ActionView::TestCase
     assets << Factory(:sop, title: 'D', contributor: @user.person, policy: Factory(:publicly_viewable_policy))
     assets << Factory(:sop, title: 'E', contributor: other_person, policy: Factory(:publicly_viewable_policy))
 
-    assets << Factory(:data_file, title: 'A', contributor: @user, policy: Factory(:downloadable_public_policy))
-    assets << Factory(:data_file, title: 'B', contributor: other_person, policy: Factory(:downloadable_public_policy), projects: [@project, Factory(:project)])
+    assets << Factory(:data_file, title: 'A', contributor: @user.person, policy: Factory(:downloadable_public_policy))
+    assets << Factory(:data_file, title: 'B', contributor: other_person, policy: Factory(:downloadable_public_policy))
     assets
   end
 end

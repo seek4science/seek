@@ -27,7 +27,7 @@ class ProjectExtensionTest < ActiveSupport::TestCase
     end
   end
 
-  
+
   test 'related resource to parent project' do
     parent_proj = Factory :project
     proj = Factory :project, parent: parent_proj
