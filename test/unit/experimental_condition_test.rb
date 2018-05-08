@@ -39,18 +39,19 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
 
   test 'should list the existing ECes of the project the sop belongs to filtered by can_view' do
     user = Factory :user
-    other_user = Factory :user
-    sop = Factory(:sop, contributor: user)
+    sop = Factory(:sop, contributor: user.person)
+    other_user = Factory(:person,project:user.person.projects.first)
+
     # create bunch of sops and ECs which belong to the same project and the sops can be viewed
     n = 2
     (0...n).to_a.each do |i|
-      s = Factory(:sop, projects: [Factory(:project), sop.projects.first], policy: Factory(:all_sysmo_viewable_policy), contributor: other_user)
+      s = Factory(:sop, policy: Factory(:all_sysmo_viewable_policy), contributor: other_user)
       Factory(:experimental_condition, sop: s, start_value: i)
     end
 
     # create bunch of sops and ECs which belong to the same project and the sops can not be viewed
     (0...n).to_a.each do |i|
-      s = Factory(:sop, projects: [sop.projects.first, Factory(:project)], contributor: other_user)
+      s = Factory(:sop, contributor: other_user)
       Factory(:experimental_condition, sop: s, start_value: i)
     end
 
@@ -60,7 +61,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
       assert_equal n, ecs.count
       ecs.each do |ec|
         assert ec.sop.can_view?
-        assert !(ec.sop.project_ids & sop.project_ids).empty?
+        refute (ec.sop.project_ids & sop.project_ids).empty?
       end
     end
   end
