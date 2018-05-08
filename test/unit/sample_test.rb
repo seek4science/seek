@@ -846,7 +846,7 @@ class SampleTest < ActiveSupport::TestCase
 
   test 'can overwrite existing samples when extracting from data file' do
     person = Factory(:person)
-    project_ids = [person.project.first.id]
+    project_ids = [person.projects.first.id]
 
     disable_authorization_checks do
       source_type = Factory(:source_sample_type, project_ids: project_ids)
