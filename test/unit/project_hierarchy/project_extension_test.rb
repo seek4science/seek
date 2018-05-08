@@ -27,13 +27,7 @@ class ProjectExtensionTest < ActiveSupport::TestCase
     end
   end
 
-  test "project's people include all in the project and its descendants" do
-    person_in_parent = Factory :person, work_groups: [Factory(:work_group, project_id: @proj.id)]
-    person_in_child1 = Factory :person, work_groups: [Factory(:work_group, project_id: @proj_child1.id)]
-    person_in_child2 = Factory :person, work_groups: [Factory(:work_group, project_id: @proj_child2.id)]
-
-    assert_equal [person_in_parent, person_in_child1, person_in_child2].sort { |a, b| a.name <=> b.name }, @proj.people.sort { |a, b| a.name <=> b.name }
-  end
+  
   test 'related resource to parent project' do
     parent_proj = Factory :project
     proj = Factory :project, parent: parent_proj
