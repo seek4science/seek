@@ -13,16 +13,17 @@ class ProjectFolderTest < ActiveSupport::TestCase
   end
 
   test 'destroy' do
-    p = Factory :project
+    contributor = Factory(:person)
+    p = contributor.projects.first
     pf = Factory :project_folder, project: p
 
     child = pf.add_child('fred')
     inner_child = child.add_child('frog')
 
     pf.reload
-    assets = [Factory(:sop, projects: [p]), Factory(:data_file, projects: [p]), Factory(:model, projects: [p])]
-    assets2 = [Factory(:sop, projects: [p]), Factory(:model, projects: [p])]
-    assets3 = [Factory(:sop, projects: [p]), Factory(:presentation, projects: [p])]
+    assets = [Factory(:sop, projects: [p], contributor:contributor), Factory(:data_file, projects: [p], contributor:contributor), Factory(:model, projects: [p], contributor:contributor)]
+    assets2 = [Factory(:sop, projects: [p], contributor:contributor), Factory(:model, projects: [p], contributor:contributor)]
+    assets3 = [Factory(:sop, projects: [p], contributor:contributor), Factory(:presentation, projects: [p], contributor:contributor)]
     all_assets = assets | assets2 | assets3
 
     # this needs creating after the assets, otherwise they will be automatically added to it when created!
@@ -50,8 +51,9 @@ class ProjectFolderTest < ActiveSupport::TestCase
   end
 
   test 'dont move assets if folder being destroyed is incoming' do
-    p = Factory :project
-    assets = [Factory(:sop, projects: [p]), Factory(:data_file, projects: [p]), Factory(:model, projects: [p])]
+    contributor = Factory(:person)
+    p = contributor.projects.first
+    assets = [Factory(:sop, projects: [p], contributor:contributor), Factory(:data_file, projects: [p], contributor:contributor), Factory(:model, projects: [p], contributor:contributor)]
     incoming = Factory :project_folder, project: p, incoming: true
 
     disable_authorization_checks do
@@ -190,7 +192,8 @@ class ProjectFolderTest < ActiveSupport::TestCase
 
   test 'cannot destroy if not deletable' do
     folder = Factory :project_folder, deletable: false
-    sop = Factory :sop, projects: [folder.project], policy: Factory(:public_policy)
+    contributor = Factory(:person,project:folder.project)
+    sop = Factory :sop, projects: [folder.project], policy: Factory(:public_policy), contributor:contributor
     folder.add_assets(sop)
     incoming_folder = Factory :project_folder, project: folder.project, incoming: true
     assert_no_difference('ProjectFolder.count') do
@@ -222,9 +225,10 @@ class ProjectFolderTest < ActiveSupport::TestCase
   test 'authorized_assets' do
     user = Factory :user
     project = user.person.projects.first
-    model = Factory :model, projects: [project], policy: Factory(:public_policy)
-    hidden_model = Factory :model, projects: [project], policy: Factory(:private_policy)
-    viewable_sop = Factory :sop, projects: [project], policy: Factory(:all_sysmo_viewable_policy)
+    another_user = Factory(:person,project:project).user
+    model = Factory :model, projects: [project], policy: Factory(:public_policy),contributor:user.person
+    hidden_model = Factory :model, projects: [project], policy: Factory(:private_policy),contributor:another_user
+    viewable_sop = Factory :sop, projects: [project], policy: Factory(:all_sysmo_viewable_policy),contributor:user.person
     folder = Factory :project_folder, project: project
 
     disable_authorization_checks do
@@ -243,7 +247,7 @@ class ProjectFolderTest < ActiveSupport::TestCase
     user = Factory :user
     project = user.person.projects.first
     pf1 = ProjectFolder.new title: 'one', project: project
-    assets = (0...3).to_a.collect { Factory :sop, projects: [project], policy: Factory(:public_policy) }
+    assets = (0...3).to_a.collect { Factory :sop, projects: [project], policy: Factory(:public_policy), contributor:user.person }
     pf1.add_assets assets
     assert_equal 'one (3)', pf1.label
   end
@@ -253,8 +257,8 @@ class ProjectFolderTest < ActiveSupport::TestCase
     project = user.person.projects.first
 
     pf1 = ProjectFolder.new title: 'one', project: project
-    model = Factory :model, projects: [project], policy: Factory(:public_policy)
-    sop = Factory :sop, projects: [project], policy: Factory(:public_policy)
+    model = Factory :model, policy: Factory(:public_policy), contributor:user.person, projects:[project]
+    sop = Factory :sop, projects: [project], policy: Factory(:public_policy), contributor:user.person
     pf1.add_assets model
     pf1.add_assets [sop]
     pf1.reload
