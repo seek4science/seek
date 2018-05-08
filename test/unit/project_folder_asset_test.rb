@@ -85,18 +85,21 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
   end
 
   test 'assign existing assets to folders' do
+
     proj = Factory :project
-    old_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj]
-    old_model = Factory :model, policy: Factory(:public_policy), projects: [proj]
-    old_presentation = Factory :presentation, policy: Factory(:public_policy), projects: [proj]
-    old_publication = Factory :publication, policy: Factory(:public_policy), projects: [proj]
-    old_datafile = Factory :data_file, policy: Factory(:public_policy), projects: [proj]
-    old_private_datafile = Factory :data_file, policy: Factory(:private_policy), projects: [proj]
-    old_datafile_other_proj = Factory :model, policy: Factory(:public_policy), projects: [Factory(:project)]
+    contributor = Factory(:person,project:proj)
+
+    old_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_model = Factory :model, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_presentation = Factory :presentation, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_publication = Factory :publication, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_datafile = Factory :data_file, policy: Factory(:public_policy), projects: [proj], contributor:contributor
+    old_private_datafile = Factory :data_file, policy: Factory(:private_policy), projects: [proj], contributor:contributor
+    old_datafile_other_proj = Factory :model, policy: Factory(:public_policy), contributor:Factory(:person)
 
     pf = Factory :project_folder, project: proj
     pf_incoming = Factory :project_folder, project: pf.project, title: 'New items', incoming: true
-    already_assigned_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj]
+    already_assigned_sop = Factory :sop, policy: Factory(:public_policy), projects: [proj], contributor:contributor
     pf.add_assets already_assigned_sop
 
     ProjectFolderAsset.assign_existing_assets(proj)
