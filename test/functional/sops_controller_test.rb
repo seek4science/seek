@@ -194,7 +194,6 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should create sop' do
-    login_as(:owner_of_my_first_sop) # can edit assay_can_edit_by_my_first_sop_owner
     sop, blob = valid_sop
     assay = Factory(:assay, contributor: User.current_user.person)
     assert_difference('Sop.count') do
@@ -206,7 +205,6 @@ class SopsControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to sop_path(assigns(:sop))
-    assert_equal users(:owner_of_my_first_sop), assigns(:sop).contributor
 
     assert assigns(:sop).content_blob.url.blank?
     assert !assigns(:sop).content_blob.data_io_object.read.nil?
@@ -324,7 +322,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_show_version
-    s = sops(:editable_sop)
+    s = Factory(:sop, contributor: @user)
 
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
@@ -338,17 +336,17 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1, s.versions[0].version
     assert_equal 2, s.versions[1].version
 
-    get :show, id: sops(:editable_sop)
+    get :show, id: s
     assert_select 'p', text: /little_file_v2.txt/, count: 1
-    assert_select 'p', text: /little_file.txt/, count: 0
+    assert_select 'p', text: /sop.pdf/, count: 0
 
-    get :show, id: sops(:editable_sop), version: '2'
+    get :show, id: s, version: '2'
     assert_select 'p', text: /little_file_v2.txt/, count: 1
-    assert_select 'p', text: /little_file.txt/, count: 0
+    assert_select 'p', text: /sop.pdf/, count: 0
 
-    get :show, id: sops(:editable_sop), version: '1'
+    get :show, id: s, version: '1'
     assert_select 'p', text: /little_file_v2.txt/, count: 0
-    assert_select 'p', text: /little_file.txt/, count: 1
+    assert_select 'p', text: /sop.pdf/, count: 1
   end
 
   test 'should download SOP from standard route' do
@@ -367,7 +365,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_should_create_new_version
-    s = sops(:editable_sop)
+    s = Factory(:sop, contributor: @user)
 
     assert_difference('Sop::Version.count', 1) do
       post :new_version, id: s, sop: { title: s.title }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision'
@@ -383,7 +381,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 2, s.version
     assert_equal 'file_picture.png', s.content_blob.original_filename
     assert_equal 'file_picture.png', s.versions[1].content_blob.original_filename
-    assert_equal 'little_file.txt', s.versions[0].content_blob.original_filename
+    assert_equal 'sop.pdf', s.versions[0].content_blob.original_filename
     assert_equal 'This is a new revision', s.versions[1].revision_comments
   end
 
@@ -391,6 +389,9 @@ class SopsControllerTest < ActionController::TestCase
     s = sops(:downloadable_sop)
     current_version = s.version
     current_version_count = s.versions.size
+
+    assert s.can_download?
+    refute s.can_edit?
 
     assert_no_difference('Sop::Version.count') do
       post :new_version, id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision'
@@ -512,19 +513,19 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not be able to update sharing without manage rights' do
-    login_as(:quentin)
-    user = users(:quentin)
-    sop = sops(:sop_with_all_sysmo_users_policy)
+    sop = Factory(:sop)
+    sop.policy.permissions << Factory(:permission, contributor: @user.person, access_type: Policy::EDITING)
 
-    assert sop.can_edit?(user), 'sop should be editable but not manageable for this test'
-    assert !sop.can_manage?(user), 'sop should be editable but not manageable for this test'
-    assert_equal Policy::EDITING, sop.policy.access_type, 'data file should have an initial policy with access type for editing'
-    put :update, id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::NO_ACCESS }
+    assert sop.can_edit?(@user), 'sop should be editable but not manageable for this test'
+    refute sop.can_manage?(@user), 'sop should be editable but not manageable for this test'
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type
+    put :update, id: sop, sop: { title: 'new title' }, policy_attributes: { access_type: Policy::EDITING }
+
     assert_redirected_to sop_path(sop)
     sop.reload
 
     assert_equal 'new title', sop.title
-    assert_equal Policy::EDITING, sop.policy.access_type, 'policy should not have been updated'
+    assert_equal Policy::NO_ACCESS, sop.policy.access_type, 'policy should not have been updated'
   end
 
   test 'owner should be able to update sharing' do
@@ -609,6 +610,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
     as_not_virtualliver do
       gatekeeper = Factory(:asset_gatekeeper)
+      @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
       post :create, sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: file_for_upload }],
                     policy_attributes: { access_type: Policy::VISIBLE }
       sop = assigns(:sop)
@@ -843,7 +845,9 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not lose project assignment when an asset is managed by a person from different project' do
-    sop = Factory :sop, contributor: User.current_user
+    sop = Factory(:sop)
+    sop.policy.permissions << Factory(:permission, contributor: User.current_user.person, access_type: Policy::MANAGING)
+    assert sop.can_edit?
     assert_not_equal sop.projects.first, User.current_user.person.projects.first
 
     get :edit, id: sop
@@ -903,9 +907,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should update license' do
-    user = users(:owner_of_my_first_sop)
-    login_as(user)
-    sop = sops(:editable_sop)
+    sop = Factory(:sop, contributor: @user, license: nil)
 
     assert_nil sop.license
 
@@ -1112,8 +1114,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'when creating, assay linked to must be editable' do
-    person = Factory(:person)
-    login_as(person)
+    person = @user.person
 
     another_person = Factory(:person)
     another_person.add_to_project_and_institution(person.projects.first,person.institutions.first)
@@ -1139,8 +1140,10 @@ class SopsControllerTest < ActionController::TestCase
 
     sop, blob = valid_sop
 
-    assert_difference('AssayAsset.count') do
-      post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+    assert_difference('Sop.count') do
+      assert_difference('AssayAsset.count') do
+        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+      end
     end
     sop = assigns(:sop)
     assert_equal [good_assay],sop.assays

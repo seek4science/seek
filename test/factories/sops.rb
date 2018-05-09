@@ -5,7 +5,8 @@ Factory.define(:sop) do |f|
 
   f.after_create do |sop|
     if sop.content_blob.blank?
-      sop.content_blob = Factory.create(:content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
+      sop.content_blob = Factory.create(:content_blob, original_filename: 'sop.pdf',
+                                        content_type: 'application/pdf', asset: sop, asset_version: sop.version)
     else
       sop.content_blob.asset = sop
       sop.content_blob.asset_version = sop.version
