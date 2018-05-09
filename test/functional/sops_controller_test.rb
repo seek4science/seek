@@ -11,7 +11,9 @@ class SopsControllerTest < ActionController::TestCase
   include HtmlHelper
 
   def setup
-    login_as(:quentin)
+    @user = users(:quentin)
+    @project = @user.person.projects.first
+    login_as(@user)
   end
 
   def rest_api_test_object
@@ -138,7 +140,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'should correctly handle bad data url' do
     stub_request(:any, 'http://sdfsdfds.com/sdf.png').to_raise(SocketError)
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://sdfsdfds.com/sdf.png' }
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
@@ -148,7 +150,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_not_nil flash.now[:error]
 
     # not even a valid url
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 's  df::sd:dfds.com/sdf.png' }
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
@@ -159,7 +161,7 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should not create invalid sop' do
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     assert_no_difference('Sop.count') do
       assert_no_difference('ContentBlob.count') do
         post :create, sop: sop, content_blobs: [{}], policy_attributes: valid_sharing
@@ -1024,45 +1026,45 @@ class SopsControllerTest < ActionController::TestCase
   test 'content blob filename precedence should take user input first' do
     stub_request(:any, 'http://example.com/url_filename.txt')
         .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt', original_filename: 'user_filename.txt' }
 
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
         post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
-
-        assert_equal 'user_filename.txt', assigns(:sop).content_blob.original_filename
       end
     end
+
+    assert_equal 'user_filename.txt', assigns(:sop).content_blob.original_filename
   end
 
   test 'content blob filename precedence should take server filename second' do
     stub_request(:any, 'http://example.com/url_filename.txt')
         .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt' }
 
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
         post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
-
-        assert_equal 'server_filename.txt', assigns(:sop).content_blob.original_filename
       end
     end
+
+    assert_equal 'server_filename.txt', assigns(:sop).content_blob.original_filename
   end
 
   test 'content blob filename precedence should take URL filename last' do
     stub_request(:any, 'http://example.com/url_filename.txt').to_return(body: 'hi')
-    sop = { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt' }
 
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
         post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing
-
-        assert_equal 'url_filename.txt', assigns(:sop).content_blob.original_filename
       end
     end
+
+    assert_equal 'url_filename.txt', assigns(:sop).content_blob.original_filename
   end
 
   test 'should show sop as RDF' do
@@ -1172,10 +1174,10 @@ class SopsControllerTest < ActionController::TestCase
 
   def valid_sop_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png'
-    [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data_url: 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png' }]
+    [{ title: 'Test', project_ids: [@project.id] }, { data_url: 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png' }]
   end
 
   def valid_sop
-    [{ title: 'Test', project_ids: [User.current_user.person.projects.first.id.to_s]}, { data: file_for_upload, data_url: '' }]
+    [{ title: 'Test', project_ids: [@project.id] }, { data: file_for_upload, data_url: '' }]
   end
 end
