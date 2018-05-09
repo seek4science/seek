@@ -467,7 +467,7 @@ class SampleTypeTest < ActiveSupport::TestCase
         assert type.can_delete?
 
         # cannot delete with samples
-        type = Factory(:patient_sample, project_ids: @project_ids).sample_type
+        type = Factory(:patient_sample, project_ids: @project_ids, contributor:@person).sample_type
         refute type.can_delete?
 
         # double check the type has been saved (due to an issue when running all tests together)
