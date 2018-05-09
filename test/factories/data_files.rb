@@ -61,9 +61,20 @@ Factory.define(:strain_sample_data_file, parent: :data_file) do |f|
   f.association :content_blob, factory: :strain_sample_data_content_blob
 end
 
-Factory.define(:jerm_data_file, parent: :data_file) do |f|
+Factory.define(:jerm_data_file, class: DataFile) do |f|
+  f.sequence(:title) { |n| "A Data File_#{n}" }
   f.contributor nil
   f.association :content_blob, factory: :url_content_blob
+
+  f.after_create do |data_file|
+    if data_file.content_blob.blank?
+      data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+    else
+      data_file.content_blob.asset = data_file
+      data_file.content_blob.asset_version = data_file.version
+      data_file.content_blob.save
+    end
+  end
 end
 
 Factory.define(:subscribable, parent: :data_file) {}

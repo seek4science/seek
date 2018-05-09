@@ -589,8 +589,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   test 'asset housekeeper can manage jerm harvested items' do
     asset_manager = Factory(:asset_housekeeper)
-    datafile1 = Factory(:data_file, contributor: nil,
-                                    projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
+    datafile1 = Factory(:jerm_data_file, projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
 
     assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
 
