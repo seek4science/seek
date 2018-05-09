@@ -170,12 +170,12 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'associates assay' do
     login_as(:owner_of_my_first_sop) # can edit assay_can_edit_by_my_first_sop_owner
-    s = sops(:my_first_sop)
-    original_assay = assays(:assay_can_edit_by_my_first_sop_owner1)
+    s = Factory(:sop, contributor:User.current_user.person)
+    original_assay = Factory(:assay, contributor:User.current_user.person, assay_assets: [Factory(:assay_asset, asset:s)])
 
     assert_includes original_assay.sops, s
 
-    new_assay = assays(:assay_can_edit_by_my_first_sop_owner2)
+    new_assay = Factory(:assay, contributor:User.current_user.person)
 
     refute_includes new_assay.sops, s
 
@@ -194,10 +194,12 @@ class SopsControllerTest < ActionController::TestCase
   test 'should create sop' do
     login_as(:owner_of_my_first_sop) # can edit assay_can_edit_by_my_first_sop_owner
     sop, blob = valid_sop
-    assay = assays(:assay_can_edit_by_my_first_sop_owner1)
+    assay = Factory(:assay, contributor: User.current_user.person)
     assert_difference('Sop.count') do
       assert_difference('ContentBlob.count') do
-        post :create, sop: sop, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [assay.id.to_s]
+        post :create, sop: sop, content_blobs: [blob],
+             policy_attributes: valid_sharing,
+             assay_ids: [assay.id.to_s]
       end
     end
 
@@ -419,7 +421,8 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def test_adding_new_conditions_to_different_versions
-    s = sops(:editable_sop)
+    s = Factory(:sop, contributor:User.current_user.person)
+    assert s.can_edit?
     condition1 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
                                               start_value: 1, sop_id: s.id, sop_version: s.version)
     assert_difference('Sop::Version.count', 1) do
@@ -1173,6 +1176,6 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   def valid_sop
-    [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data: file_for_upload, data_url: '' }]
+    [{ title: 'Test', project_ids: [User.current_user.person.projects.first.id.to_s]}, { data: file_for_upload, data_url: '' }]
   end
 end
