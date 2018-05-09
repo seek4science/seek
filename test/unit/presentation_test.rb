@@ -78,5 +78,11 @@ class PresentationTest < ActiveSupport::TestCase
     assert specified_project_pres.contributor
     assert_equal project, specified_project_pres.projects.first
     assert specified_project_pres.projects.first.has_member?(specified_project_pres.contributor)
+
+    factory_specified_project_pres = Factory(:presentation_with_specified_project)
+    assert_equal 'Specified Project', factory_specified_project_pres.projects.first.title
+    assert factory_specified_project_pres.contributor
+    assert factory_specified_project_pres.projects.any?
+    assert factory_specified_project_pres.projects.first.has_member?(factory_specified_project_pres.contributor)
   end
 end

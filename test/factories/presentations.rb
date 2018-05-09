@@ -19,17 +19,17 @@ Factory.define(:presentation) do |f|
 end
 
 Factory.define(:min_presentation, class: Presentation) do |f|
+  f.with_project_contributor
   f.title 'A Minimal Presentation'
-  f.projects { [Factory.build(:min_project)] }
   f.after_create do |presentation|
     presentation.content_blob = Factory.create(:min_content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
   end
 end
 
 Factory.define(:max_presentation, class: Presentation) do |f|
+  f.with_project_contributor
   f.title 'A Maximal Presentation'
   f.description 'Non-equilibrium Free Energy Calculations and their caveats'
-  f.projects { [Factory.build(:max_project)] }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
@@ -77,4 +77,10 @@ Factory.define(:presentation_version_with_blob, parent: :presentation_version) d
       presentation_version.content_blob.save
     end
   end
+end
+
+Factory.define(:presentation_with_specified_project, class: Presentation) do |f|
+  f.projects { [Factory(:project, title: 'Specified Project')] }
+  f.with_project_contributor
+  f.title 'Pres With Specified Project'
 end

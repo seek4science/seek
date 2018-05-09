@@ -1,11 +1,7 @@
 # DataFile
 Factory.define(:data_file) do |f|
+  f.with_project_contributor
   f.sequence(:title) { |n| "A Data File_#{n}" }
-  f.association :contributor, factory: :person
-
-  f.after_build do |df|
-    df.projects = [df.contributor.person.projects.first] if df.projects.empty?
-  end
 
   f.after_create do |data_file|
     if data_file.content_blob.blank?
@@ -19,6 +15,7 @@ Factory.define(:data_file) do |f|
 end
 
 Factory.define(:min_datafile, class: DataFile) do |f|
+  f.with_project_contributor
   f.title 'A Minimal DataFile'
   f.projects { [Factory.build(:min_project)] }
   f.after_create do |data_file|
@@ -27,6 +24,7 @@ Factory.define(:min_datafile, class: DataFile) do |f|
 end
 
 Factory.define(:max_datafile, class: DataFile) do |f|
+  f.with_project_contributor
   f.title 'A Maximal DataFile'
   f.description 'Results - Sampling conformations of ATP-Mg inside the binding pocket'
   f.projects { [Factory.build(:max_project)] }

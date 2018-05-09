@@ -1,12 +1,7 @@
 # Sop
 Factory.define(:sop) do |f|
   f.title 'This Sop'
-  f.association :contributor, factory: :person
-
-
-  f.after_build do |sop|
-    sop.projects = [sop.contributor.person.projects.first] if sop.projects.empty?
-  end
+  f.with_project_contributor
 
   f.after_create do |sop|
     if sop.content_blob.blank?
@@ -20,6 +15,7 @@ Factory.define(:sop) do |f|
 end
 
 Factory.define(:min_sop, class: Sop) do |f|
+  f.with_project_contributor
   f.title 'A Minimal Sop'
   f.projects { [Factory.build(:min_project)] }
   f.after_create do |sop|
@@ -28,6 +24,7 @@ Factory.define(:min_sop, class: Sop) do |f|
 end
 
 Factory.define(:max_sop, class: Sop) do |f|
+  f.with_project_contributor
   f.title 'A Maximal Sop'
   f.description 'How to run a simulation in GROMACS'
   f.projects { [Factory.build(:max_project)] }

@@ -6,11 +6,7 @@ end
 # Model
 Factory.define(:model) do |f|
   f.sequence(:title) { |n| "A Model #{n}" }
-  f.association :contributor, factory: :person
-
-  f.after_build do |model|
-    model.projects = [model.contributor.person.projects.first] if model.projects.empty?
-  end
+  f.with_project_contributor
 
   f.after_create do |model|
     model.content_blobs = [Factory.create(:cronwright_model_content_blob, asset: model, asset_version: model.version)] if model.content_blobs.blank?
@@ -18,11 +14,13 @@ Factory.define(:model) do |f|
 end
 
 Factory.define(:min_model, class: Model) do |f|
+  f.with_project_contributor
   f.title 'A Minimal Model'
   f.projects { [Factory.build(:min_project)] }
 end
 
 Factory.define(:max_model, class: Model) do |f|
+  f.with_project_contributor
   f.title 'A Maximal Model'
   f.description 'Hidden Markov Model'
   f.projects { [Factory.build(:max_project)] }
