@@ -146,7 +146,7 @@ class ActiveSupport::TestCase
   end
 
   def add_avatar_to_test_object(obj)
-    with_current_user(obj.contributor.try(:user)) do
+    User.with_current_user(obj.contributor.try(:user)) do
       obj.avatar = Factory(:avatar, owner: obj)
       obj.save!
     end
@@ -162,7 +162,8 @@ class ActiveSupport::TestCase
   end
 
   def add_creator_to_test_object(obj)
-    with_current_user(obj.contributor.try(:user)) do
+    User.with_current_user(obj.contributor.try(:user)) do
+      puts 'what up'
       obj.creators = [Factory(:person)]
       obj.save!
     end
