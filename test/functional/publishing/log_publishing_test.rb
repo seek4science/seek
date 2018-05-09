@@ -1,21 +1,23 @@
 require 'test_helper'
 
 class LogPublishingTest < ActionController::TestCase
-  tests DataFilesController
-
-  fixtures :all
+  tests SopsController
 
   include AuthenticatedTestHelper
 
   def setup
-    login_as(:datafile_owner)
-    @gatekeeper = Factory(:asset_gatekeeper)
+    person = Factory(:person)
+    @gatekeeper_project = person.projects.first
+    @gatekeeper = Factory(:asset_gatekeeper, project: @gatekeeper_project)
+    @another_project = Factory(:project)
+    person.add_to_project_and_institution(@another_project, person.institutions.first)
+
+    login_as(person.user)
   end
 
   test 'log when creating the public item' do
-    @controller = SopsController.new
     sop_params, blob = valid_sop
-    sop_params[:project_ids] = [Factory(:project).id] # this project has no gatekeeper
+    sop_params[:project_ids] = [@another_project.id] # this project has no gatekeeper
     assert_difference ('ResourcePublishLog.count') do
       post :create, sop: sop_params, content_blobs: [blob], policy_attributes: public_sharing
     end
@@ -28,7 +30,6 @@ class LogPublishingTest < ActionController::TestCase
 
   test 'log when creating item and request publish it' do
     sop, blob = valid_sop
-    @controller = SopsController.new
     assert_difference ('ResourcePublishLog.count') do
       post :create, sop: sop, content_blobs: [blob], policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
@@ -40,7 +41,6 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'dont log when creating the non-public item' do
-    @controller = SopsController.new
     sop, blob = valid_sop
     assert_no_difference ('ResourcePublishLog.count') do
       post :create, sop: sop, content_blobs: [blob]
@@ -50,7 +50,6 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when updating an item from non-public to public' do
-    @controller = SopsController.new
     owner = Factory(:person)
     login_as(owner.user)
 
@@ -69,11 +68,10 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when sending the publish request approval during updating a non-public item' do
-    @controller = SopsController.new
-    owner = Factory(:person)
+    owner = Factory(:person, project: @gatekeeper_project)
     login_as(owner.user)
 
-    sop = Factory(:sop, project_ids: [@gatekeeper.projects.first.id], contributor: owner.user)
+    sop = Factory(:sop, project_ids: [@gatekeeper.projects.first.id], contributor: owner)
     assert_equal Policy::NO_ACCESS, sop.policy.access_type
     assert sop.can_publish?
 
@@ -84,11 +82,10 @@ class LogPublishingTest < ActionController::TestCase
     assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, publish_log.publish_state.to_i
     sop = assigns(:sop)
     assert_equal sop, publish_log.resource
-    assert_equal sop.contributor, publish_log.user
+    assert_equal sop.contributor, publish_log.user.person
   end
 
   test 'dont log when updating an item with the not-related public sharing' do
-    @controller = SopsController.new
     owner = Factory(:person)
     login_as(owner.user)
     sop = Factory(:sop, contributor: owner.user)
@@ -100,7 +97,6 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when un-publishing an item' do
-    @controller = SopsController.new
     owner = Factory(:person)
     login_as(owner.user)
 
@@ -121,6 +117,7 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when approving publishing an item' do
+    @controller = DataFilesController.new
     df = Factory(:data_file, project_ids: @gatekeeper.projects.collect(&:id))
 
     login_as(df.contributor)
@@ -146,6 +143,7 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'gatekeeper cannot approve an item from another project' do
+    @controller = DataFilesController.new
     gatekeeper2 = Factory(:asset_gatekeeper)
     df = Factory(:data_file, project_ids: gatekeeper2.projects.collect(&:id))
 
@@ -173,17 +171,24 @@ class LogPublishingTest < ActionController::TestCase
   end
 
   test 'log when publish isa' do
+    @controller = DataFilesController.new
+    person = User.current_user.person
+
     df = Factory :data_file,
-                 contributor: users(:datafile_owner),
-                 assays: [Factory(:assay)]
+                 contributor: person,
+                 projects: [@another_project],
+                 assays: [Factory(:assay, contributor: person)]
 
     assay = df.assays.first
 
+    # can be be published, but in a project with a gatekeeper
     request_publishing_df = Factory(:data_file,
-                                    project_ids: Factory(:asset_gatekeeper).projects.collect(&:id),
-                                    contributor: users(:datafile_owner),
+                                    projects: [@gatekeeper_project],
+                                    contributor: person,
                                     assays: [assay])
 
+    refute df.gatekeeper_required?
+    assert request_publishing_df.gatekeeper_required?
     assert !df.is_published?, 'The datafile must be not be published for this test to succeed'
     assert df.can_publish?, 'The datafile must be publishable for this test to succeed'
     assert !request_publishing_df.is_published?, 'The datafile must be not be published for this test to succeed'
@@ -210,7 +215,7 @@ class LogPublishingTest < ActionController::TestCase
   private
 
   def valid_sop
-    [{ title: 'Test', project_ids: [@gatekeeper.projects.first.id] }, { data: file_for_upload }]
+    [{ title: 'Test', project_ids: [@gatekeeper_project] }, { data: file_for_upload }]
   end
 
   def public_sharing
