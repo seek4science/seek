@@ -648,12 +648,10 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'links have nofollow in sop tabs' do
-    login_as(:owner_of_my_first_sop)
-    sop_version = sops(:my_first_sop)
-    sop_version.description = 'http://news.bbc.co.uk'
-    sop_version.save!
+    assay = Factory(:assay, contributor:User.current_user.person)
+    sop = Factory(:sop,description:'http://news.bbc.co.uk',assays:[assay],contributor: User.current_user.person)
     assert_difference('ActivityLog.count') do
-      get :show, id: assays(:metabolomics_assay)
+      get :show, id: assay
     end
 
     assert_select 'div.list_item div.list_item_desc' do
