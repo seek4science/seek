@@ -163,7 +163,6 @@ class ActiveSupport::TestCase
 
   def add_creator_to_test_object(obj)
     User.with_current_user(obj.contributor.try(:user)) do
-      puts 'what up'
       obj.creators = [Factory(:person)]
       obj.save!
     end
