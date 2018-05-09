@@ -3,7 +3,6 @@ require 'test_helper'
 class ModelsHelperTest < ActionView::TestCase
 
   test 'allow_model_comparison' do
-    puts p.inspect
     model = Factory(:teusink_model, policy: Factory(:public_policy))
     assert_equal 1, model.version
 
