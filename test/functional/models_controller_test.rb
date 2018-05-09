@@ -397,7 +397,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test 'should create model version with image' do
-    m = models(:model_with_format_and_type)
+    m = Factory(:model, contributor: User.current_user.person)
     assert_difference('Model::Version.count', 1) do
       assert_difference('ModelImage.count') do
         post :new_version, id: m, model: { title: m.title },
@@ -422,7 +422,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 'little_file.txt', m.content_blobs.first.original_filename
     assert_equal 'little_file.txt', m.versions[1].content_blobs.first.original_filename
     assert_equal 'This is a new revision', m.versions[1].revision_comments
-    assert_equal 'Teusink.xml', m.versions[0].content_blobs.first.original_filename
+    assert_equal 'cronwright.xml', m.versions[0].content_blobs.first.original_filename
   end
 
   test 'should create model with import details' do
@@ -610,7 +610,7 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   def test_should_show_version
-    m = models(:model_with_format_and_type)
+    m = Factory(:model, contributor: User.current_user.person)
     m.save! # to force creation of initial version (fixtures don't include it)
 
     # create new version
@@ -624,21 +624,21 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 1, m.versions[0].version
     assert_equal 2, m.versions[1].version
 
-    get :show, id: models(:model_with_format_and_type)
+    get :show, id: m
     assert_select 'li', text: /little_file.txt/, count: 1
-    assert_select 'li', text: /Teusink.xml/, count: 0
+    assert_select 'li', text: /cronwright.xml/, count: 0
 
-    get :show, id: models(:model_with_format_and_type), version: '2'
+    get :show, id: m, version: '2'
     assert_select 'li', text: /little_file.txt/, count: 1
-    assert_select 'li', text: /Teusink.xml/, count: 0
+    assert_select 'li', text: /cronwright.xml/, count: 0
 
-    get :show, id: models(:model_with_format_and_type), version: '1'
+    get :show, id: m, version: '1'
     assert_select 'li', text: /little_file.txt/, count: 0
-    assert_select 'li', text: /Teusink.xml/, count: 1
+    assert_select 'li', text: /cronwright.xml/, count: 1
   end
 
   def test_should_create_new_version
-    m = models(:model_with_format_and_type)
+    m = Factory(:model, contributor:User.current_user.person)
     assert_difference('Model::Version.count', 1) do
       post :new_version, id: m, model: { title: m.title},
            content_blobs: [{ data: file_for_upload(filename: 'little_file.txt') }],
@@ -657,7 +657,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal m.content_blobs, m.versions[1].content_blobs
     assert_equal 'little_file.txt', m.content_blobs.first.original_filename
     assert_equal 'little_file.txt', m.versions[1].content_blobs.first.original_filename
-    assert_equal 'Teusink.xml', m.versions[0].content_blobs.first.original_filename
+    assert_equal 'cronwright.xml', m.versions[0].content_blobs.first.original_filename
     assert_equal 'This is a new revision', m.versions[1].revision_comments
   end
 
@@ -746,14 +746,14 @@ class ModelsControllerTest < ActionController::TestCase
   end
 
   test "owner should be able to choose policy 'share with everyone' when creating a model" do
-    model = { title: 'Test', project_ids: [projects(:moses_project).id] }
+    model = { title: 'Test', project_ids: [User.current_user.person.projects.first.id] }
     post :create, model: model, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }
-    assert_redirected_to model_path(assigns(:model))
-    assert_equal users(:model_owner), assigns(:model).contributor
-    assert assigns(:model)
 
-    model = assigns(:model)
-    assert_equal Policy::VISIBLE, model.policy.access_type
+    assert created_model = assigns(:model)
+    assert_redirected_to model_path(created_model)
+    assert_equal users(:model_owner), created_model.contributor
+
+    assert_equal Policy::VISIBLE, created_model.policy.access_type
     # check it doesn't create an error when retreiving the index
     get :index
     assert_response :success
@@ -1159,7 +1159,7 @@ class ModelsControllerTest < ActionController::TestCase
   private
 
   def valid_model
-    { title: 'Test', project_ids: [projects(:sysmo_project).id] }
+    { title: 'Test', project_ids: [User.current_user.person.projects.first.id] }
   end
 
   def valid_model_with_url
