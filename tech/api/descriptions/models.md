@@ -1,1 +1,1 @@
-This is a models description
+A **Model** is a computer model of a biological or biochemical network or process.Some **Models** may be simulated using the JWSOnline system.

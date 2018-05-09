@@ -448,9 +448,9 @@ paths:
         <<: *DeleteType
   '/data_files/{id}/content_blobs/{blob_id}':
     put:
-      operationId: updateDataFileContent
-#      description:
-#        $ref: ../descriptions/updateDataFileContent.md
+      operationId: uploadDataFileContent
+      description:
+        $ref: ../descriptions/uploadDataFileContent.md
       parameters:
         - name: id
           in: path
@@ -495,9 +495,9 @@ paths:
         type: integer
         default: 1831
     get:
-      operationId: readDataFileContent
-#      description:
-#        $ref: ../descriptions/readDataFileContent.md
+      operationId: downloadDataFileContent
+      description:
+        $ref: ../descriptions/downloadDataFileContent.md
       produces:
         - '*/*'
       tags:

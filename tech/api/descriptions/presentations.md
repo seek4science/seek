@@ -1,1 +1,1 @@
-This is a presentations description
+A **Presentation** is a presentation about one or more **Projects**.

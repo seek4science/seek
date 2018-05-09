@@ -1,1 +1,1 @@
-This is a organisms description
+An **Organism** is a organism as identified by an entry in the [NCBI ontology](http://www.ncbi.nlm.nih.gov/taxonomy).

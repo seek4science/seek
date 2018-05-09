@@ -1,1 +1,1 @@
-This is a projects description
+A **Project** is an area of research carried out as part of a **Programme** and consisting of one or more **Investigations**.

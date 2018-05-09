@@ -3,10 +3,12 @@ import sys
 import json
 import ruamel.yaml as yaml
 from yaml import load, dump
+from pprint import pprint
+from collections import OrderedDict
 
 def walk_tree(base):
     if isinstance(base, dict):
-        for k in base:
+        for k in base.keys():
           v = base[k]
           if (k == 'oneOf') :
             base['allOf'] = [v[0]]
@@ -34,5 +36,5 @@ walk_tree (new_data['definitions'])
 data['definitions'] = new_data['definitions']
 
 dump (data,
-      sys.stdout,
+      open(sys.argv[3], 'w'),
             Dumper=yaml.RoundTripDumper)
