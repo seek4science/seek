@@ -100,13 +100,14 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
   end
 
   test 'existing permission same project same access_type' do
-    project = Factory(:project)
+    person = Factory(:person)
+    project = person.projects.first
     model = Factory(:model,
                     policy: Factory(:policy,
                                     access_type: Policy::VISIBLE,
                                     sharing_scope: Policy::ALL_USERS,
                                     permissions: [Factory(:permission, contributor: project, access_type: Policy::VISIBLE)]),
-                    projects: [project])
+                    projects: [project], contributor: person)
 
     assert_equal 1, (permissions = model.policy.permissions).count
     assert_equal 1, (projects = model.projects).count

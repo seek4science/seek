@@ -193,12 +193,13 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'policy defaults to system default' do
-    with_config_value 'default_all_visitors_access_type', Policy::VISIBLE do
-      model = Model.new Factory.attributes_for(:model, policy: nil)
+    with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
+      model = Factory.build(:model)
+      refute model.persisted?
       model.save!
       model.reload
       assert_not_nil model.policy
-      assert_equal Policy::VISIBLE, model.policy.access_type
+      assert_equal Policy::NO_ACCESS, model.policy.access_type
       assert model.policy.permissions.empty?
     end
   end

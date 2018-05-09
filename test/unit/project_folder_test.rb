@@ -266,12 +266,12 @@ class ProjectFolderTest < ActiveSupport::TestCase
   end
 
   test 'move asset' do
-    user = Factory :user
-    project = user.person.projects.first
+    person = Factory :person
+    project = person.projects.first
 
     pf1 = ProjectFolder.new title: 'one', project: project
     pf2 = ProjectFolder.new title: 'two', project: project
-    model = Factory :model, projects: [project], policy: Factory(:public_policy)
+    model = Factory :model, projects: [project], policy: Factory(:public_policy), contributor:person
     disable_authorization_checks do
       pf1.add_assets model
     end
@@ -289,7 +289,8 @@ class ProjectFolderTest < ActiveSupport::TestCase
     project2 = Factory(:project)
     pf1 = ProjectFolder.new title: 'one', project: project
     pf2 = ProjectFolder.new title: 'two', project: project2
-    model = Factory :model, projects: [project, project2], policy: Factory(:public_policy)
+    person.add_to_project_and_institution(project2,person.institutions.first)
+    model = Factory :model, projects: [project, project2], policy: Factory(:public_policy), contributor: person
     disable_authorization_checks do
       pf1.add_assets model
     end

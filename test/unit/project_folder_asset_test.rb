@@ -44,7 +44,11 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
   test 'assets added to default folder upon creation' do
     pf = Factory :project_folder, title: 'Unsorted items', editable: false, incoming: true
     pf2 = Factory :project_folder, title: 'Unsorted items', editable: false, incoming: true
-    model = Factory.build :model, projects: [pf.project, pf2.project], policy: Factory(:public_policy)
+
+    person = Factory(:person,project: pf.project)
+    person.add_to_project_and_institution(pf2.project, person.institutions.first)
+
+    model = Factory.build :model, projects: [pf.project, pf2.project], policy: Factory(:public_policy), contributor: person
 
     model.save!
 
@@ -62,7 +66,8 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
   test 'validations' do
     pfa = ProjectFolderAsset.new
     pf = Factory :project_folder
-    model = Factory :model, policy: Factory(:public_policy), projects: [pf.project]
+    person = Factory(:person, project: pf.project)
+    model = Factory :model, policy: Factory(:public_policy), projects: [pf.project], contributor: person
 
     assert !pfa.valid?
 
@@ -77,9 +82,12 @@ class ProjectFolderAssetTest < ActiveSupport::TestCase
     # asset must belong in same project as folder
     pfa.asset = model
     assert pfa.valid?
-    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: [pf.project, Factory(:project)]
+    person.add_to_project_and_institution(Factory(:project),person.institutions.first)
+    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: person.projects, contributor: person
     assert pfa.valid?
-    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: [Factory(:project)]
+
+    other_person = Factory(:person)
+    pfa.asset = Factory :model, policy: Factory(:public_policy), projects: other_person.projects,contributor: other_person
     assert !pfa.valid?
 
     # final check for save
