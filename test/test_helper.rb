@@ -38,6 +38,22 @@ end
 include UploadHelper
 include PasswordHelper
 
+FactoryGirl.define do
+  trait :with_project_contributor do
+    contributor { nil }
+    after_build do |resource|
+      if resource.contributor.nil?
+        if resource.projects.none?
+          resource.projects = [Factory(:project)]
+        end
+        resource.contributor = Factory(:person, project: resource.projects.first)
+      elsif resource.projects.none?
+        resource.projects = [resource.contributor.projects.first]
+      end
+    end
+  end
+end
+
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
 FactoryGirl.class_eval do

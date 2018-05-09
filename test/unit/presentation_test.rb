@@ -60,4 +60,23 @@ class PresentationTest < ActiveSupport::TestCase
     assert_not_nil presentation.uuid
   end
 
+  test 'factory using with_project_contributor is still configurable' do
+    default_factory_pres = Factory(:min_presentation)
+    assert default_factory_pres.contributor
+    assert default_factory_pres.projects.any?
+    assert default_factory_pres.projects.first.has_member?(default_factory_pres.contributor)
+
+    bob = Factory(:person)
+    bobs_project = bob.projects.first
+    specified_contributor_pres = Factory(:min_presentation, contributor: bob)
+    assert_equal bob, specified_contributor_pres.contributor
+    assert_equal bobs_project, specified_contributor_pres.projects.first
+    assert specified_contributor_pres.projects.first.has_member?(bob)
+
+    project = Factory(:project)
+    specified_project_pres = Factory(:min_presentation, projects: [project])
+    assert specified_project_pres.contributor
+    assert_equal project, specified_project_pres.projects.first
+    assert specified_project_pres.projects.first.has_member?(specified_project_pres.contributor)
+  end
 end
