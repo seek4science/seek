@@ -64,6 +64,7 @@ end
 Factory.define(:jerm_data_file, class: DataFile) do |f|
   f.sequence(:title) { |n| "A Data File_#{n}" }
   f.contributor nil
+  f.projects { [Factory.build(:project)] }
   f.association :content_blob, factory: :url_content_blob
 
   f.after_create do |data_file|

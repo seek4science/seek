@@ -975,7 +975,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'adding_new_conditions_to_different_versions' do
-    d = data_files(:editable_data_file)
+    d = Factory(:data_file, contributor: User.current_user.person)
+    assert d.can_edit?
     sf = StudiedFactor.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
                               start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
     assert_difference('DataFile::Version.count', 1) do
@@ -1073,9 +1074,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should not be able to update sharing without manage rights' do
-    login_as(:quentin)
-    user = users(:quentin)
-    df = data_files(:editable_data_file)
+    refute_nil user = User.current_user
+    df = Factory(:data_file,policy: Factory(:editing_public_policy))
 
     assert df.can_edit?(user), 'data file should be editable but not manageable for this test'
     assert !df.can_manage?(user), 'data file should be editable but not manageable for this test'
@@ -1092,11 +1092,11 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should not be able to update sharing permission without manage rights' do
-    login_as(:quentin)
-    user = users(:quentin)
-    df = data_files(:editable_data_file)
+
+    refute_nil user = User.current_user
+    df = Factory(:data_file,policy: Factory(:editing_public_policy))
     assert df.can_edit?(user), 'data file should be editable but not manageable for this test'
-    assert !df.can_manage?(user), 'data file should be editable but not manageable for this test'
+    refute df.can_manage?(user), 'data file should be editable but not manageable for this test'
     assert_equal Policy::EDITING, df.policy.access_type, 'data file should have an initial policy with access type for editing'
     assert_difference('ActivityLog.count') do
       put :update, id: df, data_file: { title: 'new title' },
@@ -1118,8 +1118,10 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'owner should be able to update sharing' do
-    user = users(:datafile_owner)
-    df = data_files(:editable_data_file)
+    refute_nil user = User.current_user
+
+    df = Factory(:data_file, policy: Factory(:editing_public_policy),contributor: user.person)
+
 
     assert df.can_edit?(user), 'data file should be editable and manageable for this test'
     assert df.can_manage?(user), 'data file should be editable and manageable for this test'
@@ -1242,16 +1244,20 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test "should update sharing permissions 'with your project and with all SysMO members'" do
-    login_as(:datafile_owner)
-    df = data_files(:editable_data_file)
+    # login_as(:datafile_owner)
+    # df = data_files(:editable_data_file)
+
+    refute_nil user = User.current_user
+    df = Factory(:data_file, contributor: user.current_user, policy: Factory(:editing_public_policy, permissions:[Factory(:permission)]))
+
     assert df.can_manage?
     assert_equal Policy::EDITING, df.policy.access_type
     assert_equal df.policy.permissions.length, 1
 
     permission = df.policy.permissions.first
-    assert_equal permission.contributor_type, 'FavouriteGroup'
+    assert_equal permission.contributor_type, 'Person'
     assert_equal permission.policy_id, df.policy_id
-    assert_equal permission.access_type, Policy::DETERMINED_BY_GROUP
+    assert_equal permission.access_type, Policy::NO_ACCESS
     assert_difference('ActivityLog.count') do
       put :update, id: df, data_file: { title: df.title },
                    policy_attributes: projects_policy(Policy::ACCESSIBLE, df.projects, Policy::EDITING)
@@ -2140,9 +2146,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should update license' do
-    user = users(:datafile_owner)
-    login_as(user)
-    df = data_files(:editable_data_file)
+    refute_nil user = User.current_user
+    df = Factory(:data_file, contributor: user.person)
 
     assert_nil df.license
 
@@ -2211,7 +2216,7 @@ class DataFilesControllerTest < ActionController::TestCase
     d3 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'banana')
     d4 = Factory(:data_file, projects: person.projects, contributor: person.user, policy: Factory(:public_policy), title: 'no samples')
     [d1, d2, d3].each do |data_file|
-      Factory(:sample, originating_data_file_id: data_file.id)
+      Factory(:sample, originating_data_file_id: data_file.id, contributor: person)
     end
     login_as(person.user)
 
@@ -2487,7 +2492,7 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.save!
     extracted_sample = Factory(:sample, data: { full_name: 'John Wayne' },
                                         sample_type: sample_type,
-                                        originating_data_file: data_file)
+                                        originating_data_file: data_file, contributor: person),
 
     assert_no_difference('Sample.count') do
       post :extract_samples, id: data_file, confirm: 'true'
@@ -2576,8 +2581,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'cannot upload new version if samples have been extracted' do
-    data_file = Factory(:data_file, contributor: User.current_user)
-    Factory(:sample, originating_data_file: data_file)
+    data_file = Factory(:data_file, contributor: User.current_user.person)
+    Factory(:sample, originating_data_file: data_file, contributor: User.current_user.person)
 
     assert_no_difference('DataFile::Version.count') do
       post :new_version, id: data_file.id, data_file: { title: nil }, content_blobs: [{ data: file_for_upload }],
@@ -2611,25 +2616,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal df, assigns(:data_file)
     assert_select 'div#openbis-details-properties', count: 1
     assert_select 'div#openbis-details-properties label', text: 'SEEK_DATAFILE_ID:', count: 1
-  end
-
-  test 'get data_file as json gives openbis details' do
-    skip('json endpoint underdeveloppment, has changed since my edit')
-    mock_openbis_calls
-    login_as(Factory(:person))
-    df = openbis_linked_data_file
-    get :show, id: df, format: 'json'
-    assert_response :success
-    json = JSON.parse(response.body)
-    assert_equal df.id, json['id']
-    assert_equal 'OpenBIS 20160210130454955-23', json['title']
-    #assert_equal nil, json['description']
-    assert_equal df.version, json['version']
-    bis = json['openbis_dataset']
-    assert_not_nil bis
-    assert_equal 'DataFile_3', bis['properties']['SEEK_DATAFILE_ID']
-    assert_equal '20151216143716562-2', bis['experiment']
-
   end
 
   test "associated assays don't cause 500 error if create fails" do
@@ -2767,8 +2753,8 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'should unset policy sharing scope when updated' do
-    login_as(:datafile_owner)
-    df = data_files(:editable_data_file)
+    refute_nil user=User.current_user
+    df = Factory(:data_file, contributor: user.person)
     df.policy.update_column(:sharing_scope, Policy::ALL_USERS)
 
     assert_equal df.reload.policy.sharing_scope, Policy::ALL_USERS
@@ -3426,7 +3412,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def valid_data_file
-    [{ title: 'Test',simulation_data:'0', project_ids: [projects(:sysmo_project).id] }, { data: file_for_upload }]
+    [{ title: 'Test',simulation_data:'0', project_ids: [User.current_user.person.projects.first.id]}, { data: file_for_upload }]
   end
 
   def valid_data_file_with_http_url
