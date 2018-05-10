@@ -22,6 +22,7 @@ namespace :seek do
     reencrypt_settings
     convert_organism_concept_uris
     merge_duplicate_organisms
+    fix_setting_hash_values
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -283,6 +284,13 @@ namespace :seek do
       end
     ensure
       ActiveRecord::Base.logger = logger
+    end
+  end
+
+  task(fix_setting_hash_values: :environment) do
+    Settings.pluck(:var).select { |k| Settings[k].class.name == 'Hash' }.each do |key|
+      puts "Updating '#{key}' to a HashWithIndifferentAccess"
+      Settings.merge!(key, {})
     end
   end
 end

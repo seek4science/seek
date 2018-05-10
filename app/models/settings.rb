@@ -77,7 +77,7 @@ class Settings < ActiveRecord::Base
     old_value = self[var_name] || {}
     raise TypeError, "Existing value is not a hash, can't merge!" unless old_value.is_a?(Hash)
 
-    new_value = old_value.merge(hash_value)
+    new_value = old_value.with_indifferent_access.merge(hash_value)
     self[var_name] = new_value if new_value != old_value
 
     new_value

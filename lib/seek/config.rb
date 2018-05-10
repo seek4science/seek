@@ -219,7 +219,7 @@ module Seek
     end
 
     def smtp_settings(field)
-      smtp[field.to_sym]
+      smtp.with_indifferent_access[field.to_s]
     end
 
     def set_smtp_settings(field, value)
@@ -228,14 +228,15 @@ module Seek
     end
 
     def facet_enable_for_page(controller)
-      facet_enable_for_pages[controller.to_sym]
+      facet_enable_for_pages.with_indifferent_access[controller.to_s]
     end
 
     def default_page(controller)
-      if default_pages.key?(controller.to_sym)
-        default_pages[controller.to_sym]
+      pages = default_pages.with_indifferent_access
+      if pages.key?(controller.to_s)
+        pages[controller.to_s]
       else
-        Settings.defaults['default_pages'][controller.to_sym] || 'latest'
+        Settings.defaults['default_pages'][controller.to_s] || 'latest'
       end
     end
 
