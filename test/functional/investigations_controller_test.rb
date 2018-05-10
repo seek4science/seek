@@ -491,6 +491,6 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def edit_max_object(investigation)
     investigation.creators = [Factory(:person)]
-    investigation.save!
+    disable_authorization_checks { investigation.save! }
   end
 end
