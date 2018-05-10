@@ -1171,18 +1171,20 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'unsubscribe to a project should unsubscribe all the items of that project' do
     with_config_value 'email_enabled', true do
-      proj = Factory(:project)
-      sop = Factory(:sop, project_ids: [proj.id], policy: Factory(:public_policy))
-      df = Factory(:data_file, project_ids: [proj.id], policy: Factory(:public_policy))
+      current_person = User.current_user.person
+      proj = current_person.projects.first
+      sop = Factory(:sop, projects: [proj], policy: Factory(:public_policy))
+      df = Factory(:data_file, projects: [proj], policy: Factory(:public_policy))
+
+
 
       # subscribe to project
-      current_person = User.current_user.person
       put :update, id: current_person, receive_notifications: true, person: { project_subscriptions_attributes: { '0' => { project_id: proj.id, frequency: 'weekly', _destroy: '0' } } }
       assert_redirected_to current_person
 
-      project_subscription_id = ProjectSubscription.find_by_project_id(proj.id).id
+      project_subscription = ProjectSubscription.where({project_id:proj.id, person_id:current_person.id}).first
       assert_difference 'Subscription.count', 2 do
-        ProjectSubscriptionJob.new(project_subscription_id).perform
+        ProjectSubscriptionJob.new(project_subscription.id).perform
       end
       assert sop.subscribed?(current_person)
       assert df.subscribed?(current_person)
