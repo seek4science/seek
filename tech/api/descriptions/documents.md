@@ -1,1 +1,1 @@
-A **Document** is any documentation that describes an **Investigation**, **Study** or **Assay**. The content of a **Document** is descriptive and it must not contain any data that is consumed or produced by an **Assay**.
+A **Document** is any documentation that describes an [**Investigation**](#tag/investigations), [**Study**](#tag/studies) or [**Assay**](#tag/assays). The content of a **Document** is descriptive and it must not contain any data that is consumed or produced by an [**Assay**](#tag/assays).
