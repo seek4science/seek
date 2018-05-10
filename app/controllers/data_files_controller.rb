@@ -418,18 +418,18 @@ class DataFilesController < ApplicationController
   # @assay
   def rightfield_extraction_ajax
 
-    data_file = DataFile.new
-    warnings = nil
-    assay = Assay.new
+    @data_file = DataFile.new
+    @warnings = nil
+    @assay = Assay.new
     critical_error_msg = nil
     session.delete :extraction_exception_message
 
     begin
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
-        data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
-        warnings = data_file.populate_metadata_from_template
-        assay, warnings = data_file.initialise_assay_from_template
-        warnings.merge(warnings)
+        @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
+        @warnings = @data_file.populate_metadata_from_template
+        @assay, warnings = @data_file.initialise_assay_from_template
+        @warnings.merge(warnings)
       else
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
@@ -441,9 +441,9 @@ class DataFilesController < ApplicationController
       session[:extraction_exception_message] = e.message
     end
 
-    session[:processed_datafile] = data_file
-    session[:processed_assay] = assay
-    session[:processing_warnings] = warnings
+    session[:processed_datafile] = @data_file
+    session[:processed_assay] = @assay
+    session[:processing_warnings] = @warnings
 
     respond_to do |format|
       if critical_error_msg
