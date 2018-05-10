@@ -4414,11 +4414,14 @@
               "additionalProperties": false
             },
             "relationships": {
-              "programmes": {
-                "$ref": "#/definitions/programmeReferencesList"
-              },
-              "organisms": {
-                "$ref": "#/definitions/organismReferencesList"
+              "type": "object",
+              "properties": {
+                "programmes": {
+                  "$ref": "#/definitions/programmeReferencesList"
+                },
+                "organisms": {
+                  "$ref": "#/definitions/organismReferencesList"
+                }
               }
             }
           },
@@ -4474,11 +4477,14 @@
               "additionalProperties": false
             },
             "relationships": {
-              "programmes": {
-                "$ref": "#/definitions/programmeReferencesList"
-              },
-              "organisms": {
-                "$ref": "#/definitions/organismReferencesList"
+              "type": "object",
+              "properties": {
+                "programmes": {
+                  "$ref": "#/definitions/programmeReferencesList"
+                },
+                "organisms": {
+                  "$ref": "#/definitions/organismReferencesList"
+                }
               }
             }
           },
