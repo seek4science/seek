@@ -47,4 +47,10 @@ module DataFilesHelper
 
     end
   end
+
+  def extraction_exception_message(message)
+    if message.present?
+      render partial: 'data_files/multi-steps/exception_message', object:message
+    end
+  end
 end
