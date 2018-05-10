@@ -10,7 +10,11 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title">
-          <h4>Metadata for the uploaded file: <em><%= @data_file.content_blob.original_filename %></em></h4>
+          <h4>New Data File
+            <% unless @data_file.content_blob.nels? %>
+              <small><%= @data_file.content_blob.original_filename %></small>
+            <% end %>
+          </h4>
         </div>
       </div>
       <div class="modal-body">
