@@ -45,6 +45,86 @@
         }
       }
     },
+
+    "ok": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/nonEmptyString"
+        },
+        "required": [
+          "status"
+        ],
+        "additionalProperties": false,
+        "example": {
+          "status": "ok"
+        }
+      },
+      "not_implemented": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "$ref": "#/definitions/errors_array"
+          }
+        }
+      },
+      "unprocessable_entity": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "$ref": "#/definitions/errors_array"
+          }
+        },
+        "example": {
+          "errors": [
+            {
+              "detail": "id specified by the PUT request does not match object-id in the JSON input"
+            }
+          ]
+        }
+      },
+      "bad_request": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "$ref": "#/definitions/errors_array"
+          }
+        },
+        "example": {
+          "errors": [
+            {
+              "title": "You do not have permission",
+              "detail": "No permission"
+            }
+          ]
+        }
+      },
+      "forbidden": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "$ref": "#/definitions/errors_array"
+          }
+        }
+      },
+      "not_found": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "$ref": "#/definitions/errors_array"
+          }
+        },
+        "example": {
+          "errors": [
+            {
+              "title": "Not found",
+              "detail": "Couldn't find Institution with 'id'=[70]"
+            }
+          ]
+        }
+      }
+    },
+
     "dateTimeString" : {
       "type" : "string",
       "minLength" : 1,
@@ -222,7 +302,7 @@
           "$ref" : "#/definitions/uriString"
         },
         "api_version": {
-          "ref" : "#/definitions/nonEmptyString"
+          "$ref" : "#/definitions/nonEmptyString"
         }
       },
       "required" : [ "created", "modified", "uuid", "base_url", "api_version" ],
@@ -235,7 +315,7 @@
           "$ref" : "#/definitions/uriString"
         },
         "api_version": {
-          "ref" : "#/definitions/nonEmptyString"
+          "$ref" : "#/definitions/nonEmptyString"
         }
       },
       "required" : [ "base_url", "api_version" ],
@@ -3383,11 +3463,14 @@
               "additionalProperties" : false
             },
             "relationships": {
-              "administrators" : {
-                "$ref" : "#/definitions/peopleReferenceList"
-              },
-              "projects" : {
-                "$ref" : "#/definitions/projectReferencesList"
+              "type": "object",
+              "properties": {
+                "administrators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "projects": {
+                  "$ref": "#/definitions/projectReferencesList"
+                }
               }
             }
           },
@@ -3432,13 +3515,16 @@
               "additionalProperties" : false
             },
             "relationships": {
-              "administrators" : {
-                "$ref" : "#/definitions/peopleReferenceList"
-              },
-              "projects" : {
-                "$ref" : "#/definitions/projectReferencesList"
+              "type": "object",
+              "properties": {
+                "administrators": {
+                  "$ref": "#/definitions/peopleReferenceList"
+                },
+                "projects": {
+                  "$ref": "#/definitions/projectReferencesList"
+                }
               }
-            }
+           }
           },
           "required" : [ "id", "type" ],
           "additionalProperties" : false
