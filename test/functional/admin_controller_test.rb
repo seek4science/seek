@@ -94,8 +94,8 @@ class AdminControllerTest < ActionController::TestCase
              port: '25',
              domain: 'email.example.com',
              authentication: 'plain',
-             smtp_user_name: 'bob',
-             smtp_password: 'password',
+             smtp_user_name: '',
+             smtp_password: '',
              enable_starttls_auto: '1'
 
         assert_equal 'ActiveSupport::HashWithIndifferentAccess', Seek::Config.smtp.class.name
@@ -106,8 +106,8 @@ class AdminControllerTest < ActionController::TestCase
         assert_equal '25', mailer_settings[:port]
         assert_equal 'email.example.com', mailer_settings[:domain]
         assert_equal 'plain', mailer_settings[:authentication]
-        assert_equal 'bob', mailer_settings[:user_name]
-        assert_equal 'password', mailer_settings[:password]
+        assert_nil mailer_settings[:user_name]
+        assert_nil mailer_settings[:password]
         assert mailer_settings[:enable_starttls_auto]
       end
     end
