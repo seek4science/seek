@@ -223,7 +223,7 @@ module Seek
     end
 
     def set_smtp_settings(field, value)
-      merge! :smtp, field => value
+      merge! :smtp, field => (value.blank? ? nil : value)
       value
     end
 
