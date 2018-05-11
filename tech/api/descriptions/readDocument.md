@@ -1,3 +1,3 @@
-A **readDocument** operation will return information about the [Document](#tag/documents identified, provided the authenticated user has access to it.
+A **readDocument** operation will return information about the [Document](#tag/documents) identified, provided the authenticated user has access to it.
 
 The **readDocument** operation returns a JSON object representing the [**Document**](#tag/documents).
