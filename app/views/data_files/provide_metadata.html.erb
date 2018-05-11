@@ -10,8 +10,10 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title">
-          <h4>New Data File
-            <% unless @data_file.content_blob.nels? %>
+          <h4>New Data File:
+            <% if @data_file.content_blob.nels? %>
+              <small><%= @data_file.title %></small>
+            <% else %>
               <small><%= @data_file.content_blob.original_filename %></small>
             <% end %>
           </h4>
