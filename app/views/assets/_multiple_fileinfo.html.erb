@@ -32,7 +32,7 @@
             <% asset = file.asset
                if Seek::Util.is_multi_file_asset_type?(asset.class) && (can_download_asset?(asset, params[:code])) -%>
                 <%= render :partial => "assets/view_content", :locals => {:content_blob => file, :icon_view => true} -%>
-                <%= image_tag_for_key('download', polymorphic_path([asset, file], :action=>:download,:code=>params[:code]), "Download", {:title => 'Download this file'}, "") -%>
+                <%= mini_file_download_icon(file) %>
             <% end %>
           </li>
       <% end -%>

@@ -10,7 +10,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title">
-          <h4>New Data File:
+          <h4>New <%= t('data_file') %>:
             <% if @data_file.content_blob.nels? %>
               <small><%= @data_file.title %></small>
             <% else %>
@@ -24,6 +24,7 @@
             <%= hidden_field_tag 'content_blob_id', @data_file.content_blob.id %>
             <div id='datafile-multi-set' class='multi-step'>
               <div class="asset_form">
+                <%= extraction_exception_message @exception_message %>
                 <%= error_messages_for :data_file -%>
                 <%= error_messages_for :assay -%>
                 <%= extraction_warnings_messages_for @warnings %>

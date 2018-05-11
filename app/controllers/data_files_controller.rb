@@ -417,31 +417,37 @@ class DataFilesController < ApplicationController
   # AJAX call to trigger any RightField extraction (if appropriate), and pre-populates the associated @data_file and
   # @assay
   def rightfield_extraction_ajax
+
     @data_file = DataFile.new
-    error_msg = nil
+    @warnings = nil
+    @assay = Assay.new
+    critical_error_msg = nil
+    session.delete :extraction_exception_message
+
     begin
       if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
         @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
         @warnings = @data_file.populate_metadata_from_template
         @assay, warnings = @data_file.initialise_assay_from_template
         @warnings.merge(warnings)
-        session[:processed_datafile] = @data_file
-        session[:processed_assay] = @assay
-        session[:processing_warnings] = @warnings
       else
-        error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
+        critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
       end
     rescue Exception => e
       ExceptionNotifier.notify_exception(e, data: {
           message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}",
           current_logged_in_user: current_user
       })
-      error_msg = e.message
+      session[:extraction_exception_message] = e.message
     end
 
+    session[:processed_datafile] = @data_file
+    session[:processed_assay] = @assay
+    session[:processing_warnings] = @warnings
+
     respond_to do |format|
-      if error_msg
-        format.js { render text: error_msg, status: :unprocessable_entity }
+      if critical_error_msg
+        format.js { render text: critical_error_msg, status: :unprocessable_entity }
       else
         format.js { render text: 'done', status: :ok }
       end
@@ -454,6 +460,7 @@ class DataFilesController < ApplicationController
     @data_file ||= session[:processed_datafile]
     @assay ||= session[:processed_assay]
     @warnings ||= session[:processing_warnings] || []
+    @exception_message ||= session[:extraction_exception_message]
     @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
     respond_to do |format|
       format.html {}
