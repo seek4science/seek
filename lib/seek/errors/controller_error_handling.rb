@@ -35,9 +35,10 @@ module Seek
       def exception_notification(status, exception)
         unless !Seek::Config.exception_notification_enabled || [404, 406].include?(status)
           begin
-            ExceptionNotifier.notify_exception(exception, options.merge(:env => request.env))
-          rescue
+            ExceptionNotifier.notify_exception(exception, {:env => request.env})
+          rescue Exception => deliver_exception
             logger.error "ERROR - #{exception.class.name} (#{exception.message})"
+            logger.error "Error delivering exception email - #{deliver_exception.class.name} (#{deliver_exception.message})"
           end
         end
       end
