@@ -413,7 +413,7 @@ paths:
     patch:
       operationId: updateDataFile
       description:
-        $ref: ../descriptions/updateDataFile.md
+        $ref: ../descriptions/readDataFile.md
       tags:
       - update
       - dataFiles
