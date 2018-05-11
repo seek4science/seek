@@ -13,7 +13,7 @@ createTemplate = "A **create{0}** operation creates a new instance of a [**{0}**
 The **create{0}** operation returns a JSON object representing the newly created [**{0}**](#tag/{1}) and redirects to its URL."
 
 readTemplate = "A **read{0}** operation will return information about the\
- [{0}](#tag/{1} identified, provided the authenticated user has access to it.\n\
+ [{0}](#tag/{1}) identified, provided the authenticated user has access to it.\n\
 \n\
 The **read{0}** operation returns a JSON object representing the [**{0}**](#tag/{1})."
 
