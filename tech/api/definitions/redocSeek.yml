@@ -14,6 +14,7 @@ info:
   x-logo:
     url: ./definitions/seek.png
     backgroundColor: '#FFFFFF'
+
 host: www.fairdomhub.org
 basePath: /
 schemes:
