@@ -50,6 +50,14 @@ tags:
     description:
       $ref: ../descriptions/delete.md
     x-traitTag: true
+  - name: upload
+    description:
+      $ref: ../descriptions/upload.md
+    x-traitTag: true
+  - name: download
+    description:
+      $ref: ../descriptions/download.md
+    x-traitTag: true
 
   - name: search
     description:
@@ -115,6 +123,8 @@ x-tagGroups:
       - read
       - update
       - delete
+      - upload
+      - download
 
   - name: Search
     tags:
@@ -475,7 +485,7 @@ paths:
       produces:
         - '*/*'
       tags:
-        - update
+        - upload
         - dataFiles
       responses:
         '200':
@@ -501,7 +511,7 @@ paths:
       produces:
         - '*/*'
       tags:
-        - read
+        - download
         - dataFiles
       responses:
         '200':
@@ -600,6 +610,67 @@ paths:
           schema:
             $ref: '#/definitions/ok'
         <<: *DeleteType
+  '/documents/{id}/content_blobs/{blob_id}':
+    put:
+      operationId: uploadDocumentContent
+      description:
+        $ref: ../descriptions/uploadDocumentContent.md
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The document content to upload
+          type: integer
+          default: 1152
+        - name: blob_id
+          in: path
+          required: true
+          description: The content identifier to upload
+          type: integer
+          default: 1831
+        - in: body
+          name: blobContent
+          description: The blob content to upload
+          schema:
+            type: string
+            format: binary
+      consumes:
+        - application/octet-stream
+      produces:
+        - '*/*'
+      tags:
+        - upload
+        - documents
+      responses:
+        '200':
+          description: Success
+  '/documents/{id}/content_blobs/{blob_id}/download':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The document to fetch
+        type: integer
+        default: 1152
+      - name: blob_id
+        in: path
+        required: true
+        description: The blob to download
+        type: integer
+        default: 1831
+    get:
+      operationId: downloadDocumentContent
+      description:
+        $ref: ../descriptions/downloadDocumentContent.md
+      produces:
+        - '*/*'
+      tags:
+        - download
+        - documents
+      responses:
+        '200':
+          description: Success
+        <<: *ReadType
   /events:
     get:
       operationId: listEvents
@@ -991,6 +1062,40 @@ paths:
           schema:
             $ref: '#/definitions/ok'
         <<: *DeleteType
+  '/models/{id}/content_blobs/{blob_id}':
+    put:
+      operationId: uploadModelContent
+      description:
+        $ref: ../descriptions/uploadModelContent.md
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The model content to upload
+          type: integer
+          default: 1152
+        - name: blob_id
+          in: path
+          required: true
+          description: The content identifier to upload
+          type: integer
+          default: 1831
+        - in: body
+          name: blobContent
+          description: The blob content to upload
+          schema:
+            type: string
+            format: binary
+      consumes:
+        - application/octet-stream
+      produces:
+        - '*/*'
+      tags:
+        - upload
+        - models
+      responses:
+        '200':
+          description: Success
   '/models/{id}/content_blobs/{blob_id}/download':
     parameters:
       - name: id
@@ -1006,9 +1111,9 @@ paths:
         type: integer
         default: 1850
     get:
-      operationId: readModelContent
-#      description:
-#        $ref: ../descriptions/readModelContent.md
+      operationId: downloadModelContent
+      description:
+        $ref: ../descriptions/downloadModelContent.md
       tags:
         - read
         - models
@@ -1255,6 +1360,40 @@ paths:
           schema:
             $ref: '#/definitions/ok'
         <<: *DeleteType
+  '/presentations/{id}/content_blobs/{blob_id}':
+    put:
+      operationId: uploadPresentationContent
+      description:
+        $ref: ../descriptions/uploadPresentationContent.md
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The presentation content to upload
+          type: integer
+          default: 1152
+        - name: blob_id
+          in: path
+          required: true
+          description: The content identifier to upload
+          type: integer
+          default: 1831
+        - in: body
+          name: blobContent
+          description: The blob content to upload
+          schema:
+            type: string
+            format: binary
+      consumes:
+        - application/octet-stream
+      produces:
+        - '*/*'
+      tags:
+        - upload
+        - presentations
+      responses:
+        '200':
+          description: Success
   '/presentations/{id}/content_blobs/{blob_id}/download':
     parameters:
       - name: id
@@ -1270,11 +1409,11 @@ paths:
         type: integer
         default: 3215
     get:
-      operationId: readPresentationContent
-#      description:
-#        $ref: ../descriptions/readPresentationContent.md
+      operationId: downloadPresentationContent
+      description:
+        $ref: ../descriptions/downloadPresentationContent.md
       tags:
-        - read
+        - download
         - presentations
       responses:
         '200':
@@ -1629,6 +1768,40 @@ paths:
           schema:
             $ref: '#/definitions/ok'
         <<: *DeleteType
+  '/sops/{id}/content_blobs/{blob_id}':
+    put:
+      operationId: uploadSopContent
+      description:
+        $ref: ../descriptions/uploadSopContent.md
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The sop content to upload
+          type: integer
+          default: 1152
+        - name: blob_id
+          in: path
+          required: true
+          description: The content identifier to upload
+          type: integer
+          default: 1831
+        - in: body
+          name: blobContent
+          description: The blob content to upload
+          schema:
+            type: string
+            format: binary
+      consumes:
+        - application/octet-stream
+      produces:
+        - '*/*'
+      tags:
+        - upload
+        - sops
+      responses:
+        '200':
+          description: Success
   '/sops/{id}/content_blobs/{blob_id}/download':
     parameters:
       - name: id
@@ -1644,11 +1817,11 @@ paths:
         type: integer
         default: 1806
     get:
-      operationId: readSopContent
-#      description:
-#        $ref: ../descriptions/readSopContent.md
+      operationId: downloadSopContent
+      description:
+        $ref: ../descriptions/downloadSopContent.md
       tags:
-        - read
+        - download
         - sops
       responses:
         '200':
