@@ -25,6 +25,10 @@ module Seek
             add_warning(:not_a_project_member, project.rdf_seek_id)
             project = nil
           end
+
+          unless project
+            add_warning(:no_project)
+          end
           project
         end
 
@@ -71,7 +75,7 @@ module Seek
           valid
         end
 
-        def add_warning(problem, value, extra_info = nil)
+        def add_warning(problem, value = nil, extra_info = nil)
           warnings.add(problem, value, extra_info)
         end
       end

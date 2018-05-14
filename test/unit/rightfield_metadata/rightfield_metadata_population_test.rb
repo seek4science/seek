@@ -55,7 +55,6 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
       assert_nil data_file.title
       assert_nil data_file.description
 
-      assert_empty warnings
     end
   end
 
@@ -77,7 +76,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
       assert_equal 'My Title', data_file.title
       assert_equal 'My Description', data_file.description
       assert_equal [project], data_file.projects
-      assert_equal [assay], data_file.assays
+      assert_equal [assay], data_file.assay_assets.collect(&:assay)
 
       assert_empty warnings
     end
@@ -318,7 +317,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
         problems = []
         warnings.each { |w| problems << w.problem }
-        assert_equal [:id_not_match_host], problems
+        assert_equal [:id_not_match_host, :no_project], problems.sort
       end
     end
   end
@@ -339,7 +338,7 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
 
       problems = []
       warnings.each { |w| problems << w.problem }
-      assert_equal [:not_a_project_member], problems
+      assert_equal [:no_project, :not_a_project_member], problems.sort
     end
   end
 

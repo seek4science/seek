@@ -131,7 +131,7 @@
         }
     }
 
-    <% associated_assay_ids = resource.assays.collect(&:id) %>
+    <% associated_assay_ids = resource.assay_assets.collect(&:assay_id) %>
     <% associated_assay_ids.each do |associated_assay_id|%>
     <% assay = Assay.find(associated_assay_id) %>
     <% if assay.try :can_view? -%>
