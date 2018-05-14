@@ -1766,7 +1766,7 @@ class AssaysControllerTest < ActionController::TestCase
     refute bad_sop.can_view?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: assay, assay_sop_ids: [bad_sop.id], assay: { title: assay.title }
+      put :update, id: assay, assay: { title: assay.title, sop_ids: [bad_sop.id] }
     end
     #FIXME: it currently ignores the bad asset, but ideally should respond with an error
     #assert_response :unprocessable_entity
@@ -1774,7 +1774,7 @@ class AssaysControllerTest < ActionController::TestCase
     assert_empty assay.sops
 
     assert_difference('AssayAsset.count') do
-      put :update, id: assay, assay_sop_ids: [good_sop.id], assay: { title: assay.title }
+      put :update, id: assay, assay: { title: assay.title, sop_ids: [good_sop.id] }
     end
     assay.reload
     assert_equal [good_sop],assay.sops
@@ -1795,7 +1795,11 @@ class AssaysControllerTest < ActionController::TestCase
     refute bad_sop.can_view?
 
     assert_no_difference('AssayAsset.count') do
-      post :create, assay_sop_ids: [bad_sop.id], assay: { title: 'testing', assay_class_id:AssayClass.experimental.id, study_id:study.id },policy_attributes: valid_sharing
+      post :create, assay: { title: 'testing',
+                             assay_class_id: AssayClass.experimental.id,
+                             study_id: study.id,
+                             sop_ids: [bad_sop.id] },
+           policy_attributes: valid_sharing
     end
     #FIXME: it currently ignores the bad asset, but ideally should respond with an error
     #assert_response :unprocessable_entity
@@ -1803,7 +1807,11 @@ class AssaysControllerTest < ActionController::TestCase
 
 
     assert_difference('AssayAsset.count') do
-      post :create, assay_sop_ids: [good_sop.id], assay: { title: 'testing', assay_class_id:AssayClass.experimental.id,study_id:study.id },policy_attributes: valid_sharing
+      post :create, assay: { title: 'testing',
+                             assay_class_id: AssayClass.experimental.id,
+                             study_id: study.id,
+                             sop_ids: [good_sop.id] },
+           policy_attributes: valid_sharing
     end
     assay = assigns(:assay)
     assert_equal [good_sop],assay.sops

@@ -3276,7 +3276,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute bad_assay.can_edit?
 
     assert_no_difference('AssayAsset.count') do
-      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [bad_assay.id.to_s]
+      put :update, id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: bad_assay.id }] }
     end
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
     #assert_response :unprocessable_entity
@@ -3285,7 +3285,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty data_file.assays
 
     assert_difference('AssayAsset.count') do
-      put :update, id: data_file.id, data_file: { title: data_file.title }, assay_ids: [good_assay.id.to_s]
+      put :update, id: data_file.id, data_file: { title: data_file.title, assay_assets_attributes: [{ assay_id: good_assay.id }] }
     end
     data_file.reload
     assert_equal [good_assay], data_file.assays
@@ -3313,7 +3313,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_no_difference('AssayAsset.count') do
-      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [bad_assay.id.to_s]
+      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_assets_attributes: [{ assay_id: bad_assay.id }]
     end
 
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
@@ -3323,7 +3323,7 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_difference('AssayAsset.count') do
-      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_ids: [good_assay.id.to_s]
+      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_assets_attributes: [{ assay_id: good_assay.id }]
     end
     data_file = assigns(:data_file)
     assert_equal [good_assay],data_file.assays
