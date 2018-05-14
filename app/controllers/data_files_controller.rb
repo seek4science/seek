@@ -454,7 +454,6 @@ class DataFilesController < ApplicationController
 
     if all_valid
       update_annotations(params[:tag_list], @data_file)
-      update_scales @data_file
 
       update_relationships(@data_file, params)
 
