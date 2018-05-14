@@ -3313,7 +3313,8 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_no_difference('AssayAsset.count') do
-      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_assets_attributes: [{ assay_id: bad_assay.id }]
+      post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: bad_assay.id }]), content_blobs: [blob], 
+                    policy_attributes: valid_sharing
     end
 
     # FIXME: currently just skips the bad assay, but ideally should respond with an error status
@@ -3323,7 +3324,8 @@ class DataFilesControllerTest < ActionController::TestCase
     data_file, blob = valid_data_file
 
     assert_difference('AssayAsset.count') do
-      post :create, data_file: data_file, content_blobs: [blob], policy_attributes: valid_sharing, assay_assets_attributes: [{ assay_id: good_assay.id }]
+      post :create, data_file: data_file.merge(assay_assets_attributes: [{ assay_id: good_assay.id }]), content_blobs: [blob], 
+                    policy_attributes: valid_sharing
     end
     data_file = assigns(:data_file)
     assert_equal [good_assay],data_file.assays
