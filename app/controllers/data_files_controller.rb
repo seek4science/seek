@@ -463,9 +463,7 @@ class DataFilesController < ApplicationController
         # parse the data file if it is with sample data
 
         # the assay_id param can also contain the relationship type
-        assay_ids, _relationship_types = determine_related_assay_ids_and_relationship_types(params)
-        assay_ids = [@assay.id.to_s] if @create_new_assay
-        update_assay_assets(@data_file, assay_ids)
+        @data_file.assays << @assay if @create_new_assay
         format.html { redirect_to data_file_path(@data_file) }
         format.json { render json: @data_file }
       end
