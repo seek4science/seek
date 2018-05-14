@@ -9,27 +9,26 @@ class AssayAssetTest < ActiveSupport::TestCase
     User.current_user = nil
   end
 
-  test 'create explicit version' do
+  test 'links to latest version' do
     sop = Factory :sop, contributor: User.current_user
     sop.save_as_new_version
     assay = Factory :assay, contributor: User.current_user.person
 
     version_number = sop.version
 
-    a = AssayAsset.new
-    a.asset = sop.latest_version
-    a.assay = assay
+    aa = AssayAsset.new
+    aa.asset = sop
+    aa.assay = assay
 
-    a.save!
-    a.reload
+    aa.save!
+    aa.reload
 
     sop.save_as_new_version
 
-    assert_not_equal(sop.latest_version, a.asset) # Check still linked to version made on create
-    assert_equal(version_number, a.asset.version)
-    assert_equal(sop.find_version(version_number), a.asset)
-
-    assert_equal(assay, a.assay)
+    assert_not_equal sop.version, aa.version
+    assert_equal version_number, aa.version
+    assert_equal assay, aa.assay
+    assert_equal sop, aa.asset
   end
 
   test 'direction' do
@@ -42,7 +41,7 @@ class AssayAssetTest < ActiveSupport::TestCase
     User.with_current_user(person.user) do
       a = AssayAsset.new
       a.assay = Factory(:assay, contributor:person)
-      a.asset = Factory(:sop, contributor:person).latest_version
+      a.asset = Factory(:sop, contributor:person)
       a.save!
       a.reload
       assert_equal 0, a.direction
@@ -61,8 +60,6 @@ class AssayAssetTest < ActiveSupport::TestCase
       refute a.incoming_direction?
       assert a.outgoing_direction?
     end
-
-
   end
 
   test 'sample as asset' do
