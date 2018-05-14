@@ -1767,33 +1767,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
-  /sops/{id}/content_blobs/{blob_id}/download:
-    parameters:
-    - name: id
-      in: path
-      required: true
-      description: The SOP to fetch
-      type: integer
-      default: 203
-    - name: blob_id
-      in: path
-      required: true
-      description: The blob to download
-      type: integer
-      default: 1806
-    get:
-      operationId: downloadSopContent
-      description:
-        $ref: ../descriptions/downloadSopContent.md
-      tags:
-      - download
-      - sops
-      responses:
-        <<: *ReadType
-        '200':
-          description: Success
-          schema:
-            type: file
   /sops/{id}/content_blobs/{blob_id}:
     put:
       operationId: uploadSopContent
@@ -1828,6 +1801,33 @@ paths:
       responses:
         '200':
           description: Success
+  /sops/{id}/content_blobs/{blob_id}/download:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: The SOP to fetch
+      type: integer
+      default: 203
+    - name: blob_id
+      in: path
+      required: true
+      description: The blob to download
+      type: integer
+      default: 1806
+    get:
+      operationId: downloadSopContent
+      description:
+        $ref: ../descriptions/downloadSopContent.md
+      tags:
+      - download
+      - sops
+      responses:
+        <<: *ReadType
+        '200':
+          description: Success
+          schema:
+            type: file
   /studies:
     get:
       operationId: listStudies
@@ -2239,11 +2239,9 @@ definitions:
       revision_comments:
         $ref: '#/definitions/nullableNonEmptyString'
       created_at:
-        type: dateTimeString
-        minLength: 1
+        $ref: '#/definitions/dateTimeString'
       updated_at:
-        type: dateTimeString
-        minLength: 1
+        $ref: '#/definitions/dateTimeString'
       content_blobs:
         $ref: '#/definitions/contentBlobsList'
       policy:
@@ -2295,11 +2293,9 @@ definitions:
       revision_comments:
         $ref: '#/definitions/nullableNonEmptyString'
       created_at:
-        type: dateTimeString
-        minLength: 1
+        $ref: '#/definitions/dateTimeString'
       updated_at:
-        type: dateTimeString
-        minLength: 1
+        $ref: '#/definitions/dateTimeString'
       content_blobs:
         $ref: '#/definitions/contentBlobsList'
       model_type:
@@ -3135,8 +3131,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -3220,8 +3214,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -4059,8 +4051,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -4100,8 +4090,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -4818,10 +4806,13 @@ definitions:
             - title
             additionalProperties: false
           relationships:
-            administrators:
-              $ref: '#/definitions/peopleReferenceList'
-            projects:
-              $ref: '#/definitions/projectReferencesList'
+            type: object
+            properties:
+              administrators:
+                $ref: '#/definitions/peopleReferenceList'
+              projects:
+                $ref: '#/definitions/projectReferencesList'
+            additionalProperties: false
         required:
         - type
         - attributes
@@ -4856,10 +4847,13 @@ definitions:
                 $ref: '#/definitions/tagsType'
             additionalProperties: false
           relationships:
-            administrators:
-              $ref: '#/definitions/peopleReferenceList'
-            projects:
-              $ref: '#/definitions/projectReferencesList'
+            type: object
+            properties:
+              administrators:
+                $ref: '#/definitions/peopleReferenceList'
+              projects:
+                $ref: '#/definitions/projectReferencesList'
+            additionalProperties: false
         required:
         - id
         - type
@@ -4996,10 +4990,13 @@ definitions:
                 $ref: '#/definitions/nullableLicense'
             additionalProperties: false
           relationships:
-            programmes:
-              $ref: '#/definitions/programmeReferencesList'
-            organisms:
-              $ref: '#/definitions/organismReferencesList'
+            type: object
+            properties:
+              programmes:
+                $ref: '#/definitions/programmeReferencesList'
+              organisms:
+                $ref: '#/definitions/organismReferencesList'
+            additionalProperties: false
         required:
         - id
         - type
@@ -5038,10 +5035,13 @@ definitions:
             - title
             additionalProperties: false
           relationships:
-            programmes:
-              $ref: '#/definitions/programmeReferencesList'
-            organisms:
-              $ref: '#/definitions/organismReferencesList'
+            type: object
+            properties:
+              programmes:
+                $ref: '#/definitions/programmeReferencesList'
+              organisms:
+                $ref: '#/definitions/organismReferencesList'
+            additionalProperties: false
         required:
         - type
         - attributes
@@ -5396,8 +5396,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -5448,8 +5446,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
