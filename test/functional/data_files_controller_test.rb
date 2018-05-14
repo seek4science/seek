@@ -2819,7 +2819,7 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'rightfield extraction extracts from template' do
     person = Factory(:person)
     login_as(person)
-    content_blob = Factory(:rightfield_base_sample_template_with_assay)
+    content_blob = Factory(:rightfield_master_template_with_assay)
 
     session[:uploaded_content_blob_id] = content_blob.id.to_s
 
