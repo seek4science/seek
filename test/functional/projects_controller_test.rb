@@ -394,11 +394,13 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, id: projects(:three)
     assert_response :success
     assert_select 'a', text: /Edit Project/, count: 0
+    assert_select 'a', text: /Manage Project/, count: 0
 
     logout
     get :show, id: projects(:three)
     assert_response :success
     assert_select 'a', text: /Edit Project/, count: 0
+    assert_select 'a', text: /Manage Project/, count: 0
   end
 
   def test_user_project_administrator
@@ -406,7 +408,7 @@ class ProjectsControllerTest < ActionController::TestCase
     proj = project_admin.projects.first
     login_as(project_admin.user)
     get :show, id: proj.id
-    assert_select 'a', text: /Edit #{I18n.t('project')}/, count: 1
+    assert_select 'a', text: /Manage #{I18n.t('project')}/, count: 1
 
     get :edit, id: proj.id
     assert_response :success
@@ -421,6 +423,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(Factory(:user))
     get :show, id: projects(:three)
     assert_select 'a', text: /Edit #{I18n.t('project')}/, count: 0
+    assert_select 'a', text: /Manage #{I18n.t('project')}/, count: 0
 
     get :edit, id: projects(:three)
     assert_response :redirect
@@ -430,7 +433,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def test_admin_can_edit
     get :show, id: projects(:one)
-    assert_select 'a', text: /Edit #{I18n.t('project')}/, count: 1
+    assert_select 'a', text: /Manage #{I18n.t('project')}/, count: 1
 
     get :edit, id: projects(:one)
     assert_response :success
@@ -438,6 +441,23 @@ class ProjectsControllerTest < ActionController::TestCase
     put :update, id: projects(:three).id, project: { title: 'asd' }
 
     assert_redirected_to project_path(assigns(:project))
+  end
+
+  test 'member can edit project details' do
+    p = Factory(:person)
+    login_as(p)
+
+    get :show, id: p.projects.first
+    assert_select 'a', text: /Edit #{I18n.t('project')}/, count: 1
+    assert_select 'a', text: /Manage #{I18n.t('project')}/, count: 0
+
+    get :edit, id: p.projects.first
+    assert_response :success
+
+    put :update, id: p.projects.first.id, project: { title: 'asd' }
+
+    assert_redirected_to project_path(assigns(:project))
+    assert_equal 'asd', assigns(:project).title
   end
 
   test 'links have nofollow in sop tabs' do

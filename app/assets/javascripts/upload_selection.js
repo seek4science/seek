@@ -64,7 +64,9 @@ function update_url_checked_status(url_ok) {
 function changeUploadButtonText(isFile) {
     if ($j('[data-upload-button]').length) {
         if (isFile) {
-            $j('[data-upload-button]').val('Upload and Save');
+            //data-upload-file-text provides alternative text for when a file is selected
+            var text = $j('[data-upload-button]').data('upload-file-text') || 'Upload and Save'
+            $j('[data-upload-button]').val(text);
         } else {
             $j('[data-upload-button]').val('Register');
         }

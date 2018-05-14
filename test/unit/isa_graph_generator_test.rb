@@ -2,10 +2,10 @@ require 'test_helper'
 
 class IsaGraphGeneratorTest < ActiveSupport::TestCase
   test 'investigation with studies and assays' do
-    investigation = Factory(:investigation)
-    study = Factory(:study, investigation: investigation)
-    assay = Factory(:assay, study: study)
-    assay2 = Factory(:assay, study: study)
+    assay = Factory(:assay)
+    study = assay.study
+    investigation = assay.investigation
+    assay2 = Factory(:assay, contributor: assay.contributor, study: study)
 
     generator = Seek::IsaGraphGenerator.new(investigation)
 
@@ -41,13 +41,15 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
 
   test 'shows sibling assets' do
     assay = Factory(:assay)
-    data_file = Factory(:data_file)
-    model = Factory(:model)
-    sop = Factory(:sop)
+    data_file = Factory(:data_file, policy: Factory(:publicly_viewable_policy))
+    model = Factory(:model, policy: Factory(:publicly_viewable_policy))
+    sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
 
-    AssayAsset.create(assay: assay, asset: data_file)
-    AssayAsset.create(assay: assay, asset: model)
-    AssayAsset.create(assay: assay, asset: sop)
+    User.with_current_user(assay.contributor.user) do
+      AssayAsset.create!(assay: assay, asset: data_file)
+      AssayAsset.create!(assay: assay, asset: model)
+      AssayAsset.create!(assay: assay, asset: sop)
+    end
 
     result = Seek::IsaGraphGenerator.new(data_file).generate(include_parents: true)
 
@@ -68,17 +70,18 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
   end
 
   test "does not show sibling's children" do
-    investigation = Factory(:investigation)
-    study = Factory(:study, investigation: investigation)
-    assay = Factory(:assay, study: study)
-    sibling_assay = Factory(:assay, study: study)
-    data_file = Factory(:data_file)
-    nephew_model = Factory(:model)
-    niece_sop = Factory(:sop)
+    assay = Factory(:assay)
+    study = assay.study
+    sibling_assay = Factory(:assay, contributor: assay.contributor, study: study)
+    data_file = Factory(:data_file, policy: Factory(:publicly_viewable_policy))
+    nephew_model = Factory(:model, policy: Factory(:publicly_viewable_policy))
+    niece_sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
 
-    AssayAsset.create(assay: assay, asset: data_file)
-    AssayAsset.create(assay: sibling_assay, asset: nephew_model)
-    AssayAsset.create(assay: sibling_assay, asset: niece_sop)
+    User.with_current_user(assay.contributor.user) do
+      AssayAsset.create!(assay: assay, asset: data_file)
+      AssayAsset.create!(assay: sibling_assay, asset: nephew_model)
+      AssayAsset.create!(assay: sibling_assay, asset: niece_sop)
+    end
 
     result = Seek::IsaGraphGenerator.new(assay).generate(include_parents: true)
 
@@ -92,15 +95,17 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
   end
 
   test "show's sibling's child if only one" do
-    investigation = Factory(:investigation)
-    study = Factory(:study, investigation: investigation)
-    assay = Factory(:assay, study: study)
-    sibling_assay = Factory(:assay, study: study)
-    data_file = Factory(:data_file)
-    nephew_model = Factory(:model)
+    assay = Factory(:assay)
+    study = assay.study
+    investigation = assay.investigation
+    sibling_assay = Factory(:assay, contributor: assay.contributor, study: study)
+    data_file = Factory(:data_file, policy: Factory(:publicly_viewable_policy))
+    nephew_model = Factory(:model, policy: Factory(:publicly_viewable_policy))
 
-    AssayAsset.create(assay: assay, asset: data_file)
-    AssayAsset.create(assay: sibling_assay, asset: nephew_model)
+    User.with_current_user(assay.contributor.user) do
+      AssayAsset.create!(assay: assay, asset: data_file)
+      AssayAsset.create!(assay: sibling_assay, asset: nephew_model)
+    end
 
     result = Seek::IsaGraphGenerator.new(assay).generate(include_parents: true)
 
@@ -114,10 +119,10 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
   end
 
   test 'maintains child asset count even if the are not included in graph' do
-    investigation = Factory(:investigation)
-    study = Factory(:study, investigation: investigation)
-    assay = Factory(:assay, study: study)
-    assay2 = Factory(:assay, study: study)
+    assay = Factory(:assay)
+    study = assay.study
+    investigation = assay.investigation
+    assay2 = Factory(:assay, contributor: assay.contributor, study: study)
     generator = Seek::IsaGraphGenerator.new(investigation)
     result = generator.generate
 
@@ -129,15 +134,16 @@ class IsaGraphGeneratorTest < ActiveSupport::TestCase
   end
 
   test 'counts child assets of all ancestors' do
-    project = Factory(:project)
-    investigation = Factory(:investigation, projects: [project])
-    investigation2 = Factory(:investigation, projects: [project])
-    investigation3 = Factory(:investigation, projects: [project])
-    study = Factory(:study, investigation: investigation)
-    study2 = Factory(:study, investigation: investigation)
-    study3 = Factory(:study, investigation: investigation)
-    study4 = Factory(:study, investigation: investigation)
-    assay = Factory(:assay, study: study)
+    person = Factory(:person)
+    project = person.projects.first
+    investigation = Factory(:investigation, contributor: person, projects: [project])
+    investigation2 = Factory(:investigation, contributor: person, projects: [project])
+    investigation3 = Factory(:investigation, contributor: person, projects: [project])
+    study = Factory(:study, contributor: person, investigation: investigation)
+    study2 = Factory(:study, contributor: person, investigation: investigation)
+    study3 = Factory(:study, contributor: person, investigation: investigation)
+    study4 = Factory(:study, contributor: person, investigation: investigation)
+    assay = Factory(:assay, contributor: person, study: study)
 
     generator = Seek::IsaGraphGenerator.new(assay)
     result = generator.generate(include_parents: true)

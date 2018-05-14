@@ -8,7 +8,8 @@ class BatchPublishingTest < ActionController::TestCase
   include AuthenticatedTestHelper
 
   def setup
-    login_as(:aaron)
+    @user = users(:aaron)
+    login_as(@user)
   end
 
   test 'should have the -Publish your assets- only one your own profile' do
@@ -201,17 +202,23 @@ class BatchPublishingTest < ActionController::TestCase
   def create_gatekeeper_required_assets
     publishable_types = Seek::Util.authorized_types.select { |c| c.first.try(:is_in_isa_publishable?) }
     publishable_types.collect do |klass|
-      Factory(klass.name.underscore.to_sym, contributor: User.current_user, project_ids: Factory(:asset_gatekeeper).projects.collect(&:id))
+      gatekeeper = Factory(:asset_gatekeeper)
+      gatekept_project = gatekeeper.projects.first
+      @user.person.add_to_project_and_institution(gatekept_project, Factory(:institution))
+      Factory(klass.name.underscore.to_sym, contributor: @user, projects: [gatekept_project])
     end
   end
 
   def waiting_approval_assets_for(user)
     gatekeeper = Factory(:asset_gatekeeper)
-    df = Factory(:data_file, contributor: user, project_ids: gatekeeper.projects.collect(&:id))
+    gatekept_project = gatekeeper.projects.first
+    user.person.add_to_project_and_institution(gatekept_project, Factory(:institution))
+
+    df = Factory(:data_file, contributor: user, projects: [gatekept_project])
     df.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: df.contributor)
-    model = Factory(:model, contributor: user, project_ids: gatekeeper.projects.collect(&:id))
+    model = Factory(:model, contributor: user, projects: [gatekept_project])
     model.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: model.contributor)
-    sop = Factory(:sop, contributor: user, project_ids: gatekeeper.projects.collect(&:id))
+    sop = Factory(:sop, contributor: user, projects: [gatekept_project])
     sop.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: sop.contributor)
     [df, model, sop]
   end

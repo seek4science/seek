@@ -243,9 +243,19 @@ class Publication < ActiveRecord::Base
 
   private
 
+  def pubmed_entry
+    if pubmed_id
+      Rails.cache.fetch("bio-reference-#{pubmed_id}") do
+        entry = Bio::PubMed.efetch(pubmed_id).first
+        raise "PubMed entry was nil" if entry.nil?
+        entry
+      end
+    end
+  end
+
   def bio_reference
     if pubmed_id
-      Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      Bio::MEDLINE.new(pubmed_entry).reference
     else
       # TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
       Bio::Reference.new({ title: title, journal: journal, abstract: abstract,

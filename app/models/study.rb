@@ -24,7 +24,9 @@ class Study < ActiveRecord::Base
   has_many :assays
   belongs_to :person_responsible, :class_name => "Person"
 
-  validates :investigation, :presence => { message: "Investigation is blank or invalid" }
+  validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
+
+  enforce_authorization_on_association :investigation, :view
 
   ["data_file","sop","model","document"].each do |type|
     eval <<-END_EVAL

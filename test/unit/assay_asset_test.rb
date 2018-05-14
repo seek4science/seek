@@ -33,40 +33,51 @@ class AssayAssetTest < ActiveSupport::TestCase
   end
 
   test 'direction' do
+    person = Factory(:person)
+
     assert_equal 1, AssayAsset::Direction::INCOMING
     assert_equal 2, AssayAsset::Direction::OUTGOING
     assert_equal 0, AssayAsset::Direction::NODIRECTION
 
-    a = AssayAsset.new
-    a.assay = Factory(:assay)
-    a.asset = Factory(:sop).latest_version
-    a.save!
-    a.reload
-    assert_equal 0, a.direction
-    refute a.incoming_direction?
-    refute a.outgoing_direction?
+    User.with_current_user(person.user) do
+      a = AssayAsset.new
+      a.assay = Factory(:assay, contributor:person)
+      a.asset = Factory(:sop, contributor:person).latest_version
+      a.save!
+      a.reload
+      assert_equal 0, a.direction
+      refute a.incoming_direction?
+      refute a.outgoing_direction?
 
-    a.direction = AssayAsset::Direction::INCOMING
-    a.save!
-    a.reload
-    assert a.incoming_direction?
-    refute a.outgoing_direction?
+      a.direction = AssayAsset::Direction::INCOMING
+      a.save!
+      a.reload
+      assert a.incoming_direction?
+      refute a.outgoing_direction?
 
-    a.direction = AssayAsset::Direction::OUTGOING
-    a.save!
-    a.reload
-    refute a.incoming_direction?
-    assert a.outgoing_direction?
+      a.direction = AssayAsset::Direction::OUTGOING
+      a.save!
+      a.reload
+      refute a.incoming_direction?
+      assert a.outgoing_direction?
+    end
+
+
   end
 
   test 'sample as asset' do
-    sample = Factory(:sample)
-    assay = Factory(:assay)
-    a = AssayAsset.new asset: sample, assay: assay, direction: AssayAsset::Direction::OUTGOING
-    assert a.valid?
-    a.save!
-    a.reload
-    assert_equal sample, a.asset
-    assert_equal assay, a.assay
+    person = Factory(:person)
+
+    User.with_current_user(person.user) do
+      sample = Factory(:sample, contributor:person)
+      assay = Factory(:assay, contributor:person)
+      a = AssayAsset.new asset: sample, assay: assay, direction: AssayAsset::Direction::OUTGOING
+      assert a.valid?
+      a.save!
+      a.reload
+      assert_equal sample, a.asset
+      assert_equal assay, a.assay
+    end
+
   end
 end

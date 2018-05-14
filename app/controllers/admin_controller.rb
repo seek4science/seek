@@ -174,19 +174,11 @@ class AdminController < ApplicationController
 
   def update_pagination
     update_flag = true
-    Seek::Config.set_default_page 'people', params[:people]
-    Seek::Config.set_default_page 'projects', params[:projects]
-    Seek::Config.set_default_page 'institutions', params[:institutions]
-    Seek::Config.set_default_page 'investigations', params[:investigations]
-    Seek::Config.set_default_page 'studies', params[:studies]
-    Seek::Config.set_default_page 'assays', params[:assays]
-    Seek::Config.set_default_page 'data_files', params[:data_files]
-    Seek::Config.set_default_page 'models', params[:models]
-    Seek::Config.set_default_page 'sops', params[:sops]
-    Seek::Config.set_default_page 'publications', params[:publications]
-    Seek::Config.set_default_page 'presentations', params[:presentations]
-    Seek::Config.set_default_page 'events', params[:events]
-    Seek::Config.set_default_page 'documents', params[:documents]
+    %w[people projects projects programmes institutions investigations
+        studies assays data_files models sops publications presentations events documents].each do |type|
+      Seek::Config.set_default_page type, params[type.to_sym]
+    end
+
     Seek::Config.limit_latest = params[:limit_latest] if only_positive_integer params[:limit_latest], 'latest limit'
     update_redirect_to (only_positive_integer params[:limit_latest], 'latest limit'), 'pagination'
   end
@@ -513,10 +505,10 @@ class AdminController < ApplicationController
   def execute_command(command)
     return nil if Rails.env.test?
     begin
-      cl = Cocaine::CommandLine.new(command)
+      cl = Terrapin::CommandLine.new(command)
       cl.run
       return nil
-    rescue Cocaine::CommandNotFoundError => e
+    rescue Terrapin::CommandNotFoundError => e
       return 'The command to restart the background tasks could not be found!'
     rescue => e
       error = e.message
@@ -528,7 +520,7 @@ class AdminController < ApplicationController
     if error.blank?
       flash[:notice] = "The #{process} was restarted"
     else
-      flash[:error] = "There is a problem with restarting the #{process}. #{error.gsub('Cocaine::', '')}"
+      flash[:error] = "There is a problem with restarting the #{process}. #{error.gsub('Terrapin::', '')}"
     end
     redirect_to action: :show
   end

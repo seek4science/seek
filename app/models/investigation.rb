@@ -10,7 +10,7 @@ class Investigation < ActiveRecord::Base
 
   has_many :assays, through: :studies
 
-  validates :projects, presence: true
+  validates :projects, presence: true, projects: { self: true }
 
   def state_allows_delete?(*args)
     studies.empty? && super

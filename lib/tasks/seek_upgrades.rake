@@ -22,6 +22,7 @@ namespace :seek do
     reencrypt_settings
     convert_organism_concept_uris
     merge_duplicate_organisms
+    fix_setting_hash_values
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -94,14 +95,15 @@ namespace :seek do
   end
 
   task(update_content_blob_timestamps: :environment) do
+    puts "Copying timestamps from assets to content blobs"
     bar = ProgressBar.new(ContentBlob.where('created_at IS NULL').count)
-    puts "Collecting content blobs with assets ..."
+    puts "... collecting content blobs with assets ..."
     bar = ProgressBar.new(ContentBlob.where('created_at IS NULL').count)
     blobs_with_assets = ContentBlob.where('created_at IS NULL').find_each.select do |blob|
       bar.increment!
       blob.asset.present?
     end
-    puts " ... transferring timestamps from assets ..."
+    puts "... transferring timestamps from assets ..."
     bar = ProgressBar.new(blobs_with_assets.count)
     blobs_with_assets.each do |blob|
       blob.update_attribute(:created_at, blob.asset.created_at)
@@ -110,7 +112,7 @@ namespace :seek do
     end
 
     #clean up the remaining ones.
-    puts "Removing content blobs without assets ..."
+    puts "... removing content blobs without assets or timestamps"
     bar = ProgressBar.new(ContentBlob.where('created_at IS NULL AND updated_at IS NULL').count)
     ContentBlob.where('created_at IS NULL AND updated_at IS NULL').find_each do |blob|
       raise 'Attempting to destroy a content blob with an asset' if blob.asset.present?
@@ -282,6 +284,13 @@ namespace :seek do
       end
     ensure
       ActiveRecord::Base.logger = logger
+    end
+  end
+
+  task(fix_setting_hash_values: :environment) do
+    Settings.pluck(:var).select { |k| Settings[k].class.name == 'Hash' }.each do |key|
+      puts "Updating '#{key}' to a HashWithIndifferentAccess"
+      Settings.merge!(key, {})
     end
   end
 end

@@ -1,12 +1,12 @@
 # Sop
 Factory.define(:sop) do |f|
   f.title 'This Sop'
-  f.projects { [Factory.build(:project)] }
-  f.association :contributor, factory: :person
+  f.with_project_contributor
 
   f.after_create do |sop|
     if sop.content_blob.blank?
-      sop.content_blob = Factory.create(:content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
+      sop.content_blob = Factory.create(:content_blob, original_filename: 'sop.pdf',
+                                        content_type: 'application/pdf', asset: sop, asset_version: sop.version)
     else
       sop.content_blob.asset = sop
       sop.content_blob.asset_version = sop.version
@@ -16,6 +16,7 @@ Factory.define(:sop) do |f|
 end
 
 Factory.define(:min_sop, class: Sop) do |f|
+  f.with_project_contributor
   f.title 'A Minimal Sop'
   f.projects { [Factory.build(:min_project)] }
   f.after_create do |sop|
@@ -24,6 +25,7 @@ Factory.define(:min_sop, class: Sop) do |f|
 end
 
 Factory.define(:max_sop, class: Sop) do |f|
+  f.with_project_contributor
   f.title 'A Maximal Sop'
   f.description 'How to run a simulation in GROMACS'
   f.projects { [Factory.build(:max_project)] }

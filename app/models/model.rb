@@ -18,6 +18,8 @@ class Model < ActiveRecord::Base
 
   acts_as_asset
 
+  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+
   acts_as_doi_parent(child_accessor: :versions)
 
   scope :default_order, -> { order("title") }

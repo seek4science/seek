@@ -22,7 +22,7 @@ module Seek
         extend ActiveSupport::Concern
         included do
           unless reflect_on_association(:assays)
-            has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id
+            has_many :assay_assets, dependent: :destroy, as: :asset, foreign_key: :asset_id, autosave: true # change this to validate: true in the future
             has_many :assays, through: :assay_assets
 
             def assay_assets_attributes= attributes

@@ -93,11 +93,14 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     template_file = File.join(ApiTestHelper.template_dir, 'post_remote_presentation.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
+    validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
 
     assert_difference("#{@clz.classify}.count") do
       post "/#{@plural_clz}.json", @to_post
       assert_response :success
     end
+
+    validate_json_against_fragment response.body, "#/definitions/#{@clz.camelize(:lower)}Response"
 
     h = JSON.parse(response.body)
 

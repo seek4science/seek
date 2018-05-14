@@ -106,7 +106,6 @@ module ApiTestHelper
 
       # content check
       h = JSON.parse(response.body)
-
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
       hash_comparison(@to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
 

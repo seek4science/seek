@@ -46,14 +46,16 @@ class Assay < ActiveRecord::Base
 
   validates_presence_of :assay_type_uri
   validates_presence_of :technology_type_uri, unless: :is_modelling?
-  validates_presence_of :study, message: ' must be selected and valid'
   validates_presence_of :contributor
   validates_presence_of :assay_class
+  validates :study, presence: { message: ' must be selected and valid' }, projects: true
 
   before_validation :default_assay_and_technology_type
 
   # a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
+
+  enforce_authorization_on_association :study, :view
 
   def project_ids
     projects.map(&:id)

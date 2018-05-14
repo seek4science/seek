@@ -116,18 +116,22 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'assay association' do
-    model = models(:teusink)
-    assay = assays(:modelling_assay_with_data_and_relationship)
-    assay_asset = assay_assets(:metabolomics_assay_asset1)
-    assert_not_equal assay_asset.asset, model
-    assert_not_equal assay_asset.assay, assay
-    assay_asset.asset = model
-    assay_asset.assay = assay
-    User.with_current_user(model.contributor) { assay_asset.save! }
-    assay_asset.reload
-    assert assay_asset.valid?
-    assert_equal assay_asset.asset, model
-    assert_equal assay_asset.assay, assay
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      model = Factory(:model, contributor:person)
+      assay = Factory(:assay, contributor:person)
+      assay_asset = AssayAsset.new
+      assert_not_equal assay_asset.asset, model
+      assert_not_equal assay_asset.assay, assay
+      assay_asset.asset = model
+      assay_asset.assay = assay
+      assay_asset.save!
+      assay_asset.reload
+      assert assay_asset.valid?
+      assert_equal assay_asset.asset, model
+      assert_equal assay_asset.assay, assay
+    end
+
   end
 
   test 'sort by updated_at' do
@@ -189,12 +193,13 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'policy defaults to system default' do
-    with_config_value 'default_all_visitors_access_type', Policy::VISIBLE do
-      model = Model.new Factory.attributes_for(:model, policy: nil)
+    with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
+      model = Factory.build(:model)
+      refute model.persisted?
       model.save!
       model.reload
       assert_not_nil model.policy
-      assert_equal Policy::VISIBLE, model.policy.access_type
+      assert_equal Policy::NO_ACCESS, model.policy.access_type
       assert model.policy.permissions.empty?
     end
   end

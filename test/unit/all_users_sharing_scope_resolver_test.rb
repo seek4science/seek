@@ -100,13 +100,14 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
   end
 
   test 'existing permission same project same access_type' do
-    project = Factory(:project)
+    person = Factory(:person)
+    project = person.projects.first
     model = Factory(:model,
                     policy: Factory(:policy,
                                     access_type: Policy::VISIBLE,
                                     sharing_scope: Policy::ALL_USERS,
                                     permissions: [Factory(:permission, contributor: project, access_type: Policy::VISIBLE)]),
-                    projects: [project])
+                    projects: [project], contributor: person)
 
     assert_equal 1, (permissions = model.policy.permissions).count
     assert_equal 1, (projects = model.projects).count
@@ -131,8 +132,10 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
 
   test 'existing permission same project higher access_type' do
     # should update the permission to give the higher access
-    project = Factory(:project)
+    person = Factory(:person)
+    project = person.projects.first
     investigation = Factory(:investigation,
+                            contributor: person,
                             policy: Factory(:policy,
                                             access_type: Policy::ACCESSIBLE,
                                             sharing_scope: Policy::ALL_USERS,
@@ -162,8 +165,10 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
 
   test 'existing permission same project lower access_type' do
     # should keep the existing higher access
-    project = Factory(:project)
+    person = Factory(:person)
+    project = person.projects.first
     investigation = Factory(:investigation,
+                            contributor: person,
                             policy: Factory(:policy,
                                             access_type: Policy::VISIBLE,
                                             sharing_scope: Policy::ALL_USERS,
@@ -196,15 +201,18 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
     project2 = Factory(:project)
     project3 = Factory(:project)
     project4 = Factory(:project)
-    person = Factory(:person)
+    person = Factory(:person, project: project1)
+    person.add_to_project_and_institution(project4, person.institutions.first)
     permission1 = Factory(:permission, contributor: person, access_type: Policy::EDITING)
     permission2 = Factory(:permission, contributor: project1, access_type: Policy::VISIBLE)
     permission3 = Factory(:permission, contributor: project2, access_type: Policy::VISIBLE)
     permission4 = Factory(:permission, contributor: project3, access_type: Policy::MANAGING)
-    df = Factory(:data_file, projects: [project1, project4], policy: Factory(:policy,
-                                                                             sharing_scope: Policy::ALL_USERS,
-                                                                             access_type: Policy::ACCESSIBLE,
-                                                                             permissions: [permission1, permission2, permission3, permission4]))
+    df = Factory(:data_file, projects: [project1, project4],
+                             contributor: person,
+                             policy: Factory(:policy,
+                                             sharing_scope: Policy::ALL_USERS,
+                                             access_type: Policy::ACCESSIBLE,
+                                             permissions: [permission1, permission2, permission3, permission4]))
     assert_equal [project1, project4], df.projects
     assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE, df.policy.access_type
@@ -246,15 +254,19 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
     project2 = Factory(:project)
     project3 = Factory(:project)
     project4 = Factory(:project)
-    person = Factory(:person)
+    person = Factory(:person, project: project1)
+    person.add_to_project_and_institution(project4, person.institutions.first)
+
     permission1 = Factory(:permission, contributor: person, access_type: Policy::EDITING)
     permission2 = Factory(:permission, contributor: project1, access_type: Policy::VISIBLE)
     permission3 = Factory(:permission, contributor: project2, access_type: Policy::VISIBLE)
     permission4 = Factory(:permission, contributor: project3, access_type: Policy::MANAGING)
-    df = Factory(:data_file, projects: [project1, project4], policy: Factory(:policy,
-                                                                             sharing_scope: Policy::ALL_USERS,
-                                                                             access_type: Policy::ACCESSIBLE,
-                                                                             permissions: [permission1, permission2, permission3, permission4]))
+    df = Factory(:data_file, projects: [project1, project4],
+                             contributor: person,
+                             policy: Factory(:policy,
+                                             sharing_scope: Policy::ALL_USERS,
+                                             access_type: Policy::ACCESSIBLE,
+                                             permissions: [permission1, permission2, permission3, permission4]))
     assert_equal [project1, project4], df.projects
     assert_equal Policy::ALL_USERS, df.policy.sharing_scope
     assert_equal Policy::ACCESSIBLE, df.policy.access_type
@@ -332,15 +344,18 @@ class AllUsersSharingScopeResolverTest < ActiveSupport::TestCase
     project2 = Factory(:project)
     project3 = Factory(:project)
     project4 = Factory(:project)
-    person = Factory(:person)
+    person = Factory(:person, project: project1)
+    person.add_to_project_and_institution(project4, person.institutions.first)
     permission1 = Factory(:permission, contributor: person, access_type: Policy::EDITING)
     permission2 = Factory(:permission, contributor: project1, access_type: Policy::VISIBLE)
     permission3 = Factory(:permission, contributor: project2, access_type: Policy::VISIBLE)
     permission4 = Factory(:permission, contributor: project3, access_type: Policy::MANAGING)
-    df = Factory(:data_file, projects: [project1, project4], policy: Factory(:policy,
-                                                                             sharing_scope: Policy::ALL_USERS,
-                                                                             access_type: Policy::ACCESSIBLE,
-                                                                             permissions: [permission1, permission2, permission3, permission4]))
+    df = Factory(:data_file, projects: [project1, project4],
+                             contributor: person,
+                             policy: Factory(:policy,
+                                             sharing_scope: Policy::ALL_USERS,
+                                             access_type: Policy::ACCESSIBLE,
+                                             permissions: [permission1, permission2, permission3, permission4]))
     @resolver.resolve(df)
     file = Tempfile.new('resolver-test')
 

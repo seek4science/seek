@@ -10,7 +10,13 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title">
-          <h4>Metadata for the uploaded file: <em><%= @data_file.content_blob.original_filename %></em></h4>
+          <h4>New <%= t('data_file') %>:
+            <% if @data_file.content_blob.nels? %>
+              <small><%= @data_file.title %></small>
+            <% else %>
+              <small><%= @data_file.content_blob.original_filename %></small>
+            <% end %>
+          </h4>
         </div>
       </div>
       <div class="modal-body">
@@ -18,23 +24,29 @@
             <%= hidden_field_tag 'content_blob_id', @data_file.content_blob.id %>
             <div id='datafile-multi-set' class='multi-step'>
               <div class="asset_form">
+                <%= extraction_exception_message @exception_message %>
                 <%= error_messages_for :data_file -%>
                 <%= error_messages_for :assay -%>
+                <%= extraction_warnings_messages_for @warnings %>
 
                 <div id='step-1' class='multi-step-block'>
+                  <span class='multi-step-progress-indicator'></span>
                   <%= render partial: 'data_files/multi-steps/basic_metadata',locals:{f: f} %>
                 </div>
 
                 <div id='step-2' class='multi-step-block multi-step-datafile-block'>
+                  <span class='multi-step-progress-indicator'></span>
                   <%= render partial: 'data_files/multi-steps/license_and_permissions',locals:{f: f} %>
                 </div>
 
                 <div id='step-3' class='multi-step-block multi-step-datafile-block'>
+                  <span class='multi-step-progress-indicator'></span>
                   <%= render partial: 'data_files/multi-steps/assays',locals:{f: f} %>
                 </div>
 
                 <div id='step-4' class='multi-step-block multi-step-datafile-block'>
-                  <%= render partial: 'data_files/multi-steps/other_links',locals:{f: f} %>
+                  <span class='multi-step-progress-indicator'></span>
+                  <%= render partial: 'data_files/multi-steps/other_properties', locals:{f: f} %>
                 </div>
 
               </div>

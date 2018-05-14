@@ -38,6 +38,8 @@
 
     <%= fancy_multiselect @publication, :models, other_projects_checkbox: true %>
 
+    <%= render :partial => "assets/associate_presentation", :locals=>{:resource => @publication} -%>
+
     <%= submit_tag 'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
     or <%= cancel_button(publication_path(@publication)) %>
 <% end %>

@@ -9,6 +9,7 @@ class PresentationsControllerTest < ActionController::TestCase
 
   def setup
     login_as Factory(:user)
+    @project = User.current_user.person.projects.first
   end
 
   def rest_api_test_object
@@ -26,7 +27,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'can create with valid url' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
     presentation_attrs = Factory.attributes_for(:presentation,
-                                                project_ids: [Factory(:project).id]
+                                                project_ids: [@project.id]
                                                )
 
     assert_difference 'Presentation.count' do
@@ -37,7 +38,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'can create with local file' do
     presentation_attrs = Factory.attributes_for(:presentation,
                                                 contributor: User.current_user,
-                                                project_ids: [Factory(:project).id])
+                                                project_ids: [@project])
 
     assert_difference 'Presentation.count' do
       assert_difference 'ActivityLog.count' do
@@ -141,7 +142,7 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'can subscribe' do
-    presentation = Factory :presentation, project_ids: [Factory(:project).id], contributor: User.current_user
+    presentation = Factory :presentation, contributor: User.current_user
     assert_difference 'presentation.subscriptions.count' do
       presentation.subscribed = true
       presentation.save
@@ -336,8 +337,9 @@ class PresentationsControllerTest < ActionController::TestCase
 
   test 'programme presentations through nested routing' do
     assert_routing 'programmes/2/presentations', controller: 'presentations', action: 'index', programme_id: '2'
-    programme = Factory(:programme)
-    presentation = Factory(:presentation, projects: programme.projects, policy: Factory(:public_policy))
+    programme = Factory(:programme, projects: [@project])
+    assert_equal [@project], programme.projects
+    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor:User.current_user.person)
     presentation2 = Factory(:presentation, policy: Factory(:public_policy))
 
     get :index, programme_id: programme.id
@@ -347,6 +349,14 @@ class PresentationsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', presentation_path(presentation), text: presentation.title
       assert_select 'a[href=?]', presentation_path(presentation2), text: presentation2.title, count: 0
     end
+  end
+
+  test 'should return 406 when showing presentation as RDF' do
+    presentation = Factory :ppt_presentation, contributor: User.current_user
+
+    get :show, id: presentation, format: :rdf
+
+    assert_response :not_acceptable
   end
 
   def edit_max_object(presentation)

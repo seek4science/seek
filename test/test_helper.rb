@@ -38,6 +38,22 @@ end
 include UploadHelper
 include PasswordHelper
 
+FactoryGirl.define do
+  trait :with_project_contributor do
+    contributor { nil }
+    after_build do |resource|
+      if resource.contributor.nil?
+        if resource.projects.none?
+          resource.projects = [Factory(:project)]
+        end
+        resource.contributor = Factory(:person, project: resource.projects.first)
+      elsif resource.projects.none?
+        resource.projects = [resource.contributor.person.projects.first]
+      end
+    end
+  end
+end
+
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
 FactoryGirl.class_eval do
@@ -146,8 +162,10 @@ class ActiveSupport::TestCase
   end
 
   def add_avatar_to_test_object(obj)
-    obj.avatar = Factory(:avatar, owner: obj)
-    obj.save
+    disable_authorization_checks do
+      obj.avatar = Factory(:avatar, owner: obj)
+      obj.save!
+    end
   end
 
   def add_tags_to_test_object(obj)
@@ -160,8 +178,10 @@ class ActiveSupport::TestCase
   end
 
   def add_creator_to_test_object(obj)
-    obj.creators = [Factory(:person)]
-    obj.save
+    disable_authorization_checks do
+      obj.creators = [Factory(:person)]
+      obj.save!
+    end
   end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the

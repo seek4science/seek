@@ -16,6 +16,9 @@ class AssayAsset < ActiveRecord::Base
   scope :simulation, -> { joins(:relationship_type).where('relationship_types.key = ?', RelationshipType::SIMULATION) }
   scope :construction, -> { joins(:relationship_type).where('relationship_types.key = ?', RelationshipType::CONSTRUCTION) }
 
+  enforce_authorization_on_association :assay, :edit
+  enforce_authorization_on_association :asset, :view
+
   def set_version
     return if destroyed?
     return unless asset && asset.respond_to?(:latest_version) && asset.latest_version
