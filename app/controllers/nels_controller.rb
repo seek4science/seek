@@ -71,9 +71,9 @@ class NelsController < ApplicationController
 
     session[:uploaded_content_blob_id] = @content_blob.id
     session[:processed_datafile] = @data_file
-    session[:processed_assay] = Assay.new
+    session[:processed_assay] = @assay
 
-    redirect_to provide_metadata_data_files_path(assay_ids: [@assay.id], project_ids: @assay.project_ids)
+    redirect_to provide_metadata_data_files_path(project_ids: @assay.project_ids)
   end
 
   private

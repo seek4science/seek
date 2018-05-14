@@ -1,6 +1,6 @@
 class AssayAsset < ActiveRecord::Base
-  belongs_to :asset, polymorphic: true
-  belongs_to :assay
+  belongs_to :asset, polymorphic: true, inverse_of: :assay_assets
+  belongs_to :assay, inverse_of: :assay_assets
 
   belongs_to :relationship_type
 

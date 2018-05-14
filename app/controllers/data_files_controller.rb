@@ -371,10 +371,8 @@ class DataFilesController < ApplicationController
   # AJAX call to trigger any RightField extraction (if appropriate), and pre-populates the associated @data_file and
   # @assay
   def rightfield_extraction_ajax
-
     @data_file = DataFile.new
     @warnings = nil
-    @assay = Assay.new
     critical_error_msg = nil
     session.delete :extraction_exception_message
 
@@ -415,9 +413,10 @@ class DataFilesController < ApplicationController
     @assay ||= session[:processed_assay]
     @warnings ||= session[:processing_warnings] || []
     @exception_message ||= session[:extraction_exception_message]
-    @create_new_assay = !(@assay.title.blank? && @assay.description.blank?)
+    @create_new_assay = @assay && @assay.new_record?
+    @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
     respond_to do |format|
-      format.html {}
+      format.html
     end
   end
 
