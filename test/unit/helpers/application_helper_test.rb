@@ -9,13 +9,13 @@ class ApplicationHelperTest < ActionView::TestCase
       # should be something like
       # <p class="id">
       #   <label>SEEK ID: </label>
-      #   <a href="http://test.host/assays/1035386651">http://test.host/assays/1035386651</a>
+      #   <a href="http://localhost:3000/assays/1035386651">http://localhost:3000/assays/1035386651</a>
       # </p>
       assert_equal 'strong', blocks.first.name
       assert_match(/SEEK ID/, blocks.first.children.first.content)
       assert_equal 'a', blocks.last.name
-      assert_match(/http:\/\/test.host\/assays\/#{assay.id}/, blocks.last['href'])
-      assert_match(/http:\/\/test.host\/assays\/#{assay.id}/, blocks.last.children.first.content)
+      assert_match(/http:\/\/localhost:3000\/assays\/#{assay.id}/, blocks.last['href'])
+      assert_match(/http:\/\/localhost:3000\/assays\/#{assay.id}/, blocks.last.children.first.content)
 
       versioned_sop = Factory(:sop_version)
       html = persistent_resource_id(versioned_sop)
@@ -23,13 +23,13 @@ class ApplicationHelperTest < ActionView::TestCase
       # should be something like
       # <p class="id">
       #   <label>SEEK ID: </label>
-      #   <a href="http://test.host/sops/1055250457?version=2">http://test.host/sops/1055250457?version=2</a>
+      #   <a href="http://localhost:3000/sops/1055250457?version=2">http://localhost:3000/sops/1055250457?version=2</a>
       # </p>
       assert_equal 'strong', blocks.first.name
       assert_match(/SEEK ID/, blocks.first.children.first.content)
       assert_equal 'a', blocks.last.name
-      assert_match(/http:\/\/test.host\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last['href'])
-      assert_match(/http:\/\/test.host\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last.children.first.content)
+      assert_match(/http:\/\/localhost:3000\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last['href'])
+      assert_match(/http:\/\/localhost:3000\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last.children.first.content)
     end
   end
 
