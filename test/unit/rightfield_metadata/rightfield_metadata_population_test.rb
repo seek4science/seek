@@ -29,6 +29,26 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'rdf successful for template based data file' do
+    User.with_current_user(@user) do
+      project = Factory(:project, id: 9999)
+      assert_equal 9999, project.id
+      @person.add_to_project_and_institution(project, Factory(:institution))
+      @person.save!
+
+      blob = Factory(:rightfield_master_template)
+      data_file = DataFile.new(content_blob: blob)
+
+      data_file.populate_metadata_from_template
+
+      data_file.save!
+      data_file.reload
+
+      # just check it is successfully generated ( OPSK-1721 )
+      refute_nil data_file.to_rdf
+    end
+  end
+
   test 'handles none excel blob' do
     User.with_current_user(@user) do
       blob = Factory(:txt_content_blob)
@@ -428,4 +448,5 @@ class RightfieldMetadataPopulationTest < ActiveSupport::TestCase
       assert_equal [[:no_permission, 'http://localhost:3000/sops/9999', ['view', Sop]]], problems
     end
   end
+
 end
