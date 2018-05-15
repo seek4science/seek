@@ -74,7 +74,7 @@ module ApplicationHelper
     url = polymorphic_url(resource)
     content_tag :p, class: :id do
       content_tag(:strong) do
-        "SEEK ID: "
+        t('seek_id')+":"
       end + ' ' + link_to(url, url)
     end
   end
