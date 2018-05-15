@@ -5,7 +5,7 @@ An **Investigation** has the following associated information:
 * **The title of the Investigation**
 * A description of the **Investigation**
 * A string listing other creators of the **Investigation**
-* The sharing **Policy** of the **Investigation**
+* The sharing [**Policy**](#section/Policy) of the **Investigation**
 * References to the [**People**](#tag/people) who created the **Investigation**
 * References to the [**Projects**](#tag/projects) which the **Investigation** is part of
 * References to [**Publications**](#tag/publications) about the **Investigation**

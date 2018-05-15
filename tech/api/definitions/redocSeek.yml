@@ -1159,6 +1159,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/organismResponse'
+          examples:
+            application/json:
+              $ref: ../examples/organismResponse.yml
   /people:
     get:
       operationId: listPeople

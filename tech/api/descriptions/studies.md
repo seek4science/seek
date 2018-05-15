@@ -7,7 +7,7 @@ A **Study** has the following associated information:
 * A string listing experimentalists of the **Study**
 * A string listing other creators of the **Study**
 * A string containing the id of the [**Person**](#tag/people) responsible for the **Study**
-* The sharing **Policy** of the **Study**
+* The sharing [**Policy**](#section/Policy) of the **Study**
 * References to the [**People**](#tag/people) who created the **Study**
 ** A reference to the [Investigation](#tag/investigations) containing the Study**
 * References to [**Publications**](#tag/publications) about the **Study**

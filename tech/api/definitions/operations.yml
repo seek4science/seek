@@ -1159,6 +1159,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/organismResponse'
+          examples:
+            application/json:
+              $ref: ../examples/organismResponse.yml
         <<: *ReadType
   /people:
     get:
@@ -1648,6 +1651,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/publicationResponse'
+          examples:
+            application/json:
+              $ref: ../examples/publicationResponse.yml
         <<: *ReadType
   /sample_types:
     get:

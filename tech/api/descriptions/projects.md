@@ -7,8 +7,8 @@ A **Project** has the following associated information:
 * A description of the **Project**
 * A URI to a webpage about the **Project**
 * A URI to the wiki of the **Project**
-* The default **Policy** applied to objects belonging to the **Project**
-* The default **License** applied to objects belonging to the **Project**
+* The default [**Policy**](#section/Policy) applied to objects belonging to the **Project**
+* The default [**License**](#section/License) applied to objects belonging to the **Project**
 
 * References to the [**Programmes**](#tag/programmes) that the **Project** is part of
 * References to the [**Organisms**](#tag/organisms) studied by the **Project**

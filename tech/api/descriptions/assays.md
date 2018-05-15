@@ -8,7 +8,7 @@ An **Assay** has the following associated information:
 * A string containing the abbreviated form of the kind of **Assay** - normally *EXP* for experimental or *MOD* for modelling
 * A URI to the type of **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
 * A URI to the technology used in the **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
-* The sharing **Policy** of the **Assay**
+* The sharing [**Policy**](#section/Policy) of the **Assay**
 * References to the [**People**](#tag/people) who created the **Assay**
 * A singleton reference to the [**Study**](#tag/studies) which the **Assay** is part of
 * References to [**Publications**](#tag/publications) about the **Assay**
