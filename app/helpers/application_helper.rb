@@ -71,7 +71,7 @@ module ApplicationHelper
   # provide the block that shows the URL to the resource, including the version if it is a versioned resource
   # label is based on the application name, for example <label>FAIRDOMHUB ID: </label>
   def persistent_resource_id(resource)
-    url = polymorphic_url(resource)
+    url = resource.rdf_seek_id
     content_tag :p, class: :id do
       content_tag(:strong) do
         t('seek_id')+":"
