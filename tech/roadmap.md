@@ -15,7 +15,7 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Write API (Application Programming Interface) | Spring 2018  |
+| JSON Write API (Application Programming Interface) | Spring 2018  |
 | Further integration with openBIS, with improved metadata mappings | Summer 2018  |
 | Improved JERM templates and auto-extraction | Spring 2018 |
 | Metadata search and querying | Autumn 2018  |
