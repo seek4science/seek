@@ -14,6 +14,8 @@ class FailController < ApplicationController
         x.hello_world
       when "406"
         raise ActionController::UnknownController
+      when "503"
+        raise RSolr::Error::ConnectionRefused
     end
     
     respond_to do |format|

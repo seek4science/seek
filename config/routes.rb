@@ -722,6 +722,7 @@ SEEK::Application.routes.draw do
   get "/404" => "errors#error_404"
   get "/422" => "errors#error_422"
   get "/500" => "errors#error_500"
+  get "/503" => "errors#error_503"
 
   get "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
   get "/seek_nels" => "nels#callback", as: 'nels_oauth_callback'
