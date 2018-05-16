@@ -1,0 +1,31 @@
+---
+data:
+  type: investigations
+  attributes:
+    title: A Maximal Investigation
+    policy:
+      access: download
+      permissions:
+      - resource_id: '809'
+        resource_type: projects
+        access: manage
+      - resource_id: '859'
+        resource_type: projects
+        access: manage
+    description: This is a more complex investigation
+    other_creators: Max Blumenthal, Ed Snowden
+  relationships:
+    projects:
+      data:
+      - id: '809'
+        type: projects
+      - id: '859'
+        type: projects
+    publications:
+      data:
+      - id: '23'
+        type: publications
+    creators:
+      data:
+      - id: '555'
+        type: people

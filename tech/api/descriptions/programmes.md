@@ -1,0 +1,1 @@
+**Programmes** are an umbrella group for one or more [**Projects**](#tag/projects). They are usually, but not always, associated with a particular funded piece of research.

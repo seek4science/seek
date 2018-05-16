@@ -1,0 +1,636 @@
+---
+data:
+- id: '1'
+  type: projects
+  attributes:
+    title: BaCell-SysMO
+  links:
+    self: "/projects/1"
+- id: '2'
+  type: projects
+  attributes:
+    title: COSMIC
+  links:
+    self: "/projects/2"
+- id: '3'
+  type: projects
+  attributes:
+    title: SUMO
+  links:
+    self: "/projects/3"
+- id: '4'
+  type: projects
+  attributes:
+    title: KOSMOBAC
+  links:
+    self: "/projects/4"
+- id: '5'
+  type: projects
+  attributes:
+    title: SysMO-LAB
+  links:
+    self: "/projects/5"
+- id: '6'
+  type: projects
+  attributes:
+    title: PSYSMO
+  links:
+    self: "/projects/6"
+- id: '7'
+  type: projects
+  attributes:
+    title: SCaRAB
+  links:
+    self: "/projects/7"
+- id: '8'
+  type: projects
+  attributes:
+    title: MOSES
+  links:
+    self: "/projects/8"
+- id: '9'
+  type: projects
+  attributes:
+    title: TRANSLUCENT
+  links:
+    self: "/projects/9"
+- id: '10'
+  type: projects
+  attributes:
+    title: STREAM
+  links:
+    self: "/projects/10"
+- id: '11'
+  type: projects
+  attributes:
+    title: SulfoSys
+  links:
+    self: "/projects/11"
+- id: '12'
+  type: projects
+  attributes:
+    title: SysMO DB
+  links:
+    self: "/projects/12"
+- id: '13'
+  type: projects
+  attributes:
+    title: SysMO Funders
+  links:
+    self: "/projects/13"
+- id: '14'
+  type: projects
+  attributes:
+    title: SilicoTryp
+  links:
+    self: "/projects/14"
+- id: '15'
+  type: projects
+  attributes:
+    title: Noisy-Strep
+  links:
+    self: "/projects/15"
+- id: '16'
+  type: projects
+  attributes:
+    title: SulfoSys - Biotec
+  links:
+    self: "/projects/16"
+- id: '17'
+  type: projects
+  attributes:
+    title: Whole body modelling of glucose metabolism in malaria patients
+  links:
+    self: "/projects/17"
+- id: '18'
+  type: projects
+  attributes:
+    title: Manchester Institute for Biotechnology
+  links:
+    self: "/projects/18"
+- id: '19'
+  type: projects
+  attributes:
+    title: FAIRDOM
+  links:
+    self: "/projects/19"
+- id: '20'
+  type: projects
+  attributes:
+    title: SysVirDrug
+  links:
+    self: "/projects/20"
+- id: '21'
+  type: projects
+  attributes:
+    title: SysMilk
+  links:
+    self: "/projects/21"
+- id: '22'
+  type: projects
+  attributes:
+    title: SysMetEx
+  links:
+    self: "/projects/22"
+- id: '23'
+  type: projects
+  attributes:
+    title: MetApp
+  links:
+    self: "/projects/23"
+- id: '24'
+  type: projects
+  attributes:
+    title: IMOMESIC
+  links:
+    self: "/projects/24"
+- id: '25'
+  type: projects
+  attributes:
+    title: WineSys
+  links:
+    self: "/projects/25"
+- id: '26'
+  type: projects
+  attributes:
+    title: CropClock
+  links:
+    self: "/projects/26"
+- id: '27'
+  type: projects
+  attributes:
+    title: ICYSB 2015 - International Practical Course in Systems Biology
+  links:
+    self: "/projects/27"
+- id: '28'
+  type: projects
+  attributes:
+    title: Embryonic bodies derived cell types
+  links:
+    self: "/projects/28"
+- id: '29'
+  type: projects
+  attributes:
+    title: SYSTERACT
+  links:
+    self: "/projects/29"
+- id: '30'
+  type: projects
+  attributes:
+    title: XyloCut
+  links:
+    self: "/projects/30"
+- id: '31'
+  type: projects
+  attributes:
+    title: RootBook
+  links:
+    self: "/projects/31"
+- id: '32'
+  type: projects
+  attributes:
+    title: ROBUSTYEAST
+  links:
+    self: "/projects/32"
+- id: '33'
+  type: projects
+  attributes:
+    title: LEANPROT
+  links:
+    self: "/projects/33"
+- id: '34'
+  type: projects
+  attributes:
+    title: GenoSysFat
+  links:
+    self: "/projects/34"
+- id: '35'
+  type: projects
+  attributes:
+    title: de.NBI-SysBio
+  links:
+    self: "/projects/35"
+- id: '36'
+  type: projects
+  attributes:
+    title: ExtremoPharm
+  links:
+    self: "/projects/36"
+- id: '37'
+  type: projects
+  attributes:
+    title: ZucAt
+  links:
+    self: "/projects/37"
+- id: '38'
+  type: projects
+  attributes:
+    title: DigiSal
+  links:
+    self: "/projects/38"
+- id: '39'
+  type: projects
+  attributes:
+    title: Molecular Systems Biology
+  links:
+    self: "/projects/39"
+- id: '40'
+  type: projects
+  attributes:
+    title: Early Metabolic Injury (LiSyM-EMI - Pillar I)
+  links:
+    self: "/projects/40"
+- id: '41'
+  type: projects
+  attributes:
+    title: Chronic Liver Disease Progression (LiSyM-DP - Pillar II)
+  links:
+    self: "/projects/41"
+- id: '42'
+  type: projects
+  attributes:
+    title: Regeneration and Repair in Acute-on-Chronic Liver Failure (LiSyM-ACLF -
+      Pillar III)
+  links:
+    self: "/projects/42"
+- id: '43'
+  type: projects
+  attributes:
+    title: LiSyM Core Infrastructure and Management (LiSyM-PD)
+  links:
+    self: "/projects/43"
+- id: '44'
+  type: projects
+  attributes:
+    title: Liver Function Diagnostics (LiSyM-LiFuDi - Pillar IV)
+  links:
+    self: "/projects/44"
+- id: '45'
+  type: projects
+  attributes:
+    title: Model Guided Pharmacotherapy In Chronic Liver Disease (LiSyM-MGP)
+  links:
+    self: "/projects/45"
+- id: '46'
+  type: projects
+  attributes:
+    title: Multi-Scale Models for Personalized Liver Function Tests (LiSyM-MM-PLF)
+  links:
+    self: "/projects/46"
+- id: '47'
+  type: projects
+  attributes:
+    title: The Hedgehog Signalling Pathway (LiSyM-JGMMS)
+  links:
+    self: "/projects/47"
+- id: '48'
+  type: projects
+  attributes:
+    title: Molecular Steatosis - Imaging & Modeling (LiSyM-MSIM)
+  links:
+    self: "/projects/48"
+- id: '49'
+  type: projects
+  attributes:
+    title: Kinetics on the move - Workshop 2016
+  links:
+    self: "/projects/49"
+- id: '50'
+  type: projects
+  attributes:
+    title: Example use cases
+  links:
+    self: "/projects/50"
+- id: '51'
+  type: projects
+  attributes:
+    title: FAIRDOM user meeting
+  links:
+    self: "/projects/51"
+- id: '52'
+  type: projects
+  attributes:
+    title: ErasysApp Funders
+  links:
+    self: "/projects/52"
+- id: '53'
+  type: projects
+  attributes:
+    title: HUMET Startup
+  links:
+    self: "/projects/53"
+- id: '54'
+  type: projects
+  attributes:
+    title: SBEpo - Systems Biology of Erythropoietin
+  links:
+    self: "/projects/54"
+- id: '55'
+  type: projects
+  attributes:
+    title: INBioPharm
+  links:
+    self: "/projects/55"
+- id: '56'
+  type: projects
+  attributes:
+    title: HYp - Spatiotemporal analysis of hypersensitive response to Potato virus
+      Y in potato
+  links:
+    self: "/projects/56"
+- id: '57'
+  type: projects
+  attributes:
+    title: pISA-tree
+  links:
+    self: "/projects/57"
+- id: '58'
+  type: projects
+  attributes:
+    title: EmPowerPutida
+  links:
+    self: "/projects/58"
+- id: '59'
+  type: projects
+  attributes:
+    title: Millar group
+  links:
+    self: "/projects/59"
+- id: '60'
+  type: projects
+  attributes:
+    title: Systems toxicology of Atlantic cod
+  links:
+    self: "/projects/60"
+- id: '61'
+  type: projects
+  attributes:
+    title: Systo models
+  links:
+    self: "/projects/61"
+- id: '62'
+  type: projects
+  attributes:
+    title: Service to Milano-Bicocca with respect to their ATP-ROS model (Active NOW)
+  links:
+    self: "/projects/62"
+- id: '63'
+  type: projects
+  attributes:
+    title: 'M4 service for Milano: ATP model'
+  links:
+    self: "/projects/63"
+- id: '64'
+  type: projects
+  attributes:
+    title: Make Me My Model
+  links:
+    self: "/projects/64"
+- id: '65'
+  type: projects
+  attributes:
+    title: Service to University of Lisbon (Portugal) with respect to their CFTR maturation
+      model (Active NOW)
+  links:
+    self: "/projects/65"
+- id: '66'
+  type: projects
+  attributes:
+    title: Service to LCSB (Luxembourg)  with respect to ROS management in Parkinson’s
+      disease and cancer model (Active NOW)
+  links:
+    self: "/projects/66"
+- id: '67'
+  type: projects
+  attributes:
+    title: Service to URV Tarragona, Spain with respect to their Safety Assessment
+      of Endocrine Disrupting Chemicals model (Active NOW)
+  links:
+    self: "/projects/67"
+- id: '68'
+  type: projects
+  attributes:
+    title: Service to Universidade Católica Portugues with respect to their Molecular
+      Insight into Autism Spectrum Disorder (ASD) model (Active NOW)
+  links:
+    self: "/projects/68"
+- id: '69'
+  type: projects
+  attributes:
+    title: Service to Slovenia with respect to their Protease signaling network in
+      neurodegeneration model (Active NOW)
+  links:
+    self: "/projects/69"
+- id: '70'
+  type: projects
+  attributes:
+    title: 'Service to University of Duisburg- Essen (Germany): with respect to their
+      The Yin-Yang of Metabolism; Endometatoxicity (YYME) model (Active NOW)'
+  links:
+    self: "/projects/70"
+- id: '71'
+  type: projects
+  attributes:
+    title: 'Service to Sheffield University (UK): with respect to Mitochondrial perfect
+      adaptation model (Active NOW)'
+  links:
+    self: "/projects/71"
+- id: '72'
+  type: projects
+  attributes:
+    title: 'Service to Sanquin (Amsterdam): with respect to Modelling of acute and
+      chronic inflammation (Prospective)'
+  links:
+    self: "/projects/72"
+- id: '73'
+  type: projects
+  attributes:
+    title: 'Service to Munich (Germany): with respect toCharged peptide to charged
+      membrane binding model (Prospective)'
+  links:
+    self: "/projects/73"
+- id: '74'
+  type: projects
+  attributes:
+    title: MycoSynVac - Engineering Mycoplasma pneumoniae as a broad-spectrum animal
+      vaccine
+  links:
+    self: "/projects/74"
+- id: '75'
+  type: projects
+  attributes:
+    title: SEEK tutorial for DigiSal
+  links:
+    self: "/projects/75"
+- id: '76'
+  type: projects
+  attributes:
+    title: Training Hunfeld
+  links:
+    self: "/projects/76"
+- id: '77'
+  type: projects
+  attributes:
+    title: WG Infrastructure for Translational Research
+  links:
+    self: "/projects/77"
+- id: '78'
+  type: projects
+  attributes:
+    title: CausalDB
+  links:
+    self: "/projects/78"
+- id: '80'
+  type: projects
+  attributes:
+    title: WURSynBio
+  links:
+    self: "/projects/80"
+- id: '81'
+  type: projects
+  attributes:
+    title: Colosys
+  links:
+    self: "/projects/81"
+- id: '83'
+  type: projects
+  attributes:
+    title: MS_DILI
+  links:
+    self: "/projects/83"
+- id: '84'
+  type: projects
+  attributes:
+    title: Glycon proposal preparation
+  links:
+    self: "/projects/84"
+- id: '85'
+  type: projects
+  attributes:
+    title: TID - Dynamics of tolerant potato-potato virus Y interaction
+  links:
+    self: "/projects/85"
+- id: '86'
+  type: projects
+  attributes:
+    title: BioZEment 2.0
+  links:
+    self: "/projects/86"
+- id: '87'
+  type: projects
+  attributes:
+    title: SAFE-Aqua
+  links:
+    self: "/projects/87"
+- id: '88'
+  type: projects
+  attributes:
+    title: 'PHYTOCAL: Phytochrome Control of Resource Allocation and Growth in Arabidopsis
+      and in Brassicaceae crops'
+  links:
+    self: "/projects/88"
+- id: '90'
+  type: projects
+  attributes:
+    title: COMBINE Multicellular Modelling
+  links:
+    self: "/projects/90"
+- id: '91'
+  type: projects
+  attributes:
+    title: FAIRDOM & LiSyM & de.NBI Data Structuring Training
+  links:
+    self: "/projects/91"
+- id: '92'
+  type: projects
+  attributes:
+    title: TiMet
+  links:
+    self: "/projects/92"
+- id: '93'
+  type: projects
+  attributes:
+    title: OXYMOD
+  links:
+    self: "/projects/93"
+- id: '95'
+  type: projects
+  attributes:
+    title: POP - the Parameter Optimisation Problem
+  links:
+    self: "/projects/95"
+- id: '96'
+  type: projects
+  attributes:
+    title: Tobacco as sustainable production platform of the natural biopolymer cyanophycin
+      as co-product to oil and protein
+  links:
+    self: "/projects/96"
+- id: '97'
+  type: projects
+  attributes:
+    title: Test
+  links:
+    self: "/projects/97"
+- id: '98'
+  type: projects
+  attributes:
+    title: Mathematical modelling of the antibiotic-induced morphological transition
+      of Pseudomonas aeruginosa
+  links:
+    self: "/projects/98"
+- id: '99'
+  type: projects
+  attributes:
+    title: MESI-STRAT
+  links:
+    self: "/projects/99"
+- id: '100'
+  type: projects
+  attributes:
+    title: INCOME
+  links:
+    self: "/projects/100"
+- id: '101'
+  type: projects
+  attributes:
+    title: Multiscale modelling of state transitions in the host-microbiome-brain
+      network
+  links:
+    self: "/projects/101"
+- id: '102'
+  type: projects
+  attributes:
+    title: Crossover Research 2.0
+  links:
+    self: "/projects/102"
+- id: '103'
+  type: projects
+  attributes:
+    title: NTNU Health Druglogics
+  links:
+    self: "/projects/103"
+- id: '104'
+  type: projects
+  attributes:
+    title: ROS detailed model for MSB manucript
+  links:
+    self: "/projects/104"
+- id: '105'
+  type: projects
+  attributes:
+    title: BESTER
+  links:
+    self: "/projects/105"
+- id: '106'
+  type: projects
+  attributes:
+    title: SUSPHIRE - Sustainable Bioproduction of Pheromones for Insect Pest Control
+      in Agriculture
+  links:
+    self: "/projects/106"
+jsonapi:
+  version: '1.0'
+meta:
+  base_url: https://fairdomhub.org
+  api_version: '0.1'

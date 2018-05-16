@@ -1,0 +1,1 @@
+A **Project** is an area of research carried out as part of a [**Programme**](#tag/programmes) and consisting of one or more [**Investigations**](#tag/investigations).
