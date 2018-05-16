@@ -15,10 +15,10 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Write API (Application Programming Interface) | Winter 2017  |
-| Further integration with openBIS, with improved metadata mappings | Winter 2017  |
-| Improved JERM templates and auto-extraction | Winter 2017 |
-| Metadata search and querying | Spring 2017  |
+| Write API (Application Programming Interface) | Spring 2018  |
+| Further integration with openBIS, with improved metadata mappings | Summer 2018  |
+| Improved JERM templates and auto-extraction | Spring 2018 |
+| Metadata search and querying | Autumn 2018  |
 
 
 
