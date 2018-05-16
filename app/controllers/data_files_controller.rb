@@ -406,6 +406,8 @@ class DataFilesController < ApplicationController
       if handle_upload_data
         create_content_blobs
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
+        # assay ids passed forwards, e.g from "Add Datafile" button
+        @source_assay_ids = (params[:assay_ids] || [] ).reject(&:blank?)
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)
