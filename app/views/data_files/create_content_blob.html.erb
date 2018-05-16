@@ -28,7 +28,8 @@
         });
 
         request.done(function (data) {
-            window.location='<%= provide_metadata_data_files_path %>'
+            <% options = @source_assay_ids.present? ? {assay_ids:@source_assay_ids} : {} %>
+            window.location='<%= provide_metadata_data_files_path(options) %>'
         }).fail(function (jqXHR, textStatus,errorThrown) {
             $j('#in-progress').hide();
             $j('#response-error').show();
