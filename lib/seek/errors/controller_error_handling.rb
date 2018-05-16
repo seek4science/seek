@@ -9,7 +9,8 @@ module Seek
         ::AbstractController::ActionNotFound => 404,
         ActionController::UnknownController => 404,
         ActionController::UnknownFormat => 406,
-        ActiveRecord::RecordNotFound => 404
+        ActiveRecord::RecordNotFound => 404,
+        RSolr::Error::ConnectionRefused => 503
       }.freeze
 
       def self.included(base)
@@ -23,7 +24,7 @@ module Seek
         status = error_response_code(exception)
         exception_notification(status, exception)
         respond_to do |format|
-          format.html { render template: "errors/error_#{status}", layout: 'layouts/errors', status: status }
+          format.html { render template: "errors/error_#{status}", layout: 'layouts/errors', status: status, locals: {exception: exception} }
           format.all { render nothing: true, status: status }
         end
       end
