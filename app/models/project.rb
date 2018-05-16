@@ -161,6 +161,14 @@ class Project < ActiveRecord::Base
     settings['site_username'] = username
   end
 
+  def nels_enabled
+    settings['nels_enabled']
+  end
+
+  def nels_enabled= checkbox_value
+    settings['nels_enabled'] = !(checkbox_value == '0' || !checkbox_value)
+  end
+
   # indicates whether this project has a person, or associated user, as a member
   def has_member?(user_or_person)
     user_or_person = user_or_person.try(:person)
