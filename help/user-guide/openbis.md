@@ -188,10 +188,10 @@ Again, the dependent datasets can also be automatically registered with the Assa
 
 ## Managing OBIS DataSets
 
-In normal circumstances datasets should be rather registerd via their samples or experiments.
+In normal circumstances datasets should be rather registered via their samples or experiments.
 But this section allows registration of individual datasets. 
 
-Managing DataSets is similar to Study or Assays so it won't be seperately described.
+Managing DataSets is similar to Study or Assays so it won't be separately described.
 The only difference is that obviously DataSets don't have dependent elements that could
 be registered with them as Assay of DataFiles, so the registration options are simpler.
 
@@ -224,12 +224,12 @@ period for each object may be longer but rest assure that they all will get
 checked form time to time.
 
 The Study/Assay/DataFile screen shows the details when the metadata were
-synchronized (*Last sync." on top of the panel) as well as error messages if such 
+synchronized (*Last sync.* on top of the panel) as well as error messages if such 
 synchronization failed. 
 There is also *Sync Content* button which allows you to immediately synchronize content
 between OpenBIS and the given SEEK object.
 
-The Mange OBIS Study/Assay/DataSets screen show cached versions of each openBIS entities.
+The Mange OBIS Study/Assay/DataSets screens show cached versions of each openBIS entities.
 So it is possible that if new objects were created during last *Automated Refresh Period*
 hours they are not visible on the screens. Using the *Refresh metadata* form 
 Browse openBIS endpoint screen clears the cache and the current state of OpenBIS is
@@ -242,4 +242,22 @@ It can still be manually synchronized afterwards.
 In some cases, administrator may decide to disable automatic synchronization
 in the SEEK configuration. In that case SEEK will always present only a past snapshot 
 unless manual synchronization is clicked. 
+
+## Administration options
+
+Apart from GUI feature to enable OpenBIS in SEEK, there are few
+options that can be set using SEEK config file.
+
+They are:
+* *openbis_download_limit* - that sets limit of file size than can be downloaded
+from OpenBIS via SEEK interface
+* *openbis_autosync* - (true/false, default true) if set SEEK periodically check
+for content changes in OpenBIS and synchronizes them with local metadata.
+* *openbis_check_new_arrivals* - (true/false, default true) if set SEEK will not only check for
+description changes but also it will check for the newly added datasets/samples under already
+registered studies/assay and register them automatically in SEEK under a correct parent.
+* *openbis_debug* - (true/false, default false) used during development to print out some debug 
+messages about openBIS related calls and operations. 
+
+
 

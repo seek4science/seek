@@ -49,11 +49,11 @@ Note this uses a self-signed certificate by default. The default user is *admin*
     
 You don't need to run the combined **openSEEK** package to use SEEK with openBIS. 
 
-For SEEK versions following 1.3, you can use SEEK with a pre-existing openBIS which is running the 16.05.02 version. You can also install
+For SEEK versions following 1.6, you can use SEEK with a pre-existing openBIS which is running the 16.05.07 version. You can also install
 openBIS separately using the [Standard openBIS installation](https://wiki-bsse.ethz.ch/display/bis/openBIS+Download+Page), or a single Docker container as follows:
 
     docker volume create name=openbis-state
-    docker run -p 4000:443 -v openbis-state:/home/openbis/openbis_state openbis/debian-openbis:16.05.2
+    docker run -p 4000:443 -v openbis-state:/home/openbis/openbis_state openbis/debian-openbis:16.05.7
 
 More details about running the openBIS Docker container can be found on [Docker Hub](https://hub.docker.com/r/openbis/debian-openbis/)
     
