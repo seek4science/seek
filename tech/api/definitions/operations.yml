@@ -381,6 +381,12 @@ paths:
       tags:
         - create
         - dataFiles
+      parameters:
+        - in: body
+          name: dataFile
+          description: The dataFile to create.
+          schema:
+            $ref: '#/definitions/dataFilePost'
       responses:
         '201':
           description: Created
@@ -550,6 +556,8 @@ paths:
       responses:
         '201':
           description: Created
+          schema:
+            $ref: '#/definitions/documentResponse'
           examples:
             application/json:
               $ref: ../examples/documentPostResponse.yml

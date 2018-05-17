@@ -378,6 +378,15 @@
         ]
       }
     },
+    "permittedResourceType": {
+      "type": "string",
+      "minLength": 1,
+      "enum": [
+        "institutions",
+        "people",
+        "projects"
+      ]
+    },
     "policy": {
       "type": "object",
       "properties": {
@@ -391,7 +400,7 @@
           "items": {
             "properties": {
               "resource_type": {
-                "$ref": "#/definitions/nonEmptyString"
+                "$ref": "#/definitions/permittedResourceType"
               },
               "resource_id": {
                 "$ref": "#/definitions/nonEmptyString"
@@ -435,6 +444,7 @@
         "data_files",
         "documents",
         "events",
+        "institutions",
         "models",
         "organisms",
         "people",
