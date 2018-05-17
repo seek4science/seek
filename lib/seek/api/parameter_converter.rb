@@ -14,10 +14,20 @@ module Seek
             value[:access_type] = PolicyHelper::key_access_type(value.delete(:access))
             perms = {}
             (value.delete(:permissions) || []).each_with_index do |permission, index|
+              if permission[:resource].is_a?(Array)
+                project_id = permission[:resource].detect { |e| e[:type] == 'projects' }[:id]
+                institution_id = permission[:resource].detect { |e| e[:type] == 'institutions' }[:id]
+                work_group = WorkGroup.where(project_id: project_id, institution_id: institution_id).first
+                contributor_id = work_group.id
+                contributor_type = 'WorkGroup'
+              else
+                contributor_id = permission[:resource][:id]
+                contributor_type = permission[:resource][:type].singularize.classify
+              end
               perms[index.to_s] = {
                   access_type: PolicyHelper::key_access_type(permission[:access]),
-                  contributor_type: permission[:resource_type].singularize.classify,
-                  contributor_id: permission[:resource_id],
+                  contributor_type: contributor_type,
+                  contributor_id: contributor_id,
               }
             end
             value[:permissions_attributes] = perms

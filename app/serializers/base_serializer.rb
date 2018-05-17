@@ -107,13 +107,16 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   def BaseSerializer.permits policy
-    result = []
-    policy.permissions.each do |p|
-      result.append ({'resource_type' => p.contributor_type.downcase.pluralize,
-                      'resource_id' => p.contributor_id.to_s,
-                      'access' => (PolicyHelper::access_type_key p.access_type) } )
+    policy.permissions.map do |p|
+      if p.contributor.is_a?(WorkGroup)
+        resource = [{ id: p.contributor.project_id.to_s, type: 'projects' },
+                    { id: p.contributor.institution_id.to_s, type: 'institutions' }]
+      else
+        resource = { id: p.contributor_id.to_s, type: p.contributor_type.downcase.pluralize }
+      end
+
+      { resource: resource, access: (PolicyHelper::access_type_key(p.access_type)) }
     end
-    return result
   end
 
   def show_policy?

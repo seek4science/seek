@@ -12,18 +12,24 @@
         "access": "no_access",
         "permissions": [
           {
-            "resource_id": "<%= Factory(:person).id %>",
-            "resource_type": "people",
+            "resource": {
+              "id" : "<%= Factory(:person).id %>",
+              "type": "people"
+            },
             "access": "manage"
           },
           {
-            "resource_id": "<%= Factory(:project).id %>",
-            "resource_type": "projects",
+            "resource": {
+              "id" : "<%= Factory(:project).id %>",
+              "type": "projects"
+            },
             "access": "download"
           },
           {
-            "resource_id": "<%= Factory(:institution).id %>",
-            "resource_type": "institutions",
+            "resource": {
+              "id" : "<%= Factory(:institution).id %>",
+              "type": "institutions"
+            },
             "access": "view"
           }
         ]
