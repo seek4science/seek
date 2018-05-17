@@ -15,11 +15,12 @@
       <%= multi_step_back_button %>
       <%= submit_tag 'Create',
                      :id => 'data_file_submit_btn',
-                     :onclick => "javascript: validateResourceFields(true,'data_file',true); return(false);",
+                     :onclick => "javascript: previewPermissions(); return(false);",
                      :class => 'btn btn-primary' -%>
     </div>
 
     <%= cancel_button(data_files_path) -%>
-    <%= preview_permission_popup_link(@data_file) -%>
   </div>
 </div>
+
+<%= preview_permission_popup_link(@data_file) %>
