@@ -5,7 +5,7 @@ class RdfTripleStoreTest < ActionDispatch::IntegrationTest
     @repository = Seek::Rdf::RdfRepository.instance
     @project = Factory(:project, title: 'Test for RDF storage')
     skip('these tests need a configured triple store setup') unless @repository.configured?
-    WebMock.allow_net_connect!
+    
     @private_graph = RDF::URI.new @repository.get_configuration.private_graph
     @public_graph = RDF::URI.new @repository.get_configuration.public_graph
 

@@ -334,13 +334,14 @@ class ProjectsController < ApplicationController
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] },
                         { institution_ids: [] }, :default_license, :site_root_uri, :site_username, :site_password,
-                        :parent_id, :use_default_policy]
+                        :parent_id, :use_default_policy, :nels_enabled]
 
     if action_name == 'update'
       restricted_params =
         { site_root_uri: User.admin_logged_in?,
           site_username: User.admin_logged_in?,
           site_password: User.admin_logged_in?,
+          nels_enabled: User.admin_logged_in?,
           institution_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)) }
       restricted_params.each do |param, allowed|
         permitted_params.delete(param) if params[:project] && !allowed

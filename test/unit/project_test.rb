@@ -788,6 +788,18 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.settings['nels_enabled']
   end
 
+  test 'sets project settings using virtual attributes' do
+    project = Factory(:project)
+
+    assert_nil project.nels_enabled
+
+    assert_difference('Settings.count') do
+      project.update_attributes(nels_enabled: true)
+    end
+
+    assert project.nels_enabled
+  end
+
   test 'does not use global defaults for project settings' do
     project = Factory(:project)
 
@@ -813,5 +825,29 @@ class ProjectTest < ActiveSupport::TestCase
     assert_nil setting[:value] # This is the database value
     assert_equal 'p@ssw0rd!',  setting.value
     assert_equal 'p@ssw0rd!',  project.settings['site_password']
+  end
+
+  test 'sets NeLS enabled in various ways' do
+    project = Factory(:project)
+
+    assert_nil project.nels_enabled
+
+    project.nels_enabled = true
+    assert_equal true, project.reload.nels_enabled
+
+    project.nels_enabled = false
+    assert_equal false, project.reload.nels_enabled
+
+    project.nels_enabled = '1'
+    assert_equal true, project.reload.nels_enabled
+
+    project.nels_enabled = '0'
+    assert_equal false, project.reload.nels_enabled
+
+    project.nels_enabled = false
+    assert_equal false, project.reload.nels_enabled
+
+    project.nels_enabled = 'yes please'
+    assert_equal true, project.reload.nels_enabled
   end
 end

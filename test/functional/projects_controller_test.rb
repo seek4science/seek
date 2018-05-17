@@ -1568,6 +1568,63 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'project administrator can not enable NeLS integration' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    assert_nil project.nels_enabled
+
+    login_as(project_administrator.user)
+
+    get :edit, id: project.id
+
+    assert_select '#project_nels_enabled', count: 0
+
+    put :update, id: project.id, project: { nels_enabled: '1' }
+
+    project.reload
+    assert_redirected_to project
+    assert_nil project.nels_enabled
+  end
+
+  test 'site administrator can enable NeLS integration' do
+    project_administrator = Factory(:admin)
+    project = project_administrator.projects.first
+    assert_nil project.nels_enabled
+
+    login_as(project_administrator.user)
+
+    get :edit, id: project.id
+
+    assert_select '#project_nels_enabled', count: 1
+    assert_select '#project_nels_enabled[checked]', count: 0
+
+    put :update, id: project.id, project: { nels_enabled: '1' }
+
+    project.reload
+    assert_redirected_to project
+    assert_equal true, project.nels_enabled
+  end
+
+  test 'site administrator can disable NeLS integration' do
+    project_administrator = Factory(:admin)
+    project = project_administrator.projects.first
+    project.nels_enabled = true
+    assert_equal true, project.nels_enabled
+
+    login_as(project_administrator.user)
+
+    get :edit, id: project.id
+
+    assert_select '#project_nels_enabled', count: 1
+    assert_select '#project_nels_enabled[checked]', count: 1
+
+    put :update, id: project.id, project: { nels_enabled: '0' }
+
+    project.reload
+    assert_redirected_to project
+    assert_equal false, project.nels_enabled
+  end
+
   private
 
   def edit_max_object(project)

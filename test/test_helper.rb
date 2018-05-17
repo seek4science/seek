@@ -305,6 +305,12 @@ end
 VCR.configure do |config|
   config.cassette_library_dir = 'test/vcr_cassettes'
   config.hook_into :webmock
+
+  # ignore sparql requests, for some of the RDF integration tests
+  # fixme: in the future it would be good to make the sparql data consistent enough to work with VCR
+  config.ignore_request do |request|
+    request.uri =~ /sparql-auth/
+  end
 end
 
 WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time

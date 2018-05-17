@@ -2,6 +2,7 @@
 en:
   search_label: ""
   search_prompt: "Search here..."
+  seek_id: "SEEK ID"
 
   investigation: "Investigation"
   study: "Study"
