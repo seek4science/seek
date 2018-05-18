@@ -48,4 +48,42 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     refute blob.no_content?
     assert blob.file_size > 0
   end
+
+  test 'preserves policy on update' do
+    policy = Factory(:private_policy)
+    permissions = [
+        Factory(:permission, policy: policy, contributor: Factory(:person), access_type: Policy::MANAGING),
+        Factory(:permission, policy: policy, contributor: Factory(:project), access_type: Policy::ACCESSIBLE),
+        Factory(:permission, policy: policy, contributor: Factory(:institution), access_type: Policy::VISIBLE),
+        Factory(:permission, policy: policy, contributor: Factory(:work_group), access_type: Policy::EDITING),
+        Factory(:permission, policy: policy, contributor: Factory(:favourite_group), access_type: Policy::MANAGING)
+    ]
+    policy.reload
+    assert_equal Permission.precedence.sort, permissions.map(&:contributor_type).sort, 'Should be one of each permission type'
+    sop = Factory(:sop, contributor: @current_person, policy: policy)
+
+    get sop_path(sop, format: :json)
+    assert_response :success
+
+    policy = JSON.parse(@response.body)['data']['attributes']['policy']
+
+    validate_json_against_fragment policy.to_json, "#/definitions/policy"
+
+    to_patch = {
+        data: {
+            type: "sops",
+            id: "#{sop.id}",
+            attributes: {
+                policy: policy
+            }
+        }
+    }
+
+    patch sop_path(sop, format: :json), to_patch.to_json, { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    assert_response :success
+
+    updated_policy = JSON.parse(@response.body)['data']['attributes']['policy']
+
+    assert_equal policy, updated_policy
+  end
 end

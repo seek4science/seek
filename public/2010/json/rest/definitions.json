@@ -459,6 +459,8 @@
       "minLength": 1,
       "enum": [
         "people",
+        "favourite_groups",
+        "work_groups",
         "projects",
         "institutions"
       ]

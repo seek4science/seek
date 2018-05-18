@@ -108,7 +108,7 @@ class BaseSerializer < SimpleBaseSerializer
 
   def BaseSerializer.permits policy
     policy.permissions.map do |p|
-      resource = { id: p.contributor_id.to_s, type: p.contributor_type.downcase.pluralize }
+      resource = { id: p.contributor_id.to_s, type: p.contributor_type.underscore.pluralize }
 
       { resource: resource, access: (PolicyHelper::access_type_key(p.access_type)) }
     end
