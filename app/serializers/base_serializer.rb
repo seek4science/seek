@@ -108,12 +108,7 @@ class BaseSerializer < SimpleBaseSerializer
 
   def BaseSerializer.permits policy
     policy.permissions.map do |p|
-      if p.contributor.is_a?(WorkGroup)
-        resource = [{ id: p.contributor.project_id.to_s, type: 'projects' },
-                    { id: p.contributor.institution_id.to_s, type: 'institutions' }]
-      else
-        resource = { id: p.contributor_id.to_s, type: p.contributor_type.downcase.pluralize }
-      end
+      resource = { id: p.contributor_id.to_s, type: p.contributor_type.downcase.pluralize }
 
       { resource: resource, access: (PolicyHelper::access_type_key(p.access_type)) }
     end

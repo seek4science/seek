@@ -391,19 +391,7 @@
           "items": {
             "properties": {
               "resource": {
-                "oneOf": [
-                  {
-                    "$ref": "#/definitions/permissionResource"
-                  },
-                  {
-                    "type": "array",
-                    "minItems": 2,
-                    "maxItems": 2,
-                    "items": {
-                      "$ref": "#/definitions/permissionResource"
-                    }
-                  }
-                ]
+                "$ref": "#/definitions/permissionResource"
               },
               "access": {
                 "$ref": "#/definitions/accessType"
