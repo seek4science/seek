@@ -61,20 +61,22 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     policy.reload
     assert_equal Permission.precedence.sort, permissions.map(&:contributor_type).sort, 'Should be one of each permission type'
     sop = Factory(:sop, contributor: @current_person, policy: policy)
+    original_policy = sop.reload.policy
+    original_permissions = original_policy.permissions.to_a
 
     get sop_path(sop, format: :json)
     assert_response :success
 
-    policy = JSON.parse(@response.body)['data']['attributes']['policy']
+    parsed_policy = JSON.parse(@response.body)['data']['attributes']['policy']
 
-    validate_json_against_fragment policy.to_json, "#/definitions/policy"
+    validate_json_against_fragment parsed_policy.to_json, "#/definitions/policy"
 
     to_patch = {
         data: {
             type: "sops",
             id: "#{sop.id}",
             attributes: {
-                policy: policy
+                policy: parsed_policy
             }
         }
     }
@@ -84,6 +86,9 @@ class SopCUDTest < ActionDispatch::IntegrationTest
 
     updated_policy = JSON.parse(@response.body)['data']['attributes']['policy']
 
-    assert_equal policy, updated_policy
+    assert_equal parsed_policy, updated_policy
+    assert_equal original_policy, sop.reload.policy
+    compare = proc { |p| "#{p.contributor_type}:#{p.contributor_id} - #{p.access_type}"}
+    assert_equal original_permissions.map(&compare).sort, sop.reload.policy.permissions.to_a.map(&compare).sort
   end
 end
