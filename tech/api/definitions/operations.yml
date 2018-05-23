@@ -582,6 +582,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/documentResponse'
+          examples:
+            application/json:
+              $ref: ../examples/documentResponse.yml
         <<: *ReadType
     patch:
       operationId: updateDocument
@@ -738,6 +741,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/eventResponse'
+          examples:
+            application/json:
+              $ref: ../examples/eventResponse.yml
         <<: *ReadType
     patch:
       operationId: updateEvent
@@ -932,6 +938,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/investigationResponse'
+          examples:
+            application/json:
+              $ref: ../examples/investigationResponse.yml
         <<: *ReadType
     patch:
       operationId: updateInvestigation
@@ -1034,6 +1043,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/modelResponse'
+          examples:
+            application/json:
+              $ref: ../examples/modelResponse.yml
         <<: *ReadType
     patch:
       operationId: updateModel
@@ -1335,6 +1347,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/presentationResponse'
+          examples:
+            application/json:
+              $ref: ../examples/presentationResponse.yml
         <<: *ReadType
     patch:
       operationId: updatePresentation
@@ -1491,6 +1506,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/programmeResponse'
+          examples:
+            application/json:
+              $ref: ../examples/programmeResponse.yml
         <<: *ReadType
     patch:
       operationId: updateProgramme
@@ -1586,6 +1604,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/projectResponse'
+          examples:
+            application/json:
+              $ref: ../examples/projectResponse.yml
         <<: *ReadType
     patch:
       operationId: updateProject
@@ -1746,6 +1767,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/sopResponse'
+          examples:
+            application/json:
+              $ref: ../examples/sopResponse.yml
         <<: *ReadType
     patch:
       operationId: updateSop
@@ -1902,6 +1926,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/studyResponse'
+          examples:
+            application/json:
+              $ref: ../examples/studyResponse.yml
         <<: *ReadType
     patch:
       operationId: updateStudy
