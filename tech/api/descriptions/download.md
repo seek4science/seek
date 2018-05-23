@@ -1,0 +1,1 @@
+**Download** operations are used to retrieve the content of resources such as [**DataFile**](#tag/dataFiles), [**Document**](#tag/documents), [**Model**](#tag/models), [**SOP**](#tag/sops) or [**Presentation**](#tag/presentations). See [**ContentBlob**](#section/ContentBlob) for more details.

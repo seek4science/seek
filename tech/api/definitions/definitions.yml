@@ -178,28 +178,26 @@ definitions:
     - base_url
     - api_version
     additionalProperties: false
-
   ok:
     type: object
     properties:
       status:
-        $ref: '#/definitions/nonEmptyString'
+        "$ref": "#/definitions/nonEmptyString"
     required:
     - status
     additionalProperties: false
     example:
       status: ok
-
   not_implemented:
     type: object
     properties:
       errors:
-        $ref: '#/definitions/errors_array'
+        "$ref": "#/definitions/errors_array"
   unprocessable_entity:
     type: object
     properties:
       errors:
-        $ref: '#/definitions/errors_array'
+        "$ref": "#/definitions/errors_array"
     example:
       errors:
       - detail: id specified by the PUT request does not match object-id in the JSON
@@ -208,7 +206,7 @@ definitions:
     type: object
     properties:
       errors:
-        $ref: '#/definitions/errors_array'
+        "$ref": "#/definitions/errors_array"
     example:
       errors:
       - title: You do not have permission
@@ -217,17 +215,23 @@ definitions:
     type: object
     properties:
       errors:
-        $ref: '#/definitions/errors_array'
+        "$ref": "#/definitions/errors_array"
   not_found:
     type: object
     properties:
       errors:
-        $ref: '#/definitions/errors_array'
+        "$ref": "#/definitions/errors_array"
     example:
       errors:
       - title: Not found
         detail: Couldn't find Institution with 'id'=[70]
-
+  permittedResourceType:
+    type: string
+    minLength: 1
+    enum:
+    - institutions
+    - people
+    - projects
   policy:
     type: object
     properties:
@@ -240,7 +244,7 @@ definitions:
         items:
           properties:
             resource_type:
-              "$ref": "#/definitions/nonEmptyString"
+              "$ref": "#/definitions/permittedResourceType"
             resource_id:
               "$ref": "#/definitions/nonEmptyString"
             access:
@@ -272,6 +276,7 @@ definitions:
     - data_files
     - documents
     - events
+    - institutions
     - models
     - organisms
     - people
@@ -317,11 +322,9 @@ definitions:
       revision_comments:
         "$ref": "#/definitions/nullableNonEmptyString"
       created_at:
-        type: dateTimeString
-        minLength: 1
+        "$ref": "#/definitions/dateTimeString"
       updated_at:
-        type: dateTimeString
-        minLength: 1
+        "$ref": "#/definitions/dateTimeString"
       content_blobs:
         "$ref": "#/definitions/contentBlobsList"
       policy:
@@ -373,11 +376,9 @@ definitions:
       revision_comments:
         "$ref": "#/definitions/nullableNonEmptyString"
       created_at:
-        type: dateTimeString
-        minLength: 1
+        "$ref": "#/definitions/dateTimeString"
       updated_at:
-        type: dateTimeString
-        minLength: 1
+        "$ref": "#/definitions/dateTimeString"
       content_blobs:
         "$ref": "#/definitions/contentBlobsList"
       model_type:
@@ -1213,8 +1214,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                "$ref": "#/definitions/nullableNonEmptyStringList"
               title:
                 "$ref": "#/definitions/nonEmptyString"
               description:
@@ -1296,8 +1295,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                "$ref": "#/definitions/nullableNonEmptyStringList"
               title:
                 "$ref": "#/definitions/nonEmptyString"
               description:
@@ -2117,8 +2114,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                "$ref": "#/definitions/nullableNonEmptyStringList"
               title:
                 "$ref": "#/definitions/nonEmptyString"
               description:
@@ -2156,8 +2151,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                "$ref": "#/definitions/nullableNonEmptyStringList"
               title:
                 "$ref": "#/definitions/nonEmptyString"
               description:
@@ -2860,10 +2853,13 @@ definitions:
             - title
             additionalProperties: false
           relationships:
-            administrators:
-              "$ref": "#/definitions/peopleReferenceList"
-            projects:
-              "$ref": "#/definitions/projectReferencesList"
+            type: object
+            properties:
+              administrators:
+                "$ref": "#/definitions/peopleReferenceList"
+              projects:
+                "$ref": "#/definitions/projectReferencesList"
+            additionalProperties: false
         required:
         - type
         - attributes
@@ -2896,10 +2892,13 @@ definitions:
                 "$ref": "#/definitions/tagsType"
             additionalProperties: false
           relationships:
-            administrators:
-              "$ref": "#/definitions/peopleReferenceList"
-            projects:
-              "$ref": "#/definitions/projectReferencesList"
+            type: object
+            properties:
+              administrators:
+                "$ref": "#/definitions/peopleReferenceList"
+              projects:
+                "$ref": "#/definitions/projectReferencesList"
+            additionalProperties: false
         required:
         - id
         - type
@@ -3034,10 +3033,13 @@ definitions:
                 "$ref": "#/definitions/nullableLicense"
             additionalProperties: false
           relationships:
-            programmes:
-              "$ref": "#/definitions/programmeReferencesList"
-            organisms:
-              "$ref": "#/definitions/organismReferencesList"
+            type: object
+            properties:
+              programmes:
+                "$ref": "#/definitions/programmeReferencesList"
+              organisms:
+                "$ref": "#/definitions/organismReferencesList"
+            additionalProperties: false
         required:
         - id
         - type
@@ -3074,10 +3076,13 @@ definitions:
             - title
             additionalProperties: false
           relationships:
-            programmes:
-              "$ref": "#/definitions/programmeReferencesList"
-            organisms:
-              "$ref": "#/definitions/organismReferencesList"
+            type: object
+            properties:
+              programmes:
+                "$ref": "#/definitions/programmeReferencesList"
+              organisms:
+                "$ref": "#/definitions/organismReferencesList"
+            additionalProperties: false
         required:
         - type
         - attributes
@@ -3426,8 +3431,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                "$ref": "#/definitions/nullableNonEmptyStringList"
               title:
                 "$ref": "#/definitions/nonEmptyString"
               description:
@@ -3476,8 +3479,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                "$ref": "#/definitions/nullableNonEmptyStringList"
               title:
                 "$ref": "#/definitions/nonEmptyString"
               description:
