@@ -28,7 +28,7 @@ module Seek
           end
 
           def projects
-            direct_projects.collect { |proj| [proj] + proj.ancestors }.flatten.uniq
+            direct_projects.compact.collect { |proj| [proj] + proj.ancestors }.flatten.uniq
           end
 
           def projects_and_descendants

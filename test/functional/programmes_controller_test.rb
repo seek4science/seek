@@ -20,8 +20,7 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   test 'new page works even when no programme-less projects' do
     programme = Factory(:programme)
-    work_group = Factory(:work_group, project: programme.projects.first)
-    admin = Factory(:admin, group_memberships: [Factory(:group_membership, work_group: work_group)])
+    admin = Factory(:admin, project:programme.projects.first)
 
     Project.without_programme.delete_all
 

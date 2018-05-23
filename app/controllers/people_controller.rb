@@ -338,8 +338,7 @@ class PeopleController < ApplicationController
     results = Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
                            query: "#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |person|
-      projects = person.projects.collect(&:title).join(', ')
-      { id: person.id, name: person.name, projects: projects, hint: projects }
+      { id: person.id, name: person.name, projects: person.projects.collect(&:title).join(', '), hint: person.typeahead_hint }
     end
 
     respond_to do |format|
