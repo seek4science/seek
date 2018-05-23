@@ -1,5 +1,7 @@
 A **Project** is an area of research carried out as part of a [**Programme**](#tag/programmes) and consisting of one or more [**Investigations**](#tag/investigations).
 
+**In the current version of the API, the [Policy](#section/policy) and the description of Project members and administrative roles does not work correctly.  This will be improved in future versions of the API.**
+
 A **Project** has the following associated information:
 
 * **The title of the Project**
