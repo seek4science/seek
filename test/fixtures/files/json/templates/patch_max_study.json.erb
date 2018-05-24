@@ -12,8 +12,10 @@
         "access": "download",
         "permissions": [
           {
-            "resource_id": "<%= project_id %>",
-            "resource_type": "projects",
+            "resource": {
+              "id" : "<%= project_id %>",
+              "type": "projects"
+            },
             "access": "view"
           }
         ]
