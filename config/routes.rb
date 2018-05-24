@@ -60,6 +60,7 @@ SEEK::Application.routes.draw do
       get :funding
       post :send_feedback
       get :imprint
+      get :terms
       get :about
     end
   end
