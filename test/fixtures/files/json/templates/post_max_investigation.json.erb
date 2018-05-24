@@ -7,13 +7,15 @@
         "access": "download",
         "permissions": [
           <% unless project_ids.nil? %>
-             <% policies = Array.new %>
-             <% for project_id in project_ids do %>
-              <% policies.push("{\"resource_id\": \"#{project_id}\",
-                                \"resource_type\": \"projects\",
-                                \"access\": \"manage\"}") %>
-             <% end %>
-              <%= policies.join(',') %>
+          <% project_ids.each_with_index do |project_id, i| %>
+          {
+            "resource" : {
+              "id" : "<%= project_id %>",
+              "type" : "projects"
+            },
+            "access" : "manage"
+          }<%= ',' unless i == (project_ids.length - 1) %>
+          <% end %>
           <% end %>
         ]
       },

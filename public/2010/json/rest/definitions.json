@@ -390,19 +390,15 @@
           "uniqueItems": true,
           "items": {
             "properties": {
-              "resource_type": {
-                "$ref": "#/definitions/nonEmptyString"
-              },
-              "resource_id": {
-                "$ref": "#/definitions/nonEmptyString"
+              "resource": {
+                "$ref": "#/definitions/permissionResource"
               },
               "access": {
                 "$ref": "#/definitions/accessType"
               }
             },
             "required": [
-              "resource_type",
-              "resource_id",
+              "resource",
               "access"
             ],
             "additionalProperties": false
@@ -445,6 +441,28 @@
         "sample_types",
         "sops",
         "studies"
+      ]
+    },
+    "permissionResource" : {
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/permissionResourceType"
+        },
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "permissionResourceType": {
+      "type": "string",
+      "minLength": 1,
+      "enum": [
+        "people",
+        "favourite_groups",
+        "work_groups",
+        "projects",
+        "institutions"
       ]
     },
     "contributedTypeAttributes": {
