@@ -1,4 +1,4 @@
-An **Assay** describes a particular experiment. It allows you to associate [**DataFiles**](#tag/dataFiles), [**SOPs**](#tag/sops) and [**Models**](#tag/models) together as well as describing the type of **Assay** and any technology required to perform the experiment.
+<a name="assays"></a>An **Assay** describes a particular experiment. It allows you to associate <a href="#dataFiles">**DataFiles**</a>, <a href="#sops">**SOPs**</a> and <a href="#models">**Models**</a> together as well as describing the type of **Assay** and any technology required to perform the experiment.
 
 An **Assay** has the following associated information:
 
@@ -8,20 +8,20 @@ An **Assay** has the following associated information:
 * A string containing the abbreviated form of the kind of **Assay** - normally *EXP* for experimental or *MOD* for modelling
 * A URI to the type of **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
 * A URI to the technology used in the **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
-* The sharing [**Policy**](#section/Policy) of the **Assay**
-* References to the [**People**](#tag/people) who created the **Assay**
-* A singleton reference to the [**Study**](#tag/studies) which the **Assay** is part of
-* References to [**Publications**](#tag/publications) about the **Assay**
-* References to [**DataFiles**](#tag/dataFiles) that belong to the **Assay**
-* References to [**Documents**](#tag/documents) that belong to the **Assay**
-* References to [**Models**](#tag/models) that belong to the **Assay**
-* References to [**Sops**](#tag/sops) that belong to the **Assay**
-* References to the [**Organisms**](#tag/organisms) studied in the **Assay**
+* The sharing <a href="#Policy">**Policy**</a> of the **Assay**
+* References to the <a href="#people">**People**</a> who created the **Assay**
+* A singleton reference to the <a href="#studies">**Study**</a> which the **Assay** is part of
+* References to <a href="#publications">**Publications**</a> about the **Assay**
+* References to <a href="#dataFiles">**DataFiles**</a> that belong to the **Assay**
+* References to <a href="#documents">**Documents**</a> that belong to the **Assay**
+* References to <a href="#models">**Models**</a> that belong to the **Assay**
+* References to <a href="#sops">**Sops**</a> that belong to the **Assay**
+* References to the <a href="#organisms">**Organisms**</a> studied in the **Assay**
 
-A response for an **Assay** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
+A response for an **Assay** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
 
-* A singleton reference to the [**Investigation**](#tag/investigations) which the **Assay** is part of
-* References to the [**Projects**](#tag/projects) that indirectly contain the **Assay**
+* A singleton reference to the <a href="#investigations">**Investigation**</a> which the **Assay** is part of
+* References to the <a href="#projects">**Projects**</a> that indirectly contain the **Assay**
 
 
 

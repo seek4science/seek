@@ -159,7 +159,7 @@ definitions:
       base_url:
         "$ref": "#/definitions/uriString"
       api_version:
-        ref: "#/definitions/nonEmptyString"
+        "$ref": "#/definitions/nonEmptyString"
     required:
     - created
     - modified
@@ -173,7 +173,7 @@ definitions:
       base_url:
         "$ref": "#/definitions/uriString"
       api_version:
-        ref: "#/definitions/nonEmptyString"
+        "$ref": "#/definitions/nonEmptyString"
     required:
     - base_url
     - api_version

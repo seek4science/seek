@@ -1,9 +1,9 @@
-A **Person** in SEEK is someone who participates directly or indirectly in the scientific research described within SEEK. A person may:
+<a name="people"></a>A **Person** in SEEK is someone who participates directly or indirectly in the scientific research described within SEEK. A person may:
 
-* work at one or more [**Institutions**](#tag/institutions)
-* work on one or more [**Projects**](#tag/projects)
+* work at one or more <a href="#institutions">**Institutions**</a>
+* work on one or more <a href="#projects">**Projects**</a>
 
-A **Person** can have helped to carry out [**Investigations**](#tag/investigatioons), [**Studies**](#tag/studies) and [**Assays**](#tag/assays), and to have been involved in the creation of resources such as [**DataFles**](#tag/dataFiles).
+A **Person** can have helped to carry out <a href="#investigations">**Investigations**</a>, <a href="#studies">**Studies**</a> and <a href="#assays">**Assays**</a>, and to have been involved in the creation of resources such as <a href="#dataFiles">**DataFles**</a>.
 
 A **Person** has the following associated information:
 
@@ -18,23 +18,23 @@ A **Person** has the following associated information:
 * The telephone number of the **Person**, including country code
 * The [Skype](https://www.skype.com) name of the **Person**
 
-A response for a **Person** such as that for a [**Create**](#tag/create), [**Read**](#tag/read) or [**Update**](#tag/update) includes the additional information
+A response for a **Person** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
 
 * A URI to an image used as the **Person's** avatar
 * The **Person's** title, made from their first and last name
-* A list of the [**Project**](#tag/projects) positions held by the **Person**
+* A list of the <a href="#projects">**Project**</a> positions held by the **Person**
 
-* References to the [**Projects**](#tag/projects) in which the **Person** is involved
-* References to the [**Institutions**](#tag/institution) where the **Person** works
-* References to the [**Investigations**](#tag/investigation) in which the **Person** is involved
-* References to the [**Studies**](#tag/study) in which the **Person** is involved
-* References to the [**Assays**](#tag/assay) in which the **Person** is involved
-* References to the [**DataFiles**](#tag/dataFile) associated with the **Person**
-* References to the [**Documents**](#tag/document) associated with the **Person**
-* References to the [**Models**](#tag/model) associated with the **Person**
-* References to the [**SOPs**](#tag/sop) associated with the **Person**
-* References to the [**Publications**](#tag/publication) associated with the **Person**
-* References to the [**Presentations**](#tag/presentation) associated with the **Person**
-* References to the [**Events**](#tag/event) associated with the **Person**
+* References to the <a href="#projects">**Projects**</a> in which the **Person** is involved
+* References to the <a href="#institutions">**Institutions**</a> where the **Person** works
+* References to the <a href="#investigations">**Investigations**</a> in which the **Person** is involved
+* References to the <a href="#studies">**Studies**</a> in which the **Person** is involved
+* References to the <a href="#assays">**Assays**</a> in which the **Person** is involved
+* References to the <a href="#dataFiles">**DataFiles**</a> associated with the **Person**
+* References to the <a href="#documents">**Documents**</a> associated with the **Person**
+* References to the <a href="#models">**Models**</a> associated with the **Person**
+* References to the <a href="#sops">**SOPs**</a> associated with the **Person**
+* References to the <a href="#publications">**Publications**</a> associated with the **Person**
+* References to the <a href="#presentations">**Presentations**</a> associated with the **Person**
+* References to the <a href="#events">**Events**</a> associated with the **Person**
 
 **Note that in the Person response the email address is encoded in mbox_sha1sum**

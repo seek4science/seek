@@ -1,3 +1,3 @@
-An **updateEvent** operation will modify the information held about the specified [**Event**](#tag/events). This operation is only available if the authenticated user has access to the [**Event**](#tag/events).
+<a name="updateEvent"></a>An **updateEvent** operation will modify the information held about the specified <a href="#events">**Event**</a>. This operation is only available if the authenticated user has access to the <a href="#events">**Event**</a>.
 
-The **updateEvent** operation returns a JSON object representing the modified [**Event**](#tag/events).
+The **updateEvent** operation returns a JSON object representing the modified <a href="#events">**Event**</a>.

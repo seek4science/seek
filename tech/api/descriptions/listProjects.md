@@ -1,1 +1,1 @@
-The **listProjects** operation returns a JSON object containing a list of all the [**Projects**](#tag/projects) to which the authenticated user has accesss.
+<a name="listProjects"></a>The **listProjects** operation returns a JSON object containing a list of all the <a href="#projects">**Projects**</a> to which the authenticated user has accesss.

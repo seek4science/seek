@@ -26,6 +26,7 @@ ___
 
 ## License
 <a name="License"></a>
+
 The license specifies the license that will apply to any <a href="#dataFiles">**DataFiles**</a>, <a href="#models">**Models**</a>, <a href="#sops">**SOPs**</a>, <a href="#documents">**Documents**</a> and <a href="#presentations">**Presentations**</a> associated with a <a href="#projects">**Project**</a>.
 
 The license can currently be:
@@ -64,8 +65,7 @@ The license can currently be:
 
 ___
 
-## ContentBlob
-<a name="ContentBlob"></a>
+
 The content of a <a href="#dataFiles">**DataFile**</a>, <a href="#documents">**Document**</a>, <a href="#models">**Model**</a>, <a href="#sops">**SOP**</a> or <a href="#presentations">**Presentation**</a> is specified as a set of **ContentBlobs**.
 
 When a resource with content is created, it is possible to specify a ContentBlob either as:
@@ -92,7 +92,7 @@ A placeholder can then be satisfied by uploading a file to the location URI. For
 ],
 ```
 
-may be satisfied by uploading a file to http://www.fairdomhub.org/data_files/57/content_blobs/313 using the <a href="#uploadDataFileContent">uploadDataFileContent</a> operation
+may be satisfied by uploading a file to http://www.fairdomhub.org/data_files/57/content_blobs/313 using the [uploadDataFileContent](#operation/uploadDataFileContent) operation
 
 The content of a resource may be downloaded by first *reading* the resource and then *downloading* the ContentBlobs from their URI.
 
