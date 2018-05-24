@@ -4,6 +4,8 @@ class SampleAttributeType < ActiveRecord::Base
   validates :title, :base_type, :regexp, presence: true
   validate :validate_allowed_type, :validate_regular_expression, :validate_resolution
 
+  has_many :sample_attributes, inverse_of: :sample_attribute_type
+
   before_save :set_defaults_attributes
   after_initialize :set_defaults_attributes
 
@@ -70,6 +72,10 @@ class SampleAttributeType < ActiveRecord::Base
     base_type == Seek::Samples::BaseType::CV
   end
 
+  def seek_resource?
+    base_type_handler.is_a?(Seek::Samples::AttributeTypeHandlers::SeekResourceAttributeTypeHandler)
+  end
+
   def seek_sample?
     base_type == Seek::Samples::BaseType::SEEK_SAMPLE
   end
@@ -78,7 +84,7 @@ class SampleAttributeType < ActiveRecord::Base
     base_type == Seek::Samples::BaseType::SEEK_STRAIN
   end
 
-  def base_type_handler(additional_options)
+  def base_type_handler(additional_options = {})
     Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type, additional_options)
   end
 end

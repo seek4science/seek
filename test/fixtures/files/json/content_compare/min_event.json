@@ -18,6 +18,14 @@
       "end_date": null
     },
     "relationships": {
+      "submitter": {
+        "data": [
+          {
+            "id": "522086294",
+            "type": "people"
+          }
+        ]
+      },
       "projects": {
         "data": [
           {

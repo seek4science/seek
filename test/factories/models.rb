@@ -1,5 +1,3 @@
-include ActionDispatch::TestProcess
-
 # ModelFormat
 Factory.define(:model_format) do |f|
   f.sequence(:title) { |n| "format #{n}" }
@@ -8,19 +6,21 @@ end
 # Model
 Factory.define(:model) do |f|
   f.sequence(:title) { |n| "A Model #{n}" }
-  f.projects { [Factory.build(:project)] }
-  f.association :contributor, factory: :person
+  f.with_project_contributor
+
   f.after_create do |model|
     model.content_blobs = [Factory.create(:cronwright_model_content_blob, asset: model, asset_version: model.version)] if model.content_blobs.blank?
   end
 end
 
 Factory.define(:min_model, class: Model) do |f|
+  f.with_project_contributor
   f.title 'A Minimal Model'
   f.projects { [Factory.build(:min_project)] }
 end
 
 Factory.define(:max_model, class: Model) do |f|
+  f.with_project_contributor
   f.title 'A Maximal Model'
   f.description 'Hidden Markov Model'
   f.projects { [Factory.build(:max_project)] }
@@ -33,22 +33,19 @@ Factory.define(:max_model, class: Model) do |f|
                                           asset: model,
                                           asset_version: model.version)] if model.content_blobs.blank?
   end
+  f.other_creators 'Blogs, Joe'
 end
 
-Factory.define(:model_2_files, class: Model) do |f|
-  f.sequence(:title) { |n| "A Model #{n}" }
-  f.projects { [Factory.build(:project)] }
-  f.association :contributor, factory: :person
-  f.after_create do |model|
-    model.content_blobs = [Factory.create(:cronwright_model_content_blob, asset: model, asset_version: model.version), Factory.create(:rightfield_content_blob, asset: model, asset_version: model.version)] if model.content_blobs.blank?
+Factory.define(:model_2_files, parent: :model) do |f|
+  f.after_build do |model|
+    model.content_blobs = [Factory.create(:cronwright_model_content_blob, asset: model, asset_version: model.version),
+                           Factory.create(:rightfield_content_blob, asset: model, asset_version: model.version)] if model.content_blobs.blank?
   end
 end
 
-Factory.define(:model_2_remote_files, class: Model) do |f|
-  f.sequence(:title) { |n| "A Model #{n}" }
-  f.projects { [Factory.build(:project)] }
-  f.association :contributor, factory: :person
-  f.after_create do |model|
+Factory.define(:model_2_remote_files, parent: :model) do |f|
+
+  f.after_build do |model|
     model.content_blobs = [Factory.create(:url_content_blob,
                                           asset: model,
                                           asset_version: model.version),
@@ -116,6 +113,13 @@ end
 Factory.define(:doc_model, parent: :model) do |f|
   f.after_create do |model|
     model.content_blobs = [Factory.create(:doc_content_blob, asset: model, asset_version: model.version)]
+  end
+end
+
+Factory.define(:api_model, parent: :model) do |f|
+  f.after_create do |model|
+    model.content_blobs = [Factory.create(:blank_pdf_content_blob, asset: model, asset_version: model.version),
+                           Factory.create(:blank_xml_content_blob, asset: model, asset_version: model.version)]
   end
 end
 

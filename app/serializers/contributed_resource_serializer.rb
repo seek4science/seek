@@ -3,6 +3,10 @@ class ContributedResourceSerializer < PCSSerializer
 
   attribute :version, key: :latest_version
 
+  attribute :tags do
+    serialize_annotations(object)
+  end
+
   attribute :versions do
     versions_data = []
     object.versions.each do |v|
@@ -32,16 +36,18 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :content_blobs do
     requested_version = get_version
 
-    blobs = []
-    if defined?(requested_version.content_blobs)
-      requested_version.content_blobs.each do |cb|
-        blobs.append(convert_content_blob_to_json(cb))
-      end
-    elsif defined?(requested_version.content_blob)
-      blobs.append(convert_content_blob_to_json(requested_version.content_blob))
+    if requested_version.respond_to?(:content_blobs)
+      blobs = requested_version.content_blobs
+    elsif requested_version.respond_to?(:content_blob)
+      blobs = [requested_version.content_blob].compact
+    else
+      blobs = []
     end
-    blobs
+
+    blobs.map { |cb| convert_content_blob_to_json(cb) }
   end
+
+  attribute :other_creators
 
   def convert_content_blob_to_json(cb)
     path = polymorphic_path([cb.asset, cb])

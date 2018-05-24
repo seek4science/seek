@@ -8,10 +8,10 @@
         "access":"no_access",
         "permissions":[]
       },
-      "tags": null,
       "title": "A Minimal Study",
       "description": null,
       "experimentalists": null,
+      "other_creators": null,
       "person_responsible_id": null
     },
     "relationships": {
@@ -62,6 +62,9 @@
         "data": []
       },
       "publications": {
+        "data": []
+      },
+      "documents": {
         "data": []
       }
     },

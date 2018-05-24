@@ -14,8 +14,9 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test 'publications through the study assays' do
-    assay1 = Factory :assay
-    assay2 = Factory :assay
+    assay1 = Factory(:assay)
+    inv = assay1.investigation
+    assay2 = Factory(:assay, contributor: assay1.contributor, study: Factory(:study, contributor: assay1.contributor, investigation: inv))
 
     pub1 = Factory :publication, title: 'pub 1'
     pub2 = Factory :publication, title: 'pub 2'
@@ -25,8 +26,6 @@ class InvestigationTest < ActiveSupport::TestCase
 
     Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
     Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
-
-    inv = Factory(:investigation, studies: [Factory(:study, assays: [assay1]), Factory(:study, assays: [assay2])])
 
     assert_equal 3, inv.related_publications.size
     assert_equal [pub1, pub2, pub3], inv.related_publications.sort_by(&:id)
@@ -43,7 +42,8 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test 'to_rdf' do
-    object = Factory :investigation, description: 'Big investigation', studies: [Factory(:study), Factory(:study)]
+    object = Factory(:investigation, description: 'Big investigation')
+    FactoryGirl.create_list(:study, 2, contributor: object.contributor, investigation: object)
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
@@ -89,7 +89,8 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test 'authorized user cant delete with study' do
-    investigation = Factory :investigation, studies: [Factory(:study)], contributor: Factory(:user)
+    investigation = Factory(:study).investigation
+    assert_not_empty investigation.studies
     assert !investigation.can_delete?(investigation.contributor)
   end
 
@@ -116,7 +117,8 @@ class InvestigationTest < ActiveSupport::TestCase
   end
 
   test 'can create snapshot of investigation' do
-    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), studies: [Factory(:study)], contributor: Factory(:user))
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy))
+    Factory(:study, contributor: investigation.contributor)
     snapshot = nil
 
     assert_difference('Snapshot.count') do

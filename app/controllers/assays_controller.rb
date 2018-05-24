@@ -49,6 +49,12 @@ class AssaysController < ApplicationController
           break
         end
       end
+      @existing_assay.documents.each do |d|
+        if !d.can_view?
+          notice_message << "Some or all #{t('document').pluralize} of the existing #{t('assays.assay')} cannot be viewed, you may specify your own! <br/>"
+          break
+        end
+      end
 
       unless notice_message.blank?
         flash.now[:notice] = notice_message.html_safe
@@ -111,7 +117,10 @@ class AssaysController < ApplicationController
     update_annotations(params[:tag_list], @assay) #this saves the assay
     update_scales @assay
 
-    if @assay.present? && @assay.save
+    a = @assay.present?
+    b = @assay.save
+
+    if a && b
       update_assets_linked_to_assay @assay, params
       update_relationships(@assay, params)
 
@@ -128,17 +137,13 @@ class AssaysController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { render :action => "new" }
-        format.json { render json: {error: @assay.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
-
+        format.html { render :action => "new", status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
   end
 
   def update
-
-    set_assay_organisms_from_json if @is_json
-
     update_assay_organisms @assay, params
     update_annotations(params[:tag_list], @assay)
     update_scales @assay
@@ -156,14 +161,14 @@ class AssaysController < ApplicationController
         format.html { redirect_to(@assay) }
         format.json {render json: @assay}
       else
-        format.html { render :action => "edit" }
-        format.json { render json: {error: @assay.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+        format.html { render :action => "edit", status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end
   end
 
   def update_assay_organisms assay,params
-    organisms             = params[:assay_organism_ids] || []
+    organisms             = params[:assay_organism_ids] || params[:assay][:organism_ids] || []
     assay.assay_organisms = []
     Array(organisms).each do |text|
       o_id, strain,strain_id,culture_growth_type_text,t_id,t_title=text.split(",")
@@ -177,6 +182,7 @@ class AssaysController < ApplicationController
     data_files            = params[:data_files] || []
     model_ids             = params[:model_ids] || []
     samples               = params[:samples] || []
+    document_ids          = params[:document_ids] || []
 
     assay_assets_to_keep = [] #Store all the asset associations that we are keeping in this
     data_files.each do |data_file|
@@ -193,12 +199,20 @@ class AssaysController < ApplicationController
       s = Sop.find(id)
       assay_assets_to_keep << assay.associate(s) if s.can_view?
     end
+    Array(document_ids).each do |id|
+      d = Document.find(id)
+      assay_assets_to_keep << assay.associate(d) if d.can_view?
+    end
     samples.each do |sample|
       s = Sample.find(sample[:id])
       assay_assets_to_keep << assay.associate(s, :direction => sample[:direction]) if s.can_view?
     end
     #Destroy AssayAssets that aren't needed
-    (assay.assay_assets - assay_assets_to_keep.compact).each { |a| a.destroy }
+    (assay.assay_assets - assay_assets_to_keep.compact).each do |a|
+      unless a.asset_type == 'Document' # These are cleaned up automatically
+        a.destroy
+      end
+    end
   end
 
   def show
@@ -219,23 +233,9 @@ class AssaysController < ApplicationController
 
   private
 
-  def set_assay_organisms_from_json
-    if !(params[:assay][:assay_organism_ids].nil?)
-      params[:assay_organism_ids] = params[:assay][:assay_organism_ids]
-      params[:assay].delete :assay_organism_ids
-    end
-  end
-
-  def set_creators
-    if !(params[:data][:attributes][:creators].nil?)
-      params[:creators] = params[:data][:attributes][:creators]
-      params[:data][:attributes].delete :creators
-    end
-  end
-
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id,
-                                  :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset)
+                                  :assay_type_uri, :technology_type_uri, :license, :other_creators, :create_from_asset,
+                                  { document_ids: []})
   end
-
 end

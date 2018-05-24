@@ -39,7 +39,7 @@ class UsersController < ApplicationController
     self.current_user = params[:activation_code].blank? ? false : User.find_by_activation_code(params[:activation_code])
     if logged_in? && !current_user.active?
       current_user.activate
-      Mailer.welcome(current_user).deliver_now
+      Mailer.welcome(current_user).deliver_later
       flash[:notice] = 'Registration complete and successfully activated!'
       redirect_to current_person
     else
@@ -82,7 +82,7 @@ class UsersController < ApplicationController
           user.reset_password
 
           user.save!
-          Mailer.forgot_password(user).deliver_now if Seek::Config.email_enabled
+          Mailer.forgot_password(user).deliver_later if Seek::Config.email_enabled
           flash[:notice] = "Instructions on how to reset your password have been sent to #{user.person.email}"
           format.html { render action: 'forgot_password' }
         else
@@ -120,7 +120,7 @@ class UsersController < ApplicationController
         AuthLookupUpdateJob.new.add_items_to_queue(@user) if do_auth_update
         # user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
-          Mailer.signup(@user).deliver_now
+          Mailer.signup(@user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to action: 'activation_required' }
@@ -146,7 +146,7 @@ class UsersController < ApplicationController
   def resend_activation_email
     user = User.find(params[:id])
     if user && user.person && !user.active?
-      Mailer.signup(user).deliver_now
+      Mailer.signup(user).deliver_later
       flash[:notice] = "An email has been sent to user: #{user.person.name}"
     else
       flash[:notice] = 'No email sent. User was already activated.'

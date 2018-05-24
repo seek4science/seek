@@ -12,12 +12,12 @@ module AssetsHelper
     content = Rails.cache.fetch("#{asset.cache_key}/#{asset.content_blob.cache_key}") do
       Seek::Renderers::RendererFactory.instance.renderer(asset.content_blob).render
     end
-    unless content.blank?
+    if content.blank?
+      ''
+    else
       content_tag(:div, class: 'renderer') do
         content.html_safe
       end
-    else
-      ''
     end
   end
 
@@ -34,11 +34,11 @@ module AssetsHelper
 
   def filesize_as_text(content_blob)
     size = content_blob.nil? ? 0 : content_blob.file_size
-    if size.nil?
-      html = "<span class='none_text'>Unknown</span>"
-    else
-      html = number_to_human_size(size)
-    end
+    html = if size.nil?
+             "<span class='none_text'>Unknown</span>"
+           else
+             number_to_human_size(size)
+           end
     html.html_safe
   end
 
@@ -63,13 +63,13 @@ module AssetsHelper
       text = resource_or_text.underscore.humanize
     else
       resource_type = resource_or_text.class.name
-      if resource_or_text.is_a?(Assay)
-        text = resource_or_text.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
-      elsif !(translated = translate_resource_type(resource_type)).include?('translation missing')
-        text = translated
-      else
-        text = resource_type.underscore.humanize
-      end
+      text = if resource_or_text.is_a?(Assay)
+               resource_or_text.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')
+             elsif !(translated = translate_resource_type(resource_type)).include?('translation missing')
+               translated
+             else
+               resource_type.underscore.humanize
+             end
     end
     text
   end
@@ -97,21 +97,21 @@ module AssetsHelper
 
   def show_resource_path(resource)
     path = ''
-    if resource.class.name.include?('::Version')
-      path = polymorphic_path(resource.parent, version: resource.version)
-    else
-      path = polymorphic_path(resource)
-    end
+    path = if resource.class.name.include?('::Version')
+             polymorphic_path(resource.parent, version: resource.version)
+           else
+             polymorphic_path(resource)
+           end
     path
   end
 
   def edit_resource_path(resource)
     path = ''
-    if resource.class.name.include?('::Version')
-      path = edit_polymorphic_path(resource.parent)
-    else
-      path = edit_polymorphic_path(resource)
-    end
+    path = if resource.class.name.include?('::Version')
+             edit_polymorphic_path(resource.parent)
+           else
+             edit_polymorphic_path(resource)
+           end
     path
   end
 
@@ -120,7 +120,7 @@ module AssetsHelper
   # assets are sorted by title except if they are projects and scales (because of hierarchies)
   def authorised_assets(asset_class, projects = nil, action = 'view')
     assets = asset_class.all_authorized_for action, User.current_user, projects
-    assets = assets.sort_by(&:title) if !assets.blank? && !%w(Project Scale).include?(assets.first.class.name)
+    assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project Scale].include?(assets.first.class.name)
     assets
   end
 
@@ -145,8 +145,21 @@ module AssetsHelper
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})
     download_button = icon_link_to('Download', 'download', download_path, opts)
     link_button_or_nil = link_url ? icon_link_to('External Link', 'external_link', link_url, opts.merge(target: 'blank')) : nil
-    return asset.content_blobs.detect { |blob| !blob.show_as_external_link? } ? download_button : link_button_or_nil if asset.respond_to?(:content_blobs)
-    return asset.content_blob.show_as_external_link? ? link_button_or_nil : download_button if asset.respond_to?(:content_blob)
+    if asset.respond_to?(:content_blobs)
+      if asset.content_blobs.detect { |blob| !blob.show_as_external_link? }
+        download_button
+      else
+        link_button_or_nil
+      end
+    elsif asset.respond_to?(:content_blob) && asset.content_blob.present?
+      if asset.content_blob.nels?
+        icon_link_to('Open in NeLS', 'external_link', link_url, opts.merge(target: 'blank'))
+      elsif asset.content_blob.show_as_external_link?
+        link_button_or_nil
+      else
+        download_button
+      end
+    end
   end
 
   def view_content_button(asset)
@@ -168,5 +181,14 @@ module AssetsHelper
       sharing_text = "This item is <span style='font-weight: bold;'>Shared</span>, but not with all visitors to this site"
     end
     sharing_text.html_safe
+  end
+
+  def create_button(opts)
+    text = opts.delete(:button_text) || 'Upload and Save'
+    submit_tag(text, opts.merge('data-upload-button' => ''))
+  end
+
+  def mini_file_download_icon(fileinfo)
+    image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
   end
 end

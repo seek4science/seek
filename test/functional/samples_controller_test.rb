@@ -139,7 +139,7 @@ class SamplesControllerTest < ActionController::TestCase
     type = Factory(:simple_sample_type)
     type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
-    sample = Factory(:sample, sample_type: type)
+    sample = Factory(:sample, sample_type: type, contributor: person)
     sample.set_attribute(:the_title, 'ttt')
     sample.set_attribute(:bool, true)
     sample.save!
@@ -374,6 +374,7 @@ class SamplesControllerTest < ActionController::TestCase
     login_as(person)
     sample = populated_patient_sample
     sample.contributor = person
+    sample.projects = person.projects
     sample.policy = Factory(:private_policy)
     sample.save!
     sample.reload
@@ -391,6 +392,7 @@ class SamplesControllerTest < ActionController::TestCase
     login_as(person)
     sample = populated_patient_sample
     sample.contributor = person
+    sample.projects = person.projects
     sample.policy = Factory(:private_policy)
     sample.save!
     sample.reload
@@ -462,7 +464,7 @@ class SamplesControllerTest < ActionController::TestCase
     type = Factory(:simple_sample_type)
     type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
-    sample = Factory(:sample, sample_type: type)
+    sample = Factory(:sample, sample_type: type, contributor: person)
     sample.set_attribute(:the_title, 'ttt')
     sample.set_attribute(:bool, true)
     sample.save!
@@ -561,11 +563,37 @@ class SamplesControllerTest < ActionController::TestCase
     assert SampleTypeUpdateJob.new(type, false).exists?
   end
 
+  test 'linked samples show up in related items, for both directions' do
+    person = Factory(:person)
+    login_as(person.user)
+
+    sample_type = Factory(:linked_optional_sample_type, project_ids: person.projects.map(&:id))
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type, contributor: person)
+
+    sample = Sample.create!(sample_type: sample_type, project_ids: person.projects.map(&:id),
+                            data: { title: 'Linking sample',
+                                    patient: linked_sample.id})
+
+    # For the sample containing the link
+    get :show, id: sample
+
+    assert_response :success
+    assert_select 'div.related-items a[href=?]', sample_path(linked_sample), text: /#{linked_sample.title}/
+
+    # For the sample being linked to
+    get :show, id: linked_sample
+
+    assert_response :success
+
+    assert_select 'div.related-items a[href=?]', sample_path(sample), text: /#{sample.title}/
+  end
+
   private
 
   def populated_patient_sample
-    sample = Sample.new title: 'My Sample', policy: Factory(:public_policy), contributor: Factory(:person),
-                        project_ids: [Factory(:project).id]
+    person = Factory(:person)
+    sample = Sample.new title: 'My Sample', policy: Factory(:public_policy),
+                        project_ids:person.projects.collect(&:id),contributor:person
     sample.sample_type = Factory(:patient_sample_type)
     sample.title = 'My sample'
     sample.set_attribute(:full_name, 'Fred Bloggs')

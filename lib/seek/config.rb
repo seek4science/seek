@@ -1,5 +1,3 @@
-require 'simple_crypt'
-
 module Seek
   # Fallback attribute, which if defined will be the result if the stored/default value for a setting is nil
   # Convention to create a new fallback is to name the method <setting_name>_fallback
@@ -136,8 +134,6 @@ module Seek
 
   # Custom accessors for settings that are not a simple mapping
   module CustomAccessors
-    include SimpleCrypt
-
     def recaptcha_setup?
       if Seek::Config.recaptcha_enabled
         if Seek::Config.recaptcha_public_key.blank? || Seek::Config.recaptcha_private_key.blank?
@@ -163,7 +159,7 @@ module Seek
 
     def attr_encrypted_key
       if File.exist?(attr_encrypted_key_path)
-        File.read(attr_encrypted_key_path)
+        File.binread(attr_encrypted_key_path)[0..31]
       else
         write_attr_encrypted_key
         attr_encrypted_key
@@ -223,58 +219,25 @@ module Seek
     end
 
     def smtp_settings(field)
-      value = smtp[field.to_sym]
-      value = decrypt_value(value) if field == :password || field == 'password'
-      value
+      smtp.with_indifferent_access[field.to_s]
     end
 
     def set_smtp_settings(field, value)
-      if %i[password user_name authentication].include? field.to_sym
-        value = nil if value.blank?
-      end
-
-      value = value.to_sym if field.to_sym == :authentication && value
-      if field.to_sym == :password
-        unless value.blank?
-          value = encrypt(value, generate_key(GLOBAL_PASSPHRASE))
-        end
-      end
-      merge! :smtp, field => value
+      merge! :smtp, field => (value.blank? ? nil : value)
       value
     end
 
-    # TODO: update to use attr_encrypted
-    def datacite_password_decrypt
-      datacite_password = Seek::Config.datacite_password
-      decrypt_value(datacite_password)
-    end
-
-    # TODO: update to use attr_encrypted
-    def decrypt_value(value)
-      unless value.blank?
-        begin
-          decrypt(value, generate_key(GLOBAL_PASSPHRASE))
-        rescue => exception
-          Rails.logger.error 'ERROR decrypting value - reverting to a blank string'
-          ''
-        end
-      end
-    end
-
-    # TODO: update to use attr_encrypted
-    def datacite_password_encrypt(password)
-      unless password.blank?
-        Seek::Config.datacite_password = encrypt(password, generate_key(GLOBAL_PASSPHRASE))
-      end
-      datacite_password
-    end
-
     def facet_enable_for_page(controller)
-      facet_enable_for_pages[controller.to_sym]
+      facet_enable_for_pages.with_indifferent_access[controller.to_s]
     end
 
     def default_page(controller)
-      default_pages[controller.to_sym]
+      pages = default_pages.with_indifferent_access
+      if pages.key?(controller.to_s)
+        pages[controller.to_s]
+      else
+        Settings.defaults['default_pages'][controller.to_s] || 'latest'
+      end
     end
 
     # FIXME: change to standard setter=
@@ -298,8 +261,8 @@ module Seek
     end
 
     def write_attr_encrypted_key
-      File.open(attr_encrypted_key_path, 'w') do |f|
-        f << SecureRandom.hex(32)
+      File.open(attr_encrypted_key_path, 'wb') do |f|
+        f << SecureRandom.random_bytes(32)
       end
     end
 
@@ -329,45 +292,50 @@ module Seek
 
     # unlike default, always sets the value
     def fixed(setting, value)
-      setter = "#{setting}="
-      set_value setter, value
+      set_value(setting, value)
     end
 
     def define_class_method(method, *args, &block)
       singleton_class.instance_eval { define_method method.to_sym, *args, &block }
     end
 
-    def get_default_value(getter, conversion = nil)
-      val = Settings.defaults[getter.to_sym]
+    def get_default_value(setting, conversion = nil)
+      val = Settings.defaults[setting.to_sym]
       val = val.send(conversion) if conversion && val
       val
     end
 
     if Settings.table_exists?
-      def get_value(getter, conversion = nil)
-        val = Settings.send getter
+      def get_value(setting, conversion = nil)
+        result = Settings.global.fetch(setting)
+        if result
+          val = result.value
+        else
+          val = Settings.defaults[setting.to_s]
+        end
         val = val.send(conversion) if conversion && val
         val
       end
 
-      def set_value(setter, val, conversion = nil)
+      def set_value(setting, val, conversion = nil)
         val = val.send(conversion) if conversion && val
-        Settings.send setter, val
+        Settings.global[setting] = val
       end
-
     else
-      def get_value(getter, conversion = nil)
-        get_default_value(getter, conversion)
+      def get_value(setting, conversion = nil)
+        get_default_value(setting, conversion)
       end
 
-      def set_value(setter, val, conversion = nil)
+      def set_value(setting, val, conversion = nil)
         val = val.send(conversion) if conversion && val
-        Settings.defaults[setter.to_sym] = val
+        Settings.defaults[setting.to_sym] = val
       end
     end
 
     def merge!(var, value)
-      result = Settings.merge! var, value
+      # Initialize the hash from defaults if it does not exist yet in settings
+      Settings.global[var] = Settings.defaults[var.to_s] unless Settings.global.fetch(var)
+      result = Settings.merge!(var, value)
       send "#{var}_propagate" if respond_to? "#{var}_propagate"
       result
     end
@@ -381,22 +349,34 @@ module Seek
       default = "default_#{setting}"
       if respond_to?(fallback)
         define_class_method getter do
-          get_value(getter, options[:convert]) || send(fallback)
+          get_value(setting, options[:convert]) || send(fallback)
         end
       else
         define_class_method getter do
-          get_value(getter, options[:convert])
+          get_value(setting, options[:convert])
         end
       end
 
       define_class_method default do
-        get_default_value(getter, options[:convert])
+        get_default_value(setting, options[:convert])
       end
 
       define_class_method setter do |val|
-        set_value(setter, val, options[:convert])
+        set_value(setting, val, options[:convert])
         send propagate if respond_to?(propagate)
       end
+    end
+
+    def register_encrypted_setting(setting)
+      encrypted_settings << setting.to_sym
+    end
+
+    def encrypted_settings
+      @@encrypted_settings ||= []
+    end
+
+    def encrypted_setting?(setting)
+      encrypted_settings.include?(setting.to_sym)
     end
   end
 
@@ -418,8 +398,18 @@ module Seek
       HashWithIndifferentAccess.new(yaml)
     end
 
+    def self.read_project_setting_attributes
+      yaml = YAML.load_file(File.join(File.dirname(File.expand_path(__FILE__)), 'project_setting_attributes.yml'))
+      HashWithIndifferentAccess.new(yaml)
+    end
+
     read_setting_attributes.each do |method, opts|
       setting method, opts
+      register_encrypted_setting(method) if opts && opts[:encrypt]
+    end
+
+    read_project_setting_attributes.each do |method, opts|
+      register_encrypted_setting(method) if opts && opts[:encrypt]
     end
   end
 end

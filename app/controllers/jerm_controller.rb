@@ -33,7 +33,6 @@ class JermController < ApplicationController
       project=Project.find(params[:project])
       uri=params[:uri]
       type=params[:type]
-      project.decrypt_credentials
       downloader=Jerm::DownloaderFactory.create project.title
       data_hash = downloader.get_remote_data uri,project.site_username,project.site_password, type
       send_data data_hash[:data], :filename => data_hash[:filename], :content_type => data_hash[:content_type] || resource.content_type, :disposition => 'attachment'
@@ -90,7 +89,6 @@ class JermController < ApplicationController
   
   def fetch    
     @project=Project.find(params[:project])
-    @project.decrypt_credentials
     if @project.site_root_uri.blank?
       flash.now[:error]="No remote site location defined"
     elsif @project.site_password.blank?
@@ -145,7 +143,7 @@ class JermController < ApplicationController
     resources.each_key do |author|
       begin
         unless author.nil? || author.user.nil?
-          Mailer.resources_harvested(resources[author], author.user).deliver_now if Seek::Config.email_enabled?
+          Mailer.resources_harvested(resources[author], author.user).deliver_later if Seek::Config.email_enabled
         end
       rescue Exception=>e
         #FIXME: report exception back with the response

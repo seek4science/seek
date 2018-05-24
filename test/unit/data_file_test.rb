@@ -36,11 +36,12 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'assay association' do
-    User.with_current_user Factory(:user) do
-      datafile = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy)
-      assay = assays(:modelling_assay_with_data_and_relationship)
+    person = Factory(:person)
+    User.with_current_user person.user do
+      datafile = Factory :data_file, contributor:person
+      assay = Factory :assay, contributor:person
       relationship = relationship_types(:validation_data)
-      assay_asset = assay_assets(:metabolomics_assay_asset1)
+      assay_asset = AssayAsset.new
       assert_not_equal assay_asset.asset, datafile
       assert_not_equal assay_asset.assay, assay
       assay_asset.asset = datafile
@@ -78,16 +79,19 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'version created on save' do
-    User.current_user = Factory(:user)
-    df = DataFile.new(title: 'testing versions', projects: [Factory(:project)], policy: Factory(:private_policy))
-    assert df.valid?
-    df.save!
-    df = DataFile.find(df.id)
-    assert_equal 1, df.version
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      df = Factory.build(:data_file,title: 'testing versions', policy: Factory(:private_policy),contributor:person)
+      assert df.valid?
+      refute df.persisted?
+      df.save!
+      df = DataFile.find(df.id)
+      assert_equal 1, df.version
 
-    assert_not_nil df.find_version(1)
-    assert_equal df.find_version(1), df.latest_version
-    assert_equal df.contributor, df.latest_version.contributor
+      assert_not_nil df.find_version(1)
+      assert_equal df.find_version(1), df.latest_version
+      assert_equal df.contributor, df.latest_version.contributor
+    end
   end
 
   test 'projects' do
@@ -98,14 +102,13 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'policy defaults to system default' do
-    with_config_value 'default_all_visitors_access_type', Policy::ACCESSIBLE do
-      df_hash = Factory.attributes_for(:data_file)
-      df_hash[:policy] = nil
-      df = DataFile.new(df_hash)
+    with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
+      df = Factory.build(:data_file)
+      refute df.persisted?
       df.save!
       df.reload
-      assert_not_nil df.policy
-      assert_equal Policy::ACCESSIBLE, df.policy.access_type
+      refute_nil df.policy
+      assert_equal Policy::NO_ACCESS, df.policy.access_type
       assert df.policy.permissions.empty?
     end
   end
@@ -145,29 +148,6 @@ class DataFileTest < ActiveSupport::TestCase
       end
     end
     assert_not_nil ContentBlob.find(cb.id)
-  end
-
-  test 'is restorable after destroy' do
-    df = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy), title: 'is it restorable?'
-    User.current_user = df.contributor
-    assert_difference('DataFile.count', -1) do
-      df.destroy
-    end
-    assert_nil DataFile.find_by_title 'is it restorable?'
-    assert_difference('DataFile.count', 1) do
-      disable_authorization_checks { DataFile.restore_trash!(df.id) }
-    end
-    assert_not_nil DataFile.find_by_title 'is it restorable?'
-  end
-
-  test 'failing to delete (due to can_not_delete) still creates trash' do
-    df = Factory :data_file, policy: Factory(:private_policy), contributor: Factory(:user)
-    User.with_current_user Factory(:user) do
-      assert_no_difference('DataFile.count') do
-        df.destroy
-      end
-      assert_not_nil DataFile.restore_trash(df.id)
-    end
   end
 
   test 'test uuid generated' do
@@ -352,11 +332,14 @@ class DataFileTest < ActiveSupport::TestCase
 
   test 'build from openbis' do
     mock_openbis_calls
-    User.with_current_user(Factory(:person).user) do
-      permission_project = Factory(:project)
-      endpoint = Factory(:openbis_endpoint, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: permission_project)]))
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      permission_project = person.projects.first
+      endpoint = Factory(:openbis_endpoint, project:person.projects.first, policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: permission_project)]))
       assert_equal 1, endpoint.policy.permissions.count
       df = DataFile.build_from_openbis(endpoint, '20160210130454955-23')
+
+      df.save!
       refute_nil df
       assert df.openbis?
       assert_equal "openbis:#{endpoint.id}:dataset:20160210130454955-23", df.content_blob.url
@@ -370,18 +353,22 @@ class DataFileTest < ActiveSupport::TestCase
   end
 
   test 'openbis download restricted' do
-    df = openbis_linked_data_file
-    assert df.content_blob.openbis_dataset.size < 600.kilobytes
-    assert df.content_blob.openbis_dataset.size > 100.kilobytes
+    mock_openbis_calls
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      df = openbis_linked_data_file
+      assert df.content_blob.openbis_dataset.size < 600.kilobytes
+      assert df.content_blob.openbis_dataset.size > 100.kilobytes
 
-    with_config_value :openbis_download_limit,100.kilobytes do
-      assert df.openbis_size_download_restricted?
-      assert df.download_disabled?
-    end
+      with_config_value :openbis_download_limit,100.kilobytes do
+        assert df.openbis_size_download_restricted?
+        assert df.download_disabled?
+      end
 
-    with_config_value :openbis_download_limit,600.kilobytes do
-      refute df.openbis_size_download_restricted?
-      refute df.download_disabled?
+      with_config_value :openbis_download_limit,600.kilobytes do
+        refute df.openbis_size_download_restricted?
+        refute df.download_disabled?
+      end
     end
   end
 
@@ -394,6 +381,83 @@ class DataFileTest < ActiveSupport::TestCase
 
     assert_includes DataFile.simulation_data,df
     refute_includes DataFile.simulation_data,df2
+  end
 
+  test 'can copy assay associations' do
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      df = Factory(:data_file, contributor:person)
+
+      aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING,
+                    asset: df, assay:Factory(:assay, contributor:person))
+      aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
+                    asset: df, assay:Factory(:assay, contributor:person))
+
+      s1 = Factory(:sample, originating_data_file: df, contributor:person)
+      s2 = Factory(:sample, originating_data_file: df, contributor:person)
+
+      assert_equal 2, df.extracted_samples.count
+
+      assert_difference('AssayAsset.count', 4) do # samples * assay_assets
+        df.copy_assay_associations(df.extracted_samples)
+      end
+
+      assert_equal df.assays.sort, s1.assays.sort
+      assert_equal df.assays.sort, s2.assays.sort
+
+      assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
+      assert_equal aa2.direction, s1.assay_assets.where(assay_id: aa2.assay_id).first.direction
+    end
+  end
+
+  test 'can copy assay associations for selected assays' do
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      df = Factory(:data_file,contributor:person)
+      aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING,
+                    asset: df,  assay:Factory(:assay, contributor:person))
+      aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
+                    asset: df,  assay:Factory(:assay, contributor:person))
+
+      s1 = Factory(:sample, originating_data_file: df,contributor:person)
+      s2 = Factory(:sample, originating_data_file: df,contributor:person)
+
+      assert_equal 2, df.extracted_samples.count
+
+      assert_difference('AssayAsset.count', 2) do
+        df.copy_assay_associations(df.extracted_samples, [aa1.assay])
+      end
+
+      assert_equal [aa1.assay], s1.assays
+      assert_equal [aa1.assay], s2.assays
+
+      assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
+    end
+
+  end
+
+  test 'can copy assay associations for selected assay IDs' do
+    person = Factory(:person)
+    User.with_current_user(person.user) do
+      df = Factory(:data_file,contributor:person)
+      aa1 = Factory(:assay_asset, direction: AssayAsset::Direction::INCOMING,
+                    asset: df, assay:Factory(:assay, contributor:person))
+      aa2 = Factory(:assay_asset, direction: AssayAsset::Direction::OUTGOING,
+                    asset: df, assay:Factory(:assay, contributor:person))
+
+      s1 = Factory(:sample, originating_data_file: df, contributor:person)
+      s2 = Factory(:sample, originating_data_file: df, contributor:person)
+
+      assert_equal 2, df.extracted_samples.count
+
+      assert_difference('AssayAsset.count', 2) do
+        df.copy_assay_associations(df.extracted_samples, [aa1.assay_id])
+      end
+
+      assert_equal [aa1.assay], s1.assays
+      assert_equal [aa1.assay], s2.assays
+
+      assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
+    end
   end
 end

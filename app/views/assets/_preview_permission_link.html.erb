@@ -49,6 +49,8 @@
                 success: function (result) {
                     $j('#permissions-preview-wrapper').html(result);
                     $j('#preview_permissions').modal('show');
+                    //this is to prevent other modal boxes being closes, if this is the child of another
+                    $j('#preview_permissions').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
                 },
                 error: function () {
                     alert('Sorry, an error has occurred.');

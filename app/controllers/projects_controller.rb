@@ -14,7 +14,7 @@ class ProjectsController < ApplicationController
   before_filter :is_user_admin_auth, only: %i[manage destroy]
   before_filter :editable_by_user, only: %i[edit update]
   before_filter :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report]
-  before_filter :member_of_this_project, only: [:asset_report], unless: :admin?
+  before_filter :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
   before_filter :login_required, only: [:request_membership]
   before_filter :allow_request_membership, only: [:request_membership]
 
@@ -182,7 +182,7 @@ class ProjectsController < ApplicationController
         format.json { render json: @project }
       else
         format.html { render action: 'new' }
-        format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
       end
     end
   end
@@ -192,7 +192,7 @@ class ProjectsController < ApplicationController
   def update
     update_params = project_params
 
-    if @project.present? && !@is_json
+    if @project.present?
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end
 
@@ -212,7 +212,7 @@ class ProjectsController < ApplicationController
           else
             format.html { render action: 'edit' }
             format.xml  { render xml: @project.errors, status: :unprocessable_entity }
-            format.json { render json: { error: @project.errors, status: :unprocessable_entity }, status: :unprocessable_entity }
+            format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
           end
         end
       end
@@ -334,13 +334,14 @@ class ProjectsController < ApplicationController
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, :programme_id, { organism_ids: [] },
                         { institution_ids: [] }, :default_license, :site_root_uri, :site_username, :site_password,
-                        :parent_id, :use_default_policy]
+                        :parent_id, :use_default_policy, :nels_enabled]
 
     if action_name == 'update'
       restricted_params =
         { site_root_uri: User.admin_logged_in?,
           site_username: User.admin_logged_in?,
           site_password: User.admin_logged_in?,
+          nels_enabled: User.admin_logged_in?,
           institution_ids: (User.admin_logged_in? || @project.can_be_administered_by?(current_user)) }
       restricted_params.each do |param, allowed|
         permitted_params.delete(param) if params[:project] && !allowed
@@ -394,7 +395,7 @@ class ProjectsController < ApplicationController
   def editable_by_user
     @project = Project.find(params[:id])
     unless User.admin_logged_in? || @project.can_be_edited_by?(current_user)
-      error('Insufficient privileges', 'is invalid (insufficient_privileges)')
+      error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
   end
@@ -413,14 +414,14 @@ class ProjectsController < ApplicationController
   def administerable_by_user
     @project = Project.find(params[:id])
     unless @project.can_be_administered_by?(current_user)
-      error('Insufficient privileges', 'is invalid (insufficient_privileges)')
+      error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
   end
 
   def allow_request_membership
     unless Seek::Config.email_enabled && @project.allow_request_membership?
-      error('Cannot reqest membership of this project', 'is invalid (invalid state)')
+      error('Cannot request membership of this project', 'is invalid (invalid state)')
       false
     end
   end

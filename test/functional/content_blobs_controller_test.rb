@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'minitest/mock'
+require 'private_address_check'
 
 class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
@@ -13,7 +14,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   # Is this still needed?
   def rest_api_test_object
-    Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    Factory(:pdf_sop, policy: Factory(:downloadable_public_policy)).content_blob
+  end
+
+  def rest_show_url_options(object = rest_api_test_object)
+    { sop_id: object.asset_id }
   end
 
   test 'should resolve to json' do
@@ -61,37 +66,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   def test_index_json
     # nothing to do, no indexes for content blobs
-  end
-
-  def test_show_json(object = rest_api_test_object)
-    get :show, id: object.content_blob, sop_id: object, format: 'json'
-
-    perform_jsonapi_checks
-
-    #check meta doesn't include created_at and updated_at
-    json = JSON.parse(response.body)
-    refute_nil json['data']
-    refute_nil json['data']['meta']
-    assert_equal ['api_version','base_url','uuid'], json['data']['meta'].keys.sort
-  end
-
-  def test_response_code_for_not_available
-    sop = rest_api_test_object
-    id = 9999
-    id += 1 until ContentBlob.find_by_id(id).nil?
-
-    # blob not found
-    get :show, sop_id: sop.id, id: id, format: 'json'
-    assert_response :not_found
-
-    # asset not found
-    id += 1 until Sop.find_by_id(id).nil?
-    get :show, sop_id: id, id: sop.content_blob.id, format: 'json'
-    assert_response :not_found
-
-    # asset not found for blob
-    get :show, sop_id: Factory(:sop, policy: Factory(:public_policy)), id: sop.content_blob.id, format: 'json'
-    assert_response :not_found
   end
 
   test 'examine url to file' do
@@ -188,6 +162,42 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert assigns(:warning_msg)
     refute assigns(:error)
     refute assigns(:error_msg)
+  end
+
+  test 'examine url localhost' do
+    begin
+      # Need to allow the request through so that `private_address_check` can catch it.
+      WebMock.allow_net_connect!
+      VCR.turned_off do
+        xml_http_request :get, :examine_url, data_url: 'http://localhost/secrets'
+        assert_response :success
+        assert @response.body.include?('URL is inaccessible')
+        assert @response.body.include?('disallow_copy_option();')
+        assert assigns(:error)
+        assert assigns(:error_msg)
+        refute assigns(:unauthorized)
+      end
+    ensure
+      WebMock.disable_net_connect!(allow_localhost: true)
+    end
+  end
+
+  test 'examine url local network' do
+    begin
+      # Need to allow the request through so that `private_address_check` can catch it.
+      WebMock.allow_net_connect!
+      VCR.turned_off do
+        xml_http_request :get, :examine_url, data_url: 'http://192.168.0.1/config'
+        assert_response :success
+        assert @response.body.include?('URL is inaccessible')
+        assert @response.body.include?('disallow_copy_option();')
+        assert assigns(:error)
+        assert assigns(:error_msg)
+        refute assigns(:unauthorized)
+      end
+    ensure
+      WebMock.disable_net_connect!(allow_localhost: true)
+    end
   end
 
   test 'should find_and_auth_asset for download' do

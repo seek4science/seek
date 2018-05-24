@@ -36,6 +36,7 @@ module Seek
             def can_#{action}? user = User.current_user
               authorized_for_#{action}?(user) && state_allows_#{action}?(user)
             end
+
             def authorized_for_#{action}? user = User.current_user
                 return true if new_record?
                 user_id = user.nil? ? 0 : user.id
@@ -140,22 +141,22 @@ module Seek
         end
 
         def lookup_for_action_and_user(action, user_id, projects)
+          query = lookup_join(action, user_id)
+
           # Study's and Assays have to be treated differently, as they are linked to a project through the investigation'
-          if projects.nil? || (self == Study || self == Assay)
-            sql = "select asset_id from #{lookup_table_name} where user_id = #{user_id} and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
-            ids = ActiveRecord::Base.connection.select_all(sql).collect { |k| k['asset_id'] }
-          else
-            project_map_table = [name.underscore.pluralize.to_s, 'projects'].sort.join('_')
-            project_map_asset_id = "#{name.underscore}_id"
-            project_clause = projects.collect { |p| "#{project_map_table}.project_id = #{p.id}" }.join(' or ')
-            sql = "select asset_id,#{project_map_asset_id} from #{lookup_table_name}"
-            sql << " inner join #{project_map_table}"
-            sql << " on #{lookup_table_name}.asset_id = #{project_map_table}.#{project_map_asset_id}"
-            sql << " where #{lookup_table_name}.user_id = #{user_id} and (#{project_clause})"
-            sql << " and can_#{action}=#{ActiveRecord::Base.connection.quoted_true}"
-            ids = ActiveRecord::Base.connection.select_all(sql).collect { |k| k['asset_id'] }
+          unless projects.nil? || (self == Study || self == Assay)
+            query = query.joins(:projects).where('projects.id' => projects.map(&:id))
           end
-          default_order.where(id: ids)
+
+          query.default_order
+        end
+
+        def lookup_join(action, user_id)
+          joins(
+              "INNER JOIN #{lookup_table_name} ON #{lookup_table_name}.asset_id = #{table_name}.id"
+          ).where(
+              "#{lookup_table_name}.user_id" => user_id,
+              "#{lookup_table_name}.can_#{action}" => true)
         end
 
         # the highest asset id recorded in authorization lookup table for a given user_id or user. Used to determine if the table is complete

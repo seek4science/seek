@@ -3,9 +3,8 @@
 require 'seek/config'
 require 'seek/seek_render_override'
 
-SEEK::Application.configure do
+def load_seek_config_defaults!
   #Main settings
-
   Seek::Config.default :sycamore_enabled,false
   Seek::Config.default :events_enabled,true
   Seek::Config.default :jerm_enabled,false
@@ -46,7 +45,6 @@ SEEK::Application.configure do
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
   Seek::Config.default :delete_asset_version_enabled, false
-  Seek::Config.default :forum_enabled,false
   Seek::Config.default :filestore_path,"filestore"
   Seek::Config.default :modelling_analysis_enabled,true
   Seek::Config.default :organisms_enabled,true
@@ -56,7 +54,6 @@ SEEK::Application.configure do
   Seek::Config.default :factors_studied_enabled,false
   Seek::Config.default :experimental_conditions_enabled,false
   Seek::Config.default :tagging_enabled, true
-  Seek::Config.default :workflows_enabled,false
   Seek::Config.default :assays_enabled,true
   Seek::Config.default :publications_enabled,true
   Seek::Config.default :authorization_checks_enabled, true
@@ -110,6 +107,7 @@ SEEK::Application.configure do
 
   #the maximum size, in Mb, for a spreadsheet file that can be extracted and explored
   Seek::Config.default :max_extractable_spreadsheet_size,10
+  Seek::Config.default :jvm_memory_allocation,'512M'
 
   #the maximum size, in Mb, for a text file that can be indexed for search (too high and the indexing will timeout)
   Seek::Config.default :max_indexable_text_size,100
@@ -117,7 +115,12 @@ SEEK::Application.configure do
   Seek::Config.default :is_virtualliver, false
 
 # Pagination
-  Seek::Config.default :default_pages,{:people => 'latest', :projects => 'latest', :institutions => 'latest', :investigations => 'latest',:studies => 'latest', :assays => 'latest', :data_files => 'latest', :models => 'latest',:sops => 'latest', :publications => 'latest',:events => 'latest', :strains => 'latest', :presentations => 'latest'}
+  Seek::Config.default :default_pages,{people: 'latest', projects: 'latest', institutions: 'latest',
+                                                  investigations: 'latest',studies: 'latest', assays: 'latest',
+                                                  data_files: 'latest', models: 'latest',sops: 'latest',
+                                                  publications: 'latest',events: 'latest', strains: 'latest',
+                                                  presentations: 'latest', documents: 'latest', programmes: 'latest'}
+
   Seek::Config.default :limit_latest,7
 
   Seek::Config.default :related_items_limit,5
@@ -137,6 +140,7 @@ SEEK::Application.configure do
   Seek::Config.default :crossref_api_email,nil
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
+  Seek::Config.default :session_store_timeout, 1.hour
 
 
 
@@ -171,6 +175,7 @@ SEEK::Application.configure do
   Seek::Config.default :zenodo_api_url, 'https://zenodo.org/api'
   Seek::Config.default :zenodo_oauth_url, 'https://zenodo.org/oauth'
 
+  Seek::Config.default :allow_private_address_access, false
   Seek::Config.default :cache_remote_files, true
   Seek::Config.default :max_cachable_size, 20 * 1024 * 1024
   Seek::Config.default :hard_max_cachable_size, 100 * 1024 * 1024
@@ -205,4 +210,12 @@ SEEK::Application.configure do
   Seek::Config.default :openbis_download_limit, 2.gigabytes
 
   Seek::Config.default :default_license, 'CC-BY-4.0'
+
+  Seek::Config.default :nels_api_url, 'https://test-fe.cbu.uib.no/nels-api'
+  Seek::Config.default :nels_oauth_url, 'https://test-fe.cbu.uib.no/oauth2'
+  Seek::Config.default :nels_permalink_base, 'https://test-fe.cbu.uib.no/nels/pages/sbi/sbi.xhtml'
+end
+
+SEEK::Application.configure do
+  load_seek_config_defaults!
 end

@@ -577,8 +577,8 @@ class AuthorizationTest < ActiveSupport::TestCase
     project = asset_manager.projects.first
     other_project = asset_manager.projects.last
     asset_manager.is_asset_housekeeper = true, project
-    datafile = Factory(:data_file, projects: [other_project])
-    assert !(asset_manager.projects & datafile.projects).empty?
+    datafile = Factory(:data_file, projects: [other_project], contributor:Factory(:person, project:other_project))
+    refute (asset_manager.projects & datafile.projects).empty?
 
     refute Seek::Permissions::Authorization.authorized_by_role?('manage', datafile, asset_manager)
 
@@ -589,8 +589,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   test 'asset housekeeper can manage jerm harvested items' do
     asset_manager = Factory(:asset_housekeeper)
-    datafile1 = Factory(:data_file, contributor: nil,
-                                    projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
+    datafile1 = Factory(:jerm_data_file, projects: asset_manager.projects, policy: Factory(:publicly_viewable_policy))
 
     assert Seek::Permissions::Authorization.authorized_by_role?('manage', datafile1, asset_manager)
 
@@ -601,7 +600,7 @@ class AuthorizationTest < ActiveSupport::TestCase
 
   test 'gatekeeper should not be able to manage the item' do
     gatekeeper = Factory(:asset_gatekeeper)
-    datafile = Factory(:data_file, projects: gatekeeper.projects, policy: Factory(:all_sysmo_viewable_policy))
+    datafile = Factory(:data_file, projects: gatekeeper.projects, policy: Factory(:all_sysmo_viewable_policy), contributor:Factory(:person,project:gatekeeper.projects.first))
 
     User.with_current_user gatekeeper.user do
       assert !datafile.can_manage?

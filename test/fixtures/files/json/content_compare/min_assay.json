@@ -9,6 +9,7 @@
         "permissions":[]
       },
       "tags": null,
+      "other_creators": null,
       "title": "A Minimal Assay",
       "description": null,
       "assay_class": {
@@ -81,6 +82,9 @@
         "data": []
       },
       "publications": {
+        "data": []
+      },
+      "documents": {
         "data": []
       }
     },

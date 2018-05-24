@@ -8,10 +8,10 @@
         "access":"no_access",
         "permissions":[]
       },
-      "tags": ["Study-tag1", "Study-tag2", "Study-tag3", "Study-tag4", "Study-tag5"],
       "title": "A Maximal Study",
       "description": "The Study of many things",
       "experimentalists": "Wet lab people",
+      "other_creators": "Marie Curie",
       "person_responsible_id": "887473922"
     },
     "relationships": {
@@ -100,6 +100,14 @@
           {
             "id": "1055250468",
             "type": "publications"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "documents"
           }
         ]
       }

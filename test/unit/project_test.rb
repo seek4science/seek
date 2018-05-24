@@ -22,19 +22,19 @@ class ProjectTest < ActiveSupport::TestCase
   test 'to_rdf' do
     object = Factory :project, web_page: 'http://www.sysmo-db.org',
                                organisms: [Factory(:organism), Factory(:organism)]
-    Factory :data_file, projects: [object]
-    Factory :data_file, projects: [object]
-    Factory :model, projects: [object]
-    Factory :sop, projects: [object]
-    Factory :presentation, projects: [object]
-    i = Factory :investigation, projects: [object]
-    s = Factory :study, investigation: i
-    Factory :assay, study: s
-    wg = Factory :work_group, project: object
-    Factory :group_membership, work_group: wg, person: Factory(:person)
+    person = Factory(:person,project:object)
+    Factory :data_file, projects: [object], contributor:person
+    Factory :data_file, projects: [object], contributor:person
+    Factory :model, projects: [object], contributor:person
+    Factory :sop, projects: [object], contributor:person
+    Factory :presentation, projects: [object], contributor:person
+    i = Factory :investigation, projects: [object], contributor:person
+    s = Factory :study, investigation: i, contributor:person
+    Factory :assay, study: s, contributor:person
+
 
     object.reload
-    assert !object.people.empty?
+    refute object.people.empty?
     rdf = object.to_rdf
     RDF::Reader.for(:rdfxml).new(rdf) do |reader|
       assert reader.statements.count > 1
@@ -103,43 +103,27 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal('test project', p.title)
   end
 
-  def test_set_credentials
-    p = Project.new(title: 'test project')
-    p.site_password = '12345'
-    p.site_username = 'fred'
-    disable_authorization_checks { p.save! }
-    assert_not_nil p.site_credentials
-  end
-
-  def test_decrypt_credentials
+  test 'can set site credentials' do
     p = projects(:sysmo_project)
-    p.site_password = '12345'
     p.site_username = 'fred'
+    p.site_password = '12345'
     disable_authorization_checks { p.save! }
 
-    p = Project.find(p.id)
-    assert_nil p.site_username, 'site username should be nil until requested'
-    assert_nil p.site_password, 'site password should be nil until requested'
+    username_setting = p.settings.where(var: 'site_username').first
+    password_setting = p.settings.where(var: 'site_password').first
 
-    p.decrypt_credentials
+    assert username_setting.encrypted?
+    assert_equal 'fred', username_setting.value
+    assert_nil username_setting[:value]
+    refute_equal 'fred', username_setting[:encrypted_value]
+
+    assert password_setting.encrypted?
+    assert_equal '12345', password_setting.value
+    assert_nil password_setting[:value]
+    refute_equal '12345', password_setting[:encrypted_value]
+
     assert_equal 'fred', p.site_username
     assert_equal '12345', p.site_password
-  end
-
-  def test_credentials_not_updated_unless_password_and_username_provided
-    p = Project.new(title: 'fred')
-    p.site_password = '12345'
-    p.site_username = 'fred'
-    disable_authorization_checks { p.save! }
-    cred = p.site_credentials
-    p = Project.find(p.id)
-    assert_equal cred, p.site_credentials
-    assert_nil p.site_password
-    assert_nil p.site_username
-    disable_authorization_checks { p.save! }
-    assert_equal cred, p.site_credentials
-    p = Project.find(p.id)
-    assert_equal cred, p.site_credentials
   end
 
   def test_publications_association
@@ -790,5 +774,80 @@ class ProjectTest < ActiveSupport::TestCase
     assert_not_includes project.project_administrators, project_administrator
     assert !project_administrator.is_project_administrator?(project)
     assert !project.can_be_administered_by?(project_administrator.user)
+  end
+
+  test 'stores project settings' do
+    project = Factory(:project)
+
+    assert_nil project.settings['nels_enabled']
+
+    assert_difference('Settings.count') do
+      project.settings['nels_enabled'] = true
+    end
+
+    assert project.settings['nels_enabled']
+  end
+
+  test 'sets project settings using virtual attributes' do
+    project = Factory(:project)
+
+    assert_nil project.nels_enabled
+
+    assert_difference('Settings.count') do
+      project.update_attributes(nels_enabled: true)
+    end
+
+    assert project.nels_enabled
+  end
+
+  test 'does not use global defaults for project settings' do
+    project = Factory(:project)
+
+    assert Settings.defaults.key?('nels_enabled')
+
+    assert_nil Settings.for(project).fetch('nels_enabled')
+
+    assert_nil project.settings['nels_enabled']
+  end
+
+  test 'stores encrypted project settings' do
+    project = Factory(:project)
+
+    assert_nil project.settings['site_password']
+
+    assert_difference('Settings.count') do
+      project.settings['site_password'] = 'p@ssw0rd!'
+    end
+
+    setting = project.settings.where(var: 'site_password').first
+
+    refute_equal 'p@ssw0rd!', setting[:encrypted_value]
+    assert_nil setting[:value] # This is the database value
+    assert_equal 'p@ssw0rd!',  setting.value
+    assert_equal 'p@ssw0rd!',  project.settings['site_password']
+  end
+
+  test 'sets NeLS enabled in various ways' do
+    project = Factory(:project)
+
+    assert_nil project.nels_enabled
+
+    project.nels_enabled = true
+    assert_equal true, project.reload.nels_enabled
+
+    project.nels_enabled = false
+    assert_equal false, project.reload.nels_enabled
+
+    project.nels_enabled = '1'
+    assert_equal true, project.reload.nels_enabled
+
+    project.nels_enabled = '0'
+    assert_equal false, project.reload.nels_enabled
+
+    project.nels_enabled = false
+    assert_equal false, project.reload.nels_enabled
+
+    project.nels_enabled = 'yes please'
+    assert_equal true, project.reload.nels_enabled
   end
 end

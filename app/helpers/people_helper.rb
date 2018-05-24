@@ -24,10 +24,17 @@ module PeopleHelper
   def seek_role_icons(person, size = 32)
     icons = ''
     person.roles.each do |role|
-      icons << image(role.to_s, :size => "#{size}x#{size}", :alt => role.to_s,
-                                'data-tooltip' => tooltip(role.humanize), :style => 'vertical-align: middle')
+      icons << seek_role_icon(role, size)
     end
     icons.html_safe
+  end
+
+  def seek_role_icon(role, size = 32, options = {})
+    options.reverse_merge!(size: "#{size}x#{size}",
+                           alt: role.to_s,
+                           style: 'vertical-align: middle',
+                           'data-tooltip' => tooltip(role.humanize))
+    image(role.to_s, options)
   end
 
   def orcid_identifier(person)

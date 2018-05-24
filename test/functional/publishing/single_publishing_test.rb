@@ -84,12 +84,18 @@ class SinglePublishingTest < ActionController::TestCase
     investigation = study.investigation
 
     notifying_df = assay.data_files.reject { |d| d == df }.first
+    gatekeeper = Factory(:asset_gatekeeper)
+    person = users(:datafile_owner).person
+    gatekept_project = gatekeeper.projects.first
+    non_gatekept_project = person.projects.first
+    person.add_to_project_and_institution(gatekept_project, Factory(:institution))
     request_publishing_df = Factory(:data_file,
-                                    project_ids: Factory(:asset_gatekeeper).projects.collect(&:id),
-                                    contributor: users(:datafile_owner),
+                                    projects: [gatekept_project],
+                                    contributor: person,
                                     assays: [assay])
     publishing_df = Factory(:data_file,
-                            contributor: users(:datafile_owner),
+                            projects: [non_gatekept_project],
+                            contributor: person,
                             assays: [assay])
 
     assert_not_nil assay, 'There should be an assay associated'
@@ -136,9 +142,14 @@ class SinglePublishingTest < ActionController::TestCase
 
   test 'get check_gatekeeper_required' do
     gatekeeper = Factory(:asset_gatekeeper)
-    df = Factory(:data_file, project_ids: gatekeeper.projects.collect(&:id), contributor: User.current_user)
-    model = Factory(:model, project_ids: gatekeeper.projects.collect(&:id), contributor: User.current_user)
-    sop = Factory(:sop, contributor: User.current_user)
+    person = User.current_user.person
+    gatekept_project = gatekeeper.projects.first
+    non_gatekept_project = person.projects.first
+    person.add_to_project_and_institution(gatekept_project, Factory(:institution))
+
+    df = Factory(:data_file, projects: [gatekept_project], contributor: person)
+    model = Factory(:model, projects: [gatekept_project], contributor: person)
+    sop = Factory(:sop, projects: [non_gatekept_project], contributor: person)
     assert df.gatekeeper_required?, "This datafile must require gatekeeper's approval for the test to succeed"
     assert model.gatekeeper_required?, "This model must require gatekeeper's approval for the test to succeed"
     assert !sop.gatekeeper_required?, "This sop must not require gatekeeper's approval for the test to succeed"
@@ -215,7 +226,12 @@ class SinglePublishingTest < ActionController::TestCase
   end
 
   test "sending publishing request when doing publish for asset that need gatekeeper's approval" do
-    df = Factory(:data_file, contributor: User.current_user, project_ids: Factory(:asset_gatekeeper).projects.collect(&:id))
+    gatekeeper = Factory(:asset_gatekeeper)
+    person = User.current_user.person
+    gatekept_project = gatekeeper.projects.first
+    person.add_to_project_and_institution(gatekept_project, Factory(:institution))
+
+    df = Factory(:data_file, contributor: person, projects: [gatekept_project])
     assert df.can_publish?, 'The data file must be publishable for this test to succeed'
     assert df.gatekeeper_required?, "This datafile must need gatekeeper's approval for the test to succeed'"
     assert !df.is_waiting_approval?(User.current_user), 'The publishing request for this data file must not be sent for this test to succeed'
@@ -225,7 +241,7 @@ class SinglePublishingTest < ActionController::TestCase
     params[:publish][df.class.name][df.id.to_s] = '1'
 
     assert_difference('ResourcePublishLog.count', 1) do
-      assert_emails 1 do
+      assert_enqueued_emails 1 do
         post :publish, params.merge(id: df.id)
       end
     end
@@ -266,7 +282,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     assert !non_owned_assets.empty?, 'There should be non manageable assets included in this test'
 
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       post :publish, params.merge(id: df)
     end
 
@@ -317,7 +333,7 @@ class SinglePublishingTest < ActionController::TestCase
 
     assert !non_publishable_assets.empty?, 'There should be non publishable assets included in this test'
 
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       post :publish, params.merge(id: df)
     end
 
@@ -365,7 +381,7 @@ class SinglePublishingTest < ActionController::TestCase
   private
 
   def data_file_for_publishing(owner = users(:datafile_owner))
-    Factory :data_file, contributor: owner, project_ids: [projects(:moses_project).id]
+    Factory(:data_file, contributor: owner)
   end
 
   def data_with_isa
@@ -374,7 +390,7 @@ class SinglePublishingTest < ActionController::TestCase
     assay = Factory :experimental_assay, contributor: df.contributor.person,
                                          study: Factory(:study, contributor: df.contributor.person,
                                                                 investigation: Factory(:investigation, contributor: df.contributor.person))
-    other_persons_data_file = Factory :data_file, contributor: other_user, project_ids: other_user.person.projects.collect(&:id), policy: Factory(:policy, access_type: Policy::VISIBLE)
+    other_persons_data_file = Factory(:data_file, contributor: other_user, policy: Factory(:policy, access_type: Policy::VISIBLE))
     assay.associate(df)
     assay.associate(other_persons_data_file)
     assert !other_persons_data_file.can_manage?

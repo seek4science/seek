@@ -14,10 +14,6 @@ class SessionsControllerTest < ActionController::TestCase
   fixtures :users, :people
 
   def setup
-    @controller = SessionsController.new
-    @request    = ActionController::TestRequest.new
-    @response   = ActionController::TestResponse.new
-
     Seek::Config.omniauth_providers = {
       ldap: {
         title: 'organization-ldap',
@@ -259,6 +255,20 @@ class SessionsControllerTest < ActionController::TestCase
     assert_not_nil new_user
     assert new_user.active?
     assert !Person.where(first_name: 'new', last_name: 'ldap_user').empty?
+  end
+
+  test 'should authenticate user with legacy encryption and update password' do
+    sha1_user = Factory(:sha1_pass_user)
+    test_password = generate_user_password
+
+    assert_equal User.sha1_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
+
+    post :create, login: sha1_user.login, password: test_password
+    assert session[:user_id]
+    assert_response :redirect
+
+    sha1_user.reload
+    assert_equal User.sha256_encrypt(test_password, sha1_user.salt), sha1_user.crypted_password
   end
 
   protected

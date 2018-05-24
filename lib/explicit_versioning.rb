@@ -108,11 +108,11 @@ module Jits
 
         # Saves the object as a new version and also saves the original object as the new version.
         # Make sure to create (and thus save) any inner associations beforehand as these won't be saved here.
-        def save_as_new_version(revision_comment = nil)
+        def save_as_new_version(revision_comments = nil)
           return false unless valid?
           without_update_callbacks do
             set_new_version
-            save_version_on_create(revision_comment)
+            save_version_on_create(revision_comments)
             save
           end
         end
@@ -181,11 +181,11 @@ module Jits
         end
 
         # Saves a version of the model in the versioned table. This is called in the after_create callback by default
-        def save_version_on_create(revision_comment = nil)
+        def save_version_on_create(revision_comments = nil)
           rev = self.class.versioned_class.new
           clone_versioned_model(self, rev)
           rev.version = send(self.class.version_column)
-          rev.send("#{self.class.revision_comments_column}=", revision_comment)
+          rev.send("#{self.class.revision_comments_column}=", revision_comments)
           rev.send("#{self.class.versioned_foreign_key}=", id)
           rev.projects = projects
           saved = rev.save

@@ -1,8 +1,8 @@
 # DataFile
 Factory.define(:data_file) do |f|
+  f.with_project_contributor
   f.sequence(:title) { |n| "A Data File_#{n}" }
-  f.projects { [Factory.build(:project)] }
-  f.association :contributor, factory: :person
+
   f.after_create do |data_file|
     if data_file.content_blob.blank?
       data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
@@ -15,6 +15,7 @@ Factory.define(:data_file) do |f|
 end
 
 Factory.define(:min_datafile, class: DataFile) do |f|
+  f.with_project_contributor
   f.title 'A Minimal DataFile'
   f.projects { [Factory.build(:min_project)] }
   f.after_create do |data_file|
@@ -23,6 +24,7 @@ Factory.define(:min_datafile, class: DataFile) do |f|
 end
 
 Factory.define(:max_datafile, class: DataFile) do |f|
+  f.with_project_contributor
   f.title 'A Maximal DataFile'
   f.description 'Results - Sampling conformations of ATP-Mg inside the binding pocket'
   f.projects { [Factory.build(:max_project)] }
@@ -32,6 +34,7 @@ Factory.define(:max_datafile, class: DataFile) do |f|
   f.after_create do |data_file|
     data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
   end
+  f.other_creators 'Blogs, Joe'
 end
 
 Factory.define(:rightfield_datafile, parent: :data_file) do |f|
@@ -58,9 +61,21 @@ Factory.define(:strain_sample_data_file, parent: :data_file) do |f|
   f.association :content_blob, factory: :strain_sample_data_content_blob
 end
 
-Factory.define(:jerm_data_file, parent: :data_file) do |f|
+Factory.define(:jerm_data_file, class: DataFile) do |f|
+  f.sequence(:title) { |n| "A Data File_#{n}" }
   f.contributor nil
+  f.projects { [Factory.build(:project)] }
   f.association :content_blob, factory: :url_content_blob
+
+  f.after_create do |data_file|
+    if data_file.content_blob.blank?
+      data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
+    else
+      data_file.content_blob.asset = data_file
+      data_file.content_blob.asset_version = data_file.version
+      data_file.content_blob.save
+    end
+  end
 end
 
 Factory.define(:subscribable, parent: :data_file) {}
@@ -90,4 +105,8 @@ Factory.define(:data_file_version_with_blob, parent: :data_file_version) do |f|
       data_file_version.content_blob.save
     end
   end
+end
+
+Factory.define(:api_pdf_data_file, parent: :data_file) do |f|
+  f.association :content_blob, factory: :blank_pdf_content_blob
 end

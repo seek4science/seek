@@ -8,7 +8,7 @@
         "access":"no_access",
         "permissions":[]
       },
-      "tags": ["Investigation-tag1", "Investigation-tag2", "Investigation-tag3", "Investigation-tag4", "Investigation-tag5"],
+      "other_creators": "Max Blumenthal, Ed Snowden",
       "title": "A Maximal Investigation",
       "description": "Investigation of the Human Genome"
     },
@@ -94,6 +94,14 @@
           {
             "id": "1055250468",
             "type": "publications"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "documents"
           }
         ]
       }

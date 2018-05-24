@@ -1,0 +1,21 @@
+<div class='panel panel-default'>
+  <div class='panel-heading'>
+    License and permissions
+  </div>
+  <div class='panel-body'>
+    <%= render :partial => 'scales/scales_selector', locals: {object: @data_file} if show_scales? %>
+    <%= render :partial => 'assets/license_selector', locals: {resource: @data_file} %>
+    <%= render :partial => 'sharing/form' -%>
+    <%= render :partial => 'assets/author_form', locals: {resource_type: 'DataFile',
+                                                          existing_creators: [],
+                                                          other_creators: [],
+                                                          collapsed: true} %>
+    <%= cancel_button(data_files_path) -%>
+    <div class='multi-step-buttons'>
+      <%= multi_step_start_button %>
+      <%= multi_step_back_button %>
+      <%= multi_step_forward_button %>
+      <%= multi_step_end_button %>
+    </div>
+  </div>
+</div>

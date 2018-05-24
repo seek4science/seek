@@ -1,5 +1,5 @@
 class InvestigationSerializer < PCSSerializer
-  attributes :title, :description
+  attributes :title, :description, :other_creators
 
   has_many :people
   has_many :projects
@@ -9,4 +9,5 @@ class InvestigationSerializer < PCSSerializer
   has_many :models
   has_many :sops
   has_many :publications
+  has_many :documents
 end

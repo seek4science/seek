@@ -3,7 +3,17 @@ SEEK::Application.routes.draw do
   mount MagicLamp::Genie, :at => (SEEK::Application.config.relative_url_root || "/") + 'magic_lamp'  if defined?(MagicLamp)
   #mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
-  mount TavernaPlayer::Engine, :at => (SEEK::Application.config.relative_url_root || "/")
+  # Concerns
+  concern :has_content_blobs do
+    resources :content_blobs do
+      member do
+        get :view_pdf_content
+        get :view_content
+        get :get_pdf
+        get :download
+      end
+    end
+  end
 
   resources :scales do
     collection do
@@ -11,7 +21,6 @@ SEEK::Application.routes.draw do
       post :search_and_lazy_load_results
     end
   end
-
 
   ### GENERAL PAGES ###
 
@@ -58,7 +67,6 @@ SEEK::Application.routes.draw do
   get 'funding' => 'homes#funding', :as => :funding
   get 'index.html' => 'homes#index'
   get 'index' => 'homes#index'
-  get 'my_biovel' => 'homes#my_biovel', :as => :my_biovel
 
   resource :favourites do
     collection do
@@ -83,12 +91,6 @@ SEEK::Application.routes.draw do
     end
   end
   resources :help_images, only: [:create, :destroy]
-
-  resources :forum_attachments, :only => [:create, :destroy] do
-    member do
-      get :download
-    end
-  end
 
   resources :avatars
   resources :attachments
@@ -314,6 +316,14 @@ SEEK::Application.routes.draw do
         post :export, action: :export_submit
       end
     end
+    resources :nels, only: [:index] do
+      collection do
+        get :projects
+        get :datasets
+        get :dataset
+        post :register
+      end
+    end
     member do
       post :update_annotations_ajax
       post :check_related_items
@@ -336,7 +346,7 @@ SEEK::Application.routes.draw do
 
   ### ASSETS ###
 
-  resources :data_files do
+  resources :data_files, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -346,6 +356,10 @@ SEEK::Application.routes.draw do
       post :upload_from_email
       post :items_for_result
       post :resource_in_tab
+      get :provide_metadata
+      post :create_content_blob
+      post :rightfield_extraction_ajax
+      post :create_metadata
     end
     member do
       get :matching_models
@@ -373,24 +387,18 @@ SEEK::Application.routes.draw do
       delete :cancel_extraction
       get :isa_children
       get :destroy_samples_confirm
+      post :retrieve_nels_sample_metadata
+      get :retrieve_nels_sample_metadata
     end
     resources :studied_factors do
       collection do
         post :create_from_existing
       end
     end
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :view_content
-        get :get_pdf
-        get :download
-      end
-    end
     resources :people,:projects,:investigations,:assays, :samples, :studies,:publications,:events,:only=>[:index]
   end
 
-  resources :presentations do
+  resources :presentations, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -411,18 +419,10 @@ SEEK::Application.routes.draw do
       delete :destroy_version
       get :isa_children
     end
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :view_content
-        get :get_pdf
-        get :download
-      end
-    end
     resources :people,:projects,:publications,:events,:only=>[:index]
   end
 
-  resources :models do
+  resources :models, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -462,19 +462,10 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
-
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :view_content
-        get :get_pdf
-        get :download
-      end
-    end
     resources :people,:projects,:investigations,:assays,:studies,:publications,:events,:only=>[:index]
   end
 
-  resources :sops do
+  resources :sops, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -500,14 +491,6 @@ SEEK::Application.routes.draw do
     resources :experimental_conditions do
       collection do
         post :create_from_existing
-      end
-    end
-    resources :content_blobs do
-      member do
-        get :view_pdf_content
-        get :view_content
-        get :get_pdf
-        get :download
       end
     end
     resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
@@ -610,46 +593,7 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :workflows do
-    collection do
-      get :typeahead
-      post :test_asset_url
-    end
-
-    member do
-      get :download
-      get :describe_ports
-      post :temp_link
-      post :new_version
-      post :update_annotations_ajax
-      post :check_related_items
-      post :publish
-      get :published
-      post :favourite
-      delete :favourite_delete
-      post :mint_doi
-      get :mint_doi_confirm
-    end
-
-    resources :runs, :controller => 'taverna_player/runs'
-  end
-
-  resources :runs, :controller => 'taverna_player/runs', :only => ['edit', 'update'] do
-    member do
-      post :report_problem
-    end
-  end
-
   resources :group_memberships
-
-  resources :sweeps do
-    member do
-      put :cancel
-      get :runs
-      post :download_results
-      get :view_result
-    end
-  end
 
   resources :site_announcements do
     collection do
@@ -697,6 +641,34 @@ SEEK::Application.routes.draw do
   ### SAMPLE CONTROLLED VOCABS ###
 
   resources :sample_controlled_vocabs
+
+  ### DOCUMENTS
+
+  resources :documents, concerns: [:has_content_blobs] do
+    collection do
+      get :typeahead
+      get :preview
+      post :test_asset_url
+      post :items_for_result
+      post :resource_in_tab
+    end
+    member do
+      post :check_related_items
+      post :check_gatekeeper_required
+      get :download
+      get :published
+      post :publish_related_items
+      post :publish
+      post :request_resource
+      post :update_annotations_ajax
+      post :new_version
+      delete :destroy_version
+      post :mint_doi
+      get :mint_doi_confirm
+      get :isa_children
+    end
+    resources :people,:projects,:investigations,:assays,:samples,:studies,:publications,:events,:only=>[:index]
+  end
 
   ### ASSAY AND TECHNOLOGY TYPES ###
 
@@ -750,8 +722,10 @@ SEEK::Application.routes.draw do
   get "/404" => "errors#error_404"
   get "/422" => "errors#error_422"
   get "/500" => "errors#error_500"
+  get "/503" => "errors#error_503"
 
   get "/zenodo_oauth_callback" => "zenodo/oauth2/callbacks#callback"
+  get "/seek_nels" => "nels#callback", as: 'nels_oauth_callback'
 
   get "/citation/(*doi)" => "citations#fetch", as: :citation, constraints: { doi: /.+/ }
 

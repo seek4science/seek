@@ -7,7 +7,7 @@ class BaseSerializer < SimpleBaseSerializer
   attribute :policy, if: :show_policy?
 
   def policy
-    convert_policy object.policy
+    BaseSerializer.convert_policy object.policy
   end
 
   def associated(name)
@@ -66,6 +66,10 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Event')
   end
 
+  def documents
+    associated('Document')
+  end
+
   def self_link
     polymorphic_path(object)
   end
@@ -97,19 +101,17 @@ class BaseSerializer < SimpleBaseSerializer
                   end
   end
 
-  def convert_policy policy
-    { 'access' => (access_type_key policy.access_type),
-      'permissions' => (permits policy)}
+  def BaseSerializer.convert_policy policy
+    { 'access' => (PolicyHelper::access_type_key policy.access_type),
+      'permissions' => (BaseSerializer.permits policy)}
   end
 
-  def permits policy
-    result = []
-    policy.permissions.each do |p|
-      result.append ({'resource_type' => p.contributor_type.downcase.pluralize,
-                      'resource_id' => p.contributor_id.to_s,
-                      'access' => (access_type_key p.access_type) } )
+  def BaseSerializer.permits policy
+    policy.permissions.map do |p|
+      resource = { id: p.contributor_id.to_s, type: p.contributor_type.underscore.pluralize }
+
+      { resource: resource, access: (PolicyHelper::access_type_key(p.access_type)) }
     end
-    return result
   end
 
   def show_policy?
@@ -120,5 +122,12 @@ class BaseSerializer < SimpleBaseSerializer
     return respond_to_policy && respond_to_manage && can_manage
   end
 
-
+  def submitter
+    result = determine_submitter object
+    if result.blank?
+      return []
+    else
+      return [result]
+    end
+  end
 end

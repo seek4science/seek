@@ -153,16 +153,20 @@ class PoliciesControllerTest < ActionController::TestCase
   test 'can not publish assay having project with gatekeeper' do
     as_not_virtualliver do
       gatekeeper = Factory(:asset_gatekeeper)
-      a_person = Factory(:person)
+      refute_empty gatekeeper.projects
+      a_person = Factory(:person, project: gatekeeper.projects.first)
+      inv = Factory(:investigation, contributor: gatekeeper)
+      study = Factory(:study, investigation: inv, contributor: gatekeeper)
       assay = Assay.new
-      assay.study = Factory(:study, investigation: Factory(:investigation, project_ids: gatekeeper.projects.collect(&:id)))
+      assay.study = study
 
+      assert_equal assay.projects, gatekeeper.projects
       login_as(a_person.user)
       assert assay.can_manage?
 
-      # FIXME: can't test controller this way properly as it doesnt setup the @request and session properly
+      # FIXME: can't test controller this way properly as it doesn't setup the @request and session properly
       updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, assay.study.id.to_s)
-      assert !updated_can_publish_immediately
+      refute updated_can_publish_immediately
     end
   end
 

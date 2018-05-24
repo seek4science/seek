@@ -80,8 +80,8 @@ class StudiesController < ApplicationController
         format.html { redirect_to(@study) }
         format.json {render json: @study}
       else
-        format.html { render action: 'edit' }
-        format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+        format.html { render action: 'edit', status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
       end
     end
   end
@@ -123,8 +123,8 @@ class StudiesController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { render action: 'new' }
-        format.json { render json: {error: @study.errors, status: :unprocessable_entity}, status: :unprocessable_entity }
+        format.html { render action: 'new', status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
       end
     end
   end

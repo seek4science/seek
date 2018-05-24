@@ -1,0 +1,51 @@
+{
+  "data": {
+    "type": "sops",
+    "id": "<%= id %>",
+    "attributes": {
+      "title": "A Maximally Patched SOP",
+      "description": "Protocol",
+      "tags": ["tag1", "tag2", "tag3"],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id" : "<%= @project.id %>",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= @creator.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= @assay.id %>",
+            "type": "assays"
+          }
+        ]
+      }
+    }
+  }
+}

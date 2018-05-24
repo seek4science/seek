@@ -33,25 +33,28 @@ class Assay < ActiveRecord::Base
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
-  has_many :assay_assets, dependent: :destroy
+  has_many :assay_assets, dependent: :destroy, autosave: true # change this to validate: true in the future
 
   has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile'
   has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop'
   has_many :models, through: :assay_assets, source: :asset, source_type: 'Model'
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample'
+  has_many :documents, through: :assay_assets, source: :asset, source_type: 'Document'
 
   has_one :investigation, through: :study
 
   validates_presence_of :assay_type_uri
   validates_presence_of :technology_type_uri, unless: :is_modelling?
-  validates_presence_of :study, message: ' must be selected and valid'
   validates_presence_of :contributor
   validates_presence_of :assay_class
+  validates :study, presence: { message: ' must be selected and valid' }, projects: true
 
   before_validation :default_assay_and_technology_type
 
   # a temporary store of added assets - see AssayReindexer
   attr_reader :pending_related_assets
+
+  enforce_authorization_on_association :study, :view
 
   def project_ids
     projects.map(&:id)
@@ -89,8 +92,7 @@ class Assay < ActiveRecord::Base
       assay_asset = assay_assets.detect { |aa| aa.asset == asset }
 
       if assay_asset.nil?
-        assay_asset = AssayAsset.new
-        assay_asset.assay = self
+        assay_asset = assay_assets.build
       end
 
       assay_asset.asset = asset
@@ -110,7 +112,7 @@ class Assay < ActiveRecord::Base
   end
 
   def assets
-    data_files + models + sops + publications + samples
+    data_files + models + sops + publications + samples + documents
   end
 
   def incoming

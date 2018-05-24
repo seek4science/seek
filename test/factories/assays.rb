@@ -1,5 +1,6 @@
 # AssayClass
-#:assay_modelling and :assay_experimental rely on the existence of the AssayClasses
+# :assay_modelling and :assay_experimental rely on the existence of the AssayClasses
+
 Factory.define(:modelling_assay_class, class: AssayClass) do |f|
   f.title I18n.t('assays.modelling_analysis')
   f.key 'MODEL'
@@ -35,7 +36,9 @@ Factory.define(:assay_base, class: Assay) do |f|
   f.sequence(:title) { |n| "An Assay #{n}" }
   f.sequence(:description) { |n| "Assay description #{n}" }
   f.association :contributor, factory: :person
-  f.association :study
+  f.after_build do |a|
+    a.study ||= Factory(:study, contributor: a.contributor)
+  end
 end
 
 Factory.define(:modelling_assay, parent: :assay_base) do |f|
@@ -56,20 +59,27 @@ Factory.define(:assay, parent: :modelling_assay) {}
 Factory.define(:min_assay, class: Assay) do |f|
   f.title "A Minimal Assay"
   f.association :assay_class, factory: :experimental_assay_class
-  f.association :study, factory: :study
+  f.association :contributor,  factory: :person
+  f.after_build do |a|
+    a.study ||= Factory(:min_study, contributor: a.contributor, policy: a.policy.try(:deep_copy))
+  end
 end
 
 Factory.define(:max_assay, class: Assay) do |f|
   f.title "A Maximal Assay"
   f.description "A Western Blot Assay"
+  f.other_creators "Anonymous creator"
   f.association :assay_class, factory: :experimental_assay_class
-  f.study { Factory(:study, policy: Factory(:public_policy), investigation: Factory(:investigation, policy: Factory(:public_policy))) }
   f.association :contributor,  factory: :person
   f.assay_assets {[Factory(:assay_asset, asset: Factory(:data_file, policy: Factory(:public_policy))),
                    Factory(:assay_asset, asset: Factory(:sop, policy: Factory(:public_policy))),
-                   Factory(:assay_asset, asset: Factory(:model, policy: Factory(:public_policy)))]}
-
+                   Factory(:assay_asset, asset: Factory(:model, policy: Factory(:public_policy))),
+                   Factory(:assay_asset, asset: Factory(:document, policy: Factory(:public_policy)))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
+  f.after_build do |a|
+    a.study ||= Factory(:study, contributor: a.contributor, policy: Factory(:public_policy),
+                        investigation: Factory(:investigation, contributor: a.contributor, policy: Factory(:public_policy)))
+  end
 end
 
 # AssayAsset

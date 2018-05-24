@@ -9,9 +9,11 @@ class Sop < ActiveRecord::Base
 
   acts_as_asset
 
-  include Seek::Dois::DoiGeneration
+  acts_as_doi_parent(child_accessor: :versions)
 
   scope :default_order, -> { order("title") }
+
+  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id

@@ -1,5 +1,5 @@
 class StudySerializer < PCSSerializer
-  attributes :title, :description, :experimentalists
+  attributes :title, :description, :experimentalists, :other_creators
   attribute :person_responsible_id do
     object.person_responsible_id.to_s
   end
@@ -12,4 +12,5 @@ class StudySerializer < PCSSerializer
   has_many :models
   has_many :sops
   has_many :publications
+  has_many :documents
 end

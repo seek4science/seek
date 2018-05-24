@@ -415,11 +415,19 @@ class PublicationTest < ActiveSupport::TestCase
     assert pub.valid?
     assert_equal '10.5072/abc', pub.doi
 
-    pub.doi = 'http://dx.doi.org/10.5072/abc'
+    pub.doi = 'https://doi.org/10.5072/abc'
     assert pub.valid?
     assert_equal '10.5072/abc', pub.doi
 
     pub.doi = 'https://dx.doi.org/10.5072/abc'
+    assert pub.valid?
+    assert_equal '10.5072/abc', pub.doi
+
+    pub.doi = 'http://dx.doi.org/10.5072/abc'
+    assert pub.valid?
+    assert_equal '10.5072/abc', pub.doi
+
+    pub.doi = 'http://doi.org/10.5072/abc'
     assert pub.valid?
     assert_equal '10.5072/abc', pub.doi
 

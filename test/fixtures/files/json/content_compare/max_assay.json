@@ -15,6 +15,7 @@
         "Assay-tag4",
         "Assay-tag5"
       ],
+      "other_creators":  "Anonymous creator",
       "title": "A Maximal Assay",
       "description": "A Western Blot Assay",
       "assay_class": {
@@ -117,6 +118,14 @@
           {
             "id": "1055250468",
             "type": "publications"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "documents"
           }
         ]
       }

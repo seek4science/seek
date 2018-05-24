@@ -684,10 +684,10 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to :root
   end
 
-  test 'should have asset housekeeper icon on person show page' do
+  test 'should have asset housekeeper role on person show page' do
     asset_housekeeper = Factory(:asset_housekeeper)
     get :show, id: asset_housekeeper
-    assert_select 'img[src*=?]', role_image(:asset_housekeeper), count: 1
+    assert_select '#project-roles h3 img[src*=?]', role_image(:asset_housekeeper), count: 1
   end
 
   test 'should have asset housekeeper icon on people index page' do
@@ -699,10 +699,10 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select 'img[src*=?]', role_image(:asset_housekeeper), count: asset_housekeeper_number
   end
 
-  test 'should have project administrator icon on person show page' do
+  test 'should have project administrator role on person show page' do
     project_administrator = Factory(:project_administrator)
     get :show, id: project_administrator
-    assert_select 'img[src*=?]', role_image(:project_administrator), count: 1
+    assert_select '#project-roles h3 img[src*=?]', role_image(:project_administrator), count: 1
   end
 
   test 'should have project administrator icon on people index page' do
@@ -1154,10 +1154,10 @@ class PeopleControllerTest < ActionController::TestCase
     assert person.is_asset_gatekeeper?(work_group.project)
   end
 
-  test 'should have gatekeeper icon on person show page' do
+  test 'should have gatekeeper role on person show page' do
     gatekeeper = Factory(:asset_gatekeeper)
     get :show, id: gatekeeper
-    assert_select 'img[src*=?]', role_image(:asset_gatekeeper), count: 1
+    assert_select '#project-roles h3 img[src*=?]', role_image(:asset_gatekeeper), count: 1
   end
 
   test 'should have gatekeeper icon on people index page' do
@@ -1171,24 +1171,26 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'unsubscribe to a project should unsubscribe all the items of that project' do
     with_config_value 'email_enabled', true do
-      proj = Factory(:project)
-      sop = Factory(:sop, project_ids: [proj.id], policy: Factory(:public_policy))
-      df = Factory(:data_file, project_ids: [proj.id], policy: Factory(:public_policy))
+      current_person = User.current_user.person
+      proj = current_person.projects.first
+      sop = Factory(:sop, projects: [proj], policy: Factory(:public_policy))
+      df = Factory(:data_file, projects: [proj], policy: Factory(:public_policy))
+
+
 
       # subscribe to project
-      current_person = User.current_user.person
       put :update, id: current_person, receive_notifications: true, person: { project_subscriptions_attributes: { '0' => { project_id: proj.id, frequency: 'weekly', _destroy: '0' } } }
       assert_redirected_to current_person
 
-      project_subscription_id = ProjectSubscription.find_by_project_id(proj.id).id
+      project_subscription = ProjectSubscription.where({project_id:proj.id, person_id:current_person.id}).first
       assert_difference 'Subscription.count', 2 do
-        ProjectSubscriptionJob.new(project_subscription_id).perform
+        ProjectSubscriptionJob.new(project_subscription.id).perform
       end
       assert sop.subscribed?(current_person)
       assert df.subscribed?(current_person)
       assert current_person.receive_notifications?
 
-      assert_emails 1 do
+      assert_enqueued_emails 1 do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
         SendPeriodicEmailsJob.new('weekly').perform
@@ -1205,7 +1207,7 @@ class PeopleControllerTest < ActionController::TestCase
       refute df.subscribed?(current_person)
       assert current_person.receive_notifications?
 
-      assert_emails 0 do
+      assert_no_enqueued_emails do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
         SendPeriodicEmailsJob.new('weekly').perform
@@ -1306,23 +1308,24 @@ class PeopleControllerTest < ActionController::TestCase
     assert_select 'div.list_item_title', count: 5
   end
 
-  test 'people not in projects should not be shown in index' do
+  test 'people not in projects should be shown in index' do
     person_not_in_project = Factory(:brand_new_person, first_name: 'Person Not In Project')
     person_in_project = Factory(:person, first_name: 'Person in Project')
     assert person_not_in_project.projects.empty?
     refute person_in_project.projects.empty?
+
     get :index
     assert_response :success
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item_title  a[href=?]', person_path(person_in_project), text: /#{person_in_project.name}/, count: 1
-      assert_select 'div.list_item_title  a[href=?]', person_path(person_not_in_project), text: /#{person_not_in_project.name}/, count: 0
+      assert_select 'div.list_item_title  a[href=?]', person_path(person_not_in_project), text: /#{person_not_in_project.name}/, count: 1
     end
 
     get :index, page: 'P'
     assert_response :success
     assert_select 'div.list_items_container' do
       assert_select 'div.list_item_title  a[href=?]', person_path(person_in_project), text: /#{person_in_project.name}/, count: 1
-      assert_select 'div.list_item_title  a[href=?]', person_path(person_not_in_project), text: /#{person_not_in_project.name}/, count: 0
+      assert_select 'div.list_item_title  a[href=?]', person_path(person_not_in_project), text: /#{person_not_in_project.name}/, count: 1
     end
   end
 
@@ -1499,7 +1502,7 @@ class PeopleControllerTest < ActionController::TestCase
     assert new_person.user
     login_as admin.user
 
-    assert_emails(1) do
+    assert_enqueued_emails(1) do
       put :administer_update, id: new_person.id, person: { work_group_ids: [work_group.id] }
     end
 
@@ -1523,7 +1526,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(user)
 
     # 3 emails - 1 to admin and 2 to project administrators
-    assert_emails(3) do
+    assert_enqueued_emails(3) do
       post :create,
            person: { first_name: 'Fred', last_name: 'BBB', email: 'fred.bbb@email.com' },
            projects: [proj1.id, proj2.id, project_without_manager.id]
@@ -1803,12 +1806,22 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to people_path
   end
 
+  test 'should show project position on person show page' do
+    pos = Factory(:project_position, name: 'Barista')
+    project_administrator = Factory(:project_administrator)
+    project_administrator.group_memberships.last.project_positions = [pos]
+    get :show, id: project_administrator
+    assert_select '#project-positions label', text: /#{pos.name}/, count: 1
+  end
+
   def edit_max_object(person)
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person
     Factory :tool, value: 'fishing rod', annotatable: person
-    person.add_to_project_and_institution(Factory(:project), Factory(:min_institution))
     Factory(:event, contributor: person.user, policy: Factory(:public_policy))
+    position = ProjectPosition.find_by_name('PI')
+    person.group_memberships.first.project_positions << position
+    #person.save
     add_avatar_to_test_object(person)
   end
 

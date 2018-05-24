@@ -9,7 +9,8 @@ module Seek
         ::AbstractController::ActionNotFound => 404,
         ActionController::UnknownController => 404,
         ActionController::UnknownFormat => 406,
-        ActiveRecord::RecordNotFound => 404
+        ActiveRecord::RecordNotFound => 404,
+        RSolr::Error::ConnectionRefused => 503
       }.freeze
 
       def self.included(base)
@@ -23,7 +24,7 @@ module Seek
         status = error_response_code(exception)
         exception_notification(status, exception)
         respond_to do |format|
-          format.html { render template: "errors/error_#{status}", layout: 'layouts/errors', status: status }
+          format.html { render template: "errors/error_#{status}", layout: 'layouts/errors', status: status, locals: {exception: exception} }
           format.all { render nothing: true, status: status }
         end
       end
@@ -35,9 +36,10 @@ module Seek
       def exception_notification(status, exception)
         unless !Seek::Config.exception_notification_enabled || [404, 406].include?(status)
           begin
-            ExceptionNotifier::Notifier.exception_notification(request.env,exception).deliver_now
-          rescue
+            ExceptionNotifier.notify_exception(exception, env: request.env)
+          rescue Exception => deliver_exception
             logger.error "ERROR - #{exception.class.name} (#{exception.message})"
+            logger.error "Error delivering exception email - #{deliver_exception.class.name} (#{deliver_exception.message})"
           end
         end
       end

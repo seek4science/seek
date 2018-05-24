@@ -92,11 +92,11 @@ class FoldersControllerTest < ActionController::TestCase
     end
     assert_response :success
     @project.reload
-    assert !ProjectFolder.root_folders(@project).empty?
+    refute ProjectFolder.root_folders(@project).empty?
     assert_equal 2, ProjectFolder.new_items_folder(@project).assets.count
     assert ProjectFolder.new_items_folder(@project).assets.include?(sop)
     assert ProjectFolder.new_items_folder(@project).assets.include?(private_sop)
-    assert !ProjectFolder.new_items_folder(@project).assets.include?(sop2)
+    refute ProjectFolder.new_items_folder(@project).assets.include?(sop2)
   end
 
   test 'defaults not created if exist' do
@@ -147,14 +147,18 @@ class FoldersControllerTest < ActionController::TestCase
   end
 
   test 'ajax request for hidden assay folder contents fails' do
-    assay = Factory :experimental_assay, policy: Factory(:private_policy), title: 'Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv', description: '5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3'
-    assay.study.investigation.projects = [@project]
-    assay.study.investigation.save!
-    assert !assay.can_view?
+    person = Factory(:person)
+    inv = Factory(:investigation, contributor: person)
+    study = Factory(:study, investigation: inv, contributor: person)
+    assay = Factory(:experimental_assay, policy: Factory(:private_policy),
+                                         title: 'Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv', description: '5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3',
+                                         study: study, contributor: person)
+
+    refute assay.can_view?
     xhr(:post, :display_contents, id: "Assay_#{assay.id}", project_id: @project.id)
     assert_redirected_to root_path
-    assert !@response.body.match(/Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv/)
-    assert !@response.body.match(/5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3/)
+    refute @response.body.match(/Yp50U6BjlacF0r7HY5WXHEOP8E2UqXcv/)
+    refute @response.body.match(/5Kx0432X6IbuzBi25BIi0OdY1xo4FRG3/)
   end
 
   test 'ajax request for folder contents rejected from non project member' do

@@ -273,6 +273,28 @@ class SnapshotsControllerTest < ActionController::TestCase
     assert !assigns(:snapshot).zenodo_record_url.nil?
   end
 
+  test 'can export snapshot to Zenodo without DOI' do
+    zenodo_mock
+    zenodo_oauth_mock
+    create_investigation_snapshot
+    Factory(:oauth_session, user_id: @user.id)
+    assert_nil @snapshot.doi
+
+    login_as(@user)
+
+    get :show, investigation_id: @investigation, id: @snapshot.snapshot_number
+    assert_response :success
+    assert_select 'a.btn', text: 'Export to Zenodo', count: 1
+
+    post :export_submit, investigation_id: @investigation, id: @snapshot.snapshot_number, code: 'abc',
+                         metadata: { access_type: 'open', license: 'CC-BY-4.0' }
+
+    assert_redirected_to investigation_snapshot_path(@investigation, @snapshot.snapshot_number)
+    refute_nil assigns(:snapshot).zenodo_deposition_id
+    refute_nil assigns(:snapshot).zenodo_record_url
+    refute_nil assigns(:snapshot).doi
+  end
+
   test 'can export study snapshot to Zenodo' do
     zenodo_mock
     zenodo_oauth_mock

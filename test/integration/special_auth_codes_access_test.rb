@@ -1,13 +1,12 @@
 require 'test_helper'
 
 class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
-  ASSETS_WITH_AUTH_CODES = %w(data_files events models sops presentations)
+  ASSETS_WITH_AUTH_CODES = %w[data_files events models sops presentations].freeze
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "form allows creating temporary access links for #{type_name}" do
-      user = Factory(:user, login: 'test')
-      User.with_current_user user do
-        post '/session', login: 'test', password: factory_user_password
+      User.with_current_user(Factory(:user, login: 'test')) do
+        post '/session', login: 'test', password: generate_user_password
 
         get "/#{type_name}/new"
         assert_select 'form div#temporary_links', count: 0
@@ -22,7 +21,9 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
     test "anonymous visitors can use access codes to show or download #{type_name}" do
       item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy))
       disable_authorization_checks do
-        item.special_auth_codes << Factory(:special_auth_code, asset: item)
+        User.with_current_user(item.contributor.user) do
+          item.special_auth_codes << Factory(:special_auth_code, asset: item)
+        end
       end
 
       code = CGI.escape(item.special_auth_codes.first.code)
@@ -50,7 +51,9 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
     test "anonymous visitors can see or download #{type_name} with wrong code" do
       item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy))
       disable_authorization_checks do
-        item.special_auth_codes << Factory(:special_auth_code, asset: item)
+        User.with_current_user(item.contributor.user) do
+          item.special_auth_codes << Factory(:special_auth_code, asset: item)
+        end
       end
       random_code = CGI.escape(SecureRandom.base64(30))
       get "/#{type_name}/#{item.id}?code=#{random_code}"
@@ -64,8 +67,11 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
 
   ASSETS_WITH_AUTH_CODES.each do |type_name|
     test "auth codes allow access to private #{type_name} until they expire" do
-      auth_code = Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: Factory(type_name.singularize.to_sym, policy: Factory(:private_policy))
-      item = auth_code.asset
+      item = Factory(type_name.singularize.to_sym, policy: Factory(:private_policy))
+
+      auth_code = User.with_current_user(item.contributor.user) do
+        Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
+      end
 
       # test without code instead of can_...? function
       get "/#{type_name}/#{item.id}"
@@ -81,7 +87,10 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
         test_passing_for item, type_name, 'download', code
       end
 
-      disable_authorization_checks { auth_code.expiration_date = Time.now - 1.days; auth_code.save! }
+      User.with_current_user(item.contributor.user) do
+        disable_authorization_checks { auth_code.expiration_date = Time.now - 1.days; auth_code.save! }
+      end
+
       item.reload
       get "/#{type_name}/#{item.id}?code=#{code}"
       assert_response :forbidden
@@ -93,8 +102,11 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
   end
 
   test 'should be able to explore excel datafile with auth code' do
-    auth_code = Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: Factory(:small_test_spreadsheet_datafile, policy: Factory(:private_policy))
-    item = auth_code.asset
+    item = Factory(:small_test_spreadsheet_datafile, policy: Factory(:private_policy))
+    auth_code = User.with_current_user(item.contributor.user) do
+      Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
+    end
+
     get "/data_files/#{item.id}/explore"
     assert_redirected_to item
     assert_not_nil flash[:error]
@@ -105,8 +117,11 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
   end
 
   test 'should be able to view content of sop with auth code' do
-    auth_code = Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: Factory(:pdf_sop, policy: Factory(:private_policy))
-    item = auth_code.asset
+    item = Factory(:pdf_sop, policy: Factory(:private_policy))
+    auth_code = User.with_current_user(item.contributor.user) do
+      Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
+    end
+
     get "/sops/#{item.id}/content_blobs/#{item.content_blob.id}/view_pdf_content"
     assert_redirected_to item
     assert_not_nil flash[:error]

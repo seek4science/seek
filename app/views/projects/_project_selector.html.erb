@@ -61,7 +61,7 @@
 <%= content_tag :script, project_policies_json(possible_projects | selected_projects), type: 'application/json', id: 'project-default-policies-json' %>
 <%= content_tag :script, enable_auto_project_license? ? project_licenses_json : '{}', type: 'application/json', id: 'project-default-licenses-json' %>
 
-<script>
+<script id="project-selector-script">
   Sharing.defaultPolicies = JSON.parse($j('#project-default-policies-json').text());
   Sharing.defaultLicenses = JSON.parse($j('#project-default-licenses-json').text());
 
@@ -101,8 +101,13 @@
     }
   });
 
-
   $j(document).ready(function () {
+    <% if params[:project_ids] && resource && resource.new_record? %>
+      // Auto select projects from params if this is a new object
+      <% params[:project_ids].each do |project_id| %>
+        Sharing.projectsSelector.add(<%= project_id %>, true);
+      <% end %>
+    <% end %>
     // Auto select project if there is only one
     if (Sharing.projectsSelector.possibilities.length === 1 &&
         Sharing.projectsSelector.selected.length === 0) {

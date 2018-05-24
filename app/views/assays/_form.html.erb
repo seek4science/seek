@@ -29,7 +29,7 @@
   <label><%= t('study') -%></label><span class="required">*</span>
   <%= link_to " New #{t('study')}?",new_study_path(:new_link_from_assay=>true), :onclick => "window.open(this.href);return false;" %>
 
-  <%= assay_study_selection(@assay.study,f) %>
+  <%= assay_study_selection('assay[study_id]',@assay.study) %>
 </div>
 
 
@@ -41,7 +41,7 @@
       <%= f.label "#{@assay_type_text.capitalize}" %>
       <%= create_suggested_type_popup_link @assay.assay_type_reader.ontology_term_type %>
       <div id="assay_<%= @assay.assay_type_reader.ontology_term_type %>_types_list">
-        <%= assay_type_select_tag f, @assay.is_modelling?, "assay_type_uri", @assay, {:class => "form-control"} %>
+        <%= assay_type_select_tag "assay[assay_type_uri]", @assay.is_modelling?, @assay, {:class => "form-control"} %>
       </div>
     </div>
   </div>
@@ -51,7 +51,7 @@
           <%= f.label "Technology type" %>
           <%= create_suggested_type_popup_link @assay.technology_type_reader.ontology_term_type %>
           <div id="assay_<%= @assay.technology_type_reader.ontology_term_type %>_types_list">
-            <%= technology_type_select_tag f, "technology_type_uri", @assay, {:class => "form-control"} %>
+            <%= technology_type_select_tag "assay[technology_type_uri]", @assay, {:class => "form-control"} %>
           </div>
         </div>
       </div>
@@ -98,7 +98,8 @@
                                                                   :has_direction => !@assay.is_modelling?} -%>
 
     <%= render :partial => "assets/associate_publication", :locals => { :resource_type => (@assay.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay')),
-                                                                            :related_publications => @assay.publications} -%>
+                                                                        :related_publications => @assay.publications} -%>
+    <%= render :partial => "assets/associate_document",:locals=>{:f=>f, :resource => @assay} %>
 <% end -%>
 
 <%

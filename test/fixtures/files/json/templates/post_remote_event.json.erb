@@ -1,0 +1,33 @@
+{
+  "data": {
+    "type": "events",
+    "attributes": {
+      "title": "A Remote Event",
+      "content_blobs": [
+        {
+          "url": "http://mockedlocation.com/txt_test.txt",
+          "original_filename": "cool_event.txt",
+          "content_type": "text/plain"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= @creator.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

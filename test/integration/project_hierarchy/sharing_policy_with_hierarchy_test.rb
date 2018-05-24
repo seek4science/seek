@@ -8,7 +8,8 @@ class SharingPolicyWithHierarchyTest < ActionDispatch::IntegrationTest
     person_in_parent = Factory :person, work_groups: [Factory(:work_group, project_id: @proj.id)]
     person_in_child1 = Factory :person, work_groups: [Factory(:work_group, project_id: @proj_child1.id)]
     person_in_child2 = Factory :person, work_groups: [Factory(:work_group, project_id: @proj_child2.id)]
-    df = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy), projects: [@proj]
+    df = Factory :data_file, policy: Factory(:all_sysmo_viewable_policy),
+                 projects: [@proj], contributor:Factory(:person,project:@proj)
     assert df.can_view?(person_in_parent)
     assert df.can_view?(person_in_child1)
     assert df.can_view?(person_in_child2)

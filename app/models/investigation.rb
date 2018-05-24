@@ -10,13 +10,13 @@ class Investigation < ActiveRecord::Base
 
   has_many :assays, through: :studies
 
-  validates :projects, presence: true
+  validates :projects, presence: true, projects: { self: true }
 
   def state_allows_delete?(*args)
     studies.empty? && super
   end
 
-  %w[data_file sop model publication].each do |type|
+  %w[data_file sop model publication document].each do |type|
     eval <<-END_EVAL
       def related_#{type}s
         studies.collect{|study| study.send(:related_#{type}s)}.flatten.uniq
@@ -29,7 +29,7 @@ class Investigation < ActiveRecord::Base
   end
 
   def assets
-    related_data_files + related_sops + related_models + related_publications
+    related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
   def clone_with_associations

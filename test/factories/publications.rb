@@ -15,7 +15,7 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.title 'A Maximal Publication'
   f.journal 'Journal of Molecular Biology'
   f.published_date '2017-10-10'
-  f.doi 'http://dx.doi.org/10.5072/abcd'
+  f.doi 'https://doi.org/10.5072/abcd'
   f.pubmed_id '873864488'
   f.citation 'JMB Oct 2017, 12:234-245'
   f.publication_authors {[Factory(:publication_author), Factory(:publication_author)]}

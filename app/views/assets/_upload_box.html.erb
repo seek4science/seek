@@ -1,13 +1,12 @@
 <%
-    new_version ||= false
-    resource ||=nil
+  new_version ||= false
+  resource ||= nil
 %>
-
-
 <%= panel('Upload') do %>
     <% if !resource.nil? && Seek::Util.is_multi_file_asset_type?(resource.class) %>
-        <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version,:batch=>true, :with_image_file=>resource.is_a?(Model)} -%>
+        <%= render partial: 'assets/upload', locals: { resource: resource, new_version: new_version, batch: true,
+                                                       with_image_file: resource.is_a?(Model) } -%>
     <% else %>
-        <%= render :partial=>"assets/upload",:locals=>{:new_version=>new_version} -%>
+        <%= render partial: 'assets/upload', locals: { resource: resource, new_version: new_version } -%>
     <% end %>
 <% end %>

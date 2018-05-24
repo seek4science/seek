@@ -1,7 +1,14 @@
 require 'test_helper'
 
 class SopTest < ActiveSupport::TestCase
+
   fixtures :all
+
+  def setup
+    @person = Factory(:person)
+    @project = @person.projects.first
+    @user = @person.user
+  end
 
   test 'project' do
     s = sops(:editable_sop)
@@ -10,7 +17,8 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'to_rdf' do
-    object = Factory :sop, description: 'An excellent SOP', projects: [Factory(:project), Factory(:project)], assay_ids: [Factory(:assay).id]
+    @person.add_to_project_and_institution(Factory(:project),Factory(:institution))
+    object = Factory :sop, description: 'An excellent SOP', contributor:@person, assay_ids: [Factory(:assay).id]
     Factory :assets_creator, asset: object, creator: Factory(:person)
 
     object = Sop.find(object.id)
@@ -40,12 +48,17 @@ class SopTest < ActiveSupport::TestCase
     asset = Sop.new projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
     assert !asset.valid?
 
+
+  end
+
+  test 'virtual liver allows blank projects' do
     # VL only:allow no projects
     as_virtualliver do
       asset = Sop.new title: 'fred', policy: Factory(:private_policy)
-      assert asset.valid?
+      assert asset.save!
     end
   end
+
 
   test 'assay association' do
     sop = sops(:sop_with_fully_public_policy)
@@ -72,7 +85,8 @@ class SopTest < ActiveSupport::TestCase
 
   test 'policy defaults to system default' do
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
-      sop = Sop.new Factory.attributes_for(:sop, policy: nil)
+      sop = Factory.build(:sop)
+      refute sop.persisted?
       sop.save!
       sop.reload
       assert sop.valid?
@@ -110,7 +124,7 @@ class SopTest < ActiveSupport::TestCase
   end
 
   def test_create_new_version
-    sop = sops(:my_first_sop)
+    sop = Factory(:sop, title:'My First Favourite SOP')
     User.current_user = sop.contributor
     sop.save!
     sop = Sop.find(sop.id)
@@ -148,9 +162,11 @@ class SopTest < ActiveSupport::TestCase
   end
 
   test 'assign projects' do
-    project = Factory(:project)
-    sop = Factory(:sop, projects: [project])
-    projects = [project, Factory(:project)]
+
+    sop = Factory(:sop, projects: [@project],contributor:@person)
+    another_project = Factory(:project)
+    @person.add_to_project_and_institution(another_project,@person.institutions.first)
+    projects = [@project, another_project]
     sop.update_attributes(project_ids: projects.map(&:id))
     sop.save!
     sop.reload
@@ -184,32 +200,6 @@ class SopTest < ActiveSupport::TestCase
     assert_not_nil ContentBlob.find(cb.id)
   end
 
-  test 'is restorable after destroy' do
-    sop = Factory :sop, policy: Factory(:all_sysmo_viewable_policy), title: 'is it restorable?'
-    blob_path = sop.content_blob.filepath
-    User.current_user = sop.contributor
-    assert_difference('Sop.count', -1) do
-      sop.destroy
-    end
-    assert_nil Sop.find_by_title 'is it restorable?'
-    assert_difference('Sop.count', 1) do
-      disable_authorization_checks { Sop.restore_trash!(sop.id) }
-    end
-    sop = Sop.find_by_title('is it restorable?')
-    refute_nil sop
-    refute_nil sop.content_blob
-    assert_equal blob_path, sop.content_blob.filepath
-    assert File.exist?(blob_path)
-  end
-
-  test 'failing to delete due to can_delete still creates trash' do
-    sop = Factory :sop, policy: Factory(:private_policy)
-    assert_no_difference('Sop.count') do
-      sop.destroy
-    end
-    assert_not_nil Sop.restore_trash(sop.id)
-  end
-
   test 'test uuid generated' do
     x = sops(:my_first_sop)
     assert_nil x.attributes['uuid']
@@ -230,7 +220,5 @@ class SopTest < ActiveSupport::TestCase
     assert sop.contributor
     assert_equal sop.contributor.user, sop.contributing_user
     assert_equal sop.contributor.user, sop.latest_version.contributing_user
-    sop_without_contributor = Factory :sop, contributor: nil
-    assert_nil sop_without_contributor.contributing_user
   end
 end

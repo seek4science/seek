@@ -5,7 +5,7 @@
     <%= modal_body do %>
         <div class="form-group">
           <label>The following people...</label>
-          <%= objects_input('permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.email } } }, name: nil) -%>
+          <%= objects_input('permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } }, name: nil) -%>
           <p class="help-block">Start typing a person's name and select from the list that appears. You can select multiple people.</p>
         </div>
         <div class="form-group">

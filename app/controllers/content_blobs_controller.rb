@@ -1,10 +1,27 @@
 class ContentBlobsController < ApplicationController
-  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show]
-  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show]
+  before_filter :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show update]
+  before_filter :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
   before_filter :set_asset_version, only: %i[get_pdf download]
+
+  skip_before_filter :check_json_id_type, only: [:update]
 
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
+
+  def update
+    if @content_blob.no_content?
+      @content_blob.tmp_io_object = request.body
+      @content_blob.save
+      @asset.touch
+      respond_to do |format|
+        format.all { render text: @content_blob.file_size, status: :ok }
+      end
+    else
+      respond_to do |format|
+        format.json { render json: {}, status: :bad_request }
+      end
+    end
+  end
 
   def view_content
     if @content_blob.is_text?
@@ -135,7 +152,6 @@ class ContentBlobsController < ApplicationController
 
   def get_file_from_jerm
     project = @asset_version.projects.first
-    project.decrypt_credentials
     downloader = Jerm::DownloaderFactory.create project.title
     resource_type = @asset_version.class.name.split('::')[0] # need to handle versions, e.g. Sop::Version
     begin
@@ -149,7 +165,7 @@ class ContentBlobsController < ApplicationController
   def find_and_authorize_associated_asset
     asset = asset_object
     if asset
-      if asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))
+      if asset.can_edit? || (action_name != 'update' && (asset.can_download? || (params[:code] && asset.auth_by_code?(params[:code]))))
         @asset = asset
       else
         respond_to do |format|
@@ -176,19 +192,20 @@ class ContentBlobsController < ApplicationController
   end
 
   def asset_object
-    if params[:data_file_id]
-      DataFile.find(params[:data_file_id])
-    elsif params[:model_id]
-      Model.find(params[:model_id])
-    elsif params[:sop_id]
-      Sop.find(params[:sop_id])
-    elsif params[:presentation_id]
-      Presentation.find(params[:presentation_id])
-    elsif params[:sample_type_id]
-      SampleType.find(params[:sample_type_id])
+    params.each do |param, value|
+      if param.end_with?('_id')
+        begin
+          c = param.chomp('_id').classify.constantize
+        rescue NameError
+        else
+          if c.method_defined?(:content_blob) || c.method_defined?(:content_blobs)
+            return c.find_by_id(value)
+          end
+        end
+      end
     end
-  rescue ActiveRecord::RecordNotFound
-    nil
+
+    nil # If nothing found
   end
 
   def find_and_authorize_content_blob

@@ -24,9 +24,11 @@ class Study < ActiveRecord::Base
   has_many :assays
   belongs_to :person_responsible, :class_name => "Person"
 
-  validates :investigation, :presence => { message: "Investigation is blank or invalid" }
+  validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 
-  ["data_file","sop","model"].each do |type|
+  enforce_authorization_on_association :investigation, :view
+
+  ["data_file","sop","model","document"].each do |type|
     eval <<-END_EVAL
       def #{type}_versions
         assays.collect{|a| a.send(:#{type}_versions)}.flatten.uniq
@@ -39,7 +41,7 @@ class Study < ActiveRecord::Base
   end
 
   def assets
-    related_data_files + related_sops + related_models + related_publications
+    related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
   def project_ids
@@ -56,8 +58,4 @@ class Study < ActiveRecord::Base
 
     return new_object
   end
-
-
-
-
 end

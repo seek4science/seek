@@ -38,22 +38,27 @@ class InvestigationsControllerTest < ActionController::TestCase
   end
 
   test 'should show aggregated publications linked to assay' do
-    assay1 = Factory :assay, policy: Factory(:public_policy)
-    assay2 = Factory :assay, policy: Factory(:public_policy)
+    person = Factory(:person)
+    study=nil
+    User.with_current_user(person.user) do
+      assay1 = Factory :assay, policy: Factory(:public_policy),contributor:person
+      assay2 = Factory :assay, policy: Factory(:public_policy),contributor:person
 
-    pub1 = Factory :publication, title: 'pub 1'
-    pub2 = Factory :publication, title: 'pub 2'
-    pub3 = Factory :publication, title: 'pub 3'
-    Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
-    Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
+      pub1 = Factory :publication, title: 'pub 1',contributor:person
+      pub2 = Factory :publication, title: 'pub 2',contributor:person
+      pub3 = Factory :publication, title: 'pub 3',contributor:person
+      Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
+      Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
 
-    Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
-    Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
+      Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
+      Factory :relationship, subject: assay2, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub3
 
-    investigation = Factory(:investigation, policy: Factory(:public_policy))
-    study = Factory(:study, policy: Factory(:public_policy),
-                            assays: [assay1, assay2],
-                            investigation: investigation)
+      investigation = Factory(:investigation, policy: Factory(:public_policy),contributor:person)
+      study = Factory(:study, policy: Factory(:public_policy),
+                      assays: [assay1, assay2],
+                      investigation: investigation,contributor:person)
+    end
+
 
     get :show, id: study.investigation.id
     assert_response :success
@@ -356,7 +361,8 @@ class InvestigationsControllerTest < ActionController::TestCase
   test 'programme investigations through nested routing' do
     assert_routing 'programmes/2/investigations', controller: 'investigations', action: 'index', programme_id: '2'
     programme = Factory(:programme)
-    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy))
+    person = Factory(:person,project:programme.projects.first)
+    investigation = Factory(:investigation, projects: programme.projects, policy: Factory(:public_policy),contributor:person)
     investigation2 = Factory(:investigation, policy: Factory(:public_policy))
 
     get :index, programme_id: programme.id
@@ -370,12 +376,12 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test 'send publish approval request' do
     gatekeeper = Factory(:asset_gatekeeper)
-    investigation = Factory(:investigation, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:private_policy))
+    investigation = Factory(:investigation, projects: [gatekeeper.projects.first], policy: Factory(:private_policy),contributor:Factory(:person,project:gatekeeper.projects.first))
     login_as(investigation.contributor)
 
     refute investigation.can_view?(nil)
 
-    assert_emails 1 do
+    assert_enqueued_emails 1 do
       put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::VISIBLE }
     end
 
@@ -386,12 +392,14 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   test 'dont send publish approval request if elevating permissions from VISIBLE -> ACCESSIBLE' do # They're the same for ISA things
     gatekeeper = Factory(:asset_gatekeeper)
-    investigation = Factory(:investigation, project_ids: gatekeeper.projects.collect(&:id), policy: Factory(:public_policy, access_type: Policy::VISIBLE))
-    login_as(investigation.contributor)
+    person = Factory(:person,project:gatekeeper.projects.first)
+    investigation = Factory(:investigation, projects: gatekeeper.projects, contributor:person,
+                            policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    login_as(person)
 
     assert investigation.is_published?
 
-    assert_emails 0 do
+    assert_no_enqueued_emails do
       put :update, investigation: { title: investigation.title }, id: investigation.id, policy_attributes: { access_type: Policy::ACCESSIBLE }
     end
 
@@ -415,9 +423,74 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_redirected_to investigations_path
   end
 
+  test 'shows how to create snapshot to get a citation' do
+    study = Factory(:study)
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), studies: [study], contributor:study.contributor)
+    login_as(investigation.contributor)
+
+    refute investigation.snapshots.any?
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', new_investigation_snapshot_path(investigation)
+  end
+
+  test 'shows how to publish investigation to get a citation' do
+    study = Factory(:study)
+    investigation = Factory(:investigation, policy: Factory(:private_policy),
+                            studies: [study], contributor:study.contributor)
+    login_as(investigation.contributor)
+
+    refute investigation.permitted_for_research_object?
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions a[href=?]', check_related_items_investigation_path(investigation)
+  end
+
+  test 'shows how to get a citation for a snapshotted investigation' do
+    study = Factory(:study)
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy),
+                            studies: [study], contributor:study.contributor)
+
+    login_as(investigation.contributor)
+    investigation.create_snapshot
+
+    assert investigation.permitted_for_research_object?
+    assert investigation.snapshots.any?
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions .alert p', text: /You have created 1 snapshot of this Investigation/
+    assert_select '#citation-instructions a[href=?]', '#snapshots'
+  end
+
+  test 'does not show how to get a citation if no manage permission' do
+    person = Factory(:person)
+    another_person = Factory(:person,project:person.projects.first)
+    study = Factory(:study,contributor:another_person)
+    investigation = Factory(:investigation, projects:another_person.projects, contributor:another_person,
+                            policy: Factory(:publicly_viewable_policy), studies: [study])
+
+    login_as(person)
+    investigation.create_snapshot
+
+    assert investigation.permitted_for_research_object?
+    assert investigation.snapshots.any?
+    refute investigation.can_manage?(person.user)
+    assert investigation.can_view?(person.user)
+
+    get :show, id: investigation
+
+    assert_response :success
+    assert_select '#citation-instructions', count: 0
+  end
+
   def edit_max_object(investigation)
-    add_tags_to_test_object(investigation)
     investigation.creators = [Factory(:person)]
-    investigation.save
+    disable_authorization_checks { investigation.save! }
   end
 end

@@ -138,26 +138,35 @@ class PersonTest < ActiveSupport::TestCase
   test 'contributed items' do
     person = Factory(:person)
     refute_nil person.user
-    df = Factory(:data_file, contributor: person)
-    as = Factory(:assay, contributor: person)
-    study = Factory(:study, contributor: person.user)
+    assert_empty person.contributed_items
+
+    df = Factory(:data_file, contributor: person.user)
+    inv = Factory(:investigation, contributor:person.user)
+    study = Factory(:study, contributor: person.user,investigation:inv)
+    as = Factory(:assay, contributor: person,study:study)
+
 
     items = person.contributed_items
 
-    assert_equal 3, items.count
+    assert_equal 4, items.count
     assert_includes items, df
     assert_includes items, as
     assert_includes items, study
+    assert_includes items, inv
 
-    person = Factory(:brand_new_person)
+    person = Factory(:person_in_project)
     assert_nil person.user
+
+    assert_empty person.contributed_items
+
     df = Factory(:data_file, contributor: person)
-    as = Factory(:assay, contributor: person)
-    inv = Factory(:investigation, contributor: person)
+    inv = Factory(:investigation, contributor:person)
+    study = Factory(:study, contributor: person,investigation:inv)
+    as = Factory(:assay, contributor: person,study:study)
 
     items = person.contributed_items
 
-    assert_equal 3, items.count
+    assert_equal 4, items.count
     assert_includes items, df
     assert_includes items, as
     assert_includes items, inv
@@ -705,7 +714,7 @@ class PersonTest < ActiveSupport::TestCase
     p.save!
     assert_not_nil p.notifiee_info
     assert_difference('NotifieeInfo.count', -1) do
-      p.destroy
+      disable_authorization_checks { p.destroy }
     end
   end
 
@@ -714,7 +723,7 @@ class PersonTest < ActiveSupport::TestCase
     u = users(:quentin)
     assert_difference('Person.count', -1) do
       assert_difference('User.count', -1) do
-        p.destroy
+        disable_authorization_checks { p.destroy }
       end
     end
     assert_nil User.find_by_id(u.id)
@@ -722,7 +731,7 @@ class PersonTest < ActiveSupport::TestCase
     p = people(:random_userless_person)
     assert_difference('Person.count', -1) do
       assert_no_difference('User.count') do
-        p.destroy
+        disable_authorization_checks { p.destroy }
       end
     end
   end
@@ -811,15 +820,15 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal [assay1, assay2].sort, person.related_assays.sort
   end
 
-  test 'get the correct investigations and studides' do
+  test 'get the correct investigations and studies' do
     p = Factory(:person)
     u = p.user
 
     inv1 = Factory(:investigation, contributor: p)
     inv2 = Factory(:investigation, contributor: u)
 
-    study1 = Factory(:study, contributor: p)
-    study2 = Factory(:study, contributor: u)
+    study1 = Factory(:study, contributor: p, investigation:inv1)
+    study2 = Factory(:study, contributor: u, investigation:inv2)
     p = Person.find(p.id)
 
     assert_equal [study1, study2], p.studies.sort_by(&:id)
@@ -1133,5 +1142,25 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 'bob', person.first_name
     assert_equal 'monkhouse', person.last_name
     assert_equal 'http://fish.com', person.web_page
+  end
+
+  test 'obfuscated_email' do
+    p = Factory(:person, email: 'hello@world.org')
+    assert_equal '....@world.org',p.obfuscated_email
+
+    p = Factory(:person, email: 'hello.every-body@world.org')
+    assert_equal '....@world.org',p.obfuscated_email
+  end
+
+  test 'typeahead_hint' do
+    p = Factory(:brand_new_person,email: 'fish@world.com')
+    assert p.projects.empty?
+    assert_equal '....@world.com',p.typeahead_hint
+
+    p = Factory(:person, project:Factory(:project,title:'wibble'))
+    assert_equal 'wibble',p.typeahead_hint
+
+    p.add_to_project_and_institution(Factory(:project,title:'wobble'),p.institutions.first)
+    assert_equal 'wibble, wobble',p.typeahead_hint
   end
 end

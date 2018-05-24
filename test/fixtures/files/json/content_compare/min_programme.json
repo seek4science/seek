@@ -11,6 +11,9 @@
       "funding_codes": null
     },
     "relationships": {
+      "administrators": {
+        "data": []
+      },
       "people": {
         "data": []
       },
@@ -45,6 +48,9 @@
         "data": []
       },
       "events": {
+        "data": []
+      },
+      "documents": {
         "data": []
       }
     },

@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTest < ActiveSupport::TestCase
+
   test 'validation' do
     sample = Factory :sample, title: 'fish', sample_type: Factory(:simple_sample_type), data: { the_title: 'fish' }
     assert sample.valid?
@@ -379,8 +380,10 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'projects' do
-    sample = Factory(:sample)
+    person = Factory(:person)
+    sample = Factory(:sample, contributor:person)
     project = Factory(:project)
+    person.add_to_project_and_institution(project,person.institutions.first)
     sample.update_attributes(project_ids: [project.id])
     disable_authorization_checks { sample.save! }
     sample.reload
@@ -419,14 +422,16 @@ class SampleTest < ActiveSupport::TestCase
     assay = Factory(:assay)
     study = assay.study
     investigation = study.investigation
-    sample = Factory(:sample)
+    sample = Factory(:sample, policy: Factory(:publicly_viewable_policy))
 
     assert_empty sample.assays
     assert_empty sample.studies
     assert_empty sample.investigations
 
-    assay.associate(sample)
-    assay.save!
+    User.with_current_user(assay.contributor.user) do
+      assay.associate(sample)
+      assay.save!
+    end
     sample.reload
 
     assert_equal [assay], sample.assays
@@ -438,7 +443,9 @@ class SampleTest < ActiveSupport::TestCase
     assay = Factory(:assay)
     sample = Factory(:sample, policy: Factory(:public_policy))
     assert_difference('AssayAsset.count', 1) do
-      assay.associate(sample)
+      User.with_current_user(assay.contributor.user) do
+        assay.associate(sample)
+      end
     end
     assay.save!
     sample.reload
@@ -645,7 +652,7 @@ class SampleTest < ActiveSupport::TestCase
 
     sample = Sample.find(sample.id)
 
-    assert_equal patient.id, sample.get_attribute(:patient)
+    assert_equal patient.id, sample.get_attribute(:patient)['id']
     assert_equal [patient], sample.related_samples
   end
 
@@ -780,9 +787,10 @@ class SampleTest < ActiveSupport::TestCase
   end
 
   test 'extracted samples inherit projects from data file' do
+    person = Factory(:person)
     create_sample_attribute_type
     data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                                    policy: Factory(:private_policy)
+                                    policy: Factory(:private_policy), contributor:person
     sample_type = SampleType.new title: 'from template', project_ids: [Factory(:project).id]
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
@@ -795,6 +803,7 @@ class SampleTest < ActiveSupport::TestCase
 
     # Change the projects
     new_projects = [Factory(:project), Factory(:project)]
+    new_projects.each{|p| person.add_to_project_and_institution(p,person.institutions.first)}
     disable_authorization_checks do
       data_file.projects = new_projects
       data_file.save!
@@ -838,6 +847,50 @@ class SampleTest < ActiveSupport::TestCase
     refute sample.can_view?(nil)
   end
 
+  test 'can overwrite existing samples when extracting from data file' do
+    person = Factory(:person)
+    project_ids = [person.projects.first.id]
+
+    disable_authorization_checks do
+      source_type = Factory(:source_sample_type, project_ids: project_ids)
+      lib1 = source_type.samples.create(data: { title: 'Lib-1', info: 'bla' }, sample_type: source_type, project_ids: project_ids)
+      lib2 = source_type.samples.create(data: { title: 'Lib-2', info: 'bla' }, sample_type: source_type, project_ids: project_ids)
+      lib3 = source_type.samples.create(data: { title: 'Lib-3', info: 'bla' }, sample_type: source_type, project_ids: project_ids)
+      lib4 = source_type.samples.create(data: { title: 'Lib-4', info: 'bla' }, sample_type: source_type, project_ids: project_ids)
+
+      assert_equal 4, source_type.samples.count
+
+      type = SampleType.new(title: 'Sample type linked to other', project_ids: project_ids)
+      type.sample_attributes << Factory.build(:sample_attribute, title: 'title', template_column_index: 1,
+                                              sample_attribute_type: Factory(:string_sample_attribute_type),
+                                              required: true, is_title: true, sample_type: type)
+      type.sample_attributes << Factory.build(:sample_attribute, title: 'library id', template_column_index: 2,
+                                              sample_attribute_type: Factory(:sample_sample_attribute_type),
+                                              required: false, sample_type: type, linked_sample_type: source_type)
+      type.sample_attributes << Factory.build(:sample_attribute, title: 'info', template_column_index: 3,
+                                              sample_attribute_type: Factory(:string_sample_attribute_type),
+                                              required: false, sample_type: type)
+      type.save!
+
+      data_file = Factory(:data_file, content_blob: Factory(:linked_samples_incomplete_content_blob), project_ids: project_ids, contributor:person)
+
+      assert_difference('Sample.count', 4) do
+        data_file.extract_samples(type, true, false)
+      end
+
+      assert_equal [lib1, lib2], data_file.extracted_samples.map { |s| s.related_samples }.flatten.sort
+
+      data_file.content_blob = Factory(:linked_samples_complete_content_blob)
+      data_file.save!
+
+      assert_difference('Sample.count', 1) do # Spreadsheet contains 4 updated samples and 1 new one
+        data_file.extract_samples(type, true, true)
+      end
+
+      assert_equal [lib1, lib2, lib3, lib4], data_file.reload.extracted_samples.map { |s| s.related_samples }.flatten.uniq.sort
+    end
+  end
+
   test 'strains linked through join table' do
     sample_type = Factory(:strain_sample_type)
     strain = Factory(:strain)
@@ -855,6 +908,7 @@ class SampleTest < ActiveSupport::TestCase
     end
 
     assert_includes sample.referenced_strains, strain
+    assert_includes sample.referenced_resources, strain
     assert_includes sample.strains, strain
     assert_includes strain.samples, sample
   end
@@ -874,7 +928,93 @@ class SampleTest < ActiveSupport::TestCase
     end
 
     assert_not_includes sample.referenced_strains, strain
+    assert_not_includes sample.referenced_resources, strain
     assert_not_includes sample.strains, strain
     assert_not_includes strain.samples, sample
   end
+
+  test 'samples linked through join table' do
+    project = Factory(:project)
+    sample_type = Factory(:linked_optional_sample_type, project_ids: [project.id])
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample.set_attribute(:title, 'Linking sample')
+    sample.set_attribute(:patient, linked_sample.id)
+
+    assert_includes sample.referenced_samples, linked_sample
+    assert_includes sample.referenced_samples, linked_sample
+    assert_not_includes sample.linked_samples, linked_sample
+    assert_not_includes linked_sample.linking_samples, sample
+
+    assert_difference('SampleResourceLink.count', 1) do
+      disable_authorization_checks { sample.save }
+    end
+
+    assert_includes sample.referenced_samples, linked_sample
+    assert_includes sample.referenced_resources, linked_sample
+    assert_includes sample.linked_samples, linked_sample
+    assert_includes linked_sample.linking_samples, sample # linked both ways
+  end
+
+  test 'samples unlinked when no longer referenced' do
+    project = Factory(:project)
+    sample_type = Factory(:linked_optional_sample_type, project_ids: [project.id])
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id],
+                        data: { title: 'Linking sample',
+                                patient: linked_sample.id})
+
+    disable_authorization_checks { sample.save! }
+
+    assert_includes sample.referenced_samples, linked_sample
+    assert_includes sample.referenced_resources, linked_sample
+    assert_includes sample.linked_samples, linked_sample
+    assert_includes linked_sample.linking_samples, sample
+
+    assert_difference('SampleResourceLink.count', -1) do
+      sample.set_attribute(:patient, '')
+      disable_authorization_checks { sample.save! }
+    end
+
+    assert_not_includes sample.referenced_samples, linked_sample
+    assert_not_includes sample.referenced_resources, linked_sample
+    assert_not_includes sample.linked_samples, linked_sample
+    assert_not_includes linked_sample.linking_samples, sample
+  end
+
+  test 'samples unlinked when source destroyed' do
+    project = Factory(:project)
+    sample_type = Factory(:linked_optional_sample_type, project_ids: [project.id])
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id],
+                        data: { title: 'Linking sample',
+                                patient: linked_sample.id})
+
+    disable_authorization_checks { sample.save! }
+
+    assert_difference('SampleResourceLink.count', -1) do
+      disable_authorization_checks { sample.destroy! }
+    end
+  end
+
+  test 'samples unlinked when destination destroyed' do
+    project = Factory(:project)
+    sample_type = Factory(:linked_optional_sample_type, project_ids: [project.id])
+    linked_sample = Factory(:patient_sample, sample_type: sample_type.sample_attributes.last.linked_sample_type)
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id],
+                        data: { title: 'Linking sample',
+                                patient: linked_sample.id})
+
+    disable_authorization_checks { sample.save! }
+
+    assert_difference('SampleResourceLink.count', -1) do
+      disable_authorization_checks { linked_sample.destroy! }
+    end
+  end
+
+
 end

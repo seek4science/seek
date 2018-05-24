@@ -54,6 +54,7 @@ class Person < ActiveRecord::Base
 
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
   has_many :created_data_files, through: :assets_creators, source: :asset, source_type: 'DataFile'
+  has_many :created_documents, through: :assets_creators, source: :asset, source_type: 'Document'
   has_many :created_models, through: :assets_creators, source: :asset, source_type: 'Model'
   has_many :created_sops, through: :assets_creators, source: :asset, source_type: 'Sop'
   has_many :created_publications, through: :assets_creators, source: :asset, source_type: 'Publication'
@@ -96,11 +97,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def guest_project_member?
-    project = Project.find_by_title('BioVeL Portal Guests')
-    !project.nil? && projects == [project]
-  end
-
   def projects_with_default_license
     projects.select(&:default_license)
   end
@@ -129,6 +125,19 @@ class Person < ActiveRecord::Base
 
   def mbox_sha1sum
     Digest::SHA1.hexdigest(email_uri)
+  end
+
+  # only partially shows the email, to allow it to be used to know you are selected the right person, but without revealing the full address
+  def obfuscated_email
+    email.gsub(/.*\@/,'....@')
+  end
+
+  def typeahead_hint
+    if projects.any?
+      projects.collect(&:title).join(', ')
+    else
+      obfuscated_email
+    end
   end
 
   def studies
@@ -179,7 +188,7 @@ class Person < ActiveRecord::Base
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
-  RELATED_RESOURCE_TYPES = %i[data_files models sops presentations events publications investigations
+  RELATED_RESOURCE_TYPES = %i[data_files documents models sops presentations events publications investigations
                               studies assays].freeze
   RELATED_RESOURCE_TYPES.each do |type|
     define_method "related_#{type}" do
@@ -236,18 +245,6 @@ class Person < ActiveRecord::Base
     end
   end
 
-  def workflows
-    try(:user).try(:workflows) || []
-  end
-
-  def runs
-    try(:user).try(:taverna_player_runs) || []
-  end
-
-  def sweeps
-    try(:user).try(:sweeps) || []
-  end
-
   def projects # ALL projects, former and current
     # updating workgroups doesn't change groupmemberships until you save. And vice versa.
     work_groups.collect(&:project).uniq | group_memberships.collect { |gm| gm.work_group.project }
@@ -294,7 +291,6 @@ class Person < ActiveRecord::Base
     Person.count == 1 && [self] == Person.all && Person.first.is_admin?
   end
 
-  # the roles defined within the project
   def project_positions
     project_positions = []
     group_memberships.each do |gm|
@@ -326,7 +322,7 @@ class Person < ActiveRecord::Base
   # all items, assets, ISA, samples and events that are linked to this person as a contributor
   def contributed_items
     assays = Assay.where(contributor_id: id) # assays contributor is not polymorphic
-    [Study, Investigation, DataFile, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
+    [Study, Investigation, DataFile, Document, Sop, Presentation, Model, Sample, Publication, Event].collect do |type|
       assets = type.where("contributor_type = 'Person' AND contributor_id=?",id)
       assets |= type.where("contributor_type = 'User' AND contributor_id=?",user.id) unless user.nil?
       assets
@@ -366,7 +362,7 @@ class Person < ActiveRecord::Base
     user.try(:is_admin?)
   end
 
-  def can_destroy?(user = User.current_user)
+  def can_delete?(user = User.current_user)
     can_manage? user
   end
 

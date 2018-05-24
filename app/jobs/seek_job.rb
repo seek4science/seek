@@ -14,7 +14,7 @@ class SeekJob
       rescue Exception => exception
         raise exception if Rails.env.test?
         unless item.destroyed?
-          report_exception(exception,item)
+          report_exception(exception, item)
           retry_item(item)
         end
       end
@@ -24,8 +24,8 @@ class SeekJob
     end
   end
 
-  #adds the job to the Delayed Job queue. Will not create it if it already exists and allow_duplicate is false,
-  #or by default allow_duplicate_jobs? returns false.
+  # adds the job to the Delayed Job queue. Will not create it if it already exists and allow_duplicate is false,
+  # or by default allow_duplicate_jobs? returns false.
   def queue_job(priority = default_priority, time = default_delay.from_now, allow_duplicate = allow_duplicate_jobs?)
     if allow_duplicate || !exists?
       Delayed::Job.enqueue(self, priority: priority, queue: queue_name, run_at: time)

@@ -1,0 +1,40 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://test-fe.cbu.uib.no/nels-api/sbi/projects
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*; q=0.5, application/xml"
+      Accept-Encoding:
+      - gzip, deflate
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer fake-access-token
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Fri, 28 Jul 2017 08:57:28 GMT
+      Content-Length:
+      - '304'
+      Connection:
+      - close
+      Content-Type:
+      - text/plain; charset=UTF-8
+    body:
+      encoding: UTF-8
+      string: '[{"id":91123122,"name":"seek_pilot1","description":"Seek pilot project
+        1","contact_person":"Kidane M. Tekle","creation_date":"2017-05-17T22:00:00Z"},{"id":91123123,"name":"seek_pilot2","description":"Second
+        pilot project for seek","contact_person":"Kidane M. Tekle","creation_date":"2017-05-17T22:00:00Z"}]'
+    http_version: 
+  recorded_at: Fri, 28 Jul 2017 08:57:28 GMT
+recorded_with: VCR 2.9.3

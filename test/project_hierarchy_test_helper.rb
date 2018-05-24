@@ -52,16 +52,26 @@ module ProjectHierarchyTestHelper
   def login_as_test_user
     User.current_user = Factory(:user, login: 'test')
     # test actions in controller with User.current_user not nil
-    post '/session', login: 'test', password: factory_user_password
+    post '/session', login: 'test', password: generate_user_password
   end
 
   def initialize_hierarchical_projects
     @proj = Factory(:project, title: 'parent project')
     @proj_child1 = Factory :project, title: 'child1 project', parent_id: @proj.id
     @proj_child2 = Factory :project, title: 'child2 project', parent_id: @proj.id
-    @subscribables_in_proj = [Factory(:subscribable, projects: [Factory(:project), @proj]),
-                              Factory(:subscribable, projects: [@proj, Factory(:project), Factory(:project)]),
-                              Factory(:subscribable, projects: [@proj])]
+    person = Factory(:person, project:@proj)
+    person.add_to_project_and_institution(@proj_child1,person.institutions.first)
+    person.add_to_project_and_institution(@proj_child2,person.institutions.first)
+
+    other_projects = (0..2).collect do
+      p = Factory(:project)
+      person.add_to_project_and_institution(p,person.institutions.first)
+      p
+    end
+
+    @subscribables_in_proj = [Factory(:subscribable, projects: [other_projects[0], @proj], contributor:person),
+                              Factory(:subscribable, projects: [@proj, other_projects[1],other_projects[2]], contributor:person),
+                              Factory(:subscribable, projects: [@proj], contributor:person)]
   end
 
   def new_person_with_hierarchical_projects

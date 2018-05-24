@@ -1,8 +1,5 @@
 ENV['RAILS_ENV'] ||= 'test'
 
-require 'coveralls'
-Coveralls.wear!('rails')
-
 require File.expand_path(File.dirname(__FILE__) + '/../config/environment')
 require 'rails/test_help'
 
@@ -18,8 +15,12 @@ require 'tmpdir'
 require 'authenticated_test_helper'
 require 'mock_helper'
 require 'html_helper'
+require 'nels_test_helper'
+require 'upload_helper'
+require 'password_helper'
 require 'minitest/reporters'
 require 'minitest'
+require 'ostruct'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new]
 
@@ -30,6 +31,25 @@ module ActionView
     def self.get_alternative(key)
       key = stringify_values(key)
       @@alternative_map[key]
+    end
+  end
+end
+
+include UploadHelper
+include PasswordHelper
+
+FactoryGirl.define do
+  trait :with_project_contributor do
+    contributor { nil }
+    after_build do |resource|
+      if resource.contributor.nil?
+        if resource.projects.none?
+          resource.projects = [Factory(:project)]
+        end
+        resource.contributor = Factory(:person, project: resource.projects.first)
+      elsif resource.projects.none?
+        resource.projects = [resource.contributor.person.projects.first]
+      end
     end
   end
 end
@@ -142,8 +162,10 @@ class ActiveSupport::TestCase
   end
 
   def add_avatar_to_test_object(obj)
-    obj.avatar = Factory(:avatar, owner: obj)
-    obj.save
+    disable_authorization_checks do
+      obj.avatar = Factory(:avatar, owner: obj)
+      obj.save!
+    end
   end
 
   def add_tags_to_test_object(obj)
@@ -156,8 +178,10 @@ class ActiveSupport::TestCase
   end
 
   def add_creator_to_test_object(obj)
-    obj.creators = [Factory(:person)]
-    obj.save
+    disable_authorization_checks do
+      obj.creators = [Factory(:person)]
+      obj.save!
+    end
   end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
@@ -239,7 +263,7 @@ class ActiveSupport::TestCase
     path
   end
 
-  def assert_emails(n)
+  def assert_enqueued_emails(n)
     assert_difference 'ActionMailer::Base.deliveries.size', n do
       yield
     end
@@ -247,6 +271,18 @@ class ActiveSupport::TestCase
 
   def assert_no_emails
     assert_no_difference 'ActionMailer::Base.deliveries.size' do
+      yield
+    end
+  end
+
+  def assert_enqueued_emails(n)
+    assert_difference(-> { ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j.fetch(:job) == ActionMailer::DeliveryJob }.count }, n) do
+      yield
+    end
+  end
+
+  def assert_no_enqueued_emails
+    assert_no_difference(-> { ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j.fetch(:job) == ActionMailer::DeliveryJob }.count }) do
       yield
     end
   end
@@ -261,14 +297,20 @@ class ActiveSupport::TestCase
     f.close
     puts "Written @response.body to #{f.path}"
   end
-
-  # the password used for the Factories
-  def factory_user_password
-    Factory.build(:user).password
-  end
 end
 
 # Load seed data
 # load "#{Rails.root}/db/seeds.rb" if File.exists?("#{Rails.root}/db/seeds.rb")
 
-WebMock.disable_net_connect!(allow_localhost: true)
+VCR.configure do |config|
+  config.cassette_library_dir = 'test/vcr_cassettes'
+  config.hook_into :webmock
+
+  # ignore sparql requests, for some of the RDF integration tests
+  # fixme: in the future it would be good to make the sparql data consistent enough to work with VCR
+  config.ignore_request do |request|
+    request.uri =~ /sparql-auth/
+  end
+end
+
+WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time

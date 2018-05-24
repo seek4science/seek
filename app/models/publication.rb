@@ -84,12 +84,12 @@ class Publication < ActiveRecord::Base
   end
 
   def doi_uri
-    "https://dx.doi.org/#{doi}" if doi
+    "https://doi.org/#{doi}" if doi
   end
 
   # Automatically extract the actual DOI if the user put in the full URL
   def doi=(doi)
-    doi = doi.gsub(/(https?:\/\/)?dx\.doi\.org\//,'') if doi
+    doi = doi.gsub(/(https?:\/\/)?(dx\.)?doi\.org\//,'') if doi
     super(doi)
   end
 
@@ -254,13 +254,6 @@ class Publication < ActiveRecord::Base
     author_names
   end
 
-  # those displayed on the right. We don't want authors listed as creators here (OPSK-1247). Changing .creators breaks behaviour when editing
-  def displayed_creators
-    [contributor].compact.map do |creator|
-      creator.is_a?(User) ? creator.person : creator
-    end
-  end
-
   def has_doi?
     self.doi.present?
   end
@@ -271,9 +264,19 @@ class Publication < ActiveRecord::Base
 
   private
 
+  def pubmed_entry
+    if pubmed_id
+      Rails.cache.fetch("bio-reference-#{pubmed_id}") do
+        entry = Bio::PubMed.efetch(pubmed_id).first
+        raise "PubMed entry was nil" if entry.nil?
+        entry
+      end
+    end
+  end
+
   def bio_reference
     if pubmed_id
-      Bio::MEDLINE.new(Bio::PubMed.efetch(pubmed_id).first).reference
+      Bio::MEDLINE.new(pubmed_entry).reference
     else
       # TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
       Bio::Reference.new({ title: title, journal: journal, abstract: abstract,

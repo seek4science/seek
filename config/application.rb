@@ -58,6 +58,8 @@ module SEEK
     config.middleware.use Rack::Deflater,
                           include: %w(text/html application/xml application/json text/css application/javascript)
 
+    config.middleware.use Rack::Attack
+
     config.exceptions_app = self.routes
 
     config.active_support.escape_html_entities_in_json = true
@@ -73,7 +75,7 @@ module SEEK
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+    config.active_job.queue_adapter = Rails.env.test? ? :test : :delayed_job
   end
 end
-
-require 'settings' # This is here rather than in seek_main.rb because it has to be loaded before seek_configuration.rb

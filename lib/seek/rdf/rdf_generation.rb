@@ -22,7 +22,7 @@ module Seek
       end
 
       def to_rdf_graph
-        rdf_graph = handle_rightfield_contents self
+        rdf_graph = RDF::Graph.new
         rdf_graph = describe_type(rdf_graph)
         rdf_graph = generate_from_csv_definitions rdf_graph
         rdf_graph = additional_triples rdf_graph

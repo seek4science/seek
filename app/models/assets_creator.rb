@@ -31,8 +31,12 @@ class AssetsCreator < ActiveRecord::Base
 
       #Add any new creators
       ids_to_add.each do |i|
-        resource.creators << Person.find_by_id(i)
-
+        person = Person.find_by_id(i)
+        if person
+          resource.creators << person
+        else
+          resource.errors.add(:creators, "missing person for ID #{i}")
+        end
       end
     end
   end

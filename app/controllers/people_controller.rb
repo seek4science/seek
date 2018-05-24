@@ -47,17 +47,20 @@ class PeopleController < ApplicationController
       @people = @people.reject { |p| (p.group_memberships & @project_position.group_memberships).empty? }
     end
 
+    if (request.format == 'json' && params[:page].nil?)
+      params[:page] = 'all'
+    end
+
     if @people
-      @people = @people.select(&:can_view?).reject { |p| p.projects.empty? }
+      @people = @people.select(&:can_view?)
     else
       @people = if params[:page].blank? || params[:page] == 'latest' || params[:page] == 'all'
                   Person.active
                 else
                   Person.all
                 end
-      @people = @people.reject { |p| p.group_memberships.empty? }
-      @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
 
+      @people = apply_filters(@people).select(&:can_view?) # .select{|p| !p.group_memberships.empty?}
       unless view_context.index_with_facets?('people') && params[:user_enable_facet] == 'true'
         @people = Person.paginate_after_fetch(@people,
                                               page: (params[:page] || Seek::Config.default_page('people')),
@@ -179,7 +182,7 @@ class PeopleController < ApplicationController
           format.xml { render xml: @person, status: :created, location: @person }
           format.json {render json: @person, status: :created, location: @person }
         else
-          Mailer.signup(current_user).deliver_now
+          Mailer.signup(current_user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
@@ -188,18 +191,18 @@ class PeopleController < ApplicationController
       else
         format.html { render redirect_action }
         format.xml { render xml: @person.errors, status: :unprocessable_entity }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
   end
 
   def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(params, current_user).deliver_now
+    Mailer.contact_admin_new_user(params, current_user).deliver_later
 
     # send mail to project managers
     project_administrators = project_administrators_of_selected_projects params[:projects]
     project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_now
+      Mailer.contact_project_administrator_new_user(project_administrator, params, current_user).deliver_later
     end
   end
 
@@ -226,7 +229,7 @@ class PeopleController < ApplicationController
       else
         format.html { render action: 'edit' }
         format.xml  { render xml: @person.errors, status: :unprocessable_entity }
-        format.json { render json: @person.errors, status: :unprocessable_entity }
+        format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
   end
@@ -258,16 +261,32 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_group_membership_project_position_ids(person, params)
-    prefix = 'group_membership_role_ids_'
+  def set_group_membership_from_api_params(person,params)
     person.group_memberships.each do |gr|
-      key = prefix + gr.id.to_s
-      gr.project_positions.clear
-      next unless params[key.to_sym]
-      params[key.to_sym].each do |r|
-        r = ProjectPosition.find(r)
-        gr.project_positions << r
+      #gr.project_positions.clear ???
+      params[:person][:project_positions].each do |pos|
+        if (gr.project.id.to_s == pos[:project_id].to_s)
+          r = ProjectPosition.find(pos[:position_id])
+          gr.project_positions << r
+        end
       end
+    end
+  end
+
+  def set_group_membership_project_position_ids(person, params)
+    if params[:person][:project_positions].nil?
+      prefix = 'group_membership_role_ids_'
+      person.group_memberships.each do |gr|
+        key = prefix + gr.id.to_s
+        gr.project_positions.clear
+        next unless params[key.to_sym]
+        params[key.to_sym].each do |r|
+          r = ProjectPosition.find(r)
+          gr.project_positions << r
+        end
+      end
+    else
+      set_group_membership_from_api_params(person, params)
     end
   end
 
@@ -319,8 +338,7 @@ class PeopleController < ApplicationController
     results = Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
                            query: "#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |person|
-      projects = person.projects.collect(&:title).join(', ')
-      { id: person.id, name: person.name, projects: projects, hint: projects }
+      { id: person.id, name: person.name, projects: person.projects.collect(&:title).join(', '), hint: person.typeahead_hint }
     end
 
     respond_to do |format|
@@ -332,7 +350,7 @@ class PeopleController < ApplicationController
 
   def person_params
     params.require(:person).permit(:first_name, :last_name, :orcid, :description, :email, :web_page, :phone,
-                                   :skype_name, { discipline_ids: [] },
+                                   :skype_name, { discipline_ids: [] }, { expertise: [] }, { tools: [] },
                                    project_subscriptions_attributes: %i[id project_id _destroy frequency])
   end
 
@@ -350,8 +368,8 @@ class PeopleController < ApplicationController
   end
 
   def set_tools_and_expertise(person, params)
-    exp_changed = person.tag_annotations(params[:expertise_list], 'expertise')
-    tools_changed = person.tag_annotations(params[:tool_list], 'tool')
+    exp_changed = person.tag_annotations(params[:expertise_list], 'expertise') if params[:expertise_list]
+    tools_changed = person.tag_annotations(params[:tool_list], 'tool') if params[:tool_list]
     if immediately_clear_tag_cloud?
       expire_annotation_fragments('expertise') if exp_changed
       expire_annotation_fragments('tool') if tools_changed
