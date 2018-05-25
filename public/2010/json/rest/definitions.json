@@ -50,14 +50,14 @@
       "properties": {
         "status": {
           "$ref": "#/definitions/nonEmptyString"
-        },
-        "required": [
-          "status"
-        ],
-        "additionalProperties": false,
-        "example": {
-          "status": "ok"
         }
+      }
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false,
+      "example": {
+        "status": "ok"
       }
     },
     "not_implemented": {
@@ -431,6 +431,7 @@
         "data_files",
         "documents",
         "events",
+        "institutions",
         "models",
         "organisms",
         "people",
@@ -514,12 +515,10 @@
           "$ref": "#/definitions/nullableNonEmptyString"
         },
         "created_at": {
-          "type": "dateTimeString",
-          "minLength": 1
+          "$ref": "#/definitions/dateTimeString"
         },
         "updated_at": {
-          "type": "dateTimeString",
-          "minLength": 1
+          "$ref": "#/definitions/dateTimeString"
         },
         "content_blobs": {
           "$ref": "#/definitions/contentBlobsList"
@@ -592,12 +591,10 @@
           "$ref": "#/definitions/nullableNonEmptyString"
         },
         "created_at": {
-          "type": "dateTimeString",
-          "minLength": 1
+          "$ref": "#/definitions/dateTimeString"
         },
         "updated_at": {
-          "type": "dateTimeString",
-          "minLength": 1
+          "$ref": "#/definitions/dateTimeString"
         },
         "content_blobs": {
           "$ref": "#/definitions/contentBlobsList"
@@ -1599,7 +1596,8 @@
         "jsonapi": {
           "$ref": "#/definitions/JsonApiVersion"
         },
-        "links": {},
+        "links": {
+        },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
         }
@@ -1795,9 +1793,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -1917,9 +1912,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -3105,9 +3097,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -3163,9 +3152,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -4184,7 +4170,8 @@
                 "projects": {
                   "$ref": "#/definitions/projectReferencesList"
                 }
-              }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -4241,7 +4228,8 @@
                 "projects": {
                   "$ref": "#/definitions/projectReferencesList"
                 }
-              }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -4440,7 +4428,8 @@
                 "organisms": {
                   "$ref": "#/definitions/organismReferencesList"
                 }
-              }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -4503,7 +4492,8 @@
                 "organisms": {
                   "$ref": "#/definitions/organismReferencesList"
                 }
-              }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -4998,9 +4988,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -5072,9 +5059,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
