@@ -51,7 +51,7 @@
         "status": {
           "$ref": "#/definitions/nonEmptyString"
         }
-      }
+      },
       "required": [
         "status"
       ],
