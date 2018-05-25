@@ -462,6 +462,14 @@ class HomesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'can get terms page' do
+      with_config_value :terms_page, '<h1>Terms and Conditions</h1>' do
+        get :terms
+        assert_response :success
+        assert_select 'h1', text: 'Terms and Conditions'
+      end
+  end
+
   def uri_to_guardian_feed
     uri_to_feed 'guardian_atom.xml'
   end
