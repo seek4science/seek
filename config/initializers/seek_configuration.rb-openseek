@@ -106,6 +106,7 @@ def load_seek_config_defaults!
   Seek::Config.default :about_page, File.read(Rails.root.join('config/default_data/about_page_example'))
 
   #Terms and conditions page
+  Settings.defaults[:terms_enabled]= false
   Seek::Config.default :terms_page, File.read(Rails.root.join('config/default_data/terms_and_conditions'))
 
   #the maximum size, in Mb, for a spreadsheet file that can be extracted and explored
