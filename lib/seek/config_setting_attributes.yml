@@ -178,6 +178,8 @@ openbis_download_limit:
 default_license:
 about_page_enabled:
 about_page:
+terms_enabled:
+terms_page:
 nels_enabled:
 nels_client_id:
 nels_client_secret:

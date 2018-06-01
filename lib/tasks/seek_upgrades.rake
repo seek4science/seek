@@ -131,11 +131,15 @@ namespace :seek do
 
     Project.all.each do |project|
       if project.site_credentials.present?
-        credentials_hash = decrypt(Base64.decode64(project.site_credentials), key)
-        project.site_username = credentials_hash[:username]
-        project.site_password = credentials_hash[:password]
-        project.update_column(:site_credentials, nil)
-        conversions += 1
+        if project.site_credentials == "\u0010" # some spurious value from very old SysMO projects
+          project.update_column(:site_credentials, nil)
+        else
+          credentials_hash = decrypt(Base64.decode64(project.site_credentials), key)
+          project.site_username = credentials_hash[:username]
+          project.site_password = credentials_hash[:password]
+          project.update_column(:site_credentials, nil)
+          conversions += 1
+        end
       end
     end
 
