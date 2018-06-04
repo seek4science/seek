@@ -2,5 +2,7 @@
 
 require ::File.expand_path('../config/environment',  __FILE__)
 
-run SEEK::Application
+map Rails.application.config.relative_url_root || '/' do
+  run Rails.application
+end
 
