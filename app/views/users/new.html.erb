@@ -50,7 +50,7 @@
             <label>Confirm Password</label>
             <%= f.password_field :password_confirmation, :class => 'form-control' %>
           </div>
-        <% if User.any? %>
+        <% if (User.any? && Seek::Config.terms_enabled) %>
           <div class="form-group">
             <label>
               <%= check_box_tag "tc_agree","1",false -%> I have read and agree to the
@@ -59,7 +59,7 @@
             </label>
           </div>
         <% end %>
-          <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary', :disabled => User.any? %>
+          <%= submit_tag 'Register', data: { disable_with: 'Registering...' }, :class => 'btn btn-primary', :disabled => (User.any? && Seek::Config.terms_enabled ) %>
       <% end -%>
     </div>
   </div>
