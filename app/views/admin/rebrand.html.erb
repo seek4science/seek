@@ -54,6 +54,17 @@
                                Below is an example. You can see how it is under homes/imprint", :rows => 30) %>
     </div>
 
+  <%= admin_checkbox_setting(:terms_enabled, 1,Seek::Config.terms_enabled,
+                             "Terms and Conditions enabled","Add your Terms and Conditions to comply with the GDPR",
+                             :onchange => toggle_appear_javascript('terms_details')) %>
+
+  <div class="additional_settings" id="terms_details" style="<%= show_or_hide_block Seek::Config.terms_enabled -%>">
+    <%= admin_textarea_setting(:terms_page, Seek::Config.terms_page,
+                               nil, "Here you can specify the text for your SEEK Terms and Conditions.
+                               Or you can give the link to its content from external site. You can input basic html tags and formats.
+                               Below is an example.", :rows => 30) %>
+  </div>
+
     <%= admin_checkbox_setting(:about_page_enabled, 1,Seek::Config.about_page_enabled,
                                '"About" page enabled', 'Add a custom "About" page link to the Help menu where users can find out more information about this SEEK instance.',
                                :onchange => toggle_appear_javascript('about_page_details')) %>

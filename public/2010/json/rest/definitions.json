@@ -50,14 +50,14 @@
       "properties": {
         "status": {
           "$ref": "#/definitions/nonEmptyString"
-        },
-        "required": [
-          "status"
-        ],
-        "additionalProperties": false,
-        "example": {
-          "status": "ok"
         }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false,
+      "example": {
+        "status": "ok"
       }
     },
     "not_implemented": {
@@ -390,19 +390,15 @@
           "uniqueItems": true,
           "items": {
             "properties": {
-              "resource_type": {
-                "$ref": "#/definitions/nonEmptyString"
-              },
-              "resource_id": {
-                "$ref": "#/definitions/nonEmptyString"
+              "resource": {
+                "$ref": "#/definitions/permissionResource"
               },
               "access": {
                 "$ref": "#/definitions/accessType"
               }
             },
             "required": [
-              "resource_type",
-              "resource_id",
+              "resource",
               "access"
             ],
             "additionalProperties": false
@@ -435,6 +431,7 @@
         "data_files",
         "documents",
         "events",
+        "institutions",
         "models",
         "organisms",
         "people",
@@ -445,6 +442,28 @@
         "sample_types",
         "sops",
         "studies"
+      ]
+    },
+    "permissionResource" : {
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/permissionResourceType"
+        },
+        "id": {
+          "$ref": "#/definitions/nonEmptyString"
+        }
+      },
+      "additionalProperties": false
+    },
+    "permissionResourceType": {
+      "type": "string",
+      "minLength": 1,
+      "enum": [
+        "people",
+        "favourite_groups",
+        "work_groups",
+        "projects",
+        "institutions"
       ]
     },
     "contributedTypeAttributes": {
@@ -496,12 +515,10 @@
           "$ref": "#/definitions/nullableNonEmptyString"
         },
         "created_at": {
-          "type": "dateTimeString",
-          "minLength": 1
+          "$ref": "#/definitions/dateTimeString"
         },
         "updated_at": {
-          "type": "dateTimeString",
-          "minLength": 1
+          "$ref": "#/definitions/dateTimeString"
         },
         "content_blobs": {
           "$ref": "#/definitions/contentBlobsList"
@@ -574,12 +591,10 @@
           "$ref": "#/definitions/nullableNonEmptyString"
         },
         "created_at": {
-          "type": "dateTimeString",
-          "minLength": 1
+          "$ref": "#/definitions/dateTimeString"
         },
         "updated_at": {
-          "type": "dateTimeString",
-          "minLength": 1
+          "$ref": "#/definitions/dateTimeString"
         },
         "content_blobs": {
           "$ref": "#/definitions/contentBlobsList"
@@ -1581,7 +1596,8 @@
         "jsonapi": {
           "$ref": "#/definitions/JsonApiVersion"
         },
-        "links": {},
+        "links": {
+        },
         "meta": {
           "$ref": "#/definitions/baseMetaType"
         }
@@ -1777,9 +1793,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -1899,9 +1912,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -3087,9 +3097,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -3145,9 +3152,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -4166,7 +4170,8 @@
                 "projects": {
                   "$ref": "#/definitions/projectReferencesList"
                 }
-              }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -4223,7 +4228,8 @@
                 "projects": {
                   "$ref": "#/definitions/projectReferencesList"
                 }
-              }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -4422,7 +4428,8 @@
                 "organisms": {
                   "$ref": "#/definitions/organismReferencesList"
                 }
-              }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -4485,7 +4492,8 @@
                 "organisms": {
                   "$ref": "#/definitions/organismReferencesList"
                 }
-              }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
@@ -4980,9 +4988,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },
@@ -5054,9 +5059,6 @@
             "attributes": {
               "type": "object",
               "properties": {
-                "tags": {
-                  "$ref": "#/definitions/nullableNonEmptyStringList"
-                },
                 "title": {
                   "$ref": "#/definitions/nonEmptyString"
                 },

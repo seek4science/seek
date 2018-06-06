@@ -16,10 +16,6 @@ class AssaySerializer < PCSSerializer
       uri: object.technology_type_uri }
   end
 
-  attribute :tags do
-    serialize_annotations(object, context = 'tag')
-  end
-
   has_many :organisms
   # has_many :assay_organisms
 
