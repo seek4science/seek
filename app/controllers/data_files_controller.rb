@@ -196,7 +196,7 @@ class DataFilesController < ApplicationController
     if !(%w(xls xlsx) & mime_extensions).empty?
       respond_to do |format|
         format.html # currently complains about a missing template, but we don't want people using this for now - its purely XML
-        format.xml { render xml: spreadsheet_to_xml(file) }
+        format.xml { render xml: spreadsheet_to_xml(file, memory_allocation = Seek::Config.jvm_memory_allocation) }
         format.csv { render text: spreadsheet_to_csv(file, sheet, trim) }
       end
     else
@@ -360,6 +360,8 @@ class DataFilesController < ApplicationController
       if handle_upload_data
         create_content_blobs
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
+        # assay ids passed forwards, e.g from "Add Datafile" button
+        @source_assay_ids = (params[:assay_ids] || [] ).reject(&:blank?)
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)

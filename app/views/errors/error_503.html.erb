@@ -1,0 +1,8 @@
+<div class="dialog">
+  <h1>503</h1>
+  <h2>The service you are trying to use is currently unavailable.</h2>
+  <% if exception.class == RSolr::Error::ConnectionRefused %>
+     The search service is currently down. We have been notified and the issue will be fixed as soon as possible.
+  <% end %>
+  <p>Please try again later.</p>
+</div>

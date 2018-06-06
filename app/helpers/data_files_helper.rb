@@ -31,6 +31,8 @@ module DataFilesHelper
       "You do not have permission to #{extra_info[0]} the #{t(extra_info[1].name.underscore)}"
     when :not_a_project_member
       "You are not a member of the #{t('project')} provided, so cannot link to it."
+    when :no_project
+      "There was not a #{t('project')} provided, so will be using your default or left blank"
     when :not_in_db
       "No item could be found in the database for the #{t(extra_info.name.underscore)} SEEK ID provided"
     when :id_not_a_valid_uri

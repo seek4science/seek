@@ -7,7 +7,7 @@ module Seek
           data_file.title = title
           data_file.description = description
           data_file.projects = [project] if project
-          assay.associate(data_file) if assay
+          data_file.assay_assets.build(assay:assay) if assay
           warnings
         end
 

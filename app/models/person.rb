@@ -133,6 +133,19 @@ class Person < ActiveRecord::Base
     Digest::SHA1.hexdigest(email_uri)
   end
 
+  # only partially shows the email, to allow it to be used to know you are selected the right person, but without revealing the full address
+  def obfuscated_email
+    email.gsub(/.*\@/,'....@')
+  end
+
+  def typeahead_hint
+    if projects.any?
+      projects.collect(&:title).join(', ')
+    else
+      obfuscated_email
+    end
+  end
+
   def studies
     result = studies_for_person
     result = (result | user.studies).compact if user

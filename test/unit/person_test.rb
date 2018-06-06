@@ -1151,4 +1151,24 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 'monkhouse', person.last_name
     assert_equal 'http://fish.com', person.web_page
   end
+
+  test 'obfuscated_email' do
+    p = Factory(:person, email: 'hello@world.org')
+    assert_equal '....@world.org',p.obfuscated_email
+
+    p = Factory(:person, email: 'hello.every-body@world.org')
+    assert_equal '....@world.org',p.obfuscated_email
+  end
+
+  test 'typeahead_hint' do
+    p = Factory(:brand_new_person,email: 'fish@world.com')
+    assert p.projects.empty?
+    assert_equal '....@world.com',p.typeahead_hint
+
+    p = Factory(:person, project:Factory(:project,title:'wibble'))
+    assert_equal 'wibble',p.typeahead_hint
+
+    p.add_to_project_and_institution(Factory(:project,title:'wobble'),p.institutions.first)
+    assert_equal 'wibble, wobble',p.typeahead_hint
+  end
 end

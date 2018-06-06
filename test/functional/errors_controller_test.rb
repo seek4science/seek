@@ -15,4 +15,9 @@ class ErrorsControllerTest < ActionController::TestCase
     get :error_422
     assert_response :success
   end
+
+  test 'should get error_503' do
+    get :error_503
+    assert_response :success
+  end
 end
