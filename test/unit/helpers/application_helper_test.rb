@@ -30,6 +30,25 @@ class ApplicationHelperTest < ActionView::TestCase
       assert_equal 'a', blocks.last.name
       assert_match(/http:\/\/localhost:3000\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last['href'])
       assert_match(/http:\/\/localhost:3000\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last.children.first.content)
+
+      # handles sub uri
+      with_config_value(:site_base_host,'http://seek.org/fish') do
+        html = persistent_resource_id(assay)
+        blocks = HTML::Document.new(html).root.children.first.children
+        assert_equal 'strong', blocks.first.name
+        assert_match(/SEEK ID/, blocks.first.children.first.content)
+        assert_equal 'a', blocks.last.name
+        assert_match(/http:\/\/seek.org\/fish\/assays\/#{assay.id}/, blocks.last['href'])
+        assert_match(/http:\/\/seek.org\/fish\/assays\/#{assay.id}/, blocks.last.children.first.content)
+
+        html = persistent_resource_id(versioned_sop)
+        blocks = HTML::Document.new(html).root.children.first.children
+        assert_equal 'strong', blocks.first.name
+        assert_match(/SEEK ID/, blocks.first.children.first.content)
+        assert_equal 'a', blocks.last.name
+        assert_match(/http:\/\/seek.org\/fish\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last['href'])
+        assert_match(/http:\/\/seek.org\/fish\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last.children.first.content)
+      end
     end
   end
 
