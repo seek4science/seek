@@ -75,11 +75,10 @@ module ApplicationHelper
     # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
     # ... its also a bit messy handling the version
     url= if resource.class.name.include?("::Version")
-      URI.join(Seek::Config.site_base_host, "/#{resource.parent.class.name.tableize}/#{resource.parent.id}?version=#{resource.version}").to_s
+      URI.join(Seek::Config.site_base_host + "/", "#{resource.parent.class.name.tableize}/","#{resource.parent.id}?version=#{resource.version}").to_s
     else
-      URI.join(Seek::Config.site_base_host, "/#{resource.class.name.tableize}/#{resource.id}").to_s
+      URI.join(Seek::Config.site_base_host + "/", "#{resource.class.name.tableize}/","#{resource.id}").to_s
     end
-
 
     content_tag :p, class: :id do
       content_tag(:strong) do
