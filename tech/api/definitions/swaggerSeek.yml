@@ -9,15 +9,106 @@ info:
     name: SEEK support
     url: http://groups.google.com/group/seek4science
     email: support@fair-dom.org
-  description: |-
-    The JSON API to FAIRDOM SEEK is a [JSON API](http://jsonapi.org)
-    specification describing how to read and write to a SEEK instance.
+  description: |
+    <a name="api"></a>The JSON API to FAIRDOM SEEK is a [JSON API](http://jsonapi.org) specification describing how to read and write to a SEEK instance.
 
-    The API is defined in the [OpenAPI
-    specification](https://swagger.io/specification) currently in [version
-    2](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
+    The API is defined in the [OpenAPI specification](https://swagger.io/specification) currently in [version 2](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
 
-    Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/hleonov/ipython_for_SEEK-API).
+    Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/seek4science/seekAPIexamples)
+
+    ___
+
+    ## Policy
+    <a name="Policy"></a>
+    A Policy specifies the visibility of an object to people using SEEK. A <a href="#projects">**Project**</a> may specify the default policy for objects belonging to that <a href="#projects">**Project**</a>
+
+    The **Policy** specifies the visibility of the object to non-registered people or <a href="#people">**People**</a> not allowed special access.
+
+    The access may be one of (in order of increasing "power"):
+
+    * no_access
+    * view
+    * download
+    * edit
+    * manage
+
+    In addition a **Policy** may give special access to specific <a href="#people">**People**</a>, People working at an <a href="#institutions">**Institution**</a> or working on a <a href="#projects">**Project**</a>.
+
+    ___
+
+    ## License
+    <a name="License"></a>
+    The license specifies the license that will apply to any <a href="#dataFiles">**DataFiles**</a>, <a href="#models">**Models**</a>, <a href="#sops">**SOPs**</a>, <a href="#documents">**Documents**</a> and <a href="#presentations">**Presentations**</a> associated with a <a href="#projects">**Project**</a>.
+
+    The license can currently be:
+
+    * [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) - CC0 1.0
+    * [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/) - Creative Commons Attribution 4.0
+    * [CC-BY-SA-4.0](https://creativecommons.org/licenses/by-sa/4.0/) - Creative Commons Attribution Share-Alike 4.0
+    * [ODC-BY-1.0](http://www.opendefinition.org/licenses/odc-by) - Open Data Commons Attribution License 1.0
+    * [ODbL-1.0](http://www.opendefinition.org/licenses/odc-odbl) - Open Data Commons Open Database License 1.0
+    * [ODC-PDDL-1.0](http://www.opendefinition.org/licenses/odc-pddl) - Open Data Commons Public Domain Dedication and Licence 1.0
+    * notspecified - License Not Specified
+    * other-at - Other (Attribution)
+    * other-open - Other (Open)
+    * other-pd - Other (Public Domain)
+    * [AFL-3.0](http://www.opensource.org/licenses/AFL-3.0) - Academic Free License 3.0
+    * [Against-DRM](http://www.opendefinition.org/licenses/against-drm) - Against DRM
+    * [CC-BY-NC-4.0](https://creativecommons.org/licenses/by-nc/4.0/) - Creative Commons Attribution-NonCommercial 4.0
+    * [DSL](http://www.opendefinition.org/licenses/dsl) - Design Science License
+    * [FAL-1.3](http://www.opendefinition.org/licenses/fal) - Free Art License 1.3
+    * [GFDL-1.3-no-cover-texts-no-invariant-sections](http://www.opendefinition.org/licenses/gfdl) - GNU Free Documentation License 1.3 with no cover texts and no invariant sections
+    * [geogratis](http://geogratis.gc.ca/geogratis/licenceGG) - Geogratis
+    * [hesa-withrights](http://www.hesa.ac.uk/index.php?option=com_content&amp;task=view&amp;id=2619&amp;Itemid=209) - Higher Education Statistics Agency Copyright with data.gov.uk rights
+    * localauth-withrights - Local Authority Copyright with data.gov.uk rights
+    * [MirOS](http://www.opensource.org/licenses/MirOS) - MirOS Licence
+    * [NPOSL-3.0](http://www.opensource.org/licenses/NPOSL-3.0) - Non-Profit Open Software License 3.0
+    * [OGL-UK-1.0](http://reference.data.gov.uk/id/open-government-licence) - Open Government Licence 1.0 (United Kingdom)
+    * [OGL-UK-2.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/) - Open Government Licence 2.0 (United Kingdom)
+    * [OGL-UK-3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/) - Open Government Licence 3.0 (United Kingdom)
+    * [OGL-Canada-2.0](http://data.gc.ca/eng/open-government-licence-canada) - Open Government License 2.0 (Canada)
+    * [OSL-3.0](http://www.opensource.org/licenses/OSL-3.0) - Open Software License 3.0
+    * [dli-model-use](http://data.library.ubc.ca/datalib/geographic/DMTI/license.html) - Statistics Canada: Data Liberation Initiative (DLI) - Model Data Use Licence
+    * [Talis](http://www.opendefinition.org/licenses/tcl) - Talis Community License
+    * ukclickusepsi - UK Click Use PSI
+    * ukcrown-withrights - UK Crown Copyright with data.gov.uk rights
+    * [ukpsi](http://www.opendefinition.org/licenses/ukpsi) - UK PSI Public Sector Information
+
+    ___
+
+    ## ContentBlob
+    <a name="ContentBlob"></a>
+    The content of a <a href="#dataFiles">**DataFile**</a>, <a href="#documents">**Document**</a>, <a href="#models">**Model**</a>, <a href="#sops">**SOP**</a> or <a href="#presentations">**Presentation**</a> is specified as a set of **ContentBlobs**.
+
+    When a resource with content is created, it is possible to specify a ContentBlob either as:
+
+    * A remote ContentBlob with:
+      * **URI to the content's location**
+      * The original filename for the content
+      * The content type of the remote content as a [MIME media type](https://en.wikipedia.org/wiki/Media_type)
+    * A placeholder that will be filled with uploaded content
+      * **The original filename for the content**
+      * **The content type of the content as a [MIME media type](https://en.wikipedia.org/wiki/Media_type)**
+
+    The creation of the resource will return a JSON document containing ContentBlobs corresponding to the remote ContentBlob and to the ContentBlob placeholder. The blobs contain a URI to their location.
+
+    A placeholder can then be satisfied by uploading a file to the location URI. For example by a placeholder such as 
+
+    ```
+    "content_blobs": [
+      {
+        "original_filename": "a_pdf_file.pdf",
+        "content_type": "application/pdf",
+        "link": "http://www.fairdomhub.org/data_files/57/content_blobs/313"
+      }
+    ],
+    ```
+
+    may be satisfied by uploading a file to http://www.fairdomhub.org/data_files/57/content_blobs/313 using the <a href="#uploadDataFileContent">uploadDataFileContent</a> operation
+
+    The content of a resource may be downloaded by first *reading* the resource and then *downloading* the ContentBlobs from their URI.
+
+    ___
   x-logo:
     url: ./definitions/seek.png
     backgroundColor: '#FFFFFF'
@@ -33,7 +124,7 @@ securityDefinitions:
   basicAuth:
     type: basic
     description: |-
-      The JSON API uses [Basic access
+      <a name="authentication"></a>The JSON API uses [Basic access
       authentication](https://en.wikipedia.org/wiki/Basic_access_authentication)
       where the *username* and *password* correspond to a registered user on
       the SEEK that is being accessed.
@@ -46,7 +137,7 @@ security:
 tags:
 - name: list
   description: |-
-    **List** operations return a JSON object containing a list of all the objects of the specified class to which the authenticated user has access.
+    <a name="list"></a>**List** operations return a JSON object containing a list of all the objects of the specified class to which the authenticated user has access.
 
     Success response codes:
     * 200 OK
@@ -55,7 +146,7 @@ tags:
   x-traitTag: true
 - name: create
   description: |
-    A **Create** operation creates a new instance of the specified class. The instance is populated with the content of the body of the API call.
+    <a name="create"></a>A **Create** operation creates a new instance of the specified class. The instance is populated with the content of the body of the API call.
 
     The **Create** call returns a JSON object representing the newly created instance.
 
@@ -69,7 +160,7 @@ tags:
   x-traitTag: true
 - name: read
   description: |
-    A **Read** operation will return information about the instance identified, provided the authenticated user has access to it.
+    <a name="read"></a>A **Read** operation will return information about the instance identified, provided the authenticated user has access to it.
 
     The **Read** operation returns a JSON object representing the instance.
 
@@ -83,7 +174,7 @@ tags:
   x-traitTag: true
 - name: update
   description: |
-    An **Update** operation will modify the information held about the specified instance. This operation is only available if the authenticated user has access to the object.
+    <a name="update"></a>An **Update** operation will modify the information held about the specified instance. This operation is only available if the authenticated user has access to the object.
 
     Success response codes:
     * 200 OK
@@ -95,7 +186,7 @@ tags:
   x-traitTag: true
 - name: delete
   description: |
-    A **Delete** operation will delete the specified instance, if the authenticated user has sufficient access to it.
+    <a name="delete"></a>A **Delete** operation will delete the specified instance, if the authenticated user has sufficient access to it.
 
     Success response codes:
     * 200 OK
@@ -104,59 +195,432 @@ tags:
     * 403 Forbidden
     * 404 Not found
   x-traitTag: true
+- name: upload
+  description: |
+    <a name="upload"></a>**Upload** operations are used to satisfy the required content of previously created resources such as <a href="#dataFiles">**DataFile**</a>, <a href="#documents">**Document**</a>, <a href="#models">**Model**</a>, <a href="#sops">**SOP**</a> or <a href="#presentations">**Presentation**</a>. See <a href="#ContentBlob">**ContentBlob**</a> for more details.
+  x-traitTag: true
+- name: download
+  description: |
+    <a name="download"></a>**Download** operations are used to retrieve the content of resources such as <a href="#dataFiles">**DataFile**</a>, <a href="#documents">**Document**</a>, <a href="#models">**Model**</a>, <a href="#sops">**SOP**</a> or <a href="#presentations">**Presentation**</a>. See <a href="#ContentBlob">**ContentBlob**</a> for more details.
+  x-traitTag: true
 
 - name: search
-  description: |
-- name: institutions
   description: |-
-    An institition in SEEK is where someone is employed or works. It is normal for an institution to have a physical location - a set of buildings in which people work.
+    <a name="search"></a>
+- name: institutions
+  description: |
+    <a name="institutions"></a>An **Institition** in SEEK is where someone is employed or works. It is normal for an **Institution** to have a physical location - a set of buildings in which <a href="#people">**People**</a> work.
 
-    SEEK does not impose any constraints on the granularity of the institution so it may represent a whole university or company, or be limited to a specific site.
+    SEEK does not impose any constraints on the granularity of the **Institution** so it may represent a whole university or company, or be limited to a specific site.
+
+    An **Institution** has the following associated information:
+
+    * **The title of the Institution**
+    * A reference to an avatar / logo for the **Institution**
+    * The two letter country code
+    * The name of the city where the **Institution** has its headquarters
+    * The address of the **Institution** within the city
+    * A URI to the webpage for the **Institution**
+
+    A response for an **Institution** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * References to registered <a href="#people">**People**</a> who work at the **Institution**
+    * References to the <a href="#projects">**Projects**</a> in which the **Institution** is a partner.
 - name: people
   description: |-
-    This is a people description
+    <a name="people"></a>A **Person** in SEEK is someone who participates directly or indirectly in the scientific research described within SEEK. A person may:
+
+    * work at one or more <a href="#institutions">**Institutions**</a>
+    * work on one or more <a href="#projects">**Projects**</a>
+
+    A **Person** can have helped to carry out <a href="#investigations">**Investigations**</a>, <a href="#studies">**Studies**</a> and <a href="#assays">**Assays**</a>, and to have been involved in the creation of resources such as <a href="#dataFiles">**DataFles**</a>.
+
+    A **Person** has the following associated information:
+
+    * **The person's first name**
+    * **The person's last name**
+    * A personal description
+    * An email address for the **Person**
+    * A URI to a webpage about the **Person**
+    * The [ORCID](https://orcid.org/) for the **Person**
+    * A list of strings describing the expertise of the **Person**
+    * A list of strings describing the tools that the **Person** uses
+    * The telephone number of the **Person**, including country code
+    * The [Skype](https://www.skype.com) name of the **Person**
+
+    A response for a **Person** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * A URI to an image used as the **Person's** avatar
+    * The **Person's** title, made from their first and last name
+    * A list of the <a href="#projects">**Project**</a> positions held by the **Person**
+
+    * References to the <a href="#projects">**Projects**</a> in which the **Person** is involved
+    * References to the <a href="#institutions">**Institutions**</a> where the **Person** works
+    * References to the <a href="#investigations">**Investigations**</a> in which the **Person** is involved
+    * References to the <a href="#studies">**Studies**</a> in which the **Person** is involved
+    * References to the <a href="#assays">**Assays**</a> in which the **Person** is involved
+    * References to the <a href="#dataFiles">**DataFiles**</a> associated with the **Person**
+    * References to the <a href="#documents">**Documents**</a> associated with the **Person**
+    * References to the <a href="#models">**Models**</a> associated with the **Person**
+    * References to the <a href="#sops">**SOPs**</a> associated with the **Person**
+    * References to the <a href="#publications">**Publications**</a> associated with the **Person**
+    * References to the <a href="#presentations">**Presentations**</a> associated with the **Person**
+    * References to the <a href="#events">**Events**</a> associated with the **Person**
+
+    **Note that in the Person response the email address is encoded in mbox_sha1sum**
 - name: programmes
-  description: |-
-    **Programmes** are an umbrella group for one or more **Projects**. They are usually, but not always, associated with a particular funded piece of research.
+  description: |
+    <a name="programmes"></a>**Programmes** are an umbrella group for one or more <a href="#projects">**Projects**</a>. They are usually, but not always, associated with a particular funded piece of research.
+
+    A **Programme** has the following associated information:
+
+    * ** The title of the Programme **
+    * A description of the **Programme**
+    * A URI to a webpage about the **Programme**
+    * A string containing details about the funding of the **Programme**
+    * A list of the funding codes for the **Programme**
+
+    * References to the <a href="#people">**People**</a> who are administrators for the **Programme**
+    * References to <a href="#projects">**Projects**</a> that are part of the **Programme**
+
+    A response for a **Programme** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * References to <a href="#people">**People**</a> who work on the **Programme** and are not administrators
+    * References to <a href="#institutions">**Institutions**</a> that are involved in the **Programme**
+    * References to <a href="#investigations">**Investigations**</a> that are part of the **Programme**
+    * References to <a href="#studies">**Studies**</a> that are part of the **Programme**
+    * References to <a href="#assays">**Assays**</a> that are part of the **Programme**
+    * References to <a href="#dataFiles">**DataFiles**</a> that belong to <a href="#projects">**Projects**</a> that are part of the **Programme**
+    * References to <a href="#documents">**Documents**</a> that belong to <a href="#projects">**Projects**</a> that are part of the **Programme**
+    * References to <a href="#models">**Models**</a> that belong to <a href="#projects">**Projects**</a> that are part of the **Programme**
+    * References to <a href="#sops">**Sops**</a> that belong to <a href="#projects">**Projects**</a> that are part of the **Programme**
+    * References to <a href="#publications">**Publications**</a> that belong to <a href="#projects">**Projects**</a> that are part of the **Programme**
+    * References to <a href="#presentations">**Presentations**</a> that belong to <a href="#projects">**Projects**</a> that are part of the **Programme**
+    * References to <a href="#events">**Events**</a> that are held by or attended by <a href="#projects">**Projects**</a> that are part of the **Programme**
 - name: projects
-  description: |-
-    This is a projects description
+  description: |
+    <a name="projects"></a>A **Project** is an area of research carried out as part of a <a href="#programmes">**Programme**</a> and consisting of one or more <a href="#investigations">**Investigations**</a>.
+
+    **In the current version of the API, the <a href="#Policy">Policy</a> and the description of Project members and administrative roles does not work correctly.  This will be improved in future versions of the API.**
+
+    A **Project** has the following associated information:
+
+    * **The title of the Project**
+    * A reference to an avatar / logo for the **Project**
+    * A description of the **Project**
+    * A URI to a webpage about the **Project**
+    * A URI to the wiki of the **Project**
+    * The default <a href="#Policy">**Policy**</a> applied to objects belonging to the **Project**
+    * The default <a href="#License">**License**</a> applied to objects belonging to the **Project**
+
+    * References to the <a href="#programmes">**Programmes**</a> that the **Project** is part of
+    * References to the <a href="#organisms">**Organisms**</a> studied by the **Project**
+
+    A response for a **Project** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * References to <a href="#people">**People**</a> who work on the **Project**
+    * References to <a href="#institutions">**Institutions**</a> that are involved in the **Project**
+    * References to <a href="#investigations">**Investigations**</a> that are part of the **Project**
+    * References to <a href="#studies">**Studies**</a> that are part of the **Project**
+    * References to <a href="#assays">**Assays**</a> that are part of the **Project**
+    * References to <a href="#dataFiles">**DataFiles**</a> that belong to the <a href="#projects">**Project**</a>
+    * References to <a href="#documents">**Documents**</a> that belong to the <a href="#projects">**Project**</a>
+    * References to <a href="#models">**Models**</a> that belong to the <a href="#projects">**Project**</a>
+    * References to <a href="#sops">**Sops**</a> that belong to the <a href="#projects">**Project**</a>
+    * References to <a href="#publications">**Publications**</a> that belong to the <a href="#projects">**Project**</a>
+    * References to <a href="#presentations">**Presentations**</a> that belong to the <a href="#projects">**Project**</a>
+    * References to <a href="#events">**Events**</a> that are held by or attended by the <a href="#projects">**Project**</a>
 - name: investigations
   description: |
-    **Investigations** are high level descriptions of the research carried out by a particular **Project**. They typically reflect the general aims of the **Project**, for example, carbon metabolism or anaerobic/aerobic transitions.
+    <a name="investigations"></a>**Investigations** are high level descriptions of the research carried out by a particular <a href="#projects">**Project**</a>. They typically reflect the general aims of the <a href="#projects">**Project**</a>, for example, carbon metabolism or anaerobic/aerobic transitions.
+
+    An **Investigation** has the following associated information:
+
+    * **The title of the Investigation**
+    * A description of the **Investigation**
+    * A string listing other creators of the **Investigation**
+    * The sharing <a href="#Policy">**Policy**</a> of the **Investigation**
+    * References to the <a href="#people">**People**</a> who created the **Investigation**
+    * References to the <a href="#projects">**Projects**</a> which the **Investigation** is part of
+    * References to <a href="#publications">**Publications**</a> about the **Investigation**
+
+    A response for an **Investigation** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * A reference to the <a href="#people">**Person**</a> who registered (submitted) the **Investigation** into SEEK
+    * References to <a href="#studies">**Studies**</a> that are part of the **Investigation**
+    * References to <a href="#assays">**Assays**</a> that are part of the **Investigation**
+    * References to <a href="#dataFiles">**DataFiles**</a> that belong to the **Investigation**
+    * References to <a href="#documents">**Documents**</a> that belong to the **Investigation**
+    * References to <a href="#models">**Models**</a> that belong to the **Investigation**
+    * References to <a href="#sops">**Sops**</a> that belong to the **Investigation**
+    * References to <a href="#publications">**Publications**</a> that belong to the **Investigation**
 - name: studies
-  description: |-
-    A **Study** is a series of experiments (or **Assays**) which can be combined to answer a particular biological question. These experiments might be a series of the same type of **Assay** (for example, microarrays for different conditions), or they may be a collection of different types of **Assay** (e.g. a combination of array and mass spec measurements).
+  description: |
+    <a name="studies"></a>A **Study** is a series of experiments (or <a href="#assays">**Assays**</a> ) which can be combined to answer a particular biological question. These experiments might be a series of the same type of <a href="#assays">**Assay**</a> (for example, microarrays for different conditions), or they may be a collection of different types of <a href="#assays">**Assay**</a> (e.g. a combination of array and mass spec measurements).
+
+    A **Study** has the following associated information:
+
+    * **The title of the Study**
+    * A description of the **Study**
+    * A string listing experimentalists of the **Study**
+    * A string listing other creators of the **Study**
+    * A string containing the id of the <a href="#people">**Person**</a> responsible for the **Study**
+    * The sharing <a href="#Policy">**Policy**</a> of the **Study**
+    * References to the <a href="#people">**People**</a> who created the **Study**
+    ** A reference to the <a href="#investigations">Investigation</a> containing the Study**
+    * References to <a href="#publications">**Publications**</a> about the **Study**
+
+    A response for a **Study** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * A reference to the <a href="#people">**Person**</a> who registered (submitted) the **Study** into SEEK
+    * References to the <a href="#projects">**Projects**</a> that indirectly contain the **Study**
+    * References to the <a href="#assays">**Assays**</a> that belong to the **Stuady**
+    * References to <a href="#dataFiles">**DataFiles**</a> that belong to the **Study**
+    * References to <a href="#documents">**Documents**</a> that belong to the **Study**
+    * References to <a href="#models">**Models**</a> that belong to the **Study**
+    * References to <a href="#sops">**Sops**</a> that belong to the **Study**
+    * References to <a href="#publications">**Publications**</a> that belong to the **Study**
 - name: assays
-  description: |-
-    An **Assay** describes a particular experiment. It allows you to associate **DataFiles**, **SOPs** and **Models** together as well as describing the type of **Assay** and any technology required to perform the experiment.
+  description: |
+    <a name="assays"></a>An **Assay** describes a particular experiment. It allows you to associate <a href="#dataFiles">**DataFiles**</a>, <a href="#sops">**SOPs**</a> and <a href="#models">**Models**</a> together as well as describing the type of **Assay** and any technology required to perform the experiment.
+
+    An **Assay** has the following associated information:
+
+    * **The title of the Assay**
+    * A description of the **Assay**
+    * A string listing other creators of the **Assay**
+    * A string containing the abbreviated form of the kind of **Assay** - normally *EXP* for experimental or *MOD* for modelling
+    * A URI to the type of **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
+    * A URI to the technology used in the **Assay** resolving to an entry in the [JERM ontology](http://www.mygrid.org.uk/ontology/JERMOntology)
+    * The sharing <a href="#Policy">**Policy**</a> of the **Assay**
+    * References to the <a href="#people">**People**</a> who created the **Assay**
+    * A singleton reference to the <a href="#studies">**Study**</a> which the **Assay** is part of
+    * References to <a href="#publications">**Publications**</a> about the **Assay**
+    * References to <a href="#dataFiles">**DataFiles**</a> that belong to the **Assay**
+    * References to <a href="#documents">**Documents**</a> that belong to the **Assay**
+    * References to <a href="#models">**Models**</a> that belong to the **Assay**
+    * References to <a href="#sops">**Sops**</a> that belong to the **Assay**
+    * References to the <a href="#organisms">**Organisms**</a> studied in the **Assay**
+
+    A response for an **Assay** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * A singleton reference to the <a href="#investigations">**Investigation**</a> which the **Assay** is part of
+    * References to the <a href="#projects">**Projects**</a> that indirectly contain the **Assay**
 - name: dataFiles
   description: |
-    A **dataFile** can be any file containing data relevant to the **Assay** (raw data, processed data, calibration information etc). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc).
+    <a name="dataFiles"></a>A **dataFile** can be any file containing data relevant to the <a href="#assays">**Assay**</a> (raw data, processed data, calibration information etc). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc).
+
+    **Although dataFiles are versioned, this is out of scope for the current release of the API.**
+
+    A **DataFile** has the following associated information:
+
+    * **The title of the DataFile**
+    * **The specification for the <a href="#ContentBlob">ContentBlobs</a> in the DataFile**
+    * **References to the <a href="#projects">Projects</a> documented**
+    * A string containing a list of tags for the **DataFile**
+    * A description of the **DataFile**
+    * The <a href="#License">**License**</a> applied to the **DataFile**
+    * The sharing <a href="#Policy">**Policy**</a> applied to the **DataFile**
+    * A string listing other creators of the **DataFile**
+    * References to the <a href="#people">**People**</a> who wrote the **DataFile**
+    * References to the <a href="#assays">**Assays**</a> associated with the **DataFile**
+    * References to the <a href="#publications">**Publications**</a> associated with the **DataFile**
+    * References to the <a href="#events">**Events**</a> associated with the **DataFile**
+
+    A response for a **DataFile** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * ** An array of the versions of the DataFile**
+    * ** A number indicating the latest version**
+    * ** The time when the DataFile was created**
+    * ** The last time the DataFile was updated**
+    * A reference to the <a href="#people">**Person**</a> who submitted the **DataFile**
+    * References to the <a href="#investigations">**Investigations**</a> associated with the **DataFile**
+    * References to the <a href="#studies">**Studies**</a> associated with the **DataFile**
 - name: documents
-  description: |-
-    This is a documents description
+  description: |
+    <a name="documents"></a>A **Document** is any documentation that describes an <a href="#investigations">**Investigation**</a>, <a href="#studies">**Study**</a> or <a href="#assays">**Assay**</a>. The content of a **Document** is descriptive and it must not contain any data that is consumed or produced by an <a href="#assays">**Assay**</a>.
+
+    **Although documents are versioned, this is out of scope for the current release of the API.**
+
+    A **Document** has the following associated information:
+
+    * **The title of the Document**
+    * **The specification for the <a href="#ContentBlob">ContentBlobs</a> in the Document**
+    * **References to the <a href="#projects">Projects</a> documented**
+    * A string containing a list of tags for the **Document**
+    * A description of the **Document**
+    * The <a href="#License">**License**</a> applied to the **Document**
+    * The sharing <a href="#Policy">**Policy**</a> applied to the **Document**
+    * A string listing other creators of the **Document**
+    * References to the <a href="#people">**People**</a> who wrote the **Document**
+    * References to the <a href="#assays">**Assays**</a> documented
+
+    A response for a **Document** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * ** An array of the versions of the Document**
+    * ** A number indicating the latest version**
+    * ** The time when the Document was created**
+    * ** The last time the Document was updated**
+    * A reference to the <a href="#people">**Person**</a> who submitted the **Document**
+    * References to the <a href="#investigations">**Investigations**</a> associated with the **Document**
+    * References to the <a href="#studies">**Studies**</a> associated with the **Document**
+    * References to the <a href="#publications">**Publications**</a> associated with the **Document**
 - name: models
-  description: |-
-    This is a models description
+  description: |
+    <a name="models"></a>A **Model** is a computer model of a biological or biochemical network or process.Some **Models** may be simulated using the JWSOnline system.
+
+    **Although models are versioned, this is out of scope for the current release of the API.**
+
+    A **Model** has the following associated information:
+
+    * **The title of the Model**
+    * **The specification for the <a href="#ContentBlob">ContentBlobs</a> in the Model**
+    * **References to the <a href="#projects">Projects</a> documented**
+    * A string containing a list of tags for the **Model**
+    * A description of the **Model**
+    * The <a href="#License">**License**</a> applied to the **Model**
+    * The sharing <a href="#Policy">**Policy**</a> applied to the **Model**
+    * A string listing other creators of the **Model**
+    * A string specifying the **Model** type
+    * A string specifying the **Model** format
+    * A string specifying the execution environment of the **Model**
+    * References to the <a href="#people">**People**</a> who wrote the **Model**
+    * References to the <a href="#assays">**Assays**</a> associated with the **Model**
+    * References to the <a href="#publications">**Publications**</a> associated with the **Model**
+
+    A response for a **Model** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * ** An array of the versions of the Model**
+    * ** A number indicating the latest version**
+    * ** The time when the Model was created**
+    * ** The last time the Model was updated**
+    * A reference to the <a href="#people">**Person**</a> who submitted the **Model**
+    * References to the <a href="#investigations">**Investigations**</a> associated with the **Model**
+    * References to the <a href="#studies">**Studies**</a> associated with the **Model**
 - name: publications
-  description: |-
-    This is a publications description
+  description: |
+    <a name="publications"></a>A **Publication** is a publication about a <a href="#projects">**Project**</a>, It normally has a [DOI](http://www.doi.org/) or [PubMed ID](https://en.wikipedia.org/wiki/Wikipedia:PMID).
+
+    The response to a read of a **Publication** includes the following information:
+
+    * **The title of the Publication**
+    * **The journal in which the Publication is published**
+    * **A string containing the date of publication**
+    * **The PubMed ID**
+    * **The preferred string for citing the Publication**
+    * **A link to the Publication**
+    * The DOI of the **Publication**
+    * A list of strings for the authors
+    * The sharing <a href="#Policy">**Policy**</a> for the **Publication**
+    * References to the <a href="#people">**People**</a> who wrote the **Publication**
+    * References to the <a href="#projects">**Projects**</a> described in the **Publication**
+    * References to the <a href="#investigations">**Investigations**</a> described in the **Publication**
+    * References to the <a href="#studies">**Studies**</a> described in the **Publication**
+    * References to the <a href="#assays">**Assays**</a> described in the **Publication**
+    * References to <a href="#dataFiles">**DataFiles**</a> that were used in the work described in the **Publication**
+    * References to <a href="#models">**Models**</a> that were used in the work described in the **Publication**
+    * References to related **Publications**
+    * References to <a href="#presentations">**Presentations**</a> associated with the **Publication**
+    * References to <a href="#events">**Events**</a> associated with the **Publication**
 - name: sops
-  description: |-
-    **SOPs** are standard operating procedures which describe the protocol required to reproduce an **Assay**. They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). Relevant **SOPs** can be linked directly to the **Assay**.
+  description: |
+    <a name="sops"></a>**SOPs** are standard operating procedures which describe the protocol required to reproduce an <a href="#assays">**Assay**</a>. They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). Relevant **SOPs** can be linked directly to the <a href="#assays">**Assay**</a>.
+
+    **Although SOPs are versioned, this is out of scope for the current release of the API.**
+
+    A **SOP** has the following associated information:
+
+    * **The title of the SOP**
+    * **The specification for the <a href="#ContentBlob">ContentBlobs</a> in the SOP**
+    * **References to the <a href="#projects">Projects</a> relevant to the SOP**
+    * A string containing a list of tags for the **SOP**
+    * A description of the **SOP**
+    * The <a href="#License">**License**</a> applied to the **SOP**
+    * The sharing <a href="#Policy">**Policy**</a> applied to the **SOP**
+    * A string listing other creators of the **SOP**
+    * References to the <a href="#people">**People**</a> who wrote the **SOP**
+    * References to the <a href="#assays">**Assays**</a> relevant to the SOP
+
+    A response for a **SOP** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * ** An array of the versions of the SOP**
+    * ** A number indicating the latest version**
+    * ** The time when the SOP was created**
+    * ** The last time the SOP was updated**
+    * A reference to the <a href="#people">**Person**</a> who submitted the **SOP**
+    * References to the <a href="#investigations">**Investigations**</a> associated with the **SOP**
+    * References to the <a href="#studies">**Studies**</a> associated with the **SOP**
+    * References to the <a href="#publications">**Publications**</a> associated with the **SOP**
 - name: events
   description: |-
-    This is a events description
+    <a name="events"></a>An **Event** is an event that is associated with one or more <a href="#projects">**Projects**</a>, happening on specified dates and at a specific, actual or virtual, location.
+
+    An **Event** has the following associated information:
+
+    * **The title of the Event**
+    * **The start date of the Event**
+    * A description of the **Event**
+    * A URI to a webpage about the **Event**
+    * The two letter country code for where the **Event** is
+    * The name of the city where the **Event** takes place
+    * The address within the city where the **Event** takes place
+    * The end date of the **Event**
+    * The sharing <a href="#Policy">**Policy**</a> for the **Event**
+    * **References to the <a href="#projects">Projects</a> associated with the Event**
+    * References to any <a href="#dataFiles">**DataFiles**</a>  associated with the **Event**
+    * References to any <a href="#publications">**Publications**</a>  associated with the **Event**
+    * References to any <a href="#presentations">**Presentations**</a>  associated with the **Event**
+
+    A response for an **Event** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * Reference to the <a href="#people">**Person**</a> who submitted the **Event**
 - name: presentations
   description: |-
-    This is a presentations description
+    <a name="presentations"></a>A **Presentation** is a presentation about one or more <a href="#projects">**Projects**</a>.
+
+    **Although presentations are versioned, this is out of scope for the current release of the API.**
+
+    A **Presentation** has the following associated information:
+
+    * **The title of the Presentation**
+    * **The specification for the <a href="#ContentBlob">ContentBlobs</a> in the Presentation**
+    * **References to the <a href="#projects">Projects</a> documented**
+    * A string containing a list of tags for the **Presentation**
+    * A description of the **Presentation**
+    * The <a href="#License">**License**</a> applied to the **Presentation**
+    * The sharing <a href="#Policy">**Policy**</a> applied to the **Presentation**
+    * A string listing other creators of the **Presentation**
+    * References to the <a href="#people">**People**</a> who wrote the **Presentation**
+    * References to the <a href="#assays">**Assays**</a> associated with the **Presentation**
+    * References to the <a href="#publications">**Publications**</a> associated with the **Presentation**
+    * References to the <a href="#events">**Events**</a> associated with the **Presentation**
+
+    A response for a **Presentation** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
+
+    * ** An array of the versions of the Presentation**
+    * ** A number indicating the latest version**
+    * ** The time when the Presentation was created**
+    * ** The last time the Presentation was updated**
+    * A reference to the <a href="#people">**Person**</a> who submitted the **Presentation**
+    * References to the <a href="#investigations">**Investigations**</a> associated with the **Presentation**
+    * References to the <a href="#studies">**Studies**</a> associated with the **Presentation**
 - name: organisms
-  description: |-
-    This is a organisms description
+  description: |
+    <a name="organisms"></a>An **Organism** is a organism as identified by an entry in the [NCBI ontology](http://www.ncbi.nlm.nih.gov/taxonomy).
+
+    The response to a read of an **Organism** includes the following information:
+
+    * **The title of the Organism**
+    * **A URI referencing an ontology entry describing the Organism**
+    * **The common abbreviation for the ontology**
+    * **References to <a href="#projects">Projects</a> that use the Organism**
+    * **References to <a href="#assays">Assays</a> that use the Organism**
+    * **References to <a href="#models">Models</a> that simulate the Organism**
 - name: sampleTypes
-  description: |-
-    This is a sampleTypes description
+  description: |
+    <a name="sampleTypes"></a>A **SampleType** is a definition of the information that is held about a physical or virtual sample.
+
+    **In the current release of the API it is only possible to list references to the SampleTypes. Additional functionality will be available in future versions.**
 x-tagGroups:
 - name: operation types
   tags:
@@ -165,6 +629,8 @@ x-tagGroups:
   - read
   - update
   - delete
+  - upload
+  - download
 
 - name: Search
   tags:
@@ -287,7 +753,7 @@ paths:
     get:
       operationId: search
       description: |
-        **search** returns a list of references to resources
+        <a name="searchOperation"></a>**search** returns a list of references to resources
 
         * of the specified type
         * that are visible to the authenticated user, and
@@ -325,7 +791,7 @@ paths:
     get:
       operationId: listAssays
       description: |
-        The **listAssays** operation returns a JSON object containing a list of all the Assays to which the authenticated user has accesss.
+        <a name="listAssays"></a>The **listAssays** operation returns a JSON object containing a list of all the <a href="#assays">**Assays**</a> to which the authenticated user has accesss.
       tags:
       - list
       - assays
@@ -364,9 +830,9 @@ paths:
     post:
       operationId: createAssay
       description: |
-        A **createAssay** operation creates a new instance of a Assay. The instance is populated with the content of the body of the API call.
+        <a name="createAssay"></a>A **createAssay** operation creates a new instance of a <a href="#assays">**Assay**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createAssay** operation returns a JSON object representing the newly created Assay and redirects to its URL.
+        The **createAssay** operation returns a JSON object representing the newly created <a href="#assays">**Assay**</a> and redirects to its URL.
       tags:
       - create
       - assays
@@ -481,9 +947,9 @@ paths:
     patch:
       operationId: updateAssay
       description: |
-        An **updateAssay** operation will modify the information held about the specified Assay. This operation is only available if the authenticated user has access to the Assay.
+        <a name="updateAssay"></a>An **updateAssay** operation will modify the information held about the specified <a href="#assays">**Assay**</a>. This operation is only available if the authenticated user has access to the <a href="#assays">**Assay**</a>.
 
-        The **updateAssay** operation returns a JSON object representing the modified Assay.
+        The **updateAssay** operation returns a JSON object representing the modified <a href="#assays">**Assay**</a>.
       tags:
       - update
       - assays
@@ -590,9 +1056,9 @@ paths:
     get:
       operationId: readAssay
       description: |
-        A **readAssay** operation will return information about the Assay identified, provided the authenticated user has access to it.
+        <a name="readAssay"></a>A **readAssay** operation will return information about the <a href="#assays">Assay</a> identified, provided the authenticated user has access to it.
 
-        The **readAssay** operation returns a JSON object representing the Assay.
+        The **readAssay** operation returns a JSON object representing the <a href="#assays">**Assay**</a>.
       tags:
       - read
       - assays
@@ -667,7 +1133,7 @@ paths:
     delete:
       operationId: deleteAssay
       description: |
-        A **deleteAssay** operation will delete the specified Assay, if the authenticated user has sufficient access to it.
+        <a name="deleteAssay"></a>A **deleteAssay** operation will delete the specified <a href="#assays">**Assay**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - assays
@@ -681,7 +1147,7 @@ paths:
     get:
       operationId: listDataFiles
       description: |
-        The **listDataFiles** operation returns a JSON object containing a list of all the DataFiles to which the authenticated user has accesss.
+        <a name="listDataFiles"></a>The **listDataFiles** operation returns a JSON object containing a list of all the <a href="#dataFiles">**DataFiles**</a> to which the authenticated user has accesss.
       tags:
       - list
       - dataFiles
@@ -726,12 +1192,18 @@ paths:
     post:
       operationId: createDataFile
       description: |
-        A **createDataFile** operation creates a new instance of a DataFile. The instance is populated with the content of the body of the API call.
+        <a name="createDataFile"></a>A **createDataFile** operation creates a new instance of a <a href="#dataFiles">**DataFile**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createDataFile** operation returns a JSON object representing the newly created DataFile and redirects to its URL.
+        The **createDataFile** operation returns a JSON object representing the newly created <a href="#dataFiles">**DataFile**</a> and redirects to its URL.
       tags:
       - create
       - dataFiles
+      parameters:
+      - in: body
+        name: dataFile
+        description: The dataFile to create.
+        schema:
+          $ref: '#/definitions/dataFilePost'
       responses:
         <<: *CreateType
         '201':
@@ -834,9 +1306,9 @@ paths:
     get:
       operationId: readDataFile
       description: |
-        A **readDataFile** operation will return information about the DataFile identified, provided the authenticated user has access to it.
+        <a name="readDataFile"></a>A **readDataFile** operation will return information about the <a href="#dataFiles">DataFile</a> identified, provided the authenticated user has access to it.
 
-        The **readDataFile** operation returns a JSON object representing the DataFile.
+        The **readDataFile** operation returns a JSON object representing the <a href="#dataFiles">**DataFile**</a>.
       parameters:
       - name: version
         in: query
@@ -934,9 +1406,9 @@ paths:
     patch:
       operationId: updateDataFile
       description: |
-        An **updateDataFile** operation will modify the information held about the specified DataFile. This operation is only available if the authenticated user has access to the DataFile.
+        <a name="updateDataFile"></a>An **updateDataFile** operation will modify the information held about the specified <a href="#dataFiles">**DataFile**</a>. This operation is only available if the authenticated user has access to the <a href="#dataFiles">**DataFile**</a>.
 
-        The **updateDataFile** operation returns a JSON object representing the modified DataFile.
+        The **updateDataFile** operation returns a JSON object representing the modified <a href="#dataFiles">**DataFile**</a>.
       tags:
       - update
       - dataFiles
@@ -1025,7 +1497,7 @@ paths:
     delete:
       operationId: deleteDataFile
       description: |
-        A **deleteDataFile** operation will delete the specified DataFile, if the authenticated user has sufficient access to it.
+        <a name="deleteDataFile"></a>A **deleteDataFile** operation will delete the specified <a href="#dataFiles">**DataFile**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - dataFiles
@@ -1039,7 +1511,7 @@ paths:
     put:
       operationId: uploadDataFileContent
       description: |-
-        Description of DataFileContent upload
+        <a name="uploadDataFileContent"></a>Description of DataFileContent upload
       parameters:
       - name: id
         in: path
@@ -1064,7 +1536,7 @@ paths:
       produces:
       - '*/*'
       tags:
-      - update
+      - upload
       - dataFiles
       responses:
         '200':
@@ -1086,11 +1558,11 @@ paths:
     get:
       operationId: downloadDataFileContent
       description: |-
-        Description of DataFileContent download
+        <a name="downloadDataFileContent"></a>Description of DataFileContent download
       produces:
       - '*/*'
       tags:
-      - read
+      - download
       - dataFiles
       responses:
         <<: *ReadType
@@ -1100,7 +1572,7 @@ paths:
     get:
       operationId: listDocuments
       description: |
-        The **listDocuments** operation returns a JSON object containing a list of all the Documents to which the authenticated user has accesss.
+        <a name="listDocuments"></a>The **listDocuments** operation returns a JSON object containing a list of all the <a href="#documents">**Documents**</a> to which the authenticated user has accesss.
       tags:
       - list
       - documents
@@ -1127,9 +1599,9 @@ paths:
     post:
       operationId: createDocument
       description: |
-        A **createDocument** operation creates a new instance of a Document. The instance is populated with the content of the body of the API call.
+        <a name="createDocument"></a>A **createDocument** operation creates a new instance of a <a href="#documents">**Document**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createDocument** operation returns a JSON object representing the newly created Document and redirects to its URL.
+        The **createDocument** operation returns a JSON object representing the newly created <a href="#documents">**Document**</a> and redirects to its URL.
       tags:
       - create
       - documents
@@ -1143,6 +1615,8 @@ paths:
         <<: *CreateType
         '201':
           description: Created
+          schema:
+            $ref: '#/definitions/documentResponse'
           examples:
             application/json:
               data:
@@ -1233,9 +1707,9 @@ paths:
     get:
       operationId: readDocument
       description: |
-        A **readDocument** operation will return information about the Document identified, provided the authenticated user has access to it.
+        <a name="readDocument"></a>A **readDocument** operation will return information about the <a href="#documents">Document</a> identified, provided the authenticated user has access to it.
 
-        The **readDocument** operation returns a JSON object representing the Document.
+        The **readDocument** operation returns a JSON object representing the <a href="#documents">**Document**</a>.
       tags:
       - read
       - documents
@@ -1245,12 +1719,91 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/documentResponse'
+          examples:
+            application/json:
+              data:
+                id: '14'
+                type: documents
+                attributes:
+                  policy:
+                    access: download
+                    permissions:
+                    - resource_type: projects
+                      resource_id: '359'
+                      access: edit
+                  title: A Maximal Document
+                  description: This is the description
+                  license: CC-BY-4.0
+                  latest_version: 1
+                  tags:
+                  - tag1
+                  - tag2
+                  versions:
+                  - version: 1
+                    revision_comments:
+                    url: http://localhost:3000/documents/14?version=1
+                  version: 1
+                  revision_comments:
+                  created_at: '2018-04-27T14:26:09.000Z'
+                  updated_at: '2018-04-27T14:26:09.000Z'
+                  content_blobs:
+                  - original_filename: a_pdf_file.pdf
+                    url:
+                    md5sum:
+                    sha1sum:
+                    content_type: application/pdf
+                    link: http://localhost:3000/documents/14/content_blobs/48
+                    size:
+                  other_creators: John Smith, Jane Smith
+                relationships:
+                  creators:
+                    data:
+                    - id: '234'
+                      type: people
+                  submitter:
+                    data:
+                    - id: '233'
+                      type: people
+                  people:
+                    data:
+                    - id: '233'
+                      type: people
+                    - id: '234'
+                      type: people
+                  projects:
+                    data:
+                    - id: '359'
+                      type: projects
+                  investigations:
+                    data:
+                    - id: '51'
+                      type: investigations
+                  studies:
+                    data:
+                    - id: '51'
+                      type: studies
+                  assays:
+                    data:
+                    - id: '38'
+                      type: assays
+                  publications:
+                    data: []
+                links:
+                  self: /documents/14?version=1
+                meta:
+                  created: '2018-04-27T14:26:09.713Z'
+                  modified: '2018-04-27T14:26:10.078Z'
+                  api_version: '0.1'
+                  uuid: da7cb1a0-2c54-0136-ec2f-08002734982f
+                  base_url: http://localhost:3000
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updateDocument
       description: |
-        An **updateDocument** operation will modify the information held about the specified Document. This operation is only available if the authenticated user has access to the Document.
+        <a name="updateDocument"></a>An **updateDocument** operation will modify the information held about the specified <a href="#documents">**Document**</a>. This operation is only available if the authenticated user has access to the <a href="#documents">**Document**</a>.
 
-        The **updateDocument** operation returns a JSON object representing the modified Document.
+        The **updateDocument** operation returns a JSON object representing the modified <a href="#documents">**Document**</a>.
       tags:
       - update
       - documents
@@ -1337,7 +1890,7 @@ paths:
     delete:
       operationId: deleteDocument
       description: |
-        A **deleteDocument** operation will delete the specified Document, if the authenticated user has sufficient access to it.
+        <a name="deleteDocument"></a>A **deleteDocument** operation will delete the specified <a href="#documents">**Document**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - documents
@@ -1347,11 +1900,72 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
+  /documents/{id}/content_blobs/{blob_id}:
+    put:
+      operationId: uploadDocumentContent
+      description: |-
+        <a name="uploadDocumentContent"></a>Description of Document Content upload
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: The document content to upload
+        type: integer
+        default: 1152
+      - name: blob_id
+        in: path
+        required: true
+        description: The content identifier to upload
+        type: integer
+        default: 1831
+      - in: body
+        name: blobContent
+        description: The blob content to upload
+        schema:
+          type: string
+          format: binary
+      consumes:
+      - application/octet-stream
+      produces:
+      - '*/*'
+      tags:
+      - upload
+      - documents
+      responses:
+        '200':
+          description: Success
+  /documents/{id}/content_blobs/{blob_id}/download:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: The document to fetch
+      type: integer
+      default: 1152
+    - name: blob_id
+      in: path
+      required: true
+      description: The blob to download
+      type: integer
+      default: 1831
+    get:
+      operationId: downloadDocumentContent
+      description: |-
+        <a name="downloadDocumentContent"></a>Description of Document Content download
+      produces:
+      - '*/*'
+      tags:
+      - download
+      - documents
+      responses:
+        <<: *ReadType
+        '200':
+          description: Success
   /events:
     get:
       operationId: listEvents
       description: |
-        The **listEvents** operation returns a JSON object containing a list of all the Events to which the authenticated user has accesss.
+        <a name="listEvents"></a>The **listEvents** operation returns a JSON object containing a list of all the <a href="#events">**Events**</a> to which the authenticated user has accesss.
       tags:
       - list
       - events
@@ -1396,9 +2010,9 @@ paths:
     post:
       operationId: createEvent
       description: |
-        A **createEvent** operation creates a new instance of a Event. The instance is populated with the content of the body of the API call.
+        <a name="createEvent"></a>A **createEvent** operation creates a new instance of a <a href="#events">**Event**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createEvent** operation returns a JSON object representing the newly created Event and redirects to its URL.
+        The **createEvent** operation returns a JSON object representing the newly created <a href="#events">**Event**</a> and redirects to its URL.
       tags:
       - create
       - events
@@ -1476,9 +2090,9 @@ paths:
     get:
       operationId: readEvent
       description: |
-        A **readEvent** operation will return information about the Event identified, provided the authenticated user has access to it.
+        <a name="readEvent"></a>A **readEvent** operation will return information about the <a href="#events">Event</a> identified, provided the authenticated user has access to it.
 
-        The **readEvent** operation returns a JSON object representing the Event.
+        The **readEvent** operation returns a JSON object representing the <a href="#events">**Event**</a>.
       tags:
       - read
       - events
@@ -1488,12 +2102,54 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/eventResponse'
+          examples:
+            application/json:
+              data:
+                id: '75'
+                type: events
+                attributes:
+                  title: CropClock Kick-off Meeting, November 2014
+                  description: "The kickoff meeting of CropClock team took place in\
+                    \ November 12, 2014 at the Max Plank Institute (MPIPZ, http://www.mpipz.mpg.de/en),\
+                    \ Kologne, Germany. The goal for this meeting was for the members\
+                    \ of the various teams to get acquainted with each other\xE2\u20AC\
+                    \u2122s expertise and to discuss the following items: 1) Logistics\
+                    \ about the project start,  2) Data that need to be shared,  3)\
+                    \ Matlab code that needs to shared among the teams. \r\nThe initial\
+                    \ plan of action for data sharing was also laid out."
+                  url: http://www.mpipz.mpg.de/en
+                  address:
+                  city: Kologne
+                  country: Germany
+                  start_date: '2014-11-12T00:00:00.000Z'
+                  end_date: '2014-11-12T00:00:00.000Z'
+                relationships:
+                  projects:
+                    data:
+                    - id: '26'
+                      type: projects
+                  data_files:
+                    data: []
+                  publications:
+                    data: []
+                  presentations:
+                    data: []
+                links:
+                  self: /events/75
+                meta:
+                  created: '2017-04-24T09:49:00.000Z'
+                  modified: '2017-04-26T07:43:42.000Z'
+                  api_version: '0.1'
+                  uuid: 2adac480-0b01-0135-8501-549f350973c0
+                  base_url: https://fairdomhub.org
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updateEvent
       description: |
-        An **updateEvent** operation will modify the information held about the specified Event. This operation is only available if the authenticated user has access to the Event.
+        <a name="updateEvent"></a>An **updateEvent** operation will modify the information held about the specified <a href="#events">**Event**</a>. This operation is only available if the authenticated user has access to the <a href="#events">**Event**</a>.
 
-        The **updateEvent** operation returns a JSON object representing the modified Event.
+        The **updateEvent** operation returns a JSON object representing the modified <a href="#events">**Event**</a>.
       tags:
       - update
       - events
@@ -1554,7 +2210,7 @@ paths:
     delete:
       operationId: deleteEvent
       description: |
-        A **deleteEvent** operation will delete the specified Event, if the authenticated user has sufficient access to it.
+        <a name="deleteEvent"></a>A **deleteEvent** operation will delete the specified <a href="#events">**Event**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - events
@@ -1568,7 +2224,7 @@ paths:
     get:
       operationId: listInstitutions
       description: |
-        The **listInstitutions** operation returns a JSON object containing a list of all the Institutions to which the authenticated user has accesss.
+        <a name="listInstitutions"></a>The **listInstitutions** operation returns a JSON object containing a list of all the <a href="#institutions">**Institutions**</a> to which the authenticated user has accesss.
       tags:
       - list
       - institutions
@@ -1607,9 +2263,9 @@ paths:
     post:
       operationId: createInstitution
       description: |
-        A **createInstitution** operation creates a new instance of a Institution. The instance is populated with the content of the body of the API call.
+        <a name="createInstitution"></a>A **createInstitution** operation creates a new instance of a <a href="#institutions">**Institution**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createInstitution** operation returns a JSON object representing the newly created Institution and redirects to its URL.
+        The **createInstitution** operation returns a JSON object representing the newly created <a href="#institutions">**Institution**</a> and redirects to its URL.
       tags:
       - create
       - institutions
@@ -1666,9 +2322,9 @@ paths:
     get:
       operationId: readInstitution
       description: |
-        A **readInstitution** operation will return information about the Institution identified, provided the authenticated user has access to it.
+        <a name="readInstitution"></a>A **readInstitution** operation will return information about the <a href="#institutions">Institution</a> identified, provided the authenticated user has access to it.
 
-        The **readInstitution** operation returns a JSON object representing the Institution.
+        The **readInstitution** operation returns a JSON object representing the <a href="#institutions">**Institution**</a>.
       tags:
       - read
       - institutions
@@ -1708,9 +2364,9 @@ paths:
     patch:
       operationId: updateInstitution
       description: |
-        An **updateInstitution** operation will modify the information held about the specified Institution. This operation is only available if the authenticated user has access to the Institution.
+        <a name="updateInstitution"></a>An **updateInstitution** operation will modify the information held about the specified <a href="#institutions">**Institution**</a>. This operation is only available if the authenticated user has access to the <a href="#institutions">**Institution**</a>.
 
-        The **updateInstitution** operation returns a JSON object representing the modified Institution.
+        The **updateInstitution** operation returns a JSON object representing the modified <a href="#institutions">**Institution**</a>.
       parameters:
       - in: body
         name: institution
@@ -1757,7 +2413,7 @@ paths:
     delete:
       operationId: deleteInstitution
       description: |
-        A **deleteInstitution** operation will delete the specified Institution, if the authenticated user has sufficient access to it.
+        <a name="deleteInstitution"></a>A **deleteInstitution** operation will delete the specified <a href="#institutions">**Institution**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - institutions
@@ -1772,7 +2428,7 @@ paths:
     get:
       operationId: listInvestigations
       description: |
-        The **listInvestigations** operation returns a JSON object containing a list of all the Investigations to which the authenticated user has accesss.
+        <a name="listInvestigations"></a>The **listInvestigations** operation returns a JSON object containing a list of all the <a href="#investigations">**Investigations**</a> to which the authenticated user has accesss.
       tags:
       - list
       - investigations
@@ -1813,9 +2469,9 @@ paths:
     post:
       operationId: createInvestigation
       description: |
-        A **createInvestigation** operation creates a new instance of a Investigation. The instance is populated with the content of the body of the API call.
+        <a name="createInvestigation"></a>A **createInvestigation** operation creates a new instance of a <a href="#investigations">**Investigation**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createInvestigation** operation returns a JSON object representing the newly created Investigation and redirects to its URL.
+        The **createInvestigation** operation returns a JSON object representing the newly created <a href="#investigations">**Investigation**</a> and redirects to its URL.
       tags:
       - create
       - investigations
@@ -1905,9 +2561,9 @@ paths:
     get:
       operationId: readInvestigation
       description: |
-        A **readInvestigation** operation will return information about the Investigation identified, provided the authenticated user has access to it.
+        <a name="readInvestigation"></a>A **readInvestigation** operation will return information about the <a href="#investigations">Investigation</a> identified, provided the authenticated user has access to it.
 
-        The **readInvestigation** operation returns a JSON object representing the Investigation.
+        The **readInvestigation** operation returns a JSON object representing the <a href="#investigations">**Investigation**</a>.
       tags:
       - read
       - investigations
@@ -1917,12 +2573,223 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/investigationResponse'
+          examples:
+            application/json:
+              data:
+                id: '56'
+                type: investigations
+                attributes:
+                  tags:
+                  title: Glucose metabolism in Plasmodium falciparum trophozoites
+                  description: The investigation entails the construction and validation
+                    of a detailed mathematical model for glycolysis of the malaria
+                    parasite Plasmodium falciparum in the blood stage trophozoite
+                    form.
+                relationships:
+                  creators:
+                    data:
+                    - id: '411'
+                      type: people
+                    - id: '49'
+                      type: people
+                  submitter:
+                    data:
+                    - id: '411'
+                      type: people
+                  people:
+                    data:
+                    - id: '49'
+                      type: people
+                    - id: '411'
+                      type: people
+                  projects:
+                    data:
+                    - id: '17'
+                      type: projects
+                  studies:
+                    data:
+                    - id: '118'
+                      type: studies
+                    - id: '119'
+                      type: studies
+                    - id: '138'
+                      type: studies
+                  assays:
+                    data:
+                    - id: '247'
+                      type: assays
+                    - id: '249'
+                      type: assays
+                    - id: '250'
+                      type: assays
+                    - id: '251'
+                      type: assays
+                    - id: '252'
+                      type: assays
+                    - id: '253'
+                      type: assays
+                    - id: '254'
+                      type: assays
+                    - id: '255'
+                      type: assays
+                    - id: '256'
+                      type: assays
+                    - id: '257'
+                      type: assays
+                    - id: '258'
+                      type: assays
+                    - id: '259'
+                      type: assays
+                    - id: '260'
+                      type: assays
+                    - id: '261'
+                      type: assays
+                    - id: '262'
+                      type: assays
+                    - id: '263'
+                      type: assays
+                    - id: '264'
+                      type: assays
+                    - id: '265'
+                      type: assays
+                    - id: '266'
+                      type: assays
+                    - id: '267'
+                      type: assays
+                    - id: '268'
+                      type: assays
+                    - id: '294'
+                      type: assays
+                    - id: '295'
+                      type: assays
+                    - id: '296'
+                      type: assays
+                  data_files:
+                    data:
+                    - id: '1147'
+                      type: data_files
+                    - id: '1148'
+                      type: data_files
+                    - id: '1149'
+                      type: data_files
+                    - id: '1150'
+                      type: data_files
+                    - id: '1151'
+                      type: data_files
+                    - id: '1152'
+                      type: data_files
+                    - id: '1153'
+                      type: data_files
+                    - id: '1154'
+                      type: data_files
+                    - id: '1155'
+                      type: data_files
+                    - id: '1156'
+                      type: data_files
+                    - id: '1157'
+                      type: data_files
+                    - id: '1158'
+                      type: data_files
+                    - id: '1159'
+                      type: data_files
+                    - id: '1160'
+                      type: data_files
+                    - id: '1213'
+                      type: data_files
+                    - id: '1214'
+                      type: data_files
+                  models:
+                    data:
+                    - id: '124'
+                      type: models
+                    - id: '126'
+                      type: models
+                    - id: '127'
+                      type: models
+                    - id: '128'
+                      type: models
+                    - id: '129'
+                      type: models
+                    - id: '130'
+                      type: models
+                    - id: '131'
+                      type: models
+                    - id: '132'
+                      type: models
+                    - id: '133'
+                      type: models
+                    - id: '134'
+                      type: models
+                    - id: '135'
+                      type: models
+                    - id: '136'
+                      type: models
+                    - id: '138'
+                      type: models
+                    - id: '139'
+                      type: models
+                    - id: '144'
+                      type: models
+                    - id: '175'
+                      type: models
+                    - id: '176'
+                      type: models
+                    - id: '177'
+                      type: models
+                    - id: '179'
+                      type: models
+                  sops:
+                    data:
+                    - id: '192'
+                      type: sops
+                    - id: '193'
+                      type: sops
+                    - id: '194'
+                      type: sops
+                    - id: '195'
+                      type: sops
+                    - id: '196'
+                      type: sops
+                    - id: '197'
+                      type: sops
+                    - id: '198'
+                      type: sops
+                    - id: '199'
+                      type: sops
+                    - id: '200'
+                      type: sops
+                    - id: '201'
+                      type: sops
+                    - id: '202'
+                      type: sops
+                    - id: '203'
+                      type: sops
+                    - id: '207'
+                      type: sops
+                  publications:
+                    data:
+                    - id: '240'
+                      type: publications
+                    - id: '268'
+                      type: publications
+                    - id: '269'
+                      type: publications
+                links:
+                  self: /investigations/56
+                meta:
+                  created: '2014-08-08T13:16:45.000Z'
+                  modified: '2016-08-30T13:14:32.000Z'
+                  api_version: '0.1'
+                  uuid: 6bc37a3b-94d9-4fe2-8996-64180c396324
+                  base_url: https://fairdomhub.org
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updateInvestigation
       description: |
-        An **updateInvestigation** operation will modify the information held about the specified Investigation. This operation is only available if the authenticated user has access to the Investigation.
+        <a name="updateInvestigation"></a>An **updateInvestigation** operation will modify the information held about the specified <a href="#investigations">**Investigation**</a>. This operation is only available if the authenticated user has access to the <a href="#investigations">**Investigation**</a>.
 
-        The **updateInvestigation** operation returns a JSON object representing the modified Investigation.
+        The **updateInvestigation** operation returns a JSON object representing the modified <a href="#investigations">**Investigation**</a>.
       parameters:
       - in: body
         name: investigation
@@ -2004,7 +2871,7 @@ paths:
     delete:
       operationId: deleteInvestigation
       description: |
-        A **deleteInvestigation** operation will delete the specified Investigation, if the authenticated user has sufficient access to it.
+        <a name="deleteInvestigation"></a>A **deleteInvestigation** operation will delete the specified <a href="#investigations">**Investigation**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - investigations
@@ -2018,7 +2885,7 @@ paths:
     get:
       operationId: listModels
       description: |
-        The **listModels** operation returns a JSON object containing a list of all the Models to which the authenticated user has accesss.
+        <a name="listModels"></a>The **listModels** operation returns a JSON object containing a list of all the <a href="#models">**Models**</a> to which the authenticated user has accesss.
       tags:
       - list
       - models
@@ -2065,9 +2932,9 @@ paths:
     post:
       operationId: createModel
       description: |
-        A **createModel** operation creates a new instance of a Model. The instance is populated with the content of the body of the API call.
+        <a name="createModel"></a>A **createModel** operation creates a new instance of a <a href="#models">**Model**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createModel** operation returns a JSON object representing the newly created Model and redirects to its URL.
+        The **createModel** operation returns a JSON object representing the newly created <a href="#models">**Model**</a> and redirects to its URL.
       tags:
       - create
       - models
@@ -2185,9 +3052,9 @@ paths:
     get:
       operationId: readModel
       description: |
-        A **readModel** operation will return information about the Model identified, provided the authenticated user has access to it.
+        <a name="readModel"></a>A **readModel** operation will return information about the <a href="#models">Model</a> identified, provided the authenticated user has access to it.
 
-        The **readModel** operation returns a JSON object representing the Model.
+        The **readModel** operation returns a JSON object representing the <a href="#models">**Model**</a>.
       parameters:
       - name: version
         in: query
@@ -2204,12 +3071,92 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/modelResponse'
+          examples:
+            application/json:
+              data:
+                id: '139'
+                type: models
+                attributes:
+                  tags:
+                  title: GLCtr Kinetic model
+                  description: Mathematica notebook for the parameterisation of the
+                    glucose transport rate equation based on SEEK linked experimental
+                    data.
+                  license:
+                  latest_version: 2
+                  versions:
+                  - version: 1
+                    revision_comments:
+                    url: https://fairdomhub.org/models/139?version=1
+                  - version: 2
+                    revision_comments:
+                    url: https://fairdomhub.org/models/139?version=2
+                  version: '2'
+                  revision_comments:
+                  created_at: '2015-02-04T11:19:45.000Z'
+                  updated_at: '2015-09-08T11:29:40.000Z'
+                  content_blobs:
+                  - original_filename: GlcTr-SEEK.nb
+                    url:
+                    md5sum: 5ebff56838fec4da9a81300ddb1dac28
+                    sha1sum: b2681c49f33d9b4586f52ab6eba17363782c4c52
+                    content_type: application/mathematica
+                    link: https://fairdomhub.org/models/139/content_blobs/1850
+                    size: 35105
+                  model_type: Ordinary differential equations (ODE)
+                  model_format: Mathematica
+                  environment:
+                relationships:
+                  creators:
+                    data:
+                    - id: '411'
+                      type: people
+                    - id: '49'
+                      type: people
+                  submitter:
+                    data:
+                    - id: '411'
+                      type: people
+                  people:
+                    data:
+                    - id: '49'
+                      type: people
+                    - id: '411'
+                      type: people
+                  projects:
+                    data:
+                    - id: '17'
+                      type: projects
+                  investigations:
+                    data:
+                    - id: '56'
+                      type: investigations
+                  studies:
+                    data:
+                    - id: '118'
+                      type: studies
+                  assays:
+                    data:
+                    - id: '261'
+                      type: assays
+                  publications:
+                    data: []
+                links:
+                  self: /models/139?version=2
+                meta:
+                  created: '2014-08-11T09:12:46.000Z'
+                  modified: '2015-09-08T11:29:40.000Z'
+                  api_version: '0.1'
+                  uuid: da095021-2e64-47d4-932f-87ff56febaa1
+                  base_url: https://fairdomhub.org
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updateModel
       description: |
-        An **updateModel** operation will modify the information held about the specified Model. This operation is only available if the authenticated user has access to the Model.
+        <a name="updateModel"></a>An **updateModel** operation will modify the information held about the specified <a href="#models">**Model**</a>. This operation is only available if the authenticated user has access to the <a href="#models">**Model**</a>.
 
-        The **updateModel** operation returns a JSON object representing the modified Model.
+        The **updateModel** operation returns a JSON object representing the modified <a href="#models">**Model**</a>.
       tags:
       - update
       - models
@@ -2299,7 +3246,7 @@ paths:
     delete:
       operationId: deleteModel
       description: |
-        A **deleteModel** operation will delete the specified Model, if the authenticated user has sufficient access to it.
+        <a name="deleteModel"></a>A **deleteModel** operation will delete the specified <a href="#models">**Model**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - models
@@ -2309,6 +3256,40 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
+  /models/{id}/content_blobs/{blob_id}:
+    put:
+      operationId: uploadModelContent
+      description: |-
+        <a name="uploadModelContent"></a>Description of Model Content upload
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: The model content to upload
+        type: integer
+        default: 1152
+      - name: blob_id
+        in: path
+        required: true
+        description: The content identifier to upload
+        type: integer
+        default: 1831
+      - in: body
+        name: blobContent
+        description: The blob content to upload
+        schema:
+          type: string
+          format: binary
+      consumes:
+      - application/octet-stream
+      produces:
+      - '*/*'
+      tags:
+      - upload
+      - models
+      responses:
+        '200':
+          description: Success
   /models/{id}/content_blobs/{blob_id}/download:
     parameters:
     - name: id
@@ -2324,9 +3305,9 @@ paths:
       type: integer
       default: 1850
     get:
-      operationId: readModelContent
-#      description:
-#        $ref: ../descriptions/readModelContent.md
+      operationId: downloadModelContent
+      description: |-
+        <a name="downloadModelContent"></a>Description of Model Content download
       tags:
       - read
       - models
@@ -2339,7 +3320,7 @@ paths:
     get:
       operationId: listOrganisms
       description: |
-        The **listOrganisms** operation returns a JSON object containing a list of all the Organisms to which the authenticated user has accesss.
+        <a name="listOrganisms"></a>The **listOrganisms** operation returns a JSON object containing a list of all the <a href="#organisms">**Organisms**</a> to which the authenticated user has accesss.
       tags:
       - list
       - organisms
@@ -2392,9 +3373,9 @@ paths:
     get:
       operationId: readOrganism
       description: |
-        A **readOrganism** operation will return information about the Organism identified, provided the authenticated user has access to it.
+        <a name="readOrganism"></a>A **readOrganism** operation will return information about the <a href="#organisms">Organism</a> identified, provided the authenticated user has access to it.
 
-        The **readOrganism** operation returns a JSON object representing the Organism.
+        The **readOrganism** operation returns a JSON object representing the <a href="#organisms">**Organism**</a>.
       tags:
       - read
       - organisms
@@ -2404,11 +3385,51 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/organismResponse'
+          examples:
+            application/json:
+              data:
+                id: '1933753696'
+                type: organisms
+                attributes:
+                  title: Plasmodium falciparum
+                  concept_uri: http://purl.bioontology.org/ontology/NCBITAXON/5833
+                  ontology_id: NCBITAXON
+                relationships:
+                  projects:
+                    data:
+                    - id: '17'
+                      type: projects
+                  assays:
+                    data:
+                    - id: '294'
+                      type: assays
+                    - id: '295'
+                      type: assays
+                    - id: '296'
+                      type: assays
+                  models:
+                    data:
+                    - id: '175'
+                      type: models
+                    - id: '176'
+                      type: models
+                    - id: '177'
+                      type: models
+                links:
+                  self: /organisms/1933753696
+                meta:
+                  created: '2015-03-03T09:52:07.000Z'
+                  modified: '2015-03-03T09:52:07.000Z'
+                  api_version: '0.1'
+                  uuid: 335d74e0-a6be-0135-6773-549f350973c0
+                  base_url: https://fairdomhub.org
+              jsonapi:
+                version: '1.0'
   /people:
     get:
       operationId: listPeople
       description: |
-        The **listPeople** operation returns a JSON object containing a list of all the People to which the authenticated user has accesss.
+        <a name="listPeople"></a>The **listPeople** operation returns a JSON object containing a list of all the <a href="#people">**People**</a> to which the authenticated user has accesss.
       tags:
       - list
       - people
@@ -2447,9 +3468,9 @@ paths:
     post:
       operationId: createPerson
       description: |
-        A **createPerson** operation creates a new instance of a Person. The instance is populated with the content of the body of the API call.
+        <a name="createPerson"></a>A **createPerson** operation creates a new instance of a <a href="#people">**Person**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createPerson** operation returns a JSON object representing the newly created Person and redirects to its URL.
+        The **createPerson** operation returns a JSON object representing the newly created <a href="#people">**Person**</a> and redirects to its URL.
       tags:
       - create
       - people
@@ -2535,9 +3556,9 @@ paths:
     get:
       operationId: readPerson
       description: |
-        A **readPerson** operation will return information about the Person identified, provided the authenticated user has access to it.
+        <a name="readPerson"></a>A **readPerson** operation will return information about the <a href="#people">Person</a> identified, provided the authenticated user has access to it.
 
-        The **readPerson** operation returns a JSON object representing the Person.
+        The **readPerson** operation returns a JSON object representing the <a href="#people">**Person**</a>.
       tags:
       - read
       - people
@@ -2691,9 +3712,9 @@ paths:
     patch:
       operationId: updatePerson
       description: |
-        An **updatePerson** operation will modify the information held about the specified Person. This operation is only available if the authenticated user has access to the Person.
+        <a name="updatePerson"></a>An **updatePerson** operation will modify the information held about the specified <a href="#people">**Person**</a>. This operation is only available if the authenticated user has access to the <a href="#people">**Person**</a>.
 
-        The **updatePerson** operation returns a JSON object representing the modified Person.
+        The **updatePerson** operation returns a JSON object representing the modified <a href="#people">**Person**</a>.
       parameters:
       - in: body
         name: person
@@ -2778,7 +3799,7 @@ paths:
     delete:
       operationId: deletePerson
       description: |
-        A **deletePerson** operation will delete the specified Person, if the authenticated user has sufficient access to it.
+        <a name="deletePerson"></a>A **deletePerson** operation will delete the specified <a href="#people">**Person**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - people
@@ -2792,7 +3813,7 @@ paths:
     get:
       operationId: listPresentations
       description: |
-        The **listPresentations** operation returns a JSON object containing a list of all the Presentations to which the authenticated user has accesss.
+        <a name="listPresentations"></a>The **listPresentations** operation returns a JSON object containing a list of all the <a href="#presentations">**Presentations**</a> to which the authenticated user has accesss.
       tags:
       - list
       - presentations
@@ -2836,9 +3857,9 @@ paths:
     post:
       operationId: createPresentation
       description: |
-        A **createPresentation** operation creates a new instance of a Presentation. The instance is populated with the content of the body of the API call.
+        <a name="createPresentation"></a>A **createPresentation** operation creates a new instance of a <a href="#presentations">**Presentation**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createPresentation** operation returns a JSON object representing the newly created Presentation and redirects to its URL.
+        The **createPresentation** operation returns a JSON object representing the newly created <a href="#presentations">**Presentation**</a> and redirects to its URL.
       tags:
       - create
       - presentations
@@ -2944,9 +3965,9 @@ paths:
     get:
       operationId: readPresentation
       description: |
-        A **readPresentation** operation will return information about the Presentation identified, provided the authenticated user has access to it.
+        <a name="readPresentation"></a>A **readPresentation** operation will return information about the <a href="#presentations">Presentation</a> identified, provided the authenticated user has access to it.
 
-        The **readPresentation** operation returns a JSON object representing the Presentation.
+        The **readPresentation** operation returns a JSON object representing the <a href="#presentations">**Presentation**</a>.
       parameters:
       - name: version
         in: query
@@ -2963,12 +3984,79 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/presentationResponse'
+          examples:
+            application/json:
+              data:
+                id: '253'
+                type: presentations
+                attributes:
+                  tags:
+                  title: Data and model Management in Systems Biology
+                  description: Presentation at the 10th anniversary of SABIO-RK, Heidelberg
+                    2016
+                  license:
+                  latest_version: 1
+                  versions:
+                  - version: 1
+                    revision_comments:
+                    url: https://fairdomhub.org/presentations/253?version=1
+                  version: '1'
+                  revision_comments:
+                  created_at: '2016-05-31T09:08:57.000Z'
+                  updated_at: '2016-06-01T20:19:00.000Z'
+                  content_blobs:
+                  - original_filename: data-and-model-management-in-systems-biology
+                    url: https://www.slideshare.net/dagwa/data-and-model-management-in-systems-biology
+                    md5sum: 1173007d7340ce19abbe015ffb9881f0
+                    sha1sum: 9a72a5bfa4b73d2aa5ee7a02024ad45cadcc9cd5
+                    content_type: text/html
+                    link: https://fairdomhub.org/presentations/253/content_blobs/2505
+                    size: 157861
+                relationships:
+                  creators:
+                    data:
+                    - id: '600'
+                      type: people
+                  submitter:
+                    data:
+                    - id: '600'
+                      type: people
+                  people:
+                    data:
+                    - id: '600'
+                      type: people
+                  projects:
+                    data:
+                    - id: '35'
+                      type: projects
+                    - id: '49'
+                      type: projects
+                  investigations:
+                    data: []
+                  studies:
+                    data: []
+                  assays:
+                    data: []
+                  publications:
+                    data: []
+                  events:
+                    data: []
+                links:
+                  self: /presentations/253?version=1
+                meta:
+                  created: '2016-05-31T09:08:57.000Z'
+                  modified: '2016-06-01T20:19:00.000Z'
+                  api_version: '0.1'
+                  uuid: 3acc9170-093d-0134-4373-549f350973c0
+                  base_url: https://fairdomhub.org
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updatePresentation
       description: |
-        An **updatePresentation** operation will modify the information held about the specified Presentation. This operation is only available if the authenticated user has access to the Presentation.
+        <a name="updatePresentation"></a>An **updatePresentation** operation will modify the information held about the specified <a href="#presentations">**Presentation**</a>. This operation is only available if the authenticated user has access to the <a href="#presentations">**Presentation**</a>.
 
-        The **updatePresentation** operation returns a JSON object representing the modified Presentation.
+        The **updatePresentation** operation returns a JSON object representing the modified <a href="#presentations">**Presentation**</a>.
       tags:
       - update
       - presentations
@@ -3057,7 +4145,7 @@ paths:
     delete:
       operationId: deletePresentation
       description: |
-        A **deletePresentation** operation will delete the specified Presentation, if the authenticated user has sufficient access to it.
+        <a name="deletePresentation"></a>A **deletePresentation** operation will delete the specified <a href="#presentations">**Presentation**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - presentations
@@ -3067,6 +4155,40 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
+  /presentations/{id}/content_blobs/{blob_id}:
+    put:
+      operationId: uploadPresentationContent
+      description: |-
+        <a name="uploadPresentationContent"></a>Description of Presentation Content upload
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: The presentation content to upload
+        type: integer
+        default: 1152
+      - name: blob_id
+        in: path
+        required: true
+        description: The content identifier to upload
+        type: integer
+        default: 1831
+      - in: body
+        name: blobContent
+        description: The blob content to upload
+        schema:
+          type: string
+          format: binary
+      consumes:
+      - application/octet-stream
+      produces:
+      - '*/*'
+      tags:
+      - upload
+      - presentations
+      responses:
+        '200':
+          description: Success
   /presentations/{id}/content_blobs/{blob_id}/download:
     parameters:
     - name: id
@@ -3082,11 +4204,11 @@ paths:
       type: integer
       default: 3215
     get:
-      operationId: readPresentationContent
-#      description:
-#        $ref: ../descriptions/readPresentationContent.md
+      operationId: downloadPresentationContent
+      description: |-
+        <a name="downloadPresentationContent"></a>Description of Presentation Content download
       tags:
-      - read
+      - download
       - presentations
       responses:
         <<: *ReadType
@@ -3098,7 +4220,7 @@ paths:
     get:
       operationId: listProgrammes
       description: |
-        The **listProgrammes** operation returns a JSON object containing a list of all the Programmes to which the authenticated user has accesss.
+        <a name="listProgrammes"></a>The **listProgrammes** operation returns a JSON object containing a list of all the <a href="#programmes">**Programmes**</a> to which the authenticated user has accesss.
       tags:
       - list
       - programmes
@@ -3137,9 +4259,9 @@ paths:
     post:
       operationId: createProgramme
       description: |
-        A **createProgramme** operation creates a new instance of a Programme. The instance is populated with the content of the body of the API call.
+        <a name="createProgramme"></a>A **createProgramme** operation creates a new instance of a <a href="#programmes">**Programme**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createProgramme** operation returns a JSON object representing the newly created Programme and redirects to its URL.
+        The **createProgramme** operation returns a JSON object representing the newly created <a href="#programmes">**Programme**</a> and redirects to its URL.
       tags:
       - create
       - programmes
@@ -3225,9 +4347,9 @@ paths:
     get:
       operationId: readProgramme
       description: |
-        A **readProgramme** operation will return information about the Programme identified, provided the authenticated user has access to it.
+        <a name="readProgramme"></a>A **readProgramme** operation will return information about the <a href="#programmes">Programme</a> identified, provided the authenticated user has access to it.
 
-        The **readProgramme** operation returns a JSON object representing the Programme.
+        The **readProgramme** operation returns a JSON object representing the <a href="#programmes">**Programme**</a>.
       tags:
       - read
       - programmes
@@ -3237,12 +4359,265 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/programmeResponse'
+          examples:
+            application/json:
+              data:
+                id: '3'
+                type: programmes
+                attributes:
+                  avatar:
+                  title: 'SARCHI: Mechanistic modelling of health and epidemiology'
+                  description: "The currently used mathematical models for medical\
+                    \ treatment at the individual or population level are largely\
+                    \ phenomenological and have limited quantitative predictive power.\
+                    \ It is usually not possible to predict the effect of an intervention\
+                    \ in a specific process or to predict the effect of a pharmaceutical\
+                    \ drug since the step or enzyme on which the intervention/drug\
+                    \ works is not explicit in the model.\r\n\r\nTaking HIV pathogenesis\
+                    \ as an example, the immune system response, vaccine exposure,\
+                    \ and drug regimen all affect viral replication and onward transmission,\
+                    \ which may be a single parameter in a model. Or in higher-level\
+                    \ scenarios of epidemiological intervention, condom distribution,\
+                    \ behavioural messaging, and vaccines may all be affecting a single\
+                    \ transmissibility parameter."
+                  web_page: http://sacemaquarterly.com/mathematical-modelling/sarchi-project-mechanistic-modelling-health-epidemiology.html
+                  funding_details: 'South African Research Chair in: "Mechanistic
+                    modelling of health and epidemiology" hosted by Stellenbosch University,
+                    funded by the DST and administered by NRF. '
+                  funding_codes:
+                relationships:
+                  people:
+                    data:
+                    - id: '49'
+                      type: people
+                    - id: '411'
+                      type: people
+                    - id: '433'
+                      type: people
+                    - id: '705'
+                      type: people
+                    - id: '706'
+                      type: people
+                  projects:
+                    data:
+                    - id: '17'
+                      type: projects
+                  institutions:
+                    data:
+                    - id: '50'
+                      type: institutions
+                    - id: '62'
+                      type: institutions
+                    - id: '142'
+                      type: institutions
+                  investigations:
+                    data:
+                    - id: '56'
+                      type: investigations
+                  studies:
+                    data:
+                    - id: '118'
+                      type: studies
+                    - id: '119'
+                      type: studies
+                    - id: '138'
+                      type: studies
+                  assays:
+                    data:
+                    - id: '247'
+                      type: assays
+                    - id: '249'
+                      type: assays
+                    - id: '250'
+                      type: assays
+                    - id: '251'
+                      type: assays
+                    - id: '252'
+                      type: assays
+                    - id: '253'
+                      type: assays
+                    - id: '254'
+                      type: assays
+                    - id: '255'
+                      type: assays
+                    - id: '256'
+                      type: assays
+                    - id: '257'
+                      type: assays
+                    - id: '258'
+                      type: assays
+                    - id: '259'
+                      type: assays
+                    - id: '260'
+                      type: assays
+                    - id: '261'
+                      type: assays
+                    - id: '262'
+                      type: assays
+                    - id: '263'
+                      type: assays
+                    - id: '264'
+                      type: assays
+                    - id: '265'
+                      type: assays
+                    - id: '266'
+                      type: assays
+                    - id: '267'
+                      type: assays
+                    - id: '268'
+                      type: assays
+                    - id: '294'
+                      type: assays
+                    - id: '295'
+                      type: assays
+                    - id: '296'
+                      type: assays
+                  data_files:
+                    data:
+                    - id: '1147'
+                      type: data_files
+                    - id: '1148'
+                      type: data_files
+                    - id: '1149'
+                      type: data_files
+                    - id: '1150'
+                      type: data_files
+                    - id: '1151'
+                      type: data_files
+                    - id: '1152'
+                      type: data_files
+                    - id: '1153'
+                      type: data_files
+                    - id: '1154'
+                      type: data_files
+                    - id: '1155'
+                      type: data_files
+                    - id: '1156'
+                      type: data_files
+                    - id: '1157'
+                      type: data_files
+                    - id: '1158'
+                      type: data_files
+                    - id: '1159'
+                      type: data_files
+                    - id: '1160'
+                      type: data_files
+                    - id: '1213'
+                      type: data_files
+                    - id: '1214'
+                      type: data_files
+                  models:
+                    data:
+                    - id: '124'
+                      type: models
+                    - id: '126'
+                      type: models
+                    - id: '127'
+                      type: models
+                    - id: '128'
+                      type: models
+                    - id: '129'
+                      type: models
+                    - id: '130'
+                      type: models
+                    - id: '131'
+                      type: models
+                    - id: '132'
+                      type: models
+                    - id: '133'
+                      type: models
+                    - id: '134'
+                      type: models
+                    - id: '135'
+                      type: models
+                    - id: '136'
+                      type: models
+                    - id: '138'
+                      type: models
+                    - id: '139'
+                      type: models
+                    - id: '140'
+                      type: models
+                    - id: '141'
+                      type: models
+                    - id: '142'
+                      type: models
+                    - id: '143'
+                      type: models
+                    - id: '144'
+                      type: models
+                    - id: '175'
+                      type: models
+                    - id: '176'
+                      type: models
+                    - id: '177'
+                      type: models
+                    - id: '179'
+                      type: models
+                  sops:
+                    data:
+                    - id: '191'
+                      type: sops
+                    - id: '192'
+                      type: sops
+                    - id: '193'
+                      type: sops
+                    - id: '194'
+                      type: sops
+                    - id: '195'
+                      type: sops
+                    - id: '196'
+                      type: sops
+                    - id: '197'
+                      type: sops
+                    - id: '198'
+                      type: sops
+                    - id: '199'
+                      type: sops
+                    - id: '200'
+                      type: sops
+                    - id: '201'
+                      type: sops
+                    - id: '202'
+                      type: sops
+                    - id: '203'
+                      type: sops
+                    - id: '204'
+                      type: sops
+                    - id: '205'
+                      type: sops
+                    - id: '206'
+                      type: sops
+                    - id: '207'
+                      type: sops
+                  publications:
+                    data:
+                    - id: '240'
+                      type: publications
+                    - id: '268'
+                      type: publications
+                    - id: '269'
+                      type: publications
+                  presentations:
+                    data: []
+                  events:
+                    data: []
+                links:
+                  self: /programmes/3
+                meta:
+                  created: '2014-07-31T09:24:43.000Z'
+                  modified: '2016-09-19T13:15:39.000Z'
+                  api_version: '0.1'
+                  uuid: 4538959b-7efc-4e1c-8ae0-9cf9c9487ebc
+                  base_url: https://fairdomhub.org
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updateProgramme
       description: |
-        An **updateProgramme** operation will modify the information held about the specified Programme. This operation is only available if the authenticated user has access to the Programme.
+        <a name="updateProgramme"></a>An **updateProgramme** operation will modify the information held about the specified <a href="#programmes">**Programme**</a>. This operation is only available if the authenticated user has access to the <a href="#programmes">**Programme**</a>.
 
-        The **updateProgramme** operation returns a JSON object representing the modified Programme.
+        The **updateProgramme** operation returns a JSON object representing the modified <a href="#programmes">**Programme**</a>.
       parameters:
       - in: body
         name: programme
@@ -3317,7 +4692,7 @@ paths:
     delete:
       operationId: deleteProgramme
       description: |
-        A **deleteProgramme** operation will delete the specified Programme, if the authenticated user has sufficient access to it.
+        <a name="deleteProgramme"></a>A **deleteProgramme** operation will delete the specified <a href="#programmes">**Programme**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - programmes
@@ -3331,7 +4706,7 @@ paths:
     get:
       operationId: listProjects
       description: |
-        The **listProjects** operation returns a JSON object containing a list of all the Projects to which the authenticated user has accesss.
+        <a name="listProjects"></a>The **listProjects** operation returns a JSON object containing a list of all the <a href="#projects">**Projects**</a> to which the authenticated user has accesss.
       tags:
       - list
       - projects
@@ -3362,621 +4737,6 @@ paths:
                   title: SUMO
                 links:
                   self: /projects/3
-              - id: '4'
-                type: projects
-                attributes:
-                  title: KOSMOBAC
-                links:
-                  self: /projects/4
-              - id: '5'
-                type: projects
-                attributes:
-                  title: SysMO-LAB
-                links:
-                  self: /projects/5
-              - id: '6'
-                type: projects
-                attributes:
-                  title: PSYSMO
-                links:
-                  self: /projects/6
-              - id: '7'
-                type: projects
-                attributes:
-                  title: SCaRAB
-                links:
-                  self: /projects/7
-              - id: '8'
-                type: projects
-                attributes:
-                  title: MOSES
-                links:
-                  self: /projects/8
-              - id: '9'
-                type: projects
-                attributes:
-                  title: TRANSLUCENT
-                links:
-                  self: /projects/9
-              - id: '10'
-                type: projects
-                attributes:
-                  title: STREAM
-                links:
-                  self: /projects/10
-              - id: '11'
-                type: projects
-                attributes:
-                  title: SulfoSys
-                links:
-                  self: /projects/11
-              - id: '12'
-                type: projects
-                attributes:
-                  title: SysMO DB
-                links:
-                  self: /projects/12
-              - id: '13'
-                type: projects
-                attributes:
-                  title: SysMO Funders
-                links:
-                  self: /projects/13
-              - id: '14'
-                type: projects
-                attributes:
-                  title: SilicoTryp
-                links:
-                  self: /projects/14
-              - id: '15'
-                type: projects
-                attributes:
-                  title: Noisy-Strep
-                links:
-                  self: /projects/15
-              - id: '16'
-                type: projects
-                attributes:
-                  title: SulfoSys - Biotec
-                links:
-                  self: /projects/16
-              - id: '17'
-                type: projects
-                attributes:
-                  title: Whole body modelling of glucose metabolism in malaria patients
-                links:
-                  self: /projects/17
-              - id: '18'
-                type: projects
-                attributes:
-                  title: Manchester Institute for Biotechnology
-                links:
-                  self: /projects/18
-              - id: '19'
-                type: projects
-                attributes:
-                  title: FAIRDOM
-                links:
-                  self: /projects/19
-              - id: '20'
-                type: projects
-                attributes:
-                  title: SysVirDrug
-                links:
-                  self: /projects/20
-              - id: '21'
-                type: projects
-                attributes:
-                  title: SysMilk
-                links:
-                  self: /projects/21
-              - id: '22'
-                type: projects
-                attributes:
-                  title: SysMetEx
-                links:
-                  self: /projects/22
-              - id: '23'
-                type: projects
-                attributes:
-                  title: MetApp
-                links:
-                  self: /projects/23
-              - id: '24'
-                type: projects
-                attributes:
-                  title: IMOMESIC
-                links:
-                  self: /projects/24
-              - id: '25'
-                type: projects
-                attributes:
-                  title: WineSys
-                links:
-                  self: /projects/25
-              - id: '26'
-                type: projects
-                attributes:
-                  title: CropClock
-                links:
-                  self: /projects/26
-              - id: '27'
-                type: projects
-                attributes:
-                  title: ICYSB 2015 - International Practical Course in Systems Biology
-                links:
-                  self: /projects/27
-              - id: '28'
-                type: projects
-                attributes:
-                  title: Embryonic bodies derived cell types
-                links:
-                  self: /projects/28
-              - id: '29'
-                type: projects
-                attributes:
-                  title: SYSTERACT
-                links:
-                  self: /projects/29
-              - id: '30'
-                type: projects
-                attributes:
-                  title: XyloCut
-                links:
-                  self: /projects/30
-              - id: '31'
-                type: projects
-                attributes:
-                  title: RootBook
-                links:
-                  self: /projects/31
-              - id: '32'
-                type: projects
-                attributes:
-                  title: ROBUSTYEAST
-                links:
-                  self: /projects/32
-              - id: '33'
-                type: projects
-                attributes:
-                  title: LEANPROT
-                links:
-                  self: /projects/33
-              - id: '34'
-                type: projects
-                attributes:
-                  title: GenoSysFat
-                links:
-                  self: /projects/34
-              - id: '35'
-                type: projects
-                attributes:
-                  title: de.NBI-SysBio
-                links:
-                  self: /projects/35
-              - id: '36'
-                type: projects
-                attributes:
-                  title: ExtremoPharm
-                links:
-                  self: /projects/36
-              - id: '37'
-                type: projects
-                attributes:
-                  title: ZucAt
-                links:
-                  self: /projects/37
-              - id: '38'
-                type: projects
-                attributes:
-                  title: DigiSal
-                links:
-                  self: /projects/38
-              - id: '39'
-                type: projects
-                attributes:
-                  title: Molecular Systems Biology
-                links:
-                  self: /projects/39
-              - id: '40'
-                type: projects
-                attributes:
-                  title: Early Metabolic Injury (LiSyM-EMI - Pillar I)
-                links:
-                  self: /projects/40
-              - id: '41'
-                type: projects
-                attributes:
-                  title: Chronic Liver Disease Progression (LiSyM-DP - Pillar II)
-                links:
-                  self: /projects/41
-              - id: '42'
-                type: projects
-                attributes:
-                  title: Regeneration and Repair in Acute-on-Chronic Liver Failure
-                    (LiSyM-ACLF - Pillar III)
-                links:
-                  self: /projects/42
-              - id: '43'
-                type: projects
-                attributes:
-                  title: LiSyM Core Infrastructure and Management (LiSyM-PD)
-                links:
-                  self: /projects/43
-              - id: '44'
-                type: projects
-                attributes:
-                  title: Liver Function Diagnostics (LiSyM-LiFuDi - Pillar IV)
-                links:
-                  self: /projects/44
-              - id: '45'
-                type: projects
-                attributes:
-                  title: Model Guided Pharmacotherapy In Chronic Liver Disease (LiSyM-MGP)
-                links:
-                  self: /projects/45
-              - id: '46'
-                type: projects
-                attributes:
-                  title: Multi-Scale Models for Personalized Liver Function Tests
-                    (LiSyM-MM-PLF)
-                links:
-                  self: /projects/46
-              - id: '47'
-                type: projects
-                attributes:
-                  title: The Hedgehog Signalling Pathway (LiSyM-JGMMS)
-                links:
-                  self: /projects/47
-              - id: '48'
-                type: projects
-                attributes:
-                  title: Molecular Steatosis - Imaging & Modeling (LiSyM-MSIM)
-                links:
-                  self: /projects/48
-              - id: '49'
-                type: projects
-                attributes:
-                  title: Kinetics on the move - Workshop 2016
-                links:
-                  self: /projects/49
-              - id: '50'
-                type: projects
-                attributes:
-                  title: Example use cases
-                links:
-                  self: /projects/50
-              - id: '51'
-                type: projects
-                attributes:
-                  title: FAIRDOM user meeting
-                links:
-                  self: /projects/51
-              - id: '52'
-                type: projects
-                attributes:
-                  title: ErasysApp Funders
-                links:
-                  self: /projects/52
-              - id: '53'
-                type: projects
-                attributes:
-                  title: HUMET Startup
-                links:
-                  self: /projects/53
-              - id: '54'
-                type: projects
-                attributes:
-                  title: SBEpo - Systems Biology of Erythropoietin
-                links:
-                  self: /projects/54
-              - id: '55'
-                type: projects
-                attributes:
-                  title: INBioPharm
-                links:
-                  self: /projects/55
-              - id: '56'
-                type: projects
-                attributes:
-                  title: HYp - Spatiotemporal analysis of hypersensitive response
-                    to Potato virus Y in potato
-                links:
-                  self: /projects/56
-              - id: '57'
-                type: projects
-                attributes:
-                  title: pISA-tree
-                links:
-                  self: /projects/57
-              - id: '58'
-                type: projects
-                attributes:
-                  title: EmPowerPutida
-                links:
-                  self: /projects/58
-              - id: '59'
-                type: projects
-                attributes:
-                  title: Millar group
-                links:
-                  self: /projects/59
-              - id: '60'
-                type: projects
-                attributes:
-                  title: Systems toxicology of Atlantic cod
-                links:
-                  self: /projects/60
-              - id: '61'
-                type: projects
-                attributes:
-                  title: Systo models
-                links:
-                  self: /projects/61
-              - id: '62'
-                type: projects
-                attributes:
-                  title: Service to Milano-Bicocca with respect to their ATP-ROS model
-                    (Active NOW)
-                links:
-                  self: /projects/62
-              - id: '63'
-                type: projects
-                attributes:
-                  title: 'M4 service for Milano: ATP model'
-                links:
-                  self: /projects/63
-              - id: '64'
-                type: projects
-                attributes:
-                  title: Make Me My Model
-                links:
-                  self: /projects/64
-              - id: '65'
-                type: projects
-                attributes:
-                  title: Service to University of Lisbon (Portugal) with respect to
-                    their CFTR maturation model (Active NOW)
-                links:
-                  self: /projects/65
-              - id: '66'
-                type: projects
-                attributes:
-                  title: "Service to LCSB (Luxembourg)  with respect to ROS management\
-                    \ in Parkinson\u2019s disease and cancer model (Active NOW)"
-                links:
-                  self: /projects/66
-              - id: '67'
-                type: projects
-                attributes:
-                  title: Service to URV Tarragona, Spain with respect to their Safety
-                    Assessment of Endocrine Disrupting Chemicals model (Active NOW)
-                links:
-                  self: /projects/67
-              - id: '68'
-                type: projects
-                attributes:
-                  title: "Service to Universidade Cat\xF3lica Portugues with respect\
-                    \ to their Molecular Insight into Autism Spectrum Disorder (ASD)\
-                    \ model (Active NOW)"
-                links:
-                  self: /projects/68
-              - id: '69'
-                type: projects
-                attributes:
-                  title: Service to Slovenia with respect to their Protease signaling
-                    network in neurodegeneration model (Active NOW)
-                links:
-                  self: /projects/69
-              - id: '70'
-                type: projects
-                attributes:
-                  title: 'Service to University of Duisburg- Essen (Germany): with
-                    respect to their The Yin-Yang of Metabolism; Endometatoxicity
-                    (YYME) model (Active NOW)'
-                links:
-                  self: /projects/70
-              - id: '71'
-                type: projects
-                attributes:
-                  title: 'Service to Sheffield University (UK): with respect to Mitochondrial
-                    perfect adaptation model (Active NOW)'
-                links:
-                  self: /projects/71
-              - id: '72'
-                type: projects
-                attributes:
-                  title: 'Service to Sanquin (Amsterdam): with respect to Modelling
-                    of acute and chronic inflammation (Prospective)'
-                links:
-                  self: /projects/72
-              - id: '73'
-                type: projects
-                attributes:
-                  title: 'Service to Munich (Germany): with respect toCharged peptide
-                    to charged membrane binding model (Prospective)'
-                links:
-                  self: /projects/73
-              - id: '74'
-                type: projects
-                attributes:
-                  title: MycoSynVac - Engineering Mycoplasma pneumoniae as a broad-spectrum
-                    animal vaccine
-                links:
-                  self: /projects/74
-              - id: '75'
-                type: projects
-                attributes:
-                  title: SEEK tutorial for DigiSal
-                links:
-                  self: /projects/75
-              - id: '76'
-                type: projects
-                attributes:
-                  title: Training Hunfeld
-                links:
-                  self: /projects/76
-              - id: '77'
-                type: projects
-                attributes:
-                  title: WG Infrastructure for Translational Research
-                links:
-                  self: /projects/77
-              - id: '78'
-                type: projects
-                attributes:
-                  title: CausalDB
-                links:
-                  self: /projects/78
-              - id: '80'
-                type: projects
-                attributes:
-                  title: WURSynBio
-                links:
-                  self: /projects/80
-              - id: '81'
-                type: projects
-                attributes:
-                  title: Colosys
-                links:
-                  self: /projects/81
-              - id: '83'
-                type: projects
-                attributes:
-                  title: MS_DILI
-                links:
-                  self: /projects/83
-              - id: '84'
-                type: projects
-                attributes:
-                  title: Glycon proposal preparation
-                links:
-                  self: /projects/84
-              - id: '85'
-                type: projects
-                attributes:
-                  title: TID - Dynamics of tolerant potato-potato virus Y interaction
-                links:
-                  self: /projects/85
-              - id: '86'
-                type: projects
-                attributes:
-                  title: BioZEment 2.0
-                links:
-                  self: /projects/86
-              - id: '87'
-                type: projects
-                attributes:
-                  title: SAFE-Aqua
-                links:
-                  self: /projects/87
-              - id: '88'
-                type: projects
-                attributes:
-                  title: 'PHYTOCAL: Phytochrome Control of Resource Allocation and
-                    Growth in Arabidopsis and in Brassicaceae crops'
-                links:
-                  self: /projects/88
-              - id: '90'
-                type: projects
-                attributes:
-                  title: COMBINE Multicellular Modelling
-                links:
-                  self: /projects/90
-              - id: '91'
-                type: projects
-                attributes:
-                  title: FAIRDOM & LiSyM & de.NBI Data Structuring Training
-                links:
-                  self: /projects/91
-              - id: '92'
-                type: projects
-                attributes:
-                  title: TiMet
-                links:
-                  self: /projects/92
-              - id: '93'
-                type: projects
-                attributes:
-                  title: OXYMOD
-                links:
-                  self: /projects/93
-              - id: '95'
-                type: projects
-                attributes:
-                  title: POP - the Parameter Optimisation Problem
-                links:
-                  self: /projects/95
-              - id: '96'
-                type: projects
-                attributes:
-                  title: Tobacco as sustainable production platform of the natural
-                    biopolymer cyanophycin as co-product to oil and protein
-                links:
-                  self: /projects/96
-              - id: '97'
-                type: projects
-                attributes:
-                  title: Test
-                links:
-                  self: /projects/97
-              - id: '98'
-                type: projects
-                attributes:
-                  title: Mathematical modelling of the antibiotic-induced morphological
-                    transition of Pseudomonas aeruginosa
-                links:
-                  self: /projects/98
-              - id: '99'
-                type: projects
-                attributes:
-                  title: MESI-STRAT
-                links:
-                  self: /projects/99
-              - id: '100'
-                type: projects
-                attributes:
-                  title: INCOME
-                links:
-                  self: /projects/100
-              - id: '101'
-                type: projects
-                attributes:
-                  title: Multiscale modelling of state transitions in the host-microbiome-brain
-                    network
-                links:
-                  self: /projects/101
-              - id: '102'
-                type: projects
-                attributes:
-                  title: Crossover Research 2.0
-                links:
-                  self: /projects/102
-              - id: '103'
-                type: projects
-                attributes:
-                  title: NTNU Health Druglogics
-                links:
-                  self: /projects/103
-              - id: '104'
-                type: projects
-                attributes:
-                  title: ROS detailed model for MSB manucript
-                links:
-                  self: /projects/104
-              - id: '105'
-                type: projects
-                attributes:
-                  title: BESTER
-                links:
-                  self: /projects/105
-              - id: '106'
-                type: projects
-                attributes:
-                  title: SUSPHIRE - Sustainable Bioproduction of Pheromones for Insect
-                    Pest Control in Agriculture
-                links:
-                  self: /projects/106
               jsonapi:
                 version: '1.0'
               meta:
@@ -3985,9 +4745,9 @@ paths:
     post:
       operationId: createProject
       description: |
-        A **createProject** operation creates a new instance of a Project. The instance is populated with the content of the body of the API call.
+        <a name="createProject"></a>A **createProject** operation creates a new instance of a <a href="#projects">**Project**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createProject** operation returns a JSON object representing the newly created Project and redirects to its URL.
+        The **createProject** operation returns a JSON object representing the newly created <a href="#projects">**Project**</a> and redirects to its URL.
       tags:
       - create
       - projects
@@ -4081,9 +4841,9 @@ paths:
     get:
       operationId: readProject
       description: |
-        A **readProject** operation will return information about the Project identified, provided the authenticated user has access to it.
+        <a name="readProject"></a>A **readProject** operation will return information about the <a href="#projects">Project</a> identified, provided the authenticated user has access to it.
 
-        The **readProject** operation returns a JSON object representing the Project.
+        The **readProject** operation returns a JSON object representing the <a href="#projects">**Project**</a>.
       tags:
       - read
       - projects
@@ -4093,12 +4853,79 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/projectResponse'
+          examples:
+            application/json:
+              data:
+                id: '1926'
+                type: projects
+                attributes:
+                  avatar:
+                  title: Post Project Max
+                  description: A Taverna project
+                  web_page: http://www.taverna.org.uk
+                  wiki_page: http://www.mygrid.org.uk
+                  default_license: Other (Open)
+                  default_policy:
+                    access: no_access
+                    permissions:
+                    - resource_type: people
+                      resource_id: '1273'
+                      access: manage
+                    - resource_type: projects
+                      resource_id: '1924'
+                      access: download
+                    - resource_type: institutions
+                      resource_id: '1297'
+                      access: view
+                relationships:
+                  organisms:
+                    data:
+                    - id: '5'
+                      type: organisms
+                  people:
+                    data: []
+                  institutions:
+                    data: []
+                  programmes:
+                    data:
+                    - id: '27'
+                      type: programmes
+                  investigations:
+                    data: []
+                  studies:
+                    data: []
+                  assays:
+                    data: []
+                  data_files:
+                    data: []
+                  models:
+                    data: []
+                  sops:
+                    data: []
+                  publications:
+                    data: []
+                  presentations:
+                    data: []
+                  events:
+                    data: []
+                  documents:
+                    data: []
+                links:
+                  self: /projects/1926
+                meta:
+                  created: '2018-04-27T14:41:00.267Z'
+                  modified: '2018-04-27T14:41:00.267Z'
+                  api_version: '0.1'
+                  uuid: ed4723e0-2c56-0136-ec2f-08002734982f
+                  base_url: http://localhost:3000
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updateProject
       description: |
-        An **updateProject** operation will modify the information held about the specified Project. This operation is only available if the authenticated user has access to the Project.
+        <a name="updateProject"></a>An **updateProject** operation will modify the information held about the specified <a href="#projects">**Project**</a>. This operation is only available if the authenticated user has access to the <a href="#projects">**Project**</a>.
 
-        The **updateProject** operation returns a JSON object representing the modified Project.
+        The **updateProject** operation returns a JSON object representing the modified <a href="#projects">**Project**</a>.
       parameters:
       - in: body
         name: project
@@ -4184,7 +5011,7 @@ paths:
     delete:
       operationId: deleteProject
       description: |
-        A **deleteProject** operation will delete the specified Project, if the authenticated user has sufficient access to it.
+        <a name="deleteProject"></a>A **deleteProject** operation will delete the specified <a href="#projects">**Project**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - projects
@@ -4198,7 +5025,7 @@ paths:
     get:
       operationId: listPublications
       description: |
-        The **listPublications** operation returns a JSON object containing a list of all the Publications to which the authenticated user has accesss.
+        <a name="listPublications"></a>The **listPublications** operation returns a JSON object containing a list of all the <a href="#publications">**Publications**</a> to which the authenticated user has accesss.
       tags:
       - list
       - publications
@@ -4262,9 +5089,9 @@ paths:
     get:
       operationId: readPublication
       description: |
-        A **readPublication** operation will return information about the Publication identified, provided the authenticated user has access to it.
+        <a name="readPublication"></a>A **readPublication** operation will return information about the <a href="#publications">Publication</a> identified, provided the authenticated user has access to it.
 
-        The **readPublication** operation returns a JSON object representing the Publication.
+        The **readPublication** operation returns a JSON object representing the <a href="#publications">**Publication**</a>.
       tags:
       - read
       - publications
@@ -4274,11 +5101,95 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/publicationResponse'
+          examples:
+            application/json:
+              data:
+                id: '240'
+                type: publications
+                attributes:
+                  title: |-
+                    Construction and validation of a detailed kinetic model of glycolysis in
+                                  Plasmodium falciparum
+                  journal: FEBS J
+                  published_date: '2015-04-01'
+                  doi: 10.1111/febs.13237
+                  pubmed_id:
+                  abstract: "The enzymes in the Embden\xE2\u20AC\u201CMeyerhof\xE2\
+                    \u20AC\u201CParnas pathway of Plasmodium falciparum trophozoites\
+                    \ were kinetically characterized and their integrated activities\
+                    \ analyzed in a mathematical model. For validation of the model,\
+                    \ we compared model predictions for steady-state fluxes and metabolite\
+                    \ concentrations of the hexose phosphates with experimental values\
+                    \ for intact parasites. The model, which is completely based on\
+                    \ kinetic parameters that were measured for the individual enzymes,\
+                    \ gives an accurate prediction of the steady-state fluxes and\
+                    \ intermediate concentrations. This is the first detailed kinetic\
+                    \ model for glucose metabolism in P. falciparum, one of the most\
+                    \ prolific malaria-causing protozoa, and the high predictive power\
+                    \ of the model makes it a strong tool for future drug target identification\
+                    \ studies. The modelling workflow is transparent and reproducible,\
+                    \ and completely documented in the SEEK platform, where all experimental\
+                    \ data and model files are available for download."
+                  citation: 'FEBS J 282(8) : 1481'
+                  link_to_pub: https://www.ncbi.nlm.nih.gov/pubmed/
+                  authors:
+                  - Gerald Penkler
+                  - Francois du Toit
+                  - Waldo Adams
+                  - Marina Rautenbach
+                  - Daniel C. Palm
+                  - Dawie Van Niekerk
+                  - Jacky Snoep
+                relationships:
+                  people:
+                    data:
+                    - id: '49'
+                      type: people
+                    - id: '411'
+                      type: people
+                  projects:
+                    data:
+                    - id: '17'
+                      type: projects
+                  investigations:
+                    data:
+                    - id: '56'
+                      type: investigations
+                  studies:
+                    data:
+                    - id: '118'
+                      type: studies
+                    - id: '119'
+                      type: studies
+                    - id: '138'
+                      type: studies
+                  assays:
+                    data: []
+                  data_files:
+                    data: []
+                  models:
+                    data: []
+                  publications:
+                    data: []
+                  presentations:
+                    data: []
+                  events:
+                    data: []
+                links:
+                  self: /publications/240
+                meta:
+                  created: '2015-07-09T15:30:55.000Z'
+                  modified: '2016-09-19T13:34:11.000Z'
+                  api_version: '0.1'
+                  uuid: 69bebf90-087d-0133-36e3-549f350973c0
+                  base_url: https://fairdomhub.org
+              jsonapi:
+                version: '1.0'
   /sample_types:
     get:
       operationId: listSampleTypes
       description: |
-        The **listSampleTypes** operation returns a JSON object containing a list of all the SampleTypes to which the authenticated user has accesss.
+        <a name="listSampleTypes"></a>The **listSampleTypes** operation returns a JSON object containing a list of all the <a href="#sampleTypes">**SampleTypes**</a> to which the authenticated user has accesss.
       tags:
       - list
       - sampleTypes
@@ -4330,7 +5241,7 @@ paths:
     get:
       operationId: listSops
       description: |
-        The **listSops** operation returns a JSON object containing a list of all the Sops to which the authenticated user has accesss.
+        <a name="listSops"></a>The **listSops** operation returns a JSON object containing a list of all the <a href="#sops">**Sops**</a> to which the authenticated user has accesss.
       tags:
       - list
       - sops
@@ -4377,9 +5288,9 @@ paths:
     post:
       operationId: createSop
       description: |
-        A **createSop** operation creates a new instance of a Sop. The instance is populated with the content of the body of the API call.
+        <a name="createSop"></a>A **createSop** operation creates a new instance of a <a href="#sops">**Sop**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createSop** operation returns a JSON object representing the newly created Sop and redirects to its URL.
+        The **createSop** operation returns a JSON object representing the newly created <a href="#sops">**Sop**</a> and redirects to its URL.
       tags:
       - create
       - sops
@@ -4485,9 +5396,9 @@ paths:
     get:
       operationId: readSop
       description: |
-        A **readSop** operation will return information about the Sop identified, provided the authenticated user has access to it.
+        <a name="readSop"></a>A **readSop** operation will return information about the <a href="#sops">Sop</a> identified, provided the authenticated user has access to it.
 
-        The **readSop** operation returns a JSON object representing the Sop.
+        The **readSop** operation returns a JSON object representing the <a href="#sops">**Sop**</a>.
       parameters:
       - name: version
         in: query
@@ -4504,12 +5415,88 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/sopResponse'
+          examples:
+            application/json:
+              data:
+                id: '203'
+                type: sops
+                attributes:
+                  tags:
+                  title: Validation experiments
+                  description: SOP for the determination of external metabolites (Glc,
+                    Pyr, Gly, Lac) in intact trophozoite incubations, and for the
+                    determination of intracellular metabolite concentrations.
+                  license:
+                  latest_version: 1
+                  versions:
+                  - version: 1
+                    revision_comments:
+                    url: https://fairdomhub.org/sops/203?version=1
+                  version: '1'
+                  revision_comments:
+                  created_at: '2014-08-15T13:00:40.000Z'
+                  updated_at: '2015-04-17T10:27:22.000Z'
+                  content_blobs:
+                  - original_filename: Validation SOP.docx
+                    url:
+                    md5sum: 80afdbcc9064a4f96eb2e8cbec138d70
+                    sha1sum: b46118506c779972df036e0f7233b9cd3995bf50
+                    content_type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                    link: https://fairdomhub.org/sops/203/content_blobs/1806
+                    size: 154968
+                relationships:
+                  creators:
+                    data:
+                    - id: '411'
+                      type: people
+                    - id: '49'
+                      type: people
+                  submitter:
+                    data:
+                    - id: '411'
+                      type: people
+                  people:
+                    data:
+                    - id: '49'
+                      type: people
+                    - id: '411'
+                      type: people
+                  projects:
+                    data:
+                    - id: '17'
+                      type: projects
+                  investigations:
+                    data:
+                    - id: '56'
+                      type: investigations
+                  studies:
+                    data:
+                    - id: '119'
+                      type: studies
+                  assays:
+                    data:
+                    - id: '260'
+                      type: assays
+                    - id: '266'
+                      type: assays
+                  publications:
+                    data: []
+                links:
+                  self: /sops/203?version=1
+                meta:
+                  created: '2014-08-15T13:00:40.000Z'
+                  modified: '2015-04-17T10:27:22.000Z'
+                  api_version: '0.1'
+                  uuid: 90825ba2-b548-49e0-9215-a8c3ba19ee4b
+                  base_url: https://fairdomhub.org
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updateSop
       description: |
-        An **updateSop** operation will modify the information held about the specified Sop. This operation is only available if the authenticated user has access to the Sop.
+        <a name="updateSop"></a>An **updateSop** operation will modify the information held about the specified <a href="#sops">**Sop**</a>. This operation is only available if the authenticated user has access to the <a href="#sops">**Sop**</a>.
 
-        The **updateSop** operation returns a JSON object representing the modified Sop.
+        The **updateSop** operation returns a JSON object representing the modified <a href="#sops">**Sop**</a>.
       tags:
       - update
       - sops
@@ -4596,7 +5583,7 @@ paths:
     delete:
       operationId: deleteSop
       description: |
-        A **deleteSop** operation will delete the specified Sop, if the authenticated user has sufficient access to it.
+        <a name="deleteSop"></a>A **deleteSop** operation will delete the specified <a href="#sops">**Sop**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - sops
@@ -4606,6 +5593,40 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ok'
+  /sops/{id}/content_blobs/{blob_id}:
+    put:
+      operationId: uploadSopContent
+      description: |-
+        <a name="uploadSopContent"></a>Description of Sop Content upload
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: The sop content to upload
+        type: integer
+        default: 1152
+      - name: blob_id
+        in: path
+        required: true
+        description: The content identifier to upload
+        type: integer
+        default: 1831
+      - in: body
+        name: blobContent
+        description: The blob content to upload
+        schema:
+          type: string
+          format: binary
+      consumes:
+      - application/octet-stream
+      produces:
+      - '*/*'
+      tags:
+      - upload
+      - sops
+      responses:
+        '200':
+          description: Success
   /sops/{id}/content_blobs/{blob_id}/download:
     parameters:
     - name: id
@@ -4621,11 +5642,11 @@ paths:
       type: integer
       default: 1806
     get:
-      operationId: readSopContent
-#      description:
-#        $ref: ../descriptions/readSopContent.md
+      operationId: downloadSopContent
+      description: |-
+        <a name="downloadSopContent"></a>Description of Sop Content download
       tags:
-      - read
+      - download
       - sops
       responses:
         <<: *ReadType
@@ -4637,7 +5658,7 @@ paths:
     get:
       operationId: listStudies
       description: |
-        The **listStudys** operation returns a JSON object containing a list of all the Studys to which the authenticated user has accesss.
+        <a name="listStudies"></a>The **listStudys** operation returns a JSON object containing a list of all the Studys to which the authenticated user has accesss.
       tags:
       - list
       - studies
@@ -4676,9 +5697,9 @@ paths:
     post:
       operationId: createStudy
       description: |
-        A **createStudy** operation creates a new instance of a Study. The instance is populated with the content of the body of the API call.
+        <a name="createStudy"></a>A **createStudy** operation creates a new instance of a <a href="#studies">**Study**</a>. The instance is populated with the content of the body of the API call.
 
-        The **createStudy** operation returns a JSON object representing the newly created Study and redirects to its URL.
+        The **createStudy** operation returns a JSON object representing the newly created <a href="#studies">**Study**</a> and redirects to its URL.
       tags:
       - create
       - studies
@@ -4767,9 +5788,9 @@ paths:
     get:
       operationId: readStudy
       description: |
-        A **readStudy** operation will return information about the Study identified, provided the authenticated user has access to it.
+        <a name="readStudy"></a>A **readStudy** operation will return information about the <a href="#studies">Study</a> identified, provided the authenticated user has access to it.
 
-        The **readStudy** operation returns a JSON object representing the Study.
+        The **readStudy** operation returns a JSON object representing the <a href="#studies">**Study**</a>.
       tags:
       - read
       - studies
@@ -4779,12 +5800,86 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/studyResponse'
+          examples:
+            application/json:
+              data:
+                id: '138'
+                type: studies
+                attributes:
+                  tags:
+                  title: Model analysis
+                  description:
+                  experimentalists:
+                  person_responsible_id: '411'
+                relationships:
+                  creators:
+                    data: []
+                  submitter:
+                    data:
+                    - id: '411'
+                      type: people
+                  people:
+                    data:
+                    - id: '411'
+                      type: people
+                  projects:
+                    data:
+                    - id: '17'
+                      type: projects
+                  investigation:
+                    data:
+                      id: '56'
+                      type: investigations
+                  assays:
+                    data:
+                    - id: '294'
+                      type: assays
+                    - id: '295'
+                      type: assays
+                    - id: '296'
+                      type: assays
+                  data_files:
+                    data:
+                    - id: '1213'
+                      type: data_files
+                    - id: '1214'
+                      type: data_files
+                  models:
+                    data:
+                    - id: '144'
+                      type: models
+                    - id: '175'
+                      type: models
+                    - id: '176'
+                      type: models
+                    - id: '177'
+                      type: models
+                    - id: '179'
+                      type: models
+                  sops:
+                    data: []
+                  publications:
+                    data:
+                    - id: '240'
+                      type: publications
+                    - id: '268'
+                      type: publications
+                links:
+                  self: /studies/138
+                meta:
+                  created: '2015-07-01T08:14:11.000Z'
+                  modified: '2015-07-01T08:14:11.000Z'
+                  api_version: '0.1'
+                  uuid: 29af988a-9b3b-4ce3-a42d-1bebf0c4cbe1
+                  base_url: https://fairdomhub.org
+              jsonapi:
+                version: '1.0'
     patch:
       operationId: updateStudy
       description: |
-        An **updateStudy** operation will modify the information held about the specified Study. This operation is only available if the authenticated user has access to the Study.
+        <a name="updateStudy"></a>An **updateStudy** operation will modify the information held about the specified <a href="#studies">**Study**</a>. This operation is only available if the authenticated user has access to the <a href="#studies">**Study**</a>.
 
-        The **updateStudy** operation returns a JSON object representing the modified Study.
+        The **updateStudy** operation returns a JSON object representing the modified <a href="#studies">**Study**</a>.
       tags:
       - update
       - studies
@@ -4865,7 +5960,7 @@ paths:
     delete:
       operationId: deleteStudy
       description: |
-        A **deleteStudy** operation will delete the specified Study, if the authenticated user has sufficient access to it.
+        <a name="deleteStudy"></a>A **deleteStudy** operation will delete the specified <a href="#studies">**Study**</a>, if the authenticated user has sufficient access to it.
       tags:
       - delete
       - studies
@@ -5033,7 +6128,7 @@ definitions:
       base_url:
         $ref: '#/definitions/uriString'
       api_version:
-        ref: '#/definitions/nonEmptyString'
+        $ref: '#/definitions/nonEmptyString'
     required:
     - created
     - modified
@@ -5047,12 +6142,11 @@ definitions:
       base_url:
         $ref: '#/definitions/uriString'
       api_version:
-        ref: '#/definitions/nonEmptyString'
+        $ref: '#/definitions/nonEmptyString'
     required:
     - base_url
     - api_version
     additionalProperties: false
-
   ok:
     type: object
     properties:
@@ -5063,7 +6157,6 @@ definitions:
     additionalProperties: false
     example:
       status: ok
-
   not_implemented:
     type: object
     properties:
@@ -5101,7 +6194,13 @@ definitions:
       errors:
       - title: Not found
         detail: Couldn't find Institution with 'id'=[70]
-
+  permittedResourceType:
+    type: string
+    minLength: 1
+    enum:
+    - institutions
+    - people
+    - projects
   policy:
     type: object
     properties:
@@ -5114,7 +6213,7 @@ definitions:
         items:
           properties:
             resource_type:
-              $ref: '#/definitions/nonEmptyString'
+              $ref: '#/definitions/permittedResourceType'
             resource_id:
               $ref: '#/definitions/nonEmptyString'
             access:
@@ -5146,6 +6245,7 @@ definitions:
     - data_files
     - documents
     - events
+    - institutions
     - models
     - organisms
     - people
@@ -5191,11 +6291,9 @@ definitions:
       revision_comments:
         $ref: '#/definitions/nullableNonEmptyString'
       created_at:
-        type: dateTimeString
-        minLength: 1
+        $ref: '#/definitions/dateTimeString'
       updated_at:
-        type: dateTimeString
-        minLength: 1
+        $ref: '#/definitions/dateTimeString'
       content_blobs:
         $ref: '#/definitions/contentBlobsList'
       policy:
@@ -5247,11 +6345,9 @@ definitions:
       revision_comments:
         $ref: '#/definitions/nullableNonEmptyString'
       created_at:
-        type: dateTimeString
-        minLength: 1
+        $ref: '#/definitions/dateTimeString'
       updated_at:
-        type: dateTimeString
-        minLength: 1
+        $ref: '#/definitions/dateTimeString'
       content_blobs:
         $ref: '#/definitions/contentBlobsList'
       model_type:
@@ -6087,8 +7183,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -6226,8 +7320,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -7252,8 +8344,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -7323,8 +8413,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -8191,10 +9279,13 @@ definitions:
             - title
             additionalProperties: false
           relationships:
-            administrators:
-              $ref: '#/definitions/peopleReferenceList'
-            projects:
-              $ref: '#/definitions/projectReferencesList'
+            type: object
+            properties:
+              administrators:
+                $ref: '#/definitions/peopleReferenceList'
+              projects:
+                $ref: '#/definitions/projectReferencesList'
+            additionalProperties: false
         required:
         - type
         - attributes
@@ -8249,10 +9340,13 @@ definitions:
                 $ref: '#/definitions/tagsType'
             additionalProperties: false
           relationships:
-            administrators:
-              $ref: '#/definitions/peopleReferenceList'
-            projects:
-              $ref: '#/definitions/projectReferencesList'
+            type: object
+            properties:
+              administrators:
+                $ref: '#/definitions/peopleReferenceList'
+              projects:
+                $ref: '#/definitions/projectReferencesList'
+            additionalProperties: false
         required:
         - id
         - type
@@ -8407,10 +9501,13 @@ definitions:
                 $ref: '#/definitions/nullableLicense'
             additionalProperties: false
           relationships:
-            programmes:
-              $ref: '#/definitions/programmeReferencesList'
-            organisms:
-              $ref: '#/definitions/organismReferencesList'
+            type: object
+            properties:
+              programmes:
+                $ref: '#/definitions/programmeReferencesList'
+              organisms:
+                $ref: '#/definitions/organismReferencesList'
+            additionalProperties: false
         required:
         - id
         - type
@@ -8479,10 +9576,13 @@ definitions:
             - title
             additionalProperties: false
           relationships:
-            programmes:
-              $ref: '#/definitions/programmeReferencesList'
-            organisms:
-              $ref: '#/definitions/organismReferencesList'
+            type: object
+            properties:
+              programmes:
+                $ref: '#/definitions/programmeReferencesList'
+              organisms:
+                $ref: '#/definitions/organismReferencesList'
+            additionalProperties: false
         required:
         - type
         - attributes
@@ -8901,8 +10001,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:
@@ -8979,8 +10077,6 @@ definitions:
           attributes:
             type: object
             properties:
-              tags:
-                $ref: '#/definitions/nullableNonEmptyStringList'
               title:
                 $ref: '#/definitions/nonEmptyString'
               description:

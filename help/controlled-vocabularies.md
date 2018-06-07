@@ -74,21 +74,21 @@ SEEK documentation is a community driven activity, and we are always looking to 
 	<tr>
 		<td> Cellular Location </td>
 		<td> Gene Ontology </td>
-		<td> <a href="http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0016020">GO:0016020</a></td>
+		<td> <a href="http://amigo.geneontology.org/amigo/term/GO:0016020">GO:0016020</a></td>
 		<td> <a href="http://www.geneontology.org/">http://www.geneontology.org/</a> </td>
 		<td> urn:miriam:obo.go </td>
 	</tr>
 	<tr>
 		<td> Molecular Function </td>
 		<td> Gene Ontology </td>
-		<td> <a href="http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0004857">GO:0004857</a></td>
+		<td> <a href="http://amigo.geneontology.org/amigo/term/GO:0004857">GO:0004857</a></td>
 		<td> <a href="http://www.geneontology.org/">http://www.geneontology.org/</a> </td>
 		<td> urn:miriam:obo.go </td>
 	</tr>
 	<tr>
 		<td> Biological Process </td>
 		<td> Gene Ontology </td>
-		<td> <a href="http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0071581">GO:0071581</a></td>
+		<td> <a href="http://amigo.geneontology.org/amigo/term/GO:0071581">GO:0071581</a></td>
 		<td> <a href="http://www.geneontology.org/">http://www.geneontology.org/</a> </td>
 		<td> urn:miriam:obo.go </td>
 	</tr>

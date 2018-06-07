@@ -1,4 +1,4 @@
-The JSON API uses [Basic access
+<a name="authentication"></a>The JSON API uses [Basic access
 authentication](https://en.wikipedia.org/wiki/Basic_access_authentication)
 where the *username* and *password* correspond to a registered user on
 the SEEK that is being accessed.
