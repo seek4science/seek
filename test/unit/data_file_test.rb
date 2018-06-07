@@ -81,7 +81,7 @@ class DataFileTest < ActiveSupport::TestCase
   test 'version created on save' do
     person = Factory(:person)
     User.with_current_user(person.user) do
-      df = Factory.build(:data_file,title: 'testing versions', policy: Factory(:private_policy),contributor:person)
+      df = Factory.build(:data_file,title: 'testing versions', policy: Factory(:private_policy), contributor: person.user)
       assert df.valid?
       refute df.persisted?
       df.save!
