@@ -411,6 +411,12 @@ module Seek
         ActiveRecord::Base.connection.select_one(sql).values[0].to_i
       end
 
+      def contributors
+        a = [contributor]
+        a += versions.map(&:contributor) if respond_to?(:versions)
+        a.compact.uniq
+      end
+
       private
 
       # Note, nil user means ALL users, not anonymous user. Anon user is represented with ;anonymous

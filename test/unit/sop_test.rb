@@ -237,4 +237,20 @@ class SopTest < ActiveSupport::TestCase
     assert_equal user, version.contributor
     assert_not_equal user, sop.contributor
   end
+
+  test 'contributors method on versioned asset' do
+    user = Factory(:person).user
+    sop = Factory(:sop, policy: Factory(:public_policy))
+    User.current_user = user
+
+    assert_not_equal user, sop.contributor
+
+    assert_difference('Sop::Version.count') do
+      sop.save_as_new_version
+    end
+
+    assert_equal 2, sop.reload.contributors.length
+    assert_includes sop.contributors, sop.contributor
+    assert_includes sop.contributors, user
+  end
 end
